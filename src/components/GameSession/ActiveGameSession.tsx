@@ -85,6 +85,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
   const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
   const [isToolsMenuOpen, setIsToolsMenuOpen] = React.useState(false);
+  const [isStreamingPreview, setIsStreamingPreview] = React.useState(false);
+  const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
   
@@ -314,6 +316,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     </button>
   );
 
+  const endingSuggestion = showEndingSuggestion && endingSuggestionReason
+    ? {
+        reason: endingSuggestionReason,
+        onAccept: handleAcceptEndingSuggestion,
+        onDismiss: handleRejectEndingSuggestion,
+      }
+    : isEndingSuggestionPreview
+      ? {
+          reason: 'Draft ending preview from Tools panel.',
+          onAccept: () => {
+            setIsEndingSuggestionPreview(false);
+            handleEndStoryClick();
+          },
+          onDismiss: () => setIsEndingSuggestionPreview(false),
+        }
+      : undefined;
+
   return (
     <ManuscriptSessionShell
       hud={
@@ -346,6 +365,25 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               onOpenJournalRoute={() =>
                 router.push(`/worlds/${worldId}/play/journal`)
               }
+              onOpenCharacterPanel={() => {
+                setIsCharacterSummaryExpanded(true);
+              }}
+              onSimulateTurn={() => {
+                const fallbackChoiceId = currentDecision?.options?.[0]?.id;
+                if (fallbackChoiceId) {
+                  handleChoiceSelected(fallbackChoiceId);
+                  return;
+                }
+                handleCustomSubmit('Simulate next turn');
+              }}
+              onToggleStreamingPreview={() => {
+                setIsStreamingPreview((prev) => !prev);
+              }}
+              isStreamingPreview={isStreamingPreview}
+              onToggleEndingSuggestionPreview={() => {
+                setIsEndingSuggestionPreview((prev) => !prev);
+              }}
+              isEndingSuggestionPreview={isEndingSuggestionPreview}
             />
           )}
           drawerTriggers={isProgressiveDisclosureEnabled}
@@ -359,6 +397,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onRetryError={autoSave.retry}
                 retryable
                 compact
+                className="manuscript-save-indicator"
               />
               <button
                 type="button"
@@ -386,7 +425,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
       ) : null}
       actionRail={
-        <ManuscriptActionRail isStreaming={isGenerating || isGeneratingChoices}>
+        <ManuscriptActionRail
+          isStreaming={isGenerating || isGeneratingChoices || isStreamingPreview}
+        >
           <div className="manuscript-action-rail-stack">
             <ActiveGameSessionChoicesColumn
               currentDecision={currentDecision}
@@ -403,11 +444,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               inputActions={sessionActions}
               endStoryAction={endStoryAction}
               isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
-              endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
-                reason: endingSuggestionReason,
-                onAccept: handleAcceptEndingSuggestion,
-                onDismiss: handleRejectEndingSuggestion,
-              } : undefined}
+              endingSuggestion={endingSuggestion}
             />
           </div>
         </ManuscriptActionRail>

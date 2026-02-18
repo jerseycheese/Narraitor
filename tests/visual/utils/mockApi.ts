@@ -1,5 +1,16 @@
 import { Page } from '@playwright/test';
 
+export interface MockApiOptions {
+  narrativeDelayMs?: number;
+  choicesDelayMs?: number;
+  endingDelayMs?: number;
+}
+
+const delay = async (milliseconds: number): Promise<void> => {
+  if (milliseconds <= 0) return;
+  await new Promise((resolve) => setTimeout(resolve, milliseconds));
+};
+
 /**
  * Mock API endpoints for deterministic visual tests
  *
@@ -13,14 +24,23 @@ import { Page } from '@playwright/test';
  * // All AI endpoints now return consistent mock data
  * ```
  */
-export async function mockApiEndpoints(page: Page): Promise<void> {
+export async function mockApiEndpoints(
+  page: Page,
+  options: MockApiOptions = {},
+): Promise<void> {
   console.log('Setting up API endpoint mocks...');
+  const {
+    narrativeDelayMs = 0,
+    choicesDelayMs = 0,
+    endingDelayMs = 0,
+  } = options;
 
   // Mock narrative generation endpoint
   await page.route('**/api/narrative/generate', async (route) => {
     console.log(
       '🚫 Intercepted narrative generation API call - using mock data'
     );
+    await delay(narrativeDelayMs);
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -45,6 +65,7 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
     console.log(
       '🚫 Intercepted narrative choices API call - using mock choices'
     );
+    await delay(choicesDelayMs);
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -163,6 +184,7 @@ export async function mockApiEndpoints(page: Page): Promise<void> {
   // Mock ending generation endpoint
   await page.route('**/api/narrative/ending', async (route) => {
     console.log('Intercepted ending generation API call');
+    await delay(endingDelayMs);
     await route.fulfill({
       status: 200,
       contentType: 'application/json',

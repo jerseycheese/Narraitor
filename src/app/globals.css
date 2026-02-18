@@ -782,7 +782,7 @@ body.manuscript-overlay-open {
 .manuscript-hud-panel {
   position: absolute;
   z-index: 40;
-  width: var(--manuscript-rail-width, 13rem);
+  width: min(var(--manuscript-rail-width, 18rem), calc(100vw - 1.5rem));
   max-height: min(70vh, 32rem);
   overflow-y: auto;
   background: var(--color-overlay-surface-strong);
@@ -902,15 +902,15 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-tools-menu-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: block;
+}
+
+.manuscript-tools-menu-items > * + * {
+  margin-top: 0.5rem;
 }
 
 .manuscript-tools-menu-item {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  display: block;
   width: 100%;
   padding: 0.5rem 0.75rem;
   border-radius: 2px;
@@ -958,6 +958,11 @@ body.manuscript-overlay-open {
 .manuscript-tools-menu-item-secondary:hover {
   background: var(--color-border);
   color: var(--color-text-primary);
+}
+
+.manuscript-tools-menu-divider {
+  border-top: 1px solid var(--color-border);
+  margin: 0.25rem 0;
 }
 
 .manuscript-characters-rail-section {
@@ -2325,6 +2330,10 @@ body.manuscript-overlay-open {
     align-items: center;
   }
 
+  .manuscript-hud-right-controls {
+    gap: 0.375rem;
+  }
+
   #manuscript-action-rail {
     padding: 0.625rem;
   }
@@ -2342,7 +2351,21 @@ body.manuscript-overlay-open {
   }
 }
 
+@media (width < 640px) {
+  .manuscript-save-indicator {
+    display: none;
+  }
+
+  .manuscript-header-controls {
+    gap: 0.375rem;
+  }
+}
+
 @media (width >= 1024px) {
+  .manuscript-tools-menu-item-mobile-only {
+    display: none;
+  }
+
   .manuscript-rail-mobile-choices {
     display: none;
   }

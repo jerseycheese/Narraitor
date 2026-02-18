@@ -65,7 +65,10 @@ test.describe('Manuscript Layout Specific Tests', () => {
     await expect(hudToggle).toBeVisible();
     await hudToggle.click();
 
-    await page.waitForSelector('[data-testid="character-summary"]');
+    await page.waitForSelector('.manuscript-hud-character-panel', {
+      state: 'visible',
+      timeout: 10000,
+    });
 
     const desktopLayout = await page.evaluate(() => {
       const rail = document.querySelector('.manuscript-characters-rail');

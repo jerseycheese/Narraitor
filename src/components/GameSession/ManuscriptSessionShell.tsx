@@ -86,8 +86,8 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           }
           if (toolsPanel) {
             toolsPanel.style.removeProperty('max-height');
-            toolsPanel.style.removeProperty('height');
             toolsPanel.style.removeProperty('width');
+            toolsPanel.style.removeProperty('height');
           }
           ticking = false;
           return;
@@ -130,7 +130,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           }
           if (toolsPanel) {
             toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
-            toolsPanel.style.height = `${panelAvailableHeight}px`;
+            toolsPanel.style.removeProperty('height');
             toolsPanel.style.width = `${panelWidth}px`;
           }
         } else {
@@ -142,7 +142,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           }
           if (toolsPanel) {
             toolsPanel.style.maxHeight = `${availableSpace}px`;
-            toolsPanel.style.height = `${availableSpace}px`;
+            toolsPanel.style.removeProperty('height');
             toolsPanel.style.width = `${panelWidth}px`;
           }
         }
