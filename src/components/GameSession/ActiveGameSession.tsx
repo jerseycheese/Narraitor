@@ -163,9 +163,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (activeDrawer !== null) {
+          setActiveDrawer(null);
+          return;
+        }
         setIsCharacterSummaryExpanded(false);
         setIsToolsMenuOpen(false);
-        setActiveDrawer(null);
       }
     };
 
@@ -358,7 +361,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               activeDrawer={activeDrawer}
               onOpenDrawer={(drawerType) => {
                 setActiveDrawer(drawerType);
-                setIsToolsMenuOpen(false);
                 setIsCharacterSummaryExpanded(false);
               }}
               onClosePanel={() => setIsToolsMenuOpen(false)}
@@ -403,7 +405,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 type="button"
                 onClick={onStartNew}
                 title="Start New Session"
-                className="manuscript-hud-text-button"
+                className="manuscript-hud-text-button manuscript-hud-reset-button"
               >
                 Reset
               </button>
@@ -424,6 +426,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
          (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0) ? (
         <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
       ) : null}
+      mobileTopContent={
+        isProgressiveDisclosureEnabled ? (
+          <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
+        ) : null
+      }
       actionRail={
         <ManuscriptActionRail
           isStreaming={isGenerating || isGeneratingChoices || isStreamingPreview}
@@ -450,9 +457,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </ManuscriptActionRail>
       }
     >
-      {isProgressiveDisclosureEnabled && (
-        <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
-      )}
       <ActiveGameSessionNarrativeColumn
         controllerKey={controllerKey}
         worldId={worldId}

@@ -194,7 +194,7 @@ test.describe.serial('Issue #1065 audit exports', () => {
         );
         await appPage.screenshot({
           path: appScreenshotPath,
-          fullPage: true,
+          fullPage: false,
         });
         (metrics.app as Record<string, Record<string, unknown>>).light[
           `${viewport.name}:${state.id}`
@@ -212,7 +212,7 @@ test.describe.serial('Issue #1065 audit exports', () => {
         );
         await prototypePage.screenshot({
           path: prototypeScreenshotPath,
-          fullPage: true,
+          fullPage: false,
         });
         (metrics.prototype as Record<string, Record<string, unknown>>).light[
           `${viewport.name}:${state.id}`
@@ -234,7 +234,7 @@ test.describe.serial('Issue #1065 audit exports', () => {
           ISSUE_1065_APP_SCREENSHOT_DIR,
           screenshotName('app', 'steady', viewport.name, viewport.width, 'dark'),
         ),
-        fullPage: true,
+        fullPage: false,
       });
       (metrics.app as Record<string, Record<string, unknown>>).dark[
         `${viewport.name}:steady`
@@ -261,7 +261,7 @@ test.describe.serial('Issue #1065 audit exports', () => {
             'dark',
           ),
         ),
-        fullPage: true,
+        fullPage: false,
       });
       (metrics.prototype as Record<string, Record<string, unknown>>).dark[
         `${viewport.name}:steady`

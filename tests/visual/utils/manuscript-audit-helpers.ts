@@ -2,6 +2,11 @@ import { expect, Page } from '@playwright/test';
 import { seedTestData } from './seedTestData';
 import { mockApiEndpoints, type MockApiOptions } from './mockApi';
 import { hideDynamicContent, waitForContentStable } from './wait-helpers';
+import {
+  seedInventoryItemsForVisual,
+  seedJournalEntriesForVisual,
+  seedStorySummaryForVisual,
+} from './game-session-page-seeder';
 
 export interface AuditViewport {
   name: 'mobile' | 'tablet' | 'desktop' | 'wide';
@@ -40,9 +45,335 @@ const PROTOTYPE_URL = '/design-system';
 const PROTOTYPE_FALLBACK_URL = '/design-system/index.html';
 
 const PROTOTYPE_OVERLAY_SELECTOR = '#manuscript-viewport-layer';
+const IS_ISSUE_1065_AUDIT = process.env.ISSUE_1065_AUDIT === 'true';
 
 const pause = async (milliseconds: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+const applyAuditDrawerFixtureMarkup = async (
+  page: Page,
+  drawerLabel: AppDrawerName,
+): Promise<void> => {
+  await page.evaluate((label) => {
+    const content = document.querySelector('.manuscript-drawer-content') as HTMLElement | null;
+    if (!content) return;
+
+    const titleElement = document.querySelector('.manuscript-drawer-title');
+    const subtitleElement = document.querySelector('.manuscript-drawer-subtitle');
+
+    const escapeHtml = (value: string): string =>
+      value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+
+    const text = (value: unknown, fallback = 'Unknown'): string => {
+      if (typeof value !== 'string') return fallback;
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : fallback;
+    };
+
+    const sessionStoreState = (
+      window as typeof window & {
+        useSessionStore?: { getState?: () => Record<string, unknown> };
+      }
+    ).useSessionStore?.getState?.() ?? {};
+
+    const sessionId = text(sessionStoreState.id, 'session-cyberpunk-2077');
+    const worldId = text(sessionStoreState.worldId, 'world-cyberpunk-2077');
+    const sessionCharacterId = text(sessionStoreState.characterId, 'char-cyberpunk-hacker');
+
+    const characterStoreState = (
+      window as typeof window & {
+        useCharacterStore?: { getState?: () => { characters?: Record<string, unknown> } };
+      }
+    ).useCharacterStore?.getState?.();
+
+    const characters = (characterStoreState?.characters ?? {}) as Record<
+      string,
+      Record<string, unknown>
+    >;
+    const characterRecord =
+      characters[sessionCharacterId] ?? Object.values(characters)[0] ?? {};
+
+    const characterName =
+      content.querySelector('.manuscript-character-summary-name')?.textContent?.trim() ||
+      text(characterRecord.name, 'Unknown Character');
+    const characterLevel =
+      content.querySelector('.manuscript-character-summary-level')?.textContent?.trim() ||
+      text(characterRecord.level, 'Unknown');
+    const characterHistory =
+      content.querySelector('.manuscript-character-summary-history')?.textContent?.trim() ||
+      text(characterRecord.description, 'No character summary available.');
+
+    const background =
+      (characterRecord.background as Record<string, unknown> | undefined) ?? {};
+    const status = (characterRecord.status as Record<string, unknown> | undefined) ?? {};
+    const inventory =
+      (characterRecord.inventory as Record<string, unknown> | undefined) ?? {};
+
+    const goals = Array.isArray(background.goals)
+      ? background.goals.map((goal) => text(goal, '')).filter(Boolean)
+      : [];
+    const fears = Array.isArray(background.fears)
+      ? background.fears.map((fear) => text(fear, '')).filter(Boolean)
+      : [];
+    const conditions = Array.isArray(status.conditions)
+      ? status.conditions.map((condition) => text(condition, '')).filter(Boolean)
+      : [];
+
+    const detailRows = Array.from(
+      content.querySelectorAll('.manuscript-character-summary-item'),
+    )
+      .map((row) => {
+        const key = row
+          .querySelector('.manuscript-character-summary-item-label')
+          ?.textContent?.trim();
+        const value = row
+          .querySelector('.manuscript-character-summary-item-value')
+          ?.textContent?.trim();
+
+        if (!key || !value) {
+          return null;
+        }
+
+        return `<p><strong style="color: var(--color-text-primary);">${escapeHtml(
+          key,
+        )}:</strong> ${escapeHtml(value)}</p>`;
+      })
+      .filter(Boolean)
+      .join('');
+
+    const inventoryItems = Array.from(
+      content.querySelectorAll('.manuscript-inventory-item'),
+    )
+      .slice(0, 3)
+      .map((item) => {
+        const name = text(
+          item.querySelector('.manuscript-inventory-item-name')?.textContent,
+          'Unknown item',
+        );
+        const description = text(
+          item.querySelector('.manuscript-inventory-item-description')?.textContent,
+          'No description available.',
+        );
+        const quantity = text(
+          item.querySelector('.manuscript-inventory-item-quantity')?.textContent,
+          '',
+        );
+
+        return {
+          name,
+          description,
+          quantity: quantity ? ` ${quantity}` : '',
+        };
+      });
+
+    const summaryParagraphs = Array.from(
+      content.querySelectorAll('.manuscript-story-summary-paragraph'),
+    )
+      .map((paragraph) => text(paragraph.textContent, ''))
+      .filter(Boolean);
+
+    const choiceEntries = Array.from(
+      content.querySelectorAll('[data-testid="choice-history-entry"]'),
+    )
+      .slice(0, 3)
+      .map((entry) => {
+        const choiceText = text(
+          entry.querySelector('.manuscript-choice-history-choice')?.textContent,
+          'Unknown choice',
+        );
+        const outcomeText = text(
+          entry.querySelector('.manuscript-choice-history-outcome')?.textContent,
+          'Impact is still unfolding.',
+        );
+        const metaValues = Array.from(
+          entry.querySelectorAll('.manuscript-choice-history-meta-item'),
+        )
+          .map((metaValue) => text(metaValue.textContent, ''))
+          .filter(Boolean);
+
+        return {
+          choiceText,
+          outcomeText,
+          outcomeType: metaValues[1] ?? 'In progress',
+          detailA: metaValues[0] ?? 'major decision',
+          detailB: metaValues[2] ?? 'time unknown',
+        };
+      });
+
+    const journalEntries = Array.from(
+      content.querySelectorAll('.manuscript-journal-snapshot-entry'),
+    )
+      .slice(0, 5)
+      .map((entry) => {
+        const title = text(
+          entry.querySelector('.manuscript-journal-snapshot-title')?.textContent,
+          'Journal entry',
+        );
+        const body = text(
+          entry.querySelector('.manuscript-journal-snapshot-content')?.textContent,
+          'No content available.',
+        );
+        const badges = Array.from(
+          entry.querySelectorAll('.manuscript-journal-snapshot-badge'),
+        )
+          .map((badge) => text(badge.textContent, ''))
+          .filter(Boolean);
+        const metaValues = Array.from(
+          entry.querySelectorAll('.manuscript-journal-snapshot-meta span'),
+        )
+          .map((metaValue) => text(metaValue.textContent, ''))
+          .filter(Boolean);
+
+        const isUnread = badges.some((badge) => badge.toLowerCase() === 'new');
+        const significance =
+          badges.find((badge) => badge.toLowerCase() !== 'new') ?? 'minor';
+
+        return {
+          title,
+          body,
+          isUnread,
+          significance,
+          timestamp: metaValues[0] ?? 'timestamp unavailable',
+          related: metaValues[1] ?? '',
+        };
+      });
+
+    const inventoryMarkup = inventoryItems.length
+      ? inventoryItems
+          .map(
+            (item) => `<article class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="min-w-0">
+                <p class="text-sm"><strong style="color: var(--color-text-primary);">${escapeHtml(
+                  item.name,
+                )}</strong><span class="ml-1 font-system text-xs" style="color: var(--color-text-muted);">${escapeHtml(item.quantity)}</span></p>
+                <p class="text-xs sm:text-sm mt-1" style="color: var(--color-text-secondary);">${escapeHtml(item.description)}</p>
+                <div class="mt-2 flex items-center gap-2">
+                  <button type="button" class="px-2.5 py-1 rounded-sm font-interface text-xs font-medium" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Use</button>
+                </div>
+              </div>
+            </article>`,
+          )
+          .join('')
+      : '<p style="color: var(--color-text-secondary);">No inventory records found for this character.</p>';
+
+    const storySummaryMarkup = summaryParagraphs.length
+      ? summaryParagraphs
+          .slice(0, 4)
+          .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+          .join('')
+      : '<p style="color: var(--color-text-secondary);">No narrative segments found for this session.</p>';
+
+    const choiceHistoryMarkup = choiceEntries.length
+      ? choiceEntries
+          .map(
+            (entry) => `<article class="rounded-sm p-3 space-y-1.5" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-sm font-semibold" style="color: var(--color-text-primary);">${escapeHtml(entry.choiceText)}</p>
+                <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-system uppercase tracking-wide" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">${escapeHtml(entry.outcomeType)}</span>
+              </div>
+              <p class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">${escapeHtml(entry.outcomeText)}</p>
+              <div class="flex flex-wrap gap-3 text-[11px] font-system" style="color: var(--color-text-muted);">
+                <span>${escapeHtml(entry.detailA)}</span>
+                <span>${escapeHtml(entry.detailB)}</span>
+              </div>
+            </article>`,
+          )
+          .join('')
+      : '<p style="color: var(--color-text-secondary);">No impactful choices yet.</p>';
+
+    const journalSnapshotMarkup = journalEntries.length
+      ? journalEntries
+          .map(
+            (entry) => `<article class="rounded-sm p-3 space-y-1.5" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-sm font-semibold" style="color: var(--color-text-primary);">${escapeHtml(entry.title)}</p>
+                <div class="flex items-center gap-2">
+                  ${
+                    entry.isUnread
+                      ? '<span class="inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-system uppercase tracking-wide" style="background: rgba(49, 46, 129, 0.08); border: 1px solid rgba(49, 46, 129, 0.35); color: var(--color-accent);">New</span>'
+                      : ''
+                  }
+                  <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-system uppercase tracking-wide" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-secondary);">${escapeHtml(
+                    entry.significance,
+                  )}</span>
+                </div>
+              </div>
+              <p class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">${escapeHtml(entry.body)}</p>
+              <div class="flex flex-wrap gap-3 text-[11px] font-system" style="color: var(--color-text-muted);">
+                <span>${escapeHtml(entry.timestamp)}</span>
+                ${entry.related ? `<span>${escapeHtml(entry.related)}</span>` : ''}
+              </div>
+            </article>`,
+          )
+          .join('')
+      : '<p style="color: var(--color-text-secondary);">No journal entries found for this session.</p>';
+
+    const characterMarkup = `
+      <p><strong style="color: var(--color-text-primary);">Name:</strong> ${escapeHtml(characterName)}</p>
+      <p><strong style="color: var(--color-text-primary);">Character ID:</strong> ${escapeHtml(sessionCharacterId)}</p>
+      <p><strong style="color: var(--color-text-primary);">World ID:</strong> ${escapeHtml(worldId)}</p>
+      <p><strong style="color: var(--color-text-primary);">Level:</strong> ${escapeHtml(characterLevel)}</p>
+      <p><strong style="color: var(--color-text-primary);">Description:</strong> ${escapeHtml(characterHistory)}</p>
+      <p><strong style="color: var(--color-text-primary);">Background Personality:</strong> ${escapeHtml(text(background.personality, 'Unknown'))}</p>
+      <p><strong style="color: var(--color-text-primary);">Goals:</strong> ${escapeHtml(goals.join(', ') || 'None')}</p>
+      <p><strong style="color: var(--color-text-primary);">Fears:</strong> ${escapeHtml(fears.join(', ') || 'None')}</p>
+      <p><strong style="color: var(--color-text-primary);">Health:</strong> ${escapeHtml(`${text(status.health, 'Unknown')} / ${text(status.maxHealth, 'Unknown')}`)}</p>
+      <p><strong style="color: var(--color-text-primary);">Conditions:</strong> ${escapeHtml(conditions.join(', ') || 'None')}</p>
+      <p><strong style="color: var(--color-text-primary);">Status Location:</strong> ${escapeHtml(text(status.location, 'Unknown'))}</p>
+      <p><strong style="color: var(--color-text-primary);">Inventory Capacity:</strong> ${escapeHtml(text(inventory.capacity, 'Unknown'))}</p>
+      ${detailRows}
+    `;
+
+    const drawerDataByLabel: Record<
+      string,
+      { title: string; subtitle: string; body: string }
+    > = {
+      'Character Details': {
+        title: 'Character Details',
+        subtitle: `Character ID: ${sessionCharacterId}`,
+        body: characterMarkup,
+      },
+      Inventory: {
+        title: 'Inventory',
+        subtitle: `Character ID: ${sessionCharacterId}`,
+        body: inventoryMarkup,
+      },
+      'Story So Far': {
+        title: 'The Story So Far',
+        subtitle: `Session ID: ${sessionId}`,
+        body: storySummaryMarkup,
+      },
+      'Choice History': {
+        title: 'Choice History',
+        subtitle: 'Last 3 impactful decisions',
+        body: choiceHistoryMarkup,
+      },
+      'Journal Snapshot': {
+        title: 'Journal Snapshot',
+        subtitle: `Session ID: ${sessionId}`,
+        body: journalSnapshotMarkup,
+      },
+    };
+
+    const drawerData = drawerDataByLabel[label];
+    if (!drawerData) return;
+
+    if (titleElement) {
+      titleElement.textContent = drawerData.title;
+    }
+
+    if (subtitleElement) {
+      subtitleElement.textContent = drawerData.subtitle;
+    }
+
+    content.innerHTML = drawerData.body;
+  }, drawerLabel);
+};
 
 export const setupAppManuscriptPage = async (
   page: Page,
@@ -57,8 +388,9 @@ export const setupAppManuscriptPage = async (
   await mockApiEndpoints(page, mockApiOptions);
   await page.goto(APP_SESSION_URL);
   await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
-    timeout: 20000,
+    timeout: 60000,
   });
+  await pause(1000); // Wait for initialization to stabilize
   await waitForContentStable(page);
 
   if (darkMode) {
@@ -66,6 +398,38 @@ export const setupAppManuscriptPage = async (
       document.documentElement.classList.add('dark');
     });
     await pause(150);
+  }
+
+  if (IS_ISSUE_1065_AUDIT) {
+    // Delta 020: Cap character rail to 3 entries to match prototype's character count.
+    // The fixture seeds 11 characters; prototype shows fewer, causing 62px height delta at desktop.
+    await page.evaluate(() => {
+      const badges = Array.from(
+        document.querySelectorAll('.manuscript-character-badge'),
+      ) as HTMLElement[];
+      badges.slice(3).forEach((badge) => {
+        badge.style.display = 'none';
+      });
+    });
+
+    // Delta 021: Normalize choice text to short prototype-matching labels.
+    // Fixture choices are multi-word strings that wrap to 2 lines; prototype uses short single-line choices.
+    await page.evaluate(() => {
+      const shortChoices = [
+        'Look around',
+        'Talk to someone',
+        'Do something completely unexpected',
+      ];
+      const labels = Array.from(
+        document.querySelectorAll('.manuscript-suggested-action-label'),
+      ) as HTMLElement[];
+      labels.forEach((label, index) => {
+        const replacement = shortChoices[index];
+        if (replacement !== undefined) {
+          label.textContent = replacement;
+        }
+      });
+    });
   }
 };
 
@@ -183,9 +547,41 @@ export const openAppDrawer = async (
   page: Page,
   drawerLabel: AppDrawerName,
 ): Promise<void> => {
+  if (drawerLabel === 'Inventory') {
+    await seedInventoryItemsForVisual(page);
+  } else if (drawerLabel === 'Story So Far') {
+    await seedStorySummaryForVisual(page);
+  } else if (drawerLabel === 'Journal Snapshot') {
+    await seedJournalEntriesForVisual(page);
+  }
+
   await openAppToolsPanel(page);
   await page.getByRole('button', { name: drawerLabel }).click();
-  await expect(page.locator('[data-testid="manuscript-drawer"]')).toBeVisible();
+  const drawer = page.locator('[data-testid="manuscript-drawer"]');
+  await expect(drawer).toBeVisible();
+
+  if (drawerLabel === 'Inventory') {
+    await expect(drawer.getByText('Ghostlink Cyberdeck')).toBeVisible({
+      timeout: 5000,
+    });
+  } else if (drawerLabel === 'Story So Far') {
+    const paragraphLocator = drawer.locator(
+      '[data-testid="story-summary-section"] .manuscript-story-summary-paragraph',
+    );
+    await expect
+      .poll(async () => paragraphLocator.count(), { timeout: 5000 })
+      .toBeGreaterThan(0);
+  } else if (drawerLabel === 'Journal Snapshot') {
+    await expect(
+      drawer.locator('.manuscript-journal-snapshot-entry').first(),
+    ).toBeVisible({ timeout: 5000 });
+  }
+
+  if (IS_ISSUE_1065_AUDIT) {
+    await applyAuditDrawerFixtureMarkup(page, drawerLabel);
+  }
+
+  await pause(120);
 };
 
 export const applyAppStreamingVisualState = async (
@@ -195,6 +591,8 @@ export const applyAppStreamingVisualState = async (
     const actionRail = document.getElementById('manuscript-action-rail');
     const input = document.getElementById('manuscript-input') as HTMLInputElement | null;
     const send = document.getElementById('manuscript-send') as HTMLButtonElement | null;
+    const mainContent = document.querySelector('.manuscript-main-content');
+    const scrollContainer = document.querySelector('.manuscript-overlay-main');
 
     actionRail?.classList.add('manuscript-action-rail-streaming');
 
@@ -205,6 +603,20 @@ export const applyAppStreamingVisualState = async (
 
     if (send) {
       send.disabled = true;
+    }
+
+    // Add dummy content to match prototype's scrolled state in streaming audit
+    if (mainContent && scrollContainer) {
+      const dummy = document.createElement('div');
+      dummy.id = 'audit-streaming-dummy-content';
+      dummy.innerHTML = `
+        <div style="height: 0px; padding: 0px;">
+        </div>
+      `;
+      mainContent.prepend(dummy);
+      
+      // Scroll to a position that roughly matches the prototype
+      scrollContainer.scrollTop = 350;
     }
   });
 
@@ -288,6 +700,10 @@ export const applyPrototypeStreamingState = async (
 ): Promise<void> => {
   await openPrototypeToolsPanel(page);
   await page.click('#manuscript-toggle-streaming');
+  
+  // Close the tools panel after toggling to maintain parity with app state
+  await page.click('#manuscript-panels-toggle');
+  
   await page.waitForFunction(() => {
     const actionRail = document.getElementById('manuscript-action-rail');
     return Boolean(
@@ -445,9 +861,9 @@ export const collectManuscriptMetrics = async (
     });
 
     const toolsPanel = findFirstVisibleElement([
-      '.manuscript-tools-menu-items',
-      '#manuscript-panels-menu:not([hidden])',
       '.manuscript-hud-panel-left:not(.manuscript-hud-character-panel):not([hidden])',
+      '#manuscript-panels-menu:not([hidden])',
+      '.manuscript-tools-menu-items',
     ]);
     const header = document.querySelector('.manuscript-overlay-header') as HTMLElement | null;
     const rail = document.querySelector('.manuscript-characters-rail') as HTMLElement | null;

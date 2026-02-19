@@ -8,6 +8,7 @@ interface ManuscriptSessionShellProps {
   hud?: React.ReactNode;
   actionRail?: React.ReactNode;
   marginContent?: React.ReactNode;
+  mobileTopContent?: React.ReactNode;
   className?: string;
 }
 
@@ -16,6 +17,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
   hud,
   actionRail,
   marginContent,
+  mobileTopContent,
   className,
 }) => {
   const railRef = useRef<HTMLElement>(null);
@@ -30,7 +32,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const width = entry.contentRect.width;
+        const width = entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width;
         if (width > 0) {
           container.style.setProperty('--manuscript-rail-width', `${width}px`);
         } else {
@@ -43,42 +45,47 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  // Position character rail at the bottom (above action rail) on desktop
+  // Match prototype rail/panel geometry so desktop capture metrics stay aligned.
   useEffect(() => {
-    // Only run in browser environment
     if (typeof window === 'undefined' || !window.matchMedia) return;
 
-    // Use stable refs — container, header, and action rail always render
     const container = viewportInnerRef.current;
     const header = headerRef.current;
-    const actionRailEl = actionRailRef.current;
+    const actionRailContainer = actionRailRef.current;
 
-    if (!container || !header || !actionRailEl) return;
+    if (!container || !header || !actionRailContainer) return;
 
-    let ticking = false;
+    const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
+    let frameId: number | null = null;
+
     const syncPosition = () => {
-      if (ticking) return;
-      ticking = true;
+      if (frameId !== null) return;
 
-      window.requestAnimationFrame(() => {
-        // Read railRef fresh each call so we pick it up after it renders
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+
         const rail = railRef.current;
-        const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
+        const actionRailElement = actionRailContainer.querySelector(
+          '#manuscript-action-rail',
+        ) as HTMLElement | null;
+        const mainStage = rail?.closest('.manuscript-main-stage') as HTMLElement | null;
 
-        // Find dropdown panels (Character Snapshot, Tools menu)
         const characterPanel = document.querySelector('.manuscript-hud-character-panel') as HTMLElement | null;
-        const toolsPanels = document.querySelectorAll('.manuscript-hud-panel-left:not(.manuscript-hud-character-panel)');
-        const toolsPanel = toolsPanels[0] as HTMLElement | null;
+        const toolsPanel = document.querySelector(
+          '.manuscript-hud-panel-left:not(.manuscript-hud-character-panel)',
+        ) as HTMLElement | null;
+
+        if (!rail || !actionRailElement) return;
 
         if (!desktopMediaQuery.matches) {
-          if (rail) {
-            rail.style.removeProperty('position');
-            rail.style.removeProperty('bottom');
-            rail.style.removeProperty('left');
-            rail.style.removeProperty('width');
-            rail.style.removeProperty('max-height');
-            rail.style.removeProperty('z-index');
-          }
+          rail.style.removeProperty('position');
+          rail.style.removeProperty('top');
+          rail.style.removeProperty('bottom');
+          rail.style.removeProperty('left');
+          rail.style.removeProperty('width');
+          rail.style.removeProperty('max-height');
+          rail.style.removeProperty('z-index');
+
           if (characterPanel) {
             characterPanel.style.removeProperty('max-height');
             characterPanel.style.removeProperty('height');
@@ -89,64 +96,51 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
             toolsPanel.style.removeProperty('width');
             toolsPanel.style.removeProperty('height');
           }
-          ticking = false;
           return;
         }
 
+        if (!mainStage) return;
+
         const headerRect = header.getBoundingClientRect();
-        const actionRailRect = actionRailEl.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
+        const actionRailRect = actionRailElement.getBoundingClientRect();
+        const mainStageRect = mainStage.getBoundingClientRect();
         const gapPx = 8;
 
-        // Available vertical space between header and action rail
         const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
-        const maxRailHeight = Math.floor(availableSpace / 2);
-        // Panel width matches left column (~⅓ of container, capped at 192px)
-        const panelWidth = Math.min(Math.floor(containerRect.width / 3), 192);
+        const halfSpace = Math.floor(availableSpace / 2);
+        const panelTop = headerRect.bottom + gapPx;
 
-        if (rail) {
-          const mainStage = rail.closest('.manuscript-main-stage') as HTMLElement | null;
-          const railLeft = mainStage ? mainStage.getBoundingClientRect().left : containerRect.left;
+        const railRect = rail.getBoundingClientRect();
+        const railHeight = Math.min(railRect.height, halfSpace);
+        const railTop = actionRailRect.top - railHeight - gapPx;
+        const railWidth = Math.max(0, Math.min(railRect.width, mainStageRect.width));
 
-          // Position rail at the bottom of the viewport, just above the action rail
-          const bottomOffset = window.innerHeight - actionRailRect.top + gapPx;
-
-          rail.style.position = 'fixed';
-          rail.style.removeProperty('top');
-          rail.style.bottom = `${bottomOffset}px`;
-          rail.style.left = `${railLeft}px`;
-          rail.style.width = `${panelWidth}px`;
-          rail.style.maxHeight = `${maxRailHeight}px`;
-          rail.style.zIndex = '20';
-
-          // Re-measure rail after positioning to calculate accurate panel height
-          const railRect = rail.getBoundingClientRect();
-          const panelAvailableHeight = railRect.top - headerRect.bottom - (gapPx * 3);
-
-          if (characterPanel) {
-            characterPanel.style.maxHeight = `${panelAvailableHeight}px`;
-            characterPanel.style.height = `${panelAvailableHeight}px`;
-            characterPanel.style.width = `${panelWidth}px`;
-          }
-          if (toolsPanel) {
-            toolsPanel.style.maxHeight = `${panelAvailableHeight}px`;
-            toolsPanel.style.removeProperty('height');
-            toolsPanel.style.width = `${panelWidth}px`;
-          }
-        } else {
-          // No rail — panels fill all available space
-          if (characterPanel) {
-            characterPanel.style.maxHeight = `${availableSpace}px`;
-            characterPanel.style.height = `${availableSpace}px`;
-            characterPanel.style.width = `${panelWidth}px`;
-          }
-          if (toolsPanel) {
-            toolsPanel.style.maxHeight = `${availableSpace}px`;
-            toolsPanel.style.removeProperty('height');
-            toolsPanel.style.width = `${panelWidth}px`;
-          }
+        if (characterPanel) {
+          characterPanel.style.position = 'fixed';
+          characterPanel.style.maxHeight = `${halfSpace}px`;
+          characterPanel.style.top = `${panelTop}px`;
+          characterPanel.style.left = `${mainStageRect.left}px`;
+          characterPanel.style.width = `${railWidth}px`;
+          characterPanel.style.zIndex = '40';
+          characterPanel.style.removeProperty('height');
         }
-        ticking = false;
+        if (toolsPanel) {
+          toolsPanel.style.position = 'fixed';
+          toolsPanel.style.maxHeight = `${halfSpace}px`;
+          toolsPanel.style.top = `${panelTop}px`;
+          toolsPanel.style.left = `${mainStageRect.left}px`;
+          toolsPanel.style.width = `${railWidth}px`;
+          toolsPanel.style.zIndex = '40';
+          toolsPanel.style.removeProperty('height');
+        }
+
+        rail.style.maxHeight = `${halfSpace}px`;
+        rail.style.position = 'fixed';
+        rail.style.top = `${railTop}px`;
+        rail.style.removeProperty('bottom');
+        rail.style.left = `${mainStageRect.left}px`;
+        rail.style.width = `${railWidth}px`;
+        rail.style.zIndex = '20';
       });
     };
 
@@ -155,16 +149,19 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     const resizeObserver = new ResizeObserver(() => {
       syncPosition();
     });
-    resizeObserver.observe(actionRailEl);
+    resizeObserver.observe(actionRailContainer);
     resizeObserver.observe(container);
+    if (railRef.current) {
+      resizeObserver.observe(railRef.current);
+    }
 
-    const mediaQuery = window.matchMedia('(min-width: 1024px)');
-    mediaQuery.addEventListener('change', syncPosition);
+    const handleMediaChange = () => {
+      syncPosition();
+    };
+    desktopMediaQuery.addEventListener('change', handleMediaChange);
 
-    // Watch entire container so we detect when the rail appears (marginContent becomes non-null)
     const mutationObserver = new MutationObserver(() => {
       syncPosition();
-      // Start observing the rail for size changes once it exists
       if (railRef.current) {
         resizeObserver.observe(railRef.current);
       }
@@ -175,9 +172,12 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     window.addEventListener('scroll', syncPosition);
 
     return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
       resizeObserver.disconnect();
       mutationObserver.disconnect();
-      mediaQuery.removeEventListener('change', syncPosition);
+      desktopMediaQuery.removeEventListener('change', handleMediaChange);
       window.removeEventListener('resize', syncPosition);
       window.removeEventListener('scroll', syncPosition);
     };
@@ -198,26 +198,32 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           </header>
 
           {/* Main Narrative Stage */}
-          <main className="manuscript-overlay-main">
-            <div className={cssClasses("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
-              {marginContent && (
-                <aside
-                  className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
-                  aria-label="Characters present"
-                  ref={railRef}
-                >
-                  {marginContent}
-                </aside>
-              )}
-
-              <div className="manuscript-main-content">
-                <div className="max-w-3xl mx-auto">
-                  {children}
-                </div>
+          <main className="manuscript-overlay-main pb-4">
+            {mobileTopContent && (
+              <div className="lg:hidden">
+                {mobileTopContent}
               </div>
+            )}
 
-              <div className="manuscript-rail-spacer" aria-hidden="true" />
-            </div>
+            <div className={cssClasses("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
+                {marginContent && (
+                  <aside
+                    className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
+                    aria-label="Characters present"
+                    ref={railRef}
+                  >
+                    {marginContent}
+                  </aside>
+                )}
+
+                <div className="manuscript-main-content">
+                  <div className="max-w-3xl mx-auto">
+                    {children}
+                  </div>
+                </div>
+
+                <div className="manuscript-rail-spacer" aria-hidden="true" />
+              </div>
           </main>
 
           {/* Docked Action Rail */}

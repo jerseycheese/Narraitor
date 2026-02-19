@@ -14,12 +14,22 @@ export const SAMPLE_NARRATIVE_SEGMENTS: NarrativeSegment[] = [
     content:
       'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The *Arasaka building* looms ahead, its security algorithms pulsing like a **digital heartbeat**.',
     type: 'scene' as const,
-    characterIds: ['char-cyberpunk-hacker'],
+    characterIds: ['char-cyberpunk-hacker', 'char-cyberpunk-operative'],
     metadata: {
       mood: 'tense',
       location: 'Starting Location',
       tags: ['intro'],
-      characterIds: ['char-cyberpunk-hacker'],
+      characterIds: [
+        'char-cyberpunk-hacker',
+        'char-cyberpunk-operative',
+        'npc-fixer',
+        'npc-guard-1',
+        'npc-guard-2',
+        'npc-guard-3',
+        'npc-drone-1',
+        'npc-drone-2',
+        'npc-civilian-1'
+      ],
     },
     timestamp: new Date('2024-01-01T02:00:00.000Z'),
     createdAt: '2024-01-01T02:00:00.000Z',
@@ -72,12 +82,12 @@ export const SAMPLE_NARRATIVE_SEGMENTS: NarrativeSegment[] = [
     content:
       'Hours pass. The city breathes outside, unaware of the digital heist unfolding in the shadows.',
     type: 'transition' as const,
-    characterIds: ['char-cyberpunk-hacker'],
+    characterIds: ['char-cyberpunk-hacker', 'npc-raven', 'npc-kira'],
     metadata: {
       mood: 'neutral',
       location: 'Arasaka building',
       tags: [],
-      characterIds: ['char-cyberpunk-hacker'],
+      characterIds: ['char-cyberpunk-hacker', 'npc-raven', 'npc-kira'],
     },
     timestamp: new Date('2024-01-01T02:03:00.000Z'),
     createdAt: '2024-01-01T02:03:00.000Z',

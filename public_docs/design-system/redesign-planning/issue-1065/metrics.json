@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-18T18:48:33.739Z",
+  "generatedAt": "2026-02-19T17:22:38.871Z",
   "breakpoints": [
     {
       "name": "mobile",
@@ -61,16 +61,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -160,16 +160,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": -176,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 658
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -259,16 +259,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -306,11 +306,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 356,
-            "top": 53,
+            "height": 359,
+            "top": 44,
             "left": 12,
             "right": 300,
-            "bottom": 409
+            "bottom": 403
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -368,16 +368,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -415,11 +415,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 488,
-            "top": 53,
+            "height": 472,
+            "top": 44,
             "left": 12,
             "right": 300,
-            "bottom": 541
+            "bottom": 515
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -429,25 +429,25 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 437,
-            "top": 91,
+            "height": 421,
+            "top": 81,
             "left": 25,
             "right": 287,
-            "bottom": 528
+            "bottom": 502
           },
           {
             "selector": ".manuscript-tools-menu-item",
             "exists": true,
-            "display": "block",
+            "display": "inline-block",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 36,
-            "top": 91,
+            "height": 34,
+            "top": 81,
             "left": 25,
             "right": 287,
-            "bottom": 127
+            "bottom": 115
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -459,9 +459,9 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 48,
-          "toolsPanelLeftToRailLeft": 25,
-          "toolsPanelWidthToRailWidthDelta": 262
+          "toolsPanelTopToHeaderBottom": 1,
+          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelWidthToRailWidthDelta": 288
         }
       },
       "mobile:drawer-character": {
@@ -501,16 +501,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -542,21 +542,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 44,
+            "left": 12,
+            "right": 300,
+            "bottom": 513
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 500
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 115
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 375,
@@ -571,17 +601,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 374,
-            "height": 736,
-            "top": 76,
-            "left": 1,
-            "right": 375,
-            "bottom": 812
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 342,
+            "height": 744,
+            "top": 84,
+            "left": 17,
+            "right": 359,
+            "bottom": 828
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 1,
+          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "mobile:drawer-inventory": {
         "viewport": {
@@ -620,16 +654,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -661,21 +695,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 44,
+            "left": 12,
+            "right": 300,
+            "bottom": 513
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 500
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 115
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 375,
@@ -690,17 +754,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 374,
-            "height": 736,
-            "top": 76,
-            "left": 1,
-            "right": 375,
-            "bottom": 812
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 342,
+            "height": 372,
+            "top": 84,
+            "left": 17,
+            "right": 359,
+            "bottom": 456
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 1,
+          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "mobile:drawer-story-summary": {
         "viewport": {
@@ -739,16 +807,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -780,21 +848,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 44,
+            "left": 12,
+            "right": 300,
+            "bottom": 513
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 500
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 115
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 375,
@@ -809,17 +907,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 374,
-            "height": 736,
-            "top": 76,
-            "left": 1,
-            "right": 375,
-            "bottom": 812
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 342,
+            "height": 48,
+            "top": 84,
+            "left": 17,
+            "right": 359,
+            "bottom": 132
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 1,
+          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "mobile:drawer-choice-history": {
         "viewport": {
@@ -858,16 +960,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -899,21 +1001,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 44,
+            "left": 12,
+            "right": 300,
+            "bottom": 513
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 500
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 115
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 375,
@@ -928,17 +1060,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 374,
-            "height": 736,
-            "top": 76,
-            "left": 1,
-            "right": 375,
-            "bottom": 812
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 342,
+            "height": 154,
+            "top": 84,
+            "left": 17,
+            "right": 359,
+            "bottom": 238
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 1,
+          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "mobile:drawer-journal": {
         "viewport": {
@@ -977,16 +1113,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1018,21 +1154,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 44,
+            "left": 12,
+            "right": 300,
+            "bottom": 513
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 500
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 81,
+            "left": 25,
+            "right": 287,
+            "bottom": 115
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 375,
@@ -1047,17 +1213,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 374,
-            "height": 736,
-            "top": 76,
-            "left": 1,
-            "right": 375,
-            "bottom": 812
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 342,
+            "height": 524,
+            "top": 84,
+            "left": 17,
+            "right": 359,
+            "bottom": 608
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 1,
+          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "tablet:steady": {
         "viewport": {
@@ -1096,16 +1266,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1195,16 +1365,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1294,16 +1464,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1341,11 +1511,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 356,
-            "top": 56,
+            "height": 359,
+            "top": 48,
             "left": 15,
             "right": 303,
-            "bottom": 412
+            "bottom": 407
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1403,16 +1573,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1450,11 +1620,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 488,
-            "top": 56,
+            "height": 472,
+            "top": 48,
             "left": 15,
             "right": 303,
-            "bottom": 544
+            "bottom": 520
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1464,25 +1634,25 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 437,
-            "top": 94,
+            "height": 421,
+            "top": 86,
             "left": 28,
             "right": 290,
-            "bottom": 531
+            "bottom": 507
           },
           {
             "selector": ".manuscript-tools-menu-item",
             "exists": true,
-            "display": "block",
+            "display": "inline-block",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 36,
-            "top": 94,
+            "height": 34,
+            "top": 86,
             "left": 28,
             "right": 290,
-            "bottom": 130
+            "bottom": 120
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1494,9 +1664,9 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 48,
-          "toolsPanelLeftToRailLeft": 28,
-          "toolsPanelWidthToRailWidthDelta": 262
+          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelLeftToRailLeft": 15,
+          "toolsPanelWidthToRailWidthDelta": 288
         }
       },
       "tablet:drawer-character": {
@@ -1536,16 +1706,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1577,21 +1747,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 48,
+            "left": 15,
+            "right": 303,
+            "bottom": 518
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 505
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 120
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -1606,17 +1806,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 321,
-            "right": 768,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 744,
+            "top": 92,
+            "left": 345,
+            "right": 744,
+            "bottom": 836
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelLeftToRailLeft": 15,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "tablet:drawer-inventory": {
         "viewport": {
@@ -1655,16 +1859,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1696,21 +1900,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 48,
+            "left": 15,
+            "right": 303,
+            "bottom": 518
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 505
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 120
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -1725,17 +1959,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 321,
-            "right": 768,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 372,
+            "top": 92,
+            "left": 345,
+            "right": 744,
+            "bottom": 464
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelLeftToRailLeft": 15,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "tablet:drawer-story-summary": {
         "viewport": {
@@ -1774,16 +2012,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1815,21 +2053,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 48,
+            "left": 15,
+            "right": 303,
+            "bottom": 518
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 505
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 120
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -1844,17 +2112,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 321,
-            "right": 768,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 24,
+            "top": 92,
+            "left": 345,
+            "right": 744,
+            "bottom": 116
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelLeftToRailLeft": 15,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "tablet:drawer-choice-history": {
         "viewport": {
@@ -1893,16 +2165,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1934,21 +2206,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 48,
+            "left": 15,
+            "right": 303,
+            "bottom": 518
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 505
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 120
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -1963,17 +2265,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 321,
-            "right": 768,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 154,
+            "top": 92,
+            "left": 345,
+            "right": 744,
+            "bottom": 246
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelLeftToRailLeft": 15,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "tablet:drawer-journal": {
         "viewport": {
@@ -2012,16 +2318,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2053,21 +2359,51 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "absolute",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 288,
+            "height": 470,
+            "top": 48,
+            "left": 15,
+            "right": 303,
+            "bottom": 518
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 419,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 505
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 262,
+            "height": 34,
+            "top": 86,
+            "left": 28,
+            "right": 290,
+            "bottom": 120
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -2082,17 +2418,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 321,
-            "right": 768,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 428,
+            "top": 92,
+            "left": 345,
+            "right": 744,
+            "bottom": 520
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelLeftToRailLeft": 15,
+          "toolsPanelWidthToRailWidthDelta": 288
+        }
       },
       "desktop:steady": {
         "viewport": {
@@ -2150,11 +2490,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2164,8 +2504,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
@@ -2249,11 +2589,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2263,8 +2603,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
@@ -2348,11 +2688,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2362,8 +2702,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
@@ -2372,15 +2712,15 @@
             "selector": ".manuscript-hud-panel",
             "exists": true,
             "display": "block",
-            "position": "absolute",
+            "position": "fixed",
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 697,
-            "top": 56,
+            "height": 359,
+            "top": 54,
             "left": 24,
             "right": 216,
-            "bottom": 753
+            "bottom": 413
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2457,11 +2797,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2471,8 +2811,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
@@ -2481,15 +2821,15 @@
             "selector": ".manuscript-hud-panel",
             "exists": true,
             "display": "block",
-            "position": "absolute",
+            "position": "fixed",
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 444,
-            "top": 56,
+            "height": 386,
+            "top": 54,
             "left": 24,
             "right": 216,
-            "bottom": 500
+            "bottom": 440
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2499,25 +2839,25 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 393,
-            "top": 94,
+            "height": 387,
+            "top": 92,
             "left": 37,
             "right": 203,
-            "bottom": 487
+            "bottom": 479
           },
           {
             "selector": ".manuscript-tools-menu-item",
             "exists": true,
-            "display": "block",
+            "display": "inline-block",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 36,
-            "top": 94,
+            "height": 34,
+            "top": 100,
             "left": 37,
             "right": 203,
-            "bottom": 130
+            "bottom": 134
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -2529,9 +2869,9 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 48,
-          "toolsPanelLeftToRailLeft": 13,
-          "toolsPanelWidthToRailWidthDelta": 26
+          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelLeftToRailLeft": 0,
+          "toolsPanelWidthToRailWidthDelta": 0
         }
       },
       "desktop:drawer-character": {
@@ -2590,11 +2930,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2604,29 +2944,59 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "fixed",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 192,
+            "height": 386,
+            "top": 54,
+            "left": 24,
+            "right": 216,
+            "bottom": 440
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 385,
+            "top": 92,
+            "left": 37,
+            "right": 203,
+            "bottom": 477
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 32,
+            "top": 100,
+            "left": 37,
+            "right": 203,
+            "bottom": 132
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -2641,17 +3011,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 833,
-            "right": 1280,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 744,
+            "top": 92,
+            "left": 857,
+            "right": 1256,
+            "bottom": 836
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelLeftToRailLeft": 0,
+          "toolsPanelWidthToRailWidthDelta": 0
+        }
       },
       "desktop:drawer-inventory": {
         "viewport": {
@@ -2709,11 +3083,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2723,29 +3097,59 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "fixed",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 192,
+            "height": 386,
+            "top": 54,
+            "left": 24,
+            "right": 216,
+            "bottom": 440
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 385,
+            "top": 92,
+            "left": 37,
+            "right": 203,
+            "bottom": 477
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 34,
+            "top": 100,
+            "left": 37,
+            "right": 203,
+            "bottom": 134
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -2760,17 +3164,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 833,
-            "right": 1280,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 372,
+            "top": 92,
+            "left": 857,
+            "right": 1256,
+            "bottom": 464
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelLeftToRailLeft": 0,
+          "toolsPanelWidthToRailWidthDelta": 0
+        }
       },
       "desktop:drawer-story-summary": {
         "viewport": {
@@ -2828,11 +3236,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2842,29 +3250,59 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "fixed",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 192,
+            "height": 386,
+            "top": 54,
+            "left": 24,
+            "right": 216,
+            "bottom": 440
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 385,
+            "top": 92,
+            "left": 37,
+            "right": 203,
+            "bottom": 477
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 34,
+            "top": 100,
+            "left": 37,
+            "right": 203,
+            "bottom": 134
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -2879,17 +3317,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 833,
-            "right": 1280,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 24,
+            "top": 92,
+            "left": 857,
+            "right": 1256,
+            "bottom": 116
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelLeftToRailLeft": 0,
+          "toolsPanelWidthToRailWidthDelta": 0
+        }
       },
       "desktop:drawer-choice-history": {
         "viewport": {
@@ -2947,11 +3389,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2961,29 +3403,59 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "fixed",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 192,
+            "height": 386,
+            "top": 54,
+            "left": 24,
+            "right": 216,
+            "bottom": 440
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 385,
+            "top": 92,
+            "left": 37,
+            "right": 203,
+            "bottom": 477
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 34,
+            "top": 100,
+            "left": 37,
+            "right": 203,
+            "bottom": 134
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -2998,17 +3470,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 833,
-            "right": 1280,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 154,
+            "top": 92,
+            "left": 857,
+            "right": 1256,
+            "bottom": 246
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelLeftToRailLeft": 0,
+          "toolsPanelWidthToRailWidthDelta": 0
+        }
       },
       "desktop:drawer-journal": {
         "viewport": {
@@ -3066,11 +3542,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -3080,29 +3556,59 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "fixed",
+            "overflow": "auto",
+            "overflowY": "auto",
+            "width": 192,
+            "height": 386,
+            "top": 54,
+            "left": 24,
+            "right": 216,
+            "bottom": 440
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": false
+            "exists": true,
+            "display": "block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 385,
+            "top": 92,
+            "left": 37,
+            "right": 203,
+            "bottom": 477
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": false
+            "exists": true,
+            "display": "inline-block",
+            "position": "static",
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 166,
+            "height": 34,
+            "top": 100,
+            "left": 37,
+            "right": 203,
+            "bottom": 134
           },
           {
             "selector": ".manuscript-drawer-panel",
             "exists": true,
-            "display": "flex",
-            "position": "fixed",
+            "display": "block",
+            "position": "absolute",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 448,
@@ -3117,17 +3623,21 @@
             "exists": true,
             "display": "block",
             "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 447,
-            "height": 948,
-            "top": 76,
-            "left": 833,
-            "right": 1280,
-            "bottom": 1024
+            "overflow": "visible",
+            "overflowY": "visible",
+            "width": 399,
+            "height": 428,
+            "top": 92,
+            "left": 857,
+            "right": 1256,
+            "bottom": 520
           }
         ],
-        "relationships": {}
+        "relationships": {
+          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelLeftToRailLeft": 0,
+          "toolsPanelWidthToRailWidthDelta": 0
+        }
       }
     },
     "dark": {
@@ -3168,16 +3678,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 345,
-            "height": 864,
-            "top": 55,
+            "height": 834,
+            "top": 111,
             "left": 12,
             "right": 357,
-            "bottom": 919
+            "bottom": 945
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3267,16 +3777,16 @@
           {
             "selector": ".manuscript-main-stage",
             "exists": true,
-            "display": "flex",
+            "display": "grid",
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
             "width": 731,
-            "height": 556,
-            "top": 62,
+            "height": 502,
+            "top": 118,
             "left": 15,
             "right": 747,
-            "bottom": 618
+            "bottom": 620
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3385,11 +3895,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -3399,8 +3909,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1232,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1256,
             "bottom": 1008
@@ -3486,11 +3996,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 192,
-            "height": 87,
-            "top": 767,
+            "height": 59,
+            "top": 777,
             "left": 24,
             "right": 216,
-            "bottom": 854
+            "bottom": 836
           },
           {
             "selector": "#manuscript-action-rail",
@@ -3500,8 +4010,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1432,
-            "height": 146,
-            "top": 862,
+            "height": 164,
+            "top": 844,
             "left": 24,
             "right": 1456,
             "bottom": 1008
@@ -3710,45 +4220,15 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": true,
-            "display": "block",
-            "position": "absolute",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 288,
-            "height": 469,
-            "top": 52,
-            "left": 12,
-            "right": 300,
-            "bottom": 521
+            "exists": false
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": true,
-            "display": "block",
-            "position": "static",
-            "overflow": "visible",
-            "overflowY": "visible",
-            "width": 262,
-            "height": 419,
-            "top": 89,
-            "left": 25,
-            "right": 287,
-            "bottom": 508
+            "exists": false
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": true,
-            "display": "inline-block",
-            "position": "static",
-            "overflow": "visible",
-            "overflowY": "visible",
-            "width": 262,
-            "height": 32,
-            "top": 131,
-            "left": 25,
-            "right": 287,
-            "bottom": 163
+            "exists": false
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -3759,11 +4239,7 @@
             "exists": false
           }
         ],
-        "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
-          "toolsPanelLeftToRailLeft": 12,
-          "toolsPanelWidthToRailWidthDelta": 288
-        }
+        "relationships": {}
       },
       "mobile:character-panel-open": {
         "viewport": {
@@ -4953,45 +5429,15 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": true,
-            "display": "block",
-            "position": "absolute",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 288,
-            "height": 469,
-            "top": 54,
-            "left": 15,
-            "right": 303,
-            "bottom": 523
+            "exists": false
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": true,
-            "display": "block",
-            "position": "static",
-            "overflow": "visible",
-            "overflowY": "visible",
-            "width": 262,
-            "height": 419,
-            "top": 91,
-            "left": 28,
-            "right": 290,
-            "bottom": 510
+            "exists": false
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": true,
-            "display": "inline-block",
-            "position": "static",
-            "overflow": "visible",
-            "overflowY": "visible",
-            "width": 262,
-            "height": 32,
-            "top": 133,
-            "left": 28,
-            "right": 290,
-            "bottom": 165
+            "exists": false
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -5002,11 +5448,7 @@
             "exists": false
           }
         ],
-        "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
-          "toolsPanelLeftToRailLeft": 15,
-          "toolsPanelWidthToRailWidthDelta": 288
-        }
+        "relationships": {}
       },
       "tablet:character-panel-open": {
         "viewport": {
@@ -6196,45 +6638,15 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "exists": true,
-            "display": "block",
-            "position": "absolute",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 192,
-            "height": 386,
-            "top": 54,
-            "left": 24,
-            "right": 216,
-            "bottom": 440
+            "exists": false
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "exists": true,
-            "display": "block",
-            "position": "static",
-            "overflow": "visible",
-            "overflowY": "visible",
-            "width": 166,
-            "height": 385,
-            "top": 91,
-            "left": 37,
-            "right": 203,
-            "bottom": 476
+            "exists": false
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "exists": true,
-            "display": "inline-block",
-            "position": "static",
-            "overflow": "visible",
-            "overflowY": "visible",
-            "width": 166,
-            "height": 32,
-            "top": 99,
-            "left": 37,
-            "right": 203,
-            "bottom": 131
+            "exists": false
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -6245,11 +6657,7 @@
             "exists": false
           }
         ],
-        "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
-          "toolsPanelLeftToRailLeft": 0,
-          "toolsPanelWidthToRailWidthDelta": 0
-        }
+        "relationships": {}
       },
       "desktop:character-panel-open": {
         "viewport": {

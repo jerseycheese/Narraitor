@@ -31,8 +31,8 @@ export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character 
   return (
     <div className="manuscript-character-snapshot">
       <h4 className="manuscript-hud-panel-title">CHARACTER SNAPSHOT</h4>
-      
-      <div className="flex flex-col items-center">
+
+      <div className="manuscript-character-snapshot-identity">
         {character.portrait && (
           <div className="manuscript-character-snapshot-portrait mb-2">
             <CharacterPortrait
@@ -42,14 +42,19 @@ export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character 
             />
           </div>
         )}
-
-        <div className="manuscript-character-snapshot-identity text-center w-full">
-          <div className="manuscript-character-snapshot-name">{character.name}</div>
-          <div className="manuscript-character-snapshot-level">Level {character.level}</div>
-        </div>
+        <div className="manuscript-character-snapshot-name">{character.name}</div>
       </div>
 
       <div className="manuscript-character-snapshot-stats">
+        <div className="manuscript-character-snapshot-section">
+          <div className="manuscript-character-snapshot-list">
+            <div className="manuscript-character-snapshot-level-row">
+              <span className="manuscript-character-snapshot-item-label">Level</span>
+              <span className="manuscript-character-snapshot-item-value">{character.level}</span>
+            </div>
+          </div>
+        </div>
+
         {character.attributes && character.attributes.length > 0 && world && (
           <div className="manuscript-character-snapshot-section">
             <h5 className="manuscript-character-snapshot-subheading">Attributes</h5>

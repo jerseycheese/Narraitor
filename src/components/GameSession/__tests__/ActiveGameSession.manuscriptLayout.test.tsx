@@ -482,7 +482,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.getByText('Character Sheet')).toBeInTheDocument();
     });
 
-        it('closes Tools menu when opening a drawer', async () => {
+        it('keeps Tools menu open when opening a drawer', async () => {
 
           (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
 
@@ -506,11 +506,15 @@ describe('ActiveGameSession Manuscript Layout', () => {
       // Click a drawer trigger
       fireEvent.click(screen.getByRole('button', { name: /inventory/i }));
 
-      // Menu should now be closed, but drawer content should be open
-      expect(await screen.findByText('Inventory')).toBeInTheDocument();
+      // Menu should stay open, and drawer content should be open
+      expect(
+        await screen.findByRole('heading', { name: 'Inventory' }),
+      ).toBeInTheDocument();
+      expect(toolsToggle).toHaveAttribute('aria-expanded', 'true');
+      expect(document.querySelector('.manuscript-tools-menu-items')).not.toBeNull();
     });
 
-        it('closes drawer with Escape key', async () => {
+        it('closes drawer with Escape key before closing Tools menu', async () => {
 
           (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
 
@@ -535,8 +539,17 @@ describe('ActiveGameSession Manuscript Layout', () => {
       // Press Escape
       fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
 
-      // Verify drawer is closed
+      // Verify drawer is closed and Tools menu remains open
       expect(screen.queryByText('Character Sheet')).not.toBeInTheDocument();
+      expect(toolsToggle).toHaveAttribute('aria-expanded', 'true');
+      expect(
+        screen.queryAllByRole('button', { name: /character details/i }).length,
+      ).toBeGreaterThan(0);
+
+      // Second Escape closes open HUD panels when no drawer is open
+      fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
+      expect(toolsToggle).toHaveAttribute('aria-expanded', 'false');
+      expect(screen.queryByRole('button', { name: /character details/i })).not.toBeInTheDocument();
     });
 
     it('opens Journal Snapshot drawer from Tools menu', async () => {
@@ -578,7 +591,9 @@ describe('ActiveGameSession Manuscript Layout', () => {
       fireEvent.click(toolsToggle);
       fireEvent.click(screen.getByRole('button', { name: /journal snapshot/i }));
 
-      expect(await screen.findByText('Journal Snapshot')).toBeInTheDocument();
+      expect(
+        await screen.findByRole('heading', { name: 'Journal Snapshot' }),
+      ).toBeInTheDocument();
       expect(screen.getByText('A difficult turn')).toBeInTheDocument();
     });
   });

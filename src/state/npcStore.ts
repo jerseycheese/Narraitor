@@ -237,3 +237,10 @@ export const useNPCStore = create<NPCStore>()(
     }
   )
 );
+
+// Expose store globally in development to support test data seeding
+// and debugging via window.useNPCStore in dev tools.
+if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).useNPCStore = useNPCStore;
+}

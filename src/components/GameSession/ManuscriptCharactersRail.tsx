@@ -35,11 +35,12 @@ export const ManuscriptCharactersRail: React.FC<ManuscriptCharactersRailProps> =
     >
       {participant.avatarUrl && (
         <div className="relative w-5 h-5 rounded-full overflow-hidden manuscript-character-avatar">
-          <Image 
-            src={participant.avatarUrl} 
-            alt={`${participant.name}'s avatar`} 
+          <Image
+            src={participant.avatarUrl}
+            alt={`${participant.name}'s avatar`}
             fill
-            className="object-cover" 
+            sizes="20px"
+            className="object-cover"
           />
         </div>
       )}

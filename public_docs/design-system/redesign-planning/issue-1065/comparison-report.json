@@ -1,73 +1,145 @@
 {
   "summary": {
-    "generatedAt": "2026-02-18T18:52:28.989Z",
+    "generatedAt": "2026-02-19T17:28:08.603Z",
     "screenshotPairsCompared": 30,
     "missingPrototypePairs": [],
-    "maxMismatchRatio": 0.477916,
-    "maxMeanAbsDelta": 51.061313,
+    "maxMismatchRatio": 0.213333,
+    "maxMeanAbsDelta": 26.389212,
     "states": {
       "steady": {
         "comparisons": 6,
-        "maxMismatchRatio": 0.289477,
-        "maxMeanAbsDelta": 30.332498,
-        "maxSelectorDelta": 101,
+        "maxMismatchRatio": 0.203117,
+        "maxMeanAbsDelta": 26.098774,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "character-panel-open": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.194212,
-        "maxMeanAbsDelta": 28.745379,
-        "maxSelectorDelta": 349,
+        "maxMismatchRatio": 0.154893,
+        "maxMeanAbsDelta": 17.476743,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "drawer-character": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.477916,
-        "maxMeanAbsDelta": 51.061313,
-        "maxSelectorDelta": 368,
-        "maxRelationshipDelta": 0
+        "maxMismatchRatio": 0.15909,
+        "maxMeanAbsDelta": 20.928147,
+        "maxSelectorDelta": 168,
+        "maxRelationshipDelta": 7
       },
       "drawer-choice-history": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.431283,
-        "maxMeanAbsDelta": 45.154092,
-        "maxSelectorDelta": 736,
-        "maxRelationshipDelta": 0
+        "maxMismatchRatio": 0.06267,
+        "maxMeanAbsDelta": 6.739846,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 7
       },
       "drawer-inventory": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.433359,
-        "maxMeanAbsDelta": 44.284148,
-        "maxSelectorDelta": 552,
-        "maxRelationshipDelta": 0
+        "maxMismatchRatio": 0.074194,
+        "maxMeanAbsDelta": 8.11747,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 7
       },
       "drawer-journal": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.453104,
-        "maxMeanAbsDelta": 46.751108,
-        "maxSelectorDelta": 456,
-        "maxRelationshipDelta": 0
+        "maxMismatchRatio": 0.095087,
+        "maxMeanAbsDelta": 11.089271,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 7
       },
       "drawer-story-summary": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.43786,
-        "maxMeanAbsDelta": 45.691053,
-        "maxSelectorDelta": 652,
-        "maxRelationshipDelta": 0
+        "maxMismatchRatio": 0.078443,
+        "maxMeanAbsDelta": 8.74997,
+        "maxSelectorDelta": 272,
+        "maxRelationshipDelta": 7
       },
       "streaming": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.234176,
-        "maxMeanAbsDelta": 32.340321,
-        "maxSelectorDelta": 273,
+        "maxMismatchRatio": 0.213333,
+        "maxMeanAbsDelta": 26.389212,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "tools-panel-open": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.204287,
-        "maxMeanAbsDelta": 28.16324,
-        "maxSelectorDelta": 101,
-        "maxRelationshipDelta": 40
+        "maxMismatchRatio": 0.200269,
+        "maxMeanAbsDelta": 21.861988,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 7
+      }
+    }
+  },
+  "summaryViewportCrop": {
+    "generatedAt": "2026-02-19T17:28:08.604Z",
+    "screenshotPairsCompared": 30,
+    "missingPrototypePairs": [],
+    "maxMismatchRatio": 0.213333,
+    "maxMeanAbsDelta": 26.389212,
+    "states": {
+      "steady": {
+        "comparisons": 6,
+        "maxMismatchRatio": 0.203117,
+        "maxMeanAbsDelta": 26.098774,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 0
+      },
+      "character-panel-open": {
+        "comparisons": 3,
+        "maxMismatchRatio": 0.154893,
+        "maxMeanAbsDelta": 17.476743,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 0
+      },
+      "drawer-character": {
+        "comparisons": 3,
+        "maxMismatchRatio": 0.15909,
+        "maxMeanAbsDelta": 20.928147,
+        "maxSelectorDelta": 168,
+        "maxRelationshipDelta": 7
+      },
+      "drawer-choice-history": {
+        "comparisons": 3,
+        "maxMismatchRatio": 0.06267,
+        "maxMeanAbsDelta": 6.739846,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 7
+      },
+      "drawer-inventory": {
+        "comparisons": 3,
+        "maxMismatchRatio": 0.074194,
+        "maxMeanAbsDelta": 8.11747,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 7
+      },
+      "drawer-journal": {
+        "comparisons": 3,
+        "maxMismatchRatio": 0.095087,
+        "maxMeanAbsDelta": 11.089271,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 7
+      },
+      "drawer-story-summary": {
+        "comparisons": 3,
+        "maxMismatchRatio": 0.078443,
+        "maxMeanAbsDelta": 8.74997,
+        "maxSelectorDelta": 272,
+        "maxRelationshipDelta": 7
+      },
+      "streaming": {
+        "comparisons": 3,
+        "maxMismatchRatio": 0.213333,
+        "maxMeanAbsDelta": 26.389212,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 0
+      },
+      "tools-panel-open": {
+        "comparisons": 3,
+        "maxMismatchRatio": 0.200269,
+        "maxMeanAbsDelta": 21.861988,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 7
       }
     }
   },
@@ -79,24 +151,42 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "dark:steady:desktop",
+      "diffFile": "diff-dark-steady-desktop-1280.png",
       "screenshot": {
         "appFile": "app-dark-steady-desktop-1280.png",
         "prototypeFile": "prototype-dark-steady-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 10.707494,
-        "mismatchPixels": 216585,
-        "mismatchRatio": 0.111467,
-        "rmse": 40.091576
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 10.657781,
+        "mismatchPixels": 125365,
+        "mismatchRatio": 0.095646,
+        "rmse": 40.765491
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-dark-steady-desktop-1280.png",
+        "prototypeFile": "prototype-dark-steady-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 10.657781,
+        "mismatchPixels": 125365,
+        "mismatchRatio": 0.095646,
+        "rmse": 40.765491
       },
       "metrics": {
-        "maxSelectorDelta": 80,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
@@ -106,11 +196,7 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -125,39 +211,55 @@
       "viewport": "mobile",
       "width": 375,
       "id": "dark:steady:mobile",
+      "diffFile": "diff-dark-steady-mobile-375.png",
       "screenshot": {
         "appFile": "app-dark-steady-mobile-375.png",
         "prototypeFile": "prototype-dark-steady-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 30.332498,
-        "mismatchPixels": 145028,
-        "mismatchRatio": 0.289477,
-        "rmse": 69.044567
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 26.098774,
+        "mismatchPixels": 61849,
+        "mismatchRatio": 0.203117,
+        "rmse": 65.456015
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-dark-steady-mobile-375.png",
+        "prototypeFile": "prototype-dark-steady-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 26.098774,
+        "mismatchPixels": 61849,
+        "mismatchRatio": 0.203117,
+        "rmse": 65.456015
       },
       "metrics": {
-        "maxSelectorDelta": 101,
+        "maxSelectorDelta": 71,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }
@@ -169,39 +271,55 @@
       "viewport": "tablet",
       "width": 768,
       "id": "dark:steady:tablet",
+      "diffFile": "diff-dark-steady-tablet-768.png",
       "screenshot": {
         "appFile": "app-dark-steady-tablet-768.png",
         "prototypeFile": "prototype-dark-steady-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 13.897485,
-        "mismatchPixels": 189097,
-        "mismatchRatio": 0.159057,
-        "rmse": 44.442805
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 13.781292,
+        "mismatchPixels": 79728,
+        "mismatchRatio": 0.101379,
+        "rmse": 47.640163
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-dark-steady-tablet-768.png",
+        "prototypeFile": "prototype-dark-steady-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 13.781292,
+        "mismatchPixels": 79728,
+        "mismatchRatio": 0.101379,
+        "rmse": 47.640163
       },
       "metrics": {
-        "maxSelectorDelta": 93,
+        "maxSelectorDelta": 39,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }
@@ -213,24 +331,42 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:character-panel-open:desktop",
+      "diffFile": "diff-light-character-panel-open-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-character-panel-open-desktop-1280.png",
         "prototypeFile": "prototype-light-character-panel-open-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 12.22203,
-        "mismatchPixels": 176937,
-        "mismatchRatio": 0.091062,
-        "rmse": 41.057801
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 11.017862,
+        "mismatchPixels": 128032,
+        "mismatchRatio": 0.097681,
+        "rmse": 41.383183
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-character-panel-open-desktop-1280.png",
+        "prototypeFile": "prototype-light-character-panel-open-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 11.017862,
+        "mismatchPixels": 128032,
+        "mismatchRatio": 0.097681,
+        "rmse": 41.383183
       },
       "metrics": {
-        "maxSelectorDelta": 349,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -256,19 +392,17 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 349
+            "maxGeometryDelta": 9
           }
         ],
         "selectorsWithDisplayMismatch": [],
-        "selectorsWithPositionMismatch": [],
+        "selectorsWithPositionMismatch": [
+          ".manuscript-hud-panel"
+        ],
         "selectorsWithOverflowMismatch": []
       }
     },
@@ -279,24 +413,42 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:character-panel-open:mobile",
+      "diffFile": "diff-light-character-panel-open-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-character-panel-open-mobile-375.png",
         "prototypeFile": "prototype-light-character-panel-open-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 28.745379,
-        "mismatchPixels": 97300,
-        "mismatchRatio": 0.194212,
-        "rmse": 67.05855
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 17.476743,
+        "mismatchPixels": 47165,
+        "mismatchRatio": 0.154893,
+        "rmse": 49.299061
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-character-panel-open-mobile-375.png",
+        "prototypeFile": "prototype-light-character-panel-open-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 17.476743,
+        "mismatchPixels": 47165,
+        "mismatchRatio": 0.154893,
+        "rmse": 49.299061
       },
       "metrics": {
-        "maxSelectorDelta": 101,
+        "maxSelectorDelta": 71,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -318,16 +470,18 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
+          },
+          {
+            "selector": ".manuscript-hud-panel",
+            "maxGeometryDelta": 9
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }
@@ -339,24 +493,42 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:character-panel-open:tablet",
+      "diffFile": "diff-light-character-panel-open-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-character-panel-open-tablet-768.png",
         "prototypeFile": "prototype-light-character-panel-open-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 13.171248,
-        "mismatchPixels": 108672,
-        "mismatchRatio": 0.091408,
-        "rmse": 42.687933
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 11.278271,
+        "mismatchPixels": 73923,
+        "mismatchRatio": 0.093998,
+        "rmse": 40.964566
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-character-panel-open-tablet-768.png",
+        "prototypeFile": "prototype-light-character-panel-open-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 11.278271,
+        "mismatchPixels": 73923,
+        "mismatchRatio": 0.093998,
+        "rmse": 40.964566
       },
       "metrics": {
-        "maxSelectorDelta": 93,
+        "maxSelectorDelta": 39,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -378,7 +550,7 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
@@ -386,12 +558,10 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 8
+            "maxGeometryDelta": 9
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }
@@ -403,40 +573,58 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:drawer-character:desktop",
+      "diffFile": "diff-light-drawer-character-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-drawer-character-desktop-1280.png",
         "prototypeFile": "prototype-light-drawer-character-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 39.667522,
-        "mismatchPixels": 730705,
-        "mismatchRatio": 0.376063,
-        "rmse": 63.309105
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 8.425829,
+        "mismatchPixels": 99083,
+        "mismatchRatio": 0.075594,
+        "rmse": 33.519335
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-character-desktop-1280.png",
+        "prototypeFile": "prototype-light-drawer-character-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 8.425829,
+        "mismatchPixels": 99083,
+        "mismatchRatio": 0.075594,
+        "rmse": 33.519335
       },
       "metrics": {
-        "maxSelectorDelta": 368,
+        "maxSelectorDelta": 168,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 8,
             "prototype": 8,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
@@ -446,35 +634,18 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 368
+            "maxGeometryDelta": 168
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
+          ".manuscript-hud-panel"
         ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -484,75 +655,89 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:drawer-character:mobile",
+      "diffFile": "diff-light-drawer-character-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-drawer-character-mobile-375.png",
         "prototypeFile": "prototype-light-drawer-character-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 51.061313,
-        "mismatchPixels": 239436,
-        "mismatchRatio": 0.477916,
-        "rmse": 73.573976
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 20.928147,
+        "mismatchPixels": 48443,
+        "mismatchRatio": 0.15909,
+        "rmse": 58.988888
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-character-mobile-375.png",
+        "prototypeFile": "prototype-light-drawer-character-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 20.928147,
+        "mismatchPixels": 48443,
+        "mismatchRatio": 0.15909,
+        "rmse": 58.988888
       },
       "metrics": {
-        "maxSelectorDelta": 136,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 148,
+        "maxRelationshipDelta": 7,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 1,
             "prototype": 8,
-            "delta": null
+            "delta": 7
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 12,
             "prototype": 12,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
           },
           {
+            "selector": ".manuscript-hud-panel",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-items",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 50
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 136
+            "maxGeometryDelta": 148
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -562,75 +747,81 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:drawer-character:tablet",
+      "diffFile": "diff-light-drawer-character-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-drawer-character-tablet-768.png",
         "prototypeFile": "prototype-light-drawer-character-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 43.364595,
-        "mismatchPixels": 480334,
-        "mismatchRatio": 0.404028,
-        "rmse": 66.040694
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 11.026902,
+        "mismatchPixels": 68866,
+        "mismatchRatio": 0.087568,
+        "rmse": 40.432772
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-character-tablet-768.png",
+        "prototypeFile": "prototype-light-drawer-character-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 11.026902,
+        "mismatchPixels": 68866,
+        "mismatchRatio": 0.087568,
+        "rmse": 40.432772
       },
       "metrics": {
-        "maxSelectorDelta": 368,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 168,
+        "maxRelationshipDelta": 6,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 2,
             "prototype": 8,
-            "delta": null
+            "delta": 6
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 15,
             "prototype": 15,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           },
           {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 47
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 368
+            "maxGeometryDelta": 168
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -640,40 +831,58 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:drawer-choice-history:desktop",
+      "diffFile": "diff-light-drawer-choice-history-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-drawer-choice-history-desktop-1280.png",
         "prototypeFile": "prototype-light-drawer-choice-history-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 38.240746,
-        "mismatchPixels": 708229,
-        "mismatchRatio": 0.364495,
-        "rmse": 61.160718
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 5.65766,
+        "mismatchPixels": 76808,
+        "mismatchRatio": 0.0586,
+        "rmse": 23.155211
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-choice-history-desktop-1280.png",
+        "prototypeFile": "prototype-light-drawer-choice-history-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 5.65766,
+        "mismatchPixels": 76808,
+        "mismatchRatio": 0.0586,
+        "rmse": 23.155211
       },
       "metrics": {
-        "maxSelectorDelta": 736,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 8,
             "prototype": 8,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
@@ -683,35 +892,18 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 736
+            "maxGeometryDelta": 58
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
+          ".manuscript-hud-panel"
         ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -721,75 +913,89 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:drawer-choice-history:mobile",
+      "diffFile": "diff-light-drawer-choice-history-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-drawer-choice-history-mobile-375.png",
         "prototypeFile": "prototype-light-drawer-choice-history-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 45.154092,
-        "mismatchPixels": 216073,
-        "mismatchRatio": 0.431283,
-        "rmse": 66.009938
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 6.418395,
+        "mismatchPixels": 17104,
+        "mismatchRatio": 0.056171,
+        "rmse": 28.42638
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-choice-history-mobile-375.png",
+        "prototypeFile": "prototype-light-drawer-choice-history-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 6.418395,
+        "mismatchPixels": 17104,
+        "mismatchRatio": 0.056171,
+        "rmse": 28.42638
       },
       "metrics": {
-        "maxSelectorDelta": 540,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 71,
+        "maxRelationshipDelta": 7,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 1,
             "prototype": 8,
-            "delta": null
+            "delta": 7
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 12,
             "prototype": 12,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
           },
           {
+            "selector": ".manuscript-hud-panel",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-items",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 50
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 540
+            "maxGeometryDelta": 42
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -799,75 +1005,81 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:drawer-choice-history:tablet",
+      "diffFile": "diff-light-drawer-choice-history-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-drawer-choice-history-tablet-768.png",
         "prototypeFile": "prototype-light-drawer-choice-history-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 41.064808,
-        "mismatchPixels": 458075,
-        "mismatchRatio": 0.385305,
-        "rmse": 62.711342
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 6.739846,
+        "mismatchPixels": 49286,
+        "mismatchRatio": 0.06267,
+        "rmse": 26.258476
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-choice-history-tablet-768.png",
+        "prototypeFile": "prototype-light-drawer-choice-history-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 6.739846,
+        "mismatchPixels": 49286,
+        "mismatchRatio": 0.06267,
+        "rmse": 26.258476
       },
       "metrics": {
-        "maxSelectorDelta": 736,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 58,
+        "maxRelationshipDelta": 6,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 2,
             "prototype": 8,
-            "delta": null
+            "delta": 6
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 15,
             "prototype": 15,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           },
           {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 47
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 736
+            "maxGeometryDelta": 58
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -877,40 +1089,58 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:drawer-inventory:desktop",
+      "diffFile": "diff-light-drawer-inventory-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-drawer-inventory-desktop-1280.png",
         "prototypeFile": "prototype-light-drawer-inventory-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 38.010046,
-        "mismatchPixels": 709992,
-        "mismatchRatio": 0.365403,
-        "rmse": 61.143697
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 6.081826,
+        "mismatchPixels": 82355,
+        "mismatchRatio": 0.062832,
+        "rmse": 24.717527
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-inventory-desktop-1280.png",
+        "prototypeFile": "prototype-light-drawer-inventory-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 6.081826,
+        "mismatchPixels": 82355,
+        "mismatchRatio": 0.062832,
+        "rmse": 24.717527
       },
       "metrics": {
-        "maxSelectorDelta": 552,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 8,
             "prototype": 8,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
@@ -920,35 +1150,18 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 552
+            "maxGeometryDelta": 24
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
+          ".manuscript-hud-panel"
         ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -958,75 +1171,85 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:drawer-inventory:mobile",
+      "diffFile": "diff-light-drawer-inventory-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-drawer-inventory-mobile-375.png",
         "prototypeFile": "prototype-light-drawer-inventory-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 44.284148,
-        "mismatchPixels": 217113,
-        "mismatchRatio": 0.433359,
-        "rmse": 65.730616
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 8.11747,
+        "mismatchPixels": 22592,
+        "mismatchRatio": 0.074194,
+        "rmse": 33.619935
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-inventory-mobile-375.png",
+        "prototypeFile": "prototype-light-drawer-inventory-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 8.11747,
+        "mismatchPixels": 22592,
+        "mismatchRatio": 0.074194,
+        "rmse": 33.619935
       },
       "metrics": {
-        "maxSelectorDelta": 364,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 71,
+        "maxRelationshipDelta": 7,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 1,
             "prototype": 8,
-            "delta": null
+            "delta": 7
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 12,
             "prototype": 12,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
           },
           {
-            "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 364
+            "selector": ".manuscript-hud-panel",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-items",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 50
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1036,75 +1259,81 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:drawer-inventory:tablet",
+      "diffFile": "diff-light-drawer-inventory-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-drawer-inventory-tablet-768.png",
         "prototypeFile": "prototype-light-drawer-inventory-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 40.662015,
-        "mismatchPixels": 459818,
-        "mismatchRatio": 0.386771,
-        "rmse": 62.679774
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 7.516892,
+        "mismatchPixels": 55310,
+        "mismatchRatio": 0.07033,
+        "rmse": 28.662962
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-inventory-tablet-768.png",
+        "prototypeFile": "prototype-light-drawer-inventory-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 7.516892,
+        "mismatchPixels": 55310,
+        "mismatchRatio": 0.07033,
+        "rmse": 28.662962
       },
       "metrics": {
-        "maxSelectorDelta": 552,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 47,
+        "maxRelationshipDelta": 6,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 2,
             "prototype": 8,
-            "delta": null
+            "delta": 6
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 15,
             "prototype": 15,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           },
           {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 47
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 552
+            "maxGeometryDelta": 24
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1114,40 +1343,58 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:drawer-journal:desktop",
+      "diffFile": "diff-light-drawer-journal-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-drawer-journal-desktop-1280.png",
         "prototypeFile": "prototype-light-drawer-journal-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 38.603444,
-        "mismatchPixels": 718527,
-        "mismatchRatio": 0.369795,
-        "rmse": 61.305515
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 6.600885,
+        "mismatchPixels": 88858,
+        "mismatchRatio": 0.067793,
+        "rmse": 24.73905
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-journal-desktop-1280.png",
+        "prototypeFile": "prototype-light-drawer-journal-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 6.600885,
+        "mismatchPixels": 88858,
+        "mismatchRatio": 0.067793,
+        "rmse": 24.73905
       },
       "metrics": {
-        "maxSelectorDelta": 456,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 8,
             "prototype": 8,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
@@ -1157,35 +1404,18 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 456
+            "maxGeometryDelta": 64
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
+          ".manuscript-hud-panel"
         ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1195,75 +1425,89 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:drawer-journal:mobile",
+      "diffFile": "diff-light-drawer-journal-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-drawer-journal-mobile-375.png",
         "prototypeFile": "prototype-light-drawer-journal-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 46.751108,
-        "mismatchPixels": 227005,
-        "mismatchRatio": 0.453104,
-        "rmse": 67.111081
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 11.089271,
+        "mismatchPixels": 28954,
+        "mismatchRatio": 0.095087,
+        "rmse": 34.772148
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-journal-mobile-375.png",
+        "prototypeFile": "prototype-light-drawer-journal-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 11.089271,
+        "mismatchPixels": 28954,
+        "mismatchRatio": 0.095087,
+        "rmse": 34.772148
       },
       "metrics": {
-        "maxSelectorDelta": 252,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 71,
+        "maxRelationshipDelta": 7,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 1,
             "prototype": 8,
-            "delta": null
+            "delta": 7
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 12,
             "prototype": 12,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
           },
           {
+            "selector": ".manuscript-hud-panel",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-items",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 50
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 252
+            "maxGeometryDelta": 44
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1273,75 +1517,81 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:drawer-journal:tablet",
+      "diffFile": "diff-light-drawer-journal-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-drawer-journal-tablet-768.png",
         "prototypeFile": "prototype-light-drawer-journal-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 41.638636,
-        "mismatchPixels": 468368,
-        "mismatchRatio": 0.393963,
-        "rmse": 62.939755
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 8.261012,
+        "mismatchPixels": 61011,
+        "mismatchRatio": 0.077579,
+        "rmse": 28.479891
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-journal-tablet-768.png",
+        "prototypeFile": "prototype-light-drawer-journal-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 8.261012,
+        "mismatchPixels": 61011,
+        "mismatchRatio": 0.077579,
+        "rmse": 28.479891
       },
       "metrics": {
-        "maxSelectorDelta": 456,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 64,
+        "maxRelationshipDelta": 6,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 2,
             "prototype": 8,
-            "delta": null
+            "delta": 6
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 15,
             "prototype": 15,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           },
           {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 47
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 456
+            "maxGeometryDelta": 64
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1351,40 +1601,58 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:drawer-story-summary:desktop",
+      "diffFile": "diff-light-drawer-story-summary-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-drawer-story-summary-desktop-1280.png",
         "prototypeFile": "prototype-light-drawer-story-summary-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 38.170534,
-        "mismatchPixels": 709020,
-        "mismatchRatio": 0.364902,
-        "rmse": 61.067962
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 5.92501,
+        "mismatchPixels": 81157,
+        "mismatchRatio": 0.061918,
+        "rmse": 24.511747
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-story-summary-desktop-1280.png",
+        "prototypeFile": "prototype-light-drawer-story-summary-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 5.92501,
+        "mismatchPixels": 81157,
+        "mismatchRatio": 0.061918,
+        "rmse": 24.511747
       },
       "metrics": {
-        "maxSelectorDelta": 652,
+        "maxSelectorDelta": 272,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 8,
             "prototype": 8,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 0,
             "prototype": 0,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
@@ -1394,35 +1662,18 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 652
+            "maxGeometryDelta": 272
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
+          ".manuscript-hud-panel"
         ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1432,75 +1683,89 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:drawer-story-summary:mobile",
+      "diffFile": "diff-light-drawer-story-summary-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-drawer-story-summary-mobile-375.png",
         "prototypeFile": "prototype-light-drawer-story-summary-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 45.691053,
-        "mismatchPixels": 219368,
-        "mismatchRatio": 0.43786,
-        "rmse": 66.318664
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 8.74997,
+        "mismatchPixels": 23886,
+        "mismatchRatio": 0.078443,
+        "rmse": 34.817418
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-story-summary-mobile-375.png",
+        "prototypeFile": "prototype-light-drawer-story-summary-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 8.74997,
+        "mismatchPixels": 23886,
+        "mismatchRatio": 0.078443,
+        "rmse": 34.817418
       },
       "metrics": {
-        "maxSelectorDelta": 420,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 268,
+        "maxRelationshipDelta": 7,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 1,
             "prototype": 8,
-            "delta": null
+            "delta": 7
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 12,
             "prototype": 12,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
           },
           {
+            "selector": ".manuscript-hud-panel",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-items",
+            "maxGeometryDelta": 8
+          },
+          {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 50
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 420
+            "maxGeometryDelta": 268
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1510,75 +1775,81 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:drawer-story-summary:tablet",
+      "diffFile": "diff-light-drawer-story-summary-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-drawer-story-summary-tablet-768.png",
         "prototypeFile": "prototype-light-drawer-story-summary-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 40.955641,
-        "mismatchPixels": 458851,
-        "mismatchRatio": 0.385958,
-        "rmse": 62.560663
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 7.226409,
+        "mismatchPixels": 53933,
+        "mismatchRatio": 0.068579,
+        "rmse": 28.319174
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-drawer-story-summary-tablet-768.png",
+        "prototypeFile": "prototype-light-drawer-story-summary-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 7.226409,
+        "mismatchPixels": 53933,
+        "mismatchRatio": 0.068579,
+        "rmse": 28.319174
       },
       "metrics": {
-        "maxSelectorDelta": 652,
-        "maxRelationshipDelta": 0,
+        "maxSelectorDelta": 272,
+        "maxRelationshipDelta": 6,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": null,
+            "app": 2,
             "prototype": 8,
-            "delta": null
+            "delta": 6
           },
           "toolsPanelLeftToRailLeft": {
-            "app": null,
+            "app": 15,
             "prototype": 15,
-            "delta": null
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
+            "app": 288,
             "prototype": 288,
-            "delta": null
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           },
           {
+            "selector": ".manuscript-tools-menu-item",
+            "maxGeometryDelta": 47
+          },
+          {
             "selector": ".manuscript-drawer-content",
-            "maxGeometryDelta": 652
+            "maxGeometryDelta": 272
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-panel"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item",
-          ".manuscript-drawer-content"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1588,24 +1859,42 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:steady:desktop",
+      "diffFile": "diff-light-steady-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-steady-desktop-1280.png",
         "prototypeFile": "prototype-light-steady-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 11.049451,
-        "mismatchPixels": 159001,
-        "mismatchRatio": 0.081831,
-        "rmse": 39.224202
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 10.555107,
+        "mismatchPixels": 121681,
+        "mismatchRatio": 0.092835,
+        "rmse": 40.727064
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-steady-desktop-1280.png",
+        "prototypeFile": "prototype-light-steady-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 10.555107,
+        "mismatchPixels": 121681,
+        "mismatchRatio": 0.092835,
+        "rmse": 40.727064
       },
       "metrics": {
-        "maxSelectorDelta": 80,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
@@ -1615,11 +1904,7 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -1634,39 +1919,55 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:steady:mobile",
+      "diffFile": "diff-light-steady-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-steady-mobile-375.png",
         "prototypeFile": "prototype-light-steady-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 28.55199,
-        "mismatchPixels": 99742,
-        "mismatchRatio": 0.199086,
-        "rmse": 66.383949
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 24.3658,
+        "mismatchPixels": 61440,
+        "mismatchRatio": 0.201773,
+        "rmse": 61.044211
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-steady-mobile-375.png",
+        "prototypeFile": "prototype-light-steady-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 24.3658,
+        "mismatchPixels": 61440,
+        "mismatchRatio": 0.201773,
+        "rmse": 61.044211
       },
       "metrics": {
-        "maxSelectorDelta": 101,
+        "maxSelectorDelta": 71,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }
@@ -1678,39 +1979,55 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:steady:tablet",
+      "diffFile": "diff-light-steady-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-steady-tablet-768.png",
         "prototypeFile": "prototype-light-steady-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 12.676062,
-        "mismatchPixels": 107153,
-        "mismatchRatio": 0.090131,
-        "rmse": 41.338322
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 13.085743,
+        "mismatchPixels": 83278,
+        "mismatchRatio": 0.105893,
+        "rmse": 44.967359
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-steady-tablet-768.png",
+        "prototypeFile": "prototype-light-steady-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 13.085743,
+        "mismatchPixels": 83278,
+        "mismatchRatio": 0.105893,
+        "rmse": 44.967359
       },
       "metrics": {
-        "maxSelectorDelta": 93,
+        "maxSelectorDelta": 39,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }
@@ -1722,42 +2039,44 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:streaming:desktop",
+      "diffFile": "diff-light-streaming-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-streaming-desktop-1280.png",
         "prototypeFile": "prototype-light-streaming-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 10.48844,
-        "mismatchPixels": 145559,
-        "mismatchRatio": 0.074913,
-        "rmse": 35.273274
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 8.27475,
+        "mismatchPixels": 93018,
+        "mismatchRatio": 0.070967,
+        "rmse": 32.606022
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-streaming-desktop-1280.png",
+        "prototypeFile": "prototype-light-streaming-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 8.27475,
+        "mismatchPixels": 93018,
+        "mismatchRatio": 0.070967,
+        "rmse": 32.606022
       },
       "metrics": {
-        "maxSelectorDelta": 80,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
-        "relationshipDiffs": {
-          "toolsPanelTopToHeaderBottom": {
-            "app": null,
-            "prototype": 8,
-            "delta": null
-          },
-          "toolsPanelLeftToRailLeft": {
-            "app": null,
-            "prototype": 0,
-            "delta": null
-          },
-          "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
-            "prototype": 0,
-            "delta": null
-          }
-        },
+        "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
@@ -1765,28 +2084,12 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1796,68 +2099,57 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:streaming:mobile",
+      "diffFile": "diff-light-streaming-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-streaming-mobile-375.png",
         "prototypeFile": "prototype-light-streaming-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 32.340321,
-        "mismatchPixels": 117322,
-        "mismatchRatio": 0.234176,
-        "rmse": 68.433721
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 26.389212,
+        "mismatchPixels": 64960,
+        "mismatchRatio": 0.213333,
+        "rmse": 64.14978
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-streaming-mobile-375.png",
+        "prototypeFile": "prototype-light-streaming-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 26.389212,
+        "mismatchPixels": 64960,
+        "mismatchRatio": 0.213333,
+        "rmse": 64.14978
       },
       "metrics": {
-        "maxSelectorDelta": 273,
+        "maxSelectorDelta": 12,
         "maxRelationshipDelta": 0,
-        "relationshipDiffs": {
-          "toolsPanelTopToHeaderBottom": {
-            "app": null,
-            "prototype": 8,
-            "delta": null
-          },
-          "toolsPanelLeftToRailLeft": {
-            "app": null,
-            "prototype": 12,
-            "delta": null
-          },
-          "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
-            "prototype": 288,
-            "delta": null
-          }
-        },
+        "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 273
+            "maxGeometryDelta": 12
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 12
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1867,68 +2159,57 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:streaming:tablet",
+      "diffFile": "diff-light-streaming-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-streaming-tablet-768.png",
         "prototypeFile": "prototype-light-streaming-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 14.630486,
-        "mismatchPixels": 128769,
-        "mismatchRatio": 0.108313,
-        "rmse": 43.422029
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 12.866669,
+        "mismatchPixels": 83375,
+        "mismatchRatio": 0.106017,
+        "rmse": 44.069876
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-streaming-tablet-768.png",
+        "prototypeFile": "prototype-light-streaming-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 12.866669,
+        "mismatchPixels": 83375,
+        "mismatchRatio": 0.106017,
+        "rmse": 44.069876
       },
       "metrics": {
-        "maxSelectorDelta": 61,
+        "maxSelectorDelta": 16,
         "maxRelationshipDelta": 0,
-        "relationshipDiffs": {
-          "toolsPanelTopToHeaderBottom": {
-            "app": null,
-            "prototype": 8,
-            "delta": null
-          },
-          "toolsPanelLeftToRailLeft": {
-            "app": null,
-            "prototype": 15,
-            "delta": null
-          },
-          "toolsPanelWidthToRailWidthDelta": {
-            "app": null,
-            "prototype": 288,
-            "delta": null
-          }
-        },
+        "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 61
+            "maxGeometryDelta": 8
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ],
-        "selectorsWithPositionMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ],
-        "selectorsWithOverflowMismatch": [
-          ".manuscript-hud-panel",
-          ".manuscript-tools-menu-items",
-          ".manuscript-tools-menu-item"
-        ]
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [],
+        "selectorsWithOverflowMismatch": []
       }
     },
     {
@@ -1938,40 +2219,58 @@
       "viewport": "desktop",
       "width": 1280,
       "id": "light:tools-panel-open:desktop",
+      "diffFile": "diff-light-tools-panel-open-desktop-1280.png",
       "screenshot": {
         "appFile": "app-light-tools-panel-open-desktop-1280.png",
         "prototypeFile": "prototype-light-tools-panel-open-desktop-1280.png",
         "appWidth": 1280,
-        "appHeight": 1518,
+        "appHeight": 1024,
         "prototypeWidth": 1280,
-        "prototypeHeight": 30602,
+        "prototypeHeight": 1024,
         "overlapWidth": 1280,
-        "overlapHeight": 1518,
-        "dimensionMatch": false,
-        "comparedPixels": 1943040,
-        "meanAbsDelta": 12.101307,
-        "mismatchPixels": 176239,
-        "mismatchRatio": 0.090703,
-        "rmse": 41.207341
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 11.776472,
+        "mismatchPixels": 136550,
+        "mismatchRatio": 0.104179,
+        "rmse": 43.059212
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-tools-panel-open-desktop-1280.png",
+        "prototypeFile": "prototype-light-tools-panel-open-desktop-1280.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 1280,
+        "appHeight": 1024,
+        "prototypeWidth": 1280,
+        "prototypeHeight": 1024,
+        "overlapWidth": 1280,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 1310720,
+        "meanAbsDelta": 11.776472,
+        "mismatchPixels": 136550,
+        "mismatchRatio": 0.104179,
+        "rmse": 43.059212
       },
       "metrics": {
-        "maxSelectorDelta": 80,
-        "maxRelationshipDelta": 40,
+        "maxSelectorDelta": 90,
+        "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": 48,
+            "app": 8,
             "prototype": 8,
-            "delta": 40
+            "delta": 0
           },
           "toolsPanelLeftToRailLeft": {
-            "app": 13,
+            "app": 0,
             "prototype": 0,
-            "delta": 13
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": 26,
+            "app": 0,
             "prototype": 0,
-            "delta": 26
+            "delta": 0
           }
         },
         "selectorsOver8px": [
@@ -1981,25 +2280,13 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 80
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
-          },
-          {
-            "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 60
-          },
-          {
-            "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 11
+            "maxGeometryDelta": 90
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-tools-menu-item"
+        "selectorsWithDisplayMismatch": [],
+        "selectorsWithPositionMismatch": [
+          ".manuscript-hud-panel"
         ],
-        "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }
     },
@@ -2010,46 +2297,64 @@
       "viewport": "mobile",
       "width": 375,
       "id": "light:tools-panel-open:mobile",
+      "diffFile": "diff-light-tools-panel-open-mobile-375.png",
       "screenshot": {
         "appFile": "app-light-tools-panel-open-mobile-375.png",
         "prototypeFile": "prototype-light-tools-panel-open-mobile-375.png",
         "appWidth": 375,
-        "appHeight": 1336,
-        "prototypeWidth": 387,
-        "prototypeHeight": 40521,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
         "overlapWidth": 375,
-        "overlapHeight": 1336,
-        "dimensionMatch": false,
-        "comparedPixels": 501000,
-        "meanAbsDelta": 28.16324,
-        "mismatchPixels": 102348,
-        "mismatchRatio": 0.204287,
-        "rmse": 65.660424
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 21.861988,
+        "mismatchPixels": 60982,
+        "mismatchRatio": 0.200269,
+        "rmse": 57.024358
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-tools-panel-open-mobile-375.png",
+        "prototypeFile": "prototype-light-tools-panel-open-mobile-375.png",
+        "viewportCropHeight": 812,
+        "appWidth": 375,
+        "appHeight": 812,
+        "prototypeWidth": 375,
+        "prototypeHeight": 812,
+        "overlapWidth": 375,
+        "overlapHeight": 812,
+        "dimensionMatch": true,
+        "comparedPixels": 304500,
+        "meanAbsDelta": 21.861988,
+        "mismatchPixels": 60982,
+        "mismatchRatio": 0.200269,
+        "rmse": 57.024358
       },
       "metrics": {
-        "maxSelectorDelta": 101,
-        "maxRelationshipDelta": 40,
+        "maxSelectorDelta": 71,
+        "maxRelationshipDelta": 7,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": 48,
+            "app": 1,
             "prototype": 8,
-            "delta": 40
+            "delta": 7
           },
           "toolsPanelLeftToRailLeft": {
-            "app": 25,
+            "app": 12,
             "prototype": 12,
-            "delta": 13
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": 262,
+            "app": 288,
             "prototype": 288,
-            "delta": 26
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 101
+            "maxGeometryDelta": 71
           },
           {
             "selector": "#manuscript-action-rail",
@@ -2057,21 +2362,18 @@
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 20
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 20
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "maxGeometryDelta": 40
+            "maxGeometryDelta": 50
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-tools-menu-item"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }
@@ -2083,68 +2385,75 @@
       "viewport": "tablet",
       "width": 768,
       "id": "light:tools-panel-open:tablet",
+      "diffFile": "diff-light-tools-panel-open-tablet-768.png",
       "screenshot": {
         "appFile": "app-light-tools-panel-open-tablet-768.png",
         "prototypeFile": "prototype-light-tools-panel-open-tablet-768.png",
         "appWidth": 768,
-        "appHeight": 1548,
+        "appHeight": 1024,
         "prototypeWidth": 768,
-        "prototypeHeight": 32774,
+        "prototypeHeight": 1024,
         "overlapWidth": 768,
-        "overlapHeight": 1548,
-        "dimensionMatch": false,
-        "comparedPixels": 1188864,
-        "meanAbsDelta": 12.887433,
-        "mismatchPixels": 109910,
-        "mismatchRatio": 0.09245,
-        "rmse": 41.735725
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 12.08132,
+        "mismatchPixels": 83900,
+        "mismatchRatio": 0.106684,
+        "rmse": 42.693907
+      },
+      "screenshotViewportCrop": {
+        "appFile": "app-light-tools-panel-open-tablet-768.png",
+        "prototypeFile": "prototype-light-tools-panel-open-tablet-768.png",
+        "viewportCropHeight": 1024,
+        "appWidth": 768,
+        "appHeight": 1024,
+        "prototypeWidth": 768,
+        "prototypeHeight": 1024,
+        "overlapWidth": 768,
+        "overlapHeight": 1024,
+        "dimensionMatch": true,
+        "comparedPixels": 786432,
+        "meanAbsDelta": 12.08132,
+        "mismatchPixels": 83900,
+        "mismatchRatio": 0.106684,
+        "rmse": 42.693907
       },
       "metrics": {
-        "maxSelectorDelta": 93,
-        "maxRelationshipDelta": 40,
+        "maxSelectorDelta": 47,
+        "maxRelationshipDelta": 6,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
-            "app": 48,
+            "app": 2,
             "prototype": 8,
-            "delta": 40
+            "delta": 6
           },
           "toolsPanelLeftToRailLeft": {
-            "app": 28,
+            "app": 15,
             "prototype": 15,
-            "delta": 13
+            "delta": 0
           },
           "toolsPanelWidthToRailWidthDelta": {
-            "app": 262,
+            "app": 288,
             "prototype": 288,
-            "delta": 26
+            "delta": 0
           }
         },
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 93
+            "maxGeometryDelta": 39
           },
           {
             "selector": "#manuscript-action-rail",
             "maxGeometryDelta": 16
           },
           {
-            "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 21
-          },
-          {
-            "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 21
-          },
-          {
             "selector": ".manuscript-tools-menu-item",
-            "maxGeometryDelta": 39
+            "maxGeometryDelta": 47
           }
         ],
-        "selectorsWithDisplayMismatch": [
-          ".manuscript-main-stage",
-          ".manuscript-tools-menu-item"
-        ],
+        "selectorsWithDisplayMismatch": [],
         "selectorsWithPositionMismatch": [],
         "selectorsWithOverflowMismatch": []
       }

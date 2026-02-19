@@ -121,22 +121,25 @@ const ActiveGameSessionChoicesColumn: React.FC<
           )
         ) : (
           !hideChoices && (
-            <div>
-              {/* Choice decision skeleton - matches ChoiceSelector layout */}
-              <div>
+            <div className="choice-selector manuscript-choice-selector animate-pulse">
+              <div className="manuscript-choice-selector-body">
                 {/* Choice prompt skeleton */}
-                <div />
+                {!hidePrompt && <div className="manuscript-choice-prompt bg-muted rounded h-6 w-3/4 mb-4" />}
 
                 {/* Choice buttons skeleton */}
-                {[1, 2, 3].map((i) => (
-                  <div key={i} />
-                ))}
+                <div className="manuscript-suggested-actions-grid">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="manuscript-suggested-action bg-muted rounded h-[4.125rem]" />
+                  ))}
+                </div>
 
                 {/* Custom input skeleton */}
-                <div>
-                  <div />
-                  <div />
-                </div>
+                {!hideCustomInput && (
+                  <div className="manuscript-input-row mt-4">
+                    <div className="manuscript-custom-input bg-muted rounded flex-1" />
+                    <div className="manuscript-send-button bg-muted rounded w-16" />
+                  </div>
+                )}
               </div>
             </div>
           )
