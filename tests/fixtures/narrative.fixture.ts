@@ -12,7 +12,7 @@ export const SAMPLE_NARRATIVE_SEGMENTS: NarrativeSegment[] = [
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
-      'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The *Arasaka building* looms ahead, its security algorithms pulsing like a **digital heartbeat**.',
+      'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.',
     type: 'scene' as const,
     characterIds: ['char-cyberpunk-hacker', 'char-cyberpunk-operative'],
     metadata: {
@@ -40,7 +40,7 @@ export const SAMPLE_NARRATIVE_SEGMENTS: NarrativeSegment[] = [
     worldId: 'world-cyberpunk-2077',
     sessionId: 'session-cyberpunk-ghost',
     content:
-      '"Nice deck," a voice says from the shadows. "*Arasaka custom job, looks like.*" The fixer steps into the dim light, **chrome eyes gleaming**.',
+      '"Nice deck," a voice says from the shadows. "Arasaka custom job, looks like." The fixer steps into the dim light, chrome eyes gleaming.',
     type: 'dialogue' as const,
     characterIds: ['char-cyberpunk-hacker'],
     metadata: {

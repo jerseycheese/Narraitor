@@ -301,6 +301,8 @@ test.describe.serial('Issue #1065 audit exports', () => {
 });
 
 test.describe('Manuscript breakpoints visual regression (app)', () => {
+  test.skip(process.env.ISSUE_1065_AUDIT === 'true', 'Skipped in audit export mode — normalizations affect page height');
+
   for (const viewport of AUDIT_VIEWPORTS) {
     for (const state of LIGHT_AUDIT_STATES) {
       test(`light ${state.id} at ${viewport.name}`, async ({ page }) => {

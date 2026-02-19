@@ -541,6 +541,15 @@ export const openAppToolsPanel = async (page: Page): Promise<void> => {
   await expect(
     page.getByRole('button', { name: 'Character Details' }).first(),
   ).toBeVisible();
+
+  // Click Character Details to set it as the active (highlighted) item, then
+  // press Escape once to close the drawer while keeping the tools panel open.
+  // This matches the prototype's tools-panel-open state where Character Details is highlighted.
+  await page.getByRole('button', { name: 'Character Details' }).first().click();
+  await expect(page.locator('[data-testid="manuscript-drawer"]')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-testid="manuscript-drawer"]')).not.toBeVisible();
+  await expect.poll(isExpanded, { timeout: 3000 }).toBe(true);
 };
 
 export const openAppDrawer = async (
@@ -591,8 +600,6 @@ export const applyAppStreamingVisualState = async (
     const actionRail = document.getElementById('manuscript-action-rail');
     const input = document.getElementById('manuscript-input') as HTMLInputElement | null;
     const send = document.getElementById('manuscript-send') as HTMLButtonElement | null;
-    const mainContent = document.querySelector('.manuscript-main-content');
-    const scrollContainer = document.querySelector('.manuscript-overlay-main');
 
     actionRail?.classList.add('manuscript-action-rail-streaming');
 
@@ -603,20 +610,6 @@ export const applyAppStreamingVisualState = async (
 
     if (send) {
       send.disabled = true;
-    }
-
-    // Add dummy content to match prototype's scrolled state in streaming audit
-    if (mainContent && scrollContainer) {
-      const dummy = document.createElement('div');
-      dummy.id = 'audit-streaming-dummy-content';
-      dummy.innerHTML = `
-        <div style="height: 0px; padding: 0px;">
-        </div>
-      `;
-      mainContent.prepend(dummy);
-      
-      // Scroll to a position that roughly matches the prototype
-      scrollContainer.scrollTop = 350;
     }
   });
 

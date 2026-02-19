@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-19T17:22:38.871Z",
+  "generatedAt": "2026-02-19T21:39:03.007Z",
   "breakpoints": [
     {
       "name": "mobile",
@@ -51,11 +51,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -65,12 +65,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
+            "width": 359,
+            "height": 804,
             "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -93,11 +93,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -150,11 +150,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -164,12 +164,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
-            "top": -176,
-            "left": 12,
-            "right": 357,
-            "bottom": 658
+            "width": 359,
+            "height": 804,
+            "top": 111,
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -192,11 +192,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -249,11 +249,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -263,12 +263,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
+            "width": 359,
+            "height": 804,
             "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -291,11 +291,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -307,10 +307,10 @@
             "overflowY": "auto",
             "width": 288,
             "height": 359,
-            "top": 44,
-            "left": 12,
-            "right": 300,
-            "bottom": 403
+            "top": 52,
+            "left": 8,
+            "right": 296,
+            "bottom": 411
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -358,11 +358,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -372,12 +372,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
+            "width": 359,
+            "height": 804,
             "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -400,11 +400,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -415,11 +415,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 472,
-            "top": 44,
-            "left": 12,
-            "right": 300,
-            "bottom": 515
+            "height": 478,
+            "top": 52,
+            "left": 8,
+            "right": 296,
+            "bottom": 529
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -429,11 +429,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 421,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 502
+            "height": 427,
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 516
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -444,10 +444,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 115
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 123
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -459,8 +459,8 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 1,
-          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelTopToHeaderBottom": 9,
+          "toolsPanelLeftToRailLeft": 8,
           "toolsPanelWidthToRailWidthDelta": 288
         }
       },
@@ -491,11 +491,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -505,12 +505,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
+            "width": 359,
+            "height": 804,
             "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -533,11 +533,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -548,11 +548,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 44,
-            "left": 12,
-            "right": 300,
-            "bottom": 513
+            "height": 478,
+            "top": 52,
+            "left": 8,
+            "right": 296,
+            "bottom": 529
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -562,11 +562,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 500
+            "height": 427,
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 516
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -577,10 +577,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 115
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 123
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -612,8 +612,8 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 1,
-          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelTopToHeaderBottom": 9,
+          "toolsPanelLeftToRailLeft": 8,
           "toolsPanelWidthToRailWidthDelta": 288
         }
       },
@@ -644,11 +644,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -658,12 +658,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
+            "width": 359,
+            "height": 804,
             "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -686,11 +686,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -701,11 +701,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 44,
-            "left": 12,
-            "right": 300,
-            "bottom": 513
+            "height": 478,
+            "top": 52,
+            "left": 8,
+            "right": 296,
+            "bottom": 529
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -715,11 +715,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 500
+            "height": 427,
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 516
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -730,10 +730,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 115
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 123
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -765,8 +765,8 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 1,
-          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelTopToHeaderBottom": 9,
+          "toolsPanelLeftToRailLeft": 8,
           "toolsPanelWidthToRailWidthDelta": 288
         }
       },
@@ -797,11 +797,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -811,26 +811,16 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
-            "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "width": 359,
+            "height": 152,
+            "top": 55,
+            "left": 8,
+            "right": 367,
+            "bottom": 207
           },
           {
             "selector": ".manuscript-characters-rail",
-            "exists": true,
-            "display": "none",
-            "position": "static",
-            "overflow": "auto",
-            "overflowY": "auto",
-            "width": 0,
-            "height": 0,
-            "top": 0,
-            "left": 0,
-            "right": 0,
-            "bottom": 0
+            "exists": false
           },
           {
             "selector": "#manuscript-action-rail",
@@ -839,11 +829,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -854,11 +844,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 44,
-            "left": 12,
-            "right": 300,
-            "bottom": 513
+            "height": 478,
+            "top": 52,
+            "left": 8,
+            "right": 296,
+            "bottom": 529
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -868,11 +858,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 500
+            "height": 427,
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 516
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -883,10 +873,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 115
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 123
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -910,17 +900,15 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 342,
-            "height": 48,
+            "height": 72,
             "top": 84,
             "left": 17,
             "right": 359,
-            "bottom": 132
+            "bottom": 156
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 1,
-          "toolsPanelLeftToRailLeft": 12,
-          "toolsPanelWidthToRailWidthDelta": 288
+          "toolsPanelTopToHeaderBottom": 9
         }
       },
       "mobile:drawer-choice-history": {
@@ -950,11 +938,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -964,12 +952,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
+            "width": 359,
+            "height": 804,
             "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -992,11 +980,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -1007,11 +995,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 44,
-            "left": 12,
-            "right": 300,
-            "bottom": 513
+            "height": 478,
+            "top": 52,
+            "left": 8,
+            "right": 296,
+            "bottom": 529
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1021,11 +1009,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 500
+            "height": 427,
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 516
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -1036,10 +1024,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 115
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 123
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1071,8 +1059,8 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 1,
-          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelTopToHeaderBottom": 9,
+          "toolsPanelLeftToRailLeft": 8,
           "toolsPanelWidthToRailWidthDelta": 288
         }
       },
@@ -1103,11 +1091,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -1117,12 +1105,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
+            "width": 359,
+            "height": 804,
             "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1145,11 +1133,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -1160,11 +1148,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 44,
-            "left": 12,
-            "right": 300,
-            "bottom": 513
+            "height": 478,
+            "top": 52,
+            "left": 8,
+            "right": 296,
+            "bottom": 529
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1174,11 +1162,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 500
+            "height": 427,
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 516
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -1189,10 +1177,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 81,
-            "left": 25,
-            "right": 287,
-            "bottom": 115
+            "top": 89,
+            "left": 21,
+            "right": 283,
+            "bottom": 123
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1224,8 +1212,8 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 1,
-          "toolsPanelLeftToRailLeft": 12,
+          "toolsPanelTopToHeaderBottom": 9,
+          "toolsPanelLeftToRailLeft": 8,
           "toolsPanelWidthToRailWidthDelta": 288
         }
       },
@@ -1270,12 +1258,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1369,12 +1357,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1468,12 +1456,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1512,10 +1500,10 @@
             "overflowY": "auto",
             "width": 288,
             "height": 359,
-            "top": 48,
+            "top": 56,
             "left": 15,
             "right": 303,
-            "bottom": 407
+            "bottom": 415
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1577,12 +1565,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1620,11 +1608,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 472,
-            "top": 48,
+            "height": 478,
+            "top": 56,
             "left": 15,
             "right": 303,
-            "bottom": 520
+            "bottom": 534
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1634,11 +1622,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 421,
-            "top": 86,
+            "height": 427,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 507
+            "bottom": 521
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -1649,10 +1637,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 86,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 120
+            "bottom": 128
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1664,7 +1652,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelTopToHeaderBottom": 10,
           "toolsPanelLeftToRailLeft": 15,
           "toolsPanelWidthToRailWidthDelta": 288
         }
@@ -1710,12 +1698,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1753,11 +1741,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 48,
+            "height": 478,
+            "top": 56,
             "left": 15,
             "right": 303,
-            "bottom": 518
+            "bottom": 534
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1767,11 +1755,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 86,
+            "height": 427,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 505
+            "bottom": 521
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -1782,10 +1770,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 86,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 120
+            "bottom": 128
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1817,7 +1805,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelTopToHeaderBottom": 10,
           "toolsPanelLeftToRailLeft": 15,
           "toolsPanelWidthToRailWidthDelta": 288
         }
@@ -1863,12 +1851,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -1906,11 +1894,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 48,
+            "height": 478,
+            "top": 56,
             "left": 15,
             "right": 303,
-            "bottom": 518
+            "bottom": 534
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1920,11 +1908,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 86,
+            "height": 427,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 505
+            "bottom": 521
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -1935,10 +1923,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 86,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 120
+            "bottom": 128
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1970,7 +1958,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelTopToHeaderBottom": 10,
           "toolsPanelLeftToRailLeft": 15,
           "toolsPanelWidthToRailWidthDelta": 288
         }
@@ -2016,12 +2004,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2059,11 +2047,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 48,
+            "height": 478,
+            "top": 56,
             "left": 15,
             "right": 303,
-            "bottom": 518
+            "bottom": 534
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2073,11 +2061,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 86,
+            "height": 427,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 505
+            "bottom": 521
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -2088,10 +2076,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 86,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 120
+            "bottom": 128
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -2123,7 +2111,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelTopToHeaderBottom": 10,
           "toolsPanelLeftToRailLeft": 15,
           "toolsPanelWidthToRailWidthDelta": 288
         }
@@ -2169,12 +2157,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2212,11 +2200,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 48,
+            "height": 478,
+            "top": 56,
             "left": 15,
             "right": 303,
-            "bottom": 518
+            "bottom": 534
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2226,11 +2214,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 86,
+            "height": 427,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 505
+            "bottom": 521
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -2241,10 +2229,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 86,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 120
+            "bottom": 128
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -2276,7 +2264,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelTopToHeaderBottom": 10,
           "toolsPanelLeftToRailLeft": 15,
           "toolsPanelWidthToRailWidthDelta": 288
         }
@@ -2322,12 +2310,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2365,11 +2353,11 @@
             "overflow": "auto",
             "overflowY": "auto",
             "width": 288,
-            "height": 470,
-            "top": 48,
+            "height": 478,
+            "top": 56,
             "left": 15,
             "right": 303,
-            "bottom": 518
+            "bottom": 534
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2379,11 +2367,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 419,
-            "top": 86,
+            "height": 427,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 505
+            "bottom": 521
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -2394,10 +2382,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 86,
+            "top": 94,
             "left": 28,
             "right": 290,
-            "bottom": 120
+            "bottom": 128
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -2429,7 +2417,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 2,
+          "toolsPanelTopToHeaderBottom": 10,
           "toolsPanelLeftToRailLeft": 15,
           "toolsPanelWidthToRailWidthDelta": 288
         }
@@ -2476,11 +2464,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2575,11 +2563,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2674,11 +2662,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2717,10 +2705,10 @@
             "overflowY": "auto",
             "width": 192,
             "height": 359,
-            "top": 54,
+            "top": 62,
             "left": 24,
             "right": 216,
-            "bottom": 413
+            "bottom": 421
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2783,11 +2771,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2826,10 +2814,10 @@
             "overflowY": "auto",
             "width": 192,
             "height": 386,
-            "top": 54,
+            "top": 62,
             "left": 24,
             "right": 216,
-            "bottom": 440
+            "bottom": 448
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2839,11 +2827,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 387,
-            "top": 92,
+            "height": 393,
+            "top": 100,
             "left": 37,
             "right": 203,
-            "bottom": 479
+            "bottom": 493
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -2853,11 +2841,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 34,
-            "top": 100,
+            "height": 32,
+            "top": 108,
             "left": 37,
             "right": 203,
-            "bottom": 134
+            "bottom": 140
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -2869,7 +2857,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelTopToHeaderBottom": 16,
           "toolsPanelLeftToRailLeft": 0,
           "toolsPanelWidthToRailWidthDelta": 0
         }
@@ -2916,11 +2904,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -2959,10 +2947,10 @@
             "overflowY": "auto",
             "width": 192,
             "height": 386,
-            "top": 54,
+            "top": 62,
             "left": 24,
             "right": 216,
-            "bottom": 440
+            "bottom": 448
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2972,11 +2960,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 385,
-            "top": 92,
+            "height": 393,
+            "top": 100,
             "left": 37,
             "right": 203,
-            "bottom": 477
+            "bottom": 493
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -2987,10 +2975,10 @@
             "overflowY": "visible",
             "width": 166,
             "height": 32,
-            "top": 100,
+            "top": 108,
             "left": 37,
             "right": 203,
-            "bottom": 132
+            "bottom": 140
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -3022,7 +3010,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelTopToHeaderBottom": 16,
           "toolsPanelLeftToRailLeft": 0,
           "toolsPanelWidthToRailWidthDelta": 0
         }
@@ -3069,11 +3057,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3112,10 +3100,10 @@
             "overflowY": "auto",
             "width": 192,
             "height": 386,
-            "top": 54,
+            "top": 62,
             "left": 24,
             "right": 216,
-            "bottom": 440
+            "bottom": 448
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -3125,11 +3113,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 385,
-            "top": 92,
+            "height": 393,
+            "top": 100,
             "left": 37,
             "right": 203,
-            "bottom": 477
+            "bottom": 493
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -3140,10 +3128,10 @@
             "overflowY": "visible",
             "width": 166,
             "height": 34,
-            "top": 100,
+            "top": 108,
             "left": 37,
             "right": 203,
-            "bottom": 134
+            "bottom": 142
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -3175,7 +3163,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelTopToHeaderBottom": 16,
           "toolsPanelLeftToRailLeft": 0,
           "toolsPanelWidthToRailWidthDelta": 0
         }
@@ -3222,11 +3210,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3265,10 +3253,10 @@
             "overflowY": "auto",
             "width": 192,
             "height": 386,
-            "top": 54,
+            "top": 62,
             "left": 24,
             "right": 216,
-            "bottom": 440
+            "bottom": 448
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -3278,11 +3266,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 385,
-            "top": 92,
+            "height": 393,
+            "top": 100,
             "left": 37,
             "right": 203,
-            "bottom": 477
+            "bottom": 493
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -3293,10 +3281,10 @@
             "overflowY": "visible",
             "width": 166,
             "height": 34,
-            "top": 100,
+            "top": 108,
             "left": 37,
             "right": 203,
-            "bottom": 134
+            "bottom": 142
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -3328,7 +3316,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelTopToHeaderBottom": 16,
           "toolsPanelLeftToRailLeft": 0,
           "toolsPanelWidthToRailWidthDelta": 0
         }
@@ -3375,11 +3363,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3418,10 +3406,10 @@
             "overflowY": "auto",
             "width": 192,
             "height": 386,
-            "top": 54,
+            "top": 62,
             "left": 24,
             "right": 216,
-            "bottom": 440
+            "bottom": 448
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -3431,11 +3419,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 385,
-            "top": 92,
+            "height": 393,
+            "top": 100,
             "left": 37,
             "right": 203,
-            "bottom": 477
+            "bottom": 493
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -3446,10 +3434,10 @@
             "overflowY": "visible",
             "width": 166,
             "height": 34,
-            "top": 100,
+            "top": 108,
             "left": 37,
             "right": 203,
-            "bottom": 134
+            "bottom": 142
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -3481,7 +3469,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelTopToHeaderBottom": 16,
           "toolsPanelLeftToRailLeft": 0,
           "toolsPanelWidthToRailWidthDelta": 0
         }
@@ -3528,11 +3516,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3571,10 +3559,10 @@
             "overflowY": "auto",
             "width": 192,
             "height": 386,
-            "top": 54,
+            "top": 62,
             "left": 24,
             "right": 216,
-            "bottom": 440
+            "bottom": 448
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -3584,11 +3572,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 166,
-            "height": 385,
-            "top": 92,
+            "height": 393,
+            "top": 100,
             "left": 37,
             "right": 203,
-            "bottom": 477
+            "bottom": 493
           },
           {
             "selector": ".manuscript-tools-menu-item",
@@ -3599,10 +3587,10 @@
             "overflowY": "visible",
             "width": 166,
             "height": 34,
-            "top": 100,
+            "top": 108,
             "left": 37,
             "right": 203,
-            "bottom": 134
+            "bottom": 142
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -3634,7 +3622,7 @@
           }
         ],
         "relationships": {
-          "toolsPanelTopToHeaderBottom": 8,
+          "toolsPanelTopToHeaderBottom": 16,
           "toolsPanelLeftToRailLeft": 0,
           "toolsPanelWidthToRailWidthDelta": 0
         }
@@ -3668,11 +3656,11 @@
             "position": "relative",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 30,
             "top": 13,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 43
           },
           {
@@ -3682,12 +3670,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 345,
-            "height": 834,
+            "width": 359,
+            "height": 804,
             "top": 111,
-            "left": 12,
-            "right": 357,
-            "bottom": 945
+            "left": 8,
+            "right": 367,
+            "bottom": 915
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3710,11 +3698,11 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 351,
+            "width": 359,
             "height": 112,
             "top": 687,
-            "left": 12,
-            "right": 363,
+            "left": 8,
+            "right": 367,
             "bottom": 799
           },
           {
@@ -3781,12 +3769,12 @@
             "position": "static",
             "overflow": "visible",
             "overflowY": "visible",
-            "width": 731,
-            "height": 502,
+            "width": 737,
+            "height": 499,
             "top": 118,
             "left": 15,
-            "right": 747,
-            "bottom": 620
+            "right": 753,
+            "bottom": 617
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3881,11 +3869,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1226,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1250,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -3982,11 +3970,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 1426,
-            "height": 502,
+            "height": 499,
             "top": 62,
             "left": 24,
             "right": 1450,
-            "bottom": 564
+            "bottom": 561
           },
           {
             "selector": ".manuscript-characters-rail",

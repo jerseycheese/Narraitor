@@ -84,6 +84,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
   const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
   const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
+  const [lastOpenedDrawer, setLastOpenedDrawer] = React.useState<DrawerType | null>(null);
   const [isToolsMenuOpen, setIsToolsMenuOpen] = React.useState(false);
   const [isStreamingPreview, setIsStreamingPreview] = React.useState(false);
   const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
@@ -358,9 +359,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           characterSummaryPanel={character && <CharacterSnapshot character={character} />}
           toolsMenuPanel={isProgressiveDisclosureEnabled && (
             <ToolsMenuPanelContent
-              activeDrawer={activeDrawer}
+              activeDrawer={activeDrawer ?? lastOpenedDrawer}
               onOpenDrawer={(drawerType) => {
                 setActiveDrawer(drawerType);
+                setLastOpenedDrawer(drawerType);
                 setIsCharacterSummaryExpanded(false);
               }}
               onClosePanel={() => setIsToolsMenuOpen(false)}
