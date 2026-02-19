@@ -18,17 +18,13 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
   isCharacterSummaryExpanded,
   onToggleToolsMenu,
   isToolsMenuOpen,
-  className,
   characterSummaryPanel,
   toolsMenuPanel,
   rightContent,
   drawerTriggers,
 }) => {
   return (
-    <div
-      className={cssClasses('manuscript-floating-hud-inner', className)}
-      data-testid="manuscript-floating-hud"
-    >
+    <>
       <div className="manuscript-overlay-header-left">
         <div className="manuscript-header-controls">
           <button
@@ -69,6 +65,6 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
       <div className="manuscript-overlay-header-right">
         {rightContent}
       </div>
-    </div>
+    </>
   );
 };

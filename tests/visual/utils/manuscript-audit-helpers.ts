@@ -611,6 +611,11 @@ export const applyAppStreamingVisualState = async (
     if (send) {
       send.disabled = true;
     }
+
+    const narrativeScrollContainer = document.querySelector('.manuscript-overlay-main');
+    if (narrativeScrollContainer) {
+      narrativeScrollContainer.scrollTop = narrativeScrollContainer.scrollHeight;
+    }
   });
 
   await pause(150);
