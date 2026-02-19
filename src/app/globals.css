@@ -652,7 +652,7 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 0.9375rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 2px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
@@ -966,7 +966,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-characters-rail-label {
-  margin: 0;
+  margin: 0 0 0.5rem;
   padding: 0;
   font-size: 11px;
   font-family: var(--font-system);
@@ -2341,7 +2341,13 @@ body.manuscript-overlay-open {
   }
 
   #manuscript-action-rail {
-    padding: 0.75rem;
+    padding: 0.625rem;
+  }
+
+  .manuscript-warning-action-button {
+    padding: 0.375rem 0.75rem;
+    height: 1.875rem;
+    font-size: 0.75rem;
   }
 
   .manuscript-input-row {
@@ -2363,7 +2369,13 @@ body.manuscript-overlay-open {
   }
 
   #manuscript-action-rail {
-    padding: 1rem;
+    padding: 0.625rem;
+  }
+
+  .manuscript-warning-action-button {
+    padding: 0.375rem 0.75rem;
+    height: 1.875rem;
+    font-size: 0.75rem;
   }
 }
 
@@ -2403,7 +2415,7 @@ body.manuscript-overlay-open {
   }
 
   #manuscript-action-rail {
-    padding: 1.5625rem;
+    padding: 1rem;
   }
 
   .manuscript-suggested-actions-grid {
