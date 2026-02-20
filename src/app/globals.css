@@ -2340,7 +2340,7 @@ body.manuscript-overlay-open {
   }
 
   #manuscript-action-rail {
-    padding: 0.625rem;
+    padding: 12px;
   }
 
   .manuscript-warning-action-button {
@@ -2368,7 +2368,7 @@ body.manuscript-overlay-open {
   }
 
   #manuscript-action-rail {
-    padding: 0.625rem;
+    padding: 16px;
   }
 
   .manuscript-warning-action-button {

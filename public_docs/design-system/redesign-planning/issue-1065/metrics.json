@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-20T03:48:54.325Z",
+  "generatedAt": "2026-02-20T04:01:55.048Z",
   "breakpoints": [
     {
       "name": "mobile",
@@ -94,8 +94,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -166,10 +166,10 @@
             "overflowY": "visible",
             "width": 351,
             "height": 804,
-            "top": -153,
+            "top": -157,
             "left": 12,
             "right": 363,
-            "bottom": 650
+            "bottom": 646
           },
           {
             "selector": ".manuscript-characters-rail",
@@ -193,8 +193,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -292,8 +292,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -401,8 +401,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -534,8 +534,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -687,8 +687,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -840,8 +840,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -993,8 +993,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -1146,8 +1146,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -1299,8 +1299,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -1398,8 +1398,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -1497,8 +1497,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -1606,8 +1606,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -1739,8 +1739,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -1892,8 +1892,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -2045,8 +2045,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -2198,8 +2198,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -2351,8 +2351,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
@@ -3711,8 +3711,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 351,
-            "height": 120,
-            "top": 679,
+            "height": 124,
+            "top": 675,
             "left": 12,
             "right": 363,
             "bottom": 799
@@ -3810,8 +3810,8 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 737,
-            "height": 120,
-            "top": 888,
+            "height": 132,
+            "top": 876,
             "left": 15,
             "right": 753,
             "bottom": 1008
