@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-20T04:01:55.048Z",
+  "generatedAt": "2026-02-20T04:07:26.757Z",
   "breakpoints": [
     {
       "name": "mobile",
@@ -443,11 +443,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 34,
-            "top": 89,
+            "height": 32,
+            "top": 131,
             "left": 25,
             "right": 287,
-            "bottom": 123
+            "bottom": 163
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -576,11 +576,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 34,
-            "top": 89,
+            "height": 32,
+            "top": 131,
             "left": 25,
             "right": 287,
-            "bottom": 123
+            "bottom": 163
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -730,10 +730,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 89,
+            "top": 131,
             "left": 25,
             "right": 287,
-            "bottom": 123
+            "bottom": 165
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -883,10 +883,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 89,
+            "top": 131,
             "left": 25,
             "right": 287,
-            "bottom": 123
+            "bottom": 165
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1036,10 +1036,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 89,
+            "top": 131,
             "left": 25,
             "right": 287,
-            "bottom": 123
+            "bottom": 165
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1189,10 +1189,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 89,
+            "top": 131,
             "left": 25,
             "right": 287,
-            "bottom": 123
+            "bottom": 165
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1648,11 +1648,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 34,
-            "top": 94,
+            "height": 32,
+            "top": 136,
             "left": 28,
             "right": 290,
-            "bottom": 128
+            "bottom": 168
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1781,11 +1781,11 @@
             "overflow": "visible",
             "overflowY": "visible",
             "width": 262,
-            "height": 34,
-            "top": 94,
+            "height": 32,
+            "top": 136,
             "left": 28,
             "right": 290,
-            "bottom": 128
+            "bottom": 168
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -1935,10 +1935,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 94,
+            "top": 136,
             "left": 28,
             "right": 290,
-            "bottom": 128
+            "bottom": 170
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -2088,10 +2088,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 94,
+            "top": 136,
             "left": 28,
             "right": 290,
-            "bottom": 128
+            "bottom": 170
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -2241,10 +2241,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 94,
+            "top": 136,
             "left": 28,
             "right": 290,
-            "bottom": 128
+            "bottom": 170
           },
           {
             "selector": ".manuscript-drawer-panel",
@@ -2394,10 +2394,10 @@
             "overflowY": "visible",
             "width": 262,
             "height": 34,
-            "top": 94,
+            "top": 136,
             "left": 28,
             "right": 290,
-            "bottom": 128
+            "bottom": 170
           },
           {
             "selector": ".manuscript-drawer-panel",

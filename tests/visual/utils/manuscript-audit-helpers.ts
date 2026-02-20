@@ -822,7 +822,7 @@ export const collectManuscriptMetrics = async (
       '.manuscript-tools-menu-items':
         '.manuscript-tools-menu-items, #manuscript-panels-menu:not([hidden]) .space-y-2',
       '.manuscript-tools-menu-item':
-        '.manuscript-tools-menu-item, #manuscript-panels-menu:not([hidden]) [data-drawer-trigger]',
+        '.manuscript-tools-menu-item:not(.manuscript-tools-menu-item-mobile-only), #manuscript-panels-menu:not([hidden]) [data-drawer-trigger]',
       '.manuscript-drawer-panel':
         '.manuscript-drawer-panel, #manuscript-drawer-overlay:not(.hidden) #manuscript-drawer-panel',
       '.manuscript-drawer-content':
