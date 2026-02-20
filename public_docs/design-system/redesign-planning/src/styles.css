@@ -30,6 +30,9 @@
       --color-manuscript-gradient-end: rgba(244, 244, 245, 0.92);
       --color-scrim: rgba(17, 17, 17, 0.45);
       --shadow-overlay: 0 6px 18px rgba(0, 0, 0, 0.08);
+      --color-accent-soft: rgba(49, 46, 129, 0.08);
+      --color-danger: rgb(185, 28, 28);
+      --color-danger-hover: rgb(153, 27, 27);
 
       /* Typography */
       --font-narrative: 'Lora', serif;
@@ -67,6 +70,9 @@
       --color-manuscript-gradient-end: rgba(24, 24, 27, 0.92);
       --color-scrim: rgba(0, 0, 0, 0.65);
       --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --color-accent-soft: rgba(129, 140, 248, 0.1);
+      --color-danger: rgb(239, 68, 68);
+      --color-danger-hover: rgb(220, 38, 38);
     }
 
     body {
@@ -259,7 +265,6 @@
     .manuscript-overlay-main {
       min-height: 0;
       overflow-y: auto;
-      padding-right: 6px;
       position: relative;
       z-index: 1;
       overscroll-behavior-y: contain;

@@ -81,6 +81,13 @@ const ActiveGameSessionChoicesColumn: React.FC<
   return (
     <div className={className} aria-busy={isGeneratingChoices}>
       <div className="player-choices-container" data-tutorial={dataTutorial}>
+        {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}
+        {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && !hidePrompt && (
+          <p className="manuscript-context-summary mb-1.5 px-1">
+            {currentDecision.contextSummary}
+          </p>
+        )}
+
         {/* Mobile-only top controls for Suggested Actions toggle and End Story */}
         {isProgressiveDisclosureEnabled && (
           <div className="manuscript-mobile-rail-top-controls">
@@ -121,22 +128,25 @@ const ActiveGameSessionChoicesColumn: React.FC<
           )
         ) : (
           !hideChoices && (
-            <div>
-              {/* Choice decision skeleton - matches ChoiceSelector layout */}
-              <div>
+            <div className="choice-selector manuscript-choice-selector animate-pulse">
+              <div className="manuscript-choice-selector-body">
                 {/* Choice prompt skeleton */}
-                <div />
+                {!hidePrompt && <div className="manuscript-choice-prompt bg-muted rounded h-6 w-3/4 mb-4" />}
 
                 {/* Choice buttons skeleton */}
-                {[1, 2, 3].map((i) => (
-                  <div key={i} />
-                ))}
+                <div className="manuscript-suggested-actions-grid">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="manuscript-suggested-action bg-muted rounded h-[4.125rem]" />
+                  ))}
+                </div>
 
                 {/* Custom input skeleton */}
-                <div>
-                  <div />
-                  <div />
-                </div>
+                {!hideCustomInput && (
+                  <div className="manuscript-input-row mt-4">
+                    <div className="manuscript-custom-input bg-muted rounded flex-1" />
+                    <div className="manuscript-send-button bg-muted rounded w-16" />
+                  </div>
+                )}
               </div>
             </div>
           )

@@ -188,10 +188,9 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           />
         )}
 
-        {/* Dynamic Context Summary and Prompt */}
-        {(decision.contextSummary || !hidePrompt) && (
+        {!hidePrompt && (
           <h3 id="choices-heading" className="manuscript-choice-prompt">
-            {decision.contextSummary || displayPrompt}
+            {displayPrompt}
           </h3>
         )}
 

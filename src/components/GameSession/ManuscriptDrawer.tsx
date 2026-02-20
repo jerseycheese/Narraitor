@@ -1,13 +1,9 @@
 'use client';
 
 import React from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogContent,
-  DialogTitle,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { cssClasses } from '@/lib/utils/classNames';
 
@@ -45,36 +41,40 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPortal>
-        <DialogOverlay className="manuscript-overlay-backdrop manuscript-drawer-backdrop" />
-        <DialogContent
-          showCloseButton={false}
-          data-testid="manuscript-drawer"
-          className={cssClasses(
-            'manuscript-drawer-panel',
-            side === 'right' 
-              ? 'manuscript-drawer-panel-right'
-              : 'manuscript-drawer-panel-left'
-          )}
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="manuscript-overlay-backdrop manuscript-drawer-backdrop" />
+        <DialogPrimitive.Content
+          className="manuscript-drawer-layer"
+          aria-describedby={undefined}
         >
-          <div className="manuscript-drawer-header">
-            <div className="manuscript-drawer-header-titles">
-              <DialogTitle className="manuscript-drawer-title">
-                {title}
-              </DialogTitle>
-              {subtitle && (
-                <p className="manuscript-drawer-subtitle">{subtitle}</p>
-              )}
+          <aside
+            className={cssClasses(
+              'manuscript-drawer-panel',
+              side === 'right'
+                ? 'manuscript-drawer-panel-right'
+                : 'manuscript-drawer-panel-left'
+            )}
+            data-testid="manuscript-drawer"
+          >
+            <div className="manuscript-drawer-header">
+              <div className="manuscript-drawer-header-titles">
+                <DialogPrimitive.Title className="manuscript-drawer-title">
+                  {title}
+                </DialogPrimitive.Title>
+                {subtitle && (
+                  <p className="manuscript-drawer-subtitle">{subtitle}</p>
+                )}
+              </div>
+              <DialogPrimitive.Close className="manuscript-drawer-close-text">
+                Close
+              </DialogPrimitive.Close>
             </div>
-            <DialogClose className="manuscript-drawer-close-text">
-              Close
-            </DialogClose>
-          </div>
-          <div className="manuscript-drawer-content">
-            {children}
-          </div>
-        </DialogContent>
-      </DialogPortal>
+            <div className="manuscript-drawer-content">
+              {children}
+            </div>
+          </aside>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
     </Dialog>
   );
 };

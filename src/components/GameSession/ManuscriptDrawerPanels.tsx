@@ -155,6 +155,12 @@ interface ToolsMenuPanelContentProps {
   onOpenDrawer: (drawerType: DrawerType) => void;
   onClosePanel: () => void;
   onOpenJournalRoute: () => void;
+  onOpenCharacterPanel?: () => void;
+  onSimulateTurn?: () => void;
+  onToggleStreamingPreview?: () => void;
+  isStreamingPreview?: boolean;
+  onToggleEndingSuggestionPreview?: () => void;
+  isEndingSuggestionPreview?: boolean;
 }
 
 export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
@@ -162,6 +168,12 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
   onOpenDrawer,
   onClosePanel,
   onOpenJournalRoute,
+  onOpenCharacterPanel,
+  onSimulateTurn,
+  onToggleStreamingPreview,
+  isStreamingPreview,
+  onToggleEndingSuggestionPreview,
+  isEndingSuggestionPreview,
 }) => {
   const drawerButtons: Array<{
     id: DrawerType;
@@ -179,6 +191,18 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
       <div className="manuscript-hud-panel-title">Tools</div>
 
       <div className="manuscript-tools-menu-items">
+        {onOpenCharacterPanel && (
+          <button
+            className="manuscript-tools-menu-item manuscript-tools-menu-item-mobile-only"
+            onClick={() => {
+              onClosePanel();
+              onOpenCharacterPanel();
+            }}
+          >
+            Character
+          </button>
+        )}
+
         {drawerButtons.map((button) => (
           <button
             key={button.id}
@@ -202,8 +226,50 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
             onOpenJournalRoute();
           }}
         >
-          Open Journal
+          Open Journal Route
         </button>
+
+        {(onSimulateTurn || onToggleStreamingPreview || onToggleEndingSuggestionPreview) && (
+          <div className="manuscript-tools-menu-divider" aria-hidden="true" />
+        )}
+
+        {onSimulateTurn && (
+          <button
+            className="manuscript-tools-menu-item"
+            onClick={() => {
+              onClosePanel();
+              onSimulateTurn();
+            }}
+          >
+            Simulate Next Turn
+          </button>
+        )}
+
+        {onToggleStreamingPreview && (
+          <button
+            className={cssClasses(
+              'manuscript-tools-menu-item',
+              isStreamingPreview && 'manuscript-tools-menu-item-active'
+            )}
+            onClick={onToggleStreamingPreview}
+            aria-pressed={Boolean(isStreamingPreview)}
+          >
+            Toggle Streaming State
+          </button>
+        )}
+
+        {onToggleEndingSuggestionPreview && (
+          <button
+            className={cssClasses(
+              'manuscript-tools-menu-item',
+              isEndingSuggestionPreview && 'manuscript-tools-menu-item-active'
+            )}
+            onClick={onToggleEndingSuggestionPreview}
+            aria-pressed={Boolean(isEndingSuggestionPreview)}
+          >
+            {isEndingSuggestionPreview ? 'Hide Ending Suggestion' : 'Show Ending Suggestion'}
+          </button>
+        )}
       </div>
     </>
   );
