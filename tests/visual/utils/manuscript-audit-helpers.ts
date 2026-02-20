@@ -614,16 +614,7 @@ export const applyAppStreamingVisualState = async (
 
     const narrativeScrollContainer = document.querySelector('.manuscript-overlay-main');
     if (narrativeScrollContainer) {
-      // Find the last outcome callout to align vertical position with prototype
-      const outcomeCallouts = document.querySelectorAll('.choice-outcome-callout');
-      const lastCallout = outcomeCallouts[outcomeCallouts.length - 1];
-      
-      if (lastCallout instanceof HTMLElement) {
-        // Scroll so the outcome block is at a consistent position
-        narrativeScrollContainer.scrollTop = lastCallout.offsetTop - 12;
-      } else {
-        narrativeScrollContainer.scrollTop = narrativeScrollContainer.scrollHeight;
-      }
+      narrativeScrollContainer.scrollTop = narrativeScrollContainer.scrollHeight;
     }
   });
 
