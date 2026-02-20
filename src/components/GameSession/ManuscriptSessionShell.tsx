@@ -199,11 +199,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
           {/* Main Narrative Stage */}
           <main className="manuscript-overlay-main pb-4">
-            {mobileTopContent && (
-              <div className="lg:hidden">
-                {mobileTopContent}
-              </div>
-            )}
+            {mobileTopContent}
 
             <div className={cssClasses("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
                 {marginContent && (

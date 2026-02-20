@@ -81,6 +81,13 @@ const ActiveGameSessionChoicesColumn: React.FC<
   return (
     <div className={className} aria-busy={isGeneratingChoices}>
       <div className="player-choices-container" data-tutorial={dataTutorial}>
+        {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}
+        {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && !hidePrompt && (
+          <p className="manuscript-context-summary mb-1.5 px-1">
+            {currentDecision.contextSummary}
+          </p>
+        )}
+
         {/* Mobile-only top controls for Suggested Actions toggle and End Story */}
         {isProgressiveDisclosureEnabled && (
           <div className="manuscript-mobile-rail-top-controls">

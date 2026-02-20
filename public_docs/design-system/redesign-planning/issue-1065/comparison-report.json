@@ -1,23 +1,23 @@
 {
   "summary": {
-    "generatedAt": "2026-02-19T23:19:15.253Z",
+    "generatedAt": "2026-02-20T03:40:12.663Z",
     "screenshotPairsCompared": 30,
     "missingPrototypePairs": [],
-    "maxMismatchRatio": 0.200148,
-    "maxMeanAbsDelta": 26.106659,
+    "maxMismatchRatio": 0.175491,
+    "maxMeanAbsDelta": 22.040424,
     "states": {
       "steady": {
         "comparisons": 6,
-        "maxMismatchRatio": 0.185544,
-        "maxMeanAbsDelta": 25.224968,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.172962,
+        "maxMeanAbsDelta": 22.040424,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "character-panel-open": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.145924,
-        "maxMeanAbsDelta": 18.241678,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.136732,
+        "maxMeanAbsDelta": 16.557022,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "drawer-character": {
@@ -29,23 +29,23 @@
       },
       "drawer-choice-history": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.063659,
-        "maxMeanAbsDelta": 6.810862,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.064496,
+        "maxMeanAbsDelta": 6.785141,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8
       },
       "drawer-inventory": {
         "comparisons": 3,
         "maxMismatchRatio": 0.074194,
-        "maxMeanAbsDelta": 8.11747,
-        "maxSelectorDelta": 108,
+        "maxMeanAbsDelta": 8.117498,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8
       },
       "drawer-journal": {
         "comparisons": 3,
         "maxMismatchRatio": 0.095087,
         "maxMeanAbsDelta": 11.089271,
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8
       },
       "drawer-story-summary": {
@@ -57,39 +57,39 @@
       },
       "streaming": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.200148,
-        "maxMeanAbsDelta": 26.106659,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.164992,
+        "maxMeanAbsDelta": 21.485831,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "tools-panel-open": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.149527,
-        "maxMeanAbsDelta": 14.810716,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.175491,
+        "maxMeanAbsDelta": 16.016404,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8
       }
     }
   },
   "summaryViewportCrop": {
-    "generatedAt": "2026-02-19T23:19:15.255Z",
+    "generatedAt": "2026-02-20T03:40:12.665Z",
     "screenshotPairsCompared": 30,
     "missingPrototypePairs": [],
-    "maxMismatchRatio": 0.200148,
-    "maxMeanAbsDelta": 26.106659,
+    "maxMismatchRatio": 0.175491,
+    "maxMeanAbsDelta": 22.040424,
     "states": {
       "steady": {
         "comparisons": 6,
-        "maxMismatchRatio": 0.185544,
-        "maxMeanAbsDelta": 25.224968,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.172962,
+        "maxMeanAbsDelta": 22.040424,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "character-panel-open": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.145924,
-        "maxMeanAbsDelta": 18.241678,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.136732,
+        "maxMeanAbsDelta": 16.557022,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "drawer-character": {
@@ -101,23 +101,23 @@
       },
       "drawer-choice-history": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.063659,
-        "maxMeanAbsDelta": 6.810862,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.064496,
+        "maxMeanAbsDelta": 6.785141,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8
       },
       "drawer-inventory": {
         "comparisons": 3,
         "maxMismatchRatio": 0.074194,
-        "maxMeanAbsDelta": 8.11747,
-        "maxSelectorDelta": 108,
+        "maxMeanAbsDelta": 8.117498,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8
       },
       "drawer-journal": {
         "comparisons": 3,
         "maxMismatchRatio": 0.095087,
         "maxMeanAbsDelta": 11.089271,
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8
       },
       "drawer-story-summary": {
@@ -129,16 +129,16 @@
       },
       "streaming": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.200148,
-        "maxMeanAbsDelta": 26.106659,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.164992,
+        "maxMeanAbsDelta": 21.485831,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0
       },
       "tools-panel-open": {
         "comparisons": 3,
-        "maxMismatchRatio": 0.149527,
-        "maxMeanAbsDelta": 14.810716,
-        "maxSelectorDelta": 108,
+        "maxMismatchRatio": 0.175491,
+        "maxMeanAbsDelta": 16.016404,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8
       }
     }
@@ -163,10 +163,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 11.118681,
-        "mismatchPixels": 128090,
-        "mismatchRatio": 0.097725,
-        "rmse": 41.653413
+        "meanAbsDelta": 10.929556,
+        "mismatchPixels": 125686,
+        "mismatchRatio": 0.095891,
+        "rmse": 41.324347
       },
       "screenshotViewportCrop": {
         "appFile": "app-dark-steady-desktop-1280.png",
@@ -180,13 +180,13 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 11.118681,
-        "mismatchPixels": 128090,
-        "mismatchRatio": 0.097725,
-        "rmse": 41.653413
+        "meanAbsDelta": 10.929556,
+        "mismatchPixels": 125686,
+        "mismatchRatio": 0.095891,
+        "rmse": 41.324347
       },
       "metrics": {
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
@@ -196,11 +196,7 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -227,10 +223,10 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 25.224968,
-        "mismatchPixels": 56279,
-        "mismatchRatio": 0.184824,
-        "rmse": 64.922421
+        "meanAbsDelta": 22.040424,
+        "mismatchPixels": 52667,
+        "mismatchRatio": 0.172962,
+        "rmse": 59.723205
       },
       "screenshotViewportCrop": {
         "appFile": "app-dark-steady-mobile-375.png",
@@ -244,23 +240,19 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 25.224968,
-        "mismatchPixels": 56279,
-        "mismatchRatio": 0.184824,
-        "rmse": 64.922421
+        "meanAbsDelta": 22.040424,
+        "mismatchPixels": 52667,
+        "mismatchRatio": 0.172962,
+        "rmse": 59.723205
       },
       "metrics": {
-        "maxSelectorDelta": 41,
+        "maxSelectorDelta": 43,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -287,10 +279,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 14.161209,
-        "mismatchPixels": 83527,
-        "mismatchRatio": 0.10621,
-        "rmse": 48.040579
+        "meanAbsDelta": 11.87995,
+        "mismatchPixels": 73147,
+        "mismatchRatio": 0.093011,
+        "rmse": 43.242637
       },
       "screenshotViewportCrop": {
         "appFile": "app-dark-steady-tablet-768.png",
@@ -304,10 +296,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 14.161209,
-        "mismatchPixels": 83527,
-        "mismatchRatio": 0.10621,
-        "rmse": 48.040579
+        "meanAbsDelta": 11.87995,
+        "mismatchPixels": 73147,
+        "mismatchRatio": 0.093011,
+        "rmse": 43.242637
       },
       "metrics": {
         "maxSelectorDelta": 38,
@@ -320,7 +312,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -347,10 +339,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 11.937212,
-        "mismatchPixels": 140927,
-        "mismatchRatio": 0.107519,
-        "rmse": 42.790108
+        "meanAbsDelta": 11.38249,
+        "mismatchPixels": 129077,
+        "mismatchRatio": 0.098478,
+        "rmse": 42.206092
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-character-panel-open-desktop-1280.png",
@@ -364,13 +356,13 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 11.937212,
-        "mismatchPixels": 140927,
-        "mismatchRatio": 0.107519,
-        "rmse": 42.790108
+        "meanAbsDelta": 11.38249,
+        "mismatchPixels": 129077,
+        "mismatchRatio": 0.098478,
+        "rmse": 42.206092
       },
       "metrics": {
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -396,11 +388,7 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-hud-panel",
@@ -433,10 +421,10 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 18.241678,
-        "mismatchPixels": 44434,
-        "mismatchRatio": 0.145924,
-        "rmse": 51.60672
+        "meanAbsDelta": 16.557022,
+        "mismatchPixels": 41635,
+        "mismatchRatio": 0.136732,
+        "rmse": 49.131475
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-character-panel-open-mobile-375.png",
@@ -450,13 +438,13 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 18.241678,
-        "mismatchPixels": 44434,
-        "mismatchRatio": 0.145924,
-        "rmse": 51.60672
+        "meanAbsDelta": 16.557022,
+        "mismatchPixels": 41635,
+        "mismatchRatio": 0.136732,
+        "rmse": 49.131475
       },
       "metrics": {
-        "maxSelectorDelta": 41,
+        "maxSelectorDelta": 43,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -478,15 +466,11 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 9
+            "maxGeometryDelta": 10
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -513,10 +497,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 11.654051,
-        "mismatchPixels": 74018,
-        "mismatchRatio": 0.094119,
-        "rmse": 41.495204
+        "meanAbsDelta": 9.701707,
+        "mismatchPixels": 64310,
+        "mismatchRatio": 0.081774,
+        "rmse": 37.488256
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-character-panel-open-tablet-768.png",
@@ -530,10 +514,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 11.654051,
-        "mismatchPixels": 74018,
-        "mismatchRatio": 0.094119,
-        "rmse": 41.495204
+        "meanAbsDelta": 9.701707,
+        "mismatchPixels": 64310,
+        "mismatchRatio": 0.081774,
+        "rmse": 37.488256
       },
       "metrics": {
         "maxSelectorDelta": 38,
@@ -562,7 +546,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-hud-panel",
@@ -593,10 +577,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 9.317711,
-        "mismatchPixels": 110494,
-        "mismatchRatio": 0.0843,
-        "rmse": 34.623852
+        "meanAbsDelta": 9.24942,
+        "mismatchPixels": 111591,
+        "mismatchRatio": 0.085137,
+        "rmse": 34.649033
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-character-desktop-1280.png",
@@ -610,10 +594,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 9.317711,
-        "mismatchPixels": 110494,
-        "mismatchRatio": 0.0843,
-        "rmse": 34.623852
+        "meanAbsDelta": 9.24942,
+        "mismatchPixels": 111591,
+        "mismatchRatio": 0.085137,
+        "rmse": 34.649033
       },
       "metrics": {
         "maxSelectorDelta": 168,
@@ -642,15 +626,11 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -736,23 +716,19 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 9
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 8
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "maxGeometryDelta": 42
+            "maxGeometryDelta": 40
           },
           {
             "selector": ".manuscript-drawer-content",
@@ -783,10 +759,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 10.888391,
-        "mismatchPixels": 67502,
-        "mismatchRatio": 0.085833,
-        "rmse": 40.229194
+        "meanAbsDelta": 10.861352,
+        "mismatchPixels": 67941,
+        "mismatchRatio": 0.086391,
+        "rmse": 40.222767
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-character-tablet-768.png",
@@ -800,10 +776,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 10.888391,
-        "mismatchPixels": 67502,
-        "mismatchRatio": 0.085833,
-        "rmse": 40.229194
+        "meanAbsDelta": 10.861352,
+        "mismatchPixels": 67941,
+        "mismatchRatio": 0.086391,
+        "rmse": 40.222767
       },
       "metrics": {
         "maxSelectorDelta": 168,
@@ -832,7 +808,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-hud-panel",
@@ -875,10 +851,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 6.169296,
-        "mismatchPixels": 83439,
-        "mismatchRatio": 0.063659,
-        "rmse": 23.909435
+        "meanAbsDelta": 6.101006,
+        "mismatchPixels": 84536,
+        "mismatchRatio": 0.064496,
+        "rmse": 23.945885
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-choice-history-desktop-1280.png",
@@ -892,13 +868,13 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 6.169296,
-        "mismatchPixels": 83439,
-        "mismatchRatio": 0.063659,
-        "rmse": 23.909435
+        "meanAbsDelta": 6.101006,
+        "mismatchPixels": 84536,
+        "mismatchRatio": 0.064496,
+        "rmse": 23.945885
       },
       "metrics": {
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -924,15 +900,11 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -996,7 +968,7 @@
         "rmse": 28.42638
       },
       "metrics": {
-        "maxSelectorDelta": 42,
+        "maxSelectorDelta": 43,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -1018,23 +990,19 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 9
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 8
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "maxGeometryDelta": 42
+            "maxGeometryDelta": 40
           },
           {
             "selector": ".manuscript-drawer-content",
@@ -1065,10 +1033,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 6.810862,
-        "mismatchPixels": 49592,
-        "mismatchRatio": 0.063059,
-        "rmse": 26.352898
+        "meanAbsDelta": 6.785141,
+        "mismatchPixels": 50031,
+        "mismatchRatio": 0.063618,
+        "rmse": 26.343226
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-choice-history-tablet-768.png",
@@ -1082,10 +1050,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 6.810862,
-        "mismatchPixels": 49592,
-        "mismatchRatio": 0.063059,
-        "rmse": 26.352898
+        "meanAbsDelta": 6.785141,
+        "mismatchPixels": 50031,
+        "mismatchRatio": 0.063618,
+        "rmse": 26.343226
       },
       "metrics": {
         "maxSelectorDelta": 58,
@@ -1114,7 +1082,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-hud-panel",
@@ -1157,10 +1125,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 6.630981,
-        "mismatchPixels": 89382,
-        "mismatchRatio": 0.068193,
-        "rmse": 25.504986
+        "meanAbsDelta": 6.562698,
+        "mismatchPixels": 90479,
+        "mismatchRatio": 0.06903,
+        "rmse": 25.53916
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-inventory-desktop-1280.png",
@@ -1174,13 +1142,13 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 6.630981,
-        "mismatchPixels": 89382,
-        "mismatchRatio": 0.068193,
-        "rmse": 25.504986
+        "meanAbsDelta": 6.562698,
+        "mismatchPixels": 90479,
+        "mismatchRatio": 0.06903,
+        "rmse": 25.53916
       },
       "metrics": {
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -1206,15 +1174,11 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1255,10 +1219,10 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 8.11747,
+        "meanAbsDelta": 8.117498,
         "mismatchPixels": 22592,
         "mismatchRatio": 0.074194,
-        "rmse": 33.619935
+        "rmse": 33.619938
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-inventory-mobile-375.png",
@@ -1272,13 +1236,13 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 8.11747,
+        "meanAbsDelta": 8.117498,
         "mismatchPixels": 22592,
         "mismatchRatio": 0.074194,
-        "rmse": 33.619935
+        "rmse": 33.619938
       },
       "metrics": {
-        "maxSelectorDelta": 42,
+        "maxSelectorDelta": 43,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -1300,23 +1264,19 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 9
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 8
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "maxGeometryDelta": 42
+            "maxGeometryDelta": 40
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -1343,10 +1303,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 7.538166,
-        "mismatchPixels": 55262,
-        "mismatchRatio": 0.070269,
-        "rmse": 28.662751
+        "meanAbsDelta": 7.511946,
+        "mismatchPixels": 55701,
+        "mismatchRatio": 0.070827,
+        "rmse": 28.653811
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-inventory-tablet-768.png",
@@ -1360,10 +1320,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 7.538166,
-        "mismatchPixels": 55262,
-        "mismatchRatio": 0.070269,
-        "rmse": 28.662751
+        "meanAbsDelta": 7.511946,
+        "mismatchPixels": 55701,
+        "mismatchRatio": 0.070827,
+        "rmse": 28.653811
       },
       "metrics": {
         "maxSelectorDelta": 39,
@@ -1392,7 +1352,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-hud-panel",
@@ -1435,10 +1395,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 7.084434,
-        "mismatchPixels": 95178,
-        "mismatchRatio": 0.072615,
-        "rmse": 25.384446
+        "meanAbsDelta": 7.016143,
+        "mismatchPixels": 96275,
+        "mismatchRatio": 0.073452,
+        "rmse": 25.418782
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-journal-desktop-1280.png",
@@ -1452,13 +1412,13 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 7.084434,
-        "mismatchPixels": 95178,
-        "mismatchRatio": 0.072615,
-        "rmse": 25.384446
+        "meanAbsDelta": 7.016143,
+        "mismatchPixels": 96275,
+        "mismatchRatio": 0.073452,
+        "rmse": 25.418782
       },
       "metrics": {
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -1484,15 +1444,11 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1578,23 +1534,19 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 9
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 8
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "maxGeometryDelta": 42
+            "maxGeometryDelta": 40
           },
           {
             "selector": ".manuscript-drawer-content",
@@ -1625,10 +1577,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 8.366995,
-        "mismatchPixels": 61548,
-        "mismatchRatio": 0.078262,
-        "rmse": 28.625625
+        "meanAbsDelta": 8.341275,
+        "mismatchPixels": 61987,
+        "mismatchRatio": 0.078821,
+        "rmse": 28.61672
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-journal-tablet-768.png",
@@ -1642,10 +1594,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 8.366995,
-        "mismatchPixels": 61548,
-        "mismatchRatio": 0.078262,
-        "rmse": 28.625625
+        "meanAbsDelta": 8.341275,
+        "mismatchPixels": 61987,
+        "mismatchRatio": 0.078821,
+        "rmse": 28.61672
       },
       "metrics": {
         "maxSelectorDelta": 64,
@@ -1674,7 +1626,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-hud-panel",
@@ -1717,10 +1669,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 6.461487,
-        "mismatchPixels": 88047,
-        "mismatchRatio": 0.067175,
-        "rmse": 25.277235
+        "meanAbsDelta": 6.393197,
+        "mismatchPixels": 89144,
+        "mismatchRatio": 0.068011,
+        "rmse": 25.311717
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-story-summary-desktop-1280.png",
@@ -1734,10 +1686,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 6.461487,
-        "mismatchPixels": 88047,
-        "mismatchRatio": 0.067175,
-        "rmse": 25.277235
+        "meanAbsDelta": 6.393197,
+        "mismatchPixels": 89144,
+        "mismatchRatio": 0.068011,
+        "rmse": 25.311717
       },
       "metrics": {
         "maxSelectorDelta": 272,
@@ -1766,15 +1718,11 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -1860,23 +1808,19 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 9
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 8
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "maxGeometryDelta": 42
+            "maxGeometryDelta": 40
           },
           {
             "selector": ".manuscript-drawer-content",
@@ -1907,10 +1851,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 7.272101,
-        "mismatchPixels": 54043,
-        "mismatchRatio": 0.068719,
-        "rmse": 28.357294
+        "meanAbsDelta": 7.245893,
+        "mismatchPixels": 54482,
+        "mismatchRatio": 0.069277,
+        "rmse": 28.348261
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-drawer-story-summary-tablet-768.png",
@@ -1924,10 +1868,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 7.272101,
-        "mismatchPixels": 54043,
-        "mismatchRatio": 0.068719,
-        "rmse": 28.357294
+        "meanAbsDelta": 7.245893,
+        "mismatchPixels": 54482,
+        "mismatchRatio": 0.069277,
+        "rmse": 28.348261
       },
       "metrics": {
         "maxSelectorDelta": 272,
@@ -1956,7 +1900,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-hud-panel",
@@ -1999,10 +1943,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 11.307272,
-        "mismatchPixels": 133406,
-        "mismatchRatio": 0.101781,
-        "rmse": 41.774479
+        "meanAbsDelta": 10.819197,
+        "mismatchPixels": 122031,
+        "mismatchRatio": 0.093102,
+        "rmse": 41.326536
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-steady-desktop-1280.png",
@@ -2016,13 +1960,13 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 11.307272,
-        "mismatchPixels": 133406,
-        "mismatchRatio": 0.101781,
-        "rmse": 41.774479
+        "meanAbsDelta": 10.819197,
+        "mismatchPixels": 122031,
+        "mismatchRatio": 0.093102,
+        "rmse": 41.326536
       },
       "metrics": {
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
@@ -2032,11 +1976,7 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -2063,10 +2003,10 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 23.386764,
-        "mismatchPixels": 56498,
-        "mismatchRatio": 0.185544,
-        "rmse": 60.254989
+        "meanAbsDelta": 19.848269,
+        "mismatchPixels": 50693,
+        "mismatchRatio": 0.166479,
+        "rmse": 54.614487
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-steady-mobile-375.png",
@@ -2080,23 +2020,19 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 23.386764,
-        "mismatchPixels": 56498,
-        "mismatchRatio": 0.185544,
-        "rmse": 60.254989
+        "meanAbsDelta": 19.848269,
+        "mismatchPixels": 50693,
+        "mismatchRatio": 0.166479,
+        "rmse": 54.614487
       },
       "metrics": {
-        "maxSelectorDelta": 41,
+        "maxSelectorDelta": 43,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -2123,10 +2059,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 13.391539,
-        "mismatchPixels": 84337,
-        "mismatchRatio": 0.10724,
-        "rmse": 45.120604
+        "meanAbsDelta": 10.978423,
+        "mismatchPixels": 72498,
+        "mismatchRatio": 0.092186,
+        "rmse": 40.343539
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-steady-tablet-768.png",
@@ -2140,10 +2076,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 13.391539,
-        "mismatchPixels": 84337,
-        "mismatchRatio": 0.10724,
-        "rmse": 45.120604
+        "meanAbsDelta": 10.978423,
+        "mismatchPixels": 72498,
+        "mismatchRatio": 0.092186,
+        "rmse": 40.343539
       },
       "metrics": {
         "maxSelectorDelta": 38,
@@ -2156,7 +2092,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -2183,10 +2119,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 9.04505,
-        "mismatchPixels": 107763,
-        "mismatchRatio": 0.082217,
-        "rmse": 33.746749
+        "meanAbsDelta": 8.559224,
+        "mismatchPixels": 93907,
+        "mismatchRatio": 0.071645,
+        "rmse": 33.432635
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-streaming-desktop-1280.png",
@@ -2200,23 +2136,19 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 9.04505,
-        "mismatchPixels": 107763,
-        "mismatchRatio": 0.082217,
-        "rmse": 33.746749
+        "meanAbsDelta": 8.559224,
+        "mismatchPixels": 93907,
+        "mismatchRatio": 0.071645,
+        "rmse": 33.432635
       },
       "metrics": {
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -2243,10 +2175,10 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 26.106659,
-        "mismatchPixels": 60945,
-        "mismatchRatio": 0.200148,
-        "rmse": 62.913288
+        "meanAbsDelta": 21.485831,
+        "mismatchPixels": 50240,
+        "mismatchRatio": 0.164992,
+        "rmse": 57.154407
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-streaming-mobile-375.png",
@@ -2260,23 +2192,19 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 26.106659,
-        "mismatchPixels": 60945,
-        "mismatchRatio": 0.200148,
-        "rmse": 62.913288
+        "meanAbsDelta": 21.485831,
+        "mismatchPixels": 50240,
+        "mismatchRatio": 0.164992,
+        "rmse": 57.154407
       },
       "metrics": {
-        "maxSelectorDelta": 46,
+        "maxSelectorDelta": 26,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 46
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 26
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -2303,10 +2231,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 13.161819,
-        "mismatchPixels": 84276,
-        "mismatchRatio": 0.107162,
-        "rmse": 44.183949
+        "meanAbsDelta": 10.756052,
+        "mismatchPixels": 70067,
+        "mismatchRatio": 0.089095,
+        "rmse": 39.665266
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-streaming-tablet-768.png",
@@ -2320,19 +2248,19 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 13.161819,
-        "mismatchPixels": 84276,
-        "mismatchRatio": 0.107162,
-        "rmse": 44.183949
+        "meanAbsDelta": 10.756052,
+        "mismatchPixels": 70067,
+        "mismatchRatio": 0.089095,
+        "rmse": 39.665266
       },
       "metrics": {
-        "maxSelectorDelta": 28,
+        "maxSelectorDelta": 8,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {},
         "selectorsOver8px": [
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -2359,10 +2287,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 12.430006,
-        "mismatchPixels": 148784,
-        "mismatchRatio": 0.113513,
-        "rmse": 43.710277
+        "meanAbsDelta": 11.852487,
+        "mismatchPixels": 136659,
+        "mismatchRatio": 0.104263,
+        "rmse": 43.134921
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-tools-panel-open-desktop-1280.png",
@@ -2376,13 +2304,13 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 1310720,
-        "meanAbsDelta": 12.430006,
-        "mismatchPixels": 148784,
-        "mismatchRatio": 0.113513,
-        "rmse": 43.710277
+        "meanAbsDelta": 11.852487,
+        "mismatchPixels": 136659,
+        "mismatchRatio": 0.104263,
+        "rmse": 43.134921
       },
       "metrics": {
-        "maxSelectorDelta": 108,
+        "maxSelectorDelta": 90,
         "maxRelationshipDelta": 8,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -2408,15 +2336,11 @@
           },
           {
             "selector": ".manuscript-characters-rail",
-            "maxGeometryDelta": 108
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 90
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 18
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
@@ -2453,10 +2377,10 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 14.810716,
-        "mismatchPixels": 45531,
-        "mismatchRatio": 0.149527,
-        "rmse": 45.465578
+        "meanAbsDelta": 16.016404,
+        "mismatchPixels": 53437,
+        "mismatchRatio": 0.175491,
+        "rmse": 47.201053
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-tools-panel-open-mobile-375.png",
@@ -2470,13 +2394,13 @@
         "overlapHeight": 812,
         "dimensionMatch": true,
         "comparedPixels": 304500,
-        "meanAbsDelta": 14.810716,
-        "mismatchPixels": 45531,
-        "mismatchRatio": 0.149527,
-        "rmse": 45.465578
+        "meanAbsDelta": 16.016404,
+        "mismatchPixels": 53437,
+        "mismatchRatio": 0.175491,
+        "rmse": 47.201053
       },
       "metrics": {
-        "maxSelectorDelta": 42,
+        "maxSelectorDelta": 43,
         "maxRelationshipDelta": 0,
         "relationshipDiffs": {
           "toolsPanelTopToHeaderBottom": {
@@ -2498,23 +2422,19 @@
         "selectorsOver8px": [
           {
             "selector": ".manuscript-main-stage",
-            "maxGeometryDelta": 41
-          },
-          {
-            "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 24
+            "maxGeometryDelta": 43
           },
           {
             "selector": ".manuscript-hud-panel",
-            "maxGeometryDelta": 9
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-items",
-            "maxGeometryDelta": 8
+            "maxGeometryDelta": 10
           },
           {
             "selector": ".manuscript-tools-menu-item",
-            "maxGeometryDelta": 42
+            "maxGeometryDelta": 40
           }
         ],
         "selectorsWithDisplayMismatch": [],
@@ -2541,10 +2461,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 10.838369,
-        "mismatchPixels": 81611,
-        "mismatchRatio": 0.103774,
-        "rmse": 39.175867
+        "meanAbsDelta": 9.194286,
+        "mismatchPixels": 73195,
+        "mismatchRatio": 0.093072,
+        "rmse": 35.697057
       },
       "screenshotViewportCrop": {
         "appFile": "app-light-tools-panel-open-tablet-768.png",
@@ -2558,10 +2478,10 @@
         "overlapHeight": 1024,
         "dimensionMatch": true,
         "comparedPixels": 786432,
-        "meanAbsDelta": 10.838369,
-        "mismatchPixels": 81611,
-        "mismatchRatio": 0.103774,
-        "rmse": 39.175867
+        "meanAbsDelta": 9.194286,
+        "mismatchPixels": 73195,
+        "mismatchRatio": 0.093072,
+        "rmse": 35.697057
       },
       "metrics": {
         "maxSelectorDelta": 39,
@@ -2590,7 +2510,7 @@
           },
           {
             "selector": "#manuscript-action-rail",
-            "maxGeometryDelta": 28
+            "maxGeometryDelta": 8
           },
           {
             "selector": ".manuscript-hud-panel",

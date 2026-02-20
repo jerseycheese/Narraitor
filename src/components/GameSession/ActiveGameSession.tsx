@@ -300,16 +300,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // - marginContent slot: suggested actions in right margin (desktop only, hides prompt/custom input)
   // - Action rail primary ChoicesColumn: full choices + prompt (mobile only via lg:hidden)
   // - Action rail secondary ChoicesColumn: custom input only (desktop only via hidden lg:block)
-  const sessionActions = !isSessionEnded(sessionId) && (
-    <button
-      type="button"
-      onClick={() => window.dispatchEvent(new Event('narraitor:end-session'))}
-      className="manuscript-warning-action-button"
-    >
-      End Session
-    </button>
-  );
-
   const endStoryAction = !isSessionEnded(sessionId) && (
     <button
       type="button"
@@ -450,7 +440,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               inventoryItems={inventoryItems}
               onChoiceSelected={handleChoiceSelected}
               onCustomSubmit={handleCustomSubmit}
-              inputActions={sessionActions}
+              inputActions={null}
               endStoryAction={endStoryAction}
               isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
               endingSuggestion={endingSuggestion}
