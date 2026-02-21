@@ -14,6 +14,13 @@ test.describe('Design System Page Visual Tests', () => {
     await waitForContentStable(page);
     await hideDynamicContent(page);
 
+    // Verify newly ported sections are present in the document
+    await expect(page.locator('#philosophy')).toHaveCount(1);
+    await expect(page.locator('#radius')).toHaveCount(1);
+    await expect(page.locator('#elevation')).toHaveCount(1);
+    await expect(page.locator('#icons')).toHaveCount(1);
+    await expect(page.locator('#grid')).toHaveCount(1);
+
     // Verify page loaded
     await expect(page.locator('h2').first()).toContainText('Color Palette');
 
@@ -56,12 +63,12 @@ test.describe('Design System Page Visual Tests', () => {
     await page.goto('/dev/design-system');
     await waitForContentStable(page);
 
-    // Open navigation and click on Typography
+    // Open navigation and click on Grid & Breakpoints
     await page.getByRole('button', { name: 'Navigation menu' }).click();
     await page.waitForTimeout(350);
-    await page.getByRole('link', { name: 'TYPOGRAPHY' }).click();
+    await page.getByRole('link', { name: 'GRID & BREAKPOINTS' }).click();
 
-    // Verify navigation worked - Typography section should be visible
-    await expect(page.locator('#typography')).toBeInViewport();
+    // Verify navigation worked - Grid section should be visible
+    await expect(page.locator('#grid')).toBeInViewport();
   });
 });
