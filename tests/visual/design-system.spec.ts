@@ -20,6 +20,10 @@ test.describe('Design System Page Visual Tests', () => {
     await expect(page.locator('#elevation')).toHaveCount(1);
     await expect(page.locator('#icons')).toHaveCount(1);
     await expect(page.locator('#grid')).toHaveCount(1);
+    await expect(page.locator('#layout')).toHaveCount(1);
+    await expect(
+      page.getByRole('heading', { name: 'Default (Home & Content Pages)' })
+    ).toHaveCount(1);
 
     // Verify page loaded
     await expect(page.locator('h2').first()).toContainText('Color Palette');

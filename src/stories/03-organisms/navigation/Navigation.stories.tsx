@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Navigation } from '@/components/Navigation/Navigation';
+import { HeaderNavigation } from '@/components/Navigation/HeaderNavigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
 import { World } from '@/types/world.types';
 // Use character interface from store for consistency
 
-const meta: Meta<typeof Navigation> = {
+const meta: Meta<typeof HeaderNavigation> = {
   title: '03-Organisms/navigation/Navigation',
-  component: Navigation,
+  component: HeaderNavigation,
   parameters: {
     layout: 'fullscreen',
     docs: {

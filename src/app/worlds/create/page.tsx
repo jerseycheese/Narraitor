@@ -73,14 +73,14 @@ export default function CreateWorldPage() {
 
   
   return (
-    <main>
-      <h1>Create New World</h1>
+    <section aria-labelledby="create-world-title">
+      <h1 id="create-world-title">Create New World</h1>
       <WorldCreationWizard 
         onComplete={handleComplete}
         onCancel={handleCancel}
         initialData={generatedData || undefined}
         initialStep={initialStep} // Use step from URL parameter or default to 0
       />
-    </main>
+    </section>
   );
 }

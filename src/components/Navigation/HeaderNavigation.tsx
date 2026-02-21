@@ -2,23 +2,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
-import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
+import dynamic from 'next/dynamic';
 import { useMobileNavigation } from '@/hooks/useMobileNavigation';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { Breadcrumbs } from './Breadcrumbs';
-import dynamic from 'next/dynamic';
 import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
-// Render RecentPagesDropdown only on the client to avoid SSR/client mismatches
-const RecentPagesDropdown = dynamic(
-  () =>
-    import('./RecentPagesDropdown').then((m) => ({
-      default: m.RecentPagesDropdown,
-    })),
-  { ssr: false }
-);
+import { Breadcrumbs } from './Breadcrumbs';
 import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { TutorialMenu } from './TutorialMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
@@ -31,47 +19,40 @@ import {
   headerDropdownMenuClass,
   headerDropdownTriggerClass,
 } from './navigationDropdownStyles';
+import { useNavigationData } from './useNavigationData';
+import type { Character } from '@/state/characterStore';
+
+const RecentPagesDropdown = dynamic(
+  () =>
+    import('./RecentPagesDropdown').then((m) => ({
+      default: m.RecentPagesDropdown,
+    })),
+  { ssr: false }
+);
 
 /**
- * Navigation - Main application navigation component
- *
- * Provides the primary navigation bar with logo, main navigation links,
- * world switcher dropdown, and contextual action buttons. Automatically
- * adapts based on current route and available worlds/characters.
- *
- * Features:
- * - Responsive design with mobile-friendly layout
- * - World switcher dropdown with character counts
- * - Contextual play button when world is selected
- * - Breadcrumb navigation for deeper pages
- * - Automatic current world and character tracking
- *
- * @returns The main navigation component with header and breadcrumbs
- *
- * @example
- * // Used in root layout - no props needed
- * <Navigation />
+ * HeaderNavigation - Default top navigation for non-workshop routes.
  */
-export function Navigation() {
-  const pathname = usePathname();
-  const { currentWorldId, worlds, setCurrentWorld } = useWorldStore();
-  const { characters } = useCharacterStore();
-  const { navigateWithLoading } = useNavigationLoadingContext();
+export function HeaderNavigation() {
+  const {
+    pathname,
+    currentWorldId,
+    worlds,
+    characters,
+    currentWorld,
+    hasWorldsStore,
+    worldCharacterCount,
+    navigateWithLoading,
+    setCurrentWorld,
+  } = useNavigationData();
   const { isMenuOpen, isMobile, closeMenu, toggleMenu } = useMobileNavigation();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-    const [mounted, setMounted] = useState(false);
-    const currentWorld = currentWorldId ? worlds[currentWorldId] : null;  const hasWorldsStore = Object.keys(worlds).length > 0;
-  const worldCharacterCount = (Object.values(characters) as Character[]).filter(
-    (char) => char.worldId === currentWorldId
-  ).length;
-  // Ensure first client render matches server by deferring store-driven visibility until after mount
-  const hasWorlds = mounted && hasWorldsStore;
+  const [mounted, setMounted] = useState(false);
 
-  // Check if we should show breadcrumbs
+  const hasWorlds = mounted && hasWorldsStore;
   const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
 
-  // Keyboard shortcuts for navigation
   useKeyboardShortcuts(
     [
       {
@@ -90,7 +71,6 @@ export function Navigation() {
     true
   );
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -108,7 +88,6 @@ export function Navigation() {
     }
   }, [showWorldSwitcher]);
 
-  // Mark mounted after first client render
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -116,12 +95,10 @@ export function Navigation() {
   const handleWorldSwitch = (worldId: string) => {
     setCurrentWorld(worldId);
     setShowWorldSwitcher(false);
-    // Navigate to the selected world's view page with loading state
     const worldName = worlds[worldId]?.name || 'world';
     navigateWithLoading(`/worlds/${worldId}`, `Loading ${worldName}...`);
   };
 
-  // Don't show navigation on dev pages
   if (pathname.startsWith('/dev')) {
     return null;
   }
@@ -132,9 +109,7 @@ export function Navigation() {
         <nav role="navigation" aria-label="Main">
           <div>
             <div>
-              {/* Left side - Logo and mobile menu button */}
               <div>
-                {/* Mobile menu button */}
                 {isMobile && (
                   <Button
                     onClick={toggleMenu}
@@ -156,12 +131,10 @@ export function Navigation() {
                   <LogoText size="sm" />
                 </Link>
 
-                {/* Desktop navigation */}
                 <div data-testid="desktop-navigation">
                   <Link href="/worlds" data-navigation>
                     Worlds
                   </Link>
-                  {/* Always render Characters link to keep server/client markup consistent */}
                   <Link
                     href="/characters"
                     data-navigation
@@ -175,10 +148,8 @@ export function Navigation() {
                 </div>
               </div>
 
-              {/* Right side - Quick actions and current context (hidden on mobile) */}
               <div>
                 <TutorialMenu />
-                {/* World Switcher Dropdown */}
                 {hasWorlds && (
                   <div ref={dropdownRef}>
                     <Button
@@ -197,7 +168,7 @@ export function Navigation() {
                     </Button>
 
                     {showWorldSwitcher && (
-                      <div className={`${headerDropdownMenuClass}`}>
+                      <div className={headerDropdownMenuClass}>
                         {Object.values(worlds).map((world) => {
                           const worldCharacters = (
                             Object.values(characters) as Character[]
@@ -227,7 +198,7 @@ export function Navigation() {
                         <div className={headerDropdownDividerClass}>
                           <Link
                             href="/worlds"
-                            className={`${headerDropdownItemClass}`}
+                            className={headerDropdownItemClass}
                             onClick={() => setShowWorldSwitcher(false)}
                           >
                             <Plus aria-hidden="true" />
@@ -239,12 +210,10 @@ export function Navigation() {
                   </div>
                 )}
 
-                {/* Recent Pages Dropdown - mount after SSR-matched elements to avoid hydration diff */}
                 <SSRClientOnly>
                   <RecentPagesDropdown />
                 </SSRClientOnly>
 
-                {/* Quick actions - render after hydration to keep SSR stable */}
                 <SSRClientOnly>
                   {currentWorld ? (
                     <Button
@@ -280,14 +249,12 @@ export function Navigation() {
         </nav>
       </header>
 
-      {/* Mobile Navigation Menu */}
       <MobileNavigationMenu
         isOpen={isMenuOpen}
         onClose={closeMenu}
         onNavigate={navigateWithLoading}
       />
 
-      {/* Breadcrumbs - render after hydration to keep SSR/client markup identical */}
       {shouldShowBreadcrumbs && (
         <div>
           <div>

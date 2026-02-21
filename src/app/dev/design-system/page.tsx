@@ -122,6 +122,13 @@ const CONTAINER_WIDTHS: Array<{ title: string; rows: Array<{ label: string; valu
       { label: 'Full width', value: '1280px (max-w-7xl)' },
     ],
   },
+  {
+    title: 'DEFAULT (Home & Content)',
+    rows: [
+      { label: 'Content width', value: '1200px (shell max-width)' },
+      { label: 'Purpose', value: 'General app pages and dashboard' },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -143,6 +150,7 @@ const NAV_GROUPS = [
     title: 'SYSTEM',
     items: [
       { id: 'philosophy', label: 'DESIGN PHILOSOPHY' },
+      { id: 'layout', label: 'LAYOUT PATTERNS' },
       { id: 'variables', label: 'CSS VARIABLES' },
       { id: 'overlay', label: 'OVERLAY' },
       { id: 'grid', label: 'GRID & BREAKPOINTS' },
@@ -695,6 +703,105 @@ a:hover {
                 </div>
               </div>
             ))}
+          </div>
+        </SubSection>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* LAYOUT PATTERNS                                                   */}
+      {/* ================================================================= */}
+      <Section id="layout" title="Layout Patterns">
+        <SubSection description="The app uses three foundational layout archetypes: Default for general app pages, Manuscript for immersive play, and Workshop for utility-heavy world/character management.">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+            <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
+              <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
+                <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Manuscript (Game Session)</h3>
+                <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                  Single-column narrative with floating HUD and docked action rail.
+                </p>
+              </div>
+              <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
+                <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 12, minHeight: 180, background: 'var(--color-surface)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, fontSize: 11, color: 'var(--color-text-muted)' }}>
+                    <span>HUD (floating)</span>
+                    <span>Tools</span>
+                  </div>
+                  <div style={{ margin: '0 auto 12px', width: 'min(100%, 420px)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                    Narrative column (max-w-3xl)
+                  </div>
+                  <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 11, color: 'var(--color-text-muted)' }}>
+                    Docked action/input rail
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
+              <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
+                <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Workshop (Library & Wizards)</h3>
+                <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                  Sidebar navigation plus workspace content area for forms and management.
+                </p>
+              </div>
+              <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', minHeight: 180, border: '1px solid var(--color-border)', borderRadius: 2, overflow: 'hidden' }}>
+                  <div style={{ padding: 10, borderRight: '1px solid var(--color-border)', background: 'var(--color-surface-hover)', fontSize: 11, color: 'var(--color-text-muted)' }}>
+                    Sidebar rail
+                    <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
+                      <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Worlds</div>
+                      <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Characters</div>
+                      <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Settings</div>
+                    </div>
+                  </div>
+                  <div style={{ padding: 12, background: 'var(--color-surface)' }}>
+                    <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                      Workspace content (max-w-5xl / 1024px)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
+              <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
+                <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Default (Home & Content Pages)</h3>
+                <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                  Header navigation with a centered content workspace for broad app pages.
+                </p>
+              </div>
+              <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
+                <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, minHeight: 180, overflow: 'hidden', background: 'var(--color-surface)' }}>
+                  <div style={{ borderBottom: '1px solid var(--color-border)', padding: '8px 10px', fontSize: 11, color: 'var(--color-text-muted)' }}>
+                    Header navigation
+                  </div>
+                  <div style={{ padding: 12 }}>
+                    <div style={{ margin: '0 auto', width: '100%', maxWidth: 240, border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 8px', fontSize: 11, color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                      max-width: 1200px shell
+                    </div>
+                    <div style={{ marginTop: 8, border: '1px solid var(--color-border)', borderRadius: 2, minHeight: 96, padding: 10, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                      Dashboard and general content modules
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SubSection>
+
+        <SubSection title="Responsive Adaptation">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
+            <div style={{ padding: 12, border: '1px solid var(--color-border)', borderRadius: 4, background: 'var(--color-surface)' }}>
+              <h4 className="font-system" style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>MOBILE (&lt;768px)</h4>
+              <p style={{ margin: '8px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                Sidebar collapses to a menu trigger; workspace runs full-width.
+              </p>
+            </div>
+            <div style={{ padding: 12, border: '1px solid var(--color-border)', borderRadius: 4, background: 'var(--color-surface)' }}>
+              <h4 className="font-system" style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>DESKTOP (&ge;768px)</h4>
+              <p style={{ margin: '8px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                Sidebar remains visible and scrollable; workspace constrained to 1024px.
+              </p>
+            </div>
           </div>
         </SubSection>
       </Section>
