@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import { Globe, Users, Play, Sparkles } from 'lucide-react';
 import { primitiveColors } from '@/lib/design-tokens';
 
 // ---------------------------------------------------------------------------
@@ -62,6 +64,66 @@ function SubSection({ title, description, children }: { title?: string; descript
   );
 }
 
+const PHILOSOPHY_CARDS: Array<{ title: string; description: string }> = [
+  {
+    title: 'THE CONCEPT',
+    description: 'A fusion of long-form digital journalism and architectural drafting. The app is the "Drafting Table," and the story is the "Manuscript."',
+  },
+  {
+    title: 'THE GOAL',
+    description: 'A "blank canvas" that feels premium and intentional. It does not compete with the AI\'s genre; it frames it.',
+  },
+  {
+    title: 'NEUTRALITY',
+    description: 'Use a "Paper & Ink" palette with a single functional accent color for interactions.',
+  },
+];
+
+const RADIUS_SCALE: Array<{ name: string; value: string; note: string }> = [
+  { name: 'none', value: '0px', note: 'Dot grid, technical elements' },
+  { name: 'rounded-sm', value: '2px', note: 'Default for most UI' },
+  { name: 'rounded', value: '4px', note: 'Buttons, inputs' },
+  { name: 'rounded-lg', value: '8px', note: 'Cards, modals' },
+];
+
+const ELEVATION_SCALE: Array<{ name: string; value: string; note: string; shadow: string }> = [
+  { name: 'shadow-sm', value: '0 1px 2px rgba(0,0,0,0.05)', note: 'Subtle depth for cards', shadow: '0 1px 2px rgba(0,0,0,0.05)' },
+  { name: 'shadow-md', value: '0 4px 6px rgba(0,0,0,0.1)', note: 'Dropdowns, tooltips', shadow: '0 4px 6px -1px rgba(0,0,0,0.1)' },
+  { name: 'shadow-lg', value: '0 10px 15px rgba(0,0,0,0.1)', note: 'Modals, floating panels', shadow: '0 10px 15px -3px rgba(0,0,0,0.1)' },
+];
+
+const ICON_SIZE_SCALE: Array<{ size: number; label: string; note: string; icon: LucideIcon }> = [
+  { size: 16, label: '16px', note: 'Inline text', icon: Sparkles },
+  { size: 20, label: '20px', note: 'Standard', icon: Globe },
+  { size: 24, label: '24px', note: 'Buttons', icon: Play },
+  { size: 32, label: '32px', note: 'Hero/empty states', icon: Users },
+];
+
+const BREAKPOINTS: Array<{ label: string; width: string; note: string }> = [
+  { label: 'sm', width: '640px', note: 'Small devices' },
+  { label: 'md', width: '768px', note: 'Tablets' },
+  { label: 'lg', width: '1024px', note: 'Laptops' },
+  { label: 'xl', width: '1280px', note: 'Desktops' },
+  { label: '2xl', width: '1536px', note: 'Large screens' },
+];
+
+const CONTAINER_WIDTHS: Array<{ title: string; rows: Array<{ label: string; value: string }> }> = [
+  {
+    title: 'MANUSCRIPT (Narrative)',
+    rows: [
+      { label: 'Optimal reading width', value: '768px (max-w-3xl)' },
+      { label: 'Characters per line', value: '45-90' },
+    ],
+  },
+  {
+    title: 'WORKSHOP (Utility)',
+    rows: [
+      { label: 'Content width', value: '1024px (max-w-5xl)' },
+      { label: 'Full width', value: '1280px (max-w-7xl)' },
+    ],
+  },
+];
+
 // ---------------------------------------------------------------------------
 // Navigation
 // ---------------------------------------------------------------------------
@@ -72,13 +134,18 @@ const NAV_GROUPS = [
       { id: 'colors', label: 'COLORS' },
       { id: 'typography', label: 'TYPOGRAPHY' },
       { id: 'spacing', label: 'SPACING' },
+      { id: 'radius', label: 'BORDER RADIUS' },
+      { id: 'elevation', label: 'ELEVATION & SHADOWS' },
+      { id: 'icons', label: 'ICONOGRAPHY' },
     ],
   },
   {
     title: 'SYSTEM',
     items: [
+      { id: 'philosophy', label: 'DESIGN PHILOSOPHY' },
       { id: 'variables', label: 'CSS VARIABLES' },
       { id: 'overlay', label: 'OVERLAY' },
+      { id: 'grid', label: 'GRID & BREAKPOINTS' },
     ],
   },
   {
@@ -483,6 +550,149 @@ a:hover {
                 <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', width: 48, textAlign: 'right', flexShrink: 0 }}>{px}px</div>
                 <div style={{ width: px, height: 16, background: 'var(--color-text-muted)', borderRadius: 2, flexShrink: 0 }} />
                 <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>{px / 16}rem</div>
+              </div>
+            ))}
+          </div>
+        </SubSection>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* PHILOSOPHY                                                        */}
+      {/* ================================================================= */}
+      <Section id="philosophy" title="Design Philosophy">
+        <SubSection>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
+            {PHILOSOPHY_CARDS.map((card) => (
+              <div key={card.title} style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <h3 className="font-system" style={{ fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)', letterSpacing: '0.04em' }}>
+                  {card.title}
+                </h3>
+                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>{card.description}</p>
+              </div>
+            ))}
+          </div>
+        </SubSection>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* BORDER RADIUS                                                     */}
+      {/* ================================================================= */}
+      <Section id="radius" title="Border Radius">
+        <SubSection description="Minimal rounding to maintain crisp, technical aesthetic.">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16 }}>
+            {RADIUS_SCALE.map((item) => (
+              <div key={item.name} style={{ textAlign: 'center' }}>
+                <div style={{ width: 80, height: 80, margin: '0 auto', background: 'var(--color-accent)', borderRadius: item.value }} />
+                <div style={{ marginTop: 12 }}>
+                  <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.name}</div>
+                  <code style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{item.value}</code>
+                  <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{item.note}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SubSection>
+
+        <SubSection>
+          <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
+            <h4 className="font-system" style={{ fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>DEFAULT</h4>
+            <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
+              Use <code>rounded-sm (2px)</code> as the default throughout the system. This maintains a technical, precise aesthetic while avoiding harsh 90 degree corners.
+            </p>
+          </div>
+        </SubSection>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* ELEVATION                                                         */}
+      {/* ================================================================= */}
+      <Section id="elevation" title="Elevation & Shadows">
+        <SubSection description="Minimal shadow system for creating depth hierarchy. Use sparingly to maintain the drafting-table aesthetic.">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
+            {ELEVATION_SCALE.map((item) => (
+              <div key={item.name}>
+                <div style={{ padding: 32, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)', boxShadow: item.shadow }} />
+                <div style={{ marginTop: 12 }}>
+                  <div className="font-system" style={{ fontSize: 12, fontWeight: 500, marginBottom: 4, color: 'var(--color-text-primary)' }}>{item.name}</div>
+                  <code style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{item.value}</code>
+                  <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{item.note}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SubSection>
+
+        <SubSection>
+          <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
+            <h4 className="font-system" style={{ fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>USAGE NOTE</h4>
+            <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
+              Prefer <code>backdrop-blur</code> and borders over shadows for HUD panels. Use shadows only for floating elements that need clear separation.
+            </p>
+          </div>
+        </SubSection>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* ICONOGRAPHY                                                       */}
+      {/* ================================================================= */}
+      <Section id="icons" title="Iconography">
+        <SubSection description="Using Lucide icons with consistent sizing and stroke weight.">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
+            {ICON_SIZE_SCALE.map(({ size, label, note, icon: Icon }) => (
+              <div key={label} style={{ padding: 16, borderRadius: 2, textAlign: 'center', background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <Icon size={size} strokeWidth={1.5} aria-hidden="true" style={{ margin: '0 auto 8px', color: 'var(--color-text-primary)' }} />
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{label}</div>
+                <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{note}</div>
+              </div>
+            ))}
+          </div>
+        </SubSection>
+
+        <SubSection>
+          <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
+            <h4 className="font-system" style={{ fontSize: 12, marginBottom: 12, color: 'var(--color-text-muted)' }}>GUIDELINES</h4>
+            <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14, color: 'var(--color-text-secondary)' }}>
+              <li>Stroke weight: <code>1.5px</code> (Lucide standard)</li>
+              <li>Use icons to support text, not replace it.</li>
+              <li>Always include <code>aria-label</code> for icon-only buttons.</li>
+              <li>Icons inherit text color by default.</li>
+              <li>Use <code>aria-hidden=&quot;true&quot;</code> for decorative icons.</li>
+            </ul>
+          </div>
+        </SubSection>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* GRID & BREAKPOINTS                                                */}
+      {/* ================================================================= */}
+      <Section id="grid" title="Grid & Breakpoints">
+        <SubSection description="Responsive layout structure based on a 12-column grid with standardized breakpoints.">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {BREAKPOINTS.map((item) => (
+              <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <div>
+                  <div className="font-system" style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.label}</div>
+                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{item.note}</div>
+                </div>
+                <code className="font-system" style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>{item.width}</code>
+              </div>
+            ))}
+          </div>
+        </SubSection>
+
+        <SubSection title="Container Widths">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+            {CONTAINER_WIDTHS.map((container) => (
+              <div key={container.title} style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, marginBottom: 12, color: 'var(--color-text-muted)' }}>{container.title}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {container.rows.map((row) => (
+                    <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                      <span>{row.label}</span>
+                      <code>{row.value}</code>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
