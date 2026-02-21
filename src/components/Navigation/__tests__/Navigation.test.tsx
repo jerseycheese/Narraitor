@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Navigation } from '../Navigation';
+import { HeaderNavigation } from '../HeaderNavigation';
 import { SidebarNavigation } from '../SidebarNavigation';
 
 // Mock next/navigation
@@ -80,7 +80,7 @@ jest.mock('../MobileNavigationMenu', () => ({
   MobileNavigationMenu: () => <div data-testid="mobile-menu">Mobile Menu</div>,
 }));
 
-describe('Navigation', () => {
+describe('HeaderNavigation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset viewport to desktop
@@ -93,7 +93,7 @@ describe('Navigation', () => {
 
   describe('Core Navigation', () => {
     it('displays main navigation items when no worlds exist', () => {
-      render(<Navigation />);
+      render(<HeaderNavigation />);
 
       expect(screen.getByText('Worlds')).toBeInTheDocument();
       const charactersLink = screen.getByText('Characters');
@@ -104,7 +104,7 @@ describe('Navigation', () => {
     it('displays Characters nav when worlds exist', () => {
       mockWorldStore.worlds = { 'world-1': { id: 'world-1', name: 'Test World' } };
 
-      render(<Navigation />);
+      render(<HeaderNavigation />);
 
       expect(screen.getByText('Worlds')).toBeInTheDocument();
       expect(screen.getByText('Characters')).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('Navigation', () => {
 
   describe('Accessibility', () => {
     it('has proper navigation links and structure', () => {
-      render(<Navigation />);
+      render(<HeaderNavigation />);
 
       const worldsLink = screen.getByText('Worlds').closest('a');
       const settingsLink = screen.getByText('Settings').closest('a');
@@ -140,7 +140,7 @@ describe('Navigation', () => {
 
   describe('Mobile Navigation', () => {
     it('renders mobile navigation component', () => {
-      render(<Navigation />);
+      render(<HeaderNavigation />);
 
       expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
     });

@@ -14,12 +14,12 @@ This handles the main app navigation with loading states, responsive design, and
 
 ### Basic Navigation
 ```tsx
-import { Navigation } from '@/components/Navigation';
+import { HeaderNavigation } from '@/components/Navigation';
 
 function Layout({ children }) {
   return (
     <div>
-      <Navigation />
+      <HeaderNavigation />
       <main>{children}</main>
     </div>
   );
@@ -29,12 +29,12 @@ function Layout({ children }) {
 ### With Loading Provider
 ```tsx
 import { NavigationLoadingProvider } from '@/components/shared';
-import { Navigation } from '@/components/Navigation';
+import { HeaderNavigation } from '@/components/Navigation';
 
 function App() {
   return (
     <NavigationLoadingProvider>
-      <Navigation />
+      <HeaderNavigation />
       {/* Other components */}
     </NavigationLoadingProvider>
   );
