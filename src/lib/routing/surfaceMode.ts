@@ -34,9 +34,12 @@ function normalizePath(pathname: string): string {
   }
 
   const withLeadingSlash = pathname.startsWith('/') ? pathname : `/${pathname}`;
-  if (withLeadingSlash.length > 1 && withLeadingSlash.endsWith('/')) {
-    return withLeadingSlash.slice(0, -1);
+  const withoutHash = withLeadingSlash.split('#')[0] || '/';
+  const withoutQuery = withoutHash.split('?')[0] || '/';
+
+  if (withoutQuery.length > 1 && withoutQuery.endsWith('/')) {
+    return withoutQuery.slice(0, -1);
   }
 
-  return withLeadingSlash;
+  return withoutQuery;
 }

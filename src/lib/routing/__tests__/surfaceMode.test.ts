@@ -41,4 +41,20 @@ describe('getSurfaceMode', () => {
     expect(getSurfaceMode('worlds')).toBe('workshop');
     expect(getSurfaceMode('/worlds/')).toBe('workshop');
   });
+
+  test.each([
+    ['/worlds?view=grid', 'workshop'],
+    ['/settings#theme', 'workshop'],
+    ['/characters/create?from=home#step-2', 'workshop'],
+    ['/play?resume=true', 'manuscript'],
+  ])('ignores query params and hash fragments for %s', (path, expected) => {
+    expect(getSurfaceMode(path)).toBe(expected);
+  });
+
+  test.each(['', '?view=grid', '#theme'])(
+    'treats empty or fragment-only input as default route for %s',
+    (path) => {
+      expect(getSurfaceMode(path)).toBe('default');
+    }
+  );
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
@@ -36,6 +36,13 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
     navigateWithLoading,
     setCurrentWorld,
   } = useNavigationData();
+  const [mounted, setMounted] = useState(false);
+  const hasWorlds = mounted && hasWorldsStore;
+  const activeWorld = mounted ? currentWorld : null;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navigate = (path: string, message: string) => {
     navigateWithLoading(path, message);
@@ -86,7 +93,7 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
         </Button>
       </div>
 
-      {hasWorldsStore && (
+      {hasWorlds && (
         <div className="workshop-sidebar-section">
           <p className="workshop-sidebar-label">World Switcher</p>
           <div className="workshop-world-list">
@@ -123,22 +130,22 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
       </div>
 
       <div className="workshop-sidebar-section">
-        {currentWorld ? (
+        {activeWorld ? (
           <Button
             type="button"
             variant="success"
             className="workshop-primary-action"
             onClick={() =>
               navigate(
-                `/worlds/${currentWorld.id}/play`,
-                `Starting ${currentWorld.name}...`
+                `/worlds/${activeWorld.id}/play`,
+                `Starting ${activeWorld.name}...`
               )
             }
           >
             <Play aria-hidden="true" />
             Play
           </Button>
-        ) : !hasWorldsStore ? (
+        ) : mounted && !hasWorldsStore ? (
           <Button
             type="button"
             className="workshop-primary-action"
