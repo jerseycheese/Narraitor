@@ -5,7 +5,15 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { TutorialMenu } from './TutorialMenu';
-import { RecentPagesDropdown } from './RecentPagesDropdown';
+import dynamic from 'next/dynamic';
+
+const RecentPagesDropdown = dynamic(
+  () =>
+    import('./RecentPagesDropdown').then((m) => ({
+      default: m.RecentPagesDropdown,
+    })),
+  { ssr: false }
+);
 import { useNavigationData } from './useNavigationData';
 import { Globe, Users, Settings, Check, Play, Plus, Home } from 'lucide-react';
 import { getGenreLabel } from '@/lib/constants/genres';
@@ -111,7 +119,7 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
       )}
 
       <div className="workshop-sidebar-section workshop-sidebar-section-grow">
-        <RecentPagesDropdown className="workshop-recent-pages" />
+        <RecentPagesDropdown />
       </div>
 
       <div className="workshop-sidebar-section">
