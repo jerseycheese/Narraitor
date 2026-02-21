@@ -1,0 +1,209 @@
+.app-surface-default {
+  min-height: 100vh;
+  background: var(--color-canvas);
+}
+
+.default-surface-main {
+  min-height: 100vh;
+}
+
+.default-surface-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.app-surface-workshop {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-canvas);
+  position: relative;
+}
+
+.workshop-sidebar {
+  width: 17rem;
+  min-width: 17rem;
+  height: 100vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  background: var(--color-surface-hover);
+  border-right: 1px solid var(--color-border);
+  z-index: 30;
+}
+
+.workshop-sidebar-nav {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 0.75rem;
+}
+
+.workshop-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.workshop-sidebar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.workshop-sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.workshop-sidebar-section-grow {
+  flex: 1;
+}
+
+.workshop-sidebar-label {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.workshop-nav-link,
+.workshop-world-button,
+.workshop-primary-action {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 2.5rem;
+}
+
+.workshop-world-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.workshop-workspace {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+}
+
+.workshop-mobile-header {
+  display: none;
+}
+
+.workshop-mobile-title {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.workshop-workspace-main {
+  min-height: 100vh;
+}
+
+.workshop-workspace-inner {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.app-surface-workshop h1,
+.app-surface-default h1 {
+  font-family: var(--font-interface);
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.app-surface-workshop h2,
+.app-surface-default h2 {
+  font-family: var(--font-interface);
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.app-surface-workshop h3,
+.app-surface-default h3 {
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.workshop-sidebar-backdrop {
+  display: none;
+}
+
+@media (width < 768px) {
+  .default-surface-inner {
+    padding: 0.75rem;
+  }
+
+  .app-surface-workshop {
+    display: block;
+  }
+
+  .workshop-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 85vw;
+    max-width: 20rem;
+    min-width: 0;
+    transform: translateX(-100%);
+    transition: transform 150ms ease;
+    z-index: 40;
+  }
+
+  .workshop-sidebar.workshop-sidebar-open {
+    transform: translateX(0);
+  }
+
+  .workshop-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: var(--color-scrim);
+    z-index: 35;
+  }
+
+  .workshop-mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .workshop-workspace-main {
+    min-height: calc(100vh - 3.5rem);
+  }
+
+  .workshop-workspace-inner {
+    width: 100%;
+  }
+}
+
+@media (width >= 1024px) {
+  .default-surface-inner {
+    padding: 1.5rem;
+  }
+}

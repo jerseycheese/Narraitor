@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Navigation } from '../Navigation';
+import { SidebarNavigation } from '../SidebarNavigation';
 
 // Mock next/navigation
 const mockPush = jest.fn();
@@ -142,6 +143,19 @@ describe('Navigation', () => {
       render(<Navigation />);
 
       expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
+    });
+  });
+
+  describe('SidebarNavigation', () => {
+    it('renders core workshop navigation affordances', () => {
+      render(<SidebarNavigation />);
+
+      expect(
+        screen.getByRole('navigation', { name: 'Workshop navigation' })
+      ).toBeInTheDocument();
+      expect(screen.getByText('Worlds')).toBeInTheDocument();
+      expect(screen.getByText('Characters')).toBeInTheDocument();
+      expect(screen.getByText('Settings')).toBeInTheDocument();
     });
   });
 });

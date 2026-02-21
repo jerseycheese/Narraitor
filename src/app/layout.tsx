@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { Lora, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
+import './workshop.css';
 import { DevToolsProvider } from '@/components/devtools';
 import { ClientOnlyDevTools } from '@/components/ClientOnlyDevTools';
-import { Navigation } from '@/components/Navigation';
+import { AppSurfaceShell } from '@/components/layout/AppSurfaceShell';
 import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
 import { NavigationPersistenceProvider } from '@/components/shared/NavigationPersistenceProvider';
 import { SkipLinks } from '@/components/shared/SkipLinks';
@@ -57,10 +58,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
               {/* Toast notification system - provides context for all toast notifications */}
               <ToastProvider>
                 <TutorialProvider>
-                  <Navigation />
-                  <main id="main-content" tabIndex={-1}>
+                  <AppSurfaceShell>
                     {children}
-                  </main>
+                  </AppSurfaceShell>
                   {/* DevTools in normal flow to avoid interfering with screenshots */}
                   <ClientOnlyDevTools />
                   {/* Toast container - renders all active toasts */}
