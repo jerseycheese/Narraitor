@@ -138,6 +138,7 @@ const NAV_GROUPS = [
   {
     title: 'FOUNDATIONS',
     items: [
+      { id: 'logo', label: 'BRAND IDENTITY' },
       { id: 'colors', label: 'COLORS' },
       { id: 'typography', label: 'TYPOGRAPHY' },
       { id: 'spacing', label: 'SPACING' },
@@ -154,6 +155,7 @@ const NAV_GROUPS = [
       { id: 'variables', label: 'CSS VARIABLES' },
       { id: 'overlay', label: 'OVERLAY' },
       { id: 'grid', label: 'GRID & BREAKPOINTS' },
+      { id: 'manuscript', label: 'MANUSCRIPT DEMO' },
     ],
   },
   {
@@ -163,6 +165,210 @@ const NAV_GROUPS = [
     ],
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Manuscript Demo Component
+// ---------------------------------------------------------------------------
+function ManuscriptDemo() {
+  const [showCharacter, setShowCharacter] = useState(false);
+  const [showTools, setShowTools] = useState(false);
+  const [activeDrawer, setActiveDrawer] = useState<string | null>(null);
+
+  const drawerContent: Record<string, { title: string; subtitle: string; body: React.ReactNode }> = {
+    story: {
+      title: 'Story So Far',
+      subtitle: 'Session 04',
+      body: (
+        <>
+          <p className="text-narrative" style={{ fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>You arrived at the village seeking Elder Thane&rsquo;s wisdom. He spoke of ancient paths and choices that shape destiny.</p>
+          <p className="text-narrative" style={{ fontSize: 13, lineHeight: 1.65 }}>The meadow calls with possibility. A stranger watched from the treeline as you departed the archive.</p>
+        </>
+      ),
+    },
+    history: {
+      title: 'Choice History',
+      subtitle: '14 choices made',
+      body: (
+        <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {['Entered the village at dusk rather than waiting for morning.', 'Spoke honestly to the Elder about your origins.', 'Chose the meadow path over the forest road.'].map((c, i) => (
+            <li key={i} className="font-system" style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>{c}</li>
+          ))}
+        </ol>
+      ),
+    },
+    journal: {
+      title: 'Journal',
+      subtitle: '3 entries',
+      body: (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[
+            { title: 'Day One', excerpt: 'The road was longer than expected. The Elder\u2019s lantern was the first light I saw in hours.' },
+            { title: 'The Archive', excerpt: 'Rows of shelves. Something moved behind the eastern stacks\u2014I chose not to follow.' },
+          ].map((e) => (
+            <div key={e.title} style={{ padding: 10, border: '1px solid var(--color-border)', borderRadius: 2, background: 'var(--color-surface-hover)' }}>
+              <div className="font-system" style={{ fontSize: 11, fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: 4 }}>{e.title}</div>
+              <p className="text-narrative" style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: 0 }}>{e.excerpt}</p>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  };
+
+  return (
+    <div className="manuscript-demo" style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', minHeight: 560, position: 'relative' }}>
+      <div style={{ background: 'linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end))', padding: 12, minHeight: 560, display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 10 }}>
+
+        {/* HUD */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 12px', background: 'var(--color-overlay-surface)', border: '1px solid var(--color-border)', borderRadius: 2, backdropFilter: 'blur(12px)' }}>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => { setShowCharacter(!showCharacter); setShowTools(false); }}
+              className="font-system"
+              style={{ padding: '4px 10px', background: showCharacter ? 'var(--color-accent)' : 'var(--color-surface)', color: showCharacter ? 'white' : 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 10, letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 500 }}
+            >
+              Character
+            </button>
+            <button
+              onClick={() => { setShowTools(!showTools); setShowCharacter(false); }}
+              className="font-system"
+              style={{ padding: '4px 10px', background: showTools ? 'var(--color-accent)' : 'var(--color-surface)', color: showTools ? 'white' : 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 10, letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 500 }}
+            >
+              Tools
+            </button>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', fontWeight: 500 }}>SAVING...</span>
+            <button className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Reset</button>
+            <button className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Close</button>
+          </div>
+        </div>
+
+        {/* Character snapshot panel */}
+        {showCharacter && (
+          <div style={{ position: 'absolute', top: 56, left: 12, width: 220, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 14, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 10 }}>
+            <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Character Snapshot</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', flexShrink: 0 }} />
+              <div>
+                <div className="font-system" style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>Kael Ashford</div>
+                <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Level 5</div>
+              </div>
+            </div>
+            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 8, marginBottom: 8 }}>
+              {[['Strength', '14'], ['Dexterity', '12'], ['Wisdom', '16']].map(([attr, val]) => (
+                <div key={attr} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{attr}</span>
+                  <span className="font-system" style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-text-primary)' }}>{val}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 8 }}>
+              {[['Persuasion', '+4'], ['Stealth', '+2']].map(([skill, mod]) => (
+                <div key={skill} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{skill}</span>
+                  <span className="font-system" style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-accent)' }}>{mod}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tools menu panel */}
+        {showTools && (
+          <div style={{ position: 'absolute', top: 56, left: 84, width: 200, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 14, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 10 }}>
+            <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Tools</div>
+            {['Character Details', 'Inventory'].map((item) => (
+              <button key={item} style={{ width: '100%', padding: '7px 10px', background: 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>{item}</button>
+            ))}
+            <div style={{ borderTop: '1px solid var(--color-border)', margin: '8px 0' }} />
+            {[['Story So Far', 'story'], ['Choice History', 'history'], ['Journal', 'journal']].map(([label, key]) => (
+              <button key={key} onClick={() => { setActiveDrawer(activeDrawer === key ? null : key); setShowTools(false); }} style={{ width: '100%', padding: '7px 10px', background: activeDrawer === key ? 'var(--color-surface-hover)' : 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>{label}</button>
+            ))}
+          </div>
+        )}
+
+        {/* 3-column body */}
+        <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 140px', gap: 10, minHeight: 0 }}>
+
+          {/* Left characters rail */}
+          <div style={{ padding: '12px 10px' }}>
+            <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Characters Present</div>
+            {['Kael Ashford', 'Elder Thane'].map((name) => (
+              <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', flexShrink: 0 }} />
+                <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Narrative center */}
+          <div style={{ padding: '12px 0' }}>
+            <div className="text-narrative">
+              <p>The stone archway opened onto a meadow bathed in twilight. Wildflowers swayed in the warm breeze, their petals catching the last amber rays of sun.</p>
+              <p>Behind you, the forest path disappeared into shadow. Ahead, a small village flickered with lantern light.</p>
+              <p>&ldquo;Every journey begins with a single step,&rdquo; Elder Thane said softly. &ldquo;But which direction calls to you?&rdquo;</p>
+            </div>
+          </div>
+
+          {/* Right spacer (mirrors left rail width) */}
+          <div />
+        </div>
+
+        {/* Drawer */}
+        {activeDrawer && drawerContent[activeDrawer] && (
+          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 280, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '2px 0 0 2px', padding: 16, boxShadow: '0 16px 48px rgba(0,0,0,0.15)', overflow: 'auto', zIndex: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+              <div>
+                <h3 style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--color-text-primary)' }}>{drawerContent[activeDrawer].title}</h3>
+                <div className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', marginTop: 2 }}>{drawerContent[activeDrawer].subtitle}</div>
+              </div>
+              <button onClick={() => setActiveDrawer(null)} className="font-system" style={{ fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>Close</button>
+            </div>
+            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 12, marginTop: 8 }}>
+              {drawerContent[activeDrawer].body}
+            </div>
+          </div>
+        )}
+
+        {/* Action Rail */}
+        <div style={{ background: 'var(--color-overlay-surface-strong)', border: '1px solid var(--color-border)', borderRadius: 2, backdropFilter: 'blur(20px)', overflow: 'hidden' }}>
+          {/* Choice button grid — 3-col matching production layout */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, padding: '10px 10px 6px' }}>
+            {[
+              { label: 'Approach the village', badge: null },
+              { label: 'Explore the meadow', badge: 'Lawful' },
+              { label: 'Ask Elder Thane a question', badge: 'Chaotic' },
+            ].map(({ label, badge }) => (
+              <button
+                key={label}
+                className="font-system"
+                style={{
+                  display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                  width: '100%', height: 66, padding: '10px 14px',
+                  background: badge === 'Lawful' ? 'rgba(7,89,133,0.04)' : badge === 'Chaotic' ? 'rgba(146,64,14,0.04)' : 'var(--color-surface)',
+                  border: `1px solid ${badge === 'Lawful' ? 'rgba(7,89,133,0.3)' : badge === 'Chaotic' ? 'rgba(146,64,14,0.3)' : 'var(--color-border)'}`,
+                  borderRadius: 2, fontSize: 12, cursor: 'pointer', textAlign: 'left', color: 'var(--color-text-primary)', lineHeight: 1.4,
+                }}
+              >
+                <span style={{ fontWeight: 500 }}>{label}</span>
+                {badge && (
+                  <span style={{ alignSelf: 'flex-start', fontSize: 10, padding: '1px 6px', borderRadius: 2, background: badge === 'Lawful' ? 'rgba(7,89,133,0.1)' : 'rgba(146,64,14,0.1)', color: badge === 'Lawful' ? '#075985' : '#92400e', fontWeight: 600 }}>{badge}</span>
+                )}
+              </button>
+            ))}
+          </div>
+          {/* Input row */}
+          <div style={{ padding: '0 10px 8px', display: 'flex', gap: 8, alignItems: 'center' }}>
+            <input type="text" placeholder="Or write your own action..." readOnly style={{ flex: 1, height: 38, padding: '0 10px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 13 }} />
+            <button style={{ height: 38, padding: '0 14px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: 2, fontSize: 12, fontWeight: 500, cursor: 'default', whiteSpace: 'nowrap' }}>Send</button>
+            <button className="font-system" style={{ height: 38, padding: '0 10px', background: 'rgba(146,64,14,0.08)', border: '1px solid rgba(146,64,14,0.25)', borderRadius: 2, color: '#92400e', cursor: 'pointer', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 500, whiteSpace: 'nowrap' }}>End Story</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Page
@@ -314,6 +520,61 @@ export default function DesignSystemPage() {
           </div>
         </div>
       </nav>
+
+      {/* ================================================================= */}
+      {/* LOGO                                                              */}
+      {/* ================================================================= */}
+      <Section id="logo" title="Brand Identity">
+        <SubSection title="Narraitor Wordmark" description="Typography-driven brand identity that adapts to different contexts while maintaining recognition.">
+          <div style={{ padding: '64px 32px', background: 'linear-gradient(135deg, #fdfbf7 0%, #fafafa 100%)', borderRadius: 4, marginBottom: 24, textAlign: 'center' }}>
+            <h1 style={{ fontFamily: 'var(--font-narrative)', fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 400, letterSpacing: '-0.01em', color: 'var(--color-text-primary)', margin: 0 }}>
+              Narr<span style={{ color: 'var(--color-accent)', fontWeight: 500 }}>ai</span>tor
+            </h1>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 24 }}>
+            <div style={{ padding: 32, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface)', textAlign: 'center' }}>
+              <div className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 16 }}>All Caps</div>
+              <div style={{ fontFamily: 'var(--font-interface)', fontSize: '2rem', fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--color-text-primary)' }}>
+                NARR<span style={{ color: 'var(--color-accent)' }}>AI</span>TOR
+              </div>
+            </div>
+            <div style={{ padding: 32, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface)', textAlign: 'center' }}>
+              <div className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 16 }}>Monospace</div>
+              <div style={{ fontFamily: 'var(--font-system)', fontSize: '1.5rem', fontWeight: 600, letterSpacing: '0.05em', color: 'var(--color-text-primary)' }}>
+                NARR<span style={{ color: 'var(--color-accent)' }}>AI</span>TOR
+              </div>
+            </div>
+            <div style={{ padding: 32, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface)', textAlign: 'center' }}>
+              <div className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 16 }}>Condensed</div>
+              <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '2.25rem', fontWeight: 500, letterSpacing: '-0.03em', color: 'var(--color-text-primary)' }}>
+                Narr<span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>ai</span>tor
+              </div>
+            </div>
+          </div>
+
+          <div style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface-hover)' }}>
+            <div className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 12 }}>Brand Guidelines</div>
+            <pre className="font-system" style={{ fontSize: 13, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap' }}>
+{`/* Primary wordmark: Lora serif */
+.narraitor-wordmark {
+  font-family: 'Lora', serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Accent the "ai" */
+.narraitor-accent {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+/* Minimum size: 24px for legibility */
+/* Clear space: equal to cap height on all sides */`}
+            </pre>
+          </div>
+        </SubSection>
+      </Section>
 
       {/* ================================================================= */}
       {/* COLORS                                                            */}
@@ -953,6 +1214,15 @@ a:hover {
               </ul>
             </div>
           </div>
+        </SubSection>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* MANUSCRIPT DEMO                                                   */}
+      {/* ================================================================= */}
+      <Section id="manuscript" title="Manuscript Demo">
+        <SubSection title="Interactive Layout" description="Click buttons to toggle panels and drawers. Demonstrates progressive disclosure in the game session layout.">
+          <ManuscriptDemo />
         </SubSection>
       </Section>
 

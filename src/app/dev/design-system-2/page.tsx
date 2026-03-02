@@ -1,0 +1,1243 @@
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import './design-system-2.css';
+
+// ─────────────────────────────────────────────────────────────────
+// Scroll Reveal Hook
+// ─────────────────────────────────────────────────────────────────
+function useScrollReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      el.querySelectorAll('.ds2-reveal').forEach((child) => {
+        child.classList.add('ds2-visible');
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('ds2-visible');
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+    );
+
+    el.querySelectorAll('.ds2-reveal').forEach((child) => {
+      observer.observe(child);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Active Section Tracking Hook
+// ─────────────────────────────────────────────────────────────────
+function useActiveSection(sectionIds: string[]) {
+  const [active, setActive] = useState(sectionIds[0]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length > 0) {
+          // Pick the one closest to the top
+          visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          setActive(visible[0].target.id);
+        }
+      },
+      { threshold: 0.2, rootMargin: '-10% 0px -60% 0px' }
+    );
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [sectionIds]);
+
+  return active;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Navigation Sections
+// ─────────────────────────────────────────────────────────────────
+const NAV_SECTIONS = [
+  { id: 'ds2-hero', label: 'Sanctuary' },
+  { id: 'ds2-logo', label: 'Brand' },
+  { id: 'ds2-color', label: 'Colors' },
+  { id: 'ds2-typography', label: 'Typography' },
+  { id: 'ds2-spacing', label: 'Spacing' },
+  { id: 'ds2-radius', label: 'Radius' },
+  { id: 'ds2-elevation', label: 'Elevation' },
+  { id: 'ds2-icons', label: 'Icons' },
+  { id: 'ds2-philosophy', label: 'Philosophy' },
+  { id: 'ds2-layout', label: 'Layout' },
+  { id: 'ds2-variables', label: 'Variables' },
+  { id: 'ds2-overlay', label: 'Overlay' },
+  { id: 'ds2-grid', label: 'Grid' },
+  { id: 'ds2-manuscript', label: 'Session' },
+  { id: 'ds2-components', label: 'Components' },
+];
+
+// ─────────────────────────────────────────────────────────────────
+// Color Palette Data
+// ─────────────────────────────────────────────────────────────────
+const EARTH_PALETTE = [
+  { name: 'Canvas', hex: '#FAF8F3' },
+  { name: 'Surface', hex: '#FFFDF7' },
+  { name: 'Surface Hover', hex: '#F5F1E8' },
+  { name: 'Border', hex: '#E0D5C7' },
+  { name: 'Text Muted', hex: '#9C8D7E' },
+  { name: 'Text Secondary', hex: '#6B5D52' },
+  { name: 'Text Primary', hex: '#2D2520' },
+  { name: 'Accent', hex: '#7C8B6F' },
+];
+
+// ─────────────────────────────────────────────────────────────────
+// Heading Scale Data
+// ─────────────────────────────────────────────────────────────────
+const HEADING_SCALE = [
+  { tag: 'h1', size: '2.25rem', px: '36px', weight: 500, lh: 1.1, label: 'Chapter Opening' },
+  { tag: 'h2', size: '1.875rem', px: '30px', weight: 500, lh: 1.12, label: 'Section Divider' },
+  { tag: 'h3', size: '1.5rem', px: '24px', weight: 500, lh: 1.2, label: 'Subsection' },
+  { tag: 'h4', size: '1.25rem', px: '20px', weight: 500, lh: 1.25, label: 'Paragraph Lead' },
+  { tag: 'h5', size: '1.125rem', px: '18px', weight: 500, lh: 1.3, label: 'Minor Heading' },
+  { tag: 'h6', size: '1rem', px: '16px', weight: 600, lh: 1.35, label: 'Label' },
+];
+
+// ─────────────────────────────────────────────────────────────────
+// Spacing Scale (8px base grid)
+// ─────────────────────────────────────────────────────────────────
+const SPACING_SCALE = [8, 16, 24, 32, 40, 48, 64, 96];
+
+// ─────────────────────────────────────────────────────────────────
+// Page Component
+// ─────────────────────────────────────────────────────────────────
+export default function DesignSystem2Page() {
+  const [isDark, setIsDark] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
+  const [showCharacter, setShowCharacter] = useState(false);
+  const [showTools, setShowTools] = useState(false);
+  const [activeDrawer, setActiveDrawer] = useState<string | null>(null);
+  const revealRef = useScrollReveal();
+  const activeSection = useActiveSection(NAV_SECTIONS.map((s) => s.id));
+
+  const toggleTheme = useCallback(() => {
+    const html = document.documentElement;
+    if (isDark) {
+      html.classList.remove('dark');
+    } else {
+      html.classList.add('dark');
+    }
+    setIsDark(!isDark);
+  }, [isDark]);
+
+  return (
+    <div className="ds2 design-system-2-page" ref={revealRef}>
+      {/* ── Floating Navigation ─────────────────────────── */}
+      <nav className="ds2-nav" aria-label="Design system sections">
+        {NAV_SECTIONS.map((section) => (
+          <a
+            key={section.id}
+            href={`#${section.id}`}
+            className={`ds2-nav-item ${activeSection === section.id ? 'ds2-nav-active' : ''}`}
+          >
+            <span className="ds2-nav-dot" />
+            <span className="ds2-nav-label">{section.label}</span>
+          </a>
+        ))}
+      </nav>
+
+      {/* ── Theme Toggle ────────────────────────────────── */}
+      <button
+        className="ds2-theme-toggle"
+        onClick={toggleTheme}
+        aria-label="Toggle theme"
+      >
+        {isDark ? 'Light' : 'Dark'}
+      </button>
+
+      {/* ════════════════════════════════════════════════════
+          HERO
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-hero" className="ds2-hero">
+        <div className="ds2-reveal">
+          <p className="ds2-hero-meta">Narraitor Design System · Warm Earth Edition · 2026</p>
+        </div>
+        <h1 className="ds2-hero-title ds2-reveal">
+          A Sanctuary for Stories
+        </h1>
+        <div className="ds2-reveal">
+          <p className="ds2-hero-meta" style={{ maxWidth: '42ch', textAlign: 'center', lineHeight: 1.7, letterSpacing: '0.12em' }}>
+            Organic neutrality with warm earth tones. Soft forms, breathing space, and calm typography that frames any narrative without competing.
+          </p>
+        </div>
+        <div className="ds2-hero-divider ds2-reveal" />
+        <div className="ds2-hero-scroll-hint ds2-reveal">Explore</div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          LOGO TREATMENTS
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-logo" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">00 — Brand</div>
+          <h2 className="ds2-section-title ds2-reveal">Narraitor</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Typography-driven brand identity. The logo lives in the type system, not as a locked graphic. Adaptable, warm, and grounded.
+          </p>
+
+          {/* Primary Wordmark */}
+          <div className="ds2-component-stage ds2-reveal">
+            <div className="ds2-component-label">Primary Wordmark</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', background: 'var(--gradient-warm)', borderRadius: '12px' }}>
+              <h1 style={{ fontFamily: 'var(--font-narrative)', fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 400, letterSpacing: '-0.01em', color: 'var(--color-text-primary)', margin: 0 }}>
+                Narr<span style={{ color: 'var(--color-accent)', fontWeight: 500 }}>ai</span>tor
+              </h1>
+            </div>
+          </div>
+
+          {/* Logo Variations */}
+          <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+            <div className="ds2-component-stage ds2-reveal" style={{ textAlign: 'center', padding: '32px' }}>
+              <div className="ds2-component-label" style={{ textAlign: 'left' }}>All Caps</div>
+              <div style={{ fontFamily: 'var(--font-interface)', fontSize: '2rem', fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--color-text-primary)' }}>
+                NARR<span style={{ color: 'var(--color-accent)' }}>AI</span>TOR
+              </div>
+            </div>
+            <div className="ds2-component-stage ds2-reveal" style={{ textAlign: 'center', padding: '32px' }}>
+              <div className="ds2-component-label" style={{ textAlign: 'left' }}>Monospace</div>
+              <div style={{ fontFamily: 'var(--font-system)', fontSize: '1.5rem', fontWeight: 600, letterSpacing: '0.05em', color: 'var(--color-text-primary)' }}>
+                NARR<span style={{ color: 'var(--color-accent)' }}>AI</span>TOR
+              </div>
+            </div>
+            <div className="ds2-component-stage ds2-reveal" style={{ textAlign: 'center', padding: '32px' }}>
+              <div className="ds2-component-label" style={{ textAlign: 'left' }}>Condensed</div>
+              <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '2.25rem', fontWeight: 500, letterSpacing: '-0.03em', color: 'var(--color-text-primary)' }}>
+                Narr<span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>ai</span>tor
+              </div>
+            </div>
+          </div>
+
+          {/* Usage Guidelines */}
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Brand Guidelines</div>
+            <div className="ds2-code" style={{ fontSize: '0.875rem', lineHeight: 1.7 }}>
+{`/* Primary wordmark: Crimson Pro */
+.narraitor-wordmark {
+  font-family: 'Crimson Pro', serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Accent the "ai" */
+.narraitor-accent {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+/* Minimum size: 24px for legibility */
+/* Clear space: equal to cap height on all sides */`}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          TYPOGRAPHY
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-typography" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">01 — Typography</div>
+          <h2 className="ds2-section-title ds2-reveal">Warm Voice, Clear Purpose</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Crimson Pro for narrative warmth. JetBrains Mono for technical precision. Manrope for interface clarity. Three distinct voices that work in harmony.
+          </p>
+
+          {/* Split specimen: narrative vs technical */}
+          <div className="ds2-specimen-split ds2-reveal">
+            <div className="ds2-specimen-narrative">
+              <p>The library doors swung open to reveal shelves of leather-bound volumes stretching toward vaulted ceilings. Afternoon light filtered through tall windows, casting amber pools across worn oak tables.</p>
+              <p>You approached the central reading desk where an open manuscript waited, its pages yellowed but text still clear. The air smelled of old paper and wood polish—a scent of preserved knowledge.</p>
+              <p>A bronze plaque on the desk read: &ldquo;Every story deserves a sanctuary.&rdquo;</p>
+            </div>
+            <div className="ds2-specimen-technical">
+              <p>
+                <span className="ds2-specimen-annotation">font-narrative</span><br />
+                font-family: Crimson Pro, serif<br />
+                font-size: 1.25rem (20px)<br />
+                line-height: 1.7 (34px)<br />
+                font-weight: 400<br />
+                color: var(--color-text-primary)
+              </p>
+              <p>
+                <span className="ds2-specimen-annotation">measure</span><br />
+                max-width: 640px<br />
+                ~60-70 characters per line<br />
+                optimized for sustained reading
+              </p>
+              <p>
+                <span className="ds2-specimen-annotation">vertical rhythm</span><br />
+                paragraph spacing: 16px<br />
+                scene spacing: 24px<br />
+                aligned to 8px baseline grid
+              </p>
+            </div>
+          </div>
+
+          {/* Three font roles */}
+          <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '48px' }}>
+            <div className="ds2-component-stage ds2-reveal">
+              <div className="ds2-component-label">Narrative — Crimson Pro</div>
+              <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.375rem', lineHeight: 1.65, color: 'var(--color-text-primary)', margin: 0 }}>
+                The ancient archive breathed stories into the quiet afternoon air.
+              </p>
+            </div>
+            <div className="ds2-component-stage ds2-reveal">
+              <div className="ds2-component-label">System — JetBrains Mono</div>
+              <p style={{ fontFamily: 'var(--font-system)', fontSize: '0.9375rem', lineHeight: 1.6, letterSpacing: '0.01em', color: 'var(--color-text-primary)', margin: 0 }}>
+                HP: 42/50 · TURN 14 · SAVE: Auto · STATUS: Active
+              </p>
+            </div>
+            <div className="ds2-component-stage ds2-reveal">
+              <div className="ds2-component-label">Interface — Manrope</div>
+              <p style={{ fontFamily: 'var(--font-interface)', fontSize: '1.0625rem', lineHeight: 1.5, color: 'var(--color-text-primary)', margin: 0, fontWeight: 500 }}>
+                Continue to Character Sheet
+              </p>
+            </div>
+          </div>
+
+          {/* Heading scale as table of contents */}
+          <div className="ds2-heading-toc ds2-reveal">
+            <div className="ds2-component-label" style={{ marginBottom: '16px' }}>Heading Scale — Visual Hierarchy</div>
+            {HEADING_SCALE.map(({ tag, size, px, weight, lh, label }) => (
+              <div key={tag} className="ds2-heading-toc-item">
+                <span className="ds2-heading-toc-tag">{tag}</span>
+                <span
+                  className="ds2-heading-toc-text"
+                  style={{ fontSize: size, fontWeight: weight, lineHeight: lh }}
+                >
+                  {label}
+                </span>
+                <span className="ds2-heading-toc-meta">{px} · w{weight} · lh {lh}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          COLOR
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-color" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">02 — Palette</div>
+          <h2 className="ds2-section-title ds2-reveal">Warm Earth Tones</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            A palette inspired by clay, linen, sand, and stone. Warm neutrals that create calm without imposing mood. Genre-agnostic and story-focused.
+          </p>
+
+          {/* Full earth palette strip */}
+          <div className="ds2-reveal" style={{ marginBottom: '48px' }}>
+            <div className="ds2-component-label">Earth Tone Spectrum</div>
+            <div className="ds2-palette-strip">
+              {EARTH_PALETTE.map(({ name, hex }) => {
+                const isDark = ['Text Primary', 'Text Secondary', 'Text Muted', 'Accent'].includes(name);
+                return (
+                  <div
+                    key={name}
+                    className="ds2-palette-band"
+                    style={{ background: hex, color: isDark ? '#FAF8F3' : '#2D2520' }}
+                  >
+                    <span className="ds2-palette-band-label">{name} · {hex}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Accent demo: light vs dark */}
+          <div className="ds2-reveal" style={{ marginBottom: '48px' }}>
+            <div className="ds2-component-label">Olive Moss Accent</div>
+            <div className="ds2-accent-demo">
+              <div className="ds2-accent-panel ds2-accent-panel-light">
+                <div style={{ fontFamily: 'var(--font-system)', fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '16px', color: '#9C8D7E', fontWeight: 600 }}>
+                  Light Mode — #7C8B6F (Olive Moss)
+                </div>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.0625rem', lineHeight: 1.7, marginBottom: '16px' }}>
+                  The archivist gestured toward <span style={{ color: '#7C8B6F', textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '3px', fontWeight: 500 }}>The Chronicle of Collected Memories</span>, its moss-green binding soft against weathered pages.
+                </p>
+                <button type="button" style={{ padding: '10px 20px', background: '#7C8B6F', color: 'white', border: 'none', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, cursor: 'default' }}>
+                  Open Chronicle
+                </button>
+              </div>
+              <div className="ds2-accent-panel ds2-accent-panel-dark">
+                <div style={{ fontFamily: 'var(--font-system)', fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '16px', color: '#9C8D7E', fontWeight: 600 }}>
+                  Dark Mode — #9CAA8A (Lighter Moss)
+                </div>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.0625rem', lineHeight: 1.7, marginBottom: '16px' }}>
+                  The archivist gestured toward <span style={{ color: '#9CAA8A', textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '3px', fontWeight: 500 }}>The Chronicle of Collected Memories</span>, its moss-green binding soft against weathered pages.
+                </p>
+                <button type="button" style={{ padding: '10px 20px', background: '#9CAA8A', color: '#1A1614', border: 'none', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, cursor: 'default' }}>
+                  Open Chronicle
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Semantic colors in narrative context */}
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Semantic Colors — In Context</div>
+            <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.125rem', lineHeight: 1.7, color: 'var(--color-text-primary)', maxWidth: '700px' }}>
+              <p style={{ marginBottom: '16px' }}>
+                The curator examined each scroll carefully, marking verified histories with a gentle stamp:{' '}
+                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '3px 12px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(6, 95, 70, 0.12)', color: '#065f46' }}>Verified</span>.
+                Questionable accounts received a cautious note{' '}
+                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '3px 12px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(146, 64, 14, 0.12)', color: '#92400e' }}>Needs review</span>,
+                while lost narratives were sealed away{' '}
+                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '3px 12px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(159, 18, 57, 0.12)', color: '#9f1239' }}>Incomplete</span>.
+              </p>
+              <p>
+                A small notation in warm ink read:{' '}
+                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '3px 12px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(7, 89, 133, 0.12)', color: '#075985' }}>5 stories awaiting classification</span>.
+              </p>
+            </div>
+          </div>
+
+          {/* Contrast samples */}
+          <div className="ds2-reveal" style={{ marginTop: '48px' }}>
+            <div className="ds2-component-label">Accessibility — Contrast Verification</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+              {[
+                { bg: '#FAF8F3', fg: '#2D2520', label: 'Primary on Canvas', ratio: '12.8:1' },
+                { bg: '#FAF8F3', fg: '#6B5D52', label: 'Secondary on Canvas', ratio: '5.2:1' },
+                { bg: '#FAF8F3', fg: '#9C8D7E', label: 'Muted on Canvas', ratio: '3.1:1' },
+                { bg: '#C2532F', fg: '#FFFFFF', label: 'White on Terracotta', ratio: '4.8:1' },
+              ].map(({ bg, fg, label, ratio }) => (
+                <div
+                  key={label}
+                  style={{
+                    background: bg,
+                    color: fg,
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
+                  <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.0625rem', marginBottom: '8px', fontWeight: 500 }}>
+                    Readable text
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-system)', fontSize: '11px', opacity: 0.7, fontWeight: 600 }}>
+                    {label}<br />{ratio} — AA Pass
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          SPACING & RHYTHM
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-spacing" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">03 — Rhythm</div>
+          <h2 className="ds2-section-title ds2-reveal">Breathing Space</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            An 8px baseline grid and organic spacing scale create generous, natural rhythm. Whitespace is not decorative—it&rsquo;s essential breathing room.
+          </p>
+
+          {/* Baseline grid toggle */}
+          <div className="ds2-reveal" style={{ marginBottom: '48px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+              <div className="ds2-component-label" style={{ margin: 0, border: 'none', padding: 0 }}>Baseline Grid</div>
+              <button
+                type="button"
+                onClick={() => setShowGrid(!showGrid)}
+                style={{
+                  padding: '6px 16px',
+                  background: showGrid ? 'var(--color-accent)' : 'var(--color-surface)',
+                  color: showGrid ? 'white' : 'var(--color-text-muted)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '8px',
+                  fontFamily: 'var(--font-system)',
+                  fontSize: '11px',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+              >
+                {showGrid ? 'Hide Grid' : 'Show Grid'}
+              </button>
+            </div>
+            <div className="ds2-rhythm-demo" style={{ padding: '32px', border: '1px solid var(--color-border)', borderRadius: '12px', background: 'var(--color-surface)' }}>
+              <div className={`ds2-rhythm-grid-overlay ${showGrid ? 'ds2-rhythm-visible' : ''}`} />
+              <div style={{ position: 'relative', zIndex: 1, maxWidth: '700px' }}>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.1875rem', lineHeight: 1.7, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
+                  Each line settles naturally into place, guided by an invisible structure beneath. The 8-pixel grid provides rhythm without rigidity—breathing space for words to rest.
+                </p>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.1875rem', lineHeight: 1.7, color: 'var(--color-text-primary)', marginBottom: '24px' }}>
+                  Headings float above their content with measured distance. Every margin is intentional, creating flow that feels organic rather than engineered.
+                </p>
+                <p style={{ fontFamily: 'var(--font-system)', fontSize: '0.8125rem', lineHeight: 1.6, letterSpacing: '0.02em', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                  Turn: 14 · Status: Active · Auto-save: 2m ago
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Spacing scale */}
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Spacing Scale — 8px Base Grid</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'var(--color-surface)', padding: '24px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+              {SPACING_SCALE.map((px) => (
+                <div key={px} className="ds2-spacing-row">
+                  <span className="ds2-spacing-label">{px}px</span>
+                  <div className="ds2-spacing-bar" style={{ width: px * 2 }} />
+                  <span className="ds2-spacing-value">{px / 16}rem</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          PHILOSOPHY
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-philosophy" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">05 — Principles</div>
+          <h2 className="ds2-section-title ds2-reveal">Design Philosophy</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            A warm, organic sanctuary for storytelling. Natural forms and breathing space that frames any narrative without competing.
+          </p>
+
+          <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+            <div className="ds2-component-stage ds2-reveal">
+              <div className="ds2-component-label">The Concept</div>
+              <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1rem', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>
+                A reading sanctuary with warm earth tones. The app is the sanctuary, and the story is the guest of honor.
+              </p>
+            </div>
+            <div className="ds2-component-stage ds2-reveal">
+              <div className="ds2-component-label">The Goal</div>
+              <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1rem', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>
+                A calm, grounded presence that feels intentional. It does not compete with the story; it cradles it.
+              </p>
+            </div>
+            <div className="ds2-component-stage ds2-reveal">
+              <div className="ds2-component-label">Neutrality</div>
+              <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1rem', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>
+                Use warm earth tones with a single organic accent. Genre-agnostic, story-first, visually quiet.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          BORDER RADIUS
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-radius" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">06 — Form</div>
+          <h2 className="ds2-section-title ds2-reveal">Border Radius</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Soft, rounded corners create organic forms. More generous than the technical 2px of the original system.
+          </p>
+
+          <div className="ds2-reveal">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+              {[
+                { name: 'Small', value: '8px', note: 'Buttons, inputs, small elements' },
+                { name: 'Medium', value: '12px', note: 'Cards, panels, default' },
+                { name: 'Large', value: '16px', note: 'Modals, drawers, prominent containers' },
+                { name: 'Full', value: '9999px', note: 'Pills, badges, circular elements' },
+              ].map(({ name, value, note }) => (
+                <div key={name} className="ds2-component-stage" style={{ padding: '24px' }}>
+                  <div className="ds2-component-label">{name} — {value}</div>
+                  <div style={{ width: '100%', height: '80px', background: 'var(--color-accent-soft)', border: '2px solid var(--color-accent)', borderRadius: value, marginBottom: '12px' }} />
+                  <p style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0 }}>{note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          ELEVATION
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-elevation" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">07 — Depth</div>
+          <h2 className="ds2-section-title ds2-reveal">Elevation & Shadows</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Soft shadows with warm color cast. Elevation through gentle depth, not harsh contrast.
+          </p>
+
+          <div className="ds2-reveal">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+              {[
+                { name: 'Soft', shadow: 'var(--shadow-soft)', note: 'Cards, hover states' },
+                { name: 'Elevated', shadow: 'var(--shadow-elevated)', note: 'Drawers, modals, floating panels' },
+              ].map(({ name, shadow, note }) => (
+                <div key={name} className="ds2-component-stage" style={{ padding: '32px', textAlign: 'center' }}>
+                  <div className="ds2-component-label" style={{ textAlign: 'left' }}>{name}</div>
+                  <div style={{ width: '100%', height: '100px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '12px', boxShadow: shadow, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                    <span style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)' }}>Elevation</span>
+                  </div>
+                  <p style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0 }}>{note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          ICONS
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-icons" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">08 — Iconography</div>
+          <h2 className="ds2-section-title ds2-reveal">Icon System</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Lucide icons with consistent sizing. Warm accent color for interactive states.
+          </p>
+
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Icon Sizes</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px' }}>
+              {[
+                { size: 16, label: '16px — Inline' },
+                { size: 20, label: '20px — Standard' },
+                { size: 24, label: '24px — Buttons' },
+                { size: 32, label: '32px — Hero' },
+              ].map(({ size, label }) => (
+                <div key={size} className="ds2-component-stage" style={{ padding: '24px', textAlign: 'center' }}>
+                  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 12px' }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                  <p style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', margin: 0 }}>{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          GRID
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-grid" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">09 — Structure</div>
+          <h2 className="ds2-section-title ds2-reveal">Grid & Breakpoints</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Standard responsive breakpoints with container widths optimized for reading and creation.
+          </p>
+
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Breakpoints</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '32px' }}>
+              {[
+                { label: 'sm', width: '640px', desc: 'Small devices' },
+                { label: 'md', width: '768px', desc: 'Tablets' },
+                { label: 'lg', width: '1024px', desc: 'Laptops' },
+                { label: 'xl', width: '1280px', desc: 'Desktops — navigation appears' },
+                { label: '2xl', width: '1536px', desc: 'Large screens' },
+              ].map(({ label, width, desc }) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
+                  <span style={{ fontFamily: 'var(--font-system)', fontSize: '13px', fontWeight: 600, color: 'var(--color-accent)', width: '3rem' }}>{label}</span>
+                  <span style={{ fontFamily: 'var(--font-system)', fontSize: '13px', color: 'var(--color-text-primary)', width: '5rem', fontWeight: 600 }}>{width}</span>
+                  <span style={{ fontFamily: 'var(--font-system)', fontSize: '12px', color: 'var(--color-text-muted)' }}>{desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Container Widths</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+              {[
+                { title: 'Manuscript (Narrative)', width: '768px (max-w-3xl)', desc: 'Optimal reading, 60-70 chars/line' },
+                { title: 'Workshop (Utility)', width: '1024px (max-w-5xl)', desc: 'Forms, lists, management' },
+                { title: 'Default (Content)', width: '1200px', desc: 'General pages, dashboard' },
+              ].map(({ title, width, desc }) => (
+                <div key={title} className="ds2-component-stage" style={{ padding: '20px' }}>
+                  <div className="ds2-component-label">{title}</div>
+                  <p style={{ fontFamily: 'var(--font-system)', fontSize: '13px', color: 'var(--color-accent)', fontWeight: 600, marginBottom: '8px' }}>{width}</p>
+                  <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '0.9375rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: 0 }}>{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          MANUSCRIPT PREVIEW
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-manuscript" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">13 — Reading Experience</div>
+          <h2 className="ds2-section-title ds2-reveal">Session Layout Demo</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            A journal page, not an app. The narrative dominates; choices appear as footnotes below a thin rule. Clicking the character name or Tools in the running head opens floating paper-note panels. No rails, no chrome.
+          </p>
+
+          {/* DS2 Session Demo — The Open Journal */}
+          <div className="ds2-session-shell ds2-reveal">
+
+            {/* Running head — pure typography, no chrome bar */}
+            <div className="ds2-session-running-head">
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
+                <button
+                  type="button"
+                  className="ds2-session-char-link"
+                  onClick={() => { setShowCharacter(!showCharacter); setShowTools(false); }}
+                  style={{ color: showCharacter ? 'var(--color-accent)' : undefined }}
+                >
+                  Kael Ashford
+                </button>
+                <button
+                  type="button"
+                  className="ds2-session-ambient-btn"
+                  onClick={() => { setShowTools(!showTools); setShowCharacter(false); }}
+                  style={{ color: showTools ? 'var(--color-accent)' : undefined }}
+                >
+                  Tools
+                </button>
+              </div>
+              <div className="ds2-session-running-center">Session 04 · Turn 14</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                <span className="ds2-session-saving-dot" title="Auto-saving" />
+                <button type="button" className="ds2-session-ambient-btn">Reset</button>
+                <button type="button" className="ds2-session-ambient-btn">Close</button>
+              </div>
+            </div>
+
+            {/* Character panel — paper note */}
+            {showCharacter && (
+              <div className="ds2-session-floating-panel" style={{ left: '28px' }}>
+                <div className="ds2-session-panel-label">Character</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--color-accent-soft)', border: '1.5px solid var(--color-accent)', flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '1rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>Kael Ashford</div>
+                    <div style={{ fontFamily: 'var(--font-system)', fontSize: '10px', color: 'var(--color-text-muted)', letterSpacing: '0.06em' }}>Level 5</div>
+                  </div>
+                </div>
+                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '10px', marginBottom: '10px' }}>
+                  {[['Strength', '14'], ['Dexterity', '12'], ['Wisdom', '16']].map(([a, v]) => (
+                    <div key={a} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                      <span style={{ fontFamily: 'var(--font-system)', fontSize: '10px', color: 'var(--color-text-secondary)' }}>{a}</span>
+                      <span style={{ fontFamily: 'var(--font-system)', fontSize: '10px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '10px' }}>
+                  {[['Persuasion', '+4'], ['Stealth', '+2']].map(([s, m]) => (
+                    <div key={s} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                      <span style={{ fontFamily: 'var(--font-system)', fontSize: '10px', color: 'var(--color-text-secondary)' }}>{s}</span>
+                      <span style={{ fontFamily: 'var(--font-system)', fontSize: '10px', fontWeight: 600, color: 'var(--color-accent)' }}>{m}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tools panel */}
+            {showTools && (
+              <div className="ds2-session-floating-panel" style={{ left: '110px' }}>
+                <div className="ds2-session-panel-label">Tools</div>
+                {['Character Details', 'Inventory'].map((item) => (
+                  <button key={item} type="button" className="ds2-session-tool-btn">{item}</button>
+                ))}
+                <div style={{ borderTop: '1px solid var(--color-border)', margin: '8px 0' }} />
+                {[['Story So Far', 'story'], ['Choice History', 'history'], ['Journal', 'journal']].map(([label, key]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className="ds2-session-tool-btn"
+                    onClick={() => { setActiveDrawer(activeDrawer === key ? null : key); setShowTools(false); }}
+                    style={{ color: activeDrawer === key ? 'var(--color-accent)' : undefined }}
+                  >{label}</button>
+                ))}
+              </div>
+            )}
+
+            {/* Journal page — single reading column */}
+            <div className="ds2-session-journal-page">
+
+              {/* Characters present — ambient annotation */}
+              <div className="ds2-session-present">
+                Kael Ashford · Elder Thane present
+              </div>
+
+              {/* Narrative — dominates */}
+              <div className="ds2-session-narrative">
+                <p>The stone archway opened onto a meadow bathed in twilight. Wildflowers swayed in the warm breeze, their petals catching the last amber rays of sun. The air smelled of earth and distant rain.</p>
+                <p>Behind you, the forest path disappeared into shadow. Ahead, a small village flickered with lantern light, smoke rising from chimneys in lazy spirals. The choice was yours.</p>
+                <p>&ldquo;Every journey begins with a single step,&rdquo; Elder Thane said softly. &ldquo;But which direction calls to you?&rdquo;</p>
+              </div>
+
+              {/* Thin rule — narrative ends, choices begin */}
+              <div className="ds2-session-footnote-rule" />
+
+              {/* Choices — footnote style, not cards */}
+              <div className="ds2-session-choices">
+                {[
+                  { n: '1', label: 'Approach the village', color: null },
+                  { n: '2', label: 'Explore the meadow', color: 'rgba(7,89,133,0.4)' },
+                  { n: '3', label: 'Ask Elder Thane a question', color: 'rgba(146,64,14,0.4)' },
+                ].map(({ n, label, color }) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className="ds2-session-choice"
+                    style={{ borderLeftColor: color ?? undefined }}
+                  >
+                    <span className="ds2-session-choice-n">{n}</span>
+                    <span className="ds2-session-choice-label">{label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Compose — minimal, dashed underline style */}
+              <div className="ds2-session-action">
+                <span className="ds2-session-action-label">or write your own</span>
+                <input
+                  type="text"
+                  className="ds2-session-action-input"
+                  placeholder="What do you do?"
+                  readOnly
+                  tabIndex={-1}
+                />
+                <button type="button" className="ds2-session-action-send">Send</button>
+                <button type="button" className="ds2-session-action-end">End Story</button>
+              </div>
+
+            </div>
+
+            {/* Supplementary content — floating panel, right-anchored */}
+            {activeDrawer && (
+              <div className="ds2-session-floating-panel ds2-session-content-panel">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '10px' }}>
+                  <div>
+                    <div className="ds2-session-panel-label" style={{ marginBottom: '2px' }}>
+                      {activeDrawer === 'story' ? 'Story So Far' : activeDrawer === 'history' ? 'Choice History' : 'Journal'}
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-system)', fontSize: '9px', color: 'var(--color-text-muted)', letterSpacing: '0.06em' }}>
+                      {activeDrawer === 'story' ? 'Session 04' : activeDrawer === 'history' ? '14 choices made' : '3 entries'}
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => setActiveDrawer(null)} className="ds2-session-ambient-btn">close</button>
+                </div>
+                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '10px' }}>
+                  {activeDrawer === 'story' && (
+                    <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '0.9375rem', lineHeight: 1.65, color: 'var(--color-text-secondary)' }}>
+                      <p style={{ marginBottom: '8px' }}>You arrived at the village seeking Elder Thane&rsquo;s wisdom. He spoke of ancient paths and choices that shape destiny.</p>
+                      <p style={{ margin: 0 }}>The meadow calls with possibility. A stranger watched from the treeline as you departed.</p>
+                    </div>
+                  )}
+                  {activeDrawer === 'history' && (
+                    <ol style={{ margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {['Entered the village at dusk.', 'Spoke honestly to the Elder.', 'Chose the meadow path over the forest road.'].map((c, i) => (
+                        <li key={i} style={{ fontFamily: 'var(--font-system)', fontSize: '11px', lineHeight: 1.5, color: 'var(--color-text-secondary)' }}>{c}</li>
+                      ))}
+                    </ol>
+                  )}
+                  {activeDrawer === 'journal' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {[
+                        { title: 'Day One', excerpt: 'The road was longer than expected. The Elder\u2019s lantern was the first light I saw.' },
+                        { title: 'The Archive', excerpt: 'Rows of shelves. Something moved behind the eastern stacks.' },
+                      ].map((e) => (
+                        <div key={e.title} style={{ paddingBottom: '8px', borderBottom: '1px solid var(--color-border)' }}>
+                          <div style={{ fontFamily: 'var(--font-interface)', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '3px' }}>{e.title}</div>
+                          <p style={{ margin: 0, fontFamily: 'var(--font-narrative)', fontSize: '0.875rem', lineHeight: 1.55, color: 'var(--color-text-secondary)' }}>{e.excerpt}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* Overlay Token Reference */}
+          <div className="ds2-reveal" style={{ marginTop: '32px' }}>
+            <div className="ds2-component-label">Overlay System</div>
+            <div className="ds2-code">
+{`/* Manuscript Shell */
+background: var(--gradient-manuscript), var(--color-canvas);
+
+/* HUD & Rail */
+background: var(--color-overlay-surface);    /* 90% opacity */
+backdrop-filter: blur(16px);
+border-radius: 12px;
+
+/* Action Rail */
+background: var(--color-overlay-surface-strong);  /* 95% opacity */
+backdrop-filter: blur(20px);
+box-shadow: var(--shadow-soft);`}
+            </div>
+          </div>
+
+          {/* Class System */}
+          <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginTop: '32px' }}>
+            {[
+              { label: 'Scaffold', items: ['.manuscript-viewport-layer', '.manuscript-viewport-shell', '.manuscript-viewport-inner', '.manuscript-overlay-backdrop'] },
+              { label: 'Regions', items: ['.manuscript-overlay-header', '.manuscript-overlay-main', '.manuscript-main-stage', '.manuscript-characters-rail'] },
+              { label: 'Interactions', items: ['.manuscript-action-rail-streaming', '.manuscript-suggested-action', '.manuscript-overlay-open'] },
+            ].map((group) => (
+              <div key={group.label} className="ds2-component-stage ds2-reveal" style={{ padding: '16px' }}>
+                <div className="ds2-component-label">{group.label}</div>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                  {group.items.map((cls) => (
+                    <li key={cls} style={{ fontFamily: 'var(--font-system)', fontSize: '13px', color: 'var(--color-text-primary)', padding: '4px 0', fontWeight: 500 }}>{cls}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          COMPONENTS
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-components" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">14 — Elements</div>
+          <h2 className="ds2-section-title ds2-reveal">In Context</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Components shown in their natural habitat. Soft forms, warm colors, and purposeful spacing create interfaces that feel inviting rather than mechanical.
+          </p>
+
+          {/* Buttons in action rail context */}
+          <div className="ds2-component-stage ds2-reveal">
+            <div className="ds2-component-label">Buttons — Action Context</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+              <button type="button" style={{ padding: '10px 20px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                Send Action
+              </button>
+              <button type="button" style={{ padding: '10px 20px', background: 'var(--color-surface)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                View Journal
+              </button>
+              <button type="button" disabled style={{ padding: '10px 20px', background: 'var(--color-surface-hover)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 500, cursor: 'not-allowed', opacity: 0.6 }}>
+                Waiting...
+              </button>
+              <button type="button" style={{ padding: '10px 20px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, opacity: 0.85, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'default' }}>
+                <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                Generating
+              </button>
+            </div>
+          </div>
+
+          {/* Inputs in character creation context */}
+          <div className="ds2-component-stage ds2-reveal">
+            <div className="ds2-component-label">Inputs — Character Creation</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+              <div>
+                <label htmlFor="ds2-name" style={{ display: 'block', fontFamily: 'var(--font-system)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '8px', fontWeight: 600 }}>Character Name</label>
+                <input id="ds2-name" type="text" defaultValue="Kael Ashford" style={{ width: '100%', padding: '12px 16px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.9375rem', color: 'var(--color-text-primary)', boxSizing: 'border-box', fontWeight: 500 }} />
+              </div>
+              <div>
+                <label htmlFor="ds2-bg" style={{ display: 'block', fontFamily: 'var(--font-system)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '8px', fontWeight: 600 }}>Background</label>
+                <input id="ds2-bg" type="text" placeholder="Describe your character's history..." style={{ width: '100%', padding: '12px 16px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.9375rem', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Badges as character status */}
+          <div className="ds2-component-stage ds2-reveal">
+            <div className="ds2-component-label">Badges — Character Status</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'var(--color-accent-soft)', color: 'var(--color-accent)' }}>Player</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }}>Level 5</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(6, 95, 70, 0.12)', color: '#065f46' }}>Healthy</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(146, 64, 14, 0.12)', color: '#92400e' }}>Fatigued</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(159, 18, 57, 0.12)', color: '#9f1239' }}>Poisoned</span>
+            </div>
+          </div>
+
+          {/* Alerts as narrative feedback */}
+          <div className="ds2-component-stage ds2-reveal">
+            <div className="ds2-component-label">Alerts — System Feedback</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
+              <div style={{ borderRadius: 8, padding: '12px 16px', background: 'rgba(6, 95, 70, 0.08)', border: '1px solid rgba(6, 95, 70, 0.35)', color: '#065f46', fontSize: '0.9375rem', fontFamily: 'var(--font-interface)', fontWeight: 500 }}>
+                Your perception check succeeded. You notice fresh tracks leading east.
+              </div>
+              <div style={{ borderRadius: 8, padding: '12px 16px', background: 'rgba(146, 64, 14, 0.08)', border: '1px solid rgba(146, 64, 14, 0.35)', color: '#92400e', fontSize: '0.9375rem', fontFamily: 'var(--font-interface)', fontWeight: 500 }}>
+                Low torch visibility may reduce your stealth effectiveness.
+              </div>
+              <div style={{ borderRadius: 8, padding: '12px 16px', background: 'rgba(159, 18, 57, 0.08)', border: '1px solid rgba(159, 18, 57, 0.35)', color: '#9f1239', fontSize: '0.9375rem', fontFamily: 'var(--font-interface)', fontWeight: 500 }}>
+                Save failed. Your progress may not be preserved.
+              </div>
+            </div>
+          </div>
+
+          {/* Cards as world cards */}
+          <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            <div className="ds2-component-stage ds2-reveal" style={{ padding: '24px' }}>
+              <div style={{ fontFamily: 'var(--font-interface)', fontSize: '1.0625rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>Fantasy Realm</div>
+              <div style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '12px', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 600 }}>Fantasy · 3 Sessions · 2 Characters</div>
+              <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '0.9375rem', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>A world of magic and wonder, where ancient powers stir beneath forgotten ruins and every choice shapes destiny.</p>
+            </div>
+            <div className="ds2-component-stage ds2-reveal" style={{ padding: '24px', background: 'var(--color-overlay-surface)', backdropFilter: 'blur(16px)' }}>
+              <div style={{ fontFamily: 'var(--font-interface)', fontSize: '1.0625rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>Coastal Mystery</div>
+              <div style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '12px', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 600 }}>Mystery · 1 Session · 1 Character</div>
+              <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '0.9375rem', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>Salt air and secrets. A lighthouse keeper disappeared, and the tide brought strange things to shore.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          LAYOUT PATTERNS
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-layout" className="ds2-section" style={{ borderBottom: '1px solid var(--color-border)' }}>
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">10 — Patterns</div>
+          <h2 className="ds2-section-title ds2-reveal">Layout Archetypes</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Three foundational patterns. Manuscript for immersive reading, Workshop for creation and management, Default for general navigation.
+          </p>
+
+          <div className="ds2-archetype-grid ds2-stagger">
+            {/* Immersive Reading */}
+            <div className="ds2-archetype-card ds2-reveal">
+              <div className="ds2-archetype-preview">
+                <div style={{ border: '1px solid var(--color-border)', borderRadius: '8px', padding: '12px', minHeight: '160px', background: 'var(--color-surface)', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '10px', fontFamily: 'var(--font-system)', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                  <div style={{ height: '12px', opacity: 0.2, background: 'var(--color-surface-hover)', borderRadius: '4px', marginBottom: '2px' }} />
+                  <div style={{ flex: 1, background: 'var(--color-surface-hover)', borderRadius: '6px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: '9px' }}>
+                    Fullscreen Narrative<br/>Minimal chrome
+                  </div>
+                  <div style={{ height: '16px', background: 'var(--color-surface-hover)', borderRadius: '6px' }} />
+                </div>
+              </div>
+              <div className="ds2-archetype-info">
+                <div className="ds2-archetype-name">Immersive</div>
+                <div className="ds2-archetype-desc">Fullscreen reading mode. HUD fades on idle but action controls stay visible. Story takes center stage.</div>
+              </div>
+            </div>
+
+            {/* Balanced Session */}
+            <div className="ds2-archetype-card ds2-reveal">
+              <div className="ds2-archetype-preview">
+                <div style={{ border: '1px solid var(--color-border)', borderRadius: '8px', padding: '12px', minHeight: '160px', background: 'var(--color-surface)', display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: '6px', fontSize: '10px', fontFamily: 'var(--font-system)', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px' }}>
+                    <div style={{ display: 'flex', gap: '3px' }}>
+                      <div style={{ width: '28px', height: '12px', background: 'var(--color-surface-hover)', borderRadius: '4px' }} />
+                      <div style={{ width: '28px', height: '12px', background: 'var(--color-surface-hover)', borderRadius: '4px' }} />
+                    </div>
+                    <div style={{ fontSize: '7px', padding: '2px 4px' }}>TURN 14</div>
+                  </div>
+                  <div style={{ background: 'var(--color-surface-hover)', borderRadius: '6px', padding: '12px', textAlign: 'center', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    Full-Width Narrative<br/>Drawers slide over
+                  </div>
+                  <div style={{ padding: '6px', background: 'var(--color-surface-hover)', borderRadius: '6px', textAlign: 'center' }}>Action Input</div>
+                </div>
+              </div>
+              <div className="ds2-archetype-info">
+                <div className="ds2-archetype-name">Active Session</div>
+                <div className="ds2-archetype-desc">Balanced gameplay. Full-width narrative with HUD dropdowns and side drawers that slide over content on demand.</div>
+              </div>
+            </div>
+
+            {/* Multi-Panel Creator */}
+            <div className="ds2-archetype-card ds2-reveal">
+              <div className="ds2-archetype-preview">
+                <div style={{ border: '1px solid var(--color-border)', borderRadius: '8px', padding: '12px', minHeight: '160px', background: 'var(--color-surface)', display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '6px', fontSize: '10px', fontFamily: 'var(--font-system)', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                  <div style={{ background: 'var(--color-surface-hover)', borderRadius: '6px', padding: '6px' }}>
+                    <div style={{ fontSize: '8px', marginBottom: '4px' }}>Nav</div>
+                    <div style={{ background: 'var(--color-surface)', borderRadius: '3px', padding: '3px', marginBottom: '2px', fontSize: '7px' }}>Worlds</div>
+                    <div style={{ background: 'var(--color-surface)', borderRadius: '3px', padding: '3px', fontSize: '7px' }}>Chars</div>
+                  </div>
+                  <div style={{ background: 'var(--color-surface-hover)', borderRadius: '6px', padding: '8px', textAlign: 'center' }}>
+                    Main Editor
+                  </div>
+                  <div style={{ background: 'var(--color-surface-hover)', borderRadius: '6px', padding: '6px' }}>
+                    <div style={{ fontSize: '8px', marginBottom: '4px' }}>Inspector</div>
+                    <div style={{ background: 'var(--color-surface)', borderRadius: '3px', padding: '8px', fontSize: '7px' }}>Props</div>
+                  </div>
+                </div>
+              </div>
+              <div className="ds2-archetype-info">
+                <div className="ds2-archetype-name">Creator Studio</div>
+                <div className="ds2-archetype-desc">Multi-panel workspace for world building. Navigation sidebar, main editor, and properties inspector all visible.</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Note: Breakpoints moved to Grid section */}
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          CSS VARIABLES
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-variables" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">11 — Tokens</div>
+          <h2 className="ds2-section-title ds2-reveal">CSS Variables</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Design tokens as CSS custom properties. Theme-aware and globally accessible.
+          </p>
+
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Core Variables</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+              <div className="ds2-code">
+{`/* Typography */
+--font-narrative: 'Crimson Pro', serif
+--font-system: 'JetBrains Mono', monospace
+--font-interface: 'Manrope', sans-serif
+
+/* Surfaces */
+--color-canvas: #FAF8F3
+--color-surface: #FFFDF7
+--color-surface-hover: #F5F1E8
+
+/* Text */
+--color-text-primary: #2D2520
+--color-text-secondary: #6B5D52
+--color-text-muted: #9C8D7E`}
+              </div>
+              <div className="ds2-code">
+{`/* Borders */
+--color-border: #E0D5C7
+--color-border-strong: #D4C9BA
+
+/* Accent (Olive Moss) */
+--color-accent: #7C8B6F
+--color-accent-hover: #6A7760
+--color-accent-soft: rgba(124, 139, 111, 0.12)
+
+/* Overlays */
+--color-overlay-surface: rgba(255, 253, 247, 0.90)
+--color-overlay-surface-strong: rgba(255, 253, 247, 0.95)
+--shadow-soft: 0 8px 24px rgba(45, 37, 32, 0.08)`}
+              </div>
+            </div>
+          </div>
+
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Spacing & Layout</div>
+            <div className="ds2-code">
+{`/* Spacing (8px base grid) */
+--space-1: 8px
+--space-2: 16px
+--space-3: 24px
+--space-4: 32px
+--space-6: 48px
+--space-8: 64px
+
+/* Border Radius */
+--border-radius-sm: 8px
+--border-radius-md: 12px
+--border-radius-lg: 16px
+
+/* Shadows */
+--shadow-soft: 0 8px 24px rgba(45, 37, 32, 0.08)
+--shadow-elevated: 0 16px 48px rgba(45, 37, 32, 0.12)`}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          OVERLAY SYSTEM
+          ════════════════════════════════════════════════════ */}
+      <section id="ds2-overlay" className="ds2-section">
+        <div className="ds2-section-inner">
+          <div className="ds2-section-number ds2-reveal">12 — Manuscript Overlay</div>
+          <h2 className="ds2-section-title ds2-reveal">Overlay System</h2>
+          <p className="ds2-section-subtitle ds2-reveal">
+            Layered manuscript interface with floating HUD, drawers, and action rail. Backdrop blur and gentle transparency.
+          </p>
+
+          <div className="ds2-reveal">
+            <div className="ds2-component-label">Overlay Tokens</div>
+            <div className="ds2-code">
+{`/* Manuscript Shell */
+background: var(--gradient-manuscript), var(--color-canvas);
+
+/* HUD & Rail */
+background: var(--color-overlay-surface);    /* 90% opacity */
+backdrop-filter: blur(16px);
+border-radius: 12px;
+
+/* Action Rail */
+background: var(--color-overlay-surface-strong);  /* 95% opacity */
+backdrop-filter: blur(20px);
+box-shadow: var(--shadow-soft);
+
+/* Drawer */
+background: var(--color-surface);
+box-shadow: var(--shadow-elevated);`}
+            </div>
+          </div>
+
+          <div className="ds2-reveal" style={{ marginTop: '32px' }}>
+            <div className="ds2-component-label">Class System</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+              {[
+                { label: 'Scaffold', items: ['.manuscript-viewport-layer', '.manuscript-viewport-shell', '.manuscript-viewport-inner'] },
+                { label: 'Regions', items: ['.manuscript-overlay-header', '.manuscript-overlay-main', '.manuscript-main-stage'] },
+                { label: 'Interactions', items: ['.manuscript-drawer-panel', '.manuscript-action-rail', '.manuscript-suggested-action'] },
+              ].map((group) => (
+                <div key={group.label} className="ds2-component-stage" style={{ padding: '16px' }}>
+                  <div className="ds2-component-label">{group.label}</div>
+                  <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                    {group.items.map((cls) => (
+                      <li key={cls} style={{ fontFamily: 'var(--font-system)', fontSize: '13px', color: 'var(--color-text-primary)', padding: '4px 0', fontWeight: 500 }}>{cls}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <div className="ds2-reveal" style={{ marginTop: '96px', padding: '48px 0', textAlign: 'center', borderTop: '1px solid var(--color-border)' }}>
+        <div className="ds2-divider" />
+        <p style={{ fontFamily: 'var(--font-system)', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+          Narraitor Design System — Warm Earth Edition — End of Document
+        </p>
+      </div>
+
+      {/* Spinner animation for loading button */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
