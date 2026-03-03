@@ -221,6 +221,10 @@ export default function DesignSystemPage() {
   const revealRef = useScrollReveal();
   const activeSection = useActiveSection(NAV_SECTIONS.map(s => s.id));
 
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
+
   const toggleTheme = useCallback(() => {
     const html = document.documentElement;
     if (isDark) html.classList.remove('dark'); else html.classList.add('dark');

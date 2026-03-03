@@ -109,6 +109,10 @@ export default function DesignSystem3Page() {
   const revealRef = useScrollReveal();
   const active = useActiveSection(NAV.map(s => s.id));
 
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
+
   const toggleTheme = useCallback(() => {
     const html = document.documentElement;
     if (isDark) html.classList.remove('dark'); else html.classList.add('dark');
