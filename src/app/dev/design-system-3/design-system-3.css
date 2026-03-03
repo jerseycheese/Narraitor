@@ -1019,15 +1019,12 @@
   border-bottom: none;
 }
 
-.ds3-inv-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.ds3-inv-img {
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-sm);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  background: var(--color-surface-hover);
+  object-fit: cover;
   flex-shrink: 0;
 }
 

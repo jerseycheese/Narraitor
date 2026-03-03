@@ -994,9 +994,8 @@ box-shadow: var(--shadow-elevated);`}
             {showTools && (
               <div className="ds2-session-floating-panel" style={{ left: '110px' }}>
                 <div className="ds2-session-panel-label">Tools</div>
-                {['Character Sheet', 'Inventory'].map((item) => (
-                  <button key={item} type="button" className="ds2-session-tool-btn">{item}</button>
-                ))}
+                <button type="button" className="ds2-session-tool-btn">Character Sheet</button>
+                <button type="button" className="ds2-session-tool-btn" onClick={() => { setActiveDrawer(activeDrawer === 'inventory' ? null : 'inventory'); setShowTools(false); }} style={{ color: activeDrawer === 'inventory' ? 'var(--color-accent)' : undefined }} aria-expanded={activeDrawer === 'inventory'}>Inventory</button>
                 <div style={{ borderTop: '1px solid var(--color-border)', margin: '8px 0' }} />
                 {[['Story So Far', 'story'], ['Choice History', 'history'], ['Journal', 'journal']].map(([label, key]) => (
                   <button
@@ -1138,10 +1137,10 @@ box-shadow: var(--shadow-elevated);`}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '10px' }}>
                   <div>
                     <div className="ds2-session-panel-label" style={{ marginBottom: '2px' }}>
-                      {activeDrawer === 'story' ? 'Story So Far' : activeDrawer === 'history' ? 'Choice History' : 'Journal'}
+                      {activeDrawer === 'story' ? 'Story So Far' : activeDrawer === 'history' ? 'Choice History' : activeDrawer === 'inventory' ? 'Inventory' : 'Journal'}
                     </div>
                     <div style={{ fontFamily: 'var(--font-system)', fontSize: '9px', color: 'var(--color-text-muted)', letterSpacing: '0.06em' }}>
-                      {activeDrawer === 'story' ? 'Current Session' : activeDrawer === 'history' ? '6 choices made' : '3 entries'}
+                      {activeDrawer === 'story' ? 'Current Session' : activeDrawer === 'history' ? '6 choices made' : activeDrawer === 'inventory' ? '4 items' : '3 entries'}
                     </div>
                   </div>
                   <button type="button" onClick={() => setActiveDrawer(null)} className="ds2-session-ambient-btn">close</button>
@@ -1169,6 +1168,24 @@ box-shadow: var(--shadow-elevated);`}
                         <div key={e.title} style={{ paddingBottom: '8px', borderBottom: '1px solid var(--color-border)' }}>
                           <div style={{ fontFamily: 'var(--font-interface)', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '3px' }}>{e.title}</div>
                           <p style={{ margin: 0, fontFamily: 'var(--font-narrative)', fontSize: '0.875rem', lineHeight: 1.55, color: 'var(--color-text-secondary)' }}>{e.excerpt}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {activeDrawer === 'inventory' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                      {[
+                        { name: 'Revolver', desc: 'Standard issue, well-oiled.' },
+                        { name: 'Case File', desc: 'Clara Duvall — notes and photos.' },
+                        { name: 'Matchbook', desc: 'From the Alibi Room. Address on the back.' },
+                        { name: 'Lockpick Set', desc: 'Worn but reliable. 3 picks remain.' },
+                      ].map((item) => (
+                        <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
+                          <img src={`https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}`} alt={item.name} style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--color-surface-hover)', objectFit: 'cover', flexShrink: 0 }} />
+                          <div>
+                            <div style={{ fontFamily: 'var(--font-interface)', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.name}</div>
+                            <div style={{ fontFamily: 'var(--font-interface)', fontSize: '11px', color: 'var(--color-text-secondary)' }}>{item.desc}</div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -1333,6 +1350,63 @@ box-shadow: var(--shadow-soft);`}
               <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '0.9375rem', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>A deep-space mining station gone silent. Your crew was sent to investigate. The distress signal stopped two days ago.</p>
             </div>
           </div>
+
+          {/* Drawers — isolated */}
+          <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginTop: '32px' }}>
+            {/* Journal drawer */}
+            <div className="ds2-component-stage ds2-reveal" style={{ padding: 0, overflow: 'hidden' }}>
+              <div className="ds2-component-label" style={{ padding: '16px 20px 0' }}>Drawer — Journal</div>
+              <div style={{ padding: '12px 20px 20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-interface)', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Journal</div>
+                    <div style={{ fontFamily: 'var(--font-system)', fontSize: '9px', color: 'var(--color-text-muted)', letterSpacing: '0.06em' }}>3 entries</div>
+                  </div>
+                  <span className="ds2-session-ambient-btn">close</span>
+                </div>
+                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 10 }}>
+                  {[
+                    { title: 'The Alibi Room', excerpt: 'Clara\'s dressing room was untouched. Perfume on the vanity, a half-finished cigarette.' },
+                    { title: 'Reyes\u2019 Warning', excerpt: 'The sergeant told me to drop it. That kind of advice usually means I\'m on the right track.' },
+                  ].map((e) => (
+                    <div key={e.title} style={{ paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid var(--color-border)' }}>
+                      <div style={{ fontFamily: 'var(--font-interface)', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: 3 }}>{e.title}</div>
+                      <p style={{ margin: 0, fontFamily: 'var(--font-narrative)', fontSize: '0.875rem', lineHeight: 1.55, color: 'var(--color-text-secondary)' }}>{e.excerpt}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* Inventory drawer */}
+            <div className="ds2-component-stage ds2-reveal" style={{ padding: 0, overflow: 'hidden' }}>
+              <div className="ds2-component-label" style={{ padding: '16px 20px 0' }}>Drawer — Inventory</div>
+              <div style={{ padding: '12px 20px 20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-interface)', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Inventory</div>
+                    <div style={{ fontFamily: 'var(--font-system)', fontSize: '9px', color: 'var(--color-text-muted)', letterSpacing: '0.06em' }}>4 items</div>
+                  </div>
+                  <span className="ds2-session-ambient-btn">close</span>
+                </div>
+                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 10 }}>
+                  {[
+                    { name: 'Revolver', desc: 'Standard issue, well-oiled.' },
+                    { name: 'Case File', desc: 'Clara Duvall — notes and photos.' },
+                    { name: 'Matchbook', desc: 'From the Alibi Room. Address on the back.' },
+                    { name: 'Lockpick Set', desc: 'Worn but reliable. 3 picks remain.' },
+                  ].map((item) => (
+                    <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
+                      <img src={`https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}`} alt={item.name} style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--color-surface-hover)', objectFit: 'cover', flexShrink: 0 }} />
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-interface)', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.name}</div>
+                        <div style={{ fontFamily: 'var(--font-interface)', fontSize: '11px', color: 'var(--color-text-secondary)' }}>{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section >
 
@@ -1345,12 +1419,12 @@ box-shadow: var(--shadow-soft);`}
       </div >
 
       {/* Spinner animation for loading button */}
-      <style> {`
+      <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-      `}</style >
+      `}</style>
     </div >
   );
 }

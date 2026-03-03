@@ -780,15 +780,14 @@ export default function DesignSystem3Page() {
                   </div>
                   <div className="ds3-drawer-body">
                     {[
-                      { name: 'Revolver', desc: 'Standard issue, well-oiled.', eq: false, I: Icons.Sword },
-                      { name: 'Case File', desc: 'Clara Duvall — notes and photos.', eq: false, I: Icons.Map },
-                      { name: 'Matchbook', desc: 'From the Alibi Room. Address on the back.', eq: false, I: Icons.CheckCircle },
-                      { name: 'Lockpick Set', desc: 'Worn but reliable. 3 picks remain.', eq: false, I: Icons.Settings },
+                      { name: 'Revolver', desc: 'Standard issue, well-oiled.' },
+                      { name: 'Case File', desc: 'Clara Duvall — notes and photos.' },
+                      { name: 'Matchbook', desc: 'From the Alibi Room. Address on the back.' },
+                      { name: 'Lockpick Set', desc: 'Worn but reliable. 3 picks remain.' },
                     ].map((item, i) => (
                       <div key={i} className="ds3-inv-item">
-                        <div className="ds3-inv-icon"><item.I size={16} /></div>
+                        <img className="ds3-inv-img" src={`https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}`} alt={item.name} />
                         <div><div className="ds3-inv-name">{item.name}</div><div className="ds3-inv-desc">{item.desc}</div></div>
-                        {item.eq && <div className="ds3-inv-equipped" />}
                       </div>
                     ))}
                   </div>
@@ -935,12 +934,12 @@ export default function DesignSystem3Page() {
                 </div>
                 <div className="ds3-drawer-body">
                   {[
-                    { name: 'Iron Shortsword', desc: 'A reliable blade.', Icon: Icons.Sword },
-                    { name: 'Leather Shield', desc: 'Basic protection.', Icon: Icons.Shield },
-                    { name: 'Old Map', desc: 'Shows the northern region.', Icon: Icons.Map },
+                    { name: 'Iron Shortsword', desc: 'A reliable blade.' },
+                    { name: 'Leather Shield', desc: 'Basic protection.' },
+                    { name: 'Old Map', desc: 'Shows the northern region.' },
                   ].map((item, i) => (
                     <div key={i} className="ds3-inv-item">
-                      <div className="ds3-inv-icon"><item.Icon size={16} /></div>
+                      <img className="ds3-inv-img" src={`https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}`} alt={item.name} />
                       <div><div className="ds3-inv-name">{item.name}</div><div className="ds3-inv-desc">{item.desc}</div></div>
                     </div>
                   ))}

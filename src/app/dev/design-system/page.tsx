@@ -242,6 +242,28 @@ function ManuscriptDemo() {
         </div>
       ),
     },
+    inventory: {
+      title: 'Inventory',
+      subtitle: '4 items',
+      body: (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {[
+            { name: 'Revolver', desc: 'Standard issue, well-oiled.' },
+            { name: 'Case File', desc: 'Clara Duvall — notes and photos.' },
+            { name: 'Matchbook', desc: 'From the Alibi Room. Address on the back.' },
+            { name: 'Lockpick Set', desc: 'Worn but reliable. 3 picks remain.' },
+          ].map((item) => (
+            <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
+              <img src={`https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}`} alt={item.name} style={{ width: 32, height: 32, borderRadius: 2, background: 'var(--color-surface-hover)', objectFit: 'cover', flexShrink: 0 }} />
+              <div>
+                <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.name}</div>
+                <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{item.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
   };
 
   return (
@@ -325,9 +347,8 @@ function ManuscriptDemo() {
           {showTools && (
             <div style={{ position: 'absolute', top: 56, left: 84, width: 200, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 14, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 10 }}>
               <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Tools</div>
-              {['Character Sheet', 'Inventory'].map((item) => (
-                <button key={item} style={{ width: '100%', padding: '7px 10px', background: 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>{item}</button>
-              ))}
+              <button style={{ width: '100%', padding: '7px 10px', background: 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>Character Sheet</button>
+              <button onClick={() => { setActiveDrawer(activeDrawer === 'inventory' ? null : 'inventory'); setShowTools(false); }} aria-expanded={activeDrawer === 'inventory'} style={{ width: '100%', padding: '7px 10px', background: activeDrawer === 'inventory' ? 'var(--color-surface-hover)' : 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>Inventory</button>
               <div style={{ borderTop: '1px solid var(--color-border)', margin: '8px 0' }} />
               {[['Story So Far', 'story'], ['Choice History', 'history'], ['Journal', 'journal']].map(([label, key]) => (
                 <button key={key} onClick={() => { setActiveDrawer(activeDrawer === key ? null : key); setShowTools(false); }} aria-expanded={activeDrawer === key} style={{ width: '100%', padding: '7px 10px', background: activeDrawer === key ? 'var(--color-surface-hover)' : 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>{label}</button>
@@ -1483,6 +1504,67 @@ a:hover {
                   <div style={{ padding: 16, borderRadius: 2, background: 'rgba(255, 255, 255, 0.9)', border: '1px solid var(--color-border)', backdropFilter: 'blur(12px)' }}>
                     <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>HUD CARD</div>
                     <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Floating overlay-compatible card panel.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Drawers */}
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Drawers</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Side-panel drawers for supplementary content. Slide over the manuscript on demand.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              {/* Journal drawer */}
+              <div className="ds1-reveal" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, overflow: 'hidden' }}>
+                <div className="ds1-stage-label" style={{ padding: '12px 16px 0' }}>Drawer — Journal</div>
+                <div style={{ padding: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                    <div>
+                      <h4 style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--color-text-primary)' }}>Journal</h4>
+                      <div className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', marginTop: 2 }}>3 entries</div>
+                    </div>
+                    <span className="font-system" style={{ fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Close</span>
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 12 }}>
+                    {[
+                      { title: 'The Alibi Room', excerpt: 'Clara\'s dressing room was untouched. Perfume on the vanity, a half-finished cigarette.' },
+                      { title: 'Reyes\u2019 Warning', excerpt: 'The sergeant told me to drop it. That kind of advice usually means I\'m on the right track.' },
+                    ].map((e) => (
+                      <div key={e.title} style={{ padding: 10, border: '1px solid var(--color-border)', borderRadius: 2, background: 'var(--color-surface-hover)', marginBottom: 8 }}>
+                        <div className="font-system" style={{ fontSize: 11, fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: 4 }}>{e.title}</div>
+                        <p className="text-narrative" style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: 0 }}>{e.excerpt}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {/* Inventory drawer */}
+              <div className="ds1-reveal" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, overflow: 'hidden' }}>
+                <div className="ds1-stage-label" style={{ padding: '12px 16px 0' }}>Drawer — Inventory</div>
+                <div style={{ padding: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                    <div>
+                      <h4 style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--color-text-primary)' }}>Inventory</h4>
+                      <div className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', marginTop: 2 }}>4 items</div>
+                    </div>
+                    <span className="font-system" style={{ fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>Close</span>
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 12 }}>
+                    {[
+                      { name: 'Revolver', desc: 'Standard issue, well-oiled.' },
+                      { name: 'Case File', desc: 'Clara Duvall — notes and photos.' },
+                      { name: 'Matchbook', desc: 'From the Alibi Room. Address on the back.' },
+                      { name: 'Lockpick Set', desc: 'Worn but reliable. 3 picks remain.' },
+                    ].map((item) => (
+                      <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
+                        <img src={`https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}`} alt={item.name} style={{ width: 32, height: 32, borderRadius: 2, background: 'var(--color-surface-hover)', objectFit: 'cover', flexShrink: 0 }} />
+                        <div>
+                          <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.name}</div>
+                          <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{item.desc}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
