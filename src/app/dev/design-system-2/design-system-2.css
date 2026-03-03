@@ -395,6 +395,44 @@
   white-space: nowrap;
 }
 
+/* ── Typography Scale ────────────────────────────────────────── */
+.ds2-type-row {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ds2-type-row:last-child {
+  border-bottom: none;
+}
+
+.ds2-type-tag {
+  flex-shrink: 0;
+  width: 120px;
+  font-family: var(--font-system);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.ds2-type-sample {
+  flex: 1;
+  min-width: 0;
+}
+
+.ds2-type-meta {
+  flex-shrink: 0;
+  text-align: right;
+  font-family: var(--font-system);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
 /* ── Color Palette ────────────────────────────────────────────── */
 .ds2-palette-strip {
   display: flex;
@@ -474,6 +512,81 @@
 .ds2-accent-panel-dark {
   background: #1A1614;
   color: #F5F1E8;
+}
+
+/* ── Contrast Cards ──────────────────────────────────────────── */
+.ds2-contrast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.ds2-contrast-card {
+  padding: 20px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.ds2-contrast-sample {
+  font-family: var(--font-narrative);
+  font-size: 17px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.ds2-contrast-meta {
+  font-family: var(--font-system);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.ds2-contrast-pass {
+  color: #065f46;
+}
+
+.ds2-contrast-fail {
+  color: #9f1239;
+}
+
+/* ── Color Palette Swatches ──────────────────────────────────── */
+.ds2-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.ds2-swatch {
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.ds2-swatch-color {
+  height: 64px;
+  display: flex;
+  align-items: flex-end;
+  padding: 8px 12px;
+}
+
+.ds2-swatch-info {
+  padding: 10px 12px;
+  background: var(--color-surface);
+}
+
+.ds2-swatch-name {
+  font-family: var(--font-interface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.ds2-swatch-hex {
+  font-family: var(--font-system);
+  font-size: 11px;
+  color: var(--color-text-muted);
 }
 
 /* ── Spacing Rhythm ───────────────────────────────────────────── */
@@ -1304,4 +1417,20 @@
 
 .ds2-skip-link:focus {
   left: 16px;
+}
+
+/* ── Session Demo Keyframes ────────────────────────────────────── */
+@keyframes ds2-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes ds2-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes ds2-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }

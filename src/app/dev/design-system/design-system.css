@@ -348,3 +348,92 @@
 .ds1-skip-link:focus {
   left: 16px;
 }
+
+/* ── Typography Scale ────────────────────────────────────────── */
+.ds1-type-row {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ds1-type-row:last-child {
+  border-bottom: none;
+}
+
+.ds1-type-tag {
+  flex-shrink: 0;
+  width: 120px;
+  font-family: var(--font-system);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.ds1-type-sample {
+  flex: 1;
+  min-width: 0;
+}
+
+.ds1-type-meta {
+  flex-shrink: 0;
+  text-align: right;
+  font-family: var(--font-system);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Contrast Cards ────────────────────────────────────────────── */
+.ds1-contrast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.ds1-contrast-card {
+  padding: 16px;
+  border-radius: 2px;
+  border: 1px solid var(--color-border);
+}
+
+.ds1-contrast-sample {
+  font-family: var(--font-narrative);
+  font-size: 17px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.ds1-contrast-meta {
+  font-family: var(--font-system);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+.ds1-contrast-pass {
+  color: #065f46;
+}
+
+.ds1-contrast-fail {
+  color: #9f1239;
+}
+
+/* ── Manuscript Demo Keyframes ─────────────────────────────────── */
+@keyframes ds1-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes ds1-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes ds1-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
