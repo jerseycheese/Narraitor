@@ -642,7 +642,7 @@ export default function DesignSystem3Page() {
 
                   <div className="ds3-narrative-segment">
                     <p>Rain hammered the sidewalk outside the Alibi Room. Through the smudged window, neon signs bled pink and blue across the wet asphalt. The club was closing, and the bartender was already stacking chairs.</p>
-                    <p>A cigarette still smoldered in the ashtray by the stage door. Clara Duvall's dressing room was three steps down a narrow hallway, past velvet curtains that smelled of perfume and old smoke.</p>
+                    <p>A cigarette still smoldered in the ashtray by the stage door. Clara Duvall&apos;s dressing room was three steps down a narrow hallway, past velvet curtains that smelled of perfume and old smoke.</p>
                   </div>
 
                   {/* Outcome — revision mark (decision) */}
