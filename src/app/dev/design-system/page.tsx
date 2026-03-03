@@ -1,10 +1,52 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Globe, Users, Play, Sparkles } from 'lucide-react';
 import { primitiveColors } from '@/lib/design-tokens';
+import './design-system.css';
 
+// ---------------------------------------------------------------------------
+// Scroll Reveal Hook
+// ---------------------------------------------------------------------------
+function useScrollReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      el.querySelectorAll('.ds1-reveal').forEach(c => c.classList.add('ds1-visible'));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('ds1-visible'); }),
+      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+    );
+    el.querySelectorAll('.ds1-reveal').forEach(c => observer.observe(c));
+    return () => observer.disconnect();
+  }, []);
+  return ref;
+}
+
+// ---------------------------------------------------------------------------
+// Active Section Tracking Hook
+// ---------------------------------------------------------------------------
+function useActiveSection(ids: string[]) {
+  const [active, setActive] = useState(ids[0]);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) setActive(visible[0].target.id);
+      },
+      { rootMargin: '-20% 0px -60% 0px' }
+    );
+    ids.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, [ids]);
+  return active;
+}
 // ---------------------------------------------------------------------------
 // Helper: Color Swatch
 // ---------------------------------------------------------------------------
@@ -67,7 +109,7 @@ function SubSection({ title, description, children }: { title?: string; descript
 const PHILOSOPHY_CARDS: Array<{ title: string; description: string }> = [
   {
     title: 'THE CONCEPT',
-    description: 'A fusion of long-form digital journalism and architectural drafting. The app is the "Drafting Table," and the story is the "Manuscript."',
+    description: 'The Drafting Table. A fusion of long-form digital journalism and architectural drafting. The app is the drafting table; the story is the manuscript. Genre-neutral by design.',
   },
   {
     title: 'THE GOAL',
@@ -134,36 +176,21 @@ const CONTAINER_WIDTHS: Array<{ title: string; rows: Array<{ label: string; valu
 // ---------------------------------------------------------------------------
 // Navigation
 // ---------------------------------------------------------------------------
-const NAV_GROUPS = [
-  {
-    title: 'FOUNDATIONS',
-    items: [
-      { id: 'logo', label: 'BRAND IDENTITY' },
-      { id: 'colors', label: 'COLORS' },
-      { id: 'typography', label: 'TYPOGRAPHY' },
-      { id: 'spacing', label: 'SPACING' },
-      { id: 'radius', label: 'BORDER RADIUS' },
-      { id: 'elevation', label: 'ELEVATION & SHADOWS' },
-      { id: 'icons', label: 'ICONOGRAPHY' },
-    ],
-  },
-  {
-    title: 'SYSTEM',
-    items: [
-      { id: 'philosophy', label: 'DESIGN PHILOSOPHY' },
-      { id: 'layout', label: 'LAYOUT PATTERNS' },
-      { id: 'variables', label: 'CSS VARIABLES' },
-      { id: 'overlay', label: 'OVERLAY' },
-      { id: 'grid', label: 'GRID & BREAKPOINTS' },
-      { id: 'manuscript', label: 'MANUSCRIPT DEMO' },
-    ],
-  },
-  {
-    title: 'COMPONENTS',
-    items: [
-      { id: 'components', label: 'CORE UI' },
-    ],
-  },
+const NAV_SECTIONS = [
+  { id: 'ds1-hero', label: 'The Drafting Table' },
+  { id: 'ds1-brand', label: 'Brand' },
+  { id: 'ds1-colors', label: 'Colors' },
+  { id: 'ds1-typography', label: 'Typography' },
+  { id: 'ds1-spacing', label: 'Spacing' },
+  { id: 'ds1-radius', label: 'Radius' },
+  { id: 'ds1-elevation', label: 'Elevation' },
+  { id: 'ds1-icons', label: 'Icons' },
+  { id: 'ds1-grid', label: 'Grid' },
+  { id: 'ds1-layout', label: 'Layout' },
+  { id: 'ds1-variables', label: 'Variables' },
+  { id: 'ds1-overlay', label: 'Overlay' },
+  { id: 'ds1-session', label: 'Session' },
+  { id: 'ds1-components', label: 'Components' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -173,24 +200,26 @@ function ManuscriptDemo() {
   const [showCharacter, setShowCharacter] = useState(false);
   const [showTools, setShowTools] = useState(false);
   const [activeDrawer, setActiveDrawer] = useState<string | null>(null);
+  const [sessionState, setSessionState] = useState<string>('active');
+  const [inputValue, setInputValue] = useState('');
 
   const drawerContent: Record<string, { title: string; subtitle: string; body: React.ReactNode }> = {
     story: {
       title: 'Story So Far',
-      subtitle: 'Session 04',
+      subtitle: 'Current Session',
       body: (
         <>
-          <p className="text-narrative" style={{ fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>You arrived at the village seeking Elder Thane&rsquo;s wisdom. He spoke of ancient paths and choices that shape destiny.</p>
-          <p className="text-narrative" style={{ fontSize: 13, lineHeight: 1.65 }}>The meadow calls with possibility. A stranger watched from the treeline as you departed the archive.</p>
+          <p className="text-narrative" style={{ fontSize: 13, lineHeight: 1.65, marginBottom: 12 }}>You took the case from a worried manager at the Alibi Room. Clara Duvall, their star singer, vanished after her last set three nights ago.</p>
+          <p className="text-narrative" style={{ fontSize: 13, lineHeight: 1.65 }}>Sergeant Reyes warned you to stay out of it. The club owner, Deluca, is connected. But the trail is getting cold.</p>
         </>
       ),
     },
     history: {
       title: 'Choice History',
-      subtitle: '14 choices made',
+      subtitle: '6 choices made',
       body: (
         <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {['Entered the village at dusk rather than waiting for morning.', 'Spoke honestly to the Elder about your origins.', 'Chose the meadow path over the forest road.'].map((c, i) => (
+          {['Took Clara Duvall\'s missing person case despite Reyes\' warning.', 'Searched the dressing room before the club closed.', 'Pressed the bartender about who Clara left with.'].map((c, i) => (
             <li key={i} className="font-system" style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>{c}</li>
           ))}
         </ol>
@@ -202,8 +231,8 @@ function ManuscriptDemo() {
       body: (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
-            { title: 'Day One', excerpt: 'The road was longer than expected. The Elder\u2019s lantern was the first light I saw in hours.' },
-            { title: 'The Archive', excerpt: 'Rows of shelves. Something moved behind the eastern stacks\u2014I chose not to follow.' },
+            { title: 'The Alibi Room', excerpt: 'Clara\'s dressing room was untouched. Perfume on the vanity, a half-finished cigarette. She hadn\'t planned to leave.' },
+            { title: 'Reyes\u2019 Warning', excerpt: 'The sergeant told me to drop it. That kind of advice usually means I\'m on the right track.' },
           ].map((e) => (
             <div key={e.title} style={{ padding: 10, border: '1px solid var(--color-border)', borderRadius: 2, background: 'var(--color-surface-hover)' }}>
               <div className="font-system" style={{ fontSize: 11, fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: 4 }}>{e.title}</div>
@@ -216,156 +245,273 @@ function ManuscriptDemo() {
   };
 
   return (
-    <div className="manuscript-demo" style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', minHeight: 560, position: 'relative' }}>
-      <div style={{ background: 'linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end))', padding: 12, minHeight: 560, display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 10 }}>
+    <div>
+      {/* State Switcher */}
+      <div className="font-system" style={{ display: 'flex', gap: 4, marginBottom: 10, flexWrap: 'wrap' }}>
+        {['active', 'streaming', 'loading', 'error', 'paused'].map((s) => (
+          <button
+            key={s}
+            onClick={() => setSessionState(s)}
+            style={{
+              padding: '4px 10px', fontSize: 10, fontWeight: sessionState === s ? 600 : 400,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              background: sessionState === s ? 'var(--color-accent)' : 'var(--color-surface)',
+              color: sessionState === s ? 'white' : 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)', borderRadius: 2, cursor: 'pointer',
+            }}
+          >{s}</button>
+        ))}
+      </div>
+      <div className="manuscript-demo" style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', minHeight: 560, position: 'relative' }}>
+        <div style={{ background: 'linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end))', padding: 12, minHeight: 560, display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 10 }}>
 
-        {/* HUD */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 12px', background: 'var(--color-overlay-surface)', border: '1px solid var(--color-border)', borderRadius: 2, backdropFilter: 'blur(12px)' }}>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button
-              onClick={() => { setShowCharacter(!showCharacter); setShowTools(false); }}
-              className="font-system"
-              style={{ padding: '4px 10px', background: showCharacter ? 'var(--color-accent)' : 'var(--color-surface)', color: showCharacter ? 'white' : 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 10, letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 500 }}
-            >
-              Character
-            </button>
-            <button
-              onClick={() => { setShowTools(!showTools); setShowCharacter(false); }}
-              className="font-system"
-              style={{ padding: '4px 10px', background: showTools ? 'var(--color-accent)' : 'var(--color-surface)', color: showTools ? 'white' : 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 10, letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 500 }}
-            >
-              Tools
-            </button>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', fontWeight: 500 }}>SAVING...</span>
-            <button className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Reset</button>
-            <button className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Close</button>
-          </div>
-        </div>
-
-        {/* Character snapshot panel */}
-        {showCharacter && (
-          <div style={{ position: 'absolute', top: 56, left: 12, width: 220, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 14, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 10 }}>
-            <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Character Snapshot</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', flexShrink: 0 }} />
-              <div>
-                <div className="font-system" style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>Kael Ashford</div>
-                <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Level 5</div>
-              </div>
-            </div>
-            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 8, marginBottom: 8 }}>
-              {[['Strength', '14'], ['Dexterity', '12'], ['Wisdom', '16']].map(([attr, val]) => (
-                <div key={attr} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{attr}</span>
-                  <span className="font-system" style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-text-primary)' }}>{val}</span>
-                </div>
-              ))}
-            </div>
-            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 8 }}>
-              {[['Persuasion', '+4'], ['Stealth', '+2']].map(([skill, mod]) => (
-                <div key={skill} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{skill}</span>
-                  <span className="font-system" style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-accent)' }}>{mod}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Tools menu panel */}
-        {showTools && (
-          <div style={{ position: 'absolute', top: 56, left: 84, width: 200, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 14, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 10 }}>
-            <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Tools</div>
-            {['Character Details', 'Inventory'].map((item) => (
-              <button key={item} style={{ width: '100%', padding: '7px 10px', background: 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>{item}</button>
-            ))}
-            <div style={{ borderTop: '1px solid var(--color-border)', margin: '8px 0' }} />
-            {[['Story So Far', 'story'], ['Choice History', 'history'], ['Journal', 'journal']].map(([label, key]) => (
-              <button key={key} onClick={() => { setActiveDrawer(activeDrawer === key ? null : key); setShowTools(false); }} style={{ width: '100%', padding: '7px 10px', background: activeDrawer === key ? 'var(--color-surface-hover)' : 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>{label}</button>
-            ))}
-          </div>
-        )}
-
-        {/* 3-column body */}
-        <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 140px', gap: 10, minHeight: 0 }}>
-
-          {/* Left characters rail */}
-          <div style={{ padding: '12px 10px' }}>
-            <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Characters Present</div>
-            {['Kael Ashford', 'Elder Thane'].map((name) => (
-              <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', flexShrink: 0 }} />
-                <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Narrative center */}
-          <div style={{ padding: '12px 0' }}>
-            <div className="text-narrative">
-              <p>The stone archway opened onto a meadow bathed in twilight. Wildflowers swayed in the warm breeze, their petals catching the last amber rays of sun.</p>
-              <p>Behind you, the forest path disappeared into shadow. Ahead, a small village flickered with lantern light.</p>
-              <p>&ldquo;Every journey begins with a single step,&rdquo; Elder Thane said softly. &ldquo;But which direction calls to you?&rdquo;</p>
-            </div>
-          </div>
-
-          {/* Right spacer (mirrors left rail width) */}
-          <div />
-        </div>
-
-        {/* Drawer */}
-        {activeDrawer && drawerContent[activeDrawer] && (
-          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 280, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '2px 0 0 2px', padding: 16, boxShadow: '0 16px 48px rgba(0,0,0,0.15)', overflow: 'auto', zIndex: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-              <div>
-                <h3 style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--color-text-primary)' }}>{drawerContent[activeDrawer].title}</h3>
-                <div className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', marginTop: 2 }}>{drawerContent[activeDrawer].subtitle}</div>
-              </div>
-              <button onClick={() => setActiveDrawer(null)} className="font-system" style={{ fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>Close</button>
-            </div>
-            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 12, marginTop: 8 }}>
-              {drawerContent[activeDrawer].body}
-            </div>
-          </div>
-        )}
-
-        {/* Action Rail */}
-        <div style={{ background: 'var(--color-overlay-surface-strong)', border: '1px solid var(--color-border)', borderRadius: 2, backdropFilter: 'blur(20px)', overflow: 'hidden' }}>
-          {/* Choice button grid — 3-col matching production layout */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, padding: '10px 10px 6px' }}>
-            {[
-              { label: 'Approach the village', badge: null },
-              { label: 'Explore the meadow', badge: 'Lawful' },
-              { label: 'Ask Elder Thane a question', badge: 'Chaotic' },
-            ].map(({ label, badge }) => (
+          {/* HUD */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 12px', background: 'var(--color-overlay-surface)', border: '1px solid var(--color-border)', borderRadius: 2, backdropFilter: 'blur(12px)' }}>
+            <div style={{ display: 'flex', gap: 6 }}>
               <button
-                key={label}
+                onClick={() => { setShowCharacter(!showCharacter); setShowTools(false); }}
                 className="font-system"
-                style={{
-                  display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                  width: '100%', height: 66, padding: '10px 14px',
-                  background: badge === 'Lawful' ? 'rgba(7,89,133,0.04)' : badge === 'Chaotic' ? 'rgba(146,64,14,0.04)' : 'var(--color-surface)',
-                  border: `1px solid ${badge === 'Lawful' ? 'rgba(7,89,133,0.3)' : badge === 'Chaotic' ? 'rgba(146,64,14,0.3)' : 'var(--color-border)'}`,
-                  borderRadius: 2, fontSize: 12, cursor: 'pointer', textAlign: 'left', color: 'var(--color-text-primary)', lineHeight: 1.4,
-                }}
+                aria-expanded={showCharacter}
+                style={{ padding: '4px 10px', background: showCharacter ? 'var(--color-accent)' : 'var(--color-surface)', color: showCharacter ? 'white' : 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 10, letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 500 }}
               >
-                <span style={{ fontWeight: 500 }}>{label}</span>
-                {badge && (
-                  <span style={{ alignSelf: 'flex-start', fontSize: 10, padding: '1px 6px', borderRadius: 2, background: badge === 'Lawful' ? 'rgba(7,89,133,0.1)' : 'rgba(146,64,14,0.1)', color: badge === 'Lawful' ? '#075985' : '#92400e', fontWeight: 600 }}>{badge}</span>
-                )}
+                Character
               </button>
-            ))}
+              <button
+                onClick={() => { setShowTools(!showTools); setShowCharacter(false); }}
+                className="font-system"
+                aria-expanded={showTools}
+                style={{ padding: '4px 10px', background: showTools ? 'var(--color-accent)' : 'var(--color-surface)', color: showTools ? 'white' : 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 10, letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 500 }}
+              >
+                Tools
+              </button>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', fontWeight: 500 }}>SAVED</span>
+              <button className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Reset</button>
+              <button className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Close</button>
+            </div>
           </div>
-          {/* Input row */}
-          <div style={{ padding: '0 10px 8px', display: 'flex', gap: 8, alignItems: 'center' }}>
-            <input type="text" placeholder="Or write your own action..." readOnly style={{ flex: 1, height: 38, padding: '0 10px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 13 }} />
-            <button style={{ height: 38, padding: '0 14px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: 2, fontSize: 12, fontWeight: 500, cursor: 'default', whiteSpace: 'nowrap' }}>Send</button>
-            <button className="font-system" style={{ height: 38, padding: '0 10px', background: 'rgba(146,64,14,0.08)', border: '1px solid rgba(146,64,14,0.25)', borderRadius: 2, color: '#92400e', cursor: 'pointer', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 500, whiteSpace: 'nowrap' }}>End Story</button>
+          {/* Character snapshot panel */}
+          {showCharacter && (
+            <div style={{ position: 'absolute', top: 56, left: 12, width: 220, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 14, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 10 }}>
+              <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Character Snapshot</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', flexShrink: 0 }} />
+                <div>
+                  <div className="font-system" style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>Marlowe Vance</div>
+                  <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Level 4</div>
+                </div>
+              </div>
+              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 8, marginBottom: 8 }}>
+                {[['Instinct', '14'], ['Composure', '11'], ['Street Smarts', '16']].map(([attr, val]) => (
+                  <div key={attr} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{attr}</span>
+                    <span className="font-system" style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-text-primary)' }}>{val}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 8 }}>
+                {[['Interrogation', '4'], ['Shadowing', '2']].map(([skill, lvl]) => (
+                  <div key={skill} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{skill}</span>
+                    <span className="font-system" style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-accent)' }}>{lvl}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tools menu panel */}
+          {showTools && (
+            <div style={{ position: 'absolute', top: 56, left: 84, width: 200, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 14, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 10 }}>
+              <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Tools</div>
+              {['Character Sheet', 'Inventory'].map((item) => (
+                <button key={item} style={{ width: '100%', padding: '7px 10px', background: 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>{item}</button>
+              ))}
+              <div style={{ borderTop: '1px solid var(--color-border)', margin: '8px 0' }} />
+              {[['Story So Far', 'story'], ['Choice History', 'history'], ['Journal', 'journal']].map(([label, key]) => (
+                <button key={key} onClick={() => { setActiveDrawer(activeDrawer === key ? null : key); setShowTools(false); }} aria-expanded={activeDrawer === key} style={{ width: '100%', padding: '7px 10px', background: activeDrawer === key ? 'var(--color-surface-hover)' : 'transparent', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, textAlign: 'left', cursor: 'pointer', marginBottom: 4, color: 'var(--color-text-primary)' }}>{label}</button>
+              ))}
+            </div>
+          )}
+
+          {/* 3-column body */}
+          <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 140px', gap: 10, minHeight: 0 }}>
+
+            {/* Left characters rail */}
+            <div style={{ padding: '12px 10px' }}>
+              <div className="font-system" style={{ fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 10, fontWeight: 600 }}>Characters Present</div>
+              {['Marlowe Vance', 'Sergeant Reyes'].map((name) => (
+                <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', flexShrink: 0 }} />
+                  <span className="font-system" style={{ fontSize: 11, color: 'var(--color-text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Narrative center */}
+            <div style={{ padding: '12px 0', minHeight: 200 }}>
+              <div className="text-narrative" role="log" aria-live="polite" aria-atomic="false">
+
+                {sessionState === 'loading' ? (
+                  /* Loading: Skeleton shimmer lines */
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {[85, 100, 70, 95, 60].map((w, i) => (
+                      <div key={i} style={{
+                        height: 14, width: `${w}%`, borderRadius: 2,
+                        background: 'linear-gradient(90deg, var(--color-border) 25%, var(--color-surface-hover) 50%, var(--color-border) 75%)',
+                        backgroundSize: '200% 100%',
+                        animation: 'ds1-shimmer 1.5s ease-in-out infinite',
+                      }} />
+                    ))}
+                  </div>
+                ) : (
+                  /* Active / Streaming / Error / Paused: Show narrative */
+                  <>
+                    <p>Rain hammered the sidewalk outside the Alibi Room. Through the smudged window, neon signs bled pink and blue across the wet asphalt. The club was closing, and the bartender was already stacking chairs.</p>
+
+                    {/* Outcome — technical record annotation */}
+                    <div style={{ margin: '16px 0', padding: '0 0 0 20px', position: 'relative' }}>
+                      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 1, background: 'var(--color-border)' }} />
+                      <div className="font-system" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 2 }}>
+                        <span style={{ background: 'var(--color-accent)', color: 'white', padding: '1px 5px', borderRadius: 1, fontWeight: 600, fontSize: 8 }}>REC</span>
+                        Decision Logged
+                      </div>
+                      <p style={{ fontSize: 13, lineHeight: 1.55, fontStyle: 'italic', color: 'var(--color-text-secondary)', margin: 0, fontFamily: 'var(--font-narrative)' }}>
+                        You chose to press the bartender for information instead of searching the back office.
+                      </p>
+                    </div>
+
+                    <p>The bartender wiped down the counter without looking up. His hands were steady, but something in his jaw was tight. He knew more than he was letting on.</p>
+
+                    {/* Outcome — critical success as a stamped annotation */}
+                    <div style={{ margin: '16px 0', padding: '14px 16px', paddingTop: 36, background: 'var(--color-surface-hover)', border: '1px dashed var(--color-border)', borderRadius: 2, position: 'relative' }}>
+                      <div style={{ position: 'absolute', top: -8, right: 12, background: '#065f46', color: 'white', padding: '1px 8px', borderRadius: 1 }}>
+                        <span className="font-system" style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Critical Success</span>
+                      </div>
+                      <p className="font-system" style={{ fontSize: 11, lineHeight: 1.55, color: 'var(--color-text-secondary)', margin: 0 }}>
+                        Interrogation check passed (18 vs DC 12). The bartender&rsquo;s composure cracked &mdash; he slid a matchbook across the counter. &ldquo;She got in a car. Black sedan. That&rsquo;s all I know.&rdquo;
+                      </p>
+                    </div>
+
+                    <p>
+                      &ldquo;You&rsquo;re poking around where you shouldn&rsquo;t,&rdquo; Sergeant Reyes said, leaning against the bar. &ldquo;But I can&rsquo;t stop a man from asking questions.&rdquo;
+                      {sessionState === 'streaming' && <span style={{ display: 'inline-block', width: 2, height: '1.1em', background: 'var(--color-text-muted)', verticalAlign: 'text-bottom', animation: 'ds1-blink 1s step-end infinite', marginLeft: 2 }} />}
+                    </p>
+
+                    {sessionState === 'error' && (
+                      <div style={{ margin: '16px 0', padding: '12px 14px', background: 'rgba(159,18,57,0.06)', border: '1px solid rgba(159,18,57,0.3)', borderRadius: 2 }}>
+                        <div className="font-system" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9f1239', marginBottom: 6 }}>Error</div>
+                        <p style={{ fontSize: 13, lineHeight: 1.55, color: '#9f1239', margin: '0 0 10px', fontFamily: 'var(--font-narrative)' }}>Something went wrong generating the next part of the story.</p>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button className="font-system" style={{ padding: '4px 10px', fontSize: 10, fontWeight: 500, background: '#9f1239', color: 'white', border: 'none', borderRadius: 2, cursor: 'pointer', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Retry</button>
+                          <button className="font-system" style={{ padding: '4px 10px', fontSize: 10, fontWeight: 500, background: 'transparent', color: '#9f1239', border: '1px solid rgba(159,18,57,0.3)', borderRadius: 2, cursor: 'pointer', letterSpacing: '0.05em', textTransform: 'uppercase' }}>End Session</button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+            {/* Right spacer (mirrors left rail width) */}
+            <div />
+          </div>
+
+          {/* Drawer */}
+          {activeDrawer && drawerContent[activeDrawer] && (
+            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 280, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '2px 0 0 2px', padding: 16, boxShadow: '0 16px 48px rgba(0,0,0,0.15)', overflow: 'auto', zIndex: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                <div>
+                  <h3 style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--color-text-primary)' }}>{drawerContent[activeDrawer].title}</h3>
+                  <div className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', marginTop: 2 }}>{drawerContent[activeDrawer].subtitle}</div>
+                </div>
+                <button onClick={() => setActiveDrawer(null)} className="font-system" style={{ fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>Close</button>
+              </div>
+              <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 12, marginTop: 8 }}>
+                {drawerContent[activeDrawer].body}
+              </div>
+            </div>
+          )}
+
+          {/* Action Rail */}
+          <div style={{ background: 'var(--color-overlay-surface-strong)', border: '1px solid var(--color-border)', borderRadius: 2, backdropFilter: 'blur(20px)', overflow: 'hidden', opacity: sessionState === 'paused' ? 0.4 : 1, pointerEvents: sessionState === 'paused' ? 'none' : undefined }}>
+            {/* Choice button grid — only in active state */}
+            {sessionState === 'active' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, padding: '10px 10px 6px' }}>
+                {[
+                  { label: 'Search the back office while Reyes distracts', badge: null },
+                  { label: 'Follow the black sedan lead', badge: 'Lawful' },
+                  { label: 'Confront Deluca directly at his club', badge: 'Chaotic' },
+                ].map(({ label, badge }) => (
+                  <button
+                    key={label}
+                    className="font-system"
+                    onClick={() => setInputValue(label)}
+                    style={{
+                      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                      width: '100%', height: 66, padding: '10px 14px',
+                      background: badge === 'Lawful' ? 'rgba(7,89,133,0.04)' : badge === 'Chaotic' ? 'rgba(146,64,14,0.04)' : 'var(--color-surface)',
+                      border: `1px solid ${badge === 'Lawful' ? 'rgba(7,89,133,0.3)' : badge === 'Chaotic' ? 'rgba(146,64,14,0.3)' : 'var(--color-border)'}`,
+                      borderRadius: 2, fontSize: 12, cursor: 'pointer', textAlign: 'left', color: 'var(--color-text-primary)', lineHeight: 1.4,
+                    }}
+                  >
+                    <span style={{ fontWeight: 500 }}>{label}</span>
+                    {badge && (
+                      <span style={{ alignSelf: 'flex-start', fontSize: 10, padding: '1px 6px', borderRadius: 2, background: badge === 'Lawful' ? 'rgba(7,89,133,0.1)' : 'rgba(146,64,14,0.1)', color: badge === 'Lawful' ? '#075985' : '#92400e', fontWeight: 600 }}>{badge}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+            {/* Streaming indicator */}
+            {sessionState === 'streaming' && (
+              <div style={{ padding: '10px 10px 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: 'var(--color-text-muted)', animation: 'ds1-pulse 1.2s ease-in-out infinite' }} />
+                <span className="font-system" style={{ fontSize: 10, color: 'var(--color-text-muted)', letterSpacing: '0.04em' }}>Generating response...</span>
+              </div>
+            )}
+            {/* Input row */}
+            <div style={{ padding: '0 10px 8px', display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder={sessionState === 'active' ? 'Or write your own action...' : 'Waiting for story...'}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                readOnly={sessionState !== 'active'}
+                style={{ flex: 1, height: 38, padding: '0 10px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 13, opacity: sessionState !== 'active' ? 0.5 : 1 }}
+              />
+              <button aria-label="Send action" disabled={sessionState !== 'active'} style={{ height: 38, padding: '0 14px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: 2, fontSize: 12, fontWeight: 500, cursor: sessionState === 'active' ? 'pointer' : 'default', whiteSpace: 'nowrap', opacity: sessionState !== 'active' ? 0.5 : 1 }}>Send</button>
+              <button className="font-system" style={{ height: 38, padding: '0 10px', background: 'rgba(146,64,14,0.08)', border: '1px solid rgba(146,64,14,0.25)', borderRadius: 2, color: '#92400e', cursor: 'pointer', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 500, whiteSpace: 'nowrap' }}>End Story</button>
+            </div>
           </div>
         </div>
       </div>
+      {/* Paused overlay */}
+      {sessionState === 'paused' && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(250,250,249,0.85)', backdropFilter: 'blur(12px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, zIndex: 40, borderRadius: 4 }}>
+          <h3 style={{ fontFamily: 'var(--font-interface)', fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)', margin: 0 }}>Session Paused</h3>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => setSessionState('active')} style={{ padding: '8px 20px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: 2, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-interface)' }}>Resume</button>
+            <button style={{ padding: '8px 20px', background: 'var(--color-surface)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: 2, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-interface)' }}>End Session</button>
+          </div>
+        </div>
+      )}
+
+      {/* Keyframe animations for DS1 session states */}
+      <style>{`
+      @keyframes ds1-shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      @keyframes ds1-blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+      @keyframes ds1-pulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+    `}</style>
     </div>
   );
 }
@@ -375,157 +521,73 @@ function ManuscriptDemo() {
 // ---------------------------------------------------------------------------
 export default function DesignSystemPage() {
   const [isDark, setIsDark] = useState(false);
-  const [isNavOpen, setIsNavOpen] = useState(false);
+  const revealRef = useScrollReveal();
+  const activeSection = useActiveSection(NAV_SECTIONS.map(s => s.id));
 
-  useEffect(() => {
-    // Check initial theme
+  const toggleTheme = useCallback(() => {
     const html = document.documentElement;
-    setIsDark(html.classList.contains('dark'));
-  }, []);
-
-  useEffect(() => {
-    // Close nav on escape key
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsNavOpen(false);
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const toggleTheme = () => {
-    const html = document.documentElement;
-    if (isDark) {
-      html.classList.remove('dark');
-    } else {
-      html.classList.add('dark');
-    }
+    if (isDark) html.classList.remove('dark'); else html.classList.add('dark');
     setIsDark(!isDark);
-  };
-
-  const closeNav = () => setIsNavOpen(false);
-
-  // Nav button style matching the HTML prototype
-  const navButtonStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    padding: '8px 12px',
-    background: 'var(--color-surface)',
-    border: '1px solid var(--color-border)',
-    borderRadius: 4,
-    cursor: 'pointer',
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: '0.04em',
-    color: 'var(--color-text-primary)',
-    transition: 'all 0.15s',
-  };
+  }, [isDark]);
 
   return (
-    <div className="design-system-page" style={{ maxWidth: 1024, margin: '0 auto', padding: '0 16px' }}>
-      {/* Sticky nav matching HTML prototype */}
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          background: 'var(--color-canvas)',
-          borderBottom: '1px solid var(--color-border)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-        }}
-      >
-        <div style={{ padding: '12px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Navigation menu button */}
-          <button
-            onClick={() => setIsNavOpen(!isNavOpen)}
-            className="font-system"
-            style={navButtonStyle}
-            aria-label="Navigation menu"
-            aria-expanded={isNavOpen}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ width: 20, height: 20 }}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            <span>NAVIGATION</span>
-          </button>
+    <div className="design-system-page" style={{ position: 'relative', overflow: 'hidden' }} ref={revealRef}>
+      {/* Skip link */}
+      <a href="#ds1-main-content" className="ds1-skip-link">Skip to content</a>
 
-          {/* Theme toggle button */}
-          <button
-            onClick={toggleTheme}
-            className="font-system"
-            style={navButtonStyle}
-            aria-label="Toggle dark mode"
-          >
-            {isDark ? (
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ width: 20, height: 20 }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ width: 20, height: 20 }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            )}
-            <span>THEME</span>
-          </button>
+      {/* Floating Navigation */}
+      <nav className="ds1-nav" aria-label="Design system sections">
+        {NAV_SECTIONS.map(section => (
+          <a key={section.id} href={`#${section.id}`} className={`ds1-nav-item ${activeSection === section.id ? 'ds1-nav-active' : ''}`}>
+            <span className="ds1-nav-dot" />
+            <span className="ds1-nav-label">{section.label}</span>
+          </a>
+        ))}
+      </nav>
+
+      {/* Theme Toggle */}
+      <button className="ds1-theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+        {isDark ? 'Light' : 'Dark'}
+      </button>
+
+      {/* ═══ HERO ═══ */}
+      <section id="ds1-hero" className="ds1-hero">
+        <div className="ds1-reveal"><p className="ds1-hero-meta">Narraitor Design System · The Drafting Table · 2026</p></div>
+        <h1 className="ds1-hero-title ds1-reveal">The Drafting Table</h1>
+        <div className="ds1-reveal">
+          <p className="ds1-hero-meta" style={{ maxWidth: '44ch', textAlign: 'center', lineHeight: 1.7 }}>
+            A fusion of long-form digital journalism and architectural drafting. The app is the drafting table. The story is the manuscript.
+          </p>
         </div>
+        <div className="ds1-hero-divider ds1-reveal" />
+        <div className="ds1-hero-scroll ds1-reveal">Explore        </div>
+      </section>
 
-        {/* Dropdown nav */}
-        <div
-          style={{
-            maxHeight: isNavOpen ? 400 : 0,
-            overflow: 'hidden',
-            transition: 'max-height 0.3s ease-out',
-            borderTop: isNavOpen ? '1px solid var(--color-border)' : 'none',
-          }}
-          aria-hidden={!isNavOpen}
-        >
-          <div style={{ padding: '24px 0', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
-            {NAV_GROUPS.map((group) => (
-              <div key={group.title}>
-                <h4
-                  className="font-system"
-                  style={{
-                    fontSize: 10,
-                    color: 'var(--color-text-muted)',
-                    marginBottom: 12,
-                    letterSpacing: '0.2em',
-                    borderBottom: '1px solid var(--color-border)',
-                    paddingBottom: 4,
-                  }}
-                >
-                  {group.title}
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {group.items.map((item) => (
-                    <a
-                      key={item.id}
-                      href={`#${item.id}`}
-                      onClick={closeNav}
-                      tabIndex={isNavOpen ? 0 : -1}
-                      className="font-system"
-                      style={{
-                        fontSize: 12,
-                        color: 'var(--color-text-secondary)',
-                        textDecoration: 'none',
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      {item.label}
-                    </a>
-                  ))}
-                </div>
+      {/* ═══ DESIGN PHILOSOPHY ═══ */}
+      <section className="ds1-section" style={{ paddingTop: 48, paddingBottom: 32 }}>
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">00 — Design Philosophy</div>
+          <h2 className="ds1-section-title ds1-reveal">Paper & Ink Neutrality</h2>
+          <p className="ds1-section-subtitle ds1-reveal">
+            The Drafting Table is a blank canvas that feels premium and intentional. It does not compete with the AI&rsquo;s genre; it frames it. Sharp lines, crisp technical typography, and a Paper &amp; Ink palette with a single functional accent.
+          </p>
+          <div className="ds1-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {PHILOSOPHY_CARDS.map(card => (
+              <div key={card.title} className="ds1-stage ds1-reveal" style={{ padding: 20 }}>
+                <div className="ds1-stage-label">{card.title}</div>
+                <p style={{ fontFamily: 'var(--font-interface)', fontSize: 14, lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>{card.description}</p>
               </div>
             ))}
           </div>
         </div>
-      </nav>
+      </section>
 
-      {/* ================================================================= */}
-      {/* LOGO                                                              */}
-      {/* ================================================================= */}
-      <Section id="logo" title="Brand Identity">
-        <SubSection title="Narraitor Wordmark" description="Typography-driven brand identity that adapts to different contexts while maintaining recognition.">
+      {/* ═══ BRAND IDENTITY ═══ */}
+      <section id="ds1-brand" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">01 — Brand</div>
+          <h2 className="ds1-section-title ds1-reveal">Brand Identity</h2>
+          <p className="ds1-section-subtitle ds1-reveal">Typography-driven brand identity that adapts to different contexts while maintaining recognition.</p>
           <div style={{ padding: '64px 32px', background: 'linear-gradient(135deg, #fdfbf7 0%, #fafafa 100%)', borderRadius: 4, marginBottom: 24, textAlign: 'center' }}>
             <h1 style={{ fontFamily: 'var(--font-narrative)', fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 400, letterSpacing: '-0.01em', color: 'var(--color-text-primary)', margin: 0 }}>
               Narr<span style={{ color: 'var(--color-accent)', fontWeight: 500 }}>ai</span>tor
@@ -556,7 +618,7 @@ export default function DesignSystemPage() {
           <div style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface-hover)' }}>
             <div className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 12 }}>Brand Guidelines</div>
             <pre className="font-system" style={{ fontSize: 13, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap' }}>
-{`/* Primary wordmark: Lora serif */
+              {`/* Primary wordmark: Lora serif */
 .narraitor-wordmark {
   font-family: 'Lora', serif;
   font-weight: 400;
@@ -573,101 +635,110 @@ export default function DesignSystemPage() {
 /* Clear space: equal to cap height on all sides */`}
             </pre>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* COLORS                                                            */}
       {/* ================================================================= */}
-      <Section id="colors" title="Color Palette">
-        <SubSection title="Base Colors" description="Core surface and border colors used across the app.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
-            <Swatch color="#fafafa" name="zinc-50" hex="#fafafa" note="Canvas (light)" />
-            <Swatch color="#ffffff" name="white" hex="#ffffff" note="Surfaces" />
-            <Swatch color="#f4f4f5" name="zinc-100" hex="#f4f4f5" note="Hover states" />
-            <Swatch color="#e4e4e7" name="zinc-200" hex="#e4e4e7" note="Borders" />
-            <Swatch color="#d4d4d8" name="zinc-300" hex="#d4d4d8" note="Input borders" />
+      <section id="ds1-colors" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">02 — Colors</div>
+          <h2 className="ds1-section-title ds1-reveal">Color Palette</h2>
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Base Colors</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Core surface and border colors used across the app.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
+              <Swatch color="#fafafa" name="zinc-50" hex="#fafafa" note="Canvas (light)" />
+              <Swatch color="#ffffff" name="white" hex="#ffffff" note="Surfaces" />
+              <Swatch color="#f4f4f5" name="zinc-100" hex="#f4f4f5" note="Hover states" />
+              <Swatch color="#e4e4e7" name="zinc-200" hex="#e4e4e7" note="Borders" />
+              <Swatch color="#d4d4d8" name="zinc-300" hex="#d4d4d8" note="Input borders" />
+            </div>
           </div>
-        </SubSection>
-
-        <SubSection title="Full Zinc Neutral Scale" description="Complete neutral ramp used for surfaces, typography, borders, and dark mode tokens.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 12 }}>
-            {Object.entries(primitiveColors.zinc).map(([stop, hex]) => (
-              <ZincCard key={stop} stop={stop} hex={hex} />
-            ))}
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Full Zinc Neutral Scale</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Complete neutral ramp used for surfaces, typography, borders, and dark mode tokens.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 12 }}>
+              {Object.entries(primitiveColors.zinc).map(([stop, hex]) => (
+                <ZincCard key={stop} stop={stop} hex={hex} />
+              ))}
+            </div>
           </div>
-        </SubSection>
-
-        <SubSection title="Text Colors">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
-            <Swatch color="#111111" name="Charcoal" hex="#111111" note="Primary text" />
-            <Swatch color={primitiveColors.zinc[700]} name="zinc-700" hex={primitiveColors.zinc[700]} note="Secondary text" />
-            <Swatch color={primitiveColors.zinc[500]} name="zinc-500" hex={primitiveColors.zinc[500]} note="Muted text" />
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Text Colors</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
+              <Swatch color="#111111" name="Charcoal" hex="#111111" note="Primary text" />
+              <Swatch color={primitiveColors.zinc[700]} name="zinc-700" hex={primitiveColors.zinc[700]} note="Secondary text" />
+              <Swatch color={primitiveColors.zinc[500]} name="zinc-500" hex={primitiveColors.zinc[500]} note="Muted text" />
+            </div>
           </div>
-        </SubSection>
-
-        <SubSection title="Accent Color (Archival Ink)" description="Single functional accent for interactions. Uses CSS variable so it adapts to theme.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
-            <div className="design-system-swatch">
-              <div
-                style={{
-                  height: 60,
-                  borderRadius: 4,
-                  background: 'var(--color-accent)',
-                }}
-              />
-              <div style={{ marginTop: 8 }}>
-                <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>Accent</div>
-                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Light: #312e81 / Dark: #818cf8</div>
-                <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>Primary actions</div>
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Accent Color (Archival Ink)</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Single functional accent for interactions. Uses CSS variable so it adapts to theme.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
+              <div className="design-system-swatch">
+                <div
+                  style={{
+                    height: 60,
+                    borderRadius: 4,
+                    background: 'var(--color-accent)',
+                  }}
+                />
+                <div style={{ marginTop: 8 }}>
+                  <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>Accent</div>
+                  <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Light: #312e81 / Dark: #818cf8</div>
+                  <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>Primary actions</div>
+                </div>
+              </div>
+              <div className="design-system-swatch">
+                <div
+                  style={{
+                    height: 60,
+                    borderRadius: 4,
+                    background: 'var(--color-accent-hover)',
+                  }}
+                />
+                <div style={{ marginTop: 8 }}>
+                  <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>Accent Hover</div>
+                  <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Light: #1e1b4b / Dark: #a5b4fc</div>
+                  <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>Hover/active states</div>
+                </div>
               </div>
             </div>
-            <div className="design-system-swatch">
-              <div
-                style={{
-                  height: 60,
-                  borderRadius: 4,
-                  background: 'var(--color-accent-hover)',
-                }}
-              />
-              <div style={{ marginTop: 8 }}>
-                <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>Accent Hover</div>
-                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Light: #1e1b4b / Dark: #a5b4fc</div>
-                <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>Hover/active states</div>
-              </div>
-            </div>
           </div>
-        </SubSection>
 
-        <SubSection title="Link Styling" description="Global anchor styling using the accent token. Underline with offset for readability.">
-          <div style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>DEFAULT</div>
-              <p style={{ fontSize: 16, color: 'var(--color-text-primary)' }}>
-                Visit the <a href="#colors">color palette</a> or check the <a href="#typography">typography scale</a> for reference.
-              </p>
-            </div>
-            <div>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>IN NARRATIVE CONTEXT</div>
-              <p className="text-narrative" style={{ maxWidth: 768 }}>
-                The archivist pointed to the <a href="#components">Registry of Lost Names</a>, its binding cracked but legible.
-              </p>
-            </div>
-            <div>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>CSS RULE</div>
-              <pre
-                className="font-system"
-                style={{
-                  fontSize: 12,
-                  lineHeight: 1.6,
-                  color: 'var(--color-text-secondary)',
-                  background: 'var(--color-surface-hover)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 4,
-                  padding: 16,
-                }}
-              >
-{`a {
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Link Styling</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Global anchor styling using the accent token. Underline with offset for readability.</p>
+            <div style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>DEFAULT</div>
+                <p style={{ fontSize: 16, color: 'var(--color-text-primary)' }}>
+                  Visit the <a href="#colors">color palette</a> or check the <a href="#typography">typography scale</a> for reference.
+                </p>
+              </div>
+              <div>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>IN NARRATIVE CONTEXT</div>
+                <p className="text-narrative" style={{ maxWidth: 768 }}>
+                  The archivist pointed to the <a href="#components">Registry of Lost Names</a>, its binding cracked but legible.
+                </p>
+              </div>
+              <div>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>CSS RULE</div>
+                <pre
+                  className="font-system"
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                    color: 'var(--color-text-secondary)',
+                    background: 'var(--color-surface-hover)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 4,
+                    padding: 16,
+                  }}
+                >
+                  {`a {
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -677,423 +748,448 @@ export default function DesignSystemPage() {
 a:hover {
   color: var(--color-accent-hover);
 }`}
-              </pre>
+                </pre>
+              </div>
             </div>
           </div>
-        </SubSection>
 
-        <SubSection title="Semantic Colors" description="Status and feedback colors.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
-            <Swatch color="#065f46" name="emerald-800" hex="#065f46" note="Success" />
-            <Swatch color="#9f1239" name="rose-800" hex="#9f1239" note="Error" />
-            <Swatch color="#92400e" name="amber-800" hex="#92400e" note="Warning" />
-            <Swatch color="#075985" name="sky-800" hex="#075985" note="Info" />
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Semantic Colors</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Status and feedback colors.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
+              <Swatch color="#065f46" name="emerald-800" hex="#065f46" note="Success" />
+              <Swatch color="#9f1239" name="rose-800" hex="#9f1239" note="Error" />
+              <Swatch color="#92400e" name="amber-800" hex="#92400e" note="Warning" />
+              <Swatch color="#075985" name="sky-800" hex="#075985" note="Info" />
+            </div>
           </div>
-        </SubSection>
-
-        <SubSection title="Contrast Pairing Matrix" description="WCAG contrast ratios for core text/UI pairings. Re-check exact pairs in WebAIM before production migration.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-            {[
-              ['Text Primary on Canvas', '18.27:1'],
-              ['Text Secondary on Canvas', '10.10:1'],
-              ['Text Muted on Canvas', '4.68:1'],
-              ['White on Accent Button', '11.42:1'],
-              ['Success on Canvas', '7.43:1'],
-              ['Error on Canvas', '7.76:1'],
-              ['Warning on Canvas', '6.86:1'],
-              ['Info on Canvas', '7.32:1'],
-            ].map(([label, ratio]) => (
-              <div
-                key={label}
-                style={{
-                  padding: 12,
-                  borderRadius: 2,
-                  background: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                  fontSize: 14,
-                  color: 'var(--color-text-primary)',
-                }}
-              >
-                {label} <span className="font-system">{ratio}</span> (AA pass)
-              </div>
-            ))}
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Contrast Pairing Matrix</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>WCAG contrast ratios for core text/UI pairings. Re-check exact pairs in WebAIM before production migration.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+              {[
+                ['Text Primary on Canvas', '18.27:1'],
+                ['Text Secondary on Canvas', '10.10:1'],
+                ['Text Muted on Canvas', '4.68:1'],
+                ['White on Accent Button', '11.42:1'],
+                ['Success on Canvas', '7.43:1'],
+                ['Error on Canvas', '7.76:1'],
+                ['Warning on Canvas', '6.86:1'],
+                ['Info on Canvas', '7.32:1'],
+              ].map(([label, ratio]) => (
+                <div
+                  key={label}
+                  style={{
+                    padding: 12,
+                    borderRadius: 2,
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    fontSize: 14,
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  {label} <span className="font-system">{ratio}</span> (AA pass)
+                </div>
+              ))}
+            </div>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* TYPOGRAPHY                                                        */}
       {/* ================================================================= */}
-      <Section id="typography" title="Typography">
-        <SubSection title="Font Families">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
-            {/* Narrative */}
-            <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Narrative</div>
-              <div className="font-narrative" style={{ fontSize: 24, color: 'var(--color-text-primary)', marginBottom: 4 }}>The old library stretched before you</div>
-              <div className="font-narrative" style={{ fontSize: 18, lineHeight: 1.75, color: 'var(--color-text-secondary)', marginBottom: 8 }}>Used for all AI-generated narration</div>
-              <code style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>font-family: &apos;Lora&apos;, serif</code>
-            </div>
-
-            {/* System */}
-            <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>System</div>
-              <div className="font-system" style={{ fontSize: 24, color: 'var(--color-text-primary)', marginBottom: 4 }}>HP: 42/50 -- TURN 14</div>
-              <div className="font-system" style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 8 }}>Stats, labels, metadata, and technical text</div>
-              <code style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>font-family: &apos;IBM Plex Mono&apos;, monospace</code>
-            </div>
-
-            {/* Interface */}
-            <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interface</div>
-              <div className="font-interface" style={{ fontSize: 24, color: 'var(--color-text-primary)', marginBottom: 4 }}>Continue to Character Attributes</div>
-              <div className="font-interface" style={{ fontSize: 16, color: 'var(--color-text-secondary)', marginBottom: 8 }}>Buttons, navigation, forms, and UI chrome</div>
-              <code style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>font-family: &apos;IBM Plex Sans&apos;, sans-serif</code>
-            </div>
-          </div>
-        </SubSection>
-
-        <SubSection title="Typography Roles" description="Role-based typography utilities map semantic intent to font and rhythm.">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>text-narrative</div>
-              <p className="text-narrative" style={{ maxWidth: 768 }}>The manuscript breathed as you opened it, each line settling into place like ink finding paper.</p>
-            </div>
-            <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>text-technical</div>
-              <p className="text-technical">Turn: 14 -- Hp: 42/50 -- Save Slot: Auto-3</p>
-            </div>
-            <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>text-ui</div>
-              <p className="text-ui">Continue to Character Attributes</p>
-            </div>
-          </div>
-        </SubSection>
-
-        <SubSection title="Heading Scale">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
-            {[
-              { tag: 'h1', size: '2.25rem / 36px', weight: 600, lineHeight: 1.1 },
-              { tag: 'h2', size: '1.875rem / 30px', weight: 600, lineHeight: 1.1 },
-              { tag: 'h3', size: '1.5rem / 24px', weight: 600, lineHeight: 1.2 },
-              { tag: 'h4', size: '1.25rem / 20px', weight: 600, lineHeight: 1.2 },
-              { tag: 'h5', size: '1.125rem / 18px', weight: 500, lineHeight: 1.2 },
-              { tag: 'h6', size: '1rem / 16px', weight: 500, lineHeight: 1.2 },
-            ].map(({ tag, size, weight, lineHeight }) => (
-              <div key={tag} style={{ display: 'flex', alignItems: 'baseline', gap: 16, borderBottom: '1px solid var(--color-border)', paddingBottom: 12 }}>
-                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', width: 32, flexShrink: 0 }}>{tag}</div>
-                <div className="font-interface" style={{ fontSize: size.split(' / ')[0], fontWeight: weight, lineHeight, color: 'var(--color-text-primary)' }}>
-                  Heading Level {tag.slice(1)}
-                </div>
-                <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-                  {size} -- weight {weight} -- lh {lineHeight}
-                </div>
+      <section id="ds1-typography" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">03 — Typography</div>
+          <h2 className="ds1-section-title ds1-reveal">Typography</h2>
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Font Families</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
+              {/* Narrative */}
+              <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Narrative</div>
+                <div className="font-narrative" style={{ fontSize: 24, color: 'var(--color-text-primary)', marginBottom: 4 }}>The old library stretched before you</div>
+                <div className="font-narrative" style={{ fontSize: 18, lineHeight: 1.75, color: 'var(--color-text-secondary)', marginBottom: 8 }}>Used for all AI-generated narration</div>
+                <code style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>font-family: &apos;Lora&apos;, serif</code>
               </div>
-            ))}
-          </div>
-        </SubSection>
 
-        <SubSection title="Body Text" description="Narrative paragraph at reading width.">
-          <div style={{ maxWidth: 768, padding: 24, borderRadius: 2, border: '1px solid var(--color-border)' }}>
-            <p className="text-narrative" style={{ marginBottom: 16 }}>
-              The brass lock clicked once, then twice, and the archive doors gave way just enough for candlelight to leak through the seam.
-            </p>
-            <p className="text-narrative" style={{ marginBottom: 16 }}>
-              You stepped into the chamber and felt the temperature drop. Shelves climbed three stories high, each packed with ledgers stitched in faded cloth. Above, suspended rails traced the ceiling like constellations of iron, and every few seconds a distant mechanism clattered, then fell quiet again.
-            </p>
-            <p className="text-narrative">
-              A metal desk stood in the center under a cone of light. Its surface was scarred with compass marks and ink circles, and a copper plaque on the edge read: &quot;Records of Irrecoverable Histories.&quot;
-            </p>
+              {/* System */}
+              <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>System</div>
+                <div className="font-system" style={{ fontSize: 24, color: 'var(--color-text-primary)', marginBottom: 4 }}>HP: 42/50 -- TURN 14</div>
+                <div className="font-system" style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 8 }}>Stats, labels, metadata, and technical text</div>
+                <code style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>font-family: &apos;IBM Plex Mono&apos;, monospace</code>
+              </div>
+
+              {/* Interface */}
+              <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interface</div>
+                <div className="font-interface" style={{ fontSize: 24, color: 'var(--color-text-primary)', marginBottom: 4 }}>Continue to Character Attributes</div>
+                <div className="font-interface" style={{ fontSize: 16, color: 'var(--color-text-secondary)', marginBottom: 8 }}>Buttons, navigation, forms, and UI chrome</div>
+                <code style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>font-family: &apos;IBM Plex Sans&apos;, sans-serif</code>
+              </div>
+            </div>
           </div>
-        </SubSection>
-      </Section>
+
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Typography Roles</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Role-based typography utilities map semantic intent to font and rhythm.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>text-narrative</div>
+                <p className="text-narrative" style={{ maxWidth: 768 }}>The manuscript breathed as you opened it, each line settling into place like ink finding paper.</p>
+              </div>
+              <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>text-technical</div>
+                <p className="text-technical">Turn: 14 -- Hp: 42/50 -- Save Slot: Auto-3</p>
+              </div>
+              <div style={{ padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>text-ui</div>
+                <p className="text-ui">Continue to Character Attributes</p>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Heading Scale</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 16, borderRadius: 2, border: '1px solid var(--color-border)' }}>
+              {[
+                { tag: 'h1', size: '2.25rem / 36px', weight: 600, lineHeight: 1.1 },
+                { tag: 'h2', size: '1.875rem / 30px', weight: 600, lineHeight: 1.1 },
+                { tag: 'h3', size: '1.5rem / 24px', weight: 600, lineHeight: 1.2 },
+                { tag: 'h4', size: '1.25rem / 20px', weight: 600, lineHeight: 1.2 },
+                { tag: 'h5', size: '1.125rem / 18px', weight: 500, lineHeight: 1.2 },
+                { tag: 'h6', size: '1rem / 16px', weight: 500, lineHeight: 1.2 },
+              ].map(({ tag, size, weight, lineHeight }) => (
+                <div key={tag} style={{ display: 'flex', alignItems: 'baseline', gap: 16, borderBottom: '1px solid var(--color-border)', paddingBottom: 12 }}>
+                  <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', width: 32, flexShrink: 0 }}>{tag}</div>
+                  <div className="font-interface" style={{ fontSize: size.split(' / ')[0], fontWeight: weight, lineHeight, color: 'var(--color-text-primary)' }}>
+                    Heading Level {tag.slice(1)}
+                  </div>
+                  <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+                    {size} -- weight {weight} -- lh {lineHeight}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Body Text</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Narrative paragraph at reading width.</p>
+            <div style={{ maxWidth: 768, padding: 24, borderRadius: 2, border: '1px solid var(--color-border)' }}>
+              <p className="text-narrative" style={{ marginBottom: 16 }}>
+                The brass lock clicked once, then twice, and the archive doors gave way just enough for candlelight to leak through the seam.
+              </p>
+              <p className="text-narrative" style={{ marginBottom: 16 }}>
+                You stepped into the chamber and felt the temperature drop. Shelves climbed three stories high, each packed with ledgers stitched in faded cloth. Above, suspended rails traced the ceiling like constellations of iron, and every few seconds a distant mechanism clattered, then fell quiet again.
+              </p>
+              <p className="text-narrative">
+                A metal desk stood in the center under a cone of light. Its surface was scarred with compass marks and ink circles, and a copper plaque on the edge read: &quot;Records of Irrecoverable Histories.&quot;
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* SPACING                                                           */}
       {/* ================================================================= */}
-      <Section id="spacing" title="Spacing Scale">
-        <SubSection description="Base unit: 24px. Scale derived from 4px grid.">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[4, 8, 16, 24, 32, 48, 64, 96].map((px) => (
-              <div key={px} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', width: 48, textAlign: 'right', flexShrink: 0 }}>{px}px</div>
-                <div style={{ width: px, height: 16, background: 'var(--color-text-muted)', borderRadius: 2, flexShrink: 0 }} />
-                <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>{px / 16}rem</div>
-              </div>
-            ))}
+      <section id="ds1-spacing" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">04 — Spacing</div>
+          <h2 className="ds1-section-title ds1-reveal">Spacing Scale</h2>
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>Base unit: 24px. Scale derived from 4px grid.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[4, 8, 16, 24, 32, 48, 64, 96].map((px) => (
+                <div key={px} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', width: 48, textAlign: 'right', flexShrink: 0 }}>{px}px</div>
+                  <div style={{ width: px, height: 16, background: 'var(--color-text-muted)', borderRadius: 2, flexShrink: 0 }} />
+                  <div className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>{px / 16}rem</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </SubSection>
-      </Section>
-
-      {/* ================================================================= */}
-      {/* PHILOSOPHY                                                        */}
-      {/* ================================================================= */}
-      <Section id="philosophy" title="Design Philosophy">
-        <SubSection>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
-            {PHILOSOPHY_CARDS.map((card) => (
-              <div key={card.title} style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-                <h3 className="font-system" style={{ fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)', letterSpacing: '0.04em' }}>
-                  {card.title}
-                </h3>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>{card.description}</p>
-              </div>
-            ))}
-          </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* BORDER RADIUS                                                     */}
       {/* ================================================================= */}
-      <Section id="radius" title="Border Radius">
-        <SubSection description="Minimal rounding to maintain crisp, technical aesthetic.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16 }}>
-            {RADIUS_SCALE.map((item) => (
-              <div key={item.name} style={{ textAlign: 'center' }}>
-                <div style={{ width: 80, height: 80, margin: '0 auto', background: 'var(--color-accent)', borderRadius: item.value }} />
-                <div style={{ marginTop: 12 }}>
-                  <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.name}</div>
-                  <code style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{item.value}</code>
-                  <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{item.note}</div>
+      <section id="ds1-radius" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">05 — Radius</div>
+          <h2 className="ds1-section-title ds1-reveal">Border Radius</h2>
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>Minimal rounding to maintain crisp, technical aesthetic.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16 }}>
+              {RADIUS_SCALE.map((item) => (
+                <div key={item.name} style={{ textAlign: 'center' }}>
+                  <div style={{ width: 80, height: 80, margin: '0 auto', background: 'var(--color-accent)', borderRadius: item.value }} />
+                  <div style={{ marginTop: 12 }}>
+                    <div className="font-system" style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.name}</div>
+                    <code style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{item.value}</code>
+                    <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{item.note}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </SubSection>
-
-        <SubSection>
-          <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
-            <h4 className="font-system" style={{ fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>DEFAULT</h4>
-            <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
-              Use <code>rounded-sm (2px)</code> as the default throughout the system. This maintains a technical, precise aesthetic while avoiding harsh 90 degree corners.
-            </p>
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
+              <h4 className="font-system" style={{ fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>DEFAULT</h4>
+              <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
+                Use <code>rounded-sm (2px)</code> as the default throughout the system. This maintains a technical, precise aesthetic while avoiding harsh 90 degree corners.
+              </p>
+            </div>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* ELEVATION                                                         */}
       {/* ================================================================= */}
-      <Section id="elevation" title="Elevation & Shadows">
-        <SubSection description="Minimal shadow system for creating depth hierarchy. Use sparingly to maintain the drafting-table aesthetic.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
-            {ELEVATION_SCALE.map((item) => (
-              <div key={item.name}>
-                <div style={{ padding: 32, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)', boxShadow: item.shadow }} />
-                <div style={{ marginTop: 12 }}>
-                  <div className="font-system" style={{ fontSize: 12, fontWeight: 500, marginBottom: 4, color: 'var(--color-text-primary)' }}>{item.name}</div>
-                  <code style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{item.value}</code>
-                  <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{item.note}</div>
+      <section id="ds1-elevation" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">06 — Elevation</div>
+          <h2 className="ds1-section-title ds1-reveal">Elevation & Shadows</h2>
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>Minimal shadow system for creating depth hierarchy. Use sparingly to maintain the drafting-table aesthetic.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
+              {ELEVATION_SCALE.map((item) => (
+                <div key={item.name}>
+                  <div style={{ padding: 32, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)', boxShadow: item.shadow }} />
+                  <div style={{ marginTop: 12 }}>
+                    <div className="font-system" style={{ fontSize: 12, fontWeight: 500, marginBottom: 4, color: 'var(--color-text-primary)' }}>{item.name}</div>
+                    <code style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{item.value}</code>
+                    <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{item.note}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </SubSection>
-
-        <SubSection>
-          <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
-            <h4 className="font-system" style={{ fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>USAGE NOTE</h4>
-            <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
-              Prefer <code>backdrop-blur</code> and borders over shadows for HUD panels. Use shadows only for floating elements that need clear separation.
-            </p>
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
+              <h4 className="font-system" style={{ fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>USAGE NOTE</h4>
+              <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
+                Prefer <code>backdrop-blur</code> and borders over shadows for HUD panels. Use shadows only for floating elements that need clear separation.
+              </p>
+            </div>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* ICONOGRAPHY                                                       */}
       {/* ================================================================= */}
-      <Section id="icons" title="Iconography">
-        <SubSection description="Using Lucide icons with consistent sizing and stroke weight.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
-            {ICON_SIZE_SCALE.map(({ size, label, note, icon: Icon }) => (
-              <div key={label} style={{ padding: 16, borderRadius: 2, textAlign: 'center', background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-                <Icon size={size} strokeWidth={1.5} aria-hidden="true" style={{ margin: '0 auto 8px', color: 'var(--color-text-primary)' }} />
-                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{label}</div>
-                <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{note}</div>
-              </div>
-            ))}
+      <section id="ds1-icons" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">07 — Icons</div>
+          <h2 className="ds1-section-title ds1-reveal">Iconography</h2>
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>Using Lucide icons with consistent sizing and stroke weight.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
+              {ICON_SIZE_SCALE.map(({ size, label, note, icon: Icon }) => (
+                <div key={label} style={{ padding: 16, borderRadius: 2, textAlign: 'center', background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                  <Icon size={size} strokeWidth={1.5} aria-hidden="true" style={{ margin: '0 auto 8px', color: 'var(--color-text-primary)' }} />
+                  <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{label}</div>
+                  <div style={{ fontSize: 12, marginTop: 4, color: 'var(--color-text-muted)' }}>{note}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </SubSection>
-
-        <SubSection>
-          <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
-            <h4 className="font-system" style={{ fontSize: 12, marginBottom: 12, color: 'var(--color-text-muted)' }}>GUIDELINES</h4>
-            <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14, color: 'var(--color-text-secondary)' }}>
-              <li>Stroke weight: <code>1.5px</code> (Lucide standard)</li>
-              <li>Use icons to support text, not replace it.</li>
-              <li>Always include <code>aria-label</code> for icon-only buttons.</li>
-              <li>Icons inherit text color by default.</li>
-              <li>Use <code>aria-hidden=&quot;true&quot;</code> for decorative icons.</li>
-            </ul>
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)' }}>
+              <h4 className="font-system" style={{ fontSize: 12, marginBottom: 12, color: 'var(--color-text-muted)' }}>GUIDELINES</h4>
+              <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14, color: 'var(--color-text-secondary)' }}>
+                <li>Stroke weight: <code>1.5px</code> (Lucide standard)</li>
+                <li>Use icons to support text, not replace it.</li>
+                <li>Always include <code>aria-label</code> for icon-only buttons.</li>
+                <li>Icons inherit text color by default.</li>
+                <li>Use <code>aria-hidden=&quot;true&quot;</code> for decorative icons.</li>
+              </ul>
+            </div>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* GRID & BREAKPOINTS                                                */}
       {/* ================================================================= */}
-      <Section id="grid" title="Grid & Breakpoints">
-        <SubSection description="Responsive layout structure based on a 12-column grid with standardized breakpoints.">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {BREAKPOINTS.map((item) => (
-              <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-                <div>
-                  <div className="font-system" style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.label}</div>
-                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{item.note}</div>
+      <section id="ds1-grid" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">08 — Grid</div>
+          <h2 className="ds1-section-title ds1-reveal">Grid & Breakpoints</h2>
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>Responsive layout structure based on a 12-column grid with standardized breakpoints.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {BREAKPOINTS.map((item) => (
+                <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                  <div>
+                    <div className="font-system" style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.label}</div>
+                    <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{item.note}</div>
+                  </div>
+                  <code className="font-system" style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>{item.width}</code>
                 </div>
-                <code className="font-system" style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>{item.width}</code>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </SubSection>
-
-        <SubSection title="Container Widths">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-            {CONTAINER_WIDTHS.map((container) => (
-              <div key={container.title} style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-                <div className="font-system" style={{ fontSize: 12, marginBottom: 12, color: 'var(--color-text-muted)' }}>{container.title}</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {container.rows.map((row) => (
-                    <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 13, color: 'var(--color-text-secondary)' }}>
-                      <span>{row.label}</span>
-                      <code>{row.value}</code>
-                    </div>
-                  ))}
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Container Widths</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              {CONTAINER_WIDTHS.map((container) => (
+                <div key={container.title} style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                  <div className="font-system" style={{ fontSize: 12, marginBottom: 12, color: 'var(--color-text-muted)' }}>{container.title}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {container.rows.map((row) => (
+                      <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                        <span>{row.label}</span>
+                        <code>{row.value}</code>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* LAYOUT PATTERNS                                                   */}
       {/* ================================================================= */}
-      <Section id="layout" title="Layout Patterns">
-        <SubSection description="The app uses three foundational layout archetypes: Default for general app pages, Manuscript for immersive play, and Workshop for utility-heavy world/character management.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
-            <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
-              <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
-                <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Manuscript (Game Session)</h3>
-                <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                  Single-column narrative with floating HUD and docked action rail.
-                </p>
-              </div>
-              <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
-                <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 12, minHeight: 180, background: 'var(--color-surface)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, fontSize: 11, color: 'var(--color-text-muted)' }}>
-                    <span>HUD (floating)</span>
-                    <span>Tools</span>
-                  </div>
-                  <div style={{ margin: '0 auto 12px', width: 'min(100%, 420px)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                    Narrative column (max-w-3xl)
-                  </div>
-                  <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 11, color: 'var(--color-text-muted)' }}>
-                    Docked action/input rail
-                  </div>
+      <section id="ds1-layout" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">09 — Layout</div>
+          <h2 className="ds1-section-title ds1-reveal">Layout Patterns</h2>
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>The app uses three foundational layout archetypes: Default for general app pages, Manuscript for immersive play, and Workshop for utility-heavy world/character management.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+              <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
+                <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
+                  <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Manuscript (Game Session)</h3>
+                  <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                    Single-column narrative with floating HUD and docked action rail.
+                  </p>
                 </div>
-              </div>
-            </div>
-
-            <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
-              <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
-                <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Workshop (Library & Wizards)</h3>
-                <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                  Sidebar navigation plus workspace content area for forms and management.
-                </p>
-              </div>
-              <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', minHeight: 180, border: '1px solid var(--color-border)', borderRadius: 2, overflow: 'hidden' }}>
-                  <div style={{ padding: 10, borderRight: '1px solid var(--color-border)', background: 'var(--color-surface-hover)', fontSize: 11, color: 'var(--color-text-muted)' }}>
-                    Sidebar rail
-                    <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
-                      <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Worlds</div>
-                      <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Characters</div>
-                      <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Settings</div>
+                <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
+                  <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 12, minHeight: 180, background: 'var(--color-surface)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, fontSize: 11, color: 'var(--color-text-muted)' }}>
+                      <span>HUD (floating)</span>
+                      <span>Tools</span>
                     </div>
-                  </div>
-                  <div style={{ padding: 12, background: 'var(--color-surface)' }}>
-                    <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      Workspace content (max-w-5xl / 1024px)
+                    <div style={{ margin: '0 auto 12px', width: 'min(100%, 420px)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                      Narrative column (max-w-3xl)
+                    </div>
+                    <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 11, color: 'var(--color-text-muted)' }}>
+                      Docked action/input rail
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
-              <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
-                <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Default (Home & Content Pages)</h3>
-                <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                  Header navigation with a centered content workspace for broad app pages.
-                </p>
-              </div>
-              <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
-                <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, minHeight: 180, overflow: 'hidden', background: 'var(--color-surface)' }}>
-                  <div style={{ borderBottom: '1px solid var(--color-border)', padding: '8px 10px', fontSize: 11, color: 'var(--color-text-muted)' }}>
-                    Header navigation
-                  </div>
-                  <div style={{ padding: 12 }}>
-                    <div style={{ margin: '0 auto', width: '100%', maxWidth: 240, border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 8px', fontSize: 11, color: 'var(--color-text-muted)', textAlign: 'center' }}>
-                      max-width: 1200px shell
+              <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
+                <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
+                  <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Workshop (Library & Wizards)</h3>
+                  <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                    Sidebar navigation plus workspace content area for forms and management.
+                  </p>
+                </div>
+                <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', minHeight: 180, border: '1px solid var(--color-border)', borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ padding: 10, borderRight: '1px solid var(--color-border)', background: 'var(--color-surface-hover)', fontSize: 11, color: 'var(--color-text-muted)' }}>
+                      Sidebar rail
+                      <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Worlds</div>
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Characters</div>
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 6px', background: 'var(--color-surface)' }}>Settings</div>
+                      </div>
                     </div>
-                    <div style={{ marginTop: 8, border: '1px solid var(--color-border)', borderRadius: 2, minHeight: 96, padding: 10, fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      Dashboard and general content modules
+                    <div style={{ padding: 12, background: 'var(--color-surface)' }}>
+                      <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, padding: 8, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                        Workspace content (max-w-5xl / 1024px)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ border: '1px solid var(--color-border)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-surface)' }}>
+                <div style={{ padding: 12, borderBottom: '1px solid var(--color-border)' }}>
+                  <h3 style={{ margin: 0, fontSize: 16, color: 'var(--color-text-primary)' }}>Default (Home & Content Pages)</h3>
+                  <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                    Header navigation with a centered content workspace for broad app pages.
+                  </p>
+                </div>
+                <div style={{ padding: 12, background: 'var(--color-surface-hover)' }}>
+                  <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, minHeight: 180, overflow: 'hidden', background: 'var(--color-surface)' }}>
+                    <div style={{ borderBottom: '1px solid var(--color-border)', padding: '8px 10px', fontSize: 11, color: 'var(--color-text-muted)' }}>
+                      Header navigation
+                    </div>
+                    <div style={{ padding: 12 }}>
+                      <div style={{ margin: '0 auto', width: '100%', maxWidth: 240, border: '1px solid var(--color-border)', borderRadius: 2, padding: '4px 8px', fontSize: 11, color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                        max-width: 1200px shell
+                      </div>
+                      <div style={{ marginTop: 8, border: '1px solid var(--color-border)', borderRadius: 2, minHeight: 96, padding: 10, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                        Dashboard and general content modules
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </SubSection>
 
-        <SubSection title="Responsive Adaptation">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
-            <div style={{ padding: 12, border: '1px solid var(--color-border)', borderRadius: 4, background: 'var(--color-surface)' }}>
-              <h4 className="font-system" style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>MOBILE (&lt;768px)</h4>
-              <p style={{ margin: '8px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-                Sidebar collapses to a menu trigger; workspace runs full-width.
-              </p>
-            </div>
-            <div style={{ padding: 12, border: '1px solid var(--color-border)', borderRadius: 4, background: 'var(--color-surface)' }}>
-              <h4 className="font-system" style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>DESKTOP (&ge;768px)</h4>
-              <p style={{ margin: '8px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-                Sidebar remains visible and scrollable; workspace constrained to 1024px.
-              </p>
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Responsive Adaptation</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
+              <div style={{ padding: 12, border: '1px solid var(--color-border)', borderRadius: 4, background: 'var(--color-surface)' }}>
+                <h4 className="font-system" style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>MOBILE (&lt;768px)</h4>
+                <p style={{ margin: '8px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                  Sidebar collapses to a menu trigger; workspace runs full-width.
+                </p>
+              </div>
+              <div style={{ padding: 12, border: '1px solid var(--color-border)', borderRadius: 4, background: 'var(--color-surface)' }}>
+                <h4 className="font-system" style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>DESKTOP (&ge;768px)</h4>
+                <p style={{ margin: '8px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                  Sidebar remains visible and scrollable; workspace constrained to 1024px.
+                </p>
+              </div>
             </div>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* CSS VARIABLES                                                     */}
       {/* ================================================================= */}
-      <Section id="variables" title="CSS Variables">
-        <SubSection description="Current custom property definitions from globals.css. These drive both the shadcn layer and the design system layer.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
-            <div>
-              <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>:root (Light)</h4>
-              <pre
-                className="font-system"
-                tabIndex={0}
-                role="region"
-                aria-label="Light theme CSS variable definitions"
-                style={{
-                  fontSize: 12,
-                  lineHeight: 1.6,
-                  color: 'var(--color-text-secondary)',
-                  background: 'var(--color-surface-hover)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 4,
-                  padding: 16,
-                  overflow: 'auto',
-                  maxHeight: 480,
-                }}
-              >
-{`:root {
-  /* Typography tokens */
+      <section id="ds1-variables" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">10 — Variables</div>
+          <h2 className="ds1-section-title ds1-reveal">CSS Variables</h2>
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>Current custom property definitions from globals.css. These drive both the shadcn layer and the design system layer.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
+              <div>
+                <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>:root (Light)</h4>
+                <pre
+                  className="font-system"
+                  tabIndex={0}
+                  role="region"
+                  aria-label="Light theme CSS variable definitions"
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                    color: 'var(--color-text-secondary)',
+                    background: 'var(--color-surface-hover)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 4,
+                    padding: 16,
+                    overflow: 'auto',
+                    maxHeight: 480,
+                  }}
+                >
+                  {`:root {/* Typography tokens */
   --font-narrative: 'Lora', serif;
   --font-system: 'IBM Plex Mono', monospace;
   --font-interface: 'IBM Plex Sans', sans-serif;
@@ -1120,28 +1216,28 @@ a:hover {
   --muted: 240 4.8% 95.9%;
   --border: 240 5.2% 90%;
 }`}
-              </pre>
-            </div>
-            <div>
-              <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>.dark</h4>
-              <pre
-                className="font-system"
-                tabIndex={0}
-                role="region"
-                aria-label="Dark theme CSS variable definitions"
-                style={{
-                  fontSize: 12,
-                  lineHeight: 1.6,
-                  color: 'var(--color-text-secondary)',
-                  background: 'var(--color-surface-hover)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 4,
-                  padding: 16,
-                  overflow: 'auto',
-                  maxHeight: 480,
-                }}
-              >
-{`.dark {
+                </pre>
+              </div>
+              <div>
+                <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>.dark</h4>
+                <pre
+                  className="font-system"
+                  tabIndex={0}
+                  role="region"
+                  aria-label="Dark theme CSS variable definitions"
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                    color: 'var(--color-text-secondary)',
+                    background: 'var(--color-surface-hover)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 4,
+                    padding: 16,
+                    overflow: 'auto',
+                    maxHeight: 480,
+                  }}
+                >
+                  {`.dark {
   --color-canvas: #09090b;
   --color-surface: #18181b;
   --color-surface-hover: #27272a;
@@ -1163,215 +1259,237 @@ a:hover {
   --muted: 240 3.7% 15.9%;
   --border: 240 3.7% 15.9%;
 }`}
-              </pre>
+                </pre>
+              </div>
             </div>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* OVERLAY                                                           */}
       {/* ================================================================= */}
-      <Section id="overlay" title="Manuscript Overlay System">
-        <SubSection title="Overlay Tokens" description="Translucent surface and gradient tokens for game-session overlays.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
-            <Swatch color="var(--color-overlay-surface)" name="Overlay Surface" hex="rgba(255,255,255,0.9)" note="HUD & Rail backgrounds" />
-            <Swatch color="var(--color-overlay-surface-strong)" name="Overlay Strong" hex="rgba(255,255,255,0.95)" note="Modal & Drawer panels" />
-            <Swatch color="var(--color-scrim)" name="Scrim" hex="rgba(17,17,17,0.45)" note="Backdrop dimming" />
-          </div>
-          <div style={{ marginTop: 24, padding: 16, borderRadius: 4, background: 'linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end))', border: '1px solid var(--color-border)' }}>
-            <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>VIEWPORT GRADIENT</div>
-            <p className="text-narrative">Linear gradient applied to the manuscript viewport shell.</p>
-          </div>
-        </SubSection>
-
-        <SubSection title="Class System" description="Semantic manuscript-* classes for structural layout and state.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>SCAFFOLD</div>
-              <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
-                <li>.manuscript-viewport-layer</li>
-                <li>.manuscript-viewport-shell</li>
-                <li>.manuscript-viewport-inner</li>
-                <li>.manuscript-overlay-backdrop</li>
-              </ul>
+      <section id="ds1-overlay" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">11 — Overlay</div>
+          <h2 className="ds1-section-title ds1-reveal">Manuscript Overlay System</h2>
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Overlay Tokens</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Translucent surface and gradient tokens for game-session overlays.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
+              <Swatch color="var(--color-overlay-surface)" name="Overlay Surface" hex="rgba(255,255,255,0.9)" note="HUD & Rail backgrounds" />
+              <Swatch color="var(--color-overlay-surface-strong)" name="Overlay Strong" hex="rgba(255,255,255,0.95)" note="Modal & Drawer panels" />
+              <Swatch color="var(--color-scrim)" name="Scrim" hex="rgba(17,17,17,0.45)" note="Backdrop dimming" />
             </div>
-            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>REGIONS</div>
-              <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
-                <li>.manuscript-overlay-header</li>
-                <li>.manuscript-overlay-main</li>
-                <li>.manuscript-main-stage</li>
-                <li>.manuscript-characters-rail</li>
-              </ul>
-            </div>
-            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>INTERACTIONS</div>
-              <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
-                <li>.manuscript-action-rail-streaming</li>
-                <li>.manuscript-suggested-action</li>
-                <li>.manuscript-overlay-open</li>
-              </ul>
+            <div style={{ marginTop: 24, padding: 16, borderRadius: 4, background: 'linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end))', border: '1px solid var(--color-border)' }}>
+              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>VIEWPORT GRADIENT</div>
+              <p className="text-narrative">Linear gradient applied to the manuscript viewport shell.</p>
             </div>
           </div>
-        </SubSection>
-      </Section>
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Class System</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Semantic manuscript-* classes for structural layout and state.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+              <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>SCAFFOLD</div>
+                <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
+                  <li>.manuscript-viewport-layer</li>
+                  <li>.manuscript-viewport-shell</li>
+                  <li>.manuscript-viewport-inner</li>
+                  <li>.manuscript-overlay-backdrop</li>
+                </ul>
+              </div>
+              <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>REGIONS</div>
+                <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
+                  <li>.manuscript-overlay-header</li>
+                  <li>.manuscript-overlay-main</li>
+                  <li>.manuscript-main-stage</li>
+                  <li>.manuscript-characters-rail</li>
+                </ul>
+              </div>
+              <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>INTERACTIONS</div>
+                <ul className="font-system" style={{ fontSize: 13, color: 'var(--color-text-primary)', listStyle: 'none', padding: 0 }}>
+                  <li>.manuscript-action-rail-streaming</li>
+                  <li>.manuscript-suggested-action</li>
+                  <li>.manuscript-overlay-open</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* MANUSCRIPT DEMO                                                   */}
       {/* ================================================================= */}
-      <Section id="manuscript" title="Manuscript Demo">
-        <SubSection title="Interactive Layout" description="Click buttons to toggle panels and drawers. Demonstrates progressive disclosure in the game session layout.">
-          <ManuscriptDemo />
-        </SubSection>
-      </Section>
+      <section id="ds1-session" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">12 — Session</div>
+          <h2 className="ds1-section-title ds1-reveal">Manuscript Demo</h2>
+          <div id="ds1-main-content" />
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Interactive Layout</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Click buttons to toggle panels and drawers. Demonstrates progressive disclosure in the game session layout.</p>
+            <ManuscriptDemo />
+          </div>
+        </div>
+      </section>
 
       {/* ================================================================= */}
       {/* COMPONENTS                                                        */}
       {/* ================================================================= */}
-      <Section id="components" title="Components">
+      <section id="ds1-components" className="ds1-section">
+        <div className="ds1-section-inner">
+          <div className="ds1-section-number ds1-reveal">13 — Components</div>
+          <h2 className="ds1-section-title ds1-reveal">Components</h2>
 
-        {/* Buttons */}
-        <SubSection title="Buttons (State Matrix)" description="Primary and secondary variants shown together for default, hover, active, disabled, and loading states.">
-          <div style={{ borderRadius: 2, overflow: 'hidden', border: '1px solid var(--color-border)' }}>
-            {[
-              { state: 'DEFAULT', primary: {}, secondary: {} },
-              { state: 'HOVER', primary: { background: '#1e1b4b' }, secondary: { background: 'var(--color-surface-hover)', borderColor: 'var(--color-border-strong)' } },
-              { state: 'ACTIVE', primary: { background: '#1e1b4b', transform: 'scale(0.98)' }, secondary: { borderWidth: 2, borderColor: 'var(--color-border-strong)', transform: 'scale(0.98)' } },
-              { state: 'DISABLED', primary: { background: 'var(--color-border-strong)', color: 'var(--color-text-muted)', cursor: 'not-allowed' }, secondary: { background: 'var(--color-surface-hover)', color: 'var(--color-text-muted)', cursor: 'not-allowed' } },
-            ].map(({ state, primary, secondary }) => (
-              <div key={state} style={{ display: 'grid', gridTemplateColumns: '140px 1fr', borderBottom: '1px solid var(--color-border)' }}>
-                <div className="font-system" style={{ padding: 16, fontSize: 12, color: 'var(--color-text-muted)' }}>{state}</div>
+          {/* Buttons */}
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Buttons (State Matrix)</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Primary and secondary variants shown together for default, hover, active, disabled, and loading states.</p>
+            <div style={{ borderRadius: 2, overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+              {[
+                { state: 'DEFAULT', primary: {}, secondary: {} },
+                { state: 'HOVER', primary: { background: '#1e1b4b' }, secondary: { background: 'var(--color-surface-hover)', borderColor: 'var(--color-border-strong)' } },
+                { state: 'ACTIVE', primary: { background: '#1e1b4b', transform: 'scale(0.98)' }, secondary: { borderWidth: 2, borderColor: 'var(--color-border-strong)', transform: 'scale(0.98)' } },
+                { state: 'DISABLED', primary: { background: 'var(--color-border-strong)', color: 'var(--color-text-muted)', cursor: 'not-allowed' }, secondary: { background: 'var(--color-surface-hover)', color: 'var(--color-text-muted)', cursor: 'not-allowed' } },
+              ].map(({ state, primary, secondary }) => (
+                <div key={state} style={{ display: 'grid', gridTemplateColumns: '140px 1fr', borderBottom: '1px solid var(--color-border)' }}>
+                  <div className="font-system" style={{ padding: 16, fontSize: 12, color: 'var(--color-text-muted)' }}>{state}</div>
+                  <div style={{ padding: 16, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                    <button
+                      type="button"
+                      disabled={state === 'DISABLED'}
+                      className="font-interface"
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 2,
+                        fontSize: 14,
+                        fontWeight: 500,
+                        background: '#312e81',
+                        color: 'white',
+                        border: 'none',
+                        cursor: state === 'DISABLED' ? 'not-allowed' : 'pointer',
+                        ...primary,
+                      }}
+                    >
+                      Primary Action
+                    </button>
+                    <button
+                      type="button"
+                      disabled={state === 'DISABLED'}
+                      className="font-interface"
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 2,
+                        fontSize: 14,
+                        fontWeight: 500,
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)',
+                        border: '1px solid var(--color-border)',
+                        cursor: state === 'DISABLED' ? 'not-allowed' : 'pointer',
+                        ...secondary,
+                      }}
+                    >
+                      Secondary Action
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {/* Loading state */}
+              <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr' }}>
+                <div className="font-system" style={{ padding: 16, fontSize: 12, color: 'var(--color-text-muted)' }}>LOADING</div>
                 <div style={{ padding: 16, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                  <button
-                    type="button"
-                    disabled={state === 'DISABLED'}
-                    className="font-interface"
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: 2,
-                      fontSize: 14,
-                      fontWeight: 500,
-                      background: '#312e81',
-                      color: 'white',
-                      border: 'none',
-                      cursor: state === 'DISABLED' ? 'not-allowed' : 'pointer',
-                      ...primary,
-                    }}
-                  >
-                    Primary Action
+                  <button type="button" className="font-interface" style={{ padding: '8px 16px', borderRadius: 2, fontSize: 14, fontWeight: 500, background: '#312e81', color: 'white', border: 'none', opacity: 0.8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                    Loading...
                   </button>
-                  <button
-                    type="button"
-                    disabled={state === 'DISABLED'}
-                    className="font-interface"
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: 2,
-                      fontSize: 14,
-                      fontWeight: 500,
-                      background: 'var(--color-surface)',
-                      color: 'var(--color-text-primary)',
-                      border: '1px solid var(--color-border)',
-                      cursor: state === 'DISABLED' ? 'not-allowed' : 'pointer',
-                      ...secondary,
-                    }}
-                  >
-                    Secondary Action
+                  <button type="button" className="font-interface" style={{ padding: '8px 16px', borderRadius: 2, fontSize: 14, fontWeight: 500, background: 'var(--color-surface-hover)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-strong)', opacity: 0.8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid var(--color-border)', borderTop: '2px solid var(--color-text-muted)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                    Saving...
                   </button>
                 </div>
               </div>
-            ))}
-            {/* Loading state */}
-            <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr' }}>
-              <div className="font-system" style={{ padding: 16, fontSize: 12, color: 'var(--color-text-muted)' }}>LOADING</div>
-              <div style={{ padding: 16, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                <button type="button" className="font-interface" style={{ padding: '8px 16px', borderRadius: 2, fontSize: 14, fontWeight: 500, background: '#312e81', color: 'white', border: 'none', opacity: 0.8, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                  Loading...
-                </button>
-                <button type="button" className="font-interface" style={{ padding: '8px 16px', borderRadius: 2, fontSize: 14, fontWeight: 500, background: 'var(--color-surface-hover)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-strong)', opacity: 0.8, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid var(--color-border)', borderTop: '2px solid var(--color-text-muted)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                  Saving...
-                </button>
+            </div>
+          </div>
+          {/* Inputs */}
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Form Inputs (Validation States)</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Validation states pair visual styling with explicit helper text labels so status is never color-only.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 420 }}>
+              {/* Default */}
+              <div>
+                <label htmlFor="design-system-input-default" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Default</label>
+                <input id="design-system-input-default" type="text" placeholder="Character name" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+              </div>
+              {/* Focus */}
+              <div>
+                <label htmlFor="design-system-input-focus" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Focus</label>
+                <input id="design-system-input-focus" type="text" defaultValue="Focused narrative prompt" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #312e81', outline: '2px solid #312e81', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+              </div>
+              {/* Error */}
+              <div>
+                <label htmlFor="design-system-input-error" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Error</label>
+                <input id="design-system-input-error" type="text" defaultValue="Scene title already used" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #9f1239', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+                <p style={{ fontSize: 12, marginTop: 4, color: '#9f1239' }}>Error: choose a unique title to continue.</p>
+              </div>
+              {/* Success */}
+              <div>
+                <label htmlFor="design-system-input-success" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Success</label>
+                <input id="design-system-input-success" type="text" defaultValue="Ravenhold Ledger" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #065f46', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
+                <p style={{ fontSize: 12, marginTop: 4, color: '#065f46' }}>Success: title accepted and ready to save.</p>
+              </div>
+              {/* Disabled */}
+              <div>
+                <label htmlFor="design-system-input-disabled" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Disabled</label>
+                <input id="design-system-input-disabled" type="text" defaultValue="Locked while streaming" disabled className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', cursor: 'not-allowed', boxSizing: 'border-box' }} />
               </div>
             </div>
           </div>
-        </SubSection>
 
-        {/* Inputs */}
-        <SubSection title="Form Inputs (Validation States)" description="Validation states pair visual styling with explicit helper text labels so status is never color-only.">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 420 }}>
-            {/* Default */}
-            <div>
-              <label htmlFor="design-system-input-default" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Default</label>
-              <input id="design-system-input-default" type="text" placeholder="Character name" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
-            </div>
-            {/* Focus */}
-            <div>
-              <label htmlFor="design-system-input-focus" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Focus</label>
-              <input id="design-system-input-focus" type="text" defaultValue="Focused narrative prompt" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #312e81', outline: '2px solid #312e81', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
-            </div>
-            {/* Error */}
-            <div>
-              <label htmlFor="design-system-input-error" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Error</label>
-              <input id="design-system-input-error" type="text" defaultValue="Scene title already used" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #9f1239', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
-              <p style={{ fontSize: 12, marginTop: 4, color: '#9f1239' }}>Error: choose a unique title to continue.</p>
-            </div>
-            {/* Success */}
-            <div>
-              <label htmlFor="design-system-input-success" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Success</label>
-              <input id="design-system-input-success" type="text" defaultValue="Ravenhold Ledger" className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface)', border: '1px solid #065f46', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
-              <p style={{ fontSize: 12, marginTop: 4, color: '#065f46' }}>Success: title accepted and ready to save.</p>
-            </div>
-            {/* Disabled */}
-            <div>
-              <label htmlFor="design-system-input-disabled" className="font-system" style={{ display: 'block', fontSize: 12, marginBottom: 8, color: 'var(--color-text-muted)' }}>Disabled</label>
-              <input id="design-system-input-disabled" type="text" defaultValue="Locked while streaming" disabled className="font-interface" style={{ width: '100%', padding: '12px 16px', borderRadius: 2, fontSize: 14, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', cursor: 'not-allowed', boxSizing: 'border-box' }} />
-            </div>
-          </div>
-        </SubSection>
-
-        {/* Badges, Alerts, Cards */}
-        <SubSection title="Badges, Alerts, Cards">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
-            {/* Badges */}
-            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>BADGES</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '2px 8px', fontSize: 12, fontWeight: 600, background: 'rgba(49, 46, 129, 0.15)', color: '#312e81' }}>Fantasy</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '2px 8px', fontSize: 12, fontWeight: 600, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }}>Session 04</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '2px 8px', fontSize: 12, fontWeight: 600, background: 'rgba(6, 95, 70, 0.12)', color: '#065f46' }}>Stable</span>
-              </div>
-            </div>
-
-            {/* Alerts */}
-            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>ALERTS</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14 }}>
-                <div style={{ borderRadius: 2, padding: '8px 12px', background: 'rgba(6, 95, 70, 0.08)', border: '1px solid rgba(6, 95, 70, 0.35)', color: '#065f46' }}>Success: choices updated.</div>
-                <div style={{ borderRadius: 2, padding: '8px 12px', background: 'rgba(146, 64, 14, 0.08)', border: '1px solid rgba(146, 64, 14, 0.35)', color: '#92400e' }}>Warning: low torchlight may affect stealth.</div>
-                <div style={{ borderRadius: 2, padding: '8px 12px', background: 'rgba(159, 18, 57, 0.08)', border: '1px solid rgba(159, 18, 57, 0.35)', color: '#9f1239' }}>Error: outcome save failed.</div>
-              </div>
-            </div>
-
-            {/* Cards */}
-            <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>CARDS</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-                  <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>STANDARD CARD</div>
-                  <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Basic manuscript metadata card.</p>
+          {/* Badges, Alerts, Cards */}
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Badges, Alerts, Cards</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+              {/* Badges */}
+              <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>BADGES</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '2px 8px', fontSize: 12, fontWeight: 600, background: 'rgba(49, 46, 129, 0.15)', color: '#312e81' }}>Fantasy</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '2px 8px', fontSize: 12, fontWeight: 600, background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }}>Session 04</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '2px 8px', fontSize: 12, fontWeight: 600, background: 'rgba(6, 95, 70, 0.12)', color: '#065f46' }}>Stable</span>
                 </div>
-                <div style={{ padding: 16, borderRadius: 2, background: 'rgba(255, 255, 255, 0.9)', border: '1px solid var(--color-border)', backdropFilter: 'blur(12px)' }}>
-                  <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>HUD CARD</div>
-                  <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Floating overlay-compatible card panel.</p>
+              </div>
+              {/* Alerts */}
+              <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>ALERTS</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14 }}>
+                  <div style={{ borderRadius: 2, padding: '8px 12px', background: 'rgba(6, 95, 70, 0.08)', border: '1px solid rgba(6, 95, 70, 0.35)', color: '#065f46' }}>Success: choices updated.</div>
+                  <div style={{ borderRadius: 2, padding: '8px 12px', background: 'rgba(146, 64, 14, 0.08)', border: '1px solid rgba(146, 64, 14, 0.35)', color: '#92400e' }}>Warning: low torchlight may affect stealth.</div>
+                  <div style={{ borderRadius: 2, padding: '8px 12px', background: 'rgba(159, 18, 57, 0.08)', border: '1px solid rgba(159, 18, 57, 0.35)', color: '#9f1239' }}>Error: outcome save failed.</div>
+                </div>
+              </div>
+
+              {/* Cards */}
+              <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 12 }}>CARDS</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ padding: 16, borderRadius: 2, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                    <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>STANDARD CARD</div>
+                    <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Basic manuscript metadata card.</p>
+                  </div>
+                  <div style={{ padding: 16, borderRadius: 2, background: 'rgba(255, 255, 255, 0.9)', border: '1px solid var(--color-border)', backdropFilter: 'blur(12px)' }}>
+                    <div className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>HUD CARD</div>
+                    <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Floating overlay-compatible card panel.</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </SubSection>
-      </Section>
+        </div>
+      </section>
 
       {/* Spinner animation */}
       <style>{`
