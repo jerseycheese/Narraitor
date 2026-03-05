@@ -63,7 +63,7 @@ a[href="#main-content"]:focus {
 }
 
 .text-narrative p {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
 }
 
 .text-narrative p:last-child {
@@ -150,7 +150,7 @@ body > * {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--color-surface);
 }
@@ -160,7 +160,7 @@ body > * {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-1) var(--space-2);
   border: none;
   background: transparent;
   color: var(--color-text-muted);
@@ -173,7 +173,7 @@ body > * {
 }
 
 .dark-mode-toggle-option {
-  padding: 0.25rem 0.375rem;
+  padding: var(--space-1) var(--space-1_5);
 }
 
 .dark-mode-toggle-option svg {
@@ -206,7 +206,7 @@ body > * {
 
 .workshop-sidebar-theme-controls {
   display: flex;
-  gap: 0.375rem;
+  gap: var(--space-1_5);
   flex-wrap: wrap;
 }
 
@@ -239,7 +239,7 @@ body > * {
 }
 
 .devtools-panel h1,
-.devtools-panel h2, 
+.devtools-panel h2,
 .devtools-panel h3,
 .devtools-panel h4,
 .devtools-panel h5,
@@ -330,7 +330,7 @@ body.manuscript-overlay-open {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas: "left right";
   align-items: start;
-  gap: 0.75rem;
+  gap: var(--space-3);
   position: relative;
   z-index: 30;
 }
@@ -345,7 +345,7 @@ body.manuscript-overlay-open {
 .manuscript-header-controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   height: 100%;
 }
 
@@ -370,7 +370,7 @@ body.manuscript-overlay-open {
 
 .manuscript-main-stage {
   display: grid;
-  gap: 1rem;
+  gap: var(--space-4);
   align-items: start;
 }
 
@@ -380,15 +380,15 @@ body.manuscript-overlay-open {
 .manuscript-characters-mobile-bar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   position: sticky;
   top: 0;
   z-index: 5;
   background: var(--color-manuscript-gradient-end);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
-  padding: 0.25rem 0.5rem;
-  margin-bottom: 0.75rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-3);
   min-height: 2.25rem;
 }
 
@@ -405,7 +405,7 @@ body.manuscript-overlay-open {
 .manuscript-characters-mobile-list {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-1);
   overflow-x: auto;
   white-space: nowrap;
   min-width: 0;
@@ -421,7 +421,7 @@ body.manuscript-overlay-open {
 .manuscript-input-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-input-row #manuscript-send {
@@ -433,15 +433,15 @@ body.manuscript-overlay-open {
   background: var(--color-overlay-surface-strong);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-overlay);
-  border-radius: 2px;
-  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
 }
 
 .manuscript-mobile-rail-top-controls {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
 }
 
 .manuscript-mobile-suggested-actions-toggle {
@@ -449,8 +449,8 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 2px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text-primary);
@@ -493,8 +493,8 @@ body.manuscript-overlay-open {
   display: none;
   background: var(--color-overlay-surface);
   border: 1px solid var(--color-border);
-  border-radius: 3px;
-  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
   overflow-y: auto;
 }
 
@@ -577,13 +577,13 @@ body.manuscript-overlay-open {
   overflow-y: auto;
   background: var(--color-overlay-surface-strong);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
-  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
   box-shadow: var(--shadow-overlay);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   top: 100%;
-  margin-top: 0.5rem;
+  margin-top: var(--space-2);
   left: 0;
 }
 
@@ -622,7 +622,7 @@ body.manuscript-overlay-open {
 .manuscript-hud-group {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .manuscript-hud-group-right {
@@ -632,7 +632,7 @@ body.manuscript-overlay-open {
 .manuscript-hud-stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-hud-controls,
@@ -640,15 +640,15 @@ body.manuscript-overlay-open {
 .manuscript-hud-right-controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-hud-text-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.375rem 0.625rem;
-  border-radius: 2px;
+  padding: var(--space-1_5) var(--space-2_5);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-overlay-surface);
   color: var(--color-text-secondary);
@@ -683,7 +683,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-tools-menu-heading {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-2);
   padding: 0;
   font-size: 0.625rem;
   font-family: var(--font-system);
@@ -698,14 +698,14 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-tools-menu-items > * + * {
-  margin-top: 0.5rem;
+  margin-top: var(--space-2);
 }
 
 .manuscript-tools-menu-item {
   display: inline-block;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border-radius: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text-primary);
@@ -755,17 +755,17 @@ body.manuscript-overlay-open {
 
 .manuscript-tools-menu-divider {
   border-top: 1px solid var(--color-border);
-  margin: 0.5rem 0;
+  margin: var(--space-2) 0;
 }
 
 .manuscript-characters-rail-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-characters-rail-label {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-2);
   padding: 0;
   font-size: 11px;
   font-family: var(--font-system);
@@ -778,15 +778,15 @@ body.manuscript-overlay-open {
 .manuscript-characters-rail-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .manuscript-character-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 2px;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
   background: var(--color-surface-hover);
   border: 1px solid var(--color-border);
   font-size: 0.75rem;
@@ -812,8 +812,8 @@ body.manuscript-overlay-open {
   overflow: auto;
   background: var(--color-overlay-surface-strong);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
-  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
   box-shadow: var(--shadow-overlay);
 }
 
@@ -822,7 +822,7 @@ body.manuscript-overlay-open {
 .manuscript-action-rail-stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
   min-width: 0;
 }
 
@@ -830,14 +830,14 @@ body.manuscript-overlay-open {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .manuscript-warning-action-button {
   display: inline-flex;
   align-items: center;
-  padding: 0.5rem 0.75rem;
-  border-radius: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
   background: var(--color-warning-soft);
   border: 1px solid var(--color-warning-border);
   color: var(--color-warning);
@@ -864,10 +864,10 @@ body.manuscript-overlay-open {
 .manuscript-session-action-button {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
   border: 1px solid transparent;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -905,7 +905,7 @@ body.manuscript-overlay-open {
 .manuscript-choice-selector-body {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-context-summary {
@@ -927,8 +927,8 @@ body.manuscript-overlay-open {
 .manuscript-custom-input {
   width: 100%;
   height: 2.375rem;
-  padding: 0 0.5rem;
-  border-radius: 2px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text-primary);
@@ -951,7 +951,7 @@ body.manuscript-overlay-open {
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   min-width: 5.25rem;
 }
 
@@ -969,8 +969,8 @@ body.manuscript-overlay-open {
   align-items: center;
   justify-content: center;
   border: 0;
-  border-radius: 2px;
-  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
   background: var(--color-accent);
   color: hsl(0deg 0% 100%);
   font-family: var(--font-interface), system-ui, sans-serif;
@@ -1001,7 +1001,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-suggested-actions-heading {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-2);
   font-size: 0.875rem;
   font-family: var(--font-interface), system-ui, sans-serif;
   font-weight: 600;
@@ -1011,19 +1011,19 @@ body.manuscript-overlay-open {
 .manuscript-suggested-actions-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-suggested-actions-grid .manuscript-suggested-action {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-2);
   width: 100%;
   text-align: left;
   height: 4.125rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 2px;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
@@ -1049,24 +1049,24 @@ body.manuscript-overlay-open {
 .manuscript-journal-snapshot-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .manuscript-journal-snapshot-entry {
-  padding: 0.875rem;
+  padding: var(--space-3_5);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-journal-snapshot-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-journal-snapshot-title {
@@ -1080,7 +1080,7 @@ body.manuscript-overlay-open {
 
 .manuscript-journal-snapshot-badges {
   display: flex;
-  gap: 0.25rem;
+  gap: var(--space-1);
   flex-shrink: 0;
 }
 
@@ -1090,8 +1090,8 @@ body.manuscript-overlay-open {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.125rem 0.375rem;
-  border-radius: 2px;
+  padding: var(--space-0_5) var(--space-1_5);
+  border-radius: var(--radius-sm);
   background: var(--color-surface-hover);
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
@@ -1129,20 +1129,20 @@ body.manuscript-overlay-open {
   font-size: 0.875rem;
   color: var(--color-text-muted);
   text-align: center;
-  padding: 2rem 1rem;
+  padding: var(--space-8) var(--space-4);
 }
 
 /* Story Summary Drawer */
 .manuscript-story-summary {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .manuscript-story-summary-body {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .manuscript-story-summary-paragraph {
@@ -1186,13 +1186,13 @@ body.manuscript-overlay-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: var(--space-4);
 }
 
 .manuscript-end-story-dialog {
   background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   width: min(100%, 28rem);
   box-shadow: var(--shadow-overlay);
   display: flex;
@@ -1201,7 +1201,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-end-story-header {
-  padding: 1.25rem;
+  padding: var(--space-5);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -1214,7 +1214,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-end-story-body {
-  padding: 1.25rem;
+  padding: var(--space-5);
 }
 
 .manuscript-end-story-message {
@@ -1226,16 +1226,16 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-end-story-footer {
-  padding: 1rem 1.25rem;
+  padding: var(--space-4) var(--space-5);
   background: var(--color-surface-hover);
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .manuscript-end-story-cancel {
-  padding: 0.5rem 1rem;
+  padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text-secondary);
@@ -1246,7 +1246,7 @@ body.manuscript-overlay-open {
   letter-spacing: 0.05em;
   cursor: pointer;
   transition: all 120ms ease;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .manuscript-end-story-cancel:hover {
@@ -1255,7 +1255,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-end-story-confirm {
-  padding: 0.5rem 1rem;
+  padding: var(--space-2) var(--space-4);
   border: 1px solid transparent;
   background: var(--color-danger);
   color: rgb(255 255 255);
@@ -1266,7 +1266,7 @@ body.manuscript-overlay-open {
   letter-spacing: 0.05em;
   cursor: pointer;
   transition: all 120ms ease;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .manuscript-end-story-confirm:hover {
@@ -1282,7 +1282,7 @@ body.manuscript-overlay-open {
 
   justify-content: space-between;
 
-  gap: 0.5rem;
+  gap: var(--space-2);
 
   min-width: 0;
 
@@ -1298,7 +1298,7 @@ body.manuscript-overlay-open {
 
   align-items: center;
 
-  gap: 0.25rem;
+  gap: var(--space-1);
 
   min-width: 0;
 
@@ -1370,7 +1370,7 @@ body.manuscript-overlay-open {
 
 
 
-  gap: 0.25rem;
+  gap: var(--space-1);
 
 
 
@@ -1406,7 +1406,7 @@ body.manuscript-overlay-open {
 
 
 
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
 
 
 
@@ -1414,7 +1414,7 @@ body.manuscript-overlay-open {
 
 
 
-  padding: 0.125rem 0.375rem;
+  padding: var(--space-0_5) var(--space-1_5);
 
 
 
@@ -1563,22 +1563,22 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-secondary-controls {
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
   border-top: 1px solid var(--color-border);
 }
 
 .manuscript-support-sections {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .manuscript-support-section {
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   background: var(--color-overlay-surface);
-  padding: 0.75rem;
+  padding: var(--space-3);
 }
 
 .manuscript-support-section-journal {
@@ -1590,8 +1590,8 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--color-border);
-  border-radius: 2px;
-  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
   background: var(--color-surface);
   color: var(--color-text-primary);
   cursor: pointer;
@@ -1611,7 +1611,7 @@ body.manuscript-overlay-open {
 .manuscript-journal-button-label {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-1);
   font-family: var(--font-interface), system-ui, sans-serif;
   font-size: 0.875rem;
 }
@@ -1643,7 +1643,7 @@ body.manuscript-overlay-open {
   border-color: var(--color-border);
   background: var(--color-surface);
   overflow-y: visible;
-  padding: 1rem;
+  padding: var(--space-4);
   pointer-events: auto;
   animation: manuscript-slide-in-right 220ms ease;
 }
@@ -1664,14 +1664,14 @@ body.manuscript-overlay-open {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  margin: 0 0 1rem;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-4);
 }
 
 .manuscript-drawer-header-titles {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
   min-width: 0;
 }
 
@@ -1693,8 +1693,8 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-drawer-close-text {
-  padding: 0.25rem 0.5rem;
-  border-radius: 2px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-surface-hover);
   color: var(--color-text-secondary);
@@ -1726,24 +1726,24 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-drawer-content > * + * {
-  margin-top: 0.75rem;
+  margin-top: var(--space-3);
 }
 
 .manuscript-drawer-panel-section {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 @media (width >= 640px) {
   .manuscript-drawer-panel {
-    padding: 1.5rem;
+    padding: var(--space-6);
   }
 }
 
 .manuscript-character-summary {
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   background: var(--color-surface);
   overflow: hidden;
 }
@@ -1757,8 +1757,8 @@ body.manuscript-overlay-open {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.75rem;
+  gap: var(--space-3);
+  padding: var(--space-3);
   cursor: pointer;
 }
 
@@ -1767,7 +1767,7 @@ body.manuscript-overlay-open {
   width: 80px;
   height: 80px;
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-surface-hover);
   flex-shrink: 0;
@@ -1794,7 +1794,7 @@ body.manuscript-overlay-open {
 .manuscript-character-summary-identity {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   min-width: 0;
 }
 
@@ -1819,15 +1819,15 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-character-summary-level {
-  margin: 0.125rem 0 0;
+  margin: var(--space-0_5) 0 0;
   font-size: 0.75rem;
   color: var(--color-text-secondary);
 }
 
 .manuscript-character-summary-toggle {
   border: 1px solid var(--color-border);
-  border-radius: 2px;
-  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
   background: var(--color-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -1841,11 +1841,11 @@ body.manuscript-overlay-open {
 
 .manuscript-character-summary-details {
   border-top: 1px solid var(--color-border);
-  padding: 0.75rem;
+  padding: var(--space-3);
 }
 
 .manuscript-character-summary-history {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-3);
   color: var(--color-text-secondary);
   font-size: 0.875rem;
   line-height: 1.45;
@@ -1854,7 +1854,7 @@ body.manuscript-overlay-open {
 .manuscript-character-summary-columns {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .manuscript-character-summary-column {
@@ -1862,7 +1862,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-character-summary-subheading {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-2);
   font-size: 0.8125rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1873,14 +1873,14 @@ body.manuscript-overlay-open {
 .manuscript-character-summary-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-character-summary-item {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-character-summary-item-stack {
@@ -1907,7 +1907,7 @@ body.manuscript-overlay-open {
 
 /* Manuscript Inventory Styling */
 .manuscript-inventory-category-group {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8);
 }
 
 .manuscript-inventory-category-title {
@@ -1918,14 +1918,14 @@ body.manuscript-overlay-open {
   letter-spacing: 0.1em;
   color: var(--color-text-muted);
   border-bottom: 1px solid var(--color-border);
-  padding-bottom: 0.5rem;
-  margin-bottom: 1rem;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-4);
 }
 
 .manuscript-inventory-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 @media (width >= 640px) {
@@ -1937,10 +1937,10 @@ body.manuscript-overlay-open {
 .manuscript-inventory-item {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   transition: border-color 0.15s ease;
 }
 
@@ -1952,7 +1952,7 @@ body.manuscript-overlay-open {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
 }
 
 .manuscript-inventory-item-name {
@@ -1973,7 +1973,7 @@ body.manuscript-overlay-open {
   font-size: 0.8125rem;
   line-height: 1.5;
   color: var(--color-text-secondary);
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
   flex-grow: 1;
 }
 
@@ -1982,7 +1982,7 @@ body.manuscript-overlay-open {
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding-top: 0.75rem;
+  padding-top: var(--space-3);
   border-top: 1px dashed var(--color-border);
 }
 
@@ -1996,16 +1996,16 @@ body.manuscript-overlay-open {
 
 .manuscript-inventory-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 /* Manuscript Choice History Styling */
 .manuscript-choice-history-entry {
-  padding: 1rem;
+  padding: var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
-  margin-bottom: 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
 }
 
 .manuscript-choice-history-entry:last-child {
@@ -2017,15 +2017,15 @@ body.manuscript-overlay-open {
   font-weight: 600;
   font-size: 0.9375rem;
   color: var(--color-text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
 }
 
 .manuscript-choice-history-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--space-2);
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
 }
 
 .manuscript-choice-history-meta-item {
@@ -2034,9 +2034,9 @@ body.manuscript-overlay-open {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
-  padding: 0.125rem 0.375rem;
+  padding: var(--space-0_5) var(--space-1_5);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .manuscript-choice-history-outcome {
@@ -2045,8 +2045,8 @@ body.manuscript-overlay-open {
   line-height: 1.5;
   color: var(--color-text-secondary);
   border-left: 2px solid var(--color-border);
-  padding-left: 0.75rem;
-  margin-top: 0.75rem;
+  padding-left: var(--space-3);
+  margin-top: var(--space-3);
 }
 
 .manuscript-choice-history-details {
@@ -2055,9 +2055,9 @@ body.manuscript-overlay-open {
   line-height: 1.4;
   color: var(--color-text-muted);
   background: var(--color-surface-hover);
-  padding: 0.75rem;
-  border-radius: 2px;
-  margin-top: 0.5rem;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-2);
   border: 1px dashed var(--color-border);
 }
 
@@ -2066,21 +2066,21 @@ body.manuscript-overlay-open {
 .save-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   background: var(--color-overlay-surface);
 }
 
 .save-indicator-compact {
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-1) var(--space-2);
 }
 
 .save-indicator-status {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-1);
   min-width: 0;
 }
 
@@ -2110,8 +2110,8 @@ body.manuscript-overlay-open {
 
 .save-indicator-button {
   border: 1px solid var(--color-border);
-  border-radius: 2px;
-  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
   font-size: 0.75rem;
   font-family: var(--font-interface), system-ui, sans-serif;
   background: var(--color-surface);
@@ -2135,15 +2135,15 @@ body.manuscript-overlay-open {
   }
 
   .manuscript-hud-right-controls {
-    gap: 0.25rem;
+    gap: var(--space-1);
   }
 
   #manuscript-action-rail {
-    padding: 12px;
+    padding: var(--space-3);
   }
 
   .manuscript-warning-action-button {
-    padding: 0.5rem 0.75rem;
+    padding: var(--space-2) var(--space-3);
     height: 2rem;
     font-size: 0.75rem;
   }
@@ -2167,11 +2167,11 @@ body.manuscript-overlay-open {
   }
 
   #manuscript-action-rail {
-    padding: 16px;
+    padding: var(--space-4);
   }
 
   .manuscript-warning-action-button {
-    padding: 0.5rem 0.75rem;
+    padding: var(--space-2) var(--space-3);
     height: 2rem;
     font-size: 0.75rem;
   }
@@ -2187,7 +2187,7 @@ body.manuscript-overlay-open {
   }
 
   .manuscript-header-controls {
-    gap: 0.25rem;
+    gap: var(--space-1);
   }
 
   .manuscript-hud-text-button {
@@ -2217,7 +2217,7 @@ body.manuscript-overlay-open {
   }
 
   #manuscript-action-rail {
-    padding: 1rem;
+    padding: var(--space-4);
   }
 
   .manuscript-suggested-actions-grid {
@@ -2284,7 +2284,7 @@ body.manuscript-overlay-open {
 .manuscript-character-snapshot {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .component-character-portrait {
@@ -2309,7 +2309,7 @@ body.manuscript-overlay-open {
   width: 80px;
   height: 80px;
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-surface-hover);
 }
@@ -2327,7 +2327,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-hud-panel-title {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-2);
   font-family: var(--font-system), ui-monospace, monospace;
   font-size: 0.6875rem;
   font-weight: 400;
@@ -2339,7 +2339,7 @@ body.manuscript-overlay-open {
 .manuscript-character-snapshot-identity {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .manuscript-character-snapshot-name {
@@ -2359,13 +2359,13 @@ body.manuscript-overlay-open {
 .manuscript-character-snapshot-stats {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .manuscript-character-snapshot-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .manuscript-character-snapshot-subheading {
@@ -2381,7 +2381,7 @@ body.manuscript-overlay-open {
 .manuscript-character-snapshot-list {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .manuscript-character-snapshot-item {
@@ -2403,8 +2403,8 @@ body.manuscript-overlay-open {
 
 /* Choice Outcome Callout */
 .choice-outcome-callout {
-  border-radius: 2px;
-  padding: 1rem;
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
   border-left: 4px solid var(--color-accent);
   background: var(--color-accent-soft);
 }
@@ -2412,7 +2412,7 @@ body.manuscript-overlay-open {
 .choice-outcome-label {
   font-family: var(--font-system), ui-monospace, monospace;
   font-size: 0.75rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
   color: var(--color-accent);
   text-transform: uppercase;
   letter-spacing: 0.05em;
