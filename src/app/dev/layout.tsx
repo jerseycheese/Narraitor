@@ -11,7 +11,7 @@ export default function DevLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isDesignSystem = pathname === '/dev/design-system';
+  const isDesignSystem = pathname === '/dev/design-system' || pathname === '/dev/design-system-2' || pathname === '/dev/design-system-3';
 
   if (process.env.NODE_ENV === 'production') {
     notFound();
