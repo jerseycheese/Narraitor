@@ -51,11 +51,19 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<DesignSystem>(readStoredTheme);
-  const [colorScheme, setColorSchemeState] = useState<ColorScheme>(readStoredColorScheme);
-  const [systemPreference, setSystemPreference] = useState<'light' | 'dark'>(getSystemPreference);
+  // Initialize with defaults to match server render (FOUC script handles visual)
+  const [theme, setThemeState] = useState<DesignSystem>(DEFAULT_THEME);
+  const [colorScheme, setColorSchemeState] = useState<ColorScheme>(DEFAULT_COLOR_SCHEME);
+  const [systemPreference, setSystemPreference] = useState<'light' | 'dark'>('light');
 
   const resolvedColorScheme = colorScheme === 'system' ? systemPreference : colorScheme;
+
+  // Sync React state from localStorage after hydration
+  useEffect(() => {
+    setThemeState(readStoredTheme());
+    setColorSchemeState(readStoredColorScheme());
+    setSystemPreference(getSystemPreference());
+  }, []);
 
   // Apply theme attribute to <html>
   useEffect(() => {
