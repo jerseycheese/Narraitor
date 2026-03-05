@@ -182,9 +182,8 @@ export const QuickSetup = () => {
     <Button
       onClick={handleQuickSetup}
       disabled={isGenerating}
-      variant="default"
+      variant="success"
       size="sm"
-      className="bg-green-600 hover:bg-green-700 text-white"
     >
       {isGenerating ? 'Generating...' : '⚡ Quick Setup (World + Character)'}
     </Button>
