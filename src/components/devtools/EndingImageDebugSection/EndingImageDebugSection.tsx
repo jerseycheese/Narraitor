@@ -8,6 +8,7 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding, EndingTone, EndingType } from '@/types/narrative.types';
 import { capitalize, getTimestamp } from '@/lib/utils';
+import { endingTones } from '@/lib/design-tokens/tokens/contextual';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -197,20 +198,10 @@ export function EndingImageDebugSection() {
     return `ending-screen ending-${tone}`;
   };
 
-  // Get tone mapping for CSS classes
+  // Get tone background color from design tokens
   const getToneBackgroundColor = (tone: EndingTone) => {
-    switch (tone) {
-      case 'triumphant':
-        return '#f59e0b'; // amber-500
-      case 'mysterious':
-        return '#374151'; // gray-700
-      case 'tragic':
-        return '#b91c1c'; // red-700
-      case 'hopeful':
-        return '#22c55e'; // green-500
-      default:
-        return '#6b7280'; // gray-500
-    }
+    const toneConfig = endingTones[tone as keyof typeof endingTones];
+    return toneConfig?.background ?? '#6b7280';
   };
 
   const currentCharacter = currentEnding ? characters[currentEnding.characterId] : (Object.values(characters) as Character[])[0];

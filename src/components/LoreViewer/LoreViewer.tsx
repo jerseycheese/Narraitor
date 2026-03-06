@@ -39,11 +39,11 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
     rules: 'World Rules'
   };
 
-  const categoryColors: Record<LoreCategory, string> = {
-    characters: 'bg-lore-characters-bg',
-    locations: 'bg-lore-locations-bg',
-    events: 'bg-lore-events-bg',
-    rules: 'bg-lore-rules-bg'
+  const categoryBackgrounds: Record<LoreCategory, string> = {
+    characters: 'hsl(var(--lore-characters-bg))',
+    locations: 'hsl(var(--lore-locations-bg))',
+    events: 'hsl(var(--lore-events-bg))',
+    rules: 'hsl(var(--lore-rules-bg))'
   };
 
   if (facts.length === 0) {
@@ -64,7 +64,7 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
         if (!categoryFacts || categoryFacts.length === 0) return null;
 
         return (
-          <div key={category} className={`${categoryColors[category]}`}>
+          <div key={category} data-testid={`lore-category-${category}`} style={{ background: categoryBackgrounds[category] }}>
             <h4>{categoryLabels[category]}</h4>
             <ul>
               {categoryFacts.map(fact => (
