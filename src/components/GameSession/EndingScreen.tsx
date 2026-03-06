@@ -378,7 +378,7 @@ export function EndingScreen() {
           {/* Epilogue */}
           <section>
             <SectionWrapper title="Epilogue">
-              <div className="prose prose-gray dark:prose-invert">
+              <div className="manuscript-ending-prose">
                 {currentEnding.epilogue}
               </div>
             </SectionWrapper>
@@ -388,7 +388,7 @@ export function EndingScreen() {
             {/* Character Legacy */}
             <section>
               <SectionWrapper title="Character Legacy">
-                <div className="prose prose-gray dark:prose-invert">
+                <div className="manuscript-ending-prose">
                   {currentEnding.characterLegacy}
                 </div>
               </SectionWrapper>
@@ -430,7 +430,7 @@ export function EndingScreen() {
           {/* World Impact */}
           <section>
             <SectionWrapper title="Impact on the World">
-              <div className="prose prose-gray dark:prose-invert">
+              <div className="manuscript-ending-prose">
                 {currentEnding.worldImpact}
               </div>
             </SectionWrapper>
@@ -441,7 +441,7 @@ export function EndingScreen() {
             <CollapsibleSection title="Your Story" initialCollapsed={true}>
               <div>
                 {fullStory ? (
-                  <div className="prose prose-gray dark:prose-invert">
+                  <div className="manuscript-ending-prose">
                     {fullStory.split(/\n{2,}/).map((paragraph, index) => (
                       <p key={`story-paragraph-${index}`}>{paragraph.trim()}</p>
                     ))}

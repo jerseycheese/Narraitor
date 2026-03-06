@@ -12,20 +12,20 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
   className = '',
 }) => {
   return (
-    <div 
-      data-testid="game-session-skeleton" 
-      className={cssClasses("relative min-h-screen flex flex-col bg-background", className)}
+    <div
+      data-testid="game-session-skeleton"
+      className={cssClasses("manuscript-skeleton-viewport", className)}
     >
       {/* Floating HUD Skeleton */}
-      <div className="fixed top-0 left-0 right-0 z-50 p-4 flex justify-between">
-        <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
-        <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+      <div className="manuscript-skeleton-header">
+        <div className="manuscript-skeleton-avatar manuscript-skeleton-pulse" />
+        <div className="manuscript-skeleton-avatar manuscript-skeleton-pulse" />
       </div>
 
       {/* Main Narrative Stage Skeleton */}
-      <main className="flex-grow flex flex-col items-center px-4 pt-20 pb-40">
-        <div className="w-full max-w-3xl space-y-8">
-          <div className="space-y-4">
+      <main className="manuscript-skeleton-body">
+        <div className="manuscript-skeleton-content">
+          <div className="manuscript-skeleton-paragraph">
             <LoadingSkeleton
               skeletonLines={6}
               size="md"
@@ -33,7 +33,7 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
               centered={false}
             />
           </div>
-          <div className="space-y-4">
+          <div className="manuscript-skeleton-paragraph">
             <LoadingSkeleton
               skeletonLines={4}
               size="md"
@@ -45,15 +45,15 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
       </main>
 
       {/* Docked Action Rail Skeleton */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-t border-border p-4 md:p-6">
-        <div className="max-w-3xl mx-auto space-y-4">
-          <div className="h-6 w-1/3 bg-muted animate-pulse rounded" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="manuscript-skeleton-footer">
+        <div className="manuscript-skeleton-footer-content">
+          <div className="manuscript-skeleton-prompt manuscript-skeleton-pulse" />
+          <div className="manuscript-skeleton-choice-grid">
             {[1, 2].map((i) => (
-              <div key={i} className="h-12 bg-muted animate-pulse rounded-lg" />
+              <div key={i} className="manuscript-skeleton-choice manuscript-skeleton-pulse" />
             ))}
           </div>
-          <div className="h-14 w-full bg-muted animate-pulse rounded-md" />
+          <div className="manuscript-skeleton-input manuscript-skeleton-pulse" />
         </div>
       </div>
     </div>

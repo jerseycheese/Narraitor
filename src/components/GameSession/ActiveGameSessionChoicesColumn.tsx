@@ -72,7 +72,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
   const resolvedInputActions = isProgressiveDisclosureEnabled ? (
     <>
       {inputActions}
-      <span className="hidden lg:inline-flex">{renderEndStoryAction()}</span>
+      <span className="manuscript-end-story-desktop">{renderEndStoryAction()}</span>
     </>
   ) : (
     inputActions
@@ -83,7 +83,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
       <div className="player-choices-container" data-tutorial={dataTutorial}>
         {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}
         {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && !hidePrompt && (
-          <p className="manuscript-context-summary mb-1.5 px-1">
+          <p className="manuscript-context-summary">
             {currentDecision.contextSummary}
           </p>
         )}
@@ -101,7 +101,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
                 ? 'Hide Suggested Actions'
                 : 'Suggested Actions'}
             </button>
-            <span className="lg:hidden">{renderEndStoryAction()}</span>
+            <span className="manuscript-end-story-mobile">{renderEndStoryAction()}</span>
           </div>
         )}
 
@@ -128,23 +128,23 @@ const ActiveGameSessionChoicesColumn: React.FC<
           )
         ) : (
           !hideChoices && (
-            <div className="choice-selector manuscript-choice-selector animate-pulse">
+            <div className="choice-selector manuscript-choice-selector manuscript-choices-skeleton">
               <div className="manuscript-choice-selector-body">
                 {/* Choice prompt skeleton */}
-                {!hidePrompt && <div className="manuscript-choice-prompt bg-muted rounded h-6 w-3/4 mb-4" />}
+                {!hidePrompt && <div className="manuscript-choices-skeleton-prompt manuscript-skeleton-pulse" />}
 
                 {/* Choice buttons skeleton */}
                 <div className="manuscript-suggested-actions-grid">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="manuscript-suggested-action bg-muted rounded h-[4.125rem]" />
+                    <div key={i} className="manuscript-choices-skeleton-action manuscript-skeleton-pulse" />
                   ))}
                 </div>
 
                 {/* Custom input skeleton */}
                 {!hideCustomInput && (
-                  <div className="manuscript-input-row mt-4">
-                    <div className="manuscript-custom-input bg-muted rounded flex-1" />
-                    <div className="manuscript-send-button bg-muted rounded w-16" />
+                  <div className="manuscript-choices-skeleton-input-row">
+                    <div className="manuscript-choices-skeleton-input manuscript-skeleton-pulse" />
+                    <div className="manuscript-choices-skeleton-send manuscript-skeleton-pulse" />
                   </div>
                 )}
               </div>

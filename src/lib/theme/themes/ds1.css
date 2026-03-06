@@ -19,6 +19,7 @@
   --color-text-primary: rgb(17 17 17);
   --color-text-secondary: rgb(63 63 70);
   --color-text-muted: rgb(113 113 122);
+  --color-text-inverse: rgb(255 255 255);
 
   /* Mechanical Accent - Archival Ink Blue */
   --color-accent: rgb(49 46 129);
@@ -146,6 +147,7 @@
   --color-text-primary: rgb(250 250 250);
   --color-text-secondary: rgb(212 212 216);
   --color-text-muted: rgb(113 113 122);
+  --color-text-inverse: rgb(255 255 255);
 
   --color-accent: rgb(129 140 248);
   --color-accent-hover: rgb(165 180 252);

@@ -104,8 +104,14 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
         const headerRect = header.getBoundingClientRect();
         const actionRailRect = actionRailElement.getBoundingClientRect();
         const mainStageRect = mainStage.getBoundingClientRect();
+
+        // Visual breathing room between fixed-position panels.
+        // This is a layout geometry constant (not a design token) because it
+        // governs runtime overlap prevention, not themeable appearance.
         const gapPx = 8;
 
+        // Subtract 3x the gap to account for spacing above the character panel,
+        // between the character and tools panels, and below the tools panel.
         const availableSpace = actionRailRect.top - headerRect.bottom - (gapPx * 3);
         const halfSpace = Math.floor(availableSpace / 2);
         const panelTop = headerRect.bottom + gapPx;
@@ -198,7 +204,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           </header>
 
           {/* Main Narrative Stage */}
-          <main className="manuscript-overlay-main pb-4">
+          <main className="manuscript-overlay-main">
             {mobileTopContent}
 
             <div className={cssClasses("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
@@ -213,7 +219,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
                 )}
 
                 <div className="manuscript-main-content">
-                  <div className="max-w-3xl mx-auto">
+                  <div className="manuscript-main-content-inner">
                     {children}
                   </div>
                 </div>
