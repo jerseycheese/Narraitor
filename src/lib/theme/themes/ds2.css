@@ -112,6 +112,7 @@
   --color-manuscript-gradient-end: rgb(245 241 232 / 92%);
   --color-scrim: rgb(45 37 32 / 35%);
   --shadow-overlay: 0 8px 24px rgb(45 37 32 / 8%);
+  --shadow-drawer: -12px 0 24px rgb(45 37 32 / 8%);
   --color-danger: rgb(185 28 28);
   --color-danger-hover: rgb(153 27 27);
 
@@ -228,6 +229,7 @@
   --color-manuscript-gradient-end: rgb(34 30 27 / 92%);
   --color-scrim: rgb(0 0 0 / 50%);
   --shadow-overlay: 0 8px 24px rgb(0 0 0 / 40%);
+  --shadow-drawer: -12px 0 24px rgb(0 0 0 / 40%);
   --color-danger: rgb(239 68 68);
   --color-danger-hover: rgb(220 38 38);
 
