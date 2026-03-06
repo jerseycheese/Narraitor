@@ -5,7 +5,7 @@
       "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen", "layer"]
     }],
     "color-no-hex": true,
-    "color-named": "never", 
+    "color-named": "never",
     "function-disallowed-list": [
       "rgb",
       "rgba"
@@ -49,13 +49,14 @@
       "coverage/**/*",
       "**/*.test.css",
       "**/*.spec.css",
-      "public_docs/**/*"
+      "public_docs/**/*",
+      "src/app/dev/**/*.css"
     ],
     "overrides": [
       {
         "files": ["src/app/globals.css"],
         "rules": {
-          "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "min", "max", "clamp", "minmax", "rgb", "rgba", "blur"],
+          "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "min", "max", "clamp", "minmax", "rgb", "rgba", "blur", "cubic-bezier", "repeat"],
           "function-disallowed-list": [],
           "declaration-property-value-disallowed-list": {
             "/^(background|border|color|fill|stroke|outline|text-decoration|box-shadow).*$/": [
@@ -64,7 +65,15 @@
             ]
           }
         }
+      },
+      {
+        "files": ["src/lib/theme/themes/*.css"],
+        "rules": {
+          "function-allowed-list": ["hsl", "hsla", "var", "calc", "rgb", "rgba", "linear-gradient", "radial-gradient"],
+          "function-disallowed-list": [],
+          "color-no-hex": null,
+          "declaration-property-value-disallowed-list": null
+        }
       }
     ]
   }
-  

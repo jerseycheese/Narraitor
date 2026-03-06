@@ -14,7 +14,7 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: var(--space-4);
 }
 
 .app-surface-workshop {
@@ -40,30 +40,30 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem 0.75rem;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-3);
 }
 
 .workshop-sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0 0.25rem 0.5rem;
+  gap: var(--space-2);
+  padding: 0 var(--space-1) var(--space-2);
   border-bottom: 1px solid var(--color-border);
 }
 
 .workshop-sidebar-brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   text-decoration: none;
 }
 
 .workshop-sidebar-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .workshop-sidebar-section-grow {
@@ -89,7 +89,7 @@
 .workshop-world-list {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .workshop-workspace {
@@ -121,7 +121,7 @@
   width: 100%;
   max-width: 1024px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: var(--space-4);
 }
 
 .app-surface-workshop h1,
@@ -151,7 +151,7 @@
 
 @media (width < 768px) {
   .default-surface-inner {
-    padding: 0.75rem;
+    padding: var(--space-3);
   }
 
   .app-surface-workshop {
@@ -187,11 +187,11 @@
   .workshop-mobile-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     position: sticky;
     top: 0;
     z-index: 20;
-    padding: 0.75rem 1rem;
+    padding: var(--space-3) var(--space-4);
     background: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
   }
@@ -207,6 +207,6 @@
 
 @media (width >= 1024px) {
   .default-surface-inner {
-    padding: 1.5rem;
+    padding: var(--space-6);
   }
 }

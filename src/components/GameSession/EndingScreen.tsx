@@ -300,7 +300,7 @@ export function EndingScreen() {
         Story Complete: {currentEnding.tone} ending
       </div>
 
-      <div className="ending-screen-container" data-testid="ending-screen">
+      <div data-testid="ending-screen">
         {/* Hero Section: Combined Header with Image */}
         <section aria-label="Story ending">
           {isGeneratingImage ? (

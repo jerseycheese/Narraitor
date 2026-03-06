@@ -80,6 +80,21 @@ jest.mock('../MobileNavigationMenu', () => ({
   MobileNavigationMenu: () => <div data-testid="mobile-menu">Mobile Menu</div>,
 }));
 
+jest.mock('@/lib/theme', () => ({
+  useTheme: () => ({
+    theme: 'ds1',
+    colorScheme: 'light',
+    resolvedColorScheme: 'light',
+    setTheme: jest.fn(),
+    setColorScheme: jest.fn(),
+  }),
+  THEMES: [
+    { id: 'ds1', name: 'Drafting Table', description: 'test' },
+    { id: 'ds2', name: 'Warm Earth', description: 'test' },
+    { id: 'ds3', name: 'Mechanical Manuscript', description: 'test' },
+  ],
+}));
+
 describe('HeaderNavigation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -146,6 +161,15 @@ describe('HeaderNavigation', () => {
     });
   });
 
+  describe('Theme Controls', () => {
+    it('renders theme switcher and dark mode toggle', () => {
+      render(<HeaderNavigation />);
+
+      expect(screen.getByRole('radiogroup', { name: 'Design system theme' })).toBeInTheDocument();
+      expect(screen.getByRole('radiogroup', { name: 'Color scheme' })).toBeInTheDocument();
+    });
+  });
+
   describe('SidebarNavigation', () => {
     it('renders core workshop navigation affordances', () => {
       render(<SidebarNavigation />);
@@ -156,6 +180,13 @@ describe('HeaderNavigation', () => {
       expect(screen.getByText('Worlds')).toBeInTheDocument();
       expect(screen.getByText('Characters')).toBeInTheDocument();
       expect(screen.getByText('Settings')).toBeInTheDocument();
+    });
+
+    it('renders theme controls in sidebar', () => {
+      render(<SidebarNavigation />);
+
+      expect(screen.getByRole('radiogroup', { name: 'Design system theme' })).toBeInTheDocument();
+      expect(screen.getByRole('radiogroup', { name: 'Color scheme' })).toBeInTheDocument();
     });
   });
 });

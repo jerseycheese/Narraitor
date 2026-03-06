@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { TutorialMenu } from './TutorialMenu';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { DarkModeToggle } from './DarkModeToggle';
 import dynamic from 'next/dynamic';
 
 const RecentPagesDropdown = dynamic(
@@ -127,6 +129,11 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
 
       <div className="workshop-sidebar-section workshop-sidebar-section-grow">
         <RecentPagesDropdown />
+      </div>
+
+      <div className="workshop-sidebar-section workshop-sidebar-theme-controls">
+        <ThemeSwitcher compact />
+        <DarkModeToggle compact />
       </div>
 
       <div className="workshop-sidebar-section">
