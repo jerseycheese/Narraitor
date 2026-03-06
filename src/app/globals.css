@@ -1638,7 +1638,7 @@ body.manuscript-overlay-open {
 .manuscript-drawer-panel-right {
   right: 0;
   border-left: 1px solid var(--color-border);
-  box-shadow: -12px 0 24px rgb(0 0 0 / 15%);
+  box-shadow: var(--shadow-drawer);
 }
 
 .manuscript-drawer-panel-left {
