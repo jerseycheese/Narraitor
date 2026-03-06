@@ -549,14 +549,14 @@ body.manuscript-overlay-open {
 .manuscript-suggested-action[aria-pressed="true"] {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: hsl(0deg 0% 100%);
+  color: rgb(255 255 255);
 }
 
 .manuscript-suggested-action.is-selected:hover,
 .manuscript-suggested-action[aria-pressed="true"]:hover {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
-  color: hsl(0deg 0% 100%);
+  color: rgb(255 255 255);
 }
 
 .manuscript-suggested-action:active {
@@ -729,7 +729,7 @@ body.manuscript-overlay-open {
 .manuscript-tools-menu-item-active {
   background: var(--color-accent);
   border: none;
-  color: hsl(0deg 0% 100%);
+  color: rgb(255 255 255);
 }
 
 .manuscript-tools-menu-item-active:hover {
@@ -966,7 +966,7 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-4);
   background: var(--color-accent);
-  color: hsl(0deg 0% 100%);
+  color: rgb(255 255 255);
   font-family: var(--font-interface), system-ui, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
@@ -1520,7 +1520,7 @@ body.manuscript-overlay-open {
 
 
 
-  color: hsl(0deg 0% 100%);
+  color: rgb(255 255 255);
 
 
 
