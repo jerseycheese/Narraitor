@@ -122,11 +122,11 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" data-theme="ds1" suppressHydrationWarning>
+    <html lang="en" data-theme="ds1" className={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={fontVariables} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <SkipLinks />
         <ThemeProvider>
           <NavigationLoadingProvider>
