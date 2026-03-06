@@ -15,11 +15,11 @@ a[href="#main-content"] {
 
 a[href="#main-content"]:focus {
   position: fixed;
-  top: 8px;
-  left: 8px;
+  top: var(--space-2);
+  left: var(--space-2);
   width: auto;
   height: auto;
-  padding: 8px 16px;
+  padding: var(--space-2) var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
