@@ -25,7 +25,7 @@ a[href="#main-content"]:focus {
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-family: var(--font-interface);
-  font-size: 14px;
+  font-size: 0.875rem;
   z-index: 9999;
   outline: 2px solid var(--color-text-primary);
   outline-offset: 2px;
@@ -382,7 +382,7 @@ body.manuscript-overlay-open {
 .manuscript-characters-mobile-label {
   margin: 0;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-system);
   text-transform: uppercase;
   letter-spacing: 0.025em;
@@ -754,7 +754,7 @@ body.manuscript-overlay-open {
 .manuscript-characters-rail-label {
   margin: 0 0 var(--space-2);
   padding: 0;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-family: var(--font-system);
   font-weight: 400;
   text-transform: uppercase;
@@ -2178,7 +2178,7 @@ body.manuscript-overlay-open {
   }
 
   .manuscript-hud-text-button {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
 }
 
