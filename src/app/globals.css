@@ -80,10 +80,6 @@ a[href="#main-content"]:focus {
   margin-bottom: var(--space-6);
 }
 
-/* Dialogue segments with specific styling */
-.text-narrative.dialogue-segment {
-}
-
 /* Transition segments preserve line breaks */
 .text-narrative.preserve-breaks {
   white-space: pre-line;

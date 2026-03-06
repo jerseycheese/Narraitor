@@ -195,7 +195,7 @@ export function EndingImageDebugSection() {
 
   // Helper function to get CSS class for tone (from EndingScreen component)
   const getEndingCSSClass = (tone: EndingTone) => {
-    return `ending-screen ending-${tone}`;
+    return `ending-${tone}`;
   };
 
   // Get tone background color from design tokens

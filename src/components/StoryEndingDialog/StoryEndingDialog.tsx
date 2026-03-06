@@ -24,7 +24,7 @@ const endingTypeClasses: Record<EndingType, string> = {
   triumphant: 'ending-triumphant',
   mysterious: 'ending-mysterious',
   tragic: 'ending-tragic',
-  default: 'ending-default',
+  default: '',
 };
 
 export function StoryEndingDialog({
