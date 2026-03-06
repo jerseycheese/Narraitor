@@ -1,0 +1,271 @@
+/* ═══════════════════════════════════════════════════════════════
+   DS3 — "The Mechanical Manuscript"
+   Aged paper, drafting ink, dot grid aesthetic.
+   Fonts: Newsreader, Fira Code, DM Sans
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds3"] {
+  /* Typography mapping: semantic -> specific */
+  --font-narrative: var(--font-newsreader);
+  --font-system: var(--font-fira-code);
+  --font-interface: var(--font-dm-sans);
+
+  /* Color tokens */
+  --color-canvas: rgb(247 243 237);
+  --color-surface: rgb(255 252 246 / 80%);
+  --color-surface-hover: rgb(239 233 224);
+  --color-border: rgb(226 217 206);
+  --color-border-strong: rgb(212 201 186);
+  --color-text-primary: rgb(42 35 28);
+  --color-text-secondary: rgb(115 102 88);
+  --color-text-muted: rgb(169 157 143);
+
+  /* Steel Blue accent */
+  --color-accent: rgb(91 122 140);
+  --color-accent-hover: rgb(74 105 120);
+  --color-accent-soft: rgb(91 122 140 / 10%);
+
+  /* shadcn/ui HSL tokens */
+  --background: 36 24% 95%;
+  --foreground: 25 20% 14%;
+  --card: 38 100% 98%;
+  --card-foreground: 25 20% 14%;
+  --popover: 38 100% 98%;
+  --popover-foreground: 25 20% 14%;
+
+  --primary: 200 21% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 25 14% 40%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 30 16% 92%;
+  --muted-foreground: 25 14% 46%;
+  --accent: 30 16% 92%;
+  --accent-foreground: 25 20% 14%;
+  --destructive: 0 59% 41%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 29 16% 85%;
+  --input: 29 16% 85%;
+  --ring: 200 21% 45%;
+  --radius: 0.375rem;
+
+  /* Extended semantic tokens */
+  --success: 138 25% 40%;
+  --success-foreground: 210 40% 98%;
+  --success-text: 138 25% 20%;
+  --success-background: 138 25% 90%;
+  --success-border: 138 25% 75%;
+  --success-muted: 138 25% 90%;
+
+  --warning: 36 38% 40%;
+  --warning-foreground: 210 40% 98%;
+  --warning-text: 36 38% 20%;
+  --warning-background: 36 38% 88%;
+  --warning-border: 36 38% 70%;
+  --warning-muted: 36 38% 88%;
+
+  /* Manuscript warning button colors */
+  --color-warning: rgb(140 109 63);
+  --color-warning-soft: rgb(140 109 63 / 14%);
+  --color-warning-border: rgb(140 109 63 / 50%);
+  --color-warning-muted: rgb(140 109 63 / 10%);
+
+  --info: 200 21% 45%;
+  --info-foreground: 210 40% 98%;
+  --info-text: 200 30% 25%;
+  --info-background: 200 30% 91%;
+  --info-border: 200 30% 78%;
+  --info-muted: 200 30% 91%;
+
+  /* Contextual colors for storytelling features */
+  --ending-triumphant: 36 38% 50%;
+  --ending-bittersweet: 200 21% 50%;
+  --ending-mysterious: 25 20% 14%;
+  --ending-tragic: 0 59% 41%;
+  --ending-hopeful: 138 25% 40%;
+
+  /* Lore category colors */
+  --lore-characters-bg: 200 30% 91%;
+  --lore-characters-border: 200 30% 68%;
+  --lore-characters-text: 200 30% 25%;
+  --lore-locations-bg: 138 25% 90%;
+  --lore-locations-border: 138 25% 55%;
+  --lore-locations-text: 138 30% 27%;
+  --lore-events-bg: 200 30% 91%;
+  --lore-events-border: 200 30% 68%;
+  --lore-events-text: 200 30% 25%;
+  --lore-rules-bg: 36 38% 88%;
+  --lore-rules-border: 36 38% 50%;
+  --lore-rules-text: 36 38% 25%;
+
+  /* Choice alignment colors */
+  --alignment-lawful-bg: 200 40% 96%;
+  --alignment-lawful-border: 200 30% 87%;
+  --alignment-lawful-text: 200 30% 40%;
+  --alignment-chaotic-bg: 30 60% 96%;
+  --alignment-chaotic-border: 30 50% 82%;
+  --alignment-chaotic-text: 20 50% 42%;
+
+  /* Overlay surfaces and scrims */
+  --color-overlay-surface: rgb(255 252 246 / 90%);
+  --color-overlay-surface-strong: rgb(255 252 246 / 95%);
+  --color-manuscript-gradient-start: rgb(255 252 246 / 92%);
+  --color-manuscript-gradient-end: rgb(239 233 224 / 92%);
+  --color-scrim: rgb(42 35 28 / 35%);
+  --shadow-overlay: 0 4px 12px rgb(0 0 0 / 10%);
+  --shadow-drawer: -12px 0 12px rgb(0 0 0 / 10%);
+  --color-danger: rgb(156 64 64);
+  --color-danger-hover: rgb(130 50 50);
+
+  /* Spacing scale (Tailwind-aligned) */
+  --space-0_5: 0.125rem;
+  --space-1:   0.25rem;
+  --space-1_5: 0.375rem;
+  --space-2:   0.5rem;
+  --space-2_5: 0.625rem;
+  --space-3:   0.75rem;
+  --space-3_5: 0.875rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+
+  /* Radius tokens */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-full: 9999px;
+}
+
+/* DS3 Dark Mode */
+[data-theme="ds3"].dark {
+  --color-canvas: rgb(23 19 16);
+  --color-surface: rgb(30 26 22 / 80%);
+  --color-surface-hover: rgb(18 15 12);
+  --color-border: rgb(48 41 35);
+  --color-border-strong: rgb(61 53 45);
+  --color-text-primary: rgb(237 232 224);
+  --color-text-secondary: rgb(168 156 142);
+  --color-text-muted: rgb(107 96 87);
+
+  --color-accent: rgb(123 160 180);
+  --color-accent-hover: rgb(141 177 195);
+  --color-accent-soft: rgb(123 160 180 / 12%);
+
+  --background: 20 18% 8%;
+  --foreground: 33 17% 90%;
+  --card: 20 15% 10%;
+  --card-foreground: 33 17% 90%;
+  --popover: 20 15% 10%;
+  --popover-foreground: 33 17% 90%;
+
+  --primary: 200 19% 59%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 20 10% 28%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 20 12% 14%;
+  --muted-foreground: 25 10% 52%;
+  --accent: 20 12% 14%;
+  --accent-foreground: 33 17% 90%;
+  --destructive: 0 50% 38%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 20 15% 16%;
+  --input: 20 15% 16%;
+  --ring: 200 19% 59%;
+
+  --success: 138 20% 48%;
+  --success-foreground: 222 84% 5%;
+  --success-text: 138 20% 62%;
+  --success-background: 138 20% 8%;
+  --success-border: 138 20% 22%;
+  --success-muted: 138 20% 12%;
+
+  --warning: 36 38% 50%;
+  --warning-foreground: 222 84% 5%;
+  --warning-text: 36 38% 58%;
+  --warning-background: 30 40% 8%;
+  --warning-border: 30 35% 22%;
+  --warning-muted: 30 35% 12%;
+
+  --color-warning: rgb(176 142 92);
+  --color-warning-soft: rgb(176 142 92 / 14%);
+  --color-warning-border: rgb(176 142 92 / 50%);
+  --color-warning-muted: rgb(176 142 92 / 10%);
+
+  --info: 200 25% 57%;
+  --info-foreground: 222 84% 5%;
+  --info-text: 200 25% 60%;
+  --info-background: 200 40% 7%;
+  --info-border: 200 35% 22%;
+  --info-muted: 200 35% 12%;
+
+  --ending-triumphant: 36 38% 55%;
+  --ending-bittersweet: 200 25% 55%;
+  --ending-mysterious: 20 12% 12%;
+  --ending-tragic: 0 50% 45%;
+  --ending-hopeful: 138 20% 48%;
+
+  --lore-characters-bg: 200 40% 7%;
+  --lore-characters-border: 200 35% 22%;
+  --lore-characters-text: 200 25% 60%;
+  --lore-locations-bg: 138 20% 8%;
+  --lore-locations-border: 138 20% 22%;
+  --lore-locations-text: 138 20% 62%;
+  --lore-events-bg: 200 40% 7%;
+  --lore-events-border: 200 35% 22%;
+  --lore-events-text: 200 25% 60%;
+  --lore-rules-bg: 30 40% 8%;
+  --lore-rules-border: 30 35% 22%;
+  --lore-rules-text: 36 38% 58%;
+
+  --alignment-lawful-bg: 200 40% 10%;
+  --alignment-lawful-border: 200 30% 20%;
+  --alignment-lawful-text: 200 50% 72%;
+  --alignment-chaotic-bg: 24 50% 10%;
+  --alignment-chaotic-border: 20 60% 25%;
+  --alignment-chaotic-text: 31 70% 70%;
+
+  --color-overlay-surface: rgb(30 26 22 / 90%);
+  --color-overlay-surface-strong: rgb(30 26 22 / 96%);
+  --color-manuscript-gradient-start: rgb(18 15 12 / 90%);
+  --color-manuscript-gradient-end: rgb(30 26 22 / 92%);
+  --color-scrim: rgb(0 0 0 / 55%);
+  --shadow-overlay: 0 4px 12px rgb(0 0 0 / 35%);
+  --shadow-drawer: -12px 0 12px rgb(0 0 0 / 35%);
+  --color-danger: rgb(192 96 96);
+  --color-danger-hover: rgb(170 75 75);
+
+  /* Spacing scale (Tailwind-aligned) */
+  --space-0_5: 0.125rem;
+  --space-1:   0.25rem;
+  --space-1_5: 0.375rem;
+  --space-2:   0.5rem;
+  --space-2_5: 0.625rem;
+  --space-3:   0.75rem;
+  --space-3_5: 0.875rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+
+  /* Radius tokens */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-full: 9999px;
+}
+
+/* DS3 Background Pattern - Dot grid */
+[data-theme="ds3"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgb(42 35 28 / 18%) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.3;
+}
+
+[data-theme="ds3"].dark body::before {
+  background-image: radial-gradient(circle, rgb(237 232 224 / 12%) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.3;
+}

@@ -9,6 +9,8 @@ import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 import { Breadcrumbs } from './Breadcrumbs';
 import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { TutorialMenu } from './TutorialMenu';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { DarkModeToggle } from './DarkModeToggle';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
@@ -149,6 +151,8 @@ export function HeaderNavigation() {
               </div>
 
               <div>
+                <ThemeSwitcher />
+                <DarkModeToggle />
                 <TutorialMenu />
                 {hasWorlds && (
                   <div ref={dropdownRef}>

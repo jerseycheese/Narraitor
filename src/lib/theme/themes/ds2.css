@@ -1,0 +1,267 @@
+/* ═══════════════════════════════════════════════════════════════
+   DS2 — "Warm Earth"
+   Organic earth tones, soft forms, breathing space.
+   Fonts: Crimson Pro, JetBrains Mono, Manrope
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds2"] {
+  /* Typography mapping: semantic -> specific */
+  --font-narrative: var(--font-crimson-pro);
+  --font-system: var(--font-jetbrains-mono);
+  --font-interface: var(--font-manrope);
+
+  /* Color tokens */
+  --color-canvas: rgb(250 248 243);
+  --color-surface: rgb(255 253 247);
+  --color-surface-hover: rgb(245 241 232);
+  --color-border: rgb(224 213 199);
+  --color-border-strong: rgb(212 201 186);
+  --color-text-primary: rgb(45 37 32);
+  --color-text-secondary: rgb(107 93 82);
+  --color-text-muted: rgb(156 141 126);
+
+  /* Sage Green accent */
+  --color-accent: rgb(124 139 111);
+  --color-accent-hover: rgb(106 119 96);
+  --color-accent-soft: rgb(124 139 111 / 12%);
+
+  /* shadcn/ui HSL tokens */
+  --background: 40 33% 97%;
+  --foreground: 20 17% 15%;
+  --card: 40 100% 99%;
+  --card-foreground: 20 17% 15%;
+  --popover: 40 100% 99%;
+  --popover-foreground: 20 17% 15%;
+
+  --primary: 104 11% 49%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 20 13% 37%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 33 23% 93%;
+  --muted-foreground: 20 13% 46%;
+  --accent: 33 23% 93%;
+  --accent-foreground: 20 17% 15%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 30 20% 83%;
+  --input: 30 20% 83%;
+  --ring: 104 11% 49%;
+  --radius: 0.75rem;
+
+  /* Extended semantic tokens */
+  --success: 142 71% 45%;
+  --success-foreground: 210 40% 98%;
+  --success-text: 154 86% 20%;
+  --success-background: 142 50% 88%;
+  --success-border: 142 50% 75%;
+  --success-muted: 142 50% 88%;
+
+  --warning: 32 95% 44%;
+  --warning-foreground: 210 40% 98%;
+  --warning-text: 21 90% 20%;
+  --warning-background: 40 60% 88%;
+  --warning-border: 40 60% 75%;
+  --warning-muted: 40 60% 88%;
+
+  /* Manuscript warning button colors */
+  --color-warning: rgb(146 64 14);
+  --color-warning-soft: rgb(146 64 14 / 14%);
+  --color-warning-border: rgb(146 64 14 / 50%);
+  --color-warning-muted: rgb(146 64 14 / 10%);
+
+  --info: 200 50% 50%;
+  --info-foreground: 210 40% 98%;
+  --info-text: 200 60% 25%;
+  --info-background: 200 50% 91%;
+  --info-border: 200 50% 80%;
+  --info-muted: 200 50% 91%;
+
+  /* Contextual colors for storytelling features */
+  --ending-triumphant: 43 96% 56%;
+  --ending-bittersweet: 200 50% 50%;
+  --ending-mysterious: 20 17% 15%;
+  --ending-tragic: 0 72% 51%;
+  --ending-hopeful: 142 71% 45%;
+
+  /* Lore category colors */
+  --lore-characters-bg: 200 50% 91%;
+  --lore-characters-border: 200 50% 70%;
+  --lore-characters-text: 200 60% 25%;
+  --lore-locations-bg: 142 50% 88%;
+  --lore-locations-border: 142 50% 55%;
+  --lore-locations-text: 154 60% 27%;
+  --lore-events-bg: 200 50% 91%;
+  --lore-events-border: 200 50% 70%;
+  --lore-events-text: 200 60% 25%;
+  --lore-rules-bg: 40 60% 88%;
+  --lore-rules-border: 32 80% 44%;
+  --lore-rules-text: 21 70% 31%;
+
+  /* Choice alignment colors */
+  --alignment-lawful-bg: 200 60% 96%;
+  --alignment-lawful-border: 200 50% 88%;
+  --alignment-lawful-text: 200 60% 40%;
+  --alignment-chaotic-bg: 33 80% 96%;
+  --alignment-chaotic-border: 32 70% 83%;
+  --alignment-chaotic-text: 20 70% 45%;
+
+  /* Overlay surfaces and scrims */
+  --color-overlay-surface: rgb(255 253 247 / 90%);
+  --color-overlay-surface-strong: rgb(255 253 247 / 95%);
+  --color-manuscript-gradient-start: rgb(255 253 247 / 92%);
+  --color-manuscript-gradient-end: rgb(245 241 232 / 92%);
+  --color-scrim: rgb(45 37 32 / 35%);
+  --shadow-overlay: 0 8px 24px rgb(45 37 32 / 8%);
+  --shadow-drawer: -12px 0 24px rgb(45 37 32 / 8%);
+  --color-danger: rgb(185 28 28);
+  --color-danger-hover: rgb(153 27 27);
+
+  /* Spacing scale (Tailwind-aligned) */
+  --space-0_5: 0.125rem;
+  --space-1:   0.25rem;
+  --space-1_5: 0.375rem;
+  --space-2:   0.5rem;
+  --space-2_5: 0.625rem;
+  --space-3:   0.75rem;
+  --space-3_5: 0.875rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+
+  /* Radius tokens */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-full: 9999px;
+}
+
+/* DS2 Dark Mode */
+[data-theme="ds2"].dark {
+  --color-canvas: rgb(26 22 20);
+  --color-surface: rgb(34 30 27);
+  --color-surface-hover: rgb(45 37 32);
+  --color-border: rgb(61 53 48);
+  --color-border-strong: rgb(77 68 62);
+  --color-text-primary: rgb(245 241 232);
+  --color-text-secondary: rgb(212 201 186);
+  --color-text-muted: rgb(156 141 126);
+
+  --color-accent: rgb(156 170 138);
+  --color-accent-hover: rgb(176 190 160);
+  --color-accent-soft: rgb(156 170 138 / 15%);
+
+  --background: 17 13% 9%;
+  --foreground: 33 23% 94%;
+  --card: 17 12% 12%;
+  --card-foreground: 33 23% 94%;
+  --popover: 17 12% 12%;
+  --popover-foreground: 33 23% 94%;
+
+  --primary: 104 14% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 20 10% 30%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 20 10% 16%;
+  --muted-foreground: 30 10% 55%;
+  --accent: 20 10% 16%;
+  --accent-foreground: 33 23% 94%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 17 12% 21%;
+  --input: 17 12% 21%;
+  --ring: 104 14% 60%;
+
+  --success: 142 71% 45%;
+  --success-foreground: 222 84% 5%;
+  --success-text: 142 76% 62%;
+  --success-background: 142 71% 7%;
+  --success-border: 142 64% 24%;
+  --success-muted: 142 69% 14%;
+
+  --warning: 43 96% 56%;
+  --warning-foreground: 222 84% 5%;
+  --warning-text: 43 96% 56%;
+  --warning-background: 26 95% 7%;
+  --warning-border: 32 95% 24%;
+  --warning-muted: 26 83% 15%;
+
+  --color-warning: rgb(251 191 36);
+  --color-warning-soft: rgb(251 191 36 / 14%);
+  --color-warning-border: rgb(251 191 36 / 50%);
+  --color-warning-muted: rgb(251 191 36 / 10%);
+
+  --info: 200 50% 60%;
+  --info-foreground: 222 84% 5%;
+  --info-text: 200 50% 60%;
+  --info-background: 200 80% 7%;
+  --info-border: 200 70% 24%;
+  --info-muted: 200 60% 14%;
+
+  --ending-triumphant: 43 96% 56%;
+  --ending-bittersweet: 200 50% 55%;
+  --ending-mysterious: 20 10% 12%;
+  --ending-tragic: 0 72% 51%;
+  --ending-hopeful: 142 76% 45%;
+
+  --lore-characters-bg: 200 80% 7%;
+  --lore-characters-border: 200 70% 24%;
+  --lore-characters-text: 200 50% 60%;
+  --lore-locations-bg: 142 71% 7%;
+  --lore-locations-border: 142 64% 24%;
+  --lore-locations-text: 142 76% 62%;
+  --lore-events-bg: 200 80% 7%;
+  --lore-events-border: 200 70% 24%;
+  --lore-events-text: 200 50% 60%;
+  --lore-rules-bg: 26 95% 7%;
+  --lore-rules-border: 32 95% 24%;
+  --lore-rules-text: 43 96% 56%;
+
+  --alignment-lawful-bg: 200 60% 10%;
+  --alignment-lawful-border: 200 50% 21%;
+  --alignment-lawful-text: 200 80% 75%;
+  --alignment-chaotic-bg: 24 70% 10%;
+  --alignment-chaotic-border: 20 80% 25%;
+  --alignment-chaotic-text: 31 90% 72%;
+
+  --color-overlay-surface: rgb(34 30 27 / 90%);
+  --color-overlay-surface-strong: rgb(34 30 27 / 95%);
+  --color-manuscript-gradient-start: rgb(45 37 32 / 90%);
+  --color-manuscript-gradient-end: rgb(34 30 27 / 92%);
+  --color-scrim: rgb(0 0 0 / 50%);
+  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 40%);
+  --shadow-drawer: -12px 0 24px rgb(0 0 0 / 40%);
+  --color-danger: rgb(239 68 68);
+  --color-danger-hover: rgb(220 38 38);
+
+  /* Spacing scale (Tailwind-aligned) */
+  --space-0_5: 0.125rem;
+  --space-1:   0.25rem;
+  --space-1_5: 0.375rem;
+  --space-2:   0.5rem;
+  --space-2_5: 0.625rem;
+  --space-3:   0.75rem;
+  --space-3_5: 0.875rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+
+  /* Radius tokens */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-full: 9999px;
+}
+
+/* DS2 Background Pattern - Clean, no grid */
+[data-theme="ds2"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--color-canvas);
+}
+
+[data-theme="ds2"].dark body::before {
+  background: var(--color-canvas);
+}
