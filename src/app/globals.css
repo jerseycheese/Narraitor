@@ -308,14 +308,11 @@ body.manuscript-overlay-open {
   width: min(100%, 1480px);
   margin: 0 auto;
   height: 100%;
-  padding-left: clamp(12px, 2vw, 1.5rem);
-  padding-right: clamp(12px, 2vw, 1.5rem);
+  padding: clamp(0.5rem, 1.5vh, 1rem) clamp(12px, 2vw, 1.5rem);
   min-height: 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: clamp(0.5rem, 1.5vh, 1rem);
-  padding-top: clamp(0.5rem, 1.5vh, 1rem);
-  padding-bottom: clamp(0.5rem, 1.5vh, 1rem);
   position: relative;
   z-index: 1;
   box-sizing: border-box;
