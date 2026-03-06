@@ -22,7 +22,7 @@ a[href="#main-content"]:focus {
   padding: 8px 16px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-family: var(--font-interface);
   font-size: 14px;
@@ -77,7 +77,7 @@ a[href="#main-content"]:focus {
 
 /* Scene segments with extra paragraph spacing */
 .text-narrative.scene-spacing p {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
 }
 
 /* Dialogue segments with specific styling */
@@ -259,7 +259,7 @@ body > * {
 .devtools-panel button {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-md);
   border: 1px solid rgb(107 114 128);
   cursor: pointer;
   background-color: rgb(107 114 128);
@@ -932,7 +932,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-custom-input::placeholder {
-  color: rgb(161 161 170);
+  color: var(--color-text-muted);
 }
 
 .manuscript-custom-input:focus-visible {
@@ -1456,7 +1456,7 @@ body.manuscript-overlay-open {
 
 
 
-  background: rgb(49 46 129 / 10%);
+  background: var(--color-accent-soft);
 
 
 
@@ -1472,7 +1472,7 @@ body.manuscript-overlay-open {
 
 
 
-  border: 1px solid rgb(49 46 129 / 20%);
+  border: 1px solid var(--color-accent-soft);
 
 
 
