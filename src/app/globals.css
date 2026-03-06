@@ -365,16 +365,10 @@ body.manuscript-overlay-open {
   -webkit-overflow-scrolling: touch;
 }
 
-@media (width >= 1024px) {
-}
-
 .manuscript-main-stage {
   display: grid;
   gap: var(--space-4);
   align-items: start;
-}
-
-.manuscript-main-content {
 }
 
 .manuscript-characters-mobile-bar {

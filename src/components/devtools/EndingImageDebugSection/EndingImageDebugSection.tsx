@@ -197,22 +197,6 @@ export function EndingImageDebugSection() {
     return `ending-screen ending-${tone}`;
   };
 
-  // Helper function to get header text color for tone (from EndingScreen component)
-  const getHeaderTextColor = (tone: EndingTone) => {
-    switch (tone) {
-      case 'triumphant': // Amber background (#f59e0b)
-        return ''; // Black text for bright amber
-      case 'hopeful': // Emerald background (#10b981)  
-        return ''; // White text for emerald
-      case 'mysterious': // Gray background (#374151)
-        return ''; // White text for dark gray
-      case 'tragic': // Dark red background (#991b1b)
-        return ''; // White text for dark red
-      default:
-        return ''; // Default to white text
-    }
-  };
-
   // Get tone mapping for CSS classes
   const getToneBackgroundColor = (tone: EndingTone) => {
     switch (tone) {
@@ -262,14 +246,13 @@ export function EndingImageDebugSection() {
               <div>
                 <div><strong>AI Selected Tone:</strong> <span>{currentEnding.tone}</span></div>
                 <div><strong>CSS Class Applied:</strong> <span>{getEndingCSSClass(currentEnding.tone)}</span></div>
-                <div><strong>Header Text Color:</strong> <span>{getHeaderTextColor(currentEnding.tone)}</span></div>
               </div>
               
               {/* Visual Preview */}
               <div>
                 <div>EndingScreen Preview:</div>
                 <div 
-                  className={`${getEndingCSSClass(currentEnding.tone)} ${getHeaderTextColor(currentEnding.tone)}`}
+                  className={getEndingCSSClass(currentEnding.tone)}
                   style={{ backgroundColor: getToneBackgroundColor(currentEnding.tone) }}
                 >
                   <div>The End</div>
