@@ -546,11 +546,13 @@ body.manuscript-overlay-open {
 
 .manuscript-choices-skeleton-input {
   flex: 1;
+  height: 2.375rem;
   border-radius: var(--radius-sm);
 }
 
 .manuscript-choices-skeleton-send {
   width: 4rem;
+  height: 2.375rem;
   border-radius: var(--radius-sm);
 }
 
