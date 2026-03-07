@@ -101,7 +101,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   }
 
   return (
-    <article className="narrative-segment space-y-3">
+    <article className="narrative-segment">
       {/* Choice Outcome Callout (Issue #971) */}
       {resolvedSegment.metadata?.causedByDecisionId &&
         resolvedSegment.metadata?.causedByDecisionText && (

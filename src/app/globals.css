@@ -227,43 +227,24 @@ body > * {
   background-color: hsl(var(--ending-hopeful));
 }
 
-/* DevTools specific styling */
-.devtools-panel {
-  font-size: 12px;
-  background-color: rgb(55 65 81); /* Hardcoded gray-700 */
-  color: rgb(209 213 219); /* Hardcoded gray-300 */
+/* Narrative spacing (replaces Tailwind space-y utilities) */
+
+.narrative-history-segments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
-.devtools-panel h1,
-.devtools-panel h2,
-.devtools-panel h3,
-.devtools-panel h4,
-.devtools-panel h5,
-.devtools-panel h6 {
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin: 0.5rem 0;
-  color: rgb(209 213 219);
+.narrative-segment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
-.devtools-panel p {
-  font-size: 0.75rem;
-  margin: 0.5rem 0;
-  color: rgb(107 114 128); /* gray-500 */
-}
-
-.devtools-panel button {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--radius-md);
-  border: 1px solid rgb(107 114 128);
-  cursor: pointer;
-  background-color: rgb(107 114 128);
-  color: rgb(209 213 219);
-}
-
-.devtools-panel button:hover {
-  background-color: rgb(55 65 81);
+.inventory-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
 }
 
 /* Manuscript Overlay Class System */
