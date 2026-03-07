@@ -53,7 +53,7 @@ export default function PlayPage() {
   // For server rendering, show a simple placeholder
   if (!isClient) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="manuscript-play-page-loading">
         <p>Creating your game...</p>
       </div>
     );
@@ -65,7 +65,7 @@ export default function PlayPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="manuscript-play-page">
       <GameSession 
         worldId={worldId} 
         disableAutoResume={disableAutoResume}

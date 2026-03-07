@@ -19,6 +19,7 @@
   --color-text-primary: rgb(45 37 32);
   --color-text-secondary: rgb(107 93 82);
   --color-text-muted: rgb(156 141 126);
+  --color-text-inverse: rgb(255 255 255);
 
   /* Sage Green accent */
   --color-accent: rgb(124 139 111);
@@ -145,6 +146,7 @@
   --color-text-primary: rgb(245 241 232);
   --color-text-secondary: rgb(212 201 186);
   --color-text-muted: rgb(156 141 126);
+  --color-text-inverse: rgb(255 255 255);
 
   --color-accent: rgb(156 170 138);
   --color-accent-hover: rgb(176 190 160);

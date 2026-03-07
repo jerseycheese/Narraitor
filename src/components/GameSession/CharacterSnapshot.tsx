@@ -34,7 +34,7 @@ export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character 
 
       <div className="manuscript-character-snapshot-identity">
         {character.portrait && (
-          <div className="manuscript-character-snapshot-portrait mb-2">
+          <div className="manuscript-character-snapshot-portrait">
             <CharacterPortrait
               portrait={character.portrait}
               characterName={character.name}

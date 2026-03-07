@@ -19,7 +19,7 @@ export function EndingSuggestionBanner({
         Your story could end here
       </AlertTitle>
       <AlertDescription>{reason}</AlertDescription>
-      <div className="flex gap-2 mt-2">
+      <div className="ending-suggestion-banner-actions">
         <Button size="sm" onClick={onAccept}>
           View Ending
         </Button>

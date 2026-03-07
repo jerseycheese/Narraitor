@@ -73,12 +73,12 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
       data-tutorial="choice-history-section"
     >
       {resolvedEntries.length === 0 ? (
-        <p className="font-system text-xs text-muted-foreground uppercase tracking-wider">
+        <p className="manuscript-choice-history-empty">
           No recorded choices yet. Your decisions will appear here once you
           start choosing.
         </p>
       ) : (
-        <div className="space-y-4">
+        <div className="manuscript-choice-history-list">
           {resolvedEntries.map((entry) => {
             const choiceText = getChoiceText(entry);
             const decisionPrompt = entry.decision.prompt.trim();
@@ -135,7 +135,7 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
                     <Button
                       type="button"
                       variant="ghost"
-                      className="font-system text-[10px] uppercase tracking-wider h-5 px-2 ml-auto"
+                      className="manuscript-choice-history-details-button"
                       aria-expanded={isExpanded}
                       aria-controls={detailsId}
                       onClick={() => {

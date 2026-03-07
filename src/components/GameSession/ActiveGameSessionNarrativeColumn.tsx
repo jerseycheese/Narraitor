@@ -45,7 +45,7 @@ const ActiveGameSessionNarrativeColumn: React.FC<
     <div
       id="narrative-container"
       data-tutorial="narrative-display"
-      className="w-full"
+      className="manuscript-narrative-container"
     >
       {/* Fade-out overlay at top when multiple segments */}
       {segmentCount > 1 && <div />}
