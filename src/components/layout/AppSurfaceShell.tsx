@@ -37,7 +37,6 @@ export function AppSurfaceShell({ children }: AppSurfaceShellProps) {
   if (surfaceMode === 'manuscript') {
     return (
       <div className="app-surface app-surface-manuscript" data-surface-mode="manuscript">
-        <HeaderNavigation />
         <main id="main-content" tabIndex={-1}>
           {children}
         </main>
