@@ -258,7 +258,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         let resizeObserver: ResizeObserver | null = null;
         if (contentEl) {
           resizeObserver = new ResizeObserver(() => {
-            if (hasUserScrollInteractionRef.current && isNearBottomRef.current && scrollViewportRef.current) {
+            if ((!hasUserScrollInteractionRef.current || isNearBottomRef.current) && scrollViewportRef.current) {
               scrollViewportRef.current.scrollTo({
                 top: scrollViewportRef.current.scrollHeight,
                 behavior: 'auto'
