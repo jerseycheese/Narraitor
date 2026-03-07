@@ -15,11 +15,13 @@ jest.mock('@/state/npcStore');
 // Mock ResizeObserver
 const mockObserve = jest.fn();
 const mockDisconnect = jest.fn();
+const resizeObserverInstances: MockResizeObserver[] = [];
 
 class MockResizeObserver {
   callback: ResizeObserverCallback;
   constructor(callback: ResizeObserverCallback) {
     this.callback = callback;
+    resizeObserverInstances.push(this);
   }
   observe = mockObserve;
   unobserve = jest.fn();
@@ -34,6 +36,7 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+    resizeObserverInstances.length = 0;
     mockIsFeatureEnabled.mockReturnValue(false);
     mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore());
     Element.prototype.scrollTo = mockScrollTo;
@@ -92,34 +95,27 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     expect(screen.getByText(/Streaming content/)).toBeInTheDocument();
   });
 
-  it('auto-scrolls with behavior auto when new segments are added near bottom', () => {
+  it('anchors on ResizeObserver updates when user has not manually scrolled', () => {
     mockIsFeatureEnabled.mockReturnValue(true);
-    const { container, rerender } = render(
+    const { container } = render(
       <NarrativeHistory segments={segments} disableInitialAutoScroll={true} />
     );
 
     const viewport = container.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
     expect(viewport).toBeTruthy();
 
-    Object.defineProperty(viewport, 'scrollTop', { configurable: true, get: () => 900 });
     Object.defineProperty(viewport, 'scrollHeight', { configurable: true, get: () => 1000 });
-    Object.defineProperty(viewport, 'clientHeight', { configurable: true, get: () => 90 });
-
-    act(() => {
-      viewport.dispatchEvent(new Event('scroll'));
-    });
+    Object.defineProperty(viewport, 'scrollTop', { configurable: true, get: () => 0 });
+    Object.defineProperty(viewport, 'clientHeight', { configurable: true, get: () => 100 });
 
     mockScrollTo.mockClear();
 
-    rerender(
-      <NarrativeHistory
-        segments={[
-          ...segments,
-          createMockNarrativeSegment({ id: 'seg-2', content: 'Near-bottom update.' }),
-        ]}
-        disableInitialAutoScroll={true}
-      />
-    );
+    const resizeObserver = resizeObserverInstances[0];
+    expect(resizeObserver).toBeTruthy();
+
+    act(() => {
+      resizeObserver.callback([], resizeObserver as unknown as ResizeObserver);
+    });
 
     expect(mockScrollTo).toHaveBeenCalled();
     expect(mockScrollTo).toHaveBeenLastCalledWith(
@@ -127,9 +123,9 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     );
   });
 
-  it('does not force-scroll when user has scrolled away from bottom', () => {
+  it('does not force-scroll on ResizeObserver updates when user has scrolled away from bottom', () => {
     mockIsFeatureEnabled.mockReturnValue(true);
-    const { container, rerender } = render(
+    const { container } = render(
       <NarrativeHistory segments={segments} disableInitialAutoScroll={true} />
     );
 
@@ -147,15 +143,12 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
 
     mockScrollTo.mockClear();
 
-    rerender(
-      <NarrativeHistory
-        segments={[
-          ...segments,
-          createMockNarrativeSegment({ id: 'seg-3', content: 'Scrolled-up update.' }),
-        ]}
-        disableInitialAutoScroll={true}
-      />
-    );
+    const resizeObserver = resizeObserverInstances[0];
+    expect(resizeObserver).toBeTruthy();
+
+    act(() => {
+      resizeObserver.callback([], resizeObserver as unknown as ResizeObserver);
+    });
 
     expect(mockScrollTo).not.toHaveBeenCalled();
   });
