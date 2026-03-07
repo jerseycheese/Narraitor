@@ -5,6 +5,13 @@
   background: var(--color-canvas);
 }
 
+.app-surface-manuscript {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-canvas);
+}
+
 .default-surface-main {
   flex: 1;
   min-height: 0;
