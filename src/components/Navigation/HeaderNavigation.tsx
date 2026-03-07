@@ -107,11 +107,11 @@ export function HeaderNavigation() {
 
   return (
     <>
-      <header role="banner">
+      <header className="header-nav" role="banner">
         <nav role="navigation" aria-label="Main">
-          <div>
-            <div>
-              <div>
+          <div className="header-nav-inner">
+            <div className="header-nav-left">
+              <div className="header-nav-links">
                 {isMobile && (
                   <Button
                     onClick={toggleMenu}
@@ -150,7 +150,7 @@ export function HeaderNavigation() {
                 </div>
               </div>
 
-              <div>
+              <div className="header-nav-actions">
                 <ThemeSwitcher />
                 <DarkModeToggle />
                 <TutorialMenu />
@@ -260,8 +260,8 @@ export function HeaderNavigation() {
       />
 
       {shouldShowBreadcrumbs && (
-        <div>
-          <div>
+        <div className="breadcrumbs-container">
+          <div className="breadcrumbs-inner">
             <SSRClientOnly>
               <Breadcrumbs maxItems={2} />
             </SSRClientOnly>

@@ -59,7 +59,9 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   testId = 'active-state-card',
   hasImage = false
 }) => {
-  const stateClasses = isActive ? (activeClassName || '') : (inactiveClassName || '');
+  const defaultActiveClass = 'active-state-card-active';
+  const defaultInactiveClass = 'active-state-card-inactive';
+  const stateClasses = isActive ? (activeClassName || defaultActiveClass) : (inactiveClassName || defaultInactiveClass);
 
   // Extract the image and content
   const childrenArray = React.Children.toArray(children);
@@ -70,7 +72,7 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
     <article
       data-testid={testId}
       onClick={onClick}
-      className={`${stateClasses} ${className}`}
+      className={`active-state-card ${stateClasses} ${className}`}
     >
       {/* Image section with overlay if present */}
       {hasImage ? (
