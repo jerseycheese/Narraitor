@@ -2593,7 +2593,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-skeleton-pulse {
-  background: var(--color-surface-muted);
+  background: var(--color-surface-hover);
   animation: manuscript-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
