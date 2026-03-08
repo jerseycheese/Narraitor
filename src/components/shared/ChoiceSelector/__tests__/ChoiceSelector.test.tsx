@@ -5,6 +5,10 @@ import ChoiceSelector from '../ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
 import { InventoryItem } from '@/types/inventory.types';
 
+jest.mock('@/lib/theme/ThemeProvider', () => ({
+  useTheme: () => ({ theme: 'ds1', colorScheme: 'light', resolvedColorScheme: 'light', setTheme: jest.fn(), setColorScheme: jest.fn() }),
+}));
+
 
 describe('ChoiceSelector', () => {
   const mockOnSelect = jest.fn();

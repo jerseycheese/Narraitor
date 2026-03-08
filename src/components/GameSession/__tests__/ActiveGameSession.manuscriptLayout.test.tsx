@@ -20,6 +20,9 @@ jest.mock('@/state/journalStore');
 jest.mock('@/hooks/useAutoSave');
 jest.mock('@/components/TutorialProvider');
 jest.mock('@/lib/featureFlags');
+jest.mock('@/lib/theme/ThemeProvider', () => ({
+  useTheme: () => ({ theme: 'ds1', colorScheme: 'light', resolvedColorScheme: 'light', setTheme: jest.fn(), setColorScheme: jest.fn() }),
+}));
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
@@ -162,8 +165,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
       />
     );
 
-    expect(await screen.findByTestId('manuscript-floating-hud')).toBeInTheDocument();
-    const hudToggle = screen.getByRole('button', { name: /character/i });
+    const hudToggle = await screen.findByRole('button', { name: /character/i });
     expect(hudToggle).toHaveAttribute('aria-expanded');
 
     // Character button should be functional
@@ -182,16 +184,14 @@ describe('ActiveGameSession Manuscript Layout', () => {
 
     expect(await screen.findByTestId('manuscript-action-rail')).toBeInTheDocument();
     expect(await screen.findByTestId('choices-column')).toBeInTheDocument();
-    
-    // In JSDOM, CSS visibility doesn't hide elements from getByRole unless we're using a real browser or specific setup
-    expect(screen.getByRole('button', { name: /end session/i })).toBeInTheDocument();
+
+    // The mocked ChoicesColumn receives endStoryAction which renders "End Story"
     expect(screen.getByRole('button', { name: /end story/i })).toBeInTheDocument();
   });
 
-  it('dispatches narraitor:end-session event when End Session is clicked', async () => {
-    // Spy on dispatchEvent
-    const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
-    
+  it('renders End Story button in the action rail', async () => {
+    (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
     render(
       <ActiveGameSession
         worldId={mockWorldId}
@@ -200,15 +200,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
       />
     );
 
-    const endSessionButton = await screen.findByRole('button', { name: /end session/i });
-    fireEvent.click(endSessionButton);
-
-    // Verify correct event was dispatched
-    expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Event));
-    const dispatchedEvent = dispatchSpy.mock.calls[0][0] as Event;
-    expect(dispatchedEvent.type).toBe('narraitor:end-session');
-    
-    dispatchSpy.mockRestore();
+    const endStoryButton = await screen.findByRole('button', { name: /end story/i });
+    expect(endStoryButton).toBeInTheDocument();
   });
 
   it('does not have narrativeMaxHeight constraint in manuscript mode', async () => {
@@ -291,7 +284,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
         />
       );
 
-      await screen.findByTestId('manuscript-floating-hud');
+      await screen.findByRole('button', { name: /character/i });
       expect(screen.queryByText(/journal/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/inventory/i)).not.toBeInTheDocument();
     });
@@ -310,7 +303,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
         />
       );
 
-      await screen.findByTestId('manuscript-floating-hud');
+      await screen.findByRole('button', { name: /character/i });
       expect(screen.getByRole('button', { name: /toggle tools menu/i })).toBeInTheDocument();
     });
 

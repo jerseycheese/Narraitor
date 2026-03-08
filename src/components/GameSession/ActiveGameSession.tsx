@@ -37,6 +37,7 @@ import {
 import { CharacterSnapshot } from './CharacterSnapshot';
 import { ManuscriptCharactersRail } from './ManuscriptCharactersRail';
 import { isFeatureEnabled } from '@/lib/featureFlags';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 
 type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history' | 'journal';
 
@@ -90,7 +91,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
-  
+  const { theme } = useTheme();
+  const isDS1 = theme === 'ds1';
+
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
     typeof window !== 'undefined'
@@ -381,6 +384,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             />
           )}
           drawerTriggers={isProgressiveDisclosureEnabled}
+          characterName={character?.name}
           rightContent={
             <div className="manuscript-hud-right-controls">
               <SaveIndicator
@@ -413,13 +417,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           }
         />
       }
-      marginContent={isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
+      marginContent={isDS1 && isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
         ((latestSegmentWithParticipants.characterIds?.length ?? 0) > 0 ||
          (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0) ? (
         <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
       ) : null}
       mobileTopContent={
-        isProgressiveDisclosureEnabled ? (
+        isDS1 && isProgressiveDisclosureEnabled ? (
           <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
         ) : null
       }

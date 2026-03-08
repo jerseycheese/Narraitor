@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
 import { cssClasses, safeTrim } from '@/lib/utils';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { normalizeDecisionOptions } from './optionNormalizer';
 import type { NormalizedOption } from './optionNormalizer';
 import {
@@ -80,6 +81,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   inventoryItems = [],
   endingSuggestion,
 }) => {
+  const { theme } = useTheme();
+
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
@@ -202,7 +205,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               aria-labelledby="choices-heading"
               className="manuscript-suggested-actions-grid"
             >
-              {allOptions.map((option) => {
+              {allOptions.map((option, index) => {
                 const isOptionDisabled =
                   isDisabled || (option.isDisabledByRequirements ?? false);
 
@@ -234,11 +237,17 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     aria-checked={option.isSelected}
                     role="radio"
                   >
+                    {theme === 'ds3' && (
+                      <span className="manuscript-choice-kbd" aria-hidden="true">{index + 1}</span>
+                    )}
                     <div className="manuscript-suggested-action-content">
                       <div className="manuscript-suggested-action-title-row">
+                        {theme === 'ds2' && (
+                          <span className="manuscript-choice-footnote" aria-hidden="true">{index + 1}.</span>
+                        )}
                         <span className="manuscript-suggested-action-label">{option.text}</span>
                       </div>
-                      
+
                       <div className="manuscript-suggested-action-badges">
                         <SkillRequirementBadges
                           requirements={option.skillRequirements || []}
@@ -259,29 +268,39 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 
         {/* Custom input field - now shown AFTER suggested actions */}
         {enableCustomInput && !hideCustomInput && (
-          <div className="manuscript-input-row">
-            <Input
-              id="manuscript-input"
-              ref={inputRef}
-              value={customInputText}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={customInputPlaceholder}
-              disabled={isDisabled}
-              aria-label="Custom response input"
-              className="manuscript-custom-input"
-            />
-            <button
-              id="manuscript-send"
-              type="button"
-              onClick={handleCustomSubmit}
-              disabled={isDisabled || !safeTrim(customInputText)}
-              className="manuscript-send-button"
-            >
-              Send
-            </button>
-            {inputActions}
-          </div>
+          <>
+            {theme === 'ds2' && (
+              <span className="manuscript-input-label">or write your own</span>
+            )}
+            <div className="manuscript-input-row">
+              <Input
+                id="manuscript-input"
+                ref={inputRef}
+                value={customInputText}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder={customInputPlaceholder}
+                disabled={isDisabled}
+                aria-label="Custom response input"
+                className="manuscript-custom-input"
+              />
+              {theme === 'ds3' && (
+                <span className="manuscript-input-counter">
+                  {customInputText.length}/{maxCustomLength}
+                </span>
+              )}
+              <button
+                id="manuscript-send"
+                type="button"
+                onClick={handleCustomSubmit}
+                disabled={isDisabled || !safeTrim(customInputText)}
+                className="manuscript-send-button"
+              >
+                Send
+              </button>
+              {inputActions}
+            </div>
+          </>
         )}
       </div>
     </div>

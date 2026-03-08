@@ -2,6 +2,10 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ManuscriptSessionShell } from '../ManuscriptSessionShell';
 
+jest.mock('@/lib/theme/ThemeProvider', () => ({
+  useTheme: () => ({ theme: 'ds1', colorScheme: 'light', resolvedColorScheme: 'light', setTheme: jest.fn(), setColorScheme: jest.fn() }),
+}));
+
 describe('ManuscriptSessionShell', () => {
   beforeAll(() => {
     // Mock global CSS variables that would normally come from globals.css
