@@ -59,18 +59,13 @@ export interface CardActionGroupProps {
 export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   primaryActions = [],
   secondaryActions = [],
-  layout = 'horizontal',
-  gap = 'md',
-  size = 'md',
-  primarySize,
-  secondarySize,
   className = ''
 }) => {
-      const getButtonClasses = (action: CardAction) => {
-      const variantClass = action.variant ? `card-action-variant-${action.variant}` : '';
-      return [variantClass, action.className || ''].filter(Boolean).join(' ');
-    };
-  const renderActions = (actions: CardAction[], actionType: 'primary' | 'secondary') => {
+  const getButtonClasses = (action: CardAction) => {
+    const variantClass = action.variant ? `card-action-variant-${action.variant}` : '';
+    return [variantClass, action.className || ''].filter(Boolean).join(' ');
+  };
+  const renderActions = (actions: CardAction[]) => {
     return actions.map(action => (
       <button
         key={action.key}
@@ -92,12 +87,12 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
     <div className={`card-action-group ${className}`}>
       {primaryActions.length > 0 && (
         <div>
-          {renderActions(primaryActions, 'primary')}
+          {renderActions(primaryActions)}
         </div>
       )}
       {secondaryActions.length > 0 && (
         <div>
-          {renderActions(secondaryActions, 'secondary')}
+          {renderActions(secondaryActions)}
         </div>
       )}
     </div>
