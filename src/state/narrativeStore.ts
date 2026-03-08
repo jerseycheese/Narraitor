@@ -1398,10 +1398,14 @@ export const useNarrativeStore = create<NarrativeStore>()(
           // Serialize Date objects in debugInfo
           const serializedDebugInfo: SerializedPromptDebugInfo = {
             ...segment.metadata.debugInfo,
-            generatedAt: segment.metadata.debugInfo.generatedAt.toISOString(),
+            generatedAt: segment.metadata.debugInfo.generatedAt instanceof Date
+              ? segment.metadata.debugInfo.generatedAt.toISOString()
+              : String(segment.metadata.debugInfo.generatedAt),
             recentDecisions: segment.metadata.debugInfo.recentDecisions?.map((decision) => ({
               ...decision,
-              timestamp: decision.timestamp.toISOString(),
+              timestamp: decision.timestamp instanceof Date
+                ? decision.timestamp.toISOString()
+                : String(decision.timestamp),
             })),
           };
           acc[id] = {

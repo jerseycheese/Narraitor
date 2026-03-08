@@ -1,0 +1,131 @@
+import { test, expect } from '@playwright/test';
+import { seedTestData } from './utils/seedTestData';
+import { mockApiEndpoints } from './utils/mockApi';
+import { waitForStableScrollHeight } from './utils/wait-helpers';
+
+/**
+ * CLS (Cumulative Layout Shift) Measurement Test
+ *
+ * Validates that the styled game session surface achieves CLS < 0.10
+ * across multiple cold-load iterations. Uses the PerformanceObserver API
+ * to accumulate layout-shift entries, excluding user-input-driven shifts
+ * per the standard CLS definition.
+ *
+ * Related issues: #1033 (streaming stability), #1055 (final CLS sign-off)
+ */
+
+const ROUTE = '/worlds/world-cyberpunk-2077/play';
+const CLS_THRESHOLD = 0.1;
+const NUM_ITERATIONS = 3;
+
+test.describe('CLS Measurement - Game Session Surface', () => {
+  test('CLS stays below 0.10 across cold-load iterations', async ({ browser }) => {
+    test.setTimeout(120_000);
+
+    const results: { run: number; cls: number; entries: Array<{ value: number; startTime: number; sources: string[] }> }[] = [];
+
+    for (let i = 0; i < NUM_ITERATIONS; i++) {
+      const context = await browser.newContext({
+        viewport: { width: 1280, height: 1024 },
+      });
+      const page = await context.newPage();
+
+      try {
+        // Inject CLS observer before any navigation so it captures all shifts
+        await page.addInitScript(() => {
+          (window as any).__CLS_SCORE__ = 0;
+          (window as any).__CLS_ENTRIES__ = [];
+
+          const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              const layoutEntry = entry as PerformanceEntry & {
+                hadRecentInput: boolean;
+                value: number;
+                sources?: Array<{ node?: Node }>;
+              };
+              // Standard CLS: exclude shifts caused by recent user input
+              if (layoutEntry.hadRecentInput) continue;
+
+              (window as any).__CLS_SCORE__ += layoutEntry.value;
+              (window as any).__CLS_ENTRIES__.push({
+                value: layoutEntry.value,
+                startTime: layoutEntry.startTime,
+                sources: (layoutEntry.sources || []).map((s) => {
+                  const node = s.node;
+                  if (!node || !(node as Element).tagName) return 'unknown';
+                  const el = node as Element;
+                  const tag = el.tagName.toLowerCase();
+                  const id = el.id ? `#${el.id}` : '';
+                  const cls = el.className && typeof el.className === 'string'
+                    ? `.${el.className.split(' ').slice(0, 2).join('.')}`
+                    : '';
+                  return `${tag}${id}${cls}`;
+                }),
+              });
+            }
+          });
+
+          observer.observe({ type: 'layout-shift', buffered: true });
+        });
+
+        // Seed data and mock APIs
+        await seedTestData(page);
+        await mockApiEndpoints(page);
+
+        // Navigate to the game session route
+        await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
+
+        // Wait for the session shell to appear
+        await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+          timeout: 15_000,
+        });
+
+        // Wait for narrative segments to render
+        try {
+          await page.waitForSelector('.narrative-segment', { timeout: 10_000 });
+        } catch {
+          // Segments may not render if fixture data doesn't match — continue measurement
+        }
+
+        // Wait for scroll height to stabilize (1s stable duration)
+        await waitForStableScrollHeight(page, { timeout: 10_000, stableDuration: 1000 });
+
+        // Extra settling buffer for ResizeObserver cascades
+        await page.waitForTimeout(2000);
+
+        // Collect CLS results
+        const cls = await page.evaluate(() => (window as any).__CLS_SCORE__ as number);
+        const entries = await page.evaluate(
+          () => (window as any).__CLS_ENTRIES__ as Array<{ value: number; startTime: number; sources: string[] }>
+        );
+
+        results.push({ run: i + 1, cls, entries });
+
+        console.log(`--- CLS Run ${i + 1} ---`);
+        console.log(`  Score: ${cls.toFixed(4)}`);
+        if (entries.length > 0) {
+          entries.forEach((e, idx) => {
+            console.log(`  Shift ${idx + 1}: value=${e.value.toFixed(4)} time=${e.startTime.toFixed(0)}ms sources=[${e.sources.join(', ')}]`);
+          });
+        } else {
+          console.log('  No layout shifts detected.');
+        }
+
+        expect(cls).toBeLessThan(CLS_THRESHOLD);
+      } finally {
+        await context.close();
+      }
+    }
+
+    // Summary
+    const avg = results.reduce((sum, r) => sum + r.cls, 0) / results.length;
+    const max = Math.max(...results.map((r) => r.cls));
+    console.log('\n=== CLS Summary ===');
+    console.log(`  Runs: ${results.length}`);
+    console.log(`  Scores: ${results.map((r) => r.cls.toFixed(4)).join(', ')}`);
+    console.log(`  Average: ${avg.toFixed(4)}`);
+    console.log(`  Max: ${max.toFixed(4)}`);
+    console.log(`  Threshold: ${CLS_THRESHOLD}`);
+    console.log(`  Result: ${max < CLS_THRESHOLD ? 'PASS' : 'FAIL'}`);
+  });
+});
