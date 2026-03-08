@@ -578,7 +578,7 @@
 }
 
 .card-action-variant-danger:hover {
-  background: rgb(185 28 28 / 8%);
+  background: hsl(var(--destructive) / 8%);
   color: var(--color-danger-hover);
 }
 
