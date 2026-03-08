@@ -40,7 +40,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
         </div>
       )}
 
-      <div>
+      <div className="journal-entry-header">
         <h3>
           {isSystemEvent && (
             <span aria-label="System event">
@@ -76,7 +76,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
         </div>
       </div>
 
-      <div>
+      <div className="journal-entry-content">
         <div className="prose prose-gray dark:prose-invert">
           <p>
             {entry.type === 'discovery'

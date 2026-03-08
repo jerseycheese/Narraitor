@@ -39,15 +39,11 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
         return (
           <Card
             key={entry.id}
-            className={`${
-              isSystemEvent
-                ? selectedEntryId === entry.id
-                  ? ''
-                  : ''
-                : selectedEntryId === entry.id
-                  ? ''
-                  : ''
-            }`}
+            className={cssClasses(
+              'journal-entry-list-item',
+              isSystemEvent ? 'journal-system-event' : '',
+              selectedEntryId === entry.id ? 'journal-entry-list-item-selected' : ''
+            )}
             onClick={() => onEntrySelect(entry)}
             role="button"
             tabIndex={0}
