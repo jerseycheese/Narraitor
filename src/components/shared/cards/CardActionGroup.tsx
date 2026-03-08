@@ -59,36 +59,18 @@ export interface CardActionGroupProps {
 export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   primaryActions = [],
   secondaryActions = [],
-  layout = 'horizontal',
-  gap = 'md',
-  size = 'md',
-  primarySize,
-  secondarySize,
   className = ''
 }) => {
-      const getButtonClasses = (action: CardAction, actionType: 'primary' | 'secondary') => {
-      // Determine which size to use
-      let buttonSize = size;
-      if (actionType === 'primary' && primarySize) {
-        buttonSize = primarySize;
-      } else if (actionType === 'secondary' && secondarySize) {
-        buttonSize = secondarySize;
-      }
-      
-      let variantClasses = '';
-  
-      if (action.variant === 'primary' && action.className?.includes('bg-')) {
-        variantClasses = action.className;
-      }
-  
-      return `${variantClasses}${action.className || ''}`;
-    };
-  const renderActions = (actions: CardAction[], actionType: 'primary' | 'secondary') => {
+  const getButtonClasses = (action: CardAction) => {
+    const variantClass = action.variant ? `card-action-variant-${action.variant}` : '';
+    return [variantClass, action.className || ''].filter(Boolean).join(' ');
+  };
+  const renderActions = (actions: CardAction[]) => {
     return actions.map(action => (
       <button
         key={action.key}
         onClick={action.onClick}
-        className={`${getButtonClasses(action, actionType)}`}
+        className={getButtonClasses(action)}
         title={action.title}
         data-testid={action.testId}
         type="button"
@@ -102,15 +84,15 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   };
 
   return (
-    <div className={`${className}`}>
+    <div className={`card-action-group ${className}`}>
       {primaryActions.length > 0 && (
         <div>
-          {renderActions(primaryActions, 'primary')}
+          {renderActions(primaryActions)}
         </div>
       )}
       {secondaryActions.length > 0 && (
         <div>
-          {renderActions(secondaryActions, 'secondary')}
+          {renderActions(secondaryActions)}
         </div>
       )}
     </div>

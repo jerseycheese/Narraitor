@@ -30,7 +30,7 @@ export const ActiveStateIndicator: React.FC<ActiveStateIndicatorProps> = ({
   const defaultIcon = <CheckCircle aria-hidden="true" />;
 
   return (
-    <div className={`${className}`}>
+    <div className={`active-state-indicator ${className}`}>
       <div>
         {icon || defaultIcon}
         <span>{text}</span>

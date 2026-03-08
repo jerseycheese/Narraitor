@@ -135,7 +135,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       )}
 
       {/* Grid View - Aligned with Manuscript Design */}
-      <div className="space-y-8">
+      <div className="inventory-category-list">
         {populatedCategories.map((categoryId) => {
           const categoryItems = itemsByCategory[categoryId];
           const metadata = getCategoryMetadata(categoryId);

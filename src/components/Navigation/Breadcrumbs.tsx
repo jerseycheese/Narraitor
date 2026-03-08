@@ -11,7 +11,6 @@ import {
   buildBreadcrumbSegments,
   type BreadcrumbSegment,
 } from '@/utils/routeUtils';
-import { cssClasses } from '@/lib/utils/classNames';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
 import { Button } from '@/components/ui/button';
 
@@ -63,11 +62,11 @@ export function Breadcrumbs({
   };
 
   return (
-    <nav aria-label="Breadcrumb">
+    <nav aria-label="Breadcrumb" className={`breadcrumbs-nav ${className || ''}`}>
       {showEllipsis && (
         <>
-          <span data-testid="breadcrumb-ellipsis">...</span>
-          <span>{separator}</span>
+          <span className="breadcrumbs-item" data-testid="breadcrumb-ellipsis">...</span>
+          <span className="breadcrumbs-separator">{separator}</span>
         </>
       )}
 
@@ -79,11 +78,11 @@ export function Breadcrumbs({
         if (segment.label === 'Loading...') {
           return (
             <React.Fragment key={segment.href}>
-              <span data-testid={testId}>
+              <span className="breadcrumbs-item" data-testid={testId}>
                 {getSegmentIcon(segment)}
                 {segment.label}
               </span>
-              {!isLast && <span>{separator}</span>}
+              {!isLast && <span className="breadcrumbs-separator">{separator}</span>}
             </React.Fragment>
           );
         }
@@ -93,13 +92,14 @@ export function Breadcrumbs({
             <Link
               href={segment.href}
               onClick={(e) => handleClick(e, segment)}
+              className="breadcrumbs-item"
               data-testid={testId}
               aria-current={segment.isCurrentPage ? 'page' : undefined}
             >
               {getSegmentIcon(segment)}
               {segment.label}
             </Link>
-            {!isLast && <span>{separator}</span>}
+            {!isLast && <span className="breadcrumbs-separator">{separator}</span>}
           </React.Fragment>
         );
       })}

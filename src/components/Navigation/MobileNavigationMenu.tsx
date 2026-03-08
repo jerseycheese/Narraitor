@@ -108,6 +108,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
 
   return (
     <div
+      className="mobile-nav-menu"
       role="navigation"
       aria-label="Mobile navigation"
       ref={menuRef}
@@ -116,12 +117,12 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
       onTouchEnd={handleTouchEnd}
     >
       {/* Header with close button */}
-      <div>
-        <div>
+      <div className="mobile-nav-header">
+        <div className="mobile-nav-brand">
           <LogoIcon size="small" className="brightness-0" />
           <LogoText size="sm" />
         </div>
-        <div>
+        <div className="mobile-nav-header-actions">
           {/* Tutorial menu for mobile feature parity with desktop */}
           <TutorialMenu />
           <Button
@@ -136,7 +137,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
       </div>
 
       {/* Main navigation items */}
-      <div>
+      <div className="mobile-nav-links">
         <Button onClick={() => handleNavigation('/worlds')} variant="ghost">
           <Globe aria-hidden="true" />
           Worlds
@@ -156,9 +157,9 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
 
         {/* World switcher section */}
         {Object.keys(worlds).length > 0 && (
-          <div>
-            <h3>Worlds</h3>
-            <div>
+          <div className="mobile-nav-section">
+            <h3 className="mobile-nav-section-title">Worlds</h3>
+            <div className="mobile-nav-world-list">
               {Object.values(worlds).map((world) => {
                 const worldCharacters = (
                   Object.values(characters) as Character[]
@@ -188,7 +189,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
         )}
 
         {/* Quick actions */}
-        <div>
+        <div className="mobile-nav-actions">
           {currentWorld ? (
             <Button
               onClick={() =>

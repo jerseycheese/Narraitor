@@ -12,6 +12,7 @@ import {
 } from 'next/font/google';
 import './globals.css';
 import './workshop.css';
+import './wizard.css';
 import '@/lib/theme/themes/ds1.css';
 import '@/lib/theme/themes/ds2.css';
 import '@/lib/theme/themes/ds3.css';

@@ -149,6 +149,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       showActiveIndicator={isActive}
       testId="world-card"
       hasImage={true}
+      className="component-world-card"
     >
       {/* Always show Hero component - with image or themed background */}
       <div className="group">
