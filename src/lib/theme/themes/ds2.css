@@ -69,6 +69,9 @@
   --color-warning-soft: rgb(146 64 14 / 14%);
   --color-warning-border: rgb(146 64 14 / 50%);
   --color-warning-muted: rgb(146 64 14 / 10%);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success) / 10%);
+  --color-info: hsl(var(--info));
 
   --info: 200 50% 50%;
   --info-foreground: 210 40% 98%;
@@ -132,7 +135,8 @@
 
   /* Radius tokens */
   --radius-sm: 6px;
-  --radius-md: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-full: 9999px;
 }
 
@@ -191,6 +195,9 @@
   --color-warning-soft: rgb(251 191 36 / 14%);
   --color-warning-border: rgb(251 191 36 / 50%);
   --color-warning-muted: rgb(251 191 36 / 10%);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success) / 10%);
+  --color-info: hsl(var(--info));
 
   --info: 200 50% 60%;
   --info-foreground: 222 84% 5%;
@@ -250,7 +257,8 @@
 
   /* Radius tokens */
   --radius-sm: 6px;
-  --radius-md: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-full: 9999px;
 }
 

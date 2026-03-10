@@ -7,6 +7,7 @@ import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
+import { ArrowUp } from 'lucide-react';
 import { cssClasses, safeTrim } from '@/lib/utils';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 import { normalizeDecisionOptions } from './optionNormalizer';
@@ -279,7 +280,15 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                 value={customInputText}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder={customInputPlaceholder}
+                placeholder={
+                  customInputPlaceholder !== 'Or write your own action...'
+                    ? customInputPlaceholder
+                    : theme === 'ds2'
+                      ? 'What do you do?'
+                      : theme === 'ds3'
+                        ? 'Describe your action...'
+                        : customInputPlaceholder
+                }
                 disabled={isDisabled}
                 aria-label="Custom response input"
                 className="manuscript-custom-input"
@@ -296,7 +305,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                 disabled={isDisabled || !safeTrim(customInputText)}
                 className="manuscript-send-button"
               >
-                Send
+                {theme === 'ds3' ? <ArrowUp size={18} aria-hidden="true" /> : 'Send'}
               </button>
               {inputActions}
             </div>

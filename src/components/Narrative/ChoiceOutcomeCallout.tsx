@@ -76,6 +76,7 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
         className
       )}
       data-decision-id={decisionId}
+      data-outcome={decisionOutcome || 'decision'}
     >
       <div className="choice-outcome-label">{outcomeLabel}</div>
       <p className="choice-outcome-text">{displayDecisionText}</p>

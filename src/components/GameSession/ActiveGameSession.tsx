@@ -93,6 +93,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
   const { theme } = useTheme();
   const isDS1 = theme === 'ds1';
+  const isDS3 = theme === 'ds3';
 
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
@@ -385,7 +386,26 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           )}
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
-          rightContent={
+          onOpenDrawer={(drawerType) => {
+            setActiveDrawer(drawerType as DrawerType);
+            setLastOpenedDrawer(drawerType as DrawerType);
+            setIsCharacterSummaryExpanded(false);
+          }}
+          onStartNew={onStartNew}
+          onBack={onBack}
+          saveIndicator={
+            <SaveIndicator
+              status={autoSave.status}
+              lastSaveTime={autoSave.lastSaveTime}
+              errorMessage={autoSave.errorMessage}
+              totalSaves={autoSave.totalSaves}
+              onRetryError={autoSave.retry}
+              retryable
+              compact
+              className="manuscript-save-indicator"
+            />
+          }
+          rightContent={isDS3 ? undefined : (
             <div className="manuscript-hud-right-controls">
               <SaveIndicator
                 status={autoSave.status}
@@ -414,7 +434,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 Close
               </button>
             </div>
-          }
+          )}
         />
       }
       marginContent={isDS1 && isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&

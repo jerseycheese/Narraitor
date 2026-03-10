@@ -70,6 +70,9 @@
   --color-warning-soft: rgb(146 64 14 / 14%);
   --color-warning-border: rgb(146 64 14 / 50%);
   --color-warning-muted: rgb(146 64 14 / 10%);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success) / 10%);
+  --color-info: hsl(var(--info));
 
   --info: 217 91% 60%;
   --info-foreground: 210 40% 98%;
@@ -192,6 +195,9 @@
   --color-warning-soft: rgb(251 191 36 / 14%);
   --color-warning-border: rgb(251 191 36 / 50%);
   --color-warning-muted: rgb(251 191 36 / 10%);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success) / 10%);
+  --color-info: hsl(var(--info));
 
   --info: 213.1 93.9% 67.8%;
   --info-foreground: 222.2 84% 4.9%;

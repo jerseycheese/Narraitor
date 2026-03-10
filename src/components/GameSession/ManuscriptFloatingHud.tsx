@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useTheme } from '@/lib/theme/ThemeProvider';
+import { BookOpen, Backpack, FileText, RotateCcw, LogOut } from 'lucide-react';
 
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
@@ -14,6 +15,10 @@ interface ManuscriptFloatingHudProps {
   rightContent?: React.ReactNode;
   drawerTriggers?: boolean;
   characterName?: string;
+  onOpenDrawer?: (drawerType: string) => void;
+  onStartNew?: () => void;
+  onBack?: () => void;
+  saveIndicator?: React.ReactNode;
 }
 
 export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = (props) => {
@@ -132,6 +137,8 @@ function DS2RunningHead({
         )}
       </div>
 
+      <span className="manuscript-hud-center-label">Current Session</span>
+
       <div className="manuscript-overlay-header-right">
         {rightContent}
       </div>
@@ -143,13 +150,12 @@ function DS2RunningHead({
 function DS3FloatingPill({
   onToggleCharacterSummary,
   isCharacterSummaryExpanded,
-  onToggleToolsMenu,
-  isToolsMenuOpen,
   characterSummaryPanel,
-  toolsMenuPanel,
-  rightContent,
-  drawerTriggers,
   characterName,
+  onOpenDrawer,
+  onStartNew,
+  onBack,
+  saveIndicator,
 }: ManuscriptFloatingHudProps) {
   return (
     <>
@@ -166,22 +172,6 @@ function DS3FloatingPill({
             </span>
             <span>{characterName || 'Character'}</span>
           </button>
-
-          {drawerTriggers && (
-            <button
-              type="button"
-              onClick={onToggleToolsMenu}
-              aria-label="Toggle Tools menu"
-              aria-expanded={isToolsMenuOpen}
-              className="manuscript-hud-icon-button"
-            >
-              {/* Gear icon */}
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
-                <path d="M6.7 1.6l-.5 1.3a.8.8 0 0 1-1 .4l-1.3-.4a.4.4 0 0 0-.5.2L2.2 5a.4.4 0 0 0 .1.5l1 .9a.8.8 0 0 1 0 1.2l-1 .9a.4.4 0 0 0-.1.5l1.2 1.9a.4.4 0 0 0 .5.2l1.3-.4a.8.8 0 0 1 1 .4l.5 1.3a.4.4 0 0 0 .4.3h2.3a.4.4 0 0 0 .4-.3l.5-1.3a.8.8 0 0 1 1-.4l1.3.4a.4.4 0 0 0 .5-.2l1.2-1.9a.4.4 0 0 0-.1-.5l-1-.9a.8.8 0 0 1 0-1.2l1-.9a.4.4 0 0 0 .1-.5L12.6 3a.4.4 0 0 0-.5-.2l-1.3.4a.8.8 0 0 1-1-.4l-.5-1.3a.4.4 0 0 0-.4-.3H7.1a.4.4 0 0 0-.4.3Z" />
-              </svg>
-            </button>
-          )}
         </div>
 
         {isCharacterSummaryExpanded && characterSummaryPanel && (
@@ -189,16 +179,57 @@ function DS3FloatingPill({
             {characterSummaryPanel}
           </div>
         )}
-
-        {isToolsMenuOpen && toolsMenuPanel && (
-          <div className="manuscript-hud-panel manuscript-hud-panel-left">
-            {toolsMenuPanel}
-          </div>
-        )}
       </div>
 
       <div className="manuscript-overlay-header-right">
-        {rightContent}
+        <div className="manuscript-ds3-controls">
+          {saveIndicator}
+          <button
+            type="button"
+            onClick={() => onOpenDrawer?.('journal')}
+            title="Journal"
+            aria-label="Journal"
+            className="manuscript-hud-icon-button"
+          >
+            <BookOpen size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenDrawer?.('inventory')}
+            title="Inventory"
+            aria-label="Inventory"
+            className="manuscript-hud-icon-button"
+          >
+            <Backpack size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenDrawer?.('story-summary')}
+            title="Story Summary"
+            aria-label="Story Summary"
+            className="manuscript-hud-icon-button"
+          >
+            <FileText size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={onStartNew}
+            title="Reset Session"
+            aria-label="Reset Session"
+            className="manuscript-hud-icon-button"
+          >
+            <RotateCcw size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={onBack}
+            title="End Session"
+            aria-label="End Session"
+            className="manuscript-hud-icon-button"
+          >
+            <LogOut size={16} aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </>
   );

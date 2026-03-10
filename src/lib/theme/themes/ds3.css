@@ -69,6 +69,9 @@
   --color-warning-soft: rgb(140 109 63 / 14%);
   --color-warning-border: rgb(140 109 63 / 50%);
   --color-warning-muted: rgb(140 109 63 / 10%);
+  --color-success: rgb(74 124 89);
+  --color-success-bg: rgb(74 124 89 / 10%);
+  --color-info: rgb(91 122 140);
 
   --info: 200 21% 45%;
   --info-foreground: 210 40% 98%;
@@ -131,8 +134,9 @@
   --space-8:   2rem;
 
   /* Radius tokens */
-  --radius-sm: 2px;
-  --radius-md: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --radius-full: 9999px;
 }
 
@@ -191,6 +195,9 @@
   --color-warning-soft: rgb(176 142 92 / 14%);
   --color-warning-border: rgb(176 142 92 / 50%);
   --color-warning-muted: rgb(176 142 92 / 10%);
+  --color-success: rgb(107 158 122);
+  --color-success-bg: rgb(107 158 122 / 12%);
+  --color-info: rgb(123 160 180);
 
   --info: 200 25% 57%;
   --info-foreground: 222 84% 5%;
@@ -249,8 +256,9 @@
   --space-8:   2rem;
 
   /* Radius tokens */
-  --radius-sm: 2px;
-  --radius-md: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --radius-full: 9999px;
 }
 

@@ -3,6 +3,7 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { NarrativeDisplay } from './NarrativeDisplay';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useBufferedNarrativeSegments } from './hooks/useBufferedNarrativeSegments';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 
 interface NarrativeHistoryProps {
   segments: NarrativeSegment[];
@@ -28,6 +29,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   const hasUserScrollInteractionRef = useRef(false);
   const isNearBottomRef = useRef(true);
 
+  const { theme } = useTheme();
   const { renderedSegments } = useBufferedNarrativeSegments(segments);
 
   // Check if the viewport is near the bottom
@@ -213,13 +215,17 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     if (renderedSegments.length > 0) {
       return (
         <>
-          {renderedSegments.map((segment) => (
-            <NarrativeDisplay
-              key={segment.id}
-              segment={segment}
-              isLoading={false}
-              error={undefined}
-            />
+          {renderedSegments.map((segment, index) => (
+            <React.Fragment key={segment.id}>
+              {theme === 'ds3' && index > 0 && (
+                <hr className="manuscript-narrative-divider" />
+              )}
+              <NarrativeDisplay
+                segment={segment}
+                isLoading={false}
+                error={undefined}
+              />
+            </React.Fragment>
           ))}
 
           {/* Loading indicator for additional segments */}
