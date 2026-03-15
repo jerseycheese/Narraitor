@@ -27,6 +27,16 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
   const headerRef = useRef<HTMLElement>(null);
   const actionRailRef = useRef<HTMLDivElement>(null);
 
+  // Lock body scroll when the game session overlay is active
+  useEffect(() => {
+    document.body.classList.add('manuscript-overlay-open');
+    document.documentElement.classList.add('manuscript-overlay-open');
+    return () => {
+      document.body.classList.remove('manuscript-overlay-open');
+      document.documentElement.classList.remove('manuscript-overlay-open');
+    };
+  }, []);
+
   useEffect(() => {
     if (theme !== 'ds1') return;
     const rail = railRef.current;

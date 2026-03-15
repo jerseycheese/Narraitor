@@ -2,6 +2,31 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { RequirementLogic } from '@/types/narrative.types';
 
+interface AlignmentBadgeProps {
+  alignment?: string;
+}
+
+/**
+ * Renders the alignment label (Lawful / Chaotic) as a colored badge.
+ * Neutral alignment renders nothing (it's the unmarked default).
+ */
+export const AlignmentBadge: React.FC<AlignmentBadgeProps> = ({
+  alignment,
+}) => {
+  if (!alignment || alignment === 'neutral') return null;
+
+  const label = alignment.charAt(0).toUpperCase() + alignment.slice(1);
+
+  return (
+    <span
+      className={`manuscript-alignment-badge manuscript-alignment-badge-${alignment}`}
+      aria-label={`${label} alignment`}
+    >
+      {label}
+    </span>
+  );
+};
+
 interface SkillRequirement {
   skillName?: string;
   requirement?: {

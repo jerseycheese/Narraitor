@@ -1,10 +1,10 @@
+/* Manuscript session layout rules (game session overlay, HUD, action rail, drawers) */
+@import url('../styles/manuscript-session.css');
+
 /* Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Manuscript session layout rules (game session overlay, HUD, action rail, drawers) */
-@import '../styles/manuscript-session.css';
 
 /* Skip link - visually hidden until focused (accessibility) */
 a[href="#main-content"] {

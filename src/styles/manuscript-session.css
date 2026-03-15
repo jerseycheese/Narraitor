@@ -103,6 +103,28 @@ body.manuscript-overlay-open {
   width: 100%;
 }
 
+/* Fix 25a-c: NarrativeHistory inline style replacements */
+.narrative-history-container {
+  height: 100%;
+}
+
+.mobile-scroll {
+  height: 100%;
+}
+
+.scroll-smooth {
+  scroll-padding-block: 2rem;
+}
+
+/* Fix 25d: CharacterSummary cursor via class-based targeting */
+.manuscript-character-summary .manuscript-character-summary-header {
+  cursor: pointer;
+}
+
+.manuscript-character-details .manuscript-character-summary-header {
+  cursor: default;
+}
+
 /* ─── Play Page ─── */
 
 .manuscript-play-page {
@@ -841,15 +863,15 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-suggested-action.manuscript-suggested-action-lawful {
-  background: hsl(var(--alignment-lawful-bg));
-  border-color: hsl(var(--alignment-lawful-border));
-  color: hsl(var(--alignment-lawful-text));
+  background: var(--color-alignment-lawful-bg);
+  border-color: var(--color-alignment-lawful-border);
+  color: var(--color-alignment-lawful-text);
 }
 
 .manuscript-suggested-action.manuscript-suggested-action-chaotic {
-  background: hsl(var(--alignment-chaotic-bg));
-  border-color: hsl(var(--alignment-chaotic-border));
-  color: hsl(var(--alignment-chaotic-text));
+  background: var(--color-alignment-chaotic-bg);
+  border-color: var(--color-alignment-chaotic-border);
+  color: var(--color-alignment-chaotic-text);
 }
 
 /* Journal Snapshot Drawer */
@@ -1147,6 +1169,30 @@ body.manuscript-overlay-open {
 
   gap: var(--space-1);
 
+}
+
+.manuscript-alignment-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  padding: var(--space-0_5) var(--space-1_5);
+  font-size: 0.625rem;
+  font-family: var(--font-system);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.manuscript-alignment-badge-lawful {
+  background: var(--color-alignment-lawful-bg);
+  color: var(--color-alignment-lawful-text);
+  border: 1px solid var(--color-alignment-lawful-border);
+}
+
+.manuscript-alignment-badge-chaotic {
+  background: var(--color-alignment-chaotic-bg);
+  color: var(--color-alignment-chaotic-text);
+  border: 1px solid var(--color-alignment-chaotic-border);
 }
 
 .manuscript-skill-check-badge {
@@ -1956,6 +2002,17 @@ body.manuscript-overlay-open {
   }
 }
 
+/* Fix 22: DS1 keyframe animations */
+@keyframes ds1-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes ds1-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
 @keyframes manuscript-fade-in {
   from {
     opacity: 0;
@@ -2259,6 +2316,653 @@ body.manuscript-overlay-open {
   height: 3.5rem;
   width: 100%;
   border-radius: var(--radius-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS1 "Drafting Table" — production alignment with design spec
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Fix 1: HUD Container — full bordered box with blur */
+[data-theme="ds1"] .manuscript-overlay-header {
+  background: var(--color-overlay-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: var(--space-1_5) var(--space-3);
+}
+
+/* Fix 59: DS1 HUD left controls gap — demo uses 6px, base uses 8px */
+[data-theme="ds1"] .manuscript-header-controls {
+  gap: var(--space-1_5);
+}
+
+/* Fix 60: DS1 HUD right controls gap — demo uses 12px, base uses 8px */
+[data-theme="ds1"] .manuscript-hud-right-controls {
+  gap: var(--space-3);
+}
+
+/* Fix 2: HUD Button Typography — smaller, uppercase, mono */
+[data-theme="ds1"] .manuscript-hud-text-button {
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-2_5);
+}
+
+/* Fix 3: HUD Right Controls — plain text links, no chrome */
+[data-theme="ds1"] .manuscript-hud-right-controls .manuscript-hud-text-button {
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .manuscript-hud-right-controls .manuscript-hud-text-button:hover {
+  background: none;
+  border: none;
+  color: var(--color-text-primary);
+}
+
+/* Fix 3b: Compact save indicator for DS1 */
+[data-theme="ds1"] .manuscript-save-indicator {
+  border: none;
+  background: transparent;
+  padding: var(--space-1);
+}
+
+[data-theme="ds1"] .manuscript-save-indicator .save-indicator-copy {
+  display: none;
+}
+
+/* Fix 4: Choice Card Typography — mono font, compact */
+[data-theme="ds1"] .manuscript-suggested-action-label {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Fix 5: Skill Badge — hidden in DS1 (alignment labels shown instead) */
+[data-theme="ds1"] .manuscript-skill-check-badge {
+  display: none;
+}
+
+/* Fix 6 + 21: End Story Button — compact uppercase, demo-matched opacity colors + sizing */
+[data-theme="ds1"] .manuscript-warning-action-button {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: var(--font-system);
+  background: rgb(146 64 14 / 8%);
+  border-color: rgb(146 64 14 / 25%);
+  height: 2.375rem;
+  padding: 0 var(--space-2_5);
+}
+
+/* Fix 33: End Story Button — dark-mode warning color switch */
+[data-theme="ds1"].dark .manuscript-warning-action-button {
+  background: rgb(251 191 36 / 8%);
+  border-color: rgb(251 191 36 / 25%);
+}
+
+/* Fix 7 + 61: Character Rail Label — tighter typography + spacing */
+[data-theme="ds1"] .manuscript-characters-rail-label {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-0_5); /* Fix 61: 8px gap + 2px margin = 10px (demo: marginBottom 10) */
+}
+
+/* Fix 8 + 43: Character Badge — strip chrome, inner gap + mono font */
+[data-theme="ds1"] .manuscript-character-badge {
+  background: transparent;
+  border: none;
+  padding: var(--space-0_5) 0;
+  font-size: 0.6875rem;
+  gap: var(--space-1_5); /* 6px, demo: gap 6 */
+  font-family: var(--font-system);
+}
+
+[data-theme="ds1"] .manuscript-character-avatar {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Fix 62: DS1 HUD panel — opaque surface, demo-matched padding */
+[data-theme="ds1"] .manuscript-hud-panel {
+  background: var(--color-surface);
+  padding: var(--space-3_5);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%); /* Fix 86 */
+}
+
+/* Fix 63: DS1 HUD panel title — compact technical label (matches rail label style) */
+[data-theme="ds1"] .manuscript-hud-panel-title {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-2_5);
+}
+
+/* Fix 64-65: DS1 character snapshot — compact row layout with smaller portrait */
+[data-theme="ds1"] .manuscript-character-snapshot-identity {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2_5);
+}
+
+[data-theme="ds1"] .manuscript-character-snapshot-portrait {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+/* Fix 66: DS1 character snapshot name — tighter, bolder */
+[data-theme="ds1"] .manuscript-character-snapshot-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* Fix 67: DS1 character snapshot stats — smaller text */
+[data-theme="ds1"] .manuscript-character-snapshot-level-row {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .manuscript-character-snapshot-item {
+  font-size: 0.6875rem;
+}
+
+[data-theme="ds1"] .manuscript-character-snapshot-item-value {
+  font-weight: 600;
+}
+
+/* Fix 68: DS1 character snapshot section dividers */
+[data-theme="ds1"] .manuscript-character-snapshot-section + .manuscript-character-snapshot-section {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-2);
+}
+
+/* Fix 93: DS1 characters rail — strip container chrome, section handles own padding */
+[data-theme="ds1"] .manuscript-characters-rail {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* Fix 42: Rail list — vertical stack with wider gap */
+[data-theme="ds1"] .manuscript-characters-rail-list {
+  flex-direction: column;
+  gap: var(--space-2); /* 8px, demo: marginBottom 8 */
+}
+
+/* Fix 44: Rail section padding */
+[data-theme="ds1"] .manuscript-characters-rail-section {
+  padding: var(--space-3) var(--space-2_5); /* 12px 10px, demo: padding '12px 10px' */
+}
+
+/* Fix 9: Outcome Callout — dashed-border card with stamp badge */
+[data-theme="ds1"] .choice-outcome-callout {
+  border-left: none;
+  border: 1px dashed var(--color-border);
+  background: var(--color-surface-hover);
+  position: relative;
+  padding-top: calc(var(--space-4) + var(--space-4) + var(--space-1));
+}
+
+[data-theme="ds1"] .choice-outcome-label {
+  position: absolute;
+  top: calc(-1 * var(--space-2));
+  right: var(--space-3);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  padding: var(--space-2);
+  border-radius: 1px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-bottom: 0;
+}
+
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="success"] .choice-outcome-label,
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="critical-success"] .choice-outcome-label {
+  background: var(--color-success-text);
+}
+
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="failure"] .choice-outcome-label,
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="critical-failure"] .choice-outcome-label {
+  background: var(--color-danger);
+}
+
+[data-theme="ds1"] .choice-outcome-text {
+  font-family: var(--font-system);
+  font-style: normal;
+  font-size: 0.6875rem;
+  line-height: 1.55;
+}
+
+/* Fix 11: Alignment cards — strip text color (keep default) */
+[data-theme="ds1"] .manuscript-suggested-action.manuscript-suggested-action-lawful,
+[data-theme="ds1"] .manuscript-suggested-action.manuscript-suggested-action-chaotic {
+  color: var(--color-text-primary);
+}
+
+/* Fix 30-31: Restore alignment card bg/border tinting (overridden by Fix 13 specificity) */
+[data-theme="ds1"] .manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-lawful {
+  background: var(--color-alignment-lawful-bg);
+  border-color: var(--color-alignment-lawful-border);
+}
+
+[data-theme="ds1"] .manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-chaotic {
+  background: var(--color-alignment-chaotic-bg);
+  border-color: var(--color-alignment-chaotic-border);
+}
+
+/* Fix 34: DS1 3-column choice grid at tablet landscape (768px) instead of 1024px */
+@media (width >= 768px) {
+  [data-theme="ds1"] .manuscript-suggested-actions-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+/* Fix 13: Choice card layout — column direction, demo-matched sizing */
+[data-theme="ds1"] .manuscript-suggested-actions-grid .manuscript-suggested-action {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: 4.125rem;
+  padding: var(--space-2_5) var(--space-3_5);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+/* Fix 14 + 19: Send button — full DS1 sizing */
+[data-theme="ds1"] .manuscript-send-button {
+  font-size: 0.75rem;
+  font-weight: 500;
+  height: 2.375rem;
+  padding: 0 var(--space-3_5);
+}
+
+/* Fix 15 + 32: Alignment badge — demo-matched sizing + stronger bg tint */
+[data-theme="ds1"] .manuscript-alignment-badge {
+  font-size: 0.625rem;
+  padding: 1px var(--space-1_5);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+[data-theme="ds1"]:not(.dark) .manuscript-alignment-badge-lawful {
+  background: rgb(7 89 133 / 10%);
+}
+
+[data-theme="ds1"]:not(.dark) .manuscript-alignment-badge-chaotic {
+  background: rgb(146 64 14 / 10%);
+}
+
+/* Fix 16: Hide choice prompt in DS1 (demo has none) */
+[data-theme="ds1"] .manuscript-choice-prompt {
+  display: none;
+}
+
+/* Fix 17-18 + 41: Action Rail — backdrop blur + tighter padding + no shadow */
+[data-theme="ds1"] #manuscript-action-rail {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: var(--space-2_5) var(--space-2_5) var(--space-2);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+[data-theme="ds1"] .manuscript-action-rail-stack {
+  gap: var(--space-1_5);
+}
+
+/* Fix 20: Input field — DS1 font-size and padding */
+[data-theme="ds1"] .manuscript-custom-input {
+  font-size: 0.8125rem;
+  padding: 0 var(--space-2_5);
+}
+
+/* Fix 23: Loading skeleton — DS1 shimmer gradient */
+[data-theme="ds1"] .manuscript-skeleton-pulse {
+  background: linear-gradient(90deg, var(--color-border) 25%, var(--color-surface-hover) 50%, var(--color-border) 75%);
+  background-size: 200% 100%;
+  border-radius: 2px;
+  animation: ds1-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Fix 24: Streaming indicator — hidden by default, visible in DS1 */
+.manuscript-streaming-indicator {
+  display: none;
+}
+
+[data-theme="ds1"] .manuscript-streaming-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1_5);
+  padding: var(--space-2_5) var(--space-2_5) var(--space-1_5);
+}
+
+[data-theme="ds1"] .manuscript-streaming-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+  animation: ds1-pulse 1.2s ease-in-out infinite;
+}
+
+[data-theme="ds1"] .manuscript-streaming-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Fix 35: Hide "Suggested Actions" heading in DS1 (demo has none) */
+[data-theme="ds1"] .manuscript-suggested-actions-heading {
+  display: none;
+}
+
+/* Fix 36: Choice card inner content — column layout to match demo stacked label+badge */
+[data-theme="ds1"] .manuscript-suggested-action-content {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Fix 37: Hide choice card chevron in DS1 (demo has none) */
+[data-theme="ds1"] .manuscript-suggested-action-chevron {
+  display: none;
+}
+
+/* Fix 38: Hide context summary in DS1 (demo has none) */
+[data-theme="ds1"] .manuscript-context-summary {
+  display: none;
+}
+
+/* Fix 39 + 92: Narrative paragraph spacing — DS1 scene-spacing matches base DS1 paragraph spacing */
+[data-theme="ds1"] .text-narrative.scene-spacing p {
+  margin-bottom: var(--space-3);
+}
+
+/* Fix 40: Choice button font — DS1 uses monospace system font on the entire button */
+[data-theme="ds1"] .manuscript-suggested-action {
+  font-family: var(--font-system);
+}
+
+/* Fix 45: "Decision Logged" left-border variant — container override */
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="decision"] {
+  border: none;
+  background: transparent;
+  padding: 0 0 0 var(--space-5); /* 20px left indent */
+  padding-top: 0;
+  position: relative;
+  margin: var(--space-4) 0;
+}
+
+/* Fix 46: Left border via ::before */
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="decision"]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-border);
+}
+
+/* Fix 47: Label as inline flex row (override absolute positioning) */
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="decision"] .choice-outcome-label {
+  position: static;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  margin-bottom: var(--space-0_5);
+  padding: 0;
+  font-weight: 500;
+}
+
+/* Fix 48: "REC" badge via ::before on the label */
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="decision"] .choice-outcome-label::before {
+  content: 'REC';
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  padding: 1px var(--space-1_5);
+  border-radius: 1px;
+  font-weight: 600;
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+}
+
+/* Fix 49: Decision text — narrative font, italic, larger than stamp body */
+[data-theme="ds1"] .choice-outcome-callout[data-outcome="decision"] .choice-outcome-text {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+/* Fix 50: Dark mode stamp badge contrast — light-mode accent tokens used as
+   background flip too bright in dark mode (designed for text-on-dark, not
+   background-for-white-text). Pin badge backgrounds to their dark equivalents. */
+[data-theme="ds1"].dark .choice-outcome-label {
+  background: rgb(49 46 129); /* DS1 canonical accent — 13:1 with white */
+}
+
+[data-theme="ds1"].dark .choice-outcome-callout[data-outcome="success"] .choice-outcome-label,
+[data-theme="ds1"].dark .choice-outcome-callout[data-outcome="critical-success"] .choice-outcome-label {
+  background: rgb(22 101 52); /* green-800 — 6.4:1 with white */
+}
+
+[data-theme="ds1"].dark .choice-outcome-callout[data-outcome="failure"] .choice-outcome-label,
+[data-theme="ds1"].dark .choice-outcome-callout[data-outcome="critical-failure"] .choice-outcome-label {
+  background: rgb(185 28 28); /* DS1 light-mode danger — 6.5:1 with white */
+}
+
+/* Fix 51: Dark mode REC badge contrast */
+[data-theme="ds1"].dark .choice-outcome-callout[data-outcome="decision"] .choice-outcome-label::before {
+  background: rgb(49 46 129); /* match stamp badge override */
+}
+
+/* Fix 52: DS1 3-column grid rail width — demo uses 140px (8.75rem) rails */
+@media (width >= 1024px) {
+  [data-theme="ds1"] .manuscript-main-stage {
+    grid-template-columns: 8.75rem minmax(0, 1fr) 8.75rem;
+  }
+
+  /* Fix 84: DS1 no-rail — collapse to single column when character rail absent */
+  [data-theme="ds1"] .manuscript-main-stage.manuscript-no-rail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Fix 53: DS1 narrative center vertical padding */
+[data-theme="ds1"] .manuscript-main-content {
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+/* Fix 54: DS1 viewport inner gap tightening — demo uses flat 12px / 10px */
+[data-theme="ds1"] .manuscript-viewport-inner {
+  padding: var(--space-3) var(--space-3);
+  gap: var(--space-2_5);
+}
+
+/* Fix 56: DS1 error container */
+[data-theme="ds1"] .error-display-section {
+  margin: var(--space-4) 0;
+  padding: var(--space-3) var(--space-3_5);
+  background: rgb(159 18 57 / 6%);
+  border: 1px solid rgb(159 18 57 / 30%);
+  border-radius: var(--radius-sm);
+}
+
+/* Fix 57: DS1 error label + text */
+[data-theme="ds1"] .error-display-title {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(159 18 57);
+  margin-bottom: var(--space-1_5);
+  font-family: var(--font-system);
+}
+
+[data-theme="ds1"] .error-display-message {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: rgb(159 18 57);
+  margin: 0 0 var(--space-2_5);
+  font-family: var(--font-narrative);
+}
+
+/* Fix 58: DS1 error buttons */
+[data-theme="ds1"] .error-display-actions {
+  display: flex;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds1"] .error-display-retry {
+  padding: var(--space-1) var(--space-2_5);
+  font-size: 0.625rem;
+  font-weight: 500;
+  background: rgb(159 18 57);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-family: var(--font-system);
+}
+
+[data-theme="ds1"] .error-display-dismiss {
+  padding: var(--space-1) var(--space-2_5);
+  font-size: 0.625rem;
+  font-weight: 500;
+  background: transparent;
+  color: rgb(159 18 57);
+  border: 1px solid rgb(159 18 57 / 30%);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-family: var(--font-system);
+}
+
+/* Fix 69: DS1 tools menu items — compact, transparent background */
+[data-theme="ds1"] .manuscript-tools-menu-item {
+  padding: var(--space-2) var(--space-2_5);
+  background: transparent;
+  font-size: 0.75rem;
+}
+
+/* Fix 70: DS1 tools menu item spacing — tighter gap between items */
+[data-theme="ds1"] .manuscript-tools-menu-items > * + * {
+  margin-top: var(--space-1);
+}
+
+/* Fix 71: DS1 drawer panel — narrower to match demo proportion */
+[data-theme="ds1"] .manuscript-drawer-panel {
+  width: min(100%, 17.5rem);
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+@media (width >= 640px) {
+  [data-theme="ds1"] .manuscript-drawer-panel {
+    padding: var(--space-4);
+  }
+}
+
+
+/* Fix 72: DS1 skill value accent color */
+[data-theme="ds1"] .manuscript-character-snapshot-section[data-section="skills"] .manuscript-character-snapshot-item-value {
+  color: var(--color-accent);
+}
+
+/* Fix 73: DS1 drawer header — tighter spacing */
+[data-theme="ds1"] .manuscript-drawer-header {
+  margin-bottom: var(--space-1);
+}
+
+/* Fix 74: DS1 drawer title — smaller font */
+[data-theme="ds1"] .manuscript-drawer-title {
+  font-size: 0.875rem;
+}
+
+/* Fix 75: DS1 drawer subtitle — compact muted text */
+[data-theme="ds1"] .manuscript-drawer-subtitle {
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-0_5);
+}
+
+/* Fix 76: DS1 drawer close button — bare text link */
+[data-theme="ds1"] .manuscript-drawer-close-text {
+  background: none;
+  border: none;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted); /* Fix 85 */
+}
+
+/* Fix 77: DS1 drawer content divider */
+[data-theme="ds1"] .manuscript-drawer-content {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* Fix 78: DS1 story summary paragraph typography */
+[data-theme="ds1"] .manuscript-story-summary-paragraph {
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+/* Fix 79-80: DS1 journal entry card refinements */
+[data-theme="ds1"] .manuscript-journal-snapshot-entry {
+  padding: var(--space-2_5);
+  background: var(--color-surface-hover);
+}
+
+[data-theme="ds1"] .manuscript-journal-snapshot-title {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  margin-bottom: var(--space-1);
+}
+
+[data-theme="ds1"] .manuscript-journal-snapshot-content {
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+/* Fix 87: DS1 narrative text — compact typography matching demo reference */
+[data-theme="ds1"] .text-narrative {
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+[data-theme="ds1"] .text-narrative p {
+  margin-bottom: var(--space-3);
+}
+
+/* Fix 88: DS1 main stage — tighter column gap matching demo reference */
+[data-theme="ds1"] .manuscript-main-stage {
+  gap: var(--space-2_5);
+}
+
+/* Fix 90: DS1 snapshot stats — tighter section spacing matching demo */
+[data-theme="ds1"] .manuscript-character-snapshot-stats {
+  gap: var(--space-2);
 }
 
 /* ═══════════════════════════════════════════════════════════════

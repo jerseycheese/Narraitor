@@ -287,14 +287,11 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
       className={['narrative-history-container', className].filter(Boolean).join(' ')}
       onKeyDown={handleKeyDown}
       tabIndex={0}
-      style={{ height: '100%' }}
     >
       <ScrollArea
         ref={scrollAreaRef}
         className="mobile-scroll"
-        style={{ height: '100%' }}
         viewportClassName="scroll-smooth"
-        viewportStyle={{ scrollPaddingBlock: '2rem' }}
       >
         <div ref={scrollContentRef} className="narrative-history-segments">
           {renderContent()}

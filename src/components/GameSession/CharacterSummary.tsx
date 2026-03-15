@@ -94,8 +94,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({
       {/* Header Section */}
       <div
            className="manuscript-character-summary-header"
-           onClick={() => !isDrawer && setIsExpanded(!isExpanded)}
-           style={{ cursor: isDrawer ? 'default' : 'pointer' }}>
+           onClick={() => !isDrawer && setIsExpanded(!isExpanded)}>
         <div className="manuscript-character-summary-identity">
           {/* Portrait Section */}
           {character.portrait && (

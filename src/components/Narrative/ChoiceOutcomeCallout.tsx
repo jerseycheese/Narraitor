@@ -65,9 +65,9 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     decisionOutcome
   );
 
-  const outcomeLabel = decisionOutcome 
-    ? `OUTCOME: ${outcomeLabels[decisionOutcome].toUpperCase()}`
-    : 'OUTCOME: DECISION';
+  const outcomeLabel = decisionOutcome
+    ? outcomeLabels[decisionOutcome]
+    : 'Decision Logged';
 
   return (
     <div

@@ -64,7 +64,7 @@ describe('ChoiceOutcomeCallout', () => {
       />
     );
 
-    expect(screen.getByText('OUTCOME: SUCCESS')).toBeInTheDocument();
+    expect(screen.getByText('Success')).toBeInTheDocument();
   });
 
   it('should switch to attempt phrasing for failed outcomes', () => {

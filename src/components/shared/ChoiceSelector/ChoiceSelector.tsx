@@ -13,6 +13,7 @@ import { useTheme } from '@/lib/theme/ThemeProvider';
 import { normalizeDecisionOptions } from './optionNormalizer';
 import type { NormalizedOption } from './optionNormalizer';
 import {
+  AlignmentBadge,
   SkillRequirementBadges,
   ItemRequirementBadges,
 } from './RequirementBadges';
@@ -250,6 +251,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                       </div>
 
                       <div className="manuscript-suggested-action-badges">
+                        <AlignmentBadge alignment={option.alignment} />
                         <SkillRequirementBadges
                           requirements={option.skillRequirements || []}
                           optionId={option.id}

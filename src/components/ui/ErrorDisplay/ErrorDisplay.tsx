@@ -108,21 +108,21 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   // Default: section variant
   return (
     <div
-      className={className}
+      className={cssClasses('error-display', 'error-display-section', className)}
       role="alert"
       aria-live="polite"
     >
-      {title && <h2>{title}</h2>}
-      <p>{message}</p>
+      {title && <h2 className="error-display-title">{title}</h2>}
+      <p className="error-display-message">{message}</p>
       {(showRetry || showDismiss) && (
-        <div>
+        <div className="error-display-actions">
           {showRetry && onRetry && (
-            <button onClick={onRetry}>
+            <button className="error-display-retry" onClick={onRetry}>
               Try Again
             </button>
           )}
           {showDismiss && onDismiss && (
-            <button onClick={onDismiss}>Dismiss</button>
+            <button className="error-display-dismiss" onClick={onDismiss}>Dismiss</button>
           )}
         </div>
       )}
