@@ -2428,6 +2428,17 @@ body.manuscript-overlay-open {
   height: 1rem;
 }
 
+/* DS1: placeholder circle when no avatar image exists */
+[data-theme="ds1"] .manuscript-character-badge:not(:has(.manuscript-character-avatar))::before {
+  content: '';
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
 /* Fix 62: DS1 HUD panel — opaque surface, demo-matched size */
 [data-theme="ds1"] .manuscript-hud-panel {
   background: var(--color-surface);
@@ -2579,7 +2590,8 @@ body.manuscript-overlay-open {
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  height: 4.125rem;
+  min-height: 4.125rem;
+  height: auto;
   padding: var(--space-2_5) var(--space-3_5);
   font-size: 0.75rem;
   line-height: 1.4;
@@ -2811,6 +2823,7 @@ body.manuscript-overlay-open {
   [data-theme="ds1"] .manuscript-characters-rail {
     display: block;
     grid-column: 1;
+    order: unset;
   }
 
   [data-theme="ds1"] .manuscript-main-content {
@@ -2820,6 +2833,10 @@ body.manuscript-overlay-open {
   [data-theme="ds1"] .manuscript-rail-spacer {
     display: block;
     grid-column: 3;
+  }
+
+  [data-theme="ds1"] .manuscript-characters-mobile-bar {
+    display: none;
   }
 
   [data-theme="ds1"] .manuscript-main-stage.manuscript-no-rail {
