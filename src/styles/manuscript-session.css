@@ -2480,6 +2480,11 @@ body.manuscript-overlay-open {
   font-weight: 600;
 }
 
+/* DS1: hide "Attributes" / "Skills" subheadings — demo uses flat list */
+[data-theme="ds1"] .manuscript-character-snapshot-subheading {
+  display: none;
+}
+
 /* Fix 68: DS1 character snapshot section dividers */
 [data-theme="ds1"] .manuscript-character-snapshot-section + .manuscript-character-snapshot-section {
   border-top: 1px solid var(--color-border);
@@ -2677,11 +2682,18 @@ body.manuscript-overlay-open {
   display: none;
 }
 
-[data-theme="ds1"] .hide-mobile-actions .manuscript-suggested-actions-section,
-[data-theme="ds1"] .hide-mobile-actions .manuscript-choice-prompt,
-[data-theme="ds1"] .hide-mobile-actions .manuscript-choice-selector-body > .manuscript-choice-prompt {
+[data-theme="ds1"] .hide-mobile-actions .manuscript-suggested-actions-section {
   /* stylelint-disable-next-line declaration-no-important */
   display: block !important;
+}
+
+/* DS1: always show desktop End Story button, hide mobile variant */
+[data-theme="ds1"] .manuscript-end-story-desktop {
+  display: inline-flex;
+}
+
+[data-theme="ds1"] .manuscript-end-story-mobile {
+  display: none;
 }
 
 /* Fix 36: Choice card inner content — column layout to match demo stacked label+badge */
