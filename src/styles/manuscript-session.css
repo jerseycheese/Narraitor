@@ -2372,6 +2372,19 @@ body.manuscript-overlay-open {
 }
 
 [data-theme="ds1"] .manuscript-save-indicator .save-indicator-copy {
+  display: block;
+}
+
+[data-theme="ds1"] .manuscript-save-indicator .save-indicator-text {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="ds1"] .manuscript-save-indicator .save-indicator-meta {
   display: none;
 }
 
