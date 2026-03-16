@@ -89,7 +89,6 @@ const TYPE_ROWS = [
   { tag: 'Choice text', family: 'var(--font-interface)', size: '15px', lh: '1.5', weight: 500, sample: 'Search the dressing room for evidence' },
   { tag: 'System data', family: 'var(--font-system)', size: '13px', lh: '1.5', weight: 400, sample: 'INSTINCT 14 \u00B7 COMPOSURE 11 \u00B7 STREET SMARTS 16' },
   { tag: 'Interface', family: 'var(--font-interface)', size: '14px', lh: '1.5', weight: 500, sample: 'Select your next action' },
-  { tag: 'HUD values', family: 'var(--font-system)', size: '16px', lh: '1.4', weight: 600, sample: 'HP 24/30' },
   { tag: 'Timestamps', family: 'var(--font-system)', size: '11px', lh: '1.4', weight: 400, sample: '3 MINUTES AGO', mono: true },
 ];
 
@@ -307,7 +306,7 @@ export default function DesignSystem3Page() {
           <div className="ds3-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
             {[
               { label: 'Newsreader (Serif)', family: 'var(--font-narrative)', text: 'The jazz club exhaled smoke and regret into the damp night air.', sz: '18px', w: 400 },
-              { label: 'Fira Code (Mono)', family: 'var(--font-system)', text: 'HP: 42/50 · CASE 03 · STATUS: Active', sz: '13px', w: 400 },
+              { label: 'Fira Code (Mono)', family: 'var(--font-system)', text: 'CASE 03 · STATUS: Active', sz: '13px', w: 400 },
               { label: 'DM Sans (Sans)', family: 'var(--font-interface)', text: 'Continue to Character Sheet', sz: '15px', w: 500 },
             ].map(f => (
               <div key={f.label} className="ds3-stage ds3-reveal">
@@ -593,7 +592,7 @@ export default function DesignSystem3Page() {
             <div className="ds3-hud-char">
               {!hudOpen ? (
                 <button type="button" className="ds3-hud-pill" onClick={() => setHudOpen(true)} aria-expanded={hudOpen} aria-label="Character stats">
-                  Marlowe — HP 38/50
+                  Marlowe
                 </button>
               ) : (
                 <div className="ds3-hud-panel">
@@ -960,7 +959,7 @@ export default function DesignSystem3Page() {
             <div>
               <div style={{ marginBottom: 12, fontFamily: 'var(--font-system)', fontSize: 10, color: 'var(--color-text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Collapsed (pill)</div>
               <div className="ds3-hud-pill" style={{ cursor: 'default' }}>
-                Marlowe — HP 38/50
+                Marlowe
               </div>
             </div>
             <div>

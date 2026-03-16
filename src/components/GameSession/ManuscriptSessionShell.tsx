@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { cssClasses } from '@/lib/utils';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 
 interface ManuscriptSessionShellProps {
   children: React.ReactNode;
@@ -20,12 +21,24 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
   mobileTopContent,
   className,
 }) => {
+  const { theme } = useTheme();
   const railRef = useRef<HTMLElement>(null);
   const viewportInnerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const actionRailRef = useRef<HTMLDivElement>(null);
 
+  // Lock body scroll when the game session overlay is active
   useEffect(() => {
+    document.body.classList.add('manuscript-overlay-open');
+    document.documentElement.classList.add('manuscript-overlay-open');
+    return () => {
+      document.body.classList.remove('manuscript-overlay-open');
+      document.documentElement.classList.remove('manuscript-overlay-open');
+    };
+  }, []);
+
+  useEffect(() => {
+    if (theme !== 'ds1') return;
     const rail = railRef.current;
     const container = viewportInnerRef.current;
     if (!rail || !container) return;
@@ -43,10 +56,12 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
     observer.observe(rail);
     return () => observer.disconnect();
-  }, []);
+  }, [theme]);
 
   // Match prototype rail/panel geometry so desktop capture metrics stay aligned.
+  // Only needed for DS1 which has a 3-column rail layout.
   useEffect(() => {
+    if (theme !== 'ds1') return;
     if (typeof window === 'undefined' || !window.matchMedia) return;
 
     const container = viewportInnerRef.current;
@@ -187,7 +202,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       window.removeEventListener('resize', syncPosition);
       window.removeEventListener('scroll', syncPosition);
     };
-  }, []);
+  }, [theme]);
 
   return (
     <div

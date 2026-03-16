@@ -70,6 +70,9 @@
   --color-warning-soft: rgb(146 64 14 / 14%);
   --color-warning-border: rgb(146 64 14 / 50%);
   --color-warning-muted: rgb(146 64 14 / 10%);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success) / 10%);
+  --color-info: hsl(var(--info));
 
   --info: 217 91% 60%;
   --info-foreground: 210 40% 98%;
@@ -106,6 +109,15 @@
   --alignment-chaotic-bg: 33 100% 96%;
   --alignment-chaotic-border: 32 98% 83%;
   --alignment-chaotic-text: 20 91% 48%;
+
+  /* Semantic alignment tokens — demo-matched rgba overlays */
+  --color-alignment-lawful-bg: rgb(7 89 133 / 4%);
+  --color-alignment-lawful-border: rgb(7 89 133 / 30%);
+  --color-alignment-lawful-text: #075985;
+  --color-alignment-chaotic-bg: rgb(146 64 14 / 4%);
+  --color-alignment-chaotic-border: rgb(146 64 14 / 30%);
+  --color-alignment-chaotic-text: #92400e;
+  --color-success-text: hsl(var(--success-text));
 
   /* Overlay surfaces and scrims */
   --color-overlay-surface: rgb(255 255 255 / 90%);
@@ -192,6 +204,9 @@
   --color-warning-soft: rgb(251 191 36 / 14%);
   --color-warning-border: rgb(251 191 36 / 50%);
   --color-warning-muted: rgb(251 191 36 / 10%);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success) / 10%);
+  --color-info: hsl(var(--info));
 
   --info: 213.1 93.9% 67.8%;
   --info-foreground: 222.2 84% 4.9%;
@@ -225,6 +240,15 @@
   --alignment-chaotic-bg: 24 83% 10%;
   --alignment-chaotic-border: 20 95% 25%;
   --alignment-chaotic-text: 31 97% 72%;
+
+  /* Semantic alignment tokens */
+  --color-alignment-lawful-bg: hsl(var(--alignment-lawful-bg));
+  --color-alignment-lawful-border: hsl(var(--alignment-lawful-border));
+  --color-alignment-lawful-text: hsl(var(--alignment-lawful-text));
+  --color-alignment-chaotic-bg: hsl(var(--alignment-chaotic-bg));
+  --color-alignment-chaotic-border: hsl(var(--alignment-chaotic-border));
+  --color-alignment-chaotic-text: hsl(var(--alignment-chaotic-text));
+  --color-success-text: hsl(var(--success-text));
 
   --color-overlay-surface: rgb(24 24 27 / 90%);
   --color-overlay-surface-strong: rgb(24 24 27 / 96%);

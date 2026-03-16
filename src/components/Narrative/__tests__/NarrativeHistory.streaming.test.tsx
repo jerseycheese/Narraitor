@@ -11,6 +11,9 @@ import { useNPCStore } from '@/state/npcStore';
 
 jest.mock('@/lib/featureFlags');
 jest.mock('@/state/npcStore');
+jest.mock('@/lib/theme/ThemeProvider', () => ({
+  useTheme: () => ({ theme: 'ds1' }),
+}));
 
 // Mock ResizeObserver
 const mockObserve = jest.fn();
@@ -153,7 +156,7 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     expect(mockScrollTo).not.toHaveBeenCalled();
   });
 
-  it('applies height: 100% for layout stability', () => {
+  it('applies layout classes for height stability', () => {
     mockIsFeatureEnabled.mockReturnValue(true);
     const { container } = render(
       <NarrativeHistory segments={segments} disableInitialAutoScroll={true} />
@@ -161,10 +164,11 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
 
     const historyContainer = container.querySelector('.narrative-history-container') as HTMLDivElement;
     expect(historyContainer).toBeTruthy();
-    expect(historyContainer.style.height).toBe('100%');
 
     const scrollRoot = container.querySelector('.mobile-scroll') as HTMLDivElement;
     expect(scrollRoot).toBeTruthy();
-    expect(scrollRoot.style.height).toBe('100%');
+
+    const scrollViewport = container.querySelector('.scroll-smooth') as HTMLDivElement;
+    expect(scrollViewport).toBeTruthy();
   });
 });

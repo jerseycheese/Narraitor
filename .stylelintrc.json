@@ -74,6 +74,19 @@
           "color-no-hex": null,
           "declaration-property-value-disallowed-list": null
         }
+      },
+      {
+        "files": ["src/styles/manuscript-session.css"],
+        "rules": {
+          "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "radial-gradient", "repeating-linear-gradient", "rgb", "rgba", "blur", "cubic-bezier", "minmax", "min", "clamp"],
+          "function-disallowed-list": [],
+          "declaration-property-value-disallowed-list": {
+            "/^(background|border|color|fill|stroke|outline|text-decoration|box-shadow).*$/": [
+              "/^#[0-9a-fA-F]+$/",
+              "/^(red|blue|green|yellow|orange|purple|pink|brown|indigo|violet|cyan|teal|lime|emerald|sky|rose|slate|stone|neutral|zinc|fuchsia|magenta)$/i"
+            ]
+          }
+        }
       }
     ]
   }

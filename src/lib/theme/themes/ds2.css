@@ -69,6 +69,9 @@
   --color-warning-soft: rgb(146 64 14 / 14%);
   --color-warning-border: rgb(146 64 14 / 50%);
   --color-warning-muted: rgb(146 64 14 / 10%);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success) / 10%);
+  --color-info: hsl(var(--info));
 
   --info: 200 50% 50%;
   --info-foreground: 210 40% 98%;
@@ -106,6 +109,15 @@
   --alignment-chaotic-border: 32 70% 83%;
   --alignment-chaotic-text: 20 70% 45%;
 
+  /* Semantic alignment tokens */
+  --color-alignment-lawful-bg: hsl(var(--alignment-lawful-bg));
+  --color-alignment-lawful-border: hsl(var(--alignment-lawful-border));
+  --color-alignment-lawful-text: hsl(var(--alignment-lawful-text));
+  --color-alignment-chaotic-bg: hsl(var(--alignment-chaotic-bg));
+  --color-alignment-chaotic-border: hsl(var(--alignment-chaotic-border));
+  --color-alignment-chaotic-text: hsl(var(--alignment-chaotic-text));
+  --color-success-text: hsl(var(--success-text));
+
   /* Overlay surfaces and scrims */
   --color-overlay-surface: rgb(255 253 247 / 90%);
   --color-overlay-surface-strong: rgb(255 253 247 / 95%);
@@ -132,7 +144,8 @@
 
   /* Radius tokens */
   --radius-sm: 6px;
-  --radius-md: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-full: 9999px;
 }
 
@@ -191,6 +204,9 @@
   --color-warning-soft: rgb(251 191 36 / 14%);
   --color-warning-border: rgb(251 191 36 / 50%);
   --color-warning-muted: rgb(251 191 36 / 10%);
+  --color-success: hsl(var(--success));
+  --color-success-bg: hsl(var(--success) / 10%);
+  --color-info: hsl(var(--info));
 
   --info: 200 50% 60%;
   --info-foreground: 222 84% 5%;
@@ -225,6 +241,15 @@
   --alignment-chaotic-border: 20 80% 25%;
   --alignment-chaotic-text: 31 90% 72%;
 
+  /* Semantic alignment tokens */
+  --color-alignment-lawful-bg: hsl(var(--alignment-lawful-bg));
+  --color-alignment-lawful-border: hsl(var(--alignment-lawful-border));
+  --color-alignment-lawful-text: hsl(var(--alignment-lawful-text));
+  --color-alignment-chaotic-bg: hsl(var(--alignment-chaotic-bg));
+  --color-alignment-chaotic-border: hsl(var(--alignment-chaotic-border));
+  --color-alignment-chaotic-text: hsl(var(--alignment-chaotic-text));
+  --color-success-text: hsl(var(--success-text));
+
   --color-overlay-surface: rgb(34 30 27 / 90%);
   --color-overlay-surface-strong: rgb(34 30 27 / 95%);
   --color-manuscript-gradient-start: rgb(45 37 32 / 90%);
@@ -250,7 +275,8 @@
 
   /* Radius tokens */
   --radius-sm: 6px;
-  --radius-md: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-full: 9999px;
 }
 

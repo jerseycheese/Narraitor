@@ -37,6 +37,7 @@ import {
 import { CharacterSnapshot } from './CharacterSnapshot';
 import { ManuscriptCharactersRail } from './ManuscriptCharactersRail';
 import { isFeatureEnabled } from '@/lib/featureFlags';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 
 type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history' | 'journal';
 
@@ -90,7 +91,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
-  
+  const { theme } = useTheme();
+  const isDS1 = theme === 'ds1';
+  const isDS3 = theme === 'ds3';
+
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
     typeof window !== 'undefined'
@@ -381,7 +385,27 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             />
           )}
           drawerTriggers={isProgressiveDisclosureEnabled}
-          rightContent={
+          characterName={character?.name}
+          onOpenDrawer={(drawerType) => {
+            setActiveDrawer(drawerType as DrawerType);
+            setLastOpenedDrawer(drawerType as DrawerType);
+            setIsCharacterSummaryExpanded(false);
+          }}
+          onStartNew={onStartNew}
+          onBack={onBack}
+          saveIndicator={
+            <SaveIndicator
+              status={autoSave.status}
+              lastSaveTime={autoSave.lastSaveTime}
+              errorMessage={autoSave.errorMessage}
+              totalSaves={autoSave.totalSaves}
+              onRetryError={autoSave.retry}
+              retryable
+              compact
+              className="manuscript-save-indicator"
+            />
+          }
+          rightContent={isDS3 ? undefined : (
             <div className="manuscript-hud-right-controls">
               <SaveIndicator
                 status={autoSave.status}
@@ -410,16 +434,16 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 Close
               </button>
             </div>
-          }
+          )}
         />
       }
-      marginContent={isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
+      marginContent={isDS1 && isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
         ((latestSegmentWithParticipants.characterIds?.length ?? 0) > 0 ||
          (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0) ? (
         <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
       ) : null}
       mobileTopContent={
-        isProgressiveDisclosureEnabled ? (
+        isDS1 && isProgressiveDisclosureEnabled ? (
           <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
         ) : null
       }

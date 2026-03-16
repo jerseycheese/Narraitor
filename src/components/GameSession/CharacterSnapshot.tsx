@@ -75,7 +75,7 @@ export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character 
         )}
 
         {world && normalizedSkills.length > 0 && (
-          <div className="manuscript-character-snapshot-section">
+          <div className="manuscript-character-snapshot-section" data-section="skills">
             <h5 className="manuscript-character-snapshot-subheading">Skills</h5>
             <div className="manuscript-character-snapshot-list">
               {normalizedSkills.map(skill => {

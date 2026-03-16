@@ -69,6 +69,9 @@
   --color-warning-soft: rgb(140 109 63 / 14%);
   --color-warning-border: rgb(140 109 63 / 50%);
   --color-warning-muted: rgb(140 109 63 / 10%);
+  --color-success: rgb(74 124 89);
+  --color-success-bg: rgb(74 124 89 / 10%);
+  --color-info: rgb(91 122 140);
 
   --info: 200 21% 45%;
   --info-foreground: 210 40% 98%;
@@ -106,6 +109,15 @@
   --alignment-chaotic-border: 30 50% 82%;
   --alignment-chaotic-text: 20 50% 42%;
 
+  /* Semantic alignment tokens */
+  --color-alignment-lawful-bg: hsl(var(--alignment-lawful-bg));
+  --color-alignment-lawful-border: hsl(var(--alignment-lawful-border));
+  --color-alignment-lawful-text: hsl(var(--alignment-lawful-text));
+  --color-alignment-chaotic-bg: hsl(var(--alignment-chaotic-bg));
+  --color-alignment-chaotic-border: hsl(var(--alignment-chaotic-border));
+  --color-alignment-chaotic-text: hsl(var(--alignment-chaotic-text));
+  --color-success-text: hsl(var(--success-text));
+
   /* Overlay surfaces and scrims */
   --color-overlay-surface: rgb(255 252 246 / 90%);
   --color-overlay-surface-strong: rgb(255 252 246 / 95%);
@@ -131,8 +143,9 @@
   --space-8:   2rem;
 
   /* Radius tokens */
-  --radius-sm: 2px;
-  --radius-md: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --radius-full: 9999px;
 }
 
@@ -191,6 +204,9 @@
   --color-warning-soft: rgb(176 142 92 / 14%);
   --color-warning-border: rgb(176 142 92 / 50%);
   --color-warning-muted: rgb(176 142 92 / 10%);
+  --color-success: rgb(107 158 122);
+  --color-success-bg: rgb(107 158 122 / 12%);
+  --color-info: rgb(123 160 180);
 
   --info: 200 25% 57%;
   --info-foreground: 222 84% 5%;
@@ -225,6 +241,15 @@
   --alignment-chaotic-border: 20 60% 25%;
   --alignment-chaotic-text: 31 70% 70%;
 
+  /* Semantic alignment tokens */
+  --color-alignment-lawful-bg: hsl(var(--alignment-lawful-bg));
+  --color-alignment-lawful-border: hsl(var(--alignment-lawful-border));
+  --color-alignment-lawful-text: hsl(var(--alignment-lawful-text));
+  --color-alignment-chaotic-bg: hsl(var(--alignment-chaotic-bg));
+  --color-alignment-chaotic-border: hsl(var(--alignment-chaotic-border));
+  --color-alignment-chaotic-text: hsl(var(--alignment-chaotic-text));
+  --color-success-text: hsl(var(--success-text));
+
   --color-overlay-surface: rgb(30 26 22 / 90%);
   --color-overlay-surface-strong: rgb(30 26 22 / 96%);
   --color-manuscript-gradient-start: rgb(18 15 12 / 90%);
@@ -249,8 +274,9 @@
   --space-8:   2rem;
 
   /* Radius tokens */
-  --radius-sm: 2px;
-  --radius-md: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --radius-full: 9999px;
 }
 
