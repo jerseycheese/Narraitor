@@ -2556,7 +2556,7 @@ body.manuscript-overlay-open {
   color: var(--color-text-primary);
 }
 
-/* Fix 30-31: Restore alignment card bg/border tinting (overridden by Fix 13 specificity) */
+/* DS1 choice cards: alignment-tinted bg/border */
 [data-theme="ds1"] .manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-lawful {
   background: var(--color-alignment-lawful-bg);
   border-color: var(--color-alignment-lawful-border);
@@ -2595,12 +2595,13 @@ body.manuscript-overlay-open {
   padding: 0 var(--space-3_5);
 }
 
-/* Fix 15 + 32: Alignment badge — demo-matched sizing + stronger bg tint */
+/* Fix 15 + 32: Alignment badge — demo-matched sizing, no border */
 [data-theme="ds1"] .manuscript-alignment-badge {
   font-size: 0.625rem;
   padding: 1px var(--space-1_5);
   border-radius: var(--radius-sm);
   font-weight: 600;
+  border: none;
 }
 
 [data-theme="ds1"]:not(.dark) .manuscript-alignment-badge-lawful {
@@ -2801,13 +2802,20 @@ body.manuscript-overlay-open {
   background: rgb(49 46 129); /* match stamp badge override */
 }
 
-/* Fix 52: DS1 3-column grid rail width — demo uses 140px (8.75rem) rails */
-@media (width >= 1024px) {
+/* DS1 3-column grid — activate at 640px (demo always uses 3 columns) */
+@media (width >= 640px) {
   [data-theme="ds1"] .manuscript-main-stage {
     grid-template-columns: 8.75rem minmax(0, 1fr) 8.75rem;
   }
 
-  /* Fix 84: DS1 no-rail — collapse to single column when character rail absent */
+  [data-theme="ds1"] .manuscript-characters-rail {
+    display: block;
+  }
+
+  [data-theme="ds1"] .manuscript-rail-spacer {
+    display: block;
+  }
+
   [data-theme="ds1"] .manuscript-main-stage.manuscript-no-rail {
     grid-template-columns: minmax(0, 1fr);
   }
