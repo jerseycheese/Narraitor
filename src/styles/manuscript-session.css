@@ -2428,11 +2428,13 @@ body.manuscript-overlay-open {
   height: 1rem;
 }
 
-/* Fix 62: DS1 HUD panel — opaque surface, demo-matched padding */
+/* Fix 62: DS1 HUD panel — opaque surface, demo-matched size */
 [data-theme="ds1"] .manuscript-hud-panel {
   background: var(--color-surface);
   padding: var(--space-3_5);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%); /* Fix 86 */
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%);
+  width: 13.75rem;
+  border-radius: 2px;
 }
 
 /* Fix 63: DS1 HUD panel title — compact technical label (matches rail label style) */
@@ -2667,6 +2669,19 @@ body.manuscript-overlay-open {
 /* Fix 35: Hide "Suggested Actions" heading in DS1 (demo has none) */
 [data-theme="ds1"] .manuscript-suggested-actions-heading {
   display: none;
+}
+
+/* DS1: always show expanded choices, hide mobile toggle
+   Base rules use !important for hide/show toggle — must match to override */
+[data-theme="ds1"] .manuscript-mobile-rail-top-controls {
+  display: none;
+}
+
+[data-theme="ds1"] .hide-mobile-actions .manuscript-suggested-actions-section,
+[data-theme="ds1"] .hide-mobile-actions .manuscript-choice-prompt,
+[data-theme="ds1"] .hide-mobile-actions .manuscript-choice-selector-body > .manuscript-choice-prompt {
+  /* stylelint-disable-next-line declaration-no-important */
+  display: block !important;
 }
 
 /* Fix 36: Choice card inner content — column layout to match demo stacked label+badge */
