@@ -2987,8 +2987,11 @@ body.manuscript-overlay-open {
 /* HUD: running-head style — ambient text, no chrome */
 [data-theme="ds2"] .manuscript-overlay-header {
   align-items: baseline;
-  border-bottom: none;
-  padding-bottom: 0;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.6875rem 1.75rem 0.5625rem;
+  background: rgb(from var(--color-canvas) r g b / 70%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   grid-template-areas: "left center right";
 }
@@ -2998,7 +3001,7 @@ body.manuscript-overlay-open {
   background: transparent;
   color: var(--color-text-muted);
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -3053,7 +3056,9 @@ body.manuscript-overlay-open {
   grid-template-columns: 1fr;
 }
 
-[data-theme="ds2"] .manuscript-suggested-action {
+[data-theme="ds2"] .manuscript-suggested-action,
+[data-theme="ds2"] .manuscript-suggested-action.manuscript-suggested-action-lawful,
+[data-theme="ds2"] .manuscript-suggested-action.manuscript-suggested-action-chaotic {
   background: transparent;
   border: none;
   border-left: 2px solid transparent;
@@ -3061,9 +3066,11 @@ body.manuscript-overlay-open {
   border-radius: 0;
   height: auto;
   min-height: auto;
-  padding: var(--space-1_5) var(--space-4) var(--space-1_5) var(--space-2);
+  padding: 0.3125rem 0 0.3125rem var(--space-2);
+  gap: 0.6875rem;
   font-family: var(--font-narrative);
   font-size: 1.0625rem;
+  color: var(--color-text-primary);
   transition: border-color 120ms ease, background-color 120ms ease;
 }
 
@@ -3113,11 +3120,12 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: baseline;
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
   color: var(--color-text-muted);
-  margin-right: var(--space-1_5);
-  min-width: 1rem;
+  margin-right: 0;
+  padding-top: 2px;
+  min-width: 0.8125rem;
   flex-shrink: 0;
 }
 
@@ -3160,6 +3168,7 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-4);
   font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 /* DS2 End Story button — warm orange running-head style */
@@ -3305,6 +3314,82 @@ body.manuscript-overlay-open {
   margin: 0 auto;
 }
 
+/* DS2 narrative typography — warm journal reading style */
+[data-theme="ds2"] .text-narrative {
+  font-size: 1.1875rem;
+  line-height: 1.82;
+  margin-bottom: 1.25rem;
+}
+
+[data-theme="ds2"] .text-narrative p,
+[data-theme="ds2"] .text-narrative.scene-spacing p {
+  margin-bottom: 0.875rem;
+}
+
+/* DS2 streaming indicator — pulsing accent dot */
+[data-theme="ds2"] .manuscript-streaming-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+[data-theme="ds2"] .manuscript-streaming-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  animation: ds2-streaming-pulse 1.2s ease-in-out infinite;
+}
+
+[data-theme="ds2"] .manuscript-streaming-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+}
+
+@keyframes ds2-streaming-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* DS2 skeleton shimmer — warm gradient */
+[data-theme="ds2"] .manuscript-skeleton-pulse {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 25%,
+    var(--color-surface-hover) 50%,
+    var(--color-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: ds2-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes ds2-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* DS2 content padding — journal-page reading column */
+[data-theme="ds2"] .manuscript-main-content {
+  padding: 1.25rem 3rem 1.75rem;
+}
+
+/* DS2 "Suggested Actions" heading — hidden (DS2 uses footnote-number style) */
+[data-theme="ds2"] .manuscript-suggested-actions-heading {
+  display: none;
+}
+
+/* DS2 narrative divider — thin rule between narrative and choices */
+[data-theme="ds2"] .manuscript-narrative-divider {
+  height: 1px;
+  background: var(--color-border);
+  border: none;
+  margin: 0 0 var(--space-2_5);
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    DS3 "Mechanical Manuscript" — floating pill + icon HUD
@@ -3352,17 +3437,17 @@ body.manuscript-overlay-open {
 [data-theme="ds3"] .manuscript-hud-character-pill {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1_5);
-  padding: var(--space-1) var(--space-2_5);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   border: 1px solid var(--color-border);
-  background: var(--color-overlay-surface-strong);
+  background: var(--color-surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--color-text-primary);
   font-family: var(--font-system);
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.8125rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
 }
@@ -3430,9 +3515,7 @@ body.manuscript-overlay-open {
 
 [data-theme="ds3"] .manuscript-suggested-action {
   position: relative;
-  padding-left: calc(var(--space-2_5) + var(--space-4));
-  padding-top: var(--space-4);
-  padding-bottom: var(--space-4);
+  padding: var(--space-4) 1.25rem var(--space-4) 1.4375rem;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -3457,6 +3540,8 @@ body.manuscript-overlay-open {
 
 [data-theme="ds3"] .manuscript-suggested-action-label {
   font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-bottom: 0.25rem;
 }
 
 /* Rotate accent bar colors across choices */
@@ -3476,13 +3561,13 @@ body.manuscript-overlay-open {
   width: 1.375rem;
   height: 1.375rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-strong);
-  background: var(--color-surface);
-  box-shadow: 0 2px 0 0 var(--color-border-strong);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  box-shadow: none;
   font-family: var(--font-system);
   font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-weight: 500;
+  color: var(--color-text-muted);
   position: absolute;
   left: var(--space-2_5);
   top: 50%;
@@ -3499,11 +3584,12 @@ body.manuscript-overlay-open {
   flex-shrink: 0;
 }
 
-/* Input: recessed surface style */
+/* Input: transparent with warm border */
 [data-theme="ds3"] .manuscript-custom-input {
-  background: var(--color-surface-hover);
+  background: transparent;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  padding: var(--space-2_5) 0.875rem;
 }
 
 [data-theme="ds3"] .manuscript-custom-input:focus-visible {
@@ -3516,12 +3602,18 @@ body.manuscript-overlay-open {
   font-style: italic;
 }
 
-/* DS3 circular send button with icon */
+/* DS3 circular send button — dark primary, not accent */
 [data-theme="ds3"] .manuscript-send-button {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
   padding: 0;
+  background: var(--color-text-primary);
+  color: var(--color-canvas);
+}
+
+[data-theme="ds3"] .manuscript-send-button:hover {
+  opacity: 0.85;
 }
 
 /* DS3 outcome callout — bordered card with decorative dashed-stripe top */
@@ -3626,7 +3718,7 @@ body.manuscript-overlay-open {
   /* Scale up pill and icon for desktop */
   [data-theme="ds3"] .manuscript-hud-character-pill {
     font-size: 0.8125rem;
-    padding: var(--space-1_5) var(--space-3);
+    padding: var(--space-2) var(--space-4);
   }
 
   [data-theme="ds3"] .manuscript-hud-character-pill-avatar {
@@ -3723,3 +3815,78 @@ body.manuscript-overlay-open {
 [data-theme="ds3"] .manuscript-save-indicator .save-indicator-button {
   display: none;
 }
+
+/* DS3 streaming indicator — pulsing muted dot */
+[data-theme="ds3"] .manuscript-streaming-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds3"] .manuscript-streaming-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+  animation: ds3-streaming-pulse 1.2s ease-in-out infinite;
+}
+
+[data-theme="ds3"] .manuscript-streaming-label {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+@keyframes ds3-streaming-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* DS3 skeleton shimmer — cool-toned gradient */
+[data-theme="ds3"] .manuscript-skeleton-pulse {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 25%,
+    var(--color-surface-hover) 50%,
+    var(--color-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: ds3-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes ds3-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* DS3 "Suggested Actions" heading — hidden (DS3 uses kbd badge style) */
+[data-theme="ds3"] .manuscript-suggested-actions-heading {
+  display: none;
+}
+
+/* DS3 narrative text — 18px with generous line-height */
+[data-theme="ds3"] .text-narrative {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+[data-theme="ds3"] .text-narrative p,
+[data-theme="ds3"] .text-narrative.scene-spacing p {
+  margin-bottom: var(--space-2);
+}
+
+/* DS3 main content inner — narrower journal column */
+[data-theme="ds3"] .manuscript-main-content-inner {
+  max-width: 42.5rem;
+}
+
+/* DS3 choice cards — neutral colors, not alignment-tinted */
+[data-theme="ds3"] .manuscript-suggested-action.manuscript-suggested-action-lawful,
+[data-theme="ds3"] .manuscript-suggested-action.manuscript-suggested-action-chaotic {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+

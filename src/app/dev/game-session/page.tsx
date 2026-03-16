@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
 import { useWorldStore } from '@/state/worldStore';
@@ -209,10 +211,21 @@ type SessionStateDisplay = {
 };
 
 export default function GameSessionTestHarness() {
+  const searchParams = useSearchParams();
   const [showRealComponent, setShowRealComponent] = useState(true);
   const [isClient, setIsClient] = useState(false);
   const [currentState, setCurrentState] = useState<SessionStateDisplay>({});
   const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
+
+  const { setTheme } = useTheme();
+
+  // Force theme when loaded in compare-page iframe with ?theme= param
+  useEffect(() => {
+    const theme = searchParams.get('theme');
+    if (theme && (theme === 'ds1' || theme === 'ds2' || theme === 'ds3')) {
+      setTheme(theme);
+    }
+  }, [searchParams, setTheme]);
 
   // Create mock world and character for testing
   const createTestWorld = React.useCallback(() => {
