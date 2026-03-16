@@ -2810,10 +2810,16 @@ body.manuscript-overlay-open {
 
   [data-theme="ds1"] .manuscript-characters-rail {
     display: block;
+    grid-column: 1;
+  }
+
+  [data-theme="ds1"] .manuscript-main-content {
+    grid-column: 2;
   }
 
   [data-theme="ds1"] .manuscript-rail-spacer {
     display: block;
+    grid-column: 3;
   }
 
   [data-theme="ds1"] .manuscript-main-stage.manuscript-no-rail {
