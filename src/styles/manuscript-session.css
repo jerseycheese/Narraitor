@@ -3477,6 +3477,11 @@ body.manuscript-overlay-open {
   display: none;
 }
 
+/* DS2 choices always visible — override base !important hide at <1024px */
+[data-theme="ds2"] .manuscript-suggested-actions-section {
+  display: block !important;
+}
+
 /* DS2 choice prompt hidden — demo shows no heading above choices */
 [data-theme="ds2"] .manuscript-choice-prompt {
   display: none;
@@ -3994,6 +3999,11 @@ body.manuscript-overlay-open {
 /* DS3 mobile toggle hidden — choices always visible */
 [data-theme="ds3"] .manuscript-mobile-suggested-actions-toggle {
   display: none;
+}
+
+/* DS3 choices always visible — override base !important hide at <1024px */
+[data-theme="ds3"] .manuscript-suggested-actions-section {
+  display: block !important;
 }
 
 /* DS3 choice prompt hidden — no heading above choices */
