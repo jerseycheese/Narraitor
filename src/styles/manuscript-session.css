@@ -3670,6 +3670,18 @@ body.manuscript-overlay-open {
   display: none;
 }
 
+/* DS2/DS3 inventory category title hidden — demos show no category headers (Pass 10, fix 4) */
+[data-theme="ds2"] .manuscript-inventory-category-title,
+[data-theme="ds3"] .manuscript-inventory-category-title {
+  display: none;
+}
+
+/* DS2/DS3 inventory category group — remove margin when title hidden (Pass 10, fix 4) */
+[data-theme="ds2"] .manuscript-inventory-category-group,
+[data-theme="ds3"] .manuscript-inventory-category-group {
+  margin-bottom: var(--space-4);
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    DS3 "Mechanical Manuscript" — floating pill + icon HUD
@@ -3814,8 +3826,19 @@ body.manuscript-overlay-open {
   transition: opacity 120ms ease;
 }
 
+[data-theme="ds3"] .manuscript-suggested-action:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-float);
+}
+
 [data-theme="ds3"] .manuscript-suggested-action:hover::before {
   opacity: 1;
+}
+
+[data-theme="ds3"] .manuscript-suggested-action.is-selected,
+[data-theme="ds3"] .manuscript-suggested-action[aria-pressed="true"] {
+  background: var(--color-accent-fill);
+  border-color: var(--color-accent);
 }
 
 [data-theme="ds3"] .manuscript-suggested-action-label {
@@ -3855,12 +3878,11 @@ body.manuscript-overlay-open {
   flex-shrink: 0;
 }
 
-/* DS3 input counter */
+/* DS3 input counter (Pass 10, fix 3: color text-muted, drop letter-spacing per demo) */
 [data-theme="ds3"] .manuscript-input-counter {
   font-family: var(--font-system);
   font-size: 0.6875rem;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
@@ -4265,6 +4287,11 @@ body.manuscript-overlay-open {
   font-family: var(--font-system);
   font-size: 1rem;
   font-weight: 600;
+}
+
+/* DS3 character snapshot stat labels — system font to match values (Pass 10, fix 1) */
+[data-theme="ds3"] .manuscript-character-snapshot-item-label {
+  font-family: var(--font-system);
 }
 
 /* DS3 character snapshot stat row padding (Pass 8, fix 2) */
