@@ -3274,10 +3274,31 @@ body.manuscript-overlay-open {
   opacity: 1;
 }
 
-/* HUD panels: paper-note aesthetic */
+/* HUD panels: paper-note aesthetic, tighter size (Pass 8, fix 3) */
 [data-theme="ds2"] .manuscript-hud-panel {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-overlay);
+  width: 13.125rem;
+  padding: 0.875rem;
+}
+
+/* DS2 HUD panel title — tighter size, bolder, wider tracking (Pass 8, fix 4) */
+[data-theme="ds2"] .manuscript-hud-panel-title {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.625rem;
+}
+
+/* DS2 tools menu items — transparent bg, tighter padding (Pass 8, fix 4) */
+[data-theme="ds2"] .manuscript-tools-menu-item {
+  background: transparent;
+  padding: 0.4375rem 0.625rem;
+}
+
+/* DS2 tools menu item spacing — tighter gap (Pass 8, fix 4) */
+[data-theme="ds2"] .manuscript-tools-menu-items > * + * {
+  margin-top: var(--space-1);
 }
 
 /* Desktop override: keep single column at all breakpoints */
@@ -3512,6 +3533,143 @@ body.manuscript-overlay-open {
   display: none;
 }
 
+/* Drawer: lighter overlay, tighter title (Pass 7, fixes 1-4) */
+[data-theme="ds2"] .manuscript-overlay-backdrop.manuscript-drawer-backdrop {
+  background: rgb(0 0 0 / 15%);
+}
+
+[data-theme="ds2"] .manuscript-drawer-panel {
+  width: min(100%, 23.75rem);
+}
+
+[data-theme="ds2"] .manuscript-drawer-header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-4);
+}
+
+[data-theme="ds2"] .manuscript-drawer-title {
+  font-size: 1rem;
+}
+
+[data-theme="ds2"] .manuscript-drawer-content {
+  color: var(--color-text-primary);
+}
+
+/* DS2 drawer content — journal snapshot (Pass 9, fix 3) */
+[data-theme="ds2"] .manuscript-journal-snapshot-list {
+  gap: var(--space-2);
+}
+
+[data-theme="ds2"] .manuscript-journal-snapshot-entry {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0 0 var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds2"] .manuscript-journal-snapshot-title {
+  font-size: 0.6875rem;
+}
+
+[data-theme="ds2"] .manuscript-journal-snapshot-content {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+[data-theme="ds2"] .manuscript-journal-snapshot-badges {
+  display: none;
+}
+
+/* DS2 drawer content — inventory items (Pass 9, fix 4) */
+[data-theme="ds2"] .manuscript-inventory-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2_5);
+  padding: var(--space-2) 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item-header {
+  margin-bottom: 0;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item-name {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item-description {
+  font-family: var(--font-interface);
+  font-size: 0.6875rem;
+  margin-bottom: 0;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item-footer {
+  display: none;
+}
+
+/* DS2 drawer content — story summary (Pass 9, fix 5) */
+[data-theme="ds2"] .manuscript-story-summary-paragraph {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+/* DS2 drawer content — choice history (Pass 9, fix 6) */
+[data-theme="ds2"] .manuscript-choice-history-list {
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds2"] .manuscript-choice-history-entry {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0 0 var(--space-1_5) 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 0;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-entry:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-choice {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .manuscript-choice-history-meta {
+  display: none;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-outcome {
+  display: none;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-details {
+  display: none;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-details-button {
+  display: none;
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    DS3 "Mechanical Manuscript" — floating pill + icon HUD
@@ -3600,8 +3758,8 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-overlay-surface);
@@ -3739,7 +3897,7 @@ body.manuscript-overlay-open {
   opacity: 0.85;
 }
 
-/* DS3 outcome callout — bordered card with decorative dashed-stripe top */
+/* DS3 outcome callout — bordered card with decorative dashed-stripe top (Pass 7: padding+margin) */
 [data-theme="ds3"] .choice-outcome-callout {
   border: 1px solid var(--color-border);
   border-top: none;
@@ -3748,6 +3906,10 @@ body.manuscript-overlay-open {
   position: relative;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  padding-right: var(--space-5);
+  padding-left: var(--space-5);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
 }
 
 [data-theme="ds3"] .choice-outcome-callout::before {
@@ -3818,11 +3980,12 @@ body.manuscript-overlay-open {
   line-height: 1.6;
 }
 
-/* HUD panels: tighter radius, strong blur */
+/* HUD panels: tighter radius, strong blur, demo-matched padding (Pass 7) */
 [data-theme="ds3"] .manuscript-hud-panel {
   border-radius: var(--radius-lg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  padding: var(--space-4);
 }
 
 /* Desktop override: keep single column */
@@ -3884,12 +4047,12 @@ body.manuscript-overlay-open {
   }
 }
 
-/* DS3 icon controls grouped toolbar (top-right) */
+/* DS3 icon controls grouped toolbar (top-right) — surface (80% alpha) for grid show-through (Pass 8, fix 7) */
 [data-theme="ds3"] .manuscript-ds3-controls {
   display: flex;
   align-items: center;
   gap: 2px;
-  background: var(--color-overlay-surface);
+  background: var(--color-surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
@@ -3982,6 +4145,7 @@ body.manuscript-overlay-open {
   );
   background-size: 200% 100%;
   animation: ds3-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
 }
 
 @keyframes ds3-shimmer {
@@ -4003,6 +4167,14 @@ body.manuscript-overlay-open {
 [data-theme="ds3"] .text-narrative p,
 [data-theme="ds3"] .text-narrative.scene-spacing p {
   margin-bottom: var(--space-2);
+}
+
+/* DS3 dialogue segments — italic with left border accent (Pass 8, fix 6) */
+[data-theme="ds3"] .dialogue-segment {
+  font-style: italic;
+  border-left: 2px solid var(--color-border-strong);
+  padding-left: var(--space-4);
+  margin-left: var(--space-1);
 }
 
 /* DS3 main content inner — narrower journal column */
@@ -4038,6 +4210,18 @@ body.manuscript-overlay-open {
   display: none;
 }
 
+/* DS3 action rail — border-top only, no radius, tighter padding (Pass 8, fix 5) */
+[data-theme="ds3"] #manuscript-action-rail {
+  background: var(--color-overlay-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: none;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--space-3) var(--space-6);
+}
+
 /* DS3 mobile bar hidden (no rail concept) */
 [data-theme="ds3"] .manuscript-characters-mobile-bar {
   display: none;
@@ -4046,6 +4230,118 @@ body.manuscript-overlay-open {
 /* DS3 end story button hidden — exit action is in HUD icon toolbar */
 [data-theme="ds3"] .manuscript-end-story-desktop,
 [data-theme="ds3"] .manuscript-end-story-mobile {
+  display: none;
+}
+
+/* Drawer: lighter overlay, tighter panel, header border (Pass 7, fixes 1-6) */
+[data-theme="ds3"] .manuscript-overlay-backdrop.manuscript-drawer-backdrop {
+  background: rgb(0 0 0 / 15%);
+}
+
+[data-theme="ds3"] .manuscript-drawer-panel {
+  width: min(100%, 23.75rem);
+}
+
+[data-theme="ds3"] .manuscript-drawer-header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-4);
+}
+
+[data-theme="ds3"] .manuscript-drawer-title {
+  font-size: 1rem;
+}
+
+[data-theme="ds3"] .manuscript-drawer-content {
+  color: var(--color-text-primary);
+}
+
+/* Character name: bolder in DS3 HUD panel (Pass 7, fix 10) */
+[data-theme="ds3"] .manuscript-character-snapshot-name {
+  font-weight: 600;
+}
+
+/* DS3 character snapshot stat values — larger, bolder, system font (Pass 8, fix 1) */
+[data-theme="ds3"] .manuscript-character-snapshot-item-value {
+  font-family: var(--font-system);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* DS3 character snapshot stat row padding (Pass 8, fix 2) */
+[data-theme="ds3"] .manuscript-character-snapshot-item {
+  padding: 3px 0;
+}
+
+/* DS3 drawer content — journal snapshot (Pass 9, fix 1) */
+[data-theme="ds3"] .manuscript-journal-snapshot-list {
+  gap: 0;
+}
+
+[data-theme="ds3"] .manuscript-journal-snapshot-entry {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds3"] .manuscript-journal-snapshot-entry:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds3"] .manuscript-journal-snapshot-content {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  opacity: 0.85;
+  color: var(--color-text-primary);
+  display: block;
+  overflow: visible;
+}
+
+[data-theme="ds3"] .manuscript-journal-snapshot-meta {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* DS3 drawer content — inventory items (Pass 9, fix 2) */
+[data-theme="ds3"] .manuscript-inventory-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2_5) 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item-header {
+  margin-bottom: 0;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item-description {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  margin-bottom: 0;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item-footer {
   display: none;
 }
 
