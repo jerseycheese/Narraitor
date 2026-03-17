@@ -3234,13 +3234,12 @@ body.manuscript-overlay-open {
   font-style: italic;
 }
 
-/* DS2 input label — 9px with wider tracking, slightly muted */
+/* DS2 input label — 9px with wider tracking, slightly muted (Pass 12: removed text-transform uppercase, demo renders lowercase) */
 [data-theme="ds2"] .manuscript-input-label {
   display: block;
   font-family: var(--font-system);
   font-size: 0.5625rem;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-text-muted);
   margin-top: var(--space-3);
