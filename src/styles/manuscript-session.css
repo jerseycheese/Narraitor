@@ -3392,7 +3392,9 @@ body.manuscript-overlay-open {
 
 [data-theme="ds2"] .choice-outcome-text {
   font-style: italic;
-  max-width: 28rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  max-width: 25rem;
   margin: 0 auto;
 }
 
@@ -3794,6 +3796,11 @@ body.manuscript-overlay-open {
 [data-theme="ds3"] .choice-outcome-callout[data-outcome="critical-failure"] .choice-outcome-label {
   color: var(--color-danger);
   background: rgb(from var(--color-danger) r g b / 10%);
+}
+
+[data-theme="ds3"] .choice-outcome-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
 }
 
 /* HUD panels: tighter radius, strong blur */
