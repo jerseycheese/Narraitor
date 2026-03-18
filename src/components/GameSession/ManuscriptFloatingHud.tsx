@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTheme } from '@/lib/theme/ThemeProvider';
-import { BookOpen, Backpack, FileText, RotateCcw, LogOut } from 'lucide-react';
+import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History } from 'lucide-react';
 
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
@@ -18,6 +18,7 @@ interface ManuscriptFloatingHudProps {
   onOpenDrawer?: (drawerType: string) => void;
   onStartNew?: () => void;
   onBack?: () => void;
+  onEndStory?: () => void;
   saveIndicator?: React.ReactNode;
 }
 
@@ -154,7 +155,7 @@ function DS3FloatingPill({
   characterName,
   onOpenDrawer,
   onStartNew,
-  onBack,
+  onEndStory,
   saveIndicator,
 }: ManuscriptFloatingHudProps) {
   return (
@@ -213,6 +214,15 @@ function DS3FloatingPill({
           </button>
           <button
             type="button"
+            onClick={() => onOpenDrawer?.('choice-history')}
+            title="Choice History"
+            aria-label="Choice History"
+            className="manuscript-hud-icon-button"
+          >
+            <History size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
             onClick={onStartNew}
             title="Reset Session"
             aria-label="Reset Session"
@@ -222,9 +232,9 @@ function DS3FloatingPill({
           </button>
           <button
             type="button"
-            onClick={onBack}
-            title="End Session"
-            aria-label="End Session"
+            onClick={onEndStory}
+            title="End Story"
+            aria-label="End Story"
             className="manuscript-hud-icon-button"
           >
             <LogOut size={16} aria-hidden="true" />
