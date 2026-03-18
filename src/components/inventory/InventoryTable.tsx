@@ -172,7 +172,7 @@ export function InventoryTable({
         cell: ({ row }) => {
           const isUsing = usingItemId === row.original.id;
           return (
-            <div className="flex gap-2">
+            <div className="manuscript-inventory-actions">
               <Button
                 variant="ghost"
                 size="sm"

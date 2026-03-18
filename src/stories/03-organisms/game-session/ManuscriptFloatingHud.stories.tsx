@@ -10,7 +10,7 @@ const meta: Meta<typeof ManuscriptFloatingHud> = {
   },
   decorators: [
     (Story) => (
-      <div className="manuscript-viewport-layer bg-zinc-100 p-4">
+      <div className="manuscript-viewport-layer" style={{ background: 'var(--color-surface-muted, hsl(0 0% 96%))', padding: '1rem' }}>
         <header className="manuscript-overlay-header">
           <Story />
         </header>
@@ -30,7 +30,7 @@ export const Default: Story = {
     isToolsMenuOpen: false,
     rightContent: (
       <div className="manuscript-hud-right-controls">
-        <div className="text-[10px] font-system text-muted-foreground mr-2">SAVED</div>
+        <div style={{ fontSize: '0.625rem', fontFamily: 'var(--font-system)', color: 'var(--color-text-muted)', marginRight: '0.5rem' }}>SAVED</div>
         <button type="button" className="manuscript-hud-text-button">
           Reset
         </button>
@@ -45,9 +45,9 @@ export const Expanded: Story = {
     ...Default.args,
     isCharacterSummaryExpanded: true,
     characterSummaryPanel: (
-      <div className="p-4 bg-background border rounded-lg shadow-xl">
-        <h4 className="font-serif font-bold mb-2">The Archivist</h4>
-        <div className="text-sm text-muted-foreground">Level 4 Scholar</div>
+      <div style={{ padding: '1rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-drawer)' }}>
+        <h4 style={{ fontFamily: 'var(--font-narrative)', fontWeight: 700, marginBottom: '0.5rem' }}>The Archivist</h4>
+        <div style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Level 4 Scholar</div>
       </div>
     ),
   },

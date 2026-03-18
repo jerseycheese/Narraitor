@@ -17,7 +17,7 @@ export function InventoryViewToggle({
   onModeChange,
 }: InventoryViewToggleProps) {
   return (
-    <div role="group" aria-label="View mode toggle" className="flex items-center gap-2 mb-4">
+    <div role="group" aria-label="View mode toggle" className="manuscript-inventory-view-toggle">
       <Button
         variant={mode === 'grid' ? 'default' : 'outline'}
         size="sm"

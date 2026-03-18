@@ -95,7 +95,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
             <button 
               onClick={onDismiss} 
               aria-label="Dismiss"
-              className="text-xs font-medium underline underline-offset-2"
+              className="error-display-dismiss"
             >
               Dismiss
             </button>

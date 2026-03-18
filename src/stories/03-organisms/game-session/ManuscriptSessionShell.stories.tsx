@@ -17,20 +17,20 @@ type Story = StoryObj<typeof ManuscriptSessionShell>;
 export const Default: Story = {
   args: {
     hud: (
-      <div className="manuscript-overlay-header-left p-4 pointer-events-auto">
-        <div className="h-10 w-40 bg-background/80 backdrop-blur-sm border rounded-full flex items-center justify-center text-xs font-system">
+      <div className="manuscript-overlay-header-left" style={{ padding: '1rem', pointerEvents: 'auto' }}>
+        <div style={{ height: 40, width: 160, background: 'var(--color-surface, hsl(0 0% 98%))', backdropFilter: 'blur(4px)', border: '1px solid var(--color-border, hsl(0 0% 90%))', borderRadius: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontFamily: 'var(--font-system)' }}>
           HUD PLACEHOLDER
         </div>
       </div>
     ),
     children: (
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} className="text-narrative">
             <p>
-              Paragraph {i + 1}: The manuscript layout provides a stable reading surface. 
-              Each line of text is carefully measured for optimal legibility. 
-              As the AI generates more content, this column will grow, but the 
+              Paragraph {i + 1}: The manuscript layout provides a stable reading surface.
+              Each line of text is carefully measured for optimal legibility.
+              As the AI generates more content, this column will grow, but the
               overall stage remains fixed and steady.
             </p>
           </div>
@@ -39,7 +39,7 @@ export const Default: Story = {
     ),
     actionRail: (
       <ManuscriptActionRail>
-        <div className="h-20 bg-background/80 backdrop-blur-sm border-t flex items-center justify-center text-xs font-system">
+        <div style={{ height: 80, background: 'var(--color-surface, hsl(0 0% 98%))', backdropFilter: 'blur(4px)', borderTop: '1px solid var(--color-border, hsl(0 0% 90%))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontFamily: 'var(--font-system)' }}>
           ACTION RAIL PLACEHOLDER
         </div>
       </ManuscriptActionRail>
@@ -51,10 +51,10 @@ export const WithMarginContent: Story = {
   args: {
     ...Default.args,
     marginContent: (
-      <div className="space-y-4">
-        <h4 className="text-xs font-system text-muted-foreground uppercase tracking-wider">Suggested</h4>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <h4 style={{ fontSize: '0.75rem', fontFamily: 'var(--font-system)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Suggested</h4>
         {[1, 2, 3].map(i => (
-          <button key={i} className="manuscript-suggested-action w-full text-left p-3 text-sm rounded-sm border">
+          <button key={i} className="manuscript-suggested-action" style={{ width: '100%', textAlign: 'left', padding: '0.75rem', fontSize: '0.875rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
             Choice {i}
           </button>
         ))}
@@ -68,7 +68,7 @@ export const Streaming: Story = {
     ...WithMarginContent.args,
     actionRail: (
       <ManuscriptActionRail isStreaming={true}>
-        <div className="h-20 bg-background/80 backdrop-blur-sm border-t flex items-center justify-center text-xs font-system text-accent">
+        <div style={{ height: 80, background: 'var(--color-surface, hsl(0 0% 98%))', backdropFilter: 'blur(4px)', borderTop: '1px solid var(--color-border, hsl(0 0% 90%))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontFamily: 'var(--font-system)', color: 'var(--color-accent)' }}>
           GENERATING CONTENT...
         </div>
       </ManuscriptActionRail>
