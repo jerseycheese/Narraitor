@@ -17,11 +17,11 @@ type Story = StoryObj<typeof ManuscriptDrawer>;
 const DrawerHarness = (props: React.ComponentProps<typeof ManuscriptDrawer>) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="p-8">
+    <div style={{ padding: '2rem' }}>
       <Button onClick={() => setOpen(true)}>Open Drawer</Button>
-      <ManuscriptDrawer 
-        {...props} 
-        open={open} 
+      <ManuscriptDrawer
+        {...props}
+        open={open}
         onOpenChange={setOpen}
       />
     </div>
@@ -33,18 +33,18 @@ export const Default: Story = {
   args: {
     title: 'Character Sheet',
     children: (
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <p>This is the character sheet content inside the drawer.</p>
-        <div className="h-40 bg-muted rounded-md flex items-center justify-center text-muted-foreground">
+        <div style={{ height: 160, background: 'var(--color-surface-muted, hsl(0 0% 96%))', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
           Portrait Placeholder
         </div>
-        <div className="space-y-2">
-          <h4 className="font-serif font-bold">Attributes</h4>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex justify-between border-b pb-1"><span>Strength</span><span>14</span></div>
-            <div className="flex justify-between border-b pb-1"><span>Dexterity</span><span>12</span></div>
-            <div className="flex justify-between border-b pb-1"><span>Intelligence</span><span>16</span></div>
-            <div className="flex justify-between border-b pb-1"><span>Wisdom</span><span>10</span></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <h4 style={{ fontFamily: 'var(--font-narrative)', fontWeight: 700 }}>Attributes</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.875rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.25rem' }}><span>Strength</span><span>14</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.25rem' }}><span>Dexterity</span><span>12</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.25rem' }}><span>Intelligence</span><span>16</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.25rem' }}><span>Wisdom</span><span>10</span></div>
           </div>
         </div>
       </div>
@@ -66,11 +66,11 @@ export const LongContent: Story = {
   args: {
     title: 'World Lore',
     children: (
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {Array.from({ length: 20 }).map((_, i) => (
           <p key={i}>
-            Paragraph {i + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+            Paragraph {i + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
           </p>
         ))}

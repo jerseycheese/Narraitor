@@ -129,7 +129,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     >
       {/* Feedback message */}
       {errorFeedback && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive" className="manuscript-inventory-error">
           <AlertDescription>{errorFeedback}</AlertDescription>
         </Alert>
       )}
@@ -181,7 +181,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 
                       <div className="manuscript-inventory-actions">
                         <Button
-                          className="font-system text-[10px] uppercase tracking-wider h-7 px-3"
+                          className="manuscript-inventory-action-button"
                           variant="outline"
                           onClick={() => handleUseItem(item.id)}
                           disabled={
@@ -191,7 +191,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                           {usingItemId === item.id ? 'USING...' : 'USE'}
                         </Button>
                         <Button
-                          className="font-system text-[10px] uppercase tracking-wider h-7 px-3"
+                          className="manuscript-inventory-action-button"
                           variant="ghost"
                           onClick={() => openDropDialog(item)}
                           aria-label={`Drop ${item.name}`}

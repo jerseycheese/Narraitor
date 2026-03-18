@@ -1582,6 +1582,17 @@ body.manuscript-overlay-open {
   color: var(--color-text-muted);
 }
 
+.manuscript-inventory-error {
+  margin-bottom: var(--space-4);
+}
+
+.manuscript-inventory-view-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
 /* Manuscript Inventory Styling */
 .manuscript-inventory-category-group {
   margin-bottom: var(--space-8);
@@ -1674,6 +1685,15 @@ body.manuscript-overlay-open {
 .manuscript-inventory-actions {
   display: flex;
   gap: var(--space-2);
+}
+
+.manuscript-inventory-action-button {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  height: 1.75rem;
+  padding-inline: var(--space-3);
 }
 
 /* Manuscript Choice History Styling */
@@ -2876,6 +2896,14 @@ body.manuscript-overlay-open {
 [data-theme="ds1"] .manuscript-viewport-inner {
   padding: var(--space-3) var(--space-3);
   gap: var(--space-2_5);
+}
+
+/* Base error dismiss button (replaces Tailwind utilities) */
+.error-display-dismiss {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* Fix 56: DS1 error container */

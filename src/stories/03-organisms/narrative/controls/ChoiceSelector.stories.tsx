@@ -299,8 +299,8 @@ export const WithItemRequirements: Story = {
 export const ManuscriptContext: Story = {
   decorators: [
     (Story) => (
-      <div className="bg-zinc-100 p-8 min-h-[400px] flex flex-col justify-end">
-        <footer id="manuscript-action-rail" className="p-6 border-t bg-background/95 backdrop-blur-md shadow-lg">
+      <div style={{ background: 'var(--color-surface-muted, hsl(0 0% 96%))', padding: '2rem', minHeight: 400, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+        <footer id="manuscript-action-rail" style={{ padding: '1.5rem', borderTop: '1px solid var(--color-border)', background: 'var(--color-surface, hsl(0 0% 98% / 95%))', backdropFilter: 'blur(12px)', boxShadow: 'var(--shadow-drawer)' }}>
           <Story />
         </footer>
       </div>
