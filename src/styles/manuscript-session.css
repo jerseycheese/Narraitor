@@ -2372,6 +2372,19 @@ body.manuscript-overlay-open {
 }
 
 [data-theme="ds1"] .manuscript-save-indicator .save-indicator-copy {
+  display: block;
+}
+
+[data-theme="ds1"] .manuscript-save-indicator .save-indicator-text {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="ds1"] .manuscript-save-indicator .save-indicator-meta {
   display: none;
 }
 
@@ -2428,11 +2441,24 @@ body.manuscript-overlay-open {
   height: 1rem;
 }
 
-/* Fix 62: DS1 HUD panel — opaque surface, demo-matched padding */
+/* DS1: placeholder circle when no avatar image exists */
+[data-theme="ds1"] .manuscript-character-badge:not(:has(.manuscript-character-avatar))::before {
+  content: '';
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* Fix 62: DS1 HUD panel — opaque surface, demo-matched size */
 [data-theme="ds1"] .manuscript-hud-panel {
   background: var(--color-surface);
   padding: var(--space-3_5);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%); /* Fix 86 */
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%);
+  width: 13.75rem;
+  border-radius: 2px;
 }
 
 /* Fix 63: DS1 HUD panel title — compact technical label (matches rail label style) */
@@ -2476,6 +2502,11 @@ body.manuscript-overlay-open {
 
 [data-theme="ds1"] .manuscript-character-snapshot-item-value {
   font-weight: 600;
+}
+
+/* DS1: hide "Attributes" / "Skills" subheadings — demo uses flat list */
+[data-theme="ds1"] .manuscript-character-snapshot-subheading {
+  display: none;
 }
 
 /* Fix 68: DS1 character snapshot section dividers */
@@ -2549,7 +2580,7 @@ body.manuscript-overlay-open {
   color: var(--color-text-primary);
 }
 
-/* Fix 30-31: Restore alignment card bg/border tinting (overridden by Fix 13 specificity) */
+/* DS1 choice cards: alignment-tinted bg/border */
 [data-theme="ds1"] .manuscript-suggested-actions-grid .manuscript-suggested-action.manuscript-suggested-action-lawful {
   background: var(--color-alignment-lawful-bg);
   border-color: var(--color-alignment-lawful-border);
@@ -2572,7 +2603,8 @@ body.manuscript-overlay-open {
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  height: 4.125rem;
+  min-height: 4.125rem;
+  height: auto;
   padding: var(--space-2_5) var(--space-3_5);
   font-size: 0.75rem;
   line-height: 1.4;
@@ -2588,12 +2620,13 @@ body.manuscript-overlay-open {
   padding: 0 var(--space-3_5);
 }
 
-/* Fix 15 + 32: Alignment badge — demo-matched sizing + stronger bg tint */
+/* Fix 15 + 32: Alignment badge — demo-matched sizing, no border */
 [data-theme="ds1"] .manuscript-alignment-badge {
   font-size: 0.625rem;
   padding: 1px var(--space-1_5);
   border-radius: var(--radius-sm);
   font-weight: 600;
+  border: none;
 }
 
 [data-theme="ds1"]:not(.dark) .manuscript-alignment-badge-lawful {
@@ -2666,6 +2699,26 @@ body.manuscript-overlay-open {
 
 /* Fix 35: Hide "Suggested Actions" heading in DS1 (demo has none) */
 [data-theme="ds1"] .manuscript-suggested-actions-heading {
+  display: none;
+}
+
+/* DS1: always show expanded choices, hide mobile toggle
+   Base rules use !important for hide/show toggle — must match to override */
+[data-theme="ds1"] .manuscript-mobile-rail-top-controls {
+  display: none;
+}
+
+[data-theme="ds1"] .hide-mobile-actions .manuscript-suggested-actions-section {
+  /* stylelint-disable-next-line declaration-no-important */
+  display: block !important;
+}
+
+/* DS1: always show desktop End Story button, hide mobile variant */
+[data-theme="ds1"] .manuscript-end-story-desktop {
+  display: inline-flex;
+}
+
+[data-theme="ds1"] .manuscript-end-story-mobile {
   display: none;
 }
 
@@ -2774,16 +2827,43 @@ body.manuscript-overlay-open {
   background: rgb(49 46 129); /* match stamp badge override */
 }
 
-/* Fix 52: DS1 3-column grid rail width — demo uses 140px (8.75rem) rails */
-@media (width >= 1024px) {
+/* DS1 3-column grid — activate at 640px (demo always uses 3 columns) */
+@media (width >= 640px) {
   [data-theme="ds1"] .manuscript-main-stage {
     grid-template-columns: 8.75rem minmax(0, 1fr) 8.75rem;
   }
 
-  /* Fix 84: DS1 no-rail — collapse to single column when character rail absent */
+  [data-theme="ds1"] .manuscript-characters-rail {
+    display: block;
+    grid-column: 1;
+    order: unset;
+  }
+
+  [data-theme="ds1"] .manuscript-main-content {
+    grid-column: 2;
+  }
+
+  [data-theme="ds1"] .manuscript-rail-spacer {
+    display: block;
+    grid-column: 3;
+  }
+
+  [data-theme="ds1"] .manuscript-characters-mobile-bar {
+    display: none;
+  }
+
   [data-theme="ds1"] .manuscript-main-stage.manuscript-no-rail {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* DS1 viewport shell — solid background, not see-through */
+[data-theme="ds1"] .manuscript-viewport-shell {
+  background: linear-gradient(180deg, rgb(255 255 255), rgb(244 244 245));
+}
+
+[data-theme="ds1"].dark .manuscript-viewport-shell {
+  background: linear-gradient(180deg, rgb(39 39 42), rgb(24 24 27));
 }
 
 /* Fix 53: DS1 narrative center vertical padding */
@@ -2969,6 +3049,11 @@ body.manuscript-overlay-open {
    DS2 "Warm Earth" — single-column journal layout overrides
    ═══════════════════════════════════════════════════════════════ */
 
+/* Warm 135deg diagonal gradient (base uses 180deg vertical) */
+[data-theme="ds2"] .manuscript-viewport-shell {
+  background: linear-gradient(135deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
+}
+
 /* Grid: collapse to single centered column */
 [data-theme="ds2"] .manuscript-main-stage {
   grid-template-columns: 1fr;
@@ -2987,8 +3072,11 @@ body.manuscript-overlay-open {
 /* HUD: running-head style — ambient text, no chrome */
 [data-theme="ds2"] .manuscript-overlay-header {
   align-items: baseline;
-  border-bottom: none;
-  padding-bottom: 0;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.6875rem 1.75rem 0.5625rem;
+  background: rgb(from var(--color-canvas) r g b / 70%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   grid-template-areas: "left center right";
 }
@@ -2998,7 +3086,7 @@ body.manuscript-overlay-open {
   background: transparent;
   color: var(--color-text-muted);
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -3022,13 +3110,12 @@ body.manuscript-overlay-open {
   background: transparent;
   cursor: pointer;
   padding: 0;
+  letter-spacing: 0.005em;
   transition: color 120ms ease;
 }
 
 [data-theme="ds2"] .manuscript-hud-character-link:hover {
   color: var(--color-accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
 /* Action rail: dashed top border, transparent bg */
@@ -3053,7 +3140,9 @@ body.manuscript-overlay-open {
   grid-template-columns: 1fr;
 }
 
-[data-theme="ds2"] .manuscript-suggested-action {
+[data-theme="ds2"] .manuscript-suggested-action,
+[data-theme="ds2"] .manuscript-suggested-action.manuscript-suggested-action-lawful,
+[data-theme="ds2"] .manuscript-suggested-action.manuscript-suggested-action-chaotic {
   background: transparent;
   border: none;
   border-left: 2px solid transparent;
@@ -3061,9 +3150,11 @@ body.manuscript-overlay-open {
   border-radius: 0;
   height: auto;
   min-height: auto;
-  padding: var(--space-1_5) var(--space-4) var(--space-1_5) var(--space-2);
+  padding: 0.3125rem 0 0.3125rem var(--space-2);
+  gap: 0.6875rem;
   font-family: var(--font-narrative);
   font-size: 1.0625rem;
+  color: var(--color-text-primary);
   transition: border-color 120ms ease, background-color 120ms ease;
 }
 
@@ -3113,24 +3204,25 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: baseline;
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
   color: var(--color-text-muted);
-  margin-right: var(--space-1_5);
-  min-width: 1rem;
+  margin-right: 0;
+  padding-top: 2px;
+  min-width: 0.8125rem;
   flex-shrink: 0;
 }
 
-/* Input: dashed underline style, transparent bg */
+/* Input: solid underline style, transparent bg */
 [data-theme="ds2"] .manuscript-custom-input {
   border: none;
-  border-bottom: 1px dashed var(--color-border);
+  border-bottom: 1px solid var(--color-border);
   border-radius: 0;
   background: transparent;
   font-family: var(--font-narrative);
   font-size: 0.9375rem;
-  padding: var(--space-2) 0;
-  height: auto;
+  padding: 0 0.625rem;
+  height: 2.125rem;
 }
 
 [data-theme="ds2"] .manuscript-custom-input:focus-visible {
@@ -3142,24 +3234,26 @@ body.manuscript-overlay-open {
   font-style: italic;
 }
 
-/* DS2 input label */
+/* DS2 input label — 9px with wider tracking, slightly muted (Pass 12: removed text-transform uppercase, demo renders lowercase) */
 [data-theme="ds2"] .manuscript-input-label {
   display: block;
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   color: var(--color-text-muted);
   margin-top: var(--space-3);
   margin-bottom: var(--space-2);
+  opacity: 0.65;
 }
 
 /* Send button: accent-colored pill with more presence */
 [data-theme="ds2"] .manuscript-send-button {
   border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-4);
+  padding: 0 var(--space-4);
+  height: 2rem;
   font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 /* DS2 End Story button — warm orange running-head style */
@@ -3182,10 +3276,31 @@ body.manuscript-overlay-open {
   opacity: 1;
 }
 
-/* HUD panels: paper-note aesthetic */
+/* HUD panels: paper-note aesthetic, tighter size (Pass 8, fix 3) */
 [data-theme="ds2"] .manuscript-hud-panel {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-overlay);
+  width: 13.125rem;
+  padding: 0.875rem;
+}
+
+/* DS2 HUD panel title — tighter size, bolder, wider tracking (Pass 8, fix 4) */
+[data-theme="ds2"] .manuscript-hud-panel-title {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.625rem;
+}
+
+/* DS2 tools menu items — transparent bg, tighter padding (Pass 8, fix 4) */
+[data-theme="ds2"] .manuscript-tools-menu-item {
+  background: transparent;
+  padding: 0.4375rem 0.625rem;
+}
+
+/* DS2 tools menu item spacing — tighter gap (Pass 8, fix 4) */
+[data-theme="ds2"] .manuscript-tools-menu-items > * + * {
+  margin-top: var(--space-1);
 }
 
 /* Desktop override: keep single column at all breakpoints */
@@ -3301,8 +3416,272 @@ body.manuscript-overlay-open {
 
 [data-theme="ds2"] .choice-outcome-text {
   font-style: italic;
-  max-width: 28rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  max-width: 25rem;
   margin: 0 auto;
+}
+
+/* DS2 narrative typography — warm journal reading style */
+[data-theme="ds2"] .text-narrative {
+  font-size: 1.1875rem;
+  line-height: 1.82;
+  margin-bottom: 1.25rem;
+}
+
+[data-theme="ds2"] .text-narrative p,
+[data-theme="ds2"] .text-narrative.scene-spacing p {
+  margin-bottom: 0.875rem;
+}
+
+/* DS2 streaming indicator — pulsing accent dot */
+[data-theme="ds2"] .manuscript-streaming-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+[data-theme="ds2"] .manuscript-streaming-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  animation: ds2-streaming-pulse 1.2s ease-in-out infinite;
+}
+
+[data-theme="ds2"] .manuscript-streaming-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+}
+
+@keyframes ds2-streaming-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* DS2 skeleton shimmer — warm gradient */
+[data-theme="ds2"] .manuscript-skeleton-pulse {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 25%,
+    var(--color-surface-hover) 50%,
+    var(--color-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: ds2-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes ds2-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* DS2 content padding — journal-page reading column */
+[data-theme="ds2"] .manuscript-main-content {
+  padding: 1.25rem 3rem 1.75rem;
+}
+
+/* DS2 "Suggested Actions" heading — hidden (DS2 uses footnote-number style) */
+[data-theme="ds2"] .manuscript-suggested-actions-heading {
+  display: none;
+}
+
+/* DS2 narrative divider — thin rule between narrative and choices */
+[data-theme="ds2"] .manuscript-narrative-divider {
+  height: 1px;
+  background: var(--color-border);
+  border: none;
+  margin: 0 0 var(--space-2_5);
+}
+
+/* DS2 mobile toggle hidden — choices are always visible footnote-style */
+[data-theme="ds2"] .manuscript-mobile-suggested-actions-toggle {
+  display: none;
+}
+
+/* DS2 choices always visible — override base !important hide at <1024px */
+[data-theme="ds2"] .manuscript-suggested-actions-section {
+  display: block !important;
+}
+
+/* DS2 choice prompt hidden — demo shows no heading above choices */
+[data-theme="ds2"] .manuscript-choice-prompt {
+  display: none;
+}
+
+/* DS2 end story — always show desktop variant, orange outline pill */
+[data-theme="ds2"] .manuscript-end-story-desktop {
+  display: inline-flex;
+}
+
+[data-theme="ds2"] .manuscript-end-story-desktop .manuscript-warning-action-button {
+  font-family: var(--font-system);
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgb(146 64 14);
+  border: 1px solid rgb(146 64 14 / 20%);
+  border-radius: var(--radius-sm);
+  padding: 0 0.625rem;
+  height: 2rem;
+}
+
+[data-theme="ds2"] .manuscript-end-story-mobile {
+  display: none;
+}
+
+/* Drawer: lighter overlay, tighter title (Pass 7, fixes 1-4) */
+[data-theme="ds2"] .manuscript-overlay-backdrop.manuscript-drawer-backdrop {
+  background: rgb(0 0 0 / 15%);
+}
+
+[data-theme="ds2"] .manuscript-drawer-panel {
+  width: min(100%, 23.75rem);
+}
+
+[data-theme="ds2"] .manuscript-drawer-header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-4);
+}
+
+[data-theme="ds2"] .manuscript-drawer-title {
+  font-size: 1rem;
+}
+
+[data-theme="ds2"] .manuscript-drawer-content {
+  color: var(--color-text-primary);
+}
+
+/* DS2 drawer content — journal snapshot (Pass 9, fix 3) */
+[data-theme="ds2"] .manuscript-journal-snapshot-list {
+  gap: var(--space-2);
+}
+
+[data-theme="ds2"] .manuscript-journal-snapshot-entry {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0 0 var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds2"] .manuscript-journal-snapshot-title {
+  font-size: 0.6875rem;
+}
+
+[data-theme="ds2"] .manuscript-journal-snapshot-content {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+[data-theme="ds2"] .manuscript-journal-snapshot-badges {
+  display: none;
+}
+
+/* DS2 drawer content — inventory items (Pass 9, fix 4) */
+[data-theme="ds2"] .manuscript-inventory-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2_5);
+  padding: var(--space-2) 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item-header {
+  margin-bottom: 0;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item-name {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item-description {
+  font-family: var(--font-interface);
+  font-size: 0.6875rem;
+  margin-bottom: 0;
+}
+
+[data-theme="ds2"] .manuscript-inventory-item-footer {
+  display: none;
+}
+
+/* DS2 drawer content — story summary (Pass 9, fix 5) */
+[data-theme="ds2"] .manuscript-story-summary-paragraph {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+/* DS2 drawer content — choice history (Pass 9, fix 6) */
+[data-theme="ds2"] .manuscript-choice-history-list {
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds2"] .manuscript-choice-history-entry {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0 0 var(--space-1_5) 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 0;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-entry:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-choice {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .manuscript-choice-history-meta {
+  display: none;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-outcome {
+  display: none;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-details {
+  display: none;
+}
+
+[data-theme="ds2"] .manuscript-choice-history-details-button {
+  display: none;
+}
+
+/* DS2/DS3 inventory category title hidden — demos show no category headers (Pass 10, fix 4) */
+[data-theme="ds2"] .manuscript-inventory-category-title,
+[data-theme="ds3"] .manuscript-inventory-category-title {
+  display: none;
+}
+
+/* DS2/DS3 inventory category group — remove margin when title hidden (Pass 10, fix 4) */
+[data-theme="ds2"] .manuscript-inventory-category-group,
+[data-theme="ds3"] .manuscript-inventory-category-group {
+  margin-bottom: var(--space-4);
 }
 
 
@@ -3318,6 +3697,10 @@ body.manuscript-overlay-open {
 [data-theme="ds3"] .manuscript-characters-rail,
 [data-theme="ds3"] .manuscript-rail-spacer {
   display: none;
+}
+
+[data-theme="ds3"] .manuscript-main-content {
+  padding: 5rem 1.5rem 7.5rem;
 }
 
 /* Dot grid background overlay */
@@ -3352,17 +3735,17 @@ body.manuscript-overlay-open {
 [data-theme="ds3"] .manuscript-hud-character-pill {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1_5);
-  padding: var(--space-1) var(--space-2_5);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   border: 1px solid var(--color-border);
-  background: var(--color-overlay-surface-strong);
+  background: var(--color-surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--color-text-primary);
   font-family: var(--font-system);
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.8125rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
 }
@@ -3393,8 +3776,8 @@ body.manuscript-overlay-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-overlay-surface);
@@ -3430,9 +3813,7 @@ body.manuscript-overlay-open {
 
 [data-theme="ds3"] .manuscript-suggested-action {
   position: relative;
-  padding-left: calc(var(--space-2_5) + var(--space-4));
-  padding-top: var(--space-4);
-  padding-bottom: var(--space-4);
+  padding: var(--space-4) 1.25rem var(--space-4) 1.4375rem;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -3445,26 +3826,38 @@ body.manuscript-overlay-open {
   top: 8px;
   bottom: 8px;
   width: 3px;
-  background: var(--color-accent);
+  background: var(--color-border);
   border-radius: 0 2px 2px 0;
-  opacity: 0.35;
-  transition: opacity 120ms ease;
+  transition: background 150ms ease;
+}
+
+[data-theme="ds3"] .manuscript-suggested-action:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-float);
 }
 
 [data-theme="ds3"] .manuscript-suggested-action:hover::before {
-  opacity: 1;
+  background: var(--color-accent);
+}
+
+[data-theme="ds3"] .manuscript-suggested-action.is-selected,
+[data-theme="ds3"] .manuscript-suggested-action[aria-pressed="true"] {
+  background: var(--color-accent-fill);
+  border-color: var(--color-accent);
 }
 
 [data-theme="ds3"] .manuscript-suggested-action-label {
   font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-bottom: 0.25rem;
 }
 
-/* Rotate accent bar colors across choices */
-[data-theme="ds3"] .manuscript-suggested-action:nth-child(3n+2)::before {
+/* Rotate accent bar colors across choices — hover only */
+[data-theme="ds3"] .manuscript-suggested-action:nth-child(3n+2):hover::before {
   background: var(--color-info);
 }
 
-[data-theme="ds3"] .manuscript-suggested-action:nth-child(3n+3)::before {
+[data-theme="ds3"] .manuscript-suggested-action:nth-child(3n+3):hover::before {
   background: var(--color-warning);
 }
 
@@ -3476,13 +3869,13 @@ body.manuscript-overlay-open {
   width: 1.375rem;
   height: 1.375rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-strong);
-  background: var(--color-surface);
-  box-shadow: 0 2px 0 0 var(--color-border-strong);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  box-shadow: none;
   font-family: var(--font-system);
   font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-weight: 500;
+  color: var(--color-text-muted);
   position: absolute;
   left: var(--space-2_5);
   top: 50%;
@@ -3490,20 +3883,21 @@ body.manuscript-overlay-open {
   flex-shrink: 0;
 }
 
-/* DS3 input counter */
+/* DS3 input counter (Pass 10, fix 3: color text-muted, drop letter-spacing per demo) */
 [data-theme="ds3"] .manuscript-input-counter {
   font-family: var(--font-system);
   font-size: 0.6875rem;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
-/* Input: recessed surface style */
+/* Input: transparent with warm border */
 [data-theme="ds3"] .manuscript-custom-input {
-  background: var(--color-surface-hover);
+  background: transparent;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  padding: var(--space-2_5) 0.875rem;
+  height: auto;
 }
 
 [data-theme="ds3"] .manuscript-custom-input:focus-visible {
@@ -3516,15 +3910,21 @@ body.manuscript-overlay-open {
   font-style: italic;
 }
 
-/* DS3 circular send button with icon */
+/* DS3 circular send button — dark primary, not accent */
 [data-theme="ds3"] .manuscript-send-button {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
   padding: 0;
+  background: var(--color-text-primary);
+  color: var(--color-canvas);
 }
 
-/* DS3 outcome callout — bordered card with decorative dashed-stripe top */
+[data-theme="ds3"] .manuscript-send-button:hover {
+  opacity: 0.85;
+}
+
+/* DS3 outcome callout — bordered card with decorative dashed-stripe top (Pass 7: padding+margin) */
 [data-theme="ds3"] .choice-outcome-callout {
   border: 1px solid var(--color-border);
   border-top: none;
@@ -3533,6 +3933,10 @@ body.manuscript-overlay-open {
   position: relative;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  padding-right: var(--space-5);
+  padding-left: var(--space-5);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
 }
 
 [data-theme="ds3"] .choice-outcome-callout::before {
@@ -3598,11 +4002,17 @@ body.manuscript-overlay-open {
   background: rgb(from var(--color-danger) r g b / 10%);
 }
 
-/* HUD panels: tighter radius, strong blur */
+[data-theme="ds3"] .choice-outcome-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* HUD panels: tighter radius, strong blur, demo-matched padding (Pass 7) */
 [data-theme="ds3"] .manuscript-hud-panel {
   border-radius: var(--radius-lg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  padding: var(--space-4);
 }
 
 /* Desktop override: keep single column */
@@ -3626,7 +4036,7 @@ body.manuscript-overlay-open {
   /* Scale up pill and icon for desktop */
   [data-theme="ds3"] .manuscript-hud-character-pill {
     font-size: 0.8125rem;
-    padding: var(--space-1_5) var(--space-3);
+    padding: var(--space-2) var(--space-4);
   }
 
   [data-theme="ds3"] .manuscript-hud-character-pill-avatar {
@@ -3664,12 +4074,12 @@ body.manuscript-overlay-open {
   }
 }
 
-/* DS3 icon controls grouped toolbar (top-right) */
+/* DS3 icon controls grouped toolbar (top-right) — surface (80% alpha) for grid show-through (Pass 8, fix 7) */
 [data-theme="ds3"] .manuscript-ds3-controls {
   display: flex;
   align-items: center;
   gap: 2px;
-  background: var(--color-overlay-surface);
+  background: var(--color-surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
@@ -3723,3 +4133,247 @@ body.manuscript-overlay-open {
 [data-theme="ds3"] .manuscript-save-indicator .save-indicator-button {
   display: none;
 }
+
+/* DS3 streaming indicator — pulsing muted dot */
+[data-theme="ds3"] .manuscript-streaming-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds3"] .manuscript-streaming-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+  animation: ds3-streaming-pulse 1.2s ease-in-out infinite;
+}
+
+[data-theme="ds3"] .manuscript-streaming-label {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+@keyframes ds3-streaming-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* DS3 skeleton shimmer — cool-toned gradient */
+[data-theme="ds3"] .manuscript-skeleton-pulse {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 25%,
+    var(--color-surface-hover) 50%,
+    var(--color-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: ds3-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes ds3-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* DS3 "Suggested Actions" heading — hidden (DS3 uses kbd badge style) */
+[data-theme="ds3"] .manuscript-suggested-actions-heading {
+  display: none;
+}
+
+/* DS3 narrative text — 18px with generous line-height */
+[data-theme="ds3"] .text-narrative {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+[data-theme="ds3"] .text-narrative p,
+[data-theme="ds3"] .text-narrative.scene-spacing p {
+  margin-bottom: var(--space-2);
+}
+
+/* DS3 dialogue segments — italic with left border accent (Pass 8, fix 6) */
+[data-theme="ds3"] .dialogue-segment {
+  font-style: italic;
+  border-left: 2px solid var(--color-border-strong);
+  padding-left: var(--space-4);
+  margin-left: var(--space-1);
+}
+
+/* DS3 main content inner — narrower journal column */
+[data-theme="ds3"] .manuscript-main-content-inner {
+  max-width: 42.5rem;
+}
+
+/* DS3 choice cards — neutral colors, not alignment-tinted */
+[data-theme="ds3"] .manuscript-suggested-action.manuscript-suggested-action-lawful,
+[data-theme="ds3"] .manuscript-suggested-action.manuscript-suggested-action-chaotic {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* DS3 mobile toggle hidden — choices always visible */
+[data-theme="ds3"] .manuscript-mobile-suggested-actions-toggle {
+  display: none;
+}
+
+/* DS3 choices always visible — override base !important hide at <1024px */
+[data-theme="ds3"] .manuscript-suggested-actions-section {
+  display: block !important;
+}
+
+/* DS3 choice prompt hidden — no heading above choices */
+[data-theme="ds3"] .manuscript-choice-prompt {
+  display: none;
+}
+
+/* DS3 input label hidden — uses placeholder text only */
+[data-theme="ds3"] .manuscript-input-label {
+  display: none;
+}
+
+/* DS3 action rail — border-top only, no radius, tighter padding (Pass 8, fix 5) */
+[data-theme="ds3"] #manuscript-action-rail {
+  background: var(--color-overlay-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: none;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--space-3) var(--space-6);
+}
+
+/* DS3 mobile bar hidden (no rail concept) */
+[data-theme="ds3"] .manuscript-characters-mobile-bar {
+  display: none;
+}
+
+/* DS3 end story button hidden — exit action is in HUD icon toolbar */
+[data-theme="ds3"] .manuscript-end-story-desktop,
+[data-theme="ds3"] .manuscript-end-story-mobile {
+  display: none;
+}
+
+/* Drawer: lighter overlay, tighter panel, header border (Pass 7, fixes 1-6) */
+[data-theme="ds3"] .manuscript-overlay-backdrop.manuscript-drawer-backdrop {
+  background: rgb(0 0 0 / 15%);
+}
+
+[data-theme="ds3"] .manuscript-drawer-panel {
+  width: min(100%, 23.75rem);
+}
+
+[data-theme="ds3"] .manuscript-drawer-header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-4);
+}
+
+[data-theme="ds3"] .manuscript-drawer-title {
+  font-size: 1rem;
+}
+
+[data-theme="ds3"] .manuscript-drawer-content {
+  color: var(--color-text-primary);
+}
+
+/* Character name: bolder in DS3 HUD panel (Pass 7, fix 10) */
+[data-theme="ds3"] .manuscript-character-snapshot-name {
+  font-weight: 600;
+}
+
+/* DS3 character snapshot stat values — larger, bolder, system font (Pass 8, fix 1) */
+[data-theme="ds3"] .manuscript-character-snapshot-item-value {
+  font-family: var(--font-system);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* DS3 character snapshot stat labels — system font to match values (Pass 10, fix 1) */
+[data-theme="ds3"] .manuscript-character-snapshot-item-label {
+  font-family: var(--font-system);
+}
+
+/* DS3 character snapshot stat row padding (Pass 8, fix 2) */
+[data-theme="ds3"] .manuscript-character-snapshot-item {
+  padding: 3px 0;
+}
+
+/* DS3 drawer content — journal snapshot (Pass 9, fix 1) */
+[data-theme="ds3"] .manuscript-journal-snapshot-list {
+  gap: 0;
+}
+
+[data-theme="ds3"] .manuscript-journal-snapshot-entry {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds3"] .manuscript-journal-snapshot-entry:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds3"] .manuscript-journal-snapshot-content {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  opacity: 0.85;
+  color: var(--color-text-primary);
+  display: block;
+  overflow: visible;
+}
+
+[data-theme="ds3"] .manuscript-journal-snapshot-meta {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* DS3 drawer content — inventory items (Pass 9, fix 2) */
+[data-theme="ds3"] .manuscript-inventory-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2_5) 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item-header {
+  margin-bottom: 0;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item-description {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  margin-bottom: 0;
+}
+
+[data-theme="ds3"] .manuscript-inventory-item-footer {
+  display: none;
+}
+

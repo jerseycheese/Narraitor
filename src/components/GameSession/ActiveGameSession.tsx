@@ -393,6 +393,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           }}
           onStartNew={onStartNew}
           onBack={onBack}
+          onEndStory={handleEndStoryClick}
           saveIndicator={
             <SaveIndicator
               status={autoSave.status}
