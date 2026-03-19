@@ -90,6 +90,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   const characterButtonRef = React.useRef<HTMLButtonElement>(null);
   const toolsButtonRef = React.useRef<HTMLButtonElement>(null);
+  const drawerTriggerRef = React.useRef<HTMLElement | null>(null);
   const [isStreamingPreview, setIsStreamingPreview] = React.useState(false);
   const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
@@ -173,7 +174,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       if (event.key === 'Escape') {
         if (activeDrawer !== null) {
           setActiveDrawer(null);
-          toolsButtonRef.current?.focus();
+          drawerTriggerRef.current?.focus();
+          drawerTriggerRef.current = null;
           return;
         }
         if (isToolsMenuOpen) {
@@ -369,6 +371,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             <ToolsMenuPanelContent
               activeDrawer={activeDrawer ?? lastOpenedDrawer}
               onOpenDrawer={(drawerType) => {
+                drawerTriggerRef.current = document.activeElement as HTMLElement;
                 setActiveDrawer(drawerType);
                 setLastOpenedDrawer(drawerType);
                 setIsCharacterSummaryExpanded(false);
@@ -401,6 +404,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
           onOpenDrawer={(drawerType) => {
+            drawerTriggerRef.current = document.activeElement as HTMLElement;
             setActiveDrawer(drawerType as DrawerType);
             setLastOpenedDrawer(drawerType as DrawerType);
             setIsCharacterSummaryExpanded(false);
@@ -525,7 +529,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           onOpenChange={(open) => {
             if (!open) {
               setActiveDrawer(null);
-              toolsButtonRef.current?.focus();
+              drawerTriggerRef.current?.focus();
+              drawerTriggerRef.current = null;
             }
           }}
           title={

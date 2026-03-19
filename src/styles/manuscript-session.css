@@ -418,6 +418,9 @@ body.manuscript-overlay-open {
   top: 100%;
   margin-top: var(--space-2);
   left: 0;
+}
+
+.manuscript-hud-panel:focus:not(:focus-visible) {
   outline: none;
 }
 
