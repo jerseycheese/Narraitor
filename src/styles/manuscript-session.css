@@ -1981,11 +1981,33 @@ body.manuscript-overlay-open {
   }
 
   .manuscript-save-indicator .save-indicator-copy {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .manuscript-save-indicator .save-indicator-button {
     display: none;
+  }
+
+  /* Override DS1 theme rule that sets display: block on .save-indicator-copy */
+  [data-theme="ds1"] .manuscript-save-indicator .save-indicator-copy {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    display: block;
   }
 
   .manuscript-save-indicator .save-indicator-status::after {
