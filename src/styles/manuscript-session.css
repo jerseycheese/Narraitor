@@ -1973,8 +1973,28 @@ body.manuscript-overlay-open {
 }
 
 @media (width < 640px) {
+  /* Mobile: show save indicator as a compact status dot across all themes */
   .manuscript-save-indicator {
+    border: none;
+    background: transparent;
+    padding: var(--space-1);
+  }
+
+  .manuscript-save-indicator .save-indicator-copy {
     display: none;
+  }
+
+  .manuscript-save-indicator .save-indicator-button {
+    display: none;
+  }
+
+  .manuscript-save-indicator .save-indicator-status::after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-success);
   }
 
   .manuscript-hud-reset-button {
