@@ -87,6 +87,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
   const [lastOpenedDrawer, setLastOpenedDrawer] = React.useState<DrawerType | null>(null);
   const [isToolsMenuOpen, setIsToolsMenuOpen] = React.useState(false);
+
+  const characterButtonRef = React.useRef<HTMLButtonElement>(null);
+  const toolsButtonRef = React.useRef<HTMLButtonElement>(null);
+  const drawerTriggerRef = React.useRef<HTMLElement | null>(null);
   const [isStreamingPreview, setIsStreamingPreview] = React.useState(false);
   const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
@@ -170,10 +174,20 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       if (event.key === 'Escape') {
         if (activeDrawer !== null) {
           setActiveDrawer(null);
+          drawerTriggerRef.current?.focus();
+          drawerTriggerRef.current = null;
           return;
         }
-        setIsCharacterSummaryExpanded(false);
-        setIsToolsMenuOpen(false);
+        if (isToolsMenuOpen) {
+          setIsToolsMenuOpen(false);
+          toolsButtonRef.current?.focus();
+          return;
+        }
+        if (isCharacterSummaryExpanded) {
+          setIsCharacterSummaryExpanded(false);
+          characterButtonRef.current?.focus();
+          return;
+        }
       }
     };
 
@@ -335,6 +349,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     <ManuscriptSessionShell
       hud={
         <ManuscriptFloatingHud
+          characterButtonRef={characterButtonRef}
+          toolsButtonRef={toolsButtonRef}
           onToggleCharacterSummary={() => {
             setIsCharacterSummaryExpanded((prev) => {
               const next = !prev;
@@ -355,6 +371,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             <ToolsMenuPanelContent
               activeDrawer={activeDrawer ?? lastOpenedDrawer}
               onOpenDrawer={(drawerType) => {
+                drawerTriggerRef.current = document.activeElement as HTMLElement;
                 setActiveDrawer(drawerType);
                 setLastOpenedDrawer(drawerType);
                 setIsCharacterSummaryExpanded(false);
@@ -387,6 +404,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
           onOpenDrawer={(drawerType) => {
+            drawerTriggerRef.current = document.activeElement as HTMLElement;
             setActiveDrawer(drawerType as DrawerType);
             setLastOpenedDrawer(drawerType as DrawerType);
             setIsCharacterSummaryExpanded(false);
@@ -508,7 +526,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {isProgressiveDisclosureEnabled && (
         <ManuscriptDrawer
           open={activeDrawer !== null}
-          onOpenChange={(open) => !open && setActiveDrawer(null)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setActiveDrawer(null);
+              drawerTriggerRef.current?.focus();
+              drawerTriggerRef.current = null;
+            }
+          }}
           title={
             activeDrawer === 'character'
               ? 'Character Sheet'

@@ -20,6 +20,8 @@ interface ManuscriptFloatingHudProps {
   onBack?: () => void;
   onEndStory?: () => void;
   saveIndicator?: React.ReactNode;
+  characterButtonRef?: React.RefObject<HTMLButtonElement | null>;
+  toolsButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = (props) => {
@@ -40,12 +42,19 @@ function DS1ChromeBar({
   toolsMenuPanel,
   rightContent,
   drawerTriggers,
+  characterButtonRef,
+  toolsButtonRef,
 }: ManuscriptFloatingHudProps) {
+  const focusPanel = React.useCallback((node: HTMLDivElement | null) => {
+    node?.focus();
+  }, []);
+
   return (
     <>
       <div className="manuscript-overlay-header-left">
         <div className="manuscript-header-controls">
           <button
+            ref={characterButtonRef}
             type="button"
             onClick={onToggleCharacterSummary}
             aria-expanded={isCharacterSummaryExpanded}
@@ -56,6 +65,7 @@ function DS1ChromeBar({
 
           {drawerTriggers && (
             <button
+              ref={toolsButtonRef}
               type="button"
               onClick={onToggleToolsMenu}
               aria-label="Toggle Tools menu"
@@ -68,13 +78,13 @@ function DS1ChromeBar({
         </div>
 
         {isCharacterSummaryExpanded && characterSummaryPanel && (
-          <div className="manuscript-hud-panel manuscript-hud-panel-left manuscript-hud-character-panel">
+          <div ref={focusPanel} tabIndex={-1} className="manuscript-hud-panel manuscript-hud-panel-left manuscript-hud-character-panel">
             {characterSummaryPanel}
           </div>
         )}
 
         {isToolsMenuOpen && toolsMenuPanel && (
-          <div className="manuscript-hud-panel manuscript-hud-panel-left">
+          <div ref={focusPanel} tabIndex={-1} className="manuscript-hud-panel manuscript-hud-panel-left">
             {toolsMenuPanel}
           </div>
         )}
@@ -98,12 +108,19 @@ function DS2RunningHead({
   rightContent,
   drawerTriggers,
   characterName,
+  characterButtonRef,
+  toolsButtonRef,
 }: ManuscriptFloatingHudProps) {
+  const focusPanel = React.useCallback((node: HTMLDivElement | null) => {
+    node?.focus();
+  }, []);
+
   return (
     <>
       <div className="manuscript-overlay-header-left">
         <div className="manuscript-header-controls">
           <button
+            ref={characterButtonRef}
             type="button"
             onClick={onToggleCharacterSummary}
             aria-expanded={isCharacterSummaryExpanded}
@@ -114,6 +131,7 @@ function DS2RunningHead({
 
           {drawerTriggers && (
             <button
+              ref={toolsButtonRef}
               type="button"
               onClick={onToggleToolsMenu}
               aria-label="Toggle Tools menu"
@@ -126,13 +144,13 @@ function DS2RunningHead({
         </div>
 
         {isCharacterSummaryExpanded && characterSummaryPanel && (
-          <div className="manuscript-hud-panel manuscript-hud-panel-left manuscript-hud-character-panel">
+          <div ref={focusPanel} tabIndex={-1} className="manuscript-hud-panel manuscript-hud-panel-left manuscript-hud-character-panel">
             {characterSummaryPanel}
           </div>
         )}
 
         {isToolsMenuOpen && toolsMenuPanel && (
-          <div className="manuscript-hud-panel manuscript-hud-panel-left">
+          <div ref={focusPanel} tabIndex={-1} className="manuscript-hud-panel manuscript-hud-panel-left">
             {toolsMenuPanel}
           </div>
         )}
@@ -157,12 +175,18 @@ function DS3FloatingPill({
   onStartNew,
   onEndStory,
   saveIndicator,
+  characterButtonRef,
 }: ManuscriptFloatingHudProps) {
+  const focusPanel = React.useCallback((node: HTMLDivElement | null) => {
+    node?.focus();
+  }, []);
+
   return (
     <>
       <div className="manuscript-overlay-header-left">
         <div className="manuscript-header-controls">
           <button
+            ref={characterButtonRef}
             type="button"
             onClick={onToggleCharacterSummary}
             aria-expanded={isCharacterSummaryExpanded}
@@ -176,7 +200,7 @@ function DS3FloatingPill({
         </div>
 
         {isCharacterSummaryExpanded && characterSummaryPanel && (
-          <div className="manuscript-hud-panel manuscript-hud-panel-left manuscript-hud-character-panel">
+          <div ref={focusPanel} tabIndex={-1} className="manuscript-hud-panel manuscript-hud-panel-left manuscript-hud-character-panel">
             {characterSummaryPanel}
           </div>
         )}
