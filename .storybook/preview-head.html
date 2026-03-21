@@ -1,0 +1,38 @@
+<!--
+  Load Google Fonts that Next.js normally handles via next/font/google.
+  Storybook doesn't render layout.tsx, so the font CSS variables
+  (- -font-lora, etc.) that theme CSS references are never defined.
+  This file bridges that gap.
+-->
+
+<!-- DS1 fonts: Lora, IBM Plex Mono, IBM Plex Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- DS2 fonts: Crimson Pro, JetBrains Mono, Manrope -->
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- DS3 fonts: Newsreader, Fira Code, DM Sans -->
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Fira+Code:wght@400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+
+<style>
+  /*
+   * Map CSS variables to match what next/font/google generates in layout.tsx.
+   * Theme CSS files reference these (e.g. --font-narrative: var(--font-lora)).
+   */
+  :root {
+    /* DS1 */
+    --font-lora: 'Lora', serif;
+    --font-ibm-plex-mono: 'IBM Plex Mono', monospace;
+    --font-ibm-plex-sans: 'IBM Plex Sans', sans-serif;
+    /* DS2 */
+    --font-crimson-pro: 'Crimson Pro', serif;
+    --font-jetbrains-mono: 'JetBrains Mono', monospace;
+    --font-manrope: 'Manrope', sans-serif;
+    /* DS3 */
+    --font-newsreader: 'Newsreader', serif;
+    --font-fira-code: 'Fira Code', monospace;
+    --font-dm-sans: 'DM Sans', sans-serif;
+  }
+</style>

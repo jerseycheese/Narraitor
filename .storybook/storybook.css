@@ -3,3 +3,13 @@
  * Minimal overrides for proper display in Storybook environment.
  * Theme colors are controlled by the design system via data-theme / .dark attributes.
  */
+
+/* Let the design system's --color-canvas show through Storybook's story container */
+.sb-show-main.sb-main-padded {
+  background: var(--color-canvas);
+  transition: background 0.15s ease;
+}
+
+#storybook-root {
+  background: transparent;
+}
