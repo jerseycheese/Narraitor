@@ -1,16 +1,5 @@
 /**
  * Storybook-specific styling
- * Minimal overrides for proper display in Storybook environment
+ * Minimal overrides for proper display in Storybook environment.
+ * Theme colors are controlled by the design system via data-theme / .dark attributes.
  */
-
-
-/* Ensure consistent light theme in Storybook */
-body.sb-show-main {
-  color: #111827 !important; /* gray-900 from design system */
-  background-color: #ffffff !important; /* white from design system */
-}
-
-#storybook-root {
-  color: #111827 !important; /* gray-900 from design system */
-  background-color: #ffffff !important; /* white from design system */
-}
