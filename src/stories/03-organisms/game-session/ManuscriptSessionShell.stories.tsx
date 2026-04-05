@@ -75,3 +75,21 @@ export const Streaming: Story = {
     ),
   },
 };
+
+export const WithCharactersRail: Story = {
+  args: {
+    ...Default.args,
+    marginContent: (
+      <div className="manuscript-characters-rail-section">
+        <p className="manuscript-characters-rail-label">Characters Present</p>
+        <div className="manuscript-characters-rail-list">
+          {['Elara the Wise', 'Thorne', 'Captain Vex'].map((name) => (
+            <span key={name} className="manuscript-character-badge">
+              <span className="manuscript-character-name">{name}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+};

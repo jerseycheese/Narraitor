@@ -28,7 +28,7 @@ const DrawerHarness = (props: React.ComponentProps<typeof ManuscriptDrawer>) => 
   );
 };
 
-export const Default: Story = {
+export const CharacterSheet: Story = {
   render: (args) => <DrawerHarness {...args} />,
   args: {
     title: 'Character Sheet',
@@ -52,12 +52,30 @@ export const Default: Story = {
   },
 };
 
-export const LeftSide: Story = {
+export const Inventory: Story = {
   render: (args) => <DrawerHarness {...args} />,
   args: {
-    ...Default.args,
     title: 'Inventory',
     side: 'left',
+    children: (
+      <div className="space-y-3">
+        {[
+          { name: 'Healing Potion', qty: 3, desc: 'Restores 2d4+2 HP' },
+          { name: 'Iron Shortsword', qty: 1, desc: 'Melee weapon, 1d6 slashing' },
+          { name: 'Torch', qty: 5, desc: 'Provides light for 1 hour' },
+          { name: 'Rope (50 ft)', qty: 1, desc: 'Hemp rope, 2 HP' },
+          { name: 'Rations', qty: 7, desc: 'One day of food' },
+        ].map((item) => (
+          <div key={item.name} className="flex items-start justify-between border-b pb-2">
+            <div>
+              <div className="text-sm font-medium">{item.name}</div>
+              <div className="text-xs text-muted-foreground">{item.desc}</div>
+            </div>
+            <span className="text-xs text-muted-foreground ml-2">x{item.qty}</span>
+          </div>
+        ))}
+      </div>
+    ),
   },
 };
 
