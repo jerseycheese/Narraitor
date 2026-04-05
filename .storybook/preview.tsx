@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import type { Preview } from '@storybook/react';
 import {
   Lora,
@@ -11,6 +11,8 @@ import {
   Fira_Code,
   DM_Sans,
 } from 'next/font/google';
+import { ThemeProvider, useTheme } from '../src/lib/theme/ThemeProvider';
+import type { DesignSystem, ColorScheme } from '../src/lib/theme';
 
 import '../src/app/globals.css';
 import '../src/lib/theme/themes/ds1.css';
@@ -37,23 +39,37 @@ const fontVariables = [
   newsreader.variable, firaCode.variable, dmSans.variable,
 ].join(' ');
 
-const withTheme = (Story, context) => {
-  const theme = context.globals.theme || 'ds1';
-  const colorScheme = context.globals.colorScheme || 'light';
+// Syncs Storybook toolbar selections into ThemeProvider's React context
+// so components using useTheme() render the correct theme variant.
+const ThemeSyncer: React.FC<{ sbTheme: DesignSystem; sbColorScheme: ColorScheme }> = ({
+  sbTheme,
+  sbColorScheme,
+}) => {
+  const { setTheme, setColorScheme } = useTheme();
+  useEffect(() => { setTheme(sbTheme); }, [sbTheme, setTheme]);
+  useEffect(() => { setColorScheme(sbColorScheme); }, [sbColorScheme, setColorScheme]);
+  return null;
+};
 
+// Applies font CSS variable classes to the document root once.
+const FontInjector: React.FC = () => {
   useEffect(() => {
-    const doc = document.documentElement;
-    doc.setAttribute('data-theme', theme);
-    // Apply font CSS variable classes (mirrors layout.tsx className={fontVariables})
-    fontVariables.split(' ').forEach(cls => cls && doc.classList.add(cls));
-    if (colorScheme === 'dark') {
-      doc.classList.add('dark');
-    } else {
-      doc.classList.remove('dark');
-    }
-  }, [theme, colorScheme]);
+    fontVariables.split(' ').forEach(cls => cls && document.documentElement.classList.add(cls));
+  }, []);
+  return null;
+};
 
-  return <Story />;
+const withTheme = (Story: React.FC, context: { globals: Record<string, string> }) => {
+  const theme = (context.globals.theme || 'ds1') as DesignSystem;
+  const colorScheme = (context.globals.colorScheme || 'light') as ColorScheme;
+
+  return (
+    <ThemeProvider>
+      <FontInjector />
+      <ThemeSyncer sbTheme={theme} sbColorScheme={colorScheme} />
+      <Story />
+    </ThemeProvider>
+  );
 };
 
 const preview: Preview = {

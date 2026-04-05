@@ -28,7 +28,7 @@ const DrawerHarness = (props: React.ComponentProps<typeof ManuscriptDrawer>) => 
   );
 };
 
-export const Default: Story = {
+export const CharacterSheet: Story = {
   render: (args) => <DrawerHarness {...args} />,
   args: {
     title: 'Character Sheet',
@@ -52,12 +52,30 @@ export const Default: Story = {
   },
 };
 
-export const LeftSide: Story = {
+export const Inventory: Story = {
   render: (args) => <DrawerHarness {...args} />,
   args: {
-    ...Default.args,
     title: 'Inventory',
     side: 'left',
+    children: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {[
+          { name: 'Healing Potion', qty: 3, desc: 'Restores 2d4+2 HP' },
+          { name: 'Iron Shortsword', qty: 1, desc: 'Melee weapon, 1d6 slashing' },
+          { name: 'Torch', qty: 5, desc: 'Provides light for 1 hour' },
+          { name: 'Rope (50 ft)', qty: 1, desc: 'Hemp rope, 2 HP' },
+          { name: 'Rations', qty: 7, desc: 'One day of food' },
+        ].map((item) => (
+          <div key={item.name} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>
+            <div>
+              <div style={{ fontSize: '0.875rem', fontWeight: 500 }}>{item.name}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{item.desc}</div>
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>x{item.qty}</span>
+          </div>
+        ))}
+      </div>
+    ),
   },
 };
 
