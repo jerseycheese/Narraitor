@@ -3,7 +3,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { GeneratedImage } from '@/types/common.types';
-import { cssClasses } from '@/lib/utils/classNames';
 
 interface CharacterPortraitProps {
   portrait: GeneratedImage;

@@ -1,5 +1,4 @@
 import * as React from "react"
-import { cssClasses } from '@/lib/utils/classNames'
 
 export type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>
 

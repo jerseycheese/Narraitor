@@ -30,12 +30,6 @@ export interface CardActionGroupProps {
   layout?: 'horizontal' | 'vertical';
   /** Gap between buttons */
   gap?: 'sm' | 'md' | 'lg';
-  /** Button size - applies to all buttons if primarySize and secondarySize not specified */
-  size?: 'sm' | 'md' | 'lg';
-  /** Primary button size - overrides size for primary actions */
-  primarySize?: 'sm' | 'md' | 'lg';
-  /** Secondary button size - overrides size for secondary actions */
-  secondarySize?: 'sm' | 'md' | 'lg';
   /** Custom CSS classes for the container */
   className?: string;
 }

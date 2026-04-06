@@ -337,8 +337,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   icon: <Trash aria-hidden="true" />,
                 },
               ]}
-              primarySize="md"
-              secondarySize="sm"
             />
           </div>
         </footer>

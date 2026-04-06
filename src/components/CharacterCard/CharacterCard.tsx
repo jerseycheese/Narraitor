@@ -230,8 +230,6 @@ export function CharacterCard({
                 icon: <Trash aria-hidden="true" />,
               },
             ]}
-            primarySize="md"
-            secondarySize="sm"
           />
         </footer>
       </div>

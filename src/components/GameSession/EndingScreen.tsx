@@ -211,7 +211,7 @@ export function EndingScreen() {
       <ErrorDisplay
         variant="page"
         title="Unable to load story ending"
-        message={endingError || 'An unknown error occurred'}
+        message={endingError}
         showRetry={true}
         onRetry={() => router.back()}
       />

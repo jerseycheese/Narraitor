@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { cssClasses } from '@/lib/utils/classNames';
 import { primitiveColors } from '@/lib/design-tokens';
 
 /**

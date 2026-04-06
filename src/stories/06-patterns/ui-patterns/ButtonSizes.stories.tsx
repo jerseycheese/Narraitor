@@ -104,7 +104,6 @@ export const ButtonSizeComparison: Story = {
                 variant: 'danger',
               },
             ]}
-            secondarySize="sm"
           />
           <p>
             Secondary actions use <code>px-2 py-1 text-xs</code> sizing

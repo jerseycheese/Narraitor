@@ -381,6 +381,20 @@
   font-size: 0.75rem;
 }
 
+/* Responsive breadcrumb gating: truncated on mobile, full on desktop */
+.breadcrumbs-desktop {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .breadcrumbs-mobile {
+    display: none;
+  }
+  .breadcrumbs-desktop {
+    display: flex;
+  }
+}
+
 /* ─── Mobile Navigation Menu ─── */
 
 .mobile-nav-menu {

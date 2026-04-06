@@ -4,7 +4,6 @@
  */
 
 import * as React from 'react';
-import { cssClasses } from '@/lib/utils/classNames';
 
 const Table = React.forwardRef<
   HTMLTableElement,

@@ -1,6 +1,5 @@
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
-import { cssClasses } from '@/lib/utils';
 
 interface PointPool {
   total: number;

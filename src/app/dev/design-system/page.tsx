@@ -85,28 +85,6 @@ function ZincCard({ stop, hex }: { stop: string; hex: string }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Section wrapper
-// ---------------------------------------------------------------------------
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
-  return (
-    <section id={id} style={{ borderBottom: '1px solid var(--color-border)', padding: '48px 0' }}>
-      <h2 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24, color: 'var(--color-text-primary)', fontFamily: 'var(--font-interface)' }}>{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function SubSection({ title, description, children }: { title?: string; description?: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginBottom: 32 }}>
-      {title && <h3 style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)', fontFamily: 'var(--font-interface)' }}>{title}</h3>}
-      {description && <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>{description}</p>}
-      {children}
-    </div>
-  );
-}
-
 const PHILOSOPHY_CARDS: Array<{ title: string; description: string }> = [
   {
     title: 'THE CONCEPT',

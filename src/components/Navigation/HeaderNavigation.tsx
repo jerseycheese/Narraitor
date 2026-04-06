@@ -263,10 +263,10 @@ export function HeaderNavigation() {
         <div className="breadcrumbs-container">
           <div className="breadcrumbs-inner">
             <SSRClientOnly>
-              <Breadcrumbs maxItems={2} />
+              <Breadcrumbs maxItems={2} className="breadcrumbs-mobile" />
             </SSRClientOnly>
             <SSRClientOnly>
-              <Breadcrumbs />
+              <Breadcrumbs className="breadcrumbs-desktop" />
             </SSRClientOnly>
           </div>
         </div>
