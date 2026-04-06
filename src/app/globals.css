@@ -235,7 +235,8 @@ body > * {
 }
 
 .button-success:hover {
-  filter: brightness(0.9);
+  background: var(--color-success-hover, var(--color-success));
+  border-color: var(--color-success-hover, var(--color-success));
 }
 
 /* Variant: info */
