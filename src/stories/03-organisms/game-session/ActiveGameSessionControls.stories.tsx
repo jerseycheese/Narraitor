@@ -26,7 +26,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    character: mockCharacter as any,
+    character: mockCharacter,
     characterId: STORY_CHARACTER_ID,
     worldId: STORY_WORLD_ID,
     sessionId: STORY_SESSION_ID,
@@ -36,7 +36,7 @@ export const Default: Story = {
 
 export const WithEndConfirmation: Story = {
   args: {
-    character: mockCharacter as any,
+    character: mockCharacter,
     characterId: STORY_CHARACTER_ID,
     worldId: STORY_WORLD_ID,
     sessionId: STORY_SESSION_ID,
@@ -46,7 +46,7 @@ export const WithEndConfirmation: Story = {
 
 export const ProgressiveDisclosureHidden: Story = {
   args: {
-    character: mockCharacter as any,
+    character: mockCharacter,
     characterId: STORY_CHARACTER_ID,
     worldId: STORY_WORLD_ID,
     sessionId: STORY_SESSION_ID,

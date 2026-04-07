@@ -12,6 +12,7 @@ import type {
 import type { World } from '@/types/world.types';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import type { Character } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -26,24 +27,20 @@ export const mockWorld: World = {
   id: STORY_WORLD_ID,
   name: 'The Shattered Isles',
   description: 'A storm-ravaged archipelago where ancient magic stirs beneath volcanic rock.',
-  theme: 'dark fantasy',
+  genre: 'fantasy',
   attributes: [
-    { id: 'attr-str', name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 20, defaultValue: 10 },
-    { id: 'attr-int', name: 'Intelligence', description: 'Mental acuity', minValue: 1, maxValue: 20, defaultValue: 10 },
-    { id: 'attr-cha', name: 'Charisma', description: 'Force of personality', minValue: 1, maxValue: 20, defaultValue: 10 },
+    { id: 'attr-str', worldId: STORY_WORLD_ID, name: 'Strength', description: 'Physical power', baseValue: 10, minValue: 1, maxValue: 20 },
+    { id: 'attr-int', worldId: STORY_WORLD_ID, name: 'Intelligence', description: 'Mental acuity', baseValue: 10, minValue: 1, maxValue: 20 },
+    { id: 'attr-cha', worldId: STORY_WORLD_ID, name: 'Charisma', description: 'Force of personality', baseValue: 10, minValue: 1, maxValue: 20 },
   ],
   skills: [
-    { id: 'skill-sword', name: 'Swordsmanship', description: 'Blade combat', attributeIds: ['attr-str'], difficulty: 'medium' },
-    { id: 'skill-lore', name: 'Arcane Lore', description: 'Knowledge of magic', attributeIds: ['attr-int'], difficulty: 'hard' },
-    { id: 'skill-persuade', name: 'Persuasion', description: 'Convincing others', attributeIds: ['attr-cha'], difficulty: 'easy' },
+    { id: 'skill-sword', worldId: STORY_WORLD_ID, name: 'Swordsmanship', description: 'Blade combat', attributeIds: ['attr-str'], difficulty: 'medium', baseValue: 0, minValue: 0, maxValue: 10 },
+    { id: 'skill-lore', worldId: STORY_WORLD_ID, name: 'Arcane Lore', description: 'Knowledge of magic', attributeIds: ['attr-int'], difficulty: 'hard', baseValue: 0, minValue: 0, maxValue: 10 },
+    { id: 'skill-persuade', worldId: STORY_WORLD_ID, name: 'Persuasion', description: 'Convincing others', attributeIds: ['attr-cha'], difficulty: 'easy', baseValue: 0, minValue: 0, maxValue: 10 },
   ],
   settings: {
     maxAttributes: 6,
     maxSkills: 8,
-    startingAttributePoints: 30,
-    startingSkillPoints: 10,
-    allowCustomSkills: false,
-    allowCustomAttributes: false,
     attributePointPool: 30,
     skillPointPool: 10,
   },
@@ -53,7 +50,7 @@ export const mockWorld: World = {
 
 // ── Mock Character ───────────────────────────────────────────────────
 
-export const mockCharacter = {
+export const mockCharacter: Character = {
   id: STORY_CHARACTER_ID,
   name: 'Kael Stormwright',
   description: 'A wandering swordmage seeking the truth behind the Shattering.',
@@ -61,14 +58,14 @@ export const mockCharacter = {
   level: 5,
   isPlayer: true,
   attributes: [
-    { id: 'cattr-1', name: 'Strength', modifiedValue: 14, worldAttributeId: 'attr-str' },
-    { id: 'cattr-2', name: 'Intelligence', modifiedValue: 16, worldAttributeId: 'attr-int' },
-    { id: 'cattr-3', name: 'Charisma', modifiedValue: 12, worldAttributeId: 'attr-cha' },
+    { id: 'cattr-1', characterId: STORY_CHARACTER_ID, worldAttributeId: 'attr-str', name: 'Strength', baseValue: 10, modifiedValue: 14 },
+    { id: 'cattr-2', characterId: STORY_CHARACTER_ID, worldAttributeId: 'attr-int', name: 'Intelligence', baseValue: 10, modifiedValue: 16 },
+    { id: 'cattr-3', characterId: STORY_CHARACTER_ID, worldAttributeId: 'attr-cha', name: 'Charisma', baseValue: 10, modifiedValue: 12 },
   ],
   skills: [
-    { id: 'cskill-1', name: 'Swordsmanship', level: 4, worldSkillId: 'skill-sword' },
-    { id: 'cskill-2', name: 'Arcane Lore', level: 3, worldSkillId: 'skill-lore' },
-    { id: 'cskill-3', name: 'Persuasion', level: 2, worldSkillId: 'skill-persuade' },
+    { id: 'cskill-1', characterId: STORY_CHARACTER_ID, worldSkillId: 'skill-sword', name: 'Swordsmanship', level: 4 },
+    { id: 'cskill-2', characterId: STORY_CHARACTER_ID, worldSkillId: 'skill-lore', name: 'Arcane Lore', level: 3 },
+    { id: 'cskill-3', characterId: STORY_CHARACTER_ID, worldSkillId: 'skill-persuade', name: 'Persuasion', level: 2 },
   ],
   background: {
     history: 'Born on the outermost isle during a lightning storm, Kael was raised by the keepers of the Old Archive.',
@@ -76,10 +73,11 @@ export const mockCharacter = {
     physicalDescription: 'Tall and lean with storm-grey eyes and a scar across the left temple.',
     goals: ['Uncover the cause of the Shattering', 'Master the lost storm magic'],
     fears: ['Losing control of arcane power', 'The sea'],
+    relationships: [],
   },
   derivedStats: [
-    { id: 'ds-hp', name: 'Hit Points', currentValue: 38, maxValue: 45 },
-    { id: 'ds-mp', name: 'Mana', currentValue: 22, maxValue: 30 },
+    { id: 'ds-hp', characterId: STORY_CHARACTER_ID, derivedStatId: 'ds-hp', name: 'Hit Points', currentValue: 38, maxValue: 45, lastCalculated: '2025-01-15T00:00:00Z' },
+    { id: 'ds-mp', characterId: STORY_CHARACTER_ID, derivedStatId: 'ds-mp', name: 'Mana', currentValue: 22, maxValue: 30, lastCalculated: '2025-01-15T00:00:00Z' },
   ],
   status: {
     health: 38,
@@ -88,10 +86,16 @@ export const mockCharacter = {
     location: 'Thornhaven Docks',
   },
   portrait: {
-    type: 'placeholder' as const,
+    type: 'placeholder',
     url: null,
   },
-  inventory: [],
+  inventory: {
+    characterId: STORY_CHARACTER_ID,
+    items: [],
+    capacity: 20,
+    categories: [],
+    itemOrder: [],
+  },
   createdAt: '2025-01-01T00:00:00Z',
   updatedAt: '2025-01-15T00:00:00Z',
 };
