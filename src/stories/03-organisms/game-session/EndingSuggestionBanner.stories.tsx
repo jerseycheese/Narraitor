@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { EndingSuggestionBanner } from './EndingSuggestionBanner';
+import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
 import { fn } from '@storybook/test';
 
 const meta = {
-  title: 'GameSession/EndingSuggestionBanner',
+  title: '03-Organisms/Game Session/EndingSuggestionBanner',
   component: EndingSuggestionBanner,
   parameters: {
     layout: 'padded',

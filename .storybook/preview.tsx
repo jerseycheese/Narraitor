@@ -123,8 +123,6 @@ const preview: Preview = {
       default: 'theme',
       values: [
         { name: 'theme', value: 'transparent' },
-        { name: 'light', value: '#ffffff' },
-        { name: 'dark', value: '#1a1a1a' },
       ],
     },
     nextjs: {
