@@ -2,44 +2,70 @@
 title: "Narraitor Global Styles"
 type: design-system
 category: styling
-tags: [global-styles, css, design-system, theming]
+tags: [global-styles, css, design-system, theming, dark-mode]
 created: 2025-05-17
-updated: 2025-06-08
+updated: 2025-06-15
 ---
 
 # Narraitor Global Styles
 
-The global styling system is designed to get us to MVP fast while laying groundwork for a proper design system later. Think of it as wireframes that actually work - clean, functional, and ready to be styled properly when we have more time.
+The global styling system provides a theme-aware foundation built on CSS custom properties and Tailwind CSS v4. Three design systems (DS1, DS2, DS3) with light and dark modes are fully supported — components consume tokens through `var()` and adapt automatically when the user switches themes.
 
 ## CSS Architecture
 
-Built on Tailwind CSS v4, the styles are organized to stay maintainable:
+The styling stack loads in this order:
 
-1. **CSS Variables**: The foundation colors, fonts, and spacing that everything builds on
-2. **Base Styles**: Sensible defaults for HTML elements so things look decent out of the box
-3. **Component Classes**: A few reusable classes for common patterns
-4. **Utility Classes**: Custom utilities that Tailwind doesn't provide
+1. **Theme CSS files** (`src/lib/theme/themes/ds1.css`, `ds2.css`, `ds3.css`) — define all CSS custom properties under `[data-theme]` selectors
+2. **Global styles** (`src/app/globals.css`) — base element resets and defaults that consume `var(--token)` values
+3. **Component CSS** — co-located styles for specific components
+4. **Tailwind utilities** — atomic utility classes for layout, spacing, and responsive design
 
 ## Design Token Integration
 
-This file works with the [design token system](./design-tokens.md) to provide consistent styling. Colors, spacing, and other design properties should use design tokens through Tailwind's theme() function or utility classes rather than hardcoded values.
+This file works with the [design token system](./design-tokens.md) to provide consistent styling. Colors, spacing, typography, and elevation values should always reference CSS custom properties rather than hardcoded values.
 
 ### Style Guidelines
 
 **The Golden Rule: No Inline Styles**
 
-We stick to Tailwind classes because inline styles are the enemy of maintainable code:
+We stick to Tailwind classes and CSS custom properties because inline styles bypass the theme system:
 
-- Always use Tailwind CSS utility classes for styling
-- Never use inline styles (style prop) in components
-- If Tailwind doesn't provide what you need, create a custom CSS class
-- This keeps everything consistent and easy to refactor later
+- Always use Tailwind utility classes or `var(--token)` references
+- Never use inline styles (`style` prop) in components
+- If Tailwind doesn't provide what you need, create a custom CSS class that consumes tokens
+
+### In Component CSS
+
+```css
+/* Good — consumes theme tokens */
+.custom-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+}
+
+.custom-card:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+}
+```
 
 ### In Tailwind Classes
 
 ```tsx
-// Example of using Tailwind classes - PREFERRED approach
+// Good — uses semantic design tokens via Tailwind
 const CustomButton = ({ children }) => {
+  return (
+    <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
+      {children}
+    </button>
+  );
+};
+
+// Bad — bypasses theme system with hardcoded colors
+const BadButton = ({ children }) => {
   return (
     <button className="bg-blue-600 px-4 py-2 rounded-md text-white hover:bg-blue-700">
       {children}
@@ -48,40 +74,132 @@ const CustomButton = ({ children }) => {
 };
 ```
 
-### In CSS/SCSS Files
+## Theme Resolution Chain
+
+The theme system resolves through four stages from CSS definition to rendered output:
+
+### 1. CSS Files Define Tokens
+
+Three theme CSS files (`ds1.css`, `ds2.css`, `ds3.css`) define the complete token set under attribute selectors. Each file has two blocks:
 
 ```css
-/* Example of using design tokens through theme() function */
-.customCard {
-  background-color: theme('colors.white');
-  border: 1px solid theme('colors.gray.200');
-  padding: theme('spacing.4');
-  border-radius: theme('borderRadius.lg');
-  box-shadow: theme('boxShadow.md');
-}
-
-.customCard:hover {
-  box-shadow: theme('boxShadow.lg');
-}
+[data-theme="ds1"]      { /* light mode tokens */ }
+[data-theme="ds1"].dark { /* dark mode overrides */ }
 ```
 
-### With Tailwind CSS
+These files are imported in `src/app/layout.tsx` so all tokens are available globally.
 
-Always use Tailwind classes for styling: no inline styles:
+### 2. FOUC Prevention Script
+
+An inline `<script>` in `layout.tsx` runs before React hydrates, reading stored preferences from `localStorage` and applying them immediately to avoid a flash of unstyled content:
+
+```javascript
+// Reads narraitor-theme → sets data-theme attribute
+// Reads narraitor-color-scheme → adds .dark class if needed
+// Runs synchronously before first paint
+```
+
+This script matches what `ThemeProvider` will set after hydration, preventing a visible theme flash.
+
+### 3. ThemeProvider Manages State
+
+After React hydrates, `ThemeProvider` takes over. It syncs React state from `localStorage`, applies DOM attributes, and listens for system preference changes.
+
+### 4. CSS Selectors Resolve
+
+The browser resolves `var(--token-name)` references based on the active selectors:
+- `[data-theme="ds2"]` → DS2 light tokens win
+- `[data-theme="ds2"].dark` → DS2 dark tokens override
+
+Components never need to know which theme is active — they just reference `var(--color-surface)` and the cascade handles the rest.
+
+## ThemeProvider and useTheme() API
+
+### ThemeProvider
+
+Wrap your app tree with `ThemeProvider` (already done in `layout.tsx`):
 
 ```tsx
-// Example using only Tailwind classes
-const InfoPanel = ({ title, children }) => {
+import { ThemeProvider } from '@/lib/theme';
+
+export default function RootLayout({ children }) {
   return (
-    <div className="p-4 mb-4 rounded-md bg-purple-600 text-white">
-      <h3 className="text-lg font-bold mb-2">{title}</h3>
-      <div>{children}</div>
-    </div>
+    <html lang="en" data-theme="ds1">
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
   );
-};
+}
 ```
 
-If you need to use CSS variables, create a custom CSS class instead of using inline styles.
+### useTheme() Hook
+
+Access theme state from any component:
+
+```tsx
+import { useTheme } from '@/lib/theme';
+
+function MyComponent() {
+  const { theme, colorScheme, resolvedColorScheme, setTheme, setColorScheme } = useTheme();
+
+  // theme: 'ds1' | 'ds2' | 'ds3'
+  // colorScheme: 'light' | 'dark' | 'system'
+  // resolvedColorScheme: 'light' | 'dark' (computed — resolves 'system' to actual)
+  // setTheme: (theme) => void
+  // setColorScheme: (scheme) => void
+}
+```
+
+Throws `Error('useTheme must be used within a ThemeProvider')` if called outside the provider.
+
+### Storage & Defaults
+
+| Key | localStorage Key | Default | Purpose |
+|-----|-----------------|---------|---------|
+| Theme | `narraitor-theme` | `'ds1'` | Which design system is active |
+| Color scheme | `narraitor-color-scheme` | `'light'` | Light, dark, or system preference |
+
+Server-side renders default to DS1 + light. The FOUC script and ThemeProvider sync the actual preference after the page loads, preventing hydration mismatches.
+
+### System Preference Detection
+
+When `colorScheme` is `'system'`, ThemeProvider listens to `window.matchMedia('(prefers-color-scheme: dark)')` and updates `resolvedColorScheme` in real time when the OS setting changes.
+
+## Adding Theme-Aware Styles to New Components
+
+When building a new component, follow these patterns:
+
+```css
+/* Good — uses token variables, works across all themes and modes */
+.my-component {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  font-family: var(--font-interface);
+}
+
+/* Bad — hardcoded values that ignore the theme system */
+.my-component {
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid #e4e4e7;
+  padding: 1rem;
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+}
+```
+
+For elevation, use the shadow tokens rather than custom shadow values:
+```css
+/* Modals, popovers, floating elements */
+.modal { box-shadow: var(--shadow-overlay); }
+
+/* Side panels, drawers */
+.drawer { box-shadow: var(--shadow-drawer); }
+```
 
 ## Semantic HTML
 
@@ -126,10 +244,7 @@ Essential utility classes for common needs:
 - `.visually-hidden`: Hide content visually but keep it accessible to screen readers
 - `.focus-visible`: Enhanced focus styling for accessibility
 
-Example usage:
-
 ```tsx
-// Example of using utility classes
 const AccessibleComponent = () => {
   return (
     <div>
@@ -141,16 +256,6 @@ const AccessibleComponent = () => {
 };
 ```
 
-## Future Theming
-
-The CSS variables are set up so we can add proper theming later without rewriting everything:
-
-1. Create theme CSS files with custom variable values
-2. Apply theme classes to the root element
-3. Define theme variable values within the appropriate selectors
-
-When we're ready for dark mode or custom themes, the foundation is already there.
-
 ## Testing and Development
 
-The global styles can be viewed and tested through the `GlobalStylesDemo` component in Storybook, which demonstrates all styled elements.
+The global styles can be viewed and tested through the `GlobalStylesDemo` component in Storybook, which demonstrates all styled elements across all theme and color scheme combinations.
