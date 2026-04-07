@@ -1,16 +1,25 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { useNPCStore } from '@/state/npcStore';
+import { useLoreStore } from '@/state/loreStore';
 import { NPC } from '@/types/npc.types';
 import { mockZustandStore, createMockNPCStore, createMockNarrativeSegment } from '@/lib/test-utils';
 
 jest.mock('@/state/npcStore');
+jest.mock('@/state/loreStore');
+
+const mockGetFacts = jest.fn().mockReturnValue([]);
+(useLoreStore as unknown as jest.Mock).mockImplementation(
+  (selector: (state: { getFacts: typeof mockGetFacts }) => unknown) =>
+    selector({ getFacts: mockGetFacts })
+);
 
 describe('NarrativeDisplay', () => {
   beforeEach(() => {
+    mockGetFacts.mockReturnValue([]);
     mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
       npcs: {},
     }));
@@ -148,5 +157,73 @@ describe('NarrativeDisplay', () => {
 
     await user.click(screen.getByText('Try Again'));
     expect(mockRetry).toHaveBeenCalledTimes(1);
+  });
+
+  describe('marginalia term definitions', () => {
+    const loreFacts = [
+      {
+        id: 'fact-1',
+        key: 'world-test-1:character_aria',
+        value: 'Aria',
+        category: 'characters' as const,
+        source: 'narrative' as const,
+        worldId: 'world-test-1',
+        aliases: [],
+        visibility: 'world-shared' as const,
+        metadata: {
+          description: 'A powerful mage from the Northern Tower.',
+          type: 'protagonist',
+          importance: 'high' as const,
+        },
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+      },
+    ];
+
+    it('renders term definition buttons when lore facts exist', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-marginalia',
+        content: 'Aria stepped into the moonlit glade.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const buttons = screen.getAllByRole('button', { name: /Aria/i });
+      expect(buttons.length).toBeGreaterThan(0);
+      expect(buttons[0]).toHaveAttribute('aria-haspopup', 'dialog');
+    });
+
+    it('shows term definition on click and dismisses on Escape', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-marginalia-2',
+        content: 'Aria raised her staff.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const termButton = screen.getAllByRole('button', { name: /Aria/i })[0];
+      fireEvent.click(termButton);
+
+      // Definition panel should appear
+      const definition = screen.getByRole('complementary');
+      expect(definition).toHaveAttribute('aria-label', 'Definition: Aria');
+      expect(screen.getByText('A powerful mage from the Northern Tower.')).toBeInTheDocument();
+
+      // Escape should dismiss
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+    });
   });
 });

@@ -7,6 +7,8 @@ import { cssClasses, parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 import { PromptDebugSection } from './PromptDebugSection';
 import { ChoiceOutcomeCallout } from './ChoiceOutcomeCallout';
+import { TermDefinition } from './TermDefinition';
+import { useTermDefinitions, TermDefinitionData } from './useTermDefinitions';
 import { useNPCStore } from '@/state/npcStore';
 import { useDevTools } from '@/components/devtools/DevToolsContext';
 import {
@@ -73,6 +75,34 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     getById,
   });
 
+  // Marginalia term definitions (Issue #1058)
+  const { termNames, getDefinition } = useTermDefinitions(
+    resolvedSegment?.worldId,
+    resolvedSegment?.sessionId
+  );
+
+  const [activeTerm, setActiveTerm] = React.useState<{
+    data: TermDefinitionData;
+    anchorRect: DOMRect;
+  } | null>(null);
+
+  const handleTermClick = React.useCallback(
+    (termText: string, anchorElement: HTMLElement) => {
+      const definition = getDefinition(termText);
+      if (definition) {
+        setActiveTerm({
+          data: definition,
+          anchorRect: anchorElement.getBoundingClientRect(),
+        });
+      }
+    },
+    [getDefinition]
+  );
+
+  const handleTermDismiss = React.useCallback(() => {
+    setActiveTerm(null);
+  }, []);
+
   if (isLoading) {
     return (
       <div>
@@ -121,7 +151,17 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''
         )}
         highlightTerms={highlightTerms}
+        definitionTerms={termNames}
+        onTermClick={handleTermClick}
       />
+
+      {activeTerm && (
+        <TermDefinition
+          term={activeTerm.data}
+          anchorRect={activeTerm.anchorRect}
+          onDismiss={handleTermDismiss}
+        />
+      )}
 
       {/* Debug Information Section (dev mode only) */}
       {settings.showPromptDebugInfo && resolvedSegment.metadata?.debugInfo && (

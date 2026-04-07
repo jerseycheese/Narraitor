@@ -4435,3 +4435,136 @@ body.manuscript-overlay-open {
   display: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   MARGINALIA TERM DEFINITIONS (Issue #1058)
+   Editorial annotations — key terms in narrative text link to lore definitions.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Term link in narrative text — dotted underline like a proofreader's mark */
+.manuscript-marginalia-term {
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  text-decoration: underline dotted var(--color-text-muted);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 120ms ease;
+}
+
+.manuscript-marginalia-term:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.manuscript-marginalia-term:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Definition panel — mobile-first (fixed popover) */
+.manuscript-marginalia-definition {
+  position: fixed;
+  z-index: 200;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-overlay);
+  max-width: 280px;
+  animation: manuscript-marginalia-appear 150ms ease;
+}
+
+@keyframes manuscript-marginalia-appear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Category badge — small-caps editorial label */
+.manuscript-marginalia-category {
+  display: inline-block;
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: rgb(from var(--color-text-muted) r g b / 10%);
+  padding: 1px var(--space-1);
+  border-radius: 2px;
+  line-height: 1.4;
+  margin-bottom: var(--space-1);
+}
+
+/* Term name — narrative font, slightly prominent */
+.manuscript-marginalia-name {
+  font-family: var(--font-narrative);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1) 0;
+}
+
+/* Optional type sub-label */
+.manuscript-marginalia-type {
+  display: inline-block;
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+/* Description body */
+.manuscript-marginalia-description {
+  font-family: var(--font-narrative);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Desktop: float-right margin note (matches DS3 choice-outcome-callout pattern) */
+@media (width >= 1024px) {
+  .manuscript-marginalia-definition {
+    position: relative;
+    float: right;
+    clear: right;
+    width: 200px;
+    margin: 0 0 var(--space-3) var(--space-3);
+    z-index: auto;
+    box-shadow: none;
+    top: auto;
+    left: auto;
+  }
+}
+
+/* DS1 theme: dashed-border note card */
+[data-theme="ds1"] .manuscript-marginalia-definition {
+  border-style: dashed;
+  background: var(--color-surface-hover);
+}
+
+[data-theme="ds1"] .manuscript-marginalia-category {
+  font-family: var(--font-system);
+  letter-spacing: 0.12em;
+}
+
+/* DS3 theme: subtle shadow on desktop float */
+@media (width >= 1024px) {
+  [data-theme="ds3"] .manuscript-marginalia-definition {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+  }
+}
+

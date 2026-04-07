@@ -89,4 +89,83 @@ Multiple newlines should create separate paragraphs.`;
       )
     ).toBe(true);
   });
+
+  describe('definition terms', () => {
+    it('renders definition term buttons when definitionTerms is provided', () => {
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="The sword of power lies here."
+          definitionTerms={['sword of power']}
+        />
+      );
+
+      const buttons = container.querySelectorAll(
+        'button.manuscript-marginalia-term'
+      );
+      expect(buttons).toHaveLength(1);
+      expect(buttons[0]).toHaveTextContent('sword of power');
+    });
+
+    it('calls onTermClick with term text and anchor element when button clicked', () => {
+      const onTermClick = jest.fn();
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="The sword of power lies here."
+          definitionTerms={['sword of power']}
+          onTermClick={onTermClick}
+        />
+      );
+
+      const button = container.querySelector(
+        'button.manuscript-marginalia-term'
+      ) as HTMLElement;
+      button.click();
+      expect(onTermClick).toHaveBeenCalledTimes(1);
+      expect(onTermClick).toHaveBeenCalledWith('sword of power', button);
+    });
+
+    it('renders both highlight spans and definition buttons when both props are provided', () => {
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="Elara found the ancient relic in the vault."
+          highlightTerms={['Elara']}
+          definitionTerms={['ancient relic']}
+        />
+      );
+
+      const highlights = container.querySelectorAll(
+        'span.narrative-highlight'
+      );
+      const buttons = container.querySelectorAll(
+        'button.manuscript-marginalia-term'
+      );
+      expect(highlights).toHaveLength(1);
+      expect(highlights[0]).toHaveTextContent('Elara');
+      expect(buttons).toHaveLength(1);
+      expect(buttons[0]).toHaveTextContent('ancient relic');
+    });
+
+    it('renders definition term buttons with correct ARIA attribute', () => {
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="The dragon scale armor is legendary."
+          definitionTerms={['dragon scale armor']}
+        />
+      );
+
+      const button = container.querySelector(
+        'button.manuscript-marginalia-term'
+      );
+      expect(button).toHaveAttribute('aria-haspopup', 'dialog');
+    });
+
+    it('renders no buttons when definitionTerms is not provided', () => {
+      const { container } = render(
+        <FormattedNarrativeContent content="Normal content with no definition terms." />
+      );
+
+      const buttons = container.querySelectorAll('button');
+      expect(buttons).toHaveLength(0);
+    });
+  });
 });
