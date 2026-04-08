@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { FormattedNarrativeContent } from '../../../components/Narrative/FormattedNarrativeContent';
 
 const meta: Meta<typeof FormattedNarrativeContent> = {
@@ -57,5 +58,22 @@ export const WithHighlights: Story = {
   args: {
     content: `Marge, the Waitress slides a chipped mug across the counter. Moments later, Marge's voice drops to a hush, warning you about Old Man Rivers. Old Man Rivers chuckles from the corner booth, his weathered hands wrapped around a steaming bowl of chowder. You can't tell if the glint in Old Man Rivers' eye is mischief or menace.`,
     highlightTerms: ['Marge, the Waitress', 'Old Man Rivers'],
+  },
+};
+
+export const WithDefinitionTerms: Story = {
+  args: {
+    content: `Lady Seraphina raised her silver staff as the gates of the Northern Tower swung open. The cold wind from the Frozen Wastes carried whispers of the Great Siege, a conflict that had shaped the realm for generations. She paused, recalling her years studying within those ancient walls.`,
+    definitionTerms: ['Lady Seraphina', 'Northern Tower', 'Great Siege', 'Frozen Wastes'],
+    onTermClick: fn(),
+  },
+};
+
+export const HighlightsAndDefinitions: Story = {
+  args: {
+    content: `Marge, the Waitress whispered about the Northern Tower as she refilled your mug. Old Man Rivers overheard and mentioned Lady Seraphina by name, his voice carrying the weight of someone who had survived the Great Siege firsthand.`,
+    highlightTerms: ['Marge, the Waitress', 'Old Man Rivers'],
+    definitionTerms: ['Northern Tower', 'Lady Seraphina', 'Great Siege'],
+    onTermClick: fn(),
   },
 };
