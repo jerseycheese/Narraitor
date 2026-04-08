@@ -257,7 +257,7 @@ export const FormattedNarrativeContent: React.FC<
 
             // Fragment wrapping a plain text string: process it
             if (el.type === React.Fragment) {
-              const children = el.props.children;
+              const children = (el.props as { children?: React.ReactNode }).children;
               if (typeof children === 'string') {
                 const text = children;
                 const fragmentKey =
