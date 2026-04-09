@@ -225,5 +225,53 @@ describe('NarrativeDisplay', () => {
       fireEvent.keyDown(document, { key: 'Escape' });
       expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
     });
+
+    it('focuses definition panel when opened', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-focus-open',
+        content: 'Aria cast a spell.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const termButton = screen.getAllByRole('button', { name: /Aria/i })[0];
+      fireEvent.click(termButton);
+
+      const definition = screen.getByRole('complementary');
+      expect(document.activeElement).toBe(definition);
+    });
+
+    it('returns focus to trigger button on dismiss', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-focus-return',
+        content: 'Aria walked forward.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const termButton = screen.getAllByRole('button', { name: /Aria/i })[0];
+      fireEvent.click(termButton);
+
+      // Panel is open and focused
+      expect(screen.getByRole('complementary')).toBeInTheDocument();
+
+      // Dismiss with Escape
+      fireEvent.keyDown(document, { key: 'Escape' });
+
+      // Focus should return to the trigger button
+      expect(document.activeElement).toBe(termButton);
+    });
   });
 });

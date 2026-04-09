@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -81,25 +81,23 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     resolvedSegment?.sessionId
   );
 
-  const [activeTerm, setActiveTerm] = React.useState<{
-    data: TermDefinitionData;
-    anchorRect: DOMRect;
-  } | null>(null);
+  const [activeTerm, setActiveTerm] = React.useState<TermDefinitionData | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   const handleTermClick = React.useCallback(
     (termText: string, anchorElement: HTMLElement) => {
       const definition = getDefinition(termText);
       if (definition) {
-        setActiveTerm({
-          data: definition,
-          anchorRect: anchorElement.getBoundingClientRect(),
-        });
+        triggerRef.current = anchorElement;
+        setActiveTerm(definition);
       }
     },
     [getDefinition]
   );
 
   const handleTermDismiss = React.useCallback(() => {
+    triggerRef.current?.focus();
+    triggerRef.current = null;
     setActiveTerm(null);
   }, []);
 
@@ -157,8 +155,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
       {activeTerm && (
         <TermDefinition
-          term={activeTerm.data}
-          anchorRect={activeTerm.anchorRect}
+          term={activeTerm}
           onDismiss={handleTermDismiss}
         />
       )}
