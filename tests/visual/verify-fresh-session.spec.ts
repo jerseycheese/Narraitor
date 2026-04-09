@@ -475,7 +475,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
 
     // Then the active session container should become visible (allow time for AI/fallback)
     await page
-      .locator('[data-testid="game-session-active"]')
+      .locator('[data-testid="manuscript-session-shell"]')
       .waitFor({ state: 'visible', timeout: 20000 })
       .catch(async (e) => {
         // Attach logs to help diagnose
