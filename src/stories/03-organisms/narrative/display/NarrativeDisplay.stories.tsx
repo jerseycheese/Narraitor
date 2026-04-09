@@ -4,6 +4,7 @@ import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils';
 import { useNPCStore } from '@/state/npcStore';
+import { useLoreStore } from '@/state/loreStore';
 
 // Updated stories aligned with actual app usage patterns
 
@@ -458,5 +459,81 @@ export const MixedSegmentTypes: Story = {
   render: () => <MixedSegmentSequence />,
   args: {
     segment: null,
+  },
+};
+
+// Term definitions — marginalia interaction (#1043)
+const WithTermDefinitionsStory: React.FC = () => {
+  const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
+
+  useEffect(() => {
+    const loreStore = useLoreStore.getState();
+
+    loreStore.addFact(
+      'storybook_world_character_lady_seraphina',
+      'Lady Seraphina',
+      'characters',
+      'manual',
+      'storybook-world',
+      undefined,
+      {
+        description: 'A former court mage who turned rogue after discovering the king\'s dark pact with the shadow realm.',
+        type: 'protagonist',
+        importance: 'high',
+      }
+    );
+
+    loreStore.addFact(
+      'storybook_world_location_northern_tower',
+      'Northern Tower',
+      'locations',
+      'manual',
+      'storybook-world',
+      undefined,
+      {
+        description: 'An ancient watchtower perched on the edge of the Frozen Wastes, now home to a reclusive order of scholars.',
+        type: 'fortress',
+      }
+    );
+
+    loreStore.addFact(
+      'storybook_world_event_great_siege',
+      'Great Siege',
+      'events',
+      'manual',
+      'storybook-world',
+      undefined,
+      {
+        description: 'A month-long assault on the capital by the northern clans. Ended with the Treaty of Ash.',
+        importance: 'high',
+      }
+    );
+
+    const seg = createMockSegment(
+      'Lady Seraphina emerged from the shadows of the Northern Tower, her silver staff still scarred from the Great Siege. Seraphina\'s eyes swept the courtyard before she spoke.',
+      'scene',
+      {
+        location: 'Northern Tower',
+        mood: 'mysterious',
+        tags: ['lore', 'marginalia'],
+      }
+    );
+    setSegment({ ...seg, worldId: 'storybook-world', sessionId: 'storybook-session' });
+  }, []);
+
+  if (!segment) return null;
+  return <NarrativeDisplay segment={segment} />;
+};
+
+export const WithTermDefinitions: Story = {
+  name: 'With Term Definitions (marginalia)',
+  render: () => <WithTermDefinitionsStory />,
+  args: { segment: null },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Narrative with lore term buttons. Click a dotted-underline term to see the definition panel. On mobile the panel appears as a bottom sheet; on desktop it floats right as a margin note. Keyboard: Tab to term, Enter/Space to open, Escape to dismiss (focus returns to trigger).',
+      },
+    },
   },
 };
