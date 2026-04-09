@@ -670,6 +670,16 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* ─── CharacterTable portrait ─── */
+
+.character-portrait-clickable {
+  width: var(--space-6);
+  height: var(--space-6);
+  cursor: pointer;
+  border-radius: var(--radius-full, 9999px);
+  overflow: hidden;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Journal
    ═══════════════════════════════════════════════════════════════ */
