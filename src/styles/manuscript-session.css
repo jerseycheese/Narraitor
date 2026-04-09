@@ -879,6 +879,7 @@ body.manuscript-overlay-open {
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-sm);
   cursor: pointer;
+  white-space: normal;
 }
 
 .manuscript-suggested-action.manuscript-suggested-action-lawful {
