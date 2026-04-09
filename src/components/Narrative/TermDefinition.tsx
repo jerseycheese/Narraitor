@@ -3,20 +3,23 @@ import type { TermDefinitionData } from './useTermDefinitions';
 
 interface TermDefinitionProps {
   term: TermDefinitionData;
-  anchorRect: DOMRect;
   onDismiss: () => void;
 }
 
 /**
  * Displays a lore term definition as an editorial margin note (desktop)
- * or popover (mobile). Dismisses on Escape key or click outside.
+ * or bottom sheet (mobile). Dismisses on Escape key or click outside.
  */
 export const TermDefinition: React.FC<TermDefinitionProps> = ({
   term,
-  anchorRect,
   onDismiss,
 }) => {
   const ref = useRef<HTMLElement>(null);
+
+  // Auto-focus the panel on mount so screen readers announce it
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
 
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
@@ -46,10 +49,7 @@ export const TermDefinition: React.FC<TermDefinitionProps> = ({
       role="complementary"
       className="manuscript-marginalia-definition"
       aria-label={`Definition: ${term.name}`}
-      style={{
-        top: anchorRect.bottom + 8,
-        left: Math.max(8, Math.min(anchorRect.left, window.innerWidth - 288)),
-      }}
+      tabIndex={-1}
     >
       <span className="manuscript-marginalia-category">{term.category}</span>
       <p className="manuscript-marginalia-name">{term.name}</p>

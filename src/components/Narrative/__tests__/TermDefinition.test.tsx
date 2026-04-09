@@ -3,18 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { TermDefinition } from '../TermDefinition';
 import type { TermDefinitionData } from '../useTermDefinitions';
 
-const mockAnchorRect = {
-  top: 100,
-  right: 200,
-  bottom: 120,
-  left: 50,
-  width: 150,
-  height: 20,
-  x: 50,
-  y: 100,
-  toJSON: () => ({}),
-} as DOMRect;
-
 const baseTerm: TermDefinitionData = {
   name: 'Aria',
   category: 'characters',
@@ -28,7 +16,6 @@ describe('TermDefinition', () => {
     render(
       <TermDefinition
         term={baseTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={jest.fn()}
       />
     );
@@ -43,7 +30,6 @@ describe('TermDefinition', () => {
     render(
       <TermDefinition
         term={baseTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={jest.fn()}
       />
     );
@@ -55,7 +41,6 @@ describe('TermDefinition', () => {
     render(
       <TermDefinition
         term={baseTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={jest.fn()}
       />
     );
@@ -73,7 +58,6 @@ describe('TermDefinition', () => {
     render(
       <TermDefinition
         term={termWithoutType}
-        anchorRect={mockAnchorRect}
         onDismiss={jest.fn()}
       />
     );
@@ -87,7 +71,6 @@ describe('TermDefinition', () => {
     render(
       <TermDefinition
         term={baseTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={onDismiss}
       />
     );
@@ -102,7 +85,6 @@ describe('TermDefinition', () => {
     render(
       <TermDefinition
         term={baseTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={onDismiss}
       />
     );
@@ -117,7 +99,6 @@ describe('TermDefinition', () => {
     render(
       <TermDefinition
         term={baseTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={onDismiss}
       />
     );
@@ -131,7 +112,6 @@ describe('TermDefinition', () => {
     render(
       <TermDefinition
         term={baseTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={jest.fn()}
       />
     );
@@ -140,13 +120,36 @@ describe('TermDefinition', () => {
     expect(aside).toHaveAttribute('aria-label', 'Definition: Aria');
   });
 
+  it('has tabIndex -1 for programmatic focus', () => {
+    render(
+      <TermDefinition
+        term={baseTerm}
+        onDismiss={jest.fn()}
+      />
+    );
+
+    const aside = screen.getByRole('complementary');
+    expect(aside).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('focuses the panel on mount', () => {
+    render(
+      <TermDefinition
+        term={baseTerm}
+        onDismiss={jest.fn()}
+      />
+    );
+
+    const aside = screen.getByRole('complementary');
+    expect(document.activeElement).toBe(aside);
+  });
+
   it('cleans up event listeners on unmount', () => {
     const onDismiss = jest.fn();
 
     const { unmount } = render(
       <TermDefinition
         term={baseTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={onDismiss}
       />
     );

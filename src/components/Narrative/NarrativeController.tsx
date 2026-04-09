@@ -855,6 +855,7 @@ Respond with JSON format:
         type: newSegment.type,
         characterIds: newSegment.characterIds || [],
         metadata: newSegment.metadata,
+        worldId: newSegment.worldId,
         updatedAt: newSegment.updatedAt,
         timestamp: newSegment.timestamp,
       });
@@ -903,6 +904,7 @@ Respond with JSON format:
           type: fallbackSegment.type,
           characterIds: fallbackSegment.characterIds || [],
           metadata: fallbackSegment.metadata,
+          worldId: fallbackSegment.worldId,
           updatedAt: fallbackSegment.updatedAt,
           timestamp: fallbackSegment.timestamp,
         });
@@ -1242,6 +1244,7 @@ Respond with JSON format:
         type: newSegment.type,
         characterIds: newSegment.characterIds || [],
         metadata: newSegment.metadata,
+        worldId: newSegment.worldId,
         updatedAt: newSegment.updatedAt,
         timestamp: newSegment.timestamp,
       });

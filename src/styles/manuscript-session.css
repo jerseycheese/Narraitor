@@ -879,6 +879,7 @@ body.manuscript-overlay-open {
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-sm);
   cursor: pointer;
+  white-space: normal;
 }
 
 .manuscript-suggested-action.manuscript-suggested-action-lawful {
@@ -4465,23 +4466,38 @@ body.manuscript-overlay-open {
   border-radius: 2px;
 }
 
-/* Definition panel — mobile-first (fixed popover) */
+/* Definition panel — mobile-first (bottom sheet) */
 .manuscript-marginalia-definition {
   position: fixed;
   z-index: 200;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  padding: calc(var(--space-3) + 12px) var(--space-3) var(--space-3);
   box-shadow: var(--shadow-overlay);
-  max-width: 280px;
+  max-width: none;
   animation: manuscript-marginalia-appear 150ms ease;
+}
+
+.manuscript-marginalia-definition::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border);
 }
 
 @keyframes manuscript-marginalia-appear {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(100%);
   }
 
   to {
@@ -4542,11 +4558,29 @@ body.manuscript-overlay-open {
     float: right;
     clear: right;
     width: 200px;
+    max-width: 200px;
     margin: 0 0 var(--space-3) var(--space-3);
     z-index: auto;
     box-shadow: none;
-    top: auto;
-    left: auto;
+    border-radius: var(--radius-md);
+    padding-top: var(--space-3);
+    animation-name: manuscript-marginalia-appear-desktop;
+  }
+
+  .manuscript-marginalia-definition::before {
+    display: none;
+  }
+}
+
+@keyframes manuscript-marginalia-appear-desktop {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

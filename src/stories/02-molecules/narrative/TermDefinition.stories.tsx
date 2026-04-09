@@ -2,18 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { TermDefinition } from '@/components/Narrative/TermDefinition';
 import type { TermDefinitionData } from '@/components/Narrative/useTermDefinitions';
 
-const mockAnchorRect = {
-  top: 200,
-  right: 300,
-  bottom: 220,
-  left: 100,
-  width: 200,
-  height: 20,
-  x: 100,
-  y: 200,
-  toJSON: () => ({}),
-} as DOMRect;
-
 const meta: Meta<typeof TermDefinition> = {
   title: '02-Molecules/narrative/TermDefinition',
   component: TermDefinition,
@@ -64,7 +52,6 @@ const eventTerm: TermDefinitionData = {
 export const Character: Story = {
   args: {
     term: characterTerm,
-    anchorRect: mockAnchorRect,
     onDismiss: () => {},
   },
 };
@@ -72,7 +59,6 @@ export const Character: Story = {
 export const Location: Story = {
   args: {
     term: locationTerm,
-    anchorRect: mockAnchorRect,
     onDismiss: () => {},
   },
 };
@@ -80,7 +66,6 @@ export const Location: Story = {
 export const Event: Story = {
   args: {
     term: eventTerm,
-    anchorRect: mockAnchorRect,
     onDismiss: () => {},
   },
 };
@@ -92,7 +77,6 @@ export const WithoutType: Story = {
       category: 'events',
       description: 'A secret agreement between the king and forces from the shadow realm.',
     },
-    anchorRect: mockAnchorRect,
     onDismiss: () => {},
   },
 };
@@ -102,17 +86,14 @@ export const AllCategories: Story = {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <TermDefinition
         term={characterTerm}
-        anchorRect={mockAnchorRect}
         onDismiss={() => {}}
       />
       <TermDefinition
         term={locationTerm}
-        anchorRect={{ ...mockAnchorRect, bottom: 280 } as DOMRect}
         onDismiss={() => {}}
       />
       <TermDefinition
         term={eventTerm}
-        anchorRect={{ ...mockAnchorRect, bottom: 340 } as DOMRect}
         onDismiss={() => {}}
       />
     </div>

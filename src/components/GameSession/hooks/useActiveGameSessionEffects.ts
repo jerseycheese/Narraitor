@@ -77,6 +77,7 @@ export const useActiveGameSessionEffects = ({
           type: fallback.type,
           characterIds: [],
           metadata: fallback.metadata,
+          worldId: fallback.worldId,
           updatedAt: fallback.updatedAt,
           timestamp: fallback.timestamp,
         });
