@@ -1,4 +1,5 @@
 import * as React from "react"
+import { cssClasses } from '@/lib/utils/classNames'
 
 export type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>
 
@@ -6,7 +7,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <select
-        className={className}
+        className={cssClasses("form-select", className)}
         ref={ref}
         {...props}
       >
