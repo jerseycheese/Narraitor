@@ -168,33 +168,30 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     }
 
     return (
-      <div>
+      <div className="journal-content">
         {entries.length === 0 ? (
           <JournalEmptyState />
         ) : (
           <>
             <div
               className={cssClasses(
-                '',
-                viewMode === 'list' ? '' : 'hidden',
-                ''
+                'journal-list-pane',
+                viewMode === 'list' ? '' : 'hidden'
               )}
               data-testid="journal-list-pane"
             >
-              <div>
+              <div className="journal-list-header">
                 <h2>Entries</h2>
               </div>
-              <div>
-                <div>
-                  <Input
-                    id="journal-search"
-                    type="search"
-                    placeholder="Search entries..."
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    aria-label="Search entries"
-                  />
-                </div>
+              <div className="journal-search-wrapper">
+                <Input
+                  id="journal-search"
+                  type="search"
+                  placeholder="Search entries..."
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  aria-label="Search entries"
+                />
               </div>
               {filteredEntries.length === 0 ? (
                 <div>No entries match your search.</div>
@@ -206,7 +203,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                 />
               )}
               {canLoadMore && (
-                <div>
+                <div className="journal-load-more">
                   <Button
                     type="button"
                     variant="secondary"
@@ -225,9 +222,8 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
 
             <div
               className={cssClasses(
-                '',
-                viewMode === 'detail' ? '' : 'hidden',
-                ''
+                'journal-detail-pane',
+                viewMode === 'detail' ? '' : 'hidden'
               )}
               data-testid="journal-detail-pane"
             >
@@ -240,16 +236,14 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                   />
                 </div>
               ) : (
-                <div>
+                <div className="journal-detail-empty">
                   <div>
-                    <div>
-                      <BookOpen aria-hidden="true" />
-                    </div>
-                    <h3>Select an Entry</h3>
-                    <p>
-                      Choose an entry from the list to view its complete content
-                    </p>
+                    <BookOpen aria-hidden="true" />
                   </div>
+                  <h3>Select an Entry</h3>
+                  <p>
+                    Choose an entry from the list to view its complete content
+                  </p>
                 </div>
               )}
             </div>
