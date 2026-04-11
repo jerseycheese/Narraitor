@@ -207,6 +207,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 {characters.map((char) => (
                   <button
                     key={char.id}
+                    className="world-card-character-pill"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (actualRouter) {
@@ -224,7 +225,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                         height={40}
                       />
                     ) : (
-                      <div>
+                      <div className="world-card-character-pill-initial">
                         <span>{char.name.charAt(0).toUpperCase()}</span>
                       </div>
                     )}
