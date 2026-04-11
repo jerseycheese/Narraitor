@@ -9,7 +9,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cssClasses(
-          "file:border-0 file:bg-transparent file:text-sm file:font-medium",
+          "form-input",
           className
         )}
         ref={ref}

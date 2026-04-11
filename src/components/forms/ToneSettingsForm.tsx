@@ -69,7 +69,6 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
             <p id="content-rating-description" >Set the age-appropriate content level for generated narratives</p>
             <Select
               id="content-rating"
-              className="form-select"
               value={toneSettings.contentRating}
               onChange={(e) => formUpdater.updateField('contentRating', e.target.value as ContentRating)}
               aria-describedby="content-rating-description"
@@ -89,7 +88,6 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
             <p id="narrative-style-description" >Choose how the story will be told and presented</p>
             <Select
               id="narrative-style"
-              className="form-select"
               value={toneSettings.narrativeStyle}
               onChange={(e) => formUpdater.updateField('narrativeStyle', e.target.value as NarrativeStyle)}
               aria-describedby="narrative-style-description"
@@ -109,7 +107,6 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
             <p id="language-complexity-description" >Set the vocabulary and sentence complexity level</p>
             <Select
               id="language-complexity"
-              className="form-select"
               value={toneSettings.languageComplexity}
               onChange={(e) => formUpdater.updateField('languageComplexity', e.target.value as LanguageComplexity)}
               aria-describedby="language-complexity-description"

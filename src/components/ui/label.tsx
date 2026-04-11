@@ -9,6 +9,7 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
       <label
         ref={ref}
         className={cssClasses(
+          "form-label",
           className
         )}
         {...props}
