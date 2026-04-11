@@ -62,7 +62,7 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
     <nav aria-label="Workshop navigation" className="workshop-sidebar-nav">
       <div className="workshop-sidebar-header">
         <Link href="/" onClick={() => onNavigate?.()} className="workshop-sidebar-brand">
-          <LogoIcon size="small" className="brightness-0" />
+          <LogoIcon size="small" className="logo-icon-inverted" />
           <LogoText size="sm" />
         </Link>
         <TutorialMenu />

@@ -105,7 +105,7 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
             <div>{title}</div>
             {description && <div>{description}</div>}
           </div>
-          <button onClick={handleDismiss} aria-label="Dismiss notification">
+          <button className="toast-dismiss" onClick={handleDismiss} aria-label="Dismiss notification">
             <X aria-hidden="true" />
           </button>
         </div>

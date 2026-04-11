@@ -119,7 +119,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
       {/* Header with close button */}
       <div className="mobile-nav-header">
         <div className="mobile-nav-brand">
-          <LogoIcon size="small" className="brightness-0" />
+          <LogoIcon size="small" className="logo-icon-inverted" />
           <LogoText size="sm" />
         </div>
         <div className="mobile-nav-header-actions">
