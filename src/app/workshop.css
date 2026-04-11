@@ -107,6 +107,49 @@
   padding-top: var(--space-6);
 }
 
+/* ─── Dashboard Recent Items ─── */
+
+.dashboard-recent-item {
+  cursor: pointer;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.dashboard-recent-item:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent);
+}
+
+.dashboard-recent-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.dashboard-recent-item h3 {
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.dashboard-recent-item span,
+.dashboard-recent-item p {
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.dashboard-recent-character-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 @keyframes home-fade-up {
   from {
     opacity: 0;
@@ -735,6 +778,54 @@
   font-family: var(--font-system);
   font-size: 0.75rem;
   color: var(--color-text-muted);
+}
+
+/* WorldCard character avatar pill */
+
+.world-card-character-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full, 9999px);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.world-card-character-pill:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+}
+
+.world-card-character-pill:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.world-card-character-pill img {
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-full, 9999px);
+  object-fit: cover;
+}
+
+.world-card-character-pill-initial {
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-surface-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 /* ─── CharacterCard ─── */

@@ -157,6 +157,22 @@ describe('DashboardRecentCharacters', () => {
     expect(mockOnNavigate).toHaveBeenCalledWith('/characters');
   });
 
+  it('recent character items have design system styling', () => {
+    render(
+      <DashboardRecentCharacters
+        characters={mockCharacters}
+        worlds={mockWorlds}
+        maxItems={3}
+        onNavigate={mockOnNavigate}
+      />
+    );
+
+    const characterItems = screen.getAllByRole('button').filter(
+      el => el.classList.contains('dashboard-recent-item')
+    );
+    expect(characterItems).toHaveLength(3);
+  });
+
   it('has proper heading for accessibility', () => {
     render(
       <DashboardRecentCharacters

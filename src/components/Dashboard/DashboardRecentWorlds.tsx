@@ -52,6 +52,7 @@ export function DashboardRecentWorlds({
         {recentWorlds.map((world) => (
           <div
             key={world.id}
+            className="dashboard-recent-item"
             onClick={() => onNavigate(`/worlds/${world.id}`)}
             role="button"
             tabIndex={0}

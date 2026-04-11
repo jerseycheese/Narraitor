@@ -57,6 +57,7 @@ export function DashboardRecentCharacters({
           return (
             <div
               key={character.id}
+              className="dashboard-recent-item"
               onClick={() => onNavigate(`/characters/${character.id}`)}
               role="button"
               tabIndex={0}
@@ -68,7 +69,7 @@ export function DashboardRecentCharacters({
                 }
               }}
             >
-              <div>
+              <div className="dashboard-recent-character-content">
                 <CharacterPortrait
                   portrait={
                     character.portrait || { type: 'placeholder', url: null }
