@@ -688,6 +688,114 @@
   max-width: 100%;
 }
 
+.journal-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.journal-list-pane {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.journal-detail-pane {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+
+.journal-list-header {
+  margin-bottom: var(--space-3);
+}
+
+.journal-list-header h2 {
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.journal-search-wrapper {
+  margin-bottom: var(--space-3);
+}
+
+.journal-load-more {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-3) 0;
+}
+
+.journal-detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+  flex: 1;
+}
+
+.journal-detail-empty svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: var(--space-3);
+  opacity: 0.5;
+}
+
+.journal-detail-empty h3 {
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-1);
+}
+
+.journal-detail-empty p {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.journal-list-pane.hidden,
+.journal-detail-pane.hidden {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .journal-content {
+    flex-direction: row;
+  }
+
+  .journal-list-pane {
+    width: 20rem;
+    flex-shrink: 0;
+    border-right: 1px solid var(--color-border);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .journal-list-pane.hidden {
+    display: flex;
+  }
+
+  .journal-detail-pane {
+    padding: var(--space-4) var(--space-6);
+  }
+
+  .journal-detail-pane.hidden {
+    display: flex;
+  }
+}
+
 .journal-entry-list {
   display: flex;
   flex-direction: column;
