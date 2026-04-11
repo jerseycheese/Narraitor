@@ -10,6 +10,7 @@ import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { Button } from '@/components/ui/button';
 
 export default function PlayPage() {
   const router = useRouter();
@@ -69,17 +70,19 @@ export default function PlayPage() {
           message={error}
           severity="error"
         />
-        <div>
-          <button
+        <div className="error-display-actions">
+          <Button
+            variant="outline"
             onClick={() => router.push('/worlds')}
           >
             Select World
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
             onClick={() => router.push('/characters')}
           >
             Select Character
-          </button>
+          </Button>
         </div>
       </PageLayout>
     );
