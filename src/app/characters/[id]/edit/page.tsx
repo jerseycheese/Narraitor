@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useCharacterStore } from '@/state/characterStore';
 import { CharacterEditor } from '@/components/CharacterEditor';
 import { NotFoundState } from '@/components/shared/NotFoundState';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { BackNavigation } from '@/components/shared/BackNavigation';
 
 export default function CharacterEditPage() {
   const params = useParams();
-  const router = useRouter();
   const characterId = params.id as string;
   const { characters } = useCharacterStore();
   const [mounted, setMounted] = useState(false);
@@ -40,11 +40,7 @@ export default function CharacterEditPage() {
   return (
     <PageLayout title={`Edit Character: ${character.name}`}>
       {/* Header with back button */}
-      <div>
-        <button onClick={() => router.push(`/characters/${characterId}`)}>
-          <span>←</span> Back to Character
-        </button>
-      </div>
+      <BackNavigation href={`/characters/${characterId}`} label="Back to Character" />
 
       <CharacterEditor characterId={characterId} />
     </PageLayout>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
 
 /**
  * CollapsibleSection props
@@ -71,8 +72,10 @@ export const CollapsibleSection = ({
         >
           {title}
         </h3>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           data-testid="collapsible-section-toggle"
           onClick={(e) => {
             e.stopPropagation(); // Prevent double toggle when clicking button
@@ -80,10 +83,9 @@ export const CollapsibleSection = ({
           }}
           aria-expanded={isExpanded}
           aria-label={isExpanded ? `Collapse ${title}` : `Expand ${title}`}
-          
         >
           {isExpanded ? '−' : '+'}
-        </button>
+        </Button>
       </div>
       <div
         id={`section-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
