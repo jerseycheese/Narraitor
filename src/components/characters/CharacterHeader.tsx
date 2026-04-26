@@ -22,7 +22,7 @@ export function CharacterHeader({ character, world }: CharacterHeaderProps) {
         characterName={character.name}
         size="xlarge"
       />
-      <div className="prose prose-gray dark:prose-invert">
+      <div>
         <h2>{character.name}</h2>
         <p>Level {character.level}</p>
         {character.background.personality && (

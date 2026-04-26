@@ -155,7 +155,7 @@ export function RecentPagesDropdown({
           </div>
 
           {recentPages.map((entry, index) => (
-            <div key={`${entry.path}-${entry.timestamp}`} className="group">
+            <div key={`${entry.path}-${entry.timestamp}`}>
               <div>
                 <Button
                   onClick={() => handleNavigateToPage(entry.path, entry.title)}

@@ -258,7 +258,6 @@ const GameSession: React.FC<GameSessionProps> = ({
       // Save the session when component unmounts (navigating away)
       const currentState = useSessionStore.getState();
       if (currentState.status === 'active' && currentState.id) {
-        console.log('🔚 Production mode: Saving session on unmount');
         // Don't reset the session, just save it
         useSessionStore.getState().endSession();
         

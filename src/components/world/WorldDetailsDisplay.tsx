@@ -54,7 +54,7 @@ export function WorldDetailsDisplay({
       {showDescription && (
         <section aria-labelledby="world-description-heading">
           <h2 id="world-description-heading">About this world</h2>
-          <div className="prose prose-gray dark:prose-invert">
+          <div>
             <p>{world.description}</p>
           </div>
         </section>

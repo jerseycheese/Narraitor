@@ -447,33 +447,6 @@ body.manuscript-overlay-open {
   min-height: 100vh;
 }
 
-.manuscript-floating-hud {
-  display: contents;
-  pointer-events: none;
-}
-
-.manuscript-hud-zone {
-  pointer-events: auto;
-}
-
-.manuscript-hud-group {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-4);
-}
-
-.manuscript-hud-group-right {
-  justify-content: flex-end;
-}
-
-.manuscript-hud-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.manuscript-hud-controls,
-.manuscript-hud-drawer-triggers,
 .manuscript-hud-right-controls {
   display: flex;
   align-items: center;
@@ -517,17 +490,6 @@ body.manuscript-overlay-open {
   position: relative;
   display: inline-flex;
   align-items: center;
-}
-
-.manuscript-tools-menu-heading {
-  margin: 0 0 var(--space-2);
-  padding: 0;
-  font-size: 0.625rem;
-  font-family: var(--font-system);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
 }
 
 .manuscript-tools-menu-items {
@@ -652,17 +614,6 @@ body.manuscript-overlay-open {
   white-space: nowrap;
 }
 
-.manuscript-hud-character-panel-container {
-  width: min(80vw, 20rem);
-  max-height: min(70vh, 32rem);
-  overflow: auto;
-  background: var(--color-overlay-surface-strong);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-3);
-  box-shadow: var(--shadow-overlay);
-}
-
 /* Removed manuscript-action-rail-content as container handles padding directly */
 
 .manuscript-action-rail-stack {
@@ -670,13 +621,6 @@ body.manuscript-overlay-open {
   flex-direction: column;
   gap: var(--space-2);
   min-width: 0;
-}
-
-.manuscript-session-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: var(--space-3);
 }
 
 .manuscript-warning-action-button {
@@ -710,43 +654,6 @@ body.manuscript-overlay-open {
 .manuscript-warning-action-button:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-}
-
-.manuscript-session-action-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
-}
-
-.manuscript-session-action-button:hover {
-  color: var(--color-warning);
-  border-color: var(--color-warning-border);
-  background: var(--color-warning-muted);
-}
-
-.manuscript-session-action-button:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-.manuscript-session-action-icon {
-  width: 1rem;
-  height: 1rem;
-}
-
-.manuscript-rail-mobile-choices {
-  display: block;
-}
-
-.manuscript-rail-desktop-input {
-  display: none;
 }
 
 .manuscript-choice-selector {
@@ -800,22 +707,9 @@ body.manuscript-overlay-open {
   outline-offset: 2px;
 }
 
-.manuscript-input-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--space-2);
-  min-width: 5.25rem;
-}
-
 .manuscript-input-count {
   font-size: 0.75rem;
   color: var(--color-text-secondary);
-}
-
-.manuscript-input-count-warning {
-  color: var(--color-warning);
 }
 
 .manuscript-send-button {
@@ -852,14 +746,6 @@ body.manuscript-overlay-open {
 
 .manuscript-suggested-actions-section {
   margin: 0;
-}
-
-.manuscript-suggested-actions-heading {
-  margin: 0 0 var(--space-2);
-  font-size: 0.875rem;
-  font-family: var(--font-interface), system-ui, sans-serif;
-  font-weight: 600;
-  color: var(--color-text-secondary);
 }
 
 .manuscript-suggested-actions-grid {
@@ -1167,18 +1053,6 @@ body.manuscript-overlay-open {
 
 }
 
-.manuscript-suggested-action-chevron,
-
-.manuscript-suggested-action-alignment-icon {
-
-  flex: 0 0 auto;
-
-  width: 0.875rem;
-
-  height: 0.875rem;
-
-}
-
 .manuscript-suggested-action-badges {
 
   flex: 0 0 auto;
@@ -1311,11 +1185,6 @@ body.manuscript-overlay-open {
   gap: var(--space-1);
   font-family: var(--font-interface), system-ui, sans-serif;
   font-size: 0.875rem;
-}
-
-.manuscript-journal-button-icon {
-  width: 1rem;
-  height: 1rem;
 }
 
 .manuscript-drawer-backdrop {
@@ -1880,12 +1749,6 @@ body.manuscript-overlay-open {
   min-width: 0;
 }
 
-.save-indicator-icon {
-  width: 0.875rem;
-  height: 0.875rem;
-  color: var(--color-text-secondary);
-}
-
 .save-indicator-copy {
   display: flex;
   flex-direction: column;
@@ -1948,13 +1811,6 @@ body.manuscript-overlay-open {
     align-items: stretch;
   }
 
-  .manuscript-input-meta {
-    min-width: 4.75rem;
-  }
-
-  .manuscript-session-actions {
-    justify-content: space-between;
-  }
 }
 
 @media (width >= 640px) and (width < 1024px) {
@@ -2000,14 +1856,6 @@ body.manuscript-overlay-open {
     display: none;
   }
 
-  .manuscript-rail-mobile-choices {
-    display: none;
-  }
-
-  .manuscript-rail-desktop-input {
-    display: block;
-  }
-
   .manuscript-character-summary-columns {
     grid-template-columns: 1fr 1fr;
   }
@@ -2021,26 +1869,6 @@ body.manuscript-overlay-open {
   }
 }
 
-.manuscript-streaming-segment {
-  display: inline;
-}
-
-.manuscript-streaming-word {
-  opacity: 0;
-  animation: manuscript-word-appear 0.15s ease-out forwards;
-}
-
-@keyframes manuscript-word-appear {
-  from {
-    opacity: 0;
-    transform: translateY(2px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Fix 22: DS1 keyframe animations */
 @keyframes ds1-shimmer {
@@ -2737,11 +2565,6 @@ body.manuscript-overlay-open {
   letter-spacing: 0.04em;
 }
 
-/* Fix 35: Hide "Suggested Actions" heading in DS1 (demo has none) */
-[data-theme="ds1"] .manuscript-suggested-actions-heading {
-  display: none;
-}
-
 /* DS1: always show expanded choices, hide mobile toggle
    Base rules use !important for hide/show toggle — must match to override */
 [data-theme="ds1"] .manuscript-mobile-rail-top-controls {
@@ -2766,11 +2589,6 @@ body.manuscript-overlay-open {
 [data-theme="ds1"] .manuscript-suggested-action-content {
   flex-direction: column;
   align-items: flex-start;
-}
-
-/* Fix 37: Hide choice card chevron in DS1 (demo has none) */
-[data-theme="ds1"] .manuscript-suggested-action-chevron {
-  display: none;
 }
 
 /* Fix 38: Hide context summary in DS1 (demo has none) */
