@@ -152,7 +152,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       className="component-world-card"
     >
       {/* Always show Hero component - with image or themed background */}
-      <div className="group">
+      <div>
         <Link href={`/worlds/${world.id}`}>
           {(() => {
             // Use seeded placeholder image during Playwright tests if world has no image

@@ -677,9 +677,7 @@
   gap: var(--space-3);
 }
 
-.card-action-group > div,
-.card-action-primary,
-.card-action-secondary {
+.card-action-group > div {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);

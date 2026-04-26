@@ -77,7 +77,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
       </div>
 
       <div className="journal-entry-content">
-        <div className="prose prose-gray dark:prose-invert">
+        <div>
           <p>
             {entry.type === 'discovery'
               ? formatAIResponse(entry.detailedContent || entry.content, {

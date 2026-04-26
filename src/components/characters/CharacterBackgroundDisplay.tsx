@@ -16,7 +16,7 @@ interface CharacterBackgroundDisplayProps {
 
 export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDisplayProps) {
   return (
-    <div className="prose prose-gray dark:prose-invert">
+    <div>
       {/* History Section */}
       <div>
         <h3>

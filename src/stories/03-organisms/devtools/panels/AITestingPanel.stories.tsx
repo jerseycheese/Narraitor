@@ -48,20 +48,6 @@ export const Default: Story = {
 
 
 /**
- * Interactive example showing the complete workflow
- */
-export const InteractiveExample: Story = {
-  args: {},
-  parameters: {
-    docs: {
-      description: {
-        story: `This story demonstrates the complete workflow: 1. **Fill World Override**: Enter "Fantasy Realm" as world name and "High Fantasy" as theme 2. **Fill Character Override**: Enter "Adventurer" as character name 3. **Generate Narrative**: Click the button to see mock AI response 4. **Review Results**: Check the generated narrative and choices The component includes proper error handling and loading states for a complete developer experience.`
-      }
-    }
-  }
-};
-
-/**
  * Compact version for smaller DevTools panels
  */
 export const Compact: Story = {
