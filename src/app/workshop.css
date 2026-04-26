@@ -50,7 +50,7 @@
   );
   background-size: 24px 24px;
   pointer-events: none;
-  mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 20%, transparent 80%);
+  mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, hsl(0deg 0% 0%) 20%, transparent 80%);
 }
 
 /* Accent glow rising from below */
@@ -976,7 +976,7 @@
   display: none;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .journal-content {
     flex-direction: row;
   }
@@ -1130,4 +1130,44 @@
 .journal-empty-state {
   padding: var(--space-8) var(--space-4);
   text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Form Controls
+   ═══════════════════════════════════════════════════════════════ */
+
+.range-slider {
+  appearance: none;
+  width: 100%;
+  accent-color: var(--color-accent);
+}
+
+.range-slider-constrained {
+  accent-color: var(--color-warning, hsl(45deg 93% 47%));
+}
+
+/* ─── Logo ─── */
+
+.logo-icon-inverted {
+  filter: brightness(0);
+}
+
+/* ─── Toast ─── */
+
+.toast-dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm, 0.25rem);
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.toast-dismiss:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
 }

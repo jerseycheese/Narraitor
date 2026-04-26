@@ -129,7 +129,7 @@ export function HeaderNavigation() {
                 )}
 
                 <Link href="/">
-                  <LogoIcon size="small" className="brightness-0" />
+                  <LogoIcon size="small" className="logo-icon-inverted" />
                   <LogoText size="sm" />
                 </Link>
 

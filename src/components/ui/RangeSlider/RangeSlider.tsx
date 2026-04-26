@@ -232,12 +232,11 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
               onChange={handleChange}
               disabled={disabled}
               className={[
-                'appearance-none',
-                'accent-primary',
+                'range-slider',
                 isConstrained &&
                 effectiveMax !== undefined &&
                 value === effectiveMax
-                  ? 'accent-amber-500'
+                  ? 'range-slider-constrained'
                   : '',
               ]
                 .filter(Boolean)
