@@ -35,7 +35,7 @@ export function DashboardRecentCharacters({
     return (
       <section className="component-dashboard-recent-characters">
         <h2>Recent Characters</h2>
-        <div>
+        <div className="dashboard-recent-empty-state">
           <p>No characters yet</p>
           <Button onClick={() => onNavigate('/characters')} variant="default">
             <Plus aria-hidden="true" />
@@ -50,7 +50,7 @@ export function DashboardRecentCharacters({
     <section className="component-dashboard-recent-characters">
       <h2>Recent Characters</h2>
 
-      <div>
+      <div className="dashboard-recent-list">
         {/* Recent Characters */}
         {recentCharacters.map((character) => {
           const world = worlds[character.worldId];
@@ -89,16 +89,16 @@ export function DashboardRecentCharacters({
         {/* Empty Slots */}
         {emptySlots > 0 &&
           Array.from({ length: emptySlots }).map((_, index) => (
-            <div key={`empty-${index}`}>
-              <Button
-                onClick={() => onNavigate('/characters')}
-                variant="ghost"
-                size="sm"
-              >
-                <Plus aria-hidden="true" />
-                Create Character
-              </Button>
-            </div>
+            <Button
+              key={`empty-${index}`}
+              onClick={() => onNavigate('/characters')}
+              variant="ghost"
+              size="sm"
+              className="dashboard-recent-empty-slot"
+            >
+              <Plus aria-hidden="true" />
+              Create Character
+            </Button>
           ))}
       </div>
     </section>

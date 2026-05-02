@@ -40,16 +40,16 @@ export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
     >
       <h2 id="progress-heading">Your Progress</h2>
 
-      <div>
+      <div className="dashboard-progress-stats">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label}>
-              <div>
+            <div key={stat.label} className="dashboard-progress-stat">
+              <div className="dashboard-progress-stat-value">
                 <Icon aria-hidden="true" />
                 <span>{stat.value}</span>
               </div>
-              <p>{stat.label}</p>
+              <p className="dashboard-progress-stat-label">{stat.label}</p>
             </div>
           );
         })}
