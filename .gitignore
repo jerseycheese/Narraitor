@@ -100,6 +100,10 @@ project-config.json
 docs/
 docs/plans/
 
+# Cross-theme audit captures (#1129) — large PNG output, regenerable
+scripts/audit/captures/
+scripts/audit/seeds/*.json
+
 # Generated dependency diagrams (regenerate with npm run deps:diagram:all)
 public_docs/architecture/*.mmd
 public_docs/architecture/*.svg
