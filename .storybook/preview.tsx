@@ -15,6 +15,9 @@ import { ThemeProvider, useTheme } from '../src/lib/theme/ThemeProvider';
 import type { DesignSystem, ColorScheme } from '../src/lib/theme';
 
 import '../src/app/globals.css';
+import '../src/app/workshop.css';
+import '../src/app/wizard.css';
+import '../src/app/dashboard.css';
 import '../src/lib/theme/themes/ds1.css';
 import '../src/lib/theme/themes/ds2.css';
 import '../src/lib/theme/themes/ds3.css';

@@ -32,7 +32,7 @@ export function DashboardRecentWorlds({
     return (
       <section className="component-dashboard-recent-worlds">
         <h2>Recent Worlds</h2>
-        <div>
+        <div className="dashboard-recent-empty-state">
           <p>No worlds yet</p>
           <Button onClick={() => onNavigate('/worlds')} variant="default">
             <Plus aria-hidden="true" />
@@ -47,7 +47,7 @@ export function DashboardRecentWorlds({
     <section className="component-dashboard-recent-worlds">
       <h2>Recent Worlds</h2>
 
-      <div>
+      <div className="dashboard-recent-list">
         {/* Recent Worlds */}
         {recentWorlds.map((world) => (
           <div
@@ -74,16 +74,16 @@ export function DashboardRecentWorlds({
         {/* Empty Slots */}
         {emptySlots > 0 &&
           Array.from({ length: emptySlots }).map((_, index) => (
-            <div key={`empty-${index}`}>
-              <Button
-                onClick={() => onNavigate('/worlds')}
-                variant="ghost"
-                size="sm"
-              >
-                <Plus aria-hidden="true" />
-                Create World
-              </Button>
-            </div>
+            <Button
+              key={`empty-${index}`}
+              onClick={() => onNavigate('/worlds')}
+              variant="ghost"
+              size="sm"
+              className="dashboard-recent-empty-slot"
+            >
+              <Plus aria-hidden="true" />
+              Create World
+            </Button>
           ))}
       </div>
     </section>

@@ -50,9 +50,9 @@ export function DashboardContinueCard({
       >
         <h2 id="continue-game-heading">Continue Your Game</h2>
 
-        <div>
+        <div className="dashboard-continue-card-row">
           {/* Character Portrait */}
-          <div>
+          <div className="dashboard-continue-card-portrait">
             <CharacterPortrait
               portrait={
                 character.portrait || { type: 'placeholder', url: null }
@@ -63,13 +63,13 @@ export function DashboardContinueCard({
           </div>
 
           {/* Game Info */}
-          <div>
-            <div>
+          <div className="dashboard-continue-card-info">
+            <div className="dashboard-continue-card-fields">
               <DataField label="World" value={world.name} />
               <DataField label="Character" value={character.name} />
             </div>
 
-            <div>
+            <div className="dashboard-continue-card-meta">
               <DataField
                 label="Progress"
                 value={`${session.narrativeCount} entries`}

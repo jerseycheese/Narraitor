@@ -47,10 +47,10 @@ export function DashboardGettingStarted({
   // Hide when all steps completed
   if (allComplete) {
     return (
-      <section className="component-dashboard-getting-started">
-        <div>
-          <CheckCircle aria-hidden="true" />
-          <div>
+      <section className="component-dashboard-getting-started component-dashboard-getting-started-complete">
+        <div className="dashboard-getting-started-complete-row">
+          <CheckCircle aria-hidden="true" className="dashboard-getting-started-complete-icon" />
+          <div className="dashboard-getting-started-complete-body">
             <h3>Ready to Continue</h3>
             <p>Your world is set up. Continue your adventure!</p>
             <Button
@@ -70,27 +70,30 @@ export function DashboardGettingStarted({
     <section className="component-dashboard-getting-started">
       <h2>Getting Started</h2>
 
-      <div>
+      <ol className="dashboard-getting-started-steps">
         {steps.map((step) => {
           const Icon = step.completed ? CheckCircle : Circle;
           return (
-            <div key={step.id}>
-              <Icon
-                aria-hidden="true"
-              />
-              <span>
-                {step.label}
-              </span>
-            </div>
+            <li
+              key={step.id}
+              className={
+                'dashboard-getting-started-step' +
+                (step.completed ? ' dashboard-getting-started-step-complete' : '')
+              }
+            >
+              <Icon aria-hidden="true" className="dashboard-getting-started-step-icon" />
+              <span className="dashboard-getting-started-step-label">{step.label}</span>
+            </li>
           );
         })}
-      </div>
+      </ol>
 
       {nextStep && (
         <Button
           onClick={() => onNavigate(nextStep.path)}
           variant="default"
           size="lg"
+          className="dashboard-getting-started-cta"
         >
           {nextStep.cta}
         </Button>
