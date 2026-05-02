@@ -70,7 +70,7 @@ export const mockCharacterB = {
 export type DashboardScenario =
   | 'active-session'
   | 'returning-no-session'
-  | 'empty-but-not-first-time';
+  | 'barely-started';
 
 export const mockDashboardState = (scenario: DashboardScenario) => {
   // Always bypass first-time onboarding so we render the dashboard,
@@ -81,10 +81,15 @@ export const mockDashboardState = (scenario: DashboardScenario) => {
     resumeSavedSession: () => true,
   };
 
-  if (scenario === 'empty-but-not-first-time') {
+  if (scenario === 'barely-started') {
+    // The dashboard can't render in true-empty state — DashboardHome.tsx
+    // routes purely-empty users to GuidedFirstTimeExperience regardless of
+    // the shouldShowOnboarding flag. One world is the minimum that gets the
+    // dashboard to render with a mostly-empty Getting Started checklist
+    // (1/3 complete) and 1+2 empty world slots / 3 empty character slots.
     useWorldStore.setState({
-      worlds: {},
-      entities: {},
+      worlds: { [mockWorldA.id]: mockWorldA },
+      entities: { [mockWorldA.id]: mockWorldA },
       currentWorldId: null,
       currentEntityId: null,
       setCurrentWorld: noopVoid,

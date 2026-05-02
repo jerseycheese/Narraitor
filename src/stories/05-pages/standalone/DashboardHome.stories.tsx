@@ -10,7 +10,7 @@ const meta: Meta<typeof DashboardHome> = {
     docs: {
       description: {
         component:
-          'The dashboard home page rendered for returning users. Variants cover the three states the page renders: active session, returning user with no active session, and empty-but-not-first-time (used to QA the empty Recent + full Getting Started checklist without falling through to the first-time wizard).',
+          'The dashboard home page rendered for returning users. Variants cover the three valid states the page renders: barely-started (1 world, no characters), returning with assets but no active session, and active session (Continue card on top). True-empty users are routed to GuidedFirstTimeExperience by DashboardHome itself and aren’t representable here.',
       },
     },
   },
@@ -19,9 +19,9 @@ const meta: Meta<typeof DashboardHome> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const ActiveSession: Story = {
-  name: 'Active Session',
-  decorators: [withDashboardScenario('active-session')],
+export const BarelyStarted: Story = {
+  name: 'Barely Started (1 world)',
+  decorators: [withDashboardScenario('barely-started')],
 };
 
 export const ReturningNoSession: Story = {
@@ -29,7 +29,7 @@ export const ReturningNoSession: Story = {
   decorators: [withDashboardScenario('returning-no-session')],
 };
 
-export const EmptyButNotFirstTime: Story = {
-  name: 'Empty (bypassing first-time)',
-  decorators: [withDashboardScenario('empty-but-not-first-time')],
+export const ActiveSession: Story = {
+  name: 'Active Session',
+  decorators: [withDashboardScenario('active-session')],
 };

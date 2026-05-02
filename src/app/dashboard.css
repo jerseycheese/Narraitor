@@ -211,6 +211,20 @@
   gap: var(--space-3);
 }
 
+/* CharacterPortrait inherits its size from the parent — give it an explicit
+   small avatar box in this list context so the placeholder doesn't stretch. */
+.dashboard-recent-character-content > .component-character-portrait {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+}
+
+.dashboard-recent-character-content > div:not(.component-character-portrait) {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .dashboard-recent-empty-state {
   display: flex;
   flex-direction: column;
