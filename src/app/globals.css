@@ -355,12 +355,6 @@ body > * {
   height: 12px;
 }
 
-.workshop-sidebar-theme-controls {
-  display: flex;
-  gap: var(--space-1_5);
-  flex-wrap: wrap;
-}
-
 /* Ending Screen Tone Styles */
 .ending-triumphant {
   background-color: hsl(var(--ending-triumphant));

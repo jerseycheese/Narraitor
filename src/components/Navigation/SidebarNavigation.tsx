@@ -2,22 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { TutorialMenu } from './TutorialMenu';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { DarkModeToggle } from './DarkModeToggle';
-import dynamic from 'next/dynamic';
-
-const RecentPagesDropdown = dynamic(
-  () =>
-    import('./RecentPagesDropdown').then((m) => ({
-      default: m.RecentPagesDropdown,
-    })),
-  { ssr: false }
-);
 import { useNavigationData } from './useNavigationData';
-import { Globe, Users, Settings, Check, Play, Plus, Home } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { getGenreLabel } from '@/lib/constants/genres';
 import type { Character } from '@/state/characterStore';
 
@@ -25,26 +17,42 @@ interface SidebarNavigationProps {
   onNavigate?: () => void;
 }
 
+const PRIMARY_LINKS: ReadonlyArray<{
+  href: string;
+  label: string;
+  loadingMessage: string;
+}> = [
+  { href: '/worlds', label: 'Worlds', loadingMessage: 'Loading worlds...' },
+  { href: '/characters', label: 'Characters', loadingMessage: 'Loading characters...' },
+  { href: '/settings', label: 'Settings', loadingMessage: 'Loading settings...' },
+];
+
 /**
- * SidebarNavigation - Workshop navigation rail for world/character/settings routes.
+ * SidebarNavigation - Workshop navigation rail (desktop ≥768) and drawer (mobile).
+ * Desktop: typographic primary list, embedded world switcher, horizontal bottom toolbar.
+ * The contextual CTA, recent pages, and breadcrumbs live in WorkshopContextualHeader.
  */
 export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
   const {
+    pathname,
     currentWorldId,
     worlds,
     characters,
-    currentWorld,
     hasWorldsStore,
     navigateWithLoading,
     setCurrentWorld,
   } = useNavigationData();
+  // useNavigationData.pathname can lag during route transitions; usePathname() is the live-tick value used for active-link styling.
+  const livePath = usePathname() ?? pathname;
   const [mounted, setMounted] = useState(false);
   const hasWorlds = mounted && hasWorldsStore;
-  const activeWorld = mounted ? currentWorld : null;
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const isPrimaryActive = (href: string) =>
+    livePath === href || livePath.startsWith(`${href}/`);
 
   const navigate = (path: string, message: string) => {
     navigateWithLoading(path, message);
@@ -59,121 +67,84 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
   };
 
   return (
-    <nav aria-label="Workshop navigation" className="workshop-sidebar-nav">
-      <div className="workshop-sidebar-header">
-        <Link href="/" onClick={() => onNavigate?.()} className="workshop-sidebar-brand">
+    <nav
+      aria-label="Workshop navigation"
+      className="workshop-sidebar-nav"
+      data-identifier="workshop-sidebar-nav"
+    >
+      <div className="workshop-sidebar-brand-row">
+        <Link
+          href="/"
+          onClick={() => onNavigate?.()}
+          className="workshop-sidebar-brand"
+        >
           <LogoIcon size="small" className="logo-icon-inverted" />
           <LogoText size="sm" />
         </Link>
-        <TutorialMenu />
       </div>
 
-      <div className="workshop-sidebar-section">
-        <Button
-          variant="ghost"
-          className="workshop-nav-link"
-          onClick={() => navigate('/worlds', 'Loading worlds...')}
-        >
-          <Globe aria-hidden="true" />
-          Worlds
-        </Button>
-        <Button
-          variant="ghost"
-          className="workshop-nav-link"
-          onClick={() => navigate('/characters', 'Loading characters...')}
-        >
-          <Users aria-hidden="true" />
-          Characters
-        </Button>
-        <Button
-          variant="ghost"
-          className="workshop-nav-link"
-          onClick={() => navigate('/settings', 'Loading settings...')}
-        >
-          <Settings aria-hidden="true" />
-          Settings
-        </Button>
-      </div>
+      <ul className="workshop-sidebar-primary">
+        {PRIMARY_LINKS.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              aria-current={isPrimaryActive(link.href) ? 'page' : undefined}
+              data-active={isPrimaryActive(link.href) ? 'true' : undefined}
+              className="workshop-sidebar-primary-link"
+              onClick={(e) => {
+                // Cancel default <Link> nav so we route through navigateWithLoading (loading overlay); <Link href> stays for cmd-click / right-click parity.
+                e.preventDefault();
+                navigate(link.href, link.loadingMessage);
+              }}
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
 
       {hasWorlds && (
-        <div className="workshop-sidebar-section">
-          <p className="workshop-sidebar-label">World Switcher</p>
-          <div className="workshop-world-list">
+        <section
+          className="workshop-sidebar-worlds-section"
+          aria-label="World switcher"
+        >
+          <p className="workshop-sidebar-section-label">Worlds</p>
+          <ul className="workshop-sidebar-worlds-list">
             {Object.values(worlds).map((world) => {
               const worldCharacters = (
                 Object.values(characters) as Character[]
               ).filter((char) => char.worldId === world.id).length;
+              const isActive = world.id === currentWorldId;
 
               return (
-                <Button
-                  key={world.id}
-                  variant="ghost"
-                  className="workshop-world-button"
-                  onClick={() => handleWorldSwitch(world.id)}
-                >
-                  <div>
-                    <div>{world.name}</div>
-                    <div>
-                      {getGenreLabel(world.genre)} • {worldCharacters} characters
-                    </div>
-                  </div>
-                  {world.id === currentWorldId && (
-                    <Check aria-hidden="true" />
-                  )}
-                </Button>
+                <li key={world.id}>
+                  <Button
+                    variant="ghost"
+                    className="workshop-sidebar-world-item"
+                    data-active={isActive ? 'true' : undefined}
+                    onClick={() => handleWorldSwitch(world.id)}
+                  >
+                    <span className="workshop-sidebar-world-name">
+                      {world.name}
+                    </span>
+                    <span className="workshop-sidebar-world-meta">
+                      {getGenreLabel(world.genre)} · {worldCharacters} characters
+                    </span>
+                    {isActive && <Check aria-hidden="true" />}
+                  </Button>
+                </li>
               );
             })}
-          </div>
-        </div>
+          </ul>
+        </section>
       )}
 
-      <div className="workshop-sidebar-section workshop-sidebar-section-grow">
-        <RecentPagesDropdown />
-      </div>
+      <div className="workshop-sidebar-spacer" aria-hidden="true" />
 
-      <div className="workshop-sidebar-section workshop-sidebar-theme-controls">
+      <div className="workshop-sidebar-toolbar">
         <ThemeSwitcher compact />
         <DarkModeToggle compact />
-      </div>
-
-      <div className="workshop-sidebar-section">
-        {activeWorld ? (
-          <Button
-            type="button"
-            variant="success"
-            className="workshop-primary-action"
-            onClick={() =>
-              navigate(
-                `/worlds/${activeWorld.id}/play`,
-                `Starting ${activeWorld.name}...`
-              )
-            }
-          >
-            <Play aria-hidden="true" />
-            Play
-          </Button>
-        ) : mounted && !hasWorldsStore ? (
-          <Button
-            type="button"
-            className="workshop-primary-action"
-            onClick={() =>
-              navigate('/worlds/create', 'Setting up world creation...')
-            }
-          >
-            <Plus aria-hidden="true" />
-            Create Your First World
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            variant="ghost"
-            className="workshop-primary-action"
-            onClick={() => navigate('/worlds', 'Loading worlds...')}
-          >
-            <Home aria-hidden="true" />
-            Browse Worlds
-          </Button>
-        )}
+        <TutorialMenu />
       </div>
     </nav>
   );

@@ -2,10 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { HeaderNavigation, SidebarNavigation } from '@/components/Navigation';
+import {
+  HeaderNavigation,
+  SidebarNavigation,
+  WorkshopContextualHeader,
+} from '@/components/Navigation';
 import { getSurfaceMode } from '@/lib/routing/surfaceMode';
-import { Menu, X } from 'lucide-react';
 
 interface AppSurfaceShellProps {
   children: React.ReactNode;
@@ -63,19 +65,10 @@ export function AppSurfaceShell({ children }: AppSurfaceShellProps) {
       )}
 
       <div className="workshop-workspace">
-        <header className="workshop-mobile-header">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
-            aria-expanded={sidebarOpen}
-            onClick={() => setSidebarOpen((prev) => !prev)}
-          >
-            {sidebarOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-          </Button>
-          <p className="workshop-mobile-title">Workshop</p>
-        </header>
+        <WorkshopContextualHeader
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+        />
 
         <main id="main-content" tabIndex={-1} className="workshop-workspace-main">
           <div className="workshop-workspace-inner">{children}</div>

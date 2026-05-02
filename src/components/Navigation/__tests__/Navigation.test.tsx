@@ -182,11 +182,28 @@ describe('HeaderNavigation', () => {
       expect(screen.getByText('Settings')).toBeInTheDocument();
     });
 
-    it('renders theme controls in sidebar', () => {
+    it('renders theme controls in sidebar bottom toolbar', () => {
       render(<SidebarNavigation />);
 
-      expect(screen.getByRole('radiogroup', { name: 'Design system theme' })).toBeInTheDocument();
-      expect(screen.getByRole('radiogroup', { name: 'Color scheme' })).toBeInTheDocument();
+      const themeGroup = screen.getByRole('radiogroup', { name: 'Design system theme' });
+      const schemeGroup = screen.getByRole('radiogroup', { name: 'Color scheme' });
+      expect(themeGroup).toBeInTheDocument();
+      expect(schemeGroup).toBeInTheDocument();
+
+      const toolbar = themeGroup.closest('.workshop-sidebar-toolbar');
+      expect(toolbar).not.toBeNull();
+      expect(toolbar).toContainElement(schemeGroup);
+    });
+
+    it('does not render the contextual CTA inside the rail (it lives in the workspace header on desktop)', () => {
+      render(<SidebarNavigation />);
+
+      // Without seeded worlds the CTA on default surface would be "Create Your First World".
+      // The drafting-rail design moves all contextual CTAs into the workspace header,
+      // not the rail itself. Sidebar must not render any of these labels.
+      expect(screen.queryByText('Create Your First World')).not.toBeInTheDocument();
+      expect(screen.queryByText('Browse Worlds')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /^Play$/i })).not.toBeInTheDocument();
     });
   });
 });
