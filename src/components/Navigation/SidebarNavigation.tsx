@@ -92,7 +92,8 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
               data-active={isPrimaryActive(link.href) ? 'true' : undefined}
               className="workshop-sidebar-primary-link"
               onClick={(e) => {
-                // Cancel default <Link> nav so we route through navigateWithLoading (loading overlay); <Link href> stays for cmd-click / right-click parity.
+                // Let modifier clicks (cmd/ctrl/shift) and non-primary buttons fall through to native <Link> so the browser can open a new tab/window.
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
                 e.preventDefault();
                 navigate(link.href, link.loadingMessage);
               }}

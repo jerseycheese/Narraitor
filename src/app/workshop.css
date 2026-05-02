@@ -307,6 +307,11 @@
   font-size: 0.95rem;
   line-height: 1.2;
   color: var(--color-text-primary);
+  /* grid items need min-width: 0 to allow text-overflow: ellipsis to work */
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .workshop-sidebar-world-meta {
