@@ -1,7 +1,7 @@
 // src/components/CharacterCreationWizard/steps/TemplateSelectionStep.tsx
 
 import React, { useState } from 'react';
-import { WizardFormSection } from '@/components/shared/wizard';
+import { WizardFormSection, wizardStyles } from '@/components/shared/wizard';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Button } from '@/components/ui/button';
 import { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -137,13 +137,9 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
         title="Choose a Starting Template"
         description="Character templates will help you get started quickly"
       >
-        <div>
-          <p>
-            No templates available for this world yet.
-          </p>
-          <p>
-            Continue to create your character from scratch.
-          </p>
+        <div className="wizard-empty-state">
+          <p>No templates available for this world yet.</p>
+          <p>Continue to create your character from scratch.</p>
         </div>
       </WizardFormSection>
     );
@@ -154,8 +150,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       title="Choose a Starting Template"
       description="Select a pre-configured character template or skip to create from scratch"
     >
-      {/* Info banner */}
-      <div>
+      <div className="wizard-info-banner">
         <p>
           These templates are tailored to your <strong>{getGenreLabel(worldConfig.genre)}</strong> world.
           Select one to get started quickly, or skip to create your own character from scratch.
@@ -163,8 +158,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
         </p>
       </div>
 
-      {/* Template Cards Grid */}
-      <div>
+      <div className="wizard-archetype-grid">
         {templates.map(template => (
           <ActiveStateCard
             key={template.id}
@@ -174,29 +168,25 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
             testId="template-card"
           >
             <CardHeader>
-              <CardTitle>
+              <CardTitle className={wizardStyles.step.title}>
                 {template.name}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className={wizardStyles.step.description}>
                 {template.description}
               </CardDescription>
             </CardHeader>
 
-            <CardContent>
-              {/* Personality */}
-              <div>
-                <p>
-                  &ldquo;{template.background.personality}&rdquo;
-                </p>
-              </div>
+            <CardContent className="wizard-archetype-card-body">
+              <p className={`${wizardStyles.step.description} wizard-archetype-quote`}>
+                &ldquo;{template.background.personality}&rdquo;
+              </p>
 
-              {/* Top 3 Attributes */}
               {template.attributes && template.attributes.length > 0 && (
-                <div>
-                  <h4>
+                <div className="wizard-archetype-section">
+                  <h4 className="wizard-archetype-section-heading">
                     Key Attributes
                   </h4>
-                  <div>
+                  <div className="wizard-badge-row">
                     {[...template.attributes]
                       .sort((a, b) => b.value - a.value)
                       .slice(0, 3)
@@ -204,7 +194,6 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                         <Badge
                           key={`${template.id}-attr-${idx}`}
                           variant="secondary"
-                          
                         >
                           {attr.name} {attr.value}
                         </Badge>
@@ -213,13 +202,12 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                 </div>
               )}
 
-              {/* Top 3 Skills */}
               {template.skills && template.skills.length > 0 && (
-                <div>
-                  <h4>
+                <div className="wizard-archetype-section">
+                  <h4 className="wizard-archetype-section-heading">
                     Best Skills
                   </h4>
-                  <div>
+                  <div className="wizard-badge-row">
                     {[...template.skills]
                       .sort((a, b) => b.level - a.level)
                       .slice(0, 3)
@@ -227,7 +215,6 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                         <Badge
                           key={`${template.id}-skill-${idx}`}
                           variant="outline"
-                          
                         >
                           {skill.name} {skill.level}
                         </Badge>
@@ -236,19 +223,14 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                 </div>
               )}
 
-              {/* Motivation */}
-              <div>
-                <h4>
-                  Motivation
-                </h4>
-                <p>
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">Motivation</h4>
+                <p className={`${wizardStyles.step.description} wizard-archetype-quote`}>
                   &ldquo;{template.background.motivation}&rdquo;
                 </p>
               </div>
 
-              {/* Select Button */}
               <Button
-                
                 onClick={(e) => {
                   e.stopPropagation();
                   handleTemplateSelect(template);
@@ -262,8 +244,7 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
         ))}
       </div>
 
-      {/* Help Text */}
-      <div>
+      <div className="wizard-help-row">
         <p>
           Selected a template? Click <strong>Next</strong> to customize it further.
         </p>

@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import { templates, WorldTemplate } from '@/lib/templates/worldTemplates';
 import { RecentTemplates } from '@/components/shared/RecentTemplates';
+import { wizardStyles } from '@/components/shared/wizard';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { convertHistoryEntryToWizardData, storeTemplateDataForWizard } from '@/lib/utils/templateHelpers';
 
@@ -47,42 +48,38 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   }, [onSelect]);
 
   return (
-    <div 
-      
+    <div
+      className="component-template-selector"
       data-testid="template-selector"
     >
-      {/* Traditional Templates */}
-      <div>
-        <div 
-          
-          data-tutorial="template-list"
-        >
-          {displayTemplates.map((template) => (
+      <div className="wizard-template-list" data-tutorial="template-list">
+        {displayTemplates.map((template) => {
+          const isSelected = selectedTemplateId === template.id;
+          return (
             <div
               key={template.id}
-              className={`${selectedTemplateId === template.id ? 'selected-template' : ''}`}
+              className={`wizard-card ${isSelected ? 'wizard-card-selected selected-template' : 'wizard-card-unselected'}`}
               onClick={() => handleSelectTemplate(template.id)}
               data-testid={`template-card-${template.id}`}
             >
-              <h3 
-                
+              <h3
+                className="wizard-card-title"
                 data-testid={`template-name-${template.id}`}
               >
                 {template.name}
               </h3>
-              
+
               <p
-                
+                className={wizardStyles.step.description}
                 data-testid={`template-description-${template.id}`}
               >
                 {template.description}
               </p>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
-      {/* Recent Templates */}
       <RecentTemplates
         onTemplateSelect={handleHistoryTemplate}
         selectedTemplateId={selectedTemplateId}

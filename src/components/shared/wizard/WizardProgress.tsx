@@ -18,13 +18,24 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`${className}`}>
-      {/* Steps and connectors */}
-      <div>
+    <div
+      className={cssClasses(
+        'component-wizard-progress',
+        wizardStyles.progress.container,
+        className
+      )}
+    >
+      <div className="wizard-progress-row">
         {steps.map((step, index) => (
           <React.Fragment key={step.id}>
-            {/* Step circle */}
-            <div>
+            <div
+              className={cssClasses(
+                'wizard-progress-step-wrapper',
+                wizardStyles.progress.step,
+                index === currentStep && wizardStyles.progress.stepActive,
+                index < currentStep && wizardStyles.progress.stepCompleted
+              )}
+            >
               <div
                 className={cssClasses(
                   wizardStyles.progress.circle,
@@ -37,13 +48,16 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
               >
                 {index + 1}
               </div>
-              {/* Label */}
-              <span className={cssClasses(wizardStyles.progress.label)}>{step.label}</span>
+              <span className={wizardStyles.progress.label}>{step.label}</span>
             </div>
-            {/* Connector (no connector after last circle) */}
             {index < steps.length - 1 && (
-              <div>
-                <div />
+              <div className="wizard-progress-connector-wrapper">
+                <div
+                  className={cssClasses(
+                    wizardStyles.progress.connector,
+                    index < currentStep && wizardStyles.progress.connectorActive
+                  )}
+                />
               </div>
             )}
           </React.Fragment>

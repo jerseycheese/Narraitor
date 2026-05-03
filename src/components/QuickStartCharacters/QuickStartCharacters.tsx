@@ -20,6 +20,7 @@ import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Badge } from '@/components/ui/badge';
+import { wizardStyles } from '@/components/shared/wizard';
 import { Loader2, Sparkles, Plus } from 'lucide-react';
 import { getGenreLabel } from '@/lib/constants/genres';
 
@@ -127,10 +128,12 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (loading && archetypes.length === 0) {
     return (
-      <div>
-        <div>
-          <h2>Quick Start Characters</h2>
-          <p>Jump straight into your adventure with {world.name}</p>
+      <div className={`component-quick-start-characters ${wizardStyles.step.content}`}>
+        <div className="wizard-step-header">
+          <h2 className="wizard-page-title">Quick Start Characters</h2>
+          <p className="wizard-page-subtitle">
+            Jump straight into your adventure with {world.name}
+          </p>
         </div>
         <LoadingSkeleton
           size="md"
@@ -144,9 +147,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (error) {
     return (
-      <div>
-        <div>
-          <h2>Quick Start Characters</h2>
+      <div className={`component-quick-start-characters ${wizardStyles.step.content}`}>
+        <div className="wizard-step-header">
+          <h2 className="wizard-page-title">Quick Start Characters</h2>
         </div>
         <ErrorDisplay
           variant="section"
@@ -161,19 +164,23 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   }
 
   return (
-    <div>
-      {/* Header */}
-      <div>
-        <h2>Quick Start Characters</h2>
-        <p>Jump straight into your adventure with {world.name}</p>
-        <p>
+    <div className={`component-quick-start-characters ${wizardStyles.step.content}`}>
+      <div className="wizard-step-header">
+        <h2 className="wizard-page-title">Quick Start Characters</h2>
+        <p className="wizard-page-subtitle">
+          Jump straight into your adventure with {world.name}
+        </p>
+        <p className="wizard-page-subtitle">
           Choose from these pre-generated {getGenreLabel(world.genre)}{' '}
           archetypes or create your own
         </p>
       </div>
 
-      {/* Archetype Cards */}
-      <div data-testid="archetypes-grid" data-tutorial="quickstart-archetypes">
+      <div
+        className="wizard-archetype-grid"
+        data-testid="archetypes-grid"
+        data-tutorial="quickstart-archetypes"
+      >
         {archetypes.map((archetype) => (
           <ActiveStateCard
             key={archetype.id}
@@ -183,20 +190,24 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
             testId="archetype-card"
           >
             <CardHeader>
-              <CardTitle>{archetype.name}</CardTitle>
-              <CardDescription>{archetype.description}</CardDescription>
+              <CardTitle className={wizardStyles.step.title}>
+                {archetype.name}
+              </CardTitle>
+              <CardDescription className={wizardStyles.step.description}>
+                {archetype.description}
+              </CardDescription>
             </CardHeader>
 
-            <CardContent>
-              {/* Personality & Background */}
-              <div>
-                <p>{archetype.background.personality}</p>
-              </div>
+            <CardContent className="wizard-archetype-card-body">
+              <p className={`${wizardStyles.step.description} wizard-archetype-quote`}>
+                {archetype.background.personality}
+              </p>
 
-              {/* Top Attributes */}
-              <div>
-                <h4>Key Attributes</h4>
-                <div>
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">
+                  Key Attributes
+                </h4>
+                <div className="wizard-badge-row">
                   {archetype.attributes
                     .sort((a, b) => (b.value || 0) - (a.value || 0))
                     .slice(0, 3)
@@ -212,10 +223,11 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                 </div>
               </div>
 
-              {/* Top Skills */}
-              <div>
-                <h4>Best Skills</h4>
-                <div>
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">
+                  Best Skills
+                </h4>
+                <div className="wizard-badge-row">
                   {archetype.skills
                     .sort((a, b) => (b.level || 0) - (a.level || 0))
                     .slice(0, 3)
@@ -231,13 +243,13 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                 </div>
               </div>
 
-              {/* Motivation */}
-              <div>
-                <h4>Motivation</h4>
-                <p>&ldquo;{archetype.background.motivation}&rdquo;</p>
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">Motivation</h4>
+                <p className={`${wizardStyles.step.description} wizard-archetype-quote`}>
+                  &ldquo;{archetype.background.motivation}&rdquo;
+                </p>
               </div>
 
-              {/* Select Button */}
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -259,39 +271,35 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         ))}
       </div>
 
-      {/* Action Buttons */}
-      <div>
-        <ActionButtonGroup
-          actions={[
-            {
-              label: loading
-                ? 'Generating...'
-                : 'Generate New Random Character',
-              onClick: handleRandomSelect,
-              variant: 'secondary',
-              size: 'lg',
-              icon: loading ? (
-                <Loader2 aria-hidden="true" />
-              ) : (
-                <Sparkles aria-hidden="true" />
-              ),
-              disabled: loading,
-              dataTutorial: 'quickstart-random',
-            },
-            {
-              label: 'Create Custom Character',
-              onClick: onCustomizeClick,
-              variant: 'ghost',
-              size: 'lg',
-              icon: <Plus aria-hidden="true" />,
-              dataTutorial: 'quickstart-custom',
-            },
-          ]}
-        />
-      </div>
+      <ActionButtonGroup
+        actions={[
+          {
+            label: loading
+              ? 'Generating...'
+              : 'Generate New Random Character',
+            onClick: handleRandomSelect,
+            variant: 'secondary',
+            size: 'lg',
+            icon: loading ? (
+              <Loader2 aria-hidden="true" />
+            ) : (
+              <Sparkles aria-hidden="true" />
+            ),
+            disabled: loading,
+            dataTutorial: 'quickstart-random',
+          },
+          {
+            label: 'Create Custom Character',
+            onClick: onCustomizeClick,
+            variant: 'ghost',
+            size: 'lg',
+            icon: <Plus aria-hidden="true" />,
+            dataTutorial: 'quickstart-custom',
+          },
+        ]}
+      />
 
-      {/* Additional Info */}
-      <div>
+      <div className="wizard-help-row">
         <p>
           <strong>Generate New Random Character:</strong> Creates a completely
           new random character for this world

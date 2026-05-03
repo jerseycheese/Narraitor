@@ -11,8 +11,6 @@
   flex-direction: column;
   gap: var(--space-6);
   width: 100%;
-  max-width: 48rem;
-  margin: 0 auto;
 }
 
 .wizard-header {
@@ -333,10 +331,10 @@
 }
 
 .wizard-progress-connector {
-  width: 2px;
-  height: 1.5rem;
+  width: 100%;
+  min-width: var(--space-3);
+  height: 2px;
   background: var(--color-border);
-  margin: 0 auto;
 }
 
 .wizard-progress-connector-active {
@@ -495,5 +493,287 @@
 }
 
 .wizard-error-container p {
+  margin: 0;
+}
+
+/* ─── Page Wrappers ─── */
+
+.wizard-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  padding: var(--space-6);
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.wizard-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.wizard-page-header-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.wizard-page-title {
+  font-family: var(--font-interface);
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.wizard-page-subtitle {
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ─── Step Headers / Sections ─── */
+
+.wizard-step-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-6);
+}
+
+.wizard-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.wizard-form-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+/* ─── Progress (horizontal stepper) ─── */
+
+.wizard-progress-row {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.wizard-progress-step-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+}
+
+.wizard-progress-connector-wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-3);
+  padding-top: 1rem;
+}
+
+/* ─── Template-mode grid (TemplateStep choice panels) ─── */
+
+.wizard-template-mode-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.wizard-template-mode-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.wizard-template-mode-divider::before,
+.wizard-template-mode-divider::after {
+  content: "";
+  display: block;
+  width: 1.5rem;
+  height: 1px;
+  background: var(--color-border);
+}
+
+@media (width <= 768px) {
+  .wizard-template-mode-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wizard-template-mode-divider {
+    padding: var(--space-1) 0;
+  }
+}
+
+/* ─── Wizard panel (non-clickable card-like container) ─── */
+
+.wizard-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+/* ─── Template list (TemplateSelector traditional mode) ─── */
+
+.wizard-template-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ─── Card content helpers ─── */
+
+.wizard-card-title {
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.wizard-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* ─── Button rows ─── */
+
+.wizard-button-row {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+/* ─── Archetype / character template grid ─── */
+
+.wizard-archetype-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-6);
+  align-items: stretch;
+}
+
+@media (width <= 1024px) {
+  .wizard-archetype-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wizard-archetype-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.wizard-archetype-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.wizard-archetype-section-heading {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.wizard-archetype-quote {
+  font-style: italic;
+}
+
+.wizard-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* ─── Info banner ─── */
+
+.wizard-info-banner {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.wizard-info-banner p {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Empty / loading states ─── */
+
+.wizard-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* ─── Help text under wizard sections ─── */
+
+.wizard-help-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: center;
+  text-align: center;
+  margin-top: var(--space-4);
+}
+
+.wizard-help-row p {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
   margin: 0;
 }
