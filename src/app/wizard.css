@@ -508,6 +508,8 @@
   max-width: 64rem;
   margin: 0 auto;
   padding: var(--space-6);
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .wizard-page-header {
