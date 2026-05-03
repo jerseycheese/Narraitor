@@ -92,34 +92,30 @@ export default function CharacterCreatePage() {
 
   if (!effectiveWorldId) {
     return (
-      <div>
-        <div>
-          <h1>Create Character</h1>
+      <div className="component-create-character-page wizard-page">
+        <div className="wizard-page-header">
+          <h1 className="wizard-page-title">Create Character</h1>
+        </div>
+        <div className="wizard-empty-state">
           <div>
-            <div>
-              <AlertTriangle
-                aria-hidden="true"
-              />
-            </div>
-            <h2>World Required</h2>
-            <p>
-              Characters are created within specific worlds.
-            </p>
-            <p>
-              Each world defines unique attributes, skills, and rules that shape
-              your characters.
-            </p>
-            <ActionButtonGroup
-              actions={[
-                {
-                  label: 'Select a World First',
-                  onClick: () => router.push('/worlds'),
-                  variant: 'primary',
-                  size: 'lg',
-                },
-              ]}
-            />
+            <AlertTriangle aria-hidden="true" />
           </div>
+          <h2 className="wizard-archetype-card-name">World Required</h2>
+          <p>Characters are created within specific worlds.</p>
+          <p>
+            Each world defines unique attributes, skills, and rules that shape
+            your characters.
+          </p>
+          <ActionButtonGroup
+            actions={[
+              {
+                label: 'Select a World First',
+                onClick: () => router.push('/worlds'),
+                variant: 'primary',
+                size: 'lg',
+              },
+            ]}
+          />
         </div>
       </div>
     );
@@ -217,13 +213,13 @@ export default function CharacterCreatePage() {
     showQuickStart && (mounted ? !!currentWorld : !!effectiveWorldId);
 
   return (
-    <div>
-      <div>
+    <div className="component-create-character-page wizard-page">
+      <div className="wizard-step-content">
         {shouldShowQuickStart ? (
           <>
-            <div>
-              <h1>Create New Character</h1>
-              <p>
+            <div className="wizard-page-header">
+              <h1 className="wizard-page-title">Create New Character</h1>
+              <p className="wizard-page-subtitle">
                 <span suppressHydrationWarning>
                   {currentWorld
                     ? `Choose a quick start character for ${currentWorld.name} or create your own`
@@ -240,7 +236,7 @@ export default function CharacterCreatePage() {
                   onReady={() => setContentReady(true)}
                 />
               ) : (
-                <div>
+                <div className="wizard-empty-state">
                   Preparing quick start options...
                 </div>
               )}
@@ -248,19 +244,14 @@ export default function CharacterCreatePage() {
           </>
         ) : (
           <>
-            <div>
-              <div>
-                <h1>
-                  Create Custom Character
-                </h1>
-                <p>
+            <div className="wizard-page-header-row">
+              <div className="wizard-page-header">
+                <h1 className="wizard-page-title">Create Custom Character</h1>
+                <p className="wizard-page-subtitle">
                   Build your character from scratch with full customization
                 </p>
               </div>
-              <Button
-                variant="outline"
-                onClick={handleBackToQuickStart}
-              >
+              <Button variant="outline" onClick={handleBackToQuickStart}>
                 ← Back to Quick Start
               </Button>
             </div>

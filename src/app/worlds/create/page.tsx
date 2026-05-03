@@ -73,9 +73,14 @@ export default function CreateWorldPage() {
 
   
   return (
-    <section aria-labelledby="create-world-title">
-      <h1 id="create-world-title">Create New World</h1>
-      <WorldCreationWizard 
+    <section
+      className="component-create-world-page wizard-page"
+      aria-labelledby="create-world-title"
+    >
+      <h1 id="create-world-title" className="sr-only">
+        Create New World
+      </h1>
+      <WorldCreationWizard
         onComplete={handleComplete}
         onCancel={handleCancel}
         initialData={generatedData || undefined}

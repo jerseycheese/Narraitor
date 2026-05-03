@@ -47,38 +47,38 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   }, [onSelect]);
 
   return (
-    <div 
-      
+    <div
+      className="component-template-selector"
       data-testid="template-selector"
     >
       {/* Traditional Templates */}
       <div>
-        <div 
-          
-          data-tutorial="template-list"
-        >
-          {displayTemplates.map((template) => (
-            <div
-              key={template.id}
-              className={`${selectedTemplateId === template.id ? 'selected-template' : ''}`}
-              onClick={() => handleSelectTemplate(template.id)}
-              data-testid={`template-card-${template.id}`}
-            >
-              <h3 
-                
-                data-testid={`template-name-${template.id}`}
+        <div className="wizard-template-list" data-tutorial="template-list">
+          {displayTemplates.map((template) => {
+            const isSelected = selectedTemplateId === template.id;
+            return (
+              <div
+                key={template.id}
+                className={`wizard-card ${isSelected ? 'wizard-card-selected selected-template' : 'wizard-card-unselected'}`}
+                onClick={() => handleSelectTemplate(template.id)}
+                data-testid={`template-card-${template.id}`}
               >
-                {template.name}
-              </h3>
-              
-              <p
-                
-                data-testid={`template-description-${template.id}`}
-              >
-                {template.description}
-              </p>
-            </div>
-          ))}
+                <h3
+                  className="wizard-card-title"
+                  data-testid={`template-name-${template.id}`}
+                >
+                  {template.name}
+                </h3>
+
+                <p
+                  className="wizard-card-description"
+                  data-testid={`template-description-${template.id}`}
+                >
+                  {template.description}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
 

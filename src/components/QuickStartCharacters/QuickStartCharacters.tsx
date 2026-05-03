@@ -127,10 +127,12 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (loading && archetypes.length === 0) {
     return (
-      <div>
-        <div>
-          <h2>Quick Start Characters</h2>
-          <p>Jump straight into your adventure with {world.name}</p>
+      <div className="component-quick-start-characters wizard-step-content">
+        <div className="wizard-step-header">
+          <h2 className="wizard-page-title">Quick Start Characters</h2>
+          <p className="wizard-page-subtitle">
+            Jump straight into your adventure with {world.name}
+          </p>
         </div>
         <LoadingSkeleton
           size="md"
@@ -144,9 +146,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (error) {
     return (
-      <div>
-        <div>
-          <h2>Quick Start Characters</h2>
+      <div className="component-quick-start-characters wizard-step-content">
+        <div className="wizard-step-header">
+          <h2 className="wizard-page-title">Quick Start Characters</h2>
         </div>
         <ErrorDisplay
           variant="section"
@@ -161,19 +163,25 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   }
 
   return (
-    <div>
+    <div className="component-quick-start-characters wizard-step-content">
       {/* Header */}
-      <div>
-        <h2>Quick Start Characters</h2>
-        <p>Jump straight into your adventure with {world.name}</p>
-        <p>
+      <div className="wizard-step-header">
+        <h2 className="wizard-page-title">Quick Start Characters</h2>
+        <p className="wizard-page-subtitle">
+          Jump straight into your adventure with {world.name}
+        </p>
+        <p className="wizard-page-subtitle">
           Choose from these pre-generated {getGenreLabel(world.genre)}{' '}
           archetypes or create your own
         </p>
       </div>
 
       {/* Archetype Cards */}
-      <div data-testid="archetypes-grid" data-tutorial="quickstart-archetypes">
+      <div
+        className="wizard-archetype-grid"
+        data-testid="archetypes-grid"
+        data-tutorial="quickstart-archetypes"
+      >
         {archetypes.map((archetype) => (
           <ActiveStateCard
             key={archetype.id}
@@ -183,20 +191,28 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
             testId="archetype-card"
           >
             <CardHeader>
-              <CardTitle>{archetype.name}</CardTitle>
-              <CardDescription>{archetype.description}</CardDescription>
+              <CardTitle className="wizard-archetype-card-name">
+                {archetype.name}
+              </CardTitle>
+              <CardDescription className="wizard-archetype-card-description">
+                {archetype.description}
+              </CardDescription>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="wizard-archetype-card-body">
               {/* Personality & Background */}
               <div>
-                <p>{archetype.background.personality}</p>
+                <p className="wizard-archetype-quote">
+                  {archetype.background.personality}
+                </p>
               </div>
 
               {/* Top Attributes */}
-              <div>
-                <h4>Key Attributes</h4>
-                <div>
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">
+                  Key Attributes
+                </h4>
+                <div className="wizard-badge-row">
                   {archetype.attributes
                     .sort((a, b) => (b.value || 0) - (a.value || 0))
                     .slice(0, 3)
@@ -213,9 +229,11 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               </div>
 
               {/* Top Skills */}
-              <div>
-                <h4>Best Skills</h4>
-                <div>
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">
+                  Best Skills
+                </h4>
+                <div className="wizard-badge-row">
                   {archetype.skills
                     .sort((a, b) => (b.level || 0) - (a.level || 0))
                     .slice(0, 3)
@@ -232,9 +250,11 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               </div>
 
               {/* Motivation */}
-              <div>
-                <h4>Motivation</h4>
-                <p>&ldquo;{archetype.background.motivation}&rdquo;</p>
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">Motivation</h4>
+                <p className="wizard-archetype-quote">
+                  &ldquo;{archetype.background.motivation}&rdquo;
+                </p>
               </div>
 
               {/* Select Button */}
@@ -291,7 +311,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       </div>
 
       {/* Additional Info */}
-      <div>
+      <div className="wizard-help-row">
         <p>
           <strong>Generate New Random Character:</strong> Creates a completely
           new random character for this world

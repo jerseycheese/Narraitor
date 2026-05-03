@@ -203,21 +203,21 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   };
 
   return (
-    <div data-testid="template-step">
+    <div className="component-template-step" data-testid="template-step">
       <WizardFormSection
         title="Getting Started"
         description="Choose how you'd like to create your world - use existing templates, generate automatically, or start from scratch."
       >
         {/* Mode Selection */}
         <div data-tutorial="world-type-selector">
-          <div className="template-grid">
-            <div>
-              <div>
-                <h4>Start from Scratch</h4>
-                <p>
-                  Build your world without a template and define everything as
-                  you go.
-                </p>
+          <div className="wizard-template-mode-grid">
+            <div className="wizard-panel">
+              <h4 className="wizard-card-title">Start from Scratch</h4>
+              <p className="wizard-card-description">
+                Build your world without a template and define everything as
+                you go.
+              </p>
+              <div className="wizard-card-actions">
                 <Button
                   type="button"
                   onClick={handleCreateOwnWorld}
@@ -230,40 +230,36 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
               </div>
             </div>
 
-            <div>
-              <div>
-                <span />
-                <span>or</span>
-                <span />
-              </div>
+            <div className="wizard-template-mode-divider">
+              <span />
+              <span>or</span>
+              <span />
             </div>
 
-            <div>
+            <div className="wizard-panel">
+              <h4 className="wizard-card-title">Use a Template</h4>
+              <p className="wizard-card-description">
+                Pick a curated template or generate one to jump-start your
+                world.
+              </p>
+              <div data-tutorial="generate-tab">
+                <TabNavigation
+                  options={tabOptions}
+                  activeValue={currentMode}
+                  onChange={setCurrentMode}
+                />
+              </div>
               <div>
-                <h4>Use a Template</h4>
-                <p>
-                  Pick a curated template or generate one to jump-start your
-                  world.
-                </p>
-                <div data-tutorial="generate-tab">
-                  <TabNavigation
-                    options={tabOptions}
-                    activeValue={currentMode}
-                    onChange={setCurrentMode}
+                {currentMode === 'traditional' ? (
+                  <TemplateSelector
+                    onSelect={handleSelectTemplate}
+                    selectedTemplateId={selectedTemplateId}
                   />
-                </div>
-                <div>
-                  {currentMode === 'traditional' ? (
-                    <TemplateSelector
-                      onSelect={handleSelectTemplate}
-                      selectedTemplateId={selectedTemplateId}
-                    />
-                  ) : (
-                    <SmartTemplates
-                      onTemplateGenerated={handleSmartTemplateGenerated}
-                    />
-                  )}
-                </div>
+                ) : (
+                  <SmartTemplates
+                    onTemplateGenerated={handleSmartTemplateGenerated}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -279,7 +275,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         </div>
       )}
 
-      <div>
+      <div className="wizard-button-row">
         <Button
           type="button"
           onClick={onCancel || (() => window.history.back())}
