@@ -14,6 +14,7 @@ import './globals.css';
 import './workshop.css';
 import './wizard.css';
 import './dashboard.css';
+import './badge.css';
 import '@/lib/theme/themes/ds1.css';
 import '@/lib/theme/themes/ds2.css';
 import '@/lib/theme/themes/ds3.css';

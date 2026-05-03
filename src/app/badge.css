@@ -1,0 +1,139 @@
+/* Badge — global semantic styles for src/components/ui/badge.tsx
+ *
+ * Mirrors the wizard-badge pattern in wizard.css but covers the full
+ * Badge variant set used across the app. All values use design tokens.
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  font-family: var(--font-system);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* ─── Sizes ─── */
+
+.badge-sm {
+  padding: var(--space-0_5) var(--space-1_5);
+  font-size: 0.625rem;
+}
+
+.badge-md {
+  padding: var(--space-0_5) var(--space-2);
+  font-size: 0.6875rem;
+}
+
+.badge-lg {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+}
+
+/* ─── Variants ───
+ *
+ * The `*-static` variants share styling with their interactive counterparts.
+ * Badge is a non-interactive <div>, so the distinction is intent-only —
+ * `-static` signals "label, no future hover state".
+ */
+
+.badge-default,
+.badge-default-static {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.badge-secondary,
+.badge-secondary-static {
+  background: var(--color-surface-hover);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+.badge-outline,
+.badge-outline-static {
+  background: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.badge-destructive,
+.badge-destructive-static {
+  background: hsl(var(--destructive) / 12%);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.badge-success,
+.badge-success-static {
+  background: hsl(var(--success-muted));
+  color: hsl(var(--success-text));
+  border-color: hsl(var(--success-border));
+}
+
+.badge-warning,
+.badge-warning-static {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+  border-color: var(--color-warning-border);
+}
+
+.badge-info,
+.badge-info-static {
+  background: hsl(var(--info-muted));
+  color: hsl(var(--info-text));
+  border-color: hsl(var(--info-border));
+}
+
+/* ─── Game-specific variants ─── */
+
+.badge-available {
+  background: hsl(var(--success-muted));
+  color: hsl(var(--success-text));
+  border-color: hsl(var(--success-border));
+}
+
+.badge-unavailable {
+  background: var(--color-surface-muted, var(--color-surface-hover));
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.badge-skill-requirement {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* ─── Slots ─── */
+
+.badge .badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge .badge-icon svg {
+  width: 0.75em;
+  height: 0.75em;
+}
+
+.badge .badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25em;
+  padding: 0 var(--space-1);
+  margin-left: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 0.85em;
+  font-weight: 700;
+}
