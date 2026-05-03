@@ -1,7 +1,7 @@
 // src/components/CharacterCreationWizard/steps/TemplateSelectionStep.tsx
 
 import React, { useState } from 'react';
-import { WizardFormSection } from '@/components/shared/wizard';
+import { WizardFormSection, wizardStyles } from '@/components/shared/wizard';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Button } from '@/components/ui/button';
 import { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -150,7 +150,6 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
       title="Choose a Starting Template"
       description="Select a pre-configured character template or skip to create from scratch"
     >
-      {/* Info banner */}
       <div className="wizard-info-banner">
         <p>
           These templates are tailored to your <strong>{getGenreLabel(worldConfig.genre)}</strong> world.
@@ -159,7 +158,6 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
         </p>
       </div>
 
-      {/* Template Cards Grid */}
       <div className="wizard-archetype-grid">
         {templates.map(template => (
           <ActiveStateCard
@@ -170,23 +168,19 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
             testId="template-card"
           >
             <CardHeader>
-              <CardTitle className="wizard-archetype-card-name">
+              <CardTitle className={wizardStyles.step.title}>
                 {template.name}
               </CardTitle>
-              <CardDescription className="wizard-archetype-card-description">
+              <CardDescription className={wizardStyles.step.description}>
                 {template.description}
               </CardDescription>
             </CardHeader>
 
             <CardContent className="wizard-archetype-card-body">
-              {/* Personality */}
-              <div>
-                <p className="wizard-archetype-quote">
-                  &ldquo;{template.background.personality}&rdquo;
-                </p>
-              </div>
+              <p className={`${wizardStyles.step.description} wizard-archetype-quote`}>
+                &ldquo;{template.background.personality}&rdquo;
+              </p>
 
-              {/* Top 3 Attributes */}
               {template.attributes && template.attributes.length > 0 && (
                 <div className="wizard-archetype-section">
                   <h4 className="wizard-archetype-section-heading">
@@ -208,7 +202,6 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                 </div>
               )}
 
-              {/* Top 3 Skills */}
               {template.skills && template.skills.length > 0 && (
                 <div className="wizard-archetype-section">
                   <h4 className="wizard-archetype-section-heading">
@@ -230,15 +223,13 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
                 </div>
               )}
 
-              {/* Motivation */}
               <div className="wizard-archetype-section">
                 <h4 className="wizard-archetype-section-heading">Motivation</h4>
-                <p className="wizard-archetype-quote">
+                <p className={`${wizardStyles.step.description} wizard-archetype-quote`}>
                   &ldquo;{template.background.motivation}&rdquo;
                 </p>
               </div>
 
-              {/* Select Button */}
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -253,7 +244,6 @@ export const TemplateSelectionStep: React.FC<TemplateSelectionStepProps> = ({
         ))}
       </div>
 
-      {/* Help Text */}
       <div className="wizard-help-row">
         <p>
           Selected a template? Click <strong>Next</strong> to customize it further.

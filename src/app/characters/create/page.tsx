@@ -10,6 +10,7 @@ import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
 import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
+import { wizardStyles } from '@/components/shared/wizard';
 import { CharacterArchetype } from '@/types/world.types';
 import { useTutorial } from '@/components/TutorialProvider';
 
@@ -97,10 +98,8 @@ export default function CharacterCreatePage() {
           <h1 className="wizard-page-title">Create Character</h1>
         </div>
         <div className="wizard-empty-state">
-          <div>
-            <AlertTriangle aria-hidden="true" />
-          </div>
-          <h2 className="wizard-archetype-card-name">World Required</h2>
+          <AlertTriangle aria-hidden="true" />
+          <h2 className={wizardStyles.step.title}>World Required</h2>
           <p>Characters are created within specific worlds.</p>
           <p>
             Each world defines unique attributes, skills, and rules that shape
@@ -214,7 +213,7 @@ export default function CharacterCreatePage() {
 
   return (
     <div className="component-create-character-page wizard-page">
-      <div className="wizard-step-content">
+      <div className={wizardStyles.step.content}>
         {shouldShowQuickStart ? (
           <>
             <div className="wizard-page-header">

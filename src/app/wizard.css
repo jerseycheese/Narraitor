@@ -614,8 +614,9 @@
   color: var(--color-text-muted);
 }
 
-.wizard-template-mode-divider span:first-child,
-.wizard-template-mode-divider span:last-child {
+.wizard-template-mode-divider::before,
+.wizard-template-mode-divider::after {
+  content: "";
   display: block;
   width: 1.5rem;
   height: 1px;
@@ -662,14 +663,6 @@
   margin: 0;
 }
 
-.wizard-card-description {
-  font-family: var(--font-interface);
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  margin: 0;
-}
-
 .wizard-card-actions {
   display: flex;
   align-items: center;
@@ -686,49 +679,6 @@
   justify-content: space-between;
   gap: var(--space-2);
   margin-top: var(--space-6);
-}
-
-/* ─── Radio groups (BasicInfoStep world type, etc.) ─── */
-
-.wizard-radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin: var(--space-2) 0;
-}
-
-.wizard-radio-option {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  cursor: pointer;
-  transition: border-color 120ms ease, background 120ms ease;
-}
-
-.wizard-radio-option:hover {
-  border-color: var(--color-border-strong);
-  background: var(--color-surface-hover);
-}
-
-.wizard-radio-option-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-0_5);
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.wizard-radio-option-body p {
-  font-family: var(--font-interface);
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  margin: 0;
-  line-height: 1.4;
 }
 
 /* ─── Archetype / character template grid ─── */
@@ -753,22 +703,6 @@
   padding: var(--space-4);
 }
 
-.wizard-archetype-card-name {
-  font-family: var(--font-interface);
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.wizard-archetype-card-description {
-  font-family: var(--font-interface);
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  margin: 0;
-}
-
 .wizard-archetype-section {
   display: flex;
   flex-direction: column;
@@ -786,12 +720,7 @@
 }
 
 .wizard-archetype-quote {
-  font-family: var(--font-interface);
-  font-size: 0.875rem;
   font-style: italic;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  margin: 0;
 }
 
 .wizard-badge-row {
