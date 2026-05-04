@@ -94,7 +94,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
 
   if (loading) {
     return (
-      <div role="status" aria-label="Loading world data">
+      <div className="world-editor-loading" role="status" aria-label="Loading world data">
         <div>Loading world data...</div>
       </div>
     );
@@ -102,7 +102,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
 
   if (error || !world) {
     return (
-      <div role="alert">
+      <div className="world-editor-error" role="alert">
         <div>{error || 'World not found'}</div>
         <Button onClick={() => router.push('/worlds')}>Return to Worlds</Button>
       </div>
@@ -111,6 +111,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
 
   return (
     <form
+      className="world-editor-form"
       data-testid="world-editor-root"
       onSubmit={(e) => {
         e.preventDefault();
@@ -155,7 +156,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         />
       </CollapsibleSection>
 
-      <div>
+      <div className="world-editor-actions">
         <Button
           type="button"
           variant="outline"

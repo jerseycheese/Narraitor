@@ -26,16 +26,16 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
   };
   
   return (
-    <div>
+    <div className="component-world-settings-form">
       <section>
         <h3>World Settings</h3>
-        
+
         <div>
-          <div>
+          <div className="form-group">
             <Label htmlFor="maxAttributes">
               Maximum Attributes
             </Label>
-            <p id="maxAttributes-description" >Maximum number of attributes characters can have</p>
+            <p id="maxAttributes-description">Maximum number of attributes characters can have</p>
             <Input
               id="maxAttributes"
               type="number"
@@ -45,12 +45,12 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
               aria-describedby="maxAttributes-description"
             />
           </div>
-          
-          <div>
+
+          <div className="form-group">
             <Label htmlFor="maxSkills">
               Maximum Skills
             </Label>
-            <p id="maxSkills-description" >Maximum number of skills characters can have</p>
+            <p id="maxSkills-description">Maximum number of skills characters can have</p>
             <Input
               id="maxSkills"
               type="number"
@@ -60,12 +60,12 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
               aria-describedby="maxSkills-description"
             />
           </div>
-          
-          <div>
+
+          <div className="form-group">
             <Label htmlFor="attributePointPool">
               Attribute Point Pool
             </Label>
-            <p id="attributePointPool-description" >Total points available to distribute among attributes</p>
+            <p id="attributePointPool-description">Total points available to distribute among attributes</p>
             <Input
               id="attributePointPool"
               type="number"
@@ -75,12 +75,12 @@ const WorldSettingsForm: React.FC<WorldSettingsFormProps> = ({
               aria-describedby="attributePointPool-description"
             />
           </div>
-          
-          <div>
+
+          <div className="form-group">
             <Label htmlFor="skillPointPool">
               Skill Point Pool
             </Label>
-            <p id="skillPointPool-description" >Total points available to distribute among skills</p>
+            <p id="skillPointPool-description">Total points available to distribute among skills</p>
             <Input
               id="skillPointPool"
               type="number"

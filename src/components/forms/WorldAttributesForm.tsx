@@ -131,7 +131,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   }, [attributeToDelete, getLinkedSkills]);
   
   return (
-    <section>
+    <section className="component-world-attributes-form">
       <div>
         <h3>Attributes</h3>
         <div>
