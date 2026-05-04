@@ -267,6 +267,7 @@
   font-size: 0.95rem;
   line-height: 1.2;
   color: var(--color-text-primary);
+
   /* grid items need min-width: 0 to allow text-overflow: ellipsis to work */
   min-width: 0;
   overflow: hidden;
@@ -302,6 +303,7 @@
   padding: var(--space-2) var(--space-1);
   border-top: 1px solid var(--color-border);
   background: var(--color-surface-hover);
+
   /* Pin the toolbar to the bottom of the rail when the world list overflows the viewport. */
   position: sticky;
   bottom: 0;

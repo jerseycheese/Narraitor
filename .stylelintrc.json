@@ -18,7 +18,7 @@
         "/^(red|blue|green|yellow|orange|purple|pink|brown|indigo|violet|cyan|teal|lime|emerald|sky|rose|slate|stone|neutral|zinc|fuchsia|magenta)$/i"
       ]
     },
-    "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate"],
+    "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "repeat", "minmax"],
     "declaration-property-value-no-unknown": [true, {
       "ignoreProperties": {
         "/color/": ["/^theme\\(/", "/^hsl\\(var\\(/"],
