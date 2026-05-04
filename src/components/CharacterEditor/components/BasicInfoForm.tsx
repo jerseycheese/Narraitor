@@ -22,7 +22,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
 }) => {
   return (
     <div className="component-basic-info-form">
-      <div>
+      <div className="form-group">
         <Label htmlFor="character-name">
           Character Name <span>*</span>
         </Label>
@@ -34,8 +34,8 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
           onChange={(e) => onNameChange(e.target.value)}
         />
       </div>
-      
-      <div>
+
+      <div className="form-group">
         <Label htmlFor="character-level">
           Level
         </Label>
@@ -49,8 +49,8 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
           ))}
         </Select>
       </div>
-      
-      <div>
+
+      <div className="form-group">
         <Label htmlFor="character-type">
           Character Type
         </Label>

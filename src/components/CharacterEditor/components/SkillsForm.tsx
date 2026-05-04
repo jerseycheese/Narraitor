@@ -55,12 +55,12 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
 
   return (
     <div className="component-skills-form">
-      <div>
+      <div className="skills-form-header">
         <h2>Skills</h2>
         <PointPoolDisplay pool={pool} label="Skill Points" />
       </div>
 
-      <div>
+      <div className="skills-form-list">
         {managedSkills.map((skill, index) => {
           const uniqueKey = skill.id || `skill-${index}`;
           const worldSkill = world.skills.find(ws => ws.id === skill.id);
@@ -75,33 +75,25 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
           return (
             <div
               key={uniqueKey}
-              
+              className="skills-form-row"
             >
-              <div>
+              <div className="skills-form-label-row">
                 <Label>
                 {worldSkill?.name || `Skill ${index + 1}`}
                 </Label>
                 {worldSkill?.difficulty && (
-                  <span
-                    className={`${
-                      worldSkill.difficulty === 'easy'
-                        ? ''
-                        : worldSkill.difficulty === 'medium'
-                        ? ''
-                        : ''
-                    }`}
-                  >
+                  <span className="skills-form-difficulty">
                     {worldSkill.difficulty}
                   </span>
                 )}
               </div>
               {worldSkill?.description && (
-                <p>
+                <p className="skills-form-description">
                   {worldSkill.description}
                 </p>
               )}
               {cannotIncrease && currentValue < skill.maxValue && (
-                <p>
+                <p className="skills-form-constraint">
                   No points remaining. Reduce other skills to increase this one.
                 </p>
               )}
@@ -116,7 +108,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                 showLabel={false}
                 testId={`skill-${skill.id}`}
               />
-              <div>
+              <div className="skills-form-meta">
                 Range: {skill.minValue} - {skill.maxValue}
                 {worldSkill?.attributeIds &&
                   worldSkill.attributeIds.length > 0 && (

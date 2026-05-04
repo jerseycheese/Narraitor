@@ -20,14 +20,15 @@ interface CharacterAttributeDisplayProps {
 export function CharacterAttributeDisplay({ attributes, showCategories = false }: CharacterAttributeDisplayProps) {
   if (attributes.length === 0) {
     return (
-      <div>
-        No attributes assigned to this character.
+      <div className="component-character-attribute-display">
+        <div className="character-display-empty">
+          No attributes assigned to this character.
+        </div>
       </div>
     );
   }
 
   if (showCategories) {
-    // Group attributes by category
     const categorizedAttributes = attributes.reduce((acc, attr) => {
       const category = attr.category || 'general';
       if (!acc[category]) {
@@ -38,48 +39,52 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
     }, {} as Record<string, CharacterAttribute[]>);
 
     return (
-      <div>
-        {Object.entries(categorizedAttributes).map(([category, attrs]) => (
-          <div key={category}>
-            <h3>
-              {category}
-            </h3>
-            <div>
-              {attrs.map((attr, index) => (
-                <AttributeItem key={attr.id || `attr-${category}-${index}`} attribute={attr} />
-              ))}
+      <div className="component-character-attribute-display">
+        <div className="character-attribute-categories">
+          {Object.entries(categorizedAttributes).map(([category, attrs]) => (
+            <div key={category} className="character-attribute-category">
+              <h3 className="character-attribute-category-heading">
+                {category}
+              </h3>
+              <div className="character-attribute-grid">
+                {attrs.map((attr, index) => (
+                  <AttributeItem key={attr.id || `attr-${category}-${index}`} attribute={attr} />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      {attributes.map((attr, index) => (
-        <AttributeItem key={attr.id || `attr-${index}`} attribute={attr} />
-      ))}
+    <div className="component-character-attribute-display">
+      <div className="character-attribute-grid">
+        {attributes.map((attr, index) => (
+          <AttributeItem key={attr.id || `attr-${index}`} attribute={attr} />
+        ))}
+      </div>
     </div>
   );
 }
 
 function AttributeItem({ attribute }: { attribute: CharacterAttribute }) {
   return (
-    <div>
-      <div>
+    <div className="character-attribute-card">
+      <div className="character-attribute-name">
         {attribute.name}
       </div>
-      <div>
+      <div className="character-attribute-value">
         {attribute.modifiedValue}
       </div>
       {attribute.baseValue !== attribute.modifiedValue && (
-        <div>
+        <div className="character-attribute-base">
           Base: {attribute.baseValue}
         </div>
       )}
       {attribute.description && (
-        <p>{attribute.description}</p>
+        <p className="character-attribute-description">{attribute.description}</p>
       )}
     </div>
   );

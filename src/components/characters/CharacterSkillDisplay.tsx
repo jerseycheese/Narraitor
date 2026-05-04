@@ -19,14 +19,15 @@ interface CharacterSkillDisplayProps {
 export function CharacterSkillDisplay({ skills, showCategories = false }: CharacterSkillDisplayProps) {
   if (skills.length === 0) {
     return (
-      <div>
-        No skills assigned to this character.
+      <div className="component-character-skill-display">
+        <div className="character-display-empty">
+          No skills assigned to this character.
+        </div>
       </div>
     );
   }
 
   if (showCategories) {
-    // Group skills by category
     const categorizedSkills = skills.reduce((acc, skill) => {
       const category = skill.category || 'general';
       if (!acc[category]) {
@@ -37,46 +38,50 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
     }, {} as Record<string, CharacterSkill[]>);
 
     return (
-      <div>
-        {Object.entries(categorizedSkills).map(([category, skillList]) => (
-          <div key={category}>
-            <h3>
-              {category}
-            </h3>
-            <div>
-              {skillList.map((skill, index) => (
-                <SkillItem key={skill.id || `skill-${category}-${index}`} skill={skill} />
-              ))}
+      <div className="component-character-skill-display">
+        <div className="character-skill-categories">
+          {Object.entries(categorizedSkills).map(([category, skillList]) => (
+            <div key={category} className="character-skill-category">
+              <h3 className="character-skill-category-heading">
+                {category}
+              </h3>
+              <div className="character-skill-grid">
+                {skillList.map((skill, index) => (
+                  <SkillItem key={skill.id || `skill-${category}-${index}`} skill={skill} />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      {skills.map((skill, index) => (
-        <SkillItem key={skill.id || `skill-${index}`} skill={skill} />
-      ))}
+    <div className="component-character-skill-display">
+      <div className="character-skill-grid">
+        {skills.map((skill, index) => (
+          <SkillItem key={skill.id || `skill-${index}`} skill={skill} />
+        ))}
+      </div>
     </div>
   );
 }
 
 function SkillItem({ skill }: { skill: CharacterSkill }) {
   return (
-    <div>
-      <div>
+    <div className="character-skill-card">
+      <div className="character-skill-name">
         {skill.name}
       </div>
-      <div>
+      <div className="character-skill-value">
         {skill.level}
       </div>
-      <div>
+      <div className="character-skill-level-label">
         Level
       </div>
       {skill.description && (
-        <p>{skill.description}</p>
+        <p className="character-skill-description">{skill.description}</p>
       )}
     </div>
   );

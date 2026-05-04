@@ -63,7 +63,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
   };
   
   return (
-    <section>
+    <section className="component-world-skills-form">
       <div>
         <h3>Skills</h3>
         <Button

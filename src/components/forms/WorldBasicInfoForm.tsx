@@ -15,7 +15,7 @@ interface WorldBasicInfoFormProps {
 const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange }) => {
   return (
     <div className="component-world-basic-info-form">
-      <div>
+      <div className="form-group">
         <Label htmlFor="worldName">
           Name
         </Label>
@@ -27,8 +27,8 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
           onChange={(e) => onChange({ name: e.target.value })}
         />
       </div>
-      
-      <div>
+
+      <div className="form-group">
         <Label htmlFor="worldDescription">
           Description
         </Label>
@@ -40,8 +40,8 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
           rows={4}
         />
       </div>
-      
-      <div>
+
+      <div className="form-group">
         <Label htmlFor="worldGenre">
           Genre
         </Label>
@@ -59,7 +59,7 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
       </div>
       
       {/* World Type Section */}
-      <div>
+      <div className="form-group">
         <Label htmlFor="worldType">
           World Type
         </Label>
@@ -85,7 +85,7 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
 
       {/* Reference field - only show if not original world */}
       {world.reference !== undefined && (
-        <div>
+        <div className="form-group">
           <Label htmlFor="worldReference">
             {world.relationship === 'set_within' ? 'Set Within Universe' : 'Inspired By'}
           </Label>
