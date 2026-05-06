@@ -230,19 +230,15 @@ test.describe('Game Session Visual Tests', () => {
     // Wait for components to re-render with fresh store data
     await page.waitForTimeout(2000);
 
-    // Wait for segments to appear (more lenient timeout)
-    try {
-      await page.waitForFunction(
-        () => {
-          const segments = document.querySelectorAll('.narrative-segment');
-          return segments.length >= 2;
-        },
-        { timeout: 3000 }
-      );
-      console.log('✅ Narrative segments rendered');
-    } catch (e) {
-      console.log('⚠️ Segments not fully rendered, continuing with test...');
-    }
+    // Wait for narrative segments — must render before seeding so
+    // seedInventoryItemsForVisual sees them and preserves them deterministically.
+    await page.waitForFunction(
+      () => {
+        const segments = document.querySelectorAll('.narrative-segment');
+        return segments.length >= 2;
+      },
+      { timeout: 10000 }
+    );
 
     await renderSeededSuggestedActions(page);
     await seedInventoryItemsForVisual(page);
@@ -250,11 +246,6 @@ test.describe('Game Session Visual Tests', () => {
     await expandAllCollapsibleSections(page);
 
     await page.waitForSelector('[data-testid^="choice-option-"]', {
-      state: 'visible',
-      timeout: 2000,
-    });
-
-    await page.waitForSelector('.inventory-item', {
       state: 'visible',
       timeout: 2000,
     });
