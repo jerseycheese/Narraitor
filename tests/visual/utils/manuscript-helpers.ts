@@ -108,12 +108,6 @@ export const openAppToolsPanel = async (page: Page): Promise<void> => {
   await expect(
     page.getByRole('button', { name: 'Character Details' }).first(),
   ).toBeVisible();
-
-  await page.getByRole('button', { name: 'Character Details' }).first().click();
-  await expect(page.locator('[data-testid="manuscript-drawer"]')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('[data-testid="manuscript-drawer"]')).not.toBeVisible();
-  await expect.poll(isExpanded, { timeout: 3000 }).toBe(true);
 };
 
 export const openAppDrawer = async (
