@@ -1611,7 +1611,6 @@
       const themeKey = parts[parts.length - 1];
       const state = parts[parts.length - 2];
       const viewport = parts[parts.length - 3];
-      const route = parts[0];
       const component = parts.slice(1, parts.length - 3).join('__');
       items.push({ component, viewport, state, theme: themeKey,
                    note: m.note || '', why: m.why || '', category: m.category || '' });

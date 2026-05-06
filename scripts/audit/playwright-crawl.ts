@@ -13,7 +13,7 @@
  * Output: scripts/audit/captures/comp-<branch>/<viewport>/<state>/<route>__*.png
  */
 import { chromium, type Browser, type Page } from '@playwright/test';
-import { mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
