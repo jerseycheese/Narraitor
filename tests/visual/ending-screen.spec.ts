@@ -324,9 +324,15 @@ test.describe('EndingScreen Visual Tests', () => {
     }
     await page.waitForTimeout(1000);
 
+    // Expand all collapsible sections including "Your Story"
+    await expandAllCollapsibleSections(page);
+
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
-    
+
+    // Wait for content to stabilize
+    await page.waitForTimeout(100);
+
     // Take a full-page screenshot to include the entire UI chrome
     await expect(page).toHaveScreenshot('ending-screen-hopeful.png', {
       threshold: 0.05,

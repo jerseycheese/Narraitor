@@ -222,7 +222,7 @@ export function InventoryTable({
           enabled: true,
           placeholder: 'Search items...',
         }}
-        ariaLabel={`Inventory for character ${characterId}`}
+        ariaLabel={`Inventory table for character ${characterId}`}
       />
       <DropConfirmationDialog
         isOpen={isDialogOpen}

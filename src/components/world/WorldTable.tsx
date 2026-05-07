@@ -301,7 +301,7 @@ export function WorldTable({
         placeholder: 'Search worlds...',
       }}
       rowSelection={rowSelection}
-      ariaLabel="Worlds"
+      ariaLabel="Worlds table"
       customRowRenderer={customRowRenderer}
     />
   );
