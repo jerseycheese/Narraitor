@@ -2744,6 +2744,68 @@ body.manuscript-overlay-open {
   text-underline-offset: 2px;
 }
 
+/* Base SectionError styling — applies to DS3 (default) and any unthemed render.
+   DS1 overrides at line ~2748; DS2 overrides further below.
+   Token-driven so each theme's --destructive picks up automatically. */
+.error-display-section {
+  margin: var(--space-4) 0;
+  padding: var(--space-3) var(--space-3_5);
+  background: hsl(var(--destructive) / 8%);
+  border: 1px solid hsl(var(--destructive) / 30%);
+  border-radius: var(--radius-md);
+}
+
+.error-display-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: hsl(var(--destructive));
+  margin: 0 0 var(--space-1_5);
+}
+
+.error-display-message {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: hsl(var(--destructive));
+  margin: 0 0 var(--space-2_5);
+}
+
+.error-display-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.error-display-actions .error-display-retry {
+  padding: var(--space-1_5) var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.error-display-actions .error-display-retry:hover {
+  background: hsl(var(--destructive) / 90%);
+}
+
+.error-display-actions .error-display-dismiss {
+  padding: var(--space-1_5) var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--color-surface);
+  color: hsl(var(--destructive));
+  border: 1px solid hsl(var(--destructive) / 30%);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.error-display-actions .error-display-dismiss:hover {
+  background: hsl(var(--destructive) / 6%);
+}
+
 /* Fix 56: DS1 error container */
 [data-theme="ds1"] .error-display-section {
   margin: var(--space-4) 0;
@@ -2804,6 +2866,77 @@ body.manuscript-overlay-open {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   font-family: var(--font-system);
+}
+
+/* DS2 SectionError — Warm Earth, book-style aesthetic.
+   Crimson Pro headings, Manrope buttons, no uppercase, softer radius. */
+[data-theme="ds2"] .error-display-section {
+  margin: var(--space-4) 0;
+  padding: var(--space-4) var(--space-4);
+  background: hsl(var(--destructive) / 6%);
+  border: 1px solid hsl(var(--destructive) / 25%);
+  border-radius: var(--radius-md);
+}
+
+[data-theme="ds2"] .error-display-title {
+  font-family: var(--font-narrative);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: hsl(var(--destructive));
+  margin: 0 0 var(--space-2);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+[data-theme="ds2"] .error-display-message {
+  font-family: var(--font-narrative);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: hsl(var(--destructive));
+  margin: 0 0 var(--space-3);
+}
+
+[data-theme="ds2"] .error-display-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+[data-theme="ds2"] .error-display-actions .error-display-retry {
+  font-family: var(--font-interface);
+  padding: var(--space-1_5) var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
+}
+
+[data-theme="ds2"] .error-display-actions .error-display-retry:hover {
+  background: hsl(var(--destructive) / 90%);
+}
+
+[data-theme="ds2"] .error-display-actions .error-display-dismiss {
+  font-family: var(--font-interface);
+  padding: var(--space-1_5) var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: transparent;
+  color: hsl(var(--destructive));
+  border: 1px solid hsl(var(--destructive) / 30%);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
+}
+
+[data-theme="ds2"] .error-display-actions .error-display-dismiss:hover {
+  background: hsl(var(--destructive) / 6%);
 }
 
 /* Fix 69: DS1 tools menu items — compact, transparent background */
