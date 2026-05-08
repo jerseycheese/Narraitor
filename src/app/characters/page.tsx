@@ -552,7 +552,7 @@ export default function CharactersPage() {
       )}
 
       {mounted && currentWorld && (
-        <div>
+        <div className="characters-toolbar">
           <CharacterViewToggle
             mode={viewMode}
             onModeChange={handleViewModeChange}
@@ -561,9 +561,9 @@ export default function CharactersPage() {
         </div>
       )}
 
-      <div>
+      <div className="characters-body">
         {!currentWorld || worldCharacters.length === 0 ? (
-          <div>
+          <div className="characters-empty">
             <h2>No characters in {currentWorld?.name || 'this world'} yet</h2>
             <ActionButtonGroup
               actions={[
@@ -596,7 +596,7 @@ export default function CharactersPage() {
             onDelete={handleDeleteCharacter}
           />
         ) : (
-          <div>
+          <div className="characters-grid">
             {(worldCharacters as Character[]).map((character) => (
               <CharacterCard
                 key={character.id}
