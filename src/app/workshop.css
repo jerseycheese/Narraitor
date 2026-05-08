@@ -1674,6 +1674,14 @@
   gap: var(--space-5);
 }
 
+.character-detail-header > .component-character-portrait {
+  flex: 0 0 auto;
+  width: clamp(160px, 20vw, 240px);
+  height: clamp(160px, 20vw, 240px);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-hover);
+}
+
 .character-detail-header-info {
   display: flex;
   flex: 1;
