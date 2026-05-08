@@ -1373,6 +1373,291 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* ─── Characters Page Layout ─── */
+
+.characters-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.characters-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.characters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--space-4);
+}
+
+@media (width <= 640px) {
+  .characters-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.characters-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.characters-empty h2 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ─── DS1: Drafting Table ───────────────────────────────────────
+   Tight density, sharp 2px radii, hairline uppercase eyebrow over
+   the card title, vertical accent rule under the title. Toolbar
+   sits over a hairline base rule for the architectural feel. */
+
+[data-theme="ds1"] .characters-toolbar {
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .characters-grid {
+  gap: var(--space-3);
+}
+
+[data-theme="ds1"] .component-character-card {
+  border-radius: 2px;
+}
+
+[data-theme="ds1"] .component-character-card h3 {
+  position: relative;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  padding-top: var(--space-3);
+}
+
+[data-theme="ds1"] .component-character-card h3::before {
+  content: "Character";
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .component-character-card h3::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 18px;
+  margin: var(--space-2) 0 0;
+  background: linear-gradient(to bottom, var(--color-accent), transparent);
+}
+
+[data-theme="ds1"] .characters-empty {
+  padding: var(--space-6) var(--space-5);
+  border-radius: 2px;
+  border-left: 2px solid var(--color-accent);
+}
+
+[data-theme="ds1"] .characters-empty h2 {
+  position: relative;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds1"] .characters-empty h2::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 32px;
+  margin: var(--space-3) 0 0;
+  background: linear-gradient(to bottom, var(--color-accent), transparent);
+}
+
+/* ─── DS2: Warm Earth ───────────────────────────────────────────
+   Airy spacing, soft 1rem radii, no internal divider on the card
+   footer (extra padding instead), serif normal-case headers.
+   Empty state is centered with a quiet fade-up. */
+
+[data-theme="ds2"] .characters-toolbar {
+  margin-bottom: clamp(var(--space-4), 2vw, var(--space-6));
+}
+
+[data-theme="ds2"] .characters-grid {
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+[data-theme="ds2"] .component-character-card {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .component-character-card h3 {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  font-size: 1.25rem;
+}
+
+[data-theme="ds2"] .component-character-card > div > div:first-child {
+  padding: var(--space-5);
+}
+
+[data-theme="ds2"] .component-character-card > div > div:first-child > p {
+  line-height: 1.7;
+}
+
+[data-theme="ds2"] .component-character-card footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: none;
+}
+
+[data-theme="ds2"] .characters-empty {
+  align-items: center;
+  text-align: center;
+  padding: clamp(3rem, 7vh, 5rem) var(--space-5);
+  border-radius: 1rem;
+  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+[data-theme="ds2"] .characters-empty h2 {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  font-size: clamp(1.375rem, 3vw, 1.625rem);
+}
+
+@keyframes characters-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── DS3: Mechanical Manuscript ────────────────────────────────
+   Aged-paper rhythm. Dotted divider above the grid, monospace
+   uppercase eyebrow with bullet over each card title, italic
+   serif fallback styling, dotted hairline above the card footer
+   instead of the solid border. */
+
+[data-theme="ds3"] .characters-toolbar {
+  padding-bottom: var(--space-3);
+  position: relative;
+}
+
+[data-theme="ds3"] .characters-toolbar::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.7;
+}
+
+[data-theme="ds3"] .characters-grid {
+  gap: var(--space-4);
+}
+
+[data-theme="ds3"] .component-character-card h3 {
+  position: relative;
+  padding-top: var(--space-3);
+}
+
+[data-theme="ds3"] .component-character-card h3::before {
+  content: "• Character";
+  display: block;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .component-character-card footer {
+  border-top: none;
+  position: relative;
+}
+
+[data-theme="ds3"] .component-character-card footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--space-4);
+  right: var(--space-4);
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .characters-empty {
+  align-items: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-5);
+}
+
+[data-theme="ds3"] .characters-empty h2 {
+  position: relative;
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 400;
+}
+
+[data-theme="ds3"] .characters-empty h2::after {
+  content: "";
+  display: block;
+  width: 96px;
+  height: 4px;
+  margin: var(--space-3) auto 0;
+  background-image: radial-gradient(
+    circle,
+    var(--color-accent) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="ds2"] .characters-empty {
+    animation: none;
+  }
+}
+
 /* ─── CharacterTable portrait ─── */
 
 .character-portrait-clickable {
