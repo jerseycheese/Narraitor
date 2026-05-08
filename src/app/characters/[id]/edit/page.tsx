@@ -39,10 +39,13 @@ export default function CharacterEditPage() {
 
   return (
     <PageLayout title={`Edit Character: ${character.name}`}>
-      {/* Header with back button */}
-      <BackNavigation href={`/characters/${characterId}`} label="Back to Character" />
+      <div className="character-edit-back">
+        <BackNavigation href={`/characters/${characterId}`} label="Back to Character" />
+      </div>
 
-      <CharacterEditor characterId={characterId} />
+      <div className="character-edit-body">
+        <CharacterEditor characterId={characterId} />
+      </div>
     </PageLayout>
   );
 }

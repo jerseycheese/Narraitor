@@ -239,11 +239,11 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         />
       </CollapsibleSection>
       
-      <div>
+      <div className="character-editor-actions">
         <Button variant="destructive" onClick={() => setShowDeleteDialog(true)} disabled={saving}>
           Delete Character
         </Button>
-        <div>
+        <div className="character-editor-actions-primary">
           <Button variant="outline" onClick={handleCancel} disabled={saving}>
             Cancel
           </Button>
