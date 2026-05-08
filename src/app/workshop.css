@@ -1652,14 +1652,6 @@
   opacity: 0.7;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-theme="ds2"] .characters-empty,
-  [data-theme="ds2"] .character-detail-section,
-  [data-theme="ds2"] .component-character-editor .component-collapsible-section {
-    animation: none;
-  }
-}
-
 /* ─── Character Detail Page ─── */
 
 .character-detail-body {
@@ -2315,6 +2307,17 @@
   background-size: 12px 4px;
   background-repeat: repeat-x;
   opacity: 0.6;
+}
+
+/* Reduced-motion override — placed after all DS2 fade-up rules so the
+   later same-specificity selectors don't win the cascade. */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="ds2"] .characters-empty,
+  [data-theme="ds2"] .character-detail-section,
+  [data-theme="ds2"] .component-character-editor .component-collapsible-section {
+    animation: none;
+  }
 }
 
 /* ─── CharacterTable portrait ─── */
