@@ -197,13 +197,13 @@ const WorldCard: React.FC<WorldCardProps> = ({
         )}
       </div>
 
-      <div>
+      <div className="world-card-body">
         {/* Content area that grows to fill space */}
-        <div>
+        <div className="world-card-content">
           {/* Character badges and manage link */}
-          <div>
+          <div className="world-card-meta">
             {characters.length > 0 && (
-              <div>
+              <div className="world-card-character-pills">
                 {characters.map((char) => (
                   <button
                     key={char.id}
@@ -236,11 +236,11 @@ const WorldCard: React.FC<WorldCardProps> = ({
             )}
           </div>
 
-          <div>
+          <div className="world-card-description-block">
             <p data-testid="world-card-description">{world.description}</p>
 
             {/* World type badge */}
-            <div>
+            <div className="world-card-type-badge">
               {world.reference ? (
                 <Badge
                   variant={
@@ -266,12 +266,12 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
         {/* Footer with buttons - always at bottom */}
         <footer>
-          <div>
+          <div className="world-card-footer-meta">
             <time data-testid="world-card-createdAt">
               Created: {formatDate(world.createdAt)}
             </time>
           </div>
-          <div>
+          <div className="world-card-footer-actions">
             <CardActionGroup
               primaryActions={[
                 // Add Make Active button as first primary action for inactive worlds

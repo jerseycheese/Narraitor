@@ -42,19 +42,26 @@ const WorldList: React.FC<WorldListProps> = ({
   );
   if (worlds.length === 0) {
     return (
-      <section data-testid="world-list-empty-message">
-        <div>
+      <section
+        data-testid="world-list-empty-message"
+        className="world-list-empty"
+      >
+        <div className="world-list-empty-icon">
           <Globe aria-hidden="true" />
         </div>
-        <h2>Welcome to Narraitor!</h2>
-        <p>Begin your storytelling journey by creating your first world.</p>
-        <p>
+        <h2 className="world-list-empty-title">Welcome to Narraitor!</h2>
+        <p className="world-list-empty-lede">
+          Begin your storytelling journey by creating your first world.
+        </p>
+        <p className="world-list-empty-description">
           Each world is a unique setting with its own rules, attributes, and
           possibilities.
         </p>
-        <div>
-          <p>Getting Started Guide:</p>
-          <ol>
+        <div className="world-list-empty-guide">
+          <p className="world-list-empty-guide-heading">
+            Getting Started Guide:
+          </p>
+          <ol className="world-list-empty-guide-steps">
             <li>
               <strong>Create a World</strong> - Define your setting, theme, and
               game rules
@@ -68,7 +75,7 @@ const WorldList: React.FC<WorldListProps> = ({
               experience
             </li>
           </ol>
-          <div>
+          <div className="world-list-empty-tip">
             <p>
               <strong>Tip:</strong> You can create multiple worlds and switch
               between them anytime!
@@ -87,8 +94,8 @@ const WorldList: React.FC<WorldListProps> = ({
   });
 
   return (
-    <section data-testid="world-list-container">
-      <div>
+    <section data-testid="world-list-container" className="world-list">
+      <div className="world-list-grid">
         {sortedWorlds.map((world) => (
           <WorldCard
             key={world.id}

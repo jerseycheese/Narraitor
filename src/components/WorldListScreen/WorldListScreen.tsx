@@ -165,7 +165,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
   }
 
   return (
-    <main>
+    <main className="worlds-screen">
       {viewMode === 'table' ? (
         <WorldTable
           worlds={worlds}
