@@ -76,9 +76,9 @@
         }
       },
       {
-        "files": ["src/app/workshop.css"],
+        "files": ["src/app/workshop.css", "src/app/dashboard.css"],
         "rules": {
-          "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "radial-gradient", "color-mix", "clamp", "cubic-bezier", "brightness"],
+          "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "radial-gradient", "color-mix", "clamp", "cubic-bezier", "brightness", "blur", "repeat", "minmax"],
           "function-disallowed-list": [],
           "declaration-property-value-disallowed-list": {
             "/^(background|border|color|fill|stroke|outline|text-decoration|box-shadow).*$/": [
