@@ -141,6 +141,212 @@
   }
 }
 
+/* ─── DS1: Drafting Table ───────────────────────────────────────
+   Architectural rhythm: tight padding, sharp accent rule under the
+   title, mono uppercase eyebrow caption above. Body grid carries
+   the surface; suppress the home-hero radial dots so the patterns
+   don't collide. */
+
+[data-theme="ds1"] .home-hero {
+  padding: 3rem var(--space-4) 2.5rem;
+}
+
+[data-theme="ds1"] .home-hero::before {
+  display: none;
+}
+
+[data-theme="ds1"] .home-hero::after {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--color-accent) 6%, transparent) 70%
+  );
+}
+
+[data-theme="ds1"] .home-hero-title {
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  margin-bottom: var(--space-3);
+}
+
+[data-theme="ds1"] .home-hero-title::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 48px;
+  margin: var(--space-4) auto var(--space-2);
+  background: linear-gradient(to bottom, var(--color-accent), transparent);
+}
+
+[data-theme="ds1"] .home-hero-tagline {
+  max-width: 32rem;
+  letter-spacing: 0.005em;
+}
+
+[data-theme="ds1"] .home-dashboard {
+  border-top-color: var(--color-border-strong);
+  padding-top: var(--space-5);
+}
+
+@media (width >= 768px) {
+  [data-theme="ds1"] .home-hero {
+    padding: 4rem var(--space-4) 3rem;
+  }
+
+  [data-theme="ds1"] .home-hero-title::after {
+    height: 64px;
+  }
+}
+
+/* ─── DS2: Warm Earth ───────────────────────────────────────────
+   Generous breathing room, soft fade-up, no chrome between hero
+   and dashboard — the atmosphere does the work. Body has no grid,
+   so the home-hero dot pattern carries the texture by itself. */
+
+[data-theme="ds2"] .home-hero {
+  padding: clamp(4rem, 9vh, 6rem) var(--space-4) clamp(3rem, 7vh, 5rem);
+}
+
+[data-theme="ds2"] .home-hero::before {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-text-primary) 8%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 110% 100% at 50% 0%, hsl(0deg 0% 0%) 30%, transparent 90%);
+}
+
+[data-theme="ds2"] .home-hero::after {
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 110%,
+    color-mix(in srgb, var(--color-accent) 14%, transparent),
+    transparent 70%
+  );
+}
+
+[data-theme="ds2"] .home-hero-logo {
+  margin-bottom: var(--space-6);
+  animation: home-fade-up 0.8s cubic-bezier(0.19, 1, 0.22, 1) both,
+             home-logo-float 8s ease-in-out 0.6s infinite;
+}
+
+[data-theme="ds2"] .home-hero-title {
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  font-size: clamp(3.25rem, 9vw, 4.5rem);
+  margin-bottom: var(--space-5);
+  animation: home-fade-up 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.12s both;
+}
+
+[data-theme="ds2"] .home-hero-tagline {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  max-width: 34rem;
+  animation: home-fade-up 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.24s both;
+}
+
+[data-theme="ds2"] .home-dashboard {
+  border-top: none;
+  padding-top: clamp(3rem, 7vh, 5rem);
+}
+
+@media (width >= 768px) {
+  [data-theme="ds2"] .home-hero {
+    padding: clamp(5rem, 11vh, 8rem) var(--space-4) clamp(4rem, 9vh, 6rem);
+  }
+
+  [data-theme="ds2"] .home-hero-tagline {
+    font-size: 1.1875rem;
+  }
+}
+
+/* ─── DS3: Mechanical Manuscript ────────────────────────────────
+   Aged paper + dotted rhythm. Body carries the dot grid; hero
+   gets a dotted rule under the title and a serif italic-feeling
+   tagline. Suppress the home-hero dot pattern (body covers it). */
+
+[data-theme="ds3"] .home-hero {
+  padding: 4rem var(--space-4) 3rem;
+}
+
+[data-theme="ds3"] .home-hero::before {
+  display: none;
+}
+
+[data-theme="ds3"] .home-hero::after {
+  background: radial-gradient(
+    ellipse 75% 65% at 50% 115%,
+    color-mix(in srgb, var(--color-accent) 10%, transparent),
+    transparent 75%
+  );
+}
+
+[data-theme="ds3"] .home-hero-title {
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  margin-bottom: var(--space-3);
+}
+
+[data-theme="ds3"] .home-hero-title::after {
+  content: "";
+  display: block;
+  width: 96px;
+  height: 4px;
+  margin: var(--space-4) auto var(--space-2);
+  background-image: radial-gradient(circle, var(--color-accent) 1.5px, transparent 1.5px);
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.7;
+}
+
+[data-theme="ds3"] .home-hero-tagline {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .home-dashboard {
+  border-top: none;
+  padding-top: var(--space-6);
+  position: relative;
+}
+
+[data-theme="ds3"] .home-dashboard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background-image: radial-gradient(circle, var(--color-border-strong) 1.5px, transparent 1.5px);
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+}
+
+@media (width >= 768px) {
+  [data-theme="ds3"] .home-hero {
+    padding: 5rem var(--space-4) 4rem;
+  }
+
+  [data-theme="ds3"] .home-hero-tagline {
+    font-size: 1.1875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="ds2"] .home-hero-logo,
+  [data-theme="ds2"] .home-hero-title,
+  [data-theme="ds2"] .home-hero-tagline {
+    animation: none;
+  }
+}
+
 .app-surface-workshop {
   display: flex;
   min-height: 100vh;

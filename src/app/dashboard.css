@@ -367,11 +367,179 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Worlds page — per-theme treatments
+   Per-theme treatments
    DS1 = drafting-table density (sharp, tight, hairline rules)
    DS2 = warm-earth breathing space (rounded, generous gaps)
    DS3 = mechanical-manuscript paper (medium radius, dotted rules,
          eyebrow captions in monospace)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── DS1 ─── */
+
+[data-theme="ds1"] .component-dashboard-home {
+  gap: var(--space-5);
+}
+
+[data-theme="ds1"] .component-dashboard-progress-card,
+[data-theme="ds1"] .component-dashboard-continue-card,
+[data-theme="ds1"] .component-dashboard-recent-worlds,
+[data-theme="ds1"] .component-dashboard-recent-characters,
+[data-theme="ds1"] .component-dashboard-getting-started {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-sm);
+  gap: var(--space-3);
+}
+
+[data-theme="ds1"] .component-dashboard-progress-card h2,
+[data-theme="ds1"] .component-dashboard-continue-card h2,
+[data-theme="ds1"] .component-dashboard-recent-worlds h2,
+[data-theme="ds1"] .component-dashboard-recent-characters h2,
+[data-theme="ds1"] .component-dashboard-getting-started h2 {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds1"] .dashboard-progress-stat,
+[data-theme="ds1"] .dashboard-recent-item,
+[data-theme="ds1"] .dashboard-recent-empty-state,
+[data-theme="ds1"] .dashboard-recent-empty-slot {
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="ds1"] .dashboard-progress-stat-value span {
+  font-family: var(--font-narrative);
+  font-weight: 500;
+}
+
+/* ─── DS2 ─── */
+
+[data-theme="ds2"] .component-dashboard-home {
+  gap: var(--space-8);
+  padding: var(--space-5);
+}
+
+@media (width >= 1024px) {
+  [data-theme="ds2"] .component-dashboard-home {
+    gap: clamp(2.5rem, 5vw, 4rem);
+    padding: var(--space-8);
+  }
+}
+
+[data-theme="ds2"] .component-dashboard-progress-card,
+[data-theme="ds2"] .component-dashboard-continue-card,
+[data-theme="ds2"] .component-dashboard-recent-worlds,
+[data-theme="ds2"] .component-dashboard-recent-characters,
+[data-theme="ds2"] .component-dashboard-getting-started {
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  gap: var(--space-5);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+}
+
+[data-theme="ds2"] .component-dashboard-progress-card h2,
+[data-theme="ds2"] .component-dashboard-continue-card h2,
+[data-theme="ds2"] .component-dashboard-recent-worlds h2,
+[data-theme="ds2"] .component-dashboard-recent-characters h2,
+[data-theme="ds2"] .component-dashboard-getting-started h2 {
+  font-family: var(--font-narrative);
+  font-size: 1.375rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .dashboard-progress-stat,
+[data-theme="ds2"] .dashboard-recent-item,
+[data-theme="ds2"] .dashboard-recent-empty-state,
+[data-theme="ds2"] .dashboard-recent-empty-slot {
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+[data-theme="ds2"] .dashboard-progress-stat {
+  background: var(--color-surface-hover);
+  border-color: transparent;
+}
+
+[data-theme="ds2"] .dashboard-progress-stat-value span {
+  font-family: var(--font-narrative);
+  font-size: 2rem;
+}
+
+/* ─── DS3 ─── */
+
+[data-theme="ds3"] .component-dashboard-home {
+  gap: var(--space-6);
+}
+
+[data-theme="ds3"] .component-dashboard-progress-card,
+[data-theme="ds3"] .component-dashboard-continue-card,
+[data-theme="ds3"] .component-dashboard-recent-worlds,
+[data-theme="ds3"] .component-dashboard-recent-characters,
+[data-theme="ds3"] .component-dashboard-getting-started {
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  gap: var(--space-4);
+  background: var(--color-surface);
+  backdrop-filter: blur(6px);
+}
+
+[data-theme="ds3"] .component-dashboard-progress-card h2,
+[data-theme="ds3"] .component-dashboard-continue-card h2,
+[data-theme="ds3"] .component-dashboard-recent-worlds h2,
+[data-theme="ds3"] .component-dashboard-recent-characters h2,
+[data-theme="ds3"] .component-dashboard-getting-started h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .component-dashboard-progress-card h2::before,
+[data-theme="ds3"] .component-dashboard-continue-card h2::before,
+[data-theme="ds3"] .component-dashboard-recent-worlds h2::before,
+[data-theme="ds3"] .component-dashboard-recent-characters h2::before,
+[data-theme="ds3"] .component-dashboard-getting-started h2::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+[data-theme="ds3"] .dashboard-progress-stat,
+[data-theme="ds3"] .dashboard-recent-item,
+[data-theme="ds3"] .dashboard-recent-empty-state,
+[data-theme="ds3"] .dashboard-recent-empty-slot {
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="ds3"] .dashboard-progress-stat-label,
+[data-theme="ds3"] .dashboard-recent-item span,
+[data-theme="ds3"] .dashboard-recent-item p {
+  font-family: var(--font-system);
+}
+
+[data-theme="ds3"] .dashboard-progress-stat-value span {
+  font-family: var(--font-narrative);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Worlds page — per-theme treatments
+   Mirror the dashboard pattern (DS1 sharp/tight, DS2 rounded/airy,
+   DS3 manuscript dotted) for the worlds list, world card, and
+   empty state.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── DS1 ─── */

@@ -139,6 +139,145 @@ body.manuscript-overlay-open {
   min-height: 100vh;
 }
 
+/* ─── /play route wrapper ───
+   `.play-page` wraps every render path of /src/app/play/page.tsx so per-theme
+   typography lands on PageLayout's unstyled <header>/<h1>/<p>. DS3 = base;
+   DS1 + DS2 add overrides below. */
+
+.play-page {
+  min-height: 100vh;
+  background: var(--color-canvas);
+}
+
+.play-page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-page-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.play-page-shell > div {
+  width: 100%;
+  max-width: 42rem;
+}
+
+/* Selectors below use the `> div > div > header` chain so they match only
+   PageLayout's own header (the one /play renders for the page title) and
+   not nested <header> elements that GameSession descendants render
+   (e.g. EndingScreen, ManuscriptSessionShell). */
+
+.play-page-shell > div > div > header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.play-page-shell > div > div > header h1 {
+  font-family: var(--font-interface);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+}
+
+.play-page-shell > div > div > header p {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.play-page-active > div {
+  width: 100%;
+}
+
+.play-page-active > div > div > header {
+  padding: var(--space-6) var(--space-4) var(--space-3);
+}
+
+.play-page-active > div > div > header h1 {
+  font-family: var(--font-narrative);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1);
+}
+
+.play-page-active > div > div > header p {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* DS1 — Lora serif on a paper canvas, archival ink */
+[data-theme="ds1"] .play-page-shell > div > div > header h1 {
+  font-family: var(--font-narrative);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+[data-theme="ds1"] .play-page-shell > div > div > header p {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .play-page-active > div > div > header h1 {
+  font-family: var(--font-narrative);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+[data-theme="ds1"] .play-page-active > div > div > header p {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+}
+
+/* DS2 — Crimson Pro book heading, sage-tinted muted text */
+[data-theme="ds2"] .play-page-shell > div > div > header h1 {
+  font-family: var(--font-narrative);
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+}
+
+[data-theme="ds2"] .play-page-shell > div > div > header p {
+  font-family: var(--font-interface);
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .play-page-active > div > div > header h1 {
+  font-family: var(--font-narrative);
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .play-page-active > div > div > header p {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--color-accent);
+}
+
 .manuscript-main-stage {
   display: grid;
   gap: var(--space-4);
