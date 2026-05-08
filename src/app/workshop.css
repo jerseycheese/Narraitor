@@ -1653,9 +1653,274 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="ds2"] .characters-empty {
+  [data-theme="ds2"] .characters-empty,
+  [data-theme="ds2"] .character-detail-section {
     animation: none;
   }
+}
+
+/* ─── Character Detail Page ─── */
+
+.character-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.character-detail-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.character-detail-header > .component-character-portrait {
+  flex: 0 0 auto;
+  width: clamp(160px, 20vw, 240px);
+  height: clamp(160px, 20vw, 240px);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-hover);
+}
+
+.character-detail-header-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.character-detail-header-info h2 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.character-detail-header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.character-detail-header-meta p {
+  margin: 0;
+}
+
+.character-detail-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.character-detail-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.character-detail-section h2 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-interface);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+@media (width <= 640px) {
+  .character-detail-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* DS1 — Drafting Table: tight, sharp, hairline eyebrow */
+
+[data-theme="ds1"] .character-detail-header {
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .character-detail-header-info h2 {
+  position: relative;
+  padding-top: var(--space-3);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds1"] .character-detail-header-info h2::before {
+  content: "Character";
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .character-detail-header-info h2::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 18px;
+  margin: var(--space-2) 0 0;
+  background: linear-gradient(to bottom, var(--color-accent), transparent);
+}
+
+[data-theme="ds1"] .character-detail-section {
+  border-radius: 2px;
+}
+
+[data-theme="ds1"] .character-detail-section h2 {
+  position: relative;
+  padding-top: var(--space-3);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds1"] .character-detail-section h2::before {
+  content: "Section";
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .character-detail-section h2::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 18px;
+  margin: var(--space-2) 0 var(--space-1);
+  background: linear-gradient(to bottom, var(--color-accent), transparent);
+}
+
+/* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
+
+[data-theme="ds2"] .character-detail-body {
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+[data-theme="ds2"] .character-detail-header {
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+[data-theme="ds2"] .character-detail-header-info h2 {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds2"] .character-detail-sections {
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+[data-theme="ds2"] .character-detail-section {
+  border-radius: 1rem;
+  padding: clamp(var(--space-5), 3vw, var(--space-6));
+  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+[data-theme="ds2"] .character-detail-section h2 {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  font-size: 1.375rem;
+  letter-spacing: -0.005em;
+}
+
+/* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
+
+[data-theme="ds3"] .character-detail-header {
+  position: relative;
+  padding-bottom: var(--space-4);
+}
+
+[data-theme="ds3"] .character-detail-header::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.7;
+}
+
+[data-theme="ds3"] .character-detail-header-info h2 {
+  position: relative;
+  padding-top: var(--space-3);
+}
+
+[data-theme="ds3"] .character-detail-header-info h2::before {
+  content: "• Character";
+  display: block;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .character-detail-section h2 {
+  position: relative;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 400;
+}
+
+[data-theme="ds3"] .character-detail-section h2::before {
+  content: "• Section";
+  display: block;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .character-detail-section h2::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
 }
 
 /* ─── CharacterTable portrait ─── */
