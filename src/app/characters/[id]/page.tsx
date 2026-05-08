@@ -83,7 +83,7 @@ export default function CharacterViewPage() {
     <PageLayout>
       {/* Ultra-thin world hero */}
       {world.image?.url && (
-        <div>
+        <div className="character-detail-hero">
           <Hero
             title={character.name}
             image={{
@@ -98,14 +98,14 @@ export default function CharacterViewPage() {
 
       {/* Back navigation for pages without world image */}
       {!world.image?.url && (
-        <div>
+        <div className="character-detail-back">
           <BackNavigation href="/characters" label="Back to Characters" />
         </div>
       )}
 
       <ActionButtonGroup actions={actionButtons} />
 
-      <div>
+      <div className="character-detail-body">
         <CharacterHeader character={character} world={world} />
         <CharacterDetailsDisplay character={character} world={world} />
       </div>
