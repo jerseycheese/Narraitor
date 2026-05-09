@@ -39,7 +39,10 @@ export function ToneSettingsDisplay({
   };
 
   return (
-    <section aria-labelledby="tone-settings-heading">
+    <section
+      className="world-detail-section"
+      aria-labelledby="tone-settings-heading"
+    >
       <h2 id="tone-settings-heading">Narrative tone settings</h2>
       <p>
         These settings guide how AI-generated content will be written for this

@@ -14,7 +14,10 @@ export function WorldAttributesList({ attributes }: WorldAttributesListProps) {
   }
 
   return (
-    <SectionWrapper title="Attributes that apply to characters in this world">
+    <SectionWrapper
+      className="world-detail-section"
+      title="Attributes that apply to characters in this world"
+    >
       <div>
         {attributes.map((attr, index) => (
           <div key={`${attr.id ?? attr.name ?? index}`} >
