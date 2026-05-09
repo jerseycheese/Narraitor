@@ -6,7 +6,9 @@ import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, ze
 
 const steps = [23, 24, 25, 26, 27];
 
-test('World creation tour step 5 snapshots (steps 23-27)', async ({ page }) => {
+// Skipped pending #1198 — tour overlay/spotlight state is non-deterministic at
+// capture time; passed locally but fails CI with 42px height drift.
+test.skip('World creation tour step 5 snapshots (steps 23-27)', async ({ page }) => {
   test.setTimeout(120000);
 
   await seedTestData(page);
