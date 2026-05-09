@@ -2715,7 +2715,8 @@
   [data-theme="ds2"] .character-detail-section,
   [data-theme="ds2"] .world-detail-section,
   [data-theme="ds2"] .component-character-editor .component-collapsible-section,
-  [data-theme="ds2"] .component-world-editor .component-collapsible-section {
+  [data-theme="ds2"] .component-world-editor .component-collapsible-section,
+  [data-theme="ds2"] .wizard-page .wizard-step-content {
     animation: none;
   }
 }

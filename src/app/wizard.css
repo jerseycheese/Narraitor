@@ -777,3 +777,350 @@
   color: var(--color-text-secondary);
   margin: 0;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Per-theme structural differentiation (#1167)
+
+   DS1 — Drafting Table: sharp 2px borders, hairline uppercase eyebrow,
+     2x18 vertical accent rule under section heads, accent-rule action bar.
+   DS2 — Warm Earth: 1rem soft radii, narrative serif headers, fade-up on
+     step transitions, centered/clamp action bar (reduced-motion override
+     lives in workshop.css alongside the editor canon).
+   DS3 — Mechanical Manuscript: rounded-square step badges, monospace
+     bullet eyebrow, dotted radial-gradient connectors and dividers.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── DS1 — Drafting Table ─── */
+
+[data-theme="ds1"] .wizard-page {
+  gap: var(--space-5);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-title,
+[data-theme="ds1"] .wizard-page .wizard-page-title {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-progress-circle {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-progress-connector {
+  height: 1px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-progress-connector-active {
+  background: var(--color-accent);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-progress-label {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-step-content > div > .wizard-step-title,
+[data-theme="ds1"] .wizard-page .wizard-step-header .wizard-step-title,
+[data-theme="ds1"] .wizard-page .wizard-step-title {
+  position: relative;
+  padding-top: var(--space-3);
+  font-family: var(--font-interface);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-step-title::before {
+  content: "Step";
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-step-title::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 18px;
+  margin: var(--space-2) 0 0;
+  background: linear-gradient(to bottom, var(--color-accent), transparent);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-form-section {
+  gap: var(--space-3);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-subheading {
+  font-family: var(--font-system);
+  letter-spacing: 0.12em;
+}
+
+[data-theme="ds1"] .wizard-page .form-input,
+[data-theme="ds1"] .wizard-page .form-textarea,
+[data-theme="ds1"] .wizard-page .form-select {
+  border-radius: 2px;
+  border-width: 2px;
+  font-family: var(--font-interface);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-card,
+[data-theme="ds1"] .wizard-page .wizard-panel {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-nav-container {
+  border-top-width: 2px;
+  border-left: 2px solid var(--color-accent);
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-nav-primary,
+[data-theme="ds1"] .wizard-page .wizard-nav-secondary {
+  border-radius: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-nav-secondary {
+  border-width: 2px;
+}
+
+/* ─── DS2 — Warm Earth ─── */
+
+[data-theme="ds2"] .wizard-page {
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+[data-theme="ds2"] .wizard-page .wizard-title,
+[data-theme="ds2"] .wizard-page .wizard-page-title {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-progress-circle {
+  border-radius: var(--radius-full);
+  font-family: var(--font-narrative);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-progress-label {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-step-content {
+  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-step-title {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  font-size: 1.5rem;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-step-description {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-form-section {
+  gap: clamp(var(--space-3), 2vw, var(--space-5));
+}
+
+[data-theme="ds2"] .wizard-page .wizard-subheading {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 0.9375rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .wizard-page .form-input,
+[data-theme="ds2"] .wizard-page .form-textarea,
+[data-theme="ds2"] .wizard-page .form-select {
+  border-radius: 1rem;
+  padding: var(--space-2_5) var(--space-3_5);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-card,
+[data-theme="ds2"] .wizard-page .wizard-panel {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-nav-container {
+  border-top: none;
+  justify-content: center;
+  gap: clamp(var(--space-3), 2vw, var(--space-5));
+  padding: clamp(var(--space-4), 2vw, var(--space-5)) 0 0;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-nav-primary,
+[data-theme="ds2"] .wizard-page .wizard-nav-secondary {
+  border-radius: var(--radius-full);
+  padding: var(--space-2_5) var(--space-5);
+}
+
+/* ─── DS3 — Mechanical Manuscript ─── */
+
+[data-theme="ds3"] .wizard-page .wizard-title,
+[data-theme="ds3"] .wizard-page .wizard-page-title {
+  font-family: var(--font-interface);
+  font-style: italic;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-progress-circle {
+  border-radius: 3px;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-progress-connector {
+  height: 4px;
+  background: transparent;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-progress-connector-active {
+  background: transparent;
+  background-image: radial-gradient(
+    circle,
+    var(--color-accent) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 1;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-progress-label {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-progress-label::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-step-title {
+  position: relative;
+  padding-top: var(--space-3);
+  font-family: var(--font-interface);
+  font-style: italic;
+  font-weight: 500;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-step-title::before {
+  content: "• Step";
+  display: block;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-style: normal;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-form-section {
+  position: relative;
+  padding-top: var(--space-4);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-form-section + .wizard-form-section::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-subheading {
+  font-family: var(--font-system);
+  letter-spacing: 0.1em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-subheading::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .wizard-page .form-input,
+[data-theme="ds3"] .wizard-page .form-textarea,
+[data-theme="ds3"] .wizard-page .form-select {
+  border-radius: 4px;
+  font-family: var(--font-interface);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-card,
+[data-theme="ds3"] .wizard-page .wizard-panel {
+  border-radius: 4px;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-nav-container {
+  position: relative;
+  border-top: none;
+  padding-top: var(--space-5);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-nav-container::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-nav-primary,
+[data-theme="ds3"] .wizard-page .wizard-nav-secondary {
+  border-radius: 4px;
+}
