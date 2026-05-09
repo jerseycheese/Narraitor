@@ -1124,3 +1124,13 @@
 [data-theme="ds3"] .wizard-page .wizard-nav-secondary {
   border-radius: 4px;
 }
+
+/* Reduced-motion override — colocated with the DS2 animation rule above so
+   it wins the cascade. workshop.css's reduced-motion block can't reach this
+   because wizard.css imports after workshop.css in src/app/layout.tsx. */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="ds2"] .wizard-page .wizard-step-content {
+    animation: none;
+  }
+}
