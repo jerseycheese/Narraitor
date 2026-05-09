@@ -111,7 +111,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
 
   return (
     <form
-      className="world-editor-form"
+      className="component-world-editor world-editor-form"
       data-testid="world-editor-root"
       onSubmit={(e) => {
         e.preventDefault();
