@@ -894,6 +894,77 @@
   border-width: 2px;
 }
 
+/* DS1 step content — card titles read as eyebrows, accent rule under
+   action rows, sharp 2px chips and panels for badges/toggles/banners. */
+
+[data-theme="ds1"] .wizard-page .wizard-card-title {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-card-actions {
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 2px solid var(--color-border);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-template-mode-divider {
+  font-family: var(--font-system);
+  letter-spacing: 0.12em;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-template-mode-divider::before,
+[data-theme="ds1"] .wizard-page .wizard-template-mode-divider::after {
+  height: 2px;
+  background: var(--color-border-strong);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-archetype-section {
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--color-accent);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-archetype-section-heading {
+  font-family: var(--font-system);
+  letter-spacing: 0.12em;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-badge {
+  border-radius: 2px;
+  border: 2px solid var(--color-border-strong);
+  font-family: var(--font-system);
+  letter-spacing: 0.12em;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-toggle {
+  border-radius: 2px;
+  border-width: 2px;
+  font-family: var(--font-system);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-info-banner {
+  border-radius: 2px;
+  border-width: 2px;
+  border-left-width: 4px;
+  border-left-color: var(--color-accent);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-empty-state {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-help-row {
+  padding-top: var(--space-3);
+  border-top: 2px solid var(--color-border);
+}
+
 /* ─── DS2 — Warm Earth ─── */
 
 [data-theme="ds2"] .wizard-page {
@@ -977,6 +1048,85 @@
 [data-theme="ds2"] .wizard-page .wizard-nav-secondary {
   border-radius: var(--radius-full);
   padding: var(--space-2_5) var(--space-5);
+}
+
+/* DS2 step content — narrative serif voice on card titles, soft pill chips
+   for badges/toggles, generous radius on banners, no hard rules. */
+
+[data-theme="ds2"] .wizard-page .wizard-card-title {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--color-text-primary);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-card-actions {
+  margin-top: var(--space-3);
+  gap: var(--space-3);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-template-mode-divider {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 0.9375rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-template-mode-divider::before,
+[data-theme="ds2"] .wizard-page .wizard-template-mode-divider::after {
+  width: 2.5rem;
+  background: var(--color-border);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-archetype-section-heading {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-archetype-quote {
+  font-family: var(--font-narrative);
+  font-size: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-badge {
+  border-radius: var(--radius-full);
+  font-family: var(--font-interface);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-toggle {
+  border-radius: var(--radius-full);
+  font-family: var(--font-interface);
+  text-transform: none;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-info-banner {
+  border-radius: 1rem;
+  background: var(--color-accent-soft);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-empty-state {
+  border-radius: 1rem;
+  font-family: var(--font-narrative);
+  font-style: italic;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-help-row p {
+  font-family: var(--font-narrative);
+  font-style: italic;
 }
 
 /* ─── DS3 — Mechanical Manuscript ─── */
@@ -1123,6 +1273,114 @@
 [data-theme="ds3"] .wizard-page .wizard-nav-primary,
 [data-theme="ds3"] .wizard-page .wizard-nav-secondary {
   border-radius: 4px;
+}
+
+/* DS3 step content — monospace card titles, dotted divider/action-row
+   accents reusing the canon connector pattern, rounded-square chips. */
+
+[data-theme="ds3"] .wizard-page .wizard-card-title {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-card-actions {
+  position: relative;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-card-actions::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 8px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-template-mode-divider {
+  font-family: var(--font-system);
+  letter-spacing: 0.1em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-template-mode-divider::before,
+[data-theme="ds3"] .wizard-page .wizard-template-mode-divider::after {
+  width: 2.5rem;
+  height: 4px;
+  background: transparent;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 8px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-archetype-section-heading {
+  font-family: var(--font-system);
+  letter-spacing: 0.1em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-archetype-section-heading::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-badge {
+  border-radius: 3px;
+  font-family: var(--font-system);
+  letter-spacing: 0.05em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-toggle {
+  border-radius: 4px;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-info-banner {
+  border-radius: 4px;
+  border-style: dashed;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-empty-state {
+  border-radius: 4px;
+  font-family: var(--font-system);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-help-row {
+  position: relative;
+  padding-top: var(--space-4);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-help-row::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.5;
 }
 
 /* Reduced-motion override — colocated with the DS2 animation rule above so
