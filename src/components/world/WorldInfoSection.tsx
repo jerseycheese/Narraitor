@@ -11,7 +11,10 @@ interface WorldInfoSectionProps {
 
 export function WorldInfoSection({ world }: WorldInfoSectionProps) {
   return (
-    <section aria-labelledby="world-details-heading">
+    <section
+      className="world-detail-section"
+      aria-labelledby="world-details-heading"
+    >
       <h2 id="world-details-heading">World details</h2>
       <div>
         <DataField

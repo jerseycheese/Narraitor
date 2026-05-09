@@ -100,7 +100,7 @@ export default function WorldViewPage() {
   return (
     <PageLayout>
       {/* Hero section with image or themed background */}
-      <div>
+      <div className="world-detail-hero">
         <Hero
           title={world.name}
           image={world.image?.url ? {
@@ -114,7 +114,7 @@ export default function WorldViewPage() {
 
       <ActionButtonGroup actions={actionButtons} />
 
-      <section aria-label="World details">
+      <section className="world-detail-body" aria-label="World details">
         <WorldDetailsDisplay world={world} />
       </section>
     </PageLayout>

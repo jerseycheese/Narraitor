@@ -10,7 +10,10 @@ interface WorldSettingsDisplayProps {
 
 export function WorldSettingsDisplay({ settings }: WorldSettingsDisplayProps) {
   return (
-    <section aria-labelledby="settings-heading">
+    <section
+      className="world-detail-section"
+      aria-labelledby="settings-heading"
+    >
       <h2 id="settings-heading">Character creation rules for this world</h2>
       <div>
         <DataField

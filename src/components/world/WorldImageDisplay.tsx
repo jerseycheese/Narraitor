@@ -24,7 +24,10 @@ export function WorldImageDisplay({ image }: WorldImageDisplayProps) {
   }
 
   return (
-    <section aria-labelledby="image-details-heading">
+    <section
+      className="world-detail-section"
+      aria-labelledby="image-details-heading"
+    >
       <h2 id="image-details-heading">World image details</h2>
 
       <div>

@@ -50,9 +50,12 @@ export function WorldDetailsDisplay({
   }, [npcIds, npcsById]);
 
   return (
-    <>
+    <div className="world-detail-sections">
       {showDescription && (
-        <section aria-labelledby="world-description-heading">
+        <section
+          className="world-detail-section"
+          aria-labelledby="world-description-heading"
+        >
           <h2 id="world-description-heading">About this world</h2>
           <div>
             <p>{world.description}</p>
@@ -61,7 +64,10 @@ export function WorldDetailsDisplay({
       )}
 
       {worldNpcs.length > 0 && (
-        <section aria-labelledby="world-npcs-heading">
+        <section
+          className="world-detail-section"
+          aria-labelledby="world-npcs-heading"
+        >
           <h2 id="world-npcs-heading">Characters you may meet</h2>
           <p>
             These NPCs were generated alongside <span>{world.name}</span> and
@@ -102,6 +108,6 @@ export function WorldDetailsDisplay({
       )}
       {showImageDetails && <WorldImageDisplay image={world.image} />}
       {showInfo && <WorldInfoSection world={world} />}
-    </>
+    </div>
   );
 }

@@ -15,7 +15,10 @@ export function WorldSkillsList({ skills, attributes }: WorldSkillsListProps) {
   }
 
   return (
-    <SectionWrapper title="Skills that characters can learn in this world">
+    <SectionWrapper
+      className="world-detail-section"
+      title="Skills that characters can learn in this world"
+    >
       <div>
         {skills.map((skill, index) => (
           <div key={`${skill.id ?? skill.name ?? index}`} >
