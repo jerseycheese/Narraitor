@@ -73,18 +73,18 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
   const isLoading = isExporting || isImporting;
 
   return (
-    <div className={`${className}`}>
-      <div>
+    <div className={`settings-export-import ${className}`.trim()}>
+      <div className="settings-export-import-actions">
         <Button
           onClick={handleExport}
           disabled={isLoading}
           variant="outline"
-          
+
         >
           {isExporting ? 'Exporting...' : 'Export Game Data'}
         </Button>
 
-        <div>
+        <div className="settings-export-import-files">
           <label htmlFor="import-file" >
             Import Game Data
           </label>
@@ -95,14 +95,14 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
             accept=".json"
             onChange={handleFileChange}
             disabled={isLoading}
-            
+
             aria-label="Import game data from file"
           />
           <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading}
             variant="outline"
-            
+
           >
             {isImporting ? 'Importing...' : 'Import Game Data'}
           </Button>
@@ -119,7 +119,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
         />
       )}
 
-      <div>
+      <div className="settings-export-import-help">
         <p>
           <strong>Export:</strong> Creates a backup file of your complete game state including worlds, characters, and progress.
         </p>

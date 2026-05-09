@@ -30,10 +30,10 @@ export default function SettingsPage() {
       description="Manage your application settings and backup your game data. Export creates a downloadable backup file, and import restores your data from a previously exported file."
     >
       {/* Data Management Section */}
-      <div>
-        <section>
+      <div className="settings-page">
+        <section className="settings-section">
           <h2>Data Management</h2>
-          <Card>
+          <Card className="settings-card">
             <CardHeader>
               <CardTitle>Backup & Restore</CardTitle>
               <CardDescription>
