@@ -300,16 +300,20 @@ export function EndingScreen() {
         Story Complete: {currentEnding.tone} ending
       </div>
 
-      <div data-testid="ending-screen">
+      <div className="component-ending-screen" data-testid="ending-screen">
         {/* Hero Section: Combined Header with Image */}
-        <section aria-label="Story ending">
+        <section
+          className="component-ending-screen-hero"
+          aria-label="Story ending"
+        >
           {isGeneratingImage ? (
             <div
+              className="component-ending-screen-hero-loading"
               role="img"
               aria-live="polite"
               aria-label="Loading ending image"
             >
-              <div>
+              <div className="component-ending-screen-hero-loading-body">
                 <LoadingState message="Loading ending image..." />
                 <p>
                   Preparing a visual representation of your story&apos;s
@@ -318,26 +322,31 @@ export function EndingScreen() {
               </div>
             </div>
           ) : endingImage ? (
-            <div>
+            <div className="component-ending-screen-hero-frame">
               <Image
+                className="component-ending-screen-hero-image"
                 src={endingImage}
                 alt={`${currentEnding.tone} ending for ${character?.name || 'the hero'}'s story`}
                 width={1280}
                 height={720}
                 priority
               />
-              <div>
-                <header>
-                  <h1>The End</h1>
-                  <p>
+              <div className="component-ending-screen-hero-overlay">
+                <header className="component-ending-screen-hero-header">
+                  <h1 className="component-ending-screen-hero-title">
+                    The End
+                  </h1>
+                  <p className="component-ending-screen-hero-meta">
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
               </div>
             </div>
           ) : imageError ? (
-            <div className={`ending-${currentEnding.tone}`}>
-              <div>
+            <div
+              className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
+            >
+              <div className="component-ending-screen-hero-error">
                 <p>Unable to load ending image</p>
                 <Button
                   onClick={generateEndingImage}
@@ -348,24 +357,30 @@ export function EndingScreen() {
                   Try Again
                 </Button>
               </div>
-              <div>
-                <header>
-                  <h2>The End</h2>
-                  <p>
+              <div className="component-ending-screen-hero-overlay">
+                <header className="component-ending-screen-hero-header">
+                  <h2 className="component-ending-screen-hero-title">
+                    The End
+                  </h2>
+                  <p className="component-ending-screen-hero-meta">
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
               </div>
             </div>
           ) : (
-            <div className={`ending-${currentEnding.tone}`}>
-              <div>
+            <div
+              className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
+            >
+              <div className="component-ending-screen-hero-placeholder">
                 <p>Ending image</p>
               </div>
-              <div>
-                <header>
-                  <h2>The End</h2>
-                  <p>
+              <div className="component-ending-screen-hero-overlay">
+                <header className="component-ending-screen-hero-header">
+                  <h2 className="component-ending-screen-hero-title">
+                    The End
+                  </h2>
+                  <p className="component-ending-screen-hero-meta">
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
                 </header>
@@ -374,7 +389,7 @@ export function EndingScreen() {
           )}
         </section>
 
-        <div>
+        <div className="component-ending-screen-content">
           {/* Epilogue */}
           <section>
             <SectionWrapper title="Epilogue">
@@ -399,7 +414,10 @@ export function EndingScreen() {
               currentEnding.achievements.length > 0 && (
                 <section aria-label="Story achievements">
                   <SectionWrapper title="Achievements">
-                    <ul role="list">
+                    <ul
+                      className="component-ending-screen-achievements"
+                      role="list"
+                    >
                       {currentEnding.achievements.map((achievement, index) => {
                         // Split achievement into title and description
                         const colonIndex = achievement.indexOf(':');
@@ -413,10 +431,19 @@ export function EndingScreen() {
                             : '';
 
                         return (
-                          <li key={index}>
-                            <div>
-                              <span>{title}</span>
-                              {description && <span>{description}</span>}
+                          <li
+                            key={index}
+                            className="component-ending-screen-achievement"
+                          >
+                            <div className="component-ending-screen-achievement-body">
+                              <span className="component-ending-screen-achievement-title">
+                                {title}
+                              </span>
+                              {description && (
+                                <span className="component-ending-screen-achievement-description">
+                                  {description}
+                                </span>
+                              )}
                             </div>
                           </li>
                         );

@@ -3347,7 +3347,11 @@
   min-height: 10rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-accent) 10%, var(--color-surface)) 0%,
+    var(--color-surface) 70%
+  );
   isolation: isolate;
 }
 
@@ -3364,17 +3368,32 @@
   z-index: 0;
 }
 
-.component-hero-overlay {
-  position: relative;
+/* Top feather — pseudo-element softens the join between image and the solid
+   overlay bar below. Sits above the image but below the overlay content. */
+
+.component-hero:has(.component-hero-image)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6rem;
   z-index: 1;
-  margin-top: auto;
-  padding: var(--space-5) var(--space-6);
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--color-canvas) 92%, transparent) 0%,
-    color-mix(in oklab, var(--color-canvas) 60%, transparent) 60%,
+    var(--color-surface) 0%,
+    color-mix(in oklab, var(--color-surface) 60%, transparent) 60%,
     transparent 100%
   );
+  pointer-events: none;
+}
+
+.component-hero-overlay {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface);
 }
 
 .component-hero:not(:has(.component-hero-image)) .component-hero-overlay {
@@ -3452,7 +3471,7 @@
 
 [data-theme="ds2"] .component-hero-overlay {
   padding: clamp(var(--space-4), 2vw, var(--space-6))
-    clamp(var(--space-5), 3vw, var(--space-7));
+    clamp(var(--space-5), 3vw, var(--space-6));
 }
 
 [data-theme="ds2"] .component-hero-title {
@@ -3516,6 +3535,300 @@
   [data-theme="ds2"] .component-hero {
     animation: none;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SectionWrapper (shared component)
+   Bare divs since #1051 Tailwind cleanup — adds card chrome that
+   consumers (EndingScreen, etc.) rely on for visual structure.
+   ═══════════════════════════════════════════════════════════════ */
+
+.component-section-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.component-section-wrapper-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-section-wrapper-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-family: var(--font-interface);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+[data-theme="ds1"] .component-section-wrapper {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .component-section-wrapper-title {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds2"] .component-section-wrapper {
+  border-radius: 1rem;
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
+}
+
+[data-theme="ds2"] .component-section-wrapper-title {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.25rem;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds3"] .component-section-wrapper {
+  border-color: var(--color-border-strong);
+}
+
+[data-theme="ds3"] .component-section-wrapper-title {
+  position: relative;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds3"] .component-section-wrapper-title::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EndingScreen — story conclusion page.
+   Same #1051 bare-divs damage as Hero/SectionWrapper before this
+   commit; identifying classes added in EndingScreen.tsx so the page
+   reads as styled across DS1/DS2/DS3.
+   ═══════════════════════════════════════════════════════════════ */
+
+.component-ending-screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-5);
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.component-ending-screen-hero {
+  position: relative;
+}
+
+.component-ending-screen-hero-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: clamp(14rem, 32vw, 22rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-accent) 15%, var(--color-surface)) 0%,
+    var(--color-surface) 70%
+  );
+  isolation: isolate;
+}
+
+.component-ending-screen-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.component-ending-screen-hero-frame:has(.component-ending-screen-hero-image)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6rem;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    var(--color-surface) 0%,
+    color-mix(in oklab, var(--color-surface) 60%, transparent) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.component-ending-screen-hero-overlay {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface);
+}
+
+.component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image))
+  .component-ending-screen-hero-overlay {
+  background: transparent;
+}
+
+.component-ending-screen-hero-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.component-ending-screen-hero-title {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+}
+
+.component-ending-screen-hero-meta {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.component-ending-screen-hero-placeholder,
+.component-ending-screen-hero-loading,
+.component-ending-screen-hero-error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  font-family: var(--font-interface);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.component-ending-screen-hero-loading-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.component-ending-screen-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.component-ending-screen-achievements {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-ending-screen-achievement {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+}
+
+.component-ending-screen-achievement-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.component-ending-screen-achievement-title {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-ending-screen-achievement-description {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds1"] .component-ending-screen-hero-frame {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .component-ending-screen-hero-title {
+  font-family: var(--font-interface);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds1"] .component-ending-screen-hero-meta {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .component-ending-screen-achievement {
+  border-radius: 2px;
+  border-width: 2px;
+  border-left: 4px solid var(--color-accent);
+}
+
+[data-theme="ds2"] .component-ending-screen-hero-frame {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .component-ending-screen-hero-meta {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1.0625rem;
+}
+
+[data-theme="ds2"] .component-ending-screen-achievement {
+  border-radius: 1rem;
+}
+
+[data-theme="ds3"] .component-ending-screen-hero-frame {
+  border-color: var(--color-border-strong);
+}
+
+[data-theme="ds3"] .component-ending-screen-hero-title {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 500;
+}
+
+[data-theme="ds3"] .component-ending-screen-hero-meta {
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .component-ending-screen-achievement {
+  border-color: var(--color-border-strong);
 }
 
 /* ═══════════════════════════════════════════════════════════════

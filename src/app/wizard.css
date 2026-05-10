@@ -1395,12 +1395,21 @@
 
 /* ----------------------------------------------------------------------------
  * GuidedFirstTimeExperience — first-run wizard on the home empty state.
- * Renders inside WizardContainer so it inherits .component-wizard-container,
- * .wizard-header, and .wizard-title chrome from the wizard surface above. The
- * rules here only handle the GFTE-specific surfaces (step body, nav row, skip
- * link, error banner) so they read as on-theme without introducing a new
- * surface concept. (#1199)
+ * Renders inside WizardContainer with a `component-guided-first-time` class
+ * on the container so per-theme rules can hook the title + step body without
+ * touching the rest of the wizard surface. (#1199)
  * -------------------------------------------------------------------------- */
+
+.component-guided-first-time {
+  padding: var(--space-6) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.component-guided-first-time .wizard-title {
+  font-size: 1.625rem;
+}
 
 .component-guided-first-time-wrapper {
   display: flex;
@@ -1409,6 +1418,107 @@
 }
 
 .component-guided-first-time-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Welcome step: the three "Build / Create / Play" cards */
+
+.component-guided-first-time-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.component-guided-first-time-welcome-lede {
+  font-family: var(--font-interface);
+  color: var(--color-text-secondary);
+}
+
+.component-guided-first-time-welcome-lede p {
+  margin: 0;
+}
+
+.component-guided-first-time-steps-list {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1fr;
+}
+
+@media (width >= 720px) {
+  .component-guided-first-time-steps-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.component-guided-first-time-step-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+}
+
+.component-guided-first-time-step-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-accent);
+}
+
+.component-guided-first-time-step-num {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.component-guided-first-time-step-heading {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-guided-first-time-step-copy {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Concept + Details steps share a header chrome */
+
+.component-guided-first-time-step-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.component-guided-first-time-step-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-guided-first-time-step-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+.component-guided-first-time-concept,
+.component-guided-first-time-details {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -1446,6 +1556,45 @@
 
 /* DS1 — sharp chrome, monospace eyebrow above the action row, accent rule on
    the nav top edge to echo .wizard-nav-container at line 882. */
+
+[data-theme="ds1"] .component-guided-first-time {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .component-guided-first-time .wizard-title {
+  font-family: var(--font-interface);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds1"] .component-guided-first-time-step-item {
+  border-radius: 2px;
+  border-width: 2px;
+  border-left: 4px solid var(--color-accent);
+}
+
+[data-theme="ds1"] .component-guided-first-time-step-heading {
+  font-family: var(--font-interface);
+  font-weight: 500;
+}
+
+[data-theme="ds1"] .component-guided-first-time-step-title {
+  position: relative;
+  padding-top: var(--space-3);
+}
+
+[data-theme="ds1"] .component-guided-first-time-step-title::before {
+  content: "Step";
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
 
 [data-theme="ds1"] .component-guided-first-time-wrapper {
   gap: var(--space-4);
@@ -1489,6 +1638,54 @@
    link, soft generous radius on the error banner. Step content fades up to
    echo the wizard step transition at line 997. */
 
+[data-theme="ds2"] .component-guided-first-time {
+  border-radius: 1rem;
+  padding: clamp(var(--space-5), 3vw, var(--space-6))
+    clamp(var(--space-5), 3vw, var(--space-6));
+}
+
+[data-theme="ds2"] .component-guided-first-time .wizard-title {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .component-guided-first-time-step-item {
+  border-radius: 1rem;
+  padding: clamp(var(--space-4), 2vw, var(--space-5));
+  background: color-mix(in oklab, var(--color-surface) 70%, transparent);
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--color-accent) 8%, transparent);
+}
+
+[data-theme="ds2"] .component-guided-first-time-step-heading {
+  font-family: var(--font-narrative);
+  font-weight: 500;
+  font-size: 1.125rem;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .component-guided-first-time-step-num {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .component-guided-first-time-step-title {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  font-size: 1.5rem;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .component-guided-first-time-step-description {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1rem;
+}
+
 [data-theme="ds2"] .component-guided-first-time-wrapper {
   gap: clamp(var(--space-4), 2vw, var(--space-6));
 }
@@ -1522,6 +1719,46 @@
 /* DS3 — dotted radial-gradient divider above the nav row, mirroring the
    .wizard-progress-connector pattern at line 1147. Monospace voice on the
    skip link with a dot bullet to match wizard-progress-label at line 1178. */
+
+[data-theme="ds3"] .component-guided-first-time {
+  border-radius: var(--radius-md);
+  border-color: var(--color-border-strong);
+}
+
+[data-theme="ds3"] .component-guided-first-time .wizard-title {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 500;
+}
+
+[data-theme="ds3"] .component-guided-first-time-step-item {
+  border-radius: var(--radius-md);
+  border-color: var(--color-border-strong);
+}
+
+[data-theme="ds3"] .component-guided-first-time-step-num {
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds3"] .component-guided-first-time-step-num::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .component-guided-first-time-step-heading {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 500;
+}
+
+[data-theme="ds3"] .component-guided-first-time-step-title {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 500;
+}
 
 [data-theme="ds3"] .component-guided-first-time-nav {
   border-top: none;
