@@ -123,7 +123,7 @@ describe('DashboardContinueCard', () => {
     expect(screen.getAllByText('Aragorn').length).toBeGreaterThan(0);
   });
 
-  it('shows relative timestamp for last played', () => {
+  it('shows timestamp for last played', () => {
     render(
       <DashboardContinueCard
         session={mockSession}

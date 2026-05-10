@@ -20,7 +20,7 @@ const meta: Meta<typeof RangeSlider> = {
   },
   decorators: [
     (Story) => (
-      <div className="p-6 max-w-md mx-auto bg-white rounded shadow">
+      <div>
         <Story />
       </div>
     ),
@@ -70,10 +70,10 @@ export const CustomValueFormatter: Story = {
 export const AllLevels: Story = {
   render: (args) => {
     return (
-      <div className="space-y-6">
+      <div>
         {skillLevelDescriptions.map((level) => (
           <div key={level.value}>
-            <h3 className="text-sm font-medium mb-2">{level.label} (Level {level.value})</h3>
+            <h3>{level.label} (Level {level.value})</h3>
             <RangeSlider
               {...args}
               value={level.value}

@@ -127,7 +127,7 @@ export function DashboardHome() {
   }
 
   return (
-    <main className="component-dashboard-home grid grid-cols-1 gap-6">
+    <main className="component-dashboard-home">
       {/* Continue Card - Only for active session users */}
       {dashboardState === 'active-session' && mostRecentSession && (
         <DashboardContinueCard

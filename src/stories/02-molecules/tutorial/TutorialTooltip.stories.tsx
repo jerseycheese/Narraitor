@@ -27,7 +27,7 @@ const meta: Meta<typeof TutorialTooltip> = {
           setCurrentWizardStep: () => {},
         }}
       >
-        <div className="p-10 max-w-md">
+        <div>
           <Story />
         </div>
       </TutorialContext.Provider>
@@ -77,7 +77,7 @@ const TutorialTooltipJoyrideStory = ({
   const steps = React.useMemo(() => buildSteps(step, stepsCount), [step, stepsCount]);
 
   return (
-    <div className="space-y-6">
+    <div>
       <div>
         <Button id="tutorial-target" variant="secondary" size="sm">
           Tooltip Target

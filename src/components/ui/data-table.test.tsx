@@ -34,7 +34,7 @@ const mockColumns: ColumnDef<TestData>[] = [
 ];
 
 describe('DataTable', () => {
-  it('renders table with data', () => {
+  it('renders with data', () => {
     render(<DataTable columns={mockColumns} data={mockData} />);
 
     expect(screen.getByRole('table')).toBeTruthy();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { wizardStyles, cn } from './styles/wizardStyles';
+import { wizardStyles, cssClasses } from './styles/wizardStyles';
 
 interface WizardStep {
   id: string;
@@ -18,15 +18,26 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`relative mb-8 ${className}`}>
-      {/* Steps and connectors */}
-      <div className="relative flex items-center">
+    <div
+      className={cssClasses(
+        'component-wizard-progress',
+        wizardStyles.progress.container,
+        className
+      )}
+    >
+      <div className="wizard-progress-row">
         {steps.map((step, index) => (
           <React.Fragment key={step.id}>
-            {/* Step circle */}
-            <div className="flex flex-col items-center flex-1">
+            <div
+              className={cssClasses(
+                'wizard-progress-step-wrapper',
+                wizardStyles.progress.step,
+                index === currentStep && wizardStyles.progress.stepActive,
+                index < currentStep && wizardStyles.progress.stepCompleted
+              )}
+            >
               <div
-                className={cn(
+                className={cssClasses(
                   wizardStyles.progress.circle,
                   index === currentStep
                     ? wizardStyles.progress.circleActive
@@ -37,13 +48,16 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
               >
                 {index + 1}
               </div>
-              {/* Label */}
-              <span className={cn(wizardStyles.progress.label, 'text-center mt-2 px-1')}>{step.label}</span>
+              <span className={wizardStyles.progress.label}>{step.label}</span>
             </div>
-            {/* Connector (no connector after last circle) */}
             {index < steps.length - 1 && (
-              <div className="flex-1 h-1 mx-4 -mt-6">
-                <div className={`h-full ${index < currentStep ? 'bg-blue-500' : 'bg-gray-200'}`} />
+              <div className="wizard-progress-connector-wrapper">
+                <div
+                  className={cssClasses(
+                    wizardStyles.progress.connector,
+                    index < currentStep && wizardStyles.progress.connectorActive
+                  )}
+                />
               </div>
             )}
           </React.Fragment>

@@ -153,7 +153,7 @@ describe('CharacterSummary', () => {
   });
 
   describe('Responsive Design', () => {
-    it('renders with appropriate container structure', () => {
+    it('renders with appropriate structure', () => {
       const { container } = render(<CharacterSummary character={mockCharacter} />);
       
       const summaryElement = container.querySelector('[data-testid="character-summary"]');

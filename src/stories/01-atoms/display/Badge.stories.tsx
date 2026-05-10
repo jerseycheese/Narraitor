@@ -12,7 +12,7 @@ const meta: Meta<typeof Badge> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'secondary', 'destructive', 'outline', 'success', 'warning', 'info', 'available', 'unavailable'],
+      options: ['default', 'secondary', 'destructive', '', 'success', 'warning', 'info', 'available', 'unavailable'],
     },
     size: {
       control: 'select',
@@ -32,7 +32,7 @@ export const Default: Story = {
 
 export const Variants: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-2">
+    <div>
       <Badge variant="default">Default</Badge>
       <Badge variant="secondary">Secondary</Badge>
       <Badge variant="destructive">Destructive</Badge>
@@ -46,7 +46,7 @@ export const Variants: Story = {
 
 export const Sizes: Story = {
   render: () => (
-    <div className="flex items-center gap-2">
+    <div>
       <Badge size="sm">Small</Badge>
       <Badge size="md">Medium</Badge>
       <Badge size="lg">Large</Badge>
@@ -56,7 +56,7 @@ export const Sizes: Story = {
 
 export const WithCounts: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-2">
+    <div>
       <Badge variant="secondary" count={8}>Strength</Badge>
       <Badge variant="secondary" count={6}>Intelligence</Badge>
       <Badge variant="outline" count={9}>Combat</Badge>
@@ -67,7 +67,7 @@ export const WithCounts: Story = {
 
 export const SkillRequirements: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-2">
+    <div>
       <Badge variant="available">Stealth 6+</Badge>
       <Badge variant="unavailable">Combat 8+</Badge>
       <Badge variant="available">Intelligence 5+</Badge>
@@ -77,7 +77,7 @@ export const SkillRequirements: Story = {
 
 export const EntityTypes: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-2">
+    <div>
       <Badge variant="info">World</Badge>
       <Badge variant="success">Character</Badge>
       <Badge variant="warning">Item</Badge>

@@ -7,7 +7,7 @@ import { CheckCircle } from 'lucide-react';
 import { SaveTriggerReason } from '@/lib/services/autoSaveService';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { cn, formatTime } from '@/lib/utils';
+import { cssClasses, formatTime } from '@/lib/utils';
 
 export interface SaveIndicatorProps {
   status: 'idle' | 'saving' | 'saved' | 'error';
@@ -45,7 +45,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle error state with ErrorDisplay component
   if (status === 'error') {
     return (
-      <div className={cn('max-w-sm', className)}>
+      <div className={cssClasses('save-indicator save-indicator-error', className)}>
         <ErrorDisplay
           variant={compact ? 'inline' : 'section'}
           severity="error"
@@ -62,20 +62,15 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle saving state with LoadingState component
   if (status === 'saving') {
     return (
-      <div className={cn('flex items-center gap-2', className)}>
+      <div className={cssClasses('save-indicator', compact && 'save-indicator-compact', className)}>
         <LoadingState
           variant="spinner"
-          size="sm"
-          theme="light"
           message={compact ? undefined : 'Saving...'}
           inline={true}
           centered={false}
         />
         {onManualSave && (
-          <button
-            disabled={true}
-            className="px-2 py-1 text-xs bg-gray-300 text-gray-500 rounded cursor-not-allowed"
-          >
+          <button className="save-indicator-button" disabled={true} type="button">
             Save Now
           </button>
         )}
@@ -85,26 +80,17 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
 
   // Handle idle/saved states
   return (
-    <div className={cn('flex items-center gap-2 text-sm', className)}>
-      <div className="flex items-center gap-1">
-        <CheckCircle className="w-4 h-4 text-green-500" aria-hidden="true" />
-        
-        <div className="flex flex-col">
-          <span className="text-gray-700">{getStatusText()}</span>
-          
-          {totalSaves > 0 && !compact && (
-            <span className="text-xs text-gray-500">
-              {totalSaves} saves
-            </span>
-          )}
+    <div className={cssClasses('save-indicator', compact && 'save-indicator-compact', className)}>
+      <div className="save-indicator-status">
+        <div className="save-indicator-copy">
+          <span className="save-indicator-text">{getStatusText()}</span>
+
+          {totalSaves > 0 && !compact && <span className="save-indicator-meta">{totalSaves} saves</span>}
         </div>
       </div>
 
       {onManualSave && (
-        <button
-          onClick={() => onManualSave('manual')}
-          className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-500 transition-colors"
-        >
+        <button className="save-indicator-button" onClick={() => onManualSave('manual')} type="button">
           Save Now
         </button>
       )}

@@ -51,22 +51,22 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   };
 
   return (
-    <div className="p-6 bg-background rounded-lg border">
+    <div>
       {showHeader && (
-        <div className="mb-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight mb-2">Tone Settings</h3>
-          <p className="text-sm text-muted-foreground">
+        <div>
+          <h3>Tone Settings</h3>
+          <p>
             Configure the narrative style, content rating, and language complexity for generated content.
           </p>
         </div>
       )}
-      <div className="space-y-6">
+      <div>
         {/* Tone Settings Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
           {/* Content Rating */}
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="content-rating">Content Rating</Label>
-            <p id="content-rating-description" className="text-xs text-muted-foreground">Set the age-appropriate content level for generated narratives</p>
+            <p id="content-rating-description" >Set the age-appropriate content level for generated narratives</p>
             <Select
               id="content-rating"
               value={toneSettings.contentRating}
@@ -83,9 +83,9 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Narrative Style */}
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="narrative-style">Narrative Style</Label>
-            <p id="narrative-style-description" className="text-xs text-muted-foreground">Choose how the story will be told and presented</p>
+            <p id="narrative-style-description" >Choose how the story will be told and presented</p>
             <Select
               id="narrative-style"
               value={toneSettings.narrativeStyle}
@@ -102,9 +102,9 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Language Complexity */}
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="language-complexity">Language Complexity</Label>
-            <p id="language-complexity-description" className="text-xs text-muted-foreground">Set the vocabulary and sentence complexity level</p>
+            <p id="language-complexity-description" >Set the vocabulary and sentence complexity level</p>
             <Select
               id="language-complexity"
               value={toneSettings.languageComplexity}
@@ -121,15 +121,15 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Custom Instructions */}
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="custom-instructions">Custom Instructions (Optional)</Label>
-            <p id="custom-instructions-description" className="text-xs text-muted-foreground">Add specific guidance for tone, style, or narrative elements</p>
+            <p id="custom-instructions-description" >Add specific guidance for tone, style, or narrative elements</p>
             <Textarea
               id="custom-instructions"
               placeholder="Enter specific tone or style instructions..."
               value={toneSettings.customInstructions || ''}
               onChange={(e) => handleCustomInstructionsChange(e.target.value)}
-              className="h-20"
+              
               aria-describedby="custom-instructions-description"
               data-tutorial="tone-custom-instructions"
             />
@@ -142,7 +142,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
         )}
 
         {showSaveButton && onSave && (
-          <div className="flex justify-end">
+          <div>
             <Button 
               onClick={onSave}
               disabled={!validationResult.valid}

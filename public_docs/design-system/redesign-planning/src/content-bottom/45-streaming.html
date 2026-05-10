@@ -1,0 +1,47 @@
+<section class="section py-8 md:py-12" id="streaming">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Streaming Text Reveal</h2>
+        <p class="mb-8 text-sm sm:text-base" style="color: var(--color-text-secondary);">
+          Demonstrates word-by-word narrative text appearance during AI generation. Each word fades in with a subtle animation to indicate active streaming without causing layout shift.
+        </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div class="flex flex-col h-full">
+            <h3 class="text-base sm:text-lg font-medium mb-3">Single Segment Streaming</h3>
+            <div class="p-6 rounded-sm flex-1 flex flex-col" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div id="standalone-stream-container" class="font-narrative text-base sm:text-lg overflow-y-auto max-h-[300px]" style="color: var(--color-text-primary); min-height: 120px;">
+                <p class="text-sm" style="color: var(--color-text-muted);">Click "Start Stream" to begin the demo.</p>
+              </div>
+            </div>
+            <div class="mt-4 flex gap-4 items-center">
+              <button id="start-standalone-stream" class="px-4 py-2 text-xs font-semibold rounded-sm tracking-wide focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Start Stream</button>
+              <button id="reset-standalone-stream" class="px-4 py-2 text-xs font-semibold rounded-sm border tracking-wide focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border-color: var(--color-border); color: var(--color-text-primary);">Reset</button>
+              <div class="ml-auto text-[10px] font-system uppercase" style="color: var(--color-text-muted);">Word-by-word</div>
+            </div>
+          </div>
+
+          <div class="flex flex-col h-full">
+            <h3 class="text-base sm:text-lg font-medium mb-3">Multi-Segment History</h3>
+            <div class="p-6 rounded-sm flex-1 flex flex-col" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div id="standalone-history-container" class="font-narrative text-base sm:text-lg overflow-y-auto max-h-[300px] space-y-4" style="color: var(--color-text-primary); min-height: 120px;">
+                <p class="text-sm" style="color: var(--color-text-muted);">Click "Start History" to stream multiple segments sequentially.</p>
+              </div>
+            </div>
+            <div class="mt-4 flex gap-4 items-center">
+              <button id="start-standalone-history" class="px-4 py-2 text-xs font-semibold rounded-sm tracking-wide focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Start History</button>
+              <button id="reset-standalone-history" class="px-4 py-2 text-xs font-semibold rounded-sm border tracking-wide focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border-color: var(--color-border); color: var(--color-text-primary);">Reset</button>
+              <div class="ml-auto text-[10px] font-system uppercase" style="color: var(--color-text-muted);">Sequential segments</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">IMPLEMENTATION NOTES</h4>
+          <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+            <li>Text is tokenized by whitespace: <code>text.split(/(\s+)/)</code></li>
+            <li>Each word wrapped in <code>&lt;span class="manuscript-streaming-word"&gt;</code> with fade-in animation</li>
+            <li>Whitespace preserved as plain text nodes (no animation)</li>
+            <li>Container auto-scrolls to follow new content</li>
+            <li>No layout shift - words appear inline within existing paragraph flow</li>
+          </ul>
+        </div>
+      </section>

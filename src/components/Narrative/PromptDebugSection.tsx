@@ -18,33 +18,33 @@ interface PromptDebugSectionProps {
  */
 export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInfo }) => {
   return (
-    <div className="mt-3 border-t border-gray-300 pt-3">
+    <div>
       <CollapsibleSection
-        title="🔧 Prompt Debug Info"
+        title="Prompt Debug Info"
         initialCollapsed={true}
-        className="text-xs"
+        
       >
-        <div className="space-y-4 text-gray-800 bg-gray-50 p-3 rounded">
+        <div>
           {/* Template Name */}
           <div>
-            <div className="font-semibold text-gray-900 mb-1">Template Used:</div>
-            <div className="font-mono text-blue-700">{debugInfo.templateName}</div>
+            <div>Template Used:</div>
+            <div>{debugInfo.templateName}</div>
           </div>
 
           {/* Model Info */}
           <div>
-            <div className="font-semibold text-gray-900 mb-1">AI Model:</div>
-            <div className="font-mono text-blue-700">{debugInfo.modelUsed}</div>
+            <div>AI Model:</div>
+            <div>{debugInfo.modelUsed}</div>
           </div>
 
           {/* Token Usage */}
           {debugInfo.tokenUsage && (
             <div>
-              <div className="font-semibold text-gray-900 mb-1">Token Usage:</div>
-              <div className="font-mono">
+              <div>Token Usage:</div>
+              <div>
                 <div>Prompt: {debugInfo.tokenUsage.promptTokens.toLocaleString()}</div>
                 <div>Completion: {debugInfo.tokenUsage.completionTokens.toLocaleString()}</div>
-                <div className="font-semibold">
+                <div>
                   Total: {debugInfo.tokenUsage.totalTokens.toLocaleString()}
                 </div>
               </div>
@@ -54,22 +54,22 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
           {/* Tone Settings */}
           {debugInfo.toneSettings && (
             <div>
-              <div className="font-semibold text-gray-900 mb-1">Tone Settings:</div>
-              <div className="space-y-1">
+              <div>Tone Settings:</div>
+              <div>
                 {debugInfo.toneSettings.mood && (
                   <div>
-                    <span className="font-medium">Mood:</span> {debugInfo.toneSettings.mood}
+                    <span>Mood:</span> {debugInfo.toneSettings.mood}
                   </div>
                 )}
                 {debugInfo.toneSettings.complexity && (
                   <div>
-                    <span className="font-medium">Complexity:</span>{' '}
+                    <span>Complexity:</span>{' '}
                     {debugInfo.toneSettings.complexity}
                   </div>
                 )}
                 {debugInfo.toneSettings.customTone && (
                   <div>
-                    <span className="font-medium">Custom Instructions:</span>{' '}
+                    <span>Custom Instructions:</span>{' '}
                     {debugInfo.toneSettings.customTone}
                   </div>
                 )}
@@ -80,13 +80,13 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
           {/* Character Context */}
           {debugInfo.characterContext && debugInfo.characterContext.length > 0 && (
             <div>
-              <div className="font-semibold text-gray-900 mb-1">Character Context:</div>
-              <div className="space-y-1">
+              <div>Character Context:</div>
+              <div>
                 {debugInfo.characterContext.map((char, idx) => (
-                  <div key={idx} className="pl-2 border-l-2 border-blue-300">
-                    <div className="font-medium">{char.name}</div>
+                  <div key={idx} >
+                    <div>{char.name}</div>
                     {char.relevantTraits && char.relevantTraits.length > 0 && (
-                      <div className="text-gray-600 text-xs">
+                      <div>
                         Traits: {char.relevantTraits.join(', ')}
                       </div>
                     )}
@@ -99,8 +99,8 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
           {/* Active Goals */}
           {debugInfo.activeGoals && debugInfo.activeGoals.length > 0 && (
             <div>
-              <div className="font-semibold text-gray-900 mb-1">Active Goals:</div>
-              <ul className="list-disc list-inside space-y-1">
+              <div>Active Goals:</div>
+              <ul>
                 {debugInfo.activeGoals.map((goal, idx) => (
                   <li key={idx}>{goal}</li>
                 ))}
@@ -111,12 +111,12 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
           {/* Lore Context */}
           {debugInfo.loreContext && debugInfo.loreContext.length > 0 && (
             <div>
-              <div className="font-semibold text-gray-900 mb-1">Lore Context:</div>
-              <div className="space-y-2">
+              <div>Lore Context:</div>
+              <div>
                 {debugInfo.loreContext.map((lore, idx) => (
-                  <div key={idx} className="pl-2 border-l-2 border-purple-300">
-                    <div className="font-medium text-purple-900">{lore.title}</div>
-                    <div className="text-gray-700 text-xs mt-1">{lore.excerpt}</div>
+                  <div key={idx} >
+                    <div>{lore.title}</div>
+                    <div>{lore.excerpt}</div>
                   </div>
                 ))}
               </div>
@@ -126,15 +126,15 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
           {/* Inventory Context */}
           {debugInfo.inventoryContext && debugInfo.inventoryContext.length > 0 && (
             <div>
-              <div className="font-semibold text-gray-900 mb-1">Inventory Context:</div>
-              <div className="space-y-1">
+              <div>Inventory Context:</div>
+              <div>
                 {debugInfo.inventoryContext.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <span className={item.isEquipped ? 'font-semibold text-green-700' : ''}>
+                  <div key={idx} >
+                    <span>
                       {item.itemName}
                     </span>
                     {item.isEquipped && (
-                      <span className="text-xs bg-green-200 text-green-800 px-1.5 py-0.5 rounded">
+                      <span>
                         Equipped
                       </span>
                     )}
@@ -147,15 +147,15 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
           {/* Recent Decisions */}
           {debugInfo.recentDecisions && debugInfo.recentDecisions.length > 0 && (
             <div>
-              <div className="font-semibold text-gray-900 mb-1">Recent Decisions:</div>
-              <div className="space-y-2">
+              <div>Recent Decisions:</div>
+              <div>
                 {debugInfo.recentDecisions.map((decision, idx) => (
-                  <div key={idx} className="pl-2 border-l-2 border-orange-300">
-                    <div className="font-medium text-gray-900">{decision.decisionText}</div>
-                    <div className="text-orange-700 font-semibold text-xs mt-1">
+                  <div key={idx} >
+                    <div>{decision.decisionText}</div>
+                    <div>
                       → {decision.selectedOption}
                     </div>
-                    <div className="text-gray-600 text-xs">
+                    <div>
                       {new Date(decision.timestamp).toLocaleString()}
                     </div>
                   </div>
@@ -167,12 +167,12 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
           {/* Previous Segment Context */}
           {debugInfo.previousSegmentContext && (
             <div>
-              <div className="font-semibold text-gray-900 mb-1">Previous Segment:</div>
-              <div className="pl-2 border-l-2 border-gray-400">
-                <div className="text-xs text-gray-600 mb-1">
+              <div>Previous Segment:</div>
+              <div>
+                <div>
                   Type: {debugInfo.previousSegmentContext.type}
                 </div>
-                <div className="text-gray-700 italic">{debugInfo.previousSegmentContext.excerpt}</div>
+                <div>{debugInfo.previousSegmentContext.excerpt}</div>
               </div>
             </div>
           )}
@@ -180,14 +180,14 @@ export const PromptDebugSection: React.FC<PromptDebugSectionProps> = ({ debugInf
           {/* Full Prompt */}
           <div>
             <CollapsibleSection title="Full Prompt Text" initialCollapsed={true}>
-              <pre className="text-xs whitespace-pre-wrap bg-white p-3 rounded border border-gray-300 overflow-auto max-h-96 font-mono">
+              <pre>
                 {debugInfo.fullPrompt}
               </pre>
             </CollapsibleSection>
           </div>
 
           {/* Timestamp */}
-          <div className="text-xs text-gray-600 border-t border-gray-300 pt-2">
+          <div>
             Generated at: {new Date(debugInfo.generatedAt).toLocaleString()}
           </div>
         </div>

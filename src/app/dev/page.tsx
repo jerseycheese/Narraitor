@@ -34,34 +34,19 @@ export default function DevPage() {
     ],
   };
 
-  const colorClasses = {
-    blue: 'bg-blue-100 hover:bg-blue-200',
-    green: 'bg-green-100 hover:bg-green-200',
-    purple: 'bg-blue-100 hover:bg-blue-200',
-    orange: 'bg-amber-100 hover:bg-amber-200',
-    yellow: 'bg-amber-100 hover:bg-amber-200',
-    gray: 'bg-gray-100 hover:bg-gray-200',
-    indigo: 'bg-blue-100 hover:bg-blue-200',
-    teal: 'bg-blue-100 hover:bg-blue-200',
-    pink: 'bg-red-100 hover:bg-red-200',
-    cyan: 'bg-blue-100 hover:bg-blue-200',
-    amber: 'bg-amber-100 hover:bg-amber-200',
-  };
-
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Development Test Harnesses</h1>
+    <div>
+      <h1>Development Test Harnesses</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
         {Object.entries(testHarnesses).map(([category, items]) => (
           <div key={category}>
-            <h2 className="text-xl font-semibold mb-3 text-gray-700">{category}</h2>
-            <div className="space-y-2">
+            <h2>{category}</h2>
+            <div>
               {items.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block p-4 rounded transition-colors ${colorClasses[item.color as keyof typeof colorClasses]}`}
                 >
                   {item.label}
                 </Link>

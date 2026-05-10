@@ -10,6 +10,7 @@ import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
 import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
+import { wizardStyles } from '@/components/shared/wizard';
 import { CharacterArchetype } from '@/types/world.types';
 import { useTutorial } from '@/components/TutorialProvider';
 
@@ -92,36 +93,28 @@ export default function CharacterCreatePage() {
 
   if (!effectiveWorldId) {
     return (
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Create Character</h1>
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="w-20 h-20 bg-amber-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <AlertTriangle
-                className="w-10 h-10 text-amber-500"
-                aria-hidden="true"
-              />
-            </div>
-            <h2 className="text-xl font-semibold mb-2">World Required</h2>
-            <p className="text-gray-700 mb-2">
-              Characters are created within specific worlds.
-            </p>
-            <p className="text-gray-500 text-sm mb-6">
-              Each world defines unique attributes, skills, and rules that shape
-              your characters.
-            </p>
-            <ActionButtonGroup
-              actions={[
-                {
-                  label: 'Select a World First',
-                  onClick: () => router.push('/worlds'),
-                  variant: 'primary',
-                  size: 'lg',
-                },
-              ]}
-              className="justify-center"
-            />
-          </div>
+      <div className="component-create-character-page wizard-page">
+        <div className="wizard-page-header">
+          <h1 className="wizard-page-title">Create Character</h1>
+        </div>
+        <div className="wizard-empty-state">
+          <AlertTriangle aria-hidden="true" />
+          <h2 className={wizardStyles.step.title}>World Required</h2>
+          <p>Characters are created within specific worlds.</p>
+          <p>
+            Each world defines unique attributes, skills, and rules that shape
+            your characters.
+          </p>
+          <ActionButtonGroup
+            actions={[
+              {
+                label: 'Select a World First',
+                onClick: () => router.push('/worlds'),
+                variant: 'primary',
+                size: 'lg',
+              },
+            ]}
+          />
         </div>
       </div>
     );
@@ -219,13 +212,13 @@ export default function CharacterCreatePage() {
     showQuickStart && (mounted ? !!currentWorld : !!effectiveWorldId);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="component-create-character-page wizard-page">
+      <div className={wizardStyles.step.content}>
         {shouldShowQuickStart ? (
           <>
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Create New Character</h1>
-              <p className="text-gray-700">
+            <div className="wizard-page-header">
+              <h1 className="wizard-page-title">Create New Character</h1>
+              <p className="wizard-page-subtitle">
                 <span suppressHydrationWarning>
                   {currentWorld
                     ? `Choose a quick start character for ${currentWorld.name} or create your own`
@@ -233,7 +226,7 @@ export default function CharacterCreatePage() {
                 </span>
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-8">
+            <div>
               {mounted && currentWorld ? (
                 <QuickStartCharacters
                   world={currentWorld}
@@ -242,7 +235,7 @@ export default function CharacterCreatePage() {
                   onReady={() => setContentReady(true)}
                 />
               ) : (
-                <div className="text-center py-12 text-gray-500">
+                <div className="wizard-empty-state">
                   Preparing quick start options...
                 </div>
               )}
@@ -250,24 +243,18 @@ export default function CharacterCreatePage() {
           </>
         ) : (
           <>
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">
-                  Create Custom Character
-                </h1>
-                <p className="text-gray-700">
+            <div className="wizard-page-header-row">
+              <div className="wizard-page-header">
+                <h1 className="wizard-page-title">Create Custom Character</h1>
+                <p className="wizard-page-subtitle">
                   Build your character from scratch with full customization
                 </p>
               </div>
-              <Button
-                variant="outline"
-                onClick={handleBackToQuickStart}
-                className="flex items-center gap-2"
-              >
+              <Button variant="outline" onClick={handleBackToQuickStart}>
                 ← Back to Quick Start
               </Button>
             </div>
-            <div className="bg-white rounded-lg shadow p-8">
+            <div>
               <CharacterCreationWizard
                 key={`new-character-${effectiveWorldId}`}
                 worldId={effectiveWorldId}

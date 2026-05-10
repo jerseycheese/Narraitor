@@ -95,7 +95,7 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       sessionId: 'session-1', // Now includes sessionId from narrativeContext
       minOptions: 3,
       maxOptions: 4,
-      useAlignedChoices: false
+      useAlignedChoices: true
     });
 
     // Verify the choice generator was called - the choices themselves are tested in choiceGenerator tests

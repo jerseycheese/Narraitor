@@ -707,7 +707,7 @@ export class NarrativeGenerator {
         sessionId: sessionId || narrativeContext.sessionId,
         minOptions: 3,
         maxOptions: 4,
-        useAlignedChoices: false,
+        useAlignedChoices: true,
       });
 
       return result;
@@ -722,16 +722,19 @@ export class NarrativeGenerator {
             id: `option-${fallbackId}-1`,
             text: 'Investigate further',
             alignment: 'neutral',
+            requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
           },
           {
             id: `option-${fallbackId}-2`,
             text: 'Talk to nearby characters',
             alignment: 'lawful',
+            requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
           },
           {
             id: `option-${fallbackId}-3`,
             text: 'Move to a new location',
             alignment: 'neutral',
+            requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
           },
         ],
         decisionWeight: 'minor',

@@ -15,7 +15,7 @@ export function DashboardGettingStarted({
   hasWorlds,
   hasCharacters,
   hasSessions,
-  onNavigate
+  onNavigate,
 }: DashboardGettingStartedProps) {
   const steps = [
     {
@@ -23,22 +23,22 @@ export function DashboardGettingStarted({
       label: 'Create a world',
       completed: hasWorlds,
       cta: 'Create Your World',
-      path: '/worlds'
+      path: '/worlds',
     },
     {
       id: 'character',
       label: 'Create a character',
       completed: hasCharacters,
       cta: 'Create a Character',
-      path: '/characters'
+      path: '/characters',
     },
     {
       id: 'play',
       label: 'Start playing',
       completed: hasSessions,
       cta: 'Start Playing',
-      path: '/worlds'
-    }
+      path: '/worlds',
+    },
   ];
 
   const nextStep = steps.find((step) => !step.completed);
@@ -47,15 +47,17 @@ export function DashboardGettingStarted({
   // Hide when all steps completed
   if (allComplete) {
     return (
-      <section className="component-dashboard-getting-started bg-background rounded-lg border p-6 shadow-sm">
-        <div className="text-center space-y-4">
-          <CheckCircle className="w-12 h-12 text-success mx-auto" aria-hidden="true" />
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Ready to Continue</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Your world is set up. Continue your adventure!
-            </p>
-            <Button onClick={() => onNavigate('/worlds')} variant="default" size="lg">
+      <section className="component-dashboard-getting-started component-dashboard-getting-started-complete">
+        <div className="dashboard-getting-started-complete-row">
+          <CheckCircle aria-hidden="true" className="dashboard-getting-started-complete-icon" />
+          <div className="dashboard-getting-started-complete-body">
+            <h3>Ready to Continue</h3>
+            <p>Your world is set up. Continue your adventure!</p>
+            <Button
+              onClick={() => onNavigate('/worlds')}
+              variant="default"
+              size="lg"
+            >
               Continue Playing
             </Button>
           </div>
@@ -65,38 +67,33 @@ export function DashboardGettingStarted({
   }
 
   return (
-    <section className="component-dashboard-getting-started bg-background rounded-lg border p-6 shadow-sm">
-      <h2 className="text-lg font-semibold mb-4">Getting Started</h2>
+    <section className="component-dashboard-getting-started">
+      <h2>Getting Started</h2>
 
-      <div className="space-y-3 mb-6">
+      <ol className="dashboard-getting-started-steps">
         {steps.map((step) => {
           const Icon = step.completed ? CheckCircle : Circle;
           return (
-            <div key={step.id} className="flex items-center gap-3">
-              <Icon
-                className={`w-5 h-5 flex-shrink-0 ${
-                  step.completed ? 'text-success' : 'text-muted-foreground'
-                }`}
-                aria-hidden="true"
-              />
-              <span
-                className={`text-sm ${
-                  step.completed ? 'text-muted-foreground line-through' : 'text-foreground'
-                }`}
-              >
-                {step.label}
-              </span>
-            </div>
+            <li
+              key={step.id}
+              className={
+                'dashboard-getting-started-step' +
+                (step.completed ? ' dashboard-getting-started-step-complete' : '')
+              }
+            >
+              <Icon aria-hidden="true" className="dashboard-getting-started-step-icon" />
+              <span className="dashboard-getting-started-step-label">{step.label}</span>
+            </li>
           );
         })}
-      </div>
+      </ol>
 
       {nextStep && (
         <Button
           onClick={() => onNavigate(nextStep.path)}
           variant="default"
           size="lg"
-          className="w-full"
+          className="dashboard-getting-started-cta"
         >
           {nextStep.cta}
         </Button>

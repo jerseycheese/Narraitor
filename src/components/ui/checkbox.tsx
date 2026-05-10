@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "@/lib/utils/classNames"
+import { cssClasses } from '@/lib/utils/classNames'
 
 export interface CheckboxProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -10,17 +10,16 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   ({ className, label, ...props }, ref) => {
     if (label) {
       return (
-        <label className="flex items-center space-x-2 cursor-pointer">
+        <label>
           <input
             type="checkbox"
-            className={cn(
-              "h-4 w-4 rounded border-gray-300 text-blue-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:ring-offset-0",
+            className={cssClasses(
               className
             )}
             ref={ref}
             {...props}
           />
-          <span className="text-sm text-gray-700">{label}</span>
+          <span>{label}</span>
         </label>
       )
     }
@@ -28,8 +27,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     return (
       <input
         type="checkbox"
-        className={cn(
-          "h-4 w-4 rounded border-gray-300 text-blue-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-100 focus:ring-opacity-50 focus:ring-offset-0",
+        className={cssClasses(
           className
         )}
         ref={ref}

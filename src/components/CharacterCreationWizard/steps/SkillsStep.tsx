@@ -195,20 +195,20 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         title="Allocate Skill Points"
         description={`Choose up to ${maxSelectable} starting skills and distribute ${totalSkillPoints} skill points across them.`}
       >
-      <div className="border rounded-lg p-4 bg-blue-50 mb-6">
-        <p className="text-sm text-blue-900">
+      <div>
+        <p>
           Each selected skill starts at its minimum level. Increase levels to invest skill points.
           Unspent points are allowed if you want to create a less experienced character.
         </p>
       </div>
 
-      <div className="space-y-4 mb-6">
-        <div className={`${wizardStyles.card.base} ${remainingPoints === 0 ? 'bg-green-50 border-green-300' : 'bg-gray-100'}`}>
+      <div>
+        <div className={wizardStyles.card.base}>
           <h3 className={wizardStyles.subheading}>Skill Points</h3>
-          <div className="flex flex-wrap items-center gap-6 text-sm">
+          <div>
             <span className={wizardStyles.badge.secondary}>Total: {totalSkillPoints}</span>
             <span className={wizardStyles.badge.primary}>Spent: {Math.max(spentPoints, 0)}</span>
-            <span className={`${wizardStyles.badge.secondary} ${remainingPoints <= 0 ? 'text-green-700 border-green-300' : 'text-amber-700 border-amber-300'}`}>
+            <span className={wizardStyles.badge.secondary}>
               Remaining: {Math.max(remainingPoints, 0)}
             </span>
             {totalSkillPoints > totalCapacity && (
@@ -219,16 +219,16 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           </div>
         </div>
 
-        <div className={`${wizardStyles.card.base} bg-gray-100`}>
+        <div className={`${wizardStyles.card.base}`}>
           <h3 className={wizardStyles.subheading}>Skill Selection</h3>
-          <div className="flex gap-4 text-sm">
+          <div>
             <span className={wizardStyles.badge.primary}>Selected: {selectedSkills.length}</span>
             <span className={wizardStyles.badge.secondary}>Maximum: {maxSelectable}</span>
           </div>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div>
         {data.characterData.skills.map((skill, index) => {
           const bounds = boundsBySkillId.get(skill.skillId) ?? resolveSkillBounds(skill, worldConfig);
           const cost = costBySkillId.get(skill.skillId) ?? 0;
@@ -241,15 +241,15 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
             key={safeKey}
             className={`${wizardStyles.card.base} ${skill.isSelected ? wizardStyles.card.selected : ''}`}
           >
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <span id={skillTitleId} className="font-medium text-lg">{skill.name}</span>
+            <div>
+              <div>
+                <div>
+                  <span id={skillTitleId} >{skill.name}</span>
                   {skill.description && (
-                    <p className="text-sm text-gray-700 mt-1">{skill.description}</p>
+                    <p>{skill.description}</p>
                   )}
                   {skill.attributeIds && skill.attributeIds.length > 0 && worldConfig?.attributes && (
-                    <div className="mt-2 text-xs text-blue-700 font-medium">
+                    <div>
                       Linked to:{' '}
                       {skill.attributeIds
                         .map(attrId => worldConfig.attributes?.find(attr => attr.id === attrId)?.name || 'Unknown')
@@ -268,8 +268,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
               </div>
 
               {skill.isSelected && (
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm text-gray-700">
+                <div>
+                  <div>
                     <span>Level: {skill.level}</span>
                     <span>Allocated Points: {cost}</span>
                   </div>
@@ -284,7 +284,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                     isConstrained={maxAllowedLevel < bounds.maxLevel}
                     ariaLabelledBy={skillTitleId}
                   />
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div>
                     <span>Min: {bounds.minLevel}</span>
                     <span>Max: {bounds.maxLevel}</span>
                   </div>
@@ -297,8 +297,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       </div>
 
       {totalSkillPoints > 0 && hasUnallocatedPoints && (
-        <div className={`${wizardStyles.card.base} border-amber-300 bg-amber-50 mt-6`}>
-          <p className="text-sm text-amber-800">
+        <div className={`${wizardStyles.card.base}`}>
+          <p>
             {totalSkillPoints > totalCapacity
               ? 'Your skill point pool exceeds the current skill caps. You can maximize existing skills or leave points unspent.'
               : `You have ${remainingPoints} unspent skill points. Spending them will improve your character's capabilities. You can continue with the current allocation or invest more points.`}

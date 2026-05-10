@@ -63,9 +63,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
   };
   
   return (
-    <section className="p-4 bg-background rounded">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Skills</h3>
+    <section className="component-world-skills-form">
+      <div>
+        <h3>Skills</h3>
         <Button
           onClick={handleAddSkill}
           size="sm"
@@ -75,13 +75,13 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
       </div>
       
       {skills.length === 0 ? (
-        <p className="text-muted-foreground italic">No skills defined yet.</p>
+        <p>No skills defined yet.</p>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
           {skills.map((skill, index) => (
-            <div key={skill.id || skill.name || index} className="bg-muted rounded-lg p-4 border border-l-4 border-l-primary">
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-medium text-lg">{skill.name}</h4>
+            <div key={skill.id || skill.name || index} >
+              <div>
+                <h4>{skill.name}</h4>
                 <Button
                   onClick={() => handleRemoveSkill(index)}
                   variant="destructive"
@@ -91,9 +91,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                 </Button>
               </div>
               
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+              <div>
+                <div>
+                  <div>
                     <Label htmlFor={`skill-name-${index}`}>
                       Name
                     </Label>
@@ -105,7 +105,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     />
                   </div>
                   
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor={`skill-category-${index}`}>
                       Category
                     </Label>
@@ -118,7 +118,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   </div>
                 </div>
                 
-                <div className="space-y-2">
+                <div>
                   <Label htmlFor={`skill-description-${index}`}>
                     Description
                   </Label>
@@ -130,8 +130,8 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   />
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="space-y-2">
+                <div>
+                  <div>
                     <Label htmlFor={`skill-difficulty-${index}`}>
                       Difficulty
                     </Label>
@@ -150,16 +150,16 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     </Select>
                   </div>
                   
-                  <div className="space-y-2">
+                  <div>
                     <Label>
                       Linked Attributes
                     </Label>
                     {attributes.length === 0 ? (
-                      <p className="text-muted-foreground text-sm">No attributes available</p>
+                      <p>No attributes available</p>
                     ) : (
-                      <div className="flex flex-wrap gap-4">
+                      <div>
                         {attributes.map((attr, aIndex) => (
-                          <div key={attr.id || attr.name || aIndex} className="flex items-center space-x-2">
+                          <div key={attr.id || attr.name || aIndex} >
                             <Checkbox
                               id={`skill-${index}-attr-${attr.id}`}
                               checked={skill.attributeIds?.includes(attr.id) || false}
@@ -180,9 +180,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   </div>
                 </div>
                 
-                <div className="mt-4 border-t border-border pt-4">
-                  <h5 className="font-medium mb-2">Skill Default Level</h5>
-                  <div className="mb-4">
+                <div>
+                  <h5>Skill Default Level</h5>
+                  <div>
                     {/* Use the SkillRangeEditor component */}
                     <SkillRangeEditor
                       skill={{

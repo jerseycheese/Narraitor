@@ -10,20 +10,68 @@ import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { Button } from '@/components/ui/button';
+
+type PersistApi = {
+  persist?: {
+    hasHydrated?: () => boolean;
+    onFinishHydration?: (callback: () => void) => () => void;
+  };
+};
+
+const getPersist = (store: unknown): PersistApi['persist'] =>
+  (store as PersistApi).persist;
 
 export default function PlayPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [hydrated, setHydrated] = useState(false);
+
   const currentWorldId = useWorldStore(state => state.currentWorldId);
   const currentWorld = useWorldStore(state => state.worlds[currentWorldId || '']);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const currentCharacterId = useCharacterStore((state: any) => state.currentCharacterId);
   const initializeSession = useSessionStore(state => state.initializeSession);
   const currentSessionId = useSessionStore(state => state.id);
-  
+
+  // Wait for all three persisted stores to finish hydrating before reading
+  // their values for redirect decisions. Reading pre-hydration causes a
+  // redirect race that lands users on /worlds and surfaces a Next.js error.
   useEffect(() => {
+    const persists = [
+      getPersist(useWorldStore),
+      getPersist(useCharacterStore),
+      getPersist(useSessionStore),
+    ];
+
+    const allHydrated = persists.every(p => p?.hasHydrated?.() ?? true);
+    if (allHydrated) {
+      setHydrated(true);
+      return;
+    }
+
+    let pending = persists.filter(p => p?.hasHydrated && !p.hasHydrated()).length;
+    const unsubscribes: Array<() => void> = [];
+
+    persists.forEach(p => {
+      if (p?.onFinishHydration && p.hasHydrated && !p.hasHydrated()) {
+        const unsub = p.onFinishHydration(() => {
+          pending -= 1;
+          if (pending <= 0) setHydrated(true);
+        });
+        unsubscribes.push(unsub);
+      }
+    });
+
+    return () => {
+      unsubscribes.forEach(unsub => unsub());
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
     const setupSession = async () => {
       try {
         // Check prerequisites
@@ -31,7 +79,7 @@ export default function PlayPage() {
           router.push('/worlds');
           return;
         }
-        
+
         if (!currentCharacterId) {
           router.push('/characters');
           return;
@@ -51,11 +99,11 @@ export default function PlayPage() {
     };
 
     setupSession();
-  }, [currentWorldId, currentCharacterId, currentSessionId, initializeSession, router]);
+  }, [hydrated, currentWorldId, currentCharacterId, currentSessionId, initializeSession, router]);
 
-  if (isLoading) {
+  if (!hydrated || isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="play-page play-page-loading">
         <LoadingPulse message="Preparing your adventure..." />
       </main>
     );
@@ -63,39 +111,43 @@ export default function PlayPage() {
 
   if (error) {
     return (
-      <PageLayout title="Game Session Error">
-        <SectionError
-          title="Failed to Start Game"
-          message={error}
-          severity="error"
-        />
-        <div className="mt-4 flex gap-4">
-          <button
-            onClick={() => router.push('/worlds')}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
-          >
-            Select World
-          </button>
-          <button
-            onClick={() => router.push('/characters')}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500"
-          >
-            Select Character
-          </button>
-        </div>
-      </PageLayout>
+      <div className="play-page play-page-shell play-page-shell-error">
+        <PageLayout title="Game Session Error">
+          <SectionError
+            title="Failed to Start Game"
+            message={error}
+            severity="error"
+          />
+          <div className="error-display-actions">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/worlds')}
+            >
+              Select World
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/characters')}
+            >
+              Select Character
+            </Button>
+          </div>
+        </PageLayout>
+      </div>
     );
   }
 
   if (!currentSessionId) {
     return (
-      <PageLayout title="No Active Session">
-        <SectionError
-          title="No Active Session"
-          message="Unable to create or resume a game session."
-          severity="warning"
-        />
-      </PageLayout>
+      <div className="play-page play-page-shell play-page-shell-warning">
+        <PageLayout title="No Active Session">
+          <SectionError
+            title="No Active Session"
+            message="Unable to create or resume a game session."
+            severity="warning"
+          />
+        </PageLayout>
+      </div>
     );
   }
 
@@ -103,8 +155,10 @@ export default function PlayPage() {
   const pageDescription = currentWorld?.genre ? getGenreLabel(currentWorld.genre) : undefined;
 
   return (
-    <PageLayout title={pageTitle} description={pageDescription} className="pb-0">
-      <GameSession worldId={currentWorldId!} />
-    </PageLayout>
+    <div className="play-page play-page-active">
+      <PageLayout title={pageTitle} description={pageDescription}>
+        <GameSession worldId={currentWorldId!} />
+      </PageLayout>
+    </div>
   );
 }

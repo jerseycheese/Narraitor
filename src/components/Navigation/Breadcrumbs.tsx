@@ -7,8 +7,10 @@ import { Home, Globe, User, Users } from 'lucide-react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { buildBreadcrumbSegments, type BreadcrumbSegment } from '@/utils/routeUtils';
-import { cn } from '@/lib/utils/classNames';
+import {
+  buildBreadcrumbSegments,
+  type BreadcrumbSegment,
+} from '@/utils/routeUtils';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
 import { Button } from '@/components/ui/button';
 
@@ -19,11 +21,11 @@ export interface BreadcrumbsProps {
   showNextStep?: boolean;
 }
 
-export function Breadcrumbs({ 
+export function Breadcrumbs({
   className,
   separator = '→',
   maxItems,
-  showNextStep = false
+  showNextStep = false,
 }: BreadcrumbsProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -31,7 +33,7 @@ export function Breadcrumbs({
   const { characters } = useCharacterStore();
   const { initializeSession } = useSessionStore();
   const { getNextStep } = useNavigationFlow();
-  
+
   // Build breadcrumb segments
   const segments = buildBreadcrumbSegments(
     pathname,
@@ -39,17 +41,17 @@ export function Breadcrumbs({
     characters,
     currentWorldId
   );
-  
+
   // Handle truncation for mobile
   let displaySegments = segments;
   let showEllipsis = false;
-  
+
   if (maxItems && segments.length > maxItems) {
     showEllipsis = true;
     // Keep the last maxItems segments
     displaySegments = segments.slice(-maxItems);
   }
-  
+
   const handleClick = (e: React.MouseEvent, segment: BreadcrumbSegment) => {
     if (segment.isCurrentPage) {
       e.preventDefault();
@@ -58,75 +60,55 @@ export function Breadcrumbs({
     e.preventDefault();
     router.push(segment.href);
   };
-  
+
   return (
-    <nav 
-      aria-label="Breadcrumb"
-      className={cn('flex items-center space-x-2 text-sm', className)}
-    >
+    <nav aria-label="Breadcrumb" className={`breadcrumbs-nav ${className || ''}`}>
       {showEllipsis && (
         <>
-          <span 
-            data-testid="breadcrumb-ellipsis"
-            className="text-gray-500"
-          >
-            ...
-          </span>
-          <span className="text-gray-500">{separator}</span>
+          <span className="breadcrumbs-item" data-testid="breadcrumb-ellipsis">...</span>
+          <span className="breadcrumbs-separator">{separator}</span>
         </>
       )}
-      
+
       {displaySegments.map((segment, index) => {
         const isLast = index === displaySegments.length - 1;
         const testId = getTestId(segment);
-        
+
         // Handle loading state
         if (segment.label === 'Loading...') {
           return (
             <React.Fragment key={segment.href}>
-              <span
-                data-testid={testId}
-                className="text-gray-500 flex items-center gap-2"
-              >
+              <span className="breadcrumbs-item" data-testid={testId}>
                 {getSegmentIcon(segment)}
                 {segment.label}
               </span>
-              {!isLast && (
-                <span className="text-gray-500">{separator}</span>
-              )}
+              {!isLast && <span className="breadcrumbs-separator">{separator}</span>}
             </React.Fragment>
           );
         }
-        
+
         return (
           <React.Fragment key={segment.href}>
             <Link
               href={segment.href}
               onClick={(e) => handleClick(e, segment)}
+              className="breadcrumbs-item"
               data-testid={testId}
               aria-current={segment.isCurrentPage ? 'page' : undefined}
-              className={cn(
-                'hover:text-gray-700 transition-colors flex items-center gap-2',
-                segment.isCurrentPage 
-                  ? 'text-gray-900 font-medium cursor-default' 
-                  : 'text-gray-700'
-              )}
             >
               {getSegmentIcon(segment)}
               {segment.label}
             </Link>
-            {!isLast && (
-              <span className="text-gray-500">{separator}</span>
-            )}
+            {!isLast && <span className="breadcrumbs-separator">{separator}</span>}
           </React.Fragment>
         );
       })}
-      
+
       {/* Next Step Guidance */}
       {showNextStep && renderNextStepGuidance()}
     </nav>
   );
-  
+
   function renderNextStepGuidance() {
     const nextStep = getNextStep();
     if (!nextStep) return null;
@@ -134,9 +116,9 @@ export function Breadcrumbs({
     if (nextStep.action === 'start-game' && nextStep.characterId) {
       const character = characters[nextStep.characterId];
       return (
-        <div className="ml-4 flex items-center">
-          <span className="text-gray-500 mr-2">{separator}</span>
-          <span className="text-sm text-gray-700 mr-2">Next: Start Playing</span>
+        <div>
+          <span>{separator}</span>
+          <span>Next: Start Playing</span>
           <Button
             onClick={() => {
               if (currentWorldId && nextStep.characterId) {
@@ -147,7 +129,6 @@ export function Breadcrumbs({
             }}
             variant="success"
             size="sm"
-            className="text-sm px-3 py-1 rounded-md transition-colors"
           >
             Play as {character?.name}
           </Button>
@@ -155,21 +136,27 @@ export function Breadcrumbs({
       );
     }
 
-    if (nextStep.action === 'select-character' && (Object.values(characters) as Character[]).filter(c => c.worldId === currentWorldId).length > 0) {
+    if (
+      nextStep.action === 'select-character' &&
+      (Object.values(characters) as Character[]).filter(
+        (c) => c.worldId === currentWorldId
+      ).length > 0
+    ) {
       return (
-        <div className="ml-4 flex items-center">
-          <span className="text-gray-500 mr-2">{separator}</span>
-          <span className="text-sm text-gray-700 mr-2">Next: Start Playing</span>
+        <div>
+          <span>{separator}</span>
+          <span>Next: Start Playing</span>
           <Button
             onClick={() => {
-              const firstCharacter = (Object.values(characters) as Character[]).find(c => c.worldId === currentWorldId);
+              const firstCharacter = (
+                Object.values(characters) as Character[]
+              ).find((c) => c.worldId === currentWorldId);
               if (currentWorldId && firstCharacter) {
                 initializeSession(currentWorldId, firstCharacter.id, () => {
                   router.push('/play');
                 });
               }
             }}
-            className="text-sm px-3 py-1 bg-blue-500 hover:bg-blue-700 text-white rounded-md transition-colors"
             variant="default"
             size="sm"
           >
@@ -180,13 +167,10 @@ export function Breadcrumbs({
     }
 
     return (
-      <div className="ml-4 flex items-center">
-        <span className="text-gray-500 mr-2">{separator}</span>
-        <span className="text-sm text-gray-700 mr-2">Next: {nextStep.label}</span>
-        <Link
-          href={nextStep.href}
-          className="text-sm text-link-primary font-medium no-underline"
-        >
+      <div>
+        <span>{separator}</span>
+        <span>Next: {nextStep.label}</span>
+        <Link href={nextStep.href}>
           {nextStep.action === 'create-world' && 'Create Your First World'}
           {nextStep.action === 'create-character' && 'Create Character'}
           {nextStep.action === 'select-world' && 'Browse Worlds'}
@@ -203,28 +187,31 @@ export function Breadcrumbs({
 function getTestId(segment: BreadcrumbSegment): string {
   // Check for loading states
   if (segment.label === 'Loading...') {
-    if (segment.href.includes('/worlds/') ) {
+    if (segment.href.includes('/worlds/')) {
       return 'breadcrumb-world-loading';
     }
     if (segment.href.includes('/characters/')) {
       return 'breadcrumb-character-loading';
     }
   }
-  
+
   // Regular test IDs
   if (segment.label === 'Worlds') {
     return 'breadcrumb-home';
   }
-  if (segment.href.startsWith('/worlds/') ) {
+  if (segment.href.startsWith('/worlds/')) {
     return 'breadcrumb-world';
   }
   if (segment.href === '/characters') {
     return 'breadcrumb-characters';
   }
-  if (segment.href.startsWith('/characters/') && segment.href !== '/characters/create') {
+  if (
+    segment.href.startsWith('/characters/') &&
+    segment.href !== '/characters/create'
+  ) {
     return 'breadcrumb-character';
   }
-  
+
   return 'breadcrumb-item';
 }
 
@@ -236,24 +223,27 @@ function getTestId(segment: BreadcrumbSegment): string {
 function getSegmentIcon(segment: BreadcrumbSegment): React.ReactNode {
   // Home/Root segments
   if (segment.label === 'Worlds') {
-    return <Home className="w-4 h-4" data-testid="icon-home" aria-hidden="true" />;
+    return <Home data-testid="icon-home" aria-hidden="true" />;
   }
-  
+
   // World segments
-  if (segment.href.startsWith('/worlds/') ) {
-    return <Globe className="w-4 h-4" data-testid="icon-globe" aria-hidden="true" />;
+  if (segment.href.startsWith('/worlds/')) {
+    return <Globe data-testid="icon-globe" aria-hidden="true" />;
   }
-  
+
   // Characters list page (multiple people)
   if (segment.href === '/characters') {
-    return <Users className="w-4 h-4" data-testid="icon-users" aria-hidden="true" />;
+    return <Users data-testid="icon-users" aria-hidden="true" />;
   }
-  
+
   // Individual character page (single person)
-  if (segment.href.startsWith('/characters/') && segment.href !== '/characters/create') {
-    return <User className="w-4 h-4" data-testid="icon-user" aria-hidden="true" />;
+  if (
+    segment.href.startsWith('/characters/') &&
+    segment.href !== '/characters/create'
+  ) {
+    return <User data-testid="icon-user" aria-hidden="true" />;
   }
-  
+
   // No icon for other segments
   return null;
 }

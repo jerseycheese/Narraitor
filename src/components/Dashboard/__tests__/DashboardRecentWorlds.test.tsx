@@ -123,6 +123,21 @@ describe('DashboardRecentWorlds', () => {
     expect(mockOnNavigate).toHaveBeenCalledWith('/worlds');
   });
 
+  it('recent world items have design system styling', () => {
+    render(
+      <DashboardRecentWorlds
+        worlds={mockWorlds}
+        maxItems={3}
+        onNavigate={mockOnNavigate}
+      />
+    );
+
+    const worldItems = screen.getAllByRole('button').filter(
+      el => el.classList.contains('dashboard-recent-item')
+    );
+    expect(worldItems).toHaveLength(3);
+  });
+
   it('has proper heading for accessibility', () => {
     render(
       <DashboardRecentWorlds

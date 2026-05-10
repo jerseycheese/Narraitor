@@ -12,7 +12,7 @@ import { mockApiEndpoints } from './utils/mockApi';
 
 test.describe('EndingScreen Visual Tests', () => {
   test.describe.configure({ timeout: 60000 });
-  const ACTIVE_SESSION_SELECTOR = '[data-testid="game-session-active"]';
+  const ACTIVE_SESSION_SELECTOR = '[data-testid="manuscript-session-shell"]';
   const ACTIVE_SESSION_TIMEOUT = 20000;
 
   const waitForActiveSession = async (page: Page): Promise<void> => {
@@ -324,9 +324,15 @@ test.describe('EndingScreen Visual Tests', () => {
     }
     await page.waitForTimeout(1000);
 
+    // Expand all collapsible sections including "Your Story"
+    await expandAllCollapsibleSections(page);
+
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
-    
+
+    // Wait for content to stabilize
+    await page.waitForTimeout(100);
+
     // Take a full-page screenshot to include the entire UI chrome
     await expect(page).toHaveScreenshot('ending-screen-hopeful.png', {
       threshold: 0.05,

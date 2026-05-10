@@ -100,7 +100,7 @@ const createAlignedDecision = (): Decision => ({
     }
   ],
   decisionWeight: 'major',
-  contextSummary: 'Armed bandits block your path, forcing a decision that could determine your fate.',
+  contextSummary: 'Armed bandits your path, forcing a decision that could determine your fate.',
 });
 
 export const AlignedChoices: Story = {
@@ -138,7 +138,7 @@ const createSkillRequirementDecision = (): Decision => ({
     },
     {
       id: 'option-search',
-      text: 'Search for a hidden key',
+      text: 'Search for a key',
       alignment: 'lawful',
       hint: 'Safe but time-consuming'
       // No requirements - anyone can try this
@@ -293,5 +293,29 @@ export const WithItemRequirements: Story = {
           'Demonstrates inventory-gated choices. The character carries lockpicks, potions, and an arcane focus, so two options unlock while the missing magic key keeps the ward option highlighted as unavailable.',
       },
     },
+  },
+};
+
+export const ManuscriptContext: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ background: 'var(--color-surface-muted, hsl(0 0% 96%))', padding: '2rem', minHeight: 400, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+        <footer id="manuscript-action-rail" style={{ padding: '1.5rem', borderTop: '1px solid var(--color-border)', background: 'var(--color-surface, hsl(0 0% 98% / 95%))', backdropFilter: 'blur(12px)', boxShadow: 'var(--shadow-drawer)' }}>
+          <Story />
+        </footer>
+      </div>
+    ),
+  ],
+  args: {
+    decision: decisionWithHints,
+    enableCustomInput: true,
+  },
+};
+
+export const ManuscriptStreaming: Story = {
+  decorators: ManuscriptContext.decorators,
+  args: {
+    ...ManuscriptContext.args,
+    isDisabled: true,
   },
 };

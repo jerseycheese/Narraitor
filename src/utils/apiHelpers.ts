@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
+import { getAIConfig } from '../lib/ai/config';
 
 /**
  * Get client IP address from request headers
@@ -272,7 +273,7 @@ export async function processGeminiTextRequest(
 
     // Call Google's Gemini API from the server using secure header authentication
     const response = await makeGeminiRequest(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().modelName}:generateContent`,
       apiKey,
       {
         contents: [{

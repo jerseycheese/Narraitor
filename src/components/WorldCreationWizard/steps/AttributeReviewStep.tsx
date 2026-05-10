@@ -11,7 +11,7 @@ import {
   WizardFormSection,
   WizardFormGroup,
   WizardTextField,
-  WizardTextArea
+  WizardTextArea,
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
 import type { AIGuidanceSource } from '@/lib/constants/worldGuidance';
@@ -40,57 +40,76 @@ export default function AttributeReviewStep({
   onClearSuggestions,
 }: AttributeReviewStepProps) {
   // Custom attribute management state - initialize from existing world data when editing
-  const [customAttributes, setCustomAttributes] = useState<WorldAttribute[]>(() => {
-    // When editing, identify existing custom attributes (those not in AI suggestions)
-    if (worldData.attributes && worldData.attributes.length > 0) {
-      const suggestionNames = new Set(suggestions.map(s => s.name));
-      return worldData.attributes.filter(attr => !suggestionNames.has(attr.name));
+  const [customAttributes, setCustomAttributes] = useState<WorldAttribute[]>(
+    () => {
+      // When editing, identify existing custom attributes (those not in AI suggestions)
+      if (worldData.attributes && worldData.attributes.length > 0) {
+        const suggestionNames = new Set(suggestions.map((s) => s.name));
+        return worldData.attributes.filter(
+          (attr) => !suggestionNames.has(attr.name)
+        );
+      }
+      return [];
     }
-    return [];
-  });
-  const [isCreatingCustomAttribute, setIsCreatingCustomAttribute] = useState(false);
-  const [editingCustomAttributeId, setEditingCustomAttributeId] = useState<string | null>(null);
+  );
+  const [isCreatingCustomAttribute, setIsCreatingCustomAttribute] =
+    useState(false);
+  const [editingCustomAttributeId, setEditingCustomAttributeId] = useState<
+    string | null
+  >(null);
   const [showClearConfirmation, setShowClearConfirmation] = useState(false);
 
   /**
    * Helper function to merge accepted AI attributes with custom attributes
-   * 
+   *
    * This centralizes the merge logic to ensure consistency across all handlers
    * and reduces code duplication. Uses stable IDs to prevent unnecessary re-renders.
-   * 
+   *
    * @param acceptedSuggestions - AI-generated attribute suggestions that are accepted
    * @param customAttributesList - Custom attributes to merge (defaults to current state)
    * @returns Combined array of accepted AI attributes and custom attributes
    */
-  const mergeAllAttributes = (acceptedSuggestions: AttributeSuggestion[], customAttributesList = customAttributes): WorldAttribute[] => {
-    const acceptedAttributes: WorldAttribute[] = acceptedSuggestions.map(s => {
-      // Use stable ID based on attribute name to prevent unnecessary re-renders
-      const existingAttribute = worldData.attributes?.find(attr => attr.name === s.name);
-      return {
-        id: existingAttribute?.id || generateUniqueId('attribute'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        baseValue: s.baseValue,
-        minValue: s.minValue,
-        maxValue: s.maxValue,
-        category: s.category,
-      };
-    });
-    
+  const mergeAllAttributes = (
+    acceptedSuggestions: AttributeSuggestion[],
+    customAttributesList = customAttributes
+  ): WorldAttribute[] => {
+    const acceptedAttributes: WorldAttribute[] = acceptedSuggestions.map(
+      (s) => {
+        // Use stable ID based on attribute name to prevent unnecessary re-renders
+        const existingAttribute = worldData.attributes?.find(
+          (attr) => attr.name === s.name
+        );
+        return {
+          id: existingAttribute?.id || generateUniqueId('attribute'),
+          worldId: '',
+          name: s.name,
+          description: s.description,
+          baseValue: s.baseValue,
+          minValue: s.minValue,
+          maxValue: s.maxValue,
+          category: s.category,
+        };
+      }
+    );
+
     return [...acceptedAttributes, ...customAttributesList];
   };
   // Initialize state based on existing selections
   const [localSuggestions, setLocalSuggestions] = useState(() => {
     // If we have existing attributes in worldData, match them to suggestions
     if (worldData.attributes && worldData.attributes.length > 0) {
-      return suggestions.map(suggestion => {
-        const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
+      return suggestions.map((suggestion) => {
+        const existingAttr = worldData.attributes?.find(
+          (attr) => attr.name === suggestion.name
+        );
         return {
           ...suggestion,
-          accepted: suggestion.accepted !== undefined ? suggestion.accepted : true, // Use suggestion's accepted value, default to true
+          accepted:
+            suggestion.accepted !== undefined ? suggestion.accepted : true, // Use suggestion's accepted value, default to true
           showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
-          baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
+          baseValue:
+            existingAttr?.baseValue ??
+            Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       });
     }
@@ -107,16 +126,21 @@ export default function AttributeReviewStep({
     // This should only run on initial mount or when suggestions change from parent
     // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
-      const newSuggestions = suggestions.map(suggestion => {
-        const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
+      const newSuggestions = suggestions.map((suggestion) => {
+        const existingAttr = worldData.attributes?.find(
+          (attr) => attr.name === suggestion.name
+        );
         // Use the suggestion's accepted value, defaulting to true if not specified
-        const accepted = suggestion.accepted !== undefined ? suggestion.accepted : true;
+        const accepted =
+          suggestion.accepted !== undefined ? suggestion.accepted : true;
         // For the first attribute, show details by default to give user a clue
         return {
           ...suggestion,
           accepted,
           showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
-          baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
+          baseValue:
+            existingAttr?.baseValue ??
+            Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       });
 
@@ -124,8 +148,8 @@ export default function AttributeReviewStep({
 
       // Automatically save the initially selected attributes to parent state
       const acceptedAttributes = newSuggestions
-        .filter(s => s.accepted)
-        .map(s => ({
+        .filter((s) => s.accepted)
+        .map((s) => ({
           id: generateUniqueId('attr'),
           worldId: '',
           name: s.name,
@@ -137,7 +161,10 @@ export default function AttributeReviewStep({
         }));
 
       // Only update if we don't already have attributes or if the count is different
-      if (!worldData.attributes || worldData.attributes.length !== acceptedAttributes.length) {
+      if (
+        !worldData.attributes ||
+        worldData.attributes.length !== acceptedAttributes.length
+      ) {
         onUpdate({ ...worldData, attributes: acceptedAttributes });
       }
     } else {
@@ -146,14 +173,20 @@ export default function AttributeReviewStep({
 
       // Update worldData to only contain custom attributes (preserving user's manual work)
       // Only update if attributes have actually changed to prevent infinite loop
-      const currentAttributeIds = (worldData.attributes || []).map(a => a.id).sort().join(',');
-      const customAttributeIds = customAttributes.map(a => a.id).sort().join(',');
+      const currentAttributeIds = (worldData.attributes || [])
+        .map((a) => a.id)
+        .sort()
+        .join(',');
+      const customAttributeIds = customAttributes
+        .map((a) => a.id)
+        .sort()
+        .join(',');
 
       if (currentAttributeIds !== customAttributeIds) {
         onUpdate({ ...worldData, attributes: customAttributes });
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestions]); // Only depend on suggestions, not worldData.attributes
 
   const handleToggleAttribute = (index: number) => {
@@ -161,31 +194,38 @@ export default function AttributeReviewStep({
     const updatedSuggestions = [...localSuggestions];
     updatedSuggestions[index] = {
       ...updatedSuggestions[index],
-      accepted: !updatedSuggestions[index].accepted
+      accepted: !updatedSuggestions[index].accepted,
     };
-    
+
     // Update local state
     setLocalSuggestions(updatedSuggestions);
-    
+
     // Convert to WorldAttribute objects for the store
-    const acceptedSuggestions = updatedSuggestions.filter(s => s.accepted);
+    const acceptedSuggestions = updatedSuggestions.filter((s) => s.accepted);
     const allAttributes = mergeAllAttributes(acceptedSuggestions);
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
-  const handleModifyAttribute = (index: number, field: keyof AttributeSuggestion, value: string | number) => {
+  const handleModifyAttribute = (
+    index: number,
+    field: keyof AttributeSuggestion,
+    value: string | number
+  ) => {
     const updatedSuggestions = [...localSuggestions];
-    updatedSuggestions[index] = { ...updatedSuggestions[index], [field]: value };
+    updatedSuggestions[index] = {
+      ...updatedSuggestions[index],
+      [field]: value,
+    };
     setLocalSuggestions(updatedSuggestions);
-    
+
     // Re-calculate accepted attributes
-    const acceptedSuggestions = updatedSuggestions.filter(s => s.accepted);
+    const acceptedSuggestions = updatedSuggestions.filter((s) => s.accepted);
     const allAttributes = mergeAllAttributes(acceptedSuggestions);
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
-
-  const acceptedCount = localSuggestions.filter(s => s.accepted).length + customAttributes.length;
+  const acceptedCount =
+    localSuggestions.filter((s) => s.accepted).length + customAttributes.length;
 
   // Custom attribute handlers
   const handleAddCustomAttribute = () => {
@@ -195,22 +235,27 @@ export default function AttributeReviewStep({
 
   const handleSaveCustomAttribute = (attribute: WorldAttribute) => {
     let updatedCustomAttributes: WorldAttribute[];
-    
+
     if (editingCustomAttributeId) {
       // Edit existing custom attribute
-      updatedCustomAttributes = customAttributes.map(a => a.id === editingCustomAttributeId ? attribute : a);
+      updatedCustomAttributes = customAttributes.map((a) =>
+        a.id === editingCustomAttributeId ? attribute : a
+      );
     } else {
       // Add new custom attribute
       updatedCustomAttributes = [...customAttributes, attribute];
     }
-    
+
     setCustomAttributes(updatedCustomAttributes);
     setIsCreatingCustomAttribute(false);
     setEditingCustomAttributeId(null);
-    
+
     // Recalculate world attributes
-    const acceptedSuggestions = localSuggestions.filter(s => s.accepted);
-    const allAttributes = mergeAllAttributes(acceptedSuggestions, updatedCustomAttributes);
+    const acceptedSuggestions = localSuggestions.filter((s) => s.accepted);
+    const allAttributes = mergeAllAttributes(
+      acceptedSuggestions,
+      updatedCustomAttributes
+    );
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
@@ -220,12 +265,17 @@ export default function AttributeReviewStep({
   };
 
   const handleDeleteCustomAttribute = (attributeId: string) => {
-    const updatedCustomAttributes = customAttributes.filter(a => a.id !== attributeId);
+    const updatedCustomAttributes = customAttributes.filter(
+      (a) => a.id !== attributeId
+    );
     setCustomAttributes(updatedCustomAttributes);
-    
+
     // Recalculate world attributes
-    const acceptedSuggestions = localSuggestions.filter(s => s.accepted);
-    const allAttributes = mergeAllAttributes(acceptedSuggestions, updatedCustomAttributes);
+    const acceptedSuggestions = localSuggestions.filter((s) => s.accepted);
+    const allAttributes = mergeAllAttributes(
+      acceptedSuggestions,
+      updatedCustomAttributes
+    );
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
@@ -241,7 +291,8 @@ export default function AttributeReviewStep({
     }
   };
 
-  const showClearButton = worldData.aiSuggestionMeta?.source === 'ai' && suggestions.length > 0;
+  const showClearButton =
+    worldData.aiSuggestionMeta?.source === 'ai' && suggestions.length > 0;
 
   return (
     <div data-testid="attribute-review-step">
@@ -251,7 +302,7 @@ export default function AttributeReviewStep({
         dataTutorial="attribute-editor"
       >
         {showClearButton && (
-          <div className="mb-4 flex justify-end">
+          <div>
             <Button
               type="button"
               onClick={() => setShowClearConfirmation(true)}
@@ -264,240 +315,245 @@ export default function AttributeReviewStep({
           </div>
         )}
 
-      <div className="space-y-4 my-4">
         <div>
-          {localSuggestions.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p className="text-lg mb-2">No attribute suggestions available</p>
-              <p className="text-sm">You can add attributes to your world later in the world editor.</p>
-            </div>
-          ) : (
-            localSuggestions.map((suggestion, index) => (
-            <div 
-              key={index} 
-              className={wizardStyles.card.base} 
-              data-testid={`attribute-card-${index}`}
-              {...(index === 0 ? { 'data-tutorial': 'attribute-suggestions' } : {})}
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium">
-                    {suggestion.name}
-                  </span>
-                  {suggestion.category && (
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                      {suggestion.category}
-                    </span>
-                  )}
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button 
-                    type="button" 
-                    variant="link"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const newSuggestions = [...localSuggestions];
-                      newSuggestions[index] = {
-                        ...newSuggestions[index],
-                        showDetails: !newSuggestions[index].showDetails
-                      };
-                      setLocalSuggestions(newSuggestions);
-                    }}
-                  >
-                    {suggestion.showDetails ? 'Hide details' : 'Customize'}
-                  </Button>
-                  <Button
-                    type="button"
-                    data-testid={`attribute-toggle-${index}`}
-                    onClick={() => handleToggleAttribute(index)}
-                    variant={suggestion.accepted ? "default" : "outline"}
-                    size="sm"
-                  >
-                    {suggestion.accepted ? 'Selected' : 'Excluded'}
-                  </Button>
-                </div>
+          <div>
+            {localSuggestions.length === 0 ? (
+              <div>
+                <p>No attribute suggestions available</p>
+                <p>
+                  You can add attributes to your world later in the world
+                  editor.
+                </p>
               </div>
-              
-              {suggestion.showDetails && (
-                <div 
-                  key={`attribute-expanded-${index}`}
-                  className="mt-4 pl-7"
-                  onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
-                >
-                  <WizardFormGroup label="Name">
-                    <WizardTextField
-                      value={suggestion.name}
-                      onChange={(value) => handleModifyAttribute(index, 'name', value)}
-                      testId={`attribute-name-input-${index}`}
-                    />
-                  </WizardFormGroup>
-                  
-                  <WizardFormGroup label="Description">
-                    <WizardTextArea
-                      value={suggestion.description}
-                      onChange={(value) => handleModifyAttribute(index, 'description', value)}
-                      rows={2}
-                      testId={`attribute-description-textarea-${index}`}
-                    />
-                  </WizardFormGroup>
-
-                  {/* Fixed min/max range controls (for MVP) */}
-                  <div className="my-4">
-                    <AttributeRangeEditor
-                      attribute={{
-                        id: '',
-                        worldId: '',
-                        name: suggestion.name,
-                        description: suggestion.description,
-                        baseValue: suggestion.baseValue,
-                        minValue: 1, // Fixed for MVP
-                        maxValue: 10, // Fixed for MVP
-                      }}
-                      onChange={(updates) => {
-                        if (updates.baseValue !== undefined) {
-                          handleModifyAttribute(index, 'baseValue', updates.baseValue);
-                        }
-                      }}
-                      showLabels={false}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            ))
-          )}
-        </div>
-        
-        {/* Custom Attributes Section */}
-        <div className="mt-8 pt-6 border-t border-gray-200" data-tutorial="attribute-custom">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">Custom Attributes</h3>
-              <p className="text-sm text-gray-700">
-                Create your own unique attributes for this world ({acceptedCount}/6 slots used)
-              </p>
-            </div>
-            <Button
-              type="button"
-              onClick={handleAddCustomAttribute}
-              size="sm"
-              data-testid="add-custom-attribute-button"
-              disabled={acceptedCount >= 6}
-            >
-              + Add Custom Attribute
-            </Button>
-          </div>
-          
-          {customAttributes.length === 0 && !isCreatingCustomAttribute ? (
-            <div className="text-center py-6 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
-              <p className="text-sm text-gray-700 mb-2">No custom attributes yet</p>
-              <p className="text-xs text-gray-500">
-                {acceptedCount < 6 
-                  ? `You have ${6 - acceptedCount} attribute slot${6 - acceptedCount !== 1 ? 's' : ''} available for custom attributes`
-                  : 'Remove some suggested attributes to add custom ones'
-                }
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {customAttributes.map((attribute) => (
+            ) : (
+              localSuggestions.map((suggestion, index) => (
                 <div
-                  key={attribute.id}
-                  className={`${wizardStyles.card.base} border-l-4 border-l-green-500`}
-                  data-testid={`custom-attribute-card-${attribute.id}`}
+                  key={index}
+                  className={wizardStyles.card.base}
+                  data-testid={`attribute-card-${index}`}
+                  {...(index === 0
+                    ? { 'data-tutorial': 'attribute-suggestions' }
+                    : {})}
                 >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium">{attribute.name}</span>
-                      <span className="text-xs text-success bg-success/20 px-2 py-1 rounded">
-                        Custom
-                      </span>
-                      {attribute.category && (
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                          {attribute.category}
-                        </span>
+                  <div>
+                    <div>
+                      <span>{suggestion.name}</span>
+                      {suggestion.category && (
+                        <span>{suggestion.category}</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    <div>
                       <Button
                         type="button"
-                        onClick={() => handleEditCustomAttribute(attribute.id)}
                         variant="link"
                         size="sm"
-                        data-testid={`edit-custom-attribute-${attribute.id}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newSuggestions = [...localSuggestions];
+                          newSuggestions[index] = {
+                            ...newSuggestions[index],
+                            showDetails: !newSuggestions[index].showDetails,
+                          };
+                          setLocalSuggestions(newSuggestions);
+                        }}
                       >
-                        Edit
+                        {suggestion.showDetails ? 'Hide details' : 'Customize'}
                       </Button>
                       <Button
                         type="button"
-                        onClick={() => handleDeleteCustomAttribute(attribute.id)}
-                        variant="destructive"
+                        data-testid={`attribute-toggle-${index}`}
+                        onClick={() => handleToggleAttribute(index)}
+                        variant={suggestion.accepted ? 'default' : 'outline'}
                         size="sm"
-                        data-testid={`delete-custom-attribute-${attribute.id}`}
                       >
-                        Delete
+                        {suggestion.accepted ? 'Selected' : 'Excluded'}
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-2 text-sm text-gray-700">
-                    {attribute.description}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {/* Custom Attribute Editor */}
-          {isCreatingCustomAttribute && (
-            <div className="mt-4 p-4 bg-gray-100 rounded-lg border" data-testid="custom-attribute-editor">
-              <AttributeEditor
-                worldId={worldData.id || ''}
-                mode={editingCustomAttributeId ? 'edit' : 'create'}
-                attributeId={editingCustomAttributeId || undefined}
-                existingAttributes={[...customAttributes, ...(worldData.attributes || [])]}
-                maxAttributes={6}
-                onSave={handleSaveCustomAttribute}
-                onDelete={editingCustomAttributeId ? handleDeleteCustomAttribute : undefined}
-                onCancel={handleCancelCustomAttribute}
-              />
-            </div>
-          )}
-        </div>
-      </div>
 
-      <div
-        className="mt-6 p-4 bg-info/10 rounded-lg border border-info/20"
-        data-testid="attribute-count-summary"
-        data-tutorial="attribute-summary"
-      >
-        <div className="flex justify-between items-center">
-          <div>
-            <span className="text-sm font-medium text-gray-900">
-              Attributes Selected: {acceptedCount} / 6
-            </span>
-            {acceptedCount >= 6 && (
-              <span className="text-xs text-warning ml-2">
-                (Maximum reached)
-              </span>
+                  {suggestion.showDetails && (
+                    <div
+                      key={`attribute-expanded-${index}`}
+                      onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
+                    >
+                      <WizardFormGroup label="Name">
+                        <WizardTextField
+                          value={suggestion.name}
+                          onChange={(value) =>
+                            handleModifyAttribute(index, 'name', value)
+                          }
+                          testId={`attribute-name-input-${index}`}
+                        />
+                      </WizardFormGroup>
+
+                      <WizardFormGroup label="Description">
+                        <WizardTextArea
+                          value={suggestion.description}
+                          onChange={(value) =>
+                            handleModifyAttribute(index, 'description', value)
+                          }
+                          rows={2}
+                          testId={`attribute-description-textarea-${index}`}
+                        />
+                      </WizardFormGroup>
+
+                      {/* Fixed min/max range controls (for MVP) */}
+                      <div>
+                        <AttributeRangeEditor
+                          attribute={{
+                            id: '',
+                            worldId: '',
+                            name: suggestion.name,
+                            description: suggestion.description,
+                            baseValue: suggestion.baseValue,
+                            minValue: 1, // Fixed for MVP
+                            maxValue: 10, // Fixed for MVP
+                          }}
+                          onChange={(updates) => {
+                            if (updates.baseValue !== undefined) {
+                              handleModifyAttribute(
+                                index,
+                                'baseValue',
+                                updates.baseValue
+                              );
+                            }
+                          }}
+                          showLabels={false}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
             )}
           </div>
-          <div className="text-xs text-gray-700">
-            {acceptedCount < 6
-              ? `${6 - acceptedCount} slot${6 - acceptedCount !== 1 ? 's' : ''} available`
-              : 'All slots filled'
-            }
+
+          {/* Custom Attributes Section */}
+          <div data-tutorial="attribute-custom">
+            <div>
+              <div>
+                <h3>Custom Attributes</h3>
+                <p>
+                  Create your own unique attributes for this world (
+                  {acceptedCount}/6 slots used)
+                </p>
+              </div>
+              <Button
+                type="button"
+                onClick={handleAddCustomAttribute}
+                size="sm"
+                data-testid="add-custom-attribute-button"
+                disabled={acceptedCount >= 6}
+              >
+                + Add Custom Attribute
+              </Button>
+            </div>
+
+            {customAttributes.length === 0 && !isCreatingCustomAttribute ? (
+              <div>
+                <p>No custom attributes yet</p>
+                <p>
+                  {acceptedCount < 6
+                    ? `You have ${6 - acceptedCount} attribute slot${6 - acceptedCount !== 1 ? 's' : ''} available for custom attributes`
+                    : 'Remove some suggested attributes to add custom ones'}
+                </p>
+              </div>
+            ) : (
+              <div>
+                {customAttributes.map((attribute) => (
+                  <div
+                    key={attribute.id}
+                    className={`${wizardStyles.card.base}`}
+                    data-testid={`custom-attribute-card-${attribute.id}`}
+                  >
+                    <div>
+                      <div>
+                        <span>{attribute.name}</span>
+                        <span>Custom</span>
+                        {attribute.category && (
+                          <span>{attribute.category}</span>
+                        )}
+                      </div>
+                      <div>
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            handleEditCustomAttribute(attribute.id)
+                          }
+                          variant="link"
+                          size="sm"
+                          data-testid={`edit-custom-attribute-${attribute.id}`}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            handleDeleteCustomAttribute(attribute.id)
+                          }
+                          variant="destructive"
+                          size="sm"
+                          data-testid={`delete-custom-attribute-${attribute.id}`}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                    <div>{attribute.description}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Custom Attribute Editor */}
+            {isCreatingCustomAttribute && (
+              <div data-testid="custom-attribute-editor">
+                <AttributeEditor
+                  worldId={worldData.id || ''}
+                  mode={editingCustomAttributeId ? 'edit' : 'create'}
+                  attributeId={editingCustomAttributeId || undefined}
+                  existingAttributes={[
+                    ...customAttributes,
+                    ...(worldData.attributes || []),
+                  ]}
+                  maxAttributes={6}
+                  onSave={handleSaveCustomAttribute}
+                  onDelete={
+                    editingCustomAttributeId
+                      ? handleDeleteCustomAttribute
+                      : undefined
+                  }
+                  onCancel={handleCancelCustomAttribute}
+                />
+              </div>
+            )}
           </div>
         </div>
-        <div className="mt-2 w-full">
-          <div className="grid grid-cols-6 gap-0.5 h-2">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={`${i < acceptedCount ? 'bg-info' : 'bg-info/30'} rounded-full`} />
-            ))}
+
+        <div
+          data-testid="attribute-count-summary"
+          data-tutorial="attribute-summary"
+        >
+          <div>
+            <div>
+              <span>Attributes Selected: {acceptedCount} / 6</span>
+              {acceptedCount >= 6 && <span>(Maximum reached)</span>}
+            </div>
+            <div>
+              {acceptedCount < 6
+                ? `${6 - acceptedCount} slot${6 - acceptedCount !== 1 ? 's' : ''} available`
+                : 'All slots filled'}
+            </div>
+          </div>
+          <div>
+            <div>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
       </WizardFormSection>
 
       {errors.attributes && (
@@ -506,13 +562,19 @@ export default function AttributeReviewStep({
 
       {/* Clear Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="clear-suggestions-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clear-dialog-title">
-          <div className="rounded-lg bg-white p-6 shadow-lg max-w-md mx-4">
-            <h3 id="clear-dialog-title" className="text-lg font-semibold text-gray-900 mb-2">Clear Suggestions?</h3>
-            <p className="text-sm text-gray-700 mb-4">
-              This will remove all attribute suggestions. You can still add custom attributes or regenerate suggestions later.
+        <div
+          data-testid="clear-suggestions-dialog"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="clear-dialog-title"
+        >
+          <div>
+            <h3 id="clear-dialog-title">Clear Suggestions?</h3>
+            <p>
+              This will remove all attribute suggestions. You can still add
+              custom attributes or regenerate suggestions later.
             </p>
-            <div className="flex justify-end gap-3">
+            <div>
               <Button
                 type="button"
                 onClick={() => setShowClearConfirmation(false)}

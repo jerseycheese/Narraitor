@@ -9,6 +9,12 @@ import type {
 } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import { logger } from '@/lib/utils/logger';
+type ParsedSkillRequirement = {
+  type: 'skill';
+  targetId: string;
+  operator: 'gte';
+  value: number;
+};
 
 export const parseChoiceResponse = (
   content: string,
@@ -109,6 +115,9 @@ export const parseChoiceResponse = (
           text = safeTrim(alignmentMatch[2]);
         }
 
+        const inlineRequirement = extractInlineSkillRequirement(text);
+        text = inlineRequirement.cleanedText;
+
         currentOption = {
           id: generateUniqueId('option'),
           text,
@@ -116,6 +125,16 @@ export const parseChoiceResponse = (
           hint: undefined,
           requirements: [],
         };
+
+        if (inlineRequirement.requirementText) {
+          const parsedRequirement = parseSkillRequirementText(
+            inlineRequirement.requirementText,
+            world
+          );
+          if (parsedRequirement) {
+            addSkillRequirement(currentOption, parsedRequirement);
+          }
+        }
         continue;
       }
 
@@ -130,27 +149,9 @@ export const parseChoiceResponse = (
       const reqMatch = trimmed.match(/^Requirements?:\s*(.+)$/i);
       if (reqMatch) {
         if (currentOption) {
-          const reqText = safeTrim(reqMatch[1]);
-          const skillMatch = reqText.match(/^(\w+)\s+(\d+)\+?$/);
-          if (skillMatch) {
-            const skillName = skillMatch[1];
-            const level = parseInt(skillMatch[2]);
-            const worldSkill = world.skills?.find(
-              (ws) => ws.name.toLowerCase() === skillName.toLowerCase()
-            );
-
-            if (!worldSkill) {
-              logger.warn(
-                `[ChoiceGenerator] Unknown skill "${skillName}" in AI response - skipping requirement`
-              );
-            } else {
-              currentOption.requirements?.push({
-                type: 'skill',
-                targetId: worldSkill.id,
-                operator: 'gte',
-                value: level,
-              });
-            }
+          const parsedRequirement = parseSkillRequirementText(reqMatch[1], world);
+          if (parsedRequirement) {
+            addSkillRequirement(currentOption, parsedRequirement);
           }
         }
       }
@@ -238,4 +239,88 @@ const finalizeOption = (
   }
 
   return finalOption;
+};
+
+const parseSkillRequirementText = (
+  reqText: string,
+  world: World
+): ParsedSkillRequirement | null => {
+  const normalizedReqText = safeTrim(reqText);
+  const skillMatch = normalizedReqText.match(/^\[?\s*(.+?)\s+(\d+)\+?\s*\]?$/);
+  if (!skillMatch) {
+    return null;
+  }
+
+  const skillName = safeTrim(skillMatch[1]).replace(/\s+/g, ' ');
+  const normalizedSkillName = skillName.toLowerCase();
+  const level = parseInt(skillMatch[2]);
+  const worldSkill = world.skills?.find(
+    (ws) => safeTrim(ws.name).toLowerCase() === normalizedSkillName
+  );
+
+  if (!worldSkill) {
+    logger.warn(
+      `[ChoiceGenerator] Unknown skill "${skillName}" in AI response - skipping requirement`
+    );
+    return null;
+  }
+
+  return {
+    type: 'skill',
+    targetId: worldSkill.id,
+    operator: 'gte',
+    value: level,
+  };
+};
+
+const extractInlineSkillRequirement = (
+  optionText: string
+): { cleanedText: string; requirementText?: string } => {
+  const text = safeTrim(optionText);
+  const inlinePatterns = [
+    /\s*\[\s*([^\]]*?\d+\+?)\s*\]\s*$/i,
+    /\s*\(\s*([^)]*?\d+\+?)\s*\)\s*$/i,
+    /\s*(?:-|\u2013|\u2014)?\s*(?:requires?|req\.?)\s*[:\-]?\s*([a-z][a-z\s/-]*\s+\d+\+?)\s*$/i,
+  ];
+
+  for (const pattern of inlinePatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      const cleanedText = safeTrim(text.replace(pattern, ''));
+      return {
+        cleanedText,
+        requirementText: safeTrim(match[1]),
+      };
+    }
+  }
+
+  return { cleanedText: text };
+};
+
+const addSkillRequirement = (
+  option: Partial<DecisionOption> & {
+    requirements?: {
+      type: string;
+      targetId: string;
+      operator: string;
+      value: number;
+    }[];
+  },
+  requirement: ParsedSkillRequirement
+): void => {
+  if (!option.requirements) {
+    option.requirements = [];
+  }
+
+  const exists = option.requirements.some(
+    (req) =>
+      req.type === requirement.type &&
+      req.targetId === requirement.targetId &&
+      req.operator === requirement.operator &&
+      req.value === requirement.value
+  );
+
+  if (!exists) {
+    option.requirements.push(requirement);
+  }
 };

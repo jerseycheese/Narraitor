@@ -148,7 +148,7 @@ export const ModernWorld: Story = {
     world: {
       ...baseWorld,
       name: 'Contemporary Earth',
-      description: 'Modern day Earth with hidden supernatural elements',
+      description: 'Modern day Earth with supernatural elements',
       genre: 'fantasy',
       relationship: 'set_within',
       reference: 'World of Darkness',

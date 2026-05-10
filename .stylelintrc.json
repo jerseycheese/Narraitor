@@ -5,7 +5,7 @@
       "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen", "layer"]
     }],
     "color-no-hex": true,
-    "color-named": "never", 
+    "color-named": "never",
     "function-disallowed-list": [
       "rgb",
       "rgba"
@@ -18,7 +18,7 @@
         "/^(red|blue|green|yellow|orange|purple|pink|brown|indigo|violet|cyan|teal|lime|emerald|sky|rose|slate|stone|neutral|zinc|fuchsia|magenta)$/i"
       ]
     },
-    "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate"],
+    "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "repeat", "minmax"],
     "declaration-property-value-no-unknown": [true, {
       "ignoreProperties": {
         "/color/": ["/^theme\\(/", "/^hsl\\(var\\(/"],
@@ -37,17 +37,69 @@
     "no-descending-specificity": null,
     "declaration-empty-line-before": null
   },
-  "ignoreFiles": [
-    "node_modules/**/*",
-    "dist/**/*",
-    "build/**/*",
-    ".next/**/*",
-    "storybook-static/**/*",
-    ".storybook/**/*",
-    "playwright-html-report/**/*",
-    "**/trace/**/*",
-    "coverage/**/*",
-    "**/*.test.css",
-    "**/*.spec.css"
-  ]
-}
+    "ignoreFiles": [
+      "node_modules/**/*",
+      "dist/**/*",
+      "build/**/*",
+      ".next/**/*",
+      "storybook-static/**/*",
+      ".storybook/**/*",
+      "playwright-html-report/**/*",
+      "**/trace/**/*",
+      "coverage/**/*",
+      "**/*.test.css",
+      "**/*.spec.css",
+      "public_docs/**/*",
+      "src/app/dev/**/*.css"
+    ],
+    "overrides": [
+      {
+        "files": ["src/app/globals.css"],
+        "rules": {
+          "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "min", "max", "clamp", "minmax", "rgb", "rgba", "blur", "cubic-bezier", "repeat"],
+          "function-disallowed-list": [],
+          "declaration-property-value-disallowed-list": {
+            "/^(background|border|color|fill|stroke|outline|text-decoration|box-shadow).*$/": [
+              "/^#[0-9a-fA-F]+$/",
+              "/^(red|blue|green|yellow|orange|purple|pink|brown|indigo|violet|cyan|teal|lime|emerald|sky|rose|slate|stone|neutral|zinc|fuchsia|magenta)$/i"
+            ]
+          }
+        }
+      },
+      {
+        "files": ["src/lib/theme/themes/*.css"],
+        "rules": {
+          "function-allowed-list": ["hsl", "hsla", "var", "calc", "rgb", "rgba", "linear-gradient", "radial-gradient"],
+          "function-disallowed-list": [],
+          "color-no-hex": null,
+          "declaration-property-value-disallowed-list": null
+        }
+      },
+      {
+        "files": ["src/app/workshop.css", "src/app/dashboard.css", "src/app/wizard.css"],
+        "rules": {
+          "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "radial-gradient", "color-mix", "clamp", "cubic-bezier", "brightness", "blur", "repeat", "minmax"],
+          "function-disallowed-list": [],
+          "declaration-property-value-disallowed-list": {
+            "/^(background|border|color|fill|stroke|outline|text-decoration|box-shadow).*$/": [
+              "/^#[0-9a-fA-F]+$/",
+              "/^(red|blue|green|yellow|orange|purple|pink|brown|indigo|violet|cyan|teal|lime|emerald|sky|rose|slate|stone|neutral|zinc|fuchsia|magenta)$/i"
+            ]
+          }
+        }
+      },
+      {
+        "files": ["src/styles/manuscript-session.css"],
+        "rules": {
+          "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "radial-gradient", "repeating-linear-gradient", "rgb", "rgba", "blur", "cubic-bezier", "minmax", "min", "clamp"],
+          "function-disallowed-list": [],
+          "declaration-property-value-disallowed-list": {
+            "/^(background|border|color|fill|stroke|outline|text-decoration|box-shadow).*$/": [
+              "/^#[0-9a-fA-F]+$/",
+              "/^(red|blue|green|yellow|orange|purple|pink|brown|indigo|violet|cyan|teal|lime|emerald|sky|rose|slate|stone|neutral|zinc|fuchsia|magenta)$/i"
+            ]
+          }
+        }
+      }
+    ]
+  }

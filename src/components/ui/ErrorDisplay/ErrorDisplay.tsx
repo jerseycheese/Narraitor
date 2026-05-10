@@ -1,6 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cssClasses } from '@/lib/utils';
 
 export type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
 export type ErrorSeverity = 'error' | 'warning' | 'info';
@@ -28,27 +27,6 @@ interface ErrorDisplayProps {
   fieldName?: string;
 }
 
-const severityStyles = {
-  error: {
-    container: 'bg-destructive/10 border-destructive text-destructive',
-    title: 'text-destructive',
-    message: 'text-destructive',
-    button: 'bg-destructive/10 hover:bg-destructive/20 text-destructive',
-  },
-  warning: {
-    container: 'bg-amber-200 border-amber-200 text-amber-700',
-    title: 'text-amber-700',
-    message: 'text-amber-500',
-    button: 'bg-amber-100 hover:bg-amber-200 text-amber-700',
-  },
-  info: {
-    container: 'bg-blue-50 border-blue-200 text-blue-900',
-    title: 'text-blue-700',
-    message: 'text-blue-700',
-    button: 'bg-blue-100 hover:bg-blue-200 text-blue-700',
-  },
-};
-
 export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   variant = 'section',
   severity = 'error',
@@ -61,12 +39,10 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   className,
   fieldName,
 }) => {
-  const styles = severityStyles[severity];
-
   if (variant === 'inline') {
     return (
-      <p 
-        className={cn('text-sm mt-1', styles.message, className)}
+      <p
+        className={className}
         role="alert"
         aria-live="polite"
         {...(fieldName && { id: `${fieldName}-error` })}
@@ -78,39 +54,24 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
   if (variant === 'page') {
     return (
-      <div 
-        className={cn('flex flex-col items-center justify-center min-h-[400px] p-4 sm:p-8', className)}
+      <div
+        className={className}
         role="alert"
         aria-live="polite"
       >
-        {title && (
-          <h1 className={cn('text-2xl font-bold mb-4', styles.title)}>
-            {title}
-          </h1>
-        )}
-        <p className={cn('text-lg mb-6 text-center max-w-md', styles.message)}>
-          {message}
-        </p>
+        {title && <h1>{title}</h1>}
+        <p>{message}</p>
         {(showRetry || showDismiss) && (
-          <div className="flex gap-4">
+          <div>
             {showRetry && onRetry && (
               <button
                 onClick={onRetry}
-                className={cn(
-                  'px-6 py-2 rounded-lg font-medium transition-colors',
-                  styles.button
-                )}
               >
                 Try Again
               </button>
             )}
             {showDismiss && onDismiss && (
-              <button
-                onClick={onDismiss}
-                className="px-6 py-2 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-              >
-                Dismiss
-              </button>
+              <button onClick={onDismiss}>Dismiss</button>
             )}
           </div>
         )}
@@ -121,30 +82,22 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   if (variant === 'toast') {
     return (
       <div
-        className={cn(
-          'fixed bottom-4 right-4 max-w-sm p-4 rounded-lg shadow-lg border animate-slide-up',
-          styles.container,
-          className
-        )}
+        className={className}
         role="alert"
         aria-live="assertive"
       >
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            {title && (
-              <h3 className={cn('font-semibold mb-1', styles.title)}>
-                {title}
-              </h3>
-            )}
-            <p className={cn('text-sm', styles.message)}>{message}</p>
+        <div>
+          <div>
+            {title && <h3>{title}</h3>}
+            <p>{message}</p>
           </div>
           {showDismiss && onDismiss && (
-            <button
-              onClick={onDismiss}
-              className="ml-4 text-gray-500 hover:text-gray-700"
+            <button 
+              onClick={onDismiss} 
               aria-label="Dismiss"
+              className="error-display-dismiss"
             >
-              <X className="w-4 h-4" aria-hidden="true" />
+              Dismiss
             </button>
           )}
         </div>
@@ -155,40 +108,21 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   // Default: section variant
   return (
     <div
-      className={cn(
-        'p-4 rounded-lg border',
-        styles.container,
-        className
-      )}
+      className={cssClasses('error-display', 'error-display-section', className)}
       role="alert"
       aria-live="polite"
     >
-      {title && (
-        <h2 className={cn('text-lg font-semibold mb-2', styles.title)}>
-          {title}
-        </h2>
-      )}
-      <p className={styles.message}>{message}</p>
+      {title && <h2 className="error-display-title">{title}</h2>}
+      <p className="error-display-message">{message}</p>
       {(showRetry || showDismiss) && (
-        <div className="mt-4 flex gap-2">
+        <div className="error-display-actions">
           {showRetry && onRetry && (
-            <button
-              onClick={onRetry}
-              className={cn(
-                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
-                styles.button
-              )}
-            >
+            <button className="error-display-retry" onClick={onRetry}>
               Try Again
             </button>
           )}
           {showDismiss && onDismiss && (
-            <button
-              onClick={onDismiss}
-              className="px-4 py-2 rounded-md text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-            >
-              Dismiss
-            </button>
+            <button className="error-display-dismiss" onClick={onDismiss}>Dismiss</button>
           )}
         </div>
       )}
@@ -197,18 +131,18 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 };
 
 // Preset components for common use cases
-export const InlineError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="inline" {...props} />
-);
+export const InlineError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
+  props
+) => <ErrorDisplay variant="inline" {...props} />;
 
-export const SectionError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="section" {...props} />
-);
+export const SectionError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
+  props
+) => <ErrorDisplay variant="section" {...props} />;
 
-export const PageError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="page" {...props} />
-);
+export const PageError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
+  props
+) => <ErrorDisplay variant="page" {...props} />;
 
-export const ToastError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (props) => (
-  <ErrorDisplay variant="toast" {...props} />
-);
+export const ToastError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
+  props
+) => <ErrorDisplay variant="toast" {...props} />;

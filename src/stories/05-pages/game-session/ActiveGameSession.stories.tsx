@@ -15,29 +15,7 @@ const meta: Meta<typeof ActiveGameSession> = {
     layout: 'padded',
     docs: {
       description: {
-        component: `
-        # ActiveGameSession
-        
-        The ActiveGameSession component is the core narrative gameplay component that integrates
-        narrative generation, choice selection, and character display. It replaces the older
-        GameSessionActive component and provides full narrative engine integration.
-        
-        ## Key Features
-        
-        - Real-time narrative generation via NarrativeController
-        - Player choice selection with AI-generated options
-        - Character integration and summary display
-        - Loading states for both narrative and choice generation
-        - Error handling with fallback options
-        - Session status management (active, paused, ended)
-        
-        ## Core Stories
-        
-        - **WithExistingSegments**: Main story showing active gameplay with narrative and choices
-        - **LoadingNarrative**: Loading state during narrative generation
-        - **ErrorState**: Error handling when narrative generation fails
-        - **WithCharacter**: Complete integration with character system
-        `,
+        component: `# ActiveGameSession The ActiveGameSession component is the core narrative gameplay component that integrates narrative generation, choice selection, and character display. It replaces the older GameSessionActive component and provides full narrative engine integration. ## Key Features - Real-time narrative generation via NarrativeController - Player choice selection with AI-generated options - Character integration and summary display - Loading states for both narrative and choice generation - Error handling with fallback options - Session status management (active, paused, ended) ## Core Stories - **WithExistingSegments**: Main story showing active gameplay with narrative and choices - **LoadingNarrative**: Loading state during narrative generation - **ErrorState**: Error handling when narrative generation fails - **WithCharacter**: Complete integration with character system`,
       },
     },
   },
@@ -397,8 +375,74 @@ export const MajorDecision: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Shows a major decision with yellow border styling. Tests decision weight visual indicators.',
+        story: 'Shows a major decision with yellow styling. Tests decision weight visual indicators.',
       },
     },
   },
+};
+
+/**
+ * Loading state showing the manuscript skeleton
+ */
+export const LoadingState: Story = {
+  args: {
+    worldId: 'world-123',
+    sessionId: 'session-123',
+    world: mockWorld,
+    status: 'active',
+  },
+  decorators: [
+    (Story) => {
+      // Clear segments to trigger skeleton
+      useNarrativeStore.setState({
+        segments: {},
+        sessionSegments: {},
+        decisions: {},
+        sessionDecisions: {},
+        currentEnding: null,
+        loading: true,
+      });
+      
+      return <Story />;
+    },
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the initial loading state with the manuscript skeleton while waiting for the first narrative segment.',
+      },
+    },
+  },
+};
+
+/**
+ * Full manuscript overlay layout with progressive disclosure
+ */
+export const ManuscriptOverlay: Story = {
+  args: {
+    ...ActiveGameplay.args,
+  },
+  parameters: {
+    layout: 'fullscreen',
+  },
+  decorators: [
+    (Story) => {
+      // Set up character and narrative
+      useCharacterStore.setState({
+        characters: { 'char-123': mockCharacter },
+        entities: { 'char-123': mockCharacter },
+        currentCharacterId: 'char-123',
+        currentEntityId: 'char-123',
+        error: null,
+        loading: false,
+      });
+      useSessionStore.setState({ characterId: 'char-123' });
+      populateNarrativeStore(mockSegments, [mockDecision]);
+      
+      // Note: Feature flags might need to be mocked globally or via decorator if possible
+      // But since we use isFeatureEnabled, we might need to mock it in the story file
+      
+      return <Story />;
+    },
+  ],
 };

@@ -19,7 +19,7 @@ describe('DevTools Section Visibility - MVP', () => {
     expect(typeof result.current.toggleSectionVisibility).toBe('function');
   });
 
-  test('sections are visible by default', () => {
+  test('sections are by default', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <DevToolsProvider>{children}</DevToolsProvider>
     );

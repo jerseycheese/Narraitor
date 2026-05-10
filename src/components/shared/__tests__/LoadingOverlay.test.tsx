@@ -4,7 +4,7 @@ import { LoadingOverlay } from '../LoadingOverlay';
 
 describe('LoadingOverlay', () => {
   describe('Basic Functionality', () => {
-    it('should not render when not visible', () => {
+    it('should not render when not', () => {
       const { container } = render(
         <LoadingOverlay isVisible={false} />
       );
@@ -12,7 +12,7 @@ describe('LoadingOverlay', () => {
       expect(container.firstChild).toBeNull();
     });
 
-    it('should display loading message when visible', () => {
+    it('should display loading message when', () => {
       render(<LoadingOverlay isVisible={true} />);
       
       expect(screen.getByRole('dialog')).toBeInTheDocument();

@@ -39,44 +39,44 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
     rules: 'World Rules'
   };
 
-  const categoryColors: Record<LoreCategory, string> = {
-    characters: 'bg-lore-characters-bg border-lore-characters-border text-lore-characters-text',
-    locations: 'bg-lore-locations-bg border-lore-locations-border text-lore-locations-text',
-    events: 'bg-lore-events-bg border-lore-events-border text-lore-events-text',
-    rules: 'bg-lore-rules-bg border-lore-rules-border text-lore-rules-text'
+  const categoryBackgrounds: Record<LoreCategory, string> = {
+    characters: 'hsl(var(--lore-characters-bg))',
+    locations: 'hsl(var(--lore-locations-bg))',
+    events: 'hsl(var(--lore-events-bg))',
+    rules: 'hsl(var(--lore-rules-bg))'
   };
 
   if (facts.length === 0) {
     return (
-      <div className={`text-center py-8 text-muted-foreground ${className}`}>
+      <div className={`${className}`}>
         <p>No lore facts recorded yet.</p>
-        <p className="text-sm mt-2">Facts will appear here as the story unfolds.</p>
+        <p>Facts will appear here as the story unfolds.</p>
       </div>
     );
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      <h3 className="text-lg font-semibold text-foreground">Established Lore</h3>
+    <div className={`${className}`}>
+      <h3>Established Lore</h3>
       
       {(Object.keys(categoryLabels) as LoreCategory[]).map(category => {
         const categoryFacts = factsByCategory[category];
         if (!categoryFacts || categoryFacts.length === 0) return null;
 
         return (
-          <div key={category} className={`rounded-lg border p-4 ${categoryColors[category]}`}>
-            <h4 className="font-medium mb-3">{categoryLabels[category]}</h4>
-            <ul className="space-y-2">
+          <div key={category} data-testid={`lore-category-${category}`} style={{ background: categoryBackgrounds[category] }}>
+            <h4>{categoryLabels[category]}</h4>
+            <ul>
               {categoryFacts.map(fact => (
-                <li key={fact.id} className="text-sm">
-                  <span className="font-medium">{fact.value}</span>
+                <li key={fact.id} >
+                  <span>{fact.value}</span>
                   {fact.aliases && fact.aliases.length > 0 && (
-                    <span className="text-muted-foreground text-xs ml-2">
+                    <span>
                       (also: {fact.aliases.join(', ')})
                     </span>
                   )}
                   {fact.metadata?.description && (
-                    <p className="text-muted-foreground text-xs mt-1">
+                    <p>
                       {fact.metadata.description}
                     </p>
                   )}
@@ -87,7 +87,7 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
         );
       })}
       
-      <div className="text-xs text-muted-foreground mt-4">
+      <div>
         Total facts: {facts.length}
       </div>
     </div>

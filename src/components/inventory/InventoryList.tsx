@@ -5,17 +5,15 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { InventoryItem } from '@/types/inventory.types';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
-import { getCategoryMetadata, STANDARD_CATEGORIES } from '@/lib/inventory/categories';
+import {
+  getCategoryMetadata,
+  STANDARD_CATEGORIES,
+} from '@/lib/inventory/categories';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
-import { InventoryViewToggle, type InventoryViewMode } from './InventoryViewToggle';
-import { InventoryTable } from './InventoryTable';
-import { Trash2 } from 'lucide-react';
 import { useItemDropConfirmation } from './hooks/useItemDropConfirmation';
 import { DropConfirmationDialog } from './DropConfirmationDialog';
 
@@ -41,8 +39,10 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 }) => {
   // Select items and character inventory to re-render on changes
   const itemsObject = useInventoryStore((state) => state.items);
-  const characterInventories = useInventoryStore((state) => state.characterInventories);
-  
+  const characterInventories = useInventoryStore(
+    (state) => state.characterInventories
+  );
+
   const {
     isDialogOpen,
     itemToDrop,
@@ -65,22 +65,6 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
   const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<InventoryViewMode>(() => {
-    // Load preference from localStorage
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('inventory-view-mode');
-      return (saved as InventoryViewMode) || 'grid';
-    }
-    return 'grid';
-  });
-
-  // Persist view mode preference
-  const handleViewModeChange = (mode: InventoryViewMode) => {
-    setViewMode(mode);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('inventory-view-mode', mode);
-    }
-  };
 
   // Handle item usage
   const handleUseItem = async (itemId: EntityID) => {
@@ -88,7 +72,11 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     setErrorFeedback(null);
 
     try {
-      const result = await processItemUsage(characterId, itemId, sessionId || undefined);
+      const result = await processItemUsage(
+        characterId,
+        itemId,
+        sessionId || undefined
+      );
 
       if (result.success) {
         // Success path handled via narrative segment entry; no inline feedback needed.
@@ -103,14 +91,17 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   };
 
   // Group items by category
-  const itemsByCategory = items.reduce((acc, item) => {
-    const category = item.categoryId as StandardInventoryCategory;
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(item);
-    return acc;
-  }, {} as Record<StandardInventoryCategory, InventoryItem[]>);
+  const itemsByCategory = items.reduce(
+    (acc, item) => {
+      const category = item.categoryId as StandardInventoryCategory;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(item);
+      return acc;
+    },
+    {} as Record<StandardInventoryCategory, InventoryItem[]>
+  );
 
   // Get categories that have items (in canonical order from STANDARD_CATEGORIES)
   const populatedCategories = STANDARD_CATEGORIES.filter(
@@ -120,7 +111,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   // Empty state when no items
   if (items.length === 0) {
     return (
-      <div className={`p-6 ${className}`}>
+      <div className={`${className}`}>
         <EmptyState
           title="No items in inventory"
           description="Items will appear here as they are added"
@@ -131,151 +122,91 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   }
 
   return (
-    <div className={`space-y-6 ${className}`} role="region" aria-label="Character inventory">
-      {/* View Toggle */}
-      <div className="flex justify-end">
-        <InventoryViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
-      </div>
-
+    <div
+      className={`${className}`}
+      role="region"
+      aria-label="Character inventory"
+    >
       {/* Feedback message */}
       {errorFeedback && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="manuscript-inventory-error">
           <AlertDescription>{errorFeedback}</AlertDescription>
         </Alert>
       )}
 
-      {/* Table View */}
-      {viewMode === 'table' ? (
-        <InventoryTable characterId={characterId} />
-      ) : (
-        /* Grid View */
-        <>
-          {populatedCategories.map((categoryId) => {
-        const categoryItems = itemsByCategory[categoryId];
-        const metadata = getCategoryMetadata(categoryId);
-        const categoryName = metadata?.name || categoryId;
-        const categoryDescription = metadata?.description;
+      {/* Grid View - Aligned with Manuscript Design */}
+      <div className="inventory-category-list">
+        {populatedCategories.map((categoryId) => {
+          const categoryItems = itemsByCategory[categoryId];
+          const metadata = getCategoryMetadata(categoryId);
+          const categoryName = metadata?.name || categoryId;
 
-        return (
-          <section
-            key={categoryId}
-            className="category-group"
-            aria-labelledby={`category-${categoryId}`}
-          >
-            {/* Category Header with visual separation */}
-            <div className="mb-4 border-b border-border pb-2">
-              <h3
-                id={`category-${categoryId}`}
-                className="text-lg font-semibold text-foreground"
-              >
+          return (
+            <section
+              key={categoryId}
+              className="manuscript-inventory-category-group"
+              aria-labelledby={`category-${categoryId}`}
+            >
+              <h3 id={`category-${categoryId}`} className="manuscript-inventory-category-title">
                 {categoryName}
               </h3>
-              <p className="text-sm text-muted-foreground">
-                {categoryItems.length} {categoryItems.length === 1 ? 'item' : 'items'}
-                {categoryDescription && (
-                  <span className="sr-only"> - {categoryDescription}</span>
-                )}
-              </p>
-            </div>
 
-            {/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
-            <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-              role="list"
-              aria-label={`${categoryName} items`}
-            >
-              {categoryItems.map((item) => (
-                <Card
-                  key={item.id}
-                  className="p-4 border border-border hover:border-border/80 transition-colors inventory-item"
-                  role="listitem"
-                >
-                  {/* Item Image (if available) */}
-                  {item.image?.url && (
-                    <div className="mb-3 flex justify-center">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.image.url}
-                        alt={item.name}
-                        className="w-24 h-24 object-contain rounded-md item-image"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-
-                  {/* Item Header: Name and Quantity */}
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-foreground flex-1 item-name">
-                      {item.name}
-                    </h4>
-                    {item.stackable && (
-                      <Badge
-                        variant="secondary-static"
-                        size="sm"
-                        className="ml-2 item-quantity"
-                        aria-label={`Quantity: ${item.quantity}`}
-                      >
-                        ×{item.quantity}
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Item Description */}
-                  {item.description && (
-                    <p className="text-sm text-muted-foreground mb-3 item-description">
-                      {item.description}
-                    </p>
-                  )}
-
-                  {/* Item Metadata and Actions */}
-                  <div className="space-y-2">
-                    {/* Category Badge and Acquisition Method */}
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant="outline-static"
-                        size="sm"
-                        className="item-category"
-                        aria-label={`Category: ${categoryName}`}
-                      >
-                        {categoryName}
-                      </Badge>
-                      {item.acquisitionHistory[0] && (
-                        <span className="text-xs text-muted-foreground capitalize">
-                          {item.acquisitionHistory[0].method}
+              <div className="manuscript-inventory-grid" role="list" aria-label={`${categoryName} items`}>
+                {categoryItems.map((item) => (
+                  <article
+                    key={item.id}
+                    className="manuscript-inventory-item"
+                    role="listitem"
+                  >
+                    <div className="manuscript-inventory-item-header">
+                      <h4 className="manuscript-inventory-item-name">{item.name}</h4>
+                      {item.stackable && (
+                        <span 
+                          className="manuscript-inventory-item-quantity"
+                          aria-label={`Quantity: ${item.quantity}`}
+                        >
+                          ×{item.quantity}
                         </span>
                       )}
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleUseItem(item.id)}
-                        disabled={usingItemId === item.id || item.quantity <= 0}
-                        className="flex-1"
-                      >
-                        {usingItemId === item.id ? 'Using...' : 'Use'}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openDropDialog(item)}
-                        aria-label={`Drop ${item.name}`}
-                        title="Drop item"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    {item.description && (
+                      <p className="manuscript-inventory-item-description">{item.description}</p>
+                    )}
+
+                    <div className="manuscript-inventory-item-footer">
+                      <span className="manuscript-inventory-item-category">
+                        {categoryName}
+                      </span>
+
+                      <div className="manuscript-inventory-actions">
+                        <Button
+                          className="manuscript-inventory-action-button"
+                          variant="outline"
+                          onClick={() => handleUseItem(item.id)}
+                          disabled={
+                            usingItemId === item.id || item.quantity <= 0
+                          }
+                        >
+                          {usingItemId === item.id ? 'USING...' : 'USE'}
+                        </Button>
+                        <Button
+                          className="manuscript-inventory-action-button"
+                          variant="ghost"
+                          onClick={() => openDropDialog(item)}
+                          aria-label={`Drop ${item.name}`}
+                        >
+                          DROP
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </section>
-        );
-      })}
-        </>
-      )}
+                  </article>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
       <DropConfirmationDialog
         isOpen={isDialogOpen}

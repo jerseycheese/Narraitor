@@ -11,17 +11,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: `
-        # Narrative System Components
-        
-        The Narrative system consists of several interconnected components:
-        
-        - **NarrativeDisplay**: Shows individual narrative segments with type-specific styling
-        - **NarrativeHistory**: Displays a scrollable history of narrative segments
-        - **NarrativeController**: Manages narrative generation and history tracking
-        
-        These components work together to create immersive, AI-driven narrative experiences in Narraitor.
-        `,
+        component: `# Narrative System Components The Narrative system consists of several interconnected components: - **NarrativeDisplay**: Shows individual narrative segments with type-specific styling - **NarrativeHistory**: Displays a scrollable history of narrative segments - **NarrativeController**: Manages narrative generation and history tracking These components work together to create immersive, AI-driven narrative experiences in Narraitor.`,
       },
     },
   },
@@ -76,20 +66,20 @@ export const CompleteNarrativeSystem: Story = {
     }, []);
     
     return (
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">Narrative System Demo</h1>
+      <div>
+        <div>
+          <h1>Narrative System Demo</h1>
           
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div>
             <NarrativeHistory
               segments={segments}
               isLoading={isLoading}
-              className="space-y-4"
+              
             />
           </div>
           
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-900">
+          <div>
+            <p>
               This demo shows the complete narrative system in action. The NarrativeController
               manages generation and history, while NarrativeHistory displays all segments
               using NarrativeDisplay components.

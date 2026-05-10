@@ -69,24 +69,24 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         description="Create your character by providing their name and basic details."
       >
       {/* Helpful tip */}
-      <div className="border rounded-lg p-4 bg-muted mb-6">
-        <p className="text-sm text-muted-foreground">
+      <div>
+        <p>
           Choose a unique name for your character. The name should be between 3 and 50 characters
           and must be unique within this world.
         </p>
       </div>
 
-      <div className="flex items-start gap-6">
+      <div>
         {/* Portrait placeholder */}
-        <div className="flex-shrink-0">
+        <div>
           <CharacterPortraitPlaceholder name={data.characterData.name} />
         </div>
 
         {/* Form fields */}
-        <div className="flex-1 space-y-4">
-          <div className="space-y-2">
+        <div>
+          <div>
             <Label htmlFor="character-name">
-              Character Name <span className="text-destructive">*</span>
+              Character Name <span>*</span>
             </Label>
             <Input
               id="character-name"
@@ -99,7 +99,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             />
           </div>
 
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="character-description">
               Description (optional)
             </Label>
@@ -113,7 +113,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
             />
           </div>
 
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="physical-description">
               Physical Description (optional)
             </Label>
@@ -125,7 +125,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               rows={3}
               placeholder="Describe your character's appearance (e.g., tall and muscular, silver hair, blue eyes, wears leather armor)"
             />
-            <p className="mt-1 text-sm text-gray-500">
+            <p>
               This will be used to generate your character&apos;s portrait. Tip: Add &quot;looks like [actor name]&quot; to generate a portrait resembling a specific person.
             </p>
           </div>

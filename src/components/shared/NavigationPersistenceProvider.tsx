@@ -39,8 +39,8 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
   // Minimal loading state - only show very briefly on client
   if (!isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-sm text-gray-700">
+      <div>
+        <div>
           Loading...
         </div>
       </div>

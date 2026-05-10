@@ -43,6 +43,7 @@ interface NarrativeControllerProps {
   choiceId?: string; // ID of the choice that triggered this narrative
   className?: string;
   generateChoices?: boolean; // Whether to generate choices after narrative
+  hideHistory?: boolean; // Whether to hide the narrative history UI
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
@@ -57,6 +58,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   choiceId,
   className,
   generateChoices = true,
+  hideHistory = false,
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -450,16 +452,19 @@ Respond with JSON format:
           id: `option-${fallbackId}-1`,
           text: 'Investigate further',
           alignment: 'neutral',
+          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
         },
         {
           id: `option-${fallbackId}-2`,
           text: 'Talk to nearby characters',
           alignment: 'lawful',
+          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
         },
         {
           id: `option-${fallbackId}-3`,
           text: 'Move to a new location',
           alignment: 'neutral',
+          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
         },
       ],
       decisionWeight: 'minor',
@@ -534,6 +539,7 @@ Respond with JSON format:
           prompt: decision.prompt,
           options: decision.options,
           decisionWeight: decision.decisionWeight,
+          contextSummary: decision.contextSummary,
         });
 
       // Update the decision with the stored ID before passing to parent
@@ -579,16 +585,19 @@ Respond with JSON format:
                 id: `option-${fallbackId}-1`,
                 text: 'Investigate the situation',
                 alignment: 'neutral',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
               },
               {
                 id: `option-${fallbackId}-2`,
                 text: 'Speak with someone nearby',
                 alignment: 'lawful',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
               },
               {
                 id: `option-${fallbackId}-3`,
                 text: 'Move to a different area',
                 alignment: 'neutral',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
               },
             ],
             decisionWeight: 'minor',
@@ -601,6 +610,8 @@ Respond with JSON format:
             .addDecision(sessionId, {
               prompt: fallbackDecision.prompt,
               options: fallbackDecision.options,
+              decisionWeight: fallbackDecision.decisionWeight,
+              contextSummary: fallbackDecision.contextSummary,
             });
 
           // Update the fallback decision with the stored ID
@@ -844,6 +855,7 @@ Respond with JSON format:
         type: newSegment.type,
         characterIds: newSegment.characterIds || [],
         metadata: newSegment.metadata,
+        worldId: newSegment.worldId,
         updatedAt: newSegment.updatedAt,
         timestamp: newSegment.timestamp,
       });
@@ -892,6 +904,7 @@ Respond with JSON format:
           type: fallbackSegment.type,
           characterIds: fallbackSegment.characterIds || [],
           metadata: fallbackSegment.metadata,
+          worldId: fallbackSegment.worldId,
           updatedAt: fallbackSegment.updatedAt,
           timestamp: fallbackSegment.timestamp,
         });
@@ -1231,6 +1244,7 @@ Respond with JSON format:
         type: newSegment.type,
         characterIds: newSegment.characterIds || [],
         metadata: newSegment.metadata,
+        worldId: newSegment.worldId,
         updatedAt: newSegment.updatedAt,
         timestamp: newSegment.timestamp,
       });
@@ -1300,29 +1314,30 @@ Respond with JSON format:
 
   return (
     <div className={`narrative-controller ${className || ''}`}>
-      <NarrativeHistory
-        segments={segments}
-        isLoading={isLoading || isGeneratingChoices}
-        error={error || undefined}
-        onRetry={handleRetry}
-      />
-      {process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
-        <div className="mt-6 rounded-lg border border-dashed border-muted-foreground/50 bg-muted/40 p-4 text-sm text-muted-foreground">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+      {!hideHistory && (
+        <NarrativeHistory
+          segments={segments}
+          isLoading={isLoading || isGeneratingChoices}
+          error={error || undefined}
+          onRetry={handleRetry}
+        />
+      )}
+      {!hideHistory && process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (
+        <div>
+          <p>
             NPC roster (debug)
           </p>
-          <ul className="mt-3 space-y-3">
+          <ul>
             {npcRoster.map((npc) => (
-              <li key={npc.id} className="flex items-center gap-3">
+              <li key={npc.id}>
                 {npc.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={npc.avatarUrl}
                     alt={npc.name}
-                    className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted-foreground/20 text-xs font-semibold text-muted-foreground">
+                  <div>
                     {npc.name
                       .split(' ')
                       .map((segment) => segment[0])
@@ -1331,11 +1346,11 @@ Respond with JSON format:
                       .slice(0, 2)}
                   </div>
                 )}
-                <div className="flex flex-col">
-                  <span className="font-medium text-foreground">
+                <div>
+                  <span>
                     {npc.name}
                   </span>
-                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground/80">
+                  <span>
                     {npc.id}
                   </span>
                 </div>

@@ -15,7 +15,7 @@ const meta: Meta<typeof GameStartWizard> = {
   },
   decorators: [
     (Story) => (
-      <div className="min-h-screen bg-gray-100 p-8">
+      <div>
         <Story />
       </div>
     ),

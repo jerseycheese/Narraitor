@@ -100,6 +100,40 @@ describe('WorldCard', () => {
     expect(mockRouterPush).toHaveBeenCalledWith(`/characters?worldId=${mockWorld.id}`);
   });
 
+  // Test for character avatar pill styling
+  test('character avatar buttons use design system classes', () => {
+    const mockCharacter = {
+      id: 'char-1',
+      worldId: mockWorld.id,
+      name: 'Aragorn',
+      description: 'A ranger',
+      portrait: { type: 'placeholder' as const, url: null },
+      level: 5,
+      isPlayer: true,
+      attributes: [],
+      skills: [],
+      derivedStats: [],
+      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+      status: { health: 100, maxHealth: 100, conditions: [] },
+      inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+    };
+
+    render(
+      <WorldCard
+        world={mockWorld}
+        onSelect={jest.fn()}
+        onDelete={jest.fn()}
+        characters={[mockCharacter]}
+        _router={{ push: jest.fn() }}
+      />
+    );
+
+    const characterButton = screen.getByTitle('Play as Aragorn - Level 5');
+    expect(characterButton).toHaveClass('world-card-character-pill');
+  });
+
   // Test for Edit functionality
   test('navigates to edit page when Edit is clicked', () => {
     // Setup mocks

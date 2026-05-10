@@ -51,13 +51,13 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
   }, [setValue, managedAttributes, onAttributesChange]);
 
   return (
-    <div className="component-attributes-form bg-background rounded-lg p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Attributes</h2>
+    <div className="component-attributes-form">
+      <div className="attributes-form-header">
+        <h2>Attributes</h2>
         <PointPoolDisplay pool={pool} label="Attribute Points" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="attributes-form-list">
         {managedAttributes.map((attr, index) => {
           const worldAttr = world.attributes.find(wa => wa.id === attr.id);
           const cannotIncrease = !canIncrease(attr.id);
@@ -71,17 +71,17 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
           const uniqueKey = attr.id || `attr-${index}`;
 
           return (
-            <div key={uniqueKey} className="bg-muted rounded-lg p-4 border">
-              <Label className="block text-sm font-medium mb-1">
-                {worldAttr?.name || `Attribute ${index + 1}`}
+            <div key={uniqueKey} className="attributes-form-row">
+              <Label>
+              {worldAttr?.name || `Attribute ${index + 1}`}
               </Label>
               {worldAttr?.description && (
-                <p className="text-xs text-muted-foreground mb-2">
+                <p className="attributes-form-description">
                   {worldAttr.description}
                 </p>
               )}
               {cannotIncrease && currentValue < attr.maxValue && (
-                <p className="text-xs text-amber-500 mb-2 font-medium">
+                <p className="attributes-form-constraint">
                   No points remaining. Reduce other attributes to increase this one.
                 </p>
               )}
@@ -96,7 +96,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
                 showLabel={false}
                 testId={`attribute-${attr.id}`}
               />
-              <div className="text-xs text-muted-foreground mt-1">
+              <div className="attributes-form-meta">
                 Range: {attr.minValue} - {attr.maxValue}
               </div>
             </div>

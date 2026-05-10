@@ -41,8 +41,6 @@ export interface ActiveStateCardProps {
  * @example With custom styling
  * <ActiveStateCard 
  *   isActive={isActive}
- *   activeClassName="ring-4 ring-blue-500 shadow-2xl"
- *   inactiveClassName="hover:shadow-md"
  *   showActiveIndicator={false}
  * >
  *   <CardContent />
@@ -54,16 +52,16 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   activeIcon,
   onClick,
   className = '',
-  activeClassName = 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-500',
-  inactiveClassName = 'border-gray-300 bg-white hover:shadow-lg',
+  activeClassName,
+  inactiveClassName,
   showActiveIndicator = true,
   children,
   testId = 'active-state-card',
   hasImage = false
 }) => {
-  const baseClasses = 'border rounded-lg transition-all duration-200 relative overflow-hidden flex flex-col h-full';
-  const cursorClass = onClick ? 'cursor-pointer' : '';
-  const stateClasses = isActive ? activeClassName : inactiveClassName;
+  const defaultActiveClass = 'active-state-card-active';
+  const defaultInactiveClass = 'active-state-card-inactive';
+  const stateClasses = isActive ? (activeClassName || defaultActiveClass) : (inactiveClassName || defaultInactiveClass);
 
   // Extract the image and content
   const childrenArray = React.Children.toArray(children);
@@ -74,15 +72,15 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
     <article
       data-testid={testId}
       onClick={onClick}
-      className={`${baseClasses} ${cursorClass} ${stateClasses} ${className}`}
+      className={`active-state-card ${stateClasses} ${className}`}
     >
       {/* Image section with overlay if present */}
       {hasImage ? (
-        <div className="relative">
+        <div>
           {imageChild}
           {/* Active state indicator overlay */}
           {isActive && showActiveIndicator && (
-            <div className="absolute top-0 left-0 right-0">
+            <div>
               <ActiveStateIndicator 
                 text={activeText}
                 icon={activeIcon}

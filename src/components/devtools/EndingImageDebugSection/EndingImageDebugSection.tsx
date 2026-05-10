@@ -8,6 +8,7 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding, EndingTone, EndingType } from '@/types/narrative.types';
 import { capitalize, getTimestamp } from '@/lib/utils';
+import { endingTones } from '@/lib/design-tokens/tokens/contextual';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -194,39 +195,13 @@ export function EndingImageDebugSection() {
 
   // Helper function to get CSS class for tone (from EndingScreen component)
   const getEndingCSSClass = (tone: EndingTone) => {
-    return `ending-screen ending-${tone}`;
+    return `ending-${tone}`;
   };
 
-  // Helper function to get header text color for tone (from EndingScreen component)
-  const getHeaderTextColor = (tone: EndingTone) => {
-    switch (tone) {
-      case 'triumphant': // Amber background (#f59e0b)
-        return 'text-black'; // Black text for bright amber
-      case 'hopeful': // Emerald background (#10b981)  
-        return 'text-white'; // White text for emerald
-      case 'mysterious': // Gray background (#374151)
-        return 'text-white'; // White text for dark gray
-      case 'tragic': // Dark red background (#991b1b)
-        return 'text-white'; // White text for dark red
-      default:
-        return 'text-white'; // Default to white text
-    }
-  };
-
-  // Get tone mapping for CSS classes
+  // Get tone background color from design tokens
   const getToneBackgroundColor = (tone: EndingTone) => {
-    switch (tone) {
-      case 'triumphant':
-        return '#f59e0b'; // amber-500
-      case 'mysterious':
-        return '#374151'; // gray-700
-      case 'tragic':
-        return '#b91c1c'; // red-700
-      case 'hopeful':
-        return '#22c55e'; // green-500
-      default:
-        return '#6b7280'; // gray-500
-    }
+    const toneConfig = endingTones[tone as keyof typeof endingTones];
+    return toneConfig?.background ?? '#6b7280';
   };
 
   const currentCharacter = currentEnding ? characters[currentEnding.characterId] : (Object.values(characters) as Character[])[0];
@@ -234,13 +209,13 @@ export function EndingImageDebugSection() {
 
   return (
     <CollapsibleSection title="Ending Image Generation Debug" initialCollapsed={true}>
-      <div className="space-y-4">
+      <div>
         
         {/* Current Ending Info */}
         {currentEnding ? (
-          <div className="bg-green-50 p-3 rounded border border-green-200">
-            <h4 className="font-medium mb-2 text-green-900">Active Ending Available</h4>
-            <div className="text-sm space-y-1 text-gray-900">
+          <div>
+            <h4>Active Ending Available</h4>
+            <div>
               <div><strong>Tone:</strong> {currentEnding.tone}</div>
               <div><strong>Type:</strong> {currentEnding.type}</div>
               <div><strong>Character:</strong> {currentCharacter?.name || 'Unknown'}</div>
@@ -248,37 +223,36 @@ export function EndingImageDebugSection() {
             </div>
           </div>
         ) : (
-          <div className="bg-amber-50 p-3 rounded border border-amber-200">
-            <h4 className="font-medium mb-2 text-amber-900">No Active Ending</h4>
-            <p className="text-sm text-gray-900">Using mock data for testing. Generate an actual ending to see real prompts.</p>
+          <div>
+            <h4>No Active Ending</h4>
+            <p>Using mock data for testing. Generate an actual ending to see real prompts.</p>
           </div>
         )}
 
         {/* Tone & CSS Class Inspection */}
         {currentEnding && (
-          <div className="bg-blue-50 p-3 rounded border border-blue-200">
-            <h4 className="font-medium mb-2 text-blue-900">AI-Selected Tone & CSS Inspection</h4>
-            <div className="space-y-3">
-              <div className="text-sm space-y-1 text-gray-900">
-                <div><strong>AI Selected Tone:</strong> <span className="font-mono bg-gray-100 px-2 py-1 rounded text-gray-900">{currentEnding.tone}</span></div>
-                <div><strong>CSS Class Applied:</strong> <span className="font-mono bg-gray-100 px-2 py-1 rounded text-gray-900">{getEndingCSSClass(currentEnding.tone)}</span></div>
-                <div><strong>Header Text Color:</strong> <span className="font-mono bg-gray-100 px-2 py-1 rounded text-gray-900">{getHeaderTextColor(currentEnding.tone)}</span></div>
+          <div>
+            <h4>AI-Selected Tone & CSS Inspection</h4>
+            <div>
+              <div>
+                <div><strong>AI Selected Tone:</strong> <span>{currentEnding.tone}</span></div>
+                <div><strong>CSS Class Applied:</strong> <span>{getEndingCSSClass(currentEnding.tone)}</span></div>
               </div>
               
               {/* Visual Preview */}
-              <div className="border border-gray-300 rounded p-2">
-                <div className="text-xs text-gray-700 mb-1">EndingScreen Preview:</div>
+              <div>
+                <div>EndingScreen Preview:</div>
                 <div 
-                  className={`${getEndingCSSClass(currentEnding.tone)} ${getHeaderTextColor(currentEnding.tone)} p-3 rounded text-center`}
+                  className={getEndingCSSClass(currentEnding.tone)}
                   style={{ backgroundColor: getToneBackgroundColor(currentEnding.tone) }}
                 >
-                  <div className="font-bold">The End</div>
-                  <div className="text-sm opacity-90">{currentCharacter?.name} • {currentWorld?.name}</div>
+                  <div>The End</div>
+                  <div>{currentCharacter?.name} • {currentWorld?.name}</div>
                 </div>
               </div>
               
               {/* Tone Color Reference */}
-              <div className="text-xs text-gray-700">
+              <div>
                 <div><strong>Background Color:</strong> {getToneBackgroundColor(currentEnding.tone)}</div>
                 <div><strong>Expected in CSS:</strong> .ending-{currentEnding.tone}</div>
               </div>
@@ -288,16 +262,16 @@ export function EndingImageDebugSection() {
 
         {/* Mock Ending Configuration */}
         {!currentEnding && (
-          <div className="bg-gray-100 p-3 rounded border border-gray-300">
-            <h4 className="font-medium mb-2 text-gray-900">Mock Ending Configuration</h4>
+          <div>
+            <h4>Mock Ending Configuration</h4>
             
-            <div className="space-y-3">
+            <div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-900">Ending Tone:</label>
+                <label>Ending Tone:</label>
                 <Select 
                   value={selectedTone} 
                   onChange={(e) => setSelectedTone(e.target.value as EndingTone)}
-                  className=""
+                  
                 >
                   {toneOptions.map((tone) => (
                     <option key={tone} value={tone}>
@@ -308,34 +282,34 @@ export function EndingImageDebugSection() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-900">Custom Epilogue (optional):</label>
+                <label>Custom Epilogue (optional):</label>
                 <Textarea
                   value={customEpilogue}
                   onChange={(e) => setCustomEpilogue(e.target.value)}
                   placeholder="Leave empty to use default mock epilogue..."
-                  className="text-sm"
+                  
                   rows={3}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-900">Custom Character Legacy (optional):</label>
+                <label>Custom Character Legacy (optional):</label>
                 <Textarea
                   value={customLegacy}
                   onChange={(e) => setCustomLegacy(e.target.value)}
                   placeholder="Leave empty to use default mock legacy..."
-                  className="text-sm"
+                  
                   rows={2}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-900">Custom World Impact (optional):</label>
+                <label>Custom World Impact (optional):</label>
                 <Textarea
                   value={customWorldImpact}
                   onChange={(e) => setCustomWorldImpact(e.target.value)}
                   placeholder="Leave empty to use default mock world impact..."
-                  className="text-sm"
+                  
                   rows={2}
                 />
               </div>
@@ -344,9 +318,9 @@ export function EndingImageDebugSection() {
         )}
 
         {/* Data Summary */}
-        <div className="bg-gray-100 p-3 rounded border border-gray-300">
-          <h4 className="font-medium mb-2 text-gray-900">Data Summary</h4>
-          <div className="text-sm space-y-1 text-gray-900">
+        <div>
+          <h4>Data Summary</h4>
+          <div>
             <div><strong>Character:</strong> {currentCharacter?.name || 'No characters available'}</div>
             <div><strong>World:</strong> {currentWorld?.name || 'No worlds available'} ({currentWorld?.genre || 'No genre'})</div>
             <div><strong>Available Characters:</strong> {Object.keys(characters).length}</div>
@@ -355,11 +329,11 @@ export function EndingImageDebugSection() {
         </div>
 
         {/* Prompt Generation */}
-        <div className="space-y-2">
-          <div className="flex gap-2 flex-wrap">
+        <div>
+          <div>
             <Button
               onClick={generatePromptPreview}
-              className=""
+              
               size="sm"
               variant="default"
               disabled={isGenerating}
@@ -368,7 +342,7 @@ export function EndingImageDebugSection() {
             </Button>
             <Button
               onClick={testFullGeneration}
-              className=""
+              
               size="sm"
               variant="success"
               disabled={isGenerating}
@@ -378,7 +352,7 @@ export function EndingImageDebugSection() {
             {generatedPrompt && (
               <Button
                 onClick={copyPromptToClipboard}
-                className=""
+                
                 size="sm"
                 variant="secondary"
               >
@@ -388,9 +362,9 @@ export function EndingImageDebugSection() {
           </div>
 
           {generatedPrompt && (
-            <div className="bg-gray-100 p-3 rounded border border-gray-300">
-              <h4 className="font-medium mb-2 text-gray-900">Generated Prompt:</h4>
-              <pre className="text-sm whitespace-pre-wrap break-words bg-white p-2 rounded border border-gray-300 text-gray-900 max-h-96 overflow-y-auto">
+            <div>
+              <h4>Generated Prompt:</h4>
+              <pre>
                 {generatedPrompt}
               </pre>
             </div>
@@ -399,28 +373,28 @@ export function EndingImageDebugSection() {
 
         {/* Last Generation Results */}
         {lastGenerationResult && (
-          <div className="bg-gray-100 p-3 rounded border border-gray-300">
-            <h4 className="font-medium mb-2 text-gray-900">Last Generation Results:</h4>
-            <div className="space-y-3">
+          <div>
+            <h4>Last Generation Results:</h4>
+            <div>
               
               {/* Tone Information */}
               {lastGenerationResult.tone && (
-                <div className="text-sm space-y-1 text-gray-900">
-                  <div><strong>Generated with Tone:</strong> <span className="font-mono bg-gray-100 px-2 py-1 rounded text-gray-900">{lastGenerationResult.tone}</span></div>
-                  <div><strong>Would use CSS:</strong> <span className="font-mono bg-gray-100 px-2 py-1 rounded text-gray-900">{getEndingCSSClass(lastGenerationResult.tone as EndingTone)}</span></div>
+                <div>
+                  <div><strong>Generated with Tone:</strong> <span>{lastGenerationResult.tone}</span></div>
+                  <div><strong>Would use CSS:</strong> <span>{getEndingCSSClass(lastGenerationResult.tone as EndingTone)}</span></div>
                   
                   {/* Tone Match Check */}
                   {currentEnding && currentEnding.tone !== lastGenerationResult.tone && (
-                    <div className="bg-red-50 p-2 rounded border border-red-200">
-                      <div className="text-red-900 text-xs">
+                    <div>
+                      <div>
                         <strong>Warning: Tone Mismatch!</strong> Current ending tone ({currentEnding.tone}) doesn&apos;t match last generation ({lastGenerationResult.tone})
                       </div>
                     </div>
                   )}
                   
                   {currentEnding && currentEnding.tone === lastGenerationResult.tone && (
-                    <div className="bg-green-50 p-2 rounded border border-green-200">
-                      <div className="text-green-900 text-xs">
+                    <div>
+                      <div>
                         Tone matches current ending
                       </div>
                     </div>
@@ -429,7 +403,7 @@ export function EndingImageDebugSection() {
               )}
               
               {/* API Response Details */}
-              <div className="text-xs text-gray-700 space-y-1">
+              <div>
                 <div><strong>AI Generated:</strong> {lastGenerationResult.aiGenerated ? 'Yes' : 'No (fallback used)'}</div>
                 <div><strong>Service:</strong> {lastGenerationResult.service || 'Unknown'}</div>
                 <div><strong>Placeholder:</strong> {lastGenerationResult.placeholder ? 'Yes' : 'No'}</div>
@@ -438,13 +412,13 @@ export function EndingImageDebugSection() {
               {/* Generated Image */}
               {lastGeneratedImage && (
                 <div>
-                  <div className="text-sm font-medium text-gray-900 mb-2">Generated Image:</div>
-                  <div className="relative w-64 h-48">
+                  <div>Generated Image:</div>
+                  <div>
                     <Image
                       src={lastGeneratedImage}
                       alt="Generated ending scene"
                       fill
-                      className="rounded border border-gray-500 object-cover"
+                      
                       unoptimized // For base64 data URLs
                     />
                   </div>
@@ -455,9 +429,9 @@ export function EndingImageDebugSection() {
         )}
 
         {/* Prompt Building Tips */}
-        <div className="bg-blue-50 p-3 rounded text-sm border border-blue-200">
-          <h4 className="font-medium mb-2 text-blue-900">Ending Image Prompt Tips:</h4>
-          <ul className="list-disc list-inside space-y-1 text-gray-900">
+        <div>
+          <h4>Ending Image Prompt Tips:</h4>
+          <ul>
             <li>Tone determines visual mood and color palette</li>
             <li>World theme affects art style and setting elements</li>
             <li>Epilogue content influences scene composition</li>
@@ -468,9 +442,9 @@ export function EndingImageDebugSection() {
         </div>
 
         {/* API Debug Info */}
-        <div className="bg-amber-50 p-3 rounded text-sm border border-amber-200">
-          <h4 className="font-medium mb-2 text-amber-900">API Debug Info:</h4>
-          <div className="space-y-1 text-gray-900">
+        <div>
+          <h4>API Debug Info:</h4>
+          <div>
             <div><strong>Endpoint:</strong> /api/generate-ending-image</div>
             <div><strong>Model:</strong> gemini-2.0-flash-preview-image-generation</div>
             <div><strong>Security:</strong> Server-side API key (secure)</div>

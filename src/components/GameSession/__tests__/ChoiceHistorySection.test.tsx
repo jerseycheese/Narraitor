@@ -77,8 +77,6 @@ describe('ChoiceHistorySection', () => {
       />
     );
 
-    fireEvent.click(screen.getByTestId('collapsible-section-header'));
-
     expect(screen.getByText(/No recorded choices yet/i)).toBeInTheDocument();
   });
 });

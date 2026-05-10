@@ -30,19 +30,8 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
     }
   };
 
-  // Get custom styling for legacy variants using semantic tokens
-  // Now aligned with our design token system via CSS variables
-  const getCustomStyling = (variant: string | undefined) => {
-    switch (variant) {
-      case 'primary': return 'bg-primary text-primary-foreground hover:bg-primary/90';
-      case 'secondary': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
-      case 'success': return 'bg-green-500 hover:bg-green-700 text-white'; // Keep success as design system color
-      default: return '';
-    }
-  };
-
   return (
-    <div className={`flex gap-3 ${className}`}>
+    <div className={`${className}`}>
       {actions.map((action, index) => (
         <Button
           key={`action-${action.label}-${index}`}
@@ -50,7 +39,6 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
           variant={mapVariant(action.variant)}
           size={action.size || 'default'}
           disabled={action.disabled}
-          className={`flex items-center gap-2 ${getCustomStyling(action.variant)}`}
           data-tutorial={action.dataTutorial}
         >
           {action.icon}

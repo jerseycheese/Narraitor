@@ -8,11 +8,13 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, PackageMinus } from 'lucide-react';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
-import type { InventoryItem, StandardInventoryCategory } from '@/types/inventory.types';
+import type {
+  InventoryItem,
+  StandardInventoryCategory,
+} from '@/types/inventory.types';
 import type { EntityID } from '@/types/common.types';
 import { useItemDropConfirmation } from './hooks/useItemDropConfirmation';
 import { DropConfirmationDialog } from './DropConfirmationDialog';
@@ -39,8 +41,10 @@ export function InventoryTable({
 }: InventoryTableProps) {
   // Select items and character inventory to re-render on changes
   const items = useInventoryStore((state) => state.items);
-  const characterInventories = useInventoryStore((state) => state.characterInventories);
-  
+  const characterInventories = useInventoryStore(
+    (state) => state.characterInventories
+  );
+
   const {
     isDialogOpen,
     itemToDrop,
@@ -52,7 +56,7 @@ export function InventoryTable({
     setDropQuantity,
     confirmDrop,
   } = useItemDropConfirmation(characterId);
-  
+
   const sessionId = useSessionStore((state) => state.id);
   const [usingItemId, setUsingItemId] = React.useState<EntityID | null>(null);
 
@@ -67,7 +71,9 @@ export function InventoryTable({
   // Filter by category if specified
   const filteredItems = React.useMemo(() => {
     if (categoryFilter) {
-      return characterItems.filter((item) => item.categoryId === categoryFilter);
+      return characterItems.filter(
+        (item) => item.categoryId === categoryFilter
+      );
     }
     return characterItems;
   }, [characterItems, categoryFilter]);
@@ -101,7 +107,7 @@ export function InventoryTable({
             <img
               src={image.url}
               alt={row.original.name}
-              className="w-24 h-24 object-contain rounded-md item-image"
+              className="item-image"
               loading="lazy"
             />
           );
@@ -112,9 +118,7 @@ export function InventoryTable({
       {
         accessorKey: 'name',
         header: 'Name',
-        cell: ({ row }) => (
-          <div className="font-medium">{row.getValue('name')}</div>
-        ),
+        cell: ({ row }) => <div>{row.getValue('name')}</div>,
         enableSorting: true,
       },
       {
@@ -122,18 +126,14 @@ export function InventoryTable({
         header: 'Description',
         cell: ({ row }) => {
           const description = row.getValue('description') as string;
-          return description ? (
-            <div className="text-sm text-muted-foreground max-w-md">{description}</div>
-          ) : null;
+          return description ? <div>{description}</div> : null;
         },
         enableSorting: false,
       },
       {
         accessorKey: 'quantity',
         header: 'Quantity',
-        cell: ({ row }) => (
-          <div className="text-center">{row.getValue('quantity')}</div>
-        ),
+        cell: ({ row }) => <div>{row.getValue('quantity')}</div>,
         enableSorting: true,
         sortingFn: 'basic',
       },
@@ -141,9 +141,11 @@ export function InventoryTable({
         accessorKey: 'categoryId',
         header: 'Category',
         cell: ({ row }) => {
-          const categoryId = row.getValue('categoryId') as StandardInventoryCategory;
+          const categoryId = row.getValue(
+            'categoryId'
+          ) as StandardInventoryCategory;
           return (
-            <Badge variant="outline-static">
+            <Badge variant="outline">
               {CATEGORY_NAMES[categoryId] || categoryId}
             </Badge>
           );
@@ -160,9 +162,7 @@ export function InventoryTable({
         cell: ({ row }) => {
           const firstAcquisition = row.original.acquisitionHistory[0];
           const method = firstAcquisition?.method || 'unknown';
-          return (
-            <div className="text-sm capitalize">{method}</div>
-          );
+          return <div>{method}</div>;
         },
         enableSorting: true,
       },
@@ -172,7 +172,7 @@ export function InventoryTable({
         cell: ({ row }) => {
           const isUsing = usingItemId === row.original.id;
           return (
-            <div className="flex items-center space-x-2">
+            <div className="manuscript-inventory-actions">
               <Button
                 variant="ghost"
                 size="sm"
@@ -181,7 +181,7 @@ export function InventoryTable({
                 aria-label={`Use ${row.original.name}`}
                 title="Use item"
               >
-                <PackageMinus className="h-4 w-4" />
+                {isUsing ? 'Using...' : 'Use'}
               </Button>
               <Button
                 variant="ghost"
@@ -190,7 +190,7 @@ export function InventoryTable({
                 aria-label={`Drop ${row.original.name}`}
                 title="Drop item"
               >
-                <Trash2 className="h-4 w-4" />
+                Drop
               </Button>
             </div>
           );
@@ -203,7 +203,7 @@ export function InventoryTable({
   // Handle empty state
   if (filteredItems.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
+      <div>
         <p>No items in inventory.</p>
       </div>
     );

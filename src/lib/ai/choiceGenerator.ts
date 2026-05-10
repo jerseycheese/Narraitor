@@ -1,6 +1,6 @@
 import { AIClient } from './types';
 import { useWorldStore } from '@/state/worldStore';
-import { Decision, NarrativeContext } from '@/types/narrative.types';
+import { Decision, NarrativeContext, DecisionRequirement } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { checkAndRecordLoreMentions } from './loreContextHelper';
@@ -55,7 +55,8 @@ export class ChoiceGenerator {
       
       
       if (!response?.content || safeTrim(response?.content ?? '') === '') {
-        return generateFallbackChoices(world, narrativeContext);
+        const fallbackDecision = generateFallbackChoices(world, narrativeContext);
+        return ensureSkillChecksForAllOptions(fallbackDecision, world);
       }
       
       const decision = parseChoiceResponse(response.content, narrativeContext, world);
@@ -85,7 +86,7 @@ export class ChoiceGenerator {
         decision.options = decision.options.slice(0, maxOptions);
       }
 
-      return decision;
+      return ensureSkillChecksForAllOptions(decision, world);
     } catch (error) {
       const errorDetails = {
         error: error instanceof Error ? error.message : String(error),
@@ -100,7 +101,8 @@ export class ChoiceGenerator {
       logger.error('Full error object:', error);
       
       const world = this.getWorld(params.worldId);
-      return generateFallbackChoices(world, params.narrativeContext);
+      const fallbackDecision = generateFallbackChoices(world, params.narrativeContext);
+      return ensureSkillChecksForAllOptions(fallbackDecision, world);
     }
   }
 
@@ -120,3 +122,97 @@ export class ChoiceGenerator {
     return world;
   }
 }
+
+const ensureSkillChecksForAllOptions = (
+  decision: Decision,
+  world: World
+): Decision => {
+  const worldSkills = world.skills ?? [];
+
+  decision.options = decision.options.map((option, index) => {
+    const hasSkillRequirement =
+      option.requirements?.some((requirement) => requirement.type === 'skill') ??
+      false;
+
+    if (hasSkillRequirement) {
+      return option;
+    }
+
+    const skillRequirement = createFallbackSkillRequirement(
+      option.text,
+      option.hint,
+      worldSkills,
+      index
+    );
+
+    return {
+      ...option,
+      requirements: [...(option.requirements ?? []), skillRequirement],
+    };
+  });
+
+  return decision;
+};
+
+const createFallbackSkillRequirement = (
+  optionText: string,
+  optionHint: string | undefined,
+  worldSkills: World['skills'],
+  optionIndex: number
+): DecisionRequirement => {
+  if (worldSkills.length === 0) {
+    return {
+      type: 'skill',
+      targetId: 'generic-skill-check',
+      operator: 'gte',
+      value: 1,
+    };
+  }
+
+  const selectedSkill = selectSkillForOption(
+    optionText,
+    optionHint,
+    worldSkills,
+    optionIndex
+  );
+  const requiredLevel = getRequiredSkillLevel(selectedSkill);
+  return {
+    type: 'skill',
+    targetId: selectedSkill.id,
+    operator: 'gte',
+    value: requiredLevel,
+  };
+};
+
+const selectSkillForOption = (
+  optionText: string,
+  optionHint: string | undefined,
+  worldSkills: World['skills'],
+  optionIndex: number
+): World['skills'][number] => {
+  const combinedText = `${optionText} ${optionHint ?? ''}`.toLowerCase();
+  const skillMention = worldSkills.find((skill) =>
+    combinedText.includes(skill.name.toLowerCase())
+  );
+
+  if (skillMention) {
+    return skillMention;
+  }
+
+  return worldSkills[optionIndex % worldSkills.length];
+};
+
+const getRequiredSkillLevel = (skill: World['skills'][number]): number => {
+  const minValue = Number.isFinite(skill.minValue) ? skill.minValue : 1;
+  const maxValue = Number.isFinite(skill.maxValue) ? skill.maxValue : 10;
+  const baseValue = Number.isFinite(skill.baseValue) ? skill.baseValue : minValue;
+
+  let level = Math.round(baseValue + 2);
+  if (skill.difficulty === 'hard') {
+    level += 1;
+  } else if (skill.difficulty === 'easy') {
+    level -= 1;
+  }
+
+  return Math.max(minValue, Math.min(maxValue, level));
+};

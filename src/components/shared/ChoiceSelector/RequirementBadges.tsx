@@ -2,6 +2,31 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { RequirementLogic } from '@/types/narrative.types';
 
+interface AlignmentBadgeProps {
+  alignment?: string;
+}
+
+/**
+ * Renders the alignment label (Lawful / Chaotic) as a colored badge.
+ * Neutral alignment renders nothing (it's the unmarked default).
+ */
+export const AlignmentBadge: React.FC<AlignmentBadgeProps> = ({
+  alignment,
+}) => {
+  if (!alignment || alignment === 'neutral') return null;
+
+  const label = alignment.charAt(0).toUpperCase() + alignment.slice(1);
+
+  return (
+    <span
+      className={`manuscript-alignment-badge manuscript-alignment-badge-${alignment}`}
+      aria-label={`${label} alignment`}
+    >
+      {label}
+    </span>
+  );
+};
+
 interface SkillRequirement {
   skillName?: string;
   requirement?: {
@@ -43,18 +68,32 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
     return null;
   }
 
+  const primaryRequirement =
+    requirements.find(
+      (requirement) =>
+        Boolean(requirement.skillName) &&
+        requirement.skillName !== 'Unknown Skill'
+    ) ?? requirements[0];
+
+  const hasNamedSkill =
+    Boolean(primaryRequirement.skillName) &&
+    primaryRequirement.skillName !== 'Unknown Skill';
+  const badgeLabel = hasNamedSkill
+    ? primaryRequirement.skillName!
+    : 'Skill';
+
   return (
-    <div className="flex flex-wrap gap-1 mt-2">
-      {requirements.map((skillReq, index) => (
-        <Badge
-          key={`${optionId}-skill-${index}`}
-          variant="skill-requirement"
-          className="text-xs"
-        >
-          {skillReq.skillName || 'Unknown Skill'} Check Required
-        </Badge>
-      ))}
-    </div>
+    <span
+      className="manuscript-skill-check-badge"
+      data-option-id={optionId}
+      aria-label={
+        hasNamedSkill
+          ? `Skill check required: ${badgeLabel}`
+          : 'Skill check required'
+      }
+    >
+      {badgeLabel}
+    </span>
   );
 };
 
@@ -70,17 +109,17 @@ export const ItemRequirementBadges: React.FC<ItemRequirementBadgesProps> = ({
   }
 
   return (
-    <div className="mt-2 space-y-2">
+    <div>
       {groups.map((group, groupIndex) => (
         <div key={`${optionId}-item-group-${groupIndex}`}>
-          <p className="text-xs font-medium text-muted-foreground">
+          <p>
             {group.logic === 'any' ? 'Requires any of:' : 'Requires all:'}
           </p>
-          <div className="flex flex-wrap gap-1 mt-1">
+          <div>
             {group.requirements.map((itemReq, reqIndex) => {
               const label = itemReq.met
                 ? itemReq.itemName
-                : `${itemReq.itemName} (${itemReq.current}/${itemReq.required})`;
+                : `${itemReq.itemName}(${itemReq.current}/${itemReq.required})`;
 
               return (
                 <Badge
@@ -88,7 +127,7 @@ export const ItemRequirementBadges: React.FC<ItemRequirementBadgesProps> = ({
                   variant={itemReq.met ? 'success' : 'destructive'}
                 >
                   {label}
-                  {!itemReq.met && <span className="sr-only"> - missing</span>}
+                  {!itemReq.met && <span> - missing</span>}
                 </Badge>
               );
             })}

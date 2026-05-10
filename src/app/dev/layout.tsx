@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { notFound } from 'next/navigation';
 
 export default function DevLayout({
@@ -7,18 +10,26 @@ export default function DevLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isDesignSystem = pathname.startsWith('/dev/design-system') || pathname.startsWith('/dev/game-session-compare');
+
   if (process.env.NODE_ENV === 'production') {
     notFound();
   }
 
+  // Design system page gets clean layout without header
+  if (isDesignSystem) {
+    return <>{children}</>;
+  }
+
   return (
-    <main className="bg-gray-100 min-h-screen">
-      <div className="container mx-auto p-4">
-        <header className="bg-blue-500 text-white p-4 mb-4 rounded shadow">
+    <main>
+      <div>
+        <header>
           <Link href="/dev">
-            <h1 className="text-2xl font-bold text-white hover:text-gray-200 transition-colors cursor-pointer">Narraitor Development</h1>
+            <h1>Narraitor Development</h1>
           </Link>
-          <p className="text-sm">Test environments for component development</p>
+          <p>Test environments for component development</p>
         </header>
         {children}
       </div>

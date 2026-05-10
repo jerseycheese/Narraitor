@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
 import { useWorldStore } from '@/state/worldStore';
@@ -209,10 +211,21 @@ type SessionStateDisplay = {
 };
 
 export default function GameSessionTestHarness() {
+  const searchParams = useSearchParams();
   const [showRealComponent, setShowRealComponent] = useState(true);
   const [isClient, setIsClient] = useState(false);
   const [currentState, setCurrentState] = useState<SessionStateDisplay>({});
   const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
+
+  const { setTheme } = useTheme();
+
+  // Force theme when loaded in compare-page iframe with ?theme= param
+  useEffect(() => {
+    const theme = searchParams.get('theme');
+    if (theme && (theme === 'ds1' || theme === 'ds2' || theme === 'ds3')) {
+      setTheme(theme);
+    }
+  }, [searchParams, setTheme]);
 
   // Create mock world and character for testing
   const createTestWorld = React.useCallback(() => {
@@ -296,7 +309,7 @@ export default function GameSessionTestHarness() {
 
     inventoryStore.addItem(mockCharacter.id, {
       name: 'Ancient Map',
-      description: 'Shows hidden locations',
+      description: 'Shows locations',
       quantity: 1,
       stackable: false,
       categorization: createCategorization('documents'),
@@ -376,156 +389,140 @@ export default function GameSessionTestHarness() {
 
   const handleSessionEnd = () => {
     logger.info('Session ended');
+    setShowRealComponent(false);
   };
 
   if (!isClient) {
     // Return loading placeholder to avoid hydration mismatch
     return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Game Session Test Harness</h1>
+      <div>
+        <h1>Game Session Test Harness</h1>
         <div>Loading test harness...</div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Game Session Test Harness</h2>
+    <div className="game-session-test-harness">
+      {!showRealComponent && (
+        <>
+          <h2>Game Session Test Harness</h2>
 
-      <div className="mb-4">
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded mb-4"
-          onClick={() => setShowRealComponent(!showRealComponent)}
-        >
-          {showRealComponent ? 'Hide Component' : 'Show Component'}
-        </button>
-      </div>
+          <div>
+            <button onClick={() => setShowRealComponent(true)}>
+              Show Component
+            </button>
+          </div>
 
-      <div className="mb-4">
-        <button
-          className="px-4 py-2 bg-green-500 text-white rounded mb-4"
-          onClick={createTestWorld}
-        >
-          Ensure Test World & Character Exist
-        </button>
+          <div>
+            <button onClick={createTestWorld}>
+              Ensure Test World & Character Exist
+            </button>
 
-        <button
-          className="px-4 py-2 bg-amber-500 text-white rounded mb-4 ml-2"
-          onClick={() => {
-            // Initialize a new session
-            logger.info('Starting new session');
-            const store = useSessionStore.getState();
-            if (store.initializeSession) {
-              // Use the test character ID
-              store.initializeSession(
-                mockWorld.id,
-                mockCharacter.id,
-                handleSessionStart
-              );
-            } else {
-              logger.error('initializeSession method not found');
-            }
-          }}
-        >
-          Start Session
-        </button>
+            <button
+              onClick={() => {
+                logger.info('Starting new session');
+                const store = useSessionStore.getState();
+                if (store.initializeSession) {
+                  store.initializeSession(
+                    mockWorld.id,
+                    mockCharacter.id,
+                    handleSessionStart
+                  );
+                } else {
+                  logger.error('initializeSession method not found');
+                }
+              }}
+            >
+              Start Session
+            </button>
 
-        <button
-          className="px-4 py-2 bg-red-500 text-white rounded mb-4 ml-2"
-          onClick={() => {
-            // End current session only
-            logger.info('Ending session');
-            useSessionStore.getState().endSession();
-          }}
-        >
-          End Session
-        </button>
+            <button
+              onClick={() => {
+                logger.info('Ending session');
+                useSessionStore.getState().endSession();
+              }}
+            >
+              End Session
+            </button>
 
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded mb-4 ml-2"
-          onClick={() => {
-            // Reset all session state to break infinite loops
-            logger.info('🔄 Resetting all session and narrative state');
+            <button
+              onClick={() => {
+                logger.info('Resetting all session and narrative state');
 
-            // 1. Reset session store completely
-            useSessionStore.setState({
-              id: null,
-              status: 'initializing',
-              currentSceneId: null,
-              playerChoices: [],
-              error: null,
-              worldId: null,
-              characterId: null,
-              savedSessions: {}, // Clear saved sessions too
-              autoSave: {
-                enabled: true,
-                lastSaveTime: null,
-                status: 'idle',
-                errorMessage: null,
-                totalSaves: 0,
-              },
-            });
+                useSessionStore.setState({
+                  id: null,
+                  status: 'initializing',
+                  currentSceneId: null,
+                  playerChoices: [],
+                  error: null,
+                  worldId: null,
+                  characterId: null,
+                  savedSessions: {},
+                  autoSave: {
+                    enabled: true,
+                    lastSaveTime: null,
+                    status: 'idle',
+                    errorMessage: null,
+                    totalSaves: 0,
+                  },
+                });
 
-            // 2. Clear all narrative data using reset method
-            const narrativeStore = useNarrativeStore.getState();
-            narrativeStore.reset(); // This clears all segments, decisions, and endings
-            narrativeStore.clearEnding();
+                const narrativeStore = useNarrativeStore.getState();
+                narrativeStore.reset();
+                narrativeStore.clearEnding();
 
-            // 3. Reset character state
-            useCharacterStore.getState().setCurrentCharacter(mockCharacter.id);
+                useCharacterStore.getState().setCurrentCharacter(mockCharacter.id);
 
-            // 4. Force page refresh to ensure clean state
-            setTimeout(() => {
-              logger.info('🔄 Forcing page refresh for complete reset');
-              window.location.reload();
-            }, 500);
-          }}
-        >
-          Reset State & Refresh
-        </button>
-      </div>
+                setTimeout(() => {
+                  logger.info('Forcing page refresh for complete reset');
+                  window.location.reload();
+                }, 500);
+              }}
+            >
+              Reset State & Refresh
+            </button>
+          </div>
 
-      <div className="border p-4 rounded bg-gray-100">
-        {showRealComponent ? (
-          <GameSession
-            worldId={mockWorld.id}
-            onSessionStart={handleSessionStart}
-            onSessionEnd={handleSessionEnd}
-          />
-        ) : (
-          <div>Component hidden</div>
-        )}
-      </div>
+          <div>
+            <h2>Current Session State</h2>
+            <p>
+              Status:{' '}
+              <span>{currentState.status || 'unknown'}</span>
+            </p>
+            <p>
+              Store methods:{' '}
+              {Object.keys(useSessionStore.getState())
+                .filter((key) => {
+                  const value =
+                    useSessionStore.getState()[
+                      key as keyof typeof useSessionStore.getState
+                    ];
+                  return typeof value === 'function';
+                })
+                .join(', ')}
+            </p>
+            <div>
+              {JSON.stringify(currentState, null, 2)}
+            </div>
+          </div>
 
-      <div className="mt-6">
-        <h2 className="text-xl font-bold mb-2">Current Session State</h2>
-        <p className="text-sm text-gray-700 mb-2">
-          Status:{' '}
-          <span className="font-bold">{currentState.status || 'unknown'}</span>
-        </p>
-        <p className="text-sm text-gray-700 mb-2">
-          Store methods:{' '}
-          {Object.keys(useSessionStore.getState())
-            .filter((key) => {
-              const value =
-                useSessionStore.getState()[
-                  key as keyof typeof useSessionStore.getState
-                ];
-              return typeof value === 'function';
-            })
-            .join(', ')}
-        </p>
-        <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
-          {JSON.stringify(currentState, null, 2)}
-        </div>
-      </div>
+          <div>
+            <h2>Test World Data</h2>
+            <div>
+              {JSON.stringify(mockWorld, null, 2)}
+            </div>
+          </div>
+        </>
+      )}
 
-      <div className="mt-6">
-        <h2 className="text-xl font-bold mb-2">Test World Data</h2>
-        <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
-          {JSON.stringify(mockWorld, null, 2)}
-        </div>
-      </div>
+      {showRealComponent && (
+        <GameSession
+          worldId={mockWorld.id}
+          onSessionStart={handleSessionStart}
+          onSessionEnd={handleSessionEnd}
+        />
+      )}
     </div>
   );
 }

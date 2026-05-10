@@ -40,7 +40,7 @@ type Story = StoryObj<typeof meta>;
 const mockWorld: World = {
   id: 'world-1',
   name: 'Middle Earth',
-  description: 'A vast and mystical realm where magic flows through every living thing. Ancient forests hold secrets of the old gods, while towering mountains guard hidden valleys where legendary creatures dwell. This world is filled with wonder and danger in equal measure, where heroes are forged in the crucible of adventure and legends are born from acts of courage.',
+  description: 'A vast and mystical realm where magic flows through every living thing. Ancient forests hold secrets of the old gods, while towering mountains guard valleys where legendary creatures dwell. This world is filled with wonder and danger in equal measure, where heroes are forged in the crucible of adventure and legends are born from acts of courage.',
   genre: 'fantasy',
   relationship: 'set_within',
   reference: 'Lord of the Rings',
@@ -159,7 +159,7 @@ const mockWorld: World = {
       id: 'stealth',
       worldId: 'world-1',
       name: 'Stealth',
-      description: 'Moving silently and remaining hidden',
+      description: 'Moving silently and remaining',
       attributeIds: ['dex'],
       difficulty: 'hard',
       category: 'Utility',

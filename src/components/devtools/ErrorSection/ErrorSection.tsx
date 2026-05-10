@@ -89,34 +89,23 @@ export const ErrorSection = () => {
     });
   };
 
-  // Get severity badge color
-  const getSeverityColor = (severity: ErrorSeverity) => {
-    switch (severity) {
-      case ErrorSeverity.CRITICAL: return 'bg-red-700';
-      case ErrorSeverity.HIGH: return 'bg-red-700';
-      case ErrorSeverity.MEDIUM: return 'bg-amber-700';
-      case ErrorSeverity.LOW: return 'bg-blue-700';
-      default: return 'bg-gray-700';
-    }
-  };
-
   // Format timestamp
   const formatTimestamp = (timestamp: Date) => {
     return timestamp.toLocaleTimeString();
   };
 
   return (
-    <div className="space-y-4">
+    <div>
       {/* Error Statistics */}
-      <div className="bg-gray-100 p-3 rounded border border-gray-300">
-        <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-gray-900">Runtime Errors</h4>
+      <div>
+        <div>
+          <h4>Runtime Errors</h4>
           {statistics && statistics.total > 0 && (
             <Button
               onClick={handleClearAll}
               variant="destructive"
               size="sm"
-              className="text-xs h-6"
+              
             >
               Clear All
             </Button>
@@ -124,15 +113,15 @@ export const ErrorSection = () => {
         </div>
         
         {statistics && (
-          <div className="text-xs text-gray-700 space-y-1">
-            <div className="flex gap-4">
+          <div>
+            <div>
               <span>Total: {statistics.total}</span>
               <span>Recent: {statistics.recentCount}</span>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div>
               {Object.entries(statistics.bySeverity).map(([severity, count]) => 
                 count > 0 && (
-                  <span key={severity} className="capitalize">
+                  <span key={severity} >
                     {severity}: {count}
                   </span>
                 )
@@ -144,19 +133,19 @@ export const ErrorSection = () => {
 
       {/* Filters */}
       <CollapsibleSection title="Filters" initialCollapsed={true}>
-        <div className="space-y-3">
+        <div>
           {/* Severity Filter */}
           <div>
-            <h5 className="text-xs font-medium text-gray-900 mb-2">Severity</h5>
-            <div className="flex flex-wrap gap-2">
+            <h5>Severity</h5>
+            <div>
               {Object.values(ErrorSeverity).map(severity => (
-                <label key={severity} className="flex items-center gap-1 text-xs">
+                <label key={severity} >
                   <Checkbox
                     checked={(filter.severity || []).includes(severity)}
                     onChange={(e) => handleSeverityFilter(severity, e.target.checked)}
                     aria-label={`Filter by ${severity.charAt(0).toUpperCase() + severity.slice(1)} severity errors`}
                   />
-                  <span className="text-gray-900 capitalize">{severity}</span>
+                  <span>{severity}</span>
                 </label>
               ))}
             </div>
@@ -164,16 +153,16 @@ export const ErrorSection = () => {
 
           {/* Category Filter */}
           <div>
-            <h5 className="text-xs font-medium text-gray-900 mb-2">Category</h5>
-            <div className="flex flex-wrap gap-2">
+            <h5>Category</h5>
+            <div>
               {Object.values(ErrorCategory).map(category => (
-                <label key={category} className="flex items-center gap-1 text-xs">
+                <label key={category} >
                   <Checkbox
                     checked={(filter.category || []).includes(category)}
                     onChange={(e) => handleCategoryFilter(category, e.target.checked)}
                     aria-label={`Filter by ${category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')} category errors`}
                   />
-                  <span className="text-gray-900 capitalize">{category.replace('_', ' ')}</span>
+                  <span>{category.replace('_', ' ')}</span>
                 </label>
               ))}
             </div>
@@ -181,20 +170,20 @@ export const ErrorSection = () => {
 
           {/* Show Dismissed Toggle */}
           <div>
-            <label className="flex items-center gap-2 text-xs">
+            <label>
               <Checkbox
                 checked={filter.dismissed || false}
                 onChange={(e) => handleShowDismissed(e.target.checked)}
                 aria-label="Show dismissed errors in addition to active errors"
               />
-              <span className="text-gray-900">Show dismissed errors</span>
+              <span>Show dismissed errors</span>
             </label>
           </div>
 
           <Button 
             onClick={loadData} 
             size="sm" 
-            className="text-xs"
+            
           >
             Apply Filters
           </Button>
@@ -202,51 +191,46 @@ export const ErrorSection = () => {
       </CollapsibleSection>
 
       {/* Error List */}
-      <div className="space-y-2">
+      <div>
         {errors.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 text-sm">
+          <div>
             No runtime errors captured
           </div>
         ) : (
           errors.map((error) => (
             <div
               key={error.id}
-              className={`border rounded p-3 ${
-                error.dismissed 
-                  ? 'bg-gray-900 border-gray-700 opacity-60' 
-                  : 'bg-gray-700 border-gray-500'
-              }`}
             >
               {/* Error Header */}
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge className={`text-xs ${getSeverityColor(error.severity)} text-white`}>
+              <div>
+                <div>
+                  <div>
+                    <Badge>
                       {error.severity.toUpperCase()}
                     </Badge>
-                    <Badge variant="outline-static" className="text-xs">
+                    <Badge variant="outline" >
                       {error.category}
                     </Badge>
                     {error.count > 1 && (
-                      <Badge variant="secondary-static" className="text-xs">
+                      <Badge variant="secondary-static" >
                         {error.count}x
                       </Badge>
                     )}
-                    <span className="text-xs text-gray-500">
+                    <span>
                       {formatTimestamp(error.timestamp)}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-200 break-words">
+                  <p>
                     {error.message}
                   </p>
                 </div>
                 
-                <div className="flex gap-1">
+                <div>
                   <Button
                     onClick={() => toggleErrorExpanded(error.id)}
                     variant="ghost"
                     size="sm"
-                    className="h-6 w-6 p-0 text-gray-500 hover:text-gray-200"
+                    
                     aria-label="View error details"
                   >
                     {expandedErrors.has(error.id) ? '−' : '+'}
@@ -256,7 +240,7 @@ export const ErrorSection = () => {
                       onClick={() => handleDismissError(error.id)}
                       variant="ghost"
                       size="sm"
-                      className="h-6 w-6 p-0 text-gray-500 hover:text-gray-200"
+                      
                       aria-label="Dismiss error"
                     >
                       ×
@@ -267,12 +251,12 @@ export const ErrorSection = () => {
 
               {/* Expanded Error Details */}
               {expandedErrors.has(error.id) && (
-                <div className="border-t border-gray-700 pt-2 mt-2 space-y-2">
+                <div>
                   {/* Stack Trace */}
                   {error.stack && (
                     <div>
-                      <h6 className="text-xs font-medium text-gray-300 mb-1">Stack Trace</h6>
-                      <pre className="text-xs text-gray-500 bg-gray-900 p-2 rounded overflow-x-auto">
+                      <h6>Stack Trace</h6>
+                      <pre>
                         {error.stack}
                       </pre>
                     </div>
@@ -281,10 +265,10 @@ export const ErrorSection = () => {
                   {/* Component Context */}
                   {error.componentContext && (
                     <div>
-                      <h6 className="text-xs font-medium text-gray-300 mb-1">Component Context</h6>
-                      <div className="text-xs text-gray-500 space-y-1">
+                      <h6>Component Context</h6>
+                      <div>
                         <div>Component: {error.componentContext.componentName}</div>
-                        <pre className="bg-gray-900 p-2 rounded overflow-x-auto">
+                        <pre>
                           {error.componentContext.componentStack}
                         </pre>
                       </div>
@@ -294,8 +278,8 @@ export const ErrorSection = () => {
                   {/* State Snapshot */}
                   {error.stateSnapshot && (
                     <div>
-                      <h6 className="text-xs font-medium text-gray-300 mb-1">State Snapshot</h6>
-                      <div className="text-xs text-gray-500 space-y-1">
+                      <h6>State Snapshot</h6>
+                      <div>
                         <div>Route: {error.stateSnapshot.route}</div>
                         <div>URL: {error.stateSnapshot.url}</div>
                         <div>User Agent: {error.stateSnapshot.userAgent}</div>

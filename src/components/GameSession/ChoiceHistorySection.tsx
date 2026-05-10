@@ -1,13 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { buildDecisionHistory } from '@/lib/narrative/decisionHistory';
-import { formatDateTime, formatRelativeTime, titleCase } from '@/lib/utils';
-import type { DecisionHistoryEntry, DecisionOutcome } from '@/types/narrative.types';
+import { formatDateTime, formatRelativeTime } from '@/lib/utils';
+import type {
+  DecisionHistoryEntry,
+  DecisionOutcome,
+} from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import type { EntityID } from '@/types/common.types';
 
@@ -27,7 +27,8 @@ const outcomeLabels: Record<DecisionOutcome, string> = {
 
 const resolveDate = (value?: Date | string): Date | null => {
   if (!value) return null;
-  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (value instanceof Date)
+    return Number.isNaN(value.getTime()) ? null : value;
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
@@ -59,101 +60,109 @@ interface ChoiceHistoryContentProps {
 
 const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
   entries,
-  initialCollapsed,
+  initialCollapsed: _initialCollapsed,
 }) => {
   const resolvedEntries = entries;
-  const [expandedEntries, setExpandedEntries] = React.useState<Set<EntityID>>(new Set());
+  const [expandedEntries, setExpandedEntries] = React.useState<Set<EntityID>>(
+    new Set()
+  );
 
   return (
-    <section className="mt-6" data-testid="choice-history-section" data-tutorial="choice-history-section">
-      <CollapsibleSection title="Choice History" initialCollapsed={initialCollapsed}>
-        {resolvedEntries.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            No recorded choices yet. Your decisions will appear here once you start choosing.
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {resolvedEntries.map((entry) => {
-              const choiceText = getChoiceText(entry);
-              const decisionPrompt = entry.decision.prompt.trim();
-              const outcomeSegment = entry.outcomeSegment;
-              const outcomeText = outcomeSegment?.content || 'Impact unknown yet.';
-              const outcomeLocation = outcomeSegment?.metadata?.location;
-              const decisionTime = resolveDate(entry.decision.selectedAt)
-                || resolveDate(outcomeSegment?.createdAt)
-                || resolveDate(outcomeSegment?.timestamp);
-              const timeLabel = decisionTime ? formatRelativeTime(decisionTime) : 'Time unknown';
-              const timeTitle = decisionTime ? formatDateTime(decisionTime) : undefined;
-              const decisionOutcome = outcomeSegment?.metadata?.decisionOutcome;
-              const decisionWeight = entry.decision.decisionWeight;
-              const hasDetails = Boolean(decisionPrompt);
-              const isExpanded = expandedEntries.has(entry.decision.id);
-              const detailsId = `decision-details-${entry.decision.id}`;
+    <section
+      data-testid="choice-history-section"
+      data-tutorial="choice-history-section"
+    >
+      {resolvedEntries.length === 0 ? (
+        <p className="manuscript-choice-history-empty">
+          No recorded choices yet. Your decisions will appear here once you
+          start choosing.
+        </p>
+      ) : (
+        <div className="manuscript-choice-history-list">
+          {resolvedEntries.map((entry) => {
+            const choiceText = getChoiceText(entry);
+            const decisionPrompt = entry.decision.prompt.trim();
+            const outcomeSegment = entry.outcomeSegment;
+            const outcomeText =
+              outcomeSegment?.content || 'Impact unknown yet.';
+            const outcomeLocation = outcomeSegment?.metadata?.location;
+            const decisionTime =
+              resolveDate(entry.decision.selectedAt) ||
+              resolveDate(outcomeSegment?.createdAt) ||
+              resolveDate(outcomeSegment?.timestamp);
+            const timeLabel = decisionTime
+              ? formatRelativeTime(decisionTime)
+              : 'Time unknown';
+            const timeTitle = decisionTime
+              ? formatDateTime(decisionTime)
+              : undefined;
+            const decisionOutcome = outcomeSegment?.metadata?.decisionOutcome;
+            const decisionWeight = entry.decision.decisionWeight;
+            const hasDetails = Boolean(decisionPrompt);
+            const isExpanded = expandedEntries.has(entry.decision.id);
+            const detailsId = `decision-details-${entry.decision.id}`;
 
-              return (
-                <Card
-                  key={entry.decision.id}
-                  className="p-4 border border-amber-200 bg-white"
-                  data-testid="choice-history-entry"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <p className="text-sm font-semibold text-amber-900">
-                        {choiceText}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {decisionWeight && (
-                        <Badge variant="outline-static" size="sm">
-                          {titleCase(decisionWeight)} decision
-                        </Badge>
-                      )}
-                      {decisionOutcome && (
-                        <Badge variant="secondary-static" size="sm">
-                          {outcomeLabels[decisionOutcome]}
-                        </Badge>
-                      )}
-                      {hasDetails && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs text-amber-700"
-                          aria-expanded={isExpanded}
-                          aria-controls={detailsId}
-                          onClick={() => {
-                            setExpandedEntries((previous) => buildExpandedSet(previous, entry.decision.id));
-                          }}
-                        >
-                          {isExpanded ? 'Hide details' : 'Details'}
-                        </Button>
-                      )}
-                    </div>
+            return (
+              <article
+                key={entry.decision.id}
+                className="manuscript-choice-history-entry"
+                data-testid="choice-history-entry"
+              >
+                <h4 className="manuscript-choice-history-choice">{choiceText}</h4>
+
+                <div className="manuscript-choice-history-meta">
+                  {decisionWeight && (
+                    <span className="manuscript-choice-history-meta-item">
+                      {decisionWeight} WEIGHT
+                    </span>
+                  )}
+                  {decisionOutcome && (
+                    <span className="manuscript-choice-history-meta-item">
+                      {outcomeLabels[decisionOutcome]}
+                    </span>
+                  )}
+                  {decisionTime && (
+                    <span className="manuscript-choice-history-meta-item" title={timeTitle}>
+                      {timeLabel}
+                    </span>
+                  )}
+                  {outcomeLocation && (
+                    <span className="manuscript-choice-history-meta-item">
+                      {outcomeLocation}
+                    </span>
+                  )}
+                  {hasDetails && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="manuscript-choice-history-details-button"
+                      aria-expanded={isExpanded}
+                      aria-controls={detailsId}
+                      onClick={() => {
+                        setExpandedEntries((previous) =>
+                          buildExpandedSet(previous, entry.decision.id)
+                        );
+                      }}
+                    >
+                      {isExpanded ? 'HIDE DETAILS' : 'DETAILS'}
+                    </Button>
+                  )}
+                </div>
+
+                {hasDetails && isExpanded && (
+                  <div id={detailsId} className="manuscript-choice-history-details">
+                    {decisionPrompt}
                   </div>
-                  {(decisionTime || outcomeLocation) && (
-                    <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-500">
-                      {decisionTime && (
-                        <span title={timeTitle}>When: {timeLabel}</span>
-                      )}
-                      {outcomeLocation && (
-                        <span>Where: {outcomeLocation}</span>
-                      )}
-                    </div>
-                  )}
-                  {hasDetails && isExpanded && (
-                    <p id={detailsId} className="mt-2 text-xs text-gray-600 whitespace-pre-wrap">
-                      {decisionPrompt}
-                    </p>
-                  )}
-                  <p className={`mt-2 text-sm whitespace-pre-wrap ${outcomeSegment ? 'text-gray-700' : 'text-gray-500'}`}>
-                    {outcomeText}
-                  </p>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </CollapsibleSection>
+                )}
+
+                <div className="manuscript-choice-history-outcome">
+                  {outcomeText}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 };
@@ -181,7 +190,11 @@ const ChoiceHistoryFromStore: React.FC<ChoiceHistorySectionProps> = ({
   );
 
   const resolvedEntries = React.useMemo(
-    () => buildDecisionHistory({ decisions: sessionDecisions, segments: sessionSegments }),
+    () =>
+      buildDecisionHistory({
+        decisions: sessionDecisions,
+        segments: sessionSegments,
+      }),
     [sessionDecisions, sessionSegments]
   );
 
@@ -200,11 +213,17 @@ export const ChoiceHistorySection: React.FC<ChoiceHistorySectionProps> = ({
 }) => {
   if (entries) {
     return (
-      <ChoiceHistoryContent entries={entries} initialCollapsed={initialCollapsed} />
+      <ChoiceHistoryContent
+        entries={entries}
+        initialCollapsed={initialCollapsed}
+      />
     );
   }
 
   return (
-    <ChoiceHistoryFromStore sessionId={sessionId} initialCollapsed={initialCollapsed} />
+    <ChoiceHistoryFromStore
+      sessionId={sessionId}
+      initialCollapsed={initialCollapsed}
+    />
   );
 };

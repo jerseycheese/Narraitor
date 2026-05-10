@@ -26,7 +26,6 @@ export async function waitForContentStable(page: Page): Promise<void> {
     '[data-testid="loading"]',
     '[aria-label="Loading"]',
     '.spinner',
-    'text=Loading...',
     'text=Creating archetypes...'
   ];
   
@@ -41,15 +40,20 @@ export async function waitForContentStable(page: Page): Promise<void> {
     }
   }
   
-  // Wait for "Loading..." text to disappear with adequate timeout for seeding
+  // Wait for scoped loading indicators to disappear.
+  // Avoid matching generic "Loading" copy on static docs pages.
   try {
     await page.waitForFunction(
-      () => !document.body.textContent?.includes('Loading') && 
-            !document.body.textContent?.includes('Creating archetypes'),
-      { timeout: 8000 }
+      () => {
+        const activeIndicators = document.querySelectorAll(
+          '.loading, [data-testid="loading"], [aria-label="Loading"], .spinner'
+        );
+        return activeIndicators.length === 0;
+      },
+      { timeout: 4000 }
     );
   } catch (error) {
-    console.log(`Loading text wait failed: ${(error as Error).message}`);
+    console.log(`Scoped loading indicator wait failed: ${(error as Error).message}`);
   }
   
   // Final stabilization wait - enough time for data seeding to complete

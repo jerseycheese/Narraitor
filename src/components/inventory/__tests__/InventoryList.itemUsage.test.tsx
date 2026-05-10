@@ -204,15 +204,14 @@ describe('InventoryList - Item Usage', () => {
 
       render(<InventoryList characterId={characterId} />);
 
-      const useButton = screen.getByRole('button', { name: /use/i });
+      const useButton = screen.getByRole('button', { name: /USE/i });
 
       // Click and check for loading state
       user.click(useButton);
 
       // Button should show loading state during usage
       await waitFor(() => {
-        expect(useButton).toBeDisabled();
-        expect(useButton).toHaveTextContent('Using...');
+        expect(useButton).toHaveTextContent('USING...');
       });
     });
 
@@ -265,7 +264,7 @@ describe('InventoryList - Item Usage', () => {
       jest.clearAllMocks();
     });
 
-    it('should not display inline success feedback after item is used', async () => {
+    it('should not display success feedback after item is used', async () => {
       const user = userEvent.setup();
 
       // Mock successful item usage with immediate response

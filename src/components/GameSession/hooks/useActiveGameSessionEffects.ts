@@ -77,6 +77,7 @@ export const useActiveGameSessionEffects = ({
           type: fallback.type,
           characterIds: [],
           metadata: fallback.metadata,
+          worldId: fallback.worldId,
           updatedAt: fallback.updatedAt,
           timestamp: fallback.timestamp,
         });
@@ -260,9 +261,24 @@ export const useActiveGameSessionEffects = ({
             id: fallbackId,
             prompt: 'What will you do?',
             options: [
-              { id: `option-${fallbackId}-1`, text: 'Investigate further', alignment: 'neutral' },
-              { id: `option-${fallbackId}-2`, text: 'Talk to nearby characters', alignment: 'lawful' },
-              { id: `option-${fallbackId}-3`, text: 'Move to a new location', alignment: 'neutral' },
+              {
+                id: `option-${fallbackId}-1`,
+                text: 'Investigate further',
+                alignment: 'neutral',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
+              },
+              {
+                id: `option-${fallbackId}-2`,
+                text: 'Talk to nearby characters',
+                alignment: 'lawful',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
+              },
+              {
+                id: `option-${fallbackId}-3`,
+                text: 'Move to a new location',
+                alignment: 'neutral',
+                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
+              },
             ],
             decisionWeight: 'minor',
             contextSummary: 'Waiting for player action (timeout fallback).',

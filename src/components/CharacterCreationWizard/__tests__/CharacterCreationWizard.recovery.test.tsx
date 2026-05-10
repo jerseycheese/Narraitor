@@ -143,7 +143,7 @@ describe('CharacterCreationWizard recovery modal', () => {
     jest.clearAllMocks();
   });
 
-  it('pauses the tutorial while the recovery dialog is visible', async () => {
+  it('pauses the tutorial while the recovery dialog is', async () => {
     render(<CharacterCreationWizard worldId="world-1" />);
 
     await waitFor(() => {

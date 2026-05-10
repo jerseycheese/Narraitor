@@ -10,7 +10,7 @@ const meta: Meta<typeof BackgroundStep> = {
   },
   decorators: [
     (Story) => (
-      <div className="w-full max-w-2xl">
+      <div>
         <WizardContainer title="Create Character in Storybook Test World">
           <WizardProgress
             steps={[
@@ -21,9 +21,9 @@ const meta: Meta<typeof BackgroundStep> = {
               { id: 'portrait', label: 'Portrait' },
             ]}
             currentStep={3}
-            className="mb-6"
+            
           />
-          <div className="p-6 bg-white rounded-lg shadow">
+          <div>
             <Story />
           </div>
         </WizardContainer>

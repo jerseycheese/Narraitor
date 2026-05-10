@@ -61,9 +61,9 @@ export const Placeholder: Story = {
 export const Generating: Story = {
   decorators: [
     () => (
-      <div className="p-8 bg-gray-100 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">Generating Character Portrait</h3>
-        <div className="bg-white p-6 rounded-lg shadow">
+      <div>
+        <h3>Generating Character Portrait</h3>
+        <div>
           <LoadingState message="Generating character portrait..." />
         </div>
       </div>
@@ -89,38 +89,38 @@ export const Error: Story = {
 export const SizeComparison: Story = {
   decorators: [
     () => (
-      <div className="flex items-end gap-4 p-4">
-        <div className="text-center">
+      <div>
+        <div>
           <CharacterPortrait
             portrait={{ type: 'placeholder', url: null }}
             characterName="Small Hero"
             size="small"
           />
-          <p className="text-xs mt-2">Small</p>
+          <p>Small</p>
         </div>
-        <div className="text-center">
+        <div>
           <CharacterPortrait
             portrait={{ type: 'placeholder', url: null }}
             characterName="Medium Hero"
             size="medium"
           />
-          <p className="text-xs mt-2">Medium</p>
+          <p>Medium</p>
         </div>
-        <div className="text-center">
+        <div>
           <CharacterPortrait
             portrait={{ type: 'placeholder', url: null }}
             characterName="Large Hero"
             size="large"
           />
-          <p className="text-xs mt-2">Large</p>
+          <p>Large</p>
         </div>
-        <div className="text-center">
+        <div>
           <CharacterPortrait
             portrait={{ type: 'placeholder', url: null }}
             characterName="XLarge Hero"
             size="xlarge"
           />
-          <p className="text-xs mt-2">XLarge</p>
+          <p>XLarge</p>
         </div>
       </div>
     )

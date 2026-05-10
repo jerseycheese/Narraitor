@@ -1,28 +1,23 @@
 'use client';
 
 import React from 'react';
-import { BookOpen } from 'lucide-react';
 import type { Character } from '@/state/characterStore';
-import CharacterSummary from './CharacterSummary';
 import { StorySummarySection } from './StorySummarySection';
 import { ChoiceHistorySection } from './ChoiceHistorySection';
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
-import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { Button } from '@/components/ui/button';
-import type { UseAutoSaveReturn } from '@/hooks/useAutoSave';
 
 interface ActiveGameSessionControlsProps {
   character?: Character;
   characterId?: string;
   worldId: string;
   sessionId: string;
-  autoSave: UseAutoSaveReturn;
   showEndConfirmation: boolean;
   onConfirmEndStory: () => void;
   onCloseEndStory: () => void;
   onOpenJournal: () => void;
+  isProgressiveDisclosureEnabled?: boolean;
 }
 
 const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
@@ -30,78 +25,103 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
   characterId,
   worldId,
   sessionId,
-  autoSave,
   showEndConfirmation,
   onConfirmEndStory,
   onCloseEndStory,
   onOpenJournal,
+  isProgressiveDisclosureEnabled = false,
 }) => {
   return (
-    <>
-      {/* Character Summary Panel below hero */}
-      {character && (
-        <div className="mt-6">
-          <CharacterSummary character={character} />
-        </div>
-      )}
-
-      {/* Inventory Display */}
-      {characterId && (
-        <div className="mt-6" data-testid="inventory-collapsible" data-tutorial="inventory-toggle">
+    <div className="manuscript-support-sections">
+      {/* Inventory Display - hidden when progressive disclosure is enabled */}
+      {!isProgressiveDisclosureEnabled && characterId && (
+        <div
+          className="manuscript-support-section"
+          data-testid="inventory-collapsible"
+          data-tutorial="inventory-toggle"
+        >
           <CollapsibleSection title="Inventory" initialCollapsed>
             <InventoryList characterId={characterId} />
           </CollapsibleSection>
         </div>
       )}
 
-      <StorySummarySection worldId={worldId} sessionId={sessionId} characterId={characterId || undefined} />
+      {/* Story Summary Section - hidden when progressive disclosure is enabled */}
+      {!isProgressiveDisclosureEnabled && (
+        <div className="manuscript-support-section">
+          <StorySummarySection
+            worldId={worldId}
+            sessionId={sessionId}
+            characterId={characterId || undefined}
+          />
+        </div>
+      )}
 
-      <ChoiceHistorySection sessionId={sessionId} />
+      {/* Choice History Section - hidden when progressive disclosure is enabled */}
+      {!isProgressiveDisclosureEnabled && (
+        <div className="manuscript-support-section">
+          <ChoiceHistorySection sessionId={sessionId} />
+        </div>
+      )}
 
-      {/* Journal Button */}
-      {character && (
-        <div className="mt-6">
+      {/* Journal Button - hidden when progressive disclosure is enabled */}
+      {!isProgressiveDisclosureEnabled && character && (
+        <div className="manuscript-support-section manuscript-support-section-journal">
           <Button
             onClick={onOpenJournal}
             variant="outline"
-            className="w-full flex items-center justify-center h-auto py-4 px-6 bg-white hover:bg-amber-50 border-amber-200 text-amber-900 group"
+            className="manuscript-journal-button"
             data-tutorial="journal-toggle"
           >
-            <span className="flex items-center gap-3 font-semibold text-lg">
-              <BookOpen className="w-5 h-5" />
+            <span className="manuscript-journal-button-label">
               Open Journal
             </span>
           </Button>
         </div>
       )}
 
-      {/* Autosave indicator anchored under the main content */}
-      <div className="mt-4">
-        <SaveIndicator
-          status={autoSave.status}
-          lastSaveTime={autoSave.lastSaveTime}
-          errorMessage={autoSave.errorMessage}
-          totalSaves={autoSave.totalSaves}
-          onManualSave={autoSave.triggerSave}
-          onRetryError={autoSave.retry}
-          retryable
-          compact
-          className="text-xs sm:text-sm"
-        />
-      </div>
-
       {/* Manual End Story Confirmation */}
-      <ConfirmationDialog
-        isOpen={showEndConfirmation}
-        onConfirm={onConfirmEndStory}
-        onClose={onCloseEndStory}
-        title="End Story"
-        message="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
-        variant="warning"
-        confirmText="End Story"
-        cancelText="Cancel"
-      />
-    </>
+      {showEndConfirmation && (
+        <div 
+          className="manuscript-end-story-backdrop"
+          onClick={onCloseEndStory}
+          role="presentation"
+        >
+          <div 
+            className="manuscript-end-story-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="end-story-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="manuscript-end-story-header">
+              <h2 id="end-story-title" className="manuscript-end-story-title">End Story</h2>
+            </div>
+            
+            <div className="manuscript-end-story-body">
+              <p className="manuscript-end-story-message">
+                Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone.
+              </p>
+            </div>
+            
+            <div className="manuscript-end-story-footer">
+              <button 
+                className="manuscript-end-story-cancel"
+                onClick={onCloseEndStory}
+              >
+                Cancel
+              </button>
+              <button 
+                className="manuscript-end-story-confirm"
+                onClick={onConfirmEndStory}
+              >
+                Confirm End Story
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -14,51 +14,42 @@ export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
       label: 'Worlds',
       value: metrics.worldsCreated,
       icon: Globe,
-      color: 'bg-primary/10 text-primary border-primary/20'
     },
     {
       label: 'Characters',
       value: metrics.charactersCreated,
       icon: Users,
-      color: 'bg-success/10 text-success border-success/20'
     },
     {
       label: 'Sessions',
       value: metrics.sessionsPlayed,
       icon: Play,
-      color: 'bg-info/10 text-info border-info/20'
     },
     {
       label: 'Entries',
       value: metrics.narrativeSegments,
       icon: BookOpen,
-      color: 'bg-secondary/10 text-secondary border-secondary/20'
-    }
+    },
   ];
 
   return (
     <section
-      className="component-dashboard-progress-card bg-background rounded-lg border p-6 shadow-sm"
+      className="component-dashboard-progress-card"
       aria-labelledby="progress-heading"
       role="region"
     >
-      <h2 id="progress-heading" className="text-lg font-semibold mb-4">
-        Your Progress
-      </h2>
+      <h2 id="progress-heading">Your Progress</h2>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="dashboard-progress-stats">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div
-              key={stat.label}
-              className={`rounded-lg border p-4 ${stat.color}`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <Icon className="w-5 h-5" aria-hidden="true" />
-                <span className="text-2xl font-bold">{stat.value}</span>
+            <div key={stat.label} className="dashboard-progress-stat">
+              <div className="dashboard-progress-stat-value">
+                <Icon aria-hidden="true" />
+                <span>{stat.value}</span>
               </div>
-              <p className="text-sm font-medium">{stat.label}</p>
+              <p className="dashboard-progress-stat-label">{stat.label}</p>
             </div>
           );
         })}

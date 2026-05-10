@@ -1,28 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Navigation } from '@/components/Navigation/Navigation';
+import { HeaderNavigation } from '@/components/Navigation/HeaderNavigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
 import { World } from '@/types/world.types';
 // Use character interface from store for consistency
 
-const meta: Meta<typeof Navigation> = {
+const meta: Meta<typeof HeaderNavigation> = {
   title: '03-Organisms/navigation/Navigation',
-  component: Navigation,
+  component: HeaderNavigation,
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: `
-        Main navigation component with world switcher and contextual actions.
-
-        **Features:**
-        - World switcher dropdown with character counts
-        - Active world indicator (green highlight)
-        - Character creation shortcut for active worlds
-        - Responsive design with mobile-friendly layout
-        - Auto-close dropdown on outside clicks
-        `,
+        component: `Main navigation component with world switcher and contextual actions. **Features:** - World switcher dropdown with character counts - Active world indicator (green highlight) - Character creation shortcut for active worlds - Responsive design with mobile-friendly layout - Auto-close dropdown on outside clicks`,
       },
     },
     nextjs: {
@@ -45,12 +36,12 @@ const meta: Meta<typeof Navigation> = {
 
       return (
         <NavigationLoadingProvider>
-          <div className="min-h-screen bg-gray-100">
+          <div>
             <Story />
-            <div className="p-8">
-              <div className="bg-white rounded-lg p-6 shadow">
-                <h2 className="text-xl font-semibold mb-4">Page Content</h2>
-                <p className="text-gray-700">
+            <div>
+              <div>
+                <h2>Page Content</h2>
+                <p>
                   This area represents the page content below the navigation.
                   The navigation component adapts based on the current world
                   state and user context.
@@ -286,11 +277,7 @@ export const WorldSwitcherOpen: Story = {
 
       // Simulate opened dropdown by adding CSS to show it
       const style = document.createElement('style');
-      style.textContent = `
-        [data-testid="world-switcher-dropdown"] {
-          display: block !important;
-        }
-      `;
+      style.textContent = `[data-testid="world-switcher-dropdown"] { display: !important; }`;
       document.head.appendChild(style);
 
       return <Story />;
@@ -314,14 +301,14 @@ export const MobileView: Story = {
       useWorldStore.getState().setCurrentWorld(worldId1);
       return (
         <NavigationLoadingProvider>
-          <div className="min-h-screen bg-gray-100">
+          <div>
             <Story />
-            <div className="p-8">
-              <div className="bg-white rounded-lg p-6 shadow">
-                <h2 className="text-xl font-semibold mb-4">
+            <div>
+              <div>
+                <h2>
                   Mobile Page Content
                 </h2>
-                <p className="text-gray-700">
+                <p>
                   This shows the mobile navigation with hamburger menu. The menu
                   should show when screen width is ≤768px.
                 </p>

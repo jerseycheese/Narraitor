@@ -17,6 +17,8 @@
 
 **Phase 1: Clean Slate (remove existing styling before migration)**
 - [#1037 - Audit legacy styling before clean-slate migration](https://github.com/jerseycheese/Narraitor/issues/1037)
+- [#1046 - Audit legacy styling beyond game-session surfaces](https://github.com/jerseycheese/Narraitor/issues/1046)
+- [#1045 - Define Storybook migration contract and coverage mapping](https://github.com/jerseycheese/Narraitor/issues/1045)
 - [#1038 - Remove legacy styling and establish clean slate](https://github.com/jerseycheese/Narraitor/issues/1038)
 - [#1039 - Set up feature flag infrastructure](https://github.com/jerseycheese/Narraitor/issues/1039)
 
@@ -25,6 +27,10 @@
 - [#1033 - Migrate streaming stability to app](https://github.com/jerseycheese/Narraitor/issues/1033)
 - [#1034 - Migrate components & layout to app](https://github.com/jerseycheese/Narraitor/issues/1034)
 - [#1035 - Migrate progressive disclosure to app](https://github.com/jerseycheese/Narraitor/issues/1035)
+- [x] [#1059 - Port manuscript overlay styling to production](https://github.com/jerseycheese/Narraitor/issues/1059)
+- [#1058 - Implement marginalia term definition system](https://github.com/jerseycheese/Narraitor/issues/1058)
+- [#1055 - Final CLS sign-off on styled game-session surface](https://github.com/jerseycheese/Narraitor/issues/1055)
+- [#1047 - Roll out design system to non-game-session surfaces](https://github.com/jerseycheese/Narraitor/issues/1047)
 
 **Phase 3: Polish (deferred)**
 - [#1036 - Polish & optimization (only when pain appears)](https://github.com/jerseycheese/Narraitor/issues/1036)
@@ -102,7 +108,18 @@ This palette swap touches three surfaces:
 2. `src/app/globals.css` — CSS variables feeding shadcn/ui
 3. Component files using `gray-*` Tailwind classes directly
 
-The #1037 audit must map all gray references across these three layers so #1032 can execute a clean replacement.
+The #1037 and #1046 audits map gray references across these three layers so #1032 can execute a coordinated replacement for both game-session and non-game-session domains.
+
+---
+
+## Storybook Role in Migration
+
+Storybook is part of the migration safety net, not optional documentation.
+
+- Storybook loads app globals via `.storybook/preview.js` importing `src/app/globals.css`, so token/global CSS changes are visible there immediately.
+- Storybook build is already a CI gate (`npm run build-storybook`), so migration PRs should treat story breakage as a blocking regression.
+- For each migrated surface, update or add corresponding stories in the same PR. This keeps design intent, implementation, and regression checks aligned.
+- Use [`issue-1045-storybook-migration-contract.md`](./issue-1045-storybook-migration-contract.md) as the canonical migration contract for mapping format, gap policy, and per-issue Storybook obligations.
 
 ---
 
@@ -117,6 +134,7 @@ The #1037 audit must map all gray references across these three layers so #1032 
 - Typography all over the place (mix of system fonts and custom choices)
 - No clear hierarchy
 - Tailwind utilities everywhere, hard to maintain
+- Markup bloat: components have deep div nesting and long className strings (80-150 chars) from stacking utilities
 
 **Accessibility gaps:**
 - Missing ARIA attributes
@@ -136,11 +154,12 @@ The #1037 audit must map all gray references across these three layers so #1032 
 These happen regardless of anything else:
 
 1. **Clean-slate cutover** - Remove legacy visual styling from target surfaces before applying redesign tokens/components
-2. **Streaming stability** - Fix CLS during AI text generation (buffered rendering, scroll anchoring)
-3. **Typography foundation** - Set up CSS variables and semantic tokens (enables everything else)
-4. **Keyboard navigation** - All interactive elements accessible via keyboard
-5. **Color contrast** - Meet WCAG AA minimums (4.5:1 text, 3:1 UI)
-6. **No regressions** - Existing functionality keeps working during migration
+2. **Minimal markup** - Each migrated component uses the least markup needed; no wrapper divs for single styling concerns, no long utility chains where a semantic class suffices
+3. **Streaming stability** - Fix CLS during AI text generation (buffered rendering, scroll anchoring)
+4. **Typography foundation** - Set up CSS variables and semantic tokens (enables everything else)
+5. **Keyboard navigation** - All interactive elements accessible via keyboard
+6. **Color contrast** - Meet WCAG AA minimums (4.5:1 text, 3:1 UI)
+7. **No regressions** - Existing functionality keeps working during migration
 
 Everything else is negotiable or deferrable.
 
@@ -227,6 +246,10 @@ The current design-system.html has generic components (buttons, inputs, cards) a
 - Mark each source as keep for baseline, remove now, or defer
 - Identify conflicting style responsibilities and duplicate visual rules
 - Track this audit in [#1037](https://github.com/jerseycheese/Narraitor/issues/1037)
+- Use [`issue-1037-legacy-styling-audit.md`](./issue-1037-legacy-styling-audit.md) as the source-of-truth for #1038 removal scope and Storybook follow-up actions
+- Track non-game-session audit coverage in [#1046](https://github.com/jerseycheese/Narraitor/issues/1046)
+- Use [`issue-1046-non-game-session-legacy-styling-audit.md`](./issue-1046-non-game-session-legacy-styling-audit.md) as the source-of-truth for #1047 migration scope and #1038 shared-global removal readiness
+- Use [`issue-1045-storybook-migration-contract.md`](./issue-1045-storybook-migration-contract.md) as the source-of-truth for Storybook mapping format, gap policy, and `npm run build-storybook` migration gating
 
 **Clean-Slate Cutover**
 - Remove or neutralize legacy game-session styling based on the audit
@@ -270,6 +293,7 @@ Buffered rendering intercept likely at NarrativeHistoryManager or NarrativeHisto
 - Replace old components gradually (one page at a time)
 - Keep old components around until proven stable
 - Test each migrated component in context
+- Update matching Storybook stories in the same PR as component/layout migration work
 
 **Layout Migration**
 - Restructure `ActiveGameSession.tsx` from two-column flex layout to single-column Manuscript
@@ -281,6 +305,19 @@ Buffered rendering intercept likely at NarrativeHistoryManager or NarrativeHisto
 - Implement bottom-docked input
 - Add floating HUD
 - Test with real game sessions
+
+**Markup Simplification (Per Component)**
+
+When each component is touched during Phase 2, strip its markup back to the minimum needed. This is not a separate pass -- it happens naturally as part of migration.
+
+Simplification targets:
+- **Reduce wrapper divs**: Remove single-purpose spacing/padding wrappers when the parent or child can absorb the style
+- **Shorten className strings**: Replace long Tailwind utility chains with semantic design token classes or component-level styles. A 15-class string is a sign the component needs a design system abstraction.
+- **Flatten nesting**: If a component has 6+ levels of div nesting, restructure during migration
+- **Extract conditional styling**: Move complex ternary className logic into named variants or data-attribute-driven CSS
+- **Retire wizardStyles.ts pattern**: Replace centralized raw-Tailwind string objects with semantic token classes as wizard components are migrated
+
+Rule of thumb: After migration, a component's JSX should be readable without scrolling horizontally through className attributes.
 
 **Progressive Disclosure Migration - High Risk, Feature Flag**
 - Port marginalia system
@@ -406,6 +443,7 @@ Keep it simple and practical.
 - Test on mobile viewport (Chrome DevTools responsive mode)
 - Test keyboard navigation (Tab through everything)
 - Check contrast with browser extension (axe DevTools free version)
+- Build Storybook and verify updated stories render for touched surfaces (`npm run build-storybook`)
 
 **Before shipping progressive disclosure changes:**
 - Feature flag on, test full game session
@@ -460,12 +498,16 @@ Use this to track progress and know when each phase is done.
 
 **Phase 1: Clean Slate (Remove Existing Styling Before Migration)**
 - [ ] Legacy style source audit complete for game session surfaces
+- [ ] Legacy style source audit complete for non-game-session surfaces (#1046)
 - [ ] Gray → zinc palette mapping documented across all three token layers
 - [ ] Legacy CSS classes flagged (`.btn`, `.btn-primary`, `.card`, `.text-link-*` in globals.css)
 - [ ] Existing scroll snap CSS on `.narrative-history-container` evaluated
 - [ ] TS design-tokens directory (`src/lib/design-tokens/`) included in audit scope
+- [ ] Storybook mapping table created for audited game-session surfaces (keep/update/deprecate)
+- [ ] Storybook mapping table created for audited non-game-session surfaces (keep/update/deprecate)
 - [ ] Feature flag infrastructure set up (#1039)
 - [ ] Keep/remove/defer map written and linked to #1037
+- [ ] Keep/remove/defer map written and linked to #1046
 - [ ] Legacy visual classes/styles removed or neutralized per plan
 - [ ] Game session still usable on neutral baseline
 - [ ] No unresolved styling conflicts blocking migration issues
@@ -482,21 +524,24 @@ Use this to track progress and know when each phase is done.
 - [ ] Skeleton states added to real containers
 - [ ] Feature flag: FEATURE_BUFFERED_STREAMING added
 - [ ] CLS verified < 0.10 in production
-- [ ] Components ported to app component library
-- [ ] Game session using new components
-- [ ] ActiveGameSession restructured: two-column → single-column Manuscript
-- [ ] narrativeMaxHeight constraint removed
-- [ ] PageLayout/Hero wrapper evaluated for game session
-- [ ] Drafting grid background in production
-- [ ] Bottom-docked input implemented
-- [ ] Floating HUD added
-- [ ] Marginalia system ported
-- [ ] Contextual drawers migrated
-- [ ] Suggested actions in production
-- [ ] Feature flag: FEATURE_PROGRESSIVE_DISCLOSURE added
-- [ ] Tested with flags on/off
-- [ ] No content jumping in production
-- [ ] Keyboard navigation works on production game session
+- [x] Components ported to app component library
+- [x] Game session using new components
+- [x] ActiveGameSession restructured: two-column → single-column Manuscript (#1034, PR #1056)
+- [x] narrativeMaxHeight constraint removed (#1034, PR #1056)
+- [x] PageLayout/Hero wrapper evaluated for game session (#1034, PR #1056)
+- [ ] Drafting grid background in production (deferred to #1036)
+- [x] Bottom-docked input implemented (#1034, PR #1056)
+- [x] Floating HUD added (#1034, PR #1056)
+- [ ] Marginalia system ported (deferred)
+- [x] Contextual drawers migrated (#1035)
+- [x] Suggested actions in production (#1034, PR #1056 - action rail; #1035 - margin slot)
+- [x] Feature flag: FEATURE_PROGRESSIVE_DISCLOSURE added (#1035)
+- [x] Tested with flags on/off (#1035)
+- [ ] No content jumping in production (pending #1033)
+- [x] Keyboard navigation works on production game session (#1034, PR #1056; #1035 - Escape to close)
+- [x] Migrated components use minimal markup (no unnecessary wrapper divs, no 10+ class utility chains) (#1034, PR #1056)
+- [x] Storybook stories updated for migrated components/layouts in same PR
+- [x] `npm run build-storybook` passes after migration changes (#1034, PR #1056)
 
 **Phase 3: Polish (As Needed)**
 - [ ] Virtualization (if long sessions slow)
@@ -551,6 +596,7 @@ Use this to track progress and know when each phase is done.
 - Legacy game-session styling debt is removed from migration target surfaces
 - Neutral baseline is stable and usable
 - Migration can proceed without inheriting old visual artifacts
+- Storybook mapping is complete for affected surfaces and identifies stale stories for cleanup
 
 **Phase 2 (Migrate) successful when:**
 - Production game session using new design system
@@ -560,6 +606,7 @@ Use this to track progress and know when each phase is done.
 - No contrast violations in main UI
 - Progressive disclosure patterns feel natural (or can be toggled off)
 - No measurable performance regression from migration
+- Storybook build passes with updated stories reflecting migrated UI behavior
 
 **Measure success by:**
 - CLS score < 0.10 in production (DevTools Performance tab)
@@ -586,5 +633,7 @@ Use this to track progress and know when each phase is done.
 - [ ] Build game-session-specific composition prototypes in design-system.html (narrative surface, choice selector, HUD, docked input)
 - [ ] Build streaming demo in design-system.html to test buffered rendering
 - [ ] Start Phase 1: Complete style inventory and removal map (#1037)
+- [ ] Complete non-game-session style inventory and removal map (#1046)
+- [ ] Build Storybook surface mapping for game-session migration targets (stories to keep/update/deprecate)
 - [ ] Execute clean-slate cutover on game-session surfaces (#1038)
 - [ ] Keep epic #1020 issue checklist updated as phases move

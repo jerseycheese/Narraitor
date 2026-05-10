@@ -19,7 +19,14 @@ interface ActiveGameSessionChoicesColumnProps {
   inventoryItems: InventoryItem[];
   onChoiceSelected: (choiceId: string) => void;
   onCustomSubmit: (customText: string) => void;
-  onSuggestedActionsToggle?: (isExpanded: boolean) => void;
+  inputActions?: React.ReactNode;
+  endStoryAction?: React.ReactNode;
+  isProgressiveDisclosureEnabled?: boolean;
+  hidePrompt?: boolean;
+  hideChoices?: boolean;
+  hideCustomInput?: boolean;
+  dataTutorial?: string;
+  className?: string;
   endingSuggestion?: {
     reason: string;
     onAccept: () => void;
@@ -27,7 +34,9 @@ interface ActiveGameSessionChoicesColumnProps {
   };
 }
 
-const ActiveGameSessionChoicesColumn: React.FC<ActiveGameSessionChoicesColumnProps> = ({
+const ActiveGameSessionChoicesColumn: React.FC<
+  ActiveGameSessionChoicesColumnProps
+> = ({
   currentDecision,
   segmentCount,
   status,
@@ -39,52 +48,114 @@ const ActiveGameSessionChoicesColumn: React.FC<ActiveGameSessionChoicesColumnPro
   inventoryItems,
   onChoiceSelected,
   onCustomSubmit,
-  onSuggestedActionsToggle,
+  inputActions,
+  endStoryAction,
+  isProgressiveDisclosureEnabled = false,
+  hidePrompt = false,
+  hideChoices = false,
+  hideCustomInput = false,
+  dataTutorial = 'player-choices',
+  className = '',
   endingSuggestion,
 }) => {
+  const [showSuggestedActions, setShowSuggestedActions] = React.useState(false);
+  const renderEndStoryAction = React.useCallback(() => {
+    if (!endStoryAction) {
+      return null;
+    }
+
+    return React.isValidElement(endStoryAction)
+      ? React.cloneElement(endStoryAction)
+      : endStoryAction;
+  }, [endStoryAction]);
+
+  const resolvedInputActions = isProgressiveDisclosureEnabled ? (
+    <>
+      {inputActions}
+      <span className="manuscript-end-story-desktop">{renderEndStoryAction()}</span>
+    </>
+  ) : (
+    inputActions
+  );
+
   return (
-    <div
-      className="lg:flex-[1] min-h-0 flex flex-col"
-      id="choices-container"
-      aria-busy={isGeneratingChoices}
-    >
-      <div className="player-choices-container flex-1" data-tutorial="player-choices">
+    <div className={className} aria-busy={isGeneratingChoices}>
+      {(isGenerating || isGeneratingChoices) && (
+        <div className="manuscript-streaming-indicator">
+          <span className="manuscript-streaming-dot" />
+          <span className="manuscript-streaming-label">Generating response...</span>
+        </div>
+      )}
+      <div className="player-choices-container" data-tutorial={dataTutorial}>
+        {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}
+        {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && !hidePrompt && (
+          <p className="manuscript-context-summary">
+            {currentDecision.contextSummary}
+          </p>
+        )}
+
+        {/* Mobile-only top controls for Suggested Actions toggle and End Story */}
+        {isProgressiveDisclosureEnabled && (
+          <div className="manuscript-mobile-rail-top-controls">
+            <button
+              type="button"
+              className="manuscript-mobile-suggested-actions-toggle"
+              aria-expanded={showSuggestedActions}
+              onClick={() => setShowSuggestedActions(!showSuggestedActions)}
+            >
+              {showSuggestedActions
+                ? 'Hide Suggested Actions'
+                : 'Suggested Actions'}
+            </button>
+            <span className="manuscript-end-story-mobile">{renderEndStoryAction()}</span>
+          </div>
+        )}
+
         {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
-        {(currentDecision?.decisionWeight || (currentDecision && segmentCount > 0)) ? (
-          <ChoiceSelector
-            decision={currentDecision}
-            onSelect={onChoiceSelected}
-            onCustomSubmit={onCustomSubmit}
-            enableCustomInput={true}
-            isDisabled={status !== 'active' || isGenerating || isSessionEnded}
-            worldSkills={worldSkills}
-            characterSkills={characterSkills}
-            inventoryItems={inventoryItems}
-            onSuggestedActionsToggle={onSuggestedActionsToggle}
-            endingSuggestion={endingSuggestion}
-          />
+        {currentDecision?.decisionWeight ||
+        (currentDecision && segmentCount > 0) ? (
+          !hideChoices && (
+            <div className={isProgressiveDisclosureEnabled ? (showSuggestedActions ? 'show-mobile-actions' : 'hide-mobile-actions') : ''}>
+              <ChoiceSelector
+                decision={currentDecision}
+                onSelect={onChoiceSelected}
+                onCustomSubmit={onCustomSubmit}
+                enableCustomInput={true}
+                hidePrompt={hidePrompt}
+                hideCustomInput={hideCustomInput}
+                isDisabled={status !== 'active' || isGenerating || isSessionEnded}
+                worldSkills={worldSkills}
+                characterSkills={characterSkills}
+                inventoryItems={inventoryItems}
+                endingSuggestion={endingSuggestion}
+                inputActions={resolvedInputActions}
+              />
+            </div>
+          )
         ) : (
-          <div className="space-y-4 p-4">
-            {/* Choice decision skeleton - matches ChoiceSelector layout */}
-            <div className="space-y-3">
-              {/* Choice prompt skeleton */}
-              <div className="h-4 bg-gray-300 rounded w-2/3 animate-pulse" />
+          !hideChoices && (
+            <div className="choice-selector manuscript-choice-selector manuscript-choices-skeleton">
+              <div className="manuscript-choice-selector-body">
+                {/* Choice prompt skeleton */}
+                {!hidePrompt && <div className="manuscript-choices-skeleton-prompt manuscript-skeleton-pulse" />}
 
-              {/* Choice buttons skeleton */}
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-12 bg-gray-200 border border-gray-300 rounded-lg animate-pulse"
-                />
-              ))}
+                {/* Choice buttons skeleton */}
+                <div className="manuscript-suggested-actions-grid">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="manuscript-choices-skeleton-action manuscript-skeleton-pulse" />
+                  ))}
+                </div>
 
-              {/* Custom input skeleton */}
-              <div className="mt-4 space-y-2">
-                <div className="h-4 bg-gray-300 rounded w-1/3 animate-pulse" />
-                <div className="h-10 bg-gray-200 border border-gray-300 rounded animate-pulse" />
+                {/* Custom input skeleton */}
+                {!hideCustomInput && (
+                  <div className="manuscript-choices-skeleton-input-row">
+                    <div className="manuscript-choices-skeleton-input manuscript-skeleton-pulse" />
+                    <div className="manuscript-choices-skeleton-send manuscript-skeleton-pulse" />
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )
         )}
       </div>
     </div>

@@ -35,16 +35,16 @@ export const LoreManagementSearchTab: React.FC<LoreManagementSearchTabProps> = (
   categoryColors,
   onSelectFact,
 }) => (
-  <div className="space-y-4">
-    <div className="flex flex-wrap items-center gap-2">
+  <div>
+    <div>
       <Input
         placeholder="Search facts..."
         value={searchQuery}
         onChange={(e) => onSearchQueryChange(e.target.value)}
-        className="flex-1 min-w-[12rem]"
+        
       />
       <Select
-        className="w-full sm:w-48"
+        
         value={categoryFilter}
         onChange={(e) => onCategoryFilterChange(e.target.value as LoreCategory | '')}
       >
@@ -55,7 +55,7 @@ export const LoreManagementSearchTab: React.FC<LoreManagementSearchTabProps> = (
         <option value="rules">Rules</option>
       </Select>
       <Select
-        className="w-full sm:w-56"
+        
         value={sessionFilter}
         onChange={(e) => onSessionFilterChange(e.target.value as typeof sessionFilter)}
       >
@@ -74,43 +74,43 @@ export const LoreManagementSearchTab: React.FC<LoreManagementSearchTabProps> = (
     </div>
 
     {searchQuery && (
-      <div className="text-sm text-gray-700">Found {facts.length} result(s) for &quot;{searchQuery}&quot;</div>
+      <div>Found {facts.length} result(s) for &quot;{searchQuery}&quot;</div>
     )}
 
-    <div className="space-y-2">
+    <div>
       {facts.map((fact) => {
         const importance = fact.metadata?.importance;
         const importanceBadge = importance ? (
           <span
-            className={`px-2 py-0.5 text-xs font-semibold rounded ${
+            className={`${
               importance === 'high'
-                ? 'bg-red-100 text-red-800'
+                ? ''
                 : importance === 'medium'
-                  ? 'bg-yellow-100 text-yellow-800'
+                  ? ''
                   : importance === 'low'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-200 text-gray-600'
+                    ? ''
+                    : ''
             }`}
           >
             {importance.toUpperCase()}
           </span>
         ) : (
-          <span className="px-2 py-0.5 text-xs font-semibold rounded bg-gray-200 text-gray-600">NO IMPORTANCE</span>
+          <span>NO IMPORTANCE</span>
         );
 
         return (
           <div
             key={fact.id}
-            className="p-3 border rounded-lg hover:bg-gray-100 cursor-pointer"
+            
             onClick={() => onSelectFact(fact.id)}
           >
-            <div className="flex items-center gap-2">
-              <span className={`text-xs font-semibold ${categoryColors[fact.category]}`}>{fact.category}</span>
+            <div>
+              <span className={`${categoryColors[fact.category]}`}>{fact.category}</span>
               {importanceBadge}
-              <span className="font-mono text-sm">{fact.key}</span>
+              <span>{fact.key}</span>
             </div>
-            <div className="mt-1">{fact.value}</div>
-            {fact.metadata?.description && <div className="text-sm text-gray-700 mt-1">{fact.metadata.description}</div>}
+            <div>{fact.value}</div>
+            {fact.metadata?.description && <div>{fact.metadata.description}</div>}
           </div>
         );
       })}

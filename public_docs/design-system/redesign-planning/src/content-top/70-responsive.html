@@ -1,0 +1,286 @@
+<section class="section py-8 md:py-12" id="responsive">
+        <h2 class="text-xl sm:text-2xl font-semibold mb-6">Responsive Design</h2>
+        <p class="mb-6 text-sm sm:text-base" style="color: var(--color-text-secondary);">Mobile-first approach with graceful scaling across all devices.</p>
+
+        <div class="mb-8">
+          <h3 class="text-base sm:text-lg font-medium mb-4">Breakpoint Strategy</h3>
+          <div class="space-y-4">
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">BASE (Mobile First)</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">0px - 639px</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-accent);">DEFAULT</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Single column layouts, stacked navigation, full-width components. Touch-optimized with 44px minimum tap targets.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">sm</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">640px+</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-text-muted);">LARGE PHONES</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Slightly wider content, may introduce 2-column layouts for cards. Navigation remains mobile-optimized.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">md</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">768px+</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-text-muted);">TABLETS</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Transition point: sidebar navigation appears, 2-3 column grids, narrative text stays at optimal reading width.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">lg</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">1024px+</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-text-muted);">LAPTOPS</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Full desktop layout: HUD panels appear, Workshop sidebar visible, multi-column data tables.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center mb-3">
+                <div>
+                  <div class="font-system text-xs sm:text-sm font-medium" style="color: var(--color-text-primary);">xl / 2xl</div>
+                  <div class="text-[10px] sm:text-xs" style="color: var(--color-text-muted);">1280px+ / 1536px+</div>
+                </div>
+                <div class="font-system text-[10px] sm:text-xs" style="color: var(--color-text-muted);">LARGE DISPLAYS</div>
+              </div>
+              <div class="text-xs sm:text-sm" style="color: var(--color-text-secondary);">
+                Max content width maintained (1280px), increased margins. Narrative column stays at optimal 768px.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Layout Adaptation Patterns</h3>
+
+          <div class="space-y-6">
+
+            <!-- Manuscript Mobile -->
+            <div>
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">THE MANUSCRIPT (MOBILE)</div>
+              <div class="p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                <div class="space-y-4">
+                  <div class="p-3 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs" style="color: var(--color-text-muted);">HUD (Collapsible)</div>
+                  </div>
+                  <div class="p-6 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">NARRATIVE (Full Width)</div>
+                    <div style="height: 60px; background: linear-gradient(to bottom, rgba(120,120,120,0.1), transparent);"></div>
+                  </div>
+                  <div class="p-3 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs" style="color: var(--color-text-muted);">INPUT (Fixed Bottom)</div>
+                  </div>
+                </div>
+              </div>
+              <ul class="text-xs mt-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>HUD collapses to expandable drawer</li>
+                <li>Narrative uses full width (16px padding)</li>
+                <li>Suggested actions stack vertically</li>
+                <li>Input remains fixed at bottom</li>
+              </ul>
+            </div>
+
+            <!-- Workshop Mobile -->
+            <div>
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">THE WORKSHOP (MOBILE)</div>
+              <div class="p-6 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+                <div class="space-y-4">
+                  <div class="p-3 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs" style="color: var(--color-text-muted);">TOP NAV + PROGRESS</div>
+                  </div>
+                  <div class="p-6 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">WORKSPACE (Full Width)</div>
+                    <div style="height: 100px; background: linear-gradient(to bottom, rgba(120,120,120,0.1), transparent);"></div>
+                  </div>
+                  <div class="p-3 rounded-sm text-center" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                    <div class="font-system text-xs" style="color: var(--color-text-muted);">ACTION BUTTONS</div>
+                  </div>
+                </div>
+              </div>
+              <ul class="text-xs mt-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Sidebar becomes top navigation tabs</li>
+                <li>Progress bar moves to top</li>
+                <li>Forms stack into single column</li>
+                <li>Action buttons fixed at bottom or sticky</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Touch Optimization</h3>
+          <div class="grid grid-cols-2 gap-4">
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">MINIMUM SIZES</div>
+              <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Tap targets: <code>44px × 44px</code></li>
+                <li>Button height: <code>48px</code></li>
+                <li>Input height: <code>48px</code></li>
+                <li>List items: <code>56px</code></li>
+                <li>Icon buttons: <code>44px</code></li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">SPACING</div>
+              <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Between targets: <code>8px min</code></li>
+                <li>Edge padding: <code>16px</code></li>
+                <li>Section gaps: <code>24px</code></li>
+                <li>Safe area insets: Respected</li>
+                <li>Thumb zones: Considered</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Typography Scaling</h3>
+          <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <div class="font-system text-xs mb-3" style="color: var(--color-text-muted);">FLUID TYPE SCALE</div>
+            <div class="space-y-3 text-sm" style="color: var(--color-text-secondary);">
+              <div class="flex justify-between">
+                <span>Narrative text (mobile)</span>
+                <code>16px → 18px (tablet+)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>Body text (mobile)</span>
+                <code>14px → 16px (tablet+)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>h1 (mobile)</span>
+                <code>28px → 36px (desktop)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>h2 (mobile)</span>
+                <code>24px → 30px (desktop)</code>
+              </div>
+              <div class="flex justify-between">
+                <span>System labels</span>
+                <code>12px (all screens)</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-lg font-medium mb-4">Content Width Constraints</h3>
+          <div class="space-y-3">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-system text-sm font-medium" style="color: var(--color-text-primary);">Narrative Column</div>
+                  <div class="text-xs" style="color: var(--color-text-muted);">Optimal reading width</div>
+                </div>
+                <code class="text-xs">max-w-3xl (768px)</code>
+              </div>
+              <div class="text-xs mt-2" style="color: var(--color-text-secondary);">
+                Never exceeds 768px even on large displays. Centers with auto margins on desktop.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-system text-sm font-medium" style="color: var(--color-text-primary);">Workshop Content</div>
+                  <div class="text-xs" style="color: var(--color-text-muted);">Utility pages</div>
+                </div>
+                <code class="text-xs">max-w-5xl (1024px)</code>
+              </div>
+              <div class="text-xs mt-2" style="color: var(--color-text-secondary);">
+                Allows wider layouts for forms and data. Full width on mobile with 16px padding.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-medium mb-4">Mobile-Specific Patterns</h3>
+          <div class="grid grid-cols-2 gap-4">
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">NAVIGATION</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Bottom tab bars preferred</li>
+                <li>Hamburger menu for overflow</li>
+                <li>Swipe gestures for navigation</li>
+                <li>Back button in top-left</li>
+                <li>Breadcrumbs hidden on mobile</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">INTERACTIONS</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Pull-to-refresh support</li>
+                <li>Long-press for context menus</li>
+                <li>Swipe actions on list items</li>
+                <li>Modal sheets vs. full modals</li>
+                <li>Toast notifications at top</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">FORMS</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>One input per row</li>
+                <li>Large touch targets</li>
+                <li>Native keyboard types</li>
+                <li>Inline validation</li>
+                <li>Fixed submit buttons</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">CARDS & LISTS</div>
+              <ul class="text-sm space-y-1 list-disc pl-5" style="color: var(--color-text-secondary);">
+                <li>Horizontal scroll for cards</li>
+                <li>Infinite scroll for lists</li>
+                <li>Skeleton loaders</li>
+                <li>Optimistic UI updates</li>
+                <li>Swipe for actions</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="mt-8 p-4 rounded-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border);">
+          <h4 class="font-system text-sm mb-3" style="color: var(--color-text-muted);">IMPLEMENTATION</h4>
+          <ul class="text-sm space-y-2 list-disc pl-5" style="color: var(--color-text-secondary);">
+            <li>Use Tailwind responsive prefixes: <code>md:flex</code>, <code>lg:grid-cols-3</code></li>
+            <li>Test on real devices, not just browser DevTools</li>
+            <li>Consider touch vs. mouse hover states</li>
+            <li>Use <code>env(safe-area-inset-*)</code> for notched devices</li>
+            <li>Lazy load below-the-fold content on mobile</li>
+            <li>Optimize images with responsive srcset</li>
+          </ul>
+        </div>
+      </section>

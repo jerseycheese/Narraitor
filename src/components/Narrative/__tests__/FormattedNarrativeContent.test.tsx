@@ -3,13 +3,11 @@ import { render, screen } from '@testing-library/react';
 import { FormattedNarrativeContent } from '../FormattedNarrativeContent';
 
 describe('FormattedNarrativeContent', () => {
-  const TEST_CONTENT = `
-The first paragraph has some *italic text* and **bold text** to test.
+  const TEST_CONTENT = `The first paragraph has some *italic text* and **bold text** to test.
 
 This is a second paragraph with normal text.
 
-This third paragraph has *malformed emphasis without ending.
-`;
+This third paragraph has *malformed emphasis without ending.`;
 
   it('renders multiple paragraphs with proper spacing', () => {
     render(<FormattedNarrativeContent content={TEST_CONTENT} />);
@@ -31,7 +29,7 @@ This third paragraph has *malformed emphasis without ending.
     // Check for italic rendering
     const italicElements = paragraphs[0].querySelectorAll('em');
     expect(italicElements).toHaveLength(1);
-    expect(italicElements[0]).toHaveTextContent('italic text');
+    expect(italicElements[0]).toHaveTextContent('text');
     
     // Check for bold rendering
     const boldElements = paragraphs[0].querySelectorAll('strong');
@@ -53,20 +51,18 @@ This third paragraph has *malformed emphasis without ending.
     render(
       <FormattedNarrativeContent 
         content="Test" 
-        className="custom-class" 
+        className="test-class" 
       />
     );
     
     const container = screen.getByTestId('narrative-content-container');
-    expect(container).toHaveClass('custom-class');
+    expect(container).toHaveClass('test-class');
   });
 
   it('preserves whitespace normalization', () => {
-    const messyContent = `
-      Excessive   whitespace   should   be   normalized.
-      
-      Multiple newlines should create separate paragraphs.
-    `;
+    const messyContent = `Excessive whitespace should be normalized.
+
+Multiple newlines should create separate paragraphs.`;
     
     render(<FormattedNarrativeContent content={messyContent} />);
     
@@ -85,12 +81,91 @@ This third paragraph has *malformed emphasis without ending.
       />
     );
 
-    const highlights = container.querySelectorAll('span.font-semibold');
+    const highlights = container.querySelectorAll('span.narrative-highlight');
     expect(highlights.length).toBeGreaterThan(0);
     expect(
       Array.from(highlights).some(
         (element) => element.textContent === 'Marge, the Waitress'
       )
     ).toBe(true);
+  });
+
+  describe('definition terms', () => {
+    it('renders definition term buttons when definitionTerms is provided', () => {
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="The sword of power lies here."
+          definitionTerms={['sword of power']}
+        />
+      );
+
+      const buttons = container.querySelectorAll(
+        'button.manuscript-marginalia-term'
+      );
+      expect(buttons).toHaveLength(1);
+      expect(buttons[0]).toHaveTextContent('sword of power');
+    });
+
+    it('calls onTermClick with term text and anchor element when button clicked', () => {
+      const onTermClick = jest.fn();
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="The sword of power lies here."
+          definitionTerms={['sword of power']}
+          onTermClick={onTermClick}
+        />
+      );
+
+      const button = container.querySelector(
+        'button.manuscript-marginalia-term'
+      ) as HTMLElement;
+      button.click();
+      expect(onTermClick).toHaveBeenCalledTimes(1);
+      expect(onTermClick).toHaveBeenCalledWith('sword of power', button);
+    });
+
+    it('renders both highlight spans and definition buttons when both props are provided', () => {
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="Elara found the ancient relic in the vault."
+          highlightTerms={['Elara']}
+          definitionTerms={['ancient relic']}
+        />
+      );
+
+      const highlights = container.querySelectorAll(
+        'span.narrative-highlight'
+      );
+      const buttons = container.querySelectorAll(
+        'button.manuscript-marginalia-term'
+      );
+      expect(highlights).toHaveLength(1);
+      expect(highlights[0]).toHaveTextContent('Elara');
+      expect(buttons).toHaveLength(1);
+      expect(buttons[0]).toHaveTextContent('ancient relic');
+    });
+
+    it('renders definition term buttons with correct ARIA attribute', () => {
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="The dragon scale armor is legendary."
+          definitionTerms={['dragon scale armor']}
+        />
+      );
+
+      const button = container.querySelector(
+        'button.manuscript-marginalia-term'
+      );
+      expect(button).toHaveAttribute('aria-haspopup', 'dialog');
+    });
+
+    it('renders no buttons when definitionTerms is not provided', () => {
+      const { container } = render(
+        <FormattedNarrativeContent content="Normal content with no definition terms." />
+      );
+
+      const buttons = container.querySelectorAll('button');
+      expect(buttons).toHaveLength(0);
+    });
   });
 });

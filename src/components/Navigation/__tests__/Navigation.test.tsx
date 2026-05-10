@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Navigation } from '../Navigation';
+import { HeaderNavigation } from '../HeaderNavigation';
+import { SidebarNavigation } from '../SidebarNavigation';
 
 // Mock next/navigation
 const mockPush = jest.fn();
@@ -79,7 +80,22 @@ jest.mock('../MobileNavigationMenu', () => ({
   MobileNavigationMenu: () => <div data-testid="mobile-menu">Mobile Menu</div>,
 }));
 
-describe('Navigation', () => {
+jest.mock('@/lib/theme', () => ({
+  useTheme: () => ({
+    theme: 'ds1',
+    colorScheme: 'light',
+    resolvedColorScheme: 'light',
+    setTheme: jest.fn(),
+    setColorScheme: jest.fn(),
+  }),
+  THEMES: [
+    { id: 'ds1', name: 'Drafting Table', description: 'test' },
+    { id: 'ds2', name: 'Warm Earth', description: 'test' },
+    { id: 'ds3', name: 'Mechanical Manuscript', description: 'test' },
+  ],
+}));
+
+describe('HeaderNavigation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset viewport to desktop
@@ -92,19 +108,18 @@ describe('Navigation', () => {
 
   describe('Core Navigation', () => {
     it('displays main navigation items when no worlds exist', () => {
-      render(<Navigation />);
+      render(<HeaderNavigation />);
 
       expect(screen.getByText('Worlds')).toBeInTheDocument();
       const charactersLink = screen.getByText('Characters');
       expect(charactersLink).toBeInTheDocument();
-      expect(charactersLink).toHaveClass('hidden');
       expect(screen.getByText('Settings')).toBeInTheDocument();
     });
 
     it('displays Characters nav when worlds exist', () => {
       mockWorldStore.worlds = { 'world-1': { id: 'world-1', name: 'Test World' } };
 
-      render(<Navigation />);
+      render(<HeaderNavigation />);
 
       expect(screen.getByText('Worlds')).toBeInTheDocument();
       expect(screen.getByText('Characters')).toBeInTheDocument();
@@ -119,7 +134,7 @@ describe('Navigation', () => {
 
   describe('Accessibility', () => {
     it('has proper navigation links and structure', () => {
-      render(<Navigation />);
+      render(<HeaderNavigation />);
 
       const worldsLink = screen.getByText('Worlds').closest('a');
       const settingsLink = screen.getByText('Settings').closest('a');
@@ -140,9 +155,55 @@ describe('Navigation', () => {
 
   describe('Mobile Navigation', () => {
     it('renders mobile navigation component', () => {
-      render(<Navigation />);
+      render(<HeaderNavigation />);
 
       expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
+    });
+  });
+
+  describe('Theme Controls', () => {
+    it('renders theme switcher and dark mode toggle', () => {
+      render(<HeaderNavigation />);
+
+      expect(screen.getByRole('radiogroup', { name: 'Design system theme' })).toBeInTheDocument();
+      expect(screen.getByRole('radiogroup', { name: 'Color scheme' })).toBeInTheDocument();
+    });
+  });
+
+  describe('SidebarNavigation', () => {
+    it('renders core workshop navigation affordances', () => {
+      render(<SidebarNavigation />);
+
+      expect(
+        screen.getByRole('navigation', { name: 'Workshop navigation' })
+      ).toBeInTheDocument();
+      expect(screen.getByText('Worlds')).toBeInTheDocument();
+      expect(screen.getByText('Characters')).toBeInTheDocument();
+      expect(screen.getByText('Settings')).toBeInTheDocument();
+    });
+
+    it('renders theme controls in sidebar bottom toolbar', () => {
+      render(<SidebarNavigation />);
+
+      const themeGroup = screen.getByRole('radiogroup', { name: 'Design system theme' });
+      const schemeGroup = screen.getByRole('radiogroup', { name: 'Color scheme' });
+      expect(themeGroup).toBeInTheDocument();
+      expect(schemeGroup).toBeInTheDocument();
+
+      const toolbar = themeGroup.closest('.workshop-sidebar-toolbar');
+      expect(toolbar).not.toBeNull();
+      expect(toolbar).toContainElement(schemeGroup);
+    });
+
+    it('does not render the contextual CTA inside the rail (it lives in the workspace header on desktop)', () => {
+      render(<SidebarNavigation />);
+
+      // Without seeded worlds the CTA on default surface would be "Create Your First World".
+      // The drafting-rail design moves all contextual CTAs into the workspace header,
+      // not the rail itself. Sidebar must not render any of these labels.
+      expect(screen.queryByText('Create Your First World')).not.toBeInTheDocument();
+      expect(screen.queryByText('Browse Worlds')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /^Play$/i })).not.toBeInTheDocument();
     });
   });
 });

@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
-import { parseNarrativeContent } from '@/lib/utils';
+import { cssClasses, parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
-import { NarrativeCharacterAvatar } from './NarrativeCharacterAvatar';
 import { PromptDebugSection } from './PromptDebugSection';
 import { ChoiceOutcomeCallout } from './ChoiceOutcomeCallout';
+import { TermDefinition } from './TermDefinition';
+import { useTermDefinitions, TermDefinitionData } from './useTermDefinitions';
 import { useNPCStore } from '@/state/npcStore';
 import { useDevTools } from '@/components/devtools/DevToolsContext';
 import {
@@ -32,63 +33,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const getById = useNPCStore((state) => state.getById);
   const { settings } = useDevTools();
 
-  const getSegmentStyles = (type: string) => {
-    switch (type) {
-      case 'dialogue':
-        return {
-          container: 'border-l-4 border-info bg-info-background',
-          text: 'italic text-muted-foreground',
-        };
-      case 'action':
-        return {
-          container: 'border-2 border-warning bg-warning-background',
-          text: 'font-medium text-foreground',
-        };
-      case 'decision':
-        return {
-          container: 'border-2 border-info bg-info-background',
-          text: 'font-medium text-foreground',
-        };
-      case 'combat':
-        return {
-          container: 'border-2 border-destructive bg-destructive/10',
-          text: 'font-bold text-foreground',
-        };
-      case 'exploration':
-        return {
-          container: 'border-2 border-success bg-success-background',
-          text: 'text-muted-foreground',
-        };
-      case 'resolution':
-        return {
-          container: 'border-2 border-info bg-info-background',
-          text: 'text-muted-foreground',
-        };
-      case 'character_interaction':
-        return {
-          container: 'border-2 border-info bg-info-background',
-          text: 'text-muted-foreground',
-        };
-      case 'revelation':
-        return {
-          container: 'border-2 border-destructive bg-destructive/10',
-          text: 'font-medium italic text-foreground',
-        };
-      case 'transition':
-        return {
-          container: 'bg-muted border border-border',
-          text: 'text-muted-foreground text-sm italic',
-        };
-      case 'scene':
-      default:
-        return {
-          container: 'bg-card border border-border',
-          text: 'text-foreground',
-        };
-    }
-  };
-
-
   const getFormattingOptions = (type: string): FormattingOptions => {
     switch (type) {
       case 'dialogue':
@@ -107,7 +51,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const segmentType = resolvedSegment?.type ?? 'scene';
   const isDialogue = segmentType === 'dialogue';
 
-  const styles = getSegmentStyles(segmentType);
   const formattingOptions = getFormattingOptions(segmentType);
   const parsedContent = React.useMemo(
     () => (resolvedSegment ? parseNarrativeContent(resolvedSegment.content) : ''),
@@ -132,17 +75,43 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     getById,
   });
 
+  // Marginalia term definitions (Issue #1058)
+  const { termNames, getDefinition } = useTermDefinitions(
+    resolvedSegment?.worldId,
+    resolvedSegment?.sessionId
+  );
+
+  const [activeTerm, setActiveTerm] = React.useState<TermDefinitionData | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  const handleTermClick = React.useCallback(
+    (termText: string, anchorElement: HTMLElement) => {
+      const definition = getDefinition(termText);
+      if (definition) {
+        triggerRef.current = anchorElement;
+        setActiveTerm(definition);
+      }
+    },
+    [getDefinition]
+  );
+
+  const handleTermDismiss = React.useCallback(() => {
+    triggerRef.current?.focus();
+    triggerRef.current = null;
+    setActiveTerm(null);
+  }, []);
+
   if (isLoading) {
     return (
-      <div className="p-8 snap-center">
-        <LoadingState message="Writing your story..." theme="light" />
+      <div>
+        <LoadingState message="Writing your story..." />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="snap-center">
+      <div>
         <ErrorDisplay
           variant="section"
           severity="error"
@@ -160,82 +129,41 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   }
 
   return (
-    <div className="space-y-3 snap-center">
-      <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
-        {/* Choice Outcome Callout (Issue #971) */}
-        {resolvedSegment.metadata?.causedByDecisionId &&
-         resolvedSegment.metadata?.causedByDecisionText && (
-          <div className="mb-3">
-            <ChoiceOutcomeCallout
-              decisionId={resolvedSegment.metadata.causedByDecisionId}
-              decisionText={resolvedSegment.metadata.causedByDecisionText}
-              decisionOutcome={resolvedSegment.metadata.decisionOutcome}
-            />
-          </div>
+    <article className="narrative-segment">
+      {/* Choice Outcome Callout (Issue #971) */}
+      {resolvedSegment.metadata?.causedByDecisionId &&
+        resolvedSegment.metadata?.causedByDecisionText && (
+          <ChoiceOutcomeCallout
+            decisionId={resolvedSegment.metadata.causedByDecisionId}
+            decisionText={resolvedSegment.metadata.causedByDecisionText}
+            decisionOutcome={resolvedSegment.metadata.decisionOutcome}
+          />
         )}
 
-        {isDialogue && speakerId && speakerName && (
-          <div className="mb-3 flex items-center gap-2">
-            <NarrativeCharacterAvatar
-              name={speakerName}
-              avatarUrl={speakerRecord?.avatarUrl}
-              size="sm"
-            />
-            <span className="text-sm font-semibold text-info">
-              {speakerName}
-            </span>
-          </div>
+      <FormattedNarrativeContent
+        content={formattedContent}
+        className={cssClasses(
+          'readable',
+          resolvedSegment.type === 'scene' ? 'scene-spacing' : '',
+          resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : '',
+          resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''
         )}
+        highlightTerms={highlightTerms}
+        definitionTerms={termNames}
+        onTermClick={handleTermClick}
+      />
 
-        <FormattedNarrativeContent
-          content={formattedContent}
-          className={`text-lg narrative-content readable ${resolvedSegment.type === 'scene' ? 'scene-spacing' : ''} ${resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : ''} ${resolvedSegment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
-          highlightTerms={highlightTerms}
+      {activeTerm && (
+        <TermDefinition
+          term={activeTerm}
+          onDismiss={handleTermDismiss}
         />
-        {(participants.length > 0 || resolvedSegment.metadata?.location) && (
-          <div className="mt-4 pt-4 border-t border-border space-y-3">
-            {resolvedSegment.metadata?.location && (
-              <p className="text-sm text-muted-foreground">
-                {resolvedSegment.metadata?.location}
-              </p>
-            )}
-            {participants.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Characters Present
-                </p>
-                <div
-                  className="mt-2 flex flex-wrap gap-2"
-                  role="list"
-                  aria-label="Characters present in this scene"
-                >
-                  {participants.map((participant) => (
-                    <div
-                      key={participant.id}
-                      className="flex items-center gap-2 rounded-md border border-border bg-muted px-2 py-1"
-                      role="listitem"
-                    >
-                      <NarrativeCharacterAvatar
-                        name={participant.name}
-                        avatarUrl={participant.avatarUrl}
-                        size="sm"
-                      />
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {participant.name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+      )}
 
-        {/* Debug Information Section (dev mode only) */}
-        {settings.showPromptDebugInfo && resolvedSegment.metadata?.debugInfo && (
-          <PromptDebugSection debugInfo={resolvedSegment.metadata.debugInfo} />
-        )}
-      </div>
-    </div>
+      {/* Debug Information Section (dev mode only) */}
+      {settings.showPromptDebugInfo && resolvedSegment.metadata?.debugInfo && (
+        <PromptDebugSection debugInfo={resolvedSegment.metadata.debugInfo} />
+      )}
+    </article>
   );
 };

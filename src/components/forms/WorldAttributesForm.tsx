@@ -131,10 +131,10 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   }, [attributeToDelete, getLinkedSkills]);
   
   return (
-    <section className="p-4 bg-background rounded">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Attributes</h3>
-        <div className="flex flex-col items-end">
+    <section className="component-world-attributes-form">
+      <div>
+        <h3>Attributes</h3>
+        <div>
           <Button
             onClick={() => setShowCreateModal(true)}
             disabled={isLimitReached}
@@ -149,7 +149,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
             Add Attribute
           </Button>
           {isLimitReached && (
-            <p className="text-xs text-muted-foreground mt-1">
+            <p>
               Maximum {maxAttributes} attributes reached
             </p>
           )}
@@ -157,14 +157,14 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       </div>
       
       {attributes.length === 0 ? (
-        <p className="text-muted-foreground italic">No attributes defined yet.</p>
+        <p>No attributes defined yet.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
           {attributes.map((attribute, index) => (
-            <div key={`${attribute.id ?? attribute.name ?? index}`} className="bg-muted rounded-lg p-4 border">
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-medium text-lg">{attribute.name}</h4>
-                <div className="flex gap-2">
+            <div key={`${attribute.id ?? attribute.name ?? index}`} >
+              <div>
+                <h4>{attribute.name}</h4>
+                <div>
                   <Button
                     onClick={() => setEditingAttribute(attribute.id)}
                     variant="ghost"
@@ -182,15 +182,15 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">{attribute.description}</p>
-                <div className="space-y-1 text-sm">
+              <div>
+                <p>{attribute.description}</p>
+                <div>
                   <div>
-                    <span className="font-medium">Range:</span> {attribute.minValue} - {attribute.maxValue}
+                    <span>Range:</span> {attribute.minValue} - {attribute.maxValue}
                   </div>
                   {attribute.category && (
                     <div>
-                      <span className="font-medium">Category:</span> {attribute.category}
+                      <span>Category:</span> {attribute.category}
                     </div>
                   )}
                 </div>
@@ -206,9 +206,9 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         onClose={() => setShowCreateModal(false)}
         title="Create Attribute"
         size="xl"
-        className="max-h-[90vh] overflow-y-auto"
+        
       >
-        <div className="mb-4 text-sm text-muted-foreground">
+        <div>
           Create a new custom attribute for this world.
         </div>
         <AttributeEditor
@@ -228,9 +228,9 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         onClose={() => setEditingAttribute(null)}
         title="Edit Attribute"
         size="xl"
-        className="max-h-[90vh] overflow-y-auto"
+        
       >
-        <div className="mb-4 text-sm text-muted-foreground">
+        <div>
           Modify the details of this world attribute.
         </div>
         {editingAttribute && (

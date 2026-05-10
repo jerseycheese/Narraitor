@@ -23,6 +23,11 @@ const eslintConfig = [
     },
     rules: {
       "design-tokens/no-hardcoded-colors": "error",
+      "@typescript-eslint/no-unused-vars": ["warn", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_",
+      }],
     },
   },
   {

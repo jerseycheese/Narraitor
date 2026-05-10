@@ -4,17 +4,23 @@
 
 import React, { useState, useEffect } from 'react';
 import { World, CharacterArchetype } from '@/types/world.types';
-import { 
-  generateCharacterArchetypes, 
-  generateRandomArchetype 
+import {
+  generateCharacterArchetypes,
+  generateRandomArchetype,
 } from '@/lib/utils/characterArchetypes';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Badge } from '@/components/ui/badge';
+import { wizardStyles } from '@/components/shared/wizard';
 import { Loader2, Sparkles, Plus } from 'lucide-react';
 import { getGenreLabel } from '@/lib/constants/genres';
 
@@ -33,12 +39,14 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   onCharacterSelect,
   onCustomizeClick,
   existingCharacterNames = [],
-  onReady
+  onReady,
 }: QuickStartCharactersProps) {
   const [archetypes, setArchetypes] = useState<CharacterArchetype[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
+  const [selectedArchetype, setSelectedArchetype] = useState<string | null>(
+    null
+  );
 
   const generateArchetypes = async () => {
     try {
@@ -50,7 +58,10 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         setArchetypes(world.characterTemplates);
       } else {
         // Fall back to on-demand generation if templates not available
-        const generated = await generateCharacterArchetypes(world, existingCharacterNames);
+        const generated = await generateCharacterArchetypes(
+          world,
+          existingCharacterNames
+        );
         setArchetypes(generated);
       }
     } catch (err) {
@@ -60,7 +71,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         world: world.name,
         genre: world.genre,
         attributes: world.attributes?.length || 0,
-        skills: world.skills?.length || 0
+        skills: world.skills?.length || 0,
       });
       setError(`Unable to generate character options: ${errorMessage}`);
     } finally {
@@ -92,18 +103,23 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     }, SELECTION_DELAY_MS);
   };
 
-
   const handleRandomSelect = async () => {
     try {
       setLoading(true);
-      const randomArchetype = await generateRandomArchetype(world, existingCharacterNames);
+      const randomArchetype = await generateRandomArchetype(
+        world,
+        existingCharacterNames
+      );
       handleArchetypeSelect(randomArchetype);
     } catch (err) {
-      console.error('QuickStartCharacters random archetype generation failed:', {
-        error: err,
-        world: world.name,
-        genre: world.genre
-      });
+      console.error(
+        'QuickStartCharacters random archetype generation failed:',
+        {
+          error: err,
+          world: world.name,
+          genre: world.genre,
+        }
+      );
       setError('Failed to generate random character. Please try again.');
     } finally {
       setLoading(false);
@@ -112,10 +128,10 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (loading && archetypes.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
-          <p className="text-lg text-gray-700 mb-1">
+      <div className={`component-quick-start-characters ${wizardStyles.step.content}`}>
+        <div className="wizard-step-header">
+          <h2 className="wizard-page-title">Quick Start Characters</h2>
+          <p className="wizard-page-subtitle">
             Jump straight into your adventure with {world.name}
           </p>
         </div>
@@ -124,7 +140,6 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
           skeletonLines={6}
           message={`Creating archetypes for your ${getGenreLabel(world.genre)} world...`}
           centered={true}
-          className="py-12"
         />
       </div>
     );
@@ -132,9 +147,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
+      <div className={`component-quick-start-characters ${wizardStyles.step.content}`}>
+        <div className="wizard-step-header">
+          <h2 className="wizard-page-title">Quick Start Characters</h2>
         </div>
         <ErrorDisplay
           variant="section"
@@ -143,28 +158,26 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
           message={error}
           showRetry={true}
           onRetry={generateArchetypes}
-          className="py-12"
         />
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
-        <p className="text-lg text-gray-700 mb-1">
+    <div className={`component-quick-start-characters ${wizardStyles.step.content}`}>
+      <div className="wizard-step-header">
+        <h2 className="wizard-page-title">Quick Start Characters</h2>
+        <p className="wizard-page-subtitle">
           Jump straight into your adventure with {world.name}
         </p>
-        <p className="text-sm text-gray-500">
-          Choose from these pre-generated {getGenreLabel(world.genre)} archetypes or create your own
+        <p className="wizard-page-subtitle">
+          Choose from these pre-generated {getGenreLabel(world.genre)}{' '}
+          archetypes or create your own
         </p>
       </div>
 
-      {/* Archetype Cards */}
-      <div 
-        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+      <div
+        className="wizard-archetype-grid"
         data-testid="archetypes-grid"
         data-tutorial="quickstart-archetypes"
       >
@@ -174,40 +187,35 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
             isActive={selectedArchetype === archetype.id}
             activeText="Selected Character"
             onClick={() => handleArchetypeSelect(archetype)}
-            activeClassName="border-green-500 bg-green-50 shadow-xl ring-2 ring-green-500"
-            inactiveClassName="border-gray-300 bg-white hover:shadow-lg"
             testId="archetype-card"
           >
-            <CardHeader className="pb-3">
-              <CardTitle className="text-xl font-bold text-gray-900">
+            <CardHeader>
+              <CardTitle className={wizardStyles.step.title}>
                 {archetype.name}
               </CardTitle>
-              <CardDescription className="text-sm text-gray-700">
+              <CardDescription className={wizardStyles.step.description}>
                 {archetype.description}
               </CardDescription>
             </CardHeader>
-            
-            <CardContent className="space-y-4">
-              {/* Personality & Background */}
-              <div>
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {archetype.background.personality}
-                </p>
-              </div>
 
-              {/* Top Attributes */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Key Attributes</h4>
-                <div className="flex flex-wrap gap-1">
+            <CardContent className="wizard-archetype-card-body">
+              <p className={`${wizardStyles.step.description} wizard-archetype-quote`}>
+                {archetype.background.personality}
+              </p>
+
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">
+                  Key Attributes
+                </h4>
+                <div className="wizard-badge-row">
                   {archetype.attributes
                     .sort((a, b) => (b.value || 0) - (a.value || 0))
                     .slice(0, 3)
                     .map((attr, idx) => (
-                      <Badge 
+                      <Badge
                         key={`${archetype.id}-attr-${attr.id ?? attr.name}-${idx}`}
-                        variant="secondary" 
+                        variant="secondary"
                         count={attr.value}
-                        className="text-xs"
                       >
                         {attr.name}
                       </Badge>
@@ -215,19 +223,19 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                 </div>
               </div>
 
-              {/* Top Skills */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Best Skills</h4>
-                <div className="flex flex-wrap gap-1">
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">
+                  Best Skills
+                </h4>
+                <div className="wizard-badge-row">
                   {archetype.skills
                     .sort((a, b) => (b.level || 0) - (a.level || 0))
                     .slice(0, 3)
                     .map((skill, idx) => (
-                      <Badge 
-                        key={`${archetype.id}-skill-${skill.id ?? skill.name}-${idx}`} 
-                        variant="outline" 
+                      <Badge
+                        key={`${archetype.id}-skill-${skill.id ?? skill.name}-${idx}`}
+                        variant="outline"
                         count={skill.level}
-                        className="text-xs"
                       >
                         {skill.name}
                       </Badge>
@@ -235,17 +243,14 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                 </div>
               </div>
 
-              {/* Motivation */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">Motivation</h4>
-                <p className="text-xs text-gray-700 italic">
+              <div className="wizard-archetype-section">
+                <h4 className="wizard-archetype-section-heading">Motivation</h4>
+                <p className={`${wizardStyles.step.description} wizard-archetype-quote`}>
                   &ldquo;{archetype.background.motivation}&rdquo;
                 </p>
               </div>
 
-              {/* Select Button */}
-              <Button 
-                className="w-full mt-4"
+              <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleArchetypeSelect(archetype);
@@ -254,7 +259,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               >
                 {selectedArchetype === archetype.id ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+                    <Loader2 aria-hidden="true" />
                     Starting Game...
                   </>
                 ) : (
@@ -266,47 +271,44 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         ))}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <ActionButtonGroup
-          className="flex-col sm:flex-row w-full sm:w-auto"
-          actions={[
-            {
-              label: loading ? 'Generating...' : 'Generate New Random Character',
-              onClick: handleRandomSelect,
-              variant: 'outline',
-              size: 'lg',
-              icon: loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <Sparkles className="w-4 h-4" aria-hidden="true" />
-              ),
-              disabled: loading,
-              dataTutorial: 'quickstart-random',
-            },
-            {
-              label: 'Create Custom Character',
-              onClick: onCustomizeClick,
-              variant: 'ghost',
-              size: 'lg',
-              icon: (
-                <Plus className="w-4 h-4" aria-hidden="true" />
-              ),
-              dataTutorial: 'quickstart-custom',
-            }
-          ]}
-        />
-      </div>
+      <ActionButtonGroup
+        actions={[
+          {
+            label: loading
+              ? 'Generating...'
+              : 'Generate New Random Character',
+            onClick: handleRandomSelect,
+            variant: 'secondary',
+            size: 'lg',
+            icon: loading ? (
+              <Loader2 aria-hidden="true" />
+            ) : (
+              <Sparkles aria-hidden="true" />
+            ),
+            disabled: loading,
+            dataTutorial: 'quickstart-random',
+          },
+          {
+            label: 'Create Custom Character',
+            onClick: onCustomizeClick,
+            variant: 'ghost',
+            size: 'lg',
+            icon: <Plus aria-hidden="true" />,
+            dataTutorial: 'quickstart-custom',
+          },
+        ]}
+      />
 
-      {/* Additional Info */}
-      <div className="mt-8 text-center space-y-2">
-        <p className="text-sm text-gray-700">
-          <strong>Generate New Random Character:</strong> Creates a completely new random character for this world
+      <div className="wizard-help-row">
+        <p>
+          <strong>Generate New Random Character:</strong> Creates a completely
+          new random character for this world
         </p>
-        <p className="text-sm text-gray-700">
-          <strong>Create Custom Character:</strong> Build your own character from scratch with full customization
+        <p>
+          <strong>Create Custom Character:</strong> Build your own character
+          from scratch with full customization
         </p>
-        <p className="text-xs text-gray-500 mt-4">
+        <p>
           You can always edit any character later through the character editor
         </p>
       </div>

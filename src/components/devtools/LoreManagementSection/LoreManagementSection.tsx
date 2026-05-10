@@ -118,10 +118,10 @@ export const LoreManagementSection: React.FC = () => {
   };
 
   const categoryColors: Record<LoreCategory, string> = {
-    characters: 'text-blue-700',
-    locations: 'text-green-700',
-    events: 'text-blue-700',
-    rules: 'text-amber-700'
+    characters: '',
+    locations: '',
+    events: '',
+    rules: ''
   };
 
   const handleClearUsage = () => {
@@ -135,8 +135,8 @@ export const LoreManagementSection: React.FC = () => {
   return (
     <DevToolsSection title="Lore Management">
       {/* World Selector */}
-      <div className="mb-4">
-        <label htmlFor="world-select" className="block text-sm font-medium mb-2">
+      <div>
+        <label htmlFor="world-select" >
           Select World
         </label>
         <Select 
@@ -154,8 +154,8 @@ export const LoreManagementSection: React.FC = () => {
       </div>
 
       {selectedWorldId && (
-        <Tabs defaultValue="browse" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+        <Tabs defaultValue="browse" >
+          <TabsList>
             <TabsTrigger value="browse">Browse</TabsTrigger>
             <TabsTrigger value="create">Create</TabsTrigger>
             <TabsTrigger value="search">Search</TabsTrigger>
@@ -242,7 +242,7 @@ export const LoreManagementSection: React.FC = () => {
 
       {/* Message Display */}
       {message && (
-        <Alert className={`mt-4 ${message.type === 'error' ? 'border-red-500' : 'border-green-500'}`}>
+        <Alert>
           <AlertDescription>{message.text}</AlertDescription>
         </Alert>
       )}

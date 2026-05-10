@@ -11,7 +11,7 @@ export { formatAIResponse } from './textFormatter';
 export type { FormattingOptions } from './textFormatter';
 
 /** CSS class name utilities */
-export { cn } from './classNames';
+export { cssClasses } from './classNames';
 
 // === FORMATTING UTILITIES ===
 

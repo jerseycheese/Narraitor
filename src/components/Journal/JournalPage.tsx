@@ -16,7 +16,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { JournalEntry } from '@/types/journal.types';
 import { useShallow } from 'zustand/react/shallow';
-import { cn } from '@/lib/utils';
+import { cssClasses } from '@/lib/utils';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { selectSessionEntries } from '@/lib/journal/journalSelectors';
 import { JournalEntryDetail } from './JournalEntryDetail';
@@ -38,7 +38,9 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     loading: journalLoading,
   } = useJournalStore();
 
-  const [selectedEntryId, setSelectedEntryId] = React.useState<EntityID | null>(null);
+  const [selectedEntryId, setSelectedEntryId] = React.useState<EntityID | null>(
+    null
+  );
   const [viewMode, setViewMode] = React.useState<'list' | 'detail'>('list');
   const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -56,9 +58,10 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
 
     return entries.filter((entry) => {
       const tagsText = entry.metadata.tags?.join(' ') ?? '';
-      const relatedText = entry.relatedEntities
-        ?.map((entity) => `${entity.type} ${entity.name}`)
-        .join(' ') ?? '';
+      const relatedText =
+        entry.relatedEntities
+          ?.map((entity) => `${entity.type} ${entity.name}`)
+          .join(' ') ?? '';
       const haystack = [
         entry.title,
         entry.content,
@@ -75,15 +78,19 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   }, [entries, normalizedQuery]);
 
   const firstEntryId = filteredEntries[0]?.id ?? null;
-  const resolvedSelectedEntryId = React.useMemo(() => (
-    selectedEntryId && filteredEntries.some((entry) => entry.id === selectedEntryId)
-      ? selectedEntryId
-      : null
-  ), [filteredEntries, selectedEntryId]);
+  const resolvedSelectedEntryId = React.useMemo(
+    () =>
+      selectedEntryId &&
+      filteredEntries.some((entry) => entry.id === selectedEntryId)
+        ? selectedEntryId
+        : null,
+    [filteredEntries, selectedEntryId]
+  );
 
   const activeSelectedEntryId = resolvedSelectedEntryId ?? firstEntryId;
   const selectedEntry = activeSelectedEntryId
-    ? filteredEntries.find((entry) => entry.id === activeSelectedEntryId) || null
+    ? filteredEntries.find((entry) => entry.id === activeSelectedEntryId) ||
+      null
     : null;
 
   React.useEffect(() => {
@@ -132,20 +139,18 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
           title="No active session"
           description="Start or resume a session to view its journal entries."
           variant="centered"
-          className="text-amber-700"
         />
       );
     }
 
     if (journalLoading) {
       return (
-        <div className="rounded-lg border border-warning/30 bg-background dark:bg-white p-6">
+        <div>
           <LoadingState
             variant="skeleton"
             size="md"
             message="Loading journal entries..."
             skeletonLines={6}
-            className="w-full"
           />
         </div>
       );
@@ -158,45 +163,38 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
           severity="warning"
           title={journalError.title}
           message={journalError.message}
-          className="bg-white"
         />
       );
     }
 
     return (
-      <div className="flex-1 min-h-0 overflow-hidden rounded-lg border border-warning/30 bg-background dark:bg-white flex flex-col md:flex-row md:h-[60vh] md:max-h-[600px]">
+      <div className="journal-content">
         {entries.length === 0 ? (
           <JournalEmptyState />
         ) : (
           <>
             <div
-              className={cn(
-                'w-full md:w-80 border-b md:border-b-0 md:border-r border-amber-500 min-h-0 flex-col',
-                viewMode === 'list' ? 'flex' : 'hidden',
-                'md:flex'
+              className={cssClasses(
+                'journal-list-pane',
+                viewMode === 'list' ? '' : 'hidden'
               )}
               data-testid="journal-list-pane"
             >
-              <div className="p-4 border-b border-amber-500 bg-amber-50 flex items-center justify-between">
-                <h2 className="font-semibold text-amber-900">Entries</h2>
+              <div className="journal-list-header">
+                <h2>Entries</h2>
               </div>
-              <div className="p-4 border-b border-amber-500 bg-amber-50">
-                <div className="flex items-center">
-                  <Input
-                    id="journal-search"
-                    type="search"
-                    placeholder="Search entries..."
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    className="w-full"
-                    aria-label="Search entries"
-                  />
-                </div>
+              <div className="journal-search-wrapper">
+                <Input
+                  id="journal-search"
+                  type="search"
+                  placeholder="Search entries..."
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  aria-label="Search entries"
+                />
               </div>
               {filteredEntries.length === 0 ? (
-                <div className="flex-1 p-4 text-sm text-amber-700">
-                  No entries match your search.
-                </div>
+                <div>No entries match your search.</div>
               ) : (
                 <JournalEntryList
                   entries={visibleEntries}
@@ -205,13 +203,16 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                 />
               )}
               {canLoadMore && (
-                <div className="p-4 border-t border-amber-500 bg-amber-50">
+                <div className="journal-load-more">
                   <Button
                     type="button"
                     variant="secondary"
                     size="sm"
-                    className="w-full"
-                    onClick={() => setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, entries.length))}
+                    onClick={() =>
+                      setVisibleCount((prev) =>
+                        Math.min(prev + PAGE_SIZE, entries.length)
+                      )
+                    }
                   >
                     Load more
                   </Button>
@@ -220,15 +221,14 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
             </div>
 
             <div
-              className={cn(
-                'flex-1 min-h-0 bg-white md:w-[28rem] xl:w-[32rem] flex-col',
-                viewMode === 'detail' ? 'flex' : 'hidden',
-                'md:flex'
+              className={cssClasses(
+                'journal-detail-pane',
+                viewMode === 'detail' ? '' : 'hidden'
               )}
               data-testid="journal-detail-pane"
             >
               {selectedEntry ? (
-                <div className="p-4 md:p-6 h-full" ref={detailRef} tabIndex={-1}>
+                <div ref={detailRef} tabIndex={-1}>
                   <JournalEntryDetail
                     entry={selectedEntry}
                     showBackButton={viewMode === 'detail'}
@@ -236,16 +236,14 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
                   />
                 </div>
               ) : (
-                <div className="p-6 h-full flex items-center justify-center">
-                  <div className="text-center text-amber-500">
-                    <div className="flex justify-center mb-4">
-                      <BookOpen className="w-10 h-10 text-amber-300" aria-hidden="true" />
-                    </div>
-                    <h3 className="text-lg font-medium mb-2">Select an Entry</h3>
-                    <p className="text-sm">
-                      Choose an entry from the list to view its complete content
-                    </p>
+                <div className="journal-detail-empty">
+                  <div>
+                    <BookOpen aria-hidden="true" />
                   </div>
+                  <h3>Select an Entry</h3>
+                  <p>
+                    Choose an entry from the list to view its complete content
+                  </p>
                 </div>
               )}
             </div>
@@ -259,29 +257,29 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     <PageLayout
       title={world ? undefined : pageTitle}
       description={world ? undefined : entrySummary}
-      className="pb-0 journal-page"
+      className="journal-page"
     >
       {world && (
-        <div className="mb-6">
+        <div className="journal-hero">
           <Hero
             title={pageTitle}
-            image={world.image?.url ? {
-              url: world.image.url,
-              alt: `${world.name} world`
-            } : undefined}
-            theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
+            image={
+              world.image?.url
+                ? {
+                    url: world.image.url,
+                    alt: `${world.name} world`,
+                  }
+                : undefined
+            }
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-            height="h-20 sm:h-24"
             titleElement="h1"
           />
         </div>
       )}
 
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="journal-nav">
         <BackNavigation href={`/worlds/${worldId}/play`} label="Back to Play" />
-        {showEntrySummary && (
-          <span className="text-sm text-amber-700">{entrySummary}</span>
-        )}
+        {showEntrySummary && <span>{entrySummary}</span>}
       </div>
       {renderContent()}
     </PageLayout>

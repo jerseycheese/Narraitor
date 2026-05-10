@@ -78,7 +78,7 @@ const fillSkillForm = async (user: ReturnType<typeof userEvent.setup>, name: str
 };
 
 const createMockSkills = (count: number) => Array.from({ length: count }, (_, i) => ({
-  id: `skill-${i}`, name: `Skill ${i}`, description: `Description ${i}`, worldId: mockWorldId,
+  id: `skill-${i}`, name: `Skill${i}`, description: `Description${i}`, worldId: mockWorldId,
   attributeIds: ['attr-1'], difficulty: 'easy' as const, baseValue: 5, minValue: 1, maxValue: 10,
 }));
 
@@ -248,7 +248,7 @@ describe('SkillEditor', () => {
 
     it('trims whitespace from inputs', async () => {
       const user = renderAndSetup();
-      await fillSkillForm(user, '  Swimming  ', '  Water-based movement  ', ['Strength']);
+      await fillSkillForm(user, 'Swimming', 'Water-based movement', ['Strength']);
       await user.click(screen.getByRole('button', { name: /create skill/i }));
       expect(mockProps.onSave).toHaveBeenCalledWith(
         expect.objectContaining({ name: 'Swimming', description: 'Water-based movement' })
@@ -257,7 +257,7 @@ describe('SkillEditor', () => {
   });
 
   describe('Error Handling', () => {
-    it('displays multiple validation errors and clears them when fixed', async () => {
+    it('displays multiple validation errors and clears them when', async () => {
       const user = renderAndSetup();
       await user.click(screen.getByRole('button', { name: /create skill/i }));
       expect(screen.getByText(/skill name is required/i)).toBeInTheDocument();

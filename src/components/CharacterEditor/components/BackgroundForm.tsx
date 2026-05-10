@@ -27,10 +27,10 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
   };
 
   return (
-    <div className="component-background-form bg-background rounded-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Background</h2>
-      <div className="space-y-4">
-        <div className="space-y-2">
+    <div className="component-background-form">
+      <h2>Background</h2>
+      <div className="background-form-fields">
+        <div className="form-group">
           <Label>
             History
           </Label>
@@ -41,8 +41,8 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             placeholder="Describe your character's history and background..."
           />
         </div>
-        
-        <div className="space-y-2">
+
+        <div className="form-group">
           <Label>
             Personality
           </Label>
@@ -53,8 +53,8 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             placeholder="Describe your character's personality traits..."
           />
         </div>
-        
-        <div className="space-y-2">
+
+        <div className="form-group">
           <Label>
             Goals & Motivations
           </Label>
@@ -64,12 +64,12 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             rows={3}
             placeholder="List your character's goals and motivations (one per line)"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="form-help-text">
             Enter each goal on a separate line
           </p>
         </div>
-        
-        <div className="space-y-2">
+
+        <div className="form-group">
           <Label>
             Fears
           </Label>
@@ -79,12 +79,12 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             rows={2}
             placeholder="What does your character fear? (one per line)"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="form-help-text">
             Enter each fear on a separate line
           </p>
         </div>
-        
-        <div className="space-y-2">
+
+        <div className="form-group">
           <Label>
             Physical Description
           </Label>
@@ -94,7 +94,7 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             rows={3}
             placeholder="Describe your character's appearance, distinctive features, clothing style..."
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="form-help-text">
             This description will be used when generating character portraits. Tip: Add &quot;looks like [actor name]&quot; to generate a portrait resembling a specific person.
           </p>
         </div>

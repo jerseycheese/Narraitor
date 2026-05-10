@@ -8,6 +8,10 @@ import {
   DecisionRequirement,
   DecisionItemRequirements,
 } from '@/types/narrative.types';
+
+jest.mock('@/lib/theme/ThemeProvider', () => ({
+  useTheme: () => ({ theme: 'ds1', colorScheme: 'light', resolvedColorScheme: 'light', setTheme: jest.fn(), setColorScheme: jest.fn() }),
+}));
 import { StandardInventoryCategory } from '@/types/inventory.types';
 
 describe('ChoiceSelector - Inventory Requirements', () => {
@@ -141,7 +145,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} showHints={true} inventoryItems={mockInventoryItems} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     expect(screen.getByText(/Requires all:/i)).toBeInTheDocument();
     const optionButton = screen.getByTestId('choice-option-opt-1');
@@ -159,7 +163,7 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     ]);
 
     const handleSelect = jest.fn();
-    render(<ChoiceSelector decision={decision} onSelect={handleSelect} showHints={true} inventoryItems={mockInventoryItems} />);
+    render(<ChoiceSelector decision={decision} onSelect={handleSelect} inventoryItems={mockInventoryItems} />);
 
     // Should show current quantity vs required
     expect(screen.getByText(/Requires all:/i)).toBeInTheDocument();
@@ -269,7 +273,6 @@ describe('ChoiceSelector - Inventory Requirements', () => {
     const magicKeyButton = screen.getByTestId('choice-option-opt-1');
 
     // Should have visual indicator of being disabled
-    expect(magicKeyButton).toHaveClass('opacity-50');
-    expect(magicKeyButton).toHaveClass('cursor-not-allowed');
+    expect(magicKeyButton).toBeDisabled();
   });
 });

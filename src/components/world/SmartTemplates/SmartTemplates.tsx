@@ -135,12 +135,12 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       {/* Template Preview Modal */}
       {templatePreviewModal}
       
-      <div className="space-y-5">
+      <div>
       {aiGeneration.error && (
         <ErrorDisplay 
           message={aiGeneration.error}
           onDismiss={aiGeneration.clearError}
-          className="mb-6"
+          
         />
       )}
 
@@ -149,11 +149,11 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       )}
 
       {!aiGeneration.isGenerating && (
-        <div className="space-y-5">
+        <div>
           {/* Mode Selection */}
-          <div className="space-y-4">
+          <div>
             {/* Tab-style Mode Selection */}
-            <div className="mb-4">
+            <div>
               <TabNavigation
                 options={tabOptions}
                 activeValue={mode}
@@ -163,15 +163,15 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             </div>
 
             {/* Tab Content - fixed min-height to prevent layout shift */}
-            <div className="min-h-[180px]">
+            <div>
             {/* Inspired By Mode */}
             {mode === 'inspired-by' && (
             <div>
-              <div className="space-y-3">
+              <div>
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground">Describe Your World</h3>
+                  <h3>Describe Your World</h3>
                 </div>
-                <div className="space-y-3">
+                <div>
                   <Input
                     type="text"
                     placeholder="Steampunk Victorian London, Space pirates, etc."
@@ -194,19 +194,19 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             {/* Genre Mixer Mode */}
             {mode === 'genre-mix' && (
             <div>
-              <div className="space-y-3">
+              <div>
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground">Mix Genres Together</h3>
-                  <p className="text-sm text-muted-foreground">Select 2 or more genres to blend together</p>
+                  <h3>Mix Genres Together</h3>
+                  <p>Select 2 or more genres to blend together</p>
                 </div>
-                <div className="space-y-3">
+                <div>
                   <GenreSelector
                     selectedGenres={selectedGenres}
                     onToggleGenre={toggleGenre}
                     excludeOther={true}
                   />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
+                  <div>
+                    <span>
                       {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
                     </span>
                     <Button
@@ -226,10 +226,10 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             {/* Surprise Me Mode */}
             {mode === 'surprise-me' && (
             <div>
-              <div className="space-y-3">
+              <div>
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground">Random World Generation</h3>
-                  <p className="text-sm text-muted-foreground">Generate a completely unexpected world with unique themes and attributes.</p>
+                  <h3>Random World Generation</h3>
+                  <p>Generate a completely unexpected world with unique themes and attributes.</p>
                 </div>
                 <div>
                   <Button

@@ -275,23 +275,6 @@ describe('npcPortraitService', () => {
     });
   });
 
-  describe('bootstrapNpcPortraits', () => {
-    it('should generate portraits for NPCs without avatarUrl', async () => {
-      // This test will be implemented when we integrate with npcStore
-      expect(npcPortraitService.bootstrapNpcPortraits).toBeDefined();
-    });
-
-    it('should skip NPCs that already have avatarUrl', async () => {
-      // This test will be implemented when we integrate with npcStore
-      expect(npcPortraitService.bootstrapNpcPortraits).toBeDefined();
-    });
-
-    it('should add rate limiting delays between portrait generations', async () => {
-      // This test will be implemented when we integrate with npcStore
-      expect(npcPortraitService.bootstrapNpcPortraits).toBeDefined();
-    });
-  });
-
   describe('clearCache', () => {
     it('should clear the in-memory cache', async () => {
       const npc = createMockNPC();

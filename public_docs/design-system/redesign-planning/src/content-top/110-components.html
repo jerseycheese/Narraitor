@@ -1,0 +1,138 @@
+<section class="section" id="components">
+        <h2 class="text-2xl font-semibold mb-6">Components</h2>
+
+        <!-- Buttons -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Buttons (State Matrix)</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Primary and secondary variants are shown together for default, hover, active, disabled, and loading states.</p>
+          <div class="rounded-sm overflow-hidden" style="border: 1px solid var(--color-border);">
+            <div class="grid grid-cols-1 md:grid-cols-[140px,1fr]">
+              <div class="px-4 py-3 font-system text-xs uppercase tracking-wide" style="background: var(--color-surface-hover); color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">State</div>
+              <div class="px-4 py-3 font-system text-xs uppercase tracking-wide" style="background: var(--color-surface-hover); color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">Variants</div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">DEFAULT</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Primary Action</button>
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);">Secondary Action</button>
+              </div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">HOVER</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent-hover); color: white;">Primary Action</button>
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border-strong); color: var(--color-text-primary);">Secondary Action</button>
+              </div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">ACTIVE</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent-hover); color: white; transform: scale(0.98);">Primary Action</button>
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 2px solid var(--color-border-strong); color: var(--color-text-primary); transform: scale(0.98);">Secondary Action</button>
+              </div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted); border-bottom: 1px solid var(--color-border);">DISABLED</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3" style="border-bottom: 1px solid var(--color-border);">
+                <button type="button" disabled class="px-4 py-2 rounded-sm font-interface text-sm font-medium" style="background: var(--color-border-strong); color: var(--color-text-muted); cursor: not-allowed;">Primary Action</button>
+                <button type="button" disabled class="px-4 py-2 rounded-sm font-interface text-sm font-medium" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: not-allowed;">Secondary Action</button>
+              </div>
+
+              <div class="px-4 py-4 font-system text-xs" style="color: var(--color-text-muted);">LOADING</div>
+              <div class="px-4 py-4 flex flex-wrap gap-3">
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium flex items-center gap-2" style="background: var(--color-accent); color: white; opacity: 0.8;" aria-live="polite">
+                  <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4zm2 5.3A8 8 0 014 12H0c0 3 1.1 5.8 3 7.9l3-2.6z"></path>
+                  </svg>
+                  Loading...
+                </button>
+                <button type="button" class="px-4 py-2 rounded-sm font-interface text-sm font-medium flex items-center gap-2" style="background: var(--color-surface-hover); border: 1px solid var(--color-border-strong); color: var(--color-text-secondary); opacity: 0.8;">
+                  <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4zm2 5.3A8 8 0 014 12H0c0 3 1.1 5.8 3 7.9l3-2.6z"></path>
+                  </svg>
+                  Saving...
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inputs -->
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Form Inputs (Validation States)</h3>
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">Validation states pair visual styling with explicit helper text labels so status is never color-only.</p>
+          <div class="space-y-4 max-w-md">
+            <div>
+              <label for="component-input-default" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Default</label>
+              <input id="component-input-default" type="text" placeholder="Character name" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary);" />
+            </div>
+
+            <div>
+              <label for="component-input-focus" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Focus</label>
+              <input id="component-input-focus" type="text" value="Focused narrative prompt" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-accent); outline: 2px solid var(--color-accent); color: var(--color-text-primary);" />
+            </div>
+
+            <div>
+              <label for="component-input-error" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Error</label>
+              <input id="component-input-error" type="text" value="Scene title already used" aria-describedby="component-input-error-help" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-error); color: var(--color-text-primary);" />
+              <p id="component-input-error-help" class="text-xs mt-1" style="color: var(--color-error);">Error: choose a unique title to continue.</p>
+            </div>
+
+            <div>
+              <label for="component-input-success" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Success</label>
+              <input id="component-input-success" type="text" value="Ravenhold Ledger" aria-describedby="component-input-success-help" class="w-full px-4 py-3 rounded-sm font-interface text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-surface); border: 1px solid var(--color-success); color: var(--color-text-primary);" />
+              <p id="component-input-success-help" class="text-xs mt-1" style="color: var(--color-success);">Success: title accepted and ready to save.</p>
+            </div>
+
+            <div>
+              <label for="component-input-disabled" class="block text-sm font-system mb-2" style="color: var(--color-text-muted);">Disabled</label>
+              <input id="component-input-disabled" type="text" value="Locked while streaming" disabled class="w-full px-4 py-3 rounded-sm font-interface text-sm" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: not-allowed;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-12">
+          <h3 class="text-lg font-medium mb-4">Core Utility Cluster (Badges, Alerts, Cards, Drawer Trigger)</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">BADGES</h4>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: rgba(49, 46, 129, 0.15); color: var(--color-accent);">Fantasy</span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); color: var(--color-text-primary);">Session 04</span>
+                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background: rgba(6, 95, 70, 0.12); color: var(--color-success);">Stable</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+              <h4 class="font-system text-xs mb-3" style="color: var(--color-text-muted);">ALERTS</h4>
+              <div class="space-y-2 text-sm">
+                <div class="rounded-sm px-3 py-2" style="background: rgba(6, 95, 70, 0.08); border: 1px solid rgba(6, 95, 70, 0.35); color: var(--color-success);">Success: choices updated.</div>
+                <div class="rounded-sm px-3 py-2" style="background: rgba(146, 64, 14, 0.08); border: 1px solid rgba(146, 64, 14, 0.35); color: var(--color-warning);">Warning: low torchlight may affect stealth.</div>
+                <div class="rounded-sm px-3 py-2" style="background: rgba(159, 18, 57, 0.08); border: 1px solid rgba(159, 18, 57, 0.35); color: var(--color-error);">Error: outcome save failed.</div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STANDARD CARD</div>
+                  <p class="text-sm" style="color: var(--color-text-secondary);">Basic manuscript metadata card.</p>
+                </div>
+                <div class="p-4 rounded-sm backdrop-blur-md" style="background: var(--color-overlay-surface); border: 1px solid var(--color-border);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">HUD CARD</div>
+                  <p class="text-sm" style="color: var(--color-text-secondary);">Floating overlay-compatible card panel.</p>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-sm" style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                  <h4 class="font-system text-xs" style="color: var(--color-text-muted);">DRAWER TRIGGER + STATIC PREVIEW</h4>
+                  <button id="component-drawer-trigger" type="button" class="px-3 py-2 rounded-sm font-interface text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" style="background: var(--color-accent); color: white;">Open Character Drawer</button>
+                </div>
+                <div class="rounded-sm p-3" style="background: var(--color-surface-hover); border: 1px dashed var(--color-border-strong);">
+                  <div class="font-system text-xs mb-2" style="color: var(--color-text-muted);">STATIC DRAWER PREVIEW</div>
+                  <p class="text-sm" style="color: var(--color-text-secondary);">Overlay panel includes profile summary, inventory quick stats, and journal links. In the composition prototype, this opens as an absolute/fixed layer without shifting narrative content.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>

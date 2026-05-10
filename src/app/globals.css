@@ -1,199 +1,358 @@
+/* Manuscript session layout rules (game session overlay, HUD, action rail, drawers) */
+@import url('../styles/manuscript-session.css');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Scroll snap styles for narrative components */
-.narrative-history-container [data-radix-scroll-area-viewport] {
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
+/* Skip link - visually hidden until focused (accessibility) */
+a[href="#main-content"] {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
-.narrative-history-container .snap-center {
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
+a[href="#main-content"]:focus {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  width: auto;
+  height: auto;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  z-index: 9999;
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 2px;
+}
+
+/* Visually hidden content helper */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Narrative Content Styling for Readable Storytelling */
-.narrative-content {
-  font-family: system-ui, -apple-system, sans-serif;
-  line-height: 1.7;
-  text-align: justify;
-  hyphens: auto;
+.text-narrative {
+  font-family: var(--font-narrative);
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: var(--color-text-primary);
 }
 
-.narrative-content p {
-  margin-bottom: 1rem;
+.text-narrative p {
+  margin-bottom: var(--space-4);
 }
 
-.narrative-content p:last-child {
+.text-narrative p:last-child {
   margin-bottom: 0;
 }
 
-.narrative-content em {
+.text-narrative em {
   font-style: italic;
   color: inherit;
 }
 
 /* Scene segments with extra paragraph spacing */
-.narrative-content.scene-spacing p {
-  margin-bottom: 1.5rem;
-}
-
-/* Dialogue segments with specific styling */
-.narrative-content.dialogue-segment {
-  font-style: italic;
+.text-narrative.scene-spacing p {
+  margin-bottom: var(--space-6);
 }
 
 /* Transition segments preserve line breaks */
-.narrative-content.preserve-breaks {
+.text-narrative.preserve-breaks {
   white-space: pre-line;
 }
 
-/* Design Token CSS Variables */
-@layer base {
-  :root {
-    /* Base shadcn/ui colors */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+/* Link styling - uses archival ink accent from design system prototype */
+a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
 
-    /* Design system aligned tokens - maps to our blue-700/gray-700 */
-    --primary: 221.2 83.2% 44.3%; /* blue-700: #1d4ed8 */
-    --primary-foreground: 0 0% 100%; /* white */
-    --secondary: 220 13% 25%; /* gray-700: #374151 */
-    --secondary-foreground: 0 0% 100%; /* white */
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-    
-    /* Extended semantic tokens */
-    --success: 142 71% 45%; /* green-500: #22c55e */
-    --success-foreground: 210 40% 98%;
-    --success-text: 154 86% 20%; /* green-800ish */
-    --success-background: 142 69% 83%; /* green-200 */
-    --success-border: 142 69% 83%; /* green-200 */
-    --success-muted: 142 69% 83%; /* green-200 */
-    
-    --warning: 32 95% 44%; /* amber-500 */
-    --warning-foreground: 210 40% 98%;
-    --warning-text: 21 90% 20%; /* amber-800ish */
-    --warning-background: 43 76% 83%; /* amber-200 */
-    --warning-border: 43 76% 83%; /* amber-200 */
-    --warning-muted: 43 76% 83%; /* amber-200 */
-    
-    --info: 217 91% 60%; /* blue-500 */
-    --info-foreground: 210 40% 98%;
-    --info-text: 224 76% 25%; /* blue-700 */
-    --info-background: 214 92% 91%; /* blue-100 */
-    --info-border: 214 92% 91%; /* blue-100 */
-    --info-muted: 214 92% 91%; /* blue-100 */
-    
-    /* Contextual colors for storytelling features */
-    --ending-triumphant: 43 96% 56%; /* amber-500 - using design system amber */
-    --ending-bittersweet: 221.2 83.2% 53.1%; /* blue-500 - using design system blue */  
-    --ending-mysterious: 217.2 32.6% 17.5%; /* gray-900 - using design system gray */
-    --ending-tragic: 0 84% 60%; /* red-500 - using design system red */
-    --ending-hopeful: 142.1 76.2% 45.3%; /* green-500 - using design system green */
-    
-    /* Lore category colors */
-    --lore-characters-bg: 214 92% 91%; /* blue-100 */
-    --lore-characters-border: 213 84% 73%; /* blue-300 */
-    --lore-characters-text: 224 76% 25%; /* blue-700 */
-    
-    --lore-locations-bg: 142 69% 83%; /* green-200 */
-    --lore-locations-border: 34 84% 44%; /* green-500 */
-    --lore-locations-text: 154 86% 27%; /* green-700 */
-    
-    --lore-events-bg: 214 92% 91%; /* blue-100 */
-    --lore-events-border: 213 84% 73%; /* blue-300 */
-    --lore-events-text: 224 76% 25%; /* blue-700 */
-    
-    --lore-rules-bg: 43 76% 83%; /* amber-200 */
-    --lore-rules-border: 32 95% 44%; /* amber-500 */
-    --lore-rules-text: 21 90% 31%; /* amber-700 */
-  }
+a:hover {
+  color: var(--color-accent-hover);
+}
 
-  .dark {
-    /* Base shadcn/ui dark colors */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+/* Base styles from design system */
+body {
+  font-family: var(--font-interface), system-ui, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
 
-    /* Design system aligned dark mode tokens */
-    --primary: 221.2 83.2% 44.3%; /* blue-700: #1d4ed8 - same in dark mode */
-    --primary-foreground: 0 0% 100%; /* white */
-    --secondary: 220 13% 25%; /* gray-700: #374151 - same in dark mode */
-    --secondary-foreground: 0 0% 100%; /* white */
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 224.3 76.3% 94.1%;
-    
-    /* Extended semantic tokens (dark) */
-    --success: 142 71% 45%; /* green-500: #22c55e */
-    --success-foreground: 222.2 84% 4.9%;
-    --success-text: 142.1 76.2% 61.6%; /* green-400 */
-    --success-background: 142.1 70.6% 7.3%; /* green-950 */
-    --success-border: 142.1 64.2% 24.1%; /* green-800 */
-    --success-muted: 142.1 69.2% 14.1%; /* green-900 */
-    
-    --warning: 43.3 96.4% 56.3%; /* amber-400 */
-    --warning-foreground: 222.2 84% 4.9%;
-    --warning-text: 43.3 96.4% 56.3%; /* amber-400 */
-    --warning-background: 25.5 95% 7.1%; /* amber-950 */
-    --warning-border: 32.1 94.6% 23.7%; /* amber-800 */
-    --warning-muted: 25.5 83.3% 14.7%; /* amber-900 */
-    
-    --info: 213.1 93.9% 67.8%; /* blue-400 */
-    --info-foreground: 222.2 84% 4.9%;
-    --info-text: 213.1 93.9% 67.8%; /* blue-400 */
-    --info-background: 213.1 100% 6.1%; /* blue-950 */
-    --info-border: 213.1 93.7% 26.1%; /* blue-800 */
-    --info-muted: 212 100% 15.7%; /* blue-900 */
-    
-    /* Contextual colors remain the same in dark mode for consistency */
-    --ending-triumphant: 43 96% 56%; /* amber-500 - using design system amber */
-    --ending-bittersweet: 221.2 83.2% 53.1%; /* blue-500 - using design system blue */
-    --ending-mysterious: 217.2 32.6% 17.5%; /* gray-900 - using design system gray */
-    --ending-tragic: 0 84% 60%; /* red-500 - using design system red */
-    --ending-hopeful: 142.1 76.2% 45.3%; /* green-500 - using design system green */
-    
-    /* Lore category colors (adjusted for dark mode) */
-    --lore-characters-bg: 213.1 100% 6.1%; /* blue-950 */
-    --lore-characters-border: 213.1 93.7% 26.1%; /* blue-800 */
-    --lore-characters-text: 213.1 93.9% 67.8%; /* blue-400 */
-    
-    --lore-locations-bg: 142.1 70.6% 7.3%; /* green-950 */
-    --lore-locations-border: 142.1 64.2% 24.1%; /* green-800 */
-    --lore-locations-text: 142.1 76.2% 61.6%; /* green-400 */
-    
-    --lore-events-bg: 213.1 100% 6.1%; /* blue-950 */
-    --lore-events-border: 213.1 93.7% 26.1%; /* blue-800 */
-    --lore-events-text: 213.1 93.9% 67.8%; /* blue-400 */
-    
-    --lore-rules-bg: 25.5 95% 7.1%; /* amber-950 */
-    --lore-rules-border: 32.1 94.6% 23.7%; /* amber-800 */
-    --lore-rules-text: 43.3 96.4% 56.3%; /* amber-400 */
-  }
+/* Background pattern is defined per-theme in theme CSS files */
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Token definitions are in src/lib/theme/themes/ (ds1.css, ds2.css, ds3.css) */
+
+/* Typography role classes */
+.text-technical {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.text-ui {
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.font-narrative { font-family: var(--font-narrative); }
+.font-system { font-family: var(--font-system); }
+.font-interface { font-family: var(--font-interface); }
+
+/* Button base + variant + size classes (generated by Button component) */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+  white-space: nowrap;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Variant: default (primary action) */
+.button-default {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-accent);
+}
+
+.button-default:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+/* Variant: secondary */
+.button-secondary {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.button-secondary:hover {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border-strong, var(--color-border));
+}
+
+/* Variant: outline */
+.button-outline {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.button-outline:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong, var(--color-border));
+}
+
+/* Variant: ghost */
+.button-ghost {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid transparent;
+}
+
+.button-ghost:hover {
+  background: var(--color-surface-hover);
+}
+
+/* Variant: link */
+.button.button-link {
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid transparent;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+  min-height: auto;
+}
+
+.button-link:hover {
+  color: var(--color-accent-hover);
+}
+
+/* Variant: destructive */
+.button-destructive {
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-danger);
+}
+
+.button-destructive:hover {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
+
+/* Variant: success */
+.button-success {
+  background: var(--color-success);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-success);
+}
+
+.button-success:hover {
+  background: var(--color-success-hover, var(--color-success));
+  border-color: var(--color-success-hover, var(--color-success));
+}
+
+/* Variant: info */
+.button-info {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.button-info:hover {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+/* Variant: warning */
+.button-warning {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+.button-warning:hover {
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+}
+
+/* Size: default — applied via .button-size-default */
+.button-size-default {
+  padding: var(--space-2) var(--space-4);
+  min-height: 2.25rem;
+}
+
+/* Size: sm */
+.button-size-sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  min-height: 1.75rem;
+}
+
+/* Size: lg */
+.button-size-lg {
+  padding: var(--space-3) var(--space-6);
+  font-size: 1rem;
+  min-height: 2.75rem;
+}
+
+/* Size: icon */
+.button-size-icon {
+  padding: var(--space-2);
+  min-height: 2.25rem;
+  min-width: 2.25rem;
+}
+
+.button-size-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Theme Switcher Controls */
+.theme-switcher,
+.dark-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.theme-switcher-option,
+.dark-mode-toggle-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.dark-mode-toggle-option {
+  padding: var(--space-1) var(--space-1_5);
+}
+
+.dark-mode-toggle-option svg {
+  width: 14px;
+  height: 14px;
+}
+
+.theme-switcher-option:hover,
+.dark-mode-toggle-option:hover {
+  color: var(--color-text-secondary);
+  background: var(--color-surface-hover);
+}
+
+.theme-switcher-option-active,
+.dark-mode-toggle-option-active {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+
+.theme-switcher-option-compact,
+.dark-mode-toggle-option-compact {
+  padding: 0.1875rem 0.375rem;
+  font-size: 0.5625rem;
+}
+
+.dark-mode-toggle-option-compact svg {
+  width: 12px;
+  height: 12px;
 }
 
 /* Ending Screen Tone Styles */
@@ -217,237 +376,23 @@
   background-color: hsl(var(--ending-hopeful));
 }
 
+/* Narrative spacing (replaces Tailwind space-y utilities) */
 
-/* Base layer for HTML element styles */
-@layer base {
-  /* Main element background - only for non-ending screens */
-  main:not(.ending-screen) {
-    background-color: theme('colors.gray.100'); /* Using design token instead of hardcoded color */
-  }
-  
-  /* Link defaults */
-  a {
-    color: theme('colors.blue.500');
-    text-decoration: none;
-    transition: color 0.2s ease-in-out;
-  }
-  
-  a:hover {
-    color: theme('colors.blue.700');
-    text-decoration: underline;
-  }
-  
-  /* Text links in content */
-  .prose a,
-  p a,
-  li a,
-  span a {
-    color: theme('colors.blue.500');
-    text-decoration: underline;
-    text-decoration-color: theme('colors.blue.300');
-  }
-  
-  .prose a:hover,
-  p a:hover,
-  li a:hover,
-  span a:hover {
-    color: theme('colors.blue.700');
-    text-decoration-color: theme('colors.blue.500');
-  }
-  
-  /* Standardized text link classes */
-  .text-link-primary {
-    @apply text-blue-500 hover:underline transition-colors underline-offset-4;
-  }
-  
-  .text-link-secondary {
-    @apply text-gray-500 hover:text-blue-500 hover:underline transition-colors underline-offset-4;
-  }
-  
-  .text-link-nav {
-    @apply text-blue-500 hover:text-blue-700 transition-colors;
-  }
-  
-  .text-link-nav-dark {
-    @apply text-gray-300 hover:text-white transition-colors;
-    color: theme('colors.gray.300') !important; /* gray-300 with !important to override inheritance */
-  }
-  
-  .text-link-nav-dark:hover {
-    color: theme('colors.white') !important; /* white with !important for hover */
-  }
-  
-  /* Links in dark backgrounds should remain light - but not navigation links */
-  .bg-gray-900 a:not([data-navigation]),
-  .bg-gray-700 a:not([data-navigation]) {
-    color: inherit;
-  }
-  
-  .bg-gray-900 a:not([data-navigation]):hover,
-  .bg-gray-700 a:not([data-navigation]):hover {
-    text-decoration: none;
-  }
-  
-  /* Button defaults */
-  button {
-    cursor: pointer;
-  }
-  
-  /* Form element defaults removed - using shadcn/ui components */
+.narrative-history-segments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
-/* Space utilities - explicit rules for Tailwind v4 */
-.space-y-2 > * + * {
-  margin-top: 0.5rem;
+.narrative-segment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
-.space-y-4 > * + * {
-  margin-top: 1rem;
+.inventory-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
 }
 
-.space-y-6 > * + * {
-  margin-top: 1.5rem;
-}
-
-/* Alternative more specific selector */
-.space-y-2 > :not(:first-child) {
-  margin-top: 0.5rem;
-}
-
-.space-y-4 > :not(:first-child) {
-  margin-top: 1rem;
-}
-
-.space-y-6 > :not(:first-child) {
-  margin-top: 1.5rem;
-}
-
-/* Component layer for reusable classes */
-@layer components {
-  .card {
-    background-color: theme('colors.white');
-    border: 1px solid theme('colors.gray.300');
-    border-radius: theme('borderRadius.lg');
-    padding: theme('spacing.4');
-    box-shadow: theme('boxShadow.md');
-  }
-  
-  .btn {
-    display: inline-block;
-    padding: theme('spacing.2') theme('spacing.4');
-    border-radius: theme('borderRadius.DEFAULT');
-    font-weight: 500;
-    text-align: center;
-    cursor: pointer;
-    transition-property: background-color, border-color, color;
-    transition-duration: 150ms;
-  }
-  
-  .btn-primary {
-    background-color: theme('colors.blue.500');
-    color: theme('colors.white');
-    border: 0;
-  }
-  
-  .btn-primary:hover {
-    background-color: theme('colors.blue.700');
-  }
-}
-
-/* DevTools specific styling - not in a layer */
-.devtools-panel {
-  font-size: 12px;
-  background-color: theme('colors.gray.700');
-  color: theme('colors.gray.300');
-}
-
-.devtools-panel h1,
-.devtools-panel h2, 
-.devtools-panel h3,
-.devtools-panel h4,
-.devtools-panel h5,
-.devtools-panel h6 {
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin: 0.5rem 0;
-  color: theme('colors.gray.300');
-}
-
-.devtools-panel p {
-  font-size: 0.75rem;
-  margin: 0.5rem 0;
-  color: theme('colors.gray.500');
-}
-
-.devtools-panel button {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: theme('borderRadius.DEFAULT');
-  border: 1px solid theme('colors.gray.500');
-  cursor: pointer;
-  background-color: theme('colors.gray.500');
-  color: theme('colors.gray.300');
-}
-
-.devtools-panel button:hover {
-  background-color: theme('colors.gray.700');
-}
-
-/* Utility layer for custom animations and mobile optimizations */
-@layer utilities {
-  @keyframes slide-up {
-    from {
-      transform: translateY(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  
-  .animate-slide-up {
-    animation: slide-up 0.3s ease-out;
-  }
-  
-  .animate-fade-in {
-    animation: fade-in 0.2s ease-out;
-  }
-
-  /* Touch-friendly utilities for mobile navigation */
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  .touch-area {
-    padding: 8px;
-    margin: -8px;
-  }
-  
-  /* Prevent text selection on touch elements */
-  .touch-element {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  /* Mobile-specific scrolling */
-  .mobile-scroll {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-}

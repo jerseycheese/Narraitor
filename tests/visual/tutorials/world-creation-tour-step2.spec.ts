@@ -6,7 +6,9 @@ import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, ze
 
 const steps = [12, 13, 14];
 
-test('World creation tour step 2 snapshots (steps 12-14)', async ({ page }) => {
+// Skipped pending #1198 — same tour overlay/spotlight non-determinism as the
+// other world-creation-tour-* specs in this folder.
+test.skip('World creation tour step 2 snapshots (steps 12-14)', async ({ page }) => {
   test.setTimeout(90000);
 
   await seedTestData(page);

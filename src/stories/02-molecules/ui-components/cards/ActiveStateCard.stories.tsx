@@ -33,14 +33,14 @@ type Story = StoryObj<typeof meta>;
 
 // Sample card content component
 const SampleContent = () => (
-  <div className="p-6">
-    <h3 className="text-xl font-semibold mb-2">Sample Card Title</h3>
-    <p className="text-gray-700 mb-4">
+  <div>
+    <h3>Sample Card Title</h3>
+    <p>
       This is a sample card content to demonstrate the ActiveStateCard wrapper component.
     </p>
-    <div className="flex gap-2">
-      <button className="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-900">Action 1</button>
-      <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Action 2</button>
+    <div>
+      <button>Action 1</button>
+      <button>Action 2</button>
     </div>
   </div>
 );
@@ -71,8 +71,8 @@ export const ActiveWithoutIndicator: Story = {
 export const WithCustomStyling: Story = {
   args: {
     isActive: true,
-    activeClassName: 'ring-4 ring-blue-500 shadow-2xl border-blue-500 bg-blue-100',
-    inactiveClassName: 'hover:shadow-md border-gray-200',
+    activeClassName: '',
+    inactiveClassName: '',
     activeText: 'Primary Selection',
     children: <SampleContent />,
   },
@@ -84,8 +84,8 @@ export const WithImage: Story = {
     hasImage: true,
     children: (
       <>
-        <div className="h-48 bg-gradient-to-b from-blue-500 to-blue-700 flex items-center justify-center text-white">
-          <span className="text-2xl font-bold">Image Placeholder</span>
+        <div>
+          <span>Image Placeholder</span>
         </div>
         <SampleContent />
       </>
@@ -100,8 +100,8 @@ export const ActiveWithImage: Story = {
     activeText: 'Featured Item',
     children: (
       <>
-        <div className="h-48 bg-gradient-to-b from-green-500 to-green-700 flex items-center justify-center text-white">
-          <span className="text-2xl font-bold">Featured Image</span>
+        <div>
+          <span>Featured Image</span>
         </div>
         <SampleContent />
       </>
@@ -114,9 +114,9 @@ export const Clickable: Story = {
     isActive: false,
     onClick: () => alert('Card clicked!'),
     children: (
-      <div className="p-6">
-        <h3 className="text-xl font-semibold mb-2">Clickable Card</h3>
-        <p className="text-gray-700">Click anywhere on this card to trigger an action.</p>
+      <div>
+        <h3>Clickable Card</h3>
+        <p>Click anywhere on this card to trigger an action.</p>
       </div>
     ),
   },
@@ -129,23 +129,23 @@ export const Grid: Story = {
     children: <div>Default content</div>,
   },
   render: () => (
-    <div className="grid grid-cols-3 gap-4 p-4 w-[800px]">
+    <div>
       <ActiveStateCard isActive={true} activeText="Active Item">
-        <div className="p-4">
-          <h4 className="font-semibold">Card 1</h4>
-          <p className="text-sm text-gray-700">This card is active</p>
+        <div>
+          <h4>Card 1</h4>
+          <p>This card is active</p>
         </div>
       </ActiveStateCard>
       <ActiveStateCard isActive={false}>
-        <div className="p-4">
-          <h4 className="font-semibold">Card 2</h4>
-          <p className="text-sm text-gray-700">This card is inactive</p>
+        <div>
+          <h4>Card 2</h4>
+          <p>This card is inactive</p>
         </div>
       </ActiveStateCard>
       <ActiveStateCard isActive={false}>
-        <div className="p-4">
-          <h4 className="font-semibold">Card 3</h4>
-          <p className="text-sm text-gray-700">This card is inactive</p>
+        <div>
+          <h4>Card 3</h4>
+          <p>This card is inactive</p>
         </div>
       </ActiveStateCard>
     </div>

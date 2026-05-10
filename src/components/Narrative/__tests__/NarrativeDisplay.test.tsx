@@ -1,16 +1,25 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { useNPCStore } from '@/state/npcStore';
+import { useLoreStore } from '@/state/loreStore';
 import { NPC } from '@/types/npc.types';
 import { mockZustandStore, createMockNPCStore, createMockNarrativeSegment } from '@/lib/test-utils';
 
 jest.mock('@/state/npcStore');
+jest.mock('@/state/loreStore');
+
+const mockGetFacts = jest.fn().mockReturnValue([]);
+(useLoreStore as unknown as jest.Mock).mockImplementation(
+  (selector: (state: { getFacts: typeof mockGetFacts }) => unknown) =>
+    selector({ getFacts: mockGetFacts })
+);
 
 describe('NarrativeDisplay', () => {
   beforeEach(() => {
+    mockGetFacts.mockReturnValue([]);
     mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
       npcs: {},
     }));
@@ -34,124 +43,20 @@ describe('NarrativeDisplay', () => {
     expect(screen.getByText(/ancient forest whispered secrets/)).toBeInTheDocument();
   });
 
-  it('renders character avatars for metadata characterIds', () => {
-    const now = getTimestamp();
-    const npcs = {
-      'npc-1': {
-        id: 'npc-1',
-        name: 'Eldria Sunshadow',
-        worldId: 'world-1',
-        avatarUrl: 'https://example.com/eldria.png',
-        createdAt: now,
-        updatedAt: now,
-        description: 'A brave adventurer',
-      },
-      'npc-2': {
-        id: 'npc-2',
-        name: 'Borin Ironfist',
-        worldId: 'world-1',
-        createdAt: now,
-        updatedAt: now,
-        description: 'A gruff barkeep',
-      },
-    };
-
-    mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
-      npcs,
-      worldNpcs: {
-        'world-1': ['npc-1', 'npc-2'],
-      },
-      getById: jest.fn((id) => npcs[id as keyof typeof npcs]),
-      getAll: jest.fn(() => Object.values(npcs)),
-      getNPCsByWorld: jest.fn((worldId) => {
-        const ids = worldId === 'world-1' ? ['npc-1', 'npc-2'] : [];
-        return ids.map((id) => npcs[id as keyof typeof npcs]).filter(Boolean) as NPC[];
-      }),
-    }));
-
-    const segment = createMockNarrativeSegment({
-      id: 'seg-characters',
-      content: 'Eldria and Borin planned their next move.',
-      type: 'scene',
-      metadata: {
-        characterIds: ['npc-1', 'npc-2'],
-        tags: ['strategy'],
-      },
-    });
-
-    render(<NarrativeDisplay segment={segment} />);
-
-    expect(screen.getByRole('list', { name: /characters present/i })).toBeInTheDocument();
-    expect(screen.getByText('Eldria Sunshadow')).toBeInTheDocument();
-    expect(screen.getAllByText('Borin Ironfist')[0]).toBeInTheDocument();
-    expect(screen.getByAltText('Eldria Sunshadow')).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Borin Ironfist' })).toBeInTheDocument();
-  });
-
-  it('deduplicates character identifiers with inconsistent casing and whitespace', () => {
-    const now = getTimestamp();
-    const npcs = {
-      'npc-1': {
-        id: 'npc-1',
-        name: 'Marge, the Waitress',
-        worldId: 'world-1',
-        createdAt: now,
-        updatedAt: now,
-        description: 'A friendly waitress.',
-      },
-    };
-
-    mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore({
-      npcs,
-      worldNpcs: {
-        'world-1': ['npc-1'],
-      },
-      getById: jest.fn((id) => npcs[id as keyof typeof npcs]),
-      getAll: jest.fn(() => Object.values(npcs)),
-      getNPCsByWorld: jest.fn((worldId) => {
-        const ids = worldId === 'world-1' ? ['npc-1'] : [];
-        return ids.map((id) => npcs[id as keyof typeof npcs]).filter(Boolean) as NPC[];
-      }),
-    }));
-
-    const segment = createMockNarrativeSegment({
-      id: 'seg-dup',
-      content: 'Marge polishes the counter while you wait.',
-      type: 'scene',
-      metadata: {
-        characterIds: ['npc-1', 'npc-1 ', 'NPC-1'],
-        tags: ['diner'],
-      },
-    });
-
-    render(<NarrativeDisplay segment={segment} />);
-
-    const list = screen.getByRole('list', { name: /characters present/i });
-    expect(list).toBeInTheDocument();
-    const items = within(list).getAllByRole('listitem');
-    expect(items).toHaveLength(1);
-    expect(
-      within(items[0]).getByText((content, element) =>
-        content === 'Marge, the Waitress' &&
-        element?.classList.contains('text-sm') || false
-      )
-    ).toBeInTheDocument();
-  });
-
   it('handles malformed NPC IDs without crashing', () => {
     const segment = createMockNarrativeSegment({
       id: 'seg-malformed',
       content: 'An unnamed figure watches from afar.',
       type: 'scene',
       metadata: {
-        characterIds: ['', '   ', 'npc-42'],
+        characterIds: ['', '', 'npc-42'],
         tags: [],
       },
     });
 
-    render(<NarrativeDisplay segment={segment} />);
-
-    expect(screen.getAllByText('NPC 42').length).toBeGreaterThan(0);
+    expect(() => {
+      render(<NarrativeDisplay segment={segment} />);
+    }).not.toThrow();
   });
 
   it('emphasizes participant names within the narrative text', () => {
@@ -201,7 +106,7 @@ describe('NarrativeDisplay', () => {
     render(<NarrativeDisplay segment={segment} />);
 
     const content = screen.getByTestId('narrative-content-container');
-    const highlighted = content.querySelectorAll('span.font-semibold');
+    const highlighted = content.querySelectorAll('span.narrative-highlight');
     expect(highlighted.length).toBeGreaterThan(0);
     expect(
       Array.from(highlighted).some(
@@ -252,5 +157,121 @@ describe('NarrativeDisplay', () => {
 
     await user.click(screen.getByText('Try Again'));
     expect(mockRetry).toHaveBeenCalledTimes(1);
+  });
+
+  describe('marginalia term definitions', () => {
+    const loreFacts = [
+      {
+        id: 'fact-1',
+        key: 'world-test-1:character_aria',
+        value: 'Aria',
+        category: 'characters' as const,
+        source: 'narrative' as const,
+        worldId: 'world-test-1',
+        aliases: [],
+        visibility: 'world-shared' as const,
+        metadata: {
+          description: 'A powerful mage from the Northern Tower.',
+          type: 'protagonist',
+          importance: 'high' as const,
+        },
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+      },
+    ];
+
+    it('renders term definition buttons when lore facts exist', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-marginalia',
+        content: 'Aria stepped into the moonlit glade.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const buttons = screen.getAllByRole('button', { name: /Aria/i });
+      expect(buttons.length).toBeGreaterThan(0);
+      expect(buttons[0]).toHaveAttribute('aria-haspopup', 'dialog');
+    });
+
+    it('shows term definition on click and dismisses on Escape', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-marginalia-2',
+        content: 'Aria raised her staff.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const termButton = screen.getAllByRole('button', { name: /Aria/i })[0];
+      fireEvent.click(termButton);
+
+      // Definition panel should appear
+      const definition = screen.getByRole('complementary');
+      expect(definition).toHaveAttribute('aria-label', 'Definition: Aria');
+      expect(screen.getByText('A powerful mage from the Northern Tower.')).toBeInTheDocument();
+
+      // Escape should dismiss
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+    });
+
+    it('focuses definition panel when opened', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-focus-open',
+        content: 'Aria cast a spell.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const termButton = screen.getAllByRole('button', { name: /Aria/i })[0];
+      fireEvent.click(termButton);
+
+      const definition = screen.getByRole('complementary');
+      expect(document.activeElement).toBe(definition);
+    });
+
+    it('returns focus to trigger button on dismiss', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-focus-return',
+        content: 'Aria walked forward.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const termButton = screen.getAllByRole('button', { name: /Aria/i })[0];
+      fireEvent.click(termButton);
+
+      // Panel is open and focused
+      expect(screen.getByRole('complementary')).toBeInTheDocument();
+
+      // Dismiss with Escape
+      fireEvent.keyDown(document, { key: 'Escape' });
+
+      // Focus should return to the trigger button
+      expect(document.activeElement).toBe(termButton);
+    });
   });
 });

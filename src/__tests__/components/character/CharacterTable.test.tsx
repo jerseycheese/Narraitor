@@ -325,7 +325,7 @@ describe('CharacterTable', () => {
     // Find the first table row's first cell (portrait column)
     const firstRow = container.querySelector('tbody tr');
     const portraitCell = firstRow?.querySelector(
-      'td:first-child div.cursor-pointer'
+      'td:first-child div.character-portrait-clickable'
     );
 
     // Test should fail if portrait cell isn't found

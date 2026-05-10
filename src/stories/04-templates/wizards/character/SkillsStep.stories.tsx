@@ -108,7 +108,7 @@ export const Default: Story = {
     worldConfig,
   },
   render: (args) => (
-    <div className="max-w-3xl">
+    <div>
       <SkillsStep {...args} />
     </div>
   ),

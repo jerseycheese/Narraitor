@@ -82,14 +82,14 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
   const mockHistory = hasHistory ? mockTemplateHistory : [];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900">Smart World Templates</h2>
-        <p className="text-gray-700 mt-2">Get creative starting points for your world with AI assistance</p>
+    <div>
+      <div>
+        <h2>Smart World Templates</h2>
+        <p>Get creative starting points for your world with AI assistance</p>
       </div>
 
       {error && (
-        <div className="bg-red-200 border border-red-500 text-red-700 px-4 py-3 rounded">
+        <div>
           {error}
         </div>
       )}
@@ -99,38 +99,38 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
       )}
 
       {!isGenerating && (
-        <div className="space-y-8">
+        <div>
           {/* Mode Selection */}
-          <div className="space-y-6">
+          <div>
             {/* Tab-style Mode Selection */}
-            <div className="mb-6">
+            <div>
               <TabNavigation
                 options={tabOptions}
                 activeValue={mode}
                 onChange={setMode}
-                className="mb-6"
+                
               />
             </div>
 
             {/* Inspired By Mode */}
             {mode === 'inspired-by' && (
-              <div className="border rounded-lg p-6">
-                <div className="space-y-4">
+              <div>
+                <div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Describe Your World</h3>
+                    <h3>Describe Your World</h3>
                   </div>
-                  <div className="space-y-4">
+                  <div>
                     <input
                       type="text"
                       placeholder="Steampunk Victorian London, Space pirates, etc."
                       value={userInput}
                       onChange={(e) => setUserInput(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      
                     />
                     <button
                       onClick={handleGenerate}
                       disabled={!userInput.trim()}
-                      className="bg-blue-500 text-white px-6 py-2 rounded disabled:opacity-50"
+                      
                     >
                       Generate World
                     </button>
@@ -141,38 +141,33 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
 
             {/* Genre Mixer Mode */}
             {mode === 'genre-mix' && (
-              <div className="border rounded-lg p-6">
-                <div className="space-y-4">
+              <div>
+                <div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Mix Genres Together</h3>
-                    <p className="text-sm text-gray-700 mb-4">Select 2 or more genres to blend together</p>
+                    <h3>Mix Genres Together</h3>
+                    <p>Select 2 or more genres to blend together</p>
                   </div>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <div>
                       {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk', 'Mystery', 'Modern', 'Historical'].map(genre => (
                         <button
                           key={genre}
                           onClick={() => setSelectedGenres(prev => 
                             prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
                           )}
-                          className={`px-3 py-2 rounded text-sm ${
-                            selectedGenres.includes(genre) 
-                              ? 'bg-blue-100 text-blue-700 border border-blue-300' 
-                              : 'bg-gray-100 border border-gray-300'
-                          }`}
                         >
                           {genre}
                         </button>
                       ))}
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">
+                    <div>
+                      <span>
                         {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
                       </span>
                       <button
                         onClick={handleGenerate}
                         disabled={selectedGenres.length < 2}
-                        className="bg-blue-500 text-white px-6 py-2 rounded disabled:opacity-50"
+                        
                       >
                         Mix Genres
                       </button>
@@ -184,16 +179,16 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
 
             {/* Surprise Me Mode */}
             {mode === 'surprise-me' && (
-              <div className="border rounded-lg p-6">
-                <div className="space-y-4">
+              <div>
+                <div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Random World Generation</h3>
-                    <p className="text-sm text-gray-700 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
+                    <h3>Random World Generation</h3>
+                    <p>Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
                   </div>
                   <div>
                     <button
                       onClick={handleGenerate}
-                      className="bg-blue-700 text-white px-6 py-2 rounded"
+                      
                     >
                       Generate Random World
                     </button>
@@ -205,24 +200,24 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
 
           {/* Template History */}
           {mockHistory.length > 0 && (
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-4">Recent Templates</h3>
-              <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <h3>Recent Templates</h3>
+              <div>
                 {mockHistory.map((entry, index) => (
                   <div 
                     key={index}
-                    className="border rounded-lg p-4 hover:border-gray-500 cursor-pointer transition-colors"
+                    
                     onClick={() => onTemplateGenerated(entry.template)}
                   >
-                    <div className="flex items-start justify-between">
+                    <div>
                       <div>
-                        <h4 className="font-medium">{entry.template.name}</h4>
-                        <p className="text-sm text-gray-700 mt-1">{entry.template.genre}</p>
-                        <p className="text-xs text-gray-500 mt-2">
+                        <h4>{entry.template.name}</h4>
+                        <p>{entry.template.genre}</p>
+                        <p>
                           {formatDate(entry.generatedAt)}
                         </p>
                       </div>
-                      <span className="bg-gray-100 text-gray-900 text-xs px-2 py-1 rounded">
+                      <span>
                         {(() => {
                           switch(entry.generationType) {
                             case 'inspired-by': return 'Inspired';
@@ -240,9 +235,9 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
           )}
 
           {mockHistory.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
+            <div>
               <p>No recent templates</p>
-              <p className="text-sm">Generate your first template to get started!</p>
+              <p>Generate your first template to get started!</p>
             </div>
           )}
         </div>

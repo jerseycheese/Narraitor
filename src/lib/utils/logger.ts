@@ -26,7 +26,7 @@ interface LogColors {
 import { primitiveColors } from '@/lib/design-tokens';
 
 const LOG_COLORS: LogColors = {
-  [LogLevel.DEBUG]: `color: ${primitiveColors.gray[500]}; font-weight: normal;`,
+  [LogLevel.DEBUG]: `color: ${primitiveColors.zinc[500]}; font-weight: normal;`,
   [LogLevel.INFO]: `color: ${primitiveColors.blue[500]}; font-weight: normal;`,
   [LogLevel.WARN]: `color: ${primitiveColors.amber[500]}; font-weight: bold;`,
   [LogLevel.ERROR]: `color: ${primitiveColors.red[500]}; font-weight: bold;`,

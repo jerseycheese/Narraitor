@@ -162,6 +162,12 @@ Options:
       expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
         expect.stringContaining('[LAWFUL]')
       );
+      expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
+        expect.stringContaining('SKILL REQUIREMENTS (CRITICAL FOR MVP)')
+      );
+      expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
+        expect.stringContaining('Requirements: [Optional - SkillName X+]')
+      );
     });
 
     it('should use regular template when useAlignedChoices is false', async () => {

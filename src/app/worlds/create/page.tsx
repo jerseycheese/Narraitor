@@ -73,14 +73,19 @@ export default function CreateWorldPage() {
 
   
   return (
-    <main className="flex items-center justify-center">
-      <h1 className="sr-only">Create New World</h1>
-      <WorldCreationWizard 
+    <section
+      className="component-create-world-page wizard-page"
+      aria-labelledby="create-world-title"
+    >
+      <h1 id="create-world-title" className="sr-only">
+        Create New World
+      </h1>
+      <WorldCreationWizard
         onComplete={handleComplete}
         onCancel={handleCancel}
         initialData={generatedData || undefined}
         initialStep={initialStep} // Use step from URL parameter or default to 0
       />
-    </main>
+    </section>
   );
 }

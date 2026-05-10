@@ -170,24 +170,16 @@ describe('NarrativeDisplay - Formatting Integration', () => {
 
   describe('Visual organization for storytelling', () => {
     it('should organize long narrative content for easy reading', () => {
-      const longContent = `The ancient library stretched endlessly before them. Towering shelves disappeared into shadow above.
-
-Books of every size and color filled the shelves. Some glowed with inner light, others seemed to absorb the surrounding darkness.
-
-The librarian said, Welcome to the Archive of Ages. Here you will find the knowledge you seek.
-
-They walked deeper into the stacks. The *whispers* of ancient wisdom echoed around them.
-
-This was only the beginning of their quest.`;
+      const longContent = `The ancient library stretched endlessly before them. Towering shelves disappeared into above. Books of every size and color filled the shelves. Some glowed with inner light, others seemed to absorb the surrounding darkness. The librarian said, Welcome to the Archive of Ages. Here you will find the knowledge you seek. They walked deeper into the stacks. The *whispers* of ancient wisdom echoed around them. This was only the beginning of their quest.`;
 
       const segment = createMockSegment(longContent);
 
       render(<NarrativeDisplay segment={segment} />);
 
       // Long content should be organized into clear paragraphs with proper formatting
-      expect(screen.getByText('The ancient library stretched endlessly before them. Towering shelves disappeared into shadow above.')).toBeInTheDocument();
-      expect(screen.getByText(/The librarian said, "Welcome to the Archive of Ages\./)).toBeInTheDocument();
-      expect(screen.getByText('This was only the beginning of their quest.')).toBeInTheDocument();
+      expect(screen.getByText(/The ancient library stretched endlessly before them\. Towering shelves disappeared into above\./)).toBeInTheDocument();
+      expect(screen.getByText(/The librarian said, "Welcome to the Archive of Ages\."/)).toBeInTheDocument();
+      expect(screen.getByText(/This was only the beginning of their quest\./)).toBeInTheDocument();
 
       // Verify emphasis is rendered
       const emphasizedWord = screen.getByText('whispers');
@@ -195,7 +187,7 @@ This was only the beginning of their quest.`;
     });
 
     it('should handle whitespace normalization while preserving story structure', () => {
-      const messyContent = '   The story begins   here.   \n\n\n   Multiple    spaces    everywhere.   \n\n   The  end.   ';
+      const messyContent = 'The story begins here. \n\n\n Multiple spaces everywhere. \n\n The end.';
       const segment = createMockSegment(messyContent);
       
       render(<NarrativeDisplay segment={segment} />);

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { useStoryCheckpointManager } from './hooks/useStoryCheckpointManager';
 import { useWorldStore } from '@/state/worldStore';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
@@ -12,14 +11,23 @@ interface StorySummarySectionProps {
   characterId?: string;
 }
 
-export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldId, sessionId, characterId }) => {
+export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
+  worldId,
+  sessionId,
+  characterId,
+}) => {
   useStoryCheckpointManager({ worldId, sessionId, characterId });
-  const worldState = useWorldStore(state => worldId ? state.worldStates[worldId] : undefined);
+  const worldState = useWorldStore((state) =>
+    worldId ? state.worldStates[worldId] : undefined
+  );
 
   // Get all checkpoints for this session
   const checkpointsForSession = React.useMemo(
-    () => (worldState?.storyCheckpoints ?? []).filter((checkpoint) => checkpoint.sessionId === sessionId),
-    [worldState?.storyCheckpoints, sessionId],
+    () =>
+      (worldState?.storyCheckpoints ?? []).filter(
+        (checkpoint) => checkpoint.sessionId === sessionId
+      ),
+    [worldState?.storyCheckpoints, sessionId]
   );
 
   // Build complete story from all segments
@@ -37,22 +45,22 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({ worldI
     : [];
 
   return (
-    <section className="mt-6" data-testid="story-summary-section" data-tutorial="story-summary-section">
-      <CollapsibleSection title="The Story So Far" initialCollapsed>
-        <div>
-          {summaryParagraphs.length > 0 ? (
-            <div className="prose prose-gray dark:prose-invert">
-              {summaryParagraphs.map((paragraph, index) => (
-                <p key={`${paragraph.slice(0, 32)}-${index}`}>{paragraph}</p>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500">
-              Your story will appear here once major events occur.
-            </p>
-          )}
+    <section
+      data-testid="story-summary-section"
+      data-tutorial="story-summary-section"
+      className="manuscript-story-summary"
+    >
+      {summaryParagraphs.length > 0 ? (
+        <div className="manuscript-story-summary-body">
+          {summaryParagraphs.map((paragraph, index) => (
+            <p key={`${paragraph.slice(0, 32)}-${index}`} className="manuscript-story-summary-paragraph">{paragraph}</p>
+          ))}
         </div>
-      </CollapsibleSection>
+      ) : (
+        <p className="manuscript-story-summary-empty">
+          Your story will appear here once major events occur.
+        </p>
+      )}
     </section>
   );
 };

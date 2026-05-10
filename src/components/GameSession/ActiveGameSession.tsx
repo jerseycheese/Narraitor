@@ -7,13 +7,13 @@ import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, Character } from '@/state/characterStore';
-import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { GameSessionSkeleton } from './GameSessionSkeleton';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useRouter } from 'next/navigation';
+import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import ActiveGameSessionNarrativeColumn from './ActiveGameSessionNarrativeColumn';
 import ActiveGameSessionChoicesColumn from './ActiveGameSessionChoicesColumn';
 import ActiveGameSessionControls from './ActiveGameSessionControls';
@@ -22,6 +22,24 @@ import { useActiveGameSessionJournal } from './hooks/useActiveGameSessionJournal
 import { useActiveGameSessionActions } from './hooks/useActiveGameSessionActions';
 import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
+import { ManuscriptSessionShell } from './ManuscriptSessionShell';
+import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
+import { ManuscriptActionRail } from './ManuscriptActionRail';
+import { ManuscriptDrawer } from './ManuscriptDrawer';
+import {
+  CharacterDrawerContent,
+  InventoryDrawerContent,
+  StorySummaryDrawerContent,
+  ChoiceHistoryDrawerContent,
+  JournalSnapshotDrawerContent,
+  ToolsMenuPanelContent,
+} from './ManuscriptDrawerPanels';
+import { CharacterSnapshot } from './CharacterSnapshot';
+import { ManuscriptCharactersRail } from './ManuscriptCharactersRail';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { useTheme } from '@/lib/theme/ThemeProvider';
+
+type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history' | 'journal';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -30,6 +48,8 @@ interface ActiveGameSessionProps {
   status?: 'active' | 'paused' | 'ended';
   onChoiceSelected: (choiceId: string) => void;
   onEnd?: () => void;
+  onStartNew?: () => void;
+  onBack?: () => void;
   // Narrative specific props
   existingSegments?: NarrativeSegment[];
   choices?: Array<{
@@ -48,6 +68,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   status = 'active',
   onChoiceSelected,
   onEnd,
+  onStartNew,
+  onBack,
   /* existingSegments - not currently used */
   triggerGeneration = false,
   selectedChoiceId,
@@ -61,8 +83,22 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
-  const [isSuggestedActionsExpanded, setIsSuggestedActionsExpanded] = React.useState(false);
-  
+  const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
+  const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
+  const [lastOpenedDrawer, setLastOpenedDrawer] = React.useState<DrawerType | null>(null);
+  const [isToolsMenuOpen, setIsToolsMenuOpen] = React.useState(false);
+
+  const characterButtonRef = React.useRef<HTMLButtonElement>(null);
+  const toolsButtonRef = React.useRef<HTMLButtonElement>(null);
+  const drawerTriggerRef = React.useRef<HTMLElement | null>(null);
+  const [isStreamingPreview, setIsStreamingPreview] = React.useState(false);
+  const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
+
+  const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
+  const { theme } = useTheme();
+  const isDS1 = theme === 'ds1';
+  const isDS3 = theme === 'ds3';
+
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
     typeof window !== 'undefined'
@@ -95,8 +131,25 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Selecting derived arrays from Zustand can cause non-cached snapshots.
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
+  // Get the latest narrative segment for the characters rail
+  // We look for the most recent segment that actually has participants, matching prototype logic
+  const latestSegmentWithParticipants = useNarrativeStore((state) => {
+    const segmentIds = state.sessionSegments[sessionId] || [];
+    if (segmentIds.length === 0) return null;
+    
+    // Search backwards for a segment with characters
+    for (let i = segmentIds.length - 1; i >= 0; i--) {
+      const segment = state.segments[segmentIds[i]];
+      if (segment && ((segment.characterIds?.length ?? 0) > 0 || (segment.metadata?.characterIds?.length ?? 0) > 0)) {
+        return segment;
+      }
+    }
+    
+    // Fallback to absolute latest segment
+    return state.segments[segmentIds[segmentIds.length - 1]] || null;
+  });
+
   const hasExistingNarrative = segmentCount > 0;
-  const narrativeMaxHeight = segmentCount > 1 && !isSuggestedActionsExpanded ? '500px' : undefined;
 
   // Game is ready when:
   // 1. We're initialized
@@ -113,6 +166,34 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const router = useRouter();
   const { startTour, isTourActive } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('firstPlay'));
+
+  React.useEffect(() => {
+    if (!isCharacterSummaryExpanded && !isToolsMenuOpen && activeDrawer === null) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (activeDrawer !== null) {
+          setActiveDrawer(null);
+          drawerTriggerRef.current?.focus();
+          drawerTriggerRef.current = null;
+          return;
+        }
+        if (isToolsMenuOpen) {
+          setIsToolsMenuOpen(false);
+          toolsButtonRef.current?.focus();
+          return;
+        }
+        if (isCharacterSummaryExpanded) {
+          setIsCharacterSummaryExpanded(false);
+          characterButtonRef.current?.focus();
+          return;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCharacterSummaryExpanded, isToolsMenuOpen, activeDrawer]);
 
   React.useEffect(() => {
     if (!isGameReady) return;
@@ -198,7 +279,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // If generating ending, show loading state
   if (isGeneratingEnding) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div>
         <LoadingState
           message={isFatalEnding ? "Game Over" : "Writing your story's ending..."}
         />
@@ -210,10 +291,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // always mount the hidden NarrativeController to drive generation.
   if (!isGameReady) {
     return (
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div className="manuscript-loading-shell">
         <GameSessionSkeleton />
         {/* Hidden controller that actually performs generation while skeleton shows */}
-        <div aria-hidden="true" className="hidden h-0 overflow-hidden">
+        <div aria-hidden="true" className="sr-only">
           <NarrativeController
             key={`generator-${controllerKey}`}
             worldId={worldId}
@@ -226,77 +307,278 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             onChoicesGenerated={handleChoicesGenerated}
             onEndingSuggested={handleEndingSuggested}
             generateChoices={true}
+            hideHistory={true}
           />
         </div>
-
-        {/* Character Summary Panel - show immediately when character data is available */}
-        {character && (
-          <div className="mt-6">
-            <CharacterSummary character={character} />
-          </div>
-        )}
       </div>
     );
   }
 
-  return (
-    <div data-testid="game-session-active" role="region" aria-label="Game session" className="flex-1 min-h-0 flex flex-col">
+  // Progressive disclosure responsive strategy (when flag ON):
+  // - marginContent slot: suggested actions in right margin (desktop only, hides prompt/custom input)
+  // - Action rail primary ChoicesColumn: full choices + prompt (mobile only via lg:hidden)
+  // - Action rail secondary ChoicesColumn: custom input only (desktop only via hidden lg:block)
+  const endStoryAction = !isSessionEnded(sessionId) && (
+    <button
+      type="button"
+      onClick={handleEndStoryClick}
+      className="manuscript-warning-action-button"
+    >
+      End Story
+    </button>
+  );
 
-      {/* Two-column layout for larger screens */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch flex-1 min-h-0 lg:overflow-hidden">
-        {/* Story Column */}
-        <ActiveGameSessionNarrativeColumn
-          controllerKey={controllerKey}
+  const endingSuggestion = showEndingSuggestion && endingSuggestionReason
+    ? {
+        reason: endingSuggestionReason,
+        onAccept: handleAcceptEndingSuggestion,
+        onDismiss: handleRejectEndingSuggestion,
+      }
+    : isEndingSuggestionPreview
+      ? {
+          reason: 'Draft ending preview from Tools panel.',
+          onAccept: () => {
+            setIsEndingSuggestionPreview(false);
+            handleEndStoryClick();
+          },
+          onDismiss: () => setIsEndingSuggestionPreview(false),
+        }
+      : undefined;
+
+  return (
+    <ManuscriptSessionShell
+      hud={
+        <ManuscriptFloatingHud
+          characterButtonRef={characterButtonRef}
+          toolsButtonRef={toolsButtonRef}
+          onToggleCharacterSummary={() => {
+            setIsCharacterSummaryExpanded((prev) => {
+              const next = !prev;
+              if (next) {
+                setIsToolsMenuOpen(false);
+              }
+              return next;
+            });
+          }}
+          isCharacterSummaryExpanded={isCharacterSummaryExpanded}
+          onToggleToolsMenu={() => {
+            setIsToolsMenuOpen(!isToolsMenuOpen);
+            setIsCharacterSummaryExpanded(false);
+          }}
+          isToolsMenuOpen={isToolsMenuOpen}
+          characterSummaryPanel={character && <CharacterSnapshot character={character} />}
+          toolsMenuPanel={isProgressiveDisclosureEnabled && (
+            <ToolsMenuPanelContent
+              activeDrawer={activeDrawer ?? lastOpenedDrawer}
+              onOpenDrawer={(drawerType) => {
+                drawerTriggerRef.current = document.activeElement as HTMLElement;
+                setActiveDrawer(drawerType);
+                setLastOpenedDrawer(drawerType);
+                setIsCharacterSummaryExpanded(false);
+              }}
+              onClosePanel={() => setIsToolsMenuOpen(false)}
+              onOpenJournalRoute={() =>
+                router.push(`/worlds/${worldId}/play/journal`)
+              }
+              onOpenCharacterPanel={() => {
+                setIsCharacterSummaryExpanded(true);
+              }}
+              onSimulateTurn={() => {
+                const fallbackChoiceId = currentDecision?.options?.[0]?.id;
+                if (fallbackChoiceId) {
+                  handleChoiceSelected(fallbackChoiceId);
+                  return;
+                }
+                handleCustomSubmit('Simulate next turn');
+              }}
+              onToggleStreamingPreview={() => {
+                setIsStreamingPreview((prev) => !prev);
+              }}
+              isStreamingPreview={isStreamingPreview}
+              onToggleEndingSuggestionPreview={() => {
+                setIsEndingSuggestionPreview((prev) => !prev);
+              }}
+              isEndingSuggestionPreview={isEndingSuggestionPreview}
+            />
+          )}
+          drawerTriggers={isProgressiveDisclosureEnabled}
+          characterName={character?.name}
+          onOpenDrawer={(drawerType) => {
+            drawerTriggerRef.current = document.activeElement as HTMLElement;
+            setActiveDrawer(drawerType as DrawerType);
+            setLastOpenedDrawer(drawerType as DrawerType);
+            setIsCharacterSummaryExpanded(false);
+          }}
+          onStartNew={onStartNew}
+          onBack={onBack}
+          onEndStory={handleEndStoryClick}
+          saveIndicator={
+            <SaveIndicator
+              status={autoSave.status}
+              lastSaveTime={autoSave.lastSaveTime}
+              errorMessage={autoSave.errorMessage}
+              totalSaves={autoSave.totalSaves}
+              onRetryError={autoSave.retry}
+              retryable
+              compact
+              className="manuscript-save-indicator"
+            />
+          }
+          rightContent={isDS3 ? undefined : (
+            <div className="manuscript-hud-right-controls">
+              <SaveIndicator
+                status={autoSave.status}
+                lastSaveTime={autoSave.lastSaveTime}
+                errorMessage={autoSave.errorMessage}
+                totalSaves={autoSave.totalSaves}
+                onRetryError={autoSave.retry}
+                retryable
+                compact
+                className="manuscript-save-indicator"
+              />
+              <button
+                type="button"
+                onClick={onStartNew}
+                title="Start New Session"
+                className="manuscript-hud-text-button manuscript-hud-reset-button"
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={onBack}
+                title="Back to World"
+                className="manuscript-hud-text-button"
+              >
+                Close
+              </button>
+            </div>
+          )}
+        />
+      }
+      marginContent={isDS1 && isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
+        ((latestSegmentWithParticipants.characterIds?.length ?? 0) > 0 ||
+         (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0) ? (
+        <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
+      ) : null}
+      mobileTopContent={
+        isDS1 && isProgressiveDisclosureEnabled ? (
+          <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
+        ) : null
+      }
+      actionRail={
+        <ManuscriptActionRail
+          isStreaming={isGenerating || isGeneratingChoices || isStreamingPreview}
+        >
+          <div className="manuscript-action-rail-stack">
+            <ActiveGameSessionChoicesColumn
+              currentDecision={currentDecision}
+              segmentCount={segmentCount}
+              status={status}
+              isGenerating={isGenerating}
+              isGeneratingChoices={isGeneratingChoices}
+              isSessionEnded={isSessionEnded(sessionId)}
+              worldSkills={world?.skills || []}
+              characterSkills={characterSkills}
+              inventoryItems={inventoryItems}
+              onChoiceSelected={handleChoiceSelected}
+              onCustomSubmit={handleCustomSubmit}
+              inputActions={null}
+              endStoryAction={endStoryAction}
+              isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
+              endingSuggestion={endingSuggestion}
+            />
+          </div>
+        </ManuscriptActionRail>
+      }
+    >
+      <ActiveGameSessionNarrativeColumn
+        controllerKey={controllerKey}
+        worldId={worldId}
+        sessionId={sessionId}
+        characterId={characterId || undefined}
+        decisionWeight={currentDecision?.decisionWeight}
+        triggerGeneration={triggerGeneration}
+        initialized={initialized}
+        shouldTriggerGeneration={shouldTriggerGeneration}
+        localSelectedChoiceId={localSelectedChoiceId}
+        selectedChoiceId={selectedChoiceId}
+        onNarrativeGenerated={handleNarrativeGenerated}
+        onChoicesGenerated={handleChoicesGenerated}
+        onEndingSuggested={handleEndingSuggested}
+        segmentCount={segmentCount}
+      />
+
+      <div className="manuscript-secondary-controls">
+        <ActiveGameSessionControls
+          character={character}
+          characterId={characterId || undefined}
           worldId={worldId}
           sessionId={sessionId}
-          characterId={characterId || undefined}
-          decisionWeight={currentDecision?.decisionWeight}
-          triggerGeneration={triggerGeneration}
-          initialized={initialized}
-          shouldTriggerGeneration={shouldTriggerGeneration}
-          localSelectedChoiceId={localSelectedChoiceId}
-          selectedChoiceId={selectedChoiceId}
-          onNarrativeGenerated={handleNarrativeGenerated}
-          onChoicesGenerated={handleChoicesGenerated}
-          onEndingSuggested={handleEndingSuggested}
-          narrativeMaxHeight={narrativeMaxHeight}
-          segmentCount={segmentCount}
-        />
-
-        {/* Choices Column */}
-        <ActiveGameSessionChoicesColumn
-          currentDecision={currentDecision}
-          segmentCount={segmentCount}
-          status={status}
-          isGenerating={isGenerating}
-          isGeneratingChoices={isGeneratingChoices}
-          isSessionEnded={isSessionEnded(sessionId)}
-          worldSkills={world?.skills || []}
-          characterSkills={characterSkills}
-          inventoryItems={inventoryItems}
-          onChoiceSelected={handleChoiceSelected}
-          onCustomSubmit={handleCustomSubmit}
-          onSuggestedActionsToggle={setIsSuggestedActionsExpanded}
-          endingSuggestion={showEndingSuggestion && endingSuggestionReason ? {
-            reason: endingSuggestionReason,
-            onAccept: handleAcceptEndingSuggestion,
-            onDismiss: handleRejectEndingSuggestion,
-          } : undefined}
+          showEndConfirmation={showEndConfirmation}
+          onConfirmEndStory={handleConfirmEndStory}
+          onCloseEndStory={handleCloseEndStory}
+          onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
+          isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
         />
       </div>
 
-      <ActiveGameSessionControls
-        character={character}
-        characterId={characterId || undefined}
-        worldId={worldId}
-        sessionId={sessionId}
-        autoSave={autoSave}
-        showEndConfirmation={showEndConfirmation}
-        onConfirmEndStory={handleConfirmEndStory}
-        onCloseEndStory={handleCloseEndStory}
-        onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
-      />
-    </div>
+      {isProgressiveDisclosureEnabled && (
+        <ManuscriptDrawer
+          open={activeDrawer !== null}
+          onOpenChange={(open) => {
+            if (!open) {
+              setActiveDrawer(null);
+              drawerTriggerRef.current?.focus();
+              drawerTriggerRef.current = null;
+            }
+          }}
+          title={
+            activeDrawer === 'character'
+              ? 'Character Sheet'
+              : activeDrawer === 'inventory'
+                ? 'Inventory'
+                              : activeDrawer === 'story-summary'
+                                ? 'Story So Far'
+                                : activeDrawer === 'choice-history'
+                                  ? 'Choice History'
+                                  : activeDrawer === 'journal'
+                                    ? 'Journal Snapshot'
+                                    : ''
+                          }
+                          subtitle={
+                            activeDrawer === 'character'
+                              ? character?.name
+                              : activeDrawer === 'inventory'
+                                ? `Items for ${character?.name}`
+                                : activeDrawer === 'story-summary' || activeDrawer === 'choice-history' || activeDrawer === 'journal'
+                                  ? `Session ${sessionId.slice(0, 8)}`
+                                  : undefined
+                          }
+                
+        >
+          {activeDrawer === 'character' && character && (
+            <CharacterDrawerContent character={character} />
+          )}
+          {activeDrawer === 'inventory' && characterId && (
+            <InventoryDrawerContent characterId={characterId} />
+          )}
+          {activeDrawer === 'story-summary' && (
+            <StorySummaryDrawerContent
+              worldId={worldId}
+              sessionId={sessionId}
+              characterId={characterId || undefined}
+            />
+          )}
+          {activeDrawer === 'choice-history' && (
+            <ChoiceHistoryDrawerContent sessionId={sessionId} />
+          )}
+          {activeDrawer === 'journal' && (
+            <JournalSnapshotDrawerContent sessionId={sessionId} />
+          )}
+        </ManuscriptDrawer>
+      )}
+    </ManuscriptSessionShell>
   );
 };
 

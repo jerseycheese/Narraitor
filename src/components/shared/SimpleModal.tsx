@@ -10,7 +10,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils/classNames';
+import { cssClasses } from '@/lib/utils/classNames';
 
 interface SimpleModalProps {
   /** Whether the modal is open */
@@ -25,16 +25,12 @@ interface SimpleModalProps {
   className?: string;
   /** Optional classes for the scrolling content wrapper */
   contentClassName?: string;
-  /** Determines where scrolling happens */
-  scrollBehavior?: 'content' | 'overlay';
   /** Whether to show the close button */
   showCloseButton?: boolean;
   /** Whether to close on backdrop click */
   closeOnBackdropClick?: boolean;
   /** Whether to close on escape key */
   closeOnEscape?: boolean;
-  /** Modal size */
-  size?: 'sm' | 'md' | 'lg' | 'xl';
   /** ID of element describing the modal content */
   ariaDescribedBy?: string;
   /** Optional contextual descriptor rendered under the title */
@@ -43,10 +39,14 @@ interface SimpleModalProps {
   footer?: React.ReactNode;
   /** Optional class overrides for the footer wrapper */
   footerClassName?: string;
-  /** Whether to keep the footer visible while overlay scrolling */
+  /** Scroll behavior: 'overlay' (default) or 'content' */
+  scrollBehavior?: 'overlay' | 'content';
+  /** Whether the footer should stick to the bottom */
   stickyFooter?: boolean;
-  /** Contextual tone to align borders and accents with design tokens */
-  tone?: 'default' | 'info' | 'success' | 'warning' | 'destructive';
+  /** Modal size (deprecated/unused in clean slate) */
+  size?: string;
+  /** Modal tone/variant (deprecated/unused in clean slate) */
+  tone?: string;
 }
 
 export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
@@ -55,57 +55,6 @@ export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
   }
 
   return Boolean(target.closest('.react-joyride__tooltip'));
-};
-
-const SIZE_CLASSES: Record<NonNullable<SimpleModalProps['size']>, string> = {
-  sm: '!max-w-sm',
-  md: '!max-w-md',
-  lg: '!max-w-lg',
-  xl: '!max-w-xl',
-};
-
-const TONE_STYLES: Record<NonNullable<SimpleModalProps['tone']>, {
-  frame: string;
-  header: string;
-  headerBorder: string;
-  footerBorder: string;
-  closeButton: string;
-}> = {
-  default: {
-    frame: 'border border-border',
-    header: '',
-    headerBorder: 'border-border',
-    footerBorder: 'border-border',
-    closeButton: 'text-muted-foreground hover:text-foreground',
-  },
-  info: {
-    frame: 'border border-info/50',
-    header: 'bg-info/10',
-    headerBorder: 'border-info/40',
-    footerBorder: 'border-info/40',
-    closeButton: 'text-info hover:text-info/80',
-  },
-  success: {
-    frame: 'border border-success/50',
-    header: 'bg-success/10',
-    headerBorder: 'border-success/40',
-    footerBorder: 'border-success/40',
-    closeButton: 'text-success hover:text-success/80',
-  },
-  warning: {
-    frame: 'border border-warning/60',
-    header: 'bg-warning/10',
-    headerBorder: 'border-warning/40',
-    footerBorder: 'border-warning/40',
-    closeButton: 'text-warning hover:text-warning/80',
-  },
-  destructive: {
-    frame: 'border border-destructive/60',
-    header: 'bg-destructive/10',
-    headerBorder: 'border-destructive/40',
-    footerBorder: 'border-destructive/40',
-    closeButton: 'text-destructive hover:text-destructive/80',
-  },
 };
 
 /**
@@ -121,42 +70,37 @@ export function SimpleModal({
   children,
   className,
   contentClassName,
-  scrollBehavior = 'overlay',
   showCloseButton = true,
   closeOnBackdropClick = true,
   closeOnEscape = true,
-  size = 'md',
   ariaDescribedBy,
   description,
   footer,
   footerClassName,
-  stickyFooter = false,
-  tone = 'default',
+  scrollBehavior = 'overlay',
+  stickyFooter,
+  size, // Destructure but ignore for now to satisfy interface
+  tone, // Destructure but ignore
 }: SimpleModalProps) {
-  const toneStyles = TONE_STYLES[tone];
   const fallbackDescriptionId = useId();
   const resolvedDescriptionId =
-    ariaDescribedBy || (description ? `${fallbackDescriptionId}-description` : undefined);
+    ariaDescribedBy ||
+    (description ? `${fallbackDescriptionId}-description` : undefined);
   const hasHeaderContent = Boolean(title || showCloseButton || description);
-  const isOverlayScroll = scrollBehavior === 'overlay';
-  const shouldStickFooter = Boolean(footer) && stickyFooter && isOverlayScroll;
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => (open ? undefined : onClose())}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => (open ? undefined : onClose())}
+    >
       <DialogContent
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
-        overlayScroll={isOverlayScroll}
-        className={cn(
-          '!flex !flex-col !gap-0 !p-0 bg-background text-foreground shadow-xl focus:outline-none focus-visible:outline-none',
-          'dark:bg-white dark:text-gray-900',
-          toneStyles.frame,
-          'w-full sm:rounded-xl',
-          SIZE_CLASSES[size],
-          !isOverlayScroll ? 'max-h-[100dvh] overflow-hidden' : undefined,
-          className,
+        overlayScroll={scrollBehavior === 'overlay'}
+        className={cssClasses(
+          className
         )}
-        onInteractOutside={event => {
+        onInteractOutside={(event) => {
           if (isJoyrideTooltipTarget(event.target)) {
             event.preventDefault();
             return;
@@ -164,33 +108,21 @@ export function SimpleModal({
 
           if (!closeOnBackdropClick) {
             event.preventDefault();
+            return;
           }
         }}
-        onEscapeKeyDown={event => {
+        onEscapeKeyDown={(event) => {
           if (!closeOnEscape) {
             event.preventDefault();
           }
         }}
       >
         {hasHeaderContent && (
-          <div
-            className={cn(
-              'flex items-start justify-between gap-4 border-b px-6 py-5',
-              toneStyles.header,
-              toneStyles.headerBorder,
-            )}
-          >
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-              {title && (
-                <DialogTitle className="text-lg font-semibold text-foreground dark:text-gray-900">
-                  {title}
-                </DialogTitle>
-              )}
+          <div>
+            <div>
+              {title && <DialogTitle>{title}</DialogTitle>}
               {description && (
-                <div
-                  id={ariaDescribedBy ? undefined : resolvedDescriptionId}
-                  className="text-sm text-muted-foreground"
-                >
+                <div id={ariaDescribedBy ? undefined : resolvedDescriptionId}>
                   {description}
                 </div>
               )}
@@ -200,13 +132,9 @@ export function SimpleModal({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn(
-                    'h-9 w-9 shrink-0',
-                    toneStyles.closeButton,
-                  )}
                   aria-label="Close modal"
                 >
-                  <X className="h-4 w-4" aria-hidden="true" />
+                  <X aria-hidden="true" />
                 </Button>
               </DialogClose>
             )}
@@ -215,12 +143,8 @@ export function SimpleModal({
 
         {(children !== undefined && children !== null) || !hasHeaderContent ? (
           <div
-            data-scroll-container={isOverlayScroll ? undefined : 'content'}
-            className={cn(
-              'flex-1 px-6 py-6',
-              isOverlayScroll ? undefined : 'overflow-y-auto',
-              contentClassName,
-            )}
+            className={contentClassName}
+            data-scroll-container={scrollBehavior === 'content' ? 'content' : undefined}
           >
             {children}
           </div>
@@ -228,13 +152,8 @@ export function SimpleModal({
 
         {footer && (
           <div
-            data-sticky-footer={shouldStickFooter ? 'true' : undefined}
-            className={cn(
-              'border-t px-6 py-5',
-              toneStyles.footerBorder,
-              shouldStickFooter ? 'sticky bottom-0 z-10 bg-background dark:bg-white' : undefined,
-              footerClassName,
-            )}
+            className={footerClassName}
+            data-sticky-footer={stickyFooter ? 'true' : undefined}
           >
             {footer}
           </div>

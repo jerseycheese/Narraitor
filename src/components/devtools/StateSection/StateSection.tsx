@@ -69,7 +69,7 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
   }, []);
 
   return (
-    <div data-testid="devtools-state-section" className="space-y-3">
+    <div data-testid="devtools-state-section" >
       
       {Object.entries(storeStates).map(([storeName, storeState]) => (
         <CollapsibleSection 
@@ -83,7 +83,7 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
       ))}
       
       {Object.keys(storeStates).length === 0 && (
-        <div className="text-sm text-gray-200 italic">
+        <div>
           No stores available
         </div>
       )}

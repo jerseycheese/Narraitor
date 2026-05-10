@@ -1,0 +1,809 @@
+/* ═══════════════════════════════════════════════════════════════
+   Dashboard Surface
+   Styles for the dashboard home page (/) and its section components.
+   All values use design tokens for theme-awareness.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Page Container ─── */
+
+.component-dashboard-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+@media (width >= 1024px) {
+  .component-dashboard-home {
+    padding: var(--space-6);
+  }
+}
+
+/* ─── Shared Section Card Surface ───
+   Each top-level dashboard section (Continue, Progress, Recent Worlds,
+   Recent Characters, Getting Started) sits on a surface card. */
+
+.component-dashboard-progress-card,
+.component-dashboard-continue-card,
+.component-dashboard-recent-worlds,
+.component-dashboard-recent-characters,
+.component-dashboard-getting-started {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.component-dashboard-progress-card h2,
+.component-dashboard-continue-card h2,
+.component-dashboard-recent-worlds h2,
+.component-dashboard-recent-characters h2,
+.component-dashboard-getting-started h2 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ─── Progress Card ─── */
+
+.dashboard-progress-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--space-3);
+}
+
+@media (width <= 640px) {
+  .dashboard-progress-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dashboard-progress-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+}
+
+.dashboard-progress-stat-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--color-text-primary);
+}
+
+.dashboard-progress-stat-value svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-accent);
+  align-self: center;
+}
+
+.dashboard-progress-stat-value span {
+  font-family: var(--font-narrative);
+  font-size: 1.75rem;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.dashboard-progress-stat-label {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ─── Continue Card ─── */
+
+.dashboard-continue-card-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.dashboard-continue-card-portrait {
+  flex-shrink: 0;
+}
+
+.dashboard-continue-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dashboard-continue-card-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-6);
+}
+
+.dashboard-continue-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+
+.dashboard-continue-card-meta time {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+@media (width <= 640px) {
+  .dashboard-continue-card-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .dashboard-continue-card-fields,
+  .dashboard-continue-card-meta {
+    justify-content: center;
+  }
+}
+
+/* ─── Recent Worlds & Recent Characters ─── */
+
+.dashboard-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dashboard-recent-item {
+  cursor: pointer;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.dashboard-recent-item:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent);
+}
+
+.dashboard-recent-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.dashboard-recent-item h3 {
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.dashboard-recent-item span,
+.dashboard-recent-item p {
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.dashboard-recent-character-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* CharacterPortrait inherits its size from the parent — give it an explicit
+   small avatar box in this list context so the placeholder doesn't stretch. */
+.dashboard-recent-character-content > .component-character-portrait {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+}
+
+.dashboard-recent-character-content > div:not(.component-character-portrait) {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.dashboard-recent-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+}
+
+.dashboard-recent-empty-state p {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* Empty-slot placeholder buttons inside a partially populated list.
+   Match the dimensions of .dashboard-recent-item so the rhythm holds. */
+.dashboard-recent-empty-slot {
+  justify-content: flex-start;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  transition: border-color 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.dashboard-recent-empty-slot:hover {
+  border-style: solid;
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-text-primary);
+}
+
+.dashboard-recent-empty-slot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.dashboard-recent-empty-slot svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ─── Getting Started ─── */
+
+.dashboard-getting-started-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-getting-started-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-getting-started-step-icon {
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--color-text-muted);
+}
+
+.dashboard-getting-started-step-complete .dashboard-getting-started-step-icon {
+  color: hsl(var(--success));
+}
+
+.dashboard-getting-started-step-label {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+}
+
+.dashboard-getting-started-step-complete .dashboard-getting-started-step-label {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--color-border-strong);
+}
+
+.dashboard-getting-started-cta {
+  align-self: flex-start;
+}
+
+/* "Ready to Continue" variant — shown when all steps complete. */
+.component-dashboard-getting-started-complete {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.dashboard-getting-started-complete-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.dashboard-getting-started-complete-icon {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: var(--space-0_5);
+  color: hsl(var(--success));
+}
+
+.dashboard-getting-started-complete-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dashboard-getting-started-complete-body h3 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dashboard-getting-started-complete-body p {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Per-theme treatments
+   DS1 = drafting-table density (sharp, tight, hairline rules)
+   DS2 = warm-earth breathing space (rounded, generous gaps)
+   DS3 = mechanical-manuscript paper (medium radius, dotted rules,
+         eyebrow captions in monospace)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── DS1 ─── */
+
+[data-theme="ds1"] .component-dashboard-home {
+  gap: var(--space-5);
+}
+
+[data-theme="ds1"] .component-dashboard-progress-card,
+[data-theme="ds1"] .component-dashboard-continue-card,
+[data-theme="ds1"] .component-dashboard-recent-worlds,
+[data-theme="ds1"] .component-dashboard-recent-characters,
+[data-theme="ds1"] .component-dashboard-getting-started {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-sm);
+  gap: var(--space-3);
+}
+
+[data-theme="ds1"] .component-dashboard-progress-card h2,
+[data-theme="ds1"] .component-dashboard-continue-card h2,
+[data-theme="ds1"] .component-dashboard-recent-worlds h2,
+[data-theme="ds1"] .component-dashboard-recent-characters h2,
+[data-theme="ds1"] .component-dashboard-getting-started h2 {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds1"] .dashboard-progress-stat,
+[data-theme="ds1"] .dashboard-recent-item,
+[data-theme="ds1"] .dashboard-recent-empty-state,
+[data-theme="ds1"] .dashboard-recent-empty-slot {
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="ds1"] .dashboard-progress-stat-value span {
+  font-family: var(--font-narrative);
+  font-weight: 500;
+}
+
+/* ─── DS2 ─── */
+
+[data-theme="ds2"] .component-dashboard-home {
+  gap: var(--space-8);
+  padding: var(--space-5);
+}
+
+@media (width >= 1024px) {
+  [data-theme="ds2"] .component-dashboard-home {
+    gap: clamp(2.5rem, 5vw, 4rem);
+    padding: var(--space-8);
+  }
+}
+
+[data-theme="ds2"] .component-dashboard-progress-card,
+[data-theme="ds2"] .component-dashboard-continue-card,
+[data-theme="ds2"] .component-dashboard-recent-worlds,
+[data-theme="ds2"] .component-dashboard-recent-characters,
+[data-theme="ds2"] .component-dashboard-getting-started {
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  gap: var(--space-5);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+}
+
+[data-theme="ds2"] .component-dashboard-progress-card h2,
+[data-theme="ds2"] .component-dashboard-continue-card h2,
+[data-theme="ds2"] .component-dashboard-recent-worlds h2,
+[data-theme="ds2"] .component-dashboard-recent-characters h2,
+[data-theme="ds2"] .component-dashboard-getting-started h2 {
+  font-family: var(--font-narrative);
+  font-size: 1.375rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .dashboard-progress-stat,
+[data-theme="ds2"] .dashboard-recent-item,
+[data-theme="ds2"] .dashboard-recent-empty-state,
+[data-theme="ds2"] .dashboard-recent-empty-slot {
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+[data-theme="ds2"] .dashboard-progress-stat {
+  background: var(--color-surface-hover);
+  border-color: transparent;
+}
+
+[data-theme="ds2"] .dashboard-progress-stat-value span {
+  font-family: var(--font-narrative);
+  font-size: 2rem;
+}
+
+/* ─── DS3 ─── */
+
+[data-theme="ds3"] .component-dashboard-home {
+  gap: var(--space-6);
+}
+
+[data-theme="ds3"] .component-dashboard-progress-card,
+[data-theme="ds3"] .component-dashboard-continue-card,
+[data-theme="ds3"] .component-dashboard-recent-worlds,
+[data-theme="ds3"] .component-dashboard-recent-characters,
+[data-theme="ds3"] .component-dashboard-getting-started {
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  gap: var(--space-4);
+  background: var(--color-surface);
+  backdrop-filter: blur(6px);
+}
+
+[data-theme="ds3"] .component-dashboard-progress-card h2,
+[data-theme="ds3"] .component-dashboard-continue-card h2,
+[data-theme="ds3"] .component-dashboard-recent-worlds h2,
+[data-theme="ds3"] .component-dashboard-recent-characters h2,
+[data-theme="ds3"] .component-dashboard-getting-started h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .component-dashboard-progress-card h2::before,
+[data-theme="ds3"] .component-dashboard-continue-card h2::before,
+[data-theme="ds3"] .component-dashboard-recent-worlds h2::before,
+[data-theme="ds3"] .component-dashboard-recent-characters h2::before,
+[data-theme="ds3"] .component-dashboard-getting-started h2::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+[data-theme="ds3"] .dashboard-progress-stat,
+[data-theme="ds3"] .dashboard-recent-item,
+[data-theme="ds3"] .dashboard-recent-empty-state,
+[data-theme="ds3"] .dashboard-recent-empty-slot {
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="ds3"] .dashboard-progress-stat-label,
+[data-theme="ds3"] .dashboard-recent-item span,
+[data-theme="ds3"] .dashboard-recent-item p {
+  font-family: var(--font-system);
+}
+
+[data-theme="ds3"] .dashboard-progress-stat-value span {
+  font-family: var(--font-narrative);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Worlds page — per-theme treatments
+   Mirror the dashboard pattern (DS1 sharp/tight, DS2 rounded/airy,
+   DS3 manuscript dotted) for the worlds list, world card, and
+   empty state.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── DS1 ─── */
+
+[data-theme="ds1"] .world-list-grid {
+  gap: var(--space-3);
+}
+
+@media (width < 768px) {
+  [data-theme="ds1"] .world-list-grid {
+    gap: var(--space-2);
+  }
+}
+
+[data-theme="ds1"] .component-world-card {
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+[data-theme="ds1"] .world-card-content {
+  padding: var(--space-3) var(--space-4);
+  gap: var(--space-2);
+}
+
+[data-theme="ds1"] .component-world-card footer {
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .world-card-description-block p {
+  font-size: 0.875rem;
+}
+
+[data-theme="ds1"] .world-list-empty {
+  border-radius: var(--radius-sm);
+  padding: var(--space-6) var(--space-5);
+  gap: var(--space-2);
+}
+
+[data-theme="ds1"] .world-list-empty-icon {
+  border-radius: var(--radius-sm);
+  width: 3rem;
+  height: 3rem;
+  background: transparent;
+  border: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .world-list-empty-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+[data-theme="ds1"] .world-list-empty-title {
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  width: fit-content;
+}
+
+[data-theme="ds1"] .world-list-empty-guide {
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+}
+
+[data-theme="ds1"] .world-list-empty-guide-heading {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds1"] .world-list-empty-tip {
+  border-radius: 0;
+}
+
+/* ─── DS2 ─── */
+
+[data-theme="ds2"] .world-list-grid {
+  gap: var(--space-5);
+}
+
+@media (width >= 1024px) {
+  [data-theme="ds2"] .world-list-grid {
+    gap: clamp(2rem, 4vw, 3rem);
+  }
+}
+
+@media (width < 768px) {
+  [data-theme="ds2"] .world-list-grid {
+    gap: var(--space-4);
+  }
+}
+
+[data-theme="ds2"] .component-world-card {
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+}
+
+[data-theme="ds2"] .world-card-content {
+  padding: var(--space-6);
+  gap: var(--space-4);
+}
+
+[data-theme="ds2"] .component-world-card footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: none;
+  gap: var(--space-4);
+}
+
+[data-theme="ds2"] .world-card-description-block p {
+  font-family: var(--font-narrative);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+[data-theme="ds2"] .world-list-empty {
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-6);
+  gap: var(--space-4);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+}
+
+[data-theme="ds2"] .world-list-empty-icon {
+  width: 5rem;
+  height: 5rem;
+  background: var(--color-surface-hover);
+}
+
+[data-theme="ds2"] .world-list-empty-icon svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+[data-theme="ds2"] .world-list-empty-title {
+  font-family: var(--font-narrative);
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .world-list-empty-guide {
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+}
+
+[data-theme="ds2"] .world-list-empty-guide-heading {
+  font-family: var(--font-narrative);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+[data-theme="ds2"] .world-list-empty-tip {
+  border-radius: var(--radius-md);
+  border-left: none;
+  background: var(--color-surface-hover);
+  padding: var(--space-3) var(--space-4);
+}
+
+/* ─── DS3 ─── */
+
+[data-theme="ds3"] .world-list-grid {
+  gap: var(--space-4);
+}
+
+[data-theme="ds3"] .component-world-card {
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  backdrop-filter: blur(6px);
+}
+
+[data-theme="ds3"] .world-card-content {
+  padding: var(--space-5);
+  gap: var(--space-3);
+}
+
+[data-theme="ds3"] .component-world-card footer {
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px dotted var(--color-border);
+}
+
+[data-theme="ds3"] .world-card-description-block p {
+  font-family: var(--font-system);
+  font-size: 0.9375rem;
+}
+
+[data-theme="ds3"] .world-card-footer-meta time {
+  font-family: var(--font-system);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+}
+
+[data-theme="ds3"] .world-list-empty {
+  border-radius: var(--radius-md);
+  padding: var(--space-6) var(--space-5);
+  gap: var(--space-3);
+  background: var(--color-surface);
+  backdrop-filter: blur(6px);
+}
+
+[data-theme="ds3"] .world-list-empty-icon {
+  border-radius: var(--radius-md);
+  width: 4rem;
+  height: 4rem;
+  background: var(--color-canvas);
+  border: 1px dotted var(--color-border);
+}
+
+[data-theme="ds3"] .world-list-empty-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .world-list-empty-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+[data-theme="ds3"] .world-list-empty-lede {
+  font-family: var(--font-narrative);
+  font-size: 1.25rem;
+  color: var(--color-text-primary);
+}
+
+[data-theme="ds3"] .world-list-empty-guide {
+  border-radius: var(--radius-sm);
+  border: 1px dotted var(--color-border);
+  padding: var(--space-4) var(--space-5);
+}
+
+[data-theme="ds3"] .world-list-empty-guide-heading {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .world-list-empty-guide-steps {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+}
+
+[data-theme="ds3"] .world-list-empty-tip {
+  border-radius: var(--radius-sm);
+  border-left: none;
+  border: 1px dotted var(--color-border);
+  background: var(--color-canvas);
+}
