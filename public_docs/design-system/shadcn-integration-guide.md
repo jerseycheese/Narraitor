@@ -3,6 +3,8 @@
 ## Overview
 The shadcn/ui integration gives us a solid foundation of accessible, well-designed components that work great with Tailwind CSS. Instead of building everything from scratch, we get professional components that just work.
 
+> **Scope note**: This guide covers the shadcn/ui setup itself — dependencies, the `cn()` utility, button/badge usage. The CSS variables that shadcn components consume are now defined per-theme under `[data-theme="ds1"]`, `[data-theme="ds2"]`, and `[data-theme="ds3"]` selectors rather than a single `:root` block. The CSS Variables section below shows the original single-theme structure and is kept for historical reference; for the current per-theme token surface, see [design-tokens.md](./design-tokens.md) and [ADR-011](../architecture/ADR-011-three-design-systems.md).
+
 ## Setup Completed
 
 ### 1. Dependencies Installed
@@ -138,7 +140,7 @@ The following CSS variables are available for theming:
 ```
 
 ### Dark Mode Support
-Dark mode variables are included and can be activated with the `dark` class on the HTML element.
+Dark mode is fully supported across all three design systems. Each theme file (`ds1.css`, `ds2.css`, `ds3.css`) defines a complete dark-mode override under `[data-theme="ds1"].dark` (and so on). The `ThemeProvider` toggles a `dark` class on `<html>`; no changes needed at the component level.
 
 ## Testing
 

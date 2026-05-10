@@ -12,7 +12,7 @@ UI approach: create immersive experiences that adapt to different fictional worl
 
 ## Design Philosophy
 
-**World-Adaptive Design** - The UI should feel appropriate to the fictional setting. A noir detective world gets different typography and colors than a space opera setting. But the underlying structure and usability patterns stay consistent.
+**Three Design Systems, User-Chosen** - Three structurally-different design systems ship with the app (DS1, DS2, DS3). The user picks one; it isn't tied to world genre. Each one carries a coherent visual point of view — different fonts, spacing, shape language, density. The underlying structure and usability patterns stay consistent across all three. See [ADR-011](../architecture/ADR-011-three-design-systems.md) for the why.
 
 **Responsive & Accessible** - Works on all screen sizes with keyboard navigation, screen reader support, and proper contrast. Mobile-first approach because touch interactions are often simpler to design for.
 

@@ -27,6 +27,8 @@ So these are the key architectural decisions we made for Narraitor - basically w
 
 **shadcn/ui Components**: These give us accessible, good-looking components without reinventing the wheel. Built on Radix UI so accessibility is handled properly.
 
+**Three Design Systems (DS1/DS2/DS3)**: One look stopped being enough once worlds got more varied, but token-only theming kept reading as the same app in different paint. So we ended up with three structurally different design systems — Drafting Table, Warm Earth, Mechanical Manuscript — each with its own token file, switched via a `data-theme` attribute on `<html>`. See [ADR-011](ADR-011-three-design-systems.md) for the structural-differentiation principle and how the theme files, showcase pages, and provider fit together.
+
 ## Development Practices
 
 **Storybook-First Development**: Building components in isolation catches issues early and makes debugging way easier. Plus it forces you to think about all the different states a component needs to handle.
