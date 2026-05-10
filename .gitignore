@@ -16,7 +16,6 @@ node_modules
 /test-results/
 /data/
 index.html
-!public/design-system/index.html
 .playwright-mcp
 
 # Playwright downloaded artifacts (from CI failures)
@@ -98,11 +97,6 @@ project-config.json
 # Docs (private, untracked)
 # Use public_docs/ for committed documentation
 docs/
-docs/plans/
-
-# Cross-theme audit captures (#1129) — large PNG output, regenerable
-scripts/audit/captures/
-scripts/audit/seeds/*.json
 
 # Generated dependency diagrams (regenerate with npm run deps:diagram:all)
 public_docs/architecture/*.mmd
