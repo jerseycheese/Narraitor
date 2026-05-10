@@ -63,41 +63,42 @@ export const Hero: React.FC<HeroProps> = ({
   theme, // Destructure but ignore
 }) => {
   return (
-    <div>
+    <div className="component-hero">
       {image && (
         <Image
+          className="component-hero-image"
           src={image.url}
           alt={image.alt}
           width={800}
           height={400}
-          
+
           // Use unoptimized for data URLs and tests to avoid Next optimization proxy
           unoptimized={typeof image.url === 'string' && image.url.startsWith('data:')}
         />
       )}
 
       {/* Title overlay with gradient background */}
-      <div>
-        <div>
+      <div className="component-hero-overlay">
+        <div className="component-hero-content">
           <TitleElement
-            
+            className="component-hero-title"
             data-testid={titleTestId}
           >
             {title}
           </TitleElement>
 
           {subtitle && (
-            <p>
+            <p className="component-hero-subtitle">
               {subtitle}
             </p>
           )}
 
-          {badge && <div>{badge}</div>}
+          {badge && <div className="component-hero-badge">{badge}</div>}
         </div>
       </div>
 
       {actions && (
-        <div>
+        <div className="component-hero-actions">
           {actions}
         </div>
       )}

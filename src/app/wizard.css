@@ -1392,3 +1392,169 @@
     animation: none;
   }
 }
+
+/* ----------------------------------------------------------------------------
+ * GuidedFirstTimeExperience — first-run wizard on the home empty state.
+ * Renders inside WizardContainer so it inherits .component-wizard-container,
+ * .wizard-header, and .wizard-title chrome from the wizard surface above. The
+ * rules here only handle the GFTE-specific surfaces (step body, nav row, skip
+ * link, error banner) so they read as on-theme without introducing a new
+ * surface concept. (#1199)
+ * -------------------------------------------------------------------------- */
+
+.component-guided-first-time-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.component-guided-first-time-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.component-guided-first-time-nav {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.component-guided-first-time-nav-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.component-guided-first-time-skip {
+  display: flex;
+  justify-content: center;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.component-guided-first-time-error {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  font-family: var(--font-interface);
+  color: var(--color-text-primary);
+}
+
+/* DS1 — sharp chrome, monospace eyebrow above the action row, accent rule on
+   the nav top edge to echo .wizard-nav-container at line 882. */
+
+[data-theme="ds1"] .component-guided-first-time-wrapper {
+  gap: var(--space-4);
+}
+
+[data-theme="ds1"] .component-guided-first-time-nav {
+  position: relative;
+  padding-top: var(--space-4);
+  border-top: 2px solid var(--color-border);
+}
+
+[data-theme="ds1"] .component-guided-first-time-nav::before {
+  content: "Next step";
+  position: absolute;
+  top: calc(-1 * (var(--space-2) + 2px));
+  left: 0;
+  padding: 0 var(--space-2);
+  background-color: var(--color-canvas);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .component-guided-first-time-skip {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds1"] .component-guided-first-time-error {
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+}
+
+/* DS2 — airy spacing, no top rule on the nav (matches .wizard-nav-container
+   at line 1040), pill buttons via inheritance, narrative serif on the skip
+   link, soft generous radius on the error banner. Step content fades up to
+   echo the wizard step transition at line 997. */
+
+[data-theme="ds2"] .component-guided-first-time-wrapper {
+  gap: clamp(var(--space-4), 2vw, var(--space-6));
+}
+
+[data-theme="ds2"] .component-guided-first-time-step {
+  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+[data-theme="ds2"] .component-guided-first-time-nav {
+  border-top: none;
+  justify-content: center;
+  padding-top: clamp(var(--space-4), 2vw, var(--space-5));
+}
+
+[data-theme="ds2"] .component-guided-first-time-nav-row {
+  gap: clamp(var(--space-3), 2vw, var(--space-5));
+}
+
+[data-theme="ds2"] .component-guided-first-time-skip {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .component-guided-first-time-error {
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--color-accent) 12%, transparent);
+}
+
+/* DS3 — dotted radial-gradient divider above the nav row, mirroring the
+   .wizard-progress-connector pattern at line 1147. Monospace voice on the
+   skip link with a dot bullet to match wizard-progress-label at line 1178. */
+
+[data-theme="ds3"] .component-guided-first-time-nav {
+  border-top: none;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  background-position: top left;
+  padding-top: var(--space-5);
+}
+
+[data-theme="ds3"] .component-guided-first-time-skip {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds3"] .component-guided-first-time-skip::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .component-guided-first-time-error {
+  border-radius: var(--radius-md);
+  border-color: var(--color-border-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="ds2"] .component-guided-first-time-step {
+    animation: none;
+  }
+}

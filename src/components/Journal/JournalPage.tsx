@@ -260,7 +260,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
       className="journal-page"
     >
       {world && (
-        <div>
+        <div className="journal-hero">
           <Hero
             title={pageTitle}
             image={
@@ -277,7 +277,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
         </div>
       )}
 
-      <div>
+      <div className="journal-nav">
         <BackNavigation href={`/worlds/${worldId}/play`} label="Back to Play" />
         {showEntrySummary && <span>{entrySummary}</span>}
       </div>

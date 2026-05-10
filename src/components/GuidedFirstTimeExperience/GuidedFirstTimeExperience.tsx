@@ -388,11 +388,13 @@ export function GuidedFirstTimeExperience() {
 
   return (
     <WizardContainer title="First time?">
-      <div>
-        {renderCurrentStep()}
+      <div className="component-guided-first-time-wrapper">
+        <div className="component-guided-first-time-step">
+          {renderCurrentStep()}
+        </div>
 
-        <div>
-          <div>
+        <div className="component-guided-first-time-nav">
+          <div className="component-guided-first-time-nav-row">
             {!wizard.isFirstStep && (
               <Button onClick={wizard.handlers.handleBack} variant="outline">
                 Back
@@ -423,14 +425,14 @@ export function GuidedFirstTimeExperience() {
         </div>
 
         {/* Skip option */}
-        <div>
+        <div className="component-guided-first-time-skip">
           <Button onClick={wizard.handlers.handleCancel} variant="link">
             Skip for now
           </Button>
         </div>
 
         {wizard.currentError && (
-          <div>
+          <div className="component-guided-first-time-error">
             <p>{wizard.currentError}</p>
           </div>
         )}
