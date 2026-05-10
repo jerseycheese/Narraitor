@@ -97,7 +97,7 @@ Three design systems ship together — **DS1 "The Drafting Table"**, **DS2 "Warm
 1. **Reading first.** Long-form narrative is the most-viewed surface. Line lengths, line heights, and paragraph rhythm get optimized before anything else.
 2. **Tokens carry variation; components stay theme-blind.** No `theme === 'ds1'` branching in JSX. Components consume `var(--token-name)` and let the active theme decide.
 3. **Structural differentiation.** A theme is a coherent point of view about how interfaces should feel — different shape language, spacing, density. Same shape with three palettes reads as one app wearing three hats.
-4. **The showcase pages are canon.** [`/dev/design-system`](src/app/dev/design-system/page.tsx), [`-2`](src/app/dev/design-system-2/page.tsx), and [`-3`](src/app/dev/design-system-3/page.tsx) define the look. If a production component drifts from its showcase, the production component is wrong.
+4. **The showcase pages and Storybook are canon.** [`/dev/design-system`](src/app/dev/design-system/page.tsx), [`-2`](src/app/dev/design-system-2/page.tsx), [`-3`](src/app/dev/design-system-3/page.tsx) and their [`/session/`](src/app/dev/design-system/session/page.tsx) subroutes define the look at the page level. **Storybook** (`npm run storybook`) is the component-level canon — `00-Foundation/Design System Showcase` and `00-Foundation/Design Tokens` cover the system; per-component stories cover variants and states. The Storybook toolbar has a DS1/DS2/DS3 + light/dark switcher; verify components in all six combinations. If a production component drifts from these, the production component is wrong.
 5. **No inline styles, no hardcoded values.** Every visual value comes from a token. Hex codes and pixel literals in component code are bugs.
 
 ## Colors
@@ -292,4 +292,5 @@ The don'ts here come from real failures during the design-system migration. They
 - [Global styles](public_docs/design-system/global-styles.md) — CSS architecture and load order
 - [UI/UX guidelines](public_docs/development/ui-ux-guidelines.md) — interaction patterns and accessibility
 - Theme files: [ds1.css](src/lib/theme/themes/ds1.css), [ds2.css](src/lib/theme/themes/ds2.css), [ds3.css](src/lib/theme/themes/ds3.css)
-- Showcase pages: [DS1](src/app/dev/design-system/page.tsx), [DS2](src/app/dev/design-system-2/page.tsx), [DS3](src/app/dev/design-system-3/page.tsx)
+- Showcase pages: [DS1](src/app/dev/design-system/page.tsx), [DS2](src/app/dev/design-system-2/page.tsx), [DS3](src/app/dev/design-system-3/page.tsx) — each has a `/session/` subroute for game-session canon
+- Storybook: `npm run storybook` (port 6006); foundation stories at [src/stories/00-foundation/](src/stories/00-foundation/) (`DesignSystemShowcase.stories.tsx`, `DesignTokens.stories.tsx`); per-component stories live next to their components or under [src/stories/](src/stories/)

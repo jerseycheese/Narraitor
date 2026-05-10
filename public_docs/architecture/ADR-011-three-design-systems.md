@@ -44,7 +44,9 @@ The visual canon for each theme is the matching showcase page:
 - [src/app/dev/design-system-2/page.tsx](../../src/app/dev/design-system-2/page.tsx) (DS2)
 - [src/app/dev/design-system-3/page.tsx](../../src/app/dev/design-system-3/page.tsx) (DS3)
 
-These aren't documentation — they're the source of truth. If a production component drifts from the showcase, the production component is wrong.
+Each also has a `/session/` subroute that's the canon for game-session UI specifically. **Storybook** carries the same role at the component level — `00-Foundation/Design System Showcase` and `00-Foundation/Design Tokens` are the foundation stories, and the toolbar switcher in [.storybook/preview.tsx](../../.storybook/preview.tsx) lets you verify any story in DS1/DS2/DS3 and light/dark.
+
+These aren't documentation — they're the source of truth. If a production component drifts from the showcase or the foundation stories, the production component is wrong.
 
 ## Why This Made Sense
 
@@ -81,7 +83,7 @@ The `data-theme` attribute approach won out because it's cheap, it's reversible,
 
 **Adding a per-theme variation to a component.** Don't branch in JSX. Add a CSS variable for whatever needs to vary, set the default in the theme files, and let the component consume the variable. If the variation is structural enough that CSS variables can't carry it (e.g., a different layout), it's worth questioning whether the component should be rethought rather than forked.
 
-**Adding a new component.** Build it once against tokens. Verify in all three showcase pages before merging. If a token doesn't exist for what you need, add it to all three theme files with values that fit each theme's voice — don't add it to one and let the others fall back to undefined.
+**Adding a new component.** Build it once against tokens. Add a Storybook story alongside it. Verify in Storybook (toolbar switcher: DS1/DS2/DS3 × light/dark) and in all three showcase pages before merging. If a token doesn't exist for what you need, add it to all three theme files with values that fit each theme's voice — don't add it to one and let the others fall back to undefined.
 
 **Adding a fourth theme.** Add `dsN.css`, register it in [src/lib/theme/index.ts](../../src/lib/theme/index.ts) (the `THEMES` array and the `DesignSystem` type), and add a showcase page. ThemeProvider's `readStoredTheme` validation will need the new id added to the `if (stored === 'ds1' || ...)` check.
 
