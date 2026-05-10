@@ -10,9 +10,9 @@ interface SectionWrapperProps {
 
 export function SectionWrapper({ title, children, className = '' }: SectionWrapperProps) {
   return (
-    <section className={`${className}`}>
-      <h2>{title}</h2>
-      {children}
+    <section className={`component-section-wrapper ${className}`.trim()}>
+      <h2 className="component-section-wrapper-title">{title}</h2>
+      <div className="component-section-wrapper-body">{children}</div>
     </section>
   );
 }

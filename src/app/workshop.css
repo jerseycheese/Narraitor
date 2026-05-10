@@ -3199,6 +3199,638 @@
   text-align: center;
 }
 
+/* Journal hero + nav row wrappers (#1159) — semantic hooks added in
+   JournalPage.tsx to give the per-theme blocks below something to attach to. */
+
+.journal-hero {
+  margin-bottom: var(--space-3);
+}
+
+.journal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0 var(--space-4);
+  font-family: var(--font-interface);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+/* DS1 — Drafting Table: sharp chrome, monospace eyebrow on the entry summary,
+   2px accent rule between list and detail panes. */
+
+[data-theme="ds1"] .journal-page .journal-list-pane {
+  border-right: 2px solid var(--color-border);
+  padding: var(--space-4);
+}
+
+[data-theme="ds1"] .journal-page .journal-list-header h2 {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .journal-page .journal-nav {
+  border-top: 2px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+
+[data-theme="ds1"] .journal-page .journal-nav span {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .journal-page .journal-empty-state,
+[data-theme="ds1"] .journal-page .journal-detail-empty {
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+/* DS2 — Warm Earth: airy spacing, soft radii, narrative serif on the section
+   title, fade-up echo on the journal content surface. */
+
+[data-theme="ds2"] .journal-page .journal-content {
+  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+[data-theme="ds2"] .journal-page .journal-list-pane {
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--color-surface) 70%, transparent);
+}
+
+[data-theme="ds2"] .journal-page .journal-list-header h2 {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--color-text-primary);
+}
+
+[data-theme="ds2"] .journal-page .journal-nav {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 0.9375rem;
+  border-top: none;
+  padding-top: clamp(var(--space-3), 2vw, var(--space-4));
+}
+
+[data-theme="ds2"] .journal-page .journal-empty-state,
+[data-theme="ds2"] .journal-page .journal-detail-empty {
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--color-accent) 10%, transparent);
+}
+
+/* DS3 — Mechanical Manuscript: dotted radial-gradient divider above the nav,
+   monospace voice on the entry summary, dot-bullet on the section title. */
+
+[data-theme="ds3"] .journal-page .journal-list-header h2 {
+  position: relative;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds3"] .journal-page .journal-list-header h2::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .journal-page .journal-nav {
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  background-position: top left;
+  padding-top: var(--space-4);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="ds3"] .journal-page .journal-empty-state,
+[data-theme="ds3"] .journal-page .journal-detail-empty {
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="ds2"] .journal-page .journal-content {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Hero (shared component)
+   Renders as bare HTML elements without these classes; classes were
+   added in src/components/shared/Hero.tsx. (#1159 root cause)
+   ═══════════════════════════════════════════════════════════════ */
+
+.component-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 10rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-accent) 10%, var(--color-surface)) 0%,
+    var(--color-surface) 70%
+  );
+  isolation: isolate;
+}
+
+.component-hero:has(.component-hero-image) {
+  min-height: clamp(12rem, 30vw, 22rem);
+}
+
+.component-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Top feather — pseudo-element softens the join between image and the solid
+   overlay bar below. Sits above the image but below the overlay content. */
+
+.component-hero:has(.component-hero-image)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6rem;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    var(--color-surface) 0%,
+    color-mix(in oklab, var(--color-surface) 60%, transparent) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.component-hero-overlay {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface);
+}
+
+.component-hero:not(:has(.component-hero-image)) .component-hero-overlay {
+  background: transparent;
+}
+
+.component-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 64rem;
+}
+
+.component-hero-title {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.component-hero-subtitle {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.component-hero-badge {
+  margin-top: var(--space-2);
+}
+
+.component-hero-actions {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 2;
+}
+
+/* DS1 — Drafting Table: sharp 2px chrome, monospace uppercase subtitle as an
+   eyebrow, accent rule down the overlay's left edge. */
+
+[data-theme="ds1"] .component-hero {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .component-hero-overlay {
+  border-left: 2px solid var(--color-accent);
+  padding: var(--space-4) var(--space-5);
+}
+
+[data-theme="ds1"] .component-hero-title {
+  font-family: var(--font-interface);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds1"] .component-hero-subtitle {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* DS2 — Warm Earth: soft 1rem radius, narrative serif title, italic subtitle,
+   fade-up entrance, no internal rules. */
+
+[data-theme="ds2"] .component-hero {
+  border-radius: 1rem;
+  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+[data-theme="ds2"] .component-hero-overlay {
+  padding: clamp(var(--space-4), 2vw, var(--space-6))
+    clamp(var(--space-5), 3vw, var(--space-6));
+}
+
+[data-theme="ds2"] .component-hero-title {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds2"] .component-hero-subtitle {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1.0625rem;
+  color: var(--color-text-secondary);
+}
+
+/* DS3 — Mechanical Manuscript: rounded-square radii, italic narrative title
+   with a dotted divider above it, monospace dot-bullet subtitle. */
+
+[data-theme="ds3"] .component-hero {
+  border-radius: var(--radius-md);
+  border-color: var(--color-border-strong);
+}
+
+[data-theme="ds3"] .component-hero-overlay {
+  padding: var(--space-4) var(--space-5);
+}
+
+[data-theme="ds3"] .component-hero-title {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 500;
+}
+
+[data-theme="ds3"] .component-hero-subtitle {
+  position: relative;
+  padding-top: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .component-hero-subtitle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="ds2"] .component-hero {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SectionWrapper (shared component)
+   Bare divs since #1051 Tailwind cleanup — adds card chrome that
+   consumers (EndingScreen, etc.) rely on for visual structure.
+   ═══════════════════════════════════════════════════════════════ */
+
+.component-section-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.component-section-wrapper-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-section-wrapper-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-family: var(--font-interface);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+[data-theme="ds1"] .component-section-wrapper {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .component-section-wrapper-title {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds2"] .component-section-wrapper {
+  border-radius: 1rem;
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
+}
+
+[data-theme="ds2"] .component-section-wrapper-title {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.25rem;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds3"] .component-section-wrapper {
+  border-color: var(--color-border-strong);
+}
+
+[data-theme="ds3"] .component-section-wrapper-title {
+  position: relative;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds3"] .component-section-wrapper-title::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EndingScreen — story conclusion page.
+   Same #1051 bare-divs damage as Hero/SectionWrapper before this
+   commit; identifying classes added in EndingScreen.tsx so the page
+   reads as styled across DS1/DS2/DS3.
+   ═══════════════════════════════════════════════════════════════ */
+
+.component-ending-screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-5);
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.component-ending-screen-hero {
+  position: relative;
+}
+
+.component-ending-screen-hero-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: clamp(14rem, 32vw, 22rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-accent) 15%, var(--color-surface)) 0%,
+    var(--color-surface) 70%
+  );
+  isolation: isolate;
+}
+
+.component-ending-screen-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.component-ending-screen-hero-frame:has(.component-ending-screen-hero-image)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6rem;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    var(--color-surface) 0%,
+    color-mix(in oklab, var(--color-surface) 60%, transparent) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.component-ending-screen-hero-overlay {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface);
+}
+
+.component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image))
+  .component-ending-screen-hero-overlay {
+  background: transparent;
+}
+
+.component-ending-screen-hero-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.component-ending-screen-hero-title {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+}
+
+.component-ending-screen-hero-meta {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.component-ending-screen-hero-placeholder,
+.component-ending-screen-hero-loading,
+.component-ending-screen-hero-error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  font-family: var(--font-interface);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.component-ending-screen-hero-loading-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.component-ending-screen-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.component-ending-screen-achievements {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-ending-screen-achievement {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+}
+
+.component-ending-screen-achievement-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.component-ending-screen-achievement-title {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-ending-screen-achievement-description {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds1"] .component-ending-screen-hero-frame {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .component-ending-screen-hero-title {
+  font-family: var(--font-interface);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds1"] .component-ending-screen-hero-meta {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .component-ending-screen-achievement {
+  border-radius: 2px;
+  border-width: 2px;
+  border-left: 4px solid var(--color-accent);
+}
+
+[data-theme="ds2"] .component-ending-screen-hero-frame {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .component-ending-screen-hero-meta {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1.0625rem;
+}
+
+[data-theme="ds2"] .component-ending-screen-achievement {
+  border-radius: 1rem;
+}
+
+[data-theme="ds3"] .component-ending-screen-hero-frame {
+  border-color: var(--color-border-strong);
+}
+
+[data-theme="ds3"] .component-ending-screen-hero-title {
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-weight: 500;
+}
+
+[data-theme="ds3"] .component-ending-screen-hero-meta {
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .component-ending-screen-achievement {
+  border-color: var(--color-border-strong);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Form Controls
    ═══════════════════════════════════════════════════════════════ */

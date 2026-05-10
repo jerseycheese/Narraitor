@@ -164,44 +164,89 @@ export function GuidedFirstTimeExperience() {
   // Memoized render functions for performance
   const renderWelcomeStep = useMemo(
     () => (
-      <div data-testid="guided-experience-container">
-        <div>
+      <div
+        className="component-guided-first-time-welcome"
+        data-testid="guided-experience-container"
+      >
+        <div className="component-guided-first-time-welcome-lede">
           <p>Create a world and start a story</p>
         </div>
 
         {/* How it Works */}
-        <section>
-          <div role="list" aria-label="Steps to get started">
-            <div role="listitem">
-              {/* Background Icon */}
-              <Globe aria-hidden="true" />
-              <div>
-                <div aria-hidden="true">1</div>
-                <h4>Build Your World</h4>
-                <p>
+        <section className="component-guided-first-time-steps">
+          <div
+            className="component-guided-first-time-steps-list"
+            role="list"
+            aria-label="Steps to get started"
+          >
+            <div
+              className="component-guided-first-time-step-item"
+              role="listitem"
+            >
+              <Globe
+                className="component-guided-first-time-step-icon"
+                aria-hidden="true"
+              />
+              <div className="component-guided-first-time-step-body">
+                <div
+                  className="component-guided-first-time-step-num"
+                  aria-hidden="true"
+                >
+                  1
+                </div>
+                <h4 className="component-guided-first-time-step-heading">
+                  Build Your World
+                </h4>
+                <p className="component-guided-first-time-step-copy">
                   Create or generate unique worlds with custom rules and
                   settings
                 </p>
               </div>
             </div>
-            <div role="listitem">
-              {/* Background Icon */}
-              <Users aria-hidden="true" />
-              <div>
-                <div aria-hidden="true">2</div>
-                <h4>Create Characters</h4>
-                <p>
+            <div
+              className="component-guided-first-time-step-item"
+              role="listitem"
+            >
+              <Users
+                className="component-guided-first-time-step-icon"
+                aria-hidden="true"
+              />
+              <div className="component-guided-first-time-step-body">
+                <div
+                  className="component-guided-first-time-step-num"
+                  aria-hidden="true"
+                >
+                  2
+                </div>
+                <h4 className="component-guided-first-time-step-heading">
+                  Create Characters
+                </h4>
+                <p className="component-guided-first-time-step-copy">
                   Design or generate playable characters that fit your world
                 </p>
               </div>
             </div>
-            <div role="listitem">
-              {/* Background Icon */}
-              <Play aria-hidden="true" />
-              <div>
-                <div aria-hidden="true">3</div>
-                <h4>Start Playing</h4>
-                <p>Make choices and shape your story</p>
+            <div
+              className="component-guided-first-time-step-item"
+              role="listitem"
+            >
+              <Play
+                className="component-guided-first-time-step-icon"
+                aria-hidden="true"
+              />
+              <div className="component-guided-first-time-step-body">
+                <div
+                  className="component-guided-first-time-step-num"
+                  aria-hidden="true"
+                >
+                  3
+                </div>
+                <h4 className="component-guided-first-time-step-heading">
+                  Start Playing
+                </h4>
+                <p className="component-guided-first-time-step-copy">
+                  Make choices and shape your story
+                </p>
               </div>
             </div>
           </div>
@@ -213,10 +258,14 @@ export function GuidedFirstTimeExperience() {
 
   const renderConceptStep = useMemo(
     () => (
-      <div>
-        <div>
-          <h2>World Concept</h2>
-          <p>Create an RPG in any fictional universe or original setting</p>
+      <div className="component-guided-first-time-concept">
+        <div className="component-guided-first-time-step-header">
+          <h2 className="component-guided-first-time-step-title">
+            World Concept
+          </h2>
+          <p className="component-guided-first-time-step-description">
+            Create an RPG in any fictional universe or original setting
+          </p>
         </div>
 
         <WorldTypeSelector
@@ -268,10 +317,12 @@ export function GuidedFirstTimeExperience() {
     const isGenreOptional = isSetWithin || isInspiredBy;
 
     return (
-      <div>
-        <div>
-          <h2>World Details</h2>
-          <p>
+      <div className="component-guided-first-time-details">
+        <div className="component-guided-first-time-step-header">
+          <h2 className="component-guided-first-time-step-title">
+            World Details
+          </h2>
+          <p className="component-guided-first-time-step-description">
             {isGenreOptional
               ? 'Give your world a name and optionally override the genre'
               : 'Give your world a name and genre'}
@@ -387,12 +438,17 @@ export function GuidedFirstTimeExperience() {
   }, [confirmationState.pendingData, wizard.handlers]);
 
   return (
-    <WizardContainer title="First time?">
-      <div>
-        {renderCurrentStep()}
+    <WizardContainer
+      title="First time?"
+      className="component-guided-first-time"
+    >
+      <div className="component-guided-first-time-wrapper">
+        <div className="component-guided-first-time-step">
+          {renderCurrentStep()}
+        </div>
 
-        <div>
-          <div>
+        <div className="component-guided-first-time-nav">
+          <div className="component-guided-first-time-nav-row">
             {!wizard.isFirstStep && (
               <Button onClick={wizard.handlers.handleBack} variant="outline">
                 Back
@@ -423,14 +479,14 @@ export function GuidedFirstTimeExperience() {
         </div>
 
         {/* Skip option */}
-        <div>
+        <div className="component-guided-first-time-skip">
           <Button onClick={wizard.handlers.handleCancel} variant="link">
             Skip for now
           </Button>
         </div>
 
         {wizard.currentError && (
-          <div>
+          <div className="component-guided-first-time-error">
             <p>{wizard.currentError}</p>
           </div>
         )}
