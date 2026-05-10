@@ -19,9 +19,9 @@ import {
   PlayerCharacterThreadUpdate,
   CharacterRelationshipUpdate,
 } from '../types/world-state.types';
+import { useWorldStore } from './worldStore';
+import { useSessionStore } from './sessionStore';
 
-let worldStoreModule: typeof import('./worldStore') | null = null;
-let sessionStoreModule: typeof import('./sessionStore') | null = null;
 let characterStoreModule: typeof import('./characterStore') | null = null;
 let journalStoreModule: typeof import('./journalStore') | null = null;
 
@@ -139,18 +139,10 @@ async function applyWorldStateThreadUpdates({
   isFirstSegment,
 }: WorldStateUpdateParams): Promise<void> {
   try {
-    if (!sessionStoreModule) {
-      sessionStoreModule = await import('./sessionStore');
-    }
-    if (!worldStoreModule) {
-      worldStoreModule = await import('./worldStore');
-    }
     if (!characterStoreModule) {
       characterStoreModule = await import('./characterStore');
     }
 
-    const { useSessionStore } = sessionStoreModule!;
-    const { useWorldStore } = worldStoreModule!;
     const { useCharacterStore } = characterStoreModule!;
 
     const sessionStore = useSessionStore.getState();
@@ -1105,10 +1097,6 @@ export const useNarrativeStore = create<NarrativeStore>()(
     const payload = worldStatePayload;
     if (payload) {
       try {
-        if (!worldStoreModule) {
-          worldStoreModule = eval('require("./worldStore")');
-        }
-        const { useWorldStore } = worldStoreModule!;
         useWorldStore.getState().updateWorldState(
           payload.worldId,
           {
@@ -1371,10 +1359,6 @@ export const useNarrativeStore = create<NarrativeStore>()(
     }));
 
     try {
-      if (!sessionStoreModule) {
-        sessionStoreModule = eval('require("./sessionStore")');
-      }
-      const { useSessionStore } = sessionStoreModule!;
       useSessionStore.getState().setSessionLifecycleStatus(sessionId, 'ended');
     } catch (error) {
       logger.warn('Failed to propagate session lifecycle status on ending', error);
