@@ -243,7 +243,7 @@ The app separates concerns into clear domains:
 
 **Security**: API keys stay server-side. All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse.
 
-**Design System**: Three structurally-different design systems (DS1/DS2/DS3) ship together; the user picks one. See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts), [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for the rationale, and [public_docs/design-system/](public_docs/design-system/) for the full reference. Visual canon lives in the `/dev/design-system{,-2,-3}` showcase routes and in **Storybook** (`npm run storybook`) — the Storybook toolbar has a DS1/DS2/DS3 + light/dark switcher.
+**Design System**: Three structurally-different design systems (DS1/DS2/DS3) ship together; the user picks one. See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts), [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for the rationale, and [public_docs/design-system/](public_docs/design-system/) for the full reference. Canon order is **showcase routes (`/dev/design-system{,-2,-3}`) > Storybook (`npm run storybook`) > app** — Storybook's toolbar has a DS1/DS2/DS3 + light/dark switcher for verifying components across all six combinations.
 
 ## AI Integration Details
 

@@ -49,15 +49,17 @@ DS1 is the default. Light + dark mode are layered on top via a separate `dark` c
 ## Adding to the system
 
 - **New token?** Add it to all three theme files (`ds1.css`, `ds2.css`, `ds3.css`) — both light and dark blocks. Don't add to one and let the others fall back to undefined.
-- **New component?** Build against tokens, not raw values. Add a Storybook story alongside the component. Verify in all three showcase pages and in Storybook (DS1/DS2/DS3 + light/dark) before merging.
+- **New component?** Build against tokens, not raw values. Add a Storybook story alongside the component. Verify the showcase pages first (canon), then Storybook (DS1/DS2/DS3 × light/dark), then a real production route, before merging.
 - **New per-theme variation on an existing component?** Don't branch in JSX. Add a CSS variable for the property that needs to vary; let each theme set its own value. If the variation is structural enough that a CSS variable can't carry it, rethink the component before forking it.
 - **Fourth theme?** Add `dsN.css`, register it in [src/lib/theme/index.ts](../../src/lib/theme/index.ts), add a showcase page, update `ThemeProvider`'s `readStoredTheme` validation, and add the new theme to the Storybook toolbar in [.storybook/preview.tsx](../../.storybook/preview.tsx).
 
 ## Verifying visual changes
 
+**Canon order: showcase pages > Storybook > app.** When the three disagree, the showcase pages win.
+
 In order:
 
-1. **Storybook** for the affected component(s). Use the theme switcher to flip DS1/DS2/DS3 and light/dark. Catches token regressions at the component level.
-2. **Showcase pages** — `/dev/design-system{,-2,-3}` and the `/session/` subroutes. Catches drift from canon at the page level.
-3. **Real production routes** — walk the actual user flow that exercises the change. Token-level fixes can pass Storybook and showcase but still break in real flows where data shape, async loading, or layout context shifts behavior.
+1. **Showcase pages** — `/dev/design-system{,-2,-3}` and the `/session/` subroutes. The highest authority. If your change drifts from canon here, the change is wrong (not the canon).
+2. **Storybook** — `npm run storybook`. Component-level reference. Use the toolbar switcher to flip DS1/DS2/DS3 and light/dark. Should match the showcase; if it doesn't, fix Storybook to match canon.
+3. **Real production routes** — walk the actual user flow that exercises the change. Token-level fixes can pass showcase and Storybook but still break in real flows where data shape, async loading, or layout context shifts behavior.
 4. **Visual regression suite** — `npm run test:visual`. See [visual-regression-testing.md](../development/visual-regression-testing.md). Multi-theme baselines stabilization is tracked in [#1198](https://github.com/jerseycheese/Narraitor/issues/1198).
