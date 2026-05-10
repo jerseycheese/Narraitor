@@ -8,6 +8,12 @@ AI-powered storytelling app that basically lets you play through narrative RPG e
 
 The core idea came from wanting tabletop RPG experiences that could happen anytime, without coordinating schedules or finding a game master. Narraitor uses Google's Gemini AI to generate dynamic stories that respond to your choices, but here's the key part: it's not just generic fantasy. You define your world's rules, attributes, and tone, and the AI storytelling adapts to match exactly what you're going for.
 
+## Branches
+
+The repo has two branches that matter. `main` is the latest tagged release and the default clone target — pin here if you want something stable. `develop` is the rolling integration line where in-flight work lands, so it may include partial features at any given moment. Contributor PRs should target `develop`.
+
+Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
+
 ## Key Features
 
 **World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
