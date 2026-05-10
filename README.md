@@ -243,6 +243,8 @@ The app separates concerns into clear domains:
 
 **Security**: API keys stay server-side. All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse.
 
+**Design System**: Three structurally-different design systems (DS1/DS2/DS3) ship together; the user picks one. See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts), [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for the rationale, and [public_docs/design-system/](public_docs/design-system/) for the full reference.
+
 ## AI Integration Details
 
 The AI system routes everything through Next.js API endpoints (`/api/narrative/generate`, `/api/narrative/choices`) for security. Your API key never touches the browser.

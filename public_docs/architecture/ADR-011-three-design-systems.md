@@ -91,6 +91,8 @@ The `data-theme` attribute approach won out because it's cheap, it's reversible,
 
 ## Related Decisions
 
+- [DESIGN.md](../../DESIGN.md) — AI-readable companion at the repo root: tokens, components, and the do's/don'ts list distilled from this migration
+- [Design system overview](../design-system/README.md) — landing page for the design-system docs
 - [Architecture Decisions index](architecture-decisions.md) — high-level decision summary, including the older Tailwind/shadcn choices that this ADR builds on
 - [Design tokens documentation](../design-system/design-tokens.md) — the three-tier token model that informs how variables are organized within each theme file
 - [shadcn integration guide](../design-system/shadcn-integration-guide.md) — the shadcn-aligned token surface; reconcile the radius docs against #1203
