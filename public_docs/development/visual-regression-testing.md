@@ -15,6 +15,8 @@ Regular testing catches functional bugs but completely misses when your UI break
 
 Visual tests solve this by taking screenshots and comparing them to baseline images. If anything changes beyond acceptable thresholds, the test fails. It's like having a designer review every UI change automatically.
 
+> **Multi-theme note**: Since the [DS migration](../architecture/ADR-011-three-design-systems.md), any visual change has to be checked against all three themes (DS1, DS2, DS3), not just the default. The current baselines and helpers cover all three; stabilization work for tour and world-detail specs across themes is tracked in [#1198](https://github.com/jerseycheese/Narraitor/issues/1198).
+
 ## How It Works
 
 Our visual testing setup:

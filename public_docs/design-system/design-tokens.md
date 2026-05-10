@@ -11,6 +11,8 @@ updated: 2025-06-15
 
 Design tokens manage colors, spacing, typography, and elevation across the app via CSS custom properties. Every visual value consumed by components comes from token variables scoped to the active design system and color scheme.
 
+For the design rationale behind having three structurally-different design systems instead of one — and how that shapes the token model below — see [ADR-011](../architecture/ADR-011-three-design-systems.md).
+
 ## Architecture Overview
 
 The token system uses a three-tier hierarchy of CSS custom properties, defined per-theme in dedicated CSS files:

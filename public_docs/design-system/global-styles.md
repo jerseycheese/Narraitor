@@ -11,6 +11,8 @@ updated: 2025-06-15
 
 The global styling system provides a theme-aware foundation built on CSS custom properties and Tailwind CSS v4. Three design systems (DS1, DS2, DS3) with light and dark modes are fully supported — components consume tokens through `var()` and adapt automatically when the user switches themes.
 
+For the rationale behind having three design systems (and the structural-differentiation principle that shaped the per-theme CSS files referenced below), see [ADR-011](../architecture/ADR-011-three-design-systems.md).
+
 ## CSS Architecture
 
 The styling stack loads in this order:
