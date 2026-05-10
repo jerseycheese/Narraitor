@@ -1640,8 +1640,7 @@
 
 [data-theme="ds2"] .component-guided-first-time {
   border-radius: 1rem;
-  padding: clamp(var(--space-5), 3vw, var(--space-6))
-    clamp(var(--space-5), 3vw, var(--space-6));
+  padding: clamp(var(--space-5), 3vw, var(--space-6));
 }
 
 [data-theme="ds2"] .component-guided-first-time .wizard-title {
