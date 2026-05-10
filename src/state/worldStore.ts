@@ -12,16 +12,12 @@ import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/wo
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world';
 import Logger from '@/lib/utils/logger';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
+import { useSessionStore } from './sessionStore';
 
 const logger = new Logger('WorldStore');
-let sessionStoreModule: typeof import('./sessionStore') | null = null;
 
 const resolveSessionStatus = (sessionId: EntityID) => {
   try {
-    if (!sessionStoreModule) {
-      sessionStoreModule = eval('require("./sessionStore")');
-    }
-    const { useSessionStore } = sessionStoreModule!;
     return useSessionStore.getState().getSessionLifecycle(sessionId)?.status;
   } catch (error) {
     logger.warn('Failed to resolve session status', { sessionId, error });
