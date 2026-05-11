@@ -4004,7 +4004,7 @@ body.manuscript-overlay-open {
 
 [data-theme="ds3"] .manuscript-suggested-action {
   position: relative;
-  padding: var(--space-4) 1.25rem var(--space-4) 1.4375rem;
+  padding: var(--space-4) 1.25rem var(--space-4) 2.5rem;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
