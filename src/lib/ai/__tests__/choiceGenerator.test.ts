@@ -260,5 +260,72 @@ Options:
         expect(skillRequirements.length).toBeGreaterThan(0);
       });
     });
+
+    it('replaces invalid AI skill requirements with deterministic world skill fallbacks', async () => {
+      const { useWorldStore } = require('@/state/worldStore');
+      (useWorldStore.getState as jest.Mock).mockReturnValue({
+        worlds: {
+          'world-1': {
+            id: 'world-1',
+            name: 'Test World',
+            description: 'A test world for unit tests',
+            genre: 'fantasy',
+            attributes: [],
+            settings: {
+              maxAttributes: 6,
+              maxSkills: 12,
+              attributePointPool: 27,
+              skillPointPool: 40,
+            },
+            skills: [
+              {
+                id: 'skill-hacking',
+                worldId: 'world-1',
+                name: 'Hacking',
+                description: 'Manipulate digital systems',
+                difficulty: 'medium',
+                baseValue: 3,
+                minValue: 1,
+                maxValue: 10,
+              },
+              {
+                id: 'skill-systems',
+                worldId: 'world-1',
+                name: 'Systems',
+                description: 'Understand infrastructure',
+                difficulty: 'medium',
+                baseValue: 3,
+                minValue: 1,
+                maxValue: 10,
+              },
+            ],
+          },
+        },
+        currentWorldId: 'world-1',
+      });
+
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: `Decision: What will you do?
+
+Options:
+1. [Neutral] Talk your way past the gate
+Requirements: Persuasion 5+
+2. [Neutral] Override the security terminal
+Requirements: Systems 3+
+3. [Chaotic] Trigger a false alarm
+Requirements: skill-from-other-world 4+`,
+        finishReason: 'STOP',
+      });
+
+      const result = await choiceGenerator.generateChoices({
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      expect(result.options[0].requirements?.[0].targetId).toBe('skill-hacking');
+      expect(result.options[1].requirements?.[0].targetId).toBe('skill-systems');
+      expect(result.options[2].requirements?.[0].targetId).toBe('skill-hacking');
+    });
   });
 });

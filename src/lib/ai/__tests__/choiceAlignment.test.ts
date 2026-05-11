@@ -138,6 +138,19 @@ Options:
     });
 
     it('should use aligned template when useAlignedChoices is true', async () => {
+      mockWorld.skills = [
+        {
+          id: 'hacking',
+          worldId: 'test-world',
+          name: 'Hacking',
+          description: 'Manipulate digital systems',
+          difficulty: 'medium',
+          baseValue: 3,
+          minValue: 1,
+          maxValue: 10,
+        },
+      ];
+
       const mockResponse = `Decision: What will you do?
 
 Options:
@@ -166,7 +179,16 @@ Options:
         expect.stringContaining('SKILL REQUIREMENTS (CRITICAL FOR MVP)')
       );
       expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('Requirements: [Optional - SkillName X+]')
+        expect.stringContaining('AVAILABLE SKILLS IN THIS WORLD')
+      );
+      expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
+        expect.stringContaining('Hacking: Manipulate digital systems')
+      );
+      expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
+        expect.stringContaining('ONLY use the exact skill names')
+      );
+      expect(mockGeminiClient.generateContent).not.toHaveBeenCalledWith(
+        expect.stringContaining('Persuasion for social encounters')
       );
     });
 

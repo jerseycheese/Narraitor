@@ -91,6 +91,72 @@ Requirements: [Lock Picking 6+]
     });
   });
 
+  it('parses skill requirements by exact active-world skill id', () => {
+    const world = createMockWorld({
+      id: 'world-1',
+      skills: [
+        {
+          id: 'skill-hacking',
+          worldId: 'world-1',
+          name: 'Hacking',
+          description: 'Manipulate digital systems',
+          difficulty: 'medium',
+          baseValue: 1,
+          minValue: 0,
+          maxValue: 10,
+        },
+      ],
+    });
+
+    const content = `Decision Weight: [minor]
+Context Summary: A sealed terminal blocks your path.
+Decision: What do you do?
+
+1. [Neutral] Override the terminal lock
+Requirements: skill-hacking 5+`;
+
+    const decision = parseChoiceResponse(content, narrativeContext, world);
+
+    expect(decision.options[0].requirements?.[0]).toEqual({
+      type: 'skill',
+      targetId: 'skill-hacking',
+      operator: 'gte',
+      value: 5,
+    });
+  });
+
+  it('rejects skill names and ids that are not in the active world', () => {
+    const world = createMockWorld({
+      id: 'world-1',
+      skills: [
+        {
+          id: 'skill-hacking',
+          worldId: 'world-1',
+          name: 'Hacking',
+          description: 'Manipulate digital systems',
+          difficulty: 'medium',
+          baseValue: 1,
+          minValue: 0,
+          maxValue: 10,
+        },
+      ],
+    });
+
+    const content = `Decision Weight: [minor]
+Context Summary: The party reaches a guarded archive.
+Decision: What do you do?
+
+1. [Lawful] Talk your way past the guard
+Requirements: Persuasion 4+
+2. [Neutral] Use another world's skill id
+Requirements: skill-from-other-world 5+`;
+
+    const decision = parseChoiceResponse(content, narrativeContext, world);
+
+    expect(decision.options[0].requirements).toBeUndefined();
+    expect(decision.options[1].requirements).toBeUndefined();
+  });
+
   it('strips inline skill requirement annotations from option text', () => {
     const world = createMockWorld({
       id: 'world-1',
