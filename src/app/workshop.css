@@ -519,6 +519,24 @@
   flex-shrink: 0;
 }
 
+/* ─── DS3 — Mechanical Manuscript: dotted card border + bullet section label ─── */
+
+[data-theme="ds3"] .workshop-sidebar-world-item[data-active="true"] {
+  border-style: dotted;
+}
+
+[data-theme="ds3"] .workshop-sidebar-section-label::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  margin-right: var(--space-1);
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
 .workshop-workspace {
   flex: 1;
   min-width: 0;
