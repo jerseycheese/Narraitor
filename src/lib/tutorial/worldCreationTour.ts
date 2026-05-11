@@ -7,7 +7,7 @@ export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-type-selector"]',
     content: 'Welcome to the World Creation Wizard! You can choose a path: start from scratch on the left, or use a template on the right.',
-    placement: 'top',
+    placement: 'center',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
     hideBackButton: true,

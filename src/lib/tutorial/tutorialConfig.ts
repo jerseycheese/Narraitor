@@ -55,7 +55,9 @@ export const joyrideOptions = {
   floaterProps: {
     modifiers: {
       flip: {
-        fallbackPlacements: ['bottom', 'top'],
+        options: {
+          fallbackPlacements: ['bottom', 'top', 'left', 'right'],
+        },
       },
     },
   },
