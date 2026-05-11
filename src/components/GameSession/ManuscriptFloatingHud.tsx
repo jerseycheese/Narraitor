@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTheme } from '@/lib/theme/ThemeProvider';
-import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History, Home } from 'lucide-react';
+import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History, X } from 'lucide-react';
 
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
@@ -258,11 +258,11 @@ function DS3FloatingPill({
           <button
             type="button"
             onClick={onBack}
-            title="Exit to Dashboard"
-            aria-label="Exit to Dashboard"
+            title="Close"
+            aria-label="Close"
             className="manuscript-hud-icon-button"
           >
-            <Home size={16} aria-hidden="true" />
+            <X size={16} aria-hidden="true" />
           </button>
           <button
             type="button"

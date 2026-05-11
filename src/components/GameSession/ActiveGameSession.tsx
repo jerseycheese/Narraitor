@@ -447,10 +447,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               <button
                 type="button"
                 onClick={onBack}
-                title="Exit to Dashboard"
+                title="Close"
                 className="manuscript-hud-text-button"
               >
-                Exit
+                Close
               </button>
             </div>
           )}

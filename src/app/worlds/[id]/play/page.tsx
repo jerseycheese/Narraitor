@@ -70,7 +70,7 @@ export default function PlayPage() {
         worldId={worldId} 
         disableAutoResume={disableAutoResume}
         onStartNew={handleStartNewClick}
-        onBack={() => router.push('/')}
+        onBack={() => router.push(`/worlds/${worldId}`)}
       />
 
       {/* Confirmation dialog for starting new session */}
