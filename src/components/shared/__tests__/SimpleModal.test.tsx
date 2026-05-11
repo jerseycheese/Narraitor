@@ -46,16 +46,6 @@ describe('SimpleModal', () => {
     expect(document.querySelector('[data-scroll-container="content"]')).toBeNull();
   });
 
-  it('centers overlay content when it fits using auto margins', () => {
-    render(
-      <SimpleModal isOpen={true} onClose={jest.fn()} title="Generate World">
-        <div>Modal content</div>
-      </SimpleModal>,
-    );
-
-    const dialog = screen.getByRole('dialog');
-  });
-
   it('supports content scrolling when requested', () => {
     render(
       <SimpleModal
