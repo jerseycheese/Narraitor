@@ -207,6 +207,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       <WizardFormSection
         title="Getting Started"
         description="Choose how you'd like to create your world - use existing templates, generate automatically, or start from scratch."
+        dataTutorial="world-creation-header"
       >
         <div
           className="wizard-template-mode-grid"
