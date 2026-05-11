@@ -424,6 +424,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
             showProgress={tourOptions.showProgress}
             showSkipButton={tourOptions.showSkipButton}
             disableScrolling={tourOptions.disableScrolling}
+            floaterProps={tourOptions.floaterProps}
             styles={joyrideStyles}
             callback={handleJoyrideCallback}
             disableOverlayClose={true}

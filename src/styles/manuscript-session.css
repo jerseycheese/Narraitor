@@ -278,6 +278,48 @@ body.manuscript-overlay-open {
   color: var(--color-accent);
 }
 
+/* DS3 — Mechanical Manuscript: italic interface heading, monospace bullet eyebrow */
+[data-theme="ds3"] .play-page-shell > div > div > header h1 {
+  font-family: var(--font-interface);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--color-text-primary);
+}
+
+[data-theme="ds3"] .play-page-shell > div > div > header p {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .play-page-shell > div > div > header p::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .play-page-active > div > div > header h1 {
+  font-family: var(--font-interface);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds3"] .play-page-active > div > div > header p {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .play-page-active > div > div > header p::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
 .manuscript-main-stage {
   display: grid;
   gap: var(--space-4);
@@ -3962,7 +4004,7 @@ body.manuscript-overlay-open {
 
 [data-theme="ds3"] .manuscript-suggested-action {
   position: relative;
-  padding: var(--space-4) 1.25rem var(--space-4) 1.4375rem;
+  padding: var(--space-4) 1.25rem var(--space-4) 2.5rem;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
