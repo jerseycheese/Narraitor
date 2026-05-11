@@ -1,8 +1,4 @@
 import { NarrativeContext } from '@/types/narrative.types';
-import {
-  buildAvailableSkillsSection,
-  buildSkillRequirementGuidance,
-} from './choiceSkillRequirementGuidance';
 
 interface PlayerChoiceTemplateContext {
   worldName: string;
@@ -46,8 +42,12 @@ export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): str
     shortContext = `${firstPart}\n\n[...narrative continues...]\n\n${lastPart}`;
   }
 
-  const skillsInfo = buildAvailableSkillsSection(worldSkills);
-  const skillRequirementGuidance = buildSkillRequirementGuidance();
+  let skillsInfo = '';
+  if (worldSkills && worldSkills.length > 0) {
+    skillsInfo = `
+AVAILABLE SKILLS IN THIS WORLD:
+${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
+  }
   
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
@@ -86,7 +86,15 @@ REQUIREMENTS:
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
-${skillRequirementGuidance}
+SKILL REQUIREMENTS (CRITICAL FOR MVP):
+Generate choices with skill requirements only when the situation naturally calls for specialized abilities AND the skill exists in the "AVAILABLE SKILLS" list:
+- ONLY use the exact skill names from the "AVAILABLE SKILLS" list provided above.
+- NEVER invent new skills or use generic skills (like "Stealth", "Persuasion", "Athletics", etc.) unless they are explicitly listed in the "AVAILABLE SKILLS" for this world.
+- If NO "AVAILABLE SKILLS" are listed for this world, do NOT include any "Requirements:" lines in your options.
+- Analyze the current scene for opportunities where the provided world skills would logically apply.
+- Include a mix of skill-required and non-skill choices for player agency
+- Vary skill requirements across choices - use different character abilities when possible
+- Format skill requirements as: Requirements: SkillName X+
 
 DECISION WEIGHT ANALYSIS:
 Carefully evaluate the narrative situation and determine the significance of this decision:

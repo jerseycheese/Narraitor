@@ -130,21 +130,12 @@ const ensureSkillChecksForAllOptions = (
   const worldSkills = world.skills ?? [];
 
   decision.options = decision.options.map((option, index) => {
-    // Filter out any skill requirements that don't match active world skills
-    const validRequirements = (option.requirements ?? []).filter((req) => {
-      if (req.type !== 'skill') return true;
-      return worldSkills.some((ws) => ws.id === req.targetId);
-    });
+    const hasSkillRequirement =
+      option.requirements?.some((requirement) => requirement.type === 'skill') ??
+      false;
 
-    const hasValidSkillRequirement = validRequirements.some(
-      (requirement) => requirement.type === 'skill'
-    );
-
-    if (hasValidSkillRequirement) {
-      return {
-        ...option,
-        requirements: validRequirements,
-      };
+    if (hasSkillRequirement) {
+      return option;
     }
 
     const skillRequirement = createFallbackSkillRequirement(
@@ -156,7 +147,7 @@ const ensureSkillChecksForAllOptions = (
 
     return {
       ...option,
-      requirements: [...validRequirements, skillRequirement],
+      requirements: [...(option.requirements ?? []), skillRequirement],
     };
   });
 

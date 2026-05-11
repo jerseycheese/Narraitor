@@ -251,23 +251,16 @@ const parseSkillRequirementText = (
     return null;
   }
 
-  const skillNameOrId = safeTrim(skillMatch[1]).replace(/\s+/g, ' ');
-  const normalizedSearch = skillNameOrId.toLowerCase();
+  const skillName = safeTrim(skillMatch[1]).replace(/\s+/g, ' ');
+  const normalizedSkillName = skillName.toLowerCase();
   const level = parseInt(skillMatch[2]);
-
-  // Try exact ID match first
-  let worldSkill = world.skills?.find((ws) => ws.id === skillNameOrId);
-
-  // Then try name match (case-insensitive)
-  if (!worldSkill) {
-    worldSkill = world.skills?.find(
-      (ws) => safeTrim(ws.name).toLowerCase() === normalizedSearch
-    );
-  }
+  const worldSkill = world.skills?.find(
+    (ws) => safeTrim(ws.name).toLowerCase() === normalizedSkillName
+  );
 
   if (!worldSkill) {
     logger.warn(
-      `[ChoiceGenerator] Unknown skill "${skillNameOrId}" (world: ${world.id}) in AI response - skipping requirement`
+      `[ChoiceGenerator] Unknown skill "${skillName}" in AI response - skipping requirement`
     );
     return null;
   }
