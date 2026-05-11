@@ -6,6 +6,11 @@ interface PlayerChoiceTemplateContext {
   genre?: string;
   narrativeContext?: NarrativeContext;
   characterIds?: string[];
+  worldSkills?: Array<{
+    id: string;
+    name: string;
+    description: string;
+  }>;
 }
 
 /**
@@ -13,7 +18,7 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt with 1 lawful, 2 neutral, and 1 chaotic option
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext } = context;
+  const { worldName, genre, narrativeContext, worldSkills } = context;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
@@ -36,6 +41,13 @@ export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): str
     const lastPart = recentContent.slice(-400);
     shortContext = `${firstPart}\n\n[...narrative continues...]\n\n${lastPart}`;
   }
+
+  let skillsInfo = '';
+  if (worldSkills && worldSkills.length > 0) {
+    skillsInfo = `
+AVAILABLE SKILLS IN THIS WORLD:
+${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
+  }
   
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
@@ -45,7 +57,7 @@ LOCATION: ${location || 'Unknown location'}
 SITUATION: ${narrativeContext?.currentSituation || 'General scenario'}
 
 FULL CONTEXT:
-${shortContext}
+${shortContext}${skillsInfo}
 
 === CRITICAL INSTRUCTIONS ===
 You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.
@@ -75,12 +87,14 @@ REQUIREMENTS:
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
 SKILL REQUIREMENTS (CRITICAL FOR MVP):
-Generate choices with skill requirements when the situation naturally calls for specialized abilities:
-- Analyze the current scene for opportunities where skills would logically apply
-- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Persuasion for social encounters, Stealth for avoiding detection, Athletics for physical challenges)
+Generate choices with skill requirements only when the situation naturally calls for specialized abilities AND the skill exists in the "AVAILABLE SKILLS" list:
+- ONLY use the exact skill names from the "AVAILABLE SKILLS" list provided above.
+- NEVER invent new skills or use generic skills (like "Stealth", "Persuasion", "Athletics", etc.) unless they are explicitly listed in the "AVAILABLE SKILLS" for this world.
+- If NO "AVAILABLE SKILLS" are listed for this world, do NOT include any "Requirements:" lines in your options.
+- Analyze the current scene for opportunities where the provided world skills would logically apply.
 - Include a mix of skill-required and non-skill choices for player agency
 - Vary skill requirements across choices - use different character abilities when possible
-- Format skill requirements as: [SkillName X+] where X is the minimum level
+- Format skill requirements as: Requirements: SkillName X+
 
 DECISION WEIGHT ANALYSIS:
 Carefully evaluate the narrative situation and determine the significance of this decision:
