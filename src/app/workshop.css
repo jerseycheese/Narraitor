@@ -1828,10 +1828,12 @@
 /* ─── PageLayout ─── */
 
 .page-layout-header {
+  /* Exception: Requires layout spacing larger than the maximum --space-8 token */
   margin-bottom: 2.5rem;
 }
 
 [data-theme="ds2"] .page-layout-header {
+  /* Exception: Requires layout spacing larger than the maximum --space-8 token */
   margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
