@@ -1802,6 +1802,29 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* ─── Data Table ─── */
+
+.data-table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-4);
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.data-table-pagination-info {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.data-table-pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 /* ─── PageLayout ─── */
 
 .page-layout-header {
@@ -1842,7 +1865,6 @@
   align-items: center;
   gap: var(--space-3);
 }
-
 /* ─── Characters Page Layout ─── */
 
 .characters-toolbar {
@@ -1851,6 +1873,30 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+}
+
+.view-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.view-mode-toggle .button {
+  border: none !important;
+  border-radius: 0 !important;
+  min-height: 2.25rem !important;
+}
+
+.view-mode-toggle .button:first-child {
+  border-right: 1px solid var(--color-border) !important;
+}
+
+.view-mode-toggle .button.active {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
   margin-bottom: var(--space-4);
 }
 

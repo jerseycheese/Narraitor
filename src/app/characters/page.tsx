@@ -524,7 +524,6 @@ export default function CharactersPage() {
       onClick: handleCreateCharacter,
       variant: 'primary' as const,
       icon: <Plus aria-hidden="true" />,
-      flex: true,
     },
     {
       label: 'Generate Character',
@@ -584,7 +583,6 @@ export default function CharactersPage() {
                   onClick: handleCreateCharacter,
                   variant: 'primary',
                   size: 'lg',
-                  flex: true,
                 },
               ]}
             />

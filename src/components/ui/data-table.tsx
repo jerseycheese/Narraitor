@@ -216,12 +216,12 @@ export function DataTable<TData, TValue>({
 
       {/* Pagination */}
       {pagination.showPagination && (
-        <div>
-          <div>
+        <div className="data-table-pagination">
+          <div className="data-table-pagination-info">
             Page {table.getState().pagination.pageIndex + 1} of{' '}
             {table.getPageCount()}
           </div>
-          <div>
+          <div className="data-table-pagination-actions">
             <Button
               variant="outline"
               size="sm"
