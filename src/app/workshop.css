@@ -1873,6 +1873,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
 .view-mode-toggle {
@@ -1897,13 +1898,12 @@
   background: var(--color-surface-hover);
   color: var(--color-text-primary);
 }
-  margin-bottom: var(--space-4);
-}
 
 .characters-body {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  margin-top: var(--space-6);
 }
 
 .characters-grid {
