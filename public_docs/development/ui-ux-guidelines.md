@@ -57,6 +57,14 @@ See [design-tokens.md](../design-system/design-tokens.md) for the full token ref
 
 ## Component Design
 
+### Action Groups & Buttons
+To maintain consistent spacing and unified flexbox behavior across all design systems:
+- **Action Groups**: Never use raw floating `<Button>` clusters for toolbars or card footers. Always wrap buttons in the `<ActionButtonGroup>` or `<CardActionGroup>` components.
+- **Layout Attributes**: Use `layout="horizontal"` or `layout="vertical"` and `gap="sm" | "md" | "lg"` props on action groups to rely on standard design system space tokens instead of ad-hoc padding/margins.
+- **Flexible Primary Actions**: For buttons that should fill available width (like "Play" or "Save"), pass `flex: true` to the action definition. This uses a standardized `flex: 1 1 0%` CSS rule without requiring custom classes.
+- **Page-Level Actions**: Place primary page actions (like "Create World" or "Generate Character") inside the `actions` prop of the `<PageLayout>` component. This ensures they align to the top-right of the page header consistently.
+- **Segmented Controls**: For view toggles (like grid vs. table), wrap buttons in a `.view-mode-toggle` container and set the buttons to `size="icon"`.
+
 ### Interactive Elements
 - **Buttons**: Clear states (default, hover, active, disabled) with proper ARIA attributes
 - **Inputs**: Consistent styling with clear focus states and proper labeling
