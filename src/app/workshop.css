@@ -1828,11 +1828,11 @@
 /* ─── PageLayout ─── */
 
 .page-layout-header {
-  margin-bottom: var(--space-6);
+  margin-bottom: 2.5rem;
 }
 
 [data-theme="ds2"] .page-layout-header {
-  margin-bottom: clamp(var(--space-6), 4vw, var(--space-10));
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
 .page-layout-header-top {
@@ -1873,7 +1873,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  margin-top: var(--space-6);
+  margin-top: var(--space-8);
 }
 
 .view-mode-toggle {
@@ -1903,7 +1903,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  margin-top: var(--space-6);
+  margin-top: var(--space-8);
 }
 
 .characters-grid {
