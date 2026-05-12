@@ -6,7 +6,7 @@ import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
-import { Button } from '@/components/ui/button';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitSection } from './components/PortraitSection';
 import { BasicInfoForm } from './components/BasicInfoForm';
@@ -240,17 +240,31 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       </CollapsibleSection>
       
       <div className="character-editor-actions">
-        <Button variant="destructive" onClick={() => setShowDeleteDialog(true)} disabled={saving}>
-          Delete Character
-        </Button>
-        <div className="character-editor-actions-primary">
-          <Button variant="outline" onClick={handleCancel} disabled={saving}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={saving || !isPoolValid}>
-            {saving ? 'Saving...' : 'Save Changes'}
-          </Button>
-        </div>
+        <ActionButtonGroup
+          layout="horizontal"
+          gap="md"
+          actions={[
+            {
+              label: 'Delete Character',
+              onClick: () => setShowDeleteDialog(true),
+              variant: 'danger',
+              disabled: saving,
+            },
+            {
+              label: 'Cancel',
+              onClick: handleCancel,
+              variant: 'secondary',
+              disabled: saving,
+            },
+            {
+              label: saving ? 'Saving...' : 'Save Changes',
+              onClick: handleSave,
+              variant: 'primary',
+              disabled: saving || !isPoolValid,
+              flex: true,
+            },
+          ]}
+        />
       </div>
 
       <DeleteConfirmationDialog

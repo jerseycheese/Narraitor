@@ -11,14 +11,22 @@ export interface ActionButton {
   icon?: React.ReactNode;
   disabled?: boolean;
   dataTutorial?: string;
+  flex?: boolean;
 }
 
 interface ActionButtonGroupProps {
   actions: ActionButton[];
   className?: string;
+  layout?: 'horizontal' | 'vertical';
+  gap?: 'sm' | 'md' | 'lg';
 }
 
-export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroupProps) {
+export function ActionButtonGroup({ 
+  actions, 
+  className = '',
+  layout = 'horizontal',
+  gap = 'sm'
+}: ActionButtonGroupProps) {
   // Map legacy variants to shadcn/ui variants
   const mapVariant = (variant: string | undefined) => {
     switch (variant) {
@@ -31,7 +39,11 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
   };
 
   return (
-    <div className={`${className}`}>
+    <div 
+      className={`action-button-group ${className}`}
+      data-layout={layout}
+      data-gap={gap}
+    >
       {actions.map((action, index) => (
         <Button
           key={`action-${action.label}-${index}`}
@@ -40,6 +52,7 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
           size={action.size || 'default'}
           disabled={action.disabled}
           data-tutorial={action.dataTutorial}
+          data-flex={action.flex ? 'true' : undefined}
         >
           {action.icon}
           {action.label}

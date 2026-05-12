@@ -53,7 +53,9 @@ export interface CardActionGroupProps {
 export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   primaryActions = [],
   secondaryActions = [],
-  className = ''
+  className = '',
+  layout = 'vertical',
+  gap = 'md'
 }) => {
   const getButtonClasses = (action: CardAction) => {
     const variantClass = action.variant ? `card-action-variant-${action.variant}` : '';
@@ -67,6 +69,7 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
         className={getButtonClasses(action)}
         title={action.title}
         data-testid={action.testId}
+        data-flex={action.flex ? 'true' : undefined}
         type="button"
       >
         {action.icon && (
@@ -78,14 +81,18 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   };
 
   return (
-    <div className={`card-action-group ${className}`}>
+    <div 
+      className={`card-action-group ${className}`}
+      data-layout={layout}
+      data-gap={gap}
+    >
       {primaryActions.length > 0 && (
-        <div>
+        <div className="card-action-row primary">
           {renderActions(primaryActions)}
         </div>
       )}
       {secondaryActions.length > 0 && (
-        <div>
+        <div className="card-action-row secondary">
           {renderActions(secondaryActions)}
         </div>
       )}

@@ -986,19 +986,62 @@
   height: 0.875rem;
 }
 
-.card-action-group {
+.card-action-group,
+.action-button-group {
   display: flex;
+  width: 100%;
+  padding-bottom: var(--space-2);
+}
+
+.card-action-group[data-layout="vertical"],
+.action-button-group[data-layout="vertical"] {
   flex-direction: column;
+}
+
+.card-action-group[data-layout="horizontal"],
+.action-button-group[data-layout="horizontal"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+/* Base gap for groups and rows */
+.card-action-group,
+.action-button-group,
+.card-action-row {
   gap: var(--space-3);
 }
 
-.card-action-group > div {
+.card-action-row {
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+
+.card-action-group[data-gap="sm"],
+.action-button-group[data-gap="sm"] {
   gap: var(--space-2);
 }
 
+.card-action-group[data-gap="md"],
+.action-button-group[data-gap="md"] {
+  gap: var(--space-3);
+}
+
+.card-action-group[data-gap="lg"],
+.action-button-group[data-gap="lg"] {
+  gap: var(--space-4);
+}
+
+.card-action-group button[data-flex="true"],
+.action-button-group button[data-flex="true"] {
+  flex: 1 1 0%;
+}
+
 .card-action-group button {
+  min-height: 2.5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1608,6 +1651,7 @@
   padding: var(--space-4) var(--space-5) var(--space-5);
 }
 
+[data-theme="ds1"] .character-editor-actions,
 [data-theme="ds1"] .world-editor-actions {
   border-radius: 2px;
   border-left: 2px solid var(--color-accent);
@@ -1649,14 +1693,6 @@
   [data-testid="collapsible-section-content"] {
   padding: 0 clamp(var(--space-5), 3vw, var(--space-6))
     clamp(var(--space-5), 3vw, var(--space-6));
-}
-
-[data-theme="ds2"] .world-editor-actions {
-  border-radius: 1rem;
-  padding: clamp(var(--space-4), 2vw, var(--space-5))
-    clamp(var(--space-5), 3vw, var(--space-6));
-  justify-content: center;
-  gap: clamp(var(--space-3), 2vw, var(--space-5));
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
@@ -1719,29 +1755,6 @@
   padding-top: var(--space-4);
 }
 
-[data-theme="ds3"] .world-editor-actions {
-  position: relative;
-  padding-top: var(--space-5);
-}
-
-[data-theme="ds3"] .world-editor-actions::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: var(--space-5);
-  right: var(--space-5);
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-border-strong) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
-}
-
 /* ─── CharacterCard ─── */
 
 .component-character-card {
@@ -1787,6 +1800,47 @@
 .component-character-card footer {
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--color-border);
+}
+
+/* ─── PageLayout ─── */
+
+.page-layout-header {
+  margin-bottom: var(--space-6);
+}
+
+[data-theme="ds2"] .page-layout-header {
+  margin-bottom: clamp(var(--space-6), 4vw, var(--space-10));
+}
+
+.page-layout-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.page-layout-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.page-layout-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  max-width: 48rem;
+}
+
+.page-layout-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 /* ─── Characters Page Layout ─── */
@@ -2391,32 +2445,19 @@
   display: none;
 }
 
-.character-editor-actions {
+.character-editor-actions,
+.world-editor-actions {
   display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
+  margin-top: var(--space-8);
   padding: var(--space-4) var(--space-5);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
 }
 
-.character-editor-actions-primary {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-2);
-}
-
 @media (width <= 640px) {
-  .character-editor-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .character-editor-actions-primary {
+  .character-editor-actions,
+  .world-editor-actions {
     flex-direction: column;
     align-items: stretch;
   }
@@ -2569,16 +2610,12 @@
   font-weight: 400;
 }
 
-[data-theme="ds2"] .character-editor-actions {
+[data-theme="ds2"] .character-editor-actions,
+[data-theme="ds2"] .world-editor-actions {
   border-radius: 1rem;
   padding: clamp(var(--space-4), 2vw, var(--space-5))
     clamp(var(--space-5), 3vw, var(--space-6));
   justify-content: center;
-  gap: clamp(var(--space-3), 2vw, var(--space-5));
-}
-
-[data-theme="ds2"] .character-editor-actions-primary {
-  gap: var(--space-3);
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
@@ -2702,12 +2739,17 @@
   font-weight: 400;
 }
 
-[data-theme="ds3"] .character-editor-actions {
+[data-theme="ds3"] .character-editor-actions,
+[data-theme="ds3"] .world-editor-actions {
   position: relative;
   padding-top: var(--space-5);
+  background: transparent;
+  border: none;
+  border-radius: 0;
 }
 
-[data-theme="ds3"] .character-editor-actions::before {
+[data-theme="ds3"] .character-editor-actions::before,
+[data-theme="ds3"] .world-editor-actions::before {
   content: "";
   display: block;
   position: absolute;

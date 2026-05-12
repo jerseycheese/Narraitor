@@ -524,6 +524,7 @@ export default function CharactersPage() {
       onClick: handleCreateCharacter,
       variant: 'primary' as const,
       icon: <Plus aria-hidden="true" />,
+      flex: true,
     },
     {
       label: 'Generate Character',
@@ -557,7 +558,7 @@ export default function CharactersPage() {
             mode={viewMode}
             onModeChange={handleViewModeChange}
           />
-          <ActionButtonGroup actions={actionButtons} />
+          <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
         </div>
       )}
 
@@ -566,6 +567,8 @@ export default function CharactersPage() {
           <div className="characters-empty">
             <h2>No characters in {currentWorld?.name || 'this world'} yet</h2>
             <ActionButtonGroup
+              layout="horizontal"
+              gap="sm"
               actions={[
                 {
                   label: isGenerating
@@ -581,6 +584,7 @@ export default function CharactersPage() {
                   onClick: handleCreateCharacter,
                   variant: 'primary',
                   size: 'lg',
+                  flex: true,
                 },
               ]}
             />
