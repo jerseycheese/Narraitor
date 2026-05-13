@@ -590,7 +590,6 @@
 }
 
 .workshop-workspace-inner {
-  box-sizing: border-box;
   width: 100%;
   max-width: 1024px;
   margin: 0 auto;
@@ -1800,29 +1799,6 @@
 .component-character-card footer {
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--color-border);
-}
-
-/* ─── Data Table ─── */
-
-.data-table-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: var(--space-4);
-  margin-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
-}
-
-.data-table-pagination-info {
-  font-family: var(--font-system);
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-}
-
-.data-table-pagination-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
 }
 
 /* ─── PageLayout ─── */

@@ -148,7 +148,6 @@ export default function WorldsPage() {
       onClick: handleCreateWorld,
       variant: 'primary' as const,
       icon: <Plus aria-hidden="true" />,
-      
     },
     {
       label: 'Generate World',

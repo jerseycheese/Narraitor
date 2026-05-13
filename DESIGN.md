@@ -244,13 +244,6 @@ Component rules apply to all three themes. The token references resolve per-them
 - Height **36px** to match button default. Background `surface`, border `1px solid var(--color-border)`, radius `var(--radius-md)`, padding `8px 12px`.
 - Focus: `2px` accent outline, no border color change.
 
-### Action Groups
-
-- **Never use floating or adjacent raw `<Button>` tags** for toolbars or card footers. Wrap them in `<ActionButtonGroup>` or `<CardActionGroup>`.
-- **Layout & Spacing**: Use `layout="horizontal" | "vertical"` and `gap="sm" | "md" | "lg"` props on the group to rely on strict design system spacing tokens instead of ad-hoc padding/margins.
-- **Responsive Flex**: For buttons that should stretch to fill available width (like "Play" or "Save"), pass `flex: true` to the action definition. Do not use custom `flex-1` classes.
-- **Page-Level Placement**: Primary "create" actions on list routes must be placed in the `actions` prop of the `<PageLayout>` component to ensure consistent top-right alignment.
-
 ### Badge
 
 - Pill shape (`var(--radius-full)`), padding `2px 8px`, font `font-interface` at `0.75rem` weight 500.
