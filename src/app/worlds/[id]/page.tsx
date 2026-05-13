@@ -98,20 +98,7 @@ export default function WorldViewPage() {
 
 
   return (
-    <PageLayout
-      title={world.name}
-      description={world.description || world.genre ? getGenreLabel(world.genre) : undefined}
-      actions={
-        <ActionButtonGroup 
-          actions={actionButtons.map(btn => ({
-            ...btn,
-            flex: btn.variant === 'primary' || btn.variant === 'success'
-          }))} 
-          layout="horizontal" 
-          gap="sm" 
-        />
-      }
-    >
+    <PageLayout>
       {/* Hero section with image or themed background */}
       <div className="world-detail-hero">
         <Hero
@@ -124,6 +111,8 @@ export default function WorldViewPage() {
           theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
         />
       </div>
+
+      <ActionButtonGroup actions={actionButtons} />
 
       <section className="world-detail-body" aria-label="World details">
         <WorldDetailsDisplay world={world} />
