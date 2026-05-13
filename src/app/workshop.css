@@ -1868,6 +1868,12 @@
   align-items: center;
   gap: var(--space-3);
 }
+
+/* When action groups sit alongside a view toggle, let them size to content */
+.page-layout-actions .action-button-group,
+.characters-toolbar .action-button-group {
+  width: auto;
+}
 /* ─── Characters Page Layout ─── */
 
 .characters-toolbar {
