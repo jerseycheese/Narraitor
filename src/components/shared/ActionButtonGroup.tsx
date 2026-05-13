@@ -30,9 +30,9 @@ export function ActionButtonGroup({
   // Map legacy variants to shadcn/ui variants
   const mapVariant = (variant: string | undefined) => {
     switch (variant) {
-      case 'primary': return undefined; // Use custom styling instead
-      case 'secondary': return undefined; // Use custom styling instead  
-      case 'success': return undefined; // Use custom styling instead
+      case 'primary': return undefined; // maps to default (accent fill)
+      case 'secondary': return 'secondary';
+      case 'success': return 'success';
       case 'danger': return 'destructive';
       default: return variant as 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | undefined;
     }
