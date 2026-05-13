@@ -46,7 +46,8 @@ export function ActionButtonGroup({
     >
       {actions.map((action, index) => (
         <Button
-          key={`action-${action.label}-${index}`}
+          key={index}
+          type="button"
           onClick={action.onClick}
           variant={mapVariant(action.variant)}
           size={action.size || 'default'}

@@ -1001,8 +1001,7 @@
 
 .card-action-group[data-layout="horizontal"],
 .action-button-group[data-layout="horizontal"] {
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   align-items: stretch;
 }
 
@@ -1874,6 +1873,7 @@
 .characters-toolbar .action-button-group {
   width: auto;
 }
+
 /* ─── Characters Page Layout ─── */
 
 .characters-toolbar {
