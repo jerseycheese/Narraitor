@@ -127,7 +127,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
             </div>
           )}
           
-          <div className="card-action-group" data-layout="horizontal" data-gap="sm">
+          <div className="action-button-group" data-layout="horizontal" data-gap="sm">
             <Button
               onClick={handleGenerate}
               disabled={isGenerating}
