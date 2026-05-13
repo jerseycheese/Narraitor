@@ -261,7 +261,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
               onClick: handleSave,
               variant: 'primary',
               disabled: saving || !isPoolValid,
-              flex: true,
             },
           ]}
         />

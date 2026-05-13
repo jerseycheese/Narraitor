@@ -173,7 +173,6 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
               onClick: () => handleSave(), // Wrap in arrow to avoid event object issues
               variant: 'primary',
               disabled: saving,
-              flex: true,
             },
           ]}
         />
