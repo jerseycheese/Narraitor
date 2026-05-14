@@ -163,10 +163,10 @@ export default function WorldsPage() {
       title="My Worlds"
       description="Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar."
       actions={
-        <div>
+        <>
           {viewToggle}
-          <ActionButtonGroup actions={actionButtons} />
-        </div>
+          <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
+        </>
       }
     >
       {/* World Generation Prompt */}
@@ -179,6 +179,8 @@ export default function WorldsPage() {
         ariaDescribedBy="generate-world-desc"
         footer={
           <ActionButtonGroup
+            layout="horizontal"
+            gap="md"
             actions={[
               {
                 label: 'Cancel',
@@ -201,6 +203,7 @@ export default function WorldsPage() {
                     !worldTypeData.worldReference?.trim()),
                 icon: <Sparkles aria-hidden="true" />,
                 dataTutorial: 'generate-world-button',
+                flex: true,
               },
             ]}
           />

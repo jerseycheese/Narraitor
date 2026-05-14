@@ -83,11 +83,14 @@ export function DashboardContinueCard({
         </div>
 
         <ActionButtonGroup
+          layout="horizontal"
+          gap="sm"
           actions={[
             {
               label: 'Continue Last Game',
               onClick: () => onContinue(session.id),
               variant: 'success',
+              flex: true,
             },
             {
               label: 'Delete',

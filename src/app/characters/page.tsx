@@ -557,7 +557,7 @@ export default function CharactersPage() {
             mode={viewMode}
             onModeChange={handleViewModeChange}
           />
-          <ActionButtonGroup actions={actionButtons} />
+          <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
         </div>
       )}
 
@@ -566,6 +566,8 @@ export default function CharactersPage() {
           <div className="characters-empty">
             <h2>No characters in {currentWorld?.name || 'this world'} yet</h2>
             <ActionButtonGroup
+              layout="horizontal"
+              gap="sm"
               actions={[
                 {
                   label: isGenerating

@@ -266,9 +266,11 @@ describe('WorldEditor - MVP Level Tests', () => {
     // Click save
     fireEvent.click(saveButton);
 
-    // Buttons should be disabled during save
-    expect(saveButton).toBeDisabled();
-    expect(cancelButton).toBeDisabled();
-    expect(saveButton).toHaveTextContent('Saving...');
+    // Re-query after label switches to 'Saving...' (label change remounts the button)
+    await waitFor(() => {
+      const savingButton = screen.getByText('Saving...');
+      expect(savingButton).toBeDisabled();
+      expect(cancelButton).toBeDisabled();
+    });
   });
 });
