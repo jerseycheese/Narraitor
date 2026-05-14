@@ -1860,8 +1860,7 @@
     width: 100%;
   }
   .page-layout-actions .action-button-group .button {
-    flex: 1 1 0;
-    min-width: 0;
+    flex: 1 1 auto;
   }
 }
 
