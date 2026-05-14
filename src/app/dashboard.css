@@ -7,6 +7,9 @@
 /* ─── Page Container ─── */
 
 .component-dashboard-home {
+  /* border-box so width:100% + padding stays within the viewport
+     (no global box-sizing reset in this project). */
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -113,13 +116,20 @@
 
 .dashboard-continue-card-row {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: var(--space-4);
+  align-items: center;
+  gap: var(--space-5);
 }
 
 .dashboard-continue-card-portrait {
   flex-shrink: 0;
+}
+
+/* CharacterPortrait fills its parent (global rule), so the hero banner
+   has to give it an explicit box — it has no intrinsic size of its own. */
+.dashboard-continue-card-portrait > .component-character-portrait {
+  width: 5rem;
+  height: 5rem;
+  border-radius: var(--radius-full);
 }
 
 .dashboard-continue-card-info {
@@ -130,36 +140,102 @@
   gap: var(--space-3);
 }
 
+/* World / Character as an aligned label-over-value pair. */
 .dashboard-continue-card-fields {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4) var(--space-6);
+  gap: var(--space-2) var(--space-8);
+  margin: 0;
 }
 
+.dashboard-continue-card-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+  min-width: 0;
+}
+
+.dashboard-continue-card-field dt {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.dashboard-continue-card-field dd {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Progress + last-played as one consistent muted meta line. */
 .dashboard-continue-card-meta {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3) var(--space-4);
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.dashboard-continue-card-progress {
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .dashboard-continue-card-meta time {
   font-family: var(--font-system);
-  font-size: 0.75rem;
   color: var(--color-text-muted);
 }
 
 @media (width <= 640px) {
   .dashboard-continue-card-row {
     flex-direction: column;
-    align-items: center;
     text-align: center;
   }
 
-  .dashboard-continue-card-fields,
+  /* Stack World / Character vertically — side-by-side overflows a phone. */
+  .dashboard-continue-card-fields {
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
   .dashboard-continue-card-meta {
     justify-content: center;
   }
+}
+
+/* World image as an atmospheric background layer behind the Continue
+   card. Hidden by default; per-theme CSS opts in (and owns the scrim /
+   opacity that keeps the content legible). */
+.component-dashboard-continue-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-continue-card-bg {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.dashboard-continue-card-bg img {
+  object-fit: cover;
+}
+
+.component-dashboard-continue-card > :not(.dashboard-continue-card-bg) {
+  position: relative;
+  z-index: 1;
 }
 
 /* ─── Recent Worlds & Recent Characters ─── */
@@ -223,6 +299,32 @@
 .dashboard-recent-character-content > div:not(.component-character-portrait) {
   min-width: 0;
   flex: 1 1 auto;
+}
+
+/* Recent-world item: image thumbnail + text, mirroring the character row. */
+.dashboard-recent-world-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dashboard-recent-world-content > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.dashboard-recent-world-thumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-canvas);
+}
+
+.dashboard-recent-world-thumb img {
+  object-fit: cover;
 }
 
 .dashboard-recent-empty-state {
@@ -416,9 +518,14 @@
   font-weight: 500;
 }
 
-/* ─── DS2 ─── */
+/* ─── DS2 — "The Bento" ───
+   A composed card grid: Continue, Progress, and Getting Started run
+   full-width as banner rows; Recent Worlds and Recent Characters
+   auto-place into the two columns as an equal-weight side-by-side pair. */
 
 [data-theme="ds2"] .component-dashboard-home {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-8);
   padding: var(--space-5);
 }
@@ -430,6 +537,18 @@
   }
 }
 
+@media (width < 768px) {
+  [data-theme="ds2"] .component-dashboard-home {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-theme="ds2"] .component-dashboard-continue-card,
+[data-theme="ds2"] .component-dashboard-progress-card,
+[data-theme="ds2"] .component-dashboard-getting-started {
+  grid-column: 1 / -1;
+}
+
 [data-theme="ds2"] .component-dashboard-progress-card,
 [data-theme="ds2"] .component-dashboard-continue-card,
 [data-theme="ds2"] .component-dashboard-recent-worlds,
@@ -439,6 +558,55 @@
   border-radius: var(--radius-lg);
   gap: var(--space-5);
   box-shadow: 0 2px 6px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+}
+
+/* The Continue banner anchors the world image as a slim atmospheric
+   strip on the right edge — present and composed, but the content
+   still owns the card. A long gradient fade keeps it from reading as
+   a hard two-panel split. */
+[data-theme="ds2"] .component-dashboard-continue-card {
+  padding-right: 24%;
+}
+
+[data-theme="ds2"] .dashboard-continue-card-bg {
+  display: block;
+  left: auto;
+  right: 0;
+  width: 22%;
+}
+
+[data-theme="ds2"] .dashboard-continue-card-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    var(--color-surface),
+    color-mix(in srgb, var(--color-surface) 35%, transparent) 55%,
+    transparent 90%
+  );
+}
+
+@media (width < 768px) {
+  /* No room for a side panel — fall back to a faint full-bleed wash. */
+  [data-theme="ds2"] .component-dashboard-continue-card {
+    padding-right: var(--space-6);
+  }
+
+  [data-theme="ds2"] .dashboard-continue-card-bg {
+    left: 0;
+    right: 0;
+    width: auto;
+    opacity: 0.14;
+  }
+
+  [data-theme="ds2"] .dashboard-continue-card-bg::after {
+    display: none;
+  }
+}
+
+[data-theme="ds2"] .dashboard-recent-world-thumb {
+  border-radius: var(--radius-md);
 }
 
 [data-theme="ds2"] .component-dashboard-progress-card h2,
