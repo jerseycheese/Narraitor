@@ -59,27 +59,44 @@ export function useWizardState<T>(config: WizardConfig<T>) {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          // Merge saved state with initial data to handle schema migrations
-          // This ensures new fields in initialData are present even if not in saved state
-          const mergedData = { ...initialData, ...parsed.data };
-          // State restored from persistence with migration
-          const initialState = {
-            ...parsed,
-            data: mergedData,
-          };
 
-          if (validateStep) {
-            const validation = validateStep(initialState.currentStep, initialState.data);
-            return {
-              ...initialState,
-              validation: {
-                ...initialState.validation,
-                [initialState.currentStep]: { ...validation, touched: true },
-              },
+          // Only restore if the persisted value is actually a wizard state.
+          // Older app versions stored unrelated data under some persist keys
+          // (e.g. an onboarding completion flag under 'narraitor-onboarding'),
+          // which would otherwise produce a state object missing required
+          // fields like `errors` and crash downstream consumers.
+          const isWizardState =
+            parsed !== null &&
+            typeof parsed === 'object' &&
+            typeof parsed.currentStep === 'number' &&
+            typeof parsed.data === 'object';
+
+          if (isWizardState) {
+            // Merge saved data with initial data to handle schema migrations.
+            // This ensures new fields in initialData are present even if not
+            // in the saved state. Each top-level field is rebuilt explicitly
+            // so a partial persisted state can never yield an undefined field.
+            const initialState: WizardState<T> = {
+              currentStep: parsed.currentStep,
+              data: { ...initialData, ...parsed.data },
+              errors: parsed.errors ?? {},
+              isProcessing: false,
+              validation: parsed.validation ?? {},
             };
-          }
 
-          return initialState;
+            if (validateStep) {
+              const validation = validateStep(initialState.currentStep, initialState.data);
+              return {
+                ...initialState,
+                validation: {
+                  ...initialState.validation,
+                  [initialState.currentStep]: { ...validation, touched: true },
+                },
+              };
+            }
+
+            return initialState;
+          }
         } catch {
           // Failed to parse saved state, will use initial state
         }
