@@ -1841,6 +1841,7 @@
 
 .page-layout-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
 }
@@ -1849,6 +1850,19 @@
 .page-layout-actions .action-button-group,
 .characters-toolbar .action-button-group {
   width: auto;
+}
+
+@media (width <= 640px) {
+  .page-layout-actions {
+    width: 100%;
+  }
+  .page-layout-actions .action-button-group {
+    width: 100%;
+  }
+  .page-layout-actions .action-button-group .button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
 }
 
 /* ─── Characters Page Layout ─── */
