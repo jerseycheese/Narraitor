@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedBarelyStartedData } from './utils/seedTestData';
 
@@ -17,17 +17,15 @@ import { seedBarelyStartedData } from './utils/seedTestData';
  * DS1, DS2, and DS3. A regression in the per-theme structural overrides
  * (dashboard.css) shows up as a diff here.
  *
- * The screenshot is scoped to the dashboard element rather than the
- * full page: it keeps the async header/hero (logo, world-switcher
- * thumbnail) out of the comparison, and document.fonts.ready is awaited
- * because the Getting Started step rows take their height from the
- * active theme's font metrics — an unloaded web font shifts every row.
+ * document.fonts.ready is awaited before each screenshot because the
+ * theme fonts differ per DS; pixel comparison needs the active theme's
+ * fonts fully loaded.
  */
 
-async function prepareDashboard(
+async function settleTheme(
   page: Page,
   theme?: { id: 'ds2' | 'ds3'; label: 'DS2' | 'DS3' }
-): Promise<Locator> {
+): Promise<void> {
   if (theme) {
     await page.getByRole('radio', { name: theme.label }).click();
     await page.waitForFunction(
@@ -37,10 +35,7 @@ async function prepareDashboard(
   }
   await waitForContentStable(page);
   await hideDynamicContent(page);
-  // Theme fonts differ per DS and drive step-row heights — wait for the
-  // active theme's fonts to finish loading before comparing pixels.
   await page.evaluate(() => document.fonts.ready);
-  return page.locator('.component-dashboard-home');
 }
 
 test.describe('Dashboard Theme Differentiation', () => {
@@ -53,20 +48,20 @@ test.describe('Dashboard Theme Differentiation', () => {
   });
 
   test('DS1 dashboard renders consistently', async ({ page }) => {
-    const dashboard = await prepareDashboard(page);
+    await settleTheme(page);
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds1');
-    await expect(dashboard).toHaveScreenshot('dashboard-ds1.png');
+    await expect(page).toHaveScreenshot('dashboard-ds1.png', { fullPage: true });
   });
 
   test('DS2 dashboard renders consistently', async ({ page }) => {
-    const dashboard = await prepareDashboard(page, { id: 'ds2', label: 'DS2' });
+    await settleTheme(page, { id: 'ds2', label: 'DS2' });
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds2');
-    await expect(dashboard).toHaveScreenshot('dashboard-ds2.png');
+    await expect(page).toHaveScreenshot('dashboard-ds2.png', { fullPage: true });
   });
 
   test('DS3 dashboard renders consistently', async ({ page }) => {
-    const dashboard = await prepareDashboard(page, { id: 'ds3', label: 'DS3' });
+    await settleTheme(page, { id: 'ds3', label: 'DS3' });
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
-    await expect(dashboard).toHaveScreenshot('dashboard-ds3.png');
+    await expect(page).toHaveScreenshot('dashboard-ds3.png', { fullPage: true });
   });
 });

@@ -575,9 +575,13 @@
   border-bottom: none;
 }
 
+/* line-height is pinned on the step labels below so each row's height
+   stays deterministic across font metrics (unset line-height varies by
+   the OS-rendered font, which drifts the row rhythm in screenshots). */
 [data-theme="ds1"] .dashboard-getting-started-step-label {
   font-family: var(--font-interface);
   font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 /* ─── DS2 interior ─── */
@@ -617,6 +621,7 @@
 [data-theme="ds2"] .dashboard-getting-started-step-label {
   font-family: var(--font-narrative);
   font-size: 1rem;
+  line-height: 1.4;
 }
 
 [data-theme="ds2"] .dashboard-recent-character-content {
@@ -657,6 +662,7 @@
 [data-theme="ds3"] .dashboard-getting-started-step-label {
   font-family: var(--font-system);
   font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 [data-theme="ds3"] .dashboard-recent-character-content {
