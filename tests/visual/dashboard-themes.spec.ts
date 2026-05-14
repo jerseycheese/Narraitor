@@ -20,6 +20,13 @@ import { seedBarelyStartedData } from './utils/seedTestData';
  * document.fonts.ready is awaited before each screenshot because the
  * theme fonts differ per DS; pixel comparison needs the active theme's
  * fonts fully loaded.
+ *
+ * NOTE: the committed baselines are the CI runner's render, not a local
+ * one. The Getting Started rows take their height from OS-rendered font
+ * metrics, which differ between a dev machine and the CI macOS image, so
+ * a locally-generated baseline drifts ~15-35px against CI. To refresh
+ * these snapshots, take the actuals from a CI E2E run rather than
+ * regenerating with `--update-snapshots` locally.
  */
 
 async function settleTheme(
