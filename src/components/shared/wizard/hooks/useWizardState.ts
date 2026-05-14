@@ -61,10 +61,10 @@ export function useWizardState<T>(config: WizardConfig<T>) {
           const parsed = JSON.parse(saved);
 
           // Only restore if the persisted value is actually a wizard state.
-          // Older app versions stored unrelated data under some persist keys
-          // (e.g. an onboarding completion flag under 'narraitor-onboarding'),
-          // which would otherwise produce a state object missing required
-          // fields like `errors` and crash downstream consumers.
+          // localStorage under a persistKey is untrusted input — it can hold
+          // a value that isn't a WizardState (foreign writer, manual edit,
+          // corruption). Spreading that produced a state missing required
+          // fields like `errors`, which crashed downstream consumers.
           const isWizardState =
             parsed !== null &&
             typeof parsed === 'object' &&

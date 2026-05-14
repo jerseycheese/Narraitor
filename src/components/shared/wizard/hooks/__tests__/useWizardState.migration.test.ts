@@ -131,9 +131,9 @@ describe('useWizardState - localStorage migration', () => {
   });
 
   test('ignores persisted value that is not a wizard state', () => {
-    // Older app versions stored an onboarding completion flag under the same
-    // key the wizard now uses for persistence. It is not a WizardState and
-    // must not be spread into state (it lacks `errors`, `currentStep`, etc.).
+    // A persistKey can hold a value that isn't a WizardState (foreign writer,
+    // manual edit, corruption). It must not be spread into state, since it
+    // lacks required fields like `errors` and `currentStep`.
     localStorageMock.getItem.mockReturnValue(
       JSON.stringify({ completed: true, completedAt: 1778435386391 })
     );
