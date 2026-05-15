@@ -476,13 +476,15 @@
          eyebrow captions in monospace)
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── DS1 — "The Ledger" ───
-   An asymmetric margin-rail + body spread. A narrow rail holds Progress
-   (a vertical stat ledger) and Getting Started (a margin checklist); the
-   wide body column holds Continue + Recent Worlds + Recent Characters.
-   An ink-rule gutter divider runs between them — reads like an open
-   manuscript index page. grid-auto-flow: dense backfills the body column
-   whether or not the Continue card is present. */
+/* ─── DS1 — "The Drafting Table" ───
+   Sharp lines, archival ink, graph-paper grid (per ADR-011). An
+   asymmetric margin-rail + body spread laid on a drafting-paper
+   canvas: a narrow rail (Progress + Getting Started) on the left, a
+   wide body (Continue + Recent Worlds + Recent Characters) on the
+   right, an ink-rule gutter dividing them. Sections sit as
+   featherweight cards (thin border, sharp 2px radius) on top of a
+   24px graph-paper grid. grid-auto-flow: dense backfills the body
+   column whether or not the Continue card is present. */
 
 [data-theme="ds1"] .component-dashboard-home {
   --ds1-rail-width: 13.5rem;
@@ -496,13 +498,23 @@
   gap: var(--space-6) var(--ds1-col-gap);
   padding: var(--ds1-pad);
 
-  /* Page-tone wash — surface up top, canvas at the bottom — gives
-     the dashboard the feel of an opened codex page rather than a UI. */
-  background: linear-gradient(
-    180deg,
-    var(--color-surface) 0%,
-    var(--color-canvas) 100%
-  );
+  /* Drafting-table graph paper — a faint 24px square grid sitting on
+     the canvas. Aligned with DS1's "sharp lines + architectural
+     drafting" canon (ADR-011). */
+  background-color: var(--color-canvas);
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-border-strong) 45%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-border-strong) 45%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
+  background-repeat: repeat;
 }
 
 @media (width >= 1024px) {
@@ -523,29 +535,30 @@
   background: var(--color-border-strong);
 }
 
-/* Rail sections: column 1, no card chrome — typography-led. */
+/* Rail sections: column 1. Featherweight surface fill so the rail
+   content sits cleanly on top of the graph paper, framed by a sharp
+   hairline border (1px / radius-sm — the drafting-table standard). */
 [data-theme="ds1"] .component-dashboard-progress-card,
 [data-theme="ds1"] .component-dashboard-getting-started {
   grid-column: 1;
-  padding: 0 var(--space-3) 0 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
   gap: var(--space-3);
 }
 
-/* Body sections: column 2, no card chrome — they sit on the page,
-   separated by a single hairline rule. Reads like sections of a book
-   rather than tiles on a dashboard. */
+/* Body sections: column 2. Same drafting-paper card chrome — thin
+   border, sharp corner, surface fill — so the long-form content
+   reads as paper laid on the drafting table. */
 [data-theme="ds1"] .component-dashboard-continue-card,
 [data-theme="ds1"] .component-dashboard-recent-worlds,
 [data-theme="ds1"] .component-dashboard-recent-characters {
   grid-column: 2;
-  padding: 0 0 var(--space-5);
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
   gap: var(--space-3);
 }
 
@@ -789,25 +802,24 @@
   padding: var(--space-4);
 }
 
-/* ─── DS3 — "The Console" ───
-   Terminal / mission-control HUD: a scan-line grid background under
-   everything, hard-edged panels framed by corner brackets in
-   --color-accent, an inverted Continue readout that reads as the
-   active mission, and an oversize numeric stat strip up top.
-   Monospace throughout the body. Dense 3-col bottom row. */
+/* ─── DS3 — "The Mechanical Manuscript" ───
+   Aged paper + drafting ink + dot grid, per ADR-011 and the DS3
+   showcase canon. A radial-gradient dot grid sits beneath everything
+   (2px dot every 24px — the canonical DS3 grid). Panels are
+   featherweight cards on the canvas, framed by thin accent corner
+   brackets as a drafting-ink mechanical mark. The compact stat strip
+   sits on top of the 3-col row of Recent + Getting Started. */
 
 [data-theme="ds3"] .component-dashboard-home {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 27px,
-    color-mix(in srgb, var(--color-border) 50%, transparent) 27px,
-    color-mix(in srgb, var(--color-border) 50%, transparent) 28px
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-text-primary) 18%, transparent) 1px,
+    transparent 1px
   );
-  background-size: 100% 28px;
+  background-size: 24px 24px;
   background-repeat: repeat;
 }
 
@@ -824,8 +836,9 @@
   grid-column: 1 / -1;
 }
 
-/* Hard-edged panels — no radius, no border, no blur. Corner-bracket
-   pseudos do the framing instead. */
+/* Featherweight panels on the canvas — small canonical radius, no
+   border (corner brackets do the framing), subtle surface lift over
+   the dot grid. */
 [data-theme="ds3"] .component-dashboard-progress-card,
 [data-theme="ds3"] .component-dashboard-continue-card,
 [data-theme="ds3"] .component-dashboard-recent-worlds,
@@ -833,11 +846,11 @@
 [data-theme="ds3"] .component-dashboard-getting-started {
   position: relative;
   padding: var(--space-4) var(--space-5);
-  border-radius: 0;
+  border-radius: var(--radius-md);
   gap: var(--space-3);
-  background: var(--color-canvas);
+  background: var(--color-surface);
   border: none;
-  backdrop-filter: none;
+  backdrop-filter: blur(6px);
 }
 
 /* Corner brackets — top-left + bottom-right L-marks in accent. */
@@ -873,22 +886,11 @@
   pointer-events: none;
 }
 
-/* Continue card = the active-mission readout: inverted on the dark
-   text-primary tone (the only deeply-dark colour in the DS3 palette;
-   used here deliberately as a background to make the active mission
-   visually primary on the HUD). */
+/* Continue card stays on the aged-paper canvas — the visual emphasis
+   comes from a heavier accent-soft fill and a marginalia annotation,
+   not a dark inversion (which would break the manuscript stance). */
 [data-theme="ds3"] .component-dashboard-continue-card {
-  background: var(--color-text-primary);
-  color: var(--color-text-inverse);
-}
-
-[data-theme="ds3"] .component-dashboard-continue-card h2,
-[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-field dt,
-[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-field dd,
-[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-meta,
-[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-meta time,
-[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-progress {
-  color: var(--color-text-inverse);
+  background: var(--color-accent-soft);
 }
 
 /* Progress as a compact stat strip — stats inline along one row
@@ -926,20 +928,18 @@
   color: var(--color-text-secondary);
 }
 
+/* Canonical DS3 dot bullet — rhymes with the dot-grid background. */
 [data-theme="ds3"] .component-dashboard-progress-card h2::before,
 [data-theme="ds3"] .component-dashboard-continue-card h2::before,
 [data-theme="ds3"] .component-dashboard-recent-worlds h2::before,
 [data-theme="ds3"] .component-dashboard-recent-characters h2::before,
 [data-theme="ds3"] .component-dashboard-getting-started h2::before {
-  content: "//";
+  content: "";
   display: inline-block;
-  width: auto;
-  height: auto;
-  border-radius: 0;
-  background: transparent;
-  color: var(--color-accent);
-  font-family: var(--font-system);
-  letter-spacing: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
   flex-shrink: 0;
 }
 
