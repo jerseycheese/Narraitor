@@ -478,7 +478,8 @@ export default function DesignSystem3Page() {
             {[
               { name: 'Manuscript', width: '680px (narrative region)', purpose: 'Immersive game play — single-column reading with marginalia annotations' },
               { name: 'Workshop', width: '1200px (full-width grid)', purpose: 'World and character management, settings, and configuration' },
-              { name: 'Default', width: '1200px (shell max-width)', purpose: 'General app pages, dashboard, and navigation' },
+              { name: 'Default', width: '1200px (shell max-width)', purpose: 'General app pages and navigation' },
+              { name: 'Dashboard', width: '1200px (3-col landing grid)', purpose: 'Library landing — full-width Continue + stat strip banners over a 3-col Recent / Getting Started row' },
             ].map(a => (
               <div key={a.name} className="ds3-stage ds3-reveal" style={{ padding: 20 }}>
                 <div className="ds3-stage-label">{a.name}</div>
@@ -486,6 +487,98 @@ export default function DesignSystem3Page() {
                 <p style={{ fontFamily: 'var(--font-narrative)', fontSize: 14, lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>{a.purpose}</p>
               </div>
             ))}
+          </div>
+
+          {/* Canonical primitives introduced by the Dashboard archetype */}
+          <h3 className="ds3-reveal" style={{ fontFamily: 'var(--font-narrative)', fontSize: 22, fontWeight: 500, margin: '8px 0 12px', color: 'var(--color-text-primary)' }}>Dashboard primitives</h3>
+          <p className="ds3-reveal" style={{ fontFamily: 'var(--font-narrative)', fontSize: 14, lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: '0 0 16px' }}>
+            Three reusable patterns the Dashboard archetype contributes to the DS3 vocabulary. Compose them on any surface that wants the &ldquo;aged paper + drafting ink&rdquo; voice.
+          </p>
+          <div className="ds3-reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 16 }}>
+
+            {/* 1. Dot-grid tiled surface */}
+            <div className="ds3-stage" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{
+                position: 'relative',
+                minHeight: 140,
+                backgroundColor: 'var(--color-canvas)',
+                backgroundImage: 'radial-gradient(circle, color-mix(in srgb, var(--color-text-primary) 18%, transparent) 1px, transparent 1px)',
+                backgroundSize: '24px 24px',
+                backgroundRepeat: 'repeat',
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  inset: '20px',
+                  background: 'var(--color-surface)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 12,
+                  fontFamily: 'var(--font-system)',
+                  fontSize: 11,
+                  color: 'var(--color-text-muted)',
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  Surface on dot-grid canvas
+                </div>
+              </div>
+              <div style={{ padding: '14px 20px 18px' }}>
+                <div className="ds3-stage-label">Dot-grid tiled surface</div>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: 13, lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '6px 0 8px' }}>
+                  Tile the canonical 2px-dot-every-24px pattern as a container background (sister to the fullscreen <code>.ds3-dot-grid</code> overlay).
+                </p>
+                <code className="font-system" style={{ fontFamily: 'var(--font-system)', fontSize: 11, color: 'var(--color-text-muted)', display: 'block', lineHeight: 1.5 }}>
+                  background-image: radial-gradient(...);<br />background-size: 24px 24px;
+                </code>
+              </div>
+            </div>
+
+            {/* 2. Corner-bracket frame */}
+            <div className="ds3-stage" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{ position: 'relative', minHeight: 140, padding: 20, background: 'var(--color-canvas)' }}>
+                <div style={{ position: 'relative', minHeight: 100, background: 'var(--color-surface)', borderRadius: 'var(--radius-md)', padding: 14 }}>
+                  <span style={{ position: 'absolute', top: 0, left: 0, width: 10, height: 10, borderTop: '1px solid var(--color-accent)', borderLeft: '1px solid var(--color-accent)' }} />
+                  <span style={{ position: 'absolute', bottom: 0, right: 0, width: 10, height: 10, borderBottom: '1px solid var(--color-accent)', borderRight: '1px solid var(--color-accent)' }} />
+                  <div style={{ fontFamily: 'var(--font-system)', fontSize: 11, color: 'var(--color-text-muted)', textAlign: 'center', marginTop: 30 }}>
+                    Framed panel
+                  </div>
+                </div>
+              </div>
+              <div style={{ padding: '14px 20px 18px' }}>
+                <div className="ds3-stage-label">Corner-bracket frame</div>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: 13, lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '6px 0 8px' }}>
+                  Top-left and bottom-right 10px L-marks in <code>--color-accent</code> via <code>::before</code> / <code>::after</code>. A drafting-ink mark in place of a full border.
+                </p>
+                <code className="font-system" style={{ fontFamily: 'var(--font-system)', fontSize: 11, color: 'var(--color-text-muted)', display: 'block', lineHeight: 1.5 }}>
+                  border-top: 1px solid var(--color-accent);<br />border-left: 1px solid var(--color-accent);
+                </code>
+              </div>
+            </div>
+
+            {/* 3. Compact stat strip */}
+            <div className="ds3-stage" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{ minHeight: 140, padding: 20, background: 'var(--color-canvas)', display: 'flex', alignItems: 'center' }}>
+                <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', gap: '12px 32px', padding: '14px 18px', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)' }}>
+                  {[['12', 'WORLDS'], ['8', 'CHARS'], ['3', 'PLAYS']].map(([n, l]) => (
+                    <div key={l} style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                      <span style={{ fontFamily: 'var(--font-narrative)', fontSize: 28, lineHeight: 1, color: 'var(--color-text-primary)' }}>{n}</span>
+                      <span style={{ fontFamily: 'var(--font-system)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{l}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ padding: '14px 20px 18px' }}>
+                <div className="ds3-stage-label">Compact stat strip</div>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: 13, lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '6px 0 8px' }}>
+                  Inline <em>[number] LABEL</em> triples in a single horizontal flex row, no tile chrome. The readout pattern for any summary panel.
+                </p>
+                <code className="font-system" style={{ fontFamily: 'var(--font-system)', fontSize: 11, color: 'var(--color-text-muted)', display: 'block', lineHeight: 1.5 }}>
+                  display: flex; flex-wrap: wrap;<br />gap: var(--space-3) var(--space-6);
+                </code>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>

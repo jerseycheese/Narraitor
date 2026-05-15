@@ -797,6 +797,77 @@ export default function DesignSystem2Page() {
                 <div className="ds2-archetype-desc">Multi-panel workspace for world building. Navigation sidebar, main editor, and properties inspector all visible.</div>
               </div>
             </div>
+
+            {/* Library Landing — Magazine Spread */}
+            <div className="ds2-archetype-card ds2-reveal">
+              <div className="ds2-archetype-preview">
+                <div style={{ border: 'none', borderRadius: '8px', padding: '12px', minHeight: '160px', background: 'var(--color-surface)', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '10px', fontFamily: 'var(--font-system)', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                  <div style={{ background: 'var(--color-surface-hover)', borderRadius: '6px', padding: '8px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '6px' }}>
+                    <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '11px', fontWeight: 400, color: 'var(--color-text-primary)' }}>Lead Feature</div>
+                    <div style={{ background: 'var(--color-border)', borderRadius: '4px', minHeight: 30 }} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                    {['18', '7', '3', '42'].map((n, i) => (
+                      <div key={i} style={{ fontFamily: 'var(--font-narrative)', fontSize: '20px', fontWeight: 400, color: 'var(--color-text-primary)', textAlign: 'center', padding: '4px 0' }}>{n}</div>
+                    ))}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                    <div style={{ background: 'var(--color-surface-hover)', borderRadius: '6px', padding: '6px', textAlign: 'center', fontSize: '8px' }}>Recent A</div>
+                    <div style={{ background: 'var(--color-surface-hover)', borderRadius: '6px', padding: '6px', textAlign: 'center', fontSize: '8px' }}>Recent B</div>
+                  </div>
+                </div>
+              </div>
+              <div className="ds2-archetype-info">
+                <div className="ds2-archetype-name">Library Landing</div>
+                <div className="ds2-archetype-desc">A premium magazine spread: oversize narrative-serif headlines, display-scale numeric callouts without tile chrome, and a hero-photo lead feature in a 2-col Bento grid.</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Library Landing primitives */}
+          <h3 className="ds2-reveal" style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.5rem', fontWeight: 400, margin: '32px 0 8px', color: 'var(--color-text-primary)', letterSpacing: '-0.005em' }}>
+            Library Landing primitives
+          </h3>
+          <p className="ds2-reveal" style={{ fontFamily: 'var(--font-narrative)', fontSize: '14px', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: '0 0 16px' }}>
+            Two reusable display-scale patterns the Library Landing introduces to the DS2 vocabulary.
+          </p>
+          <div className="ds2-reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 24 }}>
+
+            {/* Editorial display numerals */}
+            <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--radius-lg, 12px)', overflow: 'hidden' }}>
+              <div style={{ padding: '24px 20px', background: 'var(--color-surface-hover)' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 32px', alignItems: 'baseline' }}>
+                  {[['18', 'Worlds'], ['7', 'Characters']].map(([n, l]) => (
+                    <div key={l} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontFamily: 'var(--font-narrative)', fontSize: '40px', fontWeight: 400, lineHeight: 1, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}>{n}</span>
+                      <span style={{ fontFamily: 'var(--font-system)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{l}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ padding: '16px 20px' }}>
+                <div style={{ fontFamily: 'var(--font-system)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-muted)', fontWeight: 500 }}>Editorial display numerals</div>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '14px', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: '6px 0 8px' }}>Narrative-serif numerals at <code>clamp(2.5rem, 4.5vw, 3.5rem)</code> with no tile chrome — read as magazine pull-quotes.</p>
+                <code style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', lineHeight: 1.5 }}>font-size: clamp(2.5rem, 4.5vw, 3.5rem);<br />font-family: var(--font-narrative);</code>
+              </div>
+            </div>
+
+            {/* Hero-photo lead feature */}
+            <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--radius-lg, 12px)', overflow: 'hidden' }}>
+              <div style={{ position: 'relative', overflow: 'hidden', minHeight: 120, background: 'var(--color-surface-hover)' }}>
+                <div style={{ position: 'absolute', inset: 0, left: '64%', background: 'linear-gradient(135deg, var(--color-border) 0%, var(--color-border-strong) 100%)' }} />
+                <div style={{ position: 'relative', padding: '20px 36% 20px 20px' }}>
+                  <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '20px', fontWeight: 400, color: 'var(--color-text-primary)', letterSpacing: '-0.005em' }}>Lead Feature</div>
+                  <div style={{ fontFamily: 'var(--font-system)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-muted)', marginTop: 4 }}>Subhead</div>
+                </div>
+              </div>
+              <div style={{ padding: '16px 20px' }}>
+                <div style={{ fontFamily: 'var(--font-system)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-muted)', fontWeight: 500 }}>Hero-photo lead</div>
+                <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '14px', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: '6px 0 8px' }}>A full-width banner with the visual asset as a 36% right-edge image strip + a soft gradient fade. Reads as a magazine cover feature.</p>
+                <code style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', display: 'block', lineHeight: 1.5 }}>padding-right: 38%;<br />.bg {'{ width: 36%; }'}</code>
+              </div>
+            </div>
+
           </div>
 
           {/* Note: Breakpoints moved to Grid section */}
