@@ -493,8 +493,16 @@
   display: grid;
   grid-template-columns: var(--ds1-rail-width) 1fr;
   grid-auto-flow: row dense;
-  gap: var(--space-5) var(--ds1-col-gap);
+  gap: var(--space-6) var(--ds1-col-gap);
   padding: var(--ds1-pad);
+
+  /* Page-tone wash — surface up top, canvas at the bottom — gives
+     the dashboard the feel of an opened codex page rather than a UI. */
+  background: linear-gradient(
+    180deg,
+    var(--color-surface) 0%,
+    var(--color-canvas) 100%
+  );
 }
 
 @media (width >= 1024px) {
@@ -515,46 +523,75 @@
   background: var(--color-border-strong);
 }
 
+/* Rail sections: column 1, no card chrome — typography-led. */
 [data-theme="ds1"] .component-dashboard-progress-card,
 [data-theme="ds1"] .component-dashboard-getting-started {
   grid-column: 1;
+  padding: 0 var(--space-3) 0 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  gap: var(--space-3);
 }
 
+/* Body sections: column 2, no card chrome — they sit on the page,
+   separated by a single hairline rule. Reads like sections of a book
+   rather than tiles on a dashboard. */
 [data-theme="ds1"] .component-dashboard-continue-card,
 [data-theme="ds1"] .component-dashboard-recent-worlds,
 [data-theme="ds1"] .component-dashboard-recent-characters {
   grid-column: 2;
-}
-
-[data-theme="ds1"] .component-dashboard-progress-card,
-[data-theme="ds1"] .component-dashboard-continue-card,
-[data-theme="ds1"] .component-dashboard-recent-worlds,
-[data-theme="ds1"] .component-dashboard-recent-characters,
-[data-theme="ds1"] .component-dashboard-getting-started {
-  padding: var(--space-4) var(--space-5);
-  border-radius: var(--radius-sm);
+  padding: 0 0 var(--space-5);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--color-border);
   gap: var(--space-3);
 }
 
+/* Section headings as small-caps eyebrow tags with a tracked underline. */
 [data-theme="ds1"] .component-dashboard-progress-card h2,
 [data-theme="ds1"] .component-dashboard-continue-card h2,
 [data-theme="ds1"] .component-dashboard-recent-worlds h2,
 [data-theme="ds1"] .component-dashboard-recent-characters h2,
 [data-theme="ds1"] .component-dashboard-getting-started h2 {
   padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-strong);
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 [data-theme="ds1"] .dashboard-progress-stat,
-[data-theme="ds1"] .dashboard-recent-item,
 [data-theme="ds1"] .dashboard-recent-empty-state,
 [data-theme="ds1"] .dashboard-recent-empty-slot {
   border-radius: var(--radius-sm);
+}
+
+/* Recent items as hanging-indent rows separated by hairline rules —
+   reads like a chapter index, not a list of tiles. */
+[data-theme="ds1"] .dashboard-recent-list {
+  gap: 0;
+}
+
+[data-theme="ds1"] .dashboard-recent-item {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) 0;
+}
+
+[data-theme="ds1"] .dashboard-recent-item:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds1"] .dashboard-recent-item:hover {
+  background: transparent;
+  border-bottom-color: var(--color-accent);
 }
 
 [data-theme="ds1"] .dashboard-progress-stat-value span {
@@ -613,22 +650,24 @@
   }
 }
 
-/* ─── DS2 — "The Bento" ───
-   A composed card grid: Continue, Progress, and Getting Started run
-   full-width as banner rows; Recent Worlds and Recent Characters
-   auto-place into the two columns as an equal-weight side-by-side pair. */
+/* ─── DS2 — "The Bento" → "The Spread" ───
+   A premium-magazine editorial spread: oversize narrative-serif
+   display headings, hero-photo Continue feature, oversize numeric
+   callouts, generous whitespace, no card borders or shadows. The
+   2-col grid stays — Continue/Progress/Getting Started as banner
+   rows, Worlds + Characters side-by-side underneath. */
 
 [data-theme="ds2"] .component-dashboard-home {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-8);
-  padding: var(--space-5);
+  gap: clamp(2rem, 4vw, 3rem);
+  padding: var(--space-6);
 }
 
 @media (width >= 1024px) {
   [data-theme="ds2"] .component-dashboard-home {
-    gap: clamp(2.5rem, 5vw, 4rem);
-    padding: var(--space-8);
+    gap: clamp(3rem, 6vw, 5rem);
+    padding: clamp(2.5rem, 5vw, 4rem);
   }
 }
 
@@ -644,30 +683,32 @@
   grid-column: 1 / -1;
 }
 
+/* Editorial blocks — no border, no shadow, just content on the page. */
 [data-theme="ds2"] .component-dashboard-progress-card,
 [data-theme="ds2"] .component-dashboard-continue-card,
 [data-theme="ds2"] .component-dashboard-recent-worlds,
 [data-theme="ds2"] .component-dashboard-recent-characters,
 [data-theme="ds2"] .component-dashboard-getting-started {
-  padding: var(--space-6);
+  padding: clamp(var(--space-5), 3vw, var(--space-8));
   border-radius: var(--radius-lg);
   gap: var(--space-5);
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  border: none;
+  box-shadow: none;
+  background: var(--color-surface);
 }
 
-/* The Continue banner anchors the world image as a slim atmospheric
-   strip on the right edge — present and composed, but the content
-   still owns the card. A long gradient fade keeps it from reading as
-   a hard two-panel split. */
+/* The Continue card is the magazine cover feature — wider hero photo,
+   warmer fill, the lead block of the page. */
 [data-theme="ds2"] .component-dashboard-continue-card {
-  padding-right: 24%;
+  padding-right: 38%;
+  background: var(--color-surface-hover);
 }
 
 [data-theme="ds2"] .dashboard-continue-card-bg {
   display: block;
   left: auto;
   right: 0;
-  width: 22%;
+  width: 36%;
 }
 
 [data-theme="ds2"] .dashboard-continue-card-bg::after {
@@ -676,9 +717,9 @@
   inset: 0;
   background: linear-gradient(
     to right,
-    var(--color-surface),
-    color-mix(in srgb, var(--color-surface) 35%, transparent) 55%,
-    transparent 90%
+    var(--color-surface-hover),
+    color-mix(in srgb, var(--color-surface-hover) 35%, transparent) 45%,
+    transparent 85%
   );
 }
 
@@ -702,20 +743,45 @@
 
 [data-theme="ds2"] .dashboard-recent-world-thumb {
   border-radius: var(--radius-md);
+  width: 4.5rem;
+  height: 4.5rem;
 }
 
+/* Display-scale narrative headlines — the unmistakable magazine
+   typographic move. */
 [data-theme="ds2"] .component-dashboard-progress-card h2,
 [data-theme="ds2"] .component-dashboard-continue-card h2,
 [data-theme="ds2"] .component-dashboard-recent-worlds h2,
 [data-theme="ds2"] .component-dashboard-recent-characters h2,
 [data-theme="ds2"] .component-dashboard-getting-started h2 {
   font-family: var(--font-narrative);
-  font-size: 1.375rem;
-  font-weight: 500;
-  letter-spacing: -0.005em;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
 }
 
-[data-theme="ds2"] .dashboard-progress-stat,
+/* Stats: drop tile chrome — they become oversize numeric callouts
+   sitting on the page. */
+[data-theme="ds2"] .dashboard-progress-stats {
+  gap: clamp(var(--space-4), 3vw, var(--space-8));
+}
+
+[data-theme="ds2"] .dashboard-progress-stat {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+
+[data-theme="ds2"] .dashboard-progress-stat-value span {
+  font-family: var(--font-narrative);
+  font-size: clamp(2.5rem, 4.5vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
 [data-theme="ds2"] .dashboard-recent-item,
 [data-theme="ds2"] .dashboard-recent-empty-state,
 [data-theme="ds2"] .dashboard-recent-empty-slot {
@@ -723,26 +789,26 @@
   padding: var(--space-4);
 }
 
-[data-theme="ds2"] .dashboard-progress-stat {
-  background: var(--color-surface-hover);
-  border-color: transparent;
-}
-
-[data-theme="ds2"] .dashboard-progress-stat-value span {
-  font-family: var(--font-narrative);
-  font-size: 2rem;
-}
-
 /* ─── DS3 — "The Console" ───
-   Dense control panel: a compact stat strip on top + a condensed
-   3-column row for Recent Worlds + Recent Characters + Getting
-   Started. Continue (when present) anchors the top as a full-width
-   banner. Below 768px collapses to a single flex column. */
+   Terminal / mission-control HUD: a scan-line grid background under
+   everything, hard-edged panels framed by corner brackets in
+   --color-accent, an inverted Continue readout that reads as the
+   active mission, and an oversize numeric stat strip up top.
+   Monospace throughout the body. Dense 3-col bottom row. */
 
 [data-theme="ds3"] .component-dashboard-home {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    color-mix(in srgb, var(--color-border) 50%, transparent) 27px,
+    color-mix(in srgb, var(--color-border) 50%, transparent) 28px
+  );
+  background-size: 100% 28px;
+  background-repeat: repeat;
 }
 
 @media (width < 768px) {
@@ -758,8 +824,75 @@
   grid-column: 1 / -1;
 }
 
+/* Hard-edged panels — no radius, no border, no blur. Corner-bracket
+   pseudos do the framing instead. */
+[data-theme="ds3"] .component-dashboard-progress-card,
+[data-theme="ds3"] .component-dashboard-continue-card,
+[data-theme="ds3"] .component-dashboard-recent-worlds,
+[data-theme="ds3"] .component-dashboard-recent-characters,
+[data-theme="ds3"] .component-dashboard-getting-started {
+  position: relative;
+  padding: var(--space-4) var(--space-5);
+  border-radius: 0;
+  gap: var(--space-3);
+  background: var(--color-canvas);
+  border: none;
+  backdrop-filter: none;
+}
+
+/* Corner brackets — top-left + bottom-right L-marks in accent. */
+[data-theme="ds3"] .component-dashboard-progress-card::before,
+[data-theme="ds3"] .component-dashboard-continue-card::before,
+[data-theme="ds3"] .component-dashboard-recent-worlds::before,
+[data-theme="ds3"] .component-dashboard-recent-characters::before,
+[data-theme="ds3"] .component-dashboard-getting-started::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+  pointer-events: none;
+}
+
+[data-theme="ds3"] .component-dashboard-progress-card::after,
+[data-theme="ds3"] .component-dashboard-continue-card::after,
+[data-theme="ds3"] .component-dashboard-recent-worlds::after,
+[data-theme="ds3"] .component-dashboard-recent-characters::after,
+[data-theme="ds3"] .component-dashboard-getting-started::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid var(--color-accent);
+  border-right: 1px solid var(--color-accent);
+  pointer-events: none;
+}
+
+/* Continue card = the active-mission readout: inverted on the dark
+   text-primary tone (the only deeply-dark colour in the DS3 palette;
+   used here deliberately as a background to make the active mission
+   visually primary on the HUD). */
+[data-theme="ds3"] .component-dashboard-continue-card {
+  background: var(--color-text-primary);
+  color: var(--color-text-inverse);
+}
+
+[data-theme="ds3"] .component-dashboard-continue-card h2,
+[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-field dt,
+[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-field dd,
+[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-meta,
+[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-meta time,
+[data-theme="ds3"] .component-dashboard-continue-card .dashboard-continue-card-progress {
+  color: var(--color-text-inverse);
+}
+
 /* Progress as a compact stat strip — stats inline along one row
-   rather than 2D-stacked tiles. */
+   rather than 2D-stacked tiles. Numbers are the lead reading element. */
 [data-theme="ds3"] .dashboard-progress-stats {
   display: flex;
   flex-wrap: wrap;
@@ -777,18 +910,6 @@
   background: transparent;
 }
 
-[data-theme="ds3"] .component-dashboard-progress-card,
-[data-theme="ds3"] .component-dashboard-continue-card,
-[data-theme="ds3"] .component-dashboard-recent-worlds,
-[data-theme="ds3"] .component-dashboard-recent-characters,
-[data-theme="ds3"] .component-dashboard-getting-started {
-  padding: var(--space-5);
-  border-radius: var(--radius-md);
-  gap: var(--space-4);
-  background: var(--color-surface);
-  backdrop-filter: blur(6px);
-}
-
 [data-theme="ds3"] .component-dashboard-progress-card h2,
 [data-theme="ds3"] .component-dashboard-continue-card h2,
 [data-theme="ds3"] .component-dashboard-recent-worlds h2,
@@ -798,9 +919,9 @@
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
 }
@@ -810,19 +931,50 @@
 [data-theme="ds3"] .component-dashboard-recent-worlds h2::before,
 [data-theme="ds3"] .component-dashboard-recent-characters h2::before,
 [data-theme="ds3"] .component-dashboard-getting-started h2::before {
-  content: "";
+  content: "//";
   display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font-family: var(--font-system);
+  letter-spacing: 0;
   flex-shrink: 0;
 }
 
-[data-theme="ds3"] .dashboard-recent-item,
+/* Recent rows: tight monospace, no radius, hairline rules between. */
+[data-theme="ds3"] .dashboard-recent-list {
+  gap: 0;
+}
+
+[data-theme="ds3"] .dashboard-recent-item {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px dotted var(--color-border);
+  background: transparent;
+  padding: var(--space-2) var(--space-3);
+}
+
+[data-theme="ds3"] .dashboard-recent-item:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds3"] .dashboard-recent-item:hover {
+  background: var(--color-surface);
+  border-bottom-color: var(--color-accent);
+}
+
+[data-theme="ds3"] .dashboard-recent-item h3 {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
 [data-theme="ds3"] .dashboard-recent-empty-state,
 [data-theme="ds3"] .dashboard-recent-empty-slot {
-  border-radius: var(--radius-sm);
+  border-radius: 0;
 }
 
 [data-theme="ds3"] .dashboard-progress-stat-label,
@@ -833,6 +985,9 @@
 
 [data-theme="ds3"] .dashboard-progress-stat-value span {
   font-family: var(--font-narrative);
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
 }
 
 /* ═══════════════════════════════════════════════════════════════
