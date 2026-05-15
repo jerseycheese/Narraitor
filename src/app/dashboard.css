@@ -476,10 +476,54 @@
          eyebrow captions in monospace)
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── DS1 ─── */
+/* ─── DS1 — "The Ledger" ───
+   An asymmetric margin-rail + body spread. A narrow rail holds Progress
+   (a vertical stat ledger) and Getting Started (a margin checklist); the
+   wide body column holds Continue + Recent Worlds + Recent Characters.
+   An ink-rule gutter divider runs between them — reads like an open
+   manuscript index page. grid-auto-flow: dense backfills the body column
+   whether or not the Continue card is present. */
 
 [data-theme="ds1"] .component-dashboard-home {
-  gap: var(--space-5);
+  --ds1-rail-width: 13.5rem;
+  --ds1-col-gap: var(--space-6);
+  --ds1-pad: var(--space-4);
+
+  position: relative;            /* anchors the ink-rule ::before */
+  display: grid;
+  grid-template-columns: var(--ds1-rail-width) 1fr;
+  grid-auto-flow: row dense;
+  gap: var(--space-5) var(--ds1-col-gap);
+  padding: var(--ds1-pad);
+}
+
+@media (width >= 1024px) {
+  [data-theme="ds1"] .component-dashboard-home {
+    --ds1-pad: var(--space-6);
+  }
+}
+
+/* Ink-rule gutter divider — one continuous vertical rule centered in the
+   gutter. Absolutely positioned so it is not a grid item. */
+[data-theme="ds1"] .component-dashboard-home::before {
+  content: "";
+  position: absolute;
+  top: var(--ds1-pad);
+  bottom: var(--ds1-pad);
+  left: calc(var(--ds1-pad) + var(--ds1-rail-width) + (var(--ds1-col-gap) / 2));
+  width: 1px;
+  background: var(--color-border-strong);
+}
+
+[data-theme="ds1"] .component-dashboard-progress-card,
+[data-theme="ds1"] .component-dashboard-getting-started {
+  grid-column: 1;
+}
+
+[data-theme="ds1"] .component-dashboard-continue-card,
+[data-theme="ds1"] .component-dashboard-recent-worlds,
+[data-theme="ds1"] .component-dashboard-recent-characters {
+  grid-column: 2;
 }
 
 [data-theme="ds1"] .component-dashboard-progress-card,
@@ -516,6 +560,57 @@
 [data-theme="ds1"] .dashboard-progress-stat-value span {
   font-family: var(--font-narrative);
   font-weight: 500;
+  font-size: 1.25rem;
+}
+
+/* Progress card as a vertical stat ledger — the 4-col stat grid becomes a
+   single column of inline ledger rows (icon + number left, label right,
+   hairline rule between) so it reads as a ruled ledger in the narrow rail. */
+[data-theme="ds1"] .dashboard-progress-stats {
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+
+[data-theme="ds1"] .dashboard-progress-stat {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-theme="ds1"] .dashboard-progress-stat:last-child {
+  border-bottom: none;
+}
+
+[data-theme="ds1"] .dashboard-progress-stat-value {
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds1"] .dashboard-progress-stat-label {
+  text-align: right;
+}
+
+/* Below 768px the margin-rail silhouette collapses to a single-column
+   stack — texture-level differentiation only, per epic #1165. */
+@media (width < 768px) {
+  [data-theme="ds1"] .component-dashboard-home {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  [data-theme="ds1"] .component-dashboard-home::before {
+    display: none;
+  }
+
+  [data-theme="ds1"] .dashboard-progress-stats {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /* ─── DS2 — "The Bento" ───
@@ -750,6 +845,17 @@
   font-family: var(--font-interface);
   font-size: 0.875rem;
   line-height: 1.4;
+}
+
+/* Getting Started sits in the narrow rail — stretch the CTA, and stack the
+   "Ready to Continue" complete variant so its lg button + copy stay legible. */
+[data-theme="ds1"] .component-dashboard-getting-started .dashboard-getting-started-cta {
+  align-self: stretch;
+}
+
+[data-theme="ds1"] .component-dashboard-getting-started-complete .dashboard-getting-started-complete-row {
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 /* ─── DS2 interior ─── */
