@@ -733,10 +733,48 @@
   font-size: 2rem;
 }
 
-/* ─── DS3 ─── */
+/* ─── DS3 — "The Console" ───
+   Dense control panel: a compact stat strip on top + a condensed
+   3-column row for Recent Worlds + Recent Characters + Getting
+   Started. Continue (when present) anchors the top as a full-width
+   banner. Below 768px collapses to a single flex column. */
 
 [data-theme="ds3"] .component-dashboard-home {
-  gap: var(--space-6);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+@media (width < 768px) {
+  [data-theme="ds3"] .component-dashboard-home {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}
+
+[data-theme="ds3"] .component-dashboard-continue-card,
+[data-theme="ds3"] .component-dashboard-progress-card {
+  grid-column: 1 / -1;
+}
+
+/* Progress as a compact stat strip — stats inline along one row
+   rather than 2D-stacked tiles. */
+[data-theme="ds3"] .dashboard-progress-stats {
+  display: flex;
+  flex-wrap: wrap;
+  grid-template-columns: none;
+  gap: var(--space-3) var(--space-6);
+}
+
+[data-theme="ds3"] .dashboard-progress-stat {
+  flex: 0 1 auto;
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
 [data-theme="ds3"] .component-dashboard-progress-card,
@@ -781,7 +819,6 @@
   flex-shrink: 0;
 }
 
-[data-theme="ds3"] .dashboard-progress-stat,
 [data-theme="ds3"] .dashboard-recent-item,
 [data-theme="ds3"] .dashboard-recent-empty-state,
 [data-theme="ds3"] .dashboard-recent-empty-slot {
