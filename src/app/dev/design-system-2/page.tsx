@@ -885,9 +885,9 @@ export default function DesignSystem2Page() {
             Design tokens as CSS custom properties. Theme-aware and globally accessible.
           </p>
 
-          <div className="ds2-reveal">
-            <div className="ds2-component-label">Core Variables</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+          <details className="ds2-reveal">
+            <summary className="ds2-component-label" style={{ cursor: 'pointer', userSelect: 'none' }}>Core Variables</summary>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px', marginTop: '12px', marginBottom: '32px' }}>
               <div className="ds2-code">
                 {`/* Typography */
 --font-narrative: 'Crimson Pro', serif
@@ -920,11 +920,11 @@ export default function DesignSystem2Page() {
 --shadow-soft: 0 8px 24px rgba(45, 37, 32, 0.08)`}
               </div>
             </div>
-          </div>
+          </details>
 
-          <div className="ds2-reveal">
-            <div className="ds2-component-label">Spacing & Layout</div>
-            <div className="ds2-code">
+          <details className="ds2-reveal">
+            <summary className="ds2-component-label" style={{ cursor: 'pointer', userSelect: 'none' }}>Spacing & Layout</summary>
+            <div className="ds2-code" style={{ marginTop: '12px' }}>
               {`/* Spacing (8px base grid) */
 --space-1: 8px
 --space-2: 16px
@@ -942,7 +942,7 @@ export default function DesignSystem2Page() {
 --shadow-soft: 0 8px 24px rgba(45, 37, 32, 0.08)
 --shadow-elevated: 0 16px 48px rgba(45, 37, 32, 0.12)`}
             </div>
-          </div>
+          </details>
         </div>
       </section >
 
@@ -957,9 +957,9 @@ export default function DesignSystem2Page() {
             Layered manuscript interface with floating HUD, drawers, and action rail. Backdrop blur and gentle transparency.
           </p>
 
-          <div className="ds2-reveal">
-            <div className="ds2-component-label">Overlay Tokens</div>
-            <div className="ds2-code">
+          <details className="ds2-reveal">
+            <summary className="ds2-component-label" style={{ cursor: 'pointer', userSelect: 'none' }}>Overlay Tokens</summary>
+            <div className="ds2-code" style={{ marginTop: '12px' }}>
               {`/* Manuscript Shell */
 background: var(--gradient-manuscript), var(--color-canvas);
 
@@ -977,7 +977,7 @@ box-shadow: var(--shadow-soft);
 background: var(--color-surface);
 box-shadow: var(--shadow-elevated);`}
             </div>
-          </div>
+          </details>
 
           <div className="ds2-reveal" style={{ marginTop: '32px' }}>
             <div className="ds2-component-label">Class System</div>
@@ -1020,9 +1020,9 @@ box-shadow: var(--shadow-elevated);`}
           <SessionDemo />
 
           {/* Overlay Token Reference */}
-          <div className="ds2-reveal" style={{ marginTop: '32px' }}>
-            <div className="ds2-component-label">Overlay System</div>
-            <div className="ds2-code">
+          <details className="ds2-reveal" style={{ marginTop: '32px' }}>
+            <summary className="ds2-component-label" style={{ cursor: 'pointer', userSelect: 'none' }}>Overlay System</summary>
+            <div className="ds2-code" style={{ marginTop: '12px' }}>
               {`/* Manuscript Shell */
 background: var(--gradient-manuscript), var(--color-canvas);
 
@@ -1036,7 +1036,7 @@ background: var(--color-overlay-surface-strong);  /* 95% opacity */
 backdrop-filter: blur(20px);
 box-shadow: var(--shadow-soft);`}
             </div>
-          </div>
+          </details>
 
           {/* Class System */}
           <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginTop: '32px' }}>

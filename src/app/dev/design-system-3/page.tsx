@@ -210,9 +210,9 @@ export default function DesignSystem3Page() {
           </div>
 
           {/* Usage Guidelines */}
-          <div className="ds3-stage ds3-reveal">
-            <div className="ds3-stage-label">Brand Guidelines</div>
-            <pre style={{ fontFamily: 'var(--font-system)', fontSize: 13, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap' }}>
+          <details className="ds3-stage ds3-reveal">
+            <summary className="ds3-stage-label" style={{ cursor: 'pointer', userSelect: 'none' }}>Brand Guidelines</summary>
+            <pre style={{ fontFamily: 'var(--font-system)', fontSize: 13, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: '12px 0 0', whiteSpace: 'pre-wrap' }}>
               {`/* Primary wordmark: Newsreader serif */
 .narraitor-wordmark {
   font-family: 'Newsreader', serif;
@@ -229,7 +229,7 @@ export default function DesignSystem3Page() {
 /* Minimum size: 24px for legibility */
 /* Clear space: equal to cap height on all sides */`}
             </pre>
-          </div>
+          </details>
         </div>
       </section>
 
@@ -589,7 +589,8 @@ export default function DesignSystem3Page() {
           <div className="ds3-section-number ds3-reveal">10 — Design Tokens</div>
           <h2 className="ds3-section-title ds3-reveal">Token Reference</h2>
           <p className="ds3-section-subtitle ds3-reveal">Every token with its resolved value.</p>
-          <div className="ds3-reveal" style={{ overflowX: 'auto' }}>
+          <details className="ds3-reveal" style={{ overflowX: 'auto' }}>
+            <summary style={{ fontFamily: 'var(--font-system)', fontSize: 12, color: 'var(--color-text-muted)', cursor: 'pointer', userSelect: 'none', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Show token reference table</summary>
             <table className="ds3-token-table">
               <thead><tr><th>Token</th><th>Value</th><th>Sample</th></tr></thead>
               <tbody>
@@ -624,7 +625,7 @@ export default function DesignSystem3Page() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </details>
         </div>
       </section>
 

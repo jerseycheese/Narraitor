@@ -294,8 +294,8 @@ export default function DesignSystemPage() {
             </div>
           </div>
 
-          <div style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface-hover)' }}>
-            <div className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 12 }}>Brand Guidelines</div>
+          <details style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface-hover)' }}>
+            <summary className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 12, cursor: 'pointer', userSelect: 'none' }}>Brand Guidelines</summary>
             <pre className="font-system" style={{ fontSize: 13, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap' }}>
               {`/* Primary wordmark: Lora serif */
 .narraitor-wordmark {
@@ -313,7 +313,7 @@ export default function DesignSystemPage() {
 /* Minimum size: 24px for legibility */
 /* Clear space: equal to cap height on all sides */`}
             </pre>
-          </div>
+          </details>
         </div>
       </section>
 
@@ -915,8 +915,8 @@ a:hover {
           <div style={{ marginBottom: 32 }}>
             <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>Current custom property definitions from globals.css. These drive both the shadcn layer and the design system layer.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
-              <div>
-                <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>:root (Light)</h4>
+              <details>
+                <summary className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer', userSelect: 'none' }}>:root (Light)</summary>
                 <pre
                   className="font-system"
                   tabIndex={0}
@@ -962,9 +962,9 @@ a:hover {
   --border: 240 5.2% 90%;
 }`}
                 </pre>
-              </div>
-              <div>
-                <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>.dark</h4>
+              </details>
+              <details>
+                <summary className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer', userSelect: 'none' }}>.dark</summary>
                 <pre
                   className="font-system"
                   tabIndex={0}
@@ -1005,7 +1005,7 @@ a:hover {
   --border: 240 3.7% 15.9%;
 }`}
                 </pre>
-              </div>
+              </details>
             </div>
           </div>
         </div>
