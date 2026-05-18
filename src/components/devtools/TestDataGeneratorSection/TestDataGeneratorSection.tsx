@@ -33,7 +33,6 @@ export const TestDataGeneratorSection: React.FC = () => {
 
       if (worldTypeRandom < 0.33) {
         // 33% - Original worlds (no reference)
-        console.log(`[DevTools] Generating original world...`);
       } else if (worldTypeRandom < 0.66) {
         // 33% - "Set in" worlds (existing universe)
         const tvMovieUniverses = [
@@ -54,9 +53,6 @@ export const TestDataGeneratorSection: React.FC = () => {
         randomReference =
           tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
         randomRelationship = 'set_within';
-        console.log(
-          `[DevTools] Generating "set in" world for ${randomReference} (canonical theme will be applied)...`
-        );
       } else {
         // 34% - "Based on" worlds (inspired by existing universe)
         const tvMovieUniverses = [
@@ -77,9 +73,6 @@ export const TestDataGeneratorSection: React.FC = () => {
         randomReference =
           tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
         randomRelationship = 'inspired_by';
-        console.log(
-          `[DevTools] Generating "based on" world inspired by ${randomReference}...`
-        );
       }
 
       const existingNames = Object.values(worlds).map((w) => w.name);
@@ -140,23 +133,15 @@ export const TestDataGeneratorSection: React.FC = () => {
 
       const worldId = createWorld(worldDataForStore);
       await ensureWorldNpcRoster(worldId);
-      console.log(
-        `Test world "${testWorldData.name}" created with ID: ${worldId}`
-      );
 
       // Set the newly created world as the active world
       const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(worldId);
-      console.log(`[DevTools] Set newly generated world as active: ${worldId}`);
 
       // Generate world image asynchronously using my enhanced API
       try {
         // Get the created world from store
         const world = useWorldStore.getState().worlds[worldId];
-        console.log(
-          `[DevTools] Attempting to generate image for world:`,
-          world?.name
-        );
         if (world) {
           const response = await fetch('/api/generate-world-image', {
             method: 'POST',
@@ -165,7 +150,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           });
 
           if (response.ok) {
-            const { imageUrl, aiGenerated, service } = await response.json();
+            const { imageUrl, aiGenerated } = await response.json();
             // Update the world with the generated image in GeneratedImage format (my enhancement)
             const image: GeneratedImage = {
               type: aiGenerated
@@ -175,10 +160,6 @@ export const TestDataGeneratorSection: React.FC = () => {
               generatedAt: getTimestamp(),
             };
             useWorldStore.getState().updateWorld(worldId, { image });
-            console.log(
-              `[DevTools] Generated ${service} image for test world "${testWorldData.name}":`,
-              imageUrl
-            );
           } else {
             const errorText = await response.text();
             console.warn(
@@ -206,8 +187,6 @@ export const TestDataGeneratorSection: React.FC = () => {
       const existingNames = Object.values(worlds).map((w) => w.name);
 
       for (let i = 0; i < 5; i++) {
-        console.log(`[DevTools] Generating diverse world ${i + 1}/5...`);
-
         // Generate a diverse mix of world types for testing (my enhancement)
         const worldTypeRandom = Math.random();
         let randomReference;
@@ -215,7 +194,6 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         if (worldTypeRandom < 0.33) {
           // 33% - Original worlds (no reference)
-          console.log(`[DevTools] Generating original world ${i + 1}/5...`);
           randomReference = undefined;
           randomRelationship = undefined;
         } else if (worldTypeRandom < 0.66) {
@@ -240,9 +218,6 @@ export const TestDataGeneratorSection: React.FC = () => {
               Math.floor(Math.random() * tvMovieUniverses.length)
             ];
           randomRelationship = 'set_within';
-          console.log(
-            `[DevTools] Generating "set in" world ${i + 1}/5 for ${randomReference} (canonical theme will be applied)...`
-          );
         } else {
           // 34% - "Based on" worlds (inspired by existing universe)
           const tvMovieUniverses = [
@@ -265,9 +240,6 @@ export const TestDataGeneratorSection: React.FC = () => {
               Math.floor(Math.random() * tvMovieUniverses.length)
             ];
           randomRelationship = 'inspired_by';
-          console.log(
-            `[DevTools] Generating "based on" world ${i + 1}/5 inspired by ${randomReference}...`
-          );
         }
 
         // Include existing names plus already created worlds in this batch to avoid duplicates
@@ -333,25 +305,17 @@ export const TestDataGeneratorSection: React.FC = () => {
         const worldId = createWorld(worldDataForStore);
         await ensureWorldNpcRoster(worldId);
         createdWorlds.push({ id: worldId, name: testWorldData.name });
-        console.log(`Created test world: ${testWorldData.name}`);
 
         // Set the first created world as active (for batch generation)
         if (i === 0) {
           const { setCurrentWorld } = useWorldStore.getState();
           setCurrentWorld(worldId);
-          console.log(
-            `[DevTools] Set first generated world as active: ${worldId}`
-          );
         }
 
         // Generate world image asynchronously for each world using my enhanced API
         try {
           // Get the created world from store
           const world = useWorldStore.getState().worlds[worldId];
-          console.log(
-            `[DevTools] Attempting to generate image for world ${i + 1}/5:`,
-            world?.name
-          );
           if (world) {
             const response = await fetch('/api/generate-world-image', {
               method: 'POST',
@@ -360,7 +324,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             });
 
             if (response.ok) {
-              const { imageUrl, aiGenerated, service } = await response.json();
+              const { imageUrl, aiGenerated } = await response.json();
               // Update the world with the generated image in GeneratedImage format (my enhancement)
               const image: GeneratedImage = {
                 type: aiGenerated
@@ -370,10 +334,6 @@ export const TestDataGeneratorSection: React.FC = () => {
                 generatedAt: getTimestamp(),
               };
               useWorldStore.getState().updateWorld(worldId, { image });
-              console.log(
-                `[DevTools] Generated ${service} image for test world "${testWorldData.name}":`,
-                imageUrl
-              );
             } else {
               const errorText = await response.text();
               console.warn(
@@ -391,10 +351,6 @@ export const TestDataGeneratorSection: React.FC = () => {
       }
 
       const worldNames = createdWorlds.map((w) => w.name).join(', ');
-      console.log(
-        `[DevTools] Generated 5 test worlds with images:`,
-        createdWorlds
-      );
       alert(`Successfully generated 5 test worlds with images: ${worldNames}`);
     } catch (error) {
       console.error('[DevTools] Error generating test worlds:', error);
@@ -481,10 +437,6 @@ export const TestDataGeneratorSection: React.FC = () => {
     const storageKey = `character-creation-${currentWorld.id}`;
     try {
       sessionStorage.setItem(storageKey, JSON.stringify(wizardState));
-      console.log(
-        `[TestDataGenerator] Stored test character data with key: ${storageKey}`,
-        wizardState
-      );
 
       // Verify it was stored
       const stored = sessionStorage.getItem(storageKey);
@@ -550,17 +502,9 @@ export const TestDataGeneratorSection: React.FC = () => {
 
     try {
       for (let i = 0; i < 5; i++) {
-        console.log(
-          `[DevTools] Generating character ${i + 1}/5 for world "${currentWorld.name}"...`
-        );
-
         // Random character type selection (50/50 between known and original)
         const types: Array<'known' | 'original'> = ['known', 'original'];
         const characterType = types[Math.floor(Math.random() * types.length)];
-
-        console.log(
-          `[DevTools] Generating ${characterType} character for world "${currentWorld.name}"`
-        );
 
         // Use the AI character generator via API route (secure approach from develop)
         const response: Response = await fetch('/api/generate-character', {
@@ -649,9 +593,6 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         const characterId = createCharacter(characterData);
         createdCharacters.push({ id: characterId, name: characterData.name });
-        console.log(
-          `[DevTools] Created AI ${characterType} character: ${characterData.name}`
-        );
 
         // Generate portrait asynchronously via API route (secure approach)
         try {
@@ -659,10 +600,6 @@ export const TestDataGeneratorSection: React.FC = () => {
           const storeCharacter =
             useCharacterStore.getState().characters[characterId];
           if (storeCharacter) {
-            console.log(
-              `[DevTools] Generating portrait for ${characterType} character "${characterData.name}"...`
-            );
-
             const response = await fetch('/api/generate-portrait', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -727,9 +664,6 @@ export const TestDataGeneratorSection: React.FC = () => {
               useCharacterStore
                 .getState()
                 .updateCharacter(characterId, { portrait });
-              console.log(
-                `[DevTools] Generated portrait for ${characterType} character "${characterData.name}"`
-              );
             } else {
               console.warn(
                 `[DevTools] Portrait generation failed for ${characterType} character "${characterData.name}"`
@@ -746,10 +680,6 @@ export const TestDataGeneratorSection: React.FC = () => {
       }
 
       const characterNames = createdCharacters.map((c) => c.name).join(', ');
-      console.log(
-        `[DevTools] Generated 5 AI characters (random type selection) with portraits for world "${currentWorld.name}":`,
-        createdCharacters
-      );
       alert(
         `Successfully generated 5 AI characters (random type selection) with portraits: ${characterNames}`
       );
@@ -797,9 +727,6 @@ export const TestDataGeneratorSection: React.FC = () => {
         worldStoreState.setCurrentWorld('');
       }
 
-      console.log(
-        `[DevTools] Deleted all ${worldCount} worlds and their characters`
-      );
       alert(
         `Successfully deleted all ${worldCount} worlds and their characters`
       );
@@ -841,11 +768,6 @@ export const TestDataGeneratorSection: React.FC = () => {
         await new Promise((resolve) => setTimeout(resolve, 1));
       }
 
-      const characterNames = worldCharacters.map((c) => c.name).join(', ');
-      console.log(
-        `[DevTools] Deleted ${worldCharacters.length} characters from world "${currentWorld.name}":`,
-        characterNames
-      );
       alert(
         `Successfully deleted ${worldCharacters.length} characters from "${currentWorld.name}"`
       );
@@ -902,9 +824,6 @@ export const TestDataGeneratorSection: React.FC = () => {
         }
       }
 
-      console.log(
-        `[DevTools] NUKED EVERYTHING: Reset both stores, deleted ${worldCount} worlds and ${characterCount} characters`
-      );
       alert(
         `NUCLEAR OPTION COMPLETE\\n\\nDeleted ${worldCount} worlds and ${characterCount} characters.\\n\\nDatabase is now empty.`
       );

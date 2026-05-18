@@ -29,6 +29,7 @@ import { SkipLinks } from '@/components/shared/SkipLinks';
 import { ToastProvider, Toaster } from '@/components/ui/toast';
 import { TutorialProvider } from '@/components/TutorialProvider';
 import { ThemeProvider } from '@/lib/theme';
+import { THEME_INIT_SCRIPT } from '@/lib/theme/themeInitScript';
 
 /* DS1 fonts (preloaded - default theme) */
 const lora = Lora({
@@ -107,8 +108,6 @@ const fontVariables = [
   dmSans.variable,
 ].join(' ');
 
-const themeScript = `(function(){try{var t=localStorage.getItem('narraitor-theme');if(t)document.documentElement.setAttribute('data-theme',t);var c=localStorage.getItem('narraitor-color-scheme');if(c==='dark'||(c==='system'&&matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
-
 export const metadata: Metadata = {
   title: 'Narraitor',
   description: 'A narrative-driven RPG framework using AI',
@@ -129,7 +128,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" data-theme="ds1" className={fontVariables} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body suppressHydrationWarning>
         <SkipLinks />

@@ -35,6 +35,7 @@ export default function FinalizeStep({
   // Logger function that can be easily disabled for production
   const log = (message: string, data?: unknown) => {
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console -- dev-only debug, gated on NODE_ENV
       console.log(message, data);
     }
   };

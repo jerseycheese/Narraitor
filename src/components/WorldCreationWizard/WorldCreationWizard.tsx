@@ -31,6 +31,18 @@ import { Button } from '@/components/ui/button';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import { useTutorial } from '@/components/TutorialProvider';
 import { tourStepToWizardStep } from '@/lib/tutorial/worldCreationTour';
+import { safeJsonParse } from '@/lib/safeJsonParse';
+
+type PersistedWorldSummary = {
+  id: string;
+  name?: string;
+  genre?: string;
+  description?: string;
+  createdAt: string;
+  attributes: unknown[];
+  skills: unknown[];
+  image?: unknown;
+};
 
 // Efficient deep comparison for arrays of objects
 const areArraysEqual = <T extends object>(a: T[] = [], b: T[] = []): boolean => {
@@ -420,7 +432,10 @@ export default function WorldCreationWizard({
       
       // Save to localStorage as temporary solution
       if (typeof window !== 'undefined') {
-        const worlds = JSON.parse(localStorage.getItem('worlds') || '[]');
+        const worlds = safeJsonParse<PersistedWorldSummary[]>(
+          localStorage.getItem('worlds'),
+          []
+        );
         worlds.push({
           id: worldId,
           name: data.name,
@@ -438,11 +453,15 @@ export default function WorldCreationWizard({
 
       // Move to quick start step instead of completing
       wizard.goNext();
-    } catch {
-      // Fallback error handling
+    } catch (error) {
+      // Fallback error handling — log so failures are observable
+      console.error('[WorldCreationWizard] handleComplete failed, using fallback world id:', error);
       const worldId = `world-${Date.now()}`;
       if (typeof window !== 'undefined') {
-        const worlds = JSON.parse(localStorage.getItem('worlds') || '[]');
+        const worlds = safeJsonParse<PersistedWorldSummary[]>(
+          localStorage.getItem('worlds'),
+          []
+        );
         worlds.push({
           id: worldId,
           name: data.name,
@@ -455,7 +474,7 @@ export default function WorldCreationWizard({
         });
         localStorage.setItem('worlds', JSON.stringify(worlds));
       }
-      
+
       // Store the world ID and move to quick start
       wizard.updateData({ createdWorldId: worldId });
       wizard.goNext();
