@@ -1,3 +1,5 @@
+// TODO: this store is ~1,400 lines and should be split into slices
+// (segments / decisions / endings / npc-roster). Tracked separately.
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence, PromptDebugInfo } from '../types/narrative.types';
