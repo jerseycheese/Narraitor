@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { SimpleModal } from '@/components/shared/SimpleModal';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
@@ -26,40 +25,25 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   isDeleting = false,
 }) => {
   return (
-    <SimpleModal
+    <ConfirmationDialog
       isOpen={isOpen}
       onClose={onClose}
+      onConfirm={onConfirm}
       title={title}
-      description={description}
-      showCloseButton={false}
-      size="lg"
-      tone="destructive"
-      footer={(
-        <div>
-          <Button
-            type="button"
-            onClick={onClose}
-            disabled={isDeleting}
-            variant="outline"
-            aria-label={`${cancelButtonText} deletion`}
-          >
-            {cancelButtonText}
-          </Button>
-
-          <Button
-            type="button"
-            onClick={onConfirm}
-            disabled={isDeleting}
-            variant="destructive"
-            aria-label={`${confirmButtonText} ${itemName}`}
-          >
-            {isDeleting ? 'Deleting...' : confirmButtonText}
-          </Button>
-        </div>
-      )}
-    >
-      <p>{itemName}</p>
-    </SimpleModal>
+      variant="destructive"
+      message={
+        <>
+          <p>{description}</p>
+          <p>{itemName}</p>
+        </>
+      }
+      confirmText={confirmButtonText}
+      cancelText={cancelButtonText}
+      confirmAriaLabel={`${confirmButtonText} ${itemName}`}
+      cancelAriaLabel={`${cancelButtonText} deletion`}
+      isLoading={isDeleting}
+      loadingText="Deleting..."
+    />
   );
 };
 

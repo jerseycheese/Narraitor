@@ -58,7 +58,6 @@ function PreviewModalInner<T>({
       onClose={onCancel}
       title={title}
       showCloseButton={false}
-      size="xl"
       className={className}
     >
       <p id="preview-modal-desc">
