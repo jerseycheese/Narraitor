@@ -98,7 +98,16 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       : step.target;
     if (!(el instanceof Element)) return;
     if (typeof ResizeObserver === 'undefined') return;
+    // Skip the initial fire that ResizeObserver delivers on observe(). Reacting
+    // to it would bump targetResizeTick, remount Joyride, and the remount's
+    // own scroll/relayout can change the target size — fires again — looping
+    // during tour startup and breaking visual snapshots.
+    let isInitialFire = true;
     const observer = new ResizeObserver(() => {
+      if (isInitialFire) {
+        isInitialFire = false;
+        return;
+      }
       setTargetResizeTick((tick) => tick + 1);
     });
     observer.observe(el);
