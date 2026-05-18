@@ -1,5 +1,5 @@
 import React from 'react';
-import { cssClasses } from '@/lib/utils';
+import { clsx } from 'clsx';
 
 export type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
 export type ErrorSeverity = 'error' | 'warning' | 'info';
@@ -108,7 +108,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   // Default: section variant
   return (
     <div
-      className={cssClasses('error-display', 'error-display-section', className)}
+      className={clsx('error-display', 'error-display-section', className)}
       role="alert"
       aria-live="polite"
     >

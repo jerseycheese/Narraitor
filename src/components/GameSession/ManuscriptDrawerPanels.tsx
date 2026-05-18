@@ -9,7 +9,8 @@ import { useJournalStore } from '@/state/journalStore';
 import { useShallow } from 'zustand/react/shallow';
 import { EntityID } from '@/types/common.types';
 import { Character } from '@/state/characterStore';
-import { titleCase, capitalize, cssClasses } from '@/lib/utils';
+import { clsx } from 'clsx';
+import { titleCase, capitalize } from '@/lib/utils';
 
 interface CharacterDrawerContentProps {
   character: Character;
@@ -206,7 +207,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
         {drawerButtons.map((button) => (
           <button
             key={button.id}
-            className={cssClasses(
+            className={clsx(
               'manuscript-tools-menu-item',
               activeDrawer === button.id && 'manuscript-tools-menu-item-active'
             )}
@@ -247,7 +248,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
 
         {onToggleStreamingPreview && (
           <button
-            className={cssClasses(
+            className={clsx(
               'manuscript-tools-menu-item',
               isStreamingPreview && 'manuscript-tools-menu-item-active'
             )}
@@ -260,7 +261,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
 
         {onToggleEndingSuggestionPreview && (
           <button
-            className={cssClasses(
+            className={clsx(
               'manuscript-tools-menu-item',
               isEndingSuggestionPreview && 'manuscript-tools-menu-item-active'
             )}

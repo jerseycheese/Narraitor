@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cssClasses } from '@/lib/utils/classNames';
+import { clsx } from 'clsx';
 
 /**
  * Props for the DevToolsSection component
@@ -44,7 +44,7 @@ export const DevToolsSection: React.FC<DevToolsSectionProps> = ({
   className = ''
 }) => {
   return (
-    <div className={cssClasses(
+    <div className={clsx(
       '',
       className
     )}>

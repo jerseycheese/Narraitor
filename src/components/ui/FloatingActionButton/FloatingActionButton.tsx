@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { cssClasses } from '@/lib/utils/classNames';
+import { clsx } from 'clsx';
 
 export interface FloatingActionButtonProps {
   onClick: () => void;
@@ -29,7 +29,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       aria-label={label}
       title={label}
       data-tutorial={dataTutorialId}
-      className={cssClasses(
+      className={clsx(
         'component-floating-action-button',
         className
       )}

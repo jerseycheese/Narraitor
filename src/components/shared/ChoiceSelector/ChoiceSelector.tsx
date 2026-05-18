@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
 import { ArrowUp } from 'lucide-react';
-import { cssClasses, safeTrim } from '@/lib/utils';
+import { clsx } from 'clsx';
+import { safeTrim } from '@/lib/utils';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 import { normalizeDecisionOptions } from './optionNormalizer';
 import type { NormalizedOption } from './optionNormalizer';
@@ -220,7 +221,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                     data-disabled-reason={
                       isOptionDisabled ? option.disabledReason : undefined
                     }
-                    className={cssClasses(
+                    className={clsx(
                       'manuscript-suggested-action',
                       option.isSelected
                         ? 'is-selected manuscript-suggested-action-selected'

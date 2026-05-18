@@ -1,5 +1,5 @@
 import React from 'react';
-import { cssClasses } from '@/lib/utils';
+import { clsx } from 'clsx';
 
 interface ManuscriptActionRailProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ export const ManuscriptActionRail: React.FC<ManuscriptActionRailProps> = ({
   return (
     <footer
       id="manuscript-action-rail"
-      className={cssClasses(
+      className={clsx(
         isStreaming && 'manuscript-action-rail-streaming',
         className
       )}

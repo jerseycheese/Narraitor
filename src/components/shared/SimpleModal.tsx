@@ -10,7 +10,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { cssClasses } from '@/lib/utils/classNames';
+import { clsx } from 'clsx';
 
 interface SimpleModalProps {
   /** Whether the modal is open */
@@ -97,7 +97,7 @@ export function SimpleModal({
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
         overlayScroll={scrollBehavior === 'overlay'}
-        className={cssClasses(
+        className={clsx(
           className
         )}
         onInteractOutside={(event) => {

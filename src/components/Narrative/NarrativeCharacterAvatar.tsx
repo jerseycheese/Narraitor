@@ -1,5 +1,5 @@
 import React from 'react';
-import { cssClasses } from '@/lib/utils/classNames';
+import { clsx } from 'clsx';
 
 interface NarrativeCharacterAvatarProps {
   name: string;
@@ -42,7 +42,7 @@ export function NarrativeCharacterAvatar({
   if (avatarUrl) {
     return (
       <div
-        className={cssClasses(
+        className={clsx(
           '',
           className
         )}
@@ -62,7 +62,7 @@ export function NarrativeCharacterAvatar({
 
   return (
     <div
-      className={cssClasses(
+      className={clsx(
         '',
         className
       )}

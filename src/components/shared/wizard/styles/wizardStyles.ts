@@ -84,6 +84,3 @@ export const wizardStyles = {
   errorContainer: "wizard-error-container",
 };
 
-export const cssClasses = (...classes: (string | undefined | null | false)[]): string => {
-  return classes.filter(Boolean).join(' ');
-};
