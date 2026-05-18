@@ -15,18 +15,13 @@ export interface ConfirmationDialogProps {
   variant?: ConfirmationVariant;
   confirmText?: string;
   cancelText?: string;
+  confirmAriaLabel?: string;
+  cancelAriaLabel?: string;
   isLoading?: boolean;
   loadingText?: string;
 }
 
-const confirmButtonVariants: Record<ConfirmationVariant, 'default' | 'destructive'> = {
-  default: 'default',
-  destructive: 'destructive',
-  warning: 'default',
-  info: 'default',
-};
-
-const modalToneMap: Record<ConfirmationVariant, NonNullable<React.ComponentProps<typeof SimpleModal>['tone']>> = {
+const confirmButtonVariants: Record<ConfirmationVariant, 'default' | 'destructive' | 'warning' | 'info'> = {
   default: 'default',
   destructive: 'destructive',
   warning: 'warning',
@@ -42,6 +37,8 @@ export function ConfirmationDialog({
   variant = 'default',
   confirmText = 'Confirm',
   cancelText = 'Cancel',
+  confirmAriaLabel,
+  cancelAriaLabel,
   isLoading = false,
   loadingText = 'Loading...',
 }: ConfirmationDialogProps) {
@@ -50,10 +47,8 @@ export function ConfirmationDialog({
 
   useEffect(() => {
     if (isOpen && !isLoading) {
-      // Focus the appropriate button when dialog opens
       const timer = setTimeout(() => {
         if (variant === 'destructive' && cancelButtonRef.current) {
-          // Focus cancel button for destructive actions to prevent accidental confirmation
           cancelButtonRef.current.focus();
         } else if (confirmButtonRef.current) {
           confirmButtonRef.current.focus();
@@ -70,8 +65,6 @@ export function ConfirmationDialog({
       onClose={onClose}
       title={title || 'Confirmation Required'}
       showCloseButton={false}
-      size="lg"
-      tone={modalToneMap[variant]}
       description={message}
       footer={(
         <div>
@@ -80,7 +73,7 @@ export function ConfirmationDialog({
             onClick={onClose}
             variant="outline"
             disabled={isLoading}
-            
+            aria-label={cancelAriaLabel}
           >
             {cancelText}
           </Button>
@@ -89,7 +82,7 @@ export function ConfirmationDialog({
             onClick={onConfirm}
             variant={confirmButtonVariants[variant]}
             disabled={isLoading}
-            
+            aria-label={confirmAriaLabel}
           >
             {isLoading ? loadingText : confirmText}
           </Button>

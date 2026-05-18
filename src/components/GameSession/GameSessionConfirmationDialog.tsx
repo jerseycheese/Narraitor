@@ -1,7 +1,6 @@
 'use client';
 
-import { SimpleModal } from '@/components/shared/SimpleModal';
-import { Button } from '@/components/ui/button';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 
 interface GameSessionConfirmationDialogProps {
   isOpen: boolean;
@@ -43,7 +42,7 @@ export function GameSessionConfirmationDialog({
   currentProgress = 0,
 }: GameSessionConfirmationDialogProps) {
   const config = copyConfig[type];
-  const tone = type === 'character-switch' ? 'info' : 'warning';
+  const variant = type === 'character-switch' ? 'info' : 'warning';
 
   const descriptionWithContext =
     type === 'start-new'
@@ -52,31 +51,21 @@ export function GameSessionConfirmationDialog({
           currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''
         }`;
 
+  const confirmText =
+    type === 'character-switch' && characterName
+      ? `Play as ${characterName}`
+      : config.confirmText;
+
   return (
-    <SimpleModal
+    <ConfirmationDialog
       isOpen={isOpen}
       onClose={onClose}
+      onConfirm={onConfirm}
       title={config.title}
-      description={descriptionWithContext}
-      tone={tone}
-      size="md"
-      showCloseButton={false}
-      footer={
-        <div>
-          <Button onClick={onClose} variant="outline" >
-            {config.cancelText}
-          </Button>
-          <Button
-            onClick={onConfirm}
-            variant={tone === 'warning' ? 'warning' : 'info'}
-            
-          >
-            {type === 'character-switch' && characterName
-            ? `Play as ${characterName}`
-              : config.confirmText}
-          </Button>
-        </div>
-      }
+      message={descriptionWithContext}
+      variant={variant}
+      confirmText={confirmText}
+      cancelText={config.cancelText}
     />
   );
 }

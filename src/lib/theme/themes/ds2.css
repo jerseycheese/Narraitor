@@ -129,24 +129,10 @@
   --color-danger: rgb(185 28 28);
   --color-danger-hover: rgb(153 27 27);
 
-  /* Spacing scale (Tailwind-aligned) */
-  --space-0_5: 0.125rem;
-  --space-1:   0.25rem;
-  --space-1_5: 0.375rem;
-  --space-2:   0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3:   0.75rem;
-  --space-3_5: 0.875rem;
-  --space-4:   1rem;
-  --space-5:   1.25rem;
-  --space-6:   1.5rem;
-  --space-8:   2rem;
-
-  /* Radius tokens */
+  /* Radius tokens (per-theme; --radius-full lives in _shared-tokens.css) */
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-full: 9999px;
 }
 
 /* DS2 Dark Mode */
@@ -259,25 +245,6 @@
   --shadow-drawer: -12px 0 24px rgb(0 0 0 / 40%);
   --color-danger: rgb(239 68 68);
   --color-danger-hover: rgb(220 38 38);
-
-  /* Spacing scale (Tailwind-aligned) */
-  --space-0_5: 0.125rem;
-  --space-1:   0.25rem;
-  --space-1_5: 0.375rem;
-  --space-2:   0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3:   0.75rem;
-  --space-3_5: 0.875rem;
-  --space-4:   1rem;
-  --space-5:   1.25rem;
-  --space-6:   1.5rem;
-  --space-8:   2rem;
-
-  /* Radius tokens */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-full: 9999px;
 }
 
 /* DS2 Background Pattern - Clean, no grid */

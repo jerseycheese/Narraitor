@@ -16,6 +16,7 @@ import './wizard.css';
 import './dashboard.css';
 import './badge.css';
 import './character-display.css';
+import '@/lib/theme/themes/_shared-tokens.css';
 import '@/lib/theme/themes/ds1.css';
 import '@/lib/theme/themes/ds2.css';
 import '@/lib/theme/themes/ds3.css';

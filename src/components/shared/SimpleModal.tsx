@@ -43,10 +43,6 @@ interface SimpleModalProps {
   scrollBehavior?: 'overlay' | 'content';
   /** Whether the footer should stick to the bottom */
   stickyFooter?: boolean;
-  /** Modal size (deprecated/unused in clean slate) */
-  size?: string;
-  /** Modal tone/variant (deprecated/unused in clean slate) */
-  tone?: string;
 }
 
 export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
@@ -79,8 +75,6 @@ export function SimpleModal({
   footerClassName,
   scrollBehavior = 'overlay',
   stickyFooter,
-  size, // Destructure but ignore for now to satisfy interface
-  tone, // Destructure but ignore
 }: SimpleModalProps) {
   const fallbackDescriptionId = useId();
   const resolvedDescriptionId =

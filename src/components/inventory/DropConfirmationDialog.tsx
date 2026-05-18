@@ -37,8 +37,6 @@ export function DropConfirmationDialog({
       onClose={onClose}
       title="Drop Item"
       showCloseButton={false}
-      size="lg"
-      tone="destructive"
       footer={
         <div>
           <Button

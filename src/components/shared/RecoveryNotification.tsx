@@ -127,7 +127,6 @@ export function RecoveryNotification({
       title="Character Creation Progress Found"
       description="Found saved character creation progress from a previous session."
       showCloseButton={true}
-      size="md"
       ariaDescribedBy="recovery-notification-content"
     >
       <div id="recovery-notification-content">

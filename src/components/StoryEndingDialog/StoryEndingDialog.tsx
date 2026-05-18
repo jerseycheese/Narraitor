@@ -64,7 +64,6 @@ export function StoryEndingDialog({
       title={(title && safeTrim(title)) || "Story Ending"}
       description={content}
       showCloseButton={false}
-      size="xl"
       ariaDescribedBy="story-ending-content"
       className={cssClasses(
         '',

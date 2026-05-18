@@ -19,11 +19,13 @@ import { UserFriendlyError } from '@/lib/utils/errorUtils';
 import { CrudStore } from './createCrudStore';
 import type { DuplicateMatch } from '../types/lore.types';
 import { getInitialState, type FactHistory } from './loreStore.state';
-import { createLoreBaseActions } from './loreStore.actions.base';
-import { createLoreFactActions } from './loreStore.actions.facts';
-import { createLoreAliasActions } from './loreStore.actions.aliases';
-import { createLoreUsageActions } from './loreStore.actions.usage';
-import { createLoreImportExportActions } from './loreStore.actions.import-export';
+import {
+  createLoreBaseActions,
+  createLoreFactActions,
+  createLoreAliasActions,
+  createLoreUsageActions,
+  createLoreImportExportActions,
+} from './loreStore.actions';
 
 export interface LoreStore extends CrudStore<LoreFact> {
   facts: Record<EntityID, LoreFact>;
