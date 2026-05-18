@@ -141,7 +141,7 @@
       "plugin:storybook/recommended"
     ]
   },
-  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
+  "description": "AI-powered storytelling app that runs narrative RPG experiences in any world — fictional or real — with mechanics and tone tailored to that world.",
   "main": "index.js",
   "directories": {
     "doc": "docs",
