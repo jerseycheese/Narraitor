@@ -26,6 +26,15 @@ test('QuickStart selection tour snapshots (steps 0-2)', async ({ page }) => {
   for (const stepIndex of steps) {
     await startTourAt(page, 'quickStartSelection', stepIndex);
     await waitForTooltip(page);
-    await expect(page).toHaveScreenshot(`tutorial-quickstart-selection-step${zeroPad(stepIndex)}.png`, { fullPage: true });
+    // Wait for any Joyride scroll animation, then force scroll to top so
+    // the sidebar logo is in frame, and clip to viewport-sized region.
+    // Avoids the Joyride overlay phantom and per-iteration overlay
+    // stacking. See PR #1233.
+    await page.waitForTimeout(400);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(100);
+    await expect(page).toHaveScreenshot(`tutorial-quickstart-selection-step${zeroPad(stepIndex)}.png`, {
+      clip: { x: 0, y: 0, width: 1280, height: 1080 },
+    });
   }
 });

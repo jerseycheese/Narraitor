@@ -124,7 +124,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   // Initialize component state on mount
   useEffect(() => {
-    const generationLocks = initialGenerationLocksRef.current;
     // Create a unique session key to track this instance
     const instanceKey = `${sessionId}-${Date.now()}`;
     setSessionKey(instanceKey);
@@ -146,8 +145,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
-      // Clear generation locks for this session to prevent memory leaks
-      generationLocks.delete(sessionId);
+      // NOTE: We intentionally do NOT delete initialGenerationLocksRef here.
+      // The lock is owned by the in-flight generation (released in its finally
+      // block); releasing it on unmount allows a remounted instance to start a
+      // duplicate generation while the original is still in flight.
     };
   }, [sessionId, worldId, characterId]);
 
