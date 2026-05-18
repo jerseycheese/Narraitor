@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { safeJsonParse } from '@/lib/safeJsonParse';
 
 export interface WizardStep {
   id: string;
@@ -55,51 +56,51 @@ export function useWizardState<T>(config: WizardConfig<T>) {
   // Initialize state from localStorage if persist key provided
   const [state, setState] = useState<WizardState<T>>(() => {
     if (persistKey && typeof window !== 'undefined') {
-      const saved = localStorage.getItem(persistKey);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
+      const parsed = safeJsonParse<unknown>(
+        localStorage.getItem(persistKey),
+        null
+      );
 
-          // Only restore if the persisted value is actually a wizard state.
-          // localStorage under a persistKey is untrusted input — it can hold
-          // a value that isn't a WizardState (foreign writer, manual edit,
-          // corruption). Spreading that produced a state missing required
-          // fields like `errors`, which crashed downstream consumers.
-          const isWizardState =
-            parsed !== null &&
-            typeof parsed === 'object' &&
-            typeof parsed.currentStep === 'number' &&
-            typeof parsed.data === 'object';
+      // Only restore if the persisted value is actually a wizard state.
+      // localStorage under a persistKey is untrusted input — it can hold
+      // a value that isn't a WizardState (foreign writer, manual edit,
+      // corruption). Spreading that produced a state missing required
+      // fields like `errors`, which crashed downstream consumers.
+      const isWizardState =
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        typeof (parsed as { currentStep?: unknown }).currentStep === 'number' &&
+        typeof (parsed as { data?: unknown }).data === 'object';
 
-          if (isWizardState) {
-            // Merge saved data with initial data to handle schema migrations.
-            // This ensures new fields in initialData are present even if not
-            // in the saved state. Each top-level field is rebuilt explicitly
-            // so a partial persisted state can never yield an undefined field.
-            const initialState: WizardState<T> = {
-              currentStep: parsed.currentStep,
-              data: { ...initialData, ...parsed.data },
-              errors: parsed.errors ?? {},
-              isProcessing: false,
-              validation: parsed.validation ?? {},
-            };
+      if (isWizardState) {
+        const persisted = parsed as Partial<WizardState<T>> & {
+          currentStep: number;
+          data: Partial<T>;
+        };
+        // Merge saved data with initial data to handle schema migrations.
+        // This ensures new fields in initialData are present even if not
+        // in the saved state. Each top-level field is rebuilt explicitly
+        // so a partial persisted state can never yield an undefined field.
+        const initialState: WizardState<T> = {
+          currentStep: persisted.currentStep,
+          data: { ...initialData, ...persisted.data },
+          errors: persisted.errors ?? {},
+          isProcessing: false,
+          validation: persisted.validation ?? {},
+        };
 
-            if (validateStep) {
-              const validation = validateStep(initialState.currentStep, initialState.data);
-              return {
-                ...initialState,
-                validation: {
-                  ...initialState.validation,
-                  [initialState.currentStep]: { ...validation, touched: true },
-                },
-              };
-            }
-
-            return initialState;
-          }
-        } catch {
-          // Failed to parse saved state, will use initial state
+        if (validateStep) {
+          const validation = validateStep(initialState.currentStep, initialState.data);
+          return {
+            ...initialState,
+            validation: {
+              ...initialState.validation,
+              [initialState.currentStep]: { ...validation, touched: true },
+            },
+          };
         }
+
+        return initialState;
       }
     }
 
