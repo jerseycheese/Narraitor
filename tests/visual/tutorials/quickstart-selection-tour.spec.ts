@@ -26,6 +26,11 @@ test('QuickStart selection tour snapshots (steps 0-2)', async ({ page }) => {
   for (const stepIndex of steps) {
     await startTourAt(page, 'quickStartSelection', stepIndex);
     await waitForTooltip(page);
-    await expect(page).toHaveScreenshot(`tutorial-quickstart-selection-step${zeroPad(stepIndex)}.png`, { fullPage: true });
+    // Clip excludes the Joyride overlay phantom that absolute-positions
+    // below the visible content; also avoids the per-iteration overlay
+    // stacking that doubled the doc height each step. See PR #1233.
+    await expect(page).toHaveScreenshot(`tutorial-quickstart-selection-step${zeroPad(stepIndex)}.png`, {
+      clip: { x: 0, y: 0, width: 1280, height: 1080 },
+    });
   }
 });

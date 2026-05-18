@@ -43,7 +43,11 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     );
 
     await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('character-creation-quickstart.png', { fullPage: true });
+    // Clip excludes the Joyride overlay phantom that absolute-positions
+    // below the visible content (mis-measured spotlight). See PR #1233.
+    await expect(page).toHaveScreenshot('character-creation-quickstart.png', {
+      clip: { x: 0, y: 0, width: 1280, height: 1080 },
+    });
   });
 
   await test.step('Step 0: Template Selection', async () => {
