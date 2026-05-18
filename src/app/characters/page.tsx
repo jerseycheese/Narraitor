@@ -28,6 +28,7 @@ import { Toast } from '@/components/ui/toast';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { GeneratedImage } from '@/types/common.types';
+import { generatePortrait } from '@/lib/api/generatePortrait';
 
 type CharacterPortraitUpdate = {
   portrait: GeneratedImage;
@@ -99,23 +100,11 @@ async function generateCharacterPortrait(
       },
     };
 
-    const response = await fetch('/api/generate-portrait', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        character: characterForPortrait,
-        world: currentWorld,
-      }),
+    const { portrait } = await generatePortrait({
+      character: characterForPortrait,
+      world: currentWorld,
     });
-
-    if (response.ok) {
-      const result = await response.json();
-      const portrait = result.portrait || {
-        type: 'ai-generated',
-        url: result.image,
-        generatedAt: getTimestamp(),
-        prompt: result.prompt,
-      };
+    if (portrait) {
       updateCharacter(characterId, { portrait });
     }
   } catch {
