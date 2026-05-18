@@ -861,10 +861,6 @@
   content: none;
 }
 
-[data-theme="ds1"] .wizard-page .wizard-archetype-grid .wizard-step-title {
-  padding-top: 0;
-}
-
 [data-theme="ds1"] .wizard-page .wizard-form-section {
   gap: var(--space-3);
 }
@@ -1212,10 +1208,6 @@
 
 [data-theme="ds3"] .wizard-page .wizard-archetype-grid .wizard-step-title::before {
   content: none;
-}
-
-[data-theme="ds3"] .wizard-page .wizard-archetype-grid .wizard-step-title {
-  padding-top: 0;
 }
 
 [data-theme="ds3"] .wizard-page .wizard-form-section {
