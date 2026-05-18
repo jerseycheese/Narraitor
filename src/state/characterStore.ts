@@ -874,8 +874,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
 
 // Expose store globally in development for testing and debugging
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useCharacterStore = useCharacterStore;
+  window.useCharacterStore = useCharacterStore;
 }
 
 // Subscribe to store events

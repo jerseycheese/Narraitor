@@ -339,7 +339,11 @@ async function applyWorldStateThreadUpdates({
     }
 
     worldStore.updateWorldState(effectiveWorldId, updatePayload, sessionId);
-  } catch {
+  } catch (error) {
+    console.error('[narrativeStore] applyWorldStateThreadUpdates failed', {
+      sessionId,
+      error,
+    });
   }
 }
 
@@ -1460,6 +1464,5 @@ export const useNarrativeStore = create<NarrativeStore>()(
 
 // Expose store globally in development for manual testing
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useNarrativeStore = useNarrativeStore;
+  window.useNarrativeStore = useNarrativeStore;
 }
