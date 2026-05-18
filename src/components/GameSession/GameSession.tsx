@@ -251,7 +251,6 @@ const GameSession: React.FC<GameSessionProps> = ({
       // In development mode with fast refresh, don't end sessions
       // This prevents the infinite reset loop during hot reloading
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔧 Development mode: Skipping session cleanup to prevent fast refresh issues');
         return;
       }
       

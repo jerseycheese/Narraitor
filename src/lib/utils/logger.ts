@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- this module is the console wrapper */
 /**
  * Logger utility for standardized debug logging across the application.
  * Provides severity levels, environment-based toggling, and formatted output.
