@@ -602,6 +602,5 @@ export const useWorldStore = create<WorldStore>()(
 // Expose store globally in development to support test data seeding
 // and debugging via window.useWorldStore in dev tools.
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useWorldStore = useWorldStore;
+  window.useWorldStore = useWorldStore;
 }

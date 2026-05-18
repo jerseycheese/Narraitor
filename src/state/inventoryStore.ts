@@ -991,8 +991,7 @@ export const useInventoryStore = create<InventoryStore>()(
 
 // Expose store globally in development for easier debugging & manual seeding
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useInventoryStore = useInventoryStore;
+  window.useInventoryStore = useInventoryStore;
 }
 
 // Subscribe to store events

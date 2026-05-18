@@ -331,7 +331,11 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
       }));
     }
 
-    const sessionState = sessionStore?.getState?.() || {};
+    const sessionState = (sessionStore?.getState?.() ?? {}) as {
+      id?: string | null;
+      worldId?: string | null;
+      characterId?: string | null;
+    };
     const sessionId = sessionState.id ?? 'session-cyberpunk-ghost';
     const worldId = sessionState.worldId ?? resolvedWorldId ?? 'world-cyberpunk-2077';
     const characterId = sessionState.characterId ?? resolvedCharacterId ?? 'char-cyberpunk-hacker';
@@ -771,7 +775,6 @@ export async function seedStorySummaryForVisual(page: Page): Promise<void> {
       worldStore.currentWorldId ||
       Object.keys(worldStore.worlds || {})[0];
     const sessionId =
-      sessionStore.currentSessionId ||
       sessionStore.id ||
       'session-visual-story';
     const characterId =

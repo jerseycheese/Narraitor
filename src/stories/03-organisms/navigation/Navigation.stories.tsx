@@ -277,7 +277,7 @@ export const WorldSwitcherOpen: Story = {
 
       // Simulate opened dropdown by adding CSS to show it
       const style = document.createElement('style');
-      style.textContent = `[data-testid="world-switcher-dropdown"] { display: !important; }`;
+      style.textContent = `[data-testid="world-switcher-dropdown"] { display: block !important; }`;
       document.head.appendChild(style);
 
       return <Story />;
