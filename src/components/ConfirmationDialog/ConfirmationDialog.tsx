@@ -11,19 +11,24 @@ export interface ConfirmationDialogProps {
   onClose: () => void;
   onConfirm: () => void;
   title?: string;
-  message: React.ReactNode;
+  message?: React.ReactNode;
+  /** Extra body rendered as modal children below the description. */
+  customBody?: React.ReactNode;
   variant?: ConfirmationVariant;
   confirmText?: string;
   cancelText?: string;
+  confirmAriaLabel?: string;
+  cancelAriaLabel?: string;
   isLoading?: boolean;
   loadingText?: string;
+  size?: string;
 }
 
-const confirmButtonVariants: Record<ConfirmationVariant, 'default' | 'destructive'> = {
+const confirmButtonVariants: Record<ConfirmationVariant, 'default' | 'destructive' | 'warning' | 'info'> = {
   default: 'default',
   destructive: 'destructive',
-  warning: 'default',
-  info: 'default',
+  warning: 'warning',
+  info: 'info',
 };
 
 const modalToneMap: Record<ConfirmationVariant, NonNullable<React.ComponentProps<typeof SimpleModal>['tone']>> = {
@@ -39,21 +44,23 @@ export function ConfirmationDialog({
   onConfirm,
   title,
   message,
+  customBody,
   variant = 'default',
   confirmText = 'Confirm',
   cancelText = 'Cancel',
+  confirmAriaLabel,
+  cancelAriaLabel,
   isLoading = false,
   loadingText = 'Loading...',
+  size = 'lg',
 }: ConfirmationDialogProps) {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isOpen && !isLoading) {
-      // Focus the appropriate button when dialog opens
       const timer = setTimeout(() => {
         if (variant === 'destructive' && cancelButtonRef.current) {
-          // Focus cancel button for destructive actions to prevent accidental confirmation
           cancelButtonRef.current.focus();
         } else if (confirmButtonRef.current) {
           confirmButtonRef.current.focus();
@@ -70,31 +77,35 @@ export function ConfirmationDialog({
       onClose={onClose}
       title={title || 'Confirmation Required'}
       showCloseButton={false}
-      size="lg"
+      size={size}
       tone={modalToneMap[variant]}
       description={message}
       footer={(
         <div>
           <Button
             ref={cancelButtonRef}
+            type="button"
             onClick={onClose}
             variant="outline"
             disabled={isLoading}
-            
+            aria-label={cancelAriaLabel}
           >
             {cancelText}
           </Button>
           <Button
             ref={confirmButtonRef}
+            type="button"
             onClick={onConfirm}
             variant={confirmButtonVariants[variant]}
             disabled={isLoading}
-            
+            aria-label={confirmAriaLabel}
           >
             {isLoading ? loadingText : confirmText}
           </Button>
         </div>
       )}
-    />
+    >
+      {customBody}
+    </SimpleModal>
   );
 }

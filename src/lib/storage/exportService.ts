@@ -1,9 +1,6 @@
 /**
- * Export/Import service for full game state backup
- * Provides functionality to export complete game state to files and import them back
- * 
- * This service handles the creation of downloadable backup files and validation
- * of imported game state to ensure data integrity.
+ * Export/Import helpers for full game state backup.
+ * Stateless functions that read from and write to the Zustand stores.
  */
 
 import { useWorldStore, WorldStore } from '../../state/worldStore';
@@ -14,6 +11,8 @@ import { useNarrativeStore } from '../../state/narrativeStore';
 import { validateWorld } from '@/lib/utils/typeGuards';
 import { getTimestamp } from '../utils';
 
+const CURRENT_VERSION = '1.0.0';
+const COMPATIBLE_VERSIONS = ['1.0.0'];
 
 export interface GameStateExport {
   version: string;
@@ -37,227 +36,185 @@ export interface ImportResult {
   error?: string;
 }
 
-export class ExportService {
-  private readonly CURRENT_VERSION = '1.0.0';
-  private readonly COMPATIBLE_VERSIONS = ['1.0.0'];
+export async function exportGameState(): Promise<ExportResult> {
+  try {
+    const gameState: GameStateExport = {
+      version: CURRENT_VERSION,
+      exportedAt: getTimestamp(),
+      worldState: useWorldStore.getState(),
+      characterState: useCharacterStore.getState(),
+      sessionState: useSessionStore.getState(),
+      journalState: useJournalStore.getState(),
+      narrativeState: useNarrativeStore.getState(),
+    };
 
-  /**
-   * Export complete game state
-   */
-  async exportGameState(): Promise<ExportResult> {
-    try {
-      const gameState: GameStateExport = {
-        version: this.CURRENT_VERSION,
-        exportedAt: getTimestamp(),
-        worldState: useWorldStore.getState(),
-        characterState: useCharacterStore.getState(),
-        sessionState: useSessionStore.getState(),
-        journalState: useJournalStore.getState(),
-        narrativeState: useNarrativeStore.getState(),
-      };
+    return { success: true, data: gameState };
+  } catch {
+    return { success: false, error: 'Failed to export game state' };
+  }
+}
 
-      return {
-        success: true,
-        data: gameState,
-      };
-    } catch {
-      return {
-        success: false,
-        error: 'Failed to export game state',
-      };
-    }
+export async function downloadGameState(): Promise<void> {
+  const exportResult = await exportGameState();
+
+  if (!exportResult.success || !exportResult.data) {
+    throw new Error(exportResult.error || 'Export failed');
   }
 
-  /**
-   * Create and download a game state file
-   */
-  async downloadGameState(): Promise<void> {
-    const exportResult = await this.exportGameState();
-    
-    if (!exportResult.success || !exportResult.data) {
-      throw new Error(exportResult.error || 'Export failed');
+  const json = JSON.stringify(exportResult.data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const filename = `narraitor-save-${getTimestamp().split('T')[0]}.json`;
+
+  const element = document.createElement('a');
+  element.setAttribute('href', url);
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+
+  URL.revokeObjectURL(url);
+}
+
+export async function importGameState(gameState: unknown): Promise<ImportResult> {
+  try {
+    const validationResult = validateGameState(gameState);
+
+    if (!validationResult.valid) {
+      return { success: false, error: validationResult.error };
     }
 
-    const json = JSON.stringify(exportResult.data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+    const validatedGameState = gameState as GameStateExport;
 
-    const filename = `narraitor-save-${getTimestamp().split('T')[0]}.json`;
+    if (validatedGameState.worldState) {
+      const incomingState = validatedGameState.worldState as Partial<WorldStore> &
+        Record<string, unknown>;
+      const normalizedWorldState: Partial<WorldStore> = { ...incomingState };
 
-    const element = document.createElement('a');
-    element.setAttribute('href', url);
-    element.setAttribute('download', filename);
-    element.style.display = 'none';
-    
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    
-    URL.revokeObjectURL(url);
-  }
-
-  /**
-   * Import game state from data object
-   */
-  async importGameState(gameState: unknown): Promise<ImportResult> {
-    try {
-      const validationResult = this.validateGameState(gameState);
-      
-      if (!validationResult.valid) {
-        return {
-          success: false,
-          error: validationResult.error,
-        };
+      if (!normalizedWorldState.entities && normalizedWorldState.worlds) {
+        normalizedWorldState.entities = { ...normalizedWorldState.worlds };
       }
 
-      // Import data into stores - cast to GameStateExport after validation
-      const validatedGameState = gameState as GameStateExport;
-      
-      // Use the underlying Zustand setState method if available
-      if (validatedGameState.worldState) {
-        const incomingState = validatedGameState.worldState as Partial<WorldStore> & Record<string, unknown>;
-        const normalizedWorldState: Partial<WorldStore> = {
-          ...incomingState,
-        };
-
-        if (!normalizedWorldState.entities && normalizedWorldState.worlds) {
-          normalizedWorldState.entities = { ...normalizedWorldState.worlds };
-        }
-
-        if (normalizedWorldState.currentWorldId && !normalizedWorldState.currentEntityId) {
-          normalizedWorldState.currentEntityId = normalizedWorldState.currentWorldId;
-        }
-
-        if (normalizedWorldState.currentEntityId && !normalizedWorldState.currentWorldId) {
-          normalizedWorldState.currentWorldId = normalizedWorldState.currentEntityId;
-        }
-
-        useWorldStore.setState(normalizedWorldState);
-      }
-      
-      if (validatedGameState.characterState) {
-        const incomingCharacterState = validatedGameState.characterState as Partial<CharacterStore> & Record<string, unknown>;
-        const normalizedCharacterState: Partial<CharacterStore> = {
-          ...incomingCharacterState,
-        };
-
-        if (!normalizedCharacterState.entities && normalizedCharacterState.characters) {
-          normalizedCharacterState.entities = { ...normalizedCharacterState.characters };
-        }
-
-        if (typeof normalizedCharacterState.currentCharacterId === 'string' && !normalizedCharacterState.currentEntityId) {
-          normalizedCharacterState.currentEntityId = normalizedCharacterState.currentCharacterId;
-        }
-
-        if (typeof normalizedCharacterState.currentEntityId === 'string' && !normalizedCharacterState.currentCharacterId) {
-          normalizedCharacterState.currentCharacterId = normalizedCharacterState.currentEntityId;
-        }
-
-        useCharacterStore.setState(normalizedCharacterState);
-      }
-      
-      if (validatedGameState.sessionState) {
-        useSessionStore.setState(validatedGameState.sessionState);
-      }
-      
-      if (validatedGameState.journalState) {
-        useJournalStore.setState(validatedGameState.journalState);
-      }
-      
-      if (validatedGameState.narrativeState) {
-        useNarrativeStore.setState(validatedGameState.narrativeState);
+      if (normalizedWorldState.currentWorldId && !normalizedWorldState.currentEntityId) {
+        normalizedWorldState.currentEntityId = normalizedWorldState.currentWorldId;
       }
 
-      return {
-        success: true,
-        message: 'Game state imported successfully',
-      };
-    } catch {
-      return {
-        success: false,
-        error: 'Failed to import game state',
-      };
+      if (normalizedWorldState.currentEntityId && !normalizedWorldState.currentWorldId) {
+        normalizedWorldState.currentWorldId = normalizedWorldState.currentEntityId;
+      }
+
+      useWorldStore.setState(normalizedWorldState);
     }
-  }
 
-  /**
-   * Import game state from file
-   */
-  async importFromFile(file: File): Promise<ImportResult> {
-    try {
-      const text = await file.text();
-      const gameState = JSON.parse(text);
-      
-      return await this.importGameState(gameState);
-    } catch {
-      return {
-        success: false,
-        error: 'Invalid JSON file',
-      };
+    if (validatedGameState.characterState) {
+      const incomingCharacterState = validatedGameState.characterState as Partial<CharacterStore> &
+        Record<string, unknown>;
+      const normalizedCharacterState: Partial<CharacterStore> = { ...incomingCharacterState };
+
+      if (!normalizedCharacterState.entities && normalizedCharacterState.characters) {
+        normalizedCharacterState.entities = { ...normalizedCharacterState.characters };
+      }
+
+      if (
+        typeof normalizedCharacterState.currentCharacterId === 'string' &&
+        !normalizedCharacterState.currentEntityId
+      ) {
+        normalizedCharacterState.currentEntityId = normalizedCharacterState.currentCharacterId;
+      }
+
+      if (
+        typeof normalizedCharacterState.currentEntityId === 'string' &&
+        !normalizedCharacterState.currentCharacterId
+      ) {
+        normalizedCharacterState.currentCharacterId = normalizedCharacterState.currentEntityId;
+      }
+
+      useCharacterStore.setState(normalizedCharacterState);
     }
+
+    if (validatedGameState.sessionState) {
+      useSessionStore.setState(validatedGameState.sessionState);
+    }
+
+    if (validatedGameState.journalState) {
+      useJournalStore.setState(validatedGameState.journalState);
+    }
+
+    if (validatedGameState.narrativeState) {
+      useNarrativeStore.setState(validatedGameState.narrativeState);
+    }
+
+    return { success: true, message: 'Game state imported successfully' };
+  } catch {
+    return { success: false, error: 'Failed to import game state' };
+  }
+}
+
+export async function importFromFile(file: File): Promise<ImportResult> {
+  try {
+    const text = await file.text();
+    const gameState = JSON.parse(text);
+    return await importGameState(gameState);
+  } catch {
+    return { success: false, error: 'Invalid JSON file' };
+  }
+}
+
+function validateGameState(gameState: unknown): { valid: boolean; error?: string } {
+  if (!gameState || typeof gameState !== 'object') {
+    return { valid: false, error: 'Invalid game state format' };
   }
 
-  /**
-   * Validate game state structure and version
-   */
-  private validateGameState(gameState: unknown): { valid: boolean; error?: string } {
-    if (!gameState || typeof gameState !== 'object') {
+  const state = gameState as Record<string, unknown>;
+
+  if (!state.version) {
+    return { valid: false, error: 'Invalid game state format' };
+  }
+
+  if (!COMPATIBLE_VERSIONS.includes(state.version as string)) {
+    return { valid: false, error: 'Incompatible save file version' };
+  }
+
+  if (!state.exportedAt) {
+    return { valid: false, error: 'Invalid game state format' };
+  }
+
+  const requiredFields = ['worldState', 'characterState', 'sessionState'];
+  for (const field of requiredFields) {
+    if (!state[field]) {
       return { valid: false, error: 'Invalid game state format' };
     }
+  }
 
-    const state = gameState as Record<string, unknown>;
-
-    if (!state.version) {
-      return { valid: false, error: 'Invalid game state format' };
-    }
-
-    if (!this.COMPATIBLE_VERSIONS.includes(state.version as string)) {
-      return { valid: false, error: 'Incompatible save file version' };
-    }
-
-    if (!state.exportedAt) {
-      return { valid: false, error: 'Invalid game state format' };
-    }
-
-    // Basic structure validation
-    const requiredFields = ['worldState', 'characterState', 'sessionState'];
-    for (const field of requiredFields) {
-      if (!state[field]) {
-        return { valid: false, error: 'Invalid game state format' };
-      }
-    }
-
-    // Validate world data if present
-    if (state.worldState && typeof state.worldState === 'object') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const worldState = state.worldState as any;
-      if (worldState.worlds && typeof worldState.worlds === 'object') {
-        for (const [worldId, worldData] of Object.entries(worldState.worlds)) {
-          const validation = validateWorld(worldData);
-          if (!validation.valid) {
-            return { 
-              valid: false, 
-              error: `Invalid world data for ${worldId}: ${validation.errors[0]}` 
-            };
-          }
+  if (state.worldState && typeof state.worldState === 'object') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const worldState = state.worldState as any;
+    if (worldState.worlds && typeof worldState.worlds === 'object') {
+      for (const [worldId, worldData] of Object.entries(worldState.worlds)) {
+        const validation = validateWorld(worldData);
+        if (!validation.valid) {
+          return {
+            valid: false,
+            error: `Invalid world data for ${worldId}: ${validation.errors[0]}`,
+          };
         }
       }
     }
-
-    return { valid: true };
   }
 
-  /**
-   * Get export file size estimate
-   */
-  async getExportSize(): Promise<number> {
-    const exportResult = await this.exportGameState();
-    
-    if (!exportResult.success || !exportResult.data) {
-      return 0;
-    }
+  return { valid: true };
+}
 
-    const json = JSON.stringify(exportResult.data);
-    return new Blob([json]).size;
+export async function getExportSize(): Promise<number> {
+  const exportResult = await exportGameState();
+
+  if (!exportResult.success || !exportResult.data) {
+    return 0;
   }
+
+  const json = JSON.stringify(exportResult.data);
+  return new Blob([json]).size;
 }

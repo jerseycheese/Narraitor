@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { LoadingState, LoadingVariant } from '@/components/ui/LoadingState/LoadingState';
 import { Button } from '@/components/ui/button';
-import { cssClasses } from '@/lib/utils';
+import { clsx } from 'clsx';
 
 export interface LoadingOverlayProps {
   /** Whether the overlay is visible */
@@ -95,7 +95,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="loading-overlay-title"
-      className={cssClasses(
+      className={clsx(
         '',
         '',
         className

@@ -1,5 +1,6 @@
 import React from 'react';
-import { cssClasses, wizardStyles } from './styles/wizardStyles';
+import { clsx } from 'clsx';
+import { wizardStyles } from './styles/wizardStyles';
 
 interface WizardContainerProps {
   title: string | React.ReactNode;
@@ -14,7 +15,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
 }) => {
   return (
     <div
-      className={cssClasses(
+      className={clsx(
         'component-wizard-container',
         wizardStyles.container,
         className

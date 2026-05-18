@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cssClasses } from '@/lib/utils/classNames'
+import { clsx } from 'clsx'
 
 export type LabelProps = React.LabelHTMLAttributes<HTMLLabelElement>
 
@@ -8,7 +8,7 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
     return (
       <label
         ref={ref}
-        className={cssClasses(
+        className={clsx(
           "form-label",
           className
         )}

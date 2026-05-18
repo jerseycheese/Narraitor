@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { GeneratedImage } from '@/types/common.types';
-// Removed direct AI client imports - using API routes instead
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PortraitCustomizationSection } from '@/components/shared';
 import { getTimestamp } from '@/lib/utils';
+import { usePortraitGeneration } from '@/lib/hooks/usePortraitGeneration';
 
 interface CharacterFormData {
   name: string;
@@ -46,8 +46,7 @@ export function PortraitStep({
   onUpdate,
   worldConfig,
 }: PortraitStepProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { isGenerating, error, generate, clearError } = usePortraitGeneration();
 
   // Local state for prompt-affecting fields
   const [localPhysicalDescription, setLocalPhysicalDescription] = useState(
@@ -61,82 +60,59 @@ export function PortraitStep({
   };
 
   const handleGeneratePortrait = async () => {
-    setIsGenerating(true);
-    setError(null);
+    const characterForGeneration: Character = {
+      id: 'temp',
+      name: data.characterData.name,
+      description: '',
+      worldId: data.worldId,
+      attributes: data.characterData.attributes.map((attr) => ({
+        attributeId: attr.attributeId,
+        value: attr.value,
+      })),
+      skills: data.characterData.skills
+        .filter((skill) => skill.isSelected)
+        .map((skill) => ({
+          skillId: skill.skillId,
+          level: skill.level,
+          experience: 0,
+          isActive: true,
+        })),
+      derivedStats: [],
+      background: {
+        history:
+          data.characterData.background.history +
+          (environmentHint ? `${environmentHint}` : ''),
+        personality: data.characterData.background.personality,
+        physicalDescription:
+          localPhysicalDescription ||
+          data.characterData.background.physicalDescription,
+        goals: data.characterData.background.goals,
+        fears: [],
+        relationships: [],
+      },
+      inventory: {
+        items: [],
+        capacity: 100,
+        categories: [],
+        characterId: 'temp',
+        itemOrder: [],
+      },
+      status: { health: 100, maxHealth: 100, conditions: [] },
+      createdAt: getTimestamp(),
+      updatedAt: getTimestamp(),
+    };
 
     try {
-      // Create a character object for the API
-      const characterForGeneration: Character = {
-        id: 'temp',
-        name: data.characterData.name,
-        description: '', // Character doesn't have a description in the wizard, using empty string
-        worldId: data.worldId,
-        attributes: data.characterData.attributes.map((attr) => ({
-          attributeId: attr.attributeId,
-          value: attr.value,
-        })),
-        skills: data.characterData.skills
-          .filter((skill) => skill.isSelected)
-          .map((skill) => ({
-            skillId: skill.skillId,
-            level: skill.level,
-            experience: 0,
-            isActive: true,
-          })),
-        derivedStats: [],
-        background: {
-          history:
-            data.characterData.background.history +
-            (environmentHint ? `${environmentHint}` : ''),
-          personality: data.characterData.background.personality,
-          physicalDescription:
-            localPhysicalDescription ||
-            data.characterData.background.physicalDescription,
-          goals: data.characterData.background.goals,
-          fears: [],
-          relationships: [],
-        },
-        inventory: {
-          items: [],
-          capacity: 100,
-          categories: [],
-          characterId: 'temp',
-          itemOrder: [],
-        },
-        status: { health: 100, maxHealth: 100, conditions: [] },
-        createdAt: getTimestamp(),
-        updatedAt: getTimestamp(),
-      };
-
-      // Use the portrait generation API route
-      const response = await fetch('/api/generate-portrait', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          character: characterForGeneration,
-          world: worldConfig,
-          customDescription: localPhysicalDescription,
-        }),
+      const generatedPortrait = await generate({
+        character: characterForGeneration,
+        world: worldConfig,
+        customDescription: localPhysicalDescription,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate portrait');
+      if (generatedPortrait) {
+        onUpdate({ portrait: generatedPortrait });
       }
-
-      const { portrait: generatedPortrait } = await response.json();
-
-      onUpdate({
-        portrait: generatedPortrait,
-      });
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to generate portrait'
-      );
-    } finally {
-      setIsGenerating(false);
+    } catch {
+      // Error already captured in hook state
     }
   };
 
@@ -147,7 +123,7 @@ export function PortraitStep({
         url: null,
       },
     });
-    setError(null);
+    clearError();
   };
 
   return (

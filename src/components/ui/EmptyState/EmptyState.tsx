@@ -1,5 +1,5 @@
 import React from 'react';
-import { cssClasses } from '@/lib/utils/classNames';
+import { clsx } from 'clsx';
 
 export interface EmptyStateProps {
   title: string;
@@ -36,7 +36,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     : '';
 
   return (
-    <div className={cssClasses(
+    <div className={clsx(
       'component-empty-state',
       '',
       baseClasses,

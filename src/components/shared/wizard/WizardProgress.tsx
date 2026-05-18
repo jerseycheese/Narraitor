@@ -1,5 +1,6 @@
 import React from 'react';
-import { wizardStyles, cssClasses } from './styles/wizardStyles';
+import { clsx } from 'clsx';
+import { wizardStyles } from './styles/wizardStyles';
 
 interface WizardStep {
   id: string;
@@ -19,7 +20,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
 }) => {
   return (
     <div
-      className={cssClasses(
+      className={clsx(
         'component-wizard-progress',
         wizardStyles.progress.container,
         className
@@ -29,7 +30,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
         {steps.map((step, index) => (
           <React.Fragment key={step.id}>
             <div
-              className={cssClasses(
+              className={clsx(
                 'wizard-progress-step-wrapper',
                 wizardStyles.progress.step,
                 index === currentStep && wizardStyles.progress.stepActive,
@@ -37,7 +38,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
               )}
             >
               <div
-                className={cssClasses(
+                className={clsx(
                   wizardStyles.progress.circle,
                   index === currentStep
                     ? wizardStyles.progress.circleActive
@@ -53,7 +54,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
             {index < steps.length - 1 && (
               <div className="wizard-progress-connector-wrapper">
                 <div
-                  className={cssClasses(
+                  className={clsx(
                     wizardStyles.progress.connector,
                     index < currentStep && wizardStyles.progress.connectorActive
                   )}

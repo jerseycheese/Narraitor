@@ -1,7 +1,7 @@
 // src/components/ui/badge.tsx
 
 import * as React from "react"
-import { cssClasses } from '@/lib/utils'
+import { clsx } from 'clsx'
 
 // Clean Slate: Removed cva and Tailwind variants.
 
@@ -33,11 +33,11 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function Badge({ className, variant = "default", size = "md", icon, count, children, ...props }: BadgeProps) {
   return (
-    <div className={cssClasses("badge", `badge-${variant}`, `badge-${size}`, className)} {...props}>
+    <div className={clsx("badge", `badge-${variant}`, `badge-${size}`, className)} {...props}>
       {icon && <span className="badge-icon">{icon}</span>}
       {children}
       {count !== undefined && (
-        <span className={cssClasses("badge-count")}>
+        <span className={clsx("badge-count")}>
           {count}
         </span>
       )}

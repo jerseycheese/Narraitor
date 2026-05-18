@@ -13,6 +13,7 @@ import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
+import { generatePortrait } from '@/lib/api/generatePortrait';
 
 // Use the Character type from the store since it's different from the main types
 type Character = ReturnType<typeof useCharacterStore.getState>['characters'][string];
@@ -123,28 +124,18 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     if (!editingCharacter || !world) return;
 
     setGeneratingPortrait(true);
-    setPortraitError(null); // Clear previous portrait errors
+    setPortraitError(null);
     try {
-      const response = await fetch('/api/generate-portrait', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          character: { ...editingCharacter, id: characterId },
-          world: world,
-          customDescription: customDescription
-        }),
+      const { portrait } = await generatePortrait({
+        character: { ...editingCharacter, id: characterId },
+        world: world,
+        customDescription: customDescription,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate portrait');
+      if (portrait) {
+        setEditingCharacter({ ...editingCharacter, portrait });
+        useCharacterStore.getState().updateCharacter(characterId, { portrait });
       }
-
-      const { portrait } = await response.json();
-
-      // Update both local editing state and store
-      setEditingCharacter({ ...editingCharacter, portrait });
-      useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
       console.error('Failed to generate portrait:', error);
       setPortraitError('Failed to generate portrait. Please try again.');

@@ -86,41 +86,36 @@ function analyzeRecoveryData(data: CharacterCreationState): RecoveryDataPreview 
     lastSaved: data.lastSaved,
   };
 
-  // Try to extract character data information
-  try {
-    const characterData = data.characterData as Record<string, unknown>;
-    if (characterData) {
-      // Extract name
-      if (characterData.name && typeof characterData.name === 'string') {
-        preview.name = characterData.name;
-      }
+  const characterData = data.characterData as Record<string, unknown> | null;
+  if (!characterData) {
+    return preview;
+  }
 
-      // Check attributes
-      if (characterData.attributes && Array.isArray(characterData.attributes)) {
-        preview.hasAttributes = characterData.attributes.length > 0;
-        preview.totalAttributePoints = characterData.attributes.reduce(
-          (sum: number, attr: Record<string, unknown>) => sum + (Number(attr.value) || 0), 0
-        );
-      }
+  if (typeof characterData.name === 'string') {
+    preview.name = characterData.name;
+  }
 
-      // Check skills
-      if (characterData.skills && Array.isArray(characterData.skills)) {
-        const selectedSkills = characterData.skills.filter((skill: Record<string, unknown>) => skill.isSelected);
-        preview.hasSkills = selectedSkills.length > 0;
-        preview.selectedSkillCount = selectedSkills.length;
-      }
+  if (Array.isArray(characterData.attributes)) {
+    preview.hasAttributes = characterData.attributes.length > 0;
+    preview.totalAttributePoints = characterData.attributes.reduce(
+      (sum: number, attr: Record<string, unknown>) => sum + (Number(attr.value) || 0), 0
+    );
+  }
 
-      // Check background
-      if (characterData.background && typeof characterData.background === 'object') {
-        const bg = characterData.background as Record<string, unknown>;
-        preview.hasBackground = !!(
-          bg.history || bg.personality || bg.motivation || 
-          (bg.goals && Array.isArray(bg.goals) && bg.goals.length > 0)
-        );
-      }
-    }
-  } catch {
-    console.warn('[AutoSave] Could not analyze recovery data for preview');
+  if (Array.isArray(characterData.skills)) {
+    const selectedSkills = characterData.skills.filter(
+      (skill: Record<string, unknown>) => skill.isSelected
+    );
+    preview.hasSkills = selectedSkills.length > 0;
+    preview.selectedSkillCount = selectedSkills.length;
+  }
+
+  if (characterData.background && typeof characterData.background === 'object') {
+    const bg = characterData.background as Record<string, unknown>;
+    preview.hasBackground = !!(
+      bg.history || bg.personality || bg.motivation ||
+      (Array.isArray(bg.goals) && bg.goals.length > 0)
+    );
   }
 
   return preview;
@@ -140,24 +135,29 @@ function hasBackgroundData(background: Record<string, unknown>): boolean {
 function hasCurrentFormData(data: CharacterCreationState | undefined): boolean {
   if (!data || !data.characterData) return false;
 
-  try {
-    const characterData = data.characterData as Record<string, unknown>;
-    
-    // Check for any meaningful user input
-    return !!(
-      characterData?.name ||
-      (characterData?.attributes && Array.isArray(characterData.attributes) && 
-        characterData.attributes.some((attr: Record<string, unknown>) => 
-          Number(attr.value || 0) > Number(attr.minValue || 0))) ||
-      (characterData?.skills && Array.isArray(characterData.skills) && 
-        characterData.skills.some((skill: Record<string, unknown>) => skill.isSelected)) ||
-      (characterData?.background && typeof characterData.background === 'object' && 
-        characterData.background !== null && 
-        hasBackgroundData(characterData.background as Record<string, unknown>))
+  const characterData = data.characterData as Record<string, unknown>;
+
+  const hasAttributePoints =
+    Array.isArray(characterData.attributes) &&
+    characterData.attributes.some((attr: Record<string, unknown>) =>
+      Number(attr.value || 0) > Number(attr.minValue || 0)
     );
-  } catch {
-    return false;
-  }
+
+  const hasSelectedSkill =
+    Array.isArray(characterData.skills) &&
+    characterData.skills.some((skill: Record<string, unknown>) => skill.isSelected);
+
+  const background =
+    characterData.background && typeof characterData.background === 'object'
+      ? (characterData.background as Record<string, unknown>)
+      : null;
+
+  return !!(
+    characterData.name ||
+    hasAttributePoints ||
+    hasSelectedSkill ||
+    (background && hasBackgroundData(background))
+  );
 }
 
 export const useCharacterCreationAutoSave = (worldId: EntityID) => {

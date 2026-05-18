@@ -5,7 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import {
   Dialog,
 } from '@/components/ui/dialog';
-import { cssClasses } from '@/lib/utils/classNames';
+import { clsx } from 'clsx';
 
 interface ManuscriptDrawerProps {
   open: boolean;
@@ -48,7 +48,7 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
           aria-describedby={undefined}
         >
           <aside
-            className={cssClasses(
+            className={clsx(
               'manuscript-drawer-panel',
               side === 'right'
                 ? 'manuscript-drawer-panel-right'

@@ -6,7 +6,7 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
-import { ExportService } from '@/lib/storage/exportService';
+import { downloadGameState, importFromFile } from '@/lib/storage/exportService';
 
 interface ExportImportControlsProps {
   className?: string;
@@ -18,7 +18,6 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const exportService = new ExportService();
 
   const showMessage = (text: string, type: 'success' | 'error') => {
     setMessage(text);
@@ -36,7 +35,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
     setIsExporting(true);
     
     try {
-      await exportService.downloadGameState();
+      await downloadGameState();
       showMessage('Export completed successfully', 'success');
     } catch {
       showMessage('Export failed. Please try again.', 'error');
@@ -52,7 +51,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
     setIsImporting(true);
     
     try {
-      const result = await exportService.importFromFile(file);
+      const result = await importFromFile(file);
       
       if (result.success) {
         showMessage(result.message || 'Import successful', 'success');

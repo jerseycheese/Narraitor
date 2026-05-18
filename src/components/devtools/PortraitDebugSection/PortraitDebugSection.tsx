@@ -16,6 +16,7 @@ import { World } from '@/types/world.types';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
+import { generatePortrait } from '@/lib/api/generatePortrait';
 
 interface PortraitDebugSectionProps {
   characterData?: Partial<Character>;
@@ -167,28 +168,12 @@ export function PortraitDebugSection({
       console.log('Request body:', requestBody);
       console.log('promptOnly flag:', requestBody.promptOnly);
 
-      const response = await fetch('/api/generate-portrait', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
-
-      console.log('API response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log('API error response:', errorText);
-        throw new Error(
-          `API request failed: ${response.status} - ${errorText}`
-        );
-      }
-
-      const result = await response.json();
+      const result = await generatePortrait(requestBody);
       console.log('API response result:', result);
       const prompt = result.prompt || result.portrait?.prompt;
       console.log('Extracted prompt:', prompt);
 
-      setGeneratedPrompt(prompt);
+      setGeneratedPrompt(prompt ?? '');
       console.log('Prompt set successfully');
     } catch (error) {
       setGeneratedPrompt(

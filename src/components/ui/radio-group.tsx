@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cssClasses } from '@/lib/utils/classNames'
+import { clsx } from 'clsx'
 
 export interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string
@@ -34,7 +34,7 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
     return (
       <RadioGroupContext.Provider value={contextValue}>
         <div
-          className={cssClasses(
+          className={clsx(
             orientation === 'horizontal' ? "grid-flow-col auto-cols-max" : "grid-flow-row",
             className
           )}
@@ -63,7 +63,7 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
           checked={context.value === value}
           onChange={() => context.onValueChange?.(value)}
           disabled={context.disabled || props.disabled}
-          className={cssClasses(
+          className={clsx(
             className
           )}
           ref={ref}

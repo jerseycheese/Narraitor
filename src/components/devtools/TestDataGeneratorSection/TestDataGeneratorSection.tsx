@@ -9,6 +9,7 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
+import { generatePortrait } from '@/lib/api/generatePortrait';
 
 export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
@@ -663,67 +664,61 @@ export const TestDataGeneratorSection: React.FC = () => {
               `[DevTools] Generating portrait for ${characterType} character "${characterData.name}"...`
             );
 
-            const response = await fetch('/api/generate-portrait', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                character: {
-                  id: storeCharacter.id,
-                  name: storeCharacter.name,
-                  worldId: storeCharacter.worldId,
-                  background: {
-                    history: storeCharacter.background.history,
-                    personality: storeCharacter.background.personality,
-                    physicalDescription:
-                      storeCharacter.background.physicalDescription || '',
-                    goals: storeCharacter.background.goals,
-                    fears: storeCharacter.background.fears,
-                    relationships: [],
-                  },
-                  attributes: storeCharacter.attributes.map(
-                    (attr: {
-                      id: string;
-                      name: string;
-                      baseValue: number;
-                    }) => ({
-                      attributeId:
-                        currentWorld.attributes.find(
-                          (wa) => wa.name === attr.name
-                        )?.id || attr.id,
-                      value: attr.baseValue,
-                    })
-                  ),
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  skills: storeCharacter.skills.map((skill: any) => ({
-                    skillId:
-                      currentWorld.skills.find((ws) => ws.name === skill.name)
-                        ?.id || skill.id,
-                    level: skill.level,
-                    experience: 0,
-                    isActive: true,
-                  })),
-                  inventory: {
-                    characterId: storeCharacter.id,
-                    items: [],
-                    capacity: 100,
-                    categories: [],
-                  },
-                  status: {
-                    health: storeCharacter.status.health,
-                    maxHealth: storeCharacter.status.maxHealth,
-                    conditions: storeCharacter.status.conditions,
-                    location: currentWorld.name,
-                  },
-                  createdAt: storeCharacter.createdAt,
-                  updatedAt: storeCharacter.updatedAt,
+            const { portrait } = await generatePortrait({
+              character: {
+                id: storeCharacter.id,
+                name: storeCharacter.name,
+                worldId: storeCharacter.worldId,
+                background: {
+                  history: storeCharacter.background.history,
+                  personality: storeCharacter.background.personality,
+                  physicalDescription:
+                    storeCharacter.background.physicalDescription || '',
+                  goals: storeCharacter.background.goals,
+                  fears: storeCharacter.background.fears,
+                  relationships: [],
                 },
-                world: currentWorld,
-              }),
+                attributes: storeCharacter.attributes.map(
+                  (attr: {
+                    id: string;
+                    name: string;
+                    baseValue: number;
+                  }) => ({
+                    attributeId:
+                      currentWorld.attributes.find(
+                        (wa) => wa.name === attr.name
+                      )?.id || attr.id,
+                    value: attr.baseValue,
+                  })
+                ),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                skills: storeCharacter.skills.map((skill: any) => ({
+                  skillId:
+                    currentWorld.skills.find((ws) => ws.name === skill.name)
+                      ?.id || skill.id,
+                  level: skill.level,
+                  experience: 0,
+                  isActive: true,
+                })),
+                inventory: {
+                  characterId: storeCharacter.id,
+                  items: [],
+                  capacity: 100,
+                  categories: [],
+                },
+                status: {
+                  health: storeCharacter.status.health,
+                  maxHealth: storeCharacter.status.maxHealth,
+                  conditions: storeCharacter.status.conditions,
+                  location: currentWorld.name,
+                },
+                createdAt: storeCharacter.createdAt,
+                updatedAt: storeCharacter.updatedAt,
+              },
+              world: currentWorld,
             });
 
-            if (response.ok) {
-              const { portrait } = await response.json();
-              // Update the character with the generated portrait
+            if (portrait) {
               useCharacterStore
                 .getState()
                 .updateCharacter(characterId, { portrait });
@@ -732,7 +727,7 @@ export const TestDataGeneratorSection: React.FC = () => {
               );
             } else {
               console.warn(
-                `[DevTools] Portrait generation failed for ${characterType} character "${characterData.name}"`
+                `[DevTools] Portrait generation returned no portrait for ${characterType} character "${characterData.name}"`
               );
             }
           }

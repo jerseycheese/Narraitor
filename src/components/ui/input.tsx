@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cssClasses } from '@/lib/utils/classNames'
+import { clsx } from 'clsx'
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 
@@ -8,7 +8,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <input
         type={type}
-        className={cssClasses(
+        className={clsx(
           "form-input",
           className
         )}

@@ -10,9 +10,6 @@ export { getTimestamp } from './timestamp';
 export { formatAIResponse } from './textFormatter';
 export type { FormattingOptions } from './textFormatter';
 
-/** CSS class name utilities */
-export { cssClasses } from './classNames';
-
 // === FORMATTING UTILITIES ===
 
 /**
