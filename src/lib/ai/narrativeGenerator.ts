@@ -17,7 +17,11 @@ import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
-import { TemplateGenerator, WorldTemplate } from './templateGenerator';
+import {
+  generateWorldTemplate as generateWorldTemplateFn,
+  convertTemplateToWorld as convertTemplateToWorldFn,
+  type WorldTemplate,
+} from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
@@ -53,7 +57,6 @@ import { buildNpcRoster, syncNpcMetadata } from './narrativeGenerator.npc';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
-  private templateGenerator: TemplateGenerator;
   private personalizationEngine: PersonalizationEngine;
 
   private staticContentCache: NarrativeStaticContentCache = {
@@ -62,7 +65,6 @@ export class NarrativeGenerator {
 
   constructor(private geminiClient: AIClient) {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
-    this.templateGenerator = new TemplateGenerator(geminiClient);
     this.personalizationEngine = new PersonalizationEngine();
   }
 
@@ -748,13 +750,13 @@ export class NarrativeGenerator {
   async generateWorldTemplate(
     context: TemplateGenerationContext
   ): Promise<WorldTemplate> {
-    return this.templateGenerator.generateWorldTemplate(context);
+    return generateWorldTemplateFn(this.geminiClient, context);
   }
 
   convertTemplateToWorld(
     template: WorldTemplate
   ): Omit<World, 'id' | 'createdAt' | 'updatedAt'> {
-    return this.templateGenerator.convertTemplateToWorld(template);
+    return convertTemplateToWorldFn(template);
   }
 
   private syncNpcMetadata(

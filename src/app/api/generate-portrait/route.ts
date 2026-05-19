@@ -26,14 +26,13 @@ async function buildPortraitPrompt(
     );
 
     // Use only the character detection part, not the full image generation
-    const { PortraitGenerator } = await import('@/lib/ai/portraitGenerator');
+    const { buildPortraitPrompt: buildPortraitPromptFn } = await import('@/lib/ai/portraitGenerator');
     const { createDefaultGeminiClient } = await import(
       '@/lib/ai/defaultGeminiClient'
     );
 
     logger.debug('generate-portrait API', 'Creating AI client and generator');
     const aiClient = createDefaultGeminiClient();
-    const generator = new PortraitGenerator(aiClient);
 
     // Create a minimal character object for detection
     const mockCharacter: Character = {
@@ -74,7 +73,7 @@ async function buildPortraitPrompt(
     );
 
     // Call buildPortraitPrompt directly to avoid the image generation requirement
-    const prompt = await generator.buildPortraitPrompt(mockCharacter, {
+    const prompt = await buildPortraitPromptFn(aiClient, mockCharacter, {
       worldGenre: worldGenre,
     });
 

@@ -1,6 +1,6 @@
 // src/lib/ai/templateGenerator.test.ts
 
-import { TemplateGenerator } from './templateGenerator';
+import { generateWorldTemplate, validateTemplate } from './templateGenerator';
 import { generateWorldTemplatePrompt } from './templatePrompts';
 import { AIClient } from './types';
 
@@ -9,11 +9,8 @@ const mockAIClient = {
   generateContent: jest.fn()
 };
 
-describe('TemplateGenerator', () => {
-  let templateGenerator: TemplateGenerator;
-
+describe('templateGenerator', () => {
   beforeEach(() => {
-    templateGenerator = new TemplateGenerator(mockAIClient as AIClient);
     jest.clearAllMocks();
   });
 
@@ -36,7 +33,7 @@ describe('TemplateGenerator', () => {
 
       mockAIClient.generateContent.mockResolvedValue(mockResponse);
 
-      const result = await templateGenerator.generateWorldTemplate({
+      const result = await generateWorldTemplate(mockAIClient as AIClient, {
         userInput: 'Steampunk flying cities',
         type: 'inspired-by'
       });
@@ -79,7 +76,7 @@ describe('TemplateGenerator', () => {
 
       mockAIClient.generateContent.mockResolvedValue(mockResponse);
 
-      const result = await templateGenerator.generateWorldTemplate({
+      const result = await generateWorldTemplate(mockAIClient as AIClient, {
         genres: ['Cyberpunk', 'Western'],
         type: 'genre-mix'
       });
@@ -87,7 +84,7 @@ describe('TemplateGenerator', () => {
       expect(result.genre).toBe('other');
       expect(result.attributes).toHaveLength(2);
       expect(result.skills).toHaveLength(2);
-      
+
       expect(mockAIClient.generateContent).toHaveBeenCalledWith(
         expect.stringContaining('Cyberpunk + Western')
       );
@@ -111,13 +108,13 @@ describe('TemplateGenerator', () => {
 
       mockAIClient.generateContent.mockResolvedValue(mockResponse);
 
-      const result = await templateGenerator.generateWorldTemplate({
+      const result = await generateWorldTemplate(mockAIClient as AIClient, {
         type: 'surprise-me'
       });
 
       expect(result.name).toBe('Microscopic Empire');
       expect(result.genre).toBe('other');
-      
+
       expect(mockAIClient.generateContent).toHaveBeenCalledWith(
         expect.stringContaining('completely unexpected')
       );
@@ -129,7 +126,7 @@ describe('TemplateGenerator', () => {
       });
 
       await expect(
-        templateGenerator.generateWorldTemplate({ type: 'surprise-me' })
+        generateWorldTemplate(mockAIClient as AIClient, { type: 'surprise-me' })
       ).rejects.toThrow('Failed to parse world template');
     });
 
@@ -137,7 +134,7 @@ describe('TemplateGenerator', () => {
       mockAIClient.generateContent.mockRejectedValue(new Error('AI service unavailable'));
 
       await expect(
-        templateGenerator.generateWorldTemplate({ type: 'surprise-me' })
+        generateWorldTemplate(mockAIClient as AIClient, { type: 'surprise-me' })
       ).rejects.toThrow('AI service unavailable');
     });
   });
@@ -157,16 +154,15 @@ describe('TemplateGenerator', () => {
         explanation: 'Test explanation'
       };
 
-      expect(() => templateGenerator.validateTemplate(validTemplate)).not.toThrow();
+      expect(() => validateTemplate(validTemplate)).not.toThrow();
     });
 
     test('throws error for missing required fields', () => {
       const invalidTemplate = {
         name: 'Test World',
-        // Missing other required fields
       };
 
-      expect(() => templateGenerator.validateTemplate(invalidTemplate as unknown))
+      expect(() => validateTemplate(invalidTemplate as unknown))
         .toThrow('Invalid template structure: missing description');
     });
 
@@ -184,7 +180,7 @@ describe('TemplateGenerator', () => {
         explanation: 'Test explanation'
       };
 
-      templateGenerator.validateTemplate(templateWithCapsGenre);
+      validateTemplate(templateWithCapsGenre);
       expect(templateWithCapsGenre.genre).toBe('fantasy');
     });
 
@@ -202,7 +198,7 @@ describe('TemplateGenerator', () => {
         explanation: 'Test explanation'
       };
 
-      templateGenerator.validateTemplate(templateWithMixedGenre);
+      validateTemplate(templateWithMixedGenre);
       expect(templateWithMixedGenre.genre).toBe('other');
     });
   });

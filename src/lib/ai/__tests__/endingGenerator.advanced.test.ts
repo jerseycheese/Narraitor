@@ -22,7 +22,7 @@ jest.mock('../../../state/journalStore', () => ({
   }
 }));
 
-import { endingGenerator } from '../endingGenerator';
+import { generateEnding } from '../endingGenerator';
 import { buildEndingContext } from '../contextManager';
 import type { EndingGenerationRequest } from '../../../types/narrative.types';
 import {
@@ -133,7 +133,7 @@ describe('EndingGenerator - Advanced Features', () => {
     mockBuildEndingContext.mockResolvedValue(mockContext);
     mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
-    const result = await endingGenerator.generateEnding(mockRequest);
+    const result = await generateEnding(mockRequest);
 
     expect(result.playTime).toBeGreaterThan(3500); // Close to 1 hour in seconds
     expect(result.playTime).toBeLessThan(3700);
@@ -167,7 +167,7 @@ describe('EndingGenerator - Advanced Features', () => {
       }` });
     });
 
-    await endingGenerator.generateEnding(mockRequest);
+    await generateEnding(mockRequest);
 
     expect(mockGeminiClient.generateContent).toHaveBeenCalled();
   });
@@ -204,7 +204,7 @@ describe('EndingGenerator - Advanced Features', () => {
         "achievements": ["Completed"]
       }` });
 
-      const result = await endingGenerator.generateEnding(mockRequest);
+      const result = await generateEnding(mockRequest);
 
       expect(result.epilogue).toContain(expectedContent);
     }

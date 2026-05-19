@@ -22,7 +22,7 @@ jest.mock('../../../state/journalStore', () => ({
   }
 }));
 
-import { endingGenerator } from '../endingGenerator';
+import { generateEnding } from '../endingGenerator';
 import { buildEndingContext } from '../contextManager';
 import type { EndingGenerationRequest } from '../../../types/narrative.types';
 import {
@@ -113,7 +113,7 @@ describe('EndingGenerator - Error Handling and Retry', () => {
         new Error('Failed to build context')
       );
 
-      await expect(endingGenerator.generateEnding(mockRequest)).rejects.toThrow(
+      await expect(generateEnding(mockRequest)).rejects.toThrow(
         'Failed to create ending'
       );
     });
@@ -150,7 +150,7 @@ describe('EndingGenerator - Error Handling and Retry', () => {
           "achievements": ["Never Give Up"]
         }` });
 
-      const result = await endingGenerator.generateEnding(mockRequest);
+      const result = await generateEnding(mockRequest);
 
       expect(result.epilogue).toContain('Success after retry');
       expect(mockGeminiClient.generateContent).toHaveBeenCalledTimes(2);

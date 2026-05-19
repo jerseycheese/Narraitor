@@ -1,8 +1,7 @@
 import {
-  TokenBudgetManager,
+  RequestBudget,
   DEFAULT_ALLOCATIONS,
   DEFAULT_TOTAL_BUDGET,
-  type RequestBudget,
 } from '@/lib/promptContext/tokenBudgetManager';
 import {
   estimateTokenCount,
@@ -13,8 +12,7 @@ import { safeTrim } from '@/lib/utils';
 
 export const createRequestBudget = (): RequestBudget => {
   const enabled = process.env.ENABLE_TOKEN_BUDGET_MANAGER === 'true';
-  const manager = new TokenBudgetManager({ enabled });
-  return manager.createBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET);
+  return new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, enabled);
 };
 
 export const applyBudget = (

@@ -7,7 +7,7 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { CharacterDeletionService } from '@/services/characterDeletionService';
+import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
 import { getTimestamp } from '@/lib/utils';
 import { CharacterCard } from '@/components/CharacterCard';
 import { CharacterTable } from '@/components/character/CharacterTable';
@@ -410,9 +410,7 @@ export default function CharactersPage() {
 
     try {
       const characterName = deleteDialog.characterName;
-      await CharacterDeletionService.deleteCharacterWithCleanup(
-        deleteDialog.characterId
-      );
+      await deleteCharacterWithCleanup(deleteDialog.characterId);
       addToast({
         title: 'Character Deleted',
         description: `${characterName} has been permanently deleted`,
