@@ -175,7 +175,6 @@ export default function WorldsPage() {
         onClose={() => setShowPrompt(false)}
         title="Generate World"
         showCloseButton={false}
-        size="xl"
         ariaDescribedBy="generate-world-desc"
         footer={
           <ActionButtonGroup

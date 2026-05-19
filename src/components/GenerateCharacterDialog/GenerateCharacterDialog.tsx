@@ -41,7 +41,6 @@ export const GenerateCharacterDialog: React.FC<
       onClose={onClose}
       title="Generate Character"
       showCloseButton={false}
-      size="xl"
       ariaDescribedBy="generate-character-desc"
     >
       <p id="generate-character-desc">

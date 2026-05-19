@@ -67,7 +67,6 @@ export function GameSessionConfirmationDialog({
       variant={variant}
       confirmText={confirmText}
       cancelText={config.cancelText}
-      size="md"
     />
   );
 }

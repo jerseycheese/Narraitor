@@ -201,12 +201,10 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       )}
       
       {/* Create Modal */}
-      <SimpleModal 
-        isOpen={showCreateModal} 
+      <SimpleModal
+        isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         title="Create Attribute"
-        size="xl"
-        
       >
         <div>
           Create a new custom attribute for this world.
@@ -223,12 +221,10 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       </SimpleModal>
       
       {/* Edit Modal */}
-      <SimpleModal 
-        isOpen={!!editingAttribute} 
+      <SimpleModal
+        isOpen={!!editingAttribute}
         onClose={() => setEditingAttribute(null)}
         title="Edit Attribute"
-        size="xl"
-        
       >
         <div>
           Modify the details of this world attribute.

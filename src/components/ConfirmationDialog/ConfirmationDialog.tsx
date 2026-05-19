@@ -21,22 +21,7 @@ export interface ConfirmationDialogProps {
   cancelAriaLabel?: string;
   isLoading?: boolean;
   loadingText?: string;
-  size?: string;
 }
-
-const confirmButtonVariants: Record<ConfirmationVariant, 'default' | 'destructive' | 'warning' | 'info'> = {
-  default: 'default',
-  destructive: 'destructive',
-  warning: 'warning',
-  info: 'info',
-};
-
-const modalToneMap: Record<ConfirmationVariant, NonNullable<React.ComponentProps<typeof SimpleModal>['tone']>> = {
-  default: 'default',
-  destructive: 'destructive',
-  warning: 'warning',
-  info: 'info',
-};
 
 export function ConfirmationDialog({
   isOpen,
@@ -52,7 +37,6 @@ export function ConfirmationDialog({
   cancelAriaLabel,
   isLoading = false,
   loadingText = 'Loading...',
-  size = 'lg',
 }: ConfirmationDialogProps) {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
@@ -77,8 +61,6 @@ export function ConfirmationDialog({
       onClose={onClose}
       title={title || 'Confirmation Required'}
       showCloseButton={false}
-      size={size}
-      tone={modalToneMap[variant]}
       description={message}
       footer={(
         <div>
@@ -96,7 +78,7 @@ export function ConfirmationDialog({
             ref={confirmButtonRef}
             type="button"
             onClick={onConfirm}
-            variant={confirmButtonVariants[variant]}
+            variant={variant}
             disabled={isLoading}
             aria-label={confirmAriaLabel}
           >
