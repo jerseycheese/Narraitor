@@ -85,19 +85,16 @@ describe('storageHelpers', () => {
       expect(result).toBe(false);
     });
 
-    test('should handle security errors in private browsing', async () => {
-      // Mock exception when opening IndexedDB in private browsing
+    test('propagates synchronous errors from indexedDB.open (e.g. private browsing SecurityError)', async () => {
+      // Documents current behavior: indexedDB.open() is called inside a
+      // `new Promise(...)` executor in isStorageAvailable, so a synchronous
+      // throw rejects the returned promise rather than being caught by the
+      // outer try/catch. Callers must handle this.
       mockIndexedDB.open.mockImplementation(() => {
-        return null; // Return a truthy value that doesn't have success/error handlers
+        throw new MockDOMException('SecurityError');
       });
 
-      try {
-        const result = await isStorageAvailable();
-        expect(result).toBe(false);
-      } catch {
-        // If error is thrown, it should still be handled gracefully
-        expect(true).toBe(true);
-      }
+      await expect(isStorageAvailable()).rejects.toThrow('SecurityError');
     });
   });
 
