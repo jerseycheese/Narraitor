@@ -144,18 +144,15 @@ describe('contextOverride', () => {
       testConfig
     );
 
-    // Verify the narrative context is defined and structure is preserved
-    expect(result.narrativeContext).toBeDefined();
+    // Verify the narrative context structure is preserved
     expect(result.narrativeContext.currentLocation).toBe(
       mockNarrativeContext.currentLocation
     );
     expect(result.narrativeContext.mood).toBe(mockNarrativeContext.mood);
 
-    // Verify that the test config was properly passed through
-    // Note: Custom variables integration would be implemented when real AI integration is added
-    // For now, we verify the context structure is intact for future variable injection
-    expect(result.world).toBeDefined();
-    expect(result.character).toBeDefined();
+    // Verify world and character pass through unchanged when only customVariables set
+    expect(result.world).toEqual(mockWorld);
+    expect(result.character).toEqual(mockCharacter);
   });
 
   test('deep clones objects to prevent mutations', () => {

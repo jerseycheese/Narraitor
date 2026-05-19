@@ -368,13 +368,12 @@ describe('goalExtractor', () => {
         existingGoals: [malformedGoal],
       };
 
-      // Should handle gracefully and not crash
+      // Should handle gracefully and not crash, returning empty arrays
       const result = await goalExtractor.extractGoalsFromNarrative(request);
 
-      expect(result).toBeDefined();
-      expect(result.newGoals).toBeDefined();
-      expect(result.updatedGoals).toBeDefined();
-      expect(result.completedGoals).toBeDefined();
+      expect(result.newGoals).toEqual([]);
+      expect(result.updatedGoals).toEqual([]);
+      expect(result.completedGoals).toEqual([]);
     });
   });
 });

@@ -146,8 +146,7 @@ describe('useAutoSave', () => {
 
   it('should initialize auto-save service when hook is used', () => {
     const { result } = renderHook(() => useAutoSave());
-    
-    expect(result.current).toBeDefined();
+
     expect(result.current.isEnabled).toBe(true);
     expect(result.current.status).toBe('idle');
   });
@@ -210,9 +209,8 @@ describe('useAutoSave', () => {
 
   it('should clear toast mocks before each test', () => {
     // This test ensures our toast mocking is working
-    const { result } = renderHook(() => useAutoSave());
-    
-    expect(result.current).toBeDefined();
+    renderHook(() => useAutoSave());
+
     expect(mockToast.success).toHaveBeenCalledTimes(0);
     expect(mockToast.error).toHaveBeenCalledTimes(0);
   });

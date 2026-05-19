@@ -327,7 +327,6 @@ describe('Item Usage Service', () => {
         .getState()
         .getSessionSegments(sessionId);
       const segment = segments.find((seg) => seg.id === result.segmentId);
-      expect(segment).toBeDefined();
       expect(segment?.metadata.tags).toEqual(
         expect.arrayContaining(['item-usage'])
       );

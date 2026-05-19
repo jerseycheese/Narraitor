@@ -25,10 +25,11 @@ describe('ChoiceSelector', () => {
 
   const assertChoicesVisible = (texts: string[]) => {
     texts.forEach(text => {
-      // Check if text is either visible content or in a title attribute
-      const hasVisibleText = screen.queryByText(text);
-      const hasTitleText = document.querySelector(`[title="${text}"]`);
-      expect(hasVisibleText || hasTitleText).toBeTruthy();
+      // Choice text should appear as either visible content or a title attribute
+      const found =
+        screen.queryByText(text) !== null ||
+        document.querySelector(`[title="${text}"]`) !== null;
+      expect(found).toBe(true);
     });
   };
 

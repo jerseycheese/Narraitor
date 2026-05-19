@@ -105,7 +105,7 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     );
 
     const viewport = container.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
-    expect(viewport).toBeTruthy();
+    expect(viewport).not.toBeNull();
 
     Object.defineProperty(viewport, 'scrollHeight', { configurable: true, get: () => 1000 });
     Object.defineProperty(viewport, 'scrollTop', { configurable: true, get: () => 0 });
@@ -114,7 +114,7 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     mockScrollTo.mockClear();
 
     const resizeObserver = resizeObserverInstances[0];
-    expect(resizeObserver).toBeTruthy();
+    expect(resizeObserver).not.toBeUndefined();
 
     act(() => {
       resizeObserver.callback([], resizeObserver as unknown as ResizeObserver);
@@ -133,7 +133,7 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     );
 
     const viewport = container.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
-    expect(viewport).toBeTruthy();
+    expect(viewport).not.toBeNull();
 
     // User scrolled far from bottom
     Object.defineProperty(viewport, 'scrollTop', { configurable: true, get: () => 100 });
@@ -147,7 +147,7 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     mockScrollTo.mockClear();
 
     const resizeObserver = resizeObserverInstances[0];
-    expect(resizeObserver).toBeTruthy();
+    expect(resizeObserver).not.toBeUndefined();
 
     act(() => {
       resizeObserver.callback([], resizeObserver as unknown as ResizeObserver);
@@ -163,12 +163,12 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     );
 
     const historyContainer = container.querySelector('.narrative-history-container') as HTMLDivElement;
-    expect(historyContainer).toBeTruthy();
+    expect(historyContainer).not.toBeNull();
 
     const scrollRoot = container.querySelector('.mobile-scroll') as HTMLDivElement;
-    expect(scrollRoot).toBeTruthy();
+    expect(scrollRoot).not.toBeNull();
 
     const scrollViewport = container.querySelector('.scroll-smooth') as HTMLDivElement;
-    expect(scrollViewport).toBeTruthy();
+    expect(scrollViewport).not.toBeNull();
   });
 });
