@@ -1228,8 +1228,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
 }
 ));
 
-// Expose store globally in development for manual testing
+// Expose store globally in development for manual testing.
+// Typed in src/types/global.d.ts; matches the pattern used by sibling stores.
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useNarrativeStore = useNarrativeStore;
+  window.useNarrativeStore = useNarrativeStore;
 }
