@@ -9,9 +9,13 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { downloadGameState, importFromFile } from '@/lib/storage/exportService';
 
 // Bound how big an import file can be before we even try to parse it.
-// Game state saves are JSON and small; anything past 25 MB is almost certainly
-// the wrong file (or hostile) and we shouldn't load it into memory.
-const MAX_IMPORT_FILE_SIZE_BYTES = 25 * 1024 * 1024;
+// `downloadGameState()` enforces no matching cap and saves embed full
+// `characterState` (AI portraits as base64 `data:image/...`) plus accumulated
+// narrative history, so legitimate self-exported backups can easily run into
+// the tens of MB. This ceiling is set high enough to accept any plausible
+// self-export while still rejecting obviously-wrong files (a 4 GB video, a
+// disk image) before we read them into memory.
+const MAX_IMPORT_FILE_SIZE_BYTES = 250 * 1024 * 1024;
 
 interface ExportImportControlsProps {
   className?: string;
