@@ -6,31 +6,26 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ExportImportControls } from '../ExportImportControls';
-import { ExportService } from '../../../lib/storage/exportService';
+import * as exportService from '../../../lib/storage/exportService';
 
-// Mock the export service
 jest.mock('../../../lib/storage/exportService');
 
-const MockedExportService = ExportService as jest.MockedClass<typeof ExportService>;
+const mockedDownloadGameState = exportService.downloadGameState as jest.MockedFunction<
+  typeof exportService.downloadGameState
+>;
+const mockedImportFromFile = exportService.importFromFile as jest.MockedFunction<
+  typeof exportService.importFromFile
+>;
 
 describe('ExportImportControls', () => {
-  let mockDownloadGameState: jest.Mock;
-  let mockImportFromFile: jest.Mock;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    
-    mockDownloadGameState = jest.fn().mockResolvedValue(undefined);
-    mockImportFromFile = jest.fn().mockResolvedValue({ success: true, message: 'Import successful' });
-    
-    MockedExportService.mockImplementation(() => ({
-      downloadGameState: mockDownloadGameState,
-      importFromFile: mockImportFromFile,
-      exportGameState: jest.fn(),
-      importGameState: jest.fn(),
-      getExportSize: jest.fn(),
-      validateGameState: jest.fn(),
-    }) as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    mockedDownloadGameState.mockResolvedValue(undefined);
+    mockedImportFromFile.mockResolvedValue({
+      success: true,
+      message: 'Import successful',
+    });
   });
 
   describe('export functionality', () => {
@@ -55,7 +50,7 @@ describe('ExportImportControls', () => {
     });
 
     test('shows error message on export failure', async () => {
-      mockDownloadGameState.mockRejectedValue(new Error('Export failed'));
+      mockedDownloadGameState.mockRejectedValue(new Error('Export failed'));
 
       render(<ExportImportControls />);
 
@@ -96,7 +91,7 @@ describe('ExportImportControls', () => {
     });
 
     test('shows import error message', async () => {
-      mockImportFromFile.mockResolvedValue({ success: false, error: 'Invalid file' });
+      mockedImportFromFile.mockResolvedValue({ success: false, error: 'Invalid file' });
 
       render(<ExportImportControls />);
 
@@ -133,7 +128,6 @@ describe('ExportImportControls', () => {
         expect(screen.getByText(/export completed/i)).toBeInTheDocument();
       });
 
-      // Fast-forward time
       jest.advanceTimersByTime(5000);
 
       await waitFor(() => {

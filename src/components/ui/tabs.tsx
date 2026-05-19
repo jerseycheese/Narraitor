@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cssClasses } from '@/lib/utils/classNames'
+import { clsx } from 'clsx'
 
 interface TabsContextValue {
   value: string
@@ -35,7 +35,7 @@ const Tabs: React.FC<TabsProps> = ({
   
   return (
     <TabsContext.Provider value={{ value, onValueChange: handleValueChange }}>
-      <div className={cssClasses('component-tabs', className)}>
+      <div className={clsx('component-tabs', className)}>
         {children}
       </div>
     </TabsContext.Provider>

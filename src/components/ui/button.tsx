@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cssClasses } from '@/lib/utils/classNames'
+import { clsx } from 'clsx'
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -11,7 +11,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => {
     return (
       <button
-        className={cssClasses(
+        className={clsx(
           "button",
           `button-${variant}`,
           `button-size-${size}`,

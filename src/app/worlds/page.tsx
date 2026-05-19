@@ -7,7 +7,7 @@ import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { useWorldStore } from '@/state/worldStore';
-import { InlineError } from '@/components/shared';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import {
   WorldTypeSelector,
   WorldTypeData,
@@ -228,7 +228,7 @@ export default function WorldsPage() {
             layout="vertical"
             size="medium"
           />
-          {error && <InlineError error={error} />}
+          {error && <ErrorDisplay variant="inline" message={error} />}
 
           {isGenerating && (
             <p>

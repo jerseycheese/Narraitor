@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cssClasses } from '@/lib/utils/classNames'
+import { clsx } from 'clsx'
 
 export interface CheckboxProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -13,7 +13,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         <label>
           <input
             type="checkbox"
-            className={cssClasses(
+            className={clsx(
               className
             )}
             ref={ref}
@@ -27,7 +27,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     return (
       <input
         type="checkbox"
-        className={cssClasses(
+        className={clsx(
           className
         )}
         ref={ref}

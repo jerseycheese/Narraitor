@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cssClasses } from '@/lib/utils/classNames'
+import { clsx } from 'clsx'
 
 // Clean Slate: Removed cva and Tailwind variants.
 // Retaining semantic variant props for future styling hooks.
@@ -13,7 +13,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     <div
       ref={ref}
       role="alert"
-      className={cssClasses("alert", `alert-${variant}`, className)}
+      className={clsx("alert", `alert-${variant}`, className)}
       {...props}
     />
   )
@@ -26,7 +26,7 @@ const AlertTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={cssClasses("alert-title", className)}
+    className={clsx("alert-title", className)}
     {...props}
   />
 ))
@@ -38,7 +38,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cssClasses("alert-description", className)}
+    className={clsx("alert-description", className)}
     {...props}
   />
 ))

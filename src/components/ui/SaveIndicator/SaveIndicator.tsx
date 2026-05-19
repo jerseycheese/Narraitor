@@ -7,7 +7,8 @@ import { CheckCircle } from 'lucide-react';
 import { SaveTriggerReason } from '@/lib/services/autoSaveService';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { cssClasses, formatTime } from '@/lib/utils';
+import { clsx } from 'clsx';
+import { formatTime } from '@/lib/utils';
 
 export interface SaveIndicatorProps {
   status: 'idle' | 'saving' | 'saved' | 'error';
@@ -45,7 +46,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle error state with ErrorDisplay component
   if (status === 'error') {
     return (
-      <div className={cssClasses('save-indicator save-indicator-error', className)}>
+      <div className={clsx('save-indicator save-indicator-error', className)}>
         <ErrorDisplay
           variant={compact ? 'inline' : 'section'}
           severity="error"
@@ -62,7 +63,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   // Handle saving state with LoadingState component
   if (status === 'saving') {
     return (
-      <div className={cssClasses('save-indicator', compact && 'save-indicator-compact', className)}>
+      <div className={clsx('save-indicator', compact && 'save-indicator-compact', className)}>
         <LoadingState
           variant="spinner"
           message={compact ? undefined : 'Saving...'}
@@ -80,7 +81,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
 
   // Handle idle/saved states
   return (
-    <div className={cssClasses('save-indicator', compact && 'save-indicator-compact', className)}>
+    <div className={clsx('save-indicator', compact && 'save-indicator-compact', className)}>
       <div className="save-indicator-status">
         <div className="save-indicator-copy">
           <span className="save-indicator-text">{getStatusText()}</span>

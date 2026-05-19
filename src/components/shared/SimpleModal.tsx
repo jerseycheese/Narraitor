@@ -1,5 +1,3 @@
-// src/components/shared/SimpleModal.tsx
-
 import React, { useId } from 'react';
 import { X } from 'lucide-react';
 
@@ -10,38 +8,22 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { cssClasses } from '@/lib/utils/classNames';
 
 interface SimpleModalProps {
-  /** Whether the modal is open */
   isOpen: boolean;
-  /** Called when modal should close */
   onClose: () => void;
-  /** Modal title */
   title?: string;
-  /** Modal content */
   children?: React.ReactNode;
-  /** Additional CSS classes for the modal content */
   className?: string;
-  /** Optional classes for the scrolling content wrapper */
   contentClassName?: string;
-  /** Whether to show the close button */
   showCloseButton?: boolean;
-  /** Whether to close on backdrop click */
   closeOnBackdropClick?: boolean;
-  /** Whether to close on escape key */
   closeOnEscape?: boolean;
-  /** ID of element describing the modal content */
   ariaDescribedBy?: string;
-  /** Optional contextual descriptor rendered under the title */
   description?: React.ReactNode;
-  /** Footer region rendered inside a padded container */
   footer?: React.ReactNode;
-  /** Optional class overrides for the footer wrapper */
   footerClassName?: string;
-  /** Scroll behavior: 'overlay' (default) or 'content' */
   scrollBehavior?: 'overlay' | 'content';
-  /** Whether the footer should stick to the bottom */
   stickyFooter?: boolean;
 }
 
@@ -53,12 +35,6 @@ export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
   return Boolean(target.closest('.react-joyride__tooltip'));
 };
 
-/**
- * SimpleModal - Accessible dialog wrapper using the shared design-system primitives.
- *
- * Provides consistent styling, Radix-driven focus management, and configurable
- * close affordances while keeping the existing component API intact.
- */
 export function SimpleModal({
   isOpen,
   onClose,
@@ -91,9 +67,7 @@ export function SimpleModal({
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
         overlayScroll={scrollBehavior === 'overlay'}
-        className={cssClasses(
-          className
-        )}
+        className={className}
         onInteractOutside={(event) => {
           if (isJoyrideTooltipTarget(event.target)) {
             event.preventDefault();

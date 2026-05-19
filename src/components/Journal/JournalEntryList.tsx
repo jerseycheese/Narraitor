@@ -5,12 +5,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { JournalEntry } from '@/types/journal.types';
 import { EntityID } from '@/types/common.types';
+import { clsx } from 'clsx';
 import {
   capitalize,
   formatRelativeTime,
   titleCase,
   truncate,
-  cssClasses,
 } from '@/lib/utils';
 import { Play, Square, Settings } from 'lucide-react';
 import { getSignificanceBadgeVariant } from './journalUtils';
@@ -29,7 +29,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
   className,
 }) => {
   return (
-    <div className={cssClasses('journal-entry-list', className)}>
+    <div className={clsx('journal-entry-list', className)}>
       {entries.map((entry) => {
         // Detect system events for list styling (Issue #176)
         const isSystemEvent =
@@ -39,7 +39,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
         return (
           <Card
             key={entry.id}
-            className={cssClasses(
+            className={clsx(
               'journal-entry-list-item',
               isSystemEvent ? 'journal-system-event' : '',
               selectedEntryId === entry.id ? 'journal-entry-list-item-selected' : ''

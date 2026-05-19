@@ -16,7 +16,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { JournalEntry } from '@/types/journal.types';
 import { useShallow } from 'zustand/react/shallow';
-import { cssClasses } from '@/lib/utils';
+import { clsx } from 'clsx';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { selectSessionEntries } from '@/lib/journal/journalSelectors';
 import { JournalEntryDetail } from './JournalEntryDetail';
@@ -174,7 +174,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
         ) : (
           <>
             <div
-              className={cssClasses(
+              className={clsx(
                 'journal-list-pane',
                 viewMode === 'list' ? '' : 'hidden'
               )}
@@ -221,7 +221,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
             </div>
 
             <div
-              className={cssClasses(
+              className={clsx(
                 'journal-detail-pane',
                 viewMode === 'detail' ? '' : 'hidden'
               )}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { EntityID } from '@/types/common.types';
-import { cssClasses } from '@/lib/utils';
+import { clsx } from 'clsx';
 import { DecisionOutcome } from '@/types/narrative.types';
 
 interface ChoiceOutcomeCalloutProps {
@@ -71,7 +71,7 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
 
   return (
     <div
-      className={cssClasses(
+      className={clsx(
         'choice-outcome-callout',
         className
       )}

@@ -3,7 +3,8 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
-import { cssClasses, parseNarrativeContent } from '@/lib/utils';
+import { clsx } from 'clsx';
+import { parseNarrativeContent } from '@/lib/utils';
 import { FormattedNarrativeContent } from './FormattedNarrativeContent';
 import { PromptDebugSection } from './PromptDebugSection';
 import { ChoiceOutcomeCallout } from './ChoiceOutcomeCallout';
@@ -142,7 +143,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
       <FormattedNarrativeContent
         content={formattedContent}
-        className={cssClasses(
+        className={clsx(
           'readable',
           resolvedSegment.type === 'scene' ? 'scene-spacing' : '',
           resolvedSegment.type === 'dialogue' ? 'dialogue-segment' : '',

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { cssClasses } from '@/lib/utils';
+import { clsx } from 'clsx';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 
 interface ManuscriptSessionShellProps {
@@ -206,7 +206,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
   return (
     <div
-      className={cssClasses("manuscript-viewport-layer", className)}
+      className={clsx("manuscript-viewport-layer", className)}
       data-testid="manuscript-session-shell"
     >
       <div className="manuscript-overlay-backdrop" />
@@ -222,7 +222,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           <main className="manuscript-overlay-main">
             {mobileTopContent}
 
-            <div className={cssClasses("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
+            <div className={clsx("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
                 {marginContent && (
                   <aside
                     className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"

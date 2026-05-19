@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { Button } from '@/components/ui/button';
-import { cssClasses } from '@/lib/utils/classNames';
+import { clsx } from 'clsx';
 import { safeTrim } from '@/lib/utils';
 
 
@@ -65,7 +65,7 @@ export function StoryEndingDialog({
       description={content}
       showCloseButton={false}
       ariaDescribedBy="story-ending-content"
-      className={cssClasses(
+      className={clsx(
         '',
         endingTypeClasses[endingType]
       )}

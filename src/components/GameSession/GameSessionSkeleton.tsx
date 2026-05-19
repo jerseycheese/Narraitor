@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
-import { cssClasses } from '@/lib/utils';
+import { clsx } from 'clsx';
 
 interface GameSessionSkeletonProps {
   className?: string;
@@ -14,7 +14,7 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
   return (
     <div
       data-testid="game-session-skeleton"
-      className={cssClasses("manuscript-skeleton-viewport", className)}
+      className={clsx("manuscript-skeleton-viewport", className)}
     >
       {/* Floating HUD Skeleton */}
       <div className="manuscript-skeleton-header">
