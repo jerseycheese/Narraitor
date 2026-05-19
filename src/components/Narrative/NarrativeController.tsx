@@ -9,6 +9,7 @@ import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { useEndingDetection } from './useEndingDetection';
 import {
   Decision,
   DecisionOutcome,
@@ -17,7 +18,7 @@ import {
   NarrativeSegment,
   SkillCheckRoll,
 } from '@/types/narrative.types';
-import { truncate, safeTrim } from '@/lib/utils';
+import { truncate } from '@/lib/utils';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
@@ -117,10 +118,16 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const initialGenerationInitiated = useRef(false);
   // Use a ref to prevent overlapping choice generation
   const choiceGenerationInProgress = useRef(false);
-  // Track if we've already suggested an ending for this session
-  const endingSuggestedRef = useRef(false);
   // Prevent duplicate initial-scene generation in dev StrictMode (effects can run twice across remounts)
   const initialGenerationLocksRef = useRef(new Set<string>());
+
+  const { checkForEndingIndicators, suggestEnding } = useEndingDetection({
+    sessionId,
+    worldId,
+    characterId,
+    segments,
+    onEndingSuggested,
+  });
 
   // Initialize component state on mount
   useEffect(() => {
@@ -140,7 +147,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     // Reset generation flags
     initialGenerationInitiated.current = false;
     choiceGenerationInProgress.current = false;
-    endingSuggestedRef.current = false;
 
     return () => {
       mountedRef.current = false;
@@ -150,158 +156,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       generationLocks.delete(sessionId);
     };
   }, [sessionId, worldId, characterId]);
-
-  /**
-   * Pure AI-based ending detection - analyzes narrative context for natural conclusions
-   *
-   * This function uses Google Gemini AI to analyze narrative segments and determine
-   * if the story has reached a natural conclusion point. Unlike traditional rule-based
-   * systems, this implementation relies entirely on AI understanding of story structure,
-   * character arcs, and emotional satisfaction.
-   *
-   * Key Features:
-   * - NO keyword matching or pattern recognition
-   * - Context-aware analysis (recent + broader story context)
-   * - Confidence-based filtering (only medium/high confidence suggestions)
-   * - Multiple ending type classification
-   * - Graceful error handling with no fallback mechanisms
-   *
-   * @param newSegment - The newly created narrative segment to analyze
-   *
-   * Behavior:
-   * - Requires at least 3 total segments before analysis begins
-   * - Analyzes last 5 segments for recent context
-   * - Includes earlier story summary for longer narratives (10+ segments)
-   * - Only triggers onEndingSuggested for medium/high confidence AI responses
-   * - Handles AI failures silently (pure AI approach - no fallback)
-   * - Supports markdown-wrapped JSON responses from AI
-   *
-   * AI Response Format:
-   * {
-   *   "suggestEnding": true/false,
-   *   "confidence": "high" | "medium" | "low",
-   *   "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
-   *   "reason": "Clear explanation of why this is/isn't a good ending point"
-   * }
-   *
-   * Error Handling:
-   * - AI service failures: Silent failure, no ending suggestion
-   * - JSON parsing errors: Silent failure, no ending suggestion
-   * - Network issues: Silent failure, no ending suggestion
-   * - Low confidence responses: Filtered out, no ending suggestion
-   *
-   * @see {@link /dev/ai-ending-detection} Test harness for manual verification
-   * @see {@link docs/features/ai-ending-detection.md} Complete documentation
-   */
-  const checkForEndingIndicators = async (newSegment: NarrativeSegment) => {
-    // Don't suggest multiple times
-    if (endingSuggestedRef.current || !onEndingSuggested) return;
-
-    // Skip if we don't have enough narrative context (less than 3 segments)
-    const allSegments = [...segments, newSegment];
-    if (allSegments.length < 3) return;
-
-    try {
-      const client = createDefaultGeminiClient();
-
-      // Get recent narrative context (last 5 segments for analysis)
-      const recentSegments = allSegments.slice(-5);
-      const narrativeContext = recentSegments
-        .map((segment, index) => `Segment ${index + 1}: ${segment.content}`)
-        .join('\n\n');
-
-      // Get broader story context (all segments but condensed)
-      const fullStoryContext =
-        allSegments.length > 10
-          ? `Earlier story: ${truncate(
-              allSegments
-                .slice(0, -5)
-                .map((s) => s.content)
-                .join(' '),
-              500
-            )}\n\n`
-          : '';
-
-      const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
-
-${fullStoryContext}Recent narrative developments:
-${narrativeContext}
-
-Analyze this story for natural ending points. Consider:
-
-STORY STRUCTURE:
-- Has the central conflict been resolved or reached climax?
-- Are character arcs showing completion or fulfillment?
-- Is there a sense of narrative closure or resolution?
-- Does the story feel like it has reached a satisfying conclusion?
-
-EMOTIONAL SATISFACTION:
-- Would ending here feel fulfilling to the reader?
-- Are loose threads tied up or at a natural pause?
-- Is there dramatic or emotional resolution?
-
-DO NOT:
-- Look for specific keywords or phrases
-- Use pattern matching
-- Apply rigid rules
-- Suggest ending just because of story length
-
-Respond with JSON format:
-{
-  "suggestEnding": true/false,
-  "confidence": "high" | "medium" | "low",
-  "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
-  "reason": "Short user-facing message (1-2 sentences max) about why this is a good ending point. Be concise and direct."
-}`;
-
-      const response = await client.generateContent(analysisPrompt);
-
-      try {
-        // Extract JSON from response, handling markdown code blocks
-        let jsonContent = response.content;
-
-        // Remove markdown code blocks if present
-        if (jsonContent.includes('```json')) {
-          jsonContent = jsonContent
-            .replace(/```json\s*/g, '')
-            .replace(/```\s*/g, '');
-        } else if (jsonContent.includes('```')) {
-          jsonContent = jsonContent.replace(/```\s*/g, '');
-        }
-
-        // Trim whitespace
-        jsonContent = safeTrim(jsonContent);
-
-        const analysis = JSON.parse(jsonContent);
-
-        // Only suggest ending if AI has medium or high confidence
-        if (
-          analysis.suggestEnding &&
-          ['high', 'medium'].includes(analysis.confidence)
-        ) {
-          endingSuggestedRef.current = true;
-
-          // Determine ending type based on AI analysis or default to story-complete
-          const endingType = [
-            'story-complete',
-            'character-retirement',
-            'session-limit',
-          ].includes(analysis.endingType)
-            ? analysis.endingType
-            : 'story-complete';
-
-          onEndingSuggested(analysis.reason, endingType);
-        }
-      } catch (parseError) {
-        console.error('Failed to parse AI ending analysis:', parseError);
-        // If JSON parsing fails, do not suggest ending
-        // Pure AI approach means no fallback to rules
-      }
-    } catch (error) {
-      console.error('Failed to analyze ending indicators with AI:', error);
-      // Pure AI approach means no fallback - if AI fails, no ending suggestion
-    }
-  };
 
   // Deduplicate segments by ID to ensure we don't have duplicates in localStorage
   useEffect(() => {
@@ -1149,13 +1003,8 @@ Respond with JSON format:
       const hasCriticalFailure =
         decisionWeight === 'critical' && rollResults.some((r) => !r.success);
 
-      if (
-        hasCriticalFailure &&
-        onEndingSuggested &&
-        !endingSuggestedRef.current
-      ) {
-        endingSuggestedRef.current = true;
-        onEndingSuggested(
+      if (hasCriticalFailure) {
+        suggestEnding(
           'fatal: failure on a pivotal decision left the character unable to continue.',
           'story-complete'
         );
@@ -1255,9 +1104,8 @@ Respond with JSON format:
 
       // If the AI marked this segment as fatal, surface an ending suggestion immediately
       const hasFatalTag = newSegment.metadata?.tags?.includes('fatal-outcome');
-      if (hasFatalTag && onEndingSuggested && !endingSuggestedRef.current) {
-        endingSuggestedRef.current = true;
-        onEndingSuggested(
+      if (hasFatalTag) {
+        suggestEnding(
           'fatal: narrative segment marked the player as dead or incapacitated.',
           'story-complete'
         );
