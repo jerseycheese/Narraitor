@@ -23,9 +23,8 @@ export async function itemNamesMatch(name1: string, name2: string): Promise<bool
 
   if (normalized1 === normalized2) return true;
 
-  const { checkItemSimilarityClient } = await import('@/lib/inventory/checkItemSimilarityClient');
-
   try {
+    const { checkItemSimilarityClient } = await import('@/lib/inventory/checkItemSimilarityClient');
     const result = await checkItemSimilarityClient({ name1, name2 });
     return result.similar && result.confidence > 0.7;
   } catch (error) {
