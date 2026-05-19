@@ -856,6 +856,11 @@
   background: linear-gradient(to bottom, var(--color-accent), transparent);
 }
 
+[data-theme="ds1"] .wizard-page .wizard-archetype-grid .wizard-step-title::before,
+[data-theme="ds1"] .wizard-page .wizard-archetype-grid .wizard-step-title::after {
+  content: none;
+}
+
 [data-theme="ds1"] .wizard-page .wizard-form-section {
   gap: var(--space-3);
 }
@@ -1199,6 +1204,10 @@
   text-transform: uppercase;
   font-style: normal;
   color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-archetype-grid .wizard-step-title::before {
+  content: none;
 }
 
 [data-theme="ds3"] .wizard-page .wizard-form-section {

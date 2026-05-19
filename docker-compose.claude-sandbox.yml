@@ -1,14 +1,16 @@
 version: '3.8'
 
-# Docker Compose for Narraitor YOLO Mode
-# Usage: ISSUE_NUMBER=501 docker-compose -f docker-compose.yolo.yml up
+# Docker Compose for sandboxed Claude Code runs (no network, isolated worktree).
+# Uses Claude's --dangerously-skip-permissions inside the container — safe only
+# because network_mode is none and the container is ephemeral.
+# Usage: ISSUE_NUMBER=501 docker-compose -f docker-compose.claude-sandbox.yml up
 
 services:
-  claude-yolo:
+  claude-sandbox:
     build:
       context: .
-      dockerfile: .claude/docker/Dockerfile.yolo
-    container_name: claude-yolo-${ISSUE_NUMBER:-000}
+      dockerfile: .claude/docker/Dockerfile.sandbox
+    container_name: claude-sandbox-${ISSUE_NUMBER:-000}
     volumes:
       # Mount the specific worktree
       - ${WORKTREE_PATH:-./}:/app
@@ -32,7 +34,7 @@ services:
     tty: true
     command: |
       sh -c "
-        echo '🚀 Starting YOLO mode for issue #${ISSUE_NUMBER}' &&
+        echo 'Starting sandboxed Claude run for issue #${ISSUE_NUMBER}' &&
         cd /app &&
         claude --dangerously-skip-permissions /project:do-issue-auto ${ISSUE_NUMBER}
       "
@@ -46,8 +48,8 @@ services:
   #   working_dir: /app
   #   command: node api-mock-server.js
   #   networks:
-  #     - yolo-internal
+  #     - claude-sandbox-internal
 
 # networks:
-#   yolo-internal:
+#   claude-sandbox-internal:
 #     internal: true  # No external connectivity

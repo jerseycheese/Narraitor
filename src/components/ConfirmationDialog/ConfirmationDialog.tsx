@@ -11,9 +11,7 @@ export interface ConfirmationDialogProps {
   onClose: () => void;
   onConfirm: () => void;
   title?: string;
-  message?: React.ReactNode;
-  /** Extra body rendered as modal children below the description. */
-  customBody?: React.ReactNode;
+  message: React.ReactNode;
   variant?: ConfirmationVariant;
   confirmText?: string;
   cancelText?: string;
@@ -23,13 +21,19 @@ export interface ConfirmationDialogProps {
   loadingText?: string;
 }
 
+const confirmButtonVariants: Record<ConfirmationVariant, 'default' | 'destructive' | 'warning' | 'info'> = {
+  default: 'default',
+  destructive: 'destructive',
+  warning: 'warning',
+  info: 'info',
+};
+
 export function ConfirmationDialog({
   isOpen,
   onClose,
   onConfirm,
   title,
   message,
-  customBody,
   variant = 'default',
   confirmText = 'Confirm',
   cancelText = 'Cancel',
@@ -66,7 +70,6 @@ export function ConfirmationDialog({
         <div>
           <Button
             ref={cancelButtonRef}
-            type="button"
             onClick={onClose}
             variant="outline"
             disabled={isLoading}
@@ -76,9 +79,8 @@ export function ConfirmationDialog({
           </Button>
           <Button
             ref={confirmButtonRef}
-            type="button"
             onClick={onConfirm}
-            variant={variant}
+            variant={confirmButtonVariants[variant]}
             disabled={isLoading}
             aria-label={confirmAriaLabel}
           >
@@ -86,8 +88,6 @@ export function ConfirmationDialog({
           </Button>
         </div>
       )}
-    >
-      {customBody}
-    </SimpleModal>
+    />
   );
 }

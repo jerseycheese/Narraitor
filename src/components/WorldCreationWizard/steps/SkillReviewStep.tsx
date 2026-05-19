@@ -466,7 +466,7 @@ export default function SkillReviewStep({
                         suggestion.selectedAttributeNames.length > 0 && (
                           <span>
                             Linked:{' '}
-                            {suggestion.selectedAttributeNames.join(',')}
+                            {suggestion.selectedAttributeNames.join(', ')}
                           </span>
                         )}
                     </div>

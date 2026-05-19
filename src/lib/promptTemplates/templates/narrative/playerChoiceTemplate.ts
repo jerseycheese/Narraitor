@@ -92,9 +92,11 @@ PERSONALITY-INFORMED CHOICES (when character personality context is provided):
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
 SKILL REQUIREMENTS (CRITICAL FOR MVP):
-Generate choices with skill requirements when the situation naturally calls for specialized abilities:
-- Analyze the current scene for opportunities where skills would logically apply
-- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Persuasion for social encounters, Stealth for avoiding detection, Athletics for physical challenges)
+Generate choices with skill requirements only when the situation naturally calls for specialized abilities AND the skill exists in the "AVAILABLE SKILLS" list:
+- ONLY use the exact skill names from the "AVAILABLE SKILLS" list provided above.
+- NEVER invent new skills or use generic skills (like "Stealth", "Persuasion", "Athletics", etc.) unless they are explicitly listed in the "AVAILABLE SKILLS" for this world.
+- If NO "AVAILABLE SKILLS" are listed for this world, do NOT include any "Requirements:" lines in your options.
+- Analyze the current scene for opportunities where the provided world skills would logically apply.
 - **IMPORTANT: Create a MIX of difficulty levels** - don't assume the character can handle everything:
   * Easy tasks: 3-4 skill level (most characters can do this)
   * Moderate tasks: 5-6 skill level (challenging but achievable)
@@ -105,7 +107,7 @@ Generate choices with skill requirements when the situation naturally calls for 
 - VARY skill requirements across choices - use different character abilities when possible
 - Balance: Include both skill-required and non-skill choices for player agency
 - Custom actions by players should trigger implicit skill checks when appropriate
-- Format skill requirements as: [SkillName X+] where X is the minimum level
+- Format skill requirements as: Requirements: SkillName X+
 
 CHOICE HINTS:
 Add helpful hint text when choices benefit from explanation:

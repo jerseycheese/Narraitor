@@ -294,8 +294,8 @@ export default function DesignSystemPage() {
             </div>
           </div>
 
-          <div style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface-hover)' }}>
-            <div className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 12 }}>Brand Guidelines</div>
+          <details style={{ padding: 24, borderRadius: 2, border: '1px solid var(--color-border)', background: 'var(--color-surface-hover)' }}>
+            <summary className="font-system" style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: 12, cursor: 'pointer', userSelect: 'none' }}>Brand Guidelines</summary>
             <pre className="font-system" style={{ fontSize: 13, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap' }}>
               {`/* Primary wordmark: Lora serif */
 .narraitor-wordmark {
@@ -313,7 +313,7 @@ export default function DesignSystemPage() {
 /* Minimum size: 24px for legibility */
 /* Clear space: equal to cap height on all sides */`}
             </pre>
-          </div>
+          </details>
         </div>
       </section>
 
@@ -820,6 +820,71 @@ a:hover {
             </div>
           </div>
 
+          {/* Dashboard archetype + primitives */}
+          <div style={{ marginBottom: 32 }}>
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Dashboard (Library Landing)</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>A fourth archetype within the Default shell: an asymmetric rail-and-body spread laid on a 24px graph-paper canvas, with an ink-rule gutter dividing rail from body. Reads as paper on a drafting table.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+
+              {/* 1. Graph-paper canvas */}
+              <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{
+                  minHeight: 140,
+                  padding: 20,
+                  backgroundColor: 'var(--color-canvas)',
+                  backgroundImage: 'linear-gradient(to right, color-mix(in srgb, var(--color-border-strong) 45%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--color-border-strong) 45%, transparent) 1px, transparent 1px)',
+                  backgroundSize: '24px 24px',
+                  backgroundRepeat: 'repeat',
+                }}>
+                  <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 12, fontFamily: 'var(--font-system)', fontSize: 11, color: 'var(--color-text-muted)', textAlign: 'center', minHeight: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    Card on graph-paper
+                  </div>
+                </div>
+                <div style={{ padding: '12px 16px 14px', borderTop: '1px solid var(--color-border)' }}>
+                  <div className="font-system" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)' }}>Graph-paper canvas</div>
+                  <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '6px 0 8px' }}>Two perpendicular linear-gradients tiled at 24px in <code>--color-border-strong</code> at 45%. The drafting-table surface treatment.</p>
+                  <code className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)', display: 'block', lineHeight: 1.5 }}>background-image: linear-gradient(...), linear-gradient(...);<br />background-size: 24px 24px;</code>
+                </div>
+              </div>
+
+              {/* 2. Rail + body + ink rule */}
+              <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ position: 'relative', minHeight: 140, padding: 20, background: 'var(--color-canvas)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr', gap: 24, minHeight: 100 }}>
+                    <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 6, fontFamily: 'var(--font-system)', fontSize: 9, color: 'var(--color-text-muted)' }}>Rail</div>
+                    <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: 6, fontFamily: 'var(--font-system)', fontSize: 9, color: 'var(--color-text-muted)' }}>Body</div>
+                  </div>
+                  <span style={{ position: 'absolute', top: 20, bottom: 20, left: 'calc(20px + 60px + 12px)', width: 1, background: 'var(--color-border-strong)' }} />
+                </div>
+                <div style={{ padding: '12px 16px 14px', borderTop: '1px solid var(--color-border)' }}>
+                  <div className="font-system" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)' }}>Rail + body + ink rule</div>
+                  <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '6px 0 8px' }}>Asymmetric 2-col grid with <code>grid-auto-flow: dense</code> so the body column backfills cleanly whether or not the lead card is present. An absolutely-positioned <code>::before</code> draws the ink rule in the gutter.</p>
+                  <code className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)', display: 'block', lineHeight: 1.5 }}>grid-template-columns: 13.5rem 1fr;<br />grid-auto-flow: row dense;</code>
+                </div>
+              </div>
+
+              {/* 3. Vertical stat ledger */}
+              <div style={{ border: '1px solid var(--color-border)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ minHeight: 140, padding: 20, background: 'var(--color-canvas)' }}>
+                  <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 2, padding: '6px 12px' }}>
+                    {[['Worlds', '12'], ['Characters', '8'], ['Sessions', '3']].map(([label, n], i, arr) => (
+                      <div key={label} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '6px 0', borderBottom: i === arr.length - 1 ? 'none' : '1px solid var(--color-border)' }}>
+                        <span style={{ fontFamily: 'var(--font-narrative)', fontSize: 18, color: 'var(--color-text-primary)' }}>{n}</span>
+                        <span style={{ fontFamily: 'var(--font-system)', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ padding: '12px 16px 14px', borderTop: '1px solid var(--color-border)' }}>
+                  <div className="font-system" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-text-muted)' }}>Vertical stat ledger</div>
+                  <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '6px 0 8px' }}>Single-column flex of <em>[number ← → label]</em> rows with hairline rules between. The summary pattern for any narrow-rail context.</p>
+                  <code className="font-system" style={{ fontSize: 11, color: 'var(--color-text-muted)', display: 'block', lineHeight: 1.5 }}>grid-template-columns: 1fr;<br />flex-direction: row; justify-content: space-between;</code>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
           <div style={{ marginBottom: 32 }}>
             <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Responsive Adaptation</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
@@ -850,8 +915,8 @@ a:hover {
           <div style={{ marginBottom: 32 }}>
             <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>Current custom property definitions from globals.css. These drive both the shadcn layer and the design system layer.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
-              <div>
-                <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>:root (Light)</h4>
+              <details>
+                <summary className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer', userSelect: 'none' }}>:root (Light)</summary>
                 <pre
                   className="font-system"
                   tabIndex={0}
@@ -897,9 +962,9 @@ a:hover {
   --border: 240 5.2% 90%;
 }`}
                 </pre>
-              </div>
-              <div>
-                <h4 className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>.dark</h4>
+              </details>
+              <details>
+                <summary className="font-system" style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer', userSelect: 'none' }}>.dark</summary>
                 <pre
                   className="font-system"
                   tabIndex={0}
@@ -940,7 +1005,7 @@ a:hover {
   --border: 240 3.7% 15.9%;
 }`}
                 </pre>
-              </div>
+              </details>
             </div>
           </div>
         </div>

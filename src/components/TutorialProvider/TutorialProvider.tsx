@@ -79,11 +79,40 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [currentWizardStep, setCurrentWizardStepState] = useState(0);
   const [stepMapping, setStepMapping] = useState<Record<number, number> | undefined>(undefined);
+  const [targetResizeTick, setTargetResizeTick] = useState(0);
   const runRef = useRef(false);
   const isPausedRef = useRef(false);
   const missingTargetRef = useRef<{ index: number; target: string | null } | null>(null);
 
   useTutorialAutoScroll(run, steps, stepIndex);
+
+  // Force Joyride to re-measure the spotlight when the active step's target resizes
+  // (e.g. a CollapsibleSection expanding). Without this, the spotlight stays at the
+  // initial measurement and visually drifts off the target. See issue #1012.
+  useEffect(() => {
+    if (!run || isPaused) return;
+    const step = steps[stepIndex];
+    if (!step?.target) return;
+    const el = typeof step.target === 'string'
+      ? document.querySelector(step.target)
+      : step.target;
+    if (!(el instanceof Element)) return;
+    if (typeof ResizeObserver === 'undefined') return;
+    // Skip the initial fire that ResizeObserver delivers on observe(). Reacting
+    // to it would bump targetResizeTick, remount Joyride, and the remount's
+    // own scroll/relayout can change the target size — fires again — looping
+    // during tour startup and breaking visual snapshots.
+    let isInitialFire = true;
+    const observer = new ResizeObserver(() => {
+      if (isInitialFire) {
+        isInitialFire = false;
+        return;
+      }
+      setTargetResizeTick((tick) => tick + 1);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [run, isPaused, steps, stepIndex]);
 
   const { 
     tutorialProgress, 
@@ -415,7 +444,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         const tourOptions = getTourOptions(activeTour || '');
         return (
           <Joyride
-            key={`${activeTour}-${isPaused}`}
+            key={`${activeTour}-${isPaused}-${targetResizeTick}`}
             steps={steps}
             run={!isPaused}
             stepIndex={stepIndex}
@@ -424,6 +453,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
             showProgress={tourOptions.showProgress}
             showSkipButton={tourOptions.showSkipButton}
             disableScrolling={tourOptions.disableScrolling}
+            floaterProps={tourOptions.floaterProps}
             styles={joyrideStyles}
             callback={handleJoyrideCallback}
             disableOverlayClose={true}

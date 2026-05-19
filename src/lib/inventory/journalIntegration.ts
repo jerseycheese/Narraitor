@@ -33,38 +33,42 @@ function determineAcquisitionSignificance(
   return 'minor';
 }
 
+function describeAcquisitionMethod(method: InventoryAcquisitionMethod): string {
+  switch (method) {
+    case 'loot': return 'as loot';
+    case 'quest': return 'from a quest';
+    case 'purchase': return 'through purchase';
+    case 'craft': return 'by crafting';
+    case 'reward': return 'as a reward';
+    case 'gift': return 'as a gift';
+    case 'manual':
+    case 'unknown':
+    default:
+      return '';
+  }
+}
+
 /**
- * Formats acquisition context for journal entry content.
- * Includes item quantity, acquisition method, and description if available.
+ * Formats acquisition context as a human-readable sentence.
+ * Category lives in metadata.tags; method is woven into prose when meaningful.
  */
 function formatAcquisitionContext(item: InventoryItem): string {
   const latestAcquisition = item.acquisitionHistory[item.acquisitionHistory.length - 1];
 
+  const subject = item.quantity > 1
+    ? `Acquired ${item.quantity}x ${item.name}`
+    : `Acquired ${item.name}`;
+
   if (!latestAcquisition) {
-    return `Acquired ${item.name}`;
+    return `${subject}.`;
   }
 
-  const parts: string[] = [];
+  const methodPhrase = describeAcquisitionMethod(latestAcquisition.method);
+  const opener = methodPhrase ? `${subject} ${methodPhrase}.` : `${subject}.`;
 
-  // Add quantity if more than 1
-  if (item.quantity > 1) {
-    parts.push(`Acquired ${item.quantity}x ${item.name}`);
-  } else {
-    parts.push(`Acquired ${item.name}`);
-  }
-
-  // Add category
-  parts.push(`Category: ${item.categoryId}`);
-
-  // Add acquisition method
-  parts.push(`Method: ${latestAcquisition.method}`);
-
-  // Add description if available
-  if (latestAcquisition.description) {
-    parts.push(latestAcquisition.description);
-  }
-
-  return parts.join(' • ');
+  return latestAcquisition.description
+    ? `${opener} ${latestAcquisition.description}`
+    : opener;
 }
 
 /**
@@ -203,31 +207,32 @@ function formatLossTitle(
   }
 }
 
+function describeLossReason(reason: string | undefined): string {
+  switch (reason) {
+    case 'consumed': return 'after using it';
+    case 'delivered': return 'after delivering it';
+    case 'stolen': return 'after it was stolen';
+    case 'destroyed': return 'after it was destroyed';
+    case 'dropped': return 'after dropping it';
+    case 'sold': return 'after selling it';
+    case 'gifted': return 'after gifting it';
+    case 'sacrificed': return 'after sacrificing it';
+    default: return '';
+  }
+}
+
 function formatLossContext(
   item: InventoryItem,
   lossMetadata: LostItemMetadata
 ): string {
-  const parts: string[] = [];
+  const subject = lossMetadata.quantity && lossMetadata.quantity > 1
+    ? `Lost ${lossMetadata.quantity}x ${item.name}`
+    : `Lost ${item.name}`;
 
-  // Quantity
-  if (lossMetadata.quantity && lossMetadata.quantity > 1) {
-    parts.push(`Lost ${lossMetadata.quantity}x ${item.name}`);
-  } else {
-    parts.push(`Lost ${item.name}`);
-  }
+  const reasonPhrase = describeLossReason(lossMetadata.lossReason);
+  const opener = reasonPhrase ? `${subject} ${reasonPhrase}.` : `${subject}.`;
 
-  // Category
-  parts.push(`Category: ${item.categoryId}`);
-
-  // Reason
-  if (lossMetadata.lossReason) {
-    parts.push(`Reason: ${lossMetadata.lossReason}`);
-  }
-
-  // Narrative context
-  if (lossMetadata.lossContext) {
-    parts.push(lossMetadata.lossContext);
-  }
-
-  return parts.join(' • ');
+  return lossMetadata.lossContext
+    ? `${opener} ${lossMetadata.lossContext}`
+    : opener;
 }

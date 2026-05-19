@@ -1,19 +1,20 @@
 import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useAiContextStore } from '@/state/aiContextStore';
-import type { NarrativeGenerationRequest } from '@/types/narrative.types';
-import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import type { InventoryItem } from '@/types/inventory.types';
+import type { NarrativeGenerationRequest } from '@/types/narrative.types';
+import type { World } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { safeTrim } from '@/lib/utils';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
+
 import { buildNpcRoster } from './narrativeGenerator.npc';
 import { applyBudget } from './narrativeGenerator.budget';
+import { getLoreContextForPrompt } from './loreContextHelper';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getComplexityAlert } from './narrativeGenerator.languageComplexity';
-import { getLoreContextForPrompt } from './loreContextHelper';
 
 export {
   enhancePromptWithPersonalization,
@@ -25,6 +26,8 @@ export interface NarrativeStaticContentCache {
   itemLossInstructions?: string;
   toneSettings?: Map<string, string>;
 }
+
+// ─── Context ────────────────────────────────────────────────────────────────
 
 export const buildNarrativeContext = (
   world: World,
@@ -88,6 +91,8 @@ export const buildNarrativeContext = (
   };
 };
 
+// ─── Lore + Goals ───────────────────────────────────────────────────────────
+
 export const enhancePromptWithLore = (
   prompt: string,
   worldId: EntityID,
@@ -130,6 +135,8 @@ export const enhancePromptWithGoalContext = async (
   }
 };
 
+// ─── Tone ───────────────────────────────────────────────────────────────────
+
 export const enhancePromptWithToneSettings = (
   prompt: string,
   world: World,
@@ -165,6 +172,8 @@ export const enhancePromptWithToneSettings = (
 
   return prompt + applyBudget(toneInstructions, 'tone-settings', budget);
 };
+
+// ─── Inventory ──────────────────────────────────────────────────────────────
 
 export const enhancePromptWithInventory = (
   prompt: string,
@@ -234,6 +243,8 @@ const getEquippedItemIds = (characterIds: string[] | undefined): string[] => {
   }
 };
 
+// ─── Item Acquisition ───────────────────────────────────────────────────────
+
 export const enhancePromptWithItemAcquisitionInstructions = (
   prompt: string,
   cache: NarrativeStaticContentCache,
@@ -282,13 +293,15 @@ The items will be automatically added to the character's inventory with proper c
   return safeTrim(limited) ? prompt + limited : prompt;
 };
 
+// ─── Item Loss ──────────────────────────────────────────────────────────────
+
 export const enhancePromptWithItemLossInstructions = (
   basePrompt: string,
   cache: NarrativeStaticContentCache,
   characterInventory: InventoryItem[]
 ): string => {
   if (!cache.itemLossInstructions) {
-    cache.itemLossInstructions = buildItemLossInstructions();
+    cache.itemLossInstructions = ITEM_LOSS_INSTRUCTIONS_TEMPLATE;
   }
 
   const inventoryContext = formatInventoryForPrompt(characterInventory);
@@ -300,8 +313,17 @@ export const enhancePromptWithItemLossInstructions = (
   return basePrompt + '\n\n' + fullInstructions;
 };
 
-function buildItemLossInstructions(): string {
-  return `
+function formatInventoryForPrompt(items: InventoryItem[]): string {
+  if (!items || items.length === 0) {
+    return '(Empty - character has no items)';
+  }
+
+  return items
+    .map((item) => `- ${item.name} (${item.quantity}x) [${item.categoryId}]`)
+    .join('\n');
+}
+
+const ITEM_LOSS_INSTRUCTIONS_TEMPLATE = `
 ## ITEM USAGE & LOSS TRACKING
 
 When your narrative describes the character using, losing, or giving away items, emit structured metadata to track inventory changes.
@@ -377,14 +399,3 @@ When your narrative describes the character using, losing, or giving away items,
 *Narrative: "Your sword shatters against the dragon's scales."*
 → itemsLost: [{ "name": "Iron Sword", "lossReason": "destroyed" }]
 `;
-}
-
-function formatInventoryForPrompt(items: InventoryItem[]): string {
-  if (!items || items.length === 0) {
-    return '(Empty - character has no items)';
-  }
-
-  return items
-    .map(item => `- ${item.name} (${item.quantity}x) [${item.categoryId}]`)
-    .join('\n');
-}

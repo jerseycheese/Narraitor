@@ -1,6 +1,6 @@
 'use client';
 
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 
 interface GameSessionConfirmationDialogProps {
   isOpen: boolean;
@@ -44,13 +44,12 @@ export function GameSessionConfirmationDialog({
   const config = copyConfig[type];
   const variant = type === 'character-switch' ? 'info' : 'warning';
 
-  const progressSuffix =
-    currentProgress > 0 ? ` (${currentProgress} story segments so far).` : '';
-
-  const description =
+  const descriptionWithContext =
     type === 'start-new'
-      ? `${config.description}${progressSuffix}`
-      : `${config.description.replace('hero', characterName || 'selected hero')}${progressSuffix}`;
+      ? `${config.description}${currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''}`
+      : `${config.description.replace('hero', characterName || 'selected hero')}${
+          currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''
+        }`;
 
   const confirmText =
     type === 'character-switch' && characterName
@@ -63,7 +62,7 @@ export function GameSessionConfirmationDialog({
       onClose={onClose}
       onConfirm={onConfirm}
       title={config.title}
-      message={description}
+      message={descriptionWithContext}
       variant={variant}
       confirmText={confirmText}
       cancelText={config.cancelText}

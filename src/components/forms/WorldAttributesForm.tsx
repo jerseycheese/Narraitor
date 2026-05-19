@@ -164,10 +164,10 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
             <div key={`${attribute.id ?? attribute.name ?? index}`} >
               <div>
                 <h4>{attribute.name}</h4>
-                <div>
+                <div className="action-button-group" data-layout="horizontal" data-gap="sm">
                   <Button
                     onClick={() => setEditingAttribute(attribute.id)}
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
                   >
                     Edit

@@ -43,7 +43,16 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     );
 
     await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('character-creation-quickstart.png', { fullPage: true });
+    // Wait for any Joyride scroll animation, then force scroll to top so
+    // the sidebar logo is in frame, and clip to viewport-sized region.
+    // Avoids the Joyride overlay phantom that absolute-positions below
+    // the visible content. See PR #1233.
+    await page.waitForTimeout(400);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(100);
+    await expect(page).toHaveScreenshot('character-creation-quickstart.png', {
+      clip: { x: 0, y: 0, width: 1280, height: 1080 },
+    });
   });
 
   await test.step('Step 0: Template Selection', async () => {

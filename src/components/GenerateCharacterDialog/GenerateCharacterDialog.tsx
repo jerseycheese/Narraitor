@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -109,21 +109,27 @@ export const GenerateCharacterDialog: React.FC<
         </div>
       )}
 
-      <div>
-        <Button onClick={onClose} disabled={isGenerating} variant="outline">
-          Cancel
-        </Button>
-        <Button
-          onClick={onGenerate}
-          disabled={
-            isGenerating ||
-            (generationType === 'specific' && !safeTrim(characterName))
-          }
-          variant="default"
-        >
-          {isGenerating ? 'Generating...' : 'Generate'}
-        </Button>
-      </div>
+      <ActionButtonGroup
+        layout="horizontal"
+        gap="md"
+        actions={[
+          {
+            label: 'Cancel',
+            onClick: onClose,
+            variant: 'secondary',
+            disabled: isGenerating,
+          },
+          {
+            label: isGenerating ? 'Generating...' : 'Generate',
+            onClick: onGenerate,
+            variant: 'primary',
+            disabled:
+              isGenerating ||
+              (generationType === 'specific' && !safeTrim(characterName)),
+            flex: true,
+          },
+        ]}
+      />
     </SimpleModal>
   );
 };

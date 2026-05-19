@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
@@ -157,17 +158,24 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       </CollapsibleSection>
 
       <div className="world-editor-actions">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleCancel}
-          disabled={saving}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={saving}>
-          {saving ? 'Saving...' : 'Save Changes'}
-        </Button>
+        <ActionButtonGroup
+          layout="horizontal"
+          gap="md"
+          actions={[
+            {
+              label: 'Cancel',
+              onClick: handleCancel,
+              variant: 'secondary',
+              disabled: saving,
+            },
+            {
+              label: saving ? 'Saving...' : 'Save Changes',
+              onClick: () => handleSave(), // Wrap in arrow to avoid event object issues
+              variant: 'primary',
+              disabled: saving,
+            },
+          ]}
+        />
       </div>
     </form>
   );

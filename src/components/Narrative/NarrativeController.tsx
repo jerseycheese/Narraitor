@@ -17,7 +17,8 @@ import {
   NarrativeSegment,
   SkillCheckRoll,
 } from '@/types/narrative.types';
-import { truncate, safeTrim } from '@/lib/utils';
+import { truncate } from '@/lib/utils';
+import { safeParseNarrativeAnalysis } from '@/lib/ai/parseNarrativeResponse';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
@@ -124,7 +125,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   // Initialize component state on mount
   useEffect(() => {
-    const generationLocks = initialGenerationLocksRef.current;
     // Create a unique session key to track this instance
     const instanceKey = `${sessionId}-${Date.now()}`;
     setSessionKey(instanceKey);
@@ -146,8 +146,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
-      // Clear generation locks for this session to prevent memory leaks
-      generationLocks.delete(sessionId);
+      // NOTE: We intentionally do NOT delete initialGenerationLocksRef here.
+      // The lock is owned by the in-flight generation (released in its finally
+      // block); releasing it on unmount allows a remounted instance to start a
+      // duplicate generation while the original is still in flight.
     };
   }, [sessionId, worldId, characterId]);
 
@@ -256,46 +258,16 @@ Respond with JSON format:
 
       const response = await client.generateContent(analysisPrompt);
 
-      try {
-        // Extract JSON from response, handling markdown code blocks
-        let jsonContent = response.content;
+      const analysis = safeParseNarrativeAnalysis(response.content);
 
-        // Remove markdown code blocks if present
-        if (jsonContent.includes('```json')) {
-          jsonContent = jsonContent
-            .replace(/```json\s*/g, '')
-            .replace(/```\s*/g, '');
-        } else if (jsonContent.includes('```')) {
-          jsonContent = jsonContent.replace(/```\s*/g, '');
-        }
-
-        // Trim whitespace
-        jsonContent = safeTrim(jsonContent);
-
-        const analysis = JSON.parse(jsonContent);
-
-        // Only suggest ending if AI has medium or high confidence
-        if (
-          analysis.suggestEnding &&
-          ['high', 'medium'].includes(analysis.confidence)
-        ) {
-          endingSuggestedRef.current = true;
-
-          // Determine ending type based on AI analysis or default to story-complete
-          const endingType = [
-            'story-complete',
-            'character-retirement',
-            'session-limit',
-          ].includes(analysis.endingType)
-            ? analysis.endingType
-            : 'story-complete';
-
-          onEndingSuggested(analysis.reason, endingType);
-        }
-      } catch (parseError) {
-        console.error('Failed to parse AI ending analysis:', parseError);
-        // If JSON parsing fails, do not suggest ending
-        // Pure AI approach means no fallback to rules
+      // Only suggest ending if AI has medium or high confidence
+      if (
+        analysis &&
+        analysis.suggestEnding &&
+        analysis.confidence !== 'low'
+      ) {
+        endingSuggestedRef.current = true;
+        onEndingSuggested(analysis.reason, analysis.endingType);
       }
     } catch (error) {
       console.error('Failed to analyze ending indicators with AI:', error);
@@ -443,6 +415,7 @@ Respond with JSON format:
     const recentSegments = currentSegments.slice(-5);
 
     // Create fallback choices upfront - we'll use these immediately if something fails
+    let usedFallbackDecision = false;
     const fallbackId = `decision-fallback-${Date.now()}`;
     const fallbackDecision: Decision = {
       id: fallbackId,
@@ -516,6 +489,7 @@ Respond with JSON format:
       } catch {
         // Choice generation failed, using fallback choices
         decision = fallbackDecision;
+        usedFallbackDecision = true;
       }
 
       // Skip if component unmounted during async operation
@@ -530,6 +504,7 @@ Respond with JSON format:
         (decision.options?.length || 0) === 0
       ) {
         decision = fallbackDecision;
+        usedFallbackDecision = true;
       }
 
       // Add decision to store and get the actual stored ID
@@ -546,14 +521,11 @@ Respond with JSON format:
       decision.id = storedDecisionId;
 
       // Only notify parent component if we have AI-generated choices (not fallback)
-      // Check if this is a fallback decision by comparing the ID pattern
-      const isFallbackDecision = decision.id.includes('decision-fallback-');
-
-      if (!isFallbackDecision) {
+      if (!usedFallbackDecision) {
         if (onChoicesGenerated) {
           try {
             // Create a deep copy of the decision to ensure React state updates
-            const decisionCopy = JSON.parse(JSON.stringify(decision));
+            const decisionCopy = structuredClone(decision);
             onChoicesGenerated(decisionCopy);
           } catch (error) {
             console.error('Error calling onChoicesGenerated callback:', error);
@@ -619,7 +591,7 @@ Respond with JSON format:
 
           // Notify parent
           if (onChoicesGenerated && mountedRef.current) {
-            const decisionCopy = JSON.parse(JSON.stringify(fallbackDecision));
+            const decisionCopy = structuredClone(fallbackDecision);
             onChoicesGenerated(decisionCopy);
           }
         }

@@ -447,7 +447,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               <button
                 type="button"
                 onClick={onBack}
-                title="Back to World"
+                title="Close"
                 className="manuscript-hud-text-button"
               >
                 Close

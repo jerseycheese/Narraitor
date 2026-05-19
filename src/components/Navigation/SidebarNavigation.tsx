@@ -129,7 +129,7 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
                       {world.name}
                     </span>
                     <span className="workshop-sidebar-world-meta">
-                      {getGenreLabel(world.genre)} · {worldCharacters} characters
+                      {getGenreLabel(world.genre)} · {worldCharacters} {worldCharacters === 1 ? 'character' : 'characters'}
                     </span>
                     {isActive && <Check aria-hidden="true" />}
                   </Button>
