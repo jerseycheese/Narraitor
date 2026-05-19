@@ -10,7 +10,7 @@ const isEnabled = (value: string | undefined): boolean => value === 'true';
 
 export const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   BUFFERED_STREAMING: isEnabled(process.env.NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING),
-  PROGRESSIVE_DISCLOSURE: process.env.NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE === 'false' ? false : true,
+  PROGRESSIVE_DISCLOSURE: process.env.NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE !== 'false',
   VIRTUALIZATION: isEnabled(process.env.NEXT_PUBLIC_FEATURE_VIRTUALIZATION),
 });
 
