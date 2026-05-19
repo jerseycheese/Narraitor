@@ -1,9 +1,9 @@
 /**
- * Tests for AutoSaveService - TDD Implementation
+ * Tests for createAutoSave - TDD Implementation
  * Starting with basic functionality tests
  */
 
-import { AutoSaveService } from '../autoSaveService';
+import { createAutoSave, AutoSave } from '../autoSaveService';
 
 // Mock the persistence module
 jest.mock('@/state/persistence', () => ({
@@ -14,8 +14,8 @@ jest.mock('@/state/persistence', () => ({
   })
 }));
 
-describe('AutoSaveService', () => {
-  let service: AutoSaveService;
+describe('createAutoSave', () => {
+  let service: AutoSave;
   let mockStateProvider: jest.Mock;
 
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('AutoSaveService', () => {
       world: { id: 'world-1', name: 'Test World' },
     });
     
-    service = new AutoSaveService(mockStateProvider);
+    service = createAutoSave(mockStateProvider);
   });
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe('AutoSaveService', () => {
   describe('Event-Based Auto-Save', () => {
     it('should save immediately when triggered manually', async () => {
       const mockOnSave = jest.fn();
-      service = new AutoSaveService(mockStateProvider, { onSave: mockOnSave });
+      service = createAutoSave(mockStateProvider, { onSave: mockOnSave });
       
       service.start();
       await service.triggerSave('manual'); // Manual saves are immediate

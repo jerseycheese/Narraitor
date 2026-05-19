@@ -1,11 +1,10 @@
 /**
- * AutoSaveService - Manages automatic saving of game state
- * Integrates with IndexedDB for persistent storage
+ * Auto-save factory — manages periodic and event-based saving of game state to IndexedDB.
  */
 
 import { createIndexedDBStorage } from '@/state/persistence';
 import { getUserFriendlyError, isRetryableError } from '@/lib/utils/errorUtils';
-import { debounce, type DebouncedFunction } from '@/lib/utils/debounce';
+import { debounce } from '@/lib/utils/debounce';
 import Logger from '@/lib/utils/logger';
 
 export type GameState = {
@@ -42,132 +41,55 @@ export type AutoSaveOptions = {
   debounceMs?: number;
 };
 
-/**
- * AutoSaveService handles periodic and event-based auto-saving
- */
-export class AutoSaveService {
-  private stateProvider: StateProvider;
-  private intervalId: NodeJS.Timeout | null = null;
-  private isServiceRunning = false;
-  private readonly intervalMs = 5 * 60 * 1000; // 5 minutes
-  private options: AutoSaveOptions;
-  private storage = createIndexedDBStorage();
-  private debouncedSave: DebouncedFunction<(reason: SaveTriggerReason) => Promise<void>> | null = null;
-  private readonly debounceMs: number;
-  private logger: Logger;
-  private retryCount = new Map<string, number>();
-  private readonly maxRetries = 3;
+export interface AutoSave {
+  start(): void;
+  stop(): void;
+  isRunning(): boolean;
+  triggerSave(reason: SaveTriggerReason): Promise<void>;
+}
 
-  constructor(stateProvider: StateProvider, options: AutoSaveOptions = {}) {
-    this.stateProvider = stateProvider;
-    this.options = options;
-    this.debounceMs = options.debounceMs ?? 500; // Default 500ms debounce
-    this.logger = new Logger('AutoSaveService');
-    
-    // Create debounced save function
-    this.debouncedSave = debounce(this.performAutoSave.bind(this), this.debounceMs);
-  }
+const INTERVAL_MS = 5 * 60 * 1000;
+const MAX_RETRIES = 3;
+const DEFAULT_DEBOUNCE_MS = 500;
 
-  /**
-   * Start the auto-save service
-   */
-  start(): void {
-    if (this.isServiceRunning) {
-      this.logger.warn('Auto-save service is already running');
-      return;
-    }
+function nextRetryDelayMs(attempt: number): number {
+  return Math.pow(2, attempt) * 1000;
+}
 
-    this.isServiceRunning = true;
-    this.intervalId = setInterval(() => {
-      this.performAutoSave('periodic');
-    }, this.intervalMs);
+function shouldSkipForInactiveSession(state: GameState, reason: SaveTriggerReason): boolean {
+  return state.session.status !== 'active' && reason !== 'manual';
+}
 
-    // Run an immediate save so the first interval isn't delayed for users
-    this.performAutoSave('periodic').catch(error => {
-      this.logger.error('Initial auto-save failed:', error);
-    });
-  }
+function wrapErrorForCaller(error: Error) {
+  const userFriendlyError = getUserFriendlyError(error);
+  const enhanced = new Error(userFriendlyError.message) as Error & {
+    retryable: boolean;
+    userFriendlyError: typeof userFriendlyError;
+  };
+  enhanced.retryable = userFriendlyError.retryable;
+  enhanced.userFriendlyError = userFriendlyError;
+  return { enhanced, userFriendlyError };
+}
 
-  /**
-   * Stop the auto-save service
-   */
-  stop(): void {
-    
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
-    
-    if (this.debouncedSave) {
-      this.debouncedSave.cancel();
-    }
-    
-    this.retryCount.clear();
-    this.isServiceRunning = false;
-  }
+export function createAutoSave(
+  stateProvider: StateProvider,
+  options: AutoSaveOptions = {}
+): AutoSave {
+  const debounceMs = options.debounceMs ?? DEFAULT_DEBOUNCE_MS;
+  const logger = new Logger('AutoSaveService');
+  const storage = createIndexedDBStorage();
+  const retryCount = new Map<string, number>();
 
-  /**
-   * Check if the service is currently running
-   */
-  isRunning(): boolean {
-    return this.isServiceRunning;
-  }
+  let intervalId: NodeJS.Timeout | null = null;
+  let running = false;
 
-  /**
-   * Trigger a save with debouncing for performance
-   */
-  async triggerSave(reason: SaveTriggerReason): Promise<void> {
-    // For manual saves, execute immediately
-    if (reason === 'manual') {
-      return this.performAutoSave(reason);
-    }
-
-    // For other triggers, use shared debouncing utility
-    if (this.debouncedSave) {
-      return this.debouncedSave(reason);
-    }
-    
-    // Fallback to immediate execution if debounce not available
-    return this.performAutoSave(reason);
-  }
-
-  /**
-   * Perform auto-save operation with retry logic
-   */
-  private async performAutoSave(reason: SaveTriggerReason): Promise<void> {
-    const operationId = `${reason}-${Date.now()}`;
-    const startTime = Date.now();
-    
-    try {
-      this.options.onSaveStart?.(reason);
-      const gameState = await this.stateProvider();
-      
-      // Only save if session is active (or if it's a manual save)
-      if (gameState.session.status === 'active' || reason === 'manual') {
-        await this.performSaveWithRetry(gameState, reason, startTime, operationId);
-      } else {
-        this.logger.debug('Skipping save - session not active:', gameState.session.status);
-        this.options.onSave?.({
-          success: false,
-          timestamp: new Date(),
-          reason,
-        });
-      }
-    } catch (error) {
-      await this.handleSaveError(error as Error, reason, operationId);
-    }
-  }
-
-  /**
-   * Perform save operation with automatic retry logic
-   */
-  private async performSaveWithRetry(
-    gameState: GameState, 
-    reason: SaveTriggerReason, 
+  async function performSaveWithRetry(
+    gameState: GameState,
+    reason: SaveTriggerReason,
     startTime: number,
     operationId: string
   ): Promise<void> {
-    const currentRetry = this.retryCount.get(operationId) ?? 0;
+    const currentRetry = retryCount.get(operationId) ?? 0;
 
     try {
       const endTime = Date.now();
@@ -175,78 +97,111 @@ export class AutoSaveService {
       const gameStateStr = JSON.stringify(gameState);
       const size = gameStateStr.length;
 
-
-      // Save game state to IndexedDB
       const saveKey = `auto-save-${gameState.session.id}-${Date.now()}`;
+      await storage.setItem(saveKey, { state: gameState, version: 1 });
 
-      await this.storage.setItem(saveKey, {
-        state: gameState,
-        version: 1,
-      });
-      
-      // Clear retry count on success
-      this.retryCount.delete(operationId);
-      
-      const result: SaveResult = {
+      retryCount.delete(operationId);
+      options.onSave?.({
         success: true,
         timestamp: new Date(endTime),
         reason,
         size,
-        duration
-      };
-      
-      
-      if (this.options.onSave) {
-        this.options.onSave(result);
-      }
+        duration,
+      });
     } catch (error) {
       const errorInstance = error as Error;
       const userFriendlyError = getUserFriendlyError(errorInstance);
-      
-      if (isRetryableError(errorInstance) && currentRetry < this.maxRetries) {
-        this.retryCount.set(operationId, currentRetry + 1);
-        this.logger.warn('Retrying save operation:', { 
-          attempt: currentRetry + 1, 
-          maxRetries: this.maxRetries,
-          error: errorInstance.message 
+
+      if (isRetryableError(errorInstance) && currentRetry < MAX_RETRIES) {
+        retryCount.set(operationId, currentRetry + 1);
+        logger.warn('Retrying save operation:', {
+          attempt: currentRetry + 1,
+          maxRetries: MAX_RETRIES,
+          error: errorInstance.message,
         });
-        
-        // Exponential backoff: 1s, 2s, 4s
-        const retryDelay = Math.pow(2, currentRetry) * 1000;
         setTimeout(() => {
-          this.performSaveWithRetry(gameState, reason, startTime, operationId);
-        }, retryDelay);
+          performSaveWithRetry(gameState, reason, startTime, operationId);
+        }, nextRetryDelayMs(currentRetry));
       } else {
-        // Max retries exceeded or non-retryable error
-        this.retryCount.delete(operationId);
+        retryCount.delete(operationId);
         throw new Error(`Save failed after ${currentRetry} retries: ${userFriendlyError.message}`);
       }
     }
   }
 
-  /**
-   * Handle save errors with user-friendly messaging
-   */
-  private async handleSaveError(error: Error, reason: SaveTriggerReason, operationId: string): Promise<void> {
-    const userFriendlyError = getUserFriendlyError(error);
-    
-    this.logger.error('Auto-save failed:', { 
-      reason, 
+  async function handleSaveError(error: Error, reason: SaveTriggerReason, operationId: string): Promise<void> {
+    const { enhanced, userFriendlyError } = wrapErrorForCaller(error);
+    logger.error('Auto-save failed:', {
+      reason,
       operationId,
       error: error.message,
-      userFriendlyMessage: userFriendlyError.message
+      userFriendlyMessage: userFriendlyError.message,
     });
-    
-    if (this.options.onError) {
-      // Enhance error with user-friendly information
-      const enhancedError = new Error(userFriendlyError.message) as Error & {
-        retryable: boolean;
-        userFriendlyError: typeof userFriendlyError;
-      };
-      enhancedError.retryable = userFriendlyError.retryable;
-      enhancedError.userFriendlyError = userFriendlyError;
-      
-      this.options.onError(enhancedError);
+    options.onError?.(enhanced);
+  }
+
+  async function performAutoSave(reason: SaveTriggerReason): Promise<void> {
+    const operationId = `${reason}-${Date.now()}`;
+    const startTime = Date.now();
+
+    try {
+      options.onSaveStart?.(reason);
+      const gameState = await stateProvider();
+
+      if (shouldSkipForInactiveSession(gameState, reason)) {
+        logger.debug('Skipping save - session not active:', gameState.session.status);
+        options.onSave?.({
+          success: false,
+          timestamp: new Date(),
+          reason,
+        });
+        return;
+      }
+
+      await performSaveWithRetry(gameState, reason, startTime, operationId);
+    } catch (error) {
+      await handleSaveError(error as Error, reason, operationId);
     }
   }
+
+  const debouncedSave = debounce(performAutoSave, debounceMs);
+
+  return {
+    start(): void {
+      if (running) {
+        logger.warn('Auto-save service is already running');
+        return;
+      }
+      running = true;
+      intervalId = setInterval(() => {
+        performAutoSave('periodic');
+      }, INTERVAL_MS);
+
+      // Run an immediate save so the first interval isn't delayed for users
+      performAutoSave('periodic').catch(error => {
+        logger.error('Initial auto-save failed:', error);
+      });
+    },
+
+    stop(): void {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      debouncedSave.cancel();
+      retryCount.clear();
+      running = false;
+    },
+
+    isRunning(): boolean {
+      return running;
+    },
+
+    async triggerSave(reason: SaveTriggerReason): Promise<void> {
+      if (reason === 'manual') {
+        return performAutoSave(reason);
+      }
+      return debouncedSave(reason);
+    },
+  };
 }

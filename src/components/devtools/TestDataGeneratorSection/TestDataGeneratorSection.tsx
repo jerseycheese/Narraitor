@@ -10,6 +10,85 @@ import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 
+const TV_MOVIE_UNIVERSES = [
+  'Game of Thrones',
+  'Lord of the Rings',
+  'Star Wars',
+  'Twin Peaks',
+  'Stranger Things',
+  'Deadwood',
+  'The Walking Dead',
+  'Black Mirror',
+  'The Matrix',
+  'Mad Max',
+  'Westworld',
+  'Star Trek',
+  'Dune',
+];
+
+type WorldRelationship = 'set_within' | 'inspired_by' | undefined;
+
+/** Pick a random reference/relationship: 33% original, 33% set_within, 34% inspired_by. */
+function pickRandomWorldType(): { reference?: string; relationship: WorldRelationship } {
+  const roll = Math.random();
+  if (roll < 0.33) return { reference: undefined, relationship: undefined };
+  const reference = TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
+  return { reference, relationship: roll < 0.66 ? 'set_within' : 'inspired_by' };
+}
+
+/** Transform API-generated world data to the shape expected by `worldStore.createWorld`. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildWorldDataForStore(testWorldData: any, reference: string | undefined, relationship: WorldRelationship): any {
+  return {
+    ...testWorldData,
+    reference,
+    relationship,
+    universeReference: reference,
+    universeRelationship: relationship,
+    attributes: testWorldData.attributes.map((attr: Record<string, unknown>) => ({
+      ...attr,
+      id: generateUniqueId('attr'),
+      worldId: '',
+    })),
+    skills: testWorldData.skills.map((skill: Record<string, unknown>) => ({
+      ...skill,
+      id: generateUniqueId('skill'),
+      worldId: '',
+    })),
+  };
+}
+
+/** Fire-and-await world image generation via API, swallowing failures so world creation isn't blocked. */
+async function generateWorldImageAsync(worldId: string, worldName: string): Promise<void> {
+  try {
+    const world = useWorldStore.getState().worlds[worldId];
+    if (!world) return;
+
+    const response = await fetch('/api/generate-world-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ world }),
+    });
+
+    if (response.ok) {
+      const { imageUrl, aiGenerated } = await response.json();
+      const image: GeneratedImage = {
+        type: aiGenerated ? 'ai-generated' : 'placeholder',
+        url: imageUrl,
+        generatedAt: getTimestamp(),
+      };
+      useWorldStore.getState().updateWorld(worldId, { image });
+    } else {
+      const errorText = await response.text();
+      console.warn(
+        `[DevTools] Failed to generate world image for "${worldName}": ${response.status} - ${errorText}`
+      );
+    }
+  } catch (error) {
+    console.error(`Failed to generate world image for test world "${worldName}":`, error);
+  }
+}
+
 export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -26,66 +105,15 @@ export const TestDataGeneratorSection: React.FC = () => {
 
   const handleGenerateWorld = async () => {
     try {
-      // Generate a diverse mix of world types for testing (my enhancement)
-      const worldTypeRandom = Math.random();
-      let randomReference;
-      let randomRelationship;
-
-      if (worldTypeRandom < 0.33) {
-        // 33% - Original worlds (no reference)
-      } else if (worldTypeRandom < 0.66) {
-        // 33% - "Set in" worlds (existing universe)
-        const tvMovieUniverses = [
-          'Game of Thrones',
-          'Lord of the Rings',
-          'Star Wars',
-          'Twin Peaks',
-          'Stranger Things',
-          'Deadwood',
-          'The Walking Dead',
-          'Black Mirror',
-          'The Matrix',
-          'Mad Max',
-          'Westworld',
-          'Star Trek',
-          'Dune',
-        ];
-        randomReference =
-          tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
-        randomRelationship = 'set_within';
-      } else {
-        // 34% - "Based on" worlds (inspired by existing universe)
-        const tvMovieUniverses = [
-          'Game of Thrones',
-          'Lord of the Rings',
-          'Star Wars',
-          'Twin Peaks',
-          'Stranger Things',
-          'Deadwood',
-          'The Walking Dead',
-          'Black Mirror',
-          'The Matrix',
-          'Mad Max',
-          'Westworld',
-          'Star Trek',
-          'Dune',
-        ];
-        randomReference =
-          tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
-        randomRelationship = 'inspired_by';
-      }
-
+      const { reference, relationship } = pickRandomWorldType();
       const existingNames = Object.values(worlds).map((w) => w.name);
 
-      // Use the secure API route approach from develop branch
       const response = await fetch('/api/generate-world', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          worldReference: randomReference,
-          worldRelationship: randomRelationship,
+          worldReference: reference,
+          worldRelationship: relationship,
           existingNames,
         }),
       });
@@ -95,82 +123,12 @@ export const TestDataGeneratorSection: React.FC = () => {
       }
 
       const testWorldData = await response.json();
-
-      // Transform the generated data to match the store's expected format
-      const worldDataForStore = {
-        ...testWorldData,
-        // Support both property patterns for compatibility
-        reference: randomReference,
-        relationship: randomRelationship,
-        universeReference: randomReference,
-        universeRelationship: randomRelationship,
-        attributes: testWorldData.attributes.map(
-          (attr: {
-            name: string;
-            description: string;
-            minValue: number;
-            maxValue: number;
-            defaultValue: number;
-          }) => ({
-            ...attr,
-            id: generateUniqueId('attr'),
-            worldId: '', // Will be set by store
-          })
-        ),
-        skills: testWorldData.skills.map(
-          (skill: {
-            name: string;
-            description: string;
-            difficulty: string;
-            category: string;
-          }) => ({
-            ...skill,
-            id: generateUniqueId('skill'),
-            worldId: '', // Will be set by store
-          })
-        ),
-      };
-
-      const worldId = createWorld(worldDataForStore);
+      const worldId = createWorld(buildWorldDataForStore(testWorldData, reference, relationship));
       await ensureWorldNpcRoster(worldId);
 
-      // Set the newly created world as the active world
-      const { setCurrentWorld } = useWorldStore.getState();
-      setCurrentWorld(worldId);
+      useWorldStore.getState().setCurrentWorld(worldId);
 
-      // Generate world image asynchronously using my enhanced API
-      try {
-        // Get the created world from store
-        const world = useWorldStore.getState().worlds[worldId];
-        if (world) {
-          const response = await fetch('/api/generate-world-image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ world }),
-          });
-
-          if (response.ok) {
-            const { imageUrl, aiGenerated } = await response.json();
-            // Update the world with the generated image in GeneratedImage format (my enhancement)
-            const image: GeneratedImage = {
-              type: aiGenerated
-                ? ('ai-generated' as const)
-                : ('placeholder' as const),
-              url: imageUrl,
-              generatedAt: getTimestamp(),
-            };
-            useWorldStore.getState().updateWorld(worldId, { image });
-          } else {
-            const errorText = await response.text();
-            console.warn(
-              `[DevTools] Failed to generate world image: ${response.status} - ${errorText}`
-            );
-          }
-        }
-      } catch (error) {
-        console.error('Failed to generate world image for test world:', error);
-        // Don't block world creation if image generation fails
-      }
+      await generateWorldImageAsync(worldId, testWorldData.name);
     } catch (error) {
       console.error('[DevTools] Error generating test world:', error);
       alert(
@@ -180,83 +138,25 @@ export const TestDataGeneratorSection: React.FC = () => {
   };
 
   const handleGenerate5Worlds = async () => {
-    const createdWorlds = [];
+    const createdWorlds: Array<{ id: string; name: string }> = [];
 
     try {
-      // Get existing world names to ensure uniqueness
       const existingNames = Object.values(worlds).map((w) => w.name);
 
       for (let i = 0; i < 5; i++) {
-        // Generate a diverse mix of world types for testing (my enhancement)
-        const worldTypeRandom = Math.random();
-        let randomReference;
-        let randomRelationship;
+        const { reference, relationship } = pickRandomWorldType();
 
-        if (worldTypeRandom < 0.33) {
-          // 33% - Original worlds (no reference)
-          randomReference = undefined;
-          randomRelationship = undefined;
-        } else if (worldTypeRandom < 0.66) {
-          // 33% - "Set in" worlds (existing universe)
-          const tvMovieUniverses = [
-            'Game of Thrones',
-            'Lord of the Rings',
-            'Star Wars',
-            'Twin Peaks',
-            'Stranger Things',
-            'Deadwood',
-            'The Walking Dead',
-            'Black Mirror',
-            'The Matrix',
-            'Mad Max',
-            'Westworld',
-            'Star Trek',
-            'Dune',
-          ];
-          randomReference =
-            tvMovieUniverses[
-              Math.floor(Math.random() * tvMovieUniverses.length)
-            ];
-          randomRelationship = 'set_within';
-        } else {
-          // 34% - "Based on" worlds (inspired by existing universe)
-          const tvMovieUniverses = [
-            'Game of Thrones',
-            'Lord of the Rings',
-            'Star Wars',
-            'Twin Peaks',
-            'Stranger Things',
-            'Deadwood',
-            'The Walking Dead',
-            'Black Mirror',
-            'The Matrix',
-            'Mad Max',
-            'Westworld',
-            'Star Trek',
-            'Dune',
-          ];
-          randomReference =
-            tvMovieUniverses[
-              Math.floor(Math.random() * tvMovieUniverses.length)
-            ];
-          randomRelationship = 'inspired_by';
-        }
-
-        // Include existing names plus already created worlds in this batch to avoid duplicates
-        const allExistingNames: string[] = [
+        const allExistingNames = [
           ...existingNames,
           ...createdWorlds.map((w) => w.name),
         ];
 
-        // Use the secure API route approach from develop branch
         const response = await fetch('/api/generate-world', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            worldReference: randomReference,
-            worldRelationship: randomRelationship,
+            worldReference: reference,
+            worldRelationship: relationship,
             existingNames: allExistingNames,
           }),
         });
@@ -266,88 +166,15 @@ export const TestDataGeneratorSection: React.FC = () => {
         }
 
         const testWorldData = await response.json();
-
-        // Transform the generated data to match the store's expected format
-        const worldDataForStore = {
-          ...testWorldData,
-          // Support both property patterns for compatibility
-          reference: randomReference,
-          relationship: randomRelationship,
-          universeReference: randomReference,
-          universeRelationship: randomRelationship,
-          attributes: testWorldData.attributes.map(
-            (attr: {
-              name: string;
-              description: string;
-              minValue: number;
-              maxValue: number;
-              defaultValue: number;
-            }) => ({
-              ...attr,
-              id: generateUniqueId('attr'),
-              worldId: '', // Will be set by store
-            })
-          ),
-          skills: testWorldData.skills.map(
-            (skill: {
-              name: string;
-              description: string;
-              difficulty: string;
-              category: string;
-            }) => ({
-              ...skill,
-              id: generateUniqueId('skill'),
-              worldId: '', // Will be set by store
-            })
-          ),
-        };
-
-        const worldId = createWorld(worldDataForStore);
+        const worldId = createWorld(buildWorldDataForStore(testWorldData, reference, relationship));
         await ensureWorldNpcRoster(worldId);
         createdWorlds.push({ id: worldId, name: testWorldData.name });
 
-        // Set the first created world as active (for batch generation)
         if (i === 0) {
-          const { setCurrentWorld } = useWorldStore.getState();
-          setCurrentWorld(worldId);
+          useWorldStore.getState().setCurrentWorld(worldId);
         }
 
-        // Generate world image asynchronously for each world using my enhanced API
-        try {
-          // Get the created world from store
-          const world = useWorldStore.getState().worlds[worldId];
-          if (world) {
-            const response = await fetch('/api/generate-world-image', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ world }),
-            });
-
-            if (response.ok) {
-              const { imageUrl, aiGenerated } = await response.json();
-              // Update the world with the generated image in GeneratedImage format (my enhancement)
-              const image: GeneratedImage = {
-                type: aiGenerated
-                  ? ('ai-generated' as const)
-                  : ('placeholder' as const),
-                url: imageUrl,
-                generatedAt: getTimestamp(),
-              };
-              useWorldStore.getState().updateWorld(worldId, { image });
-            } else {
-              const errorText = await response.text();
-              console.warn(
-                `[DevTools] Failed to generate world image for "${testWorldData.name}": ${response.status} - ${errorText}`
-              );
-            }
-          }
-        } catch (error) {
-          console.error(
-            `Failed to generate world image for test world "${testWorldData.name}":`,
-            error
-          );
-          // Don't block world creation if image generation fails
-        }
+        await generateWorldImageAsync(worldId, testWorldData.name);
       }
 
       const worldNames = createdWorlds.map((w) => w.name).join(', ');

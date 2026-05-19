@@ -199,7 +199,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     for (let i = 0; i < steps.length; i++) {
       const validator = stepValidators[i];
       if (validator) {
-        const validation = validator.validate(wizard.state.data);
+        const validation = validator(wizard.state.data);
         if (!validation.valid) {
           wizard.goToStep(i);
           wizard.setValidation(i, validation);

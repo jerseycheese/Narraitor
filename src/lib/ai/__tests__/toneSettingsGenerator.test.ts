@@ -1,8 +1,7 @@
-import { ToneSettingsGenerator, extractWorldAnalysisData, WorldAnalysisData } from '../toneSettingsGenerator';
+import { generateToneSettings, extractWorldAnalysisData, WorldAnalysisData } from '../toneSettingsGenerator';
 import { AIClient, AIResponse } from '../types';
 import { World } from '@/types/world.types';
 
-// Mock the logger
 jest.mock('@/lib/utils/logger', () => ({
   logger: {
     error: jest.fn(),
@@ -11,16 +10,14 @@ jest.mock('@/lib/utils/logger', () => ({
   }
 }));
 
-describe('ToneSettingsGenerator', () => {
+describe('generateToneSettings', () => {
   let mockClient: jest.Mocked<AIClient>;
-  let generator: ToneSettingsGenerator;
 
   beforeEach(() => {
     mockClient = {
       generateContent: jest.fn(),
       generateImage: jest.fn()
     };
-    generator = new ToneSettingsGenerator(mockClient);
   });
 
   describe('generateToneSettings', () => {
@@ -45,7 +42,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      const result = await generator.generateToneSettings(sampleWorldData);
+      const result = await generateToneSettings(mockClient, sampleWorldData);
 
       expect(result).toEqual({
         contentRating: 'R',
@@ -67,7 +64,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      const result = await generator.generateToneSettings(sampleWorldData);
+      const result = await generateToneSettings(mockClient, sampleWorldData);
 
       expect(result.contentRating).toBe('PG-13');
       expect(result.narrativeStyle).toBe('action-packed');
@@ -77,14 +74,14 @@ describe('ToneSettingsGenerator', () => {
     it('should throw specific error for rate limiting', async () => {
       mockClient.generateContent.mockRejectedValueOnce(new Error('rate limit exceeded - 429'));
 
-      await expect(generator.generateToneSettings(sampleWorldData))
+      await expect(generateToneSettings(mockClient, sampleWorldData))
         .rejects.toThrow('AI service is currently busy. Please try again in a moment.');
     });
 
     it('should throw specific error for network issues', async () => {
       mockClient.generateContent.mockRejectedValueOnce(new Error('network timeout occurred'));
 
-      await expect(generator.generateToneSettings(sampleWorldData))
+      await expect(generateToneSettings(mockClient, sampleWorldData))
         .rejects.toThrow('Network error occurred. Please check your connection and try again.');
     });
 
@@ -96,7 +93,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      await expect(generator.generateToneSettings(sampleWorldData))
+      await expect(generateToneSettings(mockClient, sampleWorldData))
         .rejects.toThrow('AI response was invalid. Please try generating again.');
     });
 
@@ -108,7 +105,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      await expect(generator.generateToneSettings(sampleWorldData))
+      await expect(generateToneSettings(mockClient, sampleWorldData))
         .rejects.toThrow('AI service returned empty response');
     });
 
@@ -125,7 +122,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      await expect(generator.generateToneSettings(sampleWorldData))
+      await expect(generateToneSettings(mockClient, sampleWorldData))
         .rejects.toThrow('Invalid content rating: INVALID');
     });
 
@@ -142,7 +139,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      await expect(generator.generateToneSettings(sampleWorldData))
+      await expect(generateToneSettings(mockClient, sampleWorldData))
         .rejects.toThrow('Invalid narrative style: invalid-style');
     });
 
@@ -158,7 +155,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      await expect(generator.generateToneSettings(sampleWorldData))
+      await expect(generateToneSettings(mockClient, sampleWorldData))
         .rejects.toThrow('Missing or invalid reasoning in response');
     });
 
@@ -175,7 +172,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      await generator.generateToneSettings(sampleWorldData);
+      await generateToneSettings(mockClient, sampleWorldData);
 
       const calledPrompt = mockClient.generateContent.mock.calls[0][0];
       expect(calledPrompt).toContain('Name: Cyberpunk City');
@@ -204,7 +201,7 @@ describe('ToneSettingsGenerator', () => {
 
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
-      const result = await generator.generateToneSettings(worldDataWithoutRef);
+      const result = await generateToneSettings(mockClient, worldDataWithoutRef);
 
       expect(result.narrativeStyle).toBe('epic');
       const calledPrompt = mockClient.generateContent.mock.calls[0][0];

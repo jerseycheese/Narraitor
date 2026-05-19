@@ -7,7 +7,13 @@ import { useSessionStore } from '@/state/sessionStore';
 import { World } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
-import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
+import {
+  Validator,
+  ValidationRule,
+  alwaysValid,
+  validateFields,
+  createValidationRules,
+} from '@/lib/utils/wizardValidation';
 import { 
   WizardContainer, 
   WizardProgress, 
@@ -135,55 +141,45 @@ export default function WorldCreationWizard({
   }), [initialData]);
 
   // Create step validators
-  const stepValidators = useMemo((): Record<number, WizardStepValidator<WorldCreationData>> => {
+  const stepValidators = useMemo((): Record<number, Validator<WorldCreationData>> => {
     return {
-      0: createWizardValidator<WorldCreationData>()
-        .customValidation((data) => {
-          const isValid = data.selectedTemplateId !== null || data.createOwnWorld === true;
-          return {
-            valid: isValid,
-            errors: isValid ? [] : ['Please select a template or choose to create your own world'],
-            touched: true,
-          };
-        })
-        .build(),
-      1: createWizardValidator<WorldCreationData>()
-        .field('genre')
-        .required('World genre is required')
-        .build(),
-      2: createWizardValidator<WorldCreationData>()
-        .field('description')
-        .required('World description is required')
-        .minLength(50, 'Description must be at least 50 characters')
-        .build(),
-      3: createWizardValidator<WorldCreationData>()
-        .customValidation((data) => {
-          if (data.createOwnWorld) {
-            return { valid: true, errors: [], touched: true };
-          }
-          const hasAttributes = (data.attributes?.length || 0) > 0;
-          return {
-            valid: hasAttributes,
-            errors: hasAttributes ? [] : ['At least one attribute is required'],
-            touched: true,
-          };
-        })
-        .build(),
-      4: createWizardValidator<WorldCreationData>()
-        .customValidation((data) => {
-          if (data.createOwnWorld) {
-            return { valid: true, errors: [], touched: true };
-          }
-          const hasSkills = (data.skills?.length || 0) > 0;
-          return {
-            valid: hasSkills,
-            errors: hasSkills ? [] : ['At least one skill is required'],
-            touched: true,
-          };
-        })
-        .build(),
-      5: createWizardValidator<WorldCreationData>().build(), // Finalize step is always valid
-      6: createWizardValidator<WorldCreationData>().build(), // Quick start step is always valid
+      0: (data) => {
+        const isValid = data.selectedTemplateId !== null || data.createOwnWorld === true;
+        return {
+          valid: isValid,
+          errors: isValid ? [] : ['Please select a template or choose to create your own world'],
+          touched: true,
+        };
+      },
+      1: validateFields<WorldCreationData>({
+        genre: [createValidationRules.required('World genre is required')],
+      }),
+      2: validateFields<WorldCreationData>({
+        description: [
+          createValidationRules.required<string | undefined>('World description is required'),
+          createValidationRules.minLength(50, 'Description must be at least 50 characters') as ValidationRule<string | undefined>,
+        ],
+      }),
+      3: (data) => {
+        if (data.createOwnWorld) return { valid: true, errors: [], touched: true };
+        const hasAttributes = (data.attributes?.length || 0) > 0;
+        return {
+          valid: hasAttributes,
+          errors: hasAttributes ? [] : ['At least one attribute is required'],
+          touched: true,
+        };
+      },
+      4: (data) => {
+        if (data.createOwnWorld) return { valid: true, errors: [], touched: true };
+        const hasSkills = (data.skills?.length || 0) > 0;
+        return {
+          valid: hasSkills,
+          errors: hasSkills ? [] : ['At least one skill is required'],
+          touched: true,
+        };
+      },
+      5: alwaysValid, // Finalize step is always valid
+      6: alwaysValid, // Quick start step is always valid
     };
   }, []);
 
@@ -194,7 +190,7 @@ export default function WorldCreationWizard({
     steps: WIZARD_STEPS,
     onStepValidation: (stepIndex, data) => {
       const validator = stepValidators[stepIndex];
-      return validator ? validator.validate(data) : { valid: true, errors: [], touched: true };
+      return validator ? validator(data) : { valid: true, errors: [], touched: true };
     },
   });
 

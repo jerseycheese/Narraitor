@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
-import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
+import {
+  Validator,
+  alwaysValid,
+  validateFields,
+  createValidationRules,
+} from '@/lib/utils/wizardValidation';
 import { EntityID } from '@/types/common.types';
 import { World } from '@/types/world.types';
 import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from '@/components/CharacterCreationWizard/utils/validation';
@@ -76,45 +81,40 @@ export function useCharacterCreationWizard({
   world
 }: UseCharacterCreationWizardProps) {
   // Create step validators
-  const stepValidators = useMemo((): Record<number, WizardStepValidator<CharacterCreationData>> => {
+  const stepValidators = useMemo((): Record<number, Validator<CharacterCreationData>> => {
     return {
-      0: createWizardValidator<CharacterCreationData>().build(), // Template selection - always valid (optional)
-      1: createWizardValidator<CharacterCreationData>()          // Basic Info (was step 0)
-        .field('name')
-        .required('Character name is required')
-        .minLength(2, 'Character name must be at least 2 characters')
-        .custom((name) => {
-          const result = validateCharacterName(name, worldId);
-          return result.valid;
-        }, 'A character with this name already exists in this world')
-        .build(),
-      2: createWizardValidator<CharacterCreationData>()          // Attributes (was step 1)
-        .customValidation((data) => {
-          const result = validateAttributes(data.attributes, world?.settings.attributePointPool || 0);
-          return { ...result, touched: true };
-        })
-        .build(),
-      3: createWizardValidator<CharacterCreationData>()          // Skills (was step 2)
-        .customValidation((data) => {
-          const result = validateSkills(
-            data.skills,
-            world?.settings.skillPointPool || 0,
-            world?.skills?.map(skill => ({
-              id: skill.id,
-              minValue: skill.minValue,
-              maxValue: skill.maxValue,
-            })) || []
-          );
-          return { ...result, touched: true };
-        })
-        .build(),
-      4: createWizardValidator<CharacterCreationData>()         // Background (was step 3)
-        .customValidation((data) => {
-          const result = validateBackground(data.background);
-          return { ...result, touched: true };
-        })
-        .build(),
-      5: createWizardValidator<CharacterCreationData>().build(), // Portrait (was step 4) - optional
+      0: alwaysValid, // Template selection - always valid (optional)
+      1: validateFields<CharacterCreationData>({
+        name: [
+          createValidationRules.required('Character name is required'),
+          createValidationRules.minLength(2, 'Character name must be at least 2 characters'),
+          createValidationRules.custom<string>(
+            (name) => validateCharacterName(name, worldId).valid,
+            'A character with this name already exists in this world'
+          ),
+        ],
+      }),
+      2: (data) => {
+        const result = validateAttributes(data.attributes, world?.settings.attributePointPool || 0);
+        return { ...result, touched: true };
+      },
+      3: (data) => {
+        const result = validateSkills(
+          data.skills,
+          world?.settings.skillPointPool || 0,
+          world?.skills?.map(skill => ({
+            id: skill.id,
+            minValue: skill.minValue,
+            maxValue: skill.maxValue,
+          })) || []
+        );
+        return { ...result, touched: true };
+      },
+      4: (data) => {
+        const result = validateBackground(data.background);
+        return { ...result, touched: true };
+      },
+      5: alwaysValid, // Portrait - optional
     };
   }, [worldId, world]);
 
@@ -125,7 +125,7 @@ export function useCharacterCreationWizard({
     steps,
     onStepValidation: (stepIndex, data) => {
       const validator = stepValidators[stepIndex];
-      return validator ? validator.validate(data) : { valid: true, errors: [], touched: true };
+      return validator ? validator(data) : { valid: true, errors: [], touched: true };
     },
   });
 

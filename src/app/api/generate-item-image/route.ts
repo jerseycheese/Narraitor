@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Logger from '@/lib/utils/logger';
 import type { InventoryItem } from '@/types/inventory.types';
-import { ItemImageGenerator } from '@/lib/ai/itemImageGenerator';
+import { buildItemPrompt } from '@/lib/ai/itemImageGenerator';
 import { generateImageWithFallback } from '@/lib/api/imageGenerationHelpers';
 
 const logger = new Logger('API');
@@ -30,13 +30,10 @@ export async function POST(request: NextRequest) {
     }
 
     const item: InventoryItem = body.item;
-    const genre: string | undefined = body.genre;
 
     logger.debug('generate-item-image API', 'Generating image for item:', item.name);
 
-    // Build the prompt using ItemImageGenerator
-    const generator = new ItemImageGenerator();
-    const prompt = await generator.buildItemPrompt(item, genre);
+    const prompt = buildItemPrompt(item);
 
     logger.debug('generate-item-image API', 'Generated prompt:', prompt.substring(0, 100) + '...');
 
