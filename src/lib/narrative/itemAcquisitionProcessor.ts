@@ -13,6 +13,11 @@ import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import type { EntityID } from '@/types/common.types';
 import type { InventoryItem, InventoryItemCategorization } from '@/types/inventory.types';
 import { itemImageService } from '@/lib/services/itemImageService';
+import {
+  delayBetweenItems,
+  itemNamesMatch,
+  runQueued,
+} from './itemProcessorShared';
 
 type PreparedItem = AcquiredItemMetadata & {
   normalizedName: string;
@@ -22,7 +27,6 @@ type PreparedItem = AcquiredItemMetadata & {
   quantity: number;
 };
 
-const RATE_LIMIT_DELAY_MS = 200;
 const processingQueue = new Map<EntityID, Promise<void>>();
 
 /**
@@ -47,14 +51,10 @@ export async function processAcquiredItems(
     return;
   }
 
-  const previous = processingQueue.get(characterId) ?? Promise.resolve();
-
-  const tracked = previous
-    .catch((err) => {
-      // Prevent a failed prior job from blocking the queue
-      console.error('Previous item acquisition run failed', err);
-    })
-    .then(async () => {
+  return runQueued(
+    processingQueue,
+    characterId,
+    async () => {
       const inventoryStore = useInventoryStore.getState();
       const now = getTimestamp();
 
@@ -116,19 +116,10 @@ export async function processAcquiredItems(
           console.error(`Failed to add item "${item.name}" to inventory:`, err);
         }
       }
-    })
-    .catch((err) => {
-      console.error('processAcquiredItems encountered an unexpected error', err);
-    })
-    .finally(() => {
-      if (processingQueue.get(characterId) === tracked) {
-        processingQueue.delete(characterId);
-      }
-    });
-
-  processingQueue.set(characterId, tracked);
-
-  return tracked;
+    },
+    (err) => console.error('Previous item acquisition run failed', err),
+    (err) => console.error('processAcquiredItems encountered an unexpected error', err)
+  );
 }
 
 /**
@@ -173,39 +164,6 @@ function buildEquipmentKey(name: string, categoryId: string): string {
 
 function buildNameKey(name: string): string {
   return normalizeText(name || '', NORM_NAME).toLowerCase();
-}
-
-/**
- * Checks if two item names are semantically similar using AI.
- * Handles complex variations like:
- * - "Lantern" vs "Rusty Kerosene Lantern"
- * - "Photo of Mom" vs "Photo of your mother"
- * - "Gold Coin" vs "Gold Coins"
- * - "Healing Potion" vs "Potion of Healing"
- */
-async function itemNamesMatch(name1: string, name2: string): Promise<boolean> {
-  const normalized1 = normalizeText(name1 || '', NORM_NAME).toLowerCase();
-  const normalized2 = normalizeText(name2 || '', NORM_NAME).toLowerCase();
-
-  // Quick exact match check (avoid AI call)
-  if (normalized1 === normalized2) return true;
-
-  // Use AI for semantic similarity
-  const { checkItemSimilarityClient } = await import('@/lib/inventory/checkItemSimilarityClient');
-
-  try {
-    const result = await checkItemSimilarityClient({
-      name1,
-      name2,
-    });
-
-    // Consider items similar if AI says so with reasonable confidence
-    return result.similar && result.confidence > 0.7;
-  } catch (error) {
-    // If AI check fails, fall back to simple substring matching
-    console.warn('AI similarity check failed, using fallback:', error);
-    return normalized1.includes(normalized2) || normalized2.includes(normalized1);
-  }
 }
 
 async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<PreparedItem> {
@@ -389,14 +347,6 @@ async function addItemToInventory(
       console.warn(`Background image generation failed for item: ${item.normalizedName}`, error);
     });
   }
-}
-
-function delayBetweenItems(index: number, total: number): Promise<void> {
-  if (index >= total - 1) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
 }
 
 function chooseBetterDescription(existing?: string, incoming?: string): string | undefined {

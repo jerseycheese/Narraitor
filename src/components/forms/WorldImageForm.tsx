@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { World } from '@/types/world.types';
 import { GeneratedImage } from '@/types/common.types';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+import { generateWorldImage } from '@/lib/ai/worldImageGenerator';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
 import { getTimestamp } from '@/lib/utils';
@@ -18,10 +18,8 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
     setIsGenerating(true);
 
     try {
-      const imageGenerator = new WorldImageGenerator();
+      const image = await generateWorldImage(world, customPrompt);
 
-      const image = await imageGenerator.generateWorldImage(world, customPrompt);
-      
       onChange({ image });
     } catch (err) {
       throw err; // Let ImageGenerationSection handle the error display

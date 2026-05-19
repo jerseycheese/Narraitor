@@ -30,7 +30,7 @@ jest.mock('@/lib/ai', () => ({
 }));
 
 jest.mock('@/lib/ai/worldImageGenerator', () => ({
-  WorldImageGenerator: jest.fn(),
+  generateWorldImage: jest.fn(),
 }));
 
 jest.mock('@/lib/ai/worldAnalyzerClient', () => ({

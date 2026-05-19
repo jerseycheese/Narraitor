@@ -25,7 +25,7 @@ import QuickStartStep from './steps/QuickStartStep';
 import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
 import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 import { getTimestamp } from '@/lib/utils';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+import { generateWorldImage } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
@@ -408,26 +408,21 @@ export default function WorldCreationWizard({
 
       // Generate world image asynchronously after creation (only if no image was already generated)
       if (!data.image?.url) {
-        const generateWorldImage = async () => {
+        const runWorldImageGeneration = async () => {
           try {
-            const imageGenerator = new WorldImageGenerator();
-
-            // Get the created world from store
             const world = useWorldStore.getState().worlds[worldId];
-            
+
             if (world) {
-              const image = await imageGenerator.generateWorldImage(world);
-              // Update the world with the generated image
+              const image = await generateWorldImage(world);
               useWorldStore.getState().updateWorld(worldId, { image });
             }
           } catch (error) {
             console.error('[WorldCreationWizard] Failed to generate world image:', error);
-            // Don't block world creation if image generation fails
           }
         };
         
         // Start image generation in the background
-        generateWorldImage();
+        runWorldImageGeneration();
       }
       
       // Save to localStorage as temporary solution
