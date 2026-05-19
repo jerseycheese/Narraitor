@@ -126,7 +126,6 @@ const removeCharacterFromRoster = (
   }
 
   if (filteredRoster.length === 0) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [worldId]: _removedRoster, ...remainingRosters } = rosters;
     return remainingRosters;
   }
@@ -434,10 +433,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             });
 
             set((state) => {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { [id]: _removedCharacter, ...remainingCharacters } =
                 state.characters;
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { [id]: _removedEntity, ...remainingEntities } =
                 state.entities;
               const isCurrent =

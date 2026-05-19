@@ -160,9 +160,7 @@ export const useNPCStore = create<NPCStore>()(
         }
 
         set((state) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [npcId]: _removedNPC, ...remainingNpcs } = state.npcs;
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [npcId]: _removedEntity, ...remainingEntities } = state.entities;
 
           const worldNpcs = state.worldNpcs[existingNPC.worldId] || [];

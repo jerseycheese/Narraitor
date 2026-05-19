@@ -534,7 +534,6 @@ export const useSessionStore = create<SessionStore>()(
   // Delete a saved session
   deleteSavedSession: (sessionId: string) => {
     set(state => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [sessionId]: _, ...remainingSessions } = state.savedSessions;
       const lifecycleEntry = state.sessionLifecycle[sessionId];
       const updatedLifecycle = lifecycleEntry

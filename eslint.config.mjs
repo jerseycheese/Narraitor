@@ -29,6 +29,10 @@ const eslintConfig = [
         "varsIgnorePattern": "^_",
         "destructuredArrayIgnorePattern": "^_",
       }],
+      // Promote no-explicit-any to error in production code so new `any`s
+      // need a deliberate suppression with a reason. Dev tools, tests, and
+      // stories are overridden below.
+      "@typescript-eslint/no-explicit-any": "error",
     },
   },
   {
@@ -47,6 +51,7 @@ const eslintConfig = [
       "@typescript-eslint/no-require-imports": "off", // Allow require() in test files for Jest mocking
       "design-tokens/no-hardcoded-colors": "off", // Allow hardcoded colors in tests, dev tools, design tokens, and stories
       "no-console": "off", // Dev tooling, tests, and stories legitimately use console
+      "@typescript-eslint/no-explicit-any": "warn", // Allow `any` in dev tools and tests, but flag it
     },
   },
 ];

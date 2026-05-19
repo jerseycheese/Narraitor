@@ -21,7 +21,11 @@ export interface PromptVariable {
 }
 
 /**
- * Interface for prompt templates
+ * Interface for prompt templates.
+ *
+ * `generate` takes a context bag whose shape varies per template. We use
+ * `any` here so individually-typed contexts (e.g. PlayerChoiceTemplateContext)
+ * remain assignable. Each template documents the shape it expects.
  */
 export interface PromptTemplate {
   id: string;
@@ -29,7 +33,8 @@ export interface PromptTemplate {
   type: PromptType;
   content: string;
   variables: PromptVariable[];
-  generate?: (context: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- context shape varies per template; see template files for expected fields
+  generate?: (context: any) => string;
 }
 
 /**

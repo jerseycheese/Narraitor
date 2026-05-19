@@ -20,11 +20,10 @@ export default function WorldViewPage() {
   const world = useWorldStore((state) => state.worlds[worldId]);
   const currentWorldId = useWorldStore((state) => state.currentWorldId);
   const setCurrentWorld = useWorldStore((state) => state.setCurrentWorld);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const characters = useCharacterStore((state: any) => state.characters);
-  
+  const characters = useCharacterStore((state) => state.characters);
+
   // Check if this world has any characters
-  const worldCharacters = (Object.values(characters) as Character[]).filter(char => char.worldId === worldId);
+  const worldCharacters = Object.values(characters).filter((char): char is Character => char.worldId === worldId);
   const isActive = currentWorldId === worldId;
 
   useEffect(() => setMounted(true), []);

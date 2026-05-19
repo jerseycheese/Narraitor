@@ -1883,16 +1883,17 @@
   border: 1px solid var(--color-border);
 }
 
+/* .view-mode-toggle .button overrides button-size-* and button-variant
+   border/radius so the outer .view-mode-toggle border provides the group
+   chrome instead. (0,2,0) specificity beats the (0,1,0) variant rules. */
 .view-mode-toggle .button {
-  /* !important required: overrides button-size-* and button-variant border/radius
-     so the outer .view-mode-toggle border provides the group chrome instead */
-  border: none !important;
-  border-radius: 0 !important;
-  min-height: 2.25rem !important; /* matches button-size-default; no --space token at this value */
+  border: none;
+  border-radius: 0;
+  min-height: 2.25rem; /* matches button-size-default; no --space token at this value */
 }
 
 .view-mode-toggle .button:first-child {
-  border-right: 1px solid var(--color-border) !important; /* divider between toggle options */
+  border-right: 1px solid var(--color-border); /* divider between toggle options */
 }
 
 .view-mode-toggle .button.active {

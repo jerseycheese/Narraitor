@@ -138,11 +138,8 @@ const createBaseActions = (set: SetState, get: GetState) => ({
     if (!get().facts[id]) return;
 
     set((state) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [id]: _removedFact, ...remainingFacts } = state.facts;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [id]: _removedEntity, ...remainingEntities } = state.entities;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [id]: _removedHistory, ...remainingHistory } = state.factHistory;
 
       return {

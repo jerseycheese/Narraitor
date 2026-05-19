@@ -180,11 +180,8 @@ export const useWorldStore = create<WorldStore>()(
           });
 
           set((state) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedWorld, ...remainingWorlds } = state.worlds;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedEntity, ...remainingEntities } = state.entities;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedState, ...remainingStates } = state.worldStates;
             const currentIsDeleted = state.currentEntityId === id || state.currentWorldId === id;
             return {
