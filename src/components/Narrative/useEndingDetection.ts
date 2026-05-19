@@ -8,7 +8,8 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-import { truncate, safeTrim } from '@/lib/utils';
+import { truncate } from '@/lib/utils';
+import { safeParseNarrativeAnalysis } from '@/lib/ai/parseNarrativeResponse';
 import type {
   EndingType,
   NarrativeSegment,
@@ -123,34 +124,19 @@ Respond with JSON format:
 
         const response = await client.generateContent(analysisPrompt);
 
-        try {
-          let jsonContent = response.content;
-          if (jsonContent.includes('```json')) {
-            jsonContent = jsonContent
-              .replace(/```json\s*/g, '')
-              .replace(/```\s*/g, '');
-          } else if (jsonContent.includes('```')) {
-            jsonContent = jsonContent.replace(/```\s*/g, '');
-          }
-          jsonContent = safeTrim(jsonContent);
+        const analysis = safeParseNarrativeAnalysis(response.content);
 
-          const analysis = JSON.parse(jsonContent);
+        if (
+          analysis &&
+          analysis.suggestEnding &&
+          ACCEPTED_CONFIDENCES.has(analysis.confidence)
+        ) {
+          const endingType: EndingType = ACCEPTED_ENDING_TYPES.has(analysis.endingType)
+            ? analysis.endingType
+            : 'story-complete';
 
-          if (
-            analysis.suggestEnding &&
-            ACCEPTED_CONFIDENCES.has(analysis.confidence)
-          ) {
-            const endingType: EndingType = ACCEPTED_ENDING_TYPES.has(
-              analysis.endingType
-            )
-              ? analysis.endingType
-              : 'story-complete';
-
-            endingSuggestedRef.current = true;
-            onEndingSuggested(analysis.reason, endingType);
-          }
-        } catch (parseError) {
-          console.error('Failed to parse AI ending analysis:', parseError);
+          endingSuggestedRef.current = true;
+          onEndingSuggested(analysis.reason, endingType);
         }
       } catch (error) {
         console.error('Failed to analyze ending indicators with AI:', error);

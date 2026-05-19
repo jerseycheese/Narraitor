@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { DataField } from '@/components/shared/DataField';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { formatRelativeTime } from '@/lib/utils';
@@ -48,6 +48,14 @@ export function DashboardContinueCard({
         className="component-dashboard-continue-card"
         aria-labelledby="continue-game-heading"
       >
+        {/* World image as an atmospheric background layer. Hidden by
+            default; per-theme CSS opts in and applies a legibility scrim. */}
+        {world.image?.url && (
+          <div className="dashboard-continue-card-bg" aria-hidden="true">
+            <Image src={world.image.url} alt="" fill sizes="100vw" />
+          </div>
+        )}
+
         <h2 id="continue-game-heading">Continue Your Game</h2>
 
         <div className="dashboard-continue-card-row">
@@ -64,25 +72,31 @@ export function DashboardContinueCard({
 
           {/* Game Info */}
           <div className="dashboard-continue-card-info">
-            <div className="dashboard-continue-card-fields">
-              <DataField label="World" value={world.name} />
-              <DataField label="Character" value={character.name} />
-            </div>
+            <dl className="dashboard-continue-card-fields">
+              <div className="dashboard-continue-card-field">
+                <dt>World</dt>
+                <dd>{world.name}</dd>
+              </div>
+              <div className="dashboard-continue-card-field">
+                <dt>Character</dt>
+                <dd>{character.name}</dd>
+              </div>
+            </dl>
 
-            <div className="dashboard-continue-card-meta">
-              <DataField
-                label="Progress"
-                value={`${session.narrativeCount} entries`}
-                variant="outline"
-              />
+            <p className="dashboard-continue-card-meta">
+              <span className="dashboard-continue-card-progress">
+                {session.narrativeCount} entries
+              </span>
               <time dateTime={session.lastPlayed}>
                 Last played {lastPlayedText}
               </time>
-            </div>
+            </p>
           </div>
         </div>
 
         <ActionButtonGroup
+          layout="horizontal"
+          gap="sm"
           actions={[
             {
               label: 'Continue Last Game',

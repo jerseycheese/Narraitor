@@ -25,7 +25,7 @@ interface WorldViewToggleProps {
  */
 export function WorldViewToggle({ mode, onModeChange }: WorldViewToggleProps) {
   return (
-    <div role="group" aria-label="View mode toggle">
+    <div className="view-mode-toggle" role="group" aria-label="View mode toggle">
       <Button
         variant={mode === 'grid' ? 'default' : 'outline'}
         size="sm"

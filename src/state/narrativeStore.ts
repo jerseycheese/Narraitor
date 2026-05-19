@@ -12,6 +12,7 @@ import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
+import { applyWorldStateThreadUpdates } from '../lib/narrative/applyWorldStateThreadUpdates';
 import { createIndexedDBStorage } from './persistence';
 import {
   NPCRelationshipUpdate,

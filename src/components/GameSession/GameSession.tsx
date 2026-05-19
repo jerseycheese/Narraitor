@@ -13,7 +13,7 @@ import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
 import ActiveGameSession from './ActiveGameSession';
 import GameSessionResume from './GameSessionResume';
-import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
 
 interface GameSessionProps {
@@ -251,7 +251,6 @@ const GameSession: React.FC<GameSessionProps> = ({
       // In development mode with fast refresh, don't end sessions
       // This prevents the infinite reset loop during hot reloading
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔧 Development mode: Skipping session cleanup to prevent fast refresh issues');
         return;
       }
       
@@ -290,7 +289,8 @@ const GameSession: React.FC<GameSessionProps> = ({
   if (!worldExists) {
     return (
       <div data-testid="game-session-error-container">
-        <SectionError 
+        <ErrorDisplay
+          variant="section"
           title="World Not Found"
           message="The world you're trying to access doesn't exist or has been deleted."
           severity="error"

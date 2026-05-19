@@ -7,7 +7,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import GameSession from '@/components/GameSession/GameSession';
 import { LoadingPulse } from '@/components/ui/LoadingState';
-import { SectionError } from '@/components/ui/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { Button } from '@/components/ui/button';
@@ -113,7 +113,8 @@ export default function PlayPage() {
     return (
       <div className="play-page play-page-shell play-page-shell-error">
         <PageLayout title="Game Session Error">
-          <SectionError
+          <ErrorDisplay
+            variant="section"
             title="Failed to Start Game"
             message={error}
             severity="error"
@@ -141,7 +142,8 @@ export default function PlayPage() {
     return (
       <div className="play-page play-page-shell play-page-shell-warning">
         <PageLayout title="No Active Session">
-          <SectionError
+          <ErrorDisplay
+            variant="section"
             title="No Active Session"
             message="Unable to create or resume a game session."
             severity="warning"

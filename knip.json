@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/app/**/{page,layout,template,error,loading,not-found,route,default,global-error}.{ts,tsx}",
+    ".storybook/{main,preview,vitest.setup}.{cjs,ts,tsx}",
+    "scripts/**/*.{js,cjs,mjs}"
+  ],
+  "project": ["src/**/*.{ts,tsx,js,jsx}", "scripts/**/*.{js,cjs,mjs}"],
+  "ignore": ["src/app/dev/**"],
+  "ignoreDependencies": [
+    "@storybook/addon-essentials",
+    "@storybook/addon-a11y",
+    "@storybook/addon-onboarding",
+    "@storybook/addon-styling-webpack",
+    "@chromatic-com/storybook",
+    "eslint-plugin-storybook",
+    "eslint-config-prettier",
+    "postcss-nested"
+  ],
+  "ignoreBinaries": ["dot"]
+}

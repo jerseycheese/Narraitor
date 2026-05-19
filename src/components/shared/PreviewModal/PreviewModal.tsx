@@ -1,44 +1,23 @@
-// src/components/shared/PreviewModal/PreviewModal.tsx
-
 import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 
 interface PreviewModalProps<T> {
-  /** Whether the modal is open */
   isOpen: boolean;
-  /** The data to preview */
   data: T;
-  /** Title for the preview modal */
   title: string;
-  /** Subtitle or description */
   subtitle?: string;
-  /** Function to render the preview content */
   renderContent: (data: T) => React.ReactNode;
-  /** Called when user confirms/accepts the preview */
   onConfirm: () => void;
-  /** Called when user cancels/goes back */
   onCancel: () => void;
-  /** Text for the confirm button */
   confirmText?: string;
-  /** Text for the cancel button */
   cancelText?: string;
-  /** Additional footer content */
   footerNote?: string;
-  /** Custom CSS classes */
   className?: string;
-  /** Modal size */
-  size?: string;
-  /** Whether to close on backdrop click */
   closeOnBackdropClick?: boolean;
 }
 
-/**
- * Generic preview modal component for displaying generated content
- * Extends the existing Modal component for consistent behavior
- * Reusable across different features (world templates, characters, etc.)
- */
 function PreviewModalInner<T>({
   isOpen,
   data,
@@ -58,7 +37,6 @@ function PreviewModalInner<T>({
       onClose={onCancel}
       title={title}
       showCloseButton={false}
-      size="xl"
       className={className}
     >
       <p id="preview-modal-desc">

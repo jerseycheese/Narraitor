@@ -339,7 +339,10 @@ export default function AttributeReviewStep({
                     <div>
                       <span>{suggestion.name}</span>
                       {suggestion.category && (
-                        <span>{suggestion.category}</span>
+                        <>
+                          <span aria-hidden="true"> · </span>
+                          <span>{suggestion.category}</span>
+                        </>
                       )}
                     </div>
 

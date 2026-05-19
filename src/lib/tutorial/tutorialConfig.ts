@@ -1,3 +1,5 @@
+import type { Placement } from '@popperjs/core';
+
 export const joyrideStyles = {
   options: {
     primaryColor: 'hsl(var(--primary))',
@@ -55,7 +57,9 @@ export const joyrideOptions = {
   floaterProps: {
     modifiers: {
       flip: {
-        fallbackPlacements: ['bottom', 'top'],
+        options: {
+          fallbackPlacements: ['bottom', 'top', 'left', 'right'] as Placement[],
+        },
       },
     },
   },

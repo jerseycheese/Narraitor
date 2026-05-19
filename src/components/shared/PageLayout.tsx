@@ -59,31 +59,31 @@ export function PageLayout({
   const hasHeaderContent = title || actions || description;
 
   return (
-    <div>
+    <div className="component-page-layout">
       <div className={`${className}`}>
         {hasHeaderContent && (
-          <header>
-            <div>
+          <header className="page-layout-header">
+            <div className="page-layout-header-top">
               {title && (
-                <h1>
+                <h1 className="page-layout-title">
                   {title}
                 </h1>
               )}
               {actions && (
-                <div>
+                <div className="page-layout-actions">
                   {actions}
                 </div>
               )}
             </div>
             {description && (
-              <p>
+              <p className="page-layout-description">
                 {description}
               </p>
             )}
           </header>
         )}
 
-        <section>
+        <section className="page-layout-content">
           {children}
         </section>
       </div>

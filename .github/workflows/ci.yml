@@ -96,6 +96,30 @@ jobs:
       - name: Enforce non-self-closing PageLayout usage
         run: npm run lint:layout-usage
 
+  knip:
+    name: Knip (unused code)
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # Non-blocking: surfaces unused-code findings in the logs without
+      # failing the check while ignore rules are still being tuned (#1231).
+      - name: Run Knip
+        run: npm run knip || true
+
   test:
     name: Unit & Integration Tests
     runs-on: ubuntu-latest

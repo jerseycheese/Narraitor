@@ -8,6 +8,8 @@ import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('API');
 
+const TEMPLATE_GENERATION_TIMEOUT_MS = 45_000;
+
 interface GenerateTemplateRequest {
   type: 'inspired-by' | 'genre-mix' | 'surprise-me';
   userInput?: string;
@@ -67,8 +69,8 @@ export async function POST(request: NextRequest) {
     const templateGenerator = new TemplateGenerator(client);
     
     // Add timeout wrapper to prevent hanging requests
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Template generation timeout')), 45000)
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Template generation timeout')), TEMPLATE_GENERATION_TIMEOUT_MS)
     );
     
     const template = await Promise.race([

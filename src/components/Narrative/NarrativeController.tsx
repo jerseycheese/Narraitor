@@ -136,7 +136,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   // Initialize component state on mount
   useEffect(() => {
-    const generationLocks = initialGenerationLocksRef.current;
     // Create a unique session key to track this instance
     const instanceKey = `${sessionId}-${Date.now()}`;
     setSessionKey(instanceKey);
@@ -157,8 +156,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
-      // Clear generation locks for this session to prevent memory leaks
-      generationLocks.delete(sessionId);
+      // NOTE: We intentionally do NOT delete initialGenerationLocksRef here.
+      // The lock is owned by the in-flight generation (released in its finally
+      // block); releasing it on unmount allows a remounted instance to start a
+      // duplicate generation while the original is still in flight.
     };
   }, [sessionId, worldId, characterId]);
 
@@ -302,6 +303,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     const recentSegments = currentSegments.slice(-5);
 
     // Create fallback choices upfront - we'll use these immediately if something fails
+    let usedFallbackDecision = false;
     const fallbackId = `decision-fallback-${Date.now()}`;
     const fallbackDecision: Decision = {
       id: fallbackId,
@@ -375,6 +377,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       } catch (error) {
         logger.warn('Choice generation failed, using fallback choices', error);
         decision = fallbackDecision;
+        usedFallbackDecision = true;
       }
 
       // Skip if component unmounted during async operation
@@ -389,6 +392,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         (decision.options?.length || 0) === 0
       ) {
         decision = fallbackDecision;
+        usedFallbackDecision = true;
       }
 
       // Add decision to store and get the actual stored ID
@@ -405,14 +409,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       decision.id = storedDecisionId;
 
       // Only notify parent component if we have AI-generated choices (not fallback)
-      // Check if this is a fallback decision by comparing the ID pattern
-      const isFallbackDecision = decision.id.includes('decision-fallback-');
-
-      if (!isFallbackDecision) {
+      if (!usedFallbackDecision) {
         if (onChoicesGenerated) {
           try {
             // Create a deep copy of the decision to ensure React state updates
-            const decisionCopy = JSON.parse(JSON.stringify(decision));
+            const decisionCopy = structuredClone(decision);
             onChoicesGenerated(decisionCopy);
           } catch (error) {
             console.error('Error calling onChoicesGenerated callback:', error);
@@ -478,7 +479,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
           // Notify parent
           if (onChoicesGenerated && mountedRef.current) {
-            const decisionCopy = JSON.parse(JSON.stringify(fallbackDecision));
+            const decisionCopy = structuredClone(fallbackDecision);
             onChoicesGenerated(decisionCopy);
           }
         }

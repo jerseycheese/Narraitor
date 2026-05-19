@@ -1,30 +1,20 @@
-// src/state/narrativeStore.worldStateThreads.ts
-//
-// Extracted from narrativeStore.ts. Applies per-segment updates to
-// player-character threads, character relationships, and major events on the
-// world store. Lives in its own module to keep narrativeStore.ts focused on
-// the store's own slices.
-
-import { EntityID } from '../types/common.types';
-import { NarrativeSegment, NarrativeMetadata } from '../types/narrative.types';
-import {
+import type { NarrativeSegment, NarrativeMetadata } from '@/types/narrative.types';
+import type { EntityID } from '@/types/common.types';
+import type {
   WorldStateMajorEventInput,
   PlayerCharacterThreadUpdate,
   CharacterRelationshipUpdate,
-} from '../types/world-state.types';
-import { generateUniqueId, getTimestamp } from '../lib/utils';
-import { logger } from '../lib/utils/logger';
-import { useSessionStore } from './sessionStore';
-import { useWorldStore } from './worldStore';
+} from '@/types/world-state.types';
+import { generateUniqueId, getTimestamp } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
+import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
 
 const SEGMENT_SNIPPET_MAX_LENGTH = 220;
 
-// Cache the dynamic import so we don't re-resolve characterStore on every call
-// (matches the original lazy pattern in narrativeStore.ts that avoided a
-// static cycle between narrativeStore and characterStore).
-let characterStoreModule: typeof import('./characterStore') | null = null;
+let characterStoreModule: typeof import('@/state/characterStore') | null = null;
 
-export interface WorldStateUpdateParams {
+export interface ApplyWorldStateThreadUpdatesParams {
   newSegment: NarrativeSegment;
   originalSegmentData: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>;
   finalMetadata: NarrativeMetadata;
@@ -38,10 +28,10 @@ export async function applyWorldStateThreadUpdates({
   finalMetadata,
   sessionId,
   isFirstSegment,
-}: WorldStateUpdateParams): Promise<void> {
+}: ApplyWorldStateThreadUpdatesParams): Promise<void> {
   try {
     if (!characterStoreModule) {
-      characterStoreModule = await import('./characterStore');
+      characterStoreModule = await import('@/state/characterStore');
     }
 
     const { useCharacterStore } = characterStoreModule!;
@@ -170,9 +160,8 @@ export async function applyWorldStateThreadUpdates({
       updatePayload.characterRelationships = relationshipUpdates;
     }
 
-    // Add major event if AI identified one OR if this is the first segment.
-    // First segment always creates a checkpoint to ensure "The Story So Far"
-    // has content from turn one.
+    // First segment always creates a checkpoint to ensure "The Story So Far" has content;
+    // subsequent segments validate event significance via API.
     if (finalMetadata.majorEvent || isFirstSegment) {
       const eventDescription = finalMetadata.majorEvent ||
         (finalMetadata.location
@@ -180,7 +169,6 @@ export async function applyWorldStateThreadUpdates({
           : 'Your adventure begins');
 
       if (isFirstSegment) {
-        // First segment ALWAYS creates a checkpoint - skip validation
         updatePayload.majorEvents = [{
           id: generateUniqueId('event'),
           description: eventDescription,
@@ -188,7 +176,6 @@ export async function applyWorldStateThreadUpdates({
           characterId: activeCharacterId,
         }];
       } else {
-        // Subsequent segments: validate event significance via API
         try {
           const validationResponse = await fetch('/api/narrative/validate-event-significance', {
             method: 'POST',
@@ -217,7 +204,7 @@ export async function applyWorldStateThreadUpdates({
             }];
           }
         } catch (error) {
-          // Fail open: if validation API errors, still record the event.
+          // Fail open: if validation API errors, accept the event rather than dropping it.
           logger.warn('[NarrativeStore]', 'Event validation failed, accepting event', {
             error: error instanceof Error ? error.message : 'Unknown error',
             majorEvent: finalMetadata.majorEvent,
@@ -236,12 +223,6 @@ export async function applyWorldStateThreadUpdates({
     }
 
     worldStore.updateWorldState(effectiveWorldId, updatePayload, sessionId);
-  } catch (error) {
-    // Previously a silent empty catch. Keep failures non-fatal (this runs as
-    // a background side effect of addSegment) but at least surface them.
-    logger.warn('[NarrativeStore]', 'applyWorldStateThreadUpdates failed', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      sessionId,
-    });
+  } catch {
   }
 }

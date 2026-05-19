@@ -6,6 +6,14 @@ import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
  *
  * Tests that the design system switcher and dark mode toggle
  * work correctly across theme combinations.
+ *
+ * NOTE: the committed baselines are the CI runner's render, not a local one.
+ * Full-page heights and any text rows take their height from OS-rendered font
+ * metrics, which differ between a dev machine and the CI macOS image, so a
+ * locally-generated baseline drifts against CI. To refresh these snapshots,
+ * take the actuals from a CI E2E run rather than regenerating with
+ * `--update-snapshots` locally. See commit 2fe3941a for the original
+ * rationale.
  */
 
 test.describe('Theme Switcher', () => {

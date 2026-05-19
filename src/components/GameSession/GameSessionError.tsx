@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 
 interface GameSessionErrorProps {
   error: string;
@@ -16,7 +16,8 @@ const GameSessionError: React.FC<GameSessionErrorProps> = ({
 }) => {
   return (
     <div data-testid="game-session-error">
-      <SectionError 
+      <ErrorDisplay
+        variant="section"
         title="Game Session Error"
         message={error}
         severity="error"

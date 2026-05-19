@@ -23,6 +23,7 @@ const eslintConfig = [
     },
     rules: {
       "design-tokens/no-hardcoded-colors": "error",
+      "no-console": ["error", { "allow": ["warn", "error"] }],
       "@typescript-eslint/no-unused-vars": ["warn", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_",
@@ -32,8 +33,11 @@ const eslintConfig = [
   },
   {
     files: [
-      "**/*.test.{js,jsx,ts,tsx}", 
-      "**/__tests__/**/*.{js,jsx,ts,tsx}", 
+      "**/*.test.{js,jsx,ts,tsx}",
+      "**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "**/__mocks__/**/*.{js,jsx,ts,tsx}",
+      "**/*.stories.{js,jsx,ts,tsx}",
+      "**/*.stories.helpers.{js,jsx,ts,tsx}",
       "src/app/dev/**/*.{js,jsx,ts,tsx}",
       "src/components/devtools/**/*.{js,jsx,ts,tsx}",
       "src/lib/design-tokens/**/*.{js,jsx,ts,tsx}",
@@ -42,6 +46,7 @@ const eslintConfig = [
     rules: {
       "@typescript-eslint/no-require-imports": "off", // Allow require() in test files for Jest mocking
       "design-tokens/no-hardcoded-colors": "off", // Allow hardcoded colors in tests, dev tools, design tokens, and stories
+      "no-console": "off", // Dev tooling, tests, and stories legitimately use console
     },
   },
 ];

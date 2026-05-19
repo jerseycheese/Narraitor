@@ -10,7 +10,7 @@ import {
 } from '@/components/world/WorldViewToggle';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/DeleteConfirmationDialog';
 import { LoadingPulse } from '@/components/ui/LoadingState';
-import { SectionError } from '@/components/ui/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import {
@@ -149,7 +149,8 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
   if (error) {
     return (
       <section data-testid="world-list-screen-error-message">
-        <SectionError
+        <ErrorDisplay
+          variant="section"
           title={error.title || 'Error Loading Worlds'}
           message={error.message}
           severity="error"

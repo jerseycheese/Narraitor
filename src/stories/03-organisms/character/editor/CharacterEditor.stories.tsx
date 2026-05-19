@@ -3,7 +3,7 @@ import CharacterEditor from '@/components/CharacterEditor/CharacterEditor';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { LoadingState as LoadingStateComponent } from '@/components/ui/LoadingState/LoadingState';
-import { PageError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { getTimestamp } from '@/lib/utils';
 
 const meta = {
@@ -269,10 +269,11 @@ export const ErrorWithRetry: Story = {
               Character Editor - Error State
             </h1>
             <p>
-              Demonstrating the PageError component
+              Demonstrating the ErrorDisplay page variant
             </p>
           </div>
-          <PageError
+          <ErrorDisplay
+            variant="page"
             title="Character Loading Failed"
             message="We couldn't load the character data. This might be due to a network issue or the character may no longer exist."
             showRetry={true}

@@ -4,9 +4,17 @@ import { seedTestData, seedBaseData } from './utils/seedTestData';
 
 /**
  * Main Pages Visual Regression Tests
- * 
+ *
  * Tests core application pages for visual consistency.
  * Covers both empty states (first-time users) and populated states (returning users).
+ *
+ * NOTE: the committed baselines are the CI runner's render, not a local one.
+ * Full-page heights and any text rows take their height from OS-rendered font
+ * metrics, which differ between a dev machine and the CI macOS image, so a
+ * locally-generated baseline drifts against CI. To refresh these snapshots,
+ * take the actuals from a CI E2E run rather than regenerating with
+ * `--update-snapshots` locally. See commit 2fe3941a for the original
+ * rationale.
  */
 
 test.describe('Main Pages Visual Tests', () => {
