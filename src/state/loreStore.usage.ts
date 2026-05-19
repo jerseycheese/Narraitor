@@ -2,7 +2,12 @@ import type { EntityID } from '../types/common.types';
 import type { LoreUsageEvent, LoreUsageSource, LoreUsageStats } from '../types/lore.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
-import type { SetState, GetState } from './loreStore.actions.types';
+import type { LoreStore } from './loreStore';
+
+type SetState = (
+  partial: Partial<LoreStore> | ((state: LoreStore) => Partial<LoreStore>)
+) => void;
+type GetState = () => LoreStore;
 
 const MAX_LORE_USAGE_EVENTS = 200;
 const MIN_MENTION_TERM_LENGTH = 3;
@@ -83,10 +88,7 @@ export const createLoreUsageActions = (set: SetState, get: GetState) => ({
     if (mentionedFactIds.length === 0) return;
 
     const now = getTimestamp();
-    const responseExcerpt = responseText
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 160);
+    const responseExcerpt = responseText.replace(/\s+/g, ' ').trim().slice(0, 160);
 
     set((state) => {
       const updatedUsage: Record<EntityID, LoreUsageStats> = { ...state.loreUsage };
@@ -135,9 +137,7 @@ export const createLoreUsageActions = (set: SetState, get: GetState) => ({
 
     set((state) => ({
       loreUsage: Object.fromEntries(
-        Object.entries(state.loreUsage).filter(
-          ([id]) => !worldFactIds.has(id)
-        )
+        Object.entries(state.loreUsage).filter(([id]) => !worldFactIds.has(id))
       ),
       loreUsageEvents: state.loreUsageEvents.filter(
         (event) => event.worldId !== worldId

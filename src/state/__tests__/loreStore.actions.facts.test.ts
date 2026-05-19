@@ -1,4 +1,4 @@
-import { createLoreFactActions } from '../loreStore.actions.facts';
+import { createLoreFactActions } from '../loreStore.facts';
 import type { LoreStore } from '../loreStore';
 
 describe('createLoreFactActions', () => {

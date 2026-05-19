@@ -10,7 +10,7 @@ import {
   importanceRank,
   MAX_EVENTS_PER_EXTRACTION,
 } from './loreStore.helpers';
-import type { EntityResolutionContext, ResolveEntityOptions } from './loreStore.resolution';
+import type { EntityResolutionContext, ResolveEntityOptions } from './loreStore.deduplication';
 
 /**
  * Structured lore extraction logic for the lore store
