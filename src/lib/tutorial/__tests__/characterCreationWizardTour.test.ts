@@ -6,7 +6,6 @@ describe('characterCreationWizardTour', () => {
       (tourStep) => tourStep.target === '[data-tutorial="basic-info"]',
     );
 
-    expect(step).toBeDefined();
     expect(step?.placement).toBe('bottom');
     expect(step?.floaterProps).toBeUndefined();
   });
@@ -16,7 +15,6 @@ describe('characterCreationWizardTour', () => {
       (tourStep) => tourStep.target === '[data-tutorial="attribute-allocation"]',
     );
 
-    expect(step).toBeDefined();
     expect(step?.placement).toBe('bottom');
   });
 
@@ -25,7 +23,6 @@ describe('characterCreationWizardTour', () => {
       (tourStep) => tourStep.target === '[data-tutorial="skill-selection"]',
     );
 
-    expect(step).toBeDefined();
     expect(step?.placement).toBe('bottom');
   });
 

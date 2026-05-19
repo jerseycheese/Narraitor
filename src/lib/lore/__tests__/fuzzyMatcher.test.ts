@@ -111,7 +111,6 @@ describe('findPotentialDuplicates', () => {
       (d.fact1.value === 'Gandalf the Grey' && d.fact2.value === 'Gandolf the Gray') ||
       (d.fact2.value === 'Gandalf the Grey' && d.fact1.value === 'Gandolf the Gray')
     );
-    expect(gandalfMatch).toBeDefined();
     expect(gandalfMatch!.confidence).toBeGreaterThan(0.8);
   });
 
@@ -219,7 +218,6 @@ describe('findPotentialDuplicates', () => {
       (d.fact2.value === 'Aragorn' && d.fact1.value === 'Strider')
     );
 
-    expect(aliasMatch).toBeDefined();
     expect(aliasMatch!.method).toBe('alias');
     expect(aliasMatch!.confidence).toBe(1.0);
   });

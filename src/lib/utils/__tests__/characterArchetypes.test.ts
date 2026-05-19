@@ -44,9 +44,8 @@ describe('characterArchetypes', () => {
       archetypes.forEach(archetype => {
         expect(archetype.attributes).toHaveLength(world.attributes.length);
         expect(archetype.skills).toHaveLength(world.skills.length);
-        expect(archetype.background).toBeDefined();
-        expect(archetype.background.personality).toBeDefined();
-        expect(archetype.background.description).toBeDefined();
+        expect(archetype.background.personality).toBeTruthy();
+        expect(archetype.background.description).toBeTruthy();
       });
     });
 

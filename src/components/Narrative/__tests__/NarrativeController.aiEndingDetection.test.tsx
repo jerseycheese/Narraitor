@@ -82,34 +82,6 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
       expect(screen.getByTestId('narrative-history')).toBeInTheDocument();
     });
 
-    it('should accept onEndingSuggested callback prop', () => {
-      const mockCallback = jest.fn();
-
-      renderWithToast(
-        <NarrativeController
-          worldId="test-world"
-          sessionId="test-session"
-          onEndingSuggested={mockCallback}
-          triggerGeneration={false}
-        />
-      );
-
-      // Component should render without errors when callback is provided
-      expect(true).toBe(true);
-    });
-
-    it('should work without onEndingSuggested callback', () => {
-      renderWithToast(
-        <NarrativeController
-          worldId="test-world"
-          sessionId="test-session"
-          triggerGeneration={false}
-        />
-      );
-
-      // Component should render without errors when callback is not provided
-      expect(true).toBe(true);
-    });
   });
 
   describe('Props and Configuration', () => {

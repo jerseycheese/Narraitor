@@ -6,7 +6,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, it, expect } from '@jest/globals';
 import { DataTable } from './data-table';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -37,16 +36,16 @@ describe('DataTable', () => {
   it('renders with data', () => {
     render(<DataTable columns={mockColumns} data={mockData} />);
 
-    expect(screen.getByRole('table')).toBeTruthy();
-    expect(screen.getByText('Health Potion')).toBeTruthy();
-    expect(screen.getByText('Iron Sword')).toBeTruthy();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByText('Health Potion')).toBeInTheDocument();
+    expect(screen.getByText('Iron Sword')).toBeInTheDocument();
   });
 
   it('displays column headers', () => {
     render(<DataTable columns={mockColumns} data={mockData} />);
 
-    expect(screen.getByText('Name')).toBeTruthy();
-    expect(screen.getByText('Quantity')).toBeTruthy();
+    expect(screen.getByText('Name')).toBeInTheDocument();
+    expect(screen.getByText('Quantity')).toBeInTheDocument();
   });
 
   it('sorts data when column header is clicked', async () => {
@@ -70,8 +69,8 @@ describe('DataTable', () => {
       />
     );
 
-    expect(screen.getByRole('button', { name: /previous/i })).toBeTruthy();
-    expect(screen.getByRole('button', { name: /next/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 
   it('navigates between pages', async () => {
@@ -93,14 +92,14 @@ describe('DataTable', () => {
     const nextButton = screen.getByRole('button', { name: /next/i });
     await user.click(nextButton);
 
-    expect(screen.getByText('Item 11')).toBeTruthy();
+    expect(screen.getByText('Item 11')).toBeInTheDocument();
     expect(screen.queryByText('Item 1')).toBeNull();
   });
 
   it('displays empty state when no data', () => {
     render(<DataTable columns={mockColumns} data={[]} />);
 
-    expect(screen.getByText(/no data available/i)).toBeTruthy();
+    expect(screen.getByText(/no data available/i)).toBeInTheDocument();
   });
 
   it('displays search filter when enabled', () => {
@@ -112,7 +111,7 @@ describe('DataTable', () => {
       />
     );
 
-    expect(screen.getByPlaceholderText('Search items...')).toBeTruthy();
+    expect(screen.getByPlaceholderText('Search items...')).toBeInTheDocument();
   });
 
   it('filters data based on search input', async () => {
@@ -128,7 +127,7 @@ describe('DataTable', () => {
     const searchInput = screen.getByPlaceholderText('Search...');
     await user.type(searchInput, 'Potion');
 
-    expect(screen.getByText('Health Potion')).toBeTruthy();
+    expect(screen.getByText('Health Potion')).toBeInTheDocument();
     expect(screen.queryByText('Iron Sword')).toBeNull();
   });
 
@@ -141,7 +140,7 @@ describe('DataTable', () => {
 
     await user.keyboard('{Tab}');
 
-    // After tab, focus should move to first interactive element
-    expect(document.activeElement).toBeDefined();
+    expect(document.activeElement).not.toBe(table);
+    expect(document.activeElement).not.toBe(document.body);
   });
 });

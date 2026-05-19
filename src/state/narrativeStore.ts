@@ -682,7 +682,6 @@ export const useNarrativeStore = create<NarrativeStore>()(
       return state;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [segmentId]: _deletedSegment, ...remainingSegments } = state.segments;
     
     // Remove from session segments

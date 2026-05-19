@@ -60,8 +60,6 @@ describe('Client Factory Mock Integration', () => {
     test('creates a client successfully', () => {
       const client = createAIClient();
 
-      // Should create some kind of client
-      expect(client).toBeDefined();
       expect(typeof client.generateContent).toBe('function');
       expect(typeof client.generateImage).toBe('function');
     });
@@ -69,13 +67,8 @@ describe('Client Factory Mock Integration', () => {
     test('client implements AIClient interface', async () => {
       const client = createAIClient();
 
-      // Should implement required methods
       expect(typeof client.generateContent).toBe('function');
       expect(typeof client.generateImage).toBe('function');
-
-      // Methods should work without throwing
-      expect(client.generateContent).toBeDefined();
-      expect(client.generateImage).toBeDefined();
     });
 
     test('mock state manager integration works', () => {

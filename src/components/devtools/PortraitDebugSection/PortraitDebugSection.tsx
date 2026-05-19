@@ -8,6 +8,9 @@ import { createAIClient } from '@/lib/ai';
 import {
   useCharacterStore,
   type Character as StoreCharacter,
+  type CharacterAttribute,
+  type CharacterSkill,
+  type CharacterStore,
 } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
@@ -36,8 +39,7 @@ export function PortraitDebugSection({
   const [showBreakdown, setShowBreakdown] = useState(false);
 
   // Get characters from store
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const characters = useCharacterStore((state: any) => state.characters);
+  const characters = useCharacterStore((state: CharacterStore) => state.characters);
   const charactersArray = Object.values(characters) as StoreCharacter[];
   const selectedCharacter = selectedCharacterId
     ? characters[selectedCharacterId]
@@ -49,8 +51,12 @@ export function PortraitDebugSection({
     ? worlds[selectedCharacter.worldId]
     : null;
 
-  // Use selected character data or passed props
-  const effectiveCharacterData = selectedCharacter || characterData;
+  // Use selected character data or passed props. Widened to Partial<StoreCharacter>
+  // because the prop's Character type (from @/types) lacks store-only fields like
+  // `level` / `isPlayer` that the mock builder reads with || fallbacks.
+  const effectiveCharacterData = (selectedCharacter || characterData) as
+    | Partial<StoreCharacter>
+    | undefined;
   const effectiveWorldConfig = selectedWorld || worldConfig;
 
   // Helper to safely access background properties
@@ -93,19 +99,25 @@ export function PortraitDebugSection({
       isActive?: boolean;
     };
 
-    const mockAttributes =
-      effectiveCharacterData.attributes?.map((attr: AnyAttribute) => ({
+    // The mock shape below intentionally diverges from CharacterAttribute /
+    // CharacterSkill — downstream portrait generation duck-types on these
+    // loose fields. Cast at the boundary to satisfy the StoreCharacter return
+    // without rewriting the mock builder.
+    const mockAttributes = (effectiveCharacterData.attributes?.map(
+      (attr: AnyAttribute) => ({
         attributeId: attr.attributeId || attr.id || 'attr-1',
         value: attr.value || attr.baseValue || 10,
-      })) || [];
+      }),
+    ) || []) as unknown as CharacterAttribute[];
 
-    const mockSkills =
-      effectiveCharacterData.skills?.map((skill: AnySkill) => ({
+    const mockSkills = (effectiveCharacterData.skills?.map(
+      (skill: AnySkill) => ({
         skillId: skill.skillId || skill.id || 'skill-1',
         level: skill.level || 1,
         experience: skill.experience || 0,
         isActive: skill.isActive !== undefined ? skill.isActive : true,
-      })) || [];
+      }),
+    ) || []) as unknown as CharacterSkill[];
 
     return {
       id,
