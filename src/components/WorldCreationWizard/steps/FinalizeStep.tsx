@@ -7,7 +7,7 @@ import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { DataField } from '@/components/shared/DataField';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+import { generateWorldImage } from '@/lib/ai/worldImageGenerator';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
 import { getGenreLabel } from '@/lib/constants/genres';
@@ -45,9 +45,6 @@ export default function FinalizeStep({
     
     setIsGeneratingImage(true);
     try {
-      const imageGenerator = new WorldImageGenerator();
-
-      // Create a temporary world object for image generation
       const tempWorld = {
         id: 'temp',
         name: worldData.name || 'Untitled World',
@@ -55,8 +52,8 @@ export default function FinalizeStep({
         genre: worldData.genre || 'fantasy',
         ...worldData
       } as World;
-      
-      const image = await imageGenerator.generateWorldImage(tempWorld, customPrompt);
+
+      const image = await generateWorldImage(tempWorld, customPrompt);
       onUpdateWorldData({ image });
     } catch (err) {
       console.error('Failed to generate world image:', err);

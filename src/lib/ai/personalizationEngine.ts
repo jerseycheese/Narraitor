@@ -17,7 +17,6 @@ import {
   CharacterGoal,
   CharacterRelationship,
   PlayerPreferences,
-  PersonalityTrait,
   ChoiceTypePreference,
 } from '@/types/personalization.types';
 import { isPlayerDecisionArray, sanitizeString } from '@/lib/utils/typeGuards';
@@ -51,21 +50,12 @@ interface PersonalizationCharacter {
 import { World } from '@/types/world.types';
 
 /**
- * Maps choice types to personality traits (kept for basic trait inference)
- */
-const CHOICE_TO_TRAIT_MAP: Record<ChoiceTypePreference, PersonalityTrait[]> = {
-  diplomatic: ['diplomatic', 'patient', 'empathetic'],
-  aggressive: ['direct', 'impulsive', 'brave'],
-  stealthy: ['cautious', 'patient', 'logical'],
-  helpful: ['empathetic', 'loyal', 'optimistic'],
-  selfish: ['independent', 'ambitious', 'direct'],
-  lawful: ['loyal', 'patient', 'logical'],
-  chaotic: ['impulsive', 'independent', 'brave'],
-  neutral: ['logical', 'cautious', 'diplomatic'],
-};
-
-/**
- * PersonalizationEngine - Let the LLM do the heavy lifting
+ * PersonalizationEngine - aggregates context for the LLM.
+ *
+ * Trait inference is delegated to the LLM at narrative-generation time. The
+ * raw decision history (including each decision's `choiceType`) is already
+ * present in the prompt via `formatDecisions`, so the LLM has everything it
+ * needs to infer traits naturally.
  */
 export class PersonalizationEngine {
   /**
@@ -81,10 +71,6 @@ export class PersonalizationEngine {
       return this.getDefaultAnalysis();
     }
 
-    // Simple trait detection (kept minimal for UI display)
-    const detectedTraits = this.detectPersonalityTraits(decisions);
-
-    // Basic preference aggregation
     const choiceTypeCounts = new Map<ChoiceTypePreference, number>();
     decisions.forEach((d) => {
       choiceTypeCounts.set(
@@ -108,7 +94,7 @@ export class PersonalizationEngine {
     };
 
     return {
-      detectedTraits,
+      detectedTraits: [],
       preferences,
       narrativeEmphasis: {
         characterFocus: [character.background || ''],
@@ -231,27 +217,6 @@ export class PersonalizationEngine {
     }
 
     return parts.join('\n\n');
-  }
-
-  /**
-   * Simple trait detection from choice types
-   */
-  private detectPersonalityTraits(
-    decisions: PlayerDecision[]
-  ): PersonalityTrait[] {
-    const traitCounts = new Map<PersonalityTrait, number>();
-
-    decisions.forEach((decision) => {
-      const traits = CHOICE_TO_TRAIT_MAP[decision.choiceType] || [];
-      traits.forEach((trait) => {
-        traitCounts.set(trait, (traitCounts.get(trait) || 0) + 1);
-      });
-    });
-
-    return Array.from(traitCounts.entries())
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3)
-      .map(([trait]) => trait);
   }
 
   /**

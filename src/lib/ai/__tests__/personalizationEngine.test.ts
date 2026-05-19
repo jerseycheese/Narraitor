@@ -133,9 +133,9 @@ describe('PersonalizationEngine - MVP Tests', () => {
         []
       );
 
-      // We aggregate choice types but don't infer complex narrative styles
+      // We aggregate choice types; trait inference is delegated to the LLM at narrative-generation time
       expect(analysis.preferences.preferredChoiceTypes).toContain('aggressive');
-      expect(analysis.detectedTraits).toContain('direct');
+      expect(analysis.detectedTraits).toEqual([]);
     });
 
     test('sanitizes dangerous input in narrative enhancement', () => {
@@ -184,7 +184,7 @@ describe('PersonalizationEngine - MVP Tests', () => {
         []
       );
 
-      expect(analysis.detectedTraits).toContain('diplomatic');
+      expect(analysis.detectedTraits).toEqual([]);
       expect(analysis.preferences.preferredChoiceTypes).toContain('diplomatic');
     });
   });

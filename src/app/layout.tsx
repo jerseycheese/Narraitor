@@ -24,7 +24,6 @@ import { DevToolsProvider } from '@/components/devtools';
 import { ClientOnlyDevTools } from '@/components/ClientOnlyDevTools';
 import { AppSurfaceShell } from '@/components/layout/AppSurfaceShell';
 import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
-import { NavigationPersistenceProvider } from '@/components/shared/NavigationPersistenceProvider';
 import { SkipLinks } from '@/components/shared/SkipLinks';
 import { ToastProvider, Toaster } from '@/components/ui/toast';
 import { TutorialProvider } from '@/components/TutorialProvider';
@@ -134,19 +133,17 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <SkipLinks />
         <ThemeProvider>
           <NavigationLoadingProvider>
-            <NavigationPersistenceProvider>
-              <DevToolsProvider>
-                <ToastProvider>
-                  <TutorialProvider>
-                    <AppSurfaceShell>
-                      {children}
-                    </AppSurfaceShell>
-                    <ClientOnlyDevTools />
-                    <Toaster />
-                  </TutorialProvider>
-                </ToastProvider>
-              </DevToolsProvider>
-            </NavigationPersistenceProvider>
+            <DevToolsProvider>
+              <ToastProvider>
+                <TutorialProvider>
+                  <AppSurfaceShell>
+                    {children}
+                  </AppSurfaceShell>
+                  <ClientOnlyDevTools />
+                  <Toaster />
+                </TutorialProvider>
+              </ToastProvider>
+            </DevToolsProvider>
           </NavigationLoadingProvider>
         </ThemeProvider>
       </body>

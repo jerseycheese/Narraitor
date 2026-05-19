@@ -166,6 +166,9 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       []
     );
 
-    expect(behaviorAnalysis.detectedTraits).toContain('diplomatic');
+    // Trait inference is delegated to the LLM at narrative-generation time.
+    // We still surface the dominant choice type via preferredChoiceTypes for the prompt.
+    expect(behaviorAnalysis.detectedTraits).toEqual([]);
+    expect(behaviorAnalysis.preferences.preferredChoiceTypes).toContain('diplomatic');
   });
 });
