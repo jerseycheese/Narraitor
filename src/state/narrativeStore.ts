@@ -20,7 +20,6 @@ import {
 } from '../types/world-state.types';
 import { useWorldStore } from './worldStore';
 import { useSessionStore } from './sessionStore';
-import { applyWorldStateThreadUpdates } from './narrativeStore.worldStateThreads';
 
 let journalStoreModule: typeof import('./journalStore') | null = null;
 
