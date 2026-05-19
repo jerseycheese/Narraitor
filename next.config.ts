@@ -29,6 +29,20 @@ const nextConfig: NextConfig = {
         destination: '/dev/:path*',
         permanent: true,
       },
+      // Unify the three design system pages under one URL pattern.
+      // The legacy /dev/design-system-2 and /dev/design-system-3 routes
+      // are kept alive only for their /session subroutes; the bare paths
+      // redirect into the unified catch-all so existing links survive.
+      {
+        source: '/dev/design-system-2',
+        destination: '/dev/design-system/2',
+        permanent: false,
+      },
+      {
+        source: '/dev/design-system-3',
+        destination: '/dev/design-system/3',
+        permanent: false,
+      },
     ];
   },
 
