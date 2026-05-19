@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
+import { generatePortrait as generatePortraitDirect } from '@/lib/ai/portraitGenerator';
 import { createAIClient } from '@/lib/ai';
 import {
   useCharacterStore,
@@ -200,11 +200,11 @@ export function PortraitDebugSection({
     setIsGenerating(true);
     try {
       const aiClient = createAIClient();
-      const generator = new PortraitGenerator(aiClient);
 
       const mockCharacter = createMockCharacter('test');
 
-      const result = await generator.generatePortrait(
+      const result = await generatePortraitDirect(
+        aiClient,
         mockCharacter as unknown as Character,
         {
           worldGenre: effectiveWorldConfig?.genre,

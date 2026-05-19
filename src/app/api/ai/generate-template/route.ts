@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TemplateGenerator } from '@/lib/ai/templateGenerator';
+import { generateWorldTemplate } from '@/lib/ai/templateGenerator';
 import { TemplateGenerationContext } from '@/lib/ai/templatePrompts';
 import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
@@ -66,15 +66,13 @@ export async function POST(request: NextRequest) {
       generationConfig: getGenerationConfig(),
       safetySettings: getSafetySettings()
     });
-    const templateGenerator = new TemplateGenerator(client);
-    
     // Add timeout wrapper to prevent hanging requests
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Template generation timeout')), TEMPLATE_GENERATION_TIMEOUT_MS)
     );
-    
+
     const template = await Promise.race([
-      templateGenerator.generateWorldTemplate(context),
+      generateWorldTemplate(client, context),
       timeoutPromise
     ]);
     

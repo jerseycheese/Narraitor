@@ -20,13 +20,6 @@ export interface BudgetAllocation {
 }
 
 /**
- * Configuration options for TokenBudgetManager
- */
-export interface TokenBudgetManagerOptions {
-  enabled?: boolean;
-}
-
-/**
  * Request budget instance for tracking allocations during a single request
  */
 export class RequestBudget {
@@ -143,37 +136,6 @@ export class RequestBudget {
    */
   recordUsage(componentId: string, tokens: number): void {
     this.usage.set(componentId, tokens);
-  }
-}
-
-/**
- * Token Budget Manager
- *
- * Centralized manager for creating and tracking token budgets across
- * prompt generation. Supports feature flag for safe rollback.
- */
-export class TokenBudgetManager {
-  private enabled: boolean;
-
-  constructor(options?: TokenBudgetManagerOptions) {
-    this.enabled = options?.enabled ?? true;
-  }
-
-  /**
-   * Create a new request budget with the given allocations
-   */
-  createBudget(
-    allocations: BudgetAllocation[],
-    totalBudget: number
-  ): RequestBudget {
-    return new RequestBudget(allocations, totalBudget, this.enabled);
-  }
-
-  /**
-   * Check if budget tracking is enabled
-   */
-  isEnabled(): boolean {
-    return this.enabled;
   }
 }
 
