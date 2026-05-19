@@ -20,8 +20,8 @@ import {
 } from '../types/world-state.types';
 import { useWorldStore } from './worldStore';
 import { useSessionStore } from './sessionStore';
-
-let journalStoreModule: typeof import('./journalStore') | null = null;
+import { useJournalStore } from './journalStore';
+import { useGoalStore } from './goalStore';
 
 const FALLBACK_ENDING_TONE: EndingTone = 'hopeful';
 
@@ -620,27 +620,26 @@ export const useNarrativeStore = create<NarrativeStore>()(
     });
 
     // Update the saved session's narrative count
-    import('../state/sessionStore').then(({ useSessionStore }) => {
-      const sessionStore = useSessionStore.getState();
+    try {
       const sessionSegments = get().sessionSegments[sessionId] || [];
-      sessionStore.updateSavedSessionNarrativeCount(sessionId, sessionSegments.length);
-    }).catch((error) => {
+      useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId, sessionSegments.length);
+    } catch (error) {
       logger.error('[NarrativeStore]', 'Failed to update session narrative count:', error);
-    });
+    }
 
-    // Process the segment for goal extraction asynchronously
-    // Import goalStore dynamically to avoid circular dependencies
-    Promise.resolve().then(async () => {
+    // Process the segment for goal extraction asynchronously.
+    // Passing segment + sessionId in avoids the goalStore needing to read
+    // back from narrativeStore (which previously required a dynamic import
+    // to dodge a circular dependency).
+    void Promise.resolve().then(async () => {
       try {
-        const goalStoreModule = await import('./goalStore');
-        const goalStore = goalStoreModule.useGoalStore.getState();
-        await goalStore.processSegmentForGoals(
-          segmentId,
+        await useGoalStore.getState().processSegmentForGoals(
+          newSegment,
+          sessionId,
           segmentData.metadata?.characterIds?.[0]
         );
       } catch {
-        // Silently fail goal processing if goalStore is not available
-        // This is not critical for narrative functionality
+        // Silently fail goal processing — not critical for narrative
       }
     });
 
@@ -942,11 +941,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
         .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
       narrativeSegments = allSegments.slice(-10); // Last 10 segments only
 
-      // Lazy load journal store to avoid circular dependencies
-      if (!journalStoreModule) {
-        journalStoreModule = await import('./journalStore');
-      }
-      const journalState = journalStoreModule.useJournalStore.getState();
+      const journalState = useJournalStore.getState();
       const allJournalEntries = journalState.entries
         ? Object.values(journalState.entries).filter(entry => entry.sessionId === params.sessionId)
         : [];

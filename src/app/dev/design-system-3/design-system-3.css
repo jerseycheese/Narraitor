@@ -685,9 +685,11 @@
   pointer-events: none;
 }
 
-.ds3-btn-loading {
+.ds3-btn.ds3-btn-loading,
+.ds3-btn.ds3-btn-loading:hover,
+.ds3-btn.ds3-btn-loading:focus {
   position: relative;
-  color: transparent !important;
+  color: transparent;
 }
 
 .ds3-btn-loading::after {
@@ -747,8 +749,9 @@
   box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
-.ds3-input-error {
-  border-color: var(--color-error) !important;
+.ds3-input.ds3-input-error,
+.ds3-input.ds3-input-error:focus {
+  border-color: var(--color-error);
 }
 
 .ds3-input-error-msg {

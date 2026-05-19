@@ -422,24 +422,24 @@ body.manuscript-overlay-open {
 .hide-mobile-actions .manuscript-suggested-actions-section,
 .hide-mobile-actions .manuscript-choice-prompt,
 .hide-mobile-actions .manuscript-choice-selector-body > .manuscript-choice-prompt {
-  display: none !important;
+  display: none;
 }
 
 .show-mobile-actions .manuscript-suggested-actions-section,
 .show-mobile-actions .manuscript-choice-prompt {
-  display: block !important;
+  display: block;
 }
 
 @media (width >= 1024px) {
   .manuscript-mobile-rail-top-controls {
-    display: none !important;
+    display: none;
   }
 
   .hide-mobile-actions .manuscript-suggested-actions-section,
   .show-mobile-actions .manuscript-suggested-actions-section,
   .hide-mobile-actions .manuscript-choice-prompt,
   .show-mobile-actions .manuscript-choice-prompt {
-    display: block !important;
+    display: block;
   }
 }
 
@@ -2749,15 +2749,13 @@ body.manuscript-overlay-open {
   letter-spacing: 0.04em;
 }
 
-/* DS1: always show expanded choices, hide mobile toggle
-   Base rules use !important for hide/show toggle — must match to override */
+/* DS1: always show expanded choices, hide mobile toggle */
 [data-theme="ds1"] .manuscript-mobile-rail-top-controls {
   display: none;
 }
 
 [data-theme="ds1"] .hide-mobile-actions .manuscript-suggested-actions-section {
-  /* stylelint-disable-next-line declaration-no-important */
-  display: block !important;
+  display: block;
 }
 
 /* DS1: always show desktop End Story button, hide mobile variant */
@@ -3692,9 +3690,9 @@ body.manuscript-overlay-open {
   display: none;
 }
 
-/* DS2 choices always visible — override base !important hide at <1024px */
+/* DS2 choices always visible — override base hide at <1024px */
 [data-theme="ds2"] .manuscript-suggested-actions-section {
-  display: block !important;
+  display: block;
 }
 
 /* DS2 choice prompt hidden — demo shows no heading above choices */
@@ -4416,9 +4414,9 @@ body.manuscript-overlay-open {
   display: none;
 }
 
-/* DS3 choices always visible — override base !important hide at <1024px */
+/* DS3 choices always visible — override base hide at <1024px */
 [data-theme="ds3"] .manuscript-suggested-actions-section {
-  display: block !important;
+  display: block;
 }
 
 /* DS3 choice prompt hidden — no heading above choices */
