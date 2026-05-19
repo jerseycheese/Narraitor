@@ -3,9 +3,6 @@ import { ContentRating, NarrativeStyle, LanguageComplexity } from '@/types/tone-
 import { World } from '@/types/world.types';
 import { logger } from '@/lib/utils/logger';
 
-/**
- * World data subset used for tone analysis
- */
 export interface WorldAnalysisData {
   name: string;
   description: string;
@@ -14,9 +11,6 @@ export interface WorldAnalysisData {
   relationship?: 'set_within' | 'inspired_by';
 }
 
-/**
- * Result of AI tone settings analysis
- */
 export interface ToneAnalysisResult {
   contentRating: ContentRating;
   narrativeStyle: NarrativeStyle;
@@ -24,58 +18,15 @@ export interface ToneAnalysisResult {
   reasoning: string;
 }
 
-/**
- * Service for AI-generated tone settings based on world analysis
- */
-export class ToneSettingsGenerator {
-  constructor(private client: AIClient) {}
+const VALID_CONTENT_RATINGS: ContentRating[] = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
+const VALID_NARRATIVE_STYLES: NarrativeStyle[] = [
+  'serious', 'humorous', 'dramatic', 'lighthearted', 'mysterious',
+  'action-packed', 'contemplative', 'epic', 'balanced'
+];
+const VALID_LANGUAGE_COMPLEXITIES: LanguageComplexity[] = ['simple', 'moderate', 'advanced', 'literary'];
 
-  /**
-   * Analyze world data and generate appropriate tone settings
-   */
-  async generateToneSettings(worldData: WorldAnalysisData): Promise<ToneAnalysisResult> {
-    const prompt = this.buildAnalysisPrompt(worldData);
-
-    try {
-      const response = await this.client.generateContent(prompt);
-
-      if (!response.content) {
-        throw new Error('AI service returned empty response');
-      }
-
-      return this.parseResponse(response.content);
-    } catch (error) {
-      if (error instanceof Error) {
-        logger.error('Failed to generate AI tone settings:', {
-          message: error.message,
-          worldData: { name: worldData.name, genre: worldData.genre }
-        });
-
-        // Provide more specific error messages based on error type
-        if (error.message.includes('rate limit') || error.message.includes('429')) {
-          throw new Error('AI service is currently busy. Please try again in a moment.');
-        } else if (error.message.includes('network') || error.message.includes('timeout')) {
-          throw new Error('Network error occurred. Please check your connection and try again.');
-        } else if (error.message.includes('No JSON found') || error.message.includes('Unable to parse')) {
-          throw new Error('AI response was invalid. Please try generating again.');
-        } else if (error.message.startsWith('Invalid ') || error.message.startsWith('Missing ') || error.message.includes('empty response')) {
-          // Re-throw validation errors and empty response errors as-is
-          throw error;
-        } else {
-          throw new Error('Unable to generate tone settings. Please try again or set them manually.');
-        }
-      } else {
-        logger.error('Unknown error generating AI tone settings:', error);
-        throw new Error('An unexpected error occurred. Please try again.');
-      }
-    }
-  }
-
-  /**
-   * Build the prompt for tone analysis
-   */
-  private buildAnalysisPrompt(worldData: WorldAnalysisData): string {
-    return `Analyze this fictional world and recommend appropriate tone settings for AI-generated narrative content.
+function buildAnalysisPrompt(worldData: WorldAnalysisData): string {
+  return `Analyze this fictional world and recommend appropriate tone settings for AI-generated narrative content.
 
 WORLD INFORMATION:
 Name: ${worldData.name}
@@ -122,88 +73,103 @@ Return your analysis in this exact JSON format:
 }
 
 Consider the world's genre conventions, target audience, thematic content, and the type of narrative experience that would best serve this setting. Your reasoning should be 2-3 sentences explaining why these specific settings match the world.`;
+}
+
+function validateParsedResponse(parsed: unknown): void {
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error('Response must be an object');
   }
 
-  /**
-   * Parse AI response into structured tone settings
-   */
-  private parseResponse(content: string): ToneAnalysisResult {
-    try {
-      // Handle empty response
-      if (!content || content.trim() === '') {
-        throw new Error('AI service returned empty response');
-      }
+  const response = parsed as Record<string, unknown>;
 
-      // Extract JSON from response (handle cases where AI adds extra text)
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in AI response');
-      }
+  if (!VALID_CONTENT_RATINGS.includes(response.contentRating as ContentRating)) {
+    throw new Error(`Invalid content rating: ${response.contentRating}`);
+  }
 
-      const parsed = JSON.parse(jsonMatch[0]);
+  if (!VALID_NARRATIVE_STYLES.includes(response.narrativeStyle as NarrativeStyle)) {
+    throw new Error(`Invalid narrative style: ${response.narrativeStyle}`);
+  }
 
-      // Validate the response structure
-      this.validateParsedResponse(parsed);
+  if (!VALID_LANGUAGE_COMPLEXITIES.includes(response.languageComplexity as LanguageComplexity)) {
+    throw new Error(`Invalid language complexity: ${response.languageComplexity}`);
+  }
 
-      return {
-        contentRating: parsed.contentRating as ContentRating,
-        narrativeStyle: parsed.narrativeStyle as NarrativeStyle,
-        languageComplexity: parsed.languageComplexity as LanguageComplexity,
-        reasoning: parsed.reasoning
-      };
-    } catch (error) {
-      // Re-throw validation errors and empty response errors as-is
-      if (error instanceof Error && (
-        error.message.startsWith('Invalid ') ||
-        error.message.startsWith('Missing ') ||
-        error.message.includes('empty response')
-      )) {
+  if (!response.reasoning || typeof response.reasoning !== 'string') {
+    throw new Error('Missing or invalid reasoning in response');
+  }
+}
+
+function parseResponse(content: string): ToneAnalysisResult {
+  try {
+    if (!content || content.trim() === '') {
+      throw new Error('AI service returned empty response');
+    }
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON found in AI response');
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    validateParsedResponse(parsed);
+
+    return {
+      contentRating: parsed.contentRating as ContentRating,
+      narrativeStyle: parsed.narrativeStyle as NarrativeStyle,
+      languageComplexity: parsed.languageComplexity as LanguageComplexity,
+      reasoning: parsed.reasoning
+    };
+  } catch (error) {
+    if (error instanceof Error && (
+      error.message.startsWith('Invalid ') ||
+      error.message.startsWith('Missing ') ||
+      error.message.includes('empty response')
+    )) {
+      throw error;
+    }
+
+    logger.error('Failed to parse AI tone settings response:', error);
+    throw new Error('Unable to parse AI response. Please try again.');
+  }
+}
+
+export async function generateToneSettings(
+  client: AIClient,
+  worldData: WorldAnalysisData
+): Promise<ToneAnalysisResult> {
+  try {
+    const response = await client.generateContent(buildAnalysisPrompt(worldData));
+
+    if (!response.content) {
+      throw new Error('AI service returned empty response');
+    }
+
+    return parseResponse(response.content);
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error('Failed to generate AI tone settings:', {
+        message: error.message,
+        worldData: { name: worldData.name, genre: worldData.genre }
+      });
+
+      if (error.message.includes('rate limit') || error.message.includes('429')) {
+        throw new Error('AI service is currently busy. Please try again in a moment.');
+      } else if (error.message.includes('network') || error.message.includes('timeout')) {
+        throw new Error('Network error occurred. Please check your connection and try again.');
+      } else if (error.message.includes('No JSON found') || error.message.includes('Unable to parse')) {
+        throw new Error('AI response was invalid. Please try generating again.');
+      } else if (error.message.startsWith('Invalid ') || error.message.startsWith('Missing ') || error.message.includes('empty response')) {
         throw error;
+      } else {
+        throw new Error('Unable to generate tone settings. Please try again or set them manually.');
       }
-
-      logger.error('Failed to parse AI tone settings response:', error);
-      throw new Error('Unable to parse AI response. Please try again.');
-    }
-  }
-
-  /**
-   * Validate that parsed response contains valid values
-   */
-  private validateParsedResponse(parsed: unknown): void {
-    if (!parsed || typeof parsed !== 'object') {
-      throw new Error('Response must be an object');
-    }
-
-    const response = parsed as Record<string, unknown>;
-
-    const validContentRatings: ContentRating[] = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
-    const validNarrativeStyles: NarrativeStyle[] = [
-      'serious', 'humorous', 'dramatic', 'lighthearted', 'mysterious',
-      'action-packed', 'contemplative', 'epic', 'balanced'
-    ];
-    const validLanguageComplexities: LanguageComplexity[] = ['simple', 'moderate', 'advanced', 'literary'];
-
-    if (!validContentRatings.includes(response.contentRating as ContentRating)) {
-      throw new Error(`Invalid content rating: ${response.contentRating}`);
-    }
-
-    if (!validNarrativeStyles.includes(response.narrativeStyle as NarrativeStyle)) {
-      throw new Error(`Invalid narrative style: ${response.narrativeStyle}`);
-    }
-
-    if (!validLanguageComplexities.includes(response.languageComplexity as LanguageComplexity)) {
-      throw new Error(`Invalid language complexity: ${response.languageComplexity}`);
-    }
-
-    if (!response.reasoning || typeof response.reasoning !== 'string') {
-      throw new Error('Missing or invalid reasoning in response');
+    } else {
+      logger.error('Unknown error generating AI tone settings:', error);
+      throw new Error('An unexpected error occurred. Please try again.');
     }
   }
 }
 
-/**
- * Extract world analysis data from a full World object
- */
 export function extractWorldAnalysisData(world: Partial<World>): WorldAnalysisData {
   if (!world.name || !world.description || !world.genre) {
     throw new Error('World must have name, description, and genre for tone analysis');

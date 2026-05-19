@@ -13,7 +13,7 @@ jest.mock('@/lib/utils/logger');
 import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import {
-  ToneSettingsGenerator,
+  generateToneSettings,
   extractWorldAnalysisData,
 } from '@/lib/ai/toneSettingsGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
@@ -24,8 +24,8 @@ const mockUseWorldStore = useWorldStore as jest.MockedFunction<
 const mockGenerateUniqueId = generateUniqueId as jest.MockedFunction<
   typeof generateUniqueId
 >;
-const mockToneSettingsGenerator = ToneSettingsGenerator as jest.MockedClass<
-  typeof ToneSettingsGenerator
+const mockGenerateToneSettings = generateToneSettings as jest.MockedFunction<
+  typeof generateToneSettings
 >;
 const mockCreateDefaultGeminiClient =
   createDefaultGeminiClient as jest.MockedFunction<
@@ -43,7 +43,6 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
     worlds: Record<string, unknown>;
   };
   let mockClient: ReturnType<typeof createDefaultGeminiClient>;
-  let mockGenerator: jest.Mocked<ToneSettingsGenerator>;
 
   beforeEach(() => {
     // Setup mock store
@@ -79,16 +78,11 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
     mockUseWorldStore.mockReturnValue(mockStore);
     mockUseWorldStore.getState = jest.fn().mockReturnValue(mockStore);
 
-    // Setup mock AI client and generator
+    // Setup mock AI client
     mockClient = { generateContent: jest.fn() } as unknown as ReturnType<
       typeof createDefaultGeminiClient
     >;
     mockCreateDefaultGeminiClient.mockReturnValue(mockClient);
-
-    mockGenerator = {
-      generateToneSettings: jest.fn(),
-    } as unknown as jest.Mocked<ToneSettingsGenerator>;
-    mockToneSettingsGenerator.mockImplementation(() => mockGenerator);
 
     // Mock the extractWorldAnalysisData function
     mockExtractWorldAnalysisData.mockImplementation((worldData) => ({
@@ -155,7 +149,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
           'Cyberpunk themes require mature content and dramatic storytelling',
       };
 
-      mockGenerator.generateToneSettings.mockResolvedValueOnce(
+      mockGenerateToneSettings.mockResolvedValueOnce(
         mockToneSettings
       );
 
@@ -164,8 +158,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       });
 
       // Verify AI tone generator was called with correct data
-      expect(mockToneSettingsGenerator).toHaveBeenCalledWith(mockClient);
-      expect(mockGenerator.generateToneSettings).toHaveBeenCalledWith({
+      expect(mockGenerateToneSettings).toHaveBeenCalledWith(mockClient, {
         name: 'Cyberpunk Metropolis',
         description: 'A dark future city where technology dominates human life',
         genre: 'sci-fi',
@@ -193,7 +186,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
 
     it('should fall back to default tone settings if AI generation fails', async () => {
       // Mock AI tone generation failure
-      mockGenerator.generateToneSettings.mockRejectedValueOnce(
+      mockGenerateToneSettings.mockRejectedValueOnce(
         new Error('AI service unavailable')
       );
 
@@ -225,7 +218,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
         reasoning: 'Dystopian themes with mystery elements',
       };
 
-      mockGenerator.generateToneSettings.mockResolvedValueOnce(
+      mockGenerateToneSettings.mockResolvedValueOnce(
         mockToneSettings
       );
 
@@ -235,7 +228,7 @@ describe('worldCreationService - AI Tone Settings Integration', () => {
       });
 
       // Verify AI was called with customized data
-      expect(mockGenerator.generateToneSettings).toHaveBeenCalledWith({
+      expect(mockGenerateToneSettings).toHaveBeenCalledWith(mockClient, {
         name: 'Custom Cyber City',
         description: 'My custom cyberpunk world',
         genre: 'cyberpunk',
