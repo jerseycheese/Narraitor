@@ -8,13 +8,11 @@ import { TutorialPhase } from '@/types/tutorial.types';
 import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 import Logger from '@/lib/utils/logger';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
+import { useTourTargetRetry } from './useTourTargetRetry';
 
 type PauseReason = 'end-of-page' | 'missing-target' | null;
 
 const logger = new Logger('TutorialProvider');
-
-const MAX_TARGET_RETRIES = 40; // 10 seconds total (40 * 250ms)
-const RETRY_INTERVAL_MS = 250;
 
 interface TutorialContextValue {
   startTour: (tourId: TutorialPhase | string, stepIndex?: number) => void;
@@ -293,47 +291,15 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   
   const lastWizardStepRef = useRef<number | null>(null);
 
-  // Sync tour with wizard (only when the wizard actually changes steps)
-  useEffect(() => {
-    if (!isPaused || pauseReason !== 'missing-target' || !stepMapping) return;
-    const missingTarget = missingTargetRef.current;
-    if (!missingTarget?.target) return;
-
-    let retries = 0;
-
-    const retryInterval = window.setInterval(() => {
-      if (!isPausedRef.current || pauseReason !== 'missing-target') {
-         window.clearInterval(retryInterval);
-         return;
-      }
-
-      const element = document.querySelector(missingTarget.target as string);
-      if (element) {
-        // Check if element is truly ready for Joyride (has dimensions and is visible)
-        const rect = element.getBoundingClientRect();
-        const isActuallyMounted = rect.width > 0 && rect.height > 0;
-        const style = window.getComputedStyle(element);
-        const isVisible = style.display !== 'none' && style.visibility !== '';
-
-        if (isActuallyMounted && isVisible) {
-          missingTargetRef.current = null;
-          resumeTour();
-          window.clearInterval(retryInterval);
-          return;
-        }
-      }
-
-      retries++;
-      if (retries >= MAX_TARGET_RETRIES) {
-        logger.warn('Tutorial missing target timeout', { target: missingTarget.target });
-        window.clearInterval(retryInterval);
-      }
-    }, RETRY_INTERVAL_MS);
-
-    return () => {
-      window.clearInterval(retryInterval);
-    };
-  }, [isPaused, pauseReason, activeTour, resumeTour, stepMapping]);
+  // Poll for missing target elements when tour is paused waiting for them
+  useTourTargetRetry({
+    isPaused,
+    pauseReason,
+    stepMapping,
+    missingTargetRef,
+    isPausedRef,
+    resumeTour,
+  });
 
   useEffect(() => {
     if (!activeTour || !stepMapping) return;
