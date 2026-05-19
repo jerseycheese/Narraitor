@@ -3,57 +3,14 @@
 import { AIClient } from './types';
 import { GeminiClient } from './geminiClient';
 import { getDefaultConfig } from './config';
-import { mockStateManager } from '../devtools/mockStateManager';
-import { MockScenarios } from './__mocks__/mockScenarios';
-
-/**
- * Development mock client that integrates with DevTools mock system
- */
-class DevMockClient implements AIClient {
-  private mockScenarios: MockScenarios;
-
-  constructor() {
-    this.mockScenarios = new MockScenarios();
-  }
-
-  async generateContent(): Promise<import('./types').AIResponse> {
-    const config = mockStateManager.getConfiguration();
-
-    if (config.settings.delayVariation) {
-      return this.mockScenarios.executeScenarioWithVariation(
-        config.activeScenarioId,
-        config.settings.variationPercent
-      );
-    } else {
-      return this.mockScenarios.executeScenario(config.activeScenarioId);
-    }
-  }
-
-  async generateImage(): Promise<import('./types').AIImageResponse> {
-    const config = mockStateManager.getConfiguration();
-
-    // Simulate image generation with mock scenario timing
-    const scenario = this.mockScenarios.getScenario(config.activeScenarioId);
-    const delay = scenario ? scenario.delay : 1000;
-
-    await new Promise(resolve => setTimeout(resolve, delay));
-
-    return {
-      image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzMzMzMzMyIvPgogIDx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TW9jayBJbWFnZTwvdGV4dD4KPC9zdmc+',
-      prompt: 'Mock image generation'
-    };
-  }
-
-  async isAvailable(): Promise<boolean> {
-    return true;
-  }
-}
 
 /**
  * Creates an AI client with image generation support
  *
  * For testing: Use the mock from __mocks__/geminiClient.image.ts (Jest auto-mocking)
- * For development with DevTools mocking enabled: Use DevMockClient
+ * For development with DevTools mocking enabled: dynamically loads DevMockClient
+ *   from src/lib/devtools/devMockClient. The dynamic load keeps production AI
+ *   code free of static imports on devtools/test fixtures.
  * For development with API key: Use real GeminiClient
  * For browser: Returns error-throwing client (use API routes instead)
  */
@@ -66,12 +23,14 @@ export function createAIClient(): AIClient {
     return new MockGeminiImageClient();
   }
 
-  // In development mode, check if DevTools mock is enabled
+  // In development mode in the browser, check if DevTools mocking is enabled.
+  // The devtools module is loaded lazily so production bundles that never hit
+  // this branch don't drag devtools/__mocks__ into the AI graph.
   if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-    const mockConfig = mockStateManager.getConfiguration();
-    if (mockConfig.isEnabled) {
-      return new DevMockClient();
-    }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { tryCreateDevMockClient } = require('../devtools/devMockClient');
+    const devClient = tryCreateDevMockClient();
+    if (devClient) return devClient;
   }
 
   // In development with API key (server or browser), use real client
