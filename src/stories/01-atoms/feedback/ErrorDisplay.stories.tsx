@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ErrorDisplay, InlineError, SectionError, PageError, ToastError } from '@/components/ui/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { fn } from '@storybook/test';
 
 const meta: Meta<typeof ErrorDisplay> = {
@@ -58,16 +58,17 @@ export const AllVariants: Story = {
       <div>
         <h3>Inline Errors</h3>
         <div>
-          <InlineError message="This field is required" severity="error" />
-          <InlineError message="This name is already taken" severity="warning" />
-          <InlineError message="This field will be auto-filled" severity="info" />
+          <ErrorDisplay variant="inline" message="This field is required" severity="error" />
+          <ErrorDisplay variant="inline" message="This name is already taken" severity="warning" />
+          <ErrorDisplay variant="inline" message="This field will be auto-filled" severity="info" />
         </div>
       </div>
 
       <div>
         <h3>Section Errors</h3>
         <div>
-          <SectionError
+          <ErrorDisplay
+            variant="section"
             title="Error Loading Data"
             message="Failed to load world data. Please check your connection and try again."
             severity="error"
@@ -76,14 +77,16 @@ export const AllVariants: Story = {
             onRetry={args.onRetry}
             onDismiss={args.onDismiss}
           />
-          <SectionError
+          <ErrorDisplay
+            variant="section"
             title="Limited Features"
             message="Some features are unavailable in offline mode."
             severity="warning"
             showDismiss
             onDismiss={args.onDismiss}
           />
-          <SectionError
+          <ErrorDisplay
+            variant="section"
             title="Tip"
             message="You can use AI suggestions to help create your world."
             severity="info"
@@ -97,7 +100,8 @@ export const AllVariants: Story = {
         <h3>Page & Toast Examples</h3>
         <div>
           <div>
-            <PageError
+            <ErrorDisplay
+              variant="page"
               title="World Not Found"
               message="The world you're looking for doesn't exist or has been deleted."
               severity="error"
@@ -106,7 +110,8 @@ export const AllVariants: Story = {
             />
           </div>
           <div>
-            <ToastError
+            <ErrorDisplay
+              variant="toast"
               title="Save Failed"
               message="Unable to save your changes."
               severity="error"
@@ -137,7 +142,7 @@ export const FormValidation: Story = {
             aria-invalid="true"
             aria-describedby="name-error"
           />
-          <InlineError message="World name must be at least 3 characters" fieldName="name" />
+          <ErrorDisplay variant="inline" message="World name must be at least 3 characters" fieldName="name" />
         </div>
         <div>
           <label htmlFor="theme" >
@@ -152,7 +157,8 @@ export const FormValidation: Story = {
             <option>Horror</option>
           </select>
         </div>
-        <SectionError
+        <ErrorDisplay
+          variant="section"
           message="Please fix the errors above before continuing."
           severity="error"
         />

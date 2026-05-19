@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
-import { ErrorBlock } from '@/components/shared';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import {
   ToneSettings,
   ContentRating,
@@ -138,7 +138,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
 
         {/* Validation Errors */}
         {!validationResult.valid && (
-          <ErrorBlock errors={validationResult.errors} />
+          <ErrorDisplay variant="section" messages={validationResult.errors} />
         )}
 
         {showSaveButton && onSave && (

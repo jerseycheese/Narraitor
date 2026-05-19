@@ -1,9 +1,5 @@
-export { 
-  ErrorDisplay, 
-  InlineError, 
-  SectionError, 
-  PageError, 
-  ToastError,
+export {
+  ErrorDisplay,
   type ErrorVariant,
-  type ErrorSeverity 
+  type ErrorSeverity,
 } from './ErrorDisplay';

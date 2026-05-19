@@ -14,5 +14,3 @@ export type { LoadingOverlayProps } from './LoadingOverlay';
 export { NavigationLoadingProvider, useNavigationLoadingContext } from './NavigationLoadingProvider';
 export * from './wizard';
 export * from './cards';
-export { ErrorBlock } from './ErrorBlock';
-export { InlineError } from './InlineError';

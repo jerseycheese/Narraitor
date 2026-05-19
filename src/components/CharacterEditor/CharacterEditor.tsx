@@ -5,7 +5,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { PageError } from '@/components/ui/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitSection } from './components/PortraitSection';
@@ -151,7 +151,8 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   // Only show full-page error for load errors, not portrait errors
   if (loadError || !editingCharacter || !world) {
     return (
-      <PageError
+      <ErrorDisplay
+        variant="page"
         title="Character Not Found"
         message={loadError || 'The requested character could not be found or loaded.'}
         showRetry={true}

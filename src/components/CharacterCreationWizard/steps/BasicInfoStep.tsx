@@ -1,7 +1,7 @@
 import React from 'react';
 import { CharacterPortraitPlaceholder } from '../components/CharacterPortraitPlaceholder';
 import { WizardFormSection } from '@/components/shared/wizard';
-import { ErrorBlock } from '@/components/shared';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -135,7 +135,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
       {/* Validation errors */}
       {showErrors && (
-        <ErrorBlock errors={validation.errors} />
+        <ErrorDisplay variant="section" messages={validation.errors} />
       )}
       </WizardFormSection>
     </div>

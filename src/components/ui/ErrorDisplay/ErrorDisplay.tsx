@@ -1,37 +1,45 @@
 import React from 'react';
 import { clsx } from 'clsx';
+import { errorStyles } from '@/styles/errorStyles';
 
 export type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
 export type ErrorSeverity = 'error' | 'warning' | 'info';
 
 interface ErrorDisplayProps {
-  /** The variant of error display */
   variant?: ErrorVariant;
-  /** Severity level of the error */
   severity?: ErrorSeverity;
-  /** Error title (for section and page variants) */
   title?: string;
-  /** Error message */
-  message: string;
-  /** Show retry button */
+  message?: string;
+  messages?: string[];
   showRetry?: boolean;
-  /** Retry button callback */
   onRetry?: () => void;
-  /** Show dismiss button */
   showDismiss?: boolean;
-  /** Dismiss button callback */
   onDismiss?: () => void;
-  /** Additional CSS classes */
   className?: string;
-  /** For inline errors: field name to associate with */
   fieldName?: string;
 }
 
+const renderMessages = (
+  message: string | undefined,
+  messages: string[] | undefined,
+  paragraphClassName?: string
+): React.ReactNode => {
+  if (messages && messages.length > 0) {
+    return messages.map((entry, index) => (
+      <p key={index} className={paragraphClassName}>
+        {entry}
+      </p>
+    ));
+  }
+  return message ? <p className={paragraphClassName}>{message}</p> : null;
+};
+
 export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   variant = 'section',
-  severity = 'error',
+  severity: _severity = 'error',
   title,
   message,
+  messages,
   showRetry = false,
   onRetry,
   showDismiss = false,
@@ -40,9 +48,26 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   fieldName,
 }) => {
   if (variant === 'inline') {
+    const inlineClass = className ?? errorStyles.message;
+    if (messages && messages.length > 0) {
+      return (
+        <div
+          className={errorStyles.list.container}
+          role="alert"
+          aria-live="polite"
+          {...(fieldName && { id: `${fieldName}-error` })}
+        >
+          {messages.map((entry, index) => (
+            <p key={index} className={inlineClass}>
+              {entry}
+            </p>
+          ))}
+        </div>
+      );
+    }
     return (
       <p
-        className={className}
+        className={inlineClass}
         role="alert"
         aria-live="polite"
         {...(fieldName && { id: `${fieldName}-error` })}
@@ -54,21 +79,13 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
   if (variant === 'page') {
     return (
-      <div
-        className={className}
-        role="alert"
-        aria-live="polite"
-      >
+      <div className={className} role="alert" aria-live="polite">
         {title && <h1>{title}</h1>}
-        <p>{message}</p>
+        {renderMessages(message, messages)}
         {(showRetry || showDismiss) && (
           <div>
             {showRetry && onRetry && (
-              <button
-                onClick={onRetry}
-              >
-                Try Again
-              </button>
+              <button onClick={onRetry}>Try Again</button>
             )}
             {showDismiss && onDismiss && (
               <button onClick={onDismiss}>Dismiss</button>
@@ -81,19 +98,15 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
   if (variant === 'toast') {
     return (
-      <div
-        className={className}
-        role="alert"
-        aria-live="assertive"
-      >
+      <div className={className} role="alert" aria-live="assertive">
         <div>
           <div>
             {title && <h3>{title}</h3>}
-            <p>{message}</p>
+            {renderMessages(message, messages)}
           </div>
           {showDismiss && onDismiss && (
-            <button 
-              onClick={onDismiss} 
+            <button
+              onClick={onDismiss}
               aria-label="Dismiss"
               className="error-display-dismiss"
             >
@@ -105,7 +118,6 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
     );
   }
 
-  // Default: section variant
   return (
     <div
       className={clsx('error-display', 'error-display-section', className)}
@@ -113,7 +125,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
       aria-live="polite"
     >
       {title && <h2 className="error-display-title">{title}</h2>}
-      <p className="error-display-message">{message}</p>
+      {renderMessages(message, messages, 'error-display-message')}
       {(showRetry || showDismiss) && (
         <div className="error-display-actions">
           {showRetry && onRetry && (
@@ -122,27 +134,12 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
             </button>
           )}
           {showDismiss && onDismiss && (
-            <button className="error-display-dismiss" onClick={onDismiss}>Dismiss</button>
+            <button className="error-display-dismiss" onClick={onDismiss}>
+              Dismiss
+            </button>
           )}
         </div>
       )}
     </div>
   );
 };
-
-// Preset components for common use cases
-export const InlineError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
-  props
-) => <ErrorDisplay variant="inline" {...props} />;
-
-export const SectionError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
-  props
-) => <ErrorDisplay variant="section" {...props} />;
-
-export const PageError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
-  props
-) => <ErrorDisplay variant="page" {...props} />;
-
-export const ToastError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
-  props
-) => <ErrorDisplay variant="toast" {...props} />;
