@@ -11,6 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
+const MAX_NAME_LENGTH = 100;
+const MAX_DESCRIPTION_LENGTH = 500;
+
 export interface SkillEditorProps {
   worldId: EntityID;
   mode: 'create' | 'edit';
@@ -122,12 +125,12 @@ export function SkillEditor({
     }
 
     // Length validation
-    if (trimmedName.length > 100) {
-      validationErrors.push('Skill name must be 100 characters or less');
+    if (trimmedName.length > MAX_NAME_LENGTH) {
+      validationErrors.push(`Skill name must be ${MAX_NAME_LENGTH} characters or less`);
     }
 
-    if (trimmedDescription.length > 500) {
-      validationErrors.push('Description must be 500 characters or less');
+    if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
+      validationErrors.push(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`);
     }
 
     // Duplicate name validation (only for create mode or different skill in edit mode)

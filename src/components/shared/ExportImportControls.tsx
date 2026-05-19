@@ -8,6 +8,11 @@ import { Button } from '@/components/ui/button';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { downloadGameState, importFromFile } from '@/lib/storage/exportService';
 
+// Bound how big an import file can be before we even try to parse it.
+// Game state saves are JSON and small; anything past 25 MB is almost certainly
+// the wrong file (or hostile) and we shouldn't load it into memory.
+const MAX_IMPORT_FILE_SIZE_BYTES = 25 * 1024 * 1024;
+
 interface ExportImportControlsProps {
   className?: string;
 }
@@ -48,11 +53,32 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
     const file = event.target.files?.[0];
     if (!file) return;
 
+    const clearInput = () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    };
+
+    // The accept=".json" attribute is a UI hint only; users can still pick
+    // anything via "All Files". Validate at the boundary before reading.
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      showMessage('Import failed. Please choose a .json file.', 'error');
+      clearInput();
+      return;
+    }
+
+    if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {
+      const limitMb = Math.round(MAX_IMPORT_FILE_SIZE_BYTES / (1024 * 1024));
+      showMessage(`Import failed. File exceeds ${limitMb} MB limit.`, 'error');
+      clearInput();
+      return;
+    }
+
     setIsImporting(true);
-    
+
     try {
       const result = await importFromFile(file);
-      
+
       if (result.success) {
         showMessage(result.message || 'Import successful', 'success');
       } else {
@@ -62,10 +88,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
       showMessage('Import failed. Please check the file format.', 'error');
     } finally {
       setIsImporting(false);
-      // Clear file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      clearInput();
     }
   };
 

@@ -29,6 +29,10 @@ import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
 
+// Hard ceiling on AI generation calls — beyond this, fall back rather than hang.
+// Generous to accommodate first-call cold starts.
+const AI_GENERATION_TIMEOUT_MS = 15000;
+
 interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
@@ -354,9 +358,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           setTimeout(
             () =>
               reject(
-                new Error('AI choice generation timed out after 15 seconds')
+                new Error(`AI choice generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
               ),
-            15000
+            AI_GENERATION_TIMEOUT_MS
           );
         });
 
@@ -648,17 +652,15 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setError(null);
 
       // Race AI generation with a timeout so we can fallback gracefully
-      // Allow more time for first-call cold-starts and slower generation
-      const timeoutMs = 15000;
       const timeoutPromise = new Promise<
         ReturnType<typeof narrativeGenerator.generateInitialScene>
       >((_, reject) => {
         setTimeout(
           () =>
             reject(
-              new Error(`Initial generation timed out after ${timeoutMs}ms`)
+              new Error(`Initial generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
             ),
-          timeoutMs
+          AI_GENERATION_TIMEOUT_MS
         );
       });
       const result = await Promise.race([
