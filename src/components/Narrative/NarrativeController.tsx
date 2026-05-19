@@ -19,6 +19,7 @@ import {
   SkillCheckRoll,
 } from '@/types/narrative.types';
 import { truncate } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
@@ -367,8 +368,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           ),
           timeoutPromise,
         ]);
-      } catch {
-        // Choice generation failed, using fallback choices
+      } catch (error) {
+        logger.warn('Choice generation failed, using fallback choices', error);
         decision = fallbackDecision;
       }
 
@@ -603,8 +604,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           }
         }, 300);
       }
-    } catch {
-      // Non-critical; continue
+    } catch (error) {
+      logger.warn('Non-critical error in post-hydration choice trigger', error);
     }
   }, [
     hasHydrated,

@@ -10,8 +10,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    apiKeyExists: !!process.env.GEMINI_API_KEY,
-    apiKeyPrefix: process.env.GEMINI_API_KEY?.substring(0, 10),
+    apiKeyConfigured: !!process.env.GEMINI_API_KEY,
     nodeEnv: process.env.NODE_ENV,
     security: 'server-side-only'
   });
