@@ -16,7 +16,7 @@ const mockAutoSaveService = {
 };
 
 jest.mock('../../lib/services/autoSaveService', () => ({
-  AutoSaveService: jest.fn().mockImplementation(() => mockAutoSaveService)
+  createAutoSave: jest.fn(() => mockAutoSaveService)
 }));
 
 const mockSessionStore: SessionStore = {
