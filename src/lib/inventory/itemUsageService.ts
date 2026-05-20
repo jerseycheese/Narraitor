@@ -10,6 +10,9 @@ import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import type { NarrativeGenerationResult } from '@/types/narrative.types';
 import { safeTrim } from '@/lib/utils';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ItemUsageService');
+
 interface ItemUsageNarrativeDetails {
   wasConsumed?: boolean;
   remainingQuantity?: number;
@@ -356,7 +359,7 @@ export async function processItemUsage(
         });
       } catch (error) {
         // If generation fails, existing decisions remain intact (not cleared)
-        console.warn('Failed to generate choices after item usage, keeping existing decisions', error);
+        logger.warn('Failed to generate choices after item usage, keeping existing decisions', error);
       }
     } catch {
       narrative = buildUsageNarrative(item, usageResult, 'simple');

@@ -26,7 +26,7 @@ const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
       const storage = new ResilientStorageMiddleware({
         onStatusChange: (status, error) => {
           if (error?.shouldNotify) {
-            console.warn('[Persistence] Storage status changed:', status, error);
+            logger.warn('[Persistence] Storage status changed:', status, error);
           }
         },
       });

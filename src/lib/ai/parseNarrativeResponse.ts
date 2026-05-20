@@ -1,6 +1,9 @@
 import { safeTrim } from '@/lib/utils';
 import type { EndingType } from '@/types/narrative.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ParseNarrativeResponse');
+
 export interface NarrativeEndingAnalysis {
   suggestEnding: boolean;
   confidence: 'high' | 'medium' | 'low';
@@ -40,7 +43,7 @@ export function safeParseNarrativeAnalysis(
   try {
     parsed = JSON.parse(cleaned);
   } catch (error) {
-    console.error('safeParseNarrativeAnalysis: invalid JSON', error);
+    logger.error('safeParseNarrativeAnalysis: invalid JSON', error);
     return null;
   }
 

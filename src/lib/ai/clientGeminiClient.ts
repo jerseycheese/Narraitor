@@ -3,6 +3,9 @@
 import { AIClient, AIResponse, AIImageResponse } from './types';
 import { userFriendlyError } from './userFriendlyErrors';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ClientGeminiClient');
+
 /**
  * Client-side proxy for Gemini API that routes through Next.js API routes
  * This ensures API keys are never exposed to the client
@@ -59,7 +62,7 @@ export class ClientGeminiClient implements AIClient {
         completionTokens: data.completionTokens
       };
     } catch (error) {
-      console.error('ClientGeminiClient error:', error);
+      logger.error('ClientGeminiClient error:', error);
       
       // Use existing error handling utilities
       const friendlyMessage = userFriendlyError(error instanceof Error ? error : new Error('Unknown error'));
@@ -125,7 +128,7 @@ export class ClientGeminiClient implements AIClient {
         completionTokens: data.completionTokens
       };
     } catch (error) {
-      console.error('ClientGeminiClient choice generation error:', error);
+      logger.error('ClientGeminiClient choice generation error:', error);
       
       // Use existing error handling utilities
       const friendlyMessage = userFriendlyError(error instanceof Error ? error : new Error('Unknown error'));
@@ -164,7 +167,7 @@ export class ClientGeminiClient implements AIClient {
         prompt: data.prompt
       };
     } catch (error) {
-      console.error('ClientGeminiClient image generation error:', error);
+      logger.error('ClientGeminiClient image generation error:', error);
       
       // Use existing error handling utilities
       const friendlyMessage = userFriendlyError(error instanceof Error ? error : new Error('Unknown error'));
@@ -193,7 +196,7 @@ export class ClientGeminiClient implements AIClient {
       // Any response (even errors) means the API route is available
       return response.status !== 404;
     } catch (error) {
-      console.error('ClientGeminiClient availability check failed:', error);
+      logger.error('ClientGeminiClient availability check failed:', error);
       return false;
     }
   }

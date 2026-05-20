@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
 import { getAIConfig } from '../lib/ai/config';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ApiHelpers');
+
 /**
  * Get client IP address from request headers
  */
@@ -291,7 +294,7 @@ export async function processGeminiTextRequest(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API Error:', {
+      logger.error('Gemini API Error:', {
         status: response.status,
         statusText: response.statusText,
         errorText: errorText
@@ -311,7 +314,7 @@ export async function processGeminiTextRequest(
 
     // Extract content from response
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
-      console.error('API Response structure issue:', {
+      logger.error('API Response structure issue:', {
         hasCandidates: !!data.candidates,
         candidatesLength: data.candidates?.length,
         hasFirstCandidate: !!data.candidates?.[0],
@@ -345,7 +348,7 @@ export async function processGeminiTextRequest(
     });
 
   } catch (error) {
-    console.error(`${errorContext} error:`, error);
+    logger.error(`${errorContext} error:`, error);
 
     return createAPIErrorResponse(
       error instanceof Error ? error : new Error('Unknown error occurred'),

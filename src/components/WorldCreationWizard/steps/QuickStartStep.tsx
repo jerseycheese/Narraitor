@@ -16,6 +16,9 @@ import { useSessionStore } from '@/state/sessionStore';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('QuickStartStep');
+
 export interface QuickStartStepProps {
   world: World;
   onBack: () => void;
@@ -103,7 +106,7 @@ export default function QuickStartStep({
         router.push('/play');
       });
     } catch (error) {
-      console.error('Failed to create character:', error);
+      logger.error('Failed to create character:', error);
       // Could show an error message here
     }
   };

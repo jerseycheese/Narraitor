@@ -15,6 +15,9 @@ import type {
   NarrativeSegment,
 } from '@/types/narrative.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('UseEndingDetection');
+
 const MIN_SEGMENTS_FOR_ANALYSIS = 3;
 const RECENT_SEGMENT_WINDOW = 5;
 const LONG_STORY_THRESHOLD = 10;
@@ -139,7 +142,7 @@ Respond with JSON format:
           onEndingSuggested(analysis.reason, endingType);
         }
       } catch (error) {
-        console.error('Failed to analyze ending indicators with AI:', error);
+        logger.error('Failed to analyze ending indicators with AI:', error);
       }
     },
     [segments, onEndingSuggested]

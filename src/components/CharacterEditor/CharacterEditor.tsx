@@ -14,6 +14,9 @@ import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('CharacterEditor');
+
 // Use the Character type from the store since it's different from the main types
 type Character = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 
@@ -62,7 +65,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     } catch (err) {
       setLoadError('Failed to load character data');
       setLoading(false);
-      console.error('Error loading character:', err);
+      logger.error('Error loading character:', err);
     }
   }, [storeCharacter, characterId]);
 
@@ -104,7 +107,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       router.push(`/characters/${characterId}`);
     } catch (err) {
       setLoadError('Failed to save character');
-      console.error('Error saving character:', err);
+      logger.error('Error saving character:', err);
     } finally {
       setSaving(false);
     }
@@ -146,7 +149,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       setEditingCharacter({ ...editingCharacter, portrait });
       useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
-      console.error('Failed to generate portrait:', error);
+      logger.error('Failed to generate portrait:', error);
       setPortraitError('Failed to generate portrait. Please try again.');
     } finally {
       setGeneratingPortrait(false);

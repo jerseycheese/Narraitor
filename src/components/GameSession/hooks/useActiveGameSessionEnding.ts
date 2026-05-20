@@ -5,6 +5,9 @@ import type { EndingTone, EndingType } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import type { Character } from '@/state/characterStore';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('UseActiveGameSessionEnding');
+
 interface UseActiveGameSessionEndingOptions {
   sessionId: string;
   characterId?: string;
@@ -62,7 +65,7 @@ export const useActiveGameSessionEnding = ({
         character: character,
       });
     } catch (error) {
-      console.error('Failed to load ending:', error);
+      logger.error('Failed to load ending:', error);
     }
   }, [character, characterId, generateEnding, sessionId, world]);
 
@@ -91,7 +94,7 @@ export const useActiveGameSessionEnding = ({
         character: character,
         desiredTone: 'tragic',
       }).catch((error) => {
-        console.error('Failed to auto-generate fatal ending:', error);
+        logger.error('Failed to auto-generate fatal ending:', error);
         setShowEndingSuggestion(true);
         fatalEndingTriggeredRef.current = false;
       });
@@ -114,7 +117,7 @@ export const useActiveGameSessionEnding = ({
         character: character,
       });
     } catch (error) {
-      console.error('Failed to load ending:', error);
+      logger.error('Failed to load ending:', error);
     }
   }, [character, characterId, generateEnding, sessionId, suggestedEndingType, world]);
 

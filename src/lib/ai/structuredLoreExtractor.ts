@@ -6,6 +6,9 @@
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import type { StructuredLoreExtraction } from '@/types/lore.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('StructuredLoreExtractor');
+
 /**
  * Extract structured lore from narrative text using AI
  */
@@ -27,7 +30,7 @@ export async function extractStructuredLore(
     if (!jsonMatch) {
       if (process.env.NODE_ENV !== 'production') {
         // If no JSON block found, try fallback mock extraction for testing/dev
-        console.warn('No JSON block found in AI response, using mock extraction for testing/dev');
+        logger.warn('No JSON block found in AI response, using mock extraction for testing/dev');
         return createMockExtraction(narrativeText);
       }
       return getEmptyExtraction();
@@ -38,7 +41,7 @@ export async function extractStructuredLore(
     
   } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('Failed to extract structured lore:', error);
+      logger.warn('Failed to extract structured lore:', error);
       // Fallback to mock extraction for demonstration/testing
       return createMockExtraction(narrativeText);
     }

@@ -16,6 +16,9 @@ import { Button } from '@/components/ui/button';
 import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 import { toGenreValue } from '@/lib/constants/genres';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('TemplateStep');
+
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
   onUpdate: (
@@ -108,7 +111,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
             }, 0);
             return;
           } catch (error) {
-            console.error('Failed to apply recent template:', error);
+            logger.error('Failed to apply recent template:', error);
           }
         }
       } else {
@@ -182,7 +185,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       // Proceed to the next step (Basic Info) so user can review/modify
       onComplete(false);
     } catch (error) {
-      console.error('Error processing template:', error);
+      logger.error('Error processing template:', error);
     } finally {
       setIsApplying(false);
     }

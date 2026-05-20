@@ -20,6 +20,9 @@ import { CrudStore } from './createCrudStore';
 import { calculateDerivedStat } from '@/lib/utils/derivedStatCalculator';
 import { storeEvents, StoreEventTypes, type CharacterDeletedEvent, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('CharacterStore');
+
 // Simplified character types for MVP implementation
 export interface CharacterAttribute {
   id: EntityID;
@@ -859,7 +862,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
         version: 3, // Incremented to clear old migrated data
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            console.error('[CharacterStore] Failed to rehydrate state', error);
+            logger.error('[CharacterStore] Failed to rehydrate state', error);
             return;
           }
           state?.syncDerivedState?.();

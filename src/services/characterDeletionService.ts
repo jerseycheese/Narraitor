@@ -3,6 +3,9 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { PlayerCharacterThreadUpdate, CharacterRelationshipRemoval, WorldStateUpdate } from '@/types/world-state.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('CharacterDeletionService');
+
 /**
  * Deletes a character and all related data (journal entries, world state).
  *
@@ -25,11 +28,11 @@ export async function deleteCharacterWithCleanup(characterId: string): Promise<v
       try {
         journalStore.deleteSessionEntries(sessionId);
       } catch (error) {
-        console.warn('Failed to clean up journal session:', sessionId, error);
+        logger.warn('Failed to clean up journal session:', sessionId, error);
       }
     });
   } catch (error) {
-    console.warn('Failed to clean up journal entries for character:', characterId, error);
+    logger.warn('Failed to clean up journal entries for character:', characterId, error);
   }
 
   const characterStore = useCharacterStore.getState();
@@ -91,7 +94,7 @@ export async function deleteCharacterWithCleanup(characterId: string): Promise<v
         worldStore.updateWorldState(worldId, updatePayload, 'system-cleanup');
       }
     } catch (error) {
-      console.warn('Failed to clean up world state for character:', characterId, error);
+      logger.warn('Failed to clean up world state for character:', characterId, error);
     }
   }
 

@@ -15,6 +15,9 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 import { Globe, Users, Play } from 'lucide-react';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('QuickPlay');
+
 export function QuickPlay() {
   const router = useRouter();
 
@@ -100,7 +103,7 @@ export function QuickPlay() {
     try {
       await cleanupSessionData(mostRecentSession.id);
     } catch (error) {
-      console.error('Failed to delete session:', error);
+      logger.error('Failed to delete session:', error);
     } finally {
       setIsDeleting(false);
       setIsDeleteDialogOpen(false);

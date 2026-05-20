@@ -14,6 +14,9 @@ import { wizardStyles } from '@/components/shared/wizard';
 import { CharacterArchetype } from '@/types/world.types';
 import { useTutorial } from '@/components/TutorialProvider';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('Create');
+
 export default function CharacterCreatePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -122,7 +125,7 @@ export default function CharacterCreatePage() {
 
   const handleQuickStartSelect = async (archetype: CharacterArchetype) => {
     if (!currentWorld) {
-      console.error('No current world available for character creation');
+      logger.error('No current world available for character creation');
       return;
     }
 
@@ -186,7 +189,7 @@ export default function CharacterCreatePage() {
         router.push('/play');
       });
     } catch (error) {
-      console.error('Failed to create character:', error);
+      logger.error('Failed to create character:', error);
       // Could show an error message here
     }
   };

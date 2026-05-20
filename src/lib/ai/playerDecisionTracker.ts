@@ -32,6 +32,9 @@ import {
   type SimpleNarrativeContext
 } from './simpleDecisionRelevance';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('PlayerDecisionTracker');
+
 /**
  * Interface for decision tracking configuration
  */
@@ -418,7 +421,7 @@ export class PlayerDecisionTracker {
         }
       }
     } catch (error) {
-      console.warn('Failed to load decisions:', error);
+      logger.warn('Failed to load decisions:', error);
       this.decisions = [];
     }
   }
@@ -432,7 +435,7 @@ export class PlayerDecisionTracker {
         localStorage.setItem(this.config.storageKey, JSON.stringify(this.decisions));
       }
     } catch (error) {
-      console.warn('Failed to save decisions:', error);
+      logger.warn('Failed to save decisions:', error);
     }
   }
 }

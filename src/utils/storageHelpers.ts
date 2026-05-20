@@ -1,3 +1,7 @@
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('StorageHelpers');
+
 /**
  * Interface for standardized storage error objects
  * @property userMessage - User-friendly error message for display
@@ -137,7 +141,7 @@ export async function clearAllStoredData(): Promise<void> {
         throw error;
       }
       // Continue with other databases even if one fails
-      console.error(`Failed to delete database ${dbName}:`, error);
+      logger.error(`Failed to delete database ${dbName}:`, error);
     }
   }
 }

@@ -5,9 +5,13 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('ActiveGameSessionEffects');
 
 const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
 const CHOICE_FALLBACK_DELAY_MS = 15000;
+const BOOTSTRAP_FALLBACK_DELAY_MS = 4000;
 
 interface UseActiveGameSessionEffectsOptions {
   sessionId: string;
@@ -83,10 +87,11 @@ export const useActiveGameSessionEffects = ({
         });
         // Begin generating choices after bootstrap
         setIsGeneratingChoices(true);
-      } catch {
-        // Ignore errors; controller may be mid-flight
+      } catch (error) {
+        // Controller may be mid-flight; surface it so the failure isn't silent.
+        logger.error('Failed to inject bootstrap fallback scene', error);
       }
-    }, 4000); // Increased timeout to 4 seconds to give AI more time
+    }, BOOTSTRAP_FALLBACK_DELAY_MS);
     return () => {
       cancelled = true;
       clearTimeout(t);

@@ -7,6 +7,9 @@
 import type { EntityID } from '@/types/common.types';
 import { normalizeText, NORM_NAME } from '@/lib/utils';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ItemProcessorShared');
+
 export const RATE_LIMIT_DELAY_MS = 200;
 
 /**
@@ -28,7 +31,7 @@ export async function itemNamesMatch(name1: string, name2: string): Promise<bool
     const result = await checkItemSimilarityClient({ name1, name2 });
     return result.similar && result.confidence > 0.7;
   } catch (error) {
-    console.warn('AI similarity check failed, using fallback:', error);
+    logger.warn('AI similarity check failed, using fallback:', error);
     return normalized1.includes(normalized2) || normalized2.includes(normalized1);
   }
 }

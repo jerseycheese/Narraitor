@@ -5,6 +5,9 @@ import { ToneSettings } from '@/types/tone-settings.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
 import { safeTrim } from '@/lib/utils';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('StoryCheckpoint');
+
 const MAX_EVENTS = 10;
 const MAX_DECISIONS = 5;
 
@@ -165,7 +168,7 @@ export async function POST(request: NextRequest) {
     const summary = await generateStoryCheckpointSummary(payload);
     return NextResponse.json(summary);
   } catch (error) {
-    console.error('[story-checkpoint] Failed to generate summary', error);
+    logger.error('[story-checkpoint] Failed to generate summary', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to generate checkpoint summary.' },
       { status: 500 }

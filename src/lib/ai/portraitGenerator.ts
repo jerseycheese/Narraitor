@@ -6,6 +6,9 @@ import { AIClient } from './types';
 import { capitalize, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('PortraitGenerator');
+
 interface PortraitGenerationOptions {
   worldGenre?: string;
   isKnownFigure?: boolean;
@@ -74,7 +77,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       figureName: figureName,
     };
   } catch (error) {
-    console.error('Character detection failed:', error);
+    logger.error('Character detection failed:', error);
     return { isKnownFigure: false };
   }
 }
@@ -256,7 +259,7 @@ async function enhanceKnownCharacter(
       },
     };
   } catch (error) {
-    console.error('Failed to enhance character:', error);
+    logger.error('Failed to enhance character:', error);
     return character;
   }
 }

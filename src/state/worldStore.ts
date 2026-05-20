@@ -546,7 +546,7 @@ export const useWorldStore = create<WorldStore>()(
       version: 5, // Incremented for segment-based checkpoint architecture
       onRehydrateStorage: () => (state, error) => {
         if (error) {
-          console.error('[WorldStore] Failed to rehydrate state', error);
+          logger.error('[WorldStore] Failed to rehydrate state', error);
           return;
         }
         state?.syncDerivedState?.();

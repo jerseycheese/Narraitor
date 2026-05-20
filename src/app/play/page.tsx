@@ -12,6 +12,9 @@ import { PageLayout } from '@/components/shared/PageLayout';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { Button } from '@/components/ui/button';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('Play');
+
 type PersistApi = {
   persist?: {
     hasHydrated?: () => boolean;
@@ -91,7 +94,7 @@ export default function PlayPage() {
 
         setIsLoading(false);
       } catch (err) {
-        console.error('Failed to initialize game session:', err);
+        logger.error('Failed to initialize game session:', err);
         setError(err instanceof Error ? err.message : 'Failed to start game session');
         setIsLoading(false);
       }

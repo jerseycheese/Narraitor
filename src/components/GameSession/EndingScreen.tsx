@@ -27,6 +27,9 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('EndingScreen');
+
 /**
  * EndingScreen displays the story ending with narrative closure
  * Uses shared components (SectionWrapper, CardActionGroup) and existing tone-based styling
@@ -143,7 +146,7 @@ export function EndingScreen() {
         };
       });
     } catch (error) {
-      console.error('Failed to load ending image:', error);
+      logger.error('Failed to load ending image:', error);
       setImageError('Failed to load ending image');
       generatedForEndingRef.current = null; // Reset on error so user can retry
     } finally {

@@ -25,6 +25,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('GuidedFirstTimeExperience');
+
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
   { id: 'concept', label: 'World Concept' },
@@ -130,7 +133,7 @@ export function GuidedFirstTimeExperience() {
         // Navigate to character creation to continue the flow
         router.push(`/characters/create?worldId=${worldId}`);
       } catch (error) {
-        console.error('Error completing onboarding:', error);
+        logger.error('Error completing onboarding:', error);
         throw error; // Re-throw to let wizard handle it
       }
     },

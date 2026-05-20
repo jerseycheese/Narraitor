@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('Summarize');
+
 export async function POST(request: NextRequest) {
   try {
     let body;
@@ -176,7 +179,7 @@ Do not include any explanatory text, code fences, markdown, or additional prose.
       });
       
     } catch (parseError) {
-      console.warn('Failed to parse AI JSON response, falling back to text-only:', parseError);
+      logger.warn('Failed to parse AI JSON response, falling back to text-only:', parseError);
       
       // Fallback to text-only response
       let summary = response.content.trim();
@@ -201,7 +204,7 @@ Do not include any explanatory text, code fences, markdown, or additional prose.
     }
 
   } catch (error) {
-    console.error('Error generating journal summary:', error);
+    logger.error('Error generating journal summary:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

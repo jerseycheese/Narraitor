@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateEventSignificance, ValidationContext } from '@/lib/ai/eventSignificanceValidator';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ValidateEventSignificance');
+
 /**
  * API endpoint for validating event significance
  * POST /api/narrative/validate-event-significance
@@ -24,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Event significance validation error:', error);
+    logger.error('Event significance validation error:', error);
     return NextResponse.json(
       {
         error: 'Failed to validate event significance',

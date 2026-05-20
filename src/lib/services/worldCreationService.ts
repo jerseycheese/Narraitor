@@ -219,7 +219,7 @@ export const worldCreationService = {
         description: worldData.description,
         genre: worldData.genre,
       }).catch(error => {
-        console.error('Background world image generation failed:', error);
+        logger.error('Background world image generation failed:', error);
         // Don't fail the world creation if image generation fails
       });
     }
@@ -268,7 +268,7 @@ export const worldCreationService = {
         },
       });
     } catch (error) {
-      console.error('Failed to generate world image:', error);
+      logger.error('Failed to generate world image:', error);
       throw error;
     }
   },

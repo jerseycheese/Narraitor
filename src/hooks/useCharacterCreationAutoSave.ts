@@ -2,6 +2,9 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { EntityID } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('UseCharacterCreationAutoSave');
+
 /**
  * Character creation state interface for auto-save functionality
  * @interface CharacterCreationState
@@ -196,7 +199,7 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
           localStorage.setItem(saveKey, JSON.stringify(dataWithTimestamp));
           setSaveStatus('saved');
         } catch (error) {
-          console.error('[AutoSave] Failed to save character creation data', error);
+          logger.error('[AutoSave] Failed to save character creation data', error);
           setSaveStatus('idle');
         }
       }, 300); // 300ms debounce
@@ -226,7 +229,7 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
           setDataInternal(parsed);
           hasLoadedRef.current = true; // Mark as loaded after setting data
         } catch (e) {
-          console.error('[AutoSave] Failed to restore character creation data', e);
+          logger.error('[AutoSave] Failed to restore character creation data', e);
           setHasRecoveryData(true); // Keep recovery data true since data exists, even if corrupted
           setRecoveryPreview(undefined); // Can't preview corrupted data
           hasLoadedRef.current = true; // Still mark as loaded to prevent retries
