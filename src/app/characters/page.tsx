@@ -9,6 +9,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
 import { getTimestamp } from '@/lib/utils';
+import { readString, writeString } from '@/lib/utils/browserStorage';
 import { CharacterCard } from '@/components/CharacterCard';
 import { CharacterTable } from '@/components/character/CharacterTable';
 import {
@@ -162,21 +163,15 @@ export default function CharactersPage() {
   const [viewMode, setViewMode] = useState<CharacterViewMode>('grid');
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(
-        'character-view-mode'
-      ) as CharacterViewMode | null;
-      if (saved === 'grid' || saved === 'table') {
-        setViewMode(saved);
-      }
+    const saved = readString('local', 'character-view-mode');
+    if (saved === 'grid' || saved === 'table') {
+      setViewMode(saved);
     }
   }, []);
 
   const handleViewModeChange = (mode: CharacterViewMode) => {
     setViewMode(mode);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('character-view-mode', mode);
-    }
+    writeString('local', 'character-view-mode', mode);
   };
 
   const worldIdFromUrl = searchParams.get('worldId');

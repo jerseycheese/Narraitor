@@ -195,9 +195,6 @@ export const useSessionStore = create<SessionStore>()(
     });
     
     try {
-      // Simulate loading time for development
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       const activationTimestamp = getTimestamp();
       set(state => {
         return { 

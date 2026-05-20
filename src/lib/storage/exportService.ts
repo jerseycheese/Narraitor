@@ -190,8 +190,7 @@ function validateGameState(gameState: unknown): { valid: boolean; error?: string
   }
 
   if (state.worldState && typeof state.worldState === 'object') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const worldState = state.worldState as any;
+    const worldState = state.worldState as Record<string, unknown>;
     if (worldState.worlds && typeof worldState.worlds === 'object') {
       for (const [worldId, worldData] of Object.entries(worldState.worlds)) {
         const validation = validateWorld(worldData);
