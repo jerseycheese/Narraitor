@@ -3,9 +3,8 @@
  * Provides reusable utilities for testing lore functionality
  */
 
-import { renderHook, act, type RenderHookResult } from '@testing-library/react';
-import { useLoreStore, type LoreStore } from '../loreStore';
-import type { LoreCategory, LoreSource } from '@/types/lore.types';
+import { renderHook, act } from '@testing-library/react';
+import { useLoreStore } from '../loreStore';
 
 /**
  * Sets up a fresh lore store and clears test worlds
@@ -18,69 +17,4 @@ export function setupLoreStore(worldIds: string[] = ['test-world', 'world-1', 'w
     });
   });
   return result;
-}
-
-/**
- * Adds a fact to the store using act
- */
-function addFact(
-  result: RenderHookResult<LoreStore, unknown>['result'],
-  key: string,
-  value: string,
-  category: LoreCategory,
-  source: LoreSource,
-  worldId: string
-) {
-  act(() => {
-    result.current.addFact(key, value, category, source, worldId);
-  });
-}
-
-/**
- * Adds multiple facts to the store
- */
-function addMultipleFacts(
-  result: RenderHookResult<LoreStore, unknown>['result'],
-  facts: Array<{
-    key: string;
-    value: string;
-    category: LoreCategory;
-    source: LoreSource;
-    worldId: string;
-  }>
-) {
-  act(() => {
-    facts.forEach(fact => {
-      result.current.addFact(fact.key, fact.value, fact.category, fact.source, fact.worldId);
-    });
-  });
-}
-
-/**
- * Creates sample character facts
- */
-function createCharacterFacts(worldId = 'test-world') {
-  return [
-    { key: 'hero_name', value: 'Lyra', category: 'characters', source: 'manual' as const, worldId },
-    { key: 'villain_name', value: 'Dark Lord', category: 'characters', source: 'narrative' as const, worldId }
-  ];
-}
-
-/**
- * Creates sample location facts
- */
-function createLocationFacts(worldId = 'test-world') {
-  return [
-    { key: 'tavern_location', value: 'Prancing Pony', category: 'locations', source: 'manual' as const, worldId },
-    { key: 'castle_location', value: 'Dark Tower', category: 'locations', source: 'narrative' as const, worldId }
-  ];
-}
-
-/**
- * Creates sample rule facts
- */
-function createRuleFacts(worldId = 'test-world') {
-  return [
-    { key: 'magic_rule', value: 'Magic requires sacrifice', category: 'rules', source: 'manual' as const, worldId }
-  ];
 }

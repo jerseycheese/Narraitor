@@ -206,14 +206,3 @@ function validateGameState(gameState: unknown): { valid: boolean; error?: string
 
   return { valid: true };
 }
-
-async function getExportSize(): Promise<number> {
-  const exportResult = await exportGameState();
-
-  if (!exportResult.success || !exportResult.data) {
-    return 0;
-  }
-
-  const json = JSON.stringify(exportResult.data);
-  return new Blob([json]).size;
-}

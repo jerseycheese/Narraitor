@@ -203,23 +203,3 @@ export const allExamples: PromptExample[] = [
   ...npcMetadataExamples,
   ...sensoryExamples,
 ];
-
-/**
- * Helper function to get examples by category
- */
-function getExamplesByCategory(
-  category: string
-): PromptExample[] {
-  return allExamples.filter((example) =>
-    example.categories.some((cat) => cat === category)
-  );
-}
-
-/**
- * Helper function to get examples by tags
- */
-function getExamplesByTags(tags: string[]): PromptExample[] {
-  return allExamples.filter((example) =>
-    tags.some((tag) => example.tags?.includes(tag))
-  );
-}

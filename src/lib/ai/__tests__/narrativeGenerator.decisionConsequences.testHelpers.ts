@@ -16,13 +16,8 @@ import { getDetailedToneInstructions } from '../toneSettingsGuidance';
 import { PlayerDecision } from '@/types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
-;
-
 // Re-export centralized timer utilities
-export {
-  setupTestTimers,
-  
-} from '@/lib/test-utils/testTimers';
+export { setupTestTimers } from '@/lib/test-utils/testTimers';
 
 const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<
   typeof playerDecisionTracker

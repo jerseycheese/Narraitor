@@ -1,2 +1,1 @@
 export { WorldImage } from './WorldImage';
-;

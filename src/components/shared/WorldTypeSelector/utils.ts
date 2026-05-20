@@ -78,10 +78,3 @@ export function createInitialWorldTypeData(worldType: WorldTypeData['worldType']
     additionalDetails: '',
   };
 }
-
-/**
- * Checks if world type data is valid
- */
-function isWorldTypeDataValid(data: WorldTypeData): boolean {
-  return validateWorldTypeData(data).length === 0;
-}

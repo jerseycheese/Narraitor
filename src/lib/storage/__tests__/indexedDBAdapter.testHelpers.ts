@@ -86,26 +86,6 @@ export const setupSuccessfulOpen = (
 };
 
 /**
- * Sets up a failed IDB open request
- */
-const setupFailedOpen = (
-  mockIDB: { open: jest.Mock },
-  error: Error
-): void => {
-  mockIDB.open.mockImplementation(() => {
-    const openRequest = createMockRequest();
-
-    setTimeout(() => {
-      if (openRequest.onerror) {
-        openRequest.onerror({ target: { error } } as unknown as Event);
-      }
-    }, 0);
-
-    return openRequest;
-  });
-};
-
-/**
  * Triggers the success callback on a mock request after a delay
  */
 export const triggerSuccess = <T>(
@@ -119,19 +99,6 @@ export const triggerSuccess = <T>(
   }, 0);
 };
 
-/**
- * Triggers the error callback on a mock request after a delay
- */
-const triggerError = (
-  request: MockRequest,
-  error: Error
-): void => {
-  setTimeout(() => {
-    if (request.onerror) {
-      request.onerror({ target: { error } } as unknown as Event);
-    }
-  }, 0);
-};
 
 /**
  * Sets up a mock database with a transaction that returns the given store

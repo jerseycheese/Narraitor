@@ -5,7 +5,7 @@
  * with token-aware selection.
  */
 
-import { exampleManager, ExampleManager } from './exampleManager';
+import { exampleManager } from './exampleManager';
 import { allExamples } from './exampleLibrary';
 import { PromptCategory, ExampleSelectionOptions } from './types';
 
@@ -35,30 +35,6 @@ export function getExamplesForPrompt(
   options: Partial<ExampleSelectionOptions> = {}
 ): string {
   const result = exampleManager.selectExamples({
-    category,
-    tokenBudget,
-    ...options,
-  });
-
-  return result.formattedContent;
-}
-
-/**
- * Get examples with custom manager instance (useful for testing)
- *
- * @param manager - Custom ExampleManager instance
- * @param category - The prompt category
- * @param tokenBudget - Maximum tokens to use
- * @param options - Additional selection options
- * @returns Formatted example string
- */
-function getExamplesWithManager(
-  manager: ExampleManager,
-  category: PromptCategory,
-  tokenBudget: number = 150,
-  options: Partial<ExampleSelectionOptions> = {}
-): string {
-  const result = manager.selectExamples({
     category,
     tokenBudget,
     ...options,

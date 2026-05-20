@@ -10,21 +10,12 @@ import type {
   WorldAttribute,
   WorldSkill,
   NarrativeSegment,
-  GameSession,
   JournalEntry,
   JournalEntryType,
   InventoryItem,
-  Decision,
 } from '@/types';
 import type { Character } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils';
-
-// PlayerChoice is a custom type for this factory
-interface PlayerChoice {
-  id: string;
-  text: string;
-  isSelected: boolean;
-}
 
 // Default timestamp for consistent test data
 const DEFAULT_TIMESTAMP = '2023-01-01T00:00:00.000Z';
@@ -152,34 +143,6 @@ export function createMockCharacter(
 }
 
 /**
- * Creates a mock GameSession object
- */
-function createMockSession(
-  overrides: Partial<GameSession> = {}
-): GameSession {
-  return {
-    id: overrides.id || generateUniqueId('session'),
-    worldId: 'world-test-1',
-    characterId: 'char-test-1',
-    state: {
-      status: 'active',
-      lastActivity: DEFAULT_TIMESTAMP,
-    },
-    narrativeHistory: [],
-    currentContext: {
-      recentSegments: [],
-      activeCharacters: ['char-test-1'],
-      currentLocation: 'Test Location',
-      activeQuests: [],
-      mood: 'neutral',
-    },
-    createdAt: DEFAULT_TIMESTAMP,
-    updatedAt: DEFAULT_TIMESTAMP,
-    ...overrides,
-  };
-}
-
-/**
  * Creates a mock NarrativeSegment object
  */
 export function createMockNarrativeSegment(
@@ -200,39 +163,6 @@ export function createMockNarrativeSegment(
     timestamp: new Date(DEFAULT_TIMESTAMP),
     createdAt: DEFAULT_TIMESTAMP,
     updatedAt: DEFAULT_TIMESTAMP,
-    ...overrides,
-  };
-}
-
-/**
- * Creates a mock Decision object
- */
-function createMockDecision(
-  overrides: Partial<Decision> = {}
-): Decision {
-  return {
-    id: overrides.id || generateUniqueId('decision'),
-    prompt: 'What do you want to do?',
-    options: [
-      { id: 'opt-1', text: 'Option 1', hint: 'Hint for option 1' },
-      { id: 'opt-2', text: 'Option 2' },
-      { id: 'opt-3', text: 'Option 3' },
-    ],
-    selectedOptionId: undefined,
-    ...overrides,
-  };
-}
-
-/**
- * Creates a mock PlayerChoice object
- */
-function createMockPlayerChoice(
-  overrides: Partial<PlayerChoice> = {}
-): PlayerChoice {
-  return {
-    id: overrides.id || generateUniqueId('choice'),
-    text: 'Test choice',
-    isSelected: false,
     ...overrides,
   };
 }

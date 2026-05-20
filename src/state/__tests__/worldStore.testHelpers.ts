@@ -57,29 +57,3 @@ export function createTestAttributeData(
     ...overrides,
   };
 }
-
-/**
- * Creates test skill data
- */
-function createTestSkillData(
-  overrides?: Partial<{
-    name: string;
-    description: string;
-    difficulty: 'easy' | 'medium' | 'hard';
-    category?: string;
-    baseValue: number;
-    minValue: number;
-    maxValue: number;
-  }>
-) {
-  return {
-    name: 'Swordsmanship',
-    description: 'Skill with sword combat',
-    difficulty: 'medium' as const,
-    category: 'Combat',
-    baseValue: 5,
-    minValue: 0,
-    maxValue: 10,
-    ...overrides,
-  };
-}

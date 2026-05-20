@@ -211,22 +211,6 @@ export const WithMockWorldStore = (Story: React.FC) => {
 };
 
 /**
- * Populates character store for stories that need character data.
- */
-const WithMockCharacterStore = (Story: React.FC) => {
-  useEffect(() => {
-    useCharacterStore.setState({
-      characters: { [STORY_CHARACTER_ID]: mockCharacter as never },
-      entities: { [STORY_CHARACTER_ID]: mockCharacter as never },
-    });
-    return () => {
-      useCharacterStore.setState({ characters: {}, entities: {} });
-    };
-  }, []);
-  return React.createElement(Story);
-};
-
-/**
  * Sets up all stores needed by EndingScreen.
  * Accepts a StoryEnding to control the tone variant.
  */

@@ -11,7 +11,6 @@ export {
   WizardTextField,
   WizardTextArea,
   WizardSelect,
-  
   WizardFormSection,
 } from './components/FormComponents';
 
@@ -22,8 +21,6 @@ export type { ToggleButtonProps } from './components/ToggleButton';
 // Export AI components
 
 // Export hooks
-;
-
 // Export types
 export * from './types/steps';
 

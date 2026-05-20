@@ -4,5 +4,5 @@
  */
 
 export { primitiveColors } from './tokens/primitives'
-export { semanticColors,  } from './tokens/semantic'
+export { semanticColors } from './tokens/semantic'
 export { endingTones, loreCategories } from './tokens/contextual'

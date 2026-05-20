@@ -1,4 +1,1 @@
 export { JournalPage } from './JournalPage';
-;
-;
-;

@@ -157,9 +157,3 @@ export function createMockCharacterWithSkills(): Character {
     updatedAt: getTimestamp(),
   };
 }
-
-/**
- * Export mock data for use in jest.mock() calls
- */
-const mockWorld = createMockWorldWithSkills();
-const mockCharacter = createMockCharacterWithSkills();

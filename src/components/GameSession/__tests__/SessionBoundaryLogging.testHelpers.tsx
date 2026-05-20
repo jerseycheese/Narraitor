@@ -90,18 +90,6 @@ export const setupMockStores = (
 };
 
 /**
- * Create test session data
- */
-const createTestSession = (overrides = {}) => ({
-  id: 'test-session-123',
-  startTime: Date.now(),
-  worldId: 'test-world',
-  characterId: 'test-character',
-  status: 'active' as const,
-  ...overrides
-});
-
-/**
  * Setup static getState and subscribe mocks for session store
  */
 export const setupSessionStoreStatics = () => {

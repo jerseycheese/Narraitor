@@ -8,15 +8,6 @@ interface GuardSanitizedContext {
   removedCount: number;
 }
 
-interface StateResetContext {
-  reason: 'schema-reset' | 'corrupted-state';
-  characterCount: number;
-}
-
 export const logInventoryGuardSanitized = (context: GuardSanitizedContext): void => {
   inventoryTelemetryLogger.info('Inventory guard sanitized payload', context);
-};
-
-const logInventoryStateReset = (context: StateResetContext): void => {
-  inventoryTelemetryLogger.warn('Inventory persistence reset applied', context);
 };
