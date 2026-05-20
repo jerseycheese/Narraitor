@@ -4,9 +4,7 @@ import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useNavigationLoading, UseNavigationLoadingReturn } from '@/hooks/useNavigationLoading';
 import { logger } from '@/lib/utils/logger';
 import { LoadingOverlay } from './LoadingOverlay';
-
-// Safety timeout to prevent stuck loading states
-const SAFETY_TIMEOUT_MS = 30000; // 30 seconds
+import { NAV_SAFETY_TIMEOUT_MS } from '@/lib/constants/timeouts';
 
 const NavigationLoadingContext = createContext<UseNavigationLoadingReturn | null>(null);
 
@@ -34,9 +32,9 @@ export const NavigationLoadingProvider: React.FC<NavigationLoadingProviderProps>
   useEffect(() => {
     if (navigationLoading.isLoading) {
       const timeout = setTimeout(() => {
-        logger.warn(`Navigation loading state automatically cleared after ${SAFETY_TIMEOUT_MS / 1000} seconds`);
+        logger.warn(`Navigation loading state automatically cleared after ${NAV_SAFETY_TIMEOUT_MS / 1000} seconds`);
         navigationLoading.clearLoading();
-      }, SAFETY_TIMEOUT_MS);
+      }, NAV_SAFETY_TIMEOUT_MS);
 
       return () => clearTimeout(timeout);
     }

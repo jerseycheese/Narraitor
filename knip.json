@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": [
     "src/app/**/{page,layout,template,error,loading,not-found,route,default,global-error}.{ts,tsx}",
-    ".storybook/{main,preview,vitest.setup}.{cjs,ts,tsx}",
+    ".storybook/{main,preview}.{cjs,ts,tsx}",
     "scripts/**/*.{js,cjs,mjs}"
   ],
   "project": ["src/**/*.{ts,tsx,js,jsx}", "scripts/**/*.{js,cjs,mjs}"],

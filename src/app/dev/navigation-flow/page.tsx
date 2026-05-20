@@ -9,6 +9,9 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
 import { formatDateTime } from '@/lib/utils';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('NavigationFlowDev');
 
 export default function NavigationFlowTestPage() {
   const [activeTest, setActiveTest] = useState<'quickplay' | 'wizard' | 'breadcrumbs' | 'flow'>('quickplay');
@@ -183,7 +186,7 @@ export default function NavigationFlowTestPage() {
               <GameStartWizard
                 initialWorldId={wizardWorldId || undefined}
                 initialCharacterId={wizardCharacterId || undefined}
-                onCancel={() => console.log('Wizard cancelled')}
+                onCancel={() => logger.debug('Wizard cancelled')}
               />
             </div>
           )}

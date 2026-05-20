@@ -12,6 +12,9 @@ import { endingTones } from '@/lib/design-tokens/tokens/contextual';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('EndingImageDebug');
 
 export function EndingImageDebugSection() {
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
@@ -97,7 +100,7 @@ export function EndingImageDebugSection() {
         promptOnly: true // Flag to return only the prompt
       };
       
-      console.log('Calling ending image API with data:', requestBody);
+      logger.debug('Calling ending image API with data:', requestBody);
       
       const response = await fetch('/api/generate-ending-image', {
         method: 'POST',
@@ -111,7 +114,7 @@ export function EndingImageDebugSection() {
       }
       
       const result = await response.json();
-      console.log('API response result:', result);
+      logger.debug('API response result:', result);
       
       const prompt = result.prompt || result.imageGenerationPrompt || 'No prompt returned';
       setGeneratedPrompt(prompt);
@@ -162,7 +165,7 @@ export function EndingImageDebugSection() {
         recentNarrative
       };
       
-      console.log('Generating full ending image with data:', requestBody);
+      logger.debug('Generating full ending image with data:', requestBody);
       
       const response = await fetch('/api/generate-ending-image', {
         method: 'POST',

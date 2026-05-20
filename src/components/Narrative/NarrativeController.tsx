@@ -20,6 +20,7 @@ import {
 } from '@/types/narrative.types';
 import { truncate } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
+import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
@@ -28,10 +29,6 @@ import type { Character as UtilCharacter } from '@/types/character.types';
 import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
-
-// Hard ceiling on AI generation calls — beyond this, fall back rather than hang.
-// Generous to accommodate first-call cold starts.
-const AI_GENERATION_TIMEOUT_MS = 15000;
 
 interface NarrativeControllerProps {
   worldId: string;

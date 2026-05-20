@@ -1,8 +1,9 @@
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
+import type { NarrativeTemplateContext } from './context';
 
-export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+export const baseNarrativeTemplate = (context: NarrativeTemplateContext) => {
   const {
     worldName,
     worldDescription,
@@ -49,8 +50,7 @@ Tone: ${tone}
 World Attributes: ${JSON.stringify(attributes)}
 
 ${narrativeContext ? `Previous Context:
-${// eslint-disable-next-line @typescript-eslint/no-explicit-any
-narrativeContext.recentSegments?.map((seg: any) => seg.content).join('\n\n')}
+${narrativeContext.recentSegments?.map((seg) => seg.content).join('\n\n')}
 
 Current Location: ${narrativeContext.currentLocation || 'Unknown'}
 Current Situation: ${narrativeContext.currentSituation || 'Continuing the story'}` : ''}
@@ -70,7 +70,7 @@ Generate a narrative segment that:
 
   // Determine budget for examples and context length
   const tokenBudget = generationParameters?.exampleTokenBudget ?? 150;
-  const contextLength = estimateTokenCount(narrativeContext?.recentSegments?.map((seg: any) => seg.content).join('\n\n') || ''); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const contextLength = estimateTokenCount(narrativeContext?.recentSegments?.map((seg) => seg.content).join('\n\n') || '');
 
   // Get examples if they should be included
   let examplesSection = '';

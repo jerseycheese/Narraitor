@@ -6,18 +6,21 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SmartTemplates } from '@/components/world/SmartTemplates';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('SmartTemplatesDev');
 
 export default function SmartTemplatesTestPage() {
   const [generatedTemplate, setGeneratedTemplate] = useState<WorldTemplate | null>(null);
   const router = useRouter();
 
   const handleTemplateGenerated = (template: WorldTemplate) => {
-    console.log('Template generated:', template);
+    logger.debug('Template generated:', template);
     setGeneratedTemplate(template);
     
     // For test harness, redirect to world creation with step parameter
     // This simulates starting at Basic Info step with template data
-    console.log('Redirecting to world creation wizard with template:', template.name);
+    logger.debug('Redirecting to world creation wizard with template:', template.name);
     
     // Store template data for the wizard to use
     const templateWizardData = {
@@ -49,19 +52,19 @@ export default function SmartTemplatesTestPage() {
       }
     };
     
-    console.log('Storing template data in sessionStorage:', templateWizardData);
+    logger.debug('Storing template data in sessionStorage:', templateWizardData);
     sessionStorage.setItem('smart-template-data', JSON.stringify(templateWizardData));
     
     // Verify storage worked
     const storedData = sessionStorage.getItem('smart-template-data');
-    console.log('Verification - stored data exists:', !!storedData);
+    logger.debug('Verification - stored data exists:', !!storedData);
     if (storedData) {
-      console.log('Verification - stored data preview:', JSON.parse(storedData).name);
+      logger.debug('Verification - stored data preview:', JSON.parse(storedData).name);
     }
     
     // Add a small delay to ensure storage is complete before navigation
     setTimeout(() => {
-      console.log('Navigating to wizard...');
+      logger.debug('Navigating to wizard...');
       router.push('/worlds/create?step=1');
     }, 100);
   };

@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import TemplateSelector from '../../../components/world/TemplateSelector/TemplateSelector';
 import { templates, WorldTemplate } from '../../../lib/templates/worldTemplates';
 import { applyWorldTemplate } from '../../../lib/templates/templateLoader';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('TemplateSelectorDev');
 
 export default function TemplateSelectorTestHarness() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
@@ -21,9 +24,9 @@ export default function TemplateSelectorTestHarness() {
       try {
         const worldId = applyWorldTemplate(selectedTemplateId);
         setAppliedTemplateId(selectedTemplateId);
-        console.log(`Applied template ${selectedTemplateId} to create world ${worldId}`);
+        logger.debug(`Applied template ${selectedTemplateId} to create world ${worldId}`);
       } catch (error) {
-        console.error('Error applying template:', error);
+        logger.error('Error applying template:', error);
       }
     }
   };
