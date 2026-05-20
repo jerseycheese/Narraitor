@@ -295,8 +295,9 @@ export const TestDataGeneratorSection: React.FC = () => {
     const storageKey = `character-creation-${currentWorld.id}`;
     const storedData = sessionStorage.getItem(storageKey);
 
+    // User-invoked diagnostic: print directly so it shows regardless of Logger level.
     if (storedData) {
-      logger.debug(
+      console.log(
         '[TestDataGenerator] Current stored data:',
         JSON.parse(storedData)
       );
@@ -304,7 +305,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         `Data found in sessionStorage for key: ${storageKey}. Check console for details.`
       );
     } else {
-      logger.debug(
+      console.log(
         '[TestDataGenerator] No data found in sessionStorage for key:',
         storageKey
       );
@@ -672,13 +673,14 @@ export const TestDataGeneratorSection: React.FC = () => {
     const worldStoreState = useWorldStore.getState();
     const characterStoreState = useCharacterStore.getState();
 
-    logger.debug('[DevTools] Current Store States:');
-    logger.debug('World Store:', {
+    // User-invoked diagnostic: print directly so it shows regardless of Logger level.
+    console.log('[DevTools] Current Store States:');
+    console.log('World Store:', {
       worldCount: Object.keys(worldStoreState.worlds).length,
       currentWorldId: worldStoreState.currentWorldId,
       worlds: worldStoreState.worlds,
     });
-    logger.debug('Character Store:', {
+    console.log('Character Store:', {
       characterCount: Object.keys(characterStoreState.characters).length,
       currentCharacterId: characterStoreState.currentCharacterId,
       characters: characterStoreState.characters,
@@ -686,10 +688,10 @@ export const TestDataGeneratorSection: React.FC = () => {
 
     // Check localStorage
     if (typeof window !== 'undefined') {
-      logger.debug('localStorage entries:');
-      logger.debug('world-store:', localStorage.getItem('world-store'));
-      logger.debug('character-store:', localStorage.getItem('character-store'));
-      logger.debug('worlds (legacy):', localStorage.getItem('worlds'));
+      console.log('localStorage entries:');
+      console.log('world-store:', localStorage.getItem('world-store'));
+      console.log('character-store:', localStorage.getItem('character-store'));
+      console.log('worlds (legacy):', localStorage.getItem('worlds'));
     }
 
     alert('Debug info logged to console. Check browser developer tools.');
