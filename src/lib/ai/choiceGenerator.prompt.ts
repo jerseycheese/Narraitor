@@ -1,4 +1,4 @@
-import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
+import { getNarrativeTemplate } from '../promptTemplates/narrativeTemplateManager';
 import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -96,7 +96,7 @@ const resolveCharacterIds = (
 const getTemplate = (templateType: string) => {
   const templateKey = `narrative/${templateType}`;
   try {
-    return narrativeTemplateManager.getTemplate(templateKey);
+    return getNarrativeTemplate(templateKey);
   } catch (error) {
     logger.error('Template not found:', templateKey, error);
     throw error;

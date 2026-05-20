@@ -37,14 +37,12 @@ jest.mock('@/state/inventoryStore', () => ({
 
 // Mock narrativeTemplateManager
 jest.mock('@/lib/promptTemplates/narrativeTemplateManager', () => ({
-  narrativeTemplateManager: {
-    getTemplate: jest.fn().mockImplementation((templateKey) => {
-      if (templateKey === 'narrative/playerChoice') {
-        return jest.fn().mockReturnValue('Generate player choices for this scenario');
-      }
-      return jest.fn();
-    })
-  }
+  getNarrativeTemplate: jest.fn().mockImplementation((templateKey) => {
+    if (templateKey === 'narrative/playerChoice') {
+      return jest.fn().mockReturnValue('Generate player choices for this scenario');
+    }
+    return jest.fn();
+  })
 }));
 
 // Generate simple mock narrative context

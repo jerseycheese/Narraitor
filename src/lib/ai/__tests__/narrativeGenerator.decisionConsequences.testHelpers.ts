@@ -8,7 +8,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
-import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useLoreStore } from '@/state/loreStore';
 import { extractStructuredLore } from '../structuredLoreExtractor';
@@ -166,7 +166,7 @@ export function setupDecisionConsequencesMocks(
   mockPlayerDecisionTracker.getRelevantDecisions.mockReturnValue(pastDecisions);
 
   // Mock template manager
-  (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+  (getNarrativeTemplate as jest.Mock).mockReturnValue(
     (context: { worldName: string; characterIds?: string[] }) =>
       `Generated prompt for ${context.worldName} with ${context.characterIds?.length || 0} characters`
   );

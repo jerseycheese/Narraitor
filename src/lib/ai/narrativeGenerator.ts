@@ -1,5 +1,5 @@
 import { AIClient } from './types';
-import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
+import { getNarrativeTemplate } from '../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import {
@@ -530,7 +530,7 @@ export class NarrativeGenerator {
 
   private getTemplate(segmentType: string) {
     const templateKey = `narrative/${segmentType}`;
-    return narrativeTemplateManager.getTemplate(templateKey);
+    return getNarrativeTemplate(templateKey);
   }
 
   private getTemplateName(segmentType: string): string {

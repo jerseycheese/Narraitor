@@ -43,9 +43,7 @@ jest.mock('@/state/npcStore', () => ({
 }));
 jest.mock('../playerDecisionTracker');
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
-  narrativeTemplateManager: {
-    getTemplate: jest.fn()
-  }
+  getNarrativeTemplate: jest.fn()
 }));
 jest.mock('../loreContextHelper', () => ({
   getLoreContextForPrompt: jest.fn(),

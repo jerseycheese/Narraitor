@@ -3,30 +3,18 @@ import type { NarrativeTemplateContext } from './templates/narrative/context';
 
 type TemplateGenerator = (context: NarrativeTemplateContext) => string;
 
-// Create a simple manager for narrative templates
-class NarrativeTemplateManager {
-  private templates: Map<string, TemplateGenerator> = new Map();
-
-  constructor() {
-    this.loadNarrativeTemplates();
-  }
-
-  private loadNarrativeTemplates() {
-    narrativeTemplates.forEach(template => {
-      if (template.generate) {
-        this.templates.set(template.id, template.generate);
-      }
-    });
-  }
-
-  getTemplate(id: string): TemplateGenerator {
-    const template = this.templates.get(id);
-    if (!template) {
-      throw new Error(`Template with id '${id}' not found`);
-    }
-
-    return template;
+const templates = new Map<string, TemplateGenerator>();
+for (const template of narrativeTemplates) {
+  if (template.generate) {
+    templates.set(template.id, template.generate);
   }
 }
 
-export const narrativeTemplateManager = new NarrativeTemplateManager();
+export function getNarrativeTemplate(id: string): TemplateGenerator {
+  const template = templates.get(id);
+  if (!template) {
+    throw new Error(`Template with id '${id}' not found`);
+  }
+
+  return template;
+}
