@@ -1,9 +1,12 @@
 /**
  * DevTools Section Visibility Storage
- * 
+ *
  * Manages localStorage persistence for DevTools section visibility preferences.
- * Provides error handling and fallback behavior for storage operations.
+ * Storage access goes through the SSR-safe browserStorage wrapper, which no-ops
+ * on the server and treats missing/corrupt values as "no value".
  */
+
+import { readJSON, writeJSON } from '@/lib/utils/browserStorage';
 
 const STORAGE_KEY = 'narraitor-devtools-section-visibility';
 
@@ -45,24 +48,6 @@ export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
 };
 
 /**
- * Check if localStorage is available and working
- */
-function isStorageAvailable(): boolean {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  try {
-    const testKey = '__storage_test__';
-    localStorage.setItem(testKey, 'test');
-    localStorage.removeItem(testKey);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Load section visibility state from localStorage
  */
 export function loadSectionVisibility(): SectionVisibility {
@@ -73,43 +58,20 @@ export function loadSectionVisibility(): SectionVisibility {
  * Load section visibility state from localStorage with custom defaults
  */
 export function loadSectionVisibilityWithDefaults(defaultVisibility: SectionVisibility): SectionVisibility {
-  if (!isStorageAvailable()) {
-    return { ...defaultVisibility };
+  const stored = readJSON<SectionVisibility | null>('local', STORAGE_KEY, null);
+
+  if (stored && typeof stored === 'object') {
+    return { ...defaultVisibility, ...stored };
   }
 
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      return { ...defaultVisibility };
-    }
-
-    const parsed = JSON.parse(stored);
-    
-    // Ensure parsed data is valid and merge with defaults
-    if (typeof parsed === 'object' && parsed !== null) {
-      return { ...defaultVisibility, ...parsed };
-    }
-    
-    return { ...defaultVisibility };
-  } catch (error) {
-    console.warn('Failed to load DevTools section visibility from localStorage:', error);
-    return { ...defaultVisibility };
-  }
+  return { ...defaultVisibility };
 }
 
 /**
  * Save section visibility state to localStorage
  */
 export function saveSectionVisibility(visibility: SectionVisibility): void {
-  if (!isStorageAvailable()) {
-    return;
-  }
-
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(visibility));
-  } catch (error) {
-    console.warn('Failed to save DevTools section visibility to localStorage:', error);
-  }
+  writeJSON('local', STORAGE_KEY, visibility);
 }
 
 /**
