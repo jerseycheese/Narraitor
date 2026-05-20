@@ -7,8 +7,10 @@ import { checkItemSimilarityClient } from '@/lib/inventory/checkItemSimilarityCl
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
 import type { InventoryItem } from '@/types/inventory.types';
+import { logger } from '@/lib/utils/logger';
 
 // Mock the dependencies
+jest.mock('@/lib/utils/logger');
 jest.mock('@/state/inventoryStore');
 jest.mock('@/lib/inventory/categorizeInventoryItemClient');
 jest.mock('@/lib/inventory/checkItemSimilarityClient');
@@ -28,12 +30,10 @@ describe('itemAcquisitionProcessor', () => {
   const mockCheckSimilarity = checkItemSimilarityClient as jest.MockedFunction<
     typeof checkItemSimilarityClient
   >;
-  let warnSpy: jest.SpyInstance;
   let characterItems: InventoryItem[];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     characterItems = [] as InventoryItem[];
 
     // Mock AI similarity checker with smart matching logic
@@ -90,9 +90,6 @@ describe('itemAcquisitionProcessor', () => {
     );
   });
 
-  afterEach(() => {
-    warnSpy?.mockRestore();
-  });
 
   describe('processAcquiredItems', () => {
     it('adds item to inventory when AI returns item metadata', async () => {
@@ -396,7 +393,7 @@ describe('itemAcquisitionProcessor', () => {
         })
       );
       expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
-      expect(warnSpy).not.toHaveBeenCalled();
+      expect(logger.warn).not.toHaveBeenCalled();
     });
 
     it('deduplicates identical equipment in the same batch and keeps one', async () => {
@@ -415,7 +412,7 @@ describe('itemAcquisitionProcessor', () => {
       await processAcquiredItems(items, 'character-123', 'session-456');
 
       expect(mockAddItem).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
     });
 
     it('merges equipment with the same name even when descriptions differ', async () => {
@@ -434,7 +431,7 @@ describe('itemAcquisitionProcessor', () => {
       await processAcquiredItems(items, 'character-123', 'session-456');
 
       expect(mockAddItem).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
       const storedDescription = characterItems[0]?.description;
       expect(storedDescription === 'Sharp edge' || storedDescription === 'Rusty blade').toBe(true);
     });
@@ -479,7 +476,7 @@ describe('itemAcquisitionProcessor', () => {
 
       expect(mockAddItem).toHaveBeenCalledTimes(1);
       expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
-      expect(warnSpy).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
     });
 
     it('prevents duplicate equipment even if AI category changes across segments', async () => {
@@ -507,7 +504,7 @@ describe('itemAcquisitionProcessor', () => {
 
       expect(mockAddItem).toHaveBeenCalledTimes(1);
       expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
-      expect(warnSpy).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
     });
 
     it('deduplicates equipment with semantically similar names (e.g., "Lantern" vs "Rusty Kerosene Lantern")', async () => {
@@ -534,7 +531,7 @@ describe('itemAcquisitionProcessor', () => {
 
       // Should only add once (first item)
       expect(mockAddItem).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalledWith(
+      expect(logger.warn).toHaveBeenCalledWith(
         expect.stringContaining('Item "Lantern" already exists')
       );
     });

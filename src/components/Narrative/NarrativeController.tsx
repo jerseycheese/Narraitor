@@ -115,7 +115,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     if (process.env.NODE_ENV === 'production') return;
     if (warnedMissingSessionIdRef.current) return;
     warnedMissingSessionIdRef.current = true;
-    console.warn(
+    logger.warn(
       `[NarrativeController] Missing sessionId; skipping ${context} generation.`
     );
   }, []);
@@ -416,7 +416,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
             const decisionCopy = structuredClone(decision);
             onChoicesGenerated(decisionCopy);
           } catch (error) {
-            console.error('Error calling onChoicesGenerated callback:', error);
+            logger.error('Error calling onChoicesGenerated callback:', error);
           }
         }
       }
@@ -925,7 +925,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
               skillCheckTags.push(`skill-roll:${rollResult.diceRoll}`);
             } catch (error) {
-              console.error('Skill check failed:', error);
+              logger.error('Skill check failed:', error);
               skillCheckTags.push(`skill-error:${requirement.targetId}`);
             }
           }

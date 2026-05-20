@@ -5,6 +5,9 @@ import { AIResponse, AIServiceConfig, AIClient } from './types';
 import { isRetryableError } from '@/lib/utils/errorUtils';
 import { getGenerationConfig, getSafetySettings } from './config';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('GeminiClient');
+
 /**
  * Client for Google Gemini AI service
  * Using the new @google/genai SDK
@@ -78,7 +81,7 @@ export class GeminiClient implements AIClient {
         completionTokens: undefined
       };
     } catch (error) {
-      console.error('GEMINI API: Request failed:', error);
+      logger.error('GEMINI API: Request failed:', error);
       throw error;
     }
   }

@@ -25,6 +25,9 @@ import {
   type CharacterDeletedEvent,
 } from '@/lib/state/storePubSub';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('InventoryStore');
+
 export interface InventoryStore extends CrudStore<InventoryItem> {
   items: Record<EntityID, InventoryItem>;
   characterInventories: Record<EntityID, EntityID[]>;
@@ -237,7 +240,7 @@ const createJournalEntryForAcquisition = async (
     journalStore.addEntry(sessionId, journalEntry);
   } catch (error) {
     // Silently fail journal entry creation - don't block inventory operations
-    console.warn('Failed to create journal entry for item acquisition:', error);
+    logger.warn('Failed to create journal entry for item acquisition:', error);
   }
 };
 

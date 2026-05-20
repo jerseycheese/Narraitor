@@ -1,6 +1,9 @@
 import { EntityID } from '@/types/common.types';
 import { World } from '@/types/world.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('SkillAllocation');
+
 export interface WizardSkillData {
   skillId: EntityID;
   name: string;
@@ -32,7 +35,7 @@ const DEFAULT_MIN_LEVEL = 1;
 
 const warnMissingWorldSkill = (skillId: EntityID, message: string) => {
   if (process.env.NODE_ENV !== 'production') {
-    console.warn(`[CharacterCreationWizard] ${message}`, { skillId });
+    logger.warn(`[CharacterCreationWizard] ${message}`, { skillId });
   }
 };
 

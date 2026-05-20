@@ -19,6 +19,9 @@ import {
   runQueued,
 } from './itemProcessorShared';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ItemAcquisitionProcessor');
+
 type PreparedItem = AcquiredItemMetadata & {
   normalizedName: string;
   normalizedDescription: string;
@@ -78,7 +81,7 @@ export async function processAcquiredItems(
               inventoryStore.updateItemQuantity(existingMatch.id, newQuantity);
 
               if (matchResult.matchedBySoft) {
-                console.warn(
+                logger.warn(
                   `Merged stackable item "${item.normalizedName}" despite category mismatch due to identical name/description.`
                 );
               }
@@ -86,14 +89,14 @@ export async function processAcquiredItems(
               continue;
             }
 
-            console.warn(
+            logger.warn(
               `Item "${item.normalizedName}" was categorized as stackable but matches existing equipment. Skipping duplicate addition.`
             );
             continue;
           }
 
           if (!item.stackable && existingMatch) {
-            console.warn(
+            logger.warn(
               `Item "${item.normalizedName}" already exists in inventory. Skipping duplicate addition.`
             );
             continue;
@@ -113,12 +116,12 @@ export async function processAcquiredItems(
           await delayBetweenItems(i, deduplicatedItems.length);
         } catch (err) {
           // Log error but continue processing remaining items
-          console.error(`Failed to add item "${item.name}" to inventory:`, err);
+          logger.error(`Failed to add item "${item.name}" to inventory:`, err);
         }
       }
     },
-    (err) => console.error('Previous item acquisition run failed', err),
-    (err) => console.error('processAcquiredItems encountered an unexpected error', err)
+    (err) => logger.error('Previous item acquisition run failed', err),
+    (err) => logger.error('processAcquiredItems encountered an unexpected error', err)
   );
 }
 
@@ -254,7 +257,7 @@ async function deduplicateBatch(items: PreparedItem[]): Promise<PreparedItem[]> 
       }
 
       if (existing.acquisitionMethod && item.acquisitionMethod && existing.acquisitionMethod !== item.acquisitionMethod) {
-        console.warn(
+        logger.warn(
           `Stackable item "${item.normalizedName}" had differing acquisition methods within the same batch. Using "${existing.acquisitionMethod}".`
         );
       }
@@ -276,7 +279,7 @@ async function deduplicateBatch(items: PreparedItem[]): Promise<PreparedItem[]> 
       allItems[existingIndex].item = mergedItem;
     }
 
-    console.warn(
+    logger.warn(
       `Duplicate equipment item detected in batch: "${item.normalizedName}". Keeping one entry and merging details.`
     );
   }
@@ -344,7 +347,7 @@ async function addItemToInventory(
 
   if (itemId) {
     itemImageService.generateForItem(itemId, characterId).catch((error) => {
-      console.warn(`Background image generation failed for item: ${item.normalizedName}`, error);
+      logger.warn(`Background image generation failed for item: ${item.normalizedName}`, error);
     });
   }
 }

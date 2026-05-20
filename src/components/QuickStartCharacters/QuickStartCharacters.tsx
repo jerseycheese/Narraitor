@@ -24,6 +24,9 @@ import { wizardStyles } from '@/components/shared/wizard';
 import { Loader2, Sparkles, Plus } from 'lucide-react';
 import { getGenreLabel } from '@/lib/constants/genres';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('QuickStartCharacters');
+
 const SELECTION_DELAY_MS = 300;
 
 export interface QuickStartCharactersProps {
@@ -66,7 +69,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      console.error('QuickStartCharacters archetype generation failed:', {
+      logger.error('QuickStartCharacters archetype generation failed:', {
         error: err,
         world: world.name,
         genre: world.genre,
@@ -112,7 +115,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       );
       handleArchetypeSelect(randomArchetype);
     } catch (err) {
-      console.error(
+      logger.error(
         'QuickStartCharacters random archetype generation failed:',
         {
           error: err,

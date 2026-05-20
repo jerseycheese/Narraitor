@@ -4,6 +4,9 @@ import { World } from '../../types/world.types';
 import { GeneratedImage } from '../../types/common.types';
 import { getTimestamp } from '@/lib/utils';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('WorldImageGenerator');
+
 function buildPrompt(world: World): string {
   const styleModifiers = 'Wide-angle high-detail photograph of';
 
@@ -99,7 +102,7 @@ export async function generateWorldImage(world: World, customPrompt?: string): P
       prompt: data.prompt || prompt
     };
   } catch (error) {
-    console.error('World image generation error:', error);
+    logger.error('World image generation error:', error);
     throw error;
   }
 }

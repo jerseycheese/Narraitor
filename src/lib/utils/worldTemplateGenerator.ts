@@ -4,6 +4,9 @@ import { World, CharacterTemplate } from '@/types/world.types';
 import { generateCharacterArchetypes } from './characterArchetypes';
 import { generateUniqueId } from './generateId';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('WorldTemplateGenerator');
+
 /**
  * Generate character templates for a world using existing archetype logic
  *
@@ -58,7 +61,7 @@ export async function generateWorldCharacterTemplates(
     );
 
     if (totalAttributePoints > attributePointPool) {
-      console.warn(
+      logger.warn(
         `Template "${template.name}" exceeds attribute point pool: ${totalAttributePoints} > ${attributePointPool}`
       );
     }

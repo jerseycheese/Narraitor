@@ -13,14 +13,20 @@ import type { EntityID } from '@/types/common.types';
 import { normalizeText, NORM_NAME } from '@/lib/utils/textNormalization';
 
 // Mock logger to suppress output during tests
-jest.mock('@/lib/utils/logger', () => ({
-  logger: {
+jest.mock('@/lib/utils/logger', () => {
+  const methods = {
     info: jest.fn(),
     debug: jest.fn(),
     error: jest.fn(),
     warn: jest.fn(),
-  },
-}));
+  };
+  return {
+    __esModule: true,
+    logger: methods,
+    Logger: jest.fn().mockImplementation(() => methods),
+    default: jest.fn().mockImplementation(() => methods),
+  };
+});
 
 describe('Lore Extraction Hardening Logic', () => {
   // Test Suite 1: Character Name Validation

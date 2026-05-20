@@ -11,6 +11,9 @@ import {
 } from '@/lib/constants/characterArchetypeTemplates';
 import type { CharacterArchetype } from '@/types/archetype.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('CharacterArchetypes');
+
 export type { CharacterArchetype };
 export type ArchetypeTemplate = ImportedArchetypeTemplate;
 
@@ -87,7 +90,7 @@ export async function generateCharacterArchetypes(
       
       archetypes.push(archetype);
     } catch (error) {
-      console.error(`Failed to generate archetype for template ${template.name}:`, error);
+      logger.error(`Failed to generate archetype for template ${template.name}:`, error);
       throw new Error(`Failed to generate archetype for ${template.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

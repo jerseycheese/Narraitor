@@ -23,7 +23,9 @@ const eslintConfig = [
     },
     rules: {
       "design-tokens/no-hardcoded-colors": "error",
-      "no-console": ["error", { "allow": ["warn", "error"] }],
+      // Route all production logging through the Logger utility (src/lib/utils/logger.ts).
+      // Dev tools, tests, and stories are overridden below.
+      "no-console": "error",
       "@typescript-eslint/no-unused-vars": ["warn", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_",
@@ -44,6 +46,7 @@ const eslintConfig = [
       "**/*.stories.helpers.{js,jsx,ts,tsx}",
       "src/app/dev/**/*.{js,jsx,ts,tsx}",
       "src/components/devtools/**/*.{js,jsx,ts,tsx}",
+      "src/lib/devtools/**/*.{js,jsx,ts,tsx}",
       "src/lib/design-tokens/**/*.{js,jsx,ts,tsx}",
       "src/stories/**/*.{js,jsx,ts,tsx}"
     ],

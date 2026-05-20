@@ -4,12 +4,14 @@ import { generateWorldCharacterTemplates } from '../worldTemplateGenerator';
 import { World, CharacterArchetype } from '@/types/world.types';
 import * as characterArchetypes from '../characterArchetypes';
 import { createMockWorld, createMockWorldAttribute, createMockWorldSkill } from '@/lib/test-utils';
+import { logger } from '@/lib/utils/logger';
 
 // Mock the characterArchetypes module
 jest.mock('../characterArchetypes', () => ({
   ...jest.requireActual('../characterArchetypes'),
   generateCharacterArchetypes: jest.fn(),
 }));
+jest.mock('@/lib/utils/logger');
 
 describe('worldTemplateGenerator', () => {
   describe('generateWorldCharacterTemplates', () => {
@@ -203,8 +205,6 @@ describe('worldTemplateGenerator', () => {
     });
 
     test('should warn if template exceeds attribute point pool', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-
       const archetypesExceedingPool = [
         {
           ...mockArchetypes[0],
@@ -221,26 +221,19 @@ describe('worldTemplateGenerator', () => {
 
       await generateWorldCharacterTemplates(mockWorld);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(logger.warn).toHaveBeenCalledWith(
         expect.stringContaining('exceeds attribute point pool')
       );
-
-      consoleSpy.mockRestore();
     });
 
     test('should not warn if templates respect attribute point pool', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-
       // Default mock archetypes respect the pool (13 and 13)
       await generateWorldCharacterTemplates(mockWorld);
 
-      expect(consoleSpy).not.toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
+      expect(logger.warn).not.toHaveBeenCalled();
     });
 
     test('should handle world with no settings gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const worldWithoutSettings = { ...mockWorld, settings: undefined as any };
 
@@ -249,9 +242,7 @@ describe('worldTemplateGenerator', () => {
 
       expect(templates).toHaveLength(3);
       // When settings is undefined, point pool defaults to 0, so warnings are expected
-      expect(consoleSpy).toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
+      expect(logger.warn).toHaveBeenCalled();
     });
 
     test('should produce deterministic results for same world', async () => {

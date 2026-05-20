@@ -1,3 +1,7 @@
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('StorePubSub');
+
 /**
  * Pub-Sub Event System for Store Communication
  *
@@ -44,7 +48,7 @@ export class StoreEventBus {
         try {
           await callback(data);
         } catch (error) {
-          console.error(`Error in event handler for "${event}":`, error);
+          logger.error(`Error in event handler for "${event}":`, error);
         }
       })
     );

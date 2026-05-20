@@ -4,6 +4,9 @@ import { generateCharacter } from '@/lib/ai/characterGenerator';
 import { World } from '@/types/world.types';
 import { validateWorld } from '@/lib/utils/typeGuards';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('GenerateCharacter');
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -41,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(generatedCharacter);
   } catch (error) {
-    console.error('Character generation error:', error);
+    logger.error('Character generation error:', error);
 
     return createAPIErrorResponse(
       error instanceof Error ? error : new Error('Character generation failed'),

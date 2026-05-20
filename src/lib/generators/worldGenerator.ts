@@ -4,6 +4,9 @@ import { normalizeGenre } from '@/lib/constants/genres';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 import { validateWorldAttribute, validateWorldSkill, validateWorldSettings } from '@/lib/utils/typeGuards';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('WorldGenerator');
+
 // Default fallback values for AI validation failures
 const DEFAULT_WORLD_ATTRIBUTE = {
   name: 'Strength',
@@ -298,7 +301,7 @@ Make the world interesting and playable with concepts appropriate to the setting
         // Validate the constructed attribute
         const validation = validateWorldAttribute(attribute);
         if (!validation.valid) {
-          console.warn(`AI generated invalid attribute "${attribute.name}":`, validation.errors[0]);
+          logger.warn(`AI generated invalid attribute "${attribute.name}":`, validation.errors[0]);
           // Return a safe default attribute
           return { ...DEFAULT_WORLD_ATTRIBUTE };
         }
@@ -333,7 +336,7 @@ Make the world interesting and playable with concepts appropriate to the setting
         // Validate the constructed skill
         const validation = validateWorldSkill(skillData);
         if (!validation.valid) {
-          console.warn(`AI generated invalid skill "${skillData.name}":`, validation.errors[0]);
+          logger.warn(`AI generated invalid skill "${skillData.name}":`, validation.errors[0]);
           // Return a safe default skill
           return { ...DEFAULT_WORLD_SKILL };
         }
@@ -361,7 +364,7 @@ Make the world interesting and playable with concepts appropriate to the setting
       // Validate the constructed settings
       const settingsValidation = validateWorldSettings(settings);
       if (!settingsValidation.valid) {
-        console.warn('AI generated invalid world settings:', settingsValidation.errors[0]);
+        logger.warn('AI generated invalid world settings:', settingsValidation.errors[0]);
         // Use safe default settings
         settings.maxAttributes = Math.max(4, attributes.length);
         settings.maxSkills = Math.max(6, skills.length);
@@ -382,7 +385,7 @@ Make the world interesting and playable with concepts appropriate to the setting
       
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error during world generation');
-      console.error(`World generation attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message);
+      logger.error(`World generation attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message);
       
       // If this is not the last attempt, continue to retry
       if (attempt < MAX_RETRIES) {
@@ -392,6 +395,6 @@ Make the world interesting and playable with concepts appropriate to the setting
   }
   
   // If we get here, all retries failed
-  console.error('Failed to generate world after all retries:', lastError);
+  logger.error('Failed to generate world after all retries:', lastError);
   throw new Error('Failed to generate world configuration. Please try again.');
 }

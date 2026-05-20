@@ -19,6 +19,9 @@ import { Character } from '@/types/character.types';
 import { WorldSkill } from '@/types/world.types';
 import { SkillCheckRoll } from '@/types/narrative.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('SkillCheckEvaluator');
+
 // ============================================================================
 // DICE ROLLER
 // ============================================================================
@@ -121,7 +124,7 @@ export function evaluateSkillCheck(
     // AI generated a skill check for a skill that doesn't exist in this world
     // Return automatic failure instead of throwing
     const attemptedSkillName = skillCheck.skillName || skillCheck.skillId || 'Unknown Skill';
-    console.warn(`Skill not found: ${attemptedSkillName} - treating as automatic failure`);
+    logger.warn(`Skill not found: ${attemptedSkillName} - treating as automatic failure`);
     return {
       skillId: skillCheck.skillId || '',
       skillName: attemptedSkillName,
@@ -241,7 +244,7 @@ function findWorldSkill(
   if (skillIdentifier.skillId) {
     const found = worldSkills.find(ws => ws.id === skillIdentifier.skillId) || null;
     if (!found) {
-      console.warn(`[findWorldSkill] No match for skillId: "${skillIdentifier.skillId}". Available skill IDs:`, worldSkills.map(ws => ws.id));
+      logger.warn(`[findWorldSkill] No match for skillId: "${skillIdentifier.skillId}". Available skill IDs:`, worldSkills.map(ws => ws.id));
     }
     return found;
   }
@@ -249,7 +252,7 @@ function findWorldSkill(
   if (skillIdentifier.skillName) {
     const found = worldSkills.find(ws => ws.name === skillIdentifier.skillName) || null;
     if (!found) {
-      console.warn(`[findWorldSkill] No match for skillName: "${skillIdentifier.skillName}". Available skill names:`, worldSkills.map(ws => ws.name));
+      logger.warn(`[findWorldSkill] No match for skillName: "${skillIdentifier.skillName}". Available skill names:`, worldSkills.map(ws => ws.name));
     }
     return found;
   }

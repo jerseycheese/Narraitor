@@ -39,6 +39,9 @@ import { useTutorial } from '@/components/TutorialProvider';
 import { tourStepToWizardStep } from '@/lib/tutorial/worldCreationTour';
 import { safeJsonParse } from '@/lib/safeJsonParse';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('WorldCreationWizard');
+
 type PersistedWorldSummary = {
   id: string;
   name?: string;
@@ -270,7 +273,7 @@ export default function WorldCreationWizard({
         aiSuggestionMeta: buildSuggestionMeta(description, 'ai'),
       });
     } catch (error) {
-      console.error('Error generating suggestions:', error);
+      logger.error('Error generating suggestions:', error);
       
       // Use default suggestions as fallback
       const defaultSuggestions = getDefaultSuggestions();
@@ -394,7 +397,7 @@ export default function WorldCreationWizard({
           const { generateCharacterTemplates } = useWorldStore.getState();
           await generateCharacterTemplates(worldId);
         } catch (error) {
-          console.error('[WorldCreationWizard] Failed to generate character templates:', error);
+          logger.error('[WorldCreationWizard] Failed to generate character templates:', error);
           // Don't block world creation if template generation fails
         }
       };
@@ -413,7 +416,7 @@ export default function WorldCreationWizard({
               useWorldStore.getState().updateWorld(worldId, { image });
             }
           } catch (error) {
-            console.error('[WorldCreationWizard] Failed to generate world image:', error);
+            logger.error('[WorldCreationWizard] Failed to generate world image:', error);
           }
         };
         
@@ -446,7 +449,7 @@ export default function WorldCreationWizard({
       wizard.goNext();
     } catch (error) {
       // Fallback error handling — log so failures are observable
-      console.error('[WorldCreationWizard] handleComplete failed, using fallback world id:', error);
+      logger.error('[WorldCreationWizard] handleComplete failed, using fallback world id:', error);
       const worldId = `world-${Date.now()}`;
       if (typeof window !== 'undefined') {
         const worlds = safeJsonParse<PersistedWorldSummary[]>(

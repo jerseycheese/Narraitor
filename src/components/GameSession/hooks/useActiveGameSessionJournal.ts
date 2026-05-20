@@ -5,6 +5,9 @@ import { useJournalStore } from '@/state/journalStore';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { safeTrim, truncate, getTimestamp } from '@/lib/utils';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('UseActiveGameSessionJournal');
+
 const YOU_PREFIX_REGEX = /^you\s+/i; // Remove leading "you" (case-insensitive) and following whitespace
 const QUESTION_MARK_SUFFIX_REGEX = /\?$/; // Remove trailing question mark
 const GENERIC_PROMPT_REGEX = /^what will you do(\b.*)?$/i;
@@ -69,7 +72,7 @@ export const useActiveGameSessionJournal = ({
         }
       }
     } catch (error) {
-      console.warn('Failed to generate AI summary for journal entry:', error);
+      logger.warn('Failed to generate AI summary for journal entry:', error);
     }
 
     // Return fallback values using decision weight for significance
@@ -131,7 +134,7 @@ export const useActiveGameSessionJournal = ({
         updatedAt: getTimestamp(),
       });
     } catch (error) {
-      console.warn('Failed to create decision journal entry:', error);
+      logger.warn('Failed to create decision journal entry:', error);
     }
   }, [addEntry, characterId, sessionId, worldId]);
 
@@ -164,10 +167,10 @@ export const useActiveGameSessionJournal = ({
           updatedAt: getTimestamp(),
         });
       } catch (error) {
-        console.warn('Failed to create journal entry from narrative segment:', error);
+        logger.warn('Failed to create journal entry from narrative segment:', error);
       }
     }).catch(error => {
-      console.warn('Failed to generate journal summary, using fallback:', error);
+      logger.warn('Failed to generate journal summary, using fallback:', error);
       // Use fallback if AI completely fails
       try {
         const fallbackSignificance = relatedDecisionWeight || 'minor';
@@ -189,7 +192,7 @@ export const useActiveGameSessionJournal = ({
           updatedAt: getTimestamp(),
         });
       } catch (fallbackError) {
-        console.warn('Failed to create fallback journal entry:', fallbackError);
+        logger.warn('Failed to create fallback journal entry:', fallbackError);
       }
     });
   }, [addEntry, characterId, createFallbackSummary, generateJournalSummary, sessionId, worldId]);

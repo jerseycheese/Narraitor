@@ -9,6 +9,9 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('SessionCleanup');
+
 /**
  * Clean up all data associated with a session
  * 
@@ -80,6 +83,6 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
 
   // Log any errors that occurred
   if (errors.length > 0) {
-    console.error('Error during session cleanup:', errors);
+    logger.error('Error during session cleanup:', errors);
   }
 }
