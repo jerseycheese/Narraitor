@@ -26,6 +26,7 @@ import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import { processLostItems } from '@/lib/narrative/itemLossProcessor';
+import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { logger } from '@/lib/utils/logger';
 import { useInventoryStore } from '@/state/inventoryStore';
@@ -191,6 +192,32 @@ export class NarrativeGenerator {
       );
 
       result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
+
+      if (
+        (!result.metadata.itemsLost || result.metadata.itemsLost.length === 0) &&
+        result.content
+      ) {
+        const inferredLosses = inferItemsLostFromNarrative(
+          result.content,
+          characterInventory
+        );
+
+        if (inferredLosses.length > 0) {
+          logger.info(
+            `Inferred ${inferredLosses.length} item losses from narrative in generateSegment`,
+            {
+              items: inferredLosses.map((i) => i.name),
+            }
+          );
+          result = {
+            ...result,
+            metadata: {
+              ...result.metadata,
+              itemsLost: inferredLosses,
+            },
+          };
+        }
+      }
 
       try {
         checkAndRecordLoreMentions(request.worldId, request.sessionId, result.content ?? '', 'narrative');
@@ -399,6 +426,32 @@ export class NarrativeGenerator {
 
       result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
 
+      if (
+        (!result.metadata.itemsLost || result.metadata.itemsLost.length === 0) &&
+        result.content
+      ) {
+        const inferredLosses = inferItemsLostFromNarrative(
+          result.content,
+          characterInventory
+        );
+
+        if (inferredLosses.length > 0) {
+          logger.info(
+            `Inferred ${inferredLosses.length} item losses from narrative in generateInitialScene`,
+            {
+              items: inferredLosses.map((i) => i.name),
+            }
+          );
+          result = {
+            ...result,
+            metadata: {
+              ...result.metadata,
+              itemsLost: inferredLosses,
+            },
+          };
+        }
+      }
+
       try {
         checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
       } catch (error) {
@@ -574,6 +627,36 @@ export class NarrativeGenerator {
       );
 
       result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
+
+      if (
+        (!result.metadata.itemsLost || result.metadata.itemsLost.length === 0) &&
+        result.content
+      ) {
+        const characterIdForLoss = characterIds[0];
+        const currentInventory = characterIdForLoss
+          ? useInventoryStore.getState().getCharacterItems(characterIdForLoss)
+          : [];
+        const inferredLosses = inferItemsLostFromNarrative(
+          result.content,
+          currentInventory
+        );
+
+        if (inferredLosses.length > 0) {
+          logger.info(
+            `Inferred ${inferredLosses.length} item losses from narrative in generateSkillAcknowledgment`,
+            {
+              items: inferredLosses.map((i) => i.name),
+            }
+          );
+          result = {
+            ...result,
+            metadata: {
+              ...result.metadata,
+              itemsLost: inferredLosses,
+            },
+          };
+        }
+      }
 
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
         const characterId = characterIds[0];
