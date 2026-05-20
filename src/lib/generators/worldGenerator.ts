@@ -50,27 +50,6 @@ export interface WorldGenerationOptions {
   additionalContext?: string; // Additional user-provided context for original worlds
 }
 
-// List of TV/movie universes for AI inspiration
-export const TV_MOVIE_UNIVERSES = [
-  'Game of Thrones',
-  'Lord of the Rings',
-  'Star Wars',
-  'Twin Peaks',
-  'Stranger Things',
-  'Deadwood',
-  'The Walking Dead',
-  'Black Mirror',
-  'The Matrix',
-  'Mad Max',
-  'Westworld',
-  'Star Trek',
-  'Dune',
-  'The Mandalorian',
-  'Breaking Bad',
-  'True Detective'
-];
-
-
 /**
  * Unified world generation function
  */
