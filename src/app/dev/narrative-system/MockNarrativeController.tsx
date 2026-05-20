@@ -3,6 +3,9 @@ import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('MockNarrativeController');
 
 interface MockNarrativeControllerProps {
   worldId: string;
@@ -30,26 +33,26 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
 
   // Load existing segments on mount
   useEffect(() => {
-    console.log(`[MockNarrativeController] Initializing for session ${sessionId}`);
+    logger.debug(`[MockNarrativeController] Initializing for session ${sessionId}`);
     
     const existingSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
-    console.log(`[MockNarrativeController] Found ${existingSegments.length} existing segments`);
+    logger.debug(`[MockNarrativeController] Found ${existingSegments.length} existing segments`);
     
     // Check for initial scenes to avoid duplication using 'intro' or 'opening' tags
     const hasInitialScene = existingSegments.some(segment =>
       segment.metadata?.tags?.some(tag => ['intro', 'opening'].includes(tag))
     );
     
-    console.log(`[MockNarrativeController] Has initial scene: ${hasInitialScene}`);
+    logger.debug(`[MockNarrativeController] Has initial scene: ${hasInitialScene}`);
     
     // If we have an initial scene already, make sure we don't generate another
     if (hasInitialScene) {
       setHasGeneratedInitial(true);
-      console.log('[MockNarrativeController] Marked initial generation as completed');
+      logger.debug('[MockNarrativeController] Marked initial generation as completed');
     } else {
       // Reset state for new sessions
       setHasGeneratedInitial(false);
-      console.log('[MockNarrativeController] Reset initial generation flag');
+      logger.debug('[MockNarrativeController] Reset initial generation flag');
     }
     
     // Update segments state
@@ -63,23 +66,23 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
     
     // Cleanup function - important for unmounting properly
     return () => {
-      console.log(`[MockNarrativeController] Unmounting controller for session ${sessionId}`);
+      logger.debug(`[MockNarrativeController] Unmounting controller for session ${sessionId}`);
     };
   }, [sessionId]);
 
   // Function to generate a narrative segment
   const generateNarrative = useCallback((isInitial: boolean, currentChoiceId?: string) => {
     if (isLoading) {
-      console.log('Already loading, skipping generation');
+      logger.debug('Already loading, skipping generation');
       return;
     }
     
-    console.log(`Starting narrative generation: ${isInitial ? 'Initial Scene' : 'Choice Response'}`);
+    logger.debug(`Starting narrative generation: ${isInitial ? 'Initial Scene' : 'Choice Response'}`);
     setIsLoading(true);
     
     // Simulate async generation with clear log messages
     setTimeout(() => {
-      console.log('Generating narrative content after timeout');
+      logger.debug('Generating narrative content after timeout');
       const choice = currentChoiceId || 'explore';
       
       // Sample theme-specific content for Western theme
@@ -103,7 +106,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
         }
       };
       
-      console.log('Created new segment:', newSegment.id);
+      logger.debug('Created new segment:', newSegment.id);
       
       // Add to local state
       setSegments(prev => [...prev, newSegment]);
@@ -116,13 +119,13 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
         );
 
         if (hasExistingInitialScene) {
-          console.log('[MockNarrativeController] Detected existing initial scene, skipping store update');
+          logger.debug('[MockNarrativeController] Detected existing initial scene, skipping store update');
           return; // Skip adding a duplicate
         }
       }
       
       // Add to store
-      console.log(`[MockNarrativeController] Adding segment to store: ${newSegment.id}`);
+      logger.debug(`[MockNarrativeController] Adding segment to store: ${newSegment.id}`);
       useNarrativeStore.getState().addSegment(sessionId, {
         content: newSegment.content,
         type: newSegment.type,
@@ -132,7 +135,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
         metadata: newSegment.metadata
       });
       
-      console.log('Setting loading to false');
+      logger.debug('Setting loading to false');
       setIsLoading(false);
       
       if (currentChoiceId) {
@@ -145,17 +148,17 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
-        console.log('Called onNarrativeGenerated callback');
+        logger.debug('Called onNarrativeGenerated callback');
       }
     }, 2000); // Increased to 2 seconds to make loading state more visible
   }, [isLoading, sessionId, worldId, onNarrativeGenerated]);
 
   // Handle initial narrative generation
   useEffect(() => {
-    console.log('Trigger check:', { triggerGeneration, hasGeneratedInitial, segmentsLength: segments.length });
+    logger.debug('Trigger check:', { triggerGeneration, hasGeneratedInitial, segmentsLength: segments.length });
     
     if (triggerGeneration && !hasGeneratedInitial && segments.length === 0) {
-      console.log('Generating initial narrative in MockNarrativeController');
+      logger.debug('Generating initial narrative in MockNarrativeController');
       generateNarrative(true);
     }
   }, [triggerGeneration, hasGeneratedInitial, segments.length, generateNarrative]);
@@ -175,7 +178,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
     );
 
     if (initialScenes.length > 1) {
-      console.log(`[MockNarrativeController] Found ${initialScenes.length} initial scenes, deduplicating`);
+      logger.debug(`[MockNarrativeController] Found ${initialScenes.length} initial scenes, deduplicating`);
 
       // Sort by timestamp (newest first)
       initialScenes.sort((a, b) =>
@@ -184,7 +187,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
 
       // Keep only the newest initial scene
       const keepScene = initialScenes[0];
-      console.log(`[MockNarrativeController] Keeping initial scene ID: ${keepScene.id}`);
+      logger.debug(`[MockNarrativeController] Keeping initial scene ID: ${keepScene.id}`);
 
       // Filter out all other initial scenes
       const filteredSegments = segments.filter(segment =>

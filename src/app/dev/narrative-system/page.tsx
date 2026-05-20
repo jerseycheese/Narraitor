@@ -8,6 +8,9 @@ import { World } from '@/types/world.types';
 // PlayerChoice import removed as it's not needed
 import { NarrativeSegment } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('NarrativeSystemDev');
 
 // Mock world for testing - Western theme to match test plan
 const mockWorld: World = {
@@ -79,15 +82,15 @@ export default function NarrativeSystemHarness() {
 
   const handleGenerateNarrative = () => {
     if (showController) {
-      console.log('Triggering narrative generation via controller');
+      logger.debug('Triggering narrative generation via controller');
       setTriggerGeneration(true);
       // Reset trigger after a longer delay to ensure it's processed
       setTimeout(() => {
         setTriggerGeneration(false);
-        console.log('Reset trigger generation flag');
+        logger.debug('Reset trigger generation flag');
       }, 500);
     } else {
-      console.log('Manually generating narrative');
+      logger.debug('Manually generating narrative');
       // Manual generation for history view
       const content = segments.length === 0
         ? 'You find yourself at the entrance of a mysterious cave. The air is cool and damp, and you can hear the distant sound of dripping water echoing from within.'
@@ -170,7 +173,7 @@ export default function NarrativeSystemHarness() {
       setTimeout(() => setShowController(true), 50);
     }
     
-    console.log('Session cleared');
+    logger.debug('Session cleared');
   };
 
   const handleNewSession = () => {
@@ -187,7 +190,7 @@ export default function NarrativeSystemHarness() {
     // to prevent duplications
     useNarrativeStore.getState().clearSessionSegments(newSessionId);
     
-    console.log(`New session created and cleared: ${newSessionId}`);
+    logger.debug(`New session created and cleared: ${newSessionId}`);
     
     // Force a component refresh if in controller mode - wait a bit longer
     if (showController) {
@@ -199,7 +202,7 @@ export default function NarrativeSystemHarness() {
         
         // Set trigger AFTER controller is mounted
         setTimeout(() => {
-          console.log('Triggering generation for new session');
+          logger.debug('Triggering generation for new session');
           setTriggerGeneration(true);
           
           // Reset trigger after a reasonable delay
@@ -208,7 +211,7 @@ export default function NarrativeSystemHarness() {
       }, 300);
     } else {
       // For manual mode, no trigger needed
-      console.log('Ready for manual generation in new session');
+      logger.debug('Ready for manual generation in new session');
     }
   };
 
@@ -275,7 +278,7 @@ export default function NarrativeSystemHarness() {
               triggerGeneration={triggerGeneration}
               choiceId={selectedChoice || undefined}
               onNarrativeGenerated={(segment) => {
-                console.log('Narrative generated:', segment);
+                logger.debug('Narrative generated:', segment);
               }}
             />
           ) : (
