@@ -1,8 +1,8 @@
-import { NarrativeSegment } from '../../../../types/narrative.types';
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
+import type { NarrativeTemplateContext } from './context';
 
-export const sceneTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+export const sceneTemplate = (context: NarrativeTemplateContext) => {
   const {
     worldName,
     genre,
@@ -17,7 +17,7 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
 
   const segmentType = generationParameters?.segmentType || 'scene';
   const recentSegments = narrativeContext?.recentSegments || [];
-  const recentContent = recentSegments.map((seg: NarrativeSegment, i: number) => 
+  const recentContent = recentSegments.map((seg, i: number) =>
     `[Scene ${recentSegments.length - i}]: ${seg.content}`
   ).join('\n\n');
   const currentTags = narrativeContext?.currentTags || [];

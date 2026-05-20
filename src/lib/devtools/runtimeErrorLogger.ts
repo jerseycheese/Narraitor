@@ -27,7 +27,7 @@ interface LogErrorOptions {
 /**
  * Runtime error logger class
  */
-export class RuntimeErrorLogger {
+class RuntimeErrorLogger {
   private errors: Map<string, RuntimeError> = new Map();
   private errorBySignature: Map<string, string> = new Map(); // signature -> errorId
 

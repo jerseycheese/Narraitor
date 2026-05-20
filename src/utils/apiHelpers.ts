@@ -10,7 +10,7 @@ const logger = new Logger('ApiHelpers');
 /**
  * Get client IP address from request headers
  */
-export function getClientIP(request: NextRequest): string {
+function getClientIP(request: NextRequest): string {
   // Check various headers that might contain the real IP
   return (
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -25,7 +25,7 @@ export function getClientIP(request: NextRequest): string {
  * Handle rate limiting for API requests
  * Returns both the rate limit result and a NextResponse if rate limit is exceeded
  */
-export function handleRateLimiting(request: NextRequest): {
+function handleRateLimiting(request: NextRequest): {
   response: NextResponse | null;
   result: RateLimitResult;
 } {
@@ -58,7 +58,7 @@ export function handleRateLimiting(request: NextRequest): {
 /**
  * Validate basic request structure for AI endpoints
  */
-export async function validateAIRequest(request: NextRequest): Promise<{
+async function validateAIRequest(request: NextRequest): Promise<{
   prompt: string;
   config?: {
     maxTokens?: number;
@@ -81,7 +81,7 @@ export async function validateAIRequest(request: NextRequest): Promise<{
 /**
  * Get and validate API key
  */
-export function validateAPIKey(): string | null {
+function validateAPIKey(): string | null {
   const apiKey = process.env.GEMINI_API_KEY;
   
   if (!apiKey || apiKey === 'MOCK_API_KEY') {
@@ -95,7 +95,7 @@ export function validateAPIKey(): string | null {
  * Create rate limit headers for successful responses
  * Uses the existing rate limit result to avoid double-counting
  */
-export function createRateLimitHeaders(result: RateLimitResult): Record<string, string> {
+function createRateLimitHeaders(result: RateLimitResult): Record<string, string> {
   return {
     'X-RateLimit-Limit': '50',
     'X-RateLimit-Remaining': result.remaining.toString(),

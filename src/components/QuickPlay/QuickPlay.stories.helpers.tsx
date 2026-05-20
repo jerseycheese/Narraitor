@@ -5,7 +5,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { getTimestamp } from '@/lib/utils';
 
 // Shared mock data
-export const mockWorld = {
+const mockWorld = {
   id: 'world-1',
   name: 'The Enchanted Realm',
   description: 'A magical world filled with wonder',
@@ -22,7 +22,7 @@ export const mockWorld = {
   updatedAt: getTimestamp(),
 };
 
-export const mockCharacter = {
+const mockCharacter = {
   id: 'char-1',
   worldId: 'world-1',
   name: 'Aria the Brave',

@@ -300,64 +300,6 @@ export function formatDateTime(date: Date | string, options: DateTimeFormatOptio
   }
 }
 
-// === NUMBER FORMATTING ===
-
-/**
- * Formats a numeric score to fixed decimal places for display
- *
- * Handles edge cases like NaN, Infinity, and undefined gracefully.
- * Perfect for displaying AI relevance scores, confidence values, or percentages.
- *
- * @param value - Number to format
- * @param decimals - Number of decimal places (default: 3)
- * @returns Formatted string with trailing zeros
- *
- * @example
- * ```typescript
- * import { formatNumericScore } from '@/lib/utils';
- *
- * formatNumericScore(0.85672); // "0.857"
- * formatNumericScore(NaN); // "0.000"
- * formatNumericScore(0.5, 2); // "0.50"
- * formatNumericScore(Infinity); // "0.000"
- * ```
- *
- * @see {@link formatStringList} for formatting arrays
- */
-export function formatNumericScore(value: number, decimals: number = 3): string {
-  return Number.isFinite(value) ? value.toFixed(decimals) : '0.'.padEnd(decimals + 2, '0');
-}
-
-// === STRING FORMATTING ===
-
-/**
- * Formats an array of strings into a comma-separated list
- *
- * Provides a safe way to display string arrays with a fallback for empty/undefined arrays.
- * Uses an em dash (—) for empty arrays to clearly indicate "no values".
- *
- * @param values - Array of strings to format
- * @param emptyIndicator - String to show when array is empty (default: '—')
- * @returns Comma-separated string or empty indicator
- *
- * @example
- * ```typescript
- * import { formatStringList } from '@/lib/utils';
- *
- * formatStringList(['mystery', 'ancient']); // "mystery, ancient"
- * formatStringList([]); // "—"
- * formatStringList(undefined); // "—"
- * formatStringList([], 'None'); // "None"
- * formatStringList(['combat', 'stealth', 'magic']); // "combat, stealth, magic"
- * ```
- *
- * @see {@link formatNumericScore} for formatting numbers
- */
-export function formatStringList(values: string[] | undefined, emptyIndicator: string = '—'): string {
-  if (!values || values.length === 0) return emptyIndicator;
-  return values.join(', ');
-}
-
 /**
  * Truncates text at a specified length with ellipsis.
  * Prefers word boundaries when possible, falls back to character-level truncation.

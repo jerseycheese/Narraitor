@@ -122,4 +122,3 @@ Options:
 Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary line, then Decision and Options sections with alignment tags.`;
 };
 
-export default alignedChoiceTemplate;

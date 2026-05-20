@@ -60,17 +60,9 @@ function createFallbackImage(config: FallbackImageConfig, prompt: string) {
 }
 
 /**
- * Check if we should use mock mode (no API key or MOCK_API_KEY)
- */
-export function shouldUseMockMode(): boolean {
-  const apiKey = process.env.GEMINI_API_KEY;
-  return !apiKey || apiKey === 'MOCK_API_KEY';
-}
-
-/**
  * Get the Gemini API key if available, null otherwise
  */
-export function getGeminiApiKey(): string | null {
+function getGeminiApiKey(): string | null {
   const apiKey = process.env.GEMINI_API_KEY;
   return apiKey && apiKey !== 'MOCK_API_KEY' ? apiKey : null;
 }

@@ -13,7 +13,7 @@ import {
 } from '../../types/goal.types';
 import { capitalize, safeTrim, formatDateTime } from '@/lib/utils';
 
-export class GoalExtractor {
+class GoalExtractor {
   private geminiClient: AIClient;
 
   constructor(geminiClient?: AIClient) {

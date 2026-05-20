@@ -100,4 +100,3 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   );
 };
 
-export default CardActionGroup;

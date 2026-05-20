@@ -175,4 +175,3 @@ IMPORTANT: Never include emojis anywhere in your response. Use only plain text -
   return `${baseContent}${examplesSection}`;
 };
 
-export default playerChoiceTemplate;

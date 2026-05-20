@@ -11,7 +11,7 @@ import { PromptExample } from './types';
 /**
  * Examples for emphasis and formatting in narrative text
  */
-export const emphasisExamples: PromptExample[] = [
+const emphasisExamples: PromptExample[] = [
   {
     id: 'emphasis-markdown-basic',
     name: 'Markdown Emphasis for Dramatic Effect',
@@ -38,7 +38,7 @@ Apply emphasis sparingly (2-4 times per paragraph) to maintain impact.`,
 /**
  * Examples for second person perspective writing
  */
-export const perspectiveExamples: PromptExample[] = [
+const perspectiveExamples: PromptExample[] = [
   {
     id: 'second-person-correct',
     name: 'Correct Second Person Perspective',
@@ -71,7 +71,7 @@ export const perspectiveExamples: PromptExample[] = [
 /**
  * Examples for skill acknowledgment
  */
-export const skillAcknowledgmentExamples: PromptExample[] = [
+const skillAcknowledgmentExamples: PromptExample[] = [
   {
     id: 'skill-success-acknowledgment',
     name: 'Success Acknowledgment',
@@ -104,7 +104,7 @@ export const skillAcknowledgmentExamples: PromptExample[] = [
 /**
  * Examples for choice generation
  */
-export const choiceExamples: PromptExample[] = [
+const choiceExamples: PromptExample[] = [
   {
     id: 'choice-context-summary-tension',
     name: 'Context Summary - Tension',
@@ -150,7 +150,7 @@ export const choiceExamples: PromptExample[] = [
 /**
  * Examples for NPC metadata handling
  */
-export const npcMetadataExamples: PromptExample[] = [
+const npcMetadataExamples: PromptExample[] = [
   {
     id: 'npc-metadata-correct-usage',
     name: 'Correct NPC Metadata Usage',
@@ -179,7 +179,7 @@ In metadata.speakerId: "captain-sarah" (only when they speak directly to player)
 /**
  * Examples for sensory descriptions
  */
-export const sensoryExamples: PromptExample[] = [
+const sensoryExamples: PromptExample[] = [
   {
     id: 'sensory-varied-description',
     name: 'Varied Sensory Details',
@@ -203,23 +203,3 @@ export const allExamples: PromptExample[] = [
   ...npcMetadataExamples,
   ...sensoryExamples,
 ];
-
-/**
- * Helper function to get examples by category
- */
-export function getExamplesByCategory(
-  category: string
-): PromptExample[] {
-  return allExamples.filter((example) =>
-    example.categories.some((cat) => cat === category)
-  );
-}
-
-/**
- * Helper function to get examples by tags
- */
-export function getExamplesByTags(tags: string[]): PromptExample[] {
-  return allExamples.filter((example) =>
-    tags.some((tag) => example.tags?.includes(tag))
-  );
-}

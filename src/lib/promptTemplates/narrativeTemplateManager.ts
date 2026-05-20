@@ -1,8 +1,7 @@
 import { narrativeTemplates } from './templates/narrative';
+import type { NarrativeTemplateContext } from './templates/narrative/context';
 
-// Generator context shape varies per template; see individual template files.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- intentional, see PromptTemplate
-type TemplateGenerator = (context: any) => string;
+type TemplateGenerator = (context: NarrativeTemplateContext) => string;
 
 const templates = new Map<string, TemplateGenerator>();
 for (const template of narrativeTemplates) {

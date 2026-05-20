@@ -57,4 +57,3 @@ export const WorldImage: React.FC<WorldImageProps> = ({
   );
 };
 
-export default WorldImage;

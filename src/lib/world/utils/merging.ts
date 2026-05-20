@@ -13,7 +13,7 @@ import {
   compareTimestamps,
 } from './deduplication';
 
-export const STORY_CHECKPOINT_LIMIT = 25;
+const STORY_CHECKPOINT_LIMIT = 25;
 
 export const mergePlayerCharacterThreads = (
   current: Record<EntityID, PlayerCharacterThread>,

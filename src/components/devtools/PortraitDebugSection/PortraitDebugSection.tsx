@@ -20,6 +20,9 @@ import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
 import { generatePortrait } from '@/lib/api/generatePortrait';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('PortraitDebug');
 
 interface PortraitDebugSectionProps {
   characterData?: Partial<Character>;
@@ -154,16 +157,16 @@ export function PortraitDebugSection({
   };
 
   const generatePromptPreview = async () => {
-    console.log('generatePromptPreview called');
+    logger.debug('generatePromptPreview called');
     if (!effectiveCharacterData) {
-      console.log('No effective character data');
+      logger.debug('No effective character data');
       setGeneratedPrompt(
         'No character data available. Please select a character or provide character data.'
       );
       return;
     }
 
-    console.log('Starting prompt generation with API...');
+    logger.debug('Starting prompt generation with API...');
     try {
       const mockCharacter = createMockCharacter('preview');
 
@@ -175,18 +178,18 @@ export function PortraitDebugSection({
         promptOnly: true, // Add a flag to return only the prompt
       };
 
-      console.log('Calling API with character:', mockCharacter.name);
-      console.log('Custom description:', requestBody.customDescription);
-      console.log('Request body:', requestBody);
-      console.log('promptOnly flag:', requestBody.promptOnly);
+      logger.debug('Calling API with character:', mockCharacter.name);
+      logger.debug('Custom description:', requestBody.customDescription);
+      logger.debug('Request body:', requestBody);
+      logger.debug('promptOnly flag:', requestBody.promptOnly);
 
       const result = await generatePortrait(requestBody);
-      console.log('API response result:', result);
+      logger.debug('API response result:', result);
       const prompt = result.prompt || result.portrait?.prompt;
-      console.log('Extracted prompt:', prompt);
+      logger.debug('Extracted prompt:', prompt);
 
       setGeneratedPrompt(prompt ?? '');
-      console.log('Prompt set successfully');
+      logger.debug('Prompt set successfully');
     } catch (error) {
       setGeneratedPrompt(
         `Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`

@@ -9,6 +9,9 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
 import { useWorldStore } from '@/state/worldStore';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('ChoiceAlignmentDev');
 
 export default function ChoiceAlignmentTestPage() {
   const [decision, setDecision] = useState<Decision | null>(null);
@@ -42,13 +45,13 @@ export default function ChoiceAlignmentTestPage() {
       const storedWorld = useWorldStore.getState().worlds[newWorldId];
       if (storedWorld) {
         setWorldId(newWorldId);
-        console.log('Created test world with ID:', newWorldId, storedWorld);
+        logger.debug('Created test world with ID:', newWorldId, storedWorld);
       } else {
-        console.error('World was not stored properly');
+        logger.error('World was not stored properly');
         setError('Failed to create test world');
       }
     } catch (err) {
-      console.error('Error creating world:', err);
+      logger.error('Error creating world:', err);
       setError(err instanceof Error ? err.message : 'Failed to create world');
     }
   }, []);
@@ -81,7 +84,7 @@ export default function ChoiceAlignmentTestPage() {
     const currentWorld = useWorldStore.getState().worlds[worldId];
     if (!currentWorld) {
       setError(`World ${worldId} no longer exists. This may be a persistence issue.`);
-      console.error('Available worlds:', Object.keys(useWorldStore.getState().worlds));
+      logger.error('Available worlds:', Object.keys(useWorldStore.getState().worlds));
       return;
     }
     
@@ -120,7 +123,7 @@ export default function ChoiceAlignmentTestPage() {
 
       setDecision(result);
     } catch (err) {
-      console.error('Error generating choices:', err);
+      logger.error('Error generating choices:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
@@ -128,10 +131,10 @@ export default function ChoiceAlignmentTestPage() {
   };
 
   const handleChoiceSelect = (choiceId: string) => {
-    console.log('Selected choice:', choiceId);
+    logger.debug('Selected choice:', choiceId);
     const selectedOption = decision?.options.find(opt => opt.id === choiceId);
     if (selectedOption) {
-      console.log('Choice details:', {
+      logger.debug('Choice details:', {
         text: selectedOption.text,
         alignment: selectedOption.alignment
       });
@@ -139,7 +142,7 @@ export default function ChoiceAlignmentTestPage() {
   };
 
   const handleCustomSubmit = (customText: string) => {
-    console.log('Custom choice submitted:', customText);
+    logger.debug('Custom choice submitted:', customText);
   };
 
   return (

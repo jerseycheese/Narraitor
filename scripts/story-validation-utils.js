@@ -105,7 +105,7 @@ export async function validateIssuesAgainstDocs(issues) {
       }
       
       // Get expected complexity and priority from mapping
-      const { getStoryComplexityAndPriority } = await import('./story-complexity-mapping.js');
+      const { getStoryComplexityAndPriority } = await import('./user-stories/story-complexity-mapping.js');
       const { complexity: expectedComplexity, priority: expectedPriority } = 
         getStoryComplexityAndPriority(storyText, domain);
       

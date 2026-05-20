@@ -6,12 +6,13 @@ import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import Logger from '@/lib/utils/logger';
+import {
+  INITIAL_GENERATION_MAX_WAIT_MS,
+  CHOICE_FALLBACK_DELAY_MS,
+  BOOTSTRAP_FALLBACK_DELAY_MS,
+} from '@/lib/constants/timeouts';
 
 const logger = new Logger('ActiveGameSessionEffects');
-
-const INITIAL_GENERATION_MAX_WAIT_MS = 20000;
-const CHOICE_FALLBACK_DELAY_MS = 15000;
-const BOOTSTRAP_FALLBACK_DELAY_MS = 4000;
 
 interface UseActiveGameSessionEffectsOptions {
   sessionId: string;

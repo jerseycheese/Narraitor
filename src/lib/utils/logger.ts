@@ -49,7 +49,7 @@ function parseLogLevel(level?: string): LogLevel {
   }
 }
 
-export class Logger {
+class Logger {
   private context: string;
   public isEnabled: boolean;
   private minLevel: LogLevel;

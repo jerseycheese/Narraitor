@@ -19,7 +19,7 @@ export interface WorldNameInputProps {
   className?: string;
 }
 
-export function WorldNameInput({
+function WorldNameInput({
   value,
   onChange,
   error,
@@ -56,7 +56,7 @@ export interface GenreSelectProps {
   className?: string;
 }
 
-export function GenreSelect({
+function GenreSelect({
   value,
   onChange,
   error,
@@ -99,7 +99,7 @@ export interface DescriptionTextAreaProps {
   className?: string;
 }
 
-export function DescriptionTextArea({
+function DescriptionTextArea({
   value,
   onChange,
   error,
@@ -151,7 +151,7 @@ export interface LoadingStateProps {
   className?: string;
 }
 
-export function LoadingState({
+function LoadingState({
   isLoading,
   message = 'Loading...',
   details,
@@ -178,7 +178,7 @@ export interface ErrorDisplayProps {
   className?: string;
 }
 
-export function ErrorDisplay({
+function ErrorDisplay({
   error,
   onRetry,
   onDismiss,

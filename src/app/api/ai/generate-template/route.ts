@@ -4,11 +4,10 @@ import { TemplateGenerationContext } from '@/lib/ai/templatePrompts';
 import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
 import Logger from '@/lib/utils/logger';
+import { TEMPLATE_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 
 
 const logger = new Logger('API');
-
-const TEMPLATE_GENERATION_TIMEOUT_MS = 45_000;
 
 interface GenerateTemplateRequest {
   type: 'inspired-by' | 'genre-mix' | 'surprise-me';

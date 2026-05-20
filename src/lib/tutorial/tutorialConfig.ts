@@ -47,7 +47,7 @@ export const joyrideStyles = {
   },
 };
 
-export const joyrideOptions = {
+const joyrideOptions = {
   continuous: true,
   scrollToFirstStep: false,
   showProgress: false,
@@ -69,13 +69,13 @@ export const joyrideOptions = {
  * Tours that run inside modals need scrolling disabled to prevent
  * the page underneath from scrolling, which breaks spotlight positioning
  */
-export const MODAL_TOURS = [] as const;
+const MODAL_TOURS = [] as const;
 
 /**
  * Tours that use the custom useTutorialAutoScroll hook
  * (Native Joyride scrolling must be disabled)
  */
-export const MANUAL_SCROLL_TOURS = [
+const MANUAL_SCROLL_TOURS = [
   'firstPlay',
 ] as const;
 

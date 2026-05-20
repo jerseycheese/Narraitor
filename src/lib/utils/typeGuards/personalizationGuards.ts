@@ -2,14 +2,14 @@
 
 import type { PlayerDecision, ChoiceTypePreference } from '@/types/personalization.types';
 
-export function isChoiceTypePreference(value: unknown): value is ChoiceTypePreference {
+function isChoiceTypePreference(value: unknown): value is ChoiceTypePreference {
   const validChoiceTypes: ChoiceTypePreference[] = [
     'diplomatic', 'aggressive', 'stealthy', 'helpful', 'selfish', 'lawful', 'chaotic', 'neutral'
   ];
   return typeof value === 'string' && validChoiceTypes.includes(value as ChoiceTypePreference);
 }
 
-export function isPlayerDecision(obj: unknown): obj is PlayerDecision {
+function isPlayerDecision(obj: unknown): obj is PlayerDecision {
   if (obj === null || obj === undefined || typeof obj !== 'object') return false;
   const o = obj as Record<string, unknown>;
   return 'choiceText' in o &&

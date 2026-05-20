@@ -9,6 +9,9 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('TestDataGenerator');
 
 const TV_MOVIE_UNIVERSES = [
   'Game of Thrones',
@@ -80,12 +83,12 @@ async function generateWorldImageAsync(worldId: string, worldName: string): Prom
       useWorldStore.getState().updateWorld(worldId, { image });
     } else {
       const errorText = await response.text();
-      console.warn(
+      logger.warn(
         `[DevTools] Failed to generate world image for "${worldName}": ${response.status} - ${errorText}`
       );
     }
   } catch (error) {
-    console.error(`Failed to generate world image for test world "${worldName}":`, error);
+    logger.error(`Failed to generate world image for test world "${worldName}":`, error);
   }
 }
 
@@ -130,7 +133,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
       await generateWorldImageAsync(worldId, testWorldData.name);
     } catch (error) {
-      console.error('[DevTools] Error generating test world:', error);
+      logger.error('[DevTools] Error generating test world:', error);
       alert(
         `Error generating test world: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -180,7 +183,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       const worldNames = createdWorlds.map((w) => w.name).join(', ');
       alert(`Successfully generated 5 test worlds with images: ${worldNames}`);
     } catch (error) {
-      console.error('[DevTools] Error generating test worlds:', error);
+      logger.error('[DevTools] Error generating test worlds:', error);
       alert(
         `Error generating test worlds: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated ${createdWorlds.length} worlds before error.`
       );
@@ -277,7 +280,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       // Use window.location for a hard navigation to ensure fresh page load
       window.location.href = '/characters/create';
     } catch (error) {
-      console.error('[TestDataGenerator] Error storing test data:', error);
+      logger.error('[TestDataGenerator] Error storing test data:', error);
       alert('Failed to store test data. Check console for details.');
     }
   };
@@ -292,6 +295,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     const storageKey = `character-creation-${currentWorld.id}`;
     const storedData = sessionStorage.getItem(storageKey);
 
+    // User-invoked diagnostic: print directly so it shows regardless of Logger level.
     if (storedData) {
       console.log(
         '[TestDataGenerator] Current stored data:',
@@ -492,13 +496,13 @@ export const TestDataGeneratorSection: React.FC = () => {
                 .getState()
                 .updateCharacter(characterId, { portrait });
             } else {
-              console.warn(
+              logger.warn(
                 `[DevTools] Portrait generation failed for ${characterType} character "${characterData.name}"`
               );
             }
           }
         } catch (error) {
-          console.error(
+          logger.error(
             `[DevTools] Failed to generate portrait for ${characterType} character "${characterData.name}":`,
             error
           );
@@ -511,7 +515,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         `Successfully generated 5 AI characters (random type selection) with portraits: ${characterNames}`
       );
     } catch (error) {
-      console.error('[DevTools] Error generating AI characters:', error);
+      logger.error('[DevTools] Error generating AI characters:', error);
       alert(
         `Error generating characters: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated ${createdCharacters.length} characters before error.`
       );
@@ -558,7 +562,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         `Successfully deleted all ${worldCount} worlds and their characters`
       );
     } catch (error) {
-      console.error('[DevTools] Error deleting all worlds:', error);
+      logger.error('[DevTools] Error deleting all worlds:', error);
       alert(
         `Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -599,7 +603,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         `Successfully deleted ${worldCharacters.length} characters from "${currentWorld.name}"`
       );
     } catch (error) {
-      console.error('[DevTools] Error deleting characters:', error);
+      logger.error('[DevTools] Error deleting characters:', error);
       alert(
         `Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -647,7 +651,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           localStorage.removeItem('character-store');
           localStorage.removeItem('worlds'); // Legacy storage
         } catch (e) {
-          console.warn('Failed to clear localStorage:', e);
+          logger.warn('Failed to clear localStorage:', e);
         }
       }
 
@@ -658,7 +662,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       // Force a small delay before allowing any other operations
       await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
-      console.error('[DevTools] Error during nuclear deletion:', error);
+      logger.error('[DevTools] Error during nuclear deletion:', error);
       alert(
         `Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nSome data may not have been deleted. Check console for details.`
       );
@@ -669,6 +673,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     const worldStoreState = useWorldStore.getState();
     const characterStoreState = useCharacterStore.getState();
 
+    // User-invoked diagnostic: print directly so it shows regardless of Logger level.
     console.log('[DevTools] Current Store States:');
     console.log('World Store:', {
       worldCount: Object.keys(worldStoreState.worlds).length,

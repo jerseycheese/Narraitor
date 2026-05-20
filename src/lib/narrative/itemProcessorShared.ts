@@ -10,7 +10,7 @@ import { normalizeText, NORM_NAME } from '@/lib/utils';
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ItemProcessorShared');
 
-export const RATE_LIMIT_DELAY_MS = 200;
+const RATE_LIMIT_DELAY_MS = 200;
 
 /**
  * Checks if two item names are semantically similar using AI.
