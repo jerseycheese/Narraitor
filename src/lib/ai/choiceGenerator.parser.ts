@@ -39,26 +39,6 @@ export const parseChoiceResponse = (
       } else if (weightText === 'critical') {
         decisionWeight = 'critical';
       }
-    } else {
-      const segmentCount = narrativeContext.previousSegments?.length || 0;
-      const randomValue = Math.random();
-      if (segmentCount > 12) {
-        if (randomValue > 0.85) {
-          decisionWeight = 'critical';
-        } else if (randomValue > 0.6) {
-          decisionWeight = 'major';
-        }
-      } else if (segmentCount > 8) {
-        if (randomValue > 0.9) {
-          decisionWeight = 'critical';
-        } else if (randomValue > 0.75) {
-          decisionWeight = 'major';
-        }
-      } else if (segmentCount > 4) {
-        if (randomValue > 0.85) {
-          decisionWeight = 'major';
-        }
-      }
     }
 
     let contextSummary = '';

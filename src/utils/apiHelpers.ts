@@ -103,6 +103,29 @@ export function createRateLimitHeaders(result: RateLimitResult): Record<string, 
   };
 }
 
+// Harm categories are always returned in this order; per-rating thresholds line up by index.
+const HARM_CATEGORIES = [
+  'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+  'HARM_CATEGORY_HATE_SPEECH',
+  'HARM_CATEGORY_HARASSMENT',
+  'HARM_CATEGORY_DANGEROUS_CONTENT',
+] as const;
+
+const MEDIUM = 'BLOCK_MEDIUM_AND_ABOVE';
+const HIGH = 'BLOCK_ONLY_HIGH';
+const NONE = 'BLOCK_NONE';
+
+// Thresholds per content rating, ordered [sexual, hate, harassment, dangerous].
+const RATING_THRESHOLDS: Record<string, readonly [string, string, string, string]> = {
+  g: [MEDIUM, MEDIUM, MEDIUM, MEDIUM],
+  pg: [HIGH, HIGH, HIGH, HIGH],
+  'pg-13': [HIGH, HIGH, HIGH, HIGH],
+  r: [NONE, HIGH, HIGH, HIGH],
+  'nc-17': [NONE, HIGH, NONE, HIGH],
+};
+
+const DEFAULT_THRESHOLDS: readonly [string, string, string, string] = [MEDIUM, MEDIUM, MEDIUM, MEDIUM];
+
 /**
  * Extract tone settings from prompt and return appropriate safety settings
  */
@@ -114,56 +137,8 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
   const contentRatingMatch = prompt.match(/((?:PG-13|NC-17|[A-Z]+))-RATED CONTENT GUIDELINES/i);
   const contentRating = contentRatingMatch?.[1]?.toLowerCase() || '';
 
-  // Map content ratings to safety thresholds
-  switch (contentRating) {
-    case 'g':
-      // G-rated: Block medium and above content
-      const gSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
-      ];
-      return gSettings;
-    case 'pg':
-    case 'pg-13':
-      // PG/PG-13: Block only high content
-      const pgSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
-      ];
-      return pgSettings;
-    case 'r':
-      // R-rated: Permissive for sexual content.
-      const rSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
-      ];
-      return rSettings;
-    case 'nc-17':
-      // NC-17: Highly permissive, no blocking on sexual content or harassment.
-      const nc17Settings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
-      ];
-      return nc17Settings;
-    default:
-      // Default: Medium filtering for safety
-      const defaultSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
-      ];
-
-      return defaultSettings;
-  }
+  const thresholds = RATING_THRESHOLDS[contentRating] ?? DEFAULT_THRESHOLDS;
+  return HARM_CATEGORIES.map((category, i) => ({ category, threshold: thresholds[i] }));
 }
 
 

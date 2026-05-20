@@ -15,20 +15,18 @@ import { useCharacterStore } from '@/state/characterStore';
 import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils/mockStoreFactories';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
-  narrativeTemplateManager: {
-    getTemplate: jest.fn().mockImplementation((key: string) => {
-      if (key === 'narrative/scene') {
-        return jest.fn().mockImplementation((context: { characterSkillContext?: string }) => {
-          const characterSkillContext = context.characterSkillContext || '';
-          return `Generate a scene...${characterSkillContext}`;
-        });
-      }
-      if (key === 'narrative/skillAcknowledgment') {
-        return jest.fn().mockReturnValue('Generate skill acknowledgment...');
-      }
-      return jest.fn().mockReturnValue('Template not found');
-    })
-  }
+  getNarrativeTemplate: jest.fn().mockImplementation((key: string) => {
+    if (key === 'narrative/scene') {
+      return jest.fn().mockImplementation((context: { characterSkillContext?: string }) => {
+        const characterSkillContext = context.characterSkillContext || '';
+        return `Generate a scene...${characterSkillContext}`;
+      });
+    }
+    if (key === 'narrative/skillAcknowledgment') {
+      return jest.fn().mockReturnValue('Generate skill acknowledgment...');
+    }
+    return jest.fn().mockReturnValue('Template not found');
+  })
 }));
 
 describe('NarrativeGenerator - Skill Acknowledgment', () => {

@@ -7,7 +7,7 @@
 
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { getLoreContextForPrompt } from '../loreContextHelper';
-import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
@@ -111,7 +111,7 @@ describe('NarrativeGenerator budget integration', () => {
     const loreContext = `\nEstablished World Facts:\n${new Array(2000).fill('word').join(' ')}\nEND_MARKER`;
     (getLoreContextForPrompt as jest.Mock).mockReturnValue(loreContext);
 
-    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+    (getNarrativeTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base narrative template')
     );
 
@@ -134,7 +134,7 @@ describe('NarrativeGenerator budget integration', () => {
     const loreContext = `\nEstablished World Facts:\n${new Array(2000).fill('word').join(' ')}\nEND_MARKER`;
     (getLoreContextForPrompt as jest.Mock).mockReturnValue(loreContext);
 
-    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+    (getNarrativeTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base narrative template')
     );
 
@@ -154,7 +154,7 @@ describe('NarrativeGenerator budget integration', () => {
   it('truncates recent narrative segments when they exceed the recent-narrative budget', async () => {
     (getLoreContextForPrompt as jest.Mock).mockReturnValue('');
 
-    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+    (getNarrativeTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockImplementation((context: unknown) => {
         const typed = context as TemplateContext;
         const recent = typed?.narrativeContext?.recentSegments ?? [];
@@ -198,7 +198,7 @@ describe('NarrativeGenerator budget integration', () => {
   it('fills remaining recent-narrative budget by truncating the oldest included segment', async () => {
     (getLoreContextForPrompt as jest.Mock).mockReturnValue('');
 
-    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+    (getNarrativeTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockImplementation((context: unknown) => {
         const typed = context as TemplateContext;
         const recent = typed?.narrativeContext?.recentSegments ?? [];

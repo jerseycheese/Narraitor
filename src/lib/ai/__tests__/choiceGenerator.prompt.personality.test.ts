@@ -5,11 +5,9 @@ import { useCharacterStore } from '@/state/characterStore';
 import type { Character as StoreCharacter } from '@/state/characterStore';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
-  narrativeTemplateManager: {
-    getTemplate: jest.fn().mockReturnValue((context: { worldName: string }) =>
-      `BASE_PROMPT:${context.worldName}`
-    ),
-  },
+  getNarrativeTemplate: jest.fn().mockReturnValue((context: { worldName: string }) =>
+    `BASE_PROMPT:${context.worldName}`
+  ),
 }));
 
 jest.mock('../toneSettingsGuidance', () => ({

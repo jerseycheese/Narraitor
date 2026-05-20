@@ -5,7 +5,7 @@
 import { ChoiceGenerator } from '../choiceGenerator';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
-import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
 import { createMockWorldStore } from '@/lib/test-utils';
 import type { World } from '@/types/world.types';
 
@@ -71,7 +71,7 @@ describe('ChoiceGenerator lore context integration', () => {
       })
     );
 
-    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+    (getNarrativeTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base prompt template')
     );
   });

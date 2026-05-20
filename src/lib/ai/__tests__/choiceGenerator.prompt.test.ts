@@ -4,11 +4,9 @@ import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { playerDecisionTracker } from '../playerDecisionTracker';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
-  narrativeTemplateManager: {
-    getTemplate: jest.fn().mockReturnValue((context: { worldName: string }) =>
-      `BASE_PROMPT:${context.worldName}`
-    ),
-  },
+  getNarrativeTemplate: jest.fn().mockReturnValue((context: { worldName: string }) =>
+    `BASE_PROMPT:${context.worldName}`
+  ),
 }));
 
 jest.mock('../toneSettingsGuidance', () => ({
