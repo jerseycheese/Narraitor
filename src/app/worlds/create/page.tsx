@@ -3,6 +3,15 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
+import { readJSON, removeKey } from '@/lib/utils/browserStorage';
+
+// Session keys used to hand off generated/template world data into the wizard.
+// Each key is read once on mount and then cleared so refreshes don't replay.
+const HANDOFF_KEYS = [
+  'generated-world-data',
+  'smart-template-data',
+  'recent-template-data',
+] as const;
 
 export default function CreateWorldPage() {
   const router = useRouter();
@@ -11,7 +20,6 @@ export default function CreateWorldPage() {
   const [initialStep, setInitialStep] = useState(0);
 
   useEffect(() => {
-    // Check for step parameter in URL
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const step = parseInt(stepParam, 10);
@@ -20,45 +28,11 @@ export default function CreateWorldPage() {
       }
     }
 
-    // Check for generated world data from AI generation
-    const storedData = sessionStorage.getItem('generated-world-data');
-    if (storedData) {
-      try {
-        const data = JSON.parse(storedData);
+    for (const key of HANDOFF_KEYS) {
+      const data = readJSON<typeof generatedData>('session', key, null);
+      if (data) {
         setGeneratedData(data);
-        // Clear the stored data so it doesn't persist
-        sessionStorage.removeItem('generated-world-data');
-      } catch (error) {
-        console.error('Failed to parse generated world data:', error);
-      }
-    }
-
-    // Check for smart template data from test harness
-    const templateData = sessionStorage.getItem('smart-template-data');
-    
-    if (templateData) {
-      try {
-        const data = JSON.parse(templateData);
-        setGeneratedData(data);
-        // Clear the stored data so it doesn't persist
-        sessionStorage.removeItem('smart-template-data');
-      } catch (error) {
-        console.error('Failed to parse smart template data:', error);
-      }
-    } else {
-    }
-
-    // Check for recent template data from Choose Template tab
-    const recentTemplateData = sessionStorage.getItem('recent-template-data');
-    
-    if (recentTemplateData) {
-      try {
-        const data = JSON.parse(recentTemplateData);
-        setGeneratedData(data);
-        // Clear the stored data
-        sessionStorage.removeItem('recent-template-data');
-      } catch (error) {
-        console.error('Failed to parse recent template data:', error);
+        removeKey('session', key);
       }
     }
   }, [searchParams]);

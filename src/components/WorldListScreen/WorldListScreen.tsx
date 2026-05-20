@@ -18,6 +18,7 @@ import {
   UserFriendlyError,
   ErrorType,
 } from '@/lib/utils/errorUtils';
+import { readString, writeString } from '@/lib/utils/browserStorage';
 
 interface WorldListScreenProps {
   _router?: {
@@ -44,19 +45,13 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
   const [selectedWorldIds, setSelectedWorldIds] = useState<EntityID[]>([]);
 
   // View mode with localStorage persistence (following inventory pattern)
-  const [viewMode, setViewMode] = useState<WorldViewMode>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('world-view-mode');
-      return (saved as WorldViewMode) || 'grid';
-    }
-    return 'grid';
-  });
+  const [viewMode, setViewMode] = useState<WorldViewMode>(
+    () => (readString('local', 'world-view-mode') as WorldViewMode) || 'grid'
+  );
 
   const handleViewModeChange = (mode: WorldViewMode) => {
     setViewMode(mode);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('world-view-mode', mode);
-    }
+    writeString('local', 'world-view-mode', mode);
   };
 
   // Pass the view toggle component to parent for header placement

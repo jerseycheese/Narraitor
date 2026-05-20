@@ -32,8 +32,7 @@ export function EndingImageDebugSection() {
   
   // Get data from stores
   const { currentEnding, getSessionSegments } = useNarrativeStore();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const characters = useCharacterStore((state: any) => state.characters);
+  const characters = useCharacterStore(state => state.characters);
   const worlds = useWorldStore((state) => state.worlds);
   
   const toneOptions: EndingTone[] = ['triumphant', 'mysterious', 'tragic', 'hopeful'];

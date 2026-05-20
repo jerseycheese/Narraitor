@@ -1,5 +1,4 @@
 // src/lib/utils/typeGuards/worldGuards.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { ValidationResult } from '@/lib/utils';
 
@@ -27,7 +26,7 @@ export function validateWorld(obj: unknown, partial: boolean = false): Validatio
     return { valid: false, errors };
   }
 
-  const world = obj as any;
+  const world = obj as Record<string, unknown>;
 
   // Required property validation
   if (!partial) {
@@ -64,7 +63,7 @@ export function validateWorld(obj: unknown, partial: boolean = false): Validatio
     if (!Array.isArray(world.attributes)) {
       errors.push('Property "attributes" must be an array');
     } else {
-      world.attributes.forEach((attr: any, index: number) => {
+      world.attributes.forEach((attr: unknown, index: number) => {
         const attrValidation = validateWorldAttribute(attr);
         if (!attrValidation.valid) {
           errors.push(`Invalid WorldAttribute at index ${index}: ${attrValidation.errors.join(', ')}`);
@@ -75,7 +74,7 @@ export function validateWorld(obj: unknown, partial: boolean = false): Validatio
     if (!Array.isArray(world.skills)) {
       errors.push('Property "skills" must be an array');
     } else {
-      world.skills.forEach((skill: any, index: number) => {
+      world.skills.forEach((skill: unknown, index: number) => {
         const skillValidation = validateWorldSkill(skill);
         if (!skillValidation.valid) {
           errors.push(`Invalid WorldSkill at index ${index}: ${skillValidation.errors.join(', ')}`);
@@ -122,7 +121,11 @@ export function validateWorld(obj: unknown, partial: boolean = false): Validatio
     errors.push('Property "reference" must be a string when present');
   }
 
-  if (world.relationship !== undefined && !['set_within', 'inspired_by'].includes(world.relationship)) {
+  if (
+    world.relationship !== undefined &&
+    !(typeof world.relationship === 'string' &&
+      ['set_within', 'inspired_by'].includes(world.relationship))
+  ) {
     errors.push('Property "relationship" must be "set_within" or "inspired_by" when present');
   }
 
@@ -151,7 +154,7 @@ export function validateWorldAttribute(obj: unknown): ValidationResult {
     return { valid: false, errors };
   }
 
-  const attr = obj as any;
+  const attr = obj as Record<string, unknown>;
 
   // Property validation
   if (typeof attr.id !== 'string') errors.push('Property "id" must be a string');
@@ -191,13 +194,13 @@ export function validateWorldSkill(obj: unknown): ValidationResult {
     return { valid: false, errors };
   }
 
-  const skill = obj as any;
+  const skill = obj as Record<string, unknown>;
 
   if (typeof skill.id !== 'string') errors.push('Property "id" must be a string');
   if (typeof skill.name !== 'string') errors.push('Property "name" must be a string');
   if (typeof skill.worldId !== 'string') errors.push('Property "worldId" must be a string');
   if (typeof skill.description !== 'string') errors.push('Property "description" must be a string');
-  if (!validDifficulties.includes(skill.difficulty)) {
+  if (typeof skill.difficulty !== 'string' || !validDifficulties.includes(skill.difficulty)) {
     errors.push(`Property "difficulty" must be one of: ${validDifficulties.join(', ')}`);
   }
   if (typeof skill.baseValue !== 'number') errors.push('Property "baseValue" must be a number');
@@ -228,7 +231,7 @@ export function validateWorldSettings(obj: unknown, partial: boolean = false): V
     return { valid: false, errors };
   }
 
-  const settings = obj as any;
+  const settings = obj as Record<string, unknown>;
 
   if (!partial) {
     if (typeof settings.maxAttributes !== 'number') {
@@ -306,9 +309,9 @@ export function validateGeneratedImage(obj: unknown): ValidationResult {
     return { valid: false, errors };
   }
 
-  const image = obj as any;
+  const image = obj as Record<string, unknown>;
 
-  if (!validTypes.includes(image.type)) {
+  if (typeof image.type !== 'string' || !validTypes.includes(image.type)) {
     errors.push(`Property "type" must be one of: ${validTypes.join(', ')}`);
   }
 

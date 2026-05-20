@@ -70,8 +70,10 @@ export function TutorialTooltip({
   const backLabel = backProps.title || backProps['aria-label'] || 'Back';
   const skipLabel = skipProps.title || skipProps['aria-label'] || 'Skip tutorial';
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { className: skipClassName, ...skipButtonProps } = skipProps as any;
+  // react-joyride's skipProps doesn't formally include className, but the
+  // rendered <button> accepts one. Widening here lets us strip-and-merge.
+  const { className: skipClassName, ...skipButtonProps } =
+    skipProps as typeof skipProps & { className?: string };
 
   return (
     <div

@@ -1,5 +1,4 @@
 // src/lib/utils/typeGuards/journalGuards.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { JournalEntry, JournalEntryType } from '@/types/journal.types';
 
@@ -16,23 +15,22 @@ const validJournalEntryTypes: JournalEntryType[] = [
 ];
 
 export function isJournalEntry(obj: unknown): obj is JournalEntry {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'sessionId' in obj &&
-    'worldId' in obj &&
-    'characterId' in obj &&
-    'type' in obj &&
-    'title' in obj &&
-    'content' in obj &&
-    'significance' in obj &&
-    'isRead' in obj &&
-    'relatedEntities' in obj &&
-    'metadata' in obj &&
-    'createdAt' in obj &&
-    'updatedAt' in obj &&
-    validJournalEntryTypes.includes((obj as any).type) &&
-    Array.isArray((obj as any).relatedEntities) &&
-    typeof (obj as any).metadata === 'object';
+  if (obj === null || obj === undefined || typeof obj !== 'object') return false;
+  const o = obj as Record<string, unknown>;
+  return 'id' in o &&
+    'sessionId' in o &&
+    'worldId' in o &&
+    'characterId' in o &&
+    'type' in o &&
+    'title' in o &&
+    'content' in o &&
+    'significance' in o &&
+    'isRead' in o &&
+    'relatedEntities' in o &&
+    'metadata' in o &&
+    'createdAt' in o &&
+    'updatedAt' in o &&
+    validJournalEntryTypes.includes(o.type as JournalEntryType) &&
+    Array.isArray(o.relatedEntities) &&
+    typeof o.metadata === 'object';
 }

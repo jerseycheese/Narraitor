@@ -1,5 +1,4 @@
 // src/lib/utils/typeGuards/personalizationGuards.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { PlayerDecision, ChoiceTypePreference } from '@/types/personalization.types';
 
@@ -11,17 +10,16 @@ export function isChoiceTypePreference(value: unknown): value is ChoiceTypePrefe
 }
 
 export function isPlayerDecision(obj: unknown): obj is PlayerDecision {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'choiceText' in obj &&
-    'choiceType' in obj &&
-    'context' in obj &&
-    'timestamp' in obj &&
-    typeof (obj as any).choiceText === 'string' &&
-    isChoiceTypePreference((obj as any).choiceType) &&
-    typeof (obj as any).context === 'object' &&
-    typeof (obj as any).timestamp === 'string';
+  if (obj === null || obj === undefined || typeof obj !== 'object') return false;
+  const o = obj as Record<string, unknown>;
+  return 'choiceText' in o &&
+    'choiceType' in o &&
+    'context' in o &&
+    'timestamp' in o &&
+    typeof o.choiceText === 'string' &&
+    isChoiceTypePreference(o.choiceType) &&
+    typeof o.context === 'object' &&
+    typeof o.timestamp === 'string';
 }
 
 export function isPlayerDecisionArray(obj: unknown): obj is PlayerDecision[] {
