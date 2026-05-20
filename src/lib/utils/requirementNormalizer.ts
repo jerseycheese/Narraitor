@@ -10,7 +10,7 @@ const DEFAULT_REQUIREMENT_LOGIC: RequirementLogic = 'all';
 /**
  * Type guard to check if value is a DecisionItemRequirementGroup
  */
-export const isDecisionItemRequirementGroup = (
+const isDecisionItemRequirementGroup = (
   value: unknown
 ): value is DecisionItemRequirementGroup => {
   return Boolean(
@@ -25,7 +25,7 @@ export const isDecisionItemRequirementGroup = (
  * Converts a list of requirements to a normalized requirement group
  * Filters only item-type requirements
  */
-export const ensureItemRequirementGroup = (
+const ensureItemRequirementGroup = (
   requirements: DecisionRequirement[] | undefined,
   logic?: RequirementLogic
 ): DecisionItemRequirementGroup | null => {

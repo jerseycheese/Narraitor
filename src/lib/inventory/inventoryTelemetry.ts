@@ -17,6 +17,6 @@ export const logInventoryGuardSanitized = (context: GuardSanitizedContext): void
   inventoryTelemetryLogger.info('Inventory guard sanitized payload', context);
 };
 
-export const logInventoryStateReset = (context: StateResetContext): void => {
+const logInventoryStateReset = (context: StateResetContext): void => {
   inventoryTelemetryLogger.warn('Inventory persistence reset applied', context);
 };

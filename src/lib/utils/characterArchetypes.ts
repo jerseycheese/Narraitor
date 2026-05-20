@@ -20,7 +20,7 @@ export type ArchetypeTemplate = ImportedArchetypeTemplate;
 /**
  * Get archetype templates based on world genre
  */
-export function getArchetypeTemplatesForGenre(genre: GenreValue): ArchetypeTemplate[] {
+function getArchetypeTemplatesForGenre(genre: GenreValue): ArchetypeTemplate[] {
   return ARCHETYPE_TEMPLATES[genre] || ARCHETYPE_TEMPLATES.fantasy;
 }
 function hashString(input: string): number {

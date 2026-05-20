@@ -50,7 +50,7 @@ export const createMockStore = (): MockStore => ({
 /**
  * Creates a mock transaction
  */
-export const createMockTransaction = (store: MockStore): MockTransaction => ({
+const createMockTransaction = (store: MockStore): MockTransaction => ({
   objectStore: jest.fn(() => store),
   oncomplete: null,
   onerror: null
@@ -88,7 +88,7 @@ export const setupSuccessfulOpen = (
 /**
  * Sets up a failed IDB open request
  */
-export const setupFailedOpen = (
+const setupFailedOpen = (
   mockIDB: { open: jest.Mock },
   error: Error
 ): void => {
@@ -122,7 +122,7 @@ export const triggerSuccess = <T>(
 /**
  * Triggers the error callback on a mock request after a delay
  */
-export const triggerError = (
+const triggerError = (
   request: MockRequest,
   error: Error
 ): void => {

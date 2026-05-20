@@ -111,7 +111,7 @@ export const semanticColors = {
 } as const
 
 // Dark theme semantic colors
-export const semanticColorsDark = {
+const semanticColorsDark = {
   primary: {
     default: primitiveColors.blue[500],
     hover: primitiveColors.blue[300],

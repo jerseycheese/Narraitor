@@ -6,7 +6,7 @@ interface InlineErrorProps {
   className?: string;
 }
 
-export const InlineError: React.FC<InlineErrorProps> = ({ error, className }) => (
+const InlineError: React.FC<InlineErrorProps> = ({ error, className }) => (
   <p className={className || errorStyles.message}>
     {error}
   </p>

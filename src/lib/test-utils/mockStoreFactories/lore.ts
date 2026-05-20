@@ -1,6 +1,6 @@
 import type { LoreStore } from './types';
 
-export function createMockLoreStore(
+function createMockLoreStore(
   overrides?: Partial<LoreStore>
 ): LoreStore {
   return {

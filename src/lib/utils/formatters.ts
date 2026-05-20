@@ -324,7 +324,7 @@ export function formatDateTime(date: Date | string, options: DateTimeFormatOptio
  *
  * @see {@link formatStringList} for formatting arrays
  */
-export function formatNumericScore(value: number, decimals: number = 3): string {
+function formatNumericScore(value: number, decimals: number = 3): string {
   return Number.isFinite(value) ? value.toFixed(decimals) : '0.'.padEnd(decimals + 2, '0');
 }
 
@@ -353,7 +353,7 @@ export function formatNumericScore(value: number, decimals: number = 3): string 
  *
  * @see {@link formatNumericScore} for formatting numbers
  */
-export function formatStringList(values: string[] | undefined, emptyIndicator: string = '—'): string {
+function formatStringList(values: string[] | undefined, emptyIndicator: string = '—'): string {
   if (!values || values.length === 0) return emptyIndicator;
   return values.join(', ');
 }

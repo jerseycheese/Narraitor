@@ -13,7 +13,7 @@ import { PromptCategory, ExampleSelectionOptions } from './types';
  * Initialize the global example manager with all examples
  * This should be called once at application startup
  */
-export function initializeExampleLibrary(): void {
+function initializeExampleLibrary(): void {
   // Clear any existing examples
   exampleManager.clearExamples();
 
@@ -52,7 +52,7 @@ export function getExamplesForPrompt(
  * @param options - Additional selection options
  * @returns Formatted example string
  */
-export function getExamplesWithManager(
+function getExamplesWithManager(
   manager: ExampleManager,
   category: PromptCategory,
   tokenBudget: number = 150,

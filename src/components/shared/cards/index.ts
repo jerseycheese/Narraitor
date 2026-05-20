@@ -2,7 +2,7 @@
 export { ActiveStateCard } from './ActiveStateCard';
 export type { ActiveStateCardProps } from './ActiveStateCard';
 
-export { ActiveStateIndicator } from './ActiveStateIndicator';
+;
 export type { ActiveStateIndicatorProps } from './ActiveStateIndicator';
 
 export { CardActionGroup } from './CardActionGroup';

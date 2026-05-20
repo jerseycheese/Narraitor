@@ -141,7 +141,7 @@ export function createMockJournalEntries(): JournalEntry[] {
 /**
  * Creates a standard mock ending response
  */
-export function createMockEndingResponse(overrides?: {
+function createMockEndingResponse(overrides?: {
   epilogue?: string;
   tone?: string;
   achievements?: string[];

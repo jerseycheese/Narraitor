@@ -23,7 +23,7 @@ export function setupLoreStore(worldIds: string[] = ['test-world', 'world-1', 'w
 /**
  * Adds a fact to the store using act
  */
-export function addFact(
+function addFact(
   result: RenderHookResult<LoreStore, unknown>['result'],
   key: string,
   value: string,
@@ -39,7 +39,7 @@ export function addFact(
 /**
  * Adds multiple facts to the store
  */
-export function addMultipleFacts(
+function addMultipleFacts(
   result: RenderHookResult<LoreStore, unknown>['result'],
   facts: Array<{
     key: string;
@@ -59,7 +59,7 @@ export function addMultipleFacts(
 /**
  * Creates sample character facts
  */
-export function createCharacterFacts(worldId = 'test-world') {
+function createCharacterFacts(worldId = 'test-world') {
   return [
     { key: 'hero_name', value: 'Lyra', category: 'characters', source: 'manual' as const, worldId },
     { key: 'villain_name', value: 'Dark Lord', category: 'characters', source: 'narrative' as const, worldId }
@@ -69,7 +69,7 @@ export function createCharacterFacts(worldId = 'test-world') {
 /**
  * Creates sample location facts
  */
-export function createLocationFacts(worldId = 'test-world') {
+function createLocationFacts(worldId = 'test-world') {
   return [
     { key: 'tavern_location', value: 'Prancing Pony', category: 'locations', source: 'manual' as const, worldId },
     { key: 'castle_location', value: 'Dark Tower', category: 'locations', source: 'narrative' as const, worldId }
@@ -79,7 +79,7 @@ export function createLocationFacts(worldId = 'test-world') {
 /**
  * Creates sample rule facts
  */
-export function createRuleFacts(worldId = 'test-world') {
+function createRuleFacts(worldId = 'test-world') {
   return [
     { key: 'magic_rule', value: 'Magic requires sacrifice', category: 'rules', source: 'manual' as const, worldId }
   ];

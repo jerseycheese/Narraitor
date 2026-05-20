@@ -172,7 +172,7 @@ interface WizardFieldErrorProps {
   error?: string;
 }
 
-export const WizardFieldError: React.FC<WizardFieldErrorProps> = ({
+const WizardFieldError: React.FC<WizardFieldErrorProps> = ({
   error,
 }) => {
   if (!error) return null;

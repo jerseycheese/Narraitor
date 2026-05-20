@@ -154,7 +154,7 @@ export function createMockCharacter(
 /**
  * Creates a mock GameSession object
  */
-export function createMockSession(
+function createMockSession(
   overrides: Partial<GameSession> = {}
 ): GameSession {
   return {
@@ -207,7 +207,7 @@ export function createMockNarrativeSegment(
 /**
  * Creates a mock Decision object
  */
-export function createMockDecision(
+function createMockDecision(
   overrides: Partial<Decision> = {}
 ): Decision {
   return {
@@ -226,7 +226,7 @@ export function createMockDecision(
 /**
  * Creates a mock PlayerChoice object
  */
-export function createMockPlayerChoice(
+function createMockPlayerChoice(
   overrides: Partial<PlayerChoice> = {}
 ): PlayerChoice {
   return {

@@ -1,6 +1,6 @@
 import type { GoalStore } from './types';
 
-export function createMockGoalStore(
+function createMockGoalStore(
   overrides?: Partial<GoalStore>
 ): GoalStore {
   return {

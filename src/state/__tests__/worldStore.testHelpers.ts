@@ -61,7 +61,7 @@ export function createTestAttributeData(
 /**
  * Creates test skill data
  */
-export function createTestSkillData(
+function createTestSkillData(
   overrides?: Partial<{
     name: string;
     description: string;

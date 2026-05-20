@@ -16,7 +16,7 @@ interface EventSubscription {
   unsubscribe: () => void;
 }
 
-export class StoreEventBus {
+class StoreEventBus {
   private subscribers = new Map<string, Set<EventCallback>>();
 
   subscribe<T = unknown>(event: string, callback: EventCallback<T>): EventSubscription {

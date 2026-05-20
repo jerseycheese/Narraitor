@@ -5,13 +5,13 @@
 import { useSessionStore } from '@/state/sessionStore';
 import { useJournalStore } from '@/state/journalStore';
 
-export const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
+const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
 export const mockUseJournalStore = useJournalStore as jest.MockedFunction<typeof useJournalStore>;
 
 /**
  * Default mock session store state
  */
-export const createMockSessionStore = (overrides = {}) => ({
+const createMockSessionStore = (overrides = {}) => ({
   id: null,
   status: 'initializing' as const,
   worldId: null,
@@ -54,7 +54,7 @@ export const createMockSessionStore = (overrides = {}) => ({
 /**
  * Default mock journal store state
  */
-export const createMockJournalStore = (overrides = {}) => ({
+const createMockJournalStore = (overrides = {}) => ({
   addEntry: jest.fn(),
   getSessionEntries: jest.fn().mockReturnValue([]),
   markAsRead: jest.fn(),
@@ -92,7 +92,7 @@ export const setupMockStores = (
 /**
  * Create test session data
  */
-export const createTestSession = (overrides = {}) => ({
+const createTestSession = (overrides = {}) => ({
   id: 'test-session-123',
   startTime: Date.now(),
   worldId: 'test-world',

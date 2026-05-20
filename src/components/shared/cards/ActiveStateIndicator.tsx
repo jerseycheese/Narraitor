@@ -39,4 +39,3 @@ export const ActiveStateIndicator: React.FC<ActiveStateIndicatorProps> = ({
   );
 };
 
-export default ActiveStateIndicator;

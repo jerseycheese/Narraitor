@@ -14,7 +14,7 @@ const validJournalEntryTypes: JournalEntryType[] = [
   'decision'
 ];
 
-export function isJournalEntry(obj: unknown): obj is JournalEntry {
+function isJournalEntry(obj: unknown): obj is JournalEntry {
   if (obj === null || obj === undefined || typeof obj !== 'object') return false;
   const o = obj as Record<string, unknown>;
   return 'id' in o &&

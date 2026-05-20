@@ -3,7 +3,7 @@
 import { safeTrim, normalizeText, NORM_NAME } from '@/lib/utils';
 
 // Utility functions
-export function isSafeString(value: unknown, maxLength: number = 200): value is string {
+function isSafeString(value: unknown, maxLength: number = 200): value is string {
   return typeof value === 'string' && 
          value.length > 0 && 
          value.length <= maxLength;

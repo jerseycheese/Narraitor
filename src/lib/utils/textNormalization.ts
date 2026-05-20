@@ -79,7 +79,7 @@ export function normalizeText(text: string, options: TextNormalizationOptions = 
 /**
  * Normalizes whitespace while preserving semantic structure
  */
-export function normalizeWhitespace(text: string, preserveStructure: boolean = true): string {
+function normalizeWhitespace(text: string, preserveStructure: boolean = true): string {
   if (!text) return '';
 
   let normalized = text;
@@ -108,7 +108,7 @@ export function normalizeWhitespace(text: string, preserveStructure: boolean = t
 /**
  * Standardizes line endings to Unix format (\n)
  */
-export function normalizeLineEndings(text: string): string {
+function normalizeLineEndings(text: string): string {
   if (!text) return '';
   return text.replace(/\r\n?/g, '\n');
 }
@@ -127,7 +127,7 @@ export function normalizeQuotationMarks(text: string): string {
 /**
  * Normalizes special characters to ASCII equivalents
  */
-export function normalizeSpecialCharacters(text: string): string {
+function normalizeSpecialCharacters(text: string): string {
   if (!text) return '';
 
   return text

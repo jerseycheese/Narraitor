@@ -11,7 +11,7 @@ export {
   WizardTextField,
   WizardTextArea,
   WizardSelect,
-  WizardFieldError,
+  
   WizardFormSection,
 } from './components/FormComponents';
 
@@ -22,7 +22,7 @@ export type { ToggleButtonProps } from './components/ToggleButton';
 // Export AI components
 
 // Export hooks
-export { useWizardState } from './hooks/useWizardState';
+;
 
 // Export types
 export * from './types/steps';

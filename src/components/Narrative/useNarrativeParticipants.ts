@@ -8,7 +8,7 @@ export interface NarrativeParticipant {
   avatarUrl?: string;
 }
 
-export const NAME_STOP_WORDS = ['the', 'and', 'but', 'for'];
+const NAME_STOP_WORDS = ['the', 'and', 'but', 'for'];
 
 export const deriveFallbackName = (id: string): string => {
   if (!id) {

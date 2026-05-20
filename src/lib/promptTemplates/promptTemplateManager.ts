@@ -186,4 +186,4 @@ export class PromptTemplateManager {
 }
 
 // Export singleton instance
-export const promptTemplateManager = new PromptTemplateManager();
+const promptTemplateManager = new PromptTemplateManager();

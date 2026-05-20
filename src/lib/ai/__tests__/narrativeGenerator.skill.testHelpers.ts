@@ -161,5 +161,5 @@ export function createMockCharacterWithSkills(): Character {
 /**
  * Export mock data for use in jest.mock() calls
  */
-export const mockWorld = createMockWorldWithSkills();
-export const mockCharacter = createMockCharacterWithSkills();
+const mockWorld = createMockWorldWithSkills();
+const mockCharacter = createMockCharacterWithSkills();

@@ -24,8 +24,8 @@ export {
   formatDate,
   formatTime,
   formatDateTime,
-  formatNumericScore,
-  formatStringList,
+  
+  
   truncate,
   capitalize,
   titleCase,
@@ -38,10 +38,10 @@ export type { DateFormatOptions, DateTimeFormatOptions, NumberFormatOptions } fr
 /** Text normalization utilities for consistent text formatting */
 export {
   normalizeText,
-  normalizeWhitespace,
-  normalizeLineEndings,
-  normalizeQuotationMarks,
-  normalizeSpecialCharacters,
+  
+  
+  
+  
   NORM_NAME,
   NORM_DESC
 } from './textNormalization';
@@ -52,29 +52,26 @@ export type {
 } from './textNormalization';
 
 // Error handling utilities
-export {
-  isRetryableError,
-  getUserFriendlyError
-} from './errorUtils';
+;
 export type { UserFriendlyError } from './errorUtils';
 
 // Validation utilities
 export {
-  validateName,
-  validateText,
-  validatePointDistribution,
-  validateSelectionCount,
+  
+  
+  
+  
   type ValidationResult
 } from './validationUtils';
 
 // Debounce utilities
-export { debounce } from './debounce';
+;
 export type { DebouncedFunction } from './debounce';
 
 // Tone settings utilities
 export { descriptionsToSelectOptions } from './enumHelpers';
 export type { SelectOptionWithDescription } from './enumHelpers';
-export { createFormUpdater } from './formHelpers';
+;
 export { validateToneSettings } from './toneSettingsValidation';
 
 

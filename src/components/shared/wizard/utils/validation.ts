@@ -79,7 +79,7 @@ export function validateField<T>(
 }
 
 // Validate multiple fields
-export function validateFields<T = UnknownValue>(
+function validateFields<T = UnknownValue>(
   fields: Array<{
     name: string;
     value: T;
@@ -99,7 +99,7 @@ export function validateFields<T = UnknownValue>(
 }
 
 // Convert field errors to validation result
-export function createValidationResult(errors: Record<string, string>): ValidationResult {
+function createValidationResult(errors: Record<string, string>): ValidationResult {
   const errorMessages = Object.values(errors);
   return {
     valid: errorMessages.length === 0,
@@ -108,7 +108,7 @@ export function createValidationResult(errors: Record<string, string>): Validati
 }
 
 // Common validation patterns
-export const patterns = {
+const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   alphanumeric: /^[a-zA-Z0-9]+$/,
   alphanumericWithSpaces: /^[a-zA-Z0-9\s]+$/,

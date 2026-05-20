@@ -110,7 +110,7 @@ export function getCategoryMetadata(
  * });
  * ```
  */
-export function getAllCategories(): Array<
+function getAllCategories(): Array<
   CategoryMetadata & { id: StandardInventoryCategory }
 > {
   return STANDARD_CATEGORIES.map((category) => ({

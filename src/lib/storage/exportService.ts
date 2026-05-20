@@ -36,7 +36,7 @@ export interface ImportResult {
   error?: string;
 }
 
-export async function exportGameState(): Promise<ExportResult> {
+async function exportGameState(): Promise<ExportResult> {
   try {
     const gameState: GameStateExport = {
       version: CURRENT_VERSION,
@@ -79,7 +79,7 @@ export async function downloadGameState(): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
-export async function importGameState(gameState: unknown): Promise<ImportResult> {
+async function importGameState(gameState: unknown): Promise<ImportResult> {
   try {
     const validationResult = validateGameState(gameState);
 
@@ -207,7 +207,7 @@ function validateGameState(gameState: unknown): { valid: boolean; error?: string
   return { valid: true };
 }
 
-export async function getExportSize(): Promise<number> {
+async function getExportSize(): Promise<number> {
   const exportResult = await exportGameState();
 
   if (!exportResult.success || !exportResult.data) {

@@ -82,6 +82,6 @@ export function createInitialWorldTypeData(worldType: WorldTypeData['worldType']
 /**
  * Checks if world type data is valid
  */
-export function isWorldTypeDataValid(data: WorldTypeData): boolean {
+function isWorldTypeDataValid(data: WorldTypeData): boolean {
   return validateWorldTypeData(data).length === 0;
 }

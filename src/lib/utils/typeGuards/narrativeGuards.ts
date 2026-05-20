@@ -5,7 +5,7 @@ import type { NarrativeSegment } from '@/types/narrative.types';
 // Boolean type guards for TypeScript type narrowing
 // These provide runtime type checking with narrowed return types for compatibility
 
-export function isNarrativeSegment(obj: unknown): obj is NarrativeSegment {
+function isNarrativeSegment(obj: unknown): obj is NarrativeSegment {
   if (obj === null || obj === undefined || typeof obj !== 'object') return false;
   const o = obj as Record<string, unknown>;
   return 'id' in o &&
