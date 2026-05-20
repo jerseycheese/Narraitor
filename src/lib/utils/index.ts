@@ -24,71 +24,45 @@ export {
   formatDate,
   formatTime,
   formatDateTime,
-  formatNumericScore,
-  formatStringList,
   truncate,
   capitalize,
   titleCase,
-  safeTrim
+  safeTrim,
 } from './formatters';
 
 /** Type definitions for formatting options */
-export type { DateFormatOptions, DateTimeFormatOptions, NumberFormatOptions } from './formatters';
+export type {
+  DateFormatOptions,
+  DateTimeFormatOptions,
+  NumberFormatOptions,
+} from './formatters';
 
 /** Text normalization utilities for consistent text formatting */
-export {
-  normalizeText,
-  normalizeWhitespace,
-  normalizeLineEndings,
-  normalizeQuotationMarks,
-  normalizeSpecialCharacters,
-  NORM_NAME,
-  NORM_DESC
-} from './textNormalization';
+export { normalizeText, NORM_NAME, NORM_DESC } from './textNormalization';
 
 /** Type definitions for text normalization */
-export type {
-  TextNormalizationOptions
-} from './textNormalization';
+export type { TextNormalizationOptions } from './textNormalization';
 
 // Error handling utilities
-export {
-  isRetryableError,
-  getUserFriendlyError
-} from './errorUtils';
 export type { UserFriendlyError } from './errorUtils';
 
 // Validation utilities
-export {
-  validateName,
-  validateText,
-  validatePointDistribution,
-  validateSelectionCount,
-  type ValidationResult
-} from './validationUtils';
+export { type ValidationResult } from './validationUtils';
 
 // Debounce utilities
-export { debounce } from './debounce';
 export type { DebouncedFunction } from './debounce';
 
 // Tone settings utilities
 export { descriptionsToSelectOptions } from './enumHelpers';
 export type { SelectOptionWithDescription } from './enumHelpers';
-export { createFormUpdater } from './formHelpers';
 export { validateToneSettings } from './toneSettingsValidation';
 
-
 // Enhanced serialization and debugging utilities
-export {
-  sanitizeForSerialization,
-  formatForDebug
-} from './formatters';
+export { sanitizeForSerialization, formatForDebug } from './formatters';
 
-
-/** 
+/**
  * Narrative parsing utilities for AI response content processing
  * Handles JSON code blocks, malformed JSON, and multiple fallback strategies
  * @see narrativeParser.ts for detailed usage examples
  */
 export { parseNarrativeContent } from './narrativeParser';
-

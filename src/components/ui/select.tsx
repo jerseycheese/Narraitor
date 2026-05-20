@@ -66,4 +66,4 @@ const SelectValue = React.forwardRef<
 ))
 SelectValue.displayName = "SelectValue"
 
-export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue }
+export { Select,     }

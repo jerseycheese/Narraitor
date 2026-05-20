@@ -131,18 +131,6 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 };
 
 // Preset components for common use cases
-export const InlineError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
-  props
-) => <ErrorDisplay variant="inline" {...props} />;
-
-export const SectionError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
-  props
-) => <ErrorDisplay variant="section" {...props} />;
-
 export const PageError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
   props
 ) => <ErrorDisplay variant="page" {...props} />;
-
-export const ToastError: React.FC<Omit<ErrorDisplayProps, 'variant'>> = (
-  props
-) => <ErrorDisplay variant="toast" {...props} />;

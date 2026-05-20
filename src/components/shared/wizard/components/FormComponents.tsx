@@ -168,18 +168,6 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
   );
 };
 
-interface WizardFieldErrorProps {
-  error?: string;
-}
-
-export const WizardFieldError: React.FC<WizardFieldErrorProps> = ({
-  error,
-}) => {
-  if (!error) return null;
-
-  return <p className={errorStyles.message}>{error}</p>;
-};
-
 interface WizardFormSectionProps {
   title?: string;
   description?: string;

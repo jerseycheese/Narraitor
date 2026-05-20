@@ -16,19 +16,14 @@ import { getDetailedToneInstructions } from '../toneSettingsGuidance';
 import { PlayerDecision } from '@/types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
-export { getTimestamp } from '@/lib/utils/timestamp';
-
 // Re-export centralized timer utilities
-export {
-  setupTestTimers,
-  cleanupTestTimers,
-} from '@/lib/test-utils/testTimers';
+export { setupTestTimers } from '@/lib/test-utils/testTimers';
 
-export const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<
+const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<
   typeof playerDecisionTracker
 >;
 
-export const mockWorld = {
+const mockWorld = {
   id: 'world-1',
   name: 'Test World',
   genre: 'fantasy',
@@ -51,7 +46,7 @@ export const mockWorld = {
   updatedAt: '2025-01-01T00:00:00.000Z',
 };
 
-export const mockCharacter = {
+const mockCharacter = {
   id: 'char-1',
   name: 'Hero',
   worldId: 'world-1',

@@ -91,7 +91,7 @@ export type DashboardScenario =
   | 'returning-no-session'
   | 'barely-started';
 
-export const mockDashboardState = (scenario: DashboardScenario) => {
+const mockDashboardState = (scenario: DashboardScenario) => {
   // Always bypass first-time onboarding so we render the dashboard,
   // not the GuidedFirstTimeExperience.
   const sharedSession = {

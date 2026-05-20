@@ -295,7 +295,7 @@ export function validateWorldSettings(obj: unknown, partial: boolean = false): V
   return { valid: errors.length === 0, errors };
 }
 
-export function validateGeneratedImage(obj: unknown): ValidationResult {
+function validateGeneratedImage(obj: unknown): ValidationResult {
   const errors: string[] = [];
   const validTypes = ['ai-generated', 'placeholder'];
 

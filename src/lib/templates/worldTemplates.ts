@@ -40,7 +40,7 @@ export interface SkillTemplate {
 /**
  * Western template
  */
-export const westernTemplate: WorldTemplate = {
+const westernTemplate: WorldTemplate = {
   id: 'western',
   name: 'Western',
   description: 'A world set in the American frontier during the late 19th century.',
@@ -204,7 +204,7 @@ export const westernTemplate: WorldTemplate = {
 /**
  * Sitcom template
  */
-export const sitcomTemplate: WorldTemplate = {
+const sitcomTemplate: WorldTemplate = {
   id: 'sitcom',
   name: 'Sitcom',
   description: 'A comedic world based on modern situation comedies.',
@@ -368,7 +368,7 @@ export const sitcomTemplate: WorldTemplate = {
 /**
  * Fantasy template
  */
-export const fantasyTemplate: WorldTemplate = {
+const fantasyTemplate: WorldTemplate = {
   id: 'fantasy',
   name: 'Fantasy',
   description: 'A magical world of heroes, monsters, and epic quests.',
