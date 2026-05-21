@@ -120,6 +120,31 @@ jobs:
       - name: Run Knip
         run: npm run knip
 
+  audit-css:
+    name: CSS audit (unused selectors)
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # Non-blocking: surfaces unused-CSS findings in the logs without failing
+      # the check, since runtime-composed class names make false positives
+      # likely. Review the output and prune manually (#1087).
+      - name: Run CSS audit
+        run: npm run audit:css || true
+
   test:
     name: Unit & Integration Tests
     runs-on: ubuntu-latest
