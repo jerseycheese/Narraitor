@@ -7,7 +7,7 @@ export interface PointPoolItem {
   maxValue: number;
 }
 
-export interface PointPool {
+interface PointPool {
   total: number;
   spent: number;
   remaining: number;
@@ -185,7 +185,7 @@ export function usePointPoolManager<T extends PointPoolItem>({
   };
 }
 
-export interface SkillPointPoolItem extends PointPoolItem {
+interface SkillPointPoolItem extends PointPoolItem {
   isSelected: boolean;
 }
 

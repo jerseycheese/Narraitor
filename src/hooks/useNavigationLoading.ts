@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-export interface NavigationLoadingState {
+interface NavigationLoadingState {
   isLoading: boolean;
   loadingType: 'page' | 'data' | 'error';
   message?: string;

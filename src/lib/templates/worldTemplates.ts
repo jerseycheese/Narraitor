@@ -17,7 +17,7 @@ export interface WorldTemplate {
   skills: SkillTemplate[];
 }
 
-export interface AttributeTemplate {
+interface AttributeTemplate {
   name: string;
   description: string;
   minValue: number;
@@ -25,7 +25,7 @@ export interface AttributeTemplate {
   defaultValue: number;
 }
 
-export interface SkillTemplate {
+interface SkillTemplate {
   name: string;
   description: string;
   relatedAttributes: string[]; // Names of attributes

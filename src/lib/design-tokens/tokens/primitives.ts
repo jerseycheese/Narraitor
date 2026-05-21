@@ -61,5 +61,3 @@ export const primitiveColors = {
     900: '#78350f',   // Very dark warning text
   },
 } as const
-
-export type PrimitiveColor = typeof primitiveColors

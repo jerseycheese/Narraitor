@@ -1,7 +1,7 @@
 import type { WorldAttribute } from '@/types/world.types';
 
 /** Minimal NPC shape the narrative templates render into the roster section. */
-export interface NpcRosterEntry {
+interface NpcRosterEntry {
   id: string;
   name: string;
   description?: string;
@@ -12,7 +12,7 @@ export interface NpcRosterEntry {
  * build this loosely (sometimes partially), so every field is optional and segments
  * are narrowed to the one property templates use.
  */
-export interface NarrativeTemplateNarrativeContext {
+interface NarrativeTemplateNarrativeContext {
   recentSegments?: Array<{ content?: string }>;
   currentLocation?: string;
   currentSituation?: string;
@@ -26,7 +26,7 @@ export interface NarrativeTemplateNarrativeContext {
 }
 
 /** Subset of generation parameters the templates read. */
-export interface NarrativeTemplateGenerationParameters {
+interface NarrativeTemplateGenerationParameters {
   desiredLength?: 'short' | 'medium' | 'long';
   exampleTokenBudget?: number;
   segmentType?: string;

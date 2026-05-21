@@ -8,7 +8,6 @@ export { getTimestamp } from './timestamp';
 
 /** AI text formatting utilities */
 export { formatAIResponse } from './textFormatter';
-export type { FormattingOptions } from './textFormatter';
 
 /** CSS class name utilities */
 export { cssClasses } from './classNames';
@@ -30,35 +29,18 @@ export {
   safeTrim,
 } from './formatters';
 
-/** Type definitions for formatting options */
-export type {
-  DateFormatOptions,
-  DateTimeFormatOptions,
-  NumberFormatOptions,
-} from './formatters';
-
 /** Text normalization utilities for consistent text formatting */
 export { normalizeText, NORM_NAME, NORM_DESC } from './textNormalization';
-
-/** Type definitions for text normalization */
-export type { TextNormalizationOptions } from './textNormalization';
-
-// Error handling utilities
-export type { UserFriendlyError } from './errorUtils';
 
 // Validation utilities
 export { type ValidationResult } from './validationUtils';
 
-// Debounce utilities
-export type { DebouncedFunction } from './debounce';
-
 // Tone settings utilities
 export { descriptionsToSelectOptions } from './enumHelpers';
-export type { SelectOptionWithDescription } from './enumHelpers';
 export { validateToneSettings } from './toneSettingsValidation';
 
 // Enhanced serialization and debugging utilities
-export { sanitizeForSerialization, formatForDebug } from './formatters';
+export { sanitizeForSerialization } from './formatters';
 
 /**
  * Narrative parsing utilities for AI response content processing

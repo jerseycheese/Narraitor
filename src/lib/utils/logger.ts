@@ -4,7 +4,7 @@
  * Provides severity levels, environment-based toggling, and formatted output.
  */
 
-export enum LogLevel {
+enum LogLevel {
   DEBUG = 0,
   INFO = 1,
   WARN = 2,

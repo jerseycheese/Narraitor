@@ -16,13 +16,8 @@ export {
 
 // Export UI components
 export { ToggleButton } from './components/ToggleButton';
-export type { ToggleButtonProps } from './components/ToggleButton';
 
 // Export AI components
-
-// Export hooks
-// Export types
-export * from './types/steps';
 
 // Export validation utilities
 export * from './utils/validation';

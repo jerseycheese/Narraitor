@@ -61,32 +61,6 @@ export interface DateTimeFormatOptions extends DateFormatOptions {
   hour12?: boolean;
 }
 
-/**
- * Number formatting options interface
- * 
- * Provides fine-grained control over number formatting behavior.
- * 
- * @example
- * ```typescript
- * const options: NumberFormatOptions = {
- *   minimumFractionDigits: 2,
- *   maximumFractionDigits: 2,
- *   useGrouping: true
- * };
- * // Note: Currently used for type definition, implementation uses simpler approach
- * ```
- */
-export interface NumberFormatOptions {
-  /** Minimum number of decimal places to show */
-  minimumFractionDigits?: number;
-  /** Maximum number of decimal places to show */
-  maximumFractionDigits?: number;
-  /** Whether to use thousands separators (commas, periods) */
-  useGrouping?: boolean;
-  /** Locale identifier for formatting (e.g., 'en-US', 'de-DE') */
-  locale?: string;
-}
-
 // === DATE FORMATTING ===
 
 /**
@@ -502,58 +476,5 @@ export function sanitizeForSerialization(obj: unknown, options?: {
   }
   
   return sanitizeRecursive(obj);
-}
-
-/**
- * Formats complex objects for debugging with circular reference handling and string truncation.
- *
- * @param obj - Object to format for debugging
- * @param options - Configuration (compact, indent, maxStringLength)
- * @returns Debug-friendly string representation
- */
-export function formatForDebug(obj: unknown, options?: {
-  /** Compact single-line format */
-  compact?: boolean;
-  /** Indentation spaces for pretty printing */
-  indent?: number;
-  /** Maximum string length before truncation */
-  maxStringLength?: number;
-}): string {
-  const { compact = false, indent = 2, maxStringLength = 100 } = options || {};
-  
-  try {
-    // First sanitize the object to handle circular references and special types
-    const sanitized = sanitizeForSerialization(obj, {
-      functionHandler: (fn) => `[Function: ${fn.name || 'anonymous'}]`
-    });
-    
-    // Apply string length limits for readability
-    const limitStrings = (value: unknown): unknown => {
-      if (typeof value === 'string' && value.length > maxStringLength) {
-        return `${value.substring(0, maxStringLength)}...`;
-      }
-      if (Array.isArray(value)) {
-        return value.map(limitStrings);
-      }
-      if (value && typeof value === 'object') {
-        const limited: Record<string, unknown> = {};
-        Object.entries(value as Record<string, unknown>).forEach(([key, val]) => {
-          limited[key] = limitStrings(val);
-        });
-        return limited;
-      }
-      return value;
-    };
-    
-    const processed = limitStrings(sanitized);
-    
-    if (compact) {
-      return JSON.stringify(processed);
-    } else {
-      return JSON.stringify(processed, null, indent);
-    }
-  } catch (error) {
-    return `[Debug Format Error: ${error instanceof Error ? error.message : 'Unknown error'}]`;
-  }
 }
 

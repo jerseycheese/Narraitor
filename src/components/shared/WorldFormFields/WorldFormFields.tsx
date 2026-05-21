@@ -9,7 +9,7 @@ import { Select } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { LoadingState as UILoadingState } from '@/components/ui/LoadingState/LoadingState';
 
-export interface WorldNameInputProps {
+interface WorldNameInputProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
@@ -46,7 +46,7 @@ function WorldNameInput({
   );
 }
 
-export interface GenreSelectProps {
+interface GenreSelectProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
@@ -86,7 +86,7 @@ function GenreSelect({
   );
 }
 
-export interface DescriptionTextAreaProps {
+interface DescriptionTextAreaProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
@@ -144,7 +144,7 @@ function DescriptionTextArea({
   );
 }
 
-export interface LoadingStateProps {
+interface LoadingStateProps {
   isLoading: boolean;
   message?: string;
   details?: string;
@@ -171,7 +171,7 @@ function LoadingState({
   );
 }
 
-export interface ErrorDisplayProps {
+interface ErrorDisplayProps {
   error: string | null;
   onRetry?: () => void;
   onDismiss?: () => void;

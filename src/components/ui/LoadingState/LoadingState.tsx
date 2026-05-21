@@ -1,8 +1,8 @@
 import React from 'react';
 
 export type LoadingVariant = 'spinner' | 'pulse' | 'dots' | 'skeleton';
-export type LoadingSize = 'sm' | 'md' | 'lg' | 'xl';
-export type LoadingTheme = 'light' | 'dark';
+type LoadingSize = 'sm' | 'md' | 'lg' | 'xl';
+type LoadingTheme = 'light' | 'dark';
 
 interface LoadingStateProps {
   /** The variant of loading indicator to display */

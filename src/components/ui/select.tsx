@@ -1,7 +1,7 @@
 import * as React from "react"
 import { clsx } from 'clsx'
 
-export type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>
+type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...props }, ref) => {

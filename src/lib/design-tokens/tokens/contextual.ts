@@ -53,6 +53,3 @@ export const loreCategories = {
     text: primitiveColors.amber[700],
   },
 } as const
-
-export type EndingTones = typeof endingTones
-export type LoreCategories = typeof loreCategories

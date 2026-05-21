@@ -1,7 +1,7 @@
 import * as React from "react"
 import { clsx } from 'clsx'
 
-export interface ButtonProps
+interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'success' | 'info' | 'warning'
   size?: 'default' | 'sm' | 'lg' | 'icon'

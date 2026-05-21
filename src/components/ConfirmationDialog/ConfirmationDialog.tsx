@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { Button } from '@/components/ui/button';
 
-export type ConfirmationVariant = 'default' | 'destructive' | 'warning' | 'info';
+type ConfirmationVariant = 'default' | 'destructive' | 'warning' | 'info';
 
 export interface ConfirmationDialogProps {
   isOpen: boolean;

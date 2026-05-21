@@ -9,7 +9,7 @@ export enum PromptType {
 /**
  * Interface for template variables
  */
-export interface PromptVariable {
+interface PromptVariable {
   name: string;
   type: string;
   description: string;
@@ -32,8 +32,3 @@ export interface PromptTemplate {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- context shape varies per template; see template files for expected fields
   generate?: (context: any) => string;
 }
-
-/**
- * Type for variable substitution values
- */
-export type VariableValues = Record<string, string>;

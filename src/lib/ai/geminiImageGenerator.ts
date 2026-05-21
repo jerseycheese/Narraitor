@@ -12,7 +12,7 @@ import { getAIConfig } from './config';
 
 const logger = new Logger('GeminiImageGenerator');
 
-export interface GeminiImagePart {
+interface GeminiImagePart {
   inlineData?: {
     mimeType?: string;
     data?: string;

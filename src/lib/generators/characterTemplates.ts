@@ -26,7 +26,7 @@ export interface GeneratedCharacterData {
   characterType?: 'protagonist' | 'antagonist' | 'supporting' | 'original';
 }
 
-export type CharacterGenerationMethod = 'template' | 'ai';
+type CharacterGenerationMethod = 'template' | 'ai';
 export type CharacterGenerationType = 'known' | 'original' | 'specific';
 
 export interface CharacterGenerationOptions {

@@ -12,7 +12,7 @@ export interface WizardValidation {
   touched: boolean;
 }
 
-export interface WizardState<TData = unknown> {
+interface WizardState<TData = unknown> {
   currentStep: number;
   data: TData;
   validation: Record<number, WizardValidation>;

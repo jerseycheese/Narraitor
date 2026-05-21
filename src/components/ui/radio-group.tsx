@@ -1,7 +1,7 @@
 import * as React from "react"
 import { clsx } from 'clsx'
 
-export interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string
   onValueChange?: (value: string) => void
   name?: string
@@ -9,7 +9,7 @@ export interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: 'vertical' | 'horizontal'
 }
 
-export interface RadioGroupItemProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface RadioGroupItemProps extends React.InputHTMLAttributes<HTMLInputElement> {
   value: string
   id?: string
   children?: React.ReactNode

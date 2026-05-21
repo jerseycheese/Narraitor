@@ -12,7 +12,7 @@ export interface LevelDescription {
 /**
  * Props for the RangeSlider component
  */
-export interface RangeSliderProps {
+interface RangeSliderProps {
   /**
    * Current value of the slider
    */

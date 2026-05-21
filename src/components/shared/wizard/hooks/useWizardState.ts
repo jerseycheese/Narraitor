@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { safeJsonParse } from '@/lib/safeJsonParse';
 
-export interface WizardStep {
+interface WizardStep {
   id: string;
   label: string;
 }
@@ -15,7 +15,7 @@ export interface WizardState<T> {
   validation: Record<number, ValidationState>;
 }
 
-export interface ValidationState {
+interface ValidationState {
   valid: boolean;
   errors: string[];
   touched: boolean;

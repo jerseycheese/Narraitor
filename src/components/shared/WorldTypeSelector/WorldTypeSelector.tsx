@@ -161,4 +161,4 @@ export function WorldTypeSelector({
   );
 }
 
-export type { WorldTypeOption, WorldTypeData };
+export type { WorldTypeData };
