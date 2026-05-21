@@ -2,11 +2,7 @@
  * Enum for different prompt template types
  */
 export enum PromptType {
-  CHARACTER = 'CHARACTER',
-  WORLD = 'WORLD',
   NARRATIVE = 'NARRATIVE',
-  DIALOGUE = 'DIALOGUE',
-  QUEST = 'QUEST',
   NarrativeGeneration = 'NARRATIVE_GENERATION'
 }
 
