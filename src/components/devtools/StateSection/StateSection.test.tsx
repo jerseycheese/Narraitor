@@ -53,7 +53,6 @@ jest.mock('@/state/aiContextStore', () => {
     getState: jest.fn().mockReturnValue({ contexts: {} })
   });
   return {
-    aiContextStore: mockStore,
     useAiContextStore: mockStore
   };
 });

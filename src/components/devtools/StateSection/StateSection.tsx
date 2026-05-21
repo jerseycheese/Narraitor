@@ -11,7 +11,7 @@ import { useNPCStore } from '@/state/npcStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { aiContextStore, useAiContextStore } from '@/state/aiContextStore';
+import { useAiContextStore } from '@/state/aiContextStore';
 import { useLoreStore } from '@/state/loreStore';
 import { useNavigationStore } from '@/state/navigationStore';
 import { useGoalStore } from '@/state/goalStore';
@@ -45,7 +45,6 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
       useNarrativeStore,
       useJournalStore,
       useSessionStore,
-      aiContextStore,
       useAiContextStore,
       useLoreStore,
       useNavigationStore,
