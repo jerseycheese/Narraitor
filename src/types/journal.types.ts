@@ -40,7 +40,7 @@ export type JournalEntryType =
 /**
  * Represents an entity related to a journal entry
  */
-export interface RelatedEntity {
+interface RelatedEntity {
   type: 'character' | 'item' | 'location' | 'event';
   id: EntityID;
   name: string;
@@ -49,7 +49,7 @@ export interface RelatedEntity {
 /**
  * Metadata for journal entries
  */
-export interface JournalMetadata {
+interface JournalMetadata {
   tags: string[];
   automaticEntry: boolean;
   narrativeSegmentId?: EntityID;

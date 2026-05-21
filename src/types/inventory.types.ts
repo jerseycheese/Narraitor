@@ -58,7 +58,7 @@ export interface InventoryAcquisitionRecord {
   recordedBy?: EntityID;
 }
 
-export type InventoryCategorizationSource = 'ai' | 'manual' | 'system' | 'fallback';
+type InventoryCategorizationSource = 'ai' | 'manual' | 'system' | 'fallback';
 
 export interface InventoryItemCategorization {
   categoryId: StandardInventoryCategory;

@@ -49,7 +49,7 @@ export interface TemplateHistoryEntry {
 /**
  * Auto-save status and metadata
  */
-export interface AutoSaveState {
+interface AutoSaveState {
   enabled: boolean;
   lastSaveTime: string | null;
   status: 'idle' | 'saving' | 'saved' | 'error';

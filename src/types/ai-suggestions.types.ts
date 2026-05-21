@@ -3,7 +3,7 @@
  */
 import type { SkillDifficulty } from './skill-difficulty.types';
 
-export interface AISuggestionBase {
+interface AISuggestionBase {
   name: string;
   description: string;
   category?: string;

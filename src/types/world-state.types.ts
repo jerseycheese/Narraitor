@@ -1,7 +1,6 @@
 // src/types/world-state.types.ts
 
 import { EntityID, ISODateString } from './common.types';
-import { SessionLifecycleStatus } from './session.types';
 
 /**
  * Relationship snapshot for an NPC within a world state.
@@ -148,16 +147,10 @@ export interface CharacterRelationshipRemoval {
 }
 
 export type WorldStateMajorEventInput = Omit<WorldStateMajorEvent, 'sessionId'>;
-export type StoryCheckpointInput = Omit<StoryCheckpoint, 'sessionId' | 'createdAt'> & {
+type StoryCheckpointInput = Omit<StoryCheckpoint, 'sessionId' | 'createdAt'> & {
   sessionId?: EntityID;
   createdAt?: ISODateString;
 };
-
-export interface SessionLifecycleSnapshot {
-  id: EntityID;
-  status: SessionLifecycleStatus;
-  updatedAt: ISODateString;
-}
 
 /**
  * Create an empty world state snapshot for a new world.

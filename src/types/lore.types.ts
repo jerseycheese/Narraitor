@@ -23,7 +23,7 @@ export type LoreUsageSource = 'narrative' | 'choices' | 'lore-extraction' | 'unk
 /**
  * What kind of usage event was recorded
  */
-export type LoreUsageEventType = 'context' | 'mention';
+type LoreUsageEventType = 'context' | 'mention';
 
 /**
  * Lore usage event entry
@@ -183,15 +183,6 @@ export interface SimilarityResult {
   confidence: number; // 0.0 to 1.0
   method: 'exact' | 'levenshtein' | 'ai' | 'alias';
   rationale: string;
-}
-
-/**
- * Options for deduplication operations
- */
-export interface DeduplicationOptions {
-  minConfidence?: number; // Minimum confidence threshold (default: 0.6)
-  category?: LoreCategory; // Filter by category
-  autoMergeThreshold?: number; // Auto-merge above this (default: 0.85)
 }
 
 /**
