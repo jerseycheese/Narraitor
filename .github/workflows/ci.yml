@@ -115,10 +115,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
-      # Non-blocking: surfaces unused-code findings in the logs without
-      # failing the check while ignore rules are still being tuned (#1231).
+      # Blocking: fails the check on any unused dependency, export, or type so
+      # dead code can't accumulate (#1231).
       - name: Run Knip
-        run: npm run knip || true
+        run: npm run knip
 
   test:
     name: Unit & Integration Tests
