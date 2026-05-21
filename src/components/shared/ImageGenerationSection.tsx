@@ -135,7 +135,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
             >
               {isGenerating ? (
                 <>
-                  <div></div>
+                  <div />
                   Generating...
                 </>
               ) : (

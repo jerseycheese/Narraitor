@@ -35,6 +35,10 @@ const eslintConfig = [
       // need a deliberate suppression with a reason. Dev tools, tests, and
       // stories are overridden below.
       "@typescript-eslint/no-explicit-any": "error",
+      // Structural markup hygiene (#1088): both auto-fixable. warn keeps them
+      // out of the blocking CI gate as a first-pass introduction.
+      "react/jsx-no-useless-fragment": ["warn", { "allowExpressions": true }],
+      "react/self-closing-comp": "warn",
     },
   },
   {
