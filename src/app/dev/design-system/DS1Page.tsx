@@ -1,53 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Globe, Users, Play, Sparkles } from 'lucide-react';
 import { primitiveColors } from '@/lib/design-tokens';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { useActiveSection } from '@/hooks/useActiveSection';
 import ManuscriptDemo from './ManuscriptDemo';
 import './design-system.css';
 
-// ---------------------------------------------------------------------------
-// Scroll Reveal Hook
-// ---------------------------------------------------------------------------
-function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      el.querySelectorAll('.ds1-reveal').forEach(c => c.classList.add('ds1-visible'));
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('ds1-visible'); }),
-      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
-    );
-    el.querySelectorAll('.ds1-reveal').forEach(c => observer.observe(c));
-    return () => observer.disconnect();
-  }, []);
-  return ref;
-}
-
-// ---------------------------------------------------------------------------
-// Active Section Tracking Hook
-// ---------------------------------------------------------------------------
-function useActiveSection(ids: string[]) {
-  const [active, setActive] = useState(ids[0]);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible.length > 0) setActive(visible[0].target.id);
-      },
-      { rootMargin: '-20% 0px -60% 0px' }
-    );
-    ids.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el); });
-    return () => observer.disconnect();
-  }, [ids]);
-  return active;
-}
 // ---------------------------------------------------------------------------
 // Helper: Color Swatch
 // ---------------------------------------------------------------------------
@@ -196,8 +157,8 @@ const NAV_SECTIONS = [
 // ---------------------------------------------------------------------------
 export default function DesignSystemPage() {
   const [isDark, setIsDark] = useState(false);
-  const revealRef = useScrollReveal();
-  const activeSection = useActiveSection(NAV_SECTIONS.map(s => s.id));
+  const revealRef = useScrollReveal({ revealClass: 'ds1-reveal', visibleClass: 'ds1-visible', threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+  const activeSection = useActiveSection(NAV_SECTIONS.map(s => s.id), { rootMargin: '-20% 0px -60% 0px' });
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));
