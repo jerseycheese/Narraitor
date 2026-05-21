@@ -139,11 +139,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
-      # Non-blocking: surfaces unused-CSS findings in the logs without failing
-      # the check, since runtime-composed class names make false positives
-      # likely. Review the output and prune manually (#1087).
+      # The audit script exits 0 on findings (it only fails on a genuine error,
+      # e.g. a broken script or missing file), so findings surface in the logs
+      # without failing the check. No `|| true` -- that would also hide a broken
+      # audit. Review the output and prune manually (#1087).
       - name: Run CSS audit
-        run: npm run audit:css || true
+        run: npm run audit:css
 
   test:
     name: Unit & Integration Tests
