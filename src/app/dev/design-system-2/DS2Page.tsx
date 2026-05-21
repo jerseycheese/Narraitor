@@ -1,77 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { useActiveSection } from '@/hooks/useActiveSection';
 import SessionDemo from './SessionDemo';
 import './design-system-2.css';
-
-// ─────────────────────────────────────────────────────────────────
-// Scroll Reveal Hook
-// ─────────────────────────────────────────────────────────────────
-function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      el.querySelectorAll('.ds2-reveal').forEach((child) => {
-        child.classList.add('ds2-visible');
-      });
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('ds2-visible');
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
-    );
-
-    el.querySelectorAll('.ds2-reveal').forEach((child) => {
-      observer.observe(child);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return ref;
-}
-
-// ─────────────────────────────────────────────────────────────────
-// Active Section Tracking Hook
-// ─────────────────────────────────────────────────────────────────
-function useActiveSection(sectionIds: string[]) {
-  const [active, setActive] = useState(sectionIds[0]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting);
-        if (visible.length > 0) {
-          // Pick the one closest to the top
-          visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-          setActive(visible[0].target.id);
-        }
-      },
-      { threshold: 0.15, rootMargin: '-10% 0px -60% 0px' }
-    );
-
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [sectionIds]);
-
-  return active;
-}
 
 // ─────────────────────────────────────────────────────────────────
 // Navigation Sections
@@ -150,8 +83,8 @@ const SPACING_SCALE = [8, 16, 24, 32, 40, 48, 64, 96];
 export default function DesignSystem2Page() {
   const [isDark, setIsDark] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
-  const revealRef = useScrollReveal();
-  const activeSection = useActiveSection(NAV_SECTIONS.map((s) => s.id));
+  const revealRef = useScrollReveal({ revealClass: 'ds2-reveal', visibleClass: 'ds2-visible', threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+  const activeSection = useActiveSection(NAV_SECTIONS.map((s) => s.id), { threshold: 0.15, rootMargin: '-10% 0px -60% 0px' });
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));

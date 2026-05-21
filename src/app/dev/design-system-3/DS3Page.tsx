@@ -1,44 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './design-system-3.css';
 import * as Icons from './icons';
 import SessionDemo from './SessionDemo';
-
-// ── Hooks ──────────────────────────────────────────────────────
-function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      el.querySelectorAll('.ds3-reveal').forEach(c => c.classList.add('ds3-visible'));
-      return;
-    }
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('ds3-visible'); });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    el.querySelectorAll('.ds3-reveal').forEach(c => obs.observe(c));
-    return () => obs.disconnect();
-  }, []);
-  return ref;
-}
-
-function useActiveSection(ids: string[]) {
-  const [active, setActive] = useState(ids[0]);
-  useEffect(() => {
-    const obs = new IntersectionObserver(entries => {
-      const vis = entries.filter(e => e.isIntersecting);
-      if (vis.length) {
-        vis.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        setActive(vis[0].target.id);
-      }
-    }, { threshold: 0.15, rootMargin: '-10% 0px -60% 0px' });
-    ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
-    return () => obs.disconnect();
-  }, [ids]);
-  return active;
-}
+import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { useActiveSection } from '@/hooks/useActiveSection';
 
 // ── Data ───────────────────────────────────────────────────────
 const NAV = [
@@ -102,8 +69,8 @@ const ICON_LIST: [string, React.FC<{ size?: number; className?: string }>][] = [
 // ── Page ───────────────────────────────────────────────────────
 export default function DesignSystem3Page() {
   const [isDark, setIsDark] = useState(false);
-  const revealRef = useScrollReveal();
-  const active = useActiveSection(NAV.map(s => s.id));
+  const revealRef = useScrollReveal({ revealClass: 'ds3-reveal', visibleClass: 'ds3-visible', threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  const active = useActiveSection(NAV.map(s => s.id), { threshold: 0.15, rootMargin: '-10% 0px -60% 0px' });
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));
