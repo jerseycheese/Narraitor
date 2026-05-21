@@ -2,7 +2,7 @@ import React from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { safeTrim } from '@/lib/utils';
 
-export interface NarrativeParticipant {
+interface NarrativeParticipant {
   id: string;
   name: string;
   avatarUrl?: string;

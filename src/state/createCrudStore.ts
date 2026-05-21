@@ -8,20 +8,20 @@
 
 import { UserFriendlyError } from '@/lib/utils/errorUtils';
 
-export interface BaseEntity {
+interface BaseEntity {
   id: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface CrudStoreState<T extends BaseEntity> {
+interface CrudStoreState<T extends BaseEntity> {
   entities: Record<string, T>;
   currentEntityId: string | null;
   error: UserFriendlyError | null;
   loading: boolean;
 }
 
-export interface CrudStoreActions<T extends BaseEntity> {
+interface CrudStoreActions<T extends BaseEntity> {
   create: (data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>) => string;
   update: (id: string, updates: Partial<Omit<T, 'id' | 'createdAt' | 'updatedAt'>>) => void;
   delete: (id: string) => void;

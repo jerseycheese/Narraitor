@@ -1,8 +1,8 @@
 import React from 'react';
 import { cssClasses } from '@/lib/utils';
 
-export type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
-export type ErrorSeverity = 'error' | 'warning' | 'info';
+type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
+type ErrorSeverity = 'error' | 'warning' | 'info';
 
 interface ErrorDisplayProps {
   /** The variant of error display */

@@ -14,7 +14,7 @@ import { getTimestamp } from '../utils';
 const CURRENT_VERSION = '1.0.0';
 const COMPATIBLE_VERSIONS = ['1.0.0'];
 
-export interface GameStateExport {
+interface GameStateExport {
   version: string;
   exportedAt: string;
   worldState: unknown;
@@ -24,7 +24,7 @@ export interface GameStateExport {
   narrativeState?: unknown;
 }
 
-export interface ExportResult {
+interface ExportResult {
   success: boolean;
   data?: GameStateExport;
   error?: string;

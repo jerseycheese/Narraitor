@@ -21,20 +21,3 @@ export interface DashboardMetrics {
   sessionsPlayed: number;
   narrativeSegments: number;
 }
-
-/**
- * Recent item display configuration
- */
-export interface RecentItemsConfig {
-  maxItems: number;
-  showEmptySlots: boolean;
-}
-
-/**
- * Progress step status for getting started guide
- */
-export interface ProgressStep {
-  id: string;
-  label: string;
-  completed: boolean;
-}

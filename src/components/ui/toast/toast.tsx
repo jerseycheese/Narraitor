@@ -10,7 +10,7 @@ import { primitiveColors } from '@/lib/design-tokens';
  * @example
  * ```tsx * // Basic toast * <Toast title="Success!" /> * * // Toast with description and custom variant * <Toast * title="File uploaded" * description="Your file has been successfully uploaded." * variant="success" * /> * * // Toast with custom duration and dismiss handler * <Toast * title="Auto-save enabled" * duration={3000} * onDismiss={() => console.log('Toast dismissed')} * /> *```
  */
-export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
+interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The main title text of the toast notification */
   title: string;
   /** Optional description text shown below the title */

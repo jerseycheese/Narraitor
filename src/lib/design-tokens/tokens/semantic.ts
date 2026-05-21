@@ -109,5 +109,3 @@ export const semanticColors = {
     focusRing: primitiveColors.blue[300],
   },
 } as const
-
-export type SemanticColors = typeof semanticColors

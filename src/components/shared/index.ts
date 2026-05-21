@@ -1,7 +1,5 @@
 export { PortraitCustomizationSection } from './PortraitCustomizationSection';
 export { ImageGenerationSection } from './ImageGenerationSection';
-export type { PageLayoutProps } from './PageLayout';
-export type { LoadingOverlayProps } from './LoadingOverlay';
 export * from './wizard';
 export * from './cards';
 export { ErrorBlock } from './ErrorBlock';

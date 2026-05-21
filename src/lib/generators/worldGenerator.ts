@@ -38,7 +38,7 @@ export interface GeneratedWorldData {
   settings: WorldSettings;
 }
 
-export type WorldGenerationMethod = 'template' | 'ai';
+type WorldGenerationMethod = 'template' | 'ai';
 
 export interface WorldGenerationOptions {
   method: WorldGenerationMethod;

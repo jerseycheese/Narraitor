@@ -24,7 +24,7 @@ export type StateProvider = () => Promise<GameState>;
 
 export type SaveTriggerReason = 'periodic' | 'player-choice' | 'scene-change' | 'manual';
 
-export type SaveResult = {
+type SaveResult = {
   success: boolean;
   timestamp: Date;
   reason: SaveTriggerReason;

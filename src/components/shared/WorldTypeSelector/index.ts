@@ -5,8 +5,5 @@ export {
   createInitialWorldTypeData,
 } from './utils';
 export type {
-  WorldType,
   WorldTypeData,
-  WorldTypeOption,
-  WorldGenerationParams,
 } from './types';

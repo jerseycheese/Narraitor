@@ -7,7 +7,7 @@ import { clsx } from 'clsx';
 import { safeTrim } from '@/lib/utils';
 
 
-export type EndingType = 'triumphant' | 'mysterious' | 'tragic' | 'default';
+type EndingType = 'triumphant' | 'mysterious' | 'tragic' | 'default';
 
 export interface StoryEndingDialogProps {
   isOpen: boolean;

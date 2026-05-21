@@ -17,17 +17,15 @@ describe('featureFlags', () => {
   };
 
   it('defaults all flags to false when env vars are missing, except PROGRESSIVE_DISCLOSURE which defaults to true', () => {
-    const { getFeatureFlags } = load({
+    const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: undefined,
       NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE: undefined,
       NEXT_PUBLIC_FEATURE_VIRTUALIZATION: undefined,
     });
 
-    expect(getFeatureFlags()).toEqual({
-      BUFFERED_STREAMING: false,
-      PROGRESSIVE_DISCLOSURE: true,
-      VIRTUALIZATION: false,
-    });
+    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(false);
+    expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
+    expect(isFeatureEnabled('VIRTUALIZATION')).toBe(false);
   });
 
   it('enables BUFFERED_STREAMING only when env var is true', () => {

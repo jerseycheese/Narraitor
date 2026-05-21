@@ -15,7 +15,7 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('CharacterArchetypes');
 
 export type { CharacterArchetype };
-export type ArchetypeTemplate = ImportedArchetypeTemplate;
+type ArchetypeTemplate = ImportedArchetypeTemplate;
 
 /**
  * Get archetype templates based on world genre

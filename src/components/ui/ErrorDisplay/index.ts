@@ -4,6 +4,4 @@ export {
    
   PageError, 
   
-  type ErrorVariant,
-  type ErrorSeverity 
 } from './ErrorDisplay';

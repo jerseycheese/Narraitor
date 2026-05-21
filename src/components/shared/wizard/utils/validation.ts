@@ -3,11 +3,6 @@ export interface ValidationResult {
   errors: string[];
 }
 
-export interface FieldValidation {
-  field: string;
-  error: string | null;
-}
-
 // Type for unknown values that need validation
 type UnknownValue = unknown;
 

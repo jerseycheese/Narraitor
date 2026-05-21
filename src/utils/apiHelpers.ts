@@ -188,7 +188,7 @@ export async function makeGeminiRequest(
 /**
  * Response structure for Gemini text generation
  */
-export interface GeminiTextResponse {
+interface GeminiTextResponse {
   content: string;
   finishReason?: string;
   promptTokens?: number;

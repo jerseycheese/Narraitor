@@ -1,7 +1,7 @@
 import { EntityID, ISODateString } from './common.types';
 import { ToneSettings } from './tone-settings.types';
 
-export interface StoryCheckpointEventPayload {
+interface StoryCheckpointEventPayload {
   id: EntityID;
   description: string;
   timestamp: ISODateString;

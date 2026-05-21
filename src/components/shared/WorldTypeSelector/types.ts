@@ -1,4 +1,4 @@
-export type WorldType = 'original' | 'inspired_by' | 'set_within';
+type WorldType = 'original' | 'inspired_by' | 'set_within';
 
 export interface WorldTypeData {
   worldType: WorldType;

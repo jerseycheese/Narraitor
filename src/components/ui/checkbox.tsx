@@ -1,7 +1,7 @@
 import * as React from "react"
 import { clsx } from 'clsx'
 
-export interface CheckboxProps
+interface CheckboxProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
 }

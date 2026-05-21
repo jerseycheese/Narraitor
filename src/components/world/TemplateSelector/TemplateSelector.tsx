@@ -7,7 +7,7 @@ import { wizardStyles } from '@/components/shared/wizard';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { convertHistoryEntryToWizardData, storeTemplateDataForWizard } from '@/lib/utils/templateHelpers';
 
-export interface TemplateSelectorProps {
+interface TemplateSelectorProps {
   /**
    * Array of templates to display
    */

@@ -5,7 +5,7 @@ import { clsx } from 'clsx'
 
 // Clean Slate: Removed cva and Tailwind variants.
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 
     | "default" 
     | "secondary" 

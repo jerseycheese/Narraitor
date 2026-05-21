@@ -113,7 +113,7 @@ const initialState = {
 };
 
 // AI Context Store implementation
-export const aiContextStore = create<AIContextStore>()((set, get) => ({
+export const useAiContextStore = create<AIContextStore>()((set, get) => ({
   ...initialState,
 
   createContext: (sessionId) => {
@@ -343,6 +343,3 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
   clearError: () => set(() => ({ error: null })),
   setLoading: (loading) => set(() => ({ loading })),
 }));
-
-// Export as useAiContextStore for compatibility
-export const useAiContextStore = aiContextStore;
