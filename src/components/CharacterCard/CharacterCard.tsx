@@ -178,7 +178,7 @@ export function CharacterCard({
               <p>{context.recentEvent}</p>
             </div>
           )}
-          <div></div>
+          <div />
         </div>
 
         {/* Footer with buttons - always at bottom */}

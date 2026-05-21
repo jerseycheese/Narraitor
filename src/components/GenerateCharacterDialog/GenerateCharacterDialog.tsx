@@ -104,7 +104,7 @@ export const GenerateCharacterDialog: React.FC<
 
       {isGenerating && (
         <div>
-          <span></span>
+          <span />
           {generatingStatus}
         </div>
       )}

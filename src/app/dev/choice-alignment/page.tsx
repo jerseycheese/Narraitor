@@ -214,15 +214,15 @@ export default function ChoiceAlignmentTestPage() {
                 <h3>Alignment Legend:</h3>
                 <div>
                   <div>
-                    <div></div>
+                    <div />
                     <span><strong>Lawful:</strong> Follows rules, respects authority</span>
                   </div>
                   <div>
-                    <div></div>
+                    <div />
                     <span><strong>Neutral:</strong> Balanced, practical approach</span>
                   </div>
                   <div>
-                    <div></div>
+                    <div />
                     <span><strong>Chaos:</strong> Unexpected, disruptive action</span>
                   </div>
                 </div>

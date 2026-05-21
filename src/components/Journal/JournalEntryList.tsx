@@ -73,7 +73,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                 )}
                 {entry.title || titleCase(entry.type.replace('_', ' '))}
               </h4>
-              {!entry.isRead && <div></div>}
+              {!entry.isRead && <div />}
             </div>
 
             <p>

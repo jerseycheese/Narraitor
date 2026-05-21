@@ -232,7 +232,7 @@ export default function WorldsPage() {
 
           {isGenerating && (
             <p>
-              <span></span>
+              <span />
               {generatingStatus}
             </p>
           )}
