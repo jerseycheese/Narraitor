@@ -19,6 +19,7 @@ import {
   SkillCheckRoll,
 } from '@/types/narrative.types';
 import { truncate } from '@/lib/utils';
+import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
@@ -595,7 +596,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       if (
         generateChoices &&
         existingSegments.length > 0 &&
-        existingDecisions.length === 0
+        existingDecisions.length === 0 &&
+        !isSessionEndingSegment(existingSegments[existingSegments.length - 1])
       ) {
         setTimeout(() => {
           if (mountedRef.current) {
@@ -719,8 +721,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Check for ending indicators
       await checkForEndingIndicators(newSegment);
 
-      // Generate choices if enabled - always generate for initial narrative
-      if (generateChoices) {
+      // Generate choices if enabled - skip when this segment already ends the session
+      if (generateChoices && !isSessionEndingSegment(newSegment)) {
         // Start generating AI choices immediately without showing fallback choices first
         setTimeout(() => {
           generatePlayerChoices();
@@ -767,7 +769,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         }
 
         // Kick off choice generation (will provide AI or fallback choices)
-        if (generateChoices) {
+        if (generateChoices && !isSessionEndingSegment(fallbackSegment)) {
           setTimeout(() => {
             generatePlayerChoices();
           }, 500);
@@ -1112,8 +1114,20 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Check for ending indicators
       await checkForEndingIndicators(newSegment);
 
-      // Generate choices if enabled
-      if (generateChoices) {
+      // Generate choices if enabled - skip when the session is ending
+      // (fatal/ending segment or a critical-decision failure).
+      // A critical failure only ends the session when an ending handler is
+      // wired: suggestEnding() is a no-op without onEndingSuggested. Without a
+      // handler, keep generating choices so a standalone controller (harness,
+      // story, embedder) can still move forward instead of stalling with no
+      // ending and no choices.
+      const criticalFailureEndsSession =
+        hasCriticalFailure && Boolean(onEndingSuggested);
+      if (
+        generateChoices &&
+        !isSessionEndingSegment(newSegment) &&
+        !criticalFailureEndsSession
+      ) {
         if (isCustomInput) {
           // Generate choices after a longer delay to ensure custom input is fully processed
           setTimeout(() => {

@@ -8,6 +8,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { createItemUsageJournalEntry } from './itemUsageJournalIntegration';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import type { NarrativeGenerationResult } from '@/types/narrative.types';
+import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
 import { safeTrim } from '@/lib/utils';
 
 import Logger from '@/lib/utils/logger';
@@ -324,39 +325,44 @@ export async function processItemUsage(
         const recentSegments = narrativeStore.getSessionSegments(resolvedSessionId).slice(-5);
         const lastSegment = recentSegments[recentSegments.length - 1];
 
-        const narrativeContext = {
-          worldId,
-          sessionId: resolvedSessionId,
-          currentSceneId: `item-usage-${item.id}-${Date.now()}`,
-          characterIds: [characterId],
-          previousSegments: recentSegments,
-          recentSegments,
-          currentTags: lastSegment?.metadata?.tags || [],
-          currentLocation: lastSegment?.metadata?.location,
-        };
+        // If using the item ended the session (fatal/ending segment), skip choice
+        // regeneration — the choices would never be shown, and existing decisions
+        // stay intact rather than being cleared.
+        if (!lastSegment || !isSessionEndingSegment(lastSegment)) {
+          const narrativeContext = {
+            worldId,
+            sessionId: resolvedSessionId,
+            currentSceneId: `item-usage-${item.id}-${Date.now()}`,
+            characterIds: [characterId],
+            previousSegments: recentSegments,
+            recentSegments,
+            currentTags: lastSegment?.metadata?.tags || [],
+            currentLocation: lastSegment?.metadata?.location,
+          };
 
-        // Yield so the UI can render a loading/skeleton state before new choices arrive
-        await new Promise((resolve) => setTimeout(resolve, 0));
+          // Yield so the UI can render a loading/skeleton state before new choices arrive
+          await new Promise((resolve) => setTimeout(resolve, 0));
 
-        const geminiClient = createDefaultGeminiClient();
-        const generator = new NarrativeGenerator(geminiClient);
-        const decision = await generator.generatePlayerChoices(
-          worldId,
-          narrativeContext,
-          [characterId],
-          resolvedSessionId
-        );
+          const geminiClient = createDefaultGeminiClient();
+          const generator = new NarrativeGenerator(geminiClient);
+          const decision = await generator.generatePlayerChoices(
+            worldId,
+            narrativeContext,
+            [characterId],
+            resolvedSessionId
+          );
 
-        // Clear old decisions only after successful generation
-        narrativeStore.clearSessionDecisions(resolvedSessionId);
+          // Clear old decisions only after successful generation
+          narrativeStore.clearSessionDecisions(resolvedSessionId);
 
-        // Persist new decision in store for UI to pick up
-        narrativeStore.addDecision(resolvedSessionId, {
-          prompt: decision.prompt,
-          options: decision.options,
-          decisionWeight: decision.decisionWeight,
-          contextSummary: decision.contextSummary,
-        });
+          // Persist new decision in store for UI to pick up
+          narrativeStore.addDecision(resolvedSessionId, {
+            prompt: decision.prompt,
+            options: decision.options,
+            decisionWeight: decision.decisionWeight,
+            contextSummary: decision.contextSummary,
+          });
+        }
       } catch (error) {
         // If generation fails, existing decisions remain intact (not cleared)
         logger.warn('Failed to generate choices after item usage, keeping existing decisions', error);
