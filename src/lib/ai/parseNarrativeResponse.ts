@@ -1,5 +1,5 @@
-import { safeTrim } from '@/lib/utils';
 import type { EndingType } from '@/types/narrative.types';
+import { stripMarkdownFences } from './parseJSON';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ParseNarrativeResponse');
@@ -18,16 +18,6 @@ const VALID_ENDING_TYPES = new Set<EndingType>([
   'session-limit',
   'player-choice',
 ]);
-
-function stripMarkdownFences(raw: string): string {
-  let content = raw;
-  if (content.includes('```json')) {
-    content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-  } else if (content.includes('```')) {
-    content = content.replace(/```\s*/g, '');
-  }
-  return safeTrim(content);
-}
 
 /**
  * Parses an AI ending-analysis response, tolerating markdown code fences and

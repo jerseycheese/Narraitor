@@ -2,6 +2,7 @@ import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { StoryCheckpointRequestBody, StoryCheckpointResponseBody } from '@/types/story-checkpoint.types';
 import { safeTrim } from '@/lib/utils';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
+import { stripMarkdownFences, extractJsonObject } from './parseJSON';
 
 const RESPONSE_SCHEMA = `{
   "segment": "2-3 sentences (50-75 words) summarizing ONLY the events provided in this checkpoint",
@@ -117,14 +118,10 @@ const sanitizeString = (value?: unknown, fallback = ''): string => {
 };
 
 const parseResponse = (content: string): StoryCheckpointResponseBody => {
-  let payload = content.trim();
-  if (payload.startsWith('```')) {
-    payload = payload.replace(/^```json?/i, '').replace(/```$/, '').trim();
-  }
-  const jsonStart = payload.indexOf('{');
-  const jsonEnd = payload.lastIndexOf('}');
-  if (jsonStart >= 0 && jsonEnd > jsonStart) {
-    payload = payload.slice(jsonStart, jsonEnd + 1);
+  let payload = stripMarkdownFences(content);
+  const extracted = extractJsonObject(payload);
+  if (extracted) {
+    payload = extracted;
   }
 
   const parsed = JSON.parse(payload);

@@ -111,23 +111,20 @@ export default function FinalizeStep({
         <div data-tutorial="finalize-review">
           <h3 className={wizardStyles.subheading}>Basic Information</h3>
           <div>
-            <DataField 
-              label="Name" 
+            <DataField
+              label="Name"
               value={<span data-testid="review-world-name">{worldData.name}</span>}
               variant="outline"
-              size="md"
             />
-            <DataField 
-              label="Genre" 
+            <DataField
+              label="Genre"
               value={<span data-testid="review-world-genre">{worldData.genre ? getGenreLabel(worldData.genre) : 'Unknown'}</span>}
               variant="outline"
-              size="md"
             />
-            <DataField 
-              label="Description" 
+            <DataField
+              label="Description"
               value={<p data-testid="review-world-description">{worldData.description}</p>}
               variant="stacked"
-              size="md"
             />
           </div>
         </div>
