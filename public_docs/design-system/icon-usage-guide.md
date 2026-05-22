@@ -409,7 +409,7 @@ interface MyComponentProps {
 
 ## Related Documentation
 
-- [shadcn/ui Integration Guide](../ui/shadcn-integration-guide.md) - Component library integration
+- [shadcn/ui Integration Guide](./shadcn-integration-guide.md) - Component library integration
 - [UI/UX Guidelines](../development/ui-ux-guidelines.md) - Overall design principles
 - [Global Styles](./global-styles.md) - CSS and styling standards
 

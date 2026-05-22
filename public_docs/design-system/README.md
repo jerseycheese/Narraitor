@@ -44,7 +44,6 @@ DS1 is the default. Light + dark mode are layered on top via a separate `dark` c
 - **[global-styles.md](./global-styles.md)** — CSS architecture, load order, the no-inline-styles rule, `useTheme()` API
 - **[shadcn-integration-guide.md](./shadcn-integration-guide.md)** — the shadcn/ui foundation (Radix primitives); mostly historical now since Tailwind, `cva`, and `cn()` were removed in the clean-slate migration
 - **[icon-usage-guide.md](./icon-usage-guide.md)** — lucide-react conventions, sizing standards
-- **[redesign-planning/](./redesign-planning/)** — historical migration research and audits, kept for context
 
 ## Adding to the system
 

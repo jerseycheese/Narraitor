@@ -115,11 +115,9 @@ Implementation details and patterns:
 
 - [Error Handling](./technical-guides/error-handling.md)
 - [Storage Resilience Guide](./technical-guides/storage-resilience-guide.md)
-- [Auto-Save Migration Notes](./technical-guides/auto-save-migration-notes.md)
 
 ### Configuration & Utilities
 
-- [Styling & CSS (note: Tailwind was removed)](./technical-guides/tailwind-css-v4-configuration.md)
 - [Coding & Naming Conventions](./technical-guides/coding-naming-conventions.md)
 - [Type Guards Usage Guide](./technical-guides/type-guards-usage-guide.md)
 - [Response Extractor Utility](./technical-guides/response-extractor.md)
