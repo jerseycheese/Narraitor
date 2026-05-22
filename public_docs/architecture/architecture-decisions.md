@@ -8,7 +8,25 @@ updated: 2026-05-22
 # Architecture Decisions
 
 These are the key architectural decisions behind Narraitor — why certain technologies and
-patterns won out over the alternatives.
+patterns won out over the alternatives. The sections below are a narrative summary; the numbered
+**Architecture Decision Records (ADRs)** capture individual decisions in depth.
+
+## Decision Records (ADRs)
+
+ADRs 001–008 were backfilled to document the inception-era foundation (reconstructed from the
+codebase and git history); 009 onward were written as the decisions were made.
+
+- [ADR-001: Next.js App Router + TypeScript](ADR-001-nextjs-app-router-typescript.md) — framework and language foundation
+- [ADR-002: Client-side-only architecture](ADR-002-client-side-only-architecture.md) — no backend database; serverless AI proxy only
+- [ADR-003: Zustand domain stores](ADR-003-zustand-state-management.md) — state management
+- [ADR-004: IndexedDB persistence](ADR-004-indexeddb-persistence.md) — client-side storage over localStorage
+- [ADR-005: Domain-driven structure](ADR-005-domain-driven-structure.md) — organize by domain, not file type
+- [ADR-006: Gemini behind server-side API routes](ADR-006-gemini-server-side-api.md) — AI provider and key protection
+- [ADR-007: Tailwind + shadcn/ui styling](ADR-007-tailwind-shadcn-styling.md) — original styling foundation (**superseded by ADR-011**)
+- [ADR-008: Testing & verification strategy](ADR-008-testing-and-verification-strategy.md) — TDD, Storybook-first, Playwright visual
+- [ADR-009: Guided onboarding system](ADR-009-guided-onboarding-system.md)
+- [ADR-010: Decision relevance simplification](ADR-010-decision-relevance-simplification.md)
+- [ADR-011: Three design systems (DS1/DS2/DS3)](ADR-011-three-design-systems.md)
 
 ## Frontend Architecture
 
