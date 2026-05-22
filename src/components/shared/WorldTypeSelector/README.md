@@ -43,23 +43,6 @@ function MyComponent() {
 }
 ```
 
-### With Custom Hook
-
-```tsx
-import { useWorldTypeSelection } from '@/hooks/useWorldTypeSelection';
-
-function MyComponent() {
-  const { data, updateData, validation, generationParams } = useWorldTypeSelection();
-
-  return (
-    <WorldTypeSelector
-      value={data}
-      onChange={updateData}
-    />
-  );
-}
-```
-
 ### Generate World with Abstracted Logic
 
 This is where the real value is - the conversion logic handles all the tricky reference field combination:

@@ -15,14 +15,20 @@ Each domain gets its own store - World, Character, Narrative, etc. They all foll
 
 ## Available Stores
 
+There are eleven domain stores, all in `src/state/` and exported as `useXStore` hooks:
+
 | Store | Purpose | Features |
 |-------|---------|----------|
 | `useWorldStore` | World configurations | CRUD operations, IndexedDB persistence |
 | `useCharacterStore` | Character data | Multi-character support, attribute/skill management |
+| `useNPCStore` | Non-player characters | World-scoped, queries by world |
 | `useNarrativeStore` | Story segments | Context management, decision tracking |
 | `useJournalStore` | Journal entries | Session grouping, entry categorization |
-| `useSessionStore` | Game sessions | Session state, navigation tracking |
-| `useInventoryStore` | Item management | Equipment tracking, item effects |
+| `useSessionStore` | Game sessions | Session lifecycle, world/character linking |
+| `useNavigationStore` | App navigation | Routing and navigation state |
+| `useInventoryStore` | Item management | Equipment tracking, item usage, images |
+| `useGoalStore` | Goals/objectives | Character goal tracking |
+| `useLoreStore` | World knowledge base | Facts, aliases, deduplication, resolution (split `loreStore.*` family) |
 | `useAiContextStore` | AI prompt context | Context building, token management |
 
 ## Basic Usage

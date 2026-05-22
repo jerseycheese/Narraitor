@@ -2,7 +2,7 @@
 title: PR Creation & Testing Workflow
 tags: [development, testing, pr, workflow]
 created: 2025-06-26
-updated: 2025-12-28
+updated: 2026-05-22
 ---
 
 # PR Creation & Testing Workflow
@@ -60,10 +60,10 @@ describe('ComponentName', () => {
   test('handles user interaction', async () => {
     const user = userEvent.setup();
     const onAction = jest.fn();
-    
+
     render(<ComponentName onAction={onAction} />);
     await user.click(screen.getByRole('button'));
-    
+
     expect(onAction).toHaveBeenCalledWith(expectedValue);
   });
 });
@@ -76,7 +76,7 @@ describe('ComponentName', () => {
 test('updates display when data changes', () => {
   const { rerender } = render(<Component data={initialData} />);
   expect(screen.getByText('Initial')).toBeInTheDocument();
-  
+
   rerender(<Component data={updatedData} />);
   expect(screen.getByText('Updated')).toBeInTheDocument();
 });
@@ -116,11 +116,34 @@ npm run test -- --watch
 ```
 
 ### CI/CD Requirements
-All PRs must:
-- Pass all existing tests
-- Maintain or improve code coverage
-- Pass build without warnings
-- Pass linting checks
+
+A PR has to get through the full set of CI gates before it can merge. The GitHub Actions
+pipeline runs these as separate jobs, so it's worth knowing what each one checks and how to run
+it locally:
+
+| Gate | Command | What it checks |
+|------|---------|----------------|
+| Type check | `npm run type-check` | `tsc --noEmit`, strict mode |
+| Lint (ESLint) | `npm run lint` | Code lint, including JSX/markup-hygiene rules |
+| Lint (Stylelint) | `npm run lint:css` | CSS design-token enforcement (no hardcoded colors) |
+| Layout usage | `npm run lint:layout-usage` | Enforces non-self-closing `PageLayout` usage |
+| Knip | `npm run knip` | Unused files, exports, and dependencies |
+| CSS audit | `npm run audit:css` | Unused CSS selectors |
+| Tests | `npm run test:ci` | Jest unit/integration with coverage |
+| Build | `npm run build` | Next.js build + Storybook build |
+| E2E / visual | `npm run test:e2e:critical` | Playwright, fails on visual diffs |
+
+Knip and the CSS audit are the newer gates that came out of the dead-code cleanup work — they
+fail the build on unused code or unused selectors, so cleaning up as you go matters. The
+Stylelint config (`.stylelintrc.json`) bans hardcoded hex/named colors outright, which is why
+the token system isn't optional.
+
+Two more quality tools run locally rather than in CI:
+- **Mutation testing** (`stryker.config.json`) targets the state, storage, and narrative layers
+  to catch tests that pass without actually asserting much. Worth running when you touch those.
+- **Dependency-cruiser** (`npm run deps:validate`) checks architecture boundaries against the
+  baseline in `.dependency-cruiser-known-violations.json`. See the
+  [dependency analysis guide](../../architecture/dependency-analysis.md).
 
 ## Pull Request Creation
 

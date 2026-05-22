@@ -2,11 +2,11 @@
 title: "Architectural Decision Record: Mock Components for Storybook"
 type: adr
 date: 2025-05-15
-status: accepted
+status: superseded
 category: architecture
 tags: [storybook, nextjs, testing, mocks]
 created: 2025-05-15
-updated: 2025-06-08
+updated: 2026-05-22
 ---
 
 # Architectural Decision Record: Mock Components for Storybook
@@ -15,10 +15,19 @@ updated: 2025-06-08
 2025-05-15
 
 ## Status
-Accepted
+Superseded (2026-05-22)
+
+> **This decision no longer reflects how the codebase works.** The separate-mock-component
+> pattern below was retired once the project moved to the `@storybook/nextjs` framework, which
+> mocks the App Router itself. There are no `MockWorldCard`/`MockWorldList`-style components in
+> the codebase anymore. Router-dependent components now render directly in Storybook with
+> `nextjs: { appDirectory: true }` set globally in `.storybook/preview.tsx` and per-story
+> `nextjs:` parameters (navigation, app-directory segments) where a story needs specific routing
+> behavior. The rest of this record is kept for historical context.
 
 ## Context
-We are using Next.js with the App Router for our Narraitor application. However, when using component-first development with Storybook, we encountered issues where Next.js router-dependent components would fail in the Storybook environment with errors like:
+The app uses Next.js with the App Router. Early on, component-first development with Storybook
+hit a wall: router-dependent components failed in the Storybook environment with errors like:
 
 ```
 Error: invariant expected app router to be mounted
@@ -37,8 +46,8 @@ We've decided to implement a pattern of creating separate mock components specif
 This approach allows us to maintain our component-first development workflow in Storybook while ensuring our real components can use the Next.js App Router features.
 
 ## Examples
-- `WorldCard` → `MockWorldCard` (for isolated component stories)
-- `WorldList` → `MockWorldList` (for component composition stories)
+- `WorldCard` had a `MockWorldCard` (for isolated component stories)
+- `WorldList` had a `MockWorldList` (for component composition stories)
 
 ## Consequences
 ### Positive

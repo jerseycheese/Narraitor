@@ -16,7 +16,7 @@ OBJECTIVES:
 1. Fetch GitHub issue #[ISSUE_NUMBER] from jerseycheese/narraitor repository
 2. Analyze issue description, comments, and acceptance criteria
 3. Create technical specification with explicit scope boundaries
-4. Identify existing utilities and components to leverage  
+4. Identify existing utilities and components to leverage
 5. Define test strategy aligned with acceptance criteria
 6. Return structured analysis ready for implementation planning
 
@@ -42,7 +42,7 @@ TOOLS TO USE:
 
 ## 2. Test Writing Specialist Template
 
-```  
+```
 TASK FOR TEST WRITING SPECIALIST:
 Create focused TDD tests for feature implementation.
 
@@ -297,10 +297,10 @@ Some subagents can work in parallel:
 
 ### Sequential Dependencies
 Some phases must complete before others:
-- Issue Analysis → Test Writing
-- Test Writing → Implementation  
-- Implementation → Verification
-- Implementation → Code Review + Documentation
+- Issue Analysis, then Test Writing
+- Test Writing, then Implementation
+- Implementation, then Verification
+- Implementation, then Code Review + Documentation
 
 ### Quality Gates
 Each subagent should validate their work against:

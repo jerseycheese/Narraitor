@@ -477,4 +477,4 @@ test('performance test', async ({ page }) => {
 
 - [Visual Regression Testing Guide](../development/visual-regression-testing.md) - Main developer guide
 - [Visual Testing Workflow](../development/workflows/visual-testing-workflow.md) - Process documentation  
-- [Visual Test Examples](../examples/visual-test-examples.md) - Practical examples
+- [Visual Test Examples](../development/visual-test-examples.md) - Practical examples

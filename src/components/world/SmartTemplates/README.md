@@ -64,7 +64,7 @@ SmartTemplates is integrated into the WorldCreationWizard TemplateStep:
 
 ```tsx
 // Automatic integration: no additional setup required
-// Available as "AI Generate ✨" tab in template selection
+// Available as the "AI Generate" tab in template selection
 ```
 
 ### Template History

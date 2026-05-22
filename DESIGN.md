@@ -180,7 +180,7 @@ There is no named typographic scale yet (no `headline-lg`, `body-md`). Sizes are
 
 ## Layout & Spacing
 
-Spacing is on a 4px base scale, Tailwind-aligned:
+Spacing is on a 4px base scale (the same increments Tailwind used, kept as `--space-*` tokens):
 
 - **xs** `4px` (`--space-1`) — between an icon and its label
 - **sm** `8px` (`--space-2`) — between tightly-related elements
@@ -264,7 +264,7 @@ The don'ts here come from real failures during the design-system migration. They
 
 - **Don't hardcode hex codes or pixel values in component code.** Use `var(--token-name)` or the matching utility class. The build doesn't catch this — review does.
 - **Don't branch on theme inside JSX.** No `theme === 'ds2' ? <FluffyCard /> : <SharpCard />`. If you can't express the variation as a CSS variable, the structural difference is large enough to question whether it should exist.
-- **Don't use Tailwind utility classes that bypass the token system** (`bg-blue-500`, `rounded-full` is fine but `rounded-[6px]` is not). The semantic Tailwind classes (`bg-primary`, `text-muted-foreground`) are wired into the token system; the literal-color ones aren't.
+- **Don't hardcode literal color or size values that bypass the token system** (`#3b82f6`, `rounded-[6px]`, `color: blue`). Use the design tokens via `var(--token-name)` so the value resolves per theme. There is no Tailwind here — it was removed in the design-system migration (`#1097`), so there are no utility classes to reach for.
 - **Don't use `!important` to override theme values.** If you need to override, you're fighting the system — fix the token instead.
 - **Don't add a token to one theme file without adding it to all three.** A missing variable in DS2 silently falls back to undefined and breaks layout.
 - **Don't put two solid-accent (primary) buttons on the same screen.** One primary action per view. Secondary actions go in `secondary`, `outline`, or `ghost`.
@@ -279,8 +279,8 @@ The don'ts here come from real failures during the design-system migration. They
 - **Do build new components against tokens, not raw values**, even when the value happens to match.
 - **Do verify every visual change in DS1, DS2, and DS3** before merging.
 - **Do use the showcase pages as the spec.** When implementing a new pattern, find the closest match in `/dev/design-system{,-2,-3}` and align to it.
-- **Do prefer semantic Tailwind classes** (`bg-primary`, `text-muted-foreground`, `border-border`) over `var(--token)` in JSX when the token has a Tailwind alias.
-- **Do consume tokens via `var()` in component CSS** when the value isn't covered by a Tailwind class.
+- **Do put styling in CSS, keyed off semantic class names.** JSX carries class names like `badge badge-success` (composed with `clsx`); the component's CSS resolves those against `var(--token)` values.
+- **Do consume tokens via `var()` in component CSS** rather than repeating literal values.
 - **Do add new tokens to all three theme files** with values that fit each theme's voice — not the same value copy-pasted across.
 
 ## Theme switching mechanism

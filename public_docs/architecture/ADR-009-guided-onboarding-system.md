@@ -83,7 +83,7 @@ Built a guided onboarding system for new users:
 ### Mitigation Strategies
 - Comprehensive test coverage (26 tests) because onboarding is critical and can't be broken
 - Graceful fallback systems so AI service failures don't kill the experience
-- Three-stage verification process (Storybook → Test Harness → System Integration) for quality assurance
+- Three-stage verification process (Storybook, then the test harness, then full system integration) for quality assurance
 - Documentation and Storybook coverage so future developers can understand what's happening
 
 ## Alternatives Considered

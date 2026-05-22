@@ -18,29 +18,9 @@ Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 **World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
 
-![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/world-creation-wizard-clean.png)
-
-*Seven-step wizard with template selection, AI generation, and custom world building*
-
 **Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
 
-![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/characters-page-clean.png)
-
-*Character management screen with AI-generated portraits and quick access to play*
-
-![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/world-detail-page-clean.png)
-
-*Complete world configuration showing custom attributes, skills, and character requirements*
-
-![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/character-detail-page-clean.png)
-
-*Detailed character sheet showing attributes, skill progression, and full background story*
-
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
-
-![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/gameplay-session-clean.png)
-
-*Active gameplay session with AI-generated narrative, multiple choice paths, and skill-based actions*
 
 **Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
@@ -109,7 +89,7 @@ npm run dev
 # Then visit /dev routes for component testing
 ```
 
-There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/devtools-test`, etc. These let you test components with real data without going through the full app flow.
+There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/game-session`, `/dev/design-system`, etc. These let you test components with real data without going through the full app flow.
 
 ### Feature Flags
 
@@ -139,13 +119,13 @@ src/
 └── utils/                  # Helper functions
 ```
 
-The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/WorldEditor/` instead of `components/editors/WorldEditor/`. Makes it easier to find related functionality.
+The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/SkillEditor/` instead of `components/editors/SkillEditor/`. Makes it easier to find related functionality.
 
 ## Roadmap
 
 The core MVP functionality is basically complete - you can create worlds, build characters, play through AI-generated stories, and everything persists properly. The focus now has shifted to polish and getting things ready for a proper 1.0 release.
 
-### What's Already Working ✅
+### What's Already Working
 
 The foundation is solid:
 - **World Creation System** with AI assistance and template worlds

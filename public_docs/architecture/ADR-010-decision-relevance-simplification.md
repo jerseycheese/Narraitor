@@ -13,7 +13,7 @@ Accepted - Implemented
 
 ## Context
 
-We had a 442-line `DecisionRelevanceCalculator` that scored past player decisions using five weighted factors: recency with exponential decay (`e^(-λ × days)`), context similarity using string overlap algorithms, impact scoring based on choice types, tag matching with keyword extraction, and character overlap using set intersections.
+We had a 442-line `DecisionRelevanceCalculator` that scored past player decisions using five weighted factors: recency with exponential decay (`e^(-lambda * days)`), context similarity using string overlap algorithms, impact scoring based on choice types, tag matching with keyword extraction, and character overlap using set intersections.
 
 Then we had a 206-line `DecisionFormatter` that adaptively formatted decisions based on relevance scores (detailed/compact/minimal formatting levels).
 
@@ -197,16 +197,12 @@ Deleting working code that solves non-existent problems is a sign of good judgme
 
 This refactoring follows the KISS principle from CLAUDE.md: "Simple solutions over clever ones. The codebase should be readable six months later."
 
-The old system was:
-- ❌ Complex scoring algorithms that felt like academic papers
-- ❌ Performance tracking in non-critical paths
-- ❌ Debug UIs to justify the complexity
-- ❌ Tests verifying implementation details
+The old system was complex in ways that didn't earn their keep: scoring algorithms that felt
+like academic papers, performance tracking in non-critical paths, debug UIs that existed mainly
+to justify the complexity, and tests that verified implementation details.
 
-The new system is:
-- ✅ Filter by world, sort by timestamp, take top N
-- ✅ Simple enough to understand in 5 minutes
-- ✅ No configuration or tuning required
-- ✅ Tests verify behavior, not implementation
+The new system is deliberately boring: filter by world, sort by timestamp, take the top N.
+It's simple enough to understand in five minutes, needs no configuration or tuning, and its
+tests verify behavior rather than implementation.
 
 This is proof that you can delete working code when it solves non-existent problems.

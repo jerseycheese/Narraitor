@@ -4,22 +4,23 @@ This directory uses the Next.js App Router architecture, which replaced the prev
 
 ## How the Routes Work
 
-The main application has these routes:
+**Core app routes:**
+- `/` - Home/dashboard
+- `/worlds`, `/worlds/create`, `/worlds/[id]`, `/worlds/[id]/edit` - world list, creation, detail, edit
+- `/worlds/[id]/play`, `/worlds/[id]/play/journal` - active gameplay and the in-session journal
+- `/characters`, `/characters/create`, `/characters/[id]`, `/characters/[id]/edit` - character list, creation, detail, edit
+- `/play` - standalone play entry
+- `/settings`, `/about`
 
-**Core App Routes:**
-- `/` - Home page (redirects to /worlds)
-- `/worlds` - World list page with "Create World" button
-- `/worlds/[id]` - Individual world page (404 until implemented)
-- `/worlds/create` - World creation page
+**API routes** (`src/app/api/**`): server-side proxies for AI and image generation
+(`narrative/generate`, `generate-character`, `inventory/categorize`, and so on). These exist so
+the Gemini API key stays server-side — see [ADR-006](../../public_docs/architecture/ADR-006-gemini-server-side-api.md).
 
-**Development Routes:**
-- `/dev` - Development test harness index
-- `/dev/controls` - Developer controls interface
-- `/dev/mocks` - Mock services testing
-- `/dev/test` - Basic test component
-- `/dev/world-creation-wizard` - World Creation Wizard test harness
-
-The dev routes are super helpful when you're working on components in isolation - you can test them without having to navigate through the whole app.
+**Development routes** (`/dev/*`): component test harnesses and the design-system showcases.
+There are a couple dozen, one per component or feature being worked on (e.g.
+`/dev/game-session`, `/dev/world-creation-wizard`, `/dev/design-system`, `/dev/design-system-2`,
+`/dev/design-system-3`). They render components in isolation with seeded data, which is handy for
+development and is the visual canon for the design system.
 
 ## World Creation Wizard
 

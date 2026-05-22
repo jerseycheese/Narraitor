@@ -118,14 +118,14 @@ There is no automated GitHub Actions or webhook sync wired up in this repo yet. 
 
 ## Data Flow
 
-### CSV → GitHub Issues
+### CSV to GitHub Issues
 1. Script reads CSV files
 2. Matches existing issues by title or ID
 3. Creates new issues for missing stories
 4. Updates existing issues with CSV data
 5. Applies appropriate labels and milestones
 
-### GitHub Issues → CSV
+### GitHub Issues to CSV
 1. Export issues via GitHub API
 2. Match issues to CSV entries
 3. Update CSV with current issue status
@@ -136,7 +136,7 @@ There is no automated GitHub Actions or webhook sync wired up in this repo yet. 
 
 ### Adding New User Stories
 1. Add row to appropriate CSV file
-2. Run `npm run sync-user-stories`
+2. Run `node scripts/update-user-stories.js` (use `--dry-run` first to preview)
 3. Verify issue was created in GitHub
 4. Commit CSV changes
 

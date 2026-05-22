@@ -20,7 +20,7 @@ Statistics dashboard shows lore facts per category, which are high-importance, a
 ## How to Use This
 
 ### Getting Started
-DevTools only (development mode) under "AI Tools & Validation" → "Consistency Validation". Developer tool, not visible to players.
+DevTools only (development mode), under "AI Tools & Validation" then "Consistency Validation". Developer tool, not visible to players.
 
 ### The Detective Work Process
 Here's the typical workflow when something's gone wrong with your AI:

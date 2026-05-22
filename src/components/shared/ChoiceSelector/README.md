@@ -175,7 +175,7 @@ Or choose a suggested action:
 ## Accessibility
 
 ### Keyboard Navigation
-- **Tab**: Cycles through custom input → submit button → choice options
+- **Tab**: Cycles through custom input, then the submit button, then the choice options
 - **Enter**: Submits custom input when focused
 - **Space**: Selects choice option when focused
 - **Arrow Keys**: Navigate between choice options
@@ -213,7 +213,7 @@ const handleCustomSubmit = (customText: string) => {
     text: customText,
     isCustomInput: true,
   };
-  
+
   // Add to current decision and trigger narrative generation
   updateDecisionWithCustomOption(customOption);
   triggerNarrativeGeneration(customOption.id);
@@ -249,7 +249,7 @@ const handleCustomSubmit = (customText: string) => {
 - `.choice-selector .choice-option`: Individual choice button
 
 ### Customization
-The component uses Tailwind CSS classes and can be customized by:
+The component is styled with CSS classes wired to design tokens and can be customized by:
 1. Passing `className` prop for container styling
 2. Overriding CSS classes in your stylesheet
 3. Using CSS-in-JS for dynamic styling
@@ -272,14 +272,14 @@ The component uses Tailwind CSS classes and can be customized by:
 ## Testing
 
 ### Test Coverage
-- ✅ Renders with simple choices
-- ✅ Renders with decision objects
-- ✅ Custom input field visibility
-- ✅ Character counting and limits
-- ✅ Input validation
-- ✅ Submission methods (button, Enter key)
-- ✅ Disabled state behavior
-- ✅ Accessibility attributes
+- Renders with simple choices
+- Renders with decision objects
+- Custom input field visibility
+- Character counting and limits
+- Input validation
+- Submission methods (button, Enter key)
+- Disabled state behavior
+- Accessibility attributes
 
 ### Testing Example
 ```tsx
@@ -290,7 +290,7 @@ import ChoiceSelector from './ChoiceSelector';
 test('enables custom input and submits text', async () => {
   const handleCustomSubmit = jest.fn();
   const user = userEvent.setup();
-  
+
   render(
     <ChoiceSelector
       choices={choices}
@@ -299,11 +299,11 @@ test('enables custom input and submits text', async () => {
       onCustomSubmit={handleCustomSubmit}
     />
   );
-  
+
   const input = screen.getByPlaceholderText('Type your custom response...');
   await user.type(input, 'I examine the door');
   await user.click(screen.getByRole('button', { name: /submit/i }));
-  
+
   expect(handleCustomSubmit).toHaveBeenCalledWith('I examine the door');
 });
 ```
