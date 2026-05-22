@@ -1115,11 +1115,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       await checkForEndingIndicators(newSegment);
 
       // Generate choices if enabled - skip when the session is ending
-      // (fatal/ending segment or a critical-decision failure)
+      // (fatal/ending segment or a critical-decision failure).
+      // A critical failure only ends the session when an ending handler is
+      // wired: suggestEnding() is a no-op without onEndingSuggested. Without a
+      // handler, keep generating choices so a standalone controller (harness,
+      // story, embedder) can still move forward instead of stalling with no
+      // ending and no choices.
+      const criticalFailureEndsSession =
+        hasCriticalFailure && Boolean(onEndingSuggested);
       if (
         generateChoices &&
         !isSessionEndingSegment(newSegment) &&
-        !hasCriticalFailure
+        !criticalFailureEndsSession
       ) {
         if (isCustomInput) {
           // Generate choices after a longer delay to ensure custom input is fully processed
