@@ -18,29 +18,9 @@ Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 **World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
 
-![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/world-creation-wizard-clean.png)
-
-*Seven-step wizard with template selection, AI generation, and custom world building*
-
 **Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
 
-![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/characters-page-clean.png)
-
-*Character management screen with AI-generated portraits and quick access to play*
-
-![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/world-detail-page-clean.png)
-
-*Complete world configuration showing custom attributes, skills, and character requirements*
-
-![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/character-detail-page-clean.png)
-
-*Detailed character sheet showing attributes, skill progression, and full background story*
-
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
-
-![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/gameplay-session-clean.png)
-
-*Active gameplay session with AI-generated narrative, multiple choice paths, and skill-based actions*
 
 **Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
