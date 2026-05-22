@@ -524,9 +524,8 @@ export const useWorldStore = create<WorldStore>()(
           get().setLoading(true);
           get().clearError();
           try {
-            // In this architecture, worlds are automatically loaded from IndexedDB
-            // via Zustand persistence, so we just need to ensure the state is ready
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Worlds are hydrated from IndexedDB by Zustand persistence and stay in
+            // sync reactively, so there is nothing to fetch imperatively here.
             get().setLoading(false);
           } catch (error) {
             get().setLoading(false);

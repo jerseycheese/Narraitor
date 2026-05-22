@@ -100,7 +100,6 @@ const GameSession: React.FC<GameSessionProps> = ({
     handleDismissError,
     startSession,
     handleSelectChoice,
-    handleEndSession,
     savedSession,
     handleResumeSession,
     handleNewSession,
@@ -387,7 +386,6 @@ const GameSession: React.FC<GameSessionProps> = ({
         // Map 'loading' to 'active' to keep the UI enabled
         status={sessionState.status === 'paused' ? 'paused' : 'active'}
         onChoiceSelected={handleSelectChoice}
-        onEnd={handleEndSession}
         onStartNew={onStartNew}
         onBack={onBack}
         choices={sessionState.playerChoices || []}
