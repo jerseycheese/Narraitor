@@ -2,7 +2,6 @@
 
 import React, { useCallback } from 'react';
 import { useSessionStore } from '@/state/sessionStore';
-import { useHistory } from '@/lib/hooks/useHistory';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 import { formatDate } from '@/lib/utils';
@@ -25,17 +24,8 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
   className = "",
   maxTemplates = 5
 }) => {
-  // Template history hooks
   const templateHistory = useSessionStore(useCallback(state => state.templateHistory, []));
-  const addTemplateToHistory = useSessionStore(useCallback(state => state.addTemplateToHistory, []));
-  const clearTemplateHistory = useSessionStore(useCallback(state => state.clearTemplateHistory, []));
-  
-  const templateHistoryManager = useHistory(
-    templateHistory,
-    addTemplateToHistory,
-    clearTemplateHistory,
-    maxTemplates
-  );
+  const recentTemplates = templateHistory.slice(0, maxTemplates);
 
   const handleTemplateClick = useCallback((entry: TemplateHistoryEntry) => {
     onTemplateSelect(entry);
@@ -49,7 +39,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
   }, [handleTemplateClick]);
 
   // Don't render if no templates
-  if (templateHistoryManager.isEmpty) {
+  if (recentTemplates.length === 0) {
     return null;
   }
 
@@ -60,7 +50,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
         <p>{description}</p>
       )}
       <div>
-        {templateHistoryManager.getRecent().map((entry, index) => (
+        {recentTemplates.map((entry, index) => (
           <div 
             key={index}
             className={`${selectedTemplateId === `ai-template-${entry.template.name}` ? 'selected-template' : ''}`}

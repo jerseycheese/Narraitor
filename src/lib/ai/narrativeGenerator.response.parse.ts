@@ -3,6 +3,7 @@ import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import type { GeneratedCharacterMetadata, LostItemMetadata } from '@/types/narrative.types';
 import type { ParsedNarrativeResponse, NarrativeExtractedMetadata } from './narrativeGenerator.response.types';
 import { validateMood, validateLossReason } from './narrativeGenerator.response.helpers';
+import { stripMarkdownFences } from './parseJSON';
 
 export const parseNarrativeResponse = (
   response: { content?: string },
@@ -17,15 +18,7 @@ export const parseNarrativeResponse = (
     actualContent.includes('"content":')
   ) {
     try {
-      let jsonStr = safeTrim(actualContent);
-
-      if (jsonStr.includes('```json')) {
-        jsonStr = jsonStr.replace(/```json\s*/, '').replace(/\s*```/, '');
-      } else if (jsonStr.includes('```')) {
-        jsonStr = jsonStr.replace(/```\s*/, '').replace(/\s*```/, '');
-      }
-
-      jsonStr = safeTrim(jsonStr);
+      let jsonStr = stripMarkdownFences(actualContent);
 
       const jsonStart = jsonStr.indexOf('{');
       const jsonEnd = jsonStr.lastIndexOf('}');

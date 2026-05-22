@@ -2,6 +2,7 @@
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { buildEndingContext } from './contextManager';
+import { stripMarkdownFences, extractJsonObject } from './parseJSON';
 import { endingTemplate, prepareEndingTemplateVariables } from '../promptTemplates/templates/endingTemplates';
 import { logger } from '../utils/logger';
 import type {
@@ -51,17 +52,6 @@ function renderTemplate(template: string, variables: Record<string, string | num
   return rendered;
 }
 
-function extractJsonFromText(text: string): string | null {
-  const firstBrace = text.indexOf('{');
-  const lastBrace = text.lastIndexOf('}');
-
-  if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
-    return null;
-  }
-
-  return text.substring(firstBrace, lastBrace + 1);
-}
-
 function validateAndCleanParsedResult(parsed: unknown): EndingGenerationResult {
   if (typeof parsed !== 'object' || parsed === null) {
     throw new Error('Parsed result is not an object');
@@ -109,14 +99,13 @@ function extractFromPlainText(response: string): EndingGenerationResult {
 
 function parseResponse(response: string): EndingGenerationResult {
   try {
-    let cleanResponse = response.trim();
-    cleanResponse = cleanResponse.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+    const cleanResponse = stripMarkdownFences(response);
 
     try {
       const parsed = JSON.parse(cleanResponse);
       return validateAndCleanParsedResult(parsed);
     } catch {
-      const jsonMatch = extractJsonFromText(cleanResponse);
+      const jsonMatch = extractJsonObject(cleanResponse);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch);
         return validateAndCleanParsedResult(parsed);
