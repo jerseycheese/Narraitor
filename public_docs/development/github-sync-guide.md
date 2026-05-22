@@ -136,7 +136,7 @@ There is no automated GitHub Actions or webhook sync wired up in this repo yet. 
 
 ### Adding New User Stories
 1. Add row to appropriate CSV file
-2. Run `node scripts/user-stories/update-user-stories.js` (use `--dry-run` first to preview)
+2. Run `node scripts/update-user-stories.js` (use `--dry-run` first to preview)
 3. Verify issue was created in GitHub
 4. Commit CSV changes
 
