@@ -87,7 +87,7 @@ Prompt: [Detailed specialist prompt]
 - **Capabilities**: Issue fetching, requirement analysis, scope definition
 - **Deliverables**: Technical specification with scope boundaries
 
-### Test Writing Specialist  
+### Test Writing Specialist
 - **Purpose**: TDD-focused test creation
 - **Capabilities**: Acceptance criteria testing, behavioral test design
 - **Deliverables**: Component tests, Storybook stories, test harness plans
@@ -139,7 +139,7 @@ Each workflow creates a comprehensive todo hierarchy:
 # Initialize new workflow
 claude-workflow-with-agents.sh init [issue-number]
 
-# Check current status  
+# Check current status
 claude-workflow-with-agents.sh status [issue-number]
 
 # Continue from current phase
@@ -155,7 +155,7 @@ claude-workflow-with-agents.sh example [issue-number]
 claude-workflow-with-agents.sh delegate [issue-number] [phase]
 
 # Available phases:
-# analysis, test-writing, implementation, verification, 
+# analysis, test-writing, implementation, verification,
 # code-review, documentation, github-management
 ```
 
@@ -175,7 +175,7 @@ node scripts/agents/workflow-coordinator.js status [issue-number]
 
 ### Playwright Integration
 - **Verification Coordinator** automatically runs `./scripts/playwright-verify.sh`
-- **Three-Stage Verification** (Storybook → Test Harness → Integration)
+- **Three-Stage Verification** (Storybook, then test harness, then integration)
 - **Automated report analysis** and fix recommendations
 
 ### GitHub Integration

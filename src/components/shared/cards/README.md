@@ -8,7 +8,7 @@ Cards were all over the place with different styling, button layouts, and intera
 The main wrapper that handles the active/inactive styling. Basically gives you that green "currently active" header and proper click handling:
 
 ```tsx
-<ActiveStateCard 
+<ActiveStateCard
   isActive={isActive}
   onClick={() => handleSelect(id)}
   activeText="Currently Active World"
@@ -28,7 +28,7 @@ Just the green header banner part if you want to use it independently:
 Standardized "make this thing active" button. Saves you from having to style the same button over and over:
 
 ```tsx
-<MakeActiveButton 
+<MakeActiveButton
   onClick={handleMakeActive}
   text="Set as Active Character"
 />
@@ -55,10 +55,10 @@ This one's pretty clever - handles the complexity of primary vs secondary action
 For those little colored badges that show entity types and statuses:
 
 ```tsx
-<EntityBadge 
-  type="world" 
-  text="Set in Middle Earth" 
-  icon="🌍"
+<EntityBadge
+  type="world"
+  text="Set in Middle Earth"
+  icon={<Globe />}
   variant="info"
 />
 ```
@@ -68,11 +68,11 @@ For those little colored badges that show entity types and statuses:
 Here's how you'd refactor an existing card component to use these shared pieces instead of rolling your own:
 
 ```tsx
-import { 
-  ActiveStateCard, 
-  MakeActiveButton, 
-  CardActionGroup, 
-  EntityBadge 
+import {
+  ActiveStateCard,
+  MakeActiveButton,
+  CardActionGroup,
+  EntityBadge
 } from '@/components/shared/cards';
 
 const WorldCard = ({ world, isActive, onSelect, onDelete }) => {
@@ -111,29 +111,29 @@ const WorldCard = ({ world, isActive, onSelect, onDelete }) => {
     >
       {/* Image section */}
       {world.image?.url && <WorldImage url={world.image.url} />}
-      
+
       {/* Card content */}
       <div className="p-4">
         <h2>{world.name}</h2>
-        
+
         {/* Entity badges */}
         <div className="flex gap-2">
-          <EntityBadge 
-            text={world.theme} 
-            variant="primary" 
+          <EntityBadge
+            text={world.theme}
+            variant="primary"
           />
-          <EntityBadge 
+          <EntityBadge
             type="world"
             text={`Set in ${world.reference}`}
             variant="info"
           />
         </div>
-        
+
         {/* Make active button for inactive worlds */}
         {!isActive && (
           <MakeActiveButton onClick={handleMakeActive} />
         )}
-        
+
         {/* Action buttons */}
         <CardActionGroup
           primaryActions={primaryActions}
@@ -167,6 +167,6 @@ These components got some love as part of the walkthrough improvements:
 ## Related Components
 
 These work well with:
-- **PageLayout**: New shared layout component for consistent page structure  
+- **PageLayout**: New shared layout component for consistent page structure
 - **Navigation**: Enhanced navigation with better world switching and actions
 - **ActionButtonGroup**: Improved action button layouts for cards
