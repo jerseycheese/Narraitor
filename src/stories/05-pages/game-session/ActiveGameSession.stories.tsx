@@ -21,7 +21,6 @@ const meta: Meta<typeof ActiveGameSession> = {
   },
   argTypes: {
     onChoiceSelected: { action: 'choice selected' },
-    onEnd: { action: 'session ended' },
     status: {
       control: 'select',
       options: ['active', 'paused', 'ended'],

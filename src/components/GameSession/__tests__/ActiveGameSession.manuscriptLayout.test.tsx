@@ -78,6 +78,12 @@ describe('ActiveGameSession Manuscript Layout', () => {
       isGeneratingEnding: false,
       isSessionEnded: () => false,
       generateEnding: jest.fn(),
+      getSessionSegments: (sid: string) => {
+        const segments = mockNarrativeState.segments as Record<string, unknown>;
+        const ids = (mockNarrativeState.sessionSegments as Record<string, string[]>)[sid] ?? [];
+        return ids.map((id) => segments[id]).filter(Boolean);
+      },
+      getSessionDecisions: () => [],
     };
     (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) => 
       selector ? selector(mockNarrativeState) : mockNarrativeState
@@ -251,10 +257,21 @@ describe('ActiveGameSession Manuscript Layout', () => {
   });
 
   it('passes isStreaming to ManuscriptActionRail when generating', async () => {
-    // We'll mock isGenerating state via the narrative controller effect
-    // But since it's an internal state, we can just check the rail prop
     const ManuscriptActionRail = require('../ManuscriptActionRail').ManuscriptActionRail;
-    
+
+    // Segments exist (so the session shell renders) but choices are still
+    // generating - that is the streaming state the action rail reflects.
+    (useNarrativeStore as unknown as { subscribe: jest.Mock }).subscribe = jest.fn(
+      (cb: (state: unknown) => void) => {
+        cb({
+          sessionSegments: { [mockSessionId]: ['seg-1'] },
+          sessionDecisions: {},
+          decisions: {},
+        });
+        return jest.fn();
+      }
+    );
+
     render(
       <ActiveGameSession
         worldId={mockWorldId}
@@ -266,8 +283,6 @@ describe('ActiveGameSession Manuscript Layout', () => {
     // Wait for initialization
     await screen.findByTestId('manuscript-session-shell');
 
-    // Check last call to the mock
-    // Note: ActiveGameSession uses useState(true) for isGenerating initially
     const lastCall = (ManuscriptActionRail as jest.Mock).mock.calls.slice(-1)[0][0];
     expect(lastCall.isStreaming).toBe(true);
   });

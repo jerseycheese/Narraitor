@@ -4,7 +4,6 @@ import { useCallback, useEffect } from 'react';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { useSessionStore } from '@/state/sessionStore';
 import Logger from '@/lib/utils/logger';
 import {
   INITIAL_GENERATION_MAX_WAIT_MS,
@@ -21,9 +20,6 @@ interface UseActiveGameSessionEffectsOptions {
   initialized: boolean;
   isGenerating: boolean;
   segmentCount: number;
-  characterId?: string;
-  onEnd?: () => void;
-  onEndStoryClick: () => void;
   setIsGenerating: Dispatch<SetStateAction<boolean>>;
   setInitialized: Dispatch<SetStateAction<boolean>>;
   setCurrentDecision: Dispatch<SetStateAction<Decision | null>>;
@@ -32,7 +28,7 @@ interface UseActiveGameSessionEffectsOptions {
 }
 
 /**
- * Drives session lifecycle side effects (init, fallbacks, store sync, global events).
+ * Drives session lifecycle side effects (init, fallbacks, store sync).
  * Returns only the choice fallback scheduler; the rest runs automatically.
  */
 export const useActiveGameSessionEffects = ({
@@ -42,9 +38,6 @@ export const useActiveGameSessionEffects = ({
   initialized,
   isGenerating,
   segmentCount,
-  characterId,
-  onEnd,
-  onEndStoryClick,
   setIsGenerating,
   setInitialized,
   setCurrentDecision,
@@ -164,10 +157,13 @@ export const useActiveGameSessionEffects = ({
           setInitialized(true);
           setIsGenerating(true);
         }
-      } catch {
-        // Error setting up narrative, continue with initialization
+      } catch (error) {
+        // Narrative setup failed. Surface the error and stop the generating
+        // state so the fallback-scene effect can recover the UI instead of
+        // leaving the player on an indefinite spinner.
+        logger.error('Failed to set up narrative', error);
         setInitialized(true);
-        setIsGenerating(true);
+        setIsGenerating(false);
       }
     };
 
@@ -210,45 +206,6 @@ export const useActiveGameSessionEffects = ({
       unsubscribe();
     };
   }, [sessionId, setCurrentDecision, setIsGeneratingChoices]);
-
-  // Global event handlers to support hero action buttons from parent pages
-  useEffect(() => {
-    const onEndStory = () => onEndStoryClick();
-    const onEndSession = async () => {
-      // Dispatch event to trigger final checkpoint before ending session
-      window.dispatchEvent(new CustomEvent('narraitor:finalize-checkpoint'));
-      // Small delay to allow checkpoint to complete
-      await new Promise(resolve => setTimeout(resolve, 500));
-      if (onEnd) onEnd();
-    };
-    const onNewSession = async () => {
-      const sessionStore = useSessionStore.getState();
-      const narrativeStore = useNarrativeStore.getState();
-      narrativeStore.clearSessionSegments(sessionId);
-      narrativeStore.clearSessionDecisions(sessionId);
-      narrativeStore.clearEnding();
-      sessionStore.endSession();
-      Object.keys(sessionStore.savedSessions).forEach(savedSessionId => {
-        const savedSession = sessionStore.savedSessions[savedSessionId];
-        if (savedSession.worldId === worldId && savedSession.characterId === characterId) {
-          sessionStore.deleteSavedSession(savedSessionId);
-        }
-      });
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const url = new URL(window.location.href);
-      url.searchParams.set('fresh', 'true');
-      window.location.href = url.toString();
-    };
-
-    window.addEventListener('narraitor:end-story', onEndStory as EventListener);
-    window.addEventListener('narraitor:end-session', onEndSession as EventListener);
-    window.addEventListener('narraitor:new-session', onNewSession as EventListener);
-    return () => {
-      window.removeEventListener('narraitor:end-story', onEndStory as EventListener);
-      window.removeEventListener('narraitor:end-session', onEndSession as EventListener);
-      window.removeEventListener('narraitor:new-session', onNewSession as EventListener);
-    };
-  }, [sessionId, worldId, characterId, onEnd, onEndStoryClick]);
 
   const scheduleChoiceFallback = useCallback(() => {
     const timeoutId = setTimeout(() => {

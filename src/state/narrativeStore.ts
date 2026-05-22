@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment, NarrativeMetadata, Consequence, PromptDebugInfo } from '../types/narrative.types';
+import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, NarrativeMetadata, Consequence, PromptDebugInfo } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { JournalEntry } from '../types/journal.types';
 import type { Character } from './characterStore';
-import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
+import { mapAlignmentToChoiceType } from '../lib/narrative/choiceType';
 // IMPORTANT: Do not import AI generators directly in client code.
 // All AI calls must go through server/API routes per project guidelines.
 import { logger } from '../lib/utils/logger';
@@ -205,30 +205,6 @@ const normalizeLocationKey = (value: string): string =>
     .replace(/\s+/g, ' ')
     .toLowerCase();
 
-/**
- * Maps choice alignment to appropriate choice type preference
- */
-const mapAlignmentToChoiceType = (alignment?: ChoiceAlignment): ChoiceTypePreference => {
-  switch (alignment) {
-    case 'lawful': return 'diplomatic';
-    case 'chaotic': return 'aggressive';
-    case 'neutral':
-    default: return 'neutral';
-  }
-};
-
-/**
- * AI-based choice type inference (placeholder for future enhancement)
- * TODO: Implement AI-based choice analysis for choices without explicit alignment
- * See follow-up issue for enhanced choice categorization using AI
- */
-const inferChoiceTypeFromText = (): ChoiceTypePreference => {
-  // For choices without explicit alignment, return neutral
-  // The alignment-based mapping handles the majority of cases effectively
-  // AI-based inference will be implemented in a follow-up enhancement
-  return 'neutral';
-};
-
 interface ExtractedWorldStateImpact {
   relationships: Record<EntityID, NPCRelationshipUpdate>;
   events: WorldStateMajorEventInput[];
@@ -380,7 +356,7 @@ const extractWorldStateImpacts = (
     }
   };
 
-  const optionConsequences = (selectedOption as unknown as { consequences?: Consequence[] }).consequences || [];
+  const optionConsequences = selectedOption.consequences ?? [];
   optionConsequences.forEach(handleConsequence);
   (decision.consequences ?? []).forEach(handleConsequence);
 
@@ -823,12 +799,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
         }
 
         if (sessionId && characterId) {
-          let choiceType: ChoiceTypePreference = 'neutral';
-          if (selectedOption.alignment) {
-            choiceType = mapAlignmentToChoiceType(selectedOption.alignment);
-          } else {
-            choiceType = inferChoiceTypeFromText();
-          }
+          const choiceType = mapAlignmentToChoiceType(selectedOption.alignment);
 
           const sessionSegmentIds = state.sessionSegments[sessionId] || [];
           const sessionSegments = sessionSegmentIds.map(id => state.segments[id]).filter(Boolean);

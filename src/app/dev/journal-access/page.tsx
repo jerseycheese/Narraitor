@@ -366,7 +366,6 @@ export default function JournalAccessTestPage() {
             onChoiceSelected={(choiceId) =>
               logger.debug('Choice selected:', choiceId)
             }
-            onEnd={() => logger.debug('Session ended')}
           />
         </div>
       </div>

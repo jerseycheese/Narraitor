@@ -11,6 +11,7 @@ import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { Hero } from '@/components/shared/Hero';
 import { CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
 
@@ -156,10 +157,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
         <Link href={`/worlds/${world.id}`}>
           {(() => {
             // Use seeded placeholder image during Playwright tests if world has no image
-            const isPlaywright =
-              typeof window !== 'undefined' &&
-              (window.navigator.userAgent.includes('Playwright') ||
-                (window as unknown as Record<string, unknown>).__playwright);
+            const isPlaywright = isPlaywrightEnv();
             const STABLE_PLACEHOLDER =
               'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
             const heroImageUrl =

@@ -47,7 +47,6 @@ interface ActiveGameSessionProps {
   world?: World;
   status?: 'active' | 'paused' | 'ended';
   onChoiceSelected: (choiceId: string) => void;
-  onEnd?: () => void;
   onStartNew?: () => void;
   onBack?: () => void;
   // Narrative specific props
@@ -67,7 +66,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   world,
   status = 'active',
   onChoiceSelected,
-  onEnd,
   onStartNew,
   onBack,
   /* existingSegments - not currently used */
@@ -238,9 +236,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     initialized,
     isGenerating,
     segmentCount,
-    characterId: characterId || undefined,
-    onEnd,
-    onEndStoryClick: handleEndStoryClick,
     setIsGenerating,
     setInitialized,
     setCurrentDecision,

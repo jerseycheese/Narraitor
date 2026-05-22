@@ -883,8 +883,7 @@ export const useSessionStore = create<SessionStore>()(
           lastActiveStep: null,
         };
         // Remove old onboarding flag - replaced by tutorialProgress
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        delete (nextState as any).onboardingCompleted;
+        delete (nextState as Partial<SessionStore> & { onboardingCompleted?: boolean }).onboardingCompleted;
       }
       
       // Migration from v3 to v4: Add worldGeneration phase

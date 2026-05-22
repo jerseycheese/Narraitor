@@ -7,6 +7,7 @@ import { joyrideStyles, getTourOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
 import { TutorialProgressWidget } from '@/components/TutorialProgress/TutorialProgressWidget';
 import Logger from '@/lib/utils/logger';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
 import { useTourTargetRetry } from './useTourTargetRetry';
 
@@ -380,7 +381,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   // Expose startTour for testing
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development' || window.__PLAYWRIGHT__) {
+    if (process.env.NODE_ENV === 'development' || isPlaywrightEnv()) {
       window.__TEST_START_TOUR__ = startTour;
       window.__TEST_STOP_TOUR__ = stopTour;
     }

@@ -21,6 +21,7 @@ import {
 import { truncate } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
@@ -210,11 +211,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       return;
     }
 
-    const isPlaywrightRuntime =
-      typeof window !== 'undefined' &&
-      Boolean(
-        (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__
-      );
+    const isPlaywrightRuntime = isPlaywrightEnv();
 
     if (isPlaywrightRuntime && persistedSegments.length === 0) {
       // Visual regression tests seed data via persistence; wait for hydration

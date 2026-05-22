@@ -92,6 +92,8 @@ export interface DecisionOption {
   customText?: string;
   // Choice alignment for personality-based variety
   alignment?: ChoiceAlignment;
+  // Consequences applied when this specific option is chosen
+  consequences?: Consequence[];
 }
 
 /**

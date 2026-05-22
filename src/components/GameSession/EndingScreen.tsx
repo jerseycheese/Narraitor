@@ -26,6 +26,7 @@ import {
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('EndingScreen');
@@ -172,10 +173,7 @@ export function EndingScreen() {
     const isDevHarness =
       typeof window !== 'undefined' &&
       window.location.pathname.includes('/dev/ending-screen');
-    const isPlaywright =
-      typeof window !== 'undefined' &&
-      (window.navigator.userAgent.includes('Playwright') ||
-        !!(window as unknown as Record<string, unknown>).__PLAYWRIGHT__);
+    const isPlaywright = isPlaywrightEnv();
 
     if (
       currentEnding &&

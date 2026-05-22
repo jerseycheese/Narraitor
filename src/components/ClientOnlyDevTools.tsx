@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { DevToolsPanel } from '@/components/devtools';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 /**
  * Client-only wrapper for development tools to prevent hydration mismatches
@@ -12,12 +13,7 @@ export function ClientOnlyDevTools() {
 
   useEffect(() => {
     setIsClient(true);
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const playwrightFlag = Boolean((window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__);
-    setIsPlaywright(playwrightFlag);
+    setIsPlaywright(isPlaywrightEnv());
   }, []);
 
   // Only render in development and on client
