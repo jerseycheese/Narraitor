@@ -19,7 +19,7 @@ So file naming was getting inconsistent across the project, which makes it harde
 
 ## CSS and Testing Stuff
 
-**CSS Classes** - We're using Tailwind utilities and shadcn/ui classes, so you shouldn't need to write custom CSS class names much. When you do, follow the existing pattern.
+**CSS Classes** - Styling is plain CSS keyed off semantic class names (there's no Tailwind), so you will write custom class names. Use kebab-case names that read as component-and-variant (`badge badge-success`, `manuscript-action-rail`) and follow the existing patterns in the per-theme CSS.
 
 **Test IDs** use kebab-case like `world-card` or `delete-button`. These make it easy to find elements in tests without cluttering up the actual user-facing content.
 

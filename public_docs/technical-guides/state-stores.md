@@ -2,53 +2,66 @@
 title: State Store Implementation
 tags: [state, zustand, stores]
 created: 2025-05-13
-updated: 2025-06-08
+updated: 2026-05-22
 ---
 
 # State Store Implementation
 
-State management in Narraitor follows domain-driven design - each major feature area gets its own Zustand store. This keeps things organized and makes it easier to reason about data flow.
+State in Narraitor is split by domain — each major feature area owns a Zustand store rather
+than everything piling into one global blob. That keeps data flow easy to reason about and
+means a change to, say, inventory logic doesn't ripple through unrelated state. Every store
+lives in `src/state/` and is exported as a `useXStore` hook.
 
-## Store Overview
+## The stores
 
-**8 Domain Stores:**
-1. **World Store** - Game worlds, attributes, and configuration settings
-2. **Character Store** - Player characters with their stats
-3. **NPC Store** - Non-player characters scoped to game worlds
-4. **Inventory Store** - Character items and equipment management
-5. **Narrative Store** - Story segments and narrative progression
-6. **Journal Store** - Journal entries and quest tracking
-7. **Session Store** - Active game sessions linking worlds and characters
-8. **AI Context Store** - Context management for AI prompt generation
+There are eleven domain stores today:
 
-## Common Patterns
+1. **`useWorldStore`** — game worlds, their attributes, skills, and configuration.
+2. **`useCharacterStore`** — player characters, scoped to a world, with their attributes and skills.
+3. **`useNPCStore`** — non-player characters, scoped to a world via `worldId`, with world-scoped queries.
+4. **`useInventoryStore`** — per-character items: stack merging, acquisition history, AI/manual categorization, and item usage.
+5. **`useNarrativeStore`** — story segments, ordering, and session-scoped narrative progression.
+6. **`useJournalStore`** — journal entries by type (including `item_usage`), read/unread state, and links back to related items.
+7. **`useSessionStore`** — active game sessions that tie a world and character together.
+8. **`useAiContextStore`** — prompt context per session, with optional token tracking.
+9. **`useGoalStore`** — character goals and objective tracking.
+10. **`useNavigationStore`** — app navigation and routing state.
+11. **`useLoreStore`** — the world knowledge base. This one's big enough that it's split across a
+    family of files (`loreStore.ts` plus `loreStore.actions`, `.aliases`, `.deduplication`,
+    `.extraction`, `.helpers`, `.import-export`, `.resolution`, `.state`, `.utils`), which keeps
+    the dedup/resolution logic out of the core store file.
 
-### Store Interface
-Every store follows the same basic pattern so you know what to expect:
+Two more files in `src/state/` support the stores rather than being stores themselves:
 
-```typescript
-interface StoreInterface {
-  // State
-  entities: Record<EntityID, Entity>;
-  currentEntityId: EntityID | null;
-  error: UserFriendlyError | null;
-  loading: boolean;
+- **`createCrudStore.ts`** is a shared type contract, not a factory. It exports `CrudStore<T>`
+  (the standard CRUD state + actions shape) that `goalStore` and `loreStore` build against. The
+  factory function that used to live here was removed as dead code — only the types remain.
+- **`persistence.ts`** exports `createIndexedDBStorage`, the IndexedDB-backed storage adapter the
+  persisted stores use.
 
-  // CRUD operations
-  createEntity: (data: EntityData) => EntityID;
-  updateEntity: (id: EntityID, updates: Partial<Entity>) => void;
-  deleteEntity: (id: EntityID) => void;
+## Cross-store communication
 
-  // State management
-  reset: () => void;
-  setError: (error: UserFriendlyError | null) => void;
-  clearError: () => void;
-  setLoading: (loading: boolean) => void;
-}
-```
+Some operations have to reach across stores — deleting a world should clean up its characters,
+deleting a character should clean up what it owns. Wiring those stores to import each other
+directly would create circular dependencies, so cross-store handoffs go through a small event
+bus in `src/lib/state/storePubSub.ts`. It exports `storeEvents` (the bus) and `StoreEventTypes`
+(the event names like `WORLD_DELETED` and `CHARACTER_DELETED`). A store publishes an event when
+it deletes something; interested stores subscribe and do their own cleanup. This is deliberate —
+don't replace it with direct imports.
 
-### Error Handling
-All stores handle errors the same way - check if the operation is valid before doing it:
+## Common patterns
+
+### Standard CRUD shape
+
+Stores that manage a collection of entities follow the `CrudStore<T>` shape: an `entities`
+record keyed by id, a `currentEntityId`, `error` and `loading` flags, and the usual
+`create`/`update`/`delete`/`getById`/`getAll` actions plus `reset`, `setError`, `clearError`,
+and `setLoading`.
+
+### Error handling
+
+Actions validate before they mutate, so a bad operation sets a user-friendly error rather than
+corrupting state:
 
 ```typescript
 addSkill: (characterId, skillData) => set((state) => {
@@ -56,215 +69,98 @@ addSkill: (characterId, skillData) => set((state) => {
   if (!character) {
     return { error: 'Character not found' };
   }
-
   if (character.skills.length >= 2) {
     return { error: 'Maximum skills limit reached' };
   }
-
   // ... continue with operation
 });
 ```
 
-### Validation
-Input validation for all operations:
+### ID generation
+
+IDs come from one helper so they're consistent and prefixed by type:
 
 ```typescript
-createWorld: (worldData) => {
-  if (!worldData.name || worldData.name.trim() === '') {
-    throw new Error('World name is required');
-  }
-  // ... continue with creation
-};
-```
-
-### ID Generation
-Consistent ID generation:
-
-```typescript
-import { generateUniqueId } from '../lib/utils/generateId';
+import { generateUniqueId } from '@/lib/utils/generateId';
 
 const worldId = generateUniqueId('world');
 const characterId = generateUniqueId('char');
 const itemId = generateUniqueId('item');
 ```
 
-### World Store
-- Manages world attributes and skills
-- Enforces limits on attributes/skills per world
-- Updates nested entities maintaining referential integrity
+## Using a store
 
-### Character Store
-- Links characters to specific worlds
-- Manages character attributes and skills
-- Simplified skill limit for MVP (hardcoded to 2)
+### In components
 
-### NPC Store
-- Links NPCs to specific worlds via worldId
-- Manages NPC basic information (name, description, avatarUrl)
-- Provides world-scoped queries with getNPCsByWorld
-- Maintains world-to-NPC mappings for efficient retrieval
-- Foundation for future NPC features (avatars, autonomous behavior)
-
-### Inventory Store
-- Tracks items per character with acquisition history
-- Performs automatic stack merging with max-stack enforcement
-- Stores AI/manual categorization metadata per item
-- Handles item usage through `useItem()` method with consumption logic
-- Returns usage results including narrative content and remaining quantities
-
-### Narrative Store
-- Associates segments with sessions
-- Maintains segment ordering
-- Provides session-specific queries
-
-### Journal Store
-- Filters entries by type (including 'item_usage' for item usage events)
-- Tracks read/unread state
-- Supports session-specific entries
-- Creates automatic entries for significant item usage moments
-- Links entries to related items through relatedEntities
-
-### Session Store
-- Creates sessions linking world and character
-- Manages session state (active/completed)
-- Tracks active session
-
-### AI Context Store
-- Manages prompt contexts per session
-- Tracks token counts (optional)
-- Clears context while preserving constraints
-
-## Usage Guidelines
-
-### In Components
+Call the hook with a selector so the component only re-renders when the slice it cares about
+changes:
 
 ```typescript
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 
 function WorldList() {
-  // Subscribe to specific state slices
-  const worlds = worldStore((state) => Object.values(state.worlds));
-  const currentWorldId = worldStore((state) => state.currentWorldId);
-  const createWorld = worldStore((state) => state.createWorld);
-  
-  // Use state and actions
+  const worlds = useWorldStore((state) => Object.values(state.worlds));
+  const currentWorldId = useWorldStore((state) => state.currentWorldId);
+  const createWorld = useWorldStore((state) => state.createWorld);
+
   const handleCreate = () => {
-    const id = createWorld({
-      name: 'New World',
-      theme: 'fantasy',
-      // ... other properties
-    });
+    const id = createWorld({ name: 'New World', theme: 'fantasy' });
   };
-  
-  return (
-    // ... component JSX
-  );
+
+  // ...
 }
 ```
 
-### Outside Components
+### Outside components
+
+For non-React code (services, tests, AI helpers), reach the store imperatively through
+`getState()`:
 
 ```typescript
-// Get current state snapshot
-const state = worldStore.getState();
-const worlds = Object.values(state.worlds);
+const worlds = Object.values(useWorldStore.getState().worlds);
 
-// Call actions directly
-worldStore.getState().createWorld({
-  name: 'Test World',
-  // ... properties
-});
+useWorldStore.getState().createWorld({ name: 'Test World' });
 ```
 
-### Subscribing to Changes
+### Subscribing to changes
 
 ```typescript
-// Subscribe to state changes
-const unsubscribe = worldStore.subscribe(
+const unsubscribe = useWorldStore.subscribe(
   (state) => state.currentWorldId,
   (currentWorldId) => {
-    console.log('Current world changed:', currentWorldId);
+    // react to the change
   }
 );
 
-// Don't forget to unsubscribe
 unsubscribe();
 ```
 
-## Integration Testing
+## Integration testing
 
-Cross-store operations are tested in integration tests:
+Cross-store relationships get exercised in integration tests, since that's where the
+world-character-session wiring tends to break:
 
 ```typescript
-// Example from storeIntegration.test.ts
-it('should create character in existing world', async () => {
-  // Create world
-  const worldId = worldStore.getState().createWorld({
-    name: 'Test World',
-    // ... properties
-  });
-  
-  // Create character in that world
-  const characterId = characterStore.getState().createCharacter({
+it('should create character in existing world', () => {
+  const worldId = useWorldStore.getState().createWorld({ name: 'Test World' });
+
+  const characterId = useCharacterStore.getState().createCharacter({
     name: 'Test Character',
     worldId,
-    // ... properties
   });
-  
-  // Verify relationship
-  const character = characterStore.getState().characters[characterId];
+
+  const character = useCharacterStore.getState().characters[characterId];
   expect(character.worldId).toBe(worldId);
 });
 ```
 
-## Best Practices
+The state, storage, and narrative layers are also covered by mutation testing (see
+`stryker.config.json`), which targets `src/state/**` specifically — state bugs are exactly the
+kind of thing a passing-but-weak test suite tends to miss.
 
-1. **Use Selectors**: Don't dig into nested state - use selectors to get what you need
-2. **Handle Errors**: Always check if the operation succeeded
-3. **Validate Input**: Make sure data is valid before trying to save it
-4. **Clean Up**: When you delete something, clean up related data too
-5. **Test Thoroughly**: State bugs are hard to track down - test everything
+## Best practices
 
-## Performance Tips
-
-Keep your stores fast:
-
-1. **Subscribe Selectively**: Only listen to the state you actually need
-2. **Memoize Selectors**: Use useMemo for expensive calculations
-3. **Batch Updates**: Don't make 10 separate updates when you can make 1
-4. **Avoid Subscriptions in Loops**: One subscription is better than many
-
-## Common Pitfalls
-
-Things that will bite you if you're not careful:
-
-1. **Direct State Mutation**: Never mutate state directly - always create new objects
-2. **Missing Error Handling**: Check if entities exist before trying to update them
-3. **Orphaned Data**: Don't leave references to deleted entities hanging around
-4. **Race Conditions**: Be careful with async operations that might complete out of order
-
-## Debugging
-
-Use Zustand DevTools for debugging:
-
-```typescript
-import { devtools } from 'zustand/middleware';
-
-export const worldStore = create<WorldStore>()(
-  devtools(
-    (set, get) => ({
-      // ... store implementation
-    }),
-    {
-      name: 'world-store',
-    }
-  )
-);
-```
-
-## Future Considerations
-
-1. **Middleware**: Logging, validation middleware
-2. **Optimistic Updates**: For better UX
-3. **State Sync**: Multi-device synchronization
-4. **Undo/Redo**: Time-travel functionality
+The short version: subscribe to the narrowest slice you need, validate input before saving,
+clean up related data on delete (or publish the right `storeEvents` event so other stores can),
+and never mutate state in place — always return new objects. State bugs are painful to track
+down, so the test coverage here is intentionally heavier than elsewhere.

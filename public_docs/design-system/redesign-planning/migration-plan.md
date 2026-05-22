@@ -1,6 +1,6 @@
 # Design System Migration Plan
 
-**Status:** Planning
+**Status:** Completed — shipped via Epic [#1020](https://github.com/jerseycheese/Narraitor/issues/1020) (DS1/DS2/DS3 migration, Tailwind removed in #1097). Kept as a historical record of the plan.
 **Created:** February 2026
 **Context:** Solo dev, part-time work, practical execution over process
 

@@ -85,7 +85,7 @@ Visual design and component guidelines:
 - [Design Tokens](./design-system/design-tokens.md) - 23-color system and variables
 - [Global Styles](./design-system/global-styles.md) - CSS architecture
 - [Icon Usage Guide](./design-system/icon-usage-guide.md) - Icon system
-- [shadcn/ui Integration](./design-system/shadcn-integration-guide.md) - Component library
+- [shadcn/ui Integration (historical)](./design-system/shadcn-integration-guide.md) - Component foundation; Tailwind/cva since removed
 
 ## Technical Guides
 
@@ -119,7 +119,7 @@ Implementation details and patterns:
 
 ### Configuration & Utilities
 
-- [Tailwind CSS v4 Configuration](./technical-guides/tailwind-css-v4-configuration.md)
+- [Styling & CSS (note: Tailwind was removed)](./technical-guides/tailwind-css-v4-configuration.md)
 - [Coding & Naming Conventions](./technical-guides/coding-naming-conventions.md)
 - [Type Guards Usage Guide](./technical-guides/type-guards-usage-guide.md)
 - [Response Extractor Utility](./technical-guides/response-extractor.md)

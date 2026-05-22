@@ -1,128 +1,47 @@
 # Prompt Template System
 
-So this is the system for managing AI prompt templates across the app. The basic idea is that instead of hardcoding prompts everywhere, you define reusable templates with variables, and the system handles substituting the actual values when you need to generate content.
+AI prompts for narrative, choices, and endings used to get hand-built inline at every
+call site, which made them hard to keep consistent and painful to tweak. This module pulls
+that work into one place: each prompt is a template that knows how to turn a typed context
+object into the final prompt string. Callers grab a template by id and run it, instead of
+gluing strings together themselves.
 
-## Why This Exists
+## How it works
 
-When you're working with AI for character generation, world building, or narrative content, you end up with a lot of similar prompts scattered throughout the codebase. This gets messy fast, and it's hard to maintain consistency. The template system centralizes all that logic and makes it easy to tweak prompts without hunting through dozens of files.
+A template is a plain object — an `id`, a `PromptType`, a `variables` list that documents
+what the template expects, and a `generate(context)` function that actually builds the
+prompt. The `generate` function is real code, not `{{placeholder}}` substitution, which
+means a template can branch on context (skip an empty inventory, format recent events,
+acknowledge a skill check) and stay type-checked against the context shape it declares.
 
-## How It Works
+Templates live under `templates/`. The narrative ones are defined per-file in
+`templates/narrative/` (base, action, scene, transition, player choice, and so on) and
+collected in `templates/narrative/index.ts`; endings live in `templates/endingTemplates.ts`.
+The shared types — `PromptType` and the `PromptTemplate` interface — are in `types.ts`.
 
-The system is pretty straightforward. You create templates with `{{variable}}` placeholders, define what variables are needed, and then process the template with actual values when you need it. It also does some validation to make sure you don't reference variables that don't exist.
+## Looking up a template
 
-Here's a basic example:
-
-```typescript
-import { PromptTemplateManager } from '@/lib/promptTemplates/promptTemplateManager';
-import { PromptType } from '@/lib/promptTemplates/types';
-
-const manager = new PromptTemplateManager();
-
-// Add a character template
-manager.addTemplate({
-  id: 'hero-template',
-  type: PromptType.CHARACTER,
-  content: 'Create a hero named {{name}} with {{power}} as their main power.',
-  variables: [
-    { name: 'name', description: 'Hero name' },
-    { name: 'power', description: 'Hero power' }
-  ]
-});
-
-// Use it later
-const prompt = manager.processTemplate('hero-template', {
-  name: 'Alice',
-  power: 'telekinesis'
-});
-// Result: "Create a hero named Alice with telekinesis as their main power."
-```
-
-## Managing Templates
-
-The manager handles all the CRUD operations you'd expect. You can add templates, update them, remove them, and organize them by type:
+`narrativeTemplateManager.ts` builds a map of every narrative template's `generate`
+function keyed by id, and exposes a single lookup:
 
 ```typescript
-// Get a specific template
-const template = manager.getTemplate('hero-template');
+import { getNarrativeTemplate } from '@/lib/promptTemplates/narrativeTemplateManager';
 
-// Update an existing one
-manager.updateTemplate('hero-template', {
-  id: 'hero-template',
-  type: PromptType.CHARACTER,
-  content: 'Create a hero named {{name}} with {{power}} and {{weakness}}.',
-  variables: [
-    { name: 'name', description: 'Hero name' },
-    { name: 'power', description: 'Hero power' },
-    { name: 'weakness', description: 'Hero weakness' }
-  ]
-});
-
-// Remove it entirely
-manager.removeTemplate('hero-template');
+const generate = getNarrativeTemplate('narrative/scene');
+const prompt = generate(narrativeContext);
 ```
 
-## Organizing by Type
+It throws if the id doesn't exist, so a typo fails loud rather than silently producing an
+empty prompt. The available narrative ids are `narrative/base`, `narrative/action`,
+`narrative/initialScene`, `narrative/scene`, `narrative/transition`,
+`narrative/playerChoice`, `narrative/alignedPlayerChoice`, and
+`narrative/skillAcknowledgment`.
 
-Templates are categorized by what they're used for - character generation, world building, narrative content, etc. This makes it easier to find the right template and keeps things organized:
+## Who uses it
 
-```typescript
-// Get all character templates
-const characterTemplates = manager.getTemplatesByType(PromptType.CHARACTER);
-
-// See what types are available
-const allTypes = manager.getAllTemplateTypes();
-
-// Get everything if you need it
-const allTemplates = manager.getAllTemplates();
-```
-
-## Template Validation
-
-The system validates templates to catch common mistakes. If you reference a variable in your template content but forget to define it in the variables array, it'll throw an error:
-
-```typescript
-// This will fail because {{age}} isn't defined
-try {
-  manager.addTemplate({
-    id: 'invalid-template',
-    type: PromptType.CHARACTER,
-    content: 'Character named {{name}} who is {{age}} years old',
-    variables: [
-      { name: 'name', description: 'Character name' }
-      // Missing 'age' variable definition
-    ]
-  });
-} catch (error) {
-  console.error(error.message);
-  // Error: "Template references undefined variable: age"
-}
-```
-
-## Variable Substitution
-
-When you process a template, the system finds all the `{{variable}}` placeholders and replaces them with the values you provide. It handles special characters properly and will throw an error if you're missing any required variables.
-
-```typescript
-const prompt = manager.processTemplate('character-template', {
-  name: 'Alice',
-  age: '30',
-  trait: 'curiosity'
-});
-```
-
-## Different Template Types
-
-The system supports different prompt types for different use cases:
-
-- **CHARACTER**: For generating character descriptions, backstories, motivations
-- **WORLD**: For creating world descriptions, locations, cultures
-- **NARRATIVE**: For story content, scene descriptions, dialogue
-- **CHOICE**: For generating decision options and consequences
-
-Each type can have its own conventions and variable patterns, which helps keep prompts consistent within their domain.
-
-## Integration with AI Services
-
-This system is designed to work with the AI integration layer. Instead of building prompts manually everywhere, you grab a template, fill in the variables, and send it off to the AI service. This makes it much easier to experiment with different prompt formulations and maintain consistency across the app.
-
-The templates themselves are just strings - the magic happens in how you use them with the actual AI calls.
+The AI layer is the consumer. `src/lib/ai/narrativeGenerator.ts` and
+`src/lib/ai/choiceGenerator.prompt.ts` both resolve a template key at runtime and call
+`getNarrativeTemplate(...)` to get the generator, then feed it the assembled context. The
+context shapes themselves are defined alongside the templates in
+`templates/narrative/context.ts`, which is what keeps each `generate` function honest about
+the fields it reads.

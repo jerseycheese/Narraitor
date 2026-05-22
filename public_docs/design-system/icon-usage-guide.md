@@ -4,6 +4,8 @@
 
 Icons should be consistent, accessible, and professional throughout the app. That means no more random emojis - we use lucide-react for everything. This guide covers how to pick the right icon, size it properly, and make it accessible.
 
+> **Note on the code examples below.** Tailwind was removed in the design-system migration (`#1097`), so the `className="w-4 h-4"` / `text-*-500` sizing-and-color classes shown here no longer apply. Size a lucide icon with the `size` prop (e.g. `<Star size={12} />`) and let color come from `currentColor` / a CSS class that sets `color: var(--token)`. The examples have been updated to the `size` prop; treat any leftover color utilities as "set this via CSS instead."
+
 ## Icon Library Standards
 
 ### Primary Icon System: lucide-react
@@ -34,8 +36,8 @@ Don't guess at icon sizes - we have established patterns for different contexts:
 For compact badge and tag elements where space is limited:
 
 ```tsx
-<Badge 
-  icon={<Star className="w-3 h-3 text-white" />} 
+<Badge
+  icon={<Star size={12} />}
   variant="warning"
 >
   Known Figure
@@ -47,11 +49,11 @@ For buttons, status indicators, and general interface elements:
 
 ```tsx
 <Button size="icon">
-  <Settings className="w-4 h-4" />
+  <Settings size={16} />
 </Button>
 
 // Status indicators
-<CheckCircle className="w-4 h-4 text-green-500" />
+<CheckCircle size={16} />
 ```
 
 #### **Prominent UI Icons: `w-5 h-5` (20px)**
@@ -59,7 +61,7 @@ For larger interface elements and section headers:
 
 ```tsx
 <button className="flex items-center gap-2">
-  <Globe className="w-5 h-5" />
+  <Globe size={20} />
   World Settings
 </button>
 ```
@@ -68,8 +70,8 @@ For larger interface elements and section headers:
 For achievement dialogs and prominent modal content:
 
 ```tsx
-<AchievementDialog 
-  icon={<Trophy className="w-8 h-8" />}
+<AchievementDialog
+  icon={<Trophy size={32} />}
   title="Achievement Unlocked!"
 />
 ```
@@ -82,9 +84,9 @@ Established patterns for navigation and breadcrumb elements:
 
 ```tsx
 // Breadcrumb navigation
-<Home className="w-4 h-4" />     // Root/home navigation
-<Globe className="w-4 h-4" />    // World-specific pages  
-<User className="w-4 h-4" />     // Character-related pages
+<Home size={16} />     // Root/home navigation
+<Globe size={16} />    // World-specific pages
+<User size={16} />     // Character-related pages
 ```
 
 ### Action Icons
@@ -92,10 +94,10 @@ Established patterns for navigation and breadcrumb elements:
 Icons for common user actions and interactions:
 
 ```tsx
-<Plus className="w-3 h-3" />      // Creation actions
-<Star className="w-3 h-3" />      // Favorites/known items
-<Settings className="w-4 h-4" />  // Configuration
-<Trash className="w-4 h-4" />     // Deletion actions
+<Plus size={12} />      // Creation actions
+<Star size={12} />      // Favorites/known items
+<Settings size={16} />  // Configuration
+<Trash size={16} />     // Deletion actions
 ```
 
 ### Status Icons
@@ -103,10 +105,10 @@ Icons for common user actions and interactions:
 System status and health indicators:
 
 ```tsx
-<CheckCircle className="w-4 h-4 text-green-500" />     // Success/healthy
-<AlertTriangle className="w-4 h-4 text-amber-500" />  // Warning/degraded
-<XCircle className="w-4 h-4 text-red-500" />           // Error/unavailable
-<RotateCcw className="w-4 h-4 text-blue-500 animate-spin" /> // Loading/recovering
+<CheckCircle size={16} />     // Success/healthy
+<AlertTriangle size={16} />  // Warning/degraded
+<XCircle size={16} />           // Error/unavailable
+<RotateCcw size={16} /> // Loading/recovering
 ```
 
 ### Game Mechanics Icons
@@ -114,10 +116,10 @@ System status and health indicators:
 Icons specific to gameplay and narrative elements:
 
 ```tsx
-<Scale className="w-4 h-4" />       // Lawful alignment choices
-<Flame className="w-4 h-4" />       // Chaotic alignment choices  
-<ChevronRight className="w-4 h-4" /> // Selected choice indicator
-<Trophy className="w-8 h-8" />       // Achievements and rewards
+<Scale size={16} />       // Lawful alignment choices
+<Flame size={16} />       // Chaotic alignment choices
+<ChevronRight size={16} /> // Selected choice indicator
+<Trophy size={32} />       // Achievements and rewards
 ```
 
 ### World & Character Icons
@@ -125,9 +127,9 @@ Icons specific to gameplay and narrative elements:
 Icons for world and character categorization:
 
 ```tsx
-<Globe className="w-3 h-3" />     // "Set Within" world type
-<Sparkles className="w-3 h-3" />  // "Inspired By" world type  
-<Zap className="w-3 h-3" />       // "Original" world type
+<Globe size={12} />     // "Set Within" world type
+<Sparkles size={12} />  // "Inspired By" world type
+<Zap size={12} />       // "Original" world type
 ```
 
 ## Color and Theming
@@ -136,8 +138,8 @@ Icons for world and character categorization:
 Always use explicit white text for visibility on colored backgrounds:
 
 ```tsx
-<Badge 
-  icon={<Star className="w-3 h-3 text-white" />}
+<Badge
+  icon={<Star size={12} />}
   variant="warning"
 >
   Known Figure
@@ -149,24 +151,24 @@ Use semantic color classes that align with the status meaning:
 
 ```tsx
 // Success states
-<CheckCircle className="w-4 h-4 text-green-500" />
+<CheckCircle size={16} />
 
-// Warning states  
-<AlertTriangle className="w-4 h-4 text-amber-500" />
+// Warning states
+<AlertTriangle size={16} />
 
 // Error states
-<XCircle className="w-4 h-4 text-red-500" />
+<XCircle size={16} />
 
 // Loading states
-<RotateCcw className="w-4 h-4 text-blue-500 animate-spin" />
+<RotateCcw size={16} />
 ```
 
 ### Neutral Icons
 Use default text colors for icons without specific semantic meaning:
 
 ```tsx
-<Settings className="w-4 h-4" />  // Inherits text color
-<Home className="w-4 h-4 text-gray-500" />  // Explicit neutral color
+<Settings size={16} />  // Inherits text color
+<Home size={16} />  // Explicit neutral color
 ```
 
 ## Accessibility Guidelines
@@ -178,17 +180,17 @@ Icons should be properly labeled for assistive technologies:
 ```tsx
 // For decorative icons, use aria-hidden
 <span aria-hidden="true">
-  <Star className="w-3 h-3" />
+  <Star size={12} />
 </span>
 
 // For meaningful icons, provide proper labeling
 <span aria-label="Storage status: healthy">
-  <CheckCircle className="w-4 h-4 text-green-500" />
+  <CheckCircle size={16} />
 </span>
 
 // In interactive elements, ensure proper labeling
 <button aria-label="Open settings">
-  <Settings className="w-4 h-4" />
+  <Settings size={16} />
 </button>
 ```
 
@@ -198,7 +200,7 @@ Ensure icons in interactive elements have proper focus states:
 
 ```tsx
 <button className="p-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-  <Settings className="w-4 h-4" />
+  <Settings size={16} />
 </button>
 ```
 
@@ -209,7 +211,7 @@ Ensure sufficient contrast and don't rely solely on color:
 ```tsx
 // Good: Color + icon shape convey meaning
 <div className="flex items-center gap-2">
-  <CheckCircle className="w-4 h-4 text-green-500" />
+  <CheckCircle size={16} />
   <span>Success</span>
 </div>
 
@@ -228,23 +230,23 @@ import { Badge } from '@/components/ui/badge'
 import { Star, Plus, Globe } from 'lucide-react'
 
 // Character type badges
-<Badge 
-  icon={<Star className="w-3 h-3 text-white" />}
+<Badge
+  icon={<Star size={12} />}
   variant="warning"
 >
   Known Figure
 </Badge>
 
-<Badge 
-  icon={<Plus className="w-3 h-3 text-white" />}
+<Badge
+  icon={<Plus size={12} />}
   variant="default"
 >
   Original
 </Badge>
 
 // World type badges
-<Badge 
-  icon={<Globe className="w-3 h-3 text-white" />}
+<Badge
+  icon={<Globe size={12} />}
   variant="info"
 >
   Set in Middle Earth
@@ -261,18 +263,18 @@ import { Settings, Plus, Trash } from 'lucide-react'
 
 // Icon-only buttons
 <Button size="icon">
-  <Settings className="w-4 h-4" />
+  <Settings size={16} />
 </Button>
 
 // Buttons with text and icons
 <Button className="flex items-center gap-2">
-  <Plus className="w-4 h-4" />
+  <Plus size={16} />
   Create New
 </Button>
 
 // Destructive actions
 <Button variant="destructive" className="flex items-center gap-2">
-  <Trash className="w-4 h-4" />
+  <Trash size={16} />
   Delete
 </Button>
 ```
@@ -286,7 +288,7 @@ import { CheckCircle, AlertTriangle, XCircle, RotateCcw } from 'lucide-react'
 
 const StorageStatusIcon = ({ status }) => {
   const iconClass = "w-4 h-4"
-  
+
   switch (status) {
     case 'healthy':
       return <CheckCircle className={`${iconClass} text-green-600`} />
@@ -328,48 +330,48 @@ When you find an emoji in the code, here's how to fix it:
 
 ```tsx
 // Achievements and success
-'🏆' → <Trophy className="w-8 h-8" />
-'⭐' → <Star className="w-3 h-3 text-white" />
-'✅' → <CheckCircle className="w-4 h-4 text-green-500" />
+'🏆' becomes <Trophy size={32} />
+'⭐' becomes <Star size={12} />
+'✅' becomes <CheckCircle size={16} />
 
 // Actions and creation
-'➕' → <Plus className="w-3 h-3 text-white" />
-'⚙️' → <Settings className="w-4 h-4" />
-'🗑️' → <Trash className="w-4 h-4" />
+'➕' becomes <Plus size={12} />
+'⚙️' becomes <Settings size={16} />
+'🗑️' becomes <Trash size={16} />
 
-// World and location types  
-'🌍' → <Globe className="w-3 h-3 text-white" />
-'✨' → <Sparkles className="w-3 h-3 text-white" />
-'⚡' → <Zap className="w-3 h-3 text-white" />
+// World and location types
+'🌍' becomes <Globe size={12} />
+'✨' becomes <Sparkles size={12} />
+'⚡' becomes <Zap size={12} />
 
 // Status and alerts
-'⚠️' → <AlertTriangle className="w-4 h-4 text-amber-500" />
-'❌' → <XCircle className="w-4 h-4 text-red-500" />
-'🔄' → <RotateCcw className="w-4 h-4 text-blue-500 animate-spin" />
+'⚠️' becomes <AlertTriangle size={16} />
+'❌' becomes <XCircle size={16} />
+'🔄' becomes <RotateCcw size={16} />
 
 // Alignment and choices
-'⚖️' → <Scale className="w-4 h-4" />
-'🔥' → <Flame className="w-4 h-4" />
-'➤' → <ChevronRight className="w-4 h-4" />
+'⚖️' becomes <Scale size={16} />
+'🔥' becomes <Flame size={16} />
+'➤' becomes <ChevronRight size={16} />
 ```
 
 ## Best Practices
 
 ### Do's
 
-✅ **Use consistent sizing** based on context and component type  
-✅ **Import only needed icons** to maintain tree-shaking benefits  
-✅ **Apply semantic colors** that match the icon's meaning  
-✅ **Provide proper accessibility** labeling for meaningful icons  
-✅ **Follow established patterns** documented in this guide  
+- **Use consistent sizing** based on context and component type
+- **Import only needed icons** to maintain tree-shaking benefits
+- **Apply semantic colors** that match the icon's meaning
+- **Provide proper accessibility** labeling for meaningful icons
+- **Follow established patterns** documented in this guide
 
 ### Don'ts
 
-❌ **Don't use emojis** for interface icons: use lucide-react instead  
-❌ **Don't use arbitrary sizes** - stick to the established sizing scale  
-❌ **Don't rely on color alone** to convey meaning  
-❌ **Don't forget accessibility** - always consider screen reader users  
-❌ **Don't mix icon libraries** - maintain consistency with lucide-react  
+- **Don't use emojis** for interface icons: use lucide-react instead
+- **Don't use arbitrary sizes** - stick to the established sizing scale
+- **Don't rely on color alone** to convey meaning
+- **Don't forget accessibility** - always consider screen reader users
+- **Don't mix icon libraries** - maintain consistency with lucide-react
 
 ## Component Integration
 
@@ -379,8 +381,8 @@ The Badge component is designed to work seamlessly with lucide-react icons:
 
 ```tsx
 // The icon prop accepts React.ReactNode
-<Badge 
-  icon={<Star className="w-3 h-3 text-white" />}
+<Badge
+  icon={<Star size={12} />}
   variant="warning"
 >
   Badge Text
@@ -393,8 +395,8 @@ Most components should accept icons as React nodes:
 
 ```tsx
 // Achievement dialogs
-<AchievementDialog 
-  icon={<Trophy className="w-8 h-8" />}
+<AchievementDialog
+  icon={<Trophy size={32} />}
   // other props...
 />
 
@@ -408,7 +410,7 @@ interface MyComponentProps {
 ## Related Documentation
 
 - [shadcn/ui Integration Guide](../ui/shadcn-integration-guide.md) - Component library integration
-- [UI/UX Guidelines](../development/ui-ux-guidelines.md) - Overall design principles  
+- [UI/UX Guidelines](../development/ui-ux-guidelines.md) - Overall design principles
 - [Global Styles](./global-styles.md) - CSS and styling standards
 
 ## Future Considerations

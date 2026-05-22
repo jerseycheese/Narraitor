@@ -28,7 +28,7 @@ As a [user type], I want [goal] so that [benefit].
 ## Domains
 
 - World Configuration
-- Character System  
+- Character System
 - Narrative Engine
 - Journal System
 - State Management

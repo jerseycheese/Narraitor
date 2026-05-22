@@ -28,7 +28,7 @@ npm run test:visual:headed
 
 Add visual tests for:
 - **New pages or major page changes**
-- **New UI components with visual complexity**  
+- **New UI components with visual complexity**
 - **Layout changes or responsive behavior**
 - **Interactive states (hover, focus, disabled)**
 
@@ -47,7 +47,7 @@ Before writing tests, identify the key visual states:
 Example: New character creation form
 - Empty form state
 - Partially filled form
-- Validation error states  
+- Validation error states
 - Success state
 - Mobile responsive layout
 ```
@@ -68,7 +68,7 @@ test.describe('Character Creation Visual Tests', () => {
   test('empty form layout', async ({ page }) => {
     await page.goto('/characters/create');
     await waitForAppReady(page);
-    
+
     await expect(page).toHaveScreenshot('character-form-empty.png');
   });
 });
@@ -93,9 +93,9 @@ open tests/visual/character-creation.spec.ts-snapshots/
 - Expected layout and spacing
 
 **Common issues to fix:**
-- Loading states visible → Add more wait time
-- Cut-off content → Use `fullPage: true` or adjust viewport
-- Inconsistent fonts → Verify `waitForAppReady` waits for fonts
+- Loading states visible: add more wait time
+- Cut-off content: use `fullPage: true` or adjust the viewport
+- Inconsistent fonts: verify `waitForAppReady` waits for fonts
 
 #### Step 5: Run Tests to Verify
 
@@ -112,7 +112,7 @@ git add tests/visual/character-creation.spec.ts-snapshots/
 git commit -m "test(visual): Add visual tests for character creation form
 
 - Test empty form state
-- Test validation error states  
+- Test validation error states
 - Test success state and responsive layout"
 ```
 
@@ -178,11 +178,11 @@ npm run test:visual -- tests/visual/character-creation.spec.ts
 test('form layout', async ({ page }) => {
   await page.goto('/characters/create');
   await waitForAppReady(page);
-  
+
   // Add specific waits for dynamic content
   await page.waitForSelector('[data-testid="form-loaded"]');
   await page.waitForTimeout(1000); // Additional stabilization
-  
+
   await expect(page).toHaveScreenshot('character-form-empty.png');
 });
 ```
@@ -220,16 +220,16 @@ npm run test:visual:debug -- tests/visual/main-pages.spec.ts
 test('flaky test', async ({ page }) => {
   await page.goto('/page');
   await waitForAppReady(page);
-  
+
   // Wait for specific elements that might be loading
   await page.waitForSelector('[data-testid="content-loaded"]');
-  
+
   // Wait for animations to complete
   await page.waitForTimeout(500);
-  
+
   // Ensure fonts are loaded
   await page.waitForFunction(() => document.fonts.ready);
-  
+
   await expect(page).toHaveScreenshot('page.png');
 });
 ```
@@ -350,15 +350,15 @@ When visual tests fail in CI:
 gh run download <run-id>
 
 # Or download from web UI
-# Go to failed workflow → Artifacts → playwright-report
+# Go to the failed workflow, then Artifacts, then playwright-report
 ```
 
 ### Step 2: Analyze CI vs Local Differences
 
 Common CI-specific issues:
-- **Font rendering differences** → Usually acceptable
-- **Timing differences** → May need longer waits
-- **Resolution differences** → Check viewport configuration
+- **Font rendering differences**: usually acceptable
+- **Timing differences**: may need longer waits
+- **Resolution differences**: check viewport configuration
 
 ### Step 3: Fix CI-Specific Issues
 
@@ -368,7 +368,7 @@ test('slow loading test', async ({ page }) => {
   // Longer timeout in CI
   const timeout = process.env.CI ? 60000 : 30000;
   test.setTimeout(timeout);
-  
+
   await page.goto('/slow-page');
   await waitForAppReady(page);
   await expect(page).toHaveScreenshot('page.png');
@@ -380,10 +380,10 @@ test('slow loading test', async ({ page }) => {
 test('environment specific test', async ({ page }) => {
   await page.goto('/page');
   await waitForAppReady(page);
-  
+
   // More tolerance in CI due to font differences
   const threshold = process.env.CI ? 0.4 : 0.2;
-  
+
   await expect(page).toHaveScreenshot('page.png', { threshold });
 });
 ```
@@ -407,7 +407,7 @@ This PR updates the following visual elements:
 ### Before
 [Include before screenshots]
 
-### After  
+### After
 [Include after screenshots]
 
 ## Baseline Updates
@@ -452,12 +452,12 @@ npm run test:visual
 
 #### Step 3: Review Process
 
-✅ **Approve if:**
+**Approve if:**
 - Changes are intentional and documented
 - Baselines are updated appropriately
 - Visual tests pass
 
-❌ **Request changes if:**
+**Request changes if:**
 - Baseline updates seem accidental
 - Visual changes aren't documented
 - Tests are failing

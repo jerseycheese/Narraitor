@@ -2,231 +2,80 @@
 title: Prompt Context API
 tags: [prompt, context, api, ai]
 created: 2025-05-12
-updated: 2025-06-08
+updated: 2026-05-22
 ---
 
 # Prompt Context API
 
-**Note**: Most of this document describes planned features not yet implemented. The actual implementation currently only includes `inventoryContextBuilder.ts`, `tokenUtils.ts`, and `types.ts`. The `ContextBuilder`, `ContextPrioritizer`, and `PromptContextManager` classes described below are planned but do not exist in the codebase yet.
+The AI needs to understand the world, the character, recent events, and lore to write a
+good scene, but the prompt can only carry so much before it gets expensive and noisy. The
+`promptContext` module is the budgeting layer that sits under prompt assembly: it estimates
+how big a chunk of text is, hands each part of the prompt a token allowance, and formats
+the trickier pieces (like inventory) so they stay useful without blowing past their share.
 
-The AI needs to understand your world and character to generate good stories, but it can only process so much information at once. The prompt context system handles the tricky job of deciding what information to include and how to format it for the AI.
+There's no single "context manager" class. The module is three small, focused pieces that
+the AI layer composes itself, which keeps each piece testable and avoids one god-object
+owning the whole prompt.
 
-## Core Components
+## Token estimation (`tokenUtils.ts`)
 
-### ContextBuilder (Planned)
-Takes your world and character data and formats it into clean, structured markdown that AI models can understand easily.
-
-```typescript
-import { ContextBuilder } from '@/lib/promptContext/contextBuilder';
-
-const builder = new ContextBuilder();
-const worldContext = builder.buildWorldContext(worldData);
-const characterContext = builder.buildCharacterContext(characterData);
-const combinedContext = builder.buildCombinedContext(worldData, characterData);
-```
-
-**Methods:**
-- `buildWorldContext(world: WorldContext): string` - Formats world data
-- `buildCharacterContext(character: CharacterContext): string` - Formats character data  
-- `buildCombinedContext(world, character): string` - Creates combined context
-
-### ContextPrioritizer (Planned)
-When you have more information than the AI can handle, this decides what to keep and what to drop. It uses importance weights to make smart choices.
+Pulling in a real tokenizer just to budget prompts isn't worth the dependency weight, so
+estimation uses a heuristic that approximates LLM tokenization — word boundaries,
+punctuation, CamelCase and hyphen splits, and a character-count fallback for long words.
+It's not exact, but it's close enough to decide what fits and what gets trimmed.
 
 ```typescript
-import { ContextPrioritizer } from '@/lib/promptContext/contextPrioritizer';
+import { estimateTokenCount, truncateToTokenLimit } from '@/lib/promptContext/tokenUtils';
 
-// Default weights
-const prioritizer = new ContextPrioritizer();
-
-// Custom weights for combat scenarios
-const combatWeights = {
-  'character.attributes': 5,
-  'character.skills': 5,
-  'character.inventory': 4,
-  'world.rules': 3
-};
-const customPrioritizer = new ContextPrioritizer(combatWeights);
-
-const prioritized = prioritizer.prioritize(contextElements, tokenLimit);
+const tokens = estimateTokenCount('This is a sample text to estimate token count.');
+const trimmed = truncateToTokenLimit(longLoreBlob, 800);
 ```
 
-**Default Priority Weights:**
-- `character.current_state`: 5 (highest)
-- `character.attributes`: 4
-- `world.rules`: 4
-- `character.skills`: 3
-- `character.inventory`: 3
-- `world.genre`: 3
-- `event`: 3
-- `world.description`: 2
-- `character.backstory`: 1
-- `world.history`: 1 (lowest)
+`truncateToTokenLimit` caps a string at an estimated token limit and avoids cutting
+mid-word when it can. That's what the prompt builders lean on to keep a large section
+(recent narrative, lore) inside its allocation.
 
-### PromptContextManager (Planned)
-The main class you'll use - it brings together the builder and prioritizer to create the final context for AI prompts.
+## Token budgeting (`tokenBudgetManager.ts`)
 
-```typescript
-import { PromptContextManager } from '@/lib/promptContext/promptContextManager';
-
-const manager = new PromptContextManager();
-
-const context = manager.generateContext({
-  promptType: 'narrative',
-  world: worldData,
-  character: characterData,
-  recentEvents: ['Found magical artifact'],
-  tokenLimit: 500
-});
-```
-
-**Context Options:**
-```typescript
-interface ContextOptions {
-  promptType?: string;        // 'narrative', 'decision', 'summary'
-  world?: WorldContext;       
-  character?: CharacterContext;
-  recentEvents?: string[];    
-  currentSituation?: string;  
-  tokenLimit?: number;        // Default: 1000
-}
-```
-
-## Usage Examples
-
-### Basic Usage
-```typescript
-const manager = new PromptContextManager();
-
-const result = await manager.generateContext({
-  promptType: 'narrative',
-  world: {
-    id: 'world-1',
-    name: 'Eldoria',
-    genre: 'fantasy',
-    description: 'A magical realm of wizards and dragons',
-    attributes: [{ id: 'str', name: 'Strength', description: 'Physical power' }]
-  },
-  character: {
-    id: 'char-1',
-    name: 'Gandalf',
-    level: 15,
-    attributes: [{ attributeId: 'str', name: 'Strength', value: 8 }]
-  },
-  tokenLimit: 500
-});
-```
-
-### Template Integration
-```typescript
-import { PromptContextManager } from '@/lib/promptContext/promptContextManager';
-import { PromptTemplateManager } from '@/lib/promptTemplates/promptTemplateManager';
-
-const templateManager = new PromptTemplateManager();
-const contextManager = new PromptContextManager();
-
-// Generate context
-const context = contextManager.generateContext({
-  world: worldData,
-  character: characterData
-});
-
-// Process template with context
-const prompt = templateManager.processTemplate('narrative-1', {
-  context,
-  situation: 'Entering the dark forest'
-});
-```
-
-## Context Format
-
-The system outputs clean, structured markdown that AI models can parse easily:
-
-```markdown
-# World: Eldoria
-Genre: fantasy
-A magical realm of wizards and dragons
-
-## Attributes:
-- Strength: Physical power
-- Intelligence: Mental acuity
-
-# Character: Gandalf
-Level: 15
-A wise and powerful wizard
-
-## Attributes:
-- Strength: 8
-- Intelligence: 18
-
-## Skills:
-- Fire Magic: 5
-- Staff Combat: 4
-
-## Key Items:
-- Staff of Power (equipped)
-- Healing Potion x3
-```
-
-## API Reference
-
-### estimateTokenCount(text: string): number
-Estimates token count using heuristic rules that approximate LLM tokenization (word boundaries, punctuation, CamelCase/hyphen splits, long-word character heuristics). It’s not perfect, but it’s good enough for budgeting and truncation without pulling in a tokenizer dependency.
-
-```typescript
-import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
-
-const text = "This is a sample text to estimate token count.";
-const tokenCount = estimateTokenCount(text);
-```
-
-### truncateToTokenLimit(text: string, limit: number): string
-Truncates a string to fit within an estimated token limit (best-effort). This is what the budget-aware prompt assembly uses to cap large prompt sections without cutting off mid-word when it can avoid it.
-
-```typescript
-import { truncateToTokenLimit } from '@/lib/promptContext/tokenUtils';
-
-const limited = truncateToTokenLimit(longLoreBlob, 800);
-```
-
-### TokenBudgetManager / RequestBudget (Implemented)
-Centralizes prompt budgets across components (lore, recent narrative, goals, tone, inventory, etc.). When enabled, prompt builders can record usage and trim sections to stay inside their per-component allocations.
+Each prompt is built from competing parts — base template, character context, recent
+narrative, goals, tone, lore, inventory, personalization — and they can't all grow
+unbounded. `RequestBudget` handles the divvying-up for a single request. You give it a set
+of per-component allocations and a total budget, and it resolves how many tokens each
+component actually gets, reducing lower-priority components first when things are tight.
 
 ```typescript
 import {
-  TokenBudgetManager,
+  RequestBudget,
+  ComponentPriority,
   DEFAULT_ALLOCATIONS,
   DEFAULT_TOTAL_BUDGET,
 } from '@/lib/promptContext/tokenBudgetManager';
 
-const manager = new TokenBudgetManager({ enabled: true });
-const budget = manager.createBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET);
+const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true);
+
+const loreAllowance = budget.getAllocation('lore-context');
+budget.recordUsage('lore-context', actualLoreTokens);
 ```
 
-### generateContext(options: ContextOptions): Promise<GenerateResult>
-Generates prioritized context based on token limits.
+A few things worth knowing about how it resolves:
 
-```typescript
-const result = await manager.generateContext({
-  promptType: 'narrative',
-  world: worldData,
-  character: characterData,
-  recentEvents: ['Defeated dragon', 'Found treasure'],
-  tokenLimit: 500
-});
+- Allocations carry a `ComponentPriority` (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) plus
+  `min`, `target`, and `max`. `CRITICAL` components (base template, character context) get
+  their minimum first, then everything else is filled by priority from what's left.
+- Pass `enabled: false` and it stops enforcing limits — `getAllocation` returns `Infinity`
+  and nothing gets trimmed, which is handy for debugging a prompt without the budget in the
+  way.
+- `DEFAULT_TOTAL_BUDGET` is `80000`, deliberately conservative at roughly 8% of a 1M-token
+  context window. `DEFAULT_ALLOCATIONS` is the narrative-generation preset that ships with
+  the module.
 
-// Returns:
-// {
-//   context: string,
-//   estimatedTokenCount: number,
-//   finalTokenCount: number,
-//   contextRetentionPercentage: number
-// }
-```
+## Inventory context (`inventoryContextBuilder.ts`)
 
-### buildInventoryContext(items: InventoryItem[], options?: InventoryContextOptions): InventoryContextResult (Implemented)
-
-Takes a character's inventory and formats it for AI prompts. The system prioritizes items that matter to the story - equipped gear, quest artifacts, recently acquired items - and keeps the output within token limits so it doesn't overwhelm the AI with mundane junk.
+Inventory is the part that most needs shaping, since a character can be carrying a pile of
+mundane junk that would crowd out the stuff the story actually cares about.
+`buildInventoryContext` sorts by what matters — equipped gear first, then category priority
+(quest items beat consumables), then how recently something was acquired — and trims to a
+token budget so the AI sees the important items and not forty healing potions.
 
 ```typescript
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
@@ -244,20 +93,24 @@ const { context } = buildInventoryContext(characterInventoryItems, {
 */
 ```
 
-The builder sorts items by importance: equipped status first, then category priority (quest items beat consumables), then recency of acquisition. Each line includes metadata about when and how the item was acquired, which helps the AI reference items naturally in narrative.
+Each line carries when and how the item was acquired, which gives the AI something concrete
+to reference in narrative. It defaults to 180 tokens and 8 items; when it has to truncate,
+it appends the "+ N more items" summary line and drops lower-priority items so that summary
+still fits.
 
-Defaults to 180 tokens and 8 items max. When it needs to truncate, it appends a summary line and removes lower-priority items to fit that summary within the token budget.
+## Where this gets used
 
-## Error Handling
+The consumers all live in the AI layer. `narrativeGenerator.prompt.ts`,
+`narrativeGenerator.budget.ts`, `narrativeGenerator.prompt.personalization.ts`, and
+`choiceGenerator.prompt.ts` assemble their prompts on top of these pieces, and the narrative
+templates themselves (`templates/narrative/baseNarrativeTemplate.ts`) pull in formatted
+context. So the flow is roughly: a template knows what sections it wants, `RequestBudget`
+says how big each can be, `tokenUtils` measures and trims, and `buildInventoryContext`
+handles the one section that needs real sorting logic.
 
-The system is designed to fail gracefully:
+## Behavior under bad input
 
-- Missing world/character data: Returns partial context with what's available
-- Invalid token limits: Defaults to 1000 tokens and keeps going
-- Empty data structures: Returns empty strings without throwing errors
-
-## Performance Notes
-
-- Context generation is synchronous and lightweight
-- Token estimation is O(n) based on content length
-- No caching currently implemented (planned for future)
+The pieces are built to degrade rather than throw. Missing world or character data just
+produces a smaller context with whatever's available, empty structures return empty strings,
+and a disabled budget skips enforcement entirely. Estimation is O(n) on content length and
+synchronous, so none of this adds latency worth worrying about.

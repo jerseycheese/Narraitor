@@ -6,7 +6,7 @@ So this system handles one of those user experience details that really matters:
 
 There are three main pieces: **NavigationLoadingProvider** manages global loading state, **LoadingOverlay** shows the visual indicator, and **useNavigationLoading** provides the hook for components to trigger loading states during navigation.
 
-The flow is pretty straightforward: User clicks → Hook triggers loading → Provider updates state → Overlay shows → Navigation completes → Loading clears.
+The flow is pretty straightforward: a user clicks, the hook triggers loading, the provider updates state, the overlay shows, navigation completes, and the loading state clears.
 
 ## Implementation
 

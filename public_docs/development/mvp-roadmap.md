@@ -1,9 +1,9 @@
 # Narraitor MVP Roadmap
 
 ## Where We Are
-**Major Milestone**: Core MVP is done. AI storytelling, world creation, character building, session persistence, and navigation all work.
+**Major Milestone**: The core MVP is basically complete. AI storytelling, world creation, character building, session persistence, and navigation all work, and a player can go end to end through the loop.
 
-**Current Status**: Advanced polish phase. ~35-40 MVP-blocking items remain across narrative consistency, UI polish, and error handling.
+**Current Status**: Polish toward a proper 1.0. Since this roadmap was first drafted, several big pieces have landed: the three-design-system migration (DS1/DS2/DS3, see [ADR-011](../architecture/ADR-011-three-design-systems.md)), Playwright visual-regression testing, the dashboard home page, the guided onboarding tutorial, table views for the list screens, and the lore entity-management work (fuzzy matching, aliases, deduplication, resolution). The remaining work is mostly UI polish, error-handling hardening, and getting things release-ready rather than net-new core systems.
 
 ## What the MVP Does
 Basically, it's a complete solo narrative RPG experience where you can:
@@ -33,8 +33,11 @@ Basically, it's a complete solo narrative RPG experience where you can:
 Making the experience smooth. Navigation done: mobile works, loading states are responsive, state persists.
 
 **Priority 1: Narrative Consistency & Lore**
-The lore/narrative consistency system partially works but has inconsistent behavior. This is the highest-priority work because without reliable AI memory, the game experience breaks down:
-- Lore storage and fact tracking (#182-185)
+The lore system has come a long way — storage, fact tracking, fuzzy matching, aliases,
+deduplication, and entity resolution have all landed (the `loreStore.*` family plus
+`src/lib/lore/`), and there's a DevTools consistency-validation panel for debugging how the AI
+processes lore. Reliable AI memory still matters most for the experience, so the remaining work
+is tightening consistency rather than building the foundation:
 - Narrative consistency checks (#188-191)
 - Decision consequence tracking (#210, #198, #196)
 - Long-term story impact systems
@@ -94,7 +97,7 @@ Cannot ship without these:
 
 ### High Priority: Player-Facing Features
 Core user experience:
-- Dashboard home page to guide world → character flow (#398)
+- Dashboard home page to guide world-to-character flow (#398)
 - Guided onboarding tutorial (#399)
 - Character creation templates (#393)
 - Character portraits (custom upload #404, avatar library #405)
@@ -125,7 +128,8 @@ Valuable but can launch with Gemini-only:
 - See "Post-MVP Features" section for full multi-provider roadmap
 
 ## Technical Debt & Infrastructure
-- Implement Playwright visual regression testing
+- Playwright visual regression testing — done (`tests/visual/`, runs in CI)
+- Dead-code and architecture tooling — done (knip, CSS audit, dependency-cruiser, mutation testing)
 - Optimize bundle size and performance
 - Enhance error boundaries and recovery
 - Improve TypeScript strictness
@@ -151,7 +155,6 @@ Features that are valuable but not required for initial launch:
 - Mobile app versions
 
 **Infrastructure**
-- Visual regression testing (Playwright)
 - Advanced CI/CD pipeline enhancements
 - Dependency updates (Next.js 16, Storybook 9.x, test stack)
 
@@ -172,4 +175,4 @@ Features that are valuable but not required for initial launch:
 - [ ] Marketing materials ready
 
 ---
-*Last Updated: 2025-11-20 - Updated priorities based on actual implementation status, ~35-40 MVP-blocking items identified*
+*Last Updated: 2026-05-22 - Reconciled status against shipped work: design-system migration, visual regression, dashboard, onboarding, table views, and lore entity management have all landed; remaining work is polish and release-readiness toward 1.0.*

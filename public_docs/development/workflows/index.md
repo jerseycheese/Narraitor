@@ -36,23 +36,23 @@ Development processes and workflow guidelines for Narraitor.
 ## Development Checklist
 
 **Before Starting:**
-- ✅ Create GitHub issue from user story
-- ✅ Create feature branch from develop
-- ✅ Understand acceptance criteria
+- Create GitHub issue from user story
+- Create feature branch from develop
+- Understand acceptance criteria
 
 **During Development:**
-- ✅ Write tests before implementation
-- ✅ Keep files under 300 lines
-- ✅ Follow KISS principles
-- ✅ Use TypeScript for type safety
-- ✅ Manual testing in dev harnesses
+- Write tests before implementation
+- Keep files under 300 lines
+- Follow KISS principles
+- Use TypeScript for type safety
+- Manual testing in dev harnesses
 
 **Before Committing:**
-- ✅ All tests pass
-- ✅ No build errors
-- ✅ Code follows conventions
-- ✅ Documentation updated if needed
-- ✅ Manual verification complete
+- All tests pass
+- No build errors
+- Code follows conventions
+- Documentation updated if needed
+- Manual verification complete
 
 ## Testing Strategy
 

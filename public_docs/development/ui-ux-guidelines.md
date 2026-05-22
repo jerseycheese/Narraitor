@@ -172,7 +172,7 @@ Use React DevTools Profiler to catch re-render issues.
 ### Theme-Aware Development
 1. Add new tokens to all 3 theme CSS files (`ds1.css`, `ds2.css`, `ds3.css`) — both light and dark blocks
 2. Consume tokens in component CSS via `var(--token-name)`
-3. Use semantic Tailwind classes (`bg-primary`, `text-muted-foreground`) for shadcn/ui-integrated components
+3. Style components with semantic CSS classes that consume design tokens via `var(--token)` — there are no Tailwind utility classes (Tailwind was removed in the design-system migration)
 4. Test across all 6 combinations (3 design systems x 2 color schemes)
 5. Verify WCAG contrast in both light and dark mode
 
