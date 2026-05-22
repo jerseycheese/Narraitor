@@ -20,9 +20,20 @@ Core architectural decisions and design patterns:
 
 ### Architecture Decision Records (ADRs)
 
+Full index in [architecture-decisions.md](./architecture/architecture-decisions.md). ADRs 001-008 were backfilled from the inception-era foundation.
+
+- [ADR-001: Next.js App Router + TypeScript](./architecture/ADR-001-nextjs-app-router-typescript.md)
+- [ADR-002: Client-side-only architecture](./architecture/ADR-002-client-side-only-architecture.md)
+- [ADR-003: Zustand domain stores](./architecture/ADR-003-zustand-state-management.md)
+- [ADR-004: IndexedDB persistence](./architecture/ADR-004-indexeddb-persistence.md)
+- [ADR-005: Domain-driven structure](./architecture/ADR-005-domain-driven-structure.md)
+- [ADR-006: Gemini behind server-side API routes](./architecture/ADR-006-gemini-server-side-api.md)
+- [ADR-007: Tailwind + shadcn/ui styling (superseded by ADR-011)](./architecture/ADR-007-tailwind-shadcn-styling.md)
+- [ADR-008: Testing & verification strategy](./architecture/ADR-008-testing-and-verification-strategy.md)
 - [ADR-009: Guided Onboarding System](./architecture/ADR-009-guided-onboarding-system.md)
 - [ADR-010: Decision Relevance Simplification](./architecture/ADR-010-decision-relevance-simplification.md)
-- [Mock Components for Storybook](./architecture/mock-components-for-storybook.md)
+- [ADR-011: Three Design Systems (DS1/DS2/DS3)](./architecture/ADR-011-three-design-systems.md)
+- [Mock Components for Storybook (superseded)](./architecture/mock-components-for-storybook.md)
 
 ## Systems
 
@@ -82,7 +93,7 @@ Guides for developers working on Narraitor:
 
 Visual design and component guidelines:
 
-- [Design Tokens](./design-system/design-tokens.md) - 23-color system and variables
+- [Design Tokens](./design-system/design-tokens.md) - three-tier token system (colors, spacing, typography, elevation)
 - [Global Styles](./design-system/global-styles.md) - CSS architecture
 - [Icon Usage Guide](./design-system/icon-usage-guide.md) - Icon system
 - [shadcn/ui Integration (historical)](./design-system/shadcn-integration-guide.md) - Component foundation; Tailwind/cva since removed
@@ -166,4 +177,4 @@ When adding documentation:
 
 ---
 
-Last updated: 2025-12-28
+Last updated: 2026-05-22

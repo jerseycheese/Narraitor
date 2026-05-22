@@ -109,7 +109,7 @@ npm run dev
 # Then visit /dev routes for component testing
 ```
 
-There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/devtools-test`, etc. These let you test components with real data without going through the full app flow.
+There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/game-session`, `/dev/design-system`, etc. These let you test components with real data without going through the full app flow.
 
 ### Feature Flags
 
@@ -139,13 +139,13 @@ src/
 └── utils/                  # Helper functions
 ```
 
-The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/WorldEditor/` instead of `components/editors/WorldEditor/`. Makes it easier to find related functionality.
+The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/SkillEditor/` instead of `components/editors/SkillEditor/`. Makes it easier to find related functionality.
 
 ## Roadmap
 
 The core MVP functionality is basically complete - you can create worlds, build characters, play through AI-generated stories, and everything persists properly. The focus now has shifted to polish and getting things ready for a proper 1.0 release.
 
-### What's Already Working ✅
+### What's Already Working
 
 The foundation is solid:
 - **World Creation System** with AI assistance and template worlds
