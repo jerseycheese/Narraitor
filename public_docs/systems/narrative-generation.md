@@ -134,6 +134,20 @@ The system includes several safeguards to prevent common issues. Initial scene d
 
 Component lifecycle management prevents state updates after a component unmounts, which React will complain about loudly. Error recovery handles AI service failures gracefully instead of crashing, and JSON parsing includes fallbacks for different response formats since the AI doesn't always return perfectly structured JSON.
 
+### AI API Call Patterns
+
+Each turn fans out into a few separate Gemini calls, and on a free tier (50 requests/hour/IP) that adds up fast during playtesting. The current per-turn pattern:
+
+- **Narrative generation** — 1 call to produce the next segment.
+- **Ending detection** — 1 call (once the session has at least 3 segments). `useEndingDetection` asks the AI whether the story has reached a natural conclusion. This is easy to forget when counting calls, but it's a real request every turn.
+- **Choice generation** — 1 call to produce the player's next decision.
+
+So a normal turn is up to 3 calls, not 2. Using an item adds its own item-usage narrative call plus a choice regeneration call on top.
+
+To trim the obvious waste, choice generation is skipped when the turn already ends the session — there's no point generating choices nobody will ever see. The `isSessionEndingSegment` helper (`src/lib/narrative/isSessionEndingSegment.ts`) is the single source of truth for "this segment is terminal": an `ending`-type segment, a `fatal-outcome` tag, or committed ending data. `NarrativeController` also skips choices on a critical-decision failure, which is fatal by definition. Ending detection short-circuits too — once an ending's been suggested for the session, it won't fire another AI call.
+
+One deliberate exception: a *soft* AI ending suggestion (the kind the player can decline and keep playing) does **not** skip choice generation. If it did, anyone who rejected the suggestion would be stranded with no choices. Only the definitive, can't-continue signals suppress choices.
+
 ## Error Handling
 
 The narrative system handles several types of errors that can come up during generation. When errors occur, the system displays appropriate messages to users instead of showing raw error text or crashing, and attempts recovery when possible.
