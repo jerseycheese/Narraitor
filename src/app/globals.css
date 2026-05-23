@@ -396,3 +396,18 @@ body > * {
   gap: var(--space-8);
 }
 
+/* Tab Navigation (shared) — implements the mobileLayout prop so tabs wrap
+   (default) or scroll instead of overflowing the container at narrow widths. */
+
+.component-tab-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.component-tab-navigation-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+

@@ -721,7 +721,9 @@
   background: var(--color-border);
 }
 
-@media (width <= 768px) {
+/* Collapse below 1024px: the app sidebar (~288px) is still present until 768px,
+   so the three-column choice grid has no room and overflows in the 768–1024 band. */
+@media (width <= 1024px) {
   .wizard-template-mode-grid {
     grid-template-columns: 1fr;
   }
@@ -1787,7 +1789,9 @@
   border-top: none;
 }
 
-@media (width < 768px) {
+/* Collapse the manuscript rail below 1024px: its fixed ~448px column plus the
+   ~288px app sidebar can't fit a content column in the 768–1024 band. */
+@media (width < 1024px) {
   [data-theme="ds1"] .component-world-creation-wizard,
   [data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header) {
     grid-template-columns: 1fr;
