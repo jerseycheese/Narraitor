@@ -2048,6 +2048,13 @@
   [data-theme="ds3"] .component-world-creation-wizard,
   [data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) {
     padding: var(--space-2);
+
+    /* Move the action bar below the form on narrow screens so Next/Back are
+       reachable after a long mobile form (desktop keeps the command-strip top). */
+    grid-template-areas:
+      "progress"
+      "content"
+      "actions";
   }
 
   [data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container,
