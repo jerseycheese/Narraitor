@@ -175,6 +175,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
       notches.push(
         <div
           key={`notch-${i}`}
+          className="range-slider-notch"
           style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
         />
       );
@@ -193,6 +194,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
       labels.push(
         <div
           key={`label-${i}`}
+          className="range-slider-scale-label"
           style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
         >
           {i}
@@ -203,26 +205,29 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   };
 
   return (
-    <div data-testid={testId}>
+    <div className="component-range-slider" data-testid={testId}>
       {showLabel && (
-        <div>
-          <span>{labelText}</span>
+        <div className="range-slider-header">
+          <span className="range-slider-label-text">{labelText}</span>
           {showLevelDescription && currentLevelDescription && (
-            <span data-testid={`${testId}-level-label`}>
+            <span
+              className="range-slider-level-label"
+              data-testid={`${testId}-level-label`}
+            >
               {currentLevelDescription.label}
             </span>
           )}
         </div>
       )}
 
-      <div>
+      <div className="range-slider-field">
         {/* Slider container with scale */}
-        <div>
+        <div className="range-slider-scale">
           {/* Scale notches */}
-          <div>{generateScaleNotches()}</div>
+          <div className="range-slider-notches">{generateScaleNotches()}</div>
 
           {/* Slider input */}
-          <div>
+          <div className="range-slider-input-wrapper">
             <input
               type="range"
               min={visualRange.min}
@@ -248,14 +253,17 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
           </div>
 
           {/* Scale labels */}
-          <div>{generateScaleLabels()}</div>
+          <div className="range-slider-labels">{generateScaleLabels()}</div>
         </div>
 
         {/* Level description */}
         {showLevelDescription &&
           currentLevelDescription &&
           currentLevelDescription.description && (
-            <div data-testid={`${testId}-description`}>
+            <div
+              className="range-slider-description"
+              data-testid={`${testId}-description`}
+            >
               <span>{currentLevelDescription.label}:</span>{' '}
               {currentLevelDescription.description}
             </div>

@@ -880,6 +880,162 @@
   margin: 0;
 }
 
+/* ─── Range sliders / point-pool controls ─── */
+
+.component-range-slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.range-slider-header,
+.point-pool-summary-row,
+.point-pool-allocation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.range-slider-label-text,
+.point-pool-allocation-name {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.range-slider-level-label,
+.point-pool-allocation-value {
+  font-family: var(--font-interface);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.range-slider-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.range-slider-scale {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  padding-top: var(--space-2);
+}
+
+.range-slider-notches,
+.range-slider-labels {
+  position: relative;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.range-slider-notches {
+  height: var(--space-2);
+}
+
+.range-slider-labels {
+  height: var(--space-4);
+}
+
+.range-slider-notch,
+.range-slider-scale-label {
+  position: absolute;
+}
+
+.range-slider-notch {
+  top: 0;
+  width: 0;
+  height: var(--space-2);
+  border-left: 1px solid var(--color-border);
+}
+
+.range-slider-scale-label {
+  top: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+.range-slider-input-wrapper {
+  min-width: 0;
+}
+
+.range-slider {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.range-slider-description {
+  font-family: var(--font-system);
+  color: var(--color-text-secondary);
+}
+
+.range-slider-description span {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-point-pool-manager,
+.point-pool-allocation-list,
+.point-pool-allocation,
+.point-pool-allocation-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.point-pool-summary,
+.point-pool-allocation {
+  min-width: 0;
+}
+
+.point-pool-totals,
+.point-pool-status,
+.point-pool-limit,
+.point-pool-limit-note {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.point-pool-totals {
+  color: var(--color-text-secondary);
+}
+
+.point-pool-status,
+.point-pool-limit-note {
+  color: var(--color-success);
+}
+
+.point-pool-status svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.point-pool-limit {
+  color: var(--color-warning);
+}
+
+.point-pool-limit-note span[aria-hidden="true"] {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-warning);
+}
+
+.point-pool-allocation-description {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Per-theme structural differentiation (#1167)
 
