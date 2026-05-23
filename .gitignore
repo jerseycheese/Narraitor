@@ -23,6 +23,10 @@ index.html
 playwright-html-report/
 playwright-test-results/
 
+# Stryker (mutation testing) generated output
+/reports/mutation/
+.stryker-tmp/
+
 # Playwright trace files (generated during debugging)
 /trace/
 trace/
