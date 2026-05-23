@@ -126,12 +126,12 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
   });
 
   await test.step('Step 4: Attributes Review', async () => {
-    // Fill description and proceed
-    const descriptionInput = page.locator('textarea[placeholder*="description"], textarea[name="description"]');
-    if (await descriptionInput.count() > 0) {
-      await descriptionInput.fill('A test world created for visual regression testing.');
-      await page.waitForTimeout(150);
-    }
+    // Full Description requires at least 50 characters before Next is enabled.
+    const descriptionInput = page.locator('[data-testid="world-full-description"]');
+    await descriptionInput.fill(
+      'A dusty frontier town on the edge of the territory, where law is scarce and every stranger hides a past worth burying.'
+    );
+    await page.waitForTimeout(150);
     const nextButton2 = page
       .locator('.component-wizard-container')
       .getByRole('button', { name: 'Next' });
@@ -198,8 +198,11 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
         }
       }
     }
-    const nextButton4 = page.locator('button:has-text("Next")');
+    const nextButton4 = page
+      .locator('.component-wizard-container')
+      .getByRole('button', { name: 'Next' });
     if (await nextButton4.count() > 0) {
+      await dismissTutorialOverlay();
       await nextButton4.click();
       await page.waitForTimeout(700);
     }
