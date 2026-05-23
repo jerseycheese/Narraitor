@@ -134,6 +134,8 @@ test('Character creation wizard tour snapshots (steps 0-5)', async ({ page }) =>
 
     await startTourAt(page, 'characterCreationWizard', stepIndex);
     await waitForTooltip(page);
-    await expect(page).toHaveScreenshot(`tutorial-character-creation-step${zeroPad(stepIndex)}.png`, { fullPage: true });
+    await expect(page).toHaveScreenshot(`tutorial-character-creation-step${zeroPad(stepIndex)}.png`, {
+      fullPage: false,
+    });
   }
 });

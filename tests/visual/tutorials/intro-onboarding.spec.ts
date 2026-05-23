@@ -20,7 +20,9 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   });
 
   // Step 0: Welcome
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(0)}.png`, { fullPage: true });
+  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(0)}.png`, {
+    fullPage: false,
+  });
 
   const nextButton = page.getByRole('button', { name: 'Next' });
   
@@ -28,11 +30,15 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await nextButton.click();
   await page.waitForTimeout(500);
   await waitForContentStable(page);
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(1)}.png`, { fullPage: true });
+  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(1)}.png`, {
+    fullPage: false,
+  });
 
   // Step 2: Details
   await nextButton.click();
   await page.waitForTimeout(500);
   await waitForContentStable(page);
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(2)}.png`, { fullPage: true });
+  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(2)}.png`, {
+    fullPage: false,
+  });
 });

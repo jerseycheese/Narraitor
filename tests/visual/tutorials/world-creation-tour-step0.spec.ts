@@ -24,6 +24,8 @@ test('World creation tour step 0 snapshots (steps 0-3)', async ({ page }) => {
   for (const stepIndex of steps) {
     await startTourAt(page, 'worldCreation', stepIndex);
     await waitForTooltip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-step${zeroPad(stepIndex)}.png`, { fullPage: true });
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-step${zeroPad(stepIndex)}.png`, {
+      fullPage: false,
+    });
   }
 });
