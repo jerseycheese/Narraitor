@@ -1,6 +1,36 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
+
+/** Capture a stable, full-page wizard screenshot with the app shell intact. */
+const captureWizardStep = async (page: Page, name: string): Promise<void> => {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await waitForContentStable(page);
+  await page.evaluate(() => document.fonts.ready);
+  await hideDynamicContent(page);
+  // Chromium's full-page screenshot mis-places the app shell on pages taller than
+  // the viewport: the sticky header/progress rail and the 100vh, own-scrolling
+  // sidebar render at an offset, leaving the page title floating above a displaced
+  // shell. Pin them into normal flow for the capture — at scroll 0 the result is
+  // identical to the live layout, minus the artifact.
+  await page.addStyleTag({
+    content: `
+      .workshop-sidebar {
+        position: static !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      header,
+      .component-wizard-progress {
+        position: static !important;
+      }
+    `,
+  });
+  await page.waitForTimeout(50);
+  await expect(page).toHaveScreenshot(name, { fullPage: true });
+};
 
 /**
  * World Creation Wizard Visual Regression Test (Sequential)
@@ -51,8 +81,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
 
   await test.step('Step 1: Template', async () => {
     await dismissTutorialOverlay();
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step1-template.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step1-template.png');
   });
 
   await test.step('Step 2: Basic Info', async () => {
@@ -66,8 +95,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
         await page.waitForTimeout(600);
       }
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step2-basic-info.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step2-basic-info.png');
   });
 
   await test.step('Step 3: Description', async () => {
@@ -94,8 +122,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton.click();
       await page.waitForTimeout(700);
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step3-description.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step3-description.png');
   });
 
   await test.step('Step 4: Attributes Review', async () => {
@@ -113,8 +140,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton2.click();
       await page.waitForTimeout(700);
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step4-attributes.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step4-attributes.png');
   });
 
   await test.step('Step 5: Skills Review', async () => {
@@ -142,8 +168,7 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton3.click();
       await page.waitForTimeout(700);
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step5-skills.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step5-skills.png');
   });
 
   await test.step('Step 6: Finalize', async () => {
@@ -178,7 +203,6 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton4.click();
       await page.waitForTimeout(700);
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step6-finalize.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step6-finalize.png');
   });
 });
