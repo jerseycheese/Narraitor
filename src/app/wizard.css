@@ -1863,7 +1863,6 @@
 [data-theme="ds2"] .component-world-creation-wizard .wizard-progress-row,
 [data-theme="ds2"] .component-character-creation-wizard .wizard-progress-row {
   align-items: center;
-  flex-wrap: nowrap;
 }
 
 [data-theme="ds2"] .component-world-creation-wizard .wizard-form-section,
@@ -1895,17 +1894,6 @@
   [data-theme="ds2"] .component-world-creation-wizard .wizard-nav-group > *,
   [data-theme="ds2"] .component-character-creation-wizard .wizard-nav-group > * {
     flex: 1 1 auto;
-  }
-
-  [data-theme="ds2"] .component-world-creation-wizard > .component-wizard-progress,
-  [data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress {
-    min-width: 0;
-    overflow-x: auto;
-  }
-
-  [data-theme="ds2"] .component-world-creation-wizard .wizard-progress-row,
-  [data-theme="ds2"] .component-character-creation-wizard .wizard-progress-row {
-    flex-wrap: wrap;
   }
 }
 
