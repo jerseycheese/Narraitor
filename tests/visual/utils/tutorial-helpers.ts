@@ -97,6 +97,27 @@ export const waitForTooltip = async (page: Page): Promise<void> => {
     .toBe(true);
 };
 
+/**
+ * Hide the Joyride overlay and spotlight (but keep the tooltip) before a tour
+ * screenshot. The spotlight currently drifts far below its target, so its
+ * absolutely-positioned overlay paints a grey wash over any empty area below
+ * short wizard steps. Hiding it keeps the baseline clean while still showing
+ * the tooltip and the UI it points at.
+ */
+export const hideTourOverlay = async (page: Page): Promise<void> => {
+  await page.addStyleTag({
+    content: `
+      .react-joyride__overlay,
+      .react-joyride__spotlight,
+      .react-joyride__beacon {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+    `,
+  });
+};
+
 export const getVisibleTutorialClip = async (
   page: Page
 ): Promise<{ x: number; y: number; width: number; height: number }> => {
