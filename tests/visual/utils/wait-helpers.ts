@@ -7,6 +7,20 @@
 
 import { Page, Locator } from '@playwright/test';
 
+const NEXT_DEV_OVERLAY_STYLE = `
+  nextjs-portal,
+  nextjs-toast,
+  [data-nextjs-toast],
+  [data-nextjs-dialog],
+  [data-nextjs-dialog-overlay],
+  [data-nextjs-build-indicator],
+  [data-nextjs-error-overlay] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+`;
+
 /**
  * Wait for content to be fully stable before taking screenshots.
  * Balanced approach - faster than original but reliable for data seeding.
@@ -173,6 +187,9 @@ export async function hideDynamicContent(page: Page): Promise<void> {
         pointer-events: none !important;
       }
 
+      /* Hide Next.js dev overlay controls from screenshots */
+      ${NEXT_DEV_OVERLAY_STYLE}
+
       /* Disable animations for consistent screenshots */
       *, *::before, *::after {
         animation-duration: 0s !important;
@@ -181,6 +198,15 @@ export async function hideDynamicContent(page: Page): Promise<void> {
         transition-delay: 0s !important;
       }
     `
+  });
+}
+
+/**
+ * Hide only the Next.js dev overlay while preserving app-level tutorial UI.
+ */
+export async function hideNextDevOverlay(page: Page): Promise<void> {
+  await page.addStyleTag({
+    content: NEXT_DEV_OVERLAY_STYLE
   });
 }
 
