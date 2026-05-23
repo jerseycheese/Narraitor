@@ -54,7 +54,7 @@ export const characterCreationWizardTour: Step[] = [
     disableScrolling: true,
   },
   {
-    target: '[data-tutorial="portrait-generator"]',
+    target: '[data-tutorial="portrait-generator-action"]',
     content: 'You can generate a unique portrait based on your character description, or upload your own image.',
     placement: 'top',
     disableBeacon: true,

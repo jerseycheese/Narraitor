@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
-import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, zeroPad } from '../utils/tutorial-helpers';
+import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
 const steps = [0, 1, 2, 3];
 
@@ -24,6 +24,10 @@ test('World creation tour step 0 snapshots (steps 0-3)', async ({ page }) => {
   for (const stepIndex of steps) {
     await startTourAt(page, 'worldCreation', stepIndex);
     await waitForTooltip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-step${zeroPad(stepIndex)}.png`, { fullPage: true });
+    await hideTourOverlay(page);
+    const clip = await getVisibleTutorialClip(page);
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-step${zeroPad(stepIndex)}.png`, {
+      clip,
+    });
   }
 });

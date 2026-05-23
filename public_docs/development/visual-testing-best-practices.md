@@ -2,7 +2,7 @@
 title: Visual Testing Best Practices
 tags: [testing, best-practices, visual-testing, playwright, guidelines]
 created: 2025-08-20
-updated: 2025-08-21
+updated: 2026-05-23
 ---
 
 # What actually works for visual testing
@@ -26,6 +26,18 @@ Here's what I've learned about writing visual tests that catch real issues witho
 - **Internal admin interfaces**: Unless visual consistency is business-critical
 
 ## Writing Effective Visual Tests
+
+### Cover All Design Systems by Default
+
+Narraitor ships three structurally different design systems, so user-facing visual coverage should normally test all three: DS1, DS2, and DS3. A one-theme screenshot can miss the same class of problem a Drupal site would miss if QA only reviewed the default theme and never checked the alternate theme implementation.
+
+Use one of these patterns:
+
+- **Small surface**: loop over `['ds1', 'ds2', 'ds3']` and capture one baseline per theme.
+- **Long workflow**: keep the full sequential workflow in one theme, then add a focused theme-differentiation spec that captures the shared surface or representative state once in DS1, DS2, and DS3.
+- **Known exception**: leave an inline comment explaining why only one theme is covered and link to the tracking issue if the gap is temporary.
+
+Snapshot names should include the design-system id, such as `dashboard-ds3.png` or `wizard-character-ds2.png`.
 
 ### Split Testing Strategy (2025 Best Practice)
 

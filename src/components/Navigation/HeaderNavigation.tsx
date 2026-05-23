@@ -133,7 +133,10 @@ export function HeaderNavigation() {
                   <LogoText size="sm" />
                 </Link>
 
-                <div data-testid="desktop-navigation">
+                <div
+                  className="header-nav-desktop-links"
+                  data-testid="desktop-navigation"
+                >
                   <Link href="/worlds" data-navigation>
                     Worlds
                   </Link>
