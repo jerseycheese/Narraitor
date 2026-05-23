@@ -11,6 +11,13 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await hideNextDevOverlay(page);
   await waitForContentStable(page);
   await expect(page.getByRole('heading', { name: 'First time?' })).toBeVisible();
+  await expect
+    .poll(async () =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    )
+    .toBe(true);
 
   // Step 0: Welcome
   await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(0)}.png`, {
