@@ -166,6 +166,7 @@ export function PortraitStep({
             type="button"
             onClick={handleGeneratePortrait}
             disabled={isGenerating}
+            data-tutorial="portrait-generator-action"
           >
             Generate Portrait
           </button>
