@@ -11,7 +11,6 @@ import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
-import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { Hero } from '@/components/shared/Hero';
 import { CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
 
@@ -156,15 +155,13 @@ const WorldCard: React.FC<WorldCardProps> = ({
       <div>
         <Link href={`/worlds/${world.id}`}>
           {(() => {
-            // Use seeded placeholder image during Playwright tests if world has no image
-            const isPlaywright = isPlaywrightEnv();
-            const STABLE_PLACEHOLDER =
-              'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
-            const heroImageUrl =
-              world.image?.url ||
-              (isPlaywright ? STABLE_PLACEHOLDER : undefined);
-            const heroImage = heroImageUrl
-              ? { url: heroImageUrl, alt: `${world.name} world` }
+            // When a world has no image, render no <img> at all and let Hero
+            // fall back to its tokenized themed background (see .component-hero
+            // in workshop.css). A previous white 1x1 placeholder rendered as a
+            // bright rectangle in dark mode (#1113). The themed empty-state is
+            // deterministic CSS, so it stays stable under visual tests too.
+            const heroImage = world.image?.url
+              ? { url: world.image.url, alt: `${world.name} world` }
               : undefined;
 
             return (

@@ -4,6 +4,11 @@ import WorldCard from '../WorldCard';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { formatDate } from '@/lib/utils';
 
+// Regression: a world with no image previously rendered a white 1x1 data-URI
+// placeholder that showed as a bright rectangle in dark mode (#1113).
+const WHITE_PLACEHOLDER =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
+
 describe('WorldCard', () => {
   const mockWorld = createMockWorld({
     name: 'Fantasy Realm',
@@ -132,6 +137,39 @@ describe('WorldCard', () => {
 
     const characterButton = screen.getByTitle('Play as Aragorn - Level 5');
     expect(characterButton).toHaveClass('world-card-character-pill');
+  });
+
+  // Regression test for #1113 - no white placeholder image in the no-image case
+  test('renders no placeholder image when the world has no image', () => {
+    const worldWithoutImage = createMockWorld({ image: undefined });
+
+    const { container } = render(
+      <WorldCard world={worldWithoutImage} onSelect={jest.fn()} onDelete={jest.fn()} />
+    );
+
+    // The themed empty-state hero renders (tokenized background via CSS), but
+    // there should be no hero <img> and no white data-URI placeholder.
+    expect(container.querySelector('.component-hero')).toBeInTheDocument();
+    expect(container.querySelector('.component-hero-image')).not.toBeInTheDocument();
+    expect(container.querySelector(`img[src="${WHITE_PLACEHOLDER}"]`)).not.toBeInTheDocument();
+  });
+
+  // Real (AI-generated) world images still render unchanged
+  test('renders the world image when one is provided', () => {
+    const worldWithImage = createMockWorld({
+      image: {
+        url: '/visual-assets/world-cyberpunk.png',
+        type: 'ai-generated',
+      },
+    });
+
+    const { container } = render(
+      <WorldCard world={worldWithImage} onSelect={jest.fn()} onDelete={jest.fn()} />
+    );
+
+    const heroImage = container.querySelector('.component-hero-image');
+    expect(heroImage).toBeInTheDocument();
+    expect(heroImage?.getAttribute('src')).not.toBe(WHITE_PLACEHOLDER);
   });
 
   // Test for Edit functionality
