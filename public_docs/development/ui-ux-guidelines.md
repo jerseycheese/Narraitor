@@ -28,21 +28,21 @@ Three design systems ship with the app, each providing a complete set of CSS cus
 Sharp lines, archival ink, graph paper grid. Technical and precise.
 - **Fonts**: Lora (narrative), IBM Plex Mono (system), IBM Plex Sans (interface)
 - **Accent**: Archival Ink Blue `rgb(49 46 129)`
-- **Radius**: `0.5rem` — square and deliberate
+- **Radius**: `--radius-md: 4px` — square and deliberate (each theme picks its own radius scale on purpose; tighter corners read as more technical)
 - **Background**: Mechanical drafting grid (72x72px)
 
 ### DS2 — "Warm Earth"
 Organic earth tones, soft forms, breathing space. Welcoming and grounded.
 - **Fonts**: Crimson Pro (narrative), JetBrains Mono (system), Manrope (interface)
 - **Accent**: Sage Green `rgb(124 139 111)`
-- **Radius**: `0.75rem` — soft and rounded
+- **Radius**: `--radius-md: 12px` — soft and rounded
 - **Background**: Clean solid (no pattern)
 
 ### DS3 — "Mechanical Manuscript"
 Aged paper, drafting ink, dot grid aesthetic. Textured and literary.
 - **Fonts**: Newsreader (narrative), Fira Code (system), DM Sans (interface)
 - **Accent**: Steel Blue `rgb(91 122 140)`
-- **Radius**: `0.375rem` — tight and compact
+- **Radius**: `--radius-md: 6px` — tight and compact
 - **Background**: Dot grid (24x24px)
 
 ### Theme Implementation
