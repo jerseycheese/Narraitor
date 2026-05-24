@@ -500,6 +500,7 @@ body.manuscript-overlay-open {
 
 .manuscript-characters-rail {
   display: none;
+  box-sizing: border-box;
   background: var(--color-overlay-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -586,6 +587,7 @@ body.manuscript-overlay-open {
 .manuscript-hud-panel {
   position: absolute;
   z-index: 40;
+  box-sizing: border-box;
   width: min(var(--manuscript-rail-width, 18rem), calc(100vw - 1.5rem));
   max-height: min(70vh, 32rem);
   overflow-y: auto;

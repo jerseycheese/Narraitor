@@ -51,9 +51,7 @@ test.describe('Manuscript Layout Specific Tests', () => {
     });
   });
 
-  // Skipped pending #1183 — desktop DS1 panel/rail width sync regressed by 30px,
-  // likely a box-sizing or ResizeObserver-timing issue introduced in #1094.
-  test.skip('Desktop should keep character rail on left and sync panel width', async ({ page }) => {
+  test('Desktop should keep character rail on left and sync panel width', async ({ page }) => {
     // Seed full test data including narrative segments
     await seedTestData(page);
     await mockApiEndpoints(page);
