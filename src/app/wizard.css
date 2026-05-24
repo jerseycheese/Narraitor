@@ -700,6 +700,15 @@
   align-items: stretch;
 }
 
+/* Let the choice panels shrink below their content's min-content size so the
+   three-column grid never spills past its track. Without this, the default
+   min-width:auto keeps the panels wider than the DS1 content column in the
+   ~1025–1080px band (sidebar + manuscript rail present), pushing the tab
+   navigation past the viewport. Wrapping content absorbs the squeeze instead. */
+.wizard-template-mode-grid > * {
+  min-width: 0;
+}
+
 .wizard-template-mode-divider {
   display: flex;
   align-items: center;
