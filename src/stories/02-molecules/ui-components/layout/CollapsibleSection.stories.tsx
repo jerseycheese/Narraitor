@@ -1,9 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 
 const meta: Meta<typeof CollapsibleSection> = {
   title: '02-Molecules/ui-components/layout/CollapsibleSection',
   component: CollapsibleSection,
+  args: {
+    // Explicit spy so Storybook's implicit-action regex doesn't throw when the
+    // component fires onToggle from its mount effect (Storybook 8 deprecation).
+    onToggle: fn(),
+  },
   parameters: {
     layout: 'centered',
     docs: {

@@ -13,6 +13,7 @@ import {
 } from 'next/font/google';
 import { ThemeProvider, useTheme } from '../src/lib/theme/ThemeProvider';
 import type { DesignSystem, ColorScheme } from '../src/lib/theme';
+import { TutorialProvider } from '../src/components/TutorialProvider/TutorialProvider';
 
 import '../src/app/globals.css';
 import '../src/app/workshop.css';
@@ -70,7 +71,9 @@ const withTheme = (Story: React.FC, context: { globals: Record<string, string> }
     <ThemeProvider>
       <FontInjector />
       <ThemeSyncer sbTheme={theme} sbColorScheme={colorScheme} />
-      <Story />
+      <TutorialProvider>
+        <Story />
+      </TutorialProvider>
     </ThemeProvider>
   );
 };
