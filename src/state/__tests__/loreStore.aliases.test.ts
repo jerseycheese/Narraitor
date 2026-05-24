@@ -130,6 +130,9 @@ describe('LoreStore - Alias Management', () => {
           result.current.addAlias('non-existent-id', 'Alias');
         });
       }).not.toThrow();
+
+      // "Do nothing" must mean no fact is created under the missing id.
+      expect(result.current.getById('non-existent-id')).toBeUndefined();
     });
   });
 
@@ -188,6 +191,9 @@ describe('LoreStore - Alias Management', () => {
           result.current.removeAlias('non-existent-id', 'Alias');
         });
       }).not.toThrow();
+
+      // "Do nothing" must mean no fact is created under the missing id.
+      expect(result.current.getById('non-existent-id')).toBeUndefined();
     });
   });
 
@@ -334,6 +340,9 @@ describe('LoreStore - Alias Management', () => {
           result.current.setAliases('non-existent-id', ['Alias']);
         });
       }).not.toThrow();
+
+      // "Do nothing" must mean no fact is created under the missing id.
+      expect(result.current.getById('non-existent-id')).toBeUndefined();
     });
   });
 

@@ -186,38 +186,29 @@ describe('storageHelpers', () => {
       expect(mockIndexedDB.deleteDatabase).toHaveBeenCalledTimes(1);
     });
 
-    test('should handle partial clearing on error', async () => {
+    test('swallows non-security deletion errors (logs, does not reject)', async () => {
       const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
-      
-      // Mock first deletion success, second failure
-      let callCount = 0;
+
+      // Fire the async onerror path with a generic (non-SecurityError) error.
       mockIndexedDB.deleteDatabase.mockImplementation(() => {
         const request = {
           onsuccess: null as ((ev: Event) => void) | null,
           onerror: null as ((ev: Event) => void) | null
         };
-        
+
         setTimeout(() => {
-          if (callCount === 0 && request.onsuccess) {
-            request.onsuccess({} as Event);
-          } else if (callCount === 1 && request.onerror) {
-            request.onerror({ target: { error: new Error('Delete failed') } } as unknown as Event);
-          }
-          callCount++;
+          request.onerror?.({ target: { error: new Error('Delete failed') } } as unknown as Event);
         }, 0);
-        
+
         return request;
       });
 
-      try {
-        await clearAllStoredData();
-      } catch {
-        // Expected to throw
-      }
+      // Non-security errors are logged and swallowed so the rest of the cleanup
+      // can proceed — the call must resolve, not reject.
+      await expect(clearAllStoredData()).resolves.toBeUndefined();
+      expect(mockIndexedDB.deleteDatabase).toHaveBeenCalledWith('narraitor-state');
+      expect(consoleError).toHaveBeenCalled();
 
-      // First database should be cleared
-      expect(mockIndexedDB.deleteDatabase).toHaveBeenCalled();
-      
       consoleError.mockRestore();
     });
 
