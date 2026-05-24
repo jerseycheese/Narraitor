@@ -297,6 +297,22 @@ test('responsive navigation component', async ({ page }) => {
 3. **Test locally first** before pushing to CI
 4. **Review visual diffs** in test results when CI fails
 
+**CI-adopted baselines (important exception)**:
+Visual regression runs on `macos-latest`. Most baselines (wizard, tour flows) match a
+local Mac within tolerance, so regenerating them locally is fine. But some content-heavy
+pages — `dashboard-themes`, `main-pages` (home, home-empty-state, world-edit,
+character-edit), and `theme-switcher` (theme-ds*-home) — do **not** match local renders
+and have their baselines **adopted from CI output**. For these:
+- Do **not** regenerate locally (it will pass locally but fail in CI).
+- After an intentional change, let the `E2E Tests` check fail, then
+  `gh run download <run-id> -n e2e-test-failures`, verify each `*-actual.png` is a correct
+  render (not a seeding/empty flake), and copy the verified actuals over the corresponding
+  `*-chromium-darwin.png` baselines.
+
+**Parallel-load flakiness**: running many visual specs across workers can time out
+`waitForStoreReady` (store hydration). Re-run the affected specs with `--workers=1` — they
+pass reliably when not competing for the dev server.
+
 ## Baseline Management and Review Process
 
 ### When to Update Baselines

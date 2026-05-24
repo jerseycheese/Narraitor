@@ -23,6 +23,10 @@ index.html
 playwright-html-report/
 playwright-test-results/
 
+# Stryker (mutation testing) generated output
+/reports/mutation/
+.stryker-tmp/
+
 # Playwright trace files (generated during debugging)
 /trace/
 trace/
@@ -121,6 +125,9 @@ AGENTS.md
 # Gemini CLI
 .gemini/
 GEMINI.md
+
+# Shared agent skills (synced locally, not committed)
+.agents/
 
 # MCP local config (do not commit)
 .mcp.json
