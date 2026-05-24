@@ -207,11 +207,4 @@ describe('useAutoSave', () => {
     expect(mockSessionStore.setAutoSaveEnabled).toHaveBeenCalledWith(false);
   });
 
-  it('should clear toast mocks before each test', () => {
-    // This test ensures our toast mocking is working
-    renderHook(() => useAutoSave());
-
-    expect(mockToast.success).toHaveBeenCalledTimes(0);
-    expect(mockToast.error).toHaveBeenCalledTimes(0);
-  });
 });

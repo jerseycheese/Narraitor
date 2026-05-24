@@ -57,14 +57,7 @@ describe('Client Factory Mock Integration', () => {
   });
 
   describe('Client Factory Behavior', () => {
-    test('creates a client successfully', () => {
-      const client = createAIClient();
-
-      expect(typeof client.generateContent).toBe('function');
-      expect(typeof client.generateImage).toBe('function');
-    });
-
-    test('client implements AIClient interface', async () => {
+    test('creates a client exposing the AIClient interface', () => {
       const client = createAIClient();
 
       expect(typeof client.generateContent).toBe('function');

@@ -43,7 +43,7 @@ describe('NarrativeDisplay', () => {
     expect(screen.getByText(/ancient forest whispered secrets/)).toBeInTheDocument();
   });
 
-  it('handles malformed NPC IDs without crashing', () => {
+  it('renders narrative content despite malformed NPC IDs', () => {
     const segment = createMockNarrativeSegment({
       id: 'seg-malformed',
       content: 'An unnamed figure watches from afar.',
@@ -54,9 +54,12 @@ describe('NarrativeDisplay', () => {
       },
     });
 
-    expect(() => {
-      render(<NarrativeDisplay segment={segment} />);
-    }).not.toThrow();
+    render(<NarrativeDisplay segment={segment} />);
+
+    // Empty/malformed NPC IDs must not stop the narrative content from rendering.
+    expect(
+      screen.getByText(/An unnamed figure watches from afar/)
+    ).toBeInTheDocument();
   });
 
   it('emphasizes participant names within the narrative text', () => {

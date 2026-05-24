@@ -241,22 +241,9 @@ describe('worldStore persistence', () => {
     });
   });
 
-  describe('fallback behavior', () => {
-    test('should log appropriate errors on persistence failure', async () => {
-      // Mock console.error
-      const consoleError = jest.spyOn(console, 'error').mockImplementation();
-      
-      // Make getItem call to trigger onRehydrateStorage error handler
-      mockGetItem('narraitor-world-store');
-      
-      // Allow async operations to complete
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
-      // Verify getItem was called
-      expect(mockGetItem).toHaveBeenCalled();
-
-      // Restore console.error
-      consoleError.mockRestore();
-    });
-  });
+  // NOTE: a "fallback behavior / logs errors on persistence failure" test was removed
+  // here. It was self-fulfilling (it called the mock itself, then asserted the mock was
+  // called) and could not be salvaged in place: this file mocks out zustand's `persist`
+  // middleware, so `onRehydrateStorage`'s error handler never runs. Real persistence-error
+  // logging coverage needs a separate test that exercises the un-mocked persist path.
 });

@@ -200,7 +200,7 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
     });
   });
 
-  it('should handle missing sessionId gracefully', () => {
+  it('renders despite a missing sessionId', () => {
     const segment = createMockNarrativeSegment({
       id: 'seg-1',
       // No sessionId
@@ -213,9 +213,9 @@ describe('NarrativeDisplay - Choice Outcome Callout Integration (Issue #971)', (
       }
     });
 
-    // Should not crash
-    expect(() => {
-      render(<NarrativeDisplay segment={segment} />);
-    }).not.toThrow();
+    render(<NarrativeDisplay segment={segment} />);
+
+    // A missing sessionId must not stop the narrative content from rendering.
+    expect(screen.getByText(/Something happens/)).toBeInTheDocument();
   });
 });
