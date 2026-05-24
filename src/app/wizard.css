@@ -2103,6 +2103,7 @@
  * -------------------------------------------------------------------------- */
 
 .component-guided-first-time {
+  box-sizing: border-box;
   padding: var(--space-6) var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
