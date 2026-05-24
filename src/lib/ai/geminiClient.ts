@@ -77,8 +77,8 @@ export class GeminiClient implements AIClient {
       return {
         content: response.text || '',
         finishReason: response.result?.finishReason || 'STOP',
-        promptTokens: undefined,
-        completionTokens: undefined
+        promptTokens: response.usageMetadata?.promptTokenCount || undefined,
+        completionTokens: response.usageMetadata?.candidatesTokenCount || undefined
       };
     } catch (error) {
       logger.error('GEMINI API: Request failed:', error);
