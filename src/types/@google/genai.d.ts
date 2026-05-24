@@ -13,11 +13,18 @@ declare module '@google/genai' {
     threshold: string;
   }
 
+  export interface GenerateContentResponseUsageMetadata {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+    totalTokenCount?: number;
+  }
+
   export interface GenerateContentResponse {
     text: string;
     result?: {
       finishReason: string;
     };
+    usageMetadata?: GenerateContentResponseUsageMetadata;
   }
 
   export interface GenerateContentConfig {
