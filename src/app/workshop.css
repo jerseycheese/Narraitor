@@ -520,10 +520,216 @@
   flex-shrink: 0;
 }
 
-/* ─── DS3 — Mechanical Manuscript: dotted card border + bullet section label ─── */
+/* ═══════════════════════════════════════════════════════════════
+   Workshop sidebar — per-theme structural differentiation (#1232)
+   Each theme gives the rail a distinct compositional tack, the same
+   way the dashboard became Drafting Table / Spread / Mechanical
+   Manuscript (#1222). The personalities match the rest of the app:
+   DS1 = a ruled architectural register, DS2 = airy floating modules,
+   DS3 = a dense dotted control rail.
+   ═══════════════════════════════════════════════════════════════ */
 
-[data-theme="ds3"] .workshop-sidebar-world-item[data-active="true"] {
-  border-style: dotted;
+/* ─── DS1 — Drafting Table: the rail as a ruled index/register ───
+   Tight density, sharp corners, hairline rules dividing every row.
+   Primary nav and the world switcher both read as ruled catalogue
+   entries; the active row is marked by a sharp accent rule, not a
+   filled pill. Section labels become tracked eyebrow tags over a
+   strong hairline — the world switcher reads as a titled register. */
+
+[data-theme="ds1"] .workshop-sidebar {
+  border-right: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .workshop-sidebar-nav {
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-3) var(--space-2);
+}
+
+[data-theme="ds1"] .workshop-sidebar-brand-row {
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .workshop-sidebar-primary {
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .workshop-sidebar-primary-link {
+  padding: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="ds1"]
+  .workshop-sidebar-primary
+  li:first-child
+  .workshop-sidebar-primary-link {
+  border-top: none;
+}
+
+[data-theme="ds1"] .workshop-sidebar-primary-link[data-active="true"] {
+  background: var(--color-surface);
+  border-left-color: var(--color-accent);
+  font-weight: 600;
+}
+
+[data-theme="ds1"] .workshop-sidebar-section-label {
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--color-border-strong);
+  font-family: var(--font-interface);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+[data-theme="ds1"] .workshop-sidebar-worlds-list {
+  gap: 0;
+}
+
+[data-theme="ds1"] .workshop-sidebar-world-item {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  padding: var(--space-2);
+}
+
+[data-theme="ds1"]
+  .workshop-sidebar-worlds-list
+  li:first-child
+  .workshop-sidebar-world-item {
+  border-top: none;
+}
+
+[data-theme="ds1"] .workshop-sidebar-world-item[data-active="true"] {
+  background: var(--color-surface);
+  border-left-color: var(--color-accent);
+}
+
+[data-theme="ds1"] .workshop-sidebar-world-name {
+  font-family: var(--font-interface);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+/* ─── DS2 — The Spread: airy rail with floating modules ───
+   Generous spacing, soft radii, narrative-serif section labels in
+   normal case. The nav links become roomy rounded pills and the
+   world switcher is lifted into its own rounded surface module that
+   floats on the rail — the unmistakable editorial-spread move. */
+
+[data-theme="ds2"] .workshop-sidebar-nav {
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-4) var(--space-4);
+}
+
+[data-theme="ds2"] .workshop-sidebar-brand-row {
+  padding-bottom: var(--space-4);
+  border-bottom: none;
+}
+
+[data-theme="ds2"] .workshop-sidebar-primary {
+  gap: var(--space-1);
+}
+
+[data-theme="ds2"] .workshop-sidebar-primary-link {
+  padding: var(--space-2) var(--space-3);
+  border-left: none;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+}
+
+[data-theme="ds2"] .workshop-sidebar-primary-link[data-active="true"] {
+  background: var(--color-surface);
+}
+
+[data-theme="ds2"] .workshop-sidebar-worlds-section {
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+[data-theme="ds2"] .workshop-sidebar-section-label {
+  font-family: var(--font-narrative);
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .workshop-sidebar-worlds-list {
+  gap: var(--space-2);
+}
+
+[data-theme="ds2"] .workshop-sidebar-world-item {
+  padding: var(--space-3);
+  border-color: transparent;
+  border-radius: var(--radius-md);
+}
+
+[data-theme="ds2"] .workshop-sidebar-world-item[data-active="true"] {
+  background: var(--color-surface-hover);
+  border-color: transparent;
+}
+
+[data-theme="ds2"] .workshop-sidebar-world-name {
+  font-size: 1rem;
+}
+
+/* ─── DS3 — Mechanical Manuscript: dense dotted control rail ───
+   Condensed entries, monospace eyebrow labels with a bullet, dotted
+   rules in place of solid borders, and a high-contrast filled active
+   nav state. The world switcher tightens into a compact status
+   readout — dense rows with a dotted active frame. */
+
+[data-theme="ds3"] .workshop-sidebar-nav {
+  gap: var(--space-3);
+}
+
+[data-theme="ds3"] .workshop-sidebar-brand-row {
+  position: relative;
+  padding-bottom: var(--space-2);
+  border-bottom: none;
+}
+
+[data-theme="ds3"] .workshop-sidebar-brand-row::after {
+  content: "";
+  position: absolute;
+  left: var(--space-1);
+  right: var(--space-1);
+  bottom: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.7;
+}
+
+[data-theme="ds3"] .workshop-sidebar-primary-link {
+  padding: var(--space-1) var(--space-2);
+  border-left: none;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds3"] .workshop-sidebar-primary-link[data-active="true"] {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+[data-theme="ds3"] .workshop-sidebar-section-label {
+  position: relative;
+  padding-bottom: var(--space-2);
 }
 
 [data-theme="ds3"] .workshop-sidebar-section-label::before {
@@ -536,6 +742,49 @@
   margin-right: var(--space-1);
   flex-shrink: 0;
   vertical-align: middle;
+}
+
+[data-theme="ds3"] .workshop-sidebar-section-label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .workshop-sidebar-worlds-list {
+  gap: 0;
+}
+
+[data-theme="ds3"] .workshop-sidebar-world-item {
+  gap: 0 var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-style: dotted;
+  border-color: transparent;
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .workshop-sidebar-world-item[data-active="true"] {
+  background: var(--color-accent-soft);
+  border-style: dotted;
+  border-color: var(--color-accent);
+}
+
+[data-theme="ds3"] .workshop-sidebar-world-name {
+  font-size: 0.875rem;
+}
+
+[data-theme="ds3"] .workshop-sidebar-world-meta {
+  font-size: 0.65rem;
 }
 
 .workshop-workspace {
