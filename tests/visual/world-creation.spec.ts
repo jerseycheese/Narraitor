@@ -29,7 +29,9 @@ const captureWizardStep = async (page: Page, name: string): Promise<void> => {
     `,
   });
   await page.waitForTimeout(50);
-  await expect(page).toHaveScreenshot(name, { fullPage: true });
+  // Soft so a single run surfaces a diff at every step; a hard assertion
+  // aborts the sequence at the first diff and leaks the rest one run at a time.
+  await expect.soft(page).toHaveScreenshot(name, { fullPage: true });
 };
 
 /**
