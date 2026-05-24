@@ -92,7 +92,7 @@ export const enforceLanguageComplexity = async (
         };
       }
 
-      logger.warn('Language complexity rewrite did not pass thresholds', {
+      logger.debug('Language complexity rewrite did not pass thresholds', {
         level,
         reasons: secondEval.reasons,
         metrics: secondEval.metrics,
@@ -100,7 +100,7 @@ export const enforceLanguageComplexity = async (
     }
   }
 
-  logger.warn('Generated narrative exceeds language complexity guidelines', {
+  logger.debug('Generated narrative exceeds language complexity guidelines', {
     reasons: evaluation.reasons,
     metrics: evaluation.metrics,
     level,
