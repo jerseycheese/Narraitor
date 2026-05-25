@@ -1,0 +1,380 @@
+/* Canonical component showcase (issue #1276)
+ *
+ * Skins the real `@/components/ui/*` primitives for the design-system pages.
+ * Button, Badge, Input, Textarea, Select, and Label already carry global,
+ * token-based styling; the rules here only cover primitives the app ships
+ * unstyled (Alert, Card, Tabs, Table, Checkbox, Radio, Dialog) plus the
+ * showcase layout. Everything is scoped under `.ds-components` so it stays
+ * inside the showcase, and every value resolves to a design token from the
+ * surrounding `data-theme` scope. No hardcoded colors.
+ */
+
+.ds-components {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.dsc-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dsc-group-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dsc-group-note {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.dsc-group-note code {
+  font-family: var(--font-system);
+  font-size: 0.8125em;
+  padding: 0 var(--space-1);
+  background: var(--color-surface-hover);
+  border-radius: var(--radius-sm);
+}
+
+.dsc-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.dsc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.dsc-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dsc-stack-wide {
+  max-width: 36rem;
+}
+
+.dsc-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1_5);
+}
+
+.dsc-field-wide {
+  grid-column: 1 / -1;
+}
+
+.dsc-field .form-error {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.75rem;
+  color: var(--color-danger);
+}
+
+/* Loading button spinner (Button has no loading variant) */
+.dsc-spinner {
+  display: inline-block;
+  width: 0.875em;
+  height: 0.875em;
+  border: 2px solid var(--color-border-strong);
+  border-top-color: var(--color-accent);
+  border-radius: var(--radius-full);
+  animation: dsc-spin 0.8s linear infinite;
+}
+
+@keyframes dsc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Alert (ships unstyled) ─── */
+
+.ds-components .alert {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-family: var(--font-interface);
+}
+
+.ds-components .alert-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.ds-components .alert-description {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.ds-components .alert-destructive {
+  border-color: var(--color-danger);
+  background: hsl(var(--destructive) / 8%);
+}
+
+.ds-components .alert-destructive .alert-title {
+  color: var(--color-danger);
+}
+
+.ds-components .alert-warning {
+  border-color: var(--color-warning-border);
+  background: var(--color-warning-soft);
+}
+
+.ds-components .alert-warning .alert-title {
+  color: var(--color-warning);
+}
+
+.ds-components .alert-info {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.ds-components .alert-info .alert-title {
+  color: var(--color-accent);
+}
+
+/* ─── Card (ships with no base class) ─── */
+
+.ds-components .dsc-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.ds-components .dsc-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.ds-components .dsc-card-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.ds-components .dsc-card-description {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.ds-components .dsc-card-content {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-narrative);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.ds-components .dsc-card-footer {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+/* ─── Tabs (only the root carries a class) ─── */
+
+.ds-components .component-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds-components .dsc-tabs-list {
+  display: inline-flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ds-components .dsc-tabs-trigger {
+  appearance: none;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.ds-components .dsc-tabs-trigger:hover {
+  color: var(--color-text-primary);
+}
+
+.ds-components .dsc-tabs-trigger[aria-selected='true'] {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.ds-components .dsc-tabs-content {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Table (only the wrapper carries a class) ─── */
+
+.ds-components .table-wrapper {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.ds-components table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+}
+
+.ds-components thead th {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: var(--color-surface-hover);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ds-components tbody td {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ds-components tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ─── Checkbox & Radio (native inputs, unstyled primitives) ─── */
+
+.ds-components input[type='checkbox'],
+.ds-components input[type='radio'] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0 var(--space-2) 0 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.ds-components .dsc-stack label,
+.ds-components .dsc-radio-group label {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.ds-components .dsc-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ds-components .dsc-radio-group > div {
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Status icon legend ─── */
+
+.ds-components .dsc-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1_5);
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.ds-components .dsc-icon-chip svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ─── Dialog (Radix portal, rendered to <body>) ─── */
+
+.dsc-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: var(--color-scrim);
+}
+
+.dsc-dialog-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 28rem;
+  padding: var(--space-5);
+  font-family: var(--font-interface);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.dsc-dialog-title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.dsc-dialog-body {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.dsc-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

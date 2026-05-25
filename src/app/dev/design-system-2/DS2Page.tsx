@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { useActiveSection } from '@/hooks/useActiveSection';
 import SessionDemo from './SessionDemo';
+import { ComponentShowcase } from '../design-system/_ui/ComponentShowcase';
 import './design-system-2.css';
 
 // ─────────────────────────────────────────────────────────────────
@@ -994,149 +995,16 @@ box-shadow: var(--shadow-soft);`}
       {/* ════════════════════════════════════════════════════
           COMPONENTS
           ════════════════════════════════════════════════════ */}
-      < section id="ds2-components" className="ds2-section" >
+      <section id="ds2-components" className="ds2-section">
         <div className="ds2-section-inner">
           <div className="ds2-section-number ds2-reveal">13 — Elements</div>
           <h2 className="ds2-section-title ds2-reveal">In Context</h2>
           <p className="ds2-section-subtitle ds2-reveal">
-            Components shown in their natural habitat. Soft forms, warm colors, and purposeful spacing create interfaces that feel inviting rather than mechanical.
+            The real production primitives, themed by the Warm Earth tokens.
           </p>
-
-          {/* Buttons in action rail context */}
-          <div className="ds2-component-stage ds2-reveal">
-            <div className="ds2-component-label">Buttons — Action Context</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
-              <button type="button" style={{ padding: '10px 20px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-                Send Action
-              </button>
-              <button type="button" style={{ padding: '10px 20px', background: 'var(--color-surface)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-                View Journal
-              </button>
-              <button type="button" disabled style={{ padding: '10px 20px', background: 'var(--color-surface-hover)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 500, cursor: 'not-allowed', opacity: 0.6 }}>
-                Waiting...
-              </button>
-              <button type="button" style={{ padding: '10px 20px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, opacity: 0.85, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'default' }}>
-                <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                Generating
-              </button>
-            </div>
-          </div>
-
-          {/* Inputs in character creation context */}
-          <div className="ds2-component-stage ds2-reveal">
-            <div className="ds2-component-label">Inputs — Character Creation</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
-              <div>
-                <label htmlFor="ds2-name" style={{ display: 'block', fontFamily: 'var(--font-system)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '8px', fontWeight: 600 }}>Character Name</label>
-                <input id="ds2-name" type="text" defaultValue="Marlowe Vance" style={{ width: '100%', padding: '12px 16px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.9375rem', color: 'var(--color-text-primary)', boxSizing: 'border-box', fontWeight: 500 }} />
-              </div>
-              <div>
-                <label htmlFor="ds2-bg" style={{ display: 'block', fontFamily: 'var(--font-system)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '8px', fontWeight: 600 }}>Background</label>
-                <input id="ds2-bg" type="text" placeholder="Describe your character's history..." style={{ width: '100%', padding: '12px 16px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.9375rem', color: 'var(--color-text-primary)', boxSizing: 'border-box' }} />
-              </div>
-            </div>
-          </div>
-
-          {/* Badges as character status */}
-          <div className="ds2-component-stage ds2-reveal">
-            <div className="ds2-component-label">Badges — Character Status</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'var(--color-accent-soft)', color: 'var(--color-accent)' }}>Player</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }}>Level 4</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(6, 95, 70, 0.12)', color: '#065f46' }}>Healthy</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(146, 64, 14, 0.12)', color: '#92400e' }}>Fatigued</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '4px 14px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(159, 18, 57, 0.12)', color: '#9f1239' }}>Poisoned</span>
-            </div>
-          </div>
-
-          {/* Alerts as narrative feedback */}
-          <div className="ds2-component-stage ds2-reveal">
-            <div className="ds2-component-label">Alerts — System Feedback</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
-              <div style={{ borderRadius: 8, padding: '12px 16px', background: 'rgba(6, 95, 70, 0.08)', border: '1px solid rgba(6, 95, 70, 0.35)', color: '#065f46', fontSize: '0.9375rem', fontFamily: 'var(--font-interface)', fontWeight: 500 }}>
-                Your interrogation check succeeded. The bartender reveals Clara left with a man in a dark coat.
-              </div>
-              <div style={{ borderRadius: 8, padding: '12px 16px', background: 'rgba(146, 64, 14, 0.08)', border: '1px solid rgba(146, 64, 14, 0.35)', color: '#92400e', fontSize: '0.9375rem', fontFamily: 'var(--font-interface)', fontWeight: 500 }}>
-                The rain is getting heavier. Shadowing targets will be more difficult.
-              </div>
-              <div style={{ borderRadius: 8, padding: '12px 16px', background: 'rgba(159, 18, 57, 0.08)', border: '1px solid rgba(159, 18, 57, 0.35)', color: '#9f1239', fontSize: '0.9375rem', fontFamily: 'var(--font-interface)', fontWeight: 500 }}>
-                Save failed. Your progress may not be preserved.
-              </div>
-            </div>
-          </div>
-
-          {/* Cards as world cards */}
-          <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-            <div className="ds2-component-stage ds2-reveal" style={{ padding: '24px' }}>
-              <div style={{ fontFamily: 'var(--font-interface)', fontSize: '1.0625rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>Rain City Noir</div>
-              <div style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '12px', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 600 }}>Mystery · 3 Sessions · 2 Characters</div>
-              <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '0.9375rem', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>A rain-soaked city of jazz clubs and back alleys, where every lead goes cold and every witness has something to hide.</p>
-            </div>
-            <div className="ds2-component-stage ds2-reveal" style={{ padding: '24px', background: 'var(--color-overlay-surface)', backdropFilter: 'blur(16px)' }}>
-              <div style={{ fontFamily: 'var(--font-interface)', fontSize: '1.0625rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>Starfall Station</div>
-              <div style={{ fontFamily: 'var(--font-system)', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '12px', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 600 }}>Sci-Fi · 1 Session · 1 Character</div>
-              <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '0.9375rem', lineHeight: 1.65, color: 'var(--color-text-secondary)', margin: 0 }}>A deep-space mining station gone silent. Your crew was sent to investigate. The distress signal stopped two days ago.</p>
-            </div>
-          </div>
-
-          {/* Drawers — isolated */}
-          <div className="ds2-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginTop: '32px' }}>
-            {/* Journal drawer */}
-            <div className="ds2-component-stage ds2-reveal" style={{ padding: 0, overflow: 'hidden' }}>
-              <div className="ds2-component-label" style={{ padding: '16px 20px 0' }}>Drawer — Journal</div>
-              <div style={{ padding: '12px 20px 20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-interface)', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Journal</div>
-                    <div style={{ fontFamily: 'var(--font-system)', fontSize: '9px', color: 'var(--color-text-muted)', letterSpacing: '0.06em' }}>3 entries</div>
-                  </div>
-                  <span className="ds2-session-ambient-btn">close</span>
-                </div>
-                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 10 }}>
-                  {[
-                    { title: 'The Alibi Room', excerpt: 'Clara\'s dressing room was untouched. Perfume on the vanity, a half-finished cigarette.' },
-                    { title: 'Reyes\u2019 Warning', excerpt: 'The sergeant told me to drop it. That kind of advice usually means I\'m on the right track.' },
-                  ].map((e) => (
-                    <div key={e.title} style={{ paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid var(--color-border)' }}>
-                      <div style={{ fontFamily: 'var(--font-interface)', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: 3 }}>{e.title}</div>
-                      <p style={{ margin: 0, fontFamily: 'var(--font-narrative)', fontSize: '0.875rem', lineHeight: 1.55, color: 'var(--color-text-secondary)' }}>{e.excerpt}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {/* Inventory drawer */}
-            <div className="ds2-component-stage ds2-reveal" style={{ padding: 0, overflow: 'hidden' }}>
-              <div className="ds2-component-label" style={{ padding: '16px 20px 0' }}>Drawer — Inventory</div>
-              <div style={{ padding: '12px 20px 20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-interface)', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Inventory</div>
-                    <div style={{ fontFamily: 'var(--font-system)', fontSize: '9px', color: 'var(--color-text-muted)', letterSpacing: '0.06em' }}>4 items</div>
-                  </div>
-                  <span className="ds2-session-ambient-btn">close</span>
-                </div>
-                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 10 }}>
-                  {[
-                    { name: 'Revolver', desc: 'Standard issue, well-oiled.' },
-                    { name: 'Case File', desc: 'Clara Duvall — notes and photos.' },
-                    { name: 'Matchbook', desc: 'From the Alibi Room. Address on the back.' },
-                    { name: 'Lockpick Set', desc: 'Worn but reliable. 3 picks remain.' },
-                  ].map((item) => (
-                    <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
-                      <img src={`https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(item.name)}`} alt={item.name} style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--color-surface-hover)', objectFit: 'cover', flexShrink: 0 }} />
-                      <div>
-                        <div style={{ fontFamily: 'var(--font-interface)', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{item.name}</div>
-                        <div style={{ fontFamily: 'var(--font-interface)', fontSize: '11px', color: 'var(--color-text-secondary)' }}>{item.desc}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <ComponentShowcase theme="ds2" />
         </div>
-      </section >
+      </section>
 
       {/* Footer */}
       < div className="ds2-reveal" style={{ marginTop: '96px', padding: '48px 0', textAlign: 'center', borderTop: '1px solid var(--color-border)' }}>
@@ -1146,13 +1014,6 @@ box-shadow: var(--shadow-soft);`}
         </p>
       </div >
 
-      {/* Spinner animation for loading button */}
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div >
   );
 }
