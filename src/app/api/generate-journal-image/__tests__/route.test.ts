@@ -3,7 +3,7 @@
  */
 
 jest.mock('@/lib/ai/geminiImageGenerator', () => ({
-  generateAndSaveImageWithGemini: jest.fn(),
+  generateImageWithGemini: jest.fn(),
 }));
 jest.mock('@/lib/utils/logger', () => {
   return jest.fn().mockImplementation(() => ({
@@ -19,13 +19,11 @@ jest.mock('@/lib/utils/genrePromptGuide', () => ({
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
-import { generateAndSaveImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import type { JournalEntry } from '@/types/journal.types';
 import type { World } from '@/types/world.types';
 
-const mockGenerateAndSave = generateAndSaveImageWithGemini as jest.MockedFunction<
-  typeof generateAndSaveImageWithGemini
->;
+const mockGenerate = generateImageWithGemini as jest.MockedFunction<typeof generateImageWithGemini>;
 
 const mockEntry: JournalEntry = {
   id: 'entry-1',
@@ -80,19 +78,12 @@ describe('/api/generate-journal-image', () => {
     expect(data.error).toBe('Journal entry data is required');
   });
 
-  it('rejects an entry id with unsafe path characters', async () => {
-    const response = await POST(
-      makeRequest({ entry: { ...mockEntry, id: '../../etc/passwd' }, world: mockWorld })
-    );
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Invalid journal entry id');
-    expect(mockGenerateAndSave).not.toHaveBeenCalled();
-  });
-
-  it('builds a prompt from the entry content and saves the image', async () => {
-    mockGenerateAndSave.mockResolvedValue({ url: '/uploads/journals/entry-1.png', fileSize: 2048 });
+  it('builds a prompt from the entry content and returns the generated image', async () => {
+    mockGenerate.mockResolvedValue({
+      url: 'data:image/png;base64,abc123',
+      mimeType: 'image/png',
+      base64Data: 'abc123',
+    });
 
     const response = await POST(makeRequest({ entry: mockEntry, world: mockWorld }));
     const data = await response.json();
@@ -100,21 +91,23 @@ describe('/api/generate-journal-image', () => {
     expect(response.status).toBe(200);
     expect(data.aiGenerated).toBe(true);
     expect(data.placeholder).toBe(false);
-    expect(data.imageUrl).toBe('/uploads/journals/entry-1.png');
+    expect(data.imageUrl).toBe('data:image/png;base64,abc123');
 
-    const [prompt, , entityId, category] = mockGenerateAndSave.mock.calls[0];
+    const prompt = mockGenerate.mock.calls[0][0];
     expect(prompt).toContain('burning bridge');
     expect(prompt).toContain('A Turning Point');
-    expect(entityId).toBe('entry-1');
-    expect(category).toBe('journals');
   });
 
   it('uses the custom prompt verbatim when provided', async () => {
-    mockGenerateAndSave.mockResolvedValue({ url: '/uploads/journals/entry-1.png', fileSize: 2048 });
+    mockGenerate.mockResolvedValue({
+      url: 'data:image/png;base64,abc123',
+      mimeType: 'image/png',
+      base64Data: 'abc123',
+    });
 
     await POST(makeRequest({ entry: mockEntry, world: mockWorld, customPrompt: 'A lone lighthouse' }));
 
-    expect(mockGenerateAndSave.mock.calls[0][0]).toBe('A lone lighthouse');
+    expect(mockGenerate.mock.calls[0][0]).toBe('A lone lighthouse');
   });
 
   it('falls back to a placeholder when the API key is missing', async () => {
@@ -127,11 +120,11 @@ describe('/api/generate-journal-image', () => {
     expect(data.aiGenerated).toBe(false);
     expect(data.placeholder).toBe(true);
     expect(data.imageUrl).toContain('picsum.photos');
-    expect(mockGenerateAndSave).not.toHaveBeenCalled();
+    expect(mockGenerate).not.toHaveBeenCalled();
   });
 
   it('falls back to a placeholder when generation returns null', async () => {
-    mockGenerateAndSave.mockResolvedValue(null);
+    mockGenerate.mockResolvedValue(null);
 
     const response = await POST(makeRequest({ entry: mockEntry, world: mockWorld }));
     const data = await response.json();

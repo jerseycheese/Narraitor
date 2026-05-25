@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { JournalEntry } from '@/types/journal.types';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
-import { generateAndSaveImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('JournalImageAPI');
@@ -57,21 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { entry, world, customPrompt } = body;
-
-    // The entry id becomes part of a saved file path (and a log line), so
-    // constrain it to a safe allowlist at the boundary. Capture it into a
-    // single variable first, then guard *that* variable, so the validated
-    // value is the one that flows onward (rejects path separators / control
-    // characters outright, on top of saveBase64Image's own sanitizing).
-    const entryId = entry.id;
-    if (typeof entryId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(entryId)) {
-      return NextResponse.json(
-        { error: 'Invalid journal entry id' },
-        { status: 400 }
-      );
-    }
-
-    logger.debug('generate-journal-image', 'Starting image generation for entry:', entryId);
+    logger.debug('generate-journal-image', 'Starting image generation');
 
     const imagePrompt = customPrompt || generateImagePrompt(entry, world);
     const apiKey = process.env.GEMINI_API_KEY;
@@ -87,20 +73,12 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const savedImage = await generateAndSaveImageWithGemini(
-        imagePrompt,
-        apiKey,
-        entryId,
-        'journals'
-      );
+      const generatedImage = await generateImageWithGemini(imagePrompt, apiKey);
 
-      if (savedImage) {
-        logger.debug(
-          'generate-journal-image',
-          `Gemini image saved successfully (${savedImage.fileSize} bytes)`
-        );
+      if (generatedImage) {
+        logger.debug('generate-journal-image', 'Gemini image generated successfully');
         return NextResponse.json({
-          imageUrl: savedImage.url,
+          imageUrl: generatedImage.url,
           prompt: imagePrompt,
           placeholder: false,
           aiGenerated: true,
