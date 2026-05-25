@@ -428,10 +428,10 @@ export default function SkillReviewStep({
           </div>
         )}
 
-        <div>
-          <div>
+        <div className="wizard-review-list">
+          <div className="wizard-review-suggestions">
             {localSuggestions.length === 0 ? (
-              <div>
+              <div className="wizard-empty-state">
                 <p>No skill suggestions available</p>
                 <p>
                   You can add skills to your world later in the world editor.
@@ -441,14 +441,14 @@ export default function SkillReviewStep({
               localSuggestions.map((suggestion, index) => (
                 <div
                   key={index}
-                  className={wizardStyles.card.base}
+                  className={`${wizardStyles.card.base} wizard-review-card`}
                   data-testid={`skill-card-${index}`}
                   {...(index === 0
                     ? { 'data-tutorial': 'skill-suggestions' }
                     : {})}
                 >
-                  <div>
-                    <div>
+                  <div className="wizard-review-card-head">
+                    <div className="wizard-review-card-meta">
                       <span>{suggestion.name}</span>
                       <span
                         className={`${wizardStyles.badge.base} ${
@@ -471,7 +471,7 @@ export default function SkillReviewStep({
                         )}
                     </div>
 
-                    <div>
+                    <div className="wizard-review-card-tools">
                       <Button
                         type="button"
                         variant="link"
@@ -501,7 +501,10 @@ export default function SkillReviewStep({
                   </div>
 
                   {suggestion.showDetails && (
-                    <div key={`skill-expanded-${index}`}>
+                    <div
+                      key={`skill-expanded-${index}`}
+                      className="wizard-review-card-detail"
+                    >
                       <WizardFormGroup label="Name">
                         <WizardTextField
                           value={suggestion.name}
@@ -523,7 +526,7 @@ export default function SkillReviewStep({
                         />
                       </WizardFormGroup>
 
-                      <div>
+                      <div className="wizard-review-detail-row">
                         <div>
                           <WizardFormGroup label="Difficulty">
                             <WizardSelect
@@ -542,15 +545,21 @@ export default function SkillReviewStep({
 
                         <div>
                           <WizardFormGroup label="Linked Attributes">
-                            <div>
+                            <div className="form-help-text">
                               Select one or more attributes this skill depends
                               on
                             </div>
-                            <div data-testid={`skill-attributes-${index}`}>
+                            <div
+                              className="wizard-skill-attr-grid"
+                              data-testid={`skill-attributes-${index}`}
+                            >
                               {worldData.attributes &&
                               worldData.attributes.length > 0 ? (
                                 worldData.attributes.map((attribute) => (
-                                  <div key={attribute.id}>
+                                  <div
+                                    key={attribute.id}
+                                    className="wizard-skill-attr-option"
+                                  >
                                     <Checkbox
                                       id={`skill-${index}-attribute-${attribute.id}`}
                                       checked={
@@ -646,10 +655,10 @@ export default function SkillReviewStep({
           </div>
 
           {/* Custom Skills Section */}
-          <div data-tutorial="skill-custom">
-            <div>
-              <div>
-                <h3>Custom Skills</h3>
+          <div className="wizard-review-custom" data-tutorial="skill-custom">
+            <div className="wizard-review-custom-head">
+              <div className="wizard-review-custom-heading">
+                <h3 className="wizard-subheading">Custom Skills</h3>
                 <p>
                   Create your own unique skills for this world ({acceptedCount}
                   /12 slots used)
@@ -667,7 +676,7 @@ export default function SkillReviewStep({
             </div>
 
             {customSkills.length === 0 && !isCreatingCustomSkill ? (
-              <div>
+              <div className="wizard-empty-state">
                 <p>No custom skills yet</p>
                 <p>
                   {acceptedCount < 12
@@ -676,15 +685,15 @@ export default function SkillReviewStep({
                 </p>
               </div>
             ) : (
-              <div>
+              <div className="wizard-review-custom-list">
                 {customSkills.map((skill) => (
                   <div
                     key={skill.id}
-                    className={`${wizardStyles.card.base}`}
+                    className={`${wizardStyles.card.base} wizard-review-card`}
                     data-testid={`custom-skill-card-${skill.id}`}
                   >
-                    <div>
-                      <div>
+                    <div className="wizard-review-card-head">
+                      <div className="wizard-review-card-meta">
                         <span>{skill.name}</span>
                         <span>Custom</span>
                         <span
@@ -713,7 +722,7 @@ export default function SkillReviewStep({
                                                             .join(', ')}                            </span>
                           )}
                       </div>
-                      <div>
+                      <div className="wizard-review-card-tools">
                         <Button
                           type="button"
                           onClick={() => handleEditCustomSkill(skill.id)}
@@ -734,7 +743,7 @@ export default function SkillReviewStep({
                         </Button>
                       </div>
                     </div>
-                    <div>{skill.description}</div>
+                    <div className="wizard-review-card-detail">{skill.description}</div>
                   </div>
                 ))}
               </div>
@@ -742,7 +751,7 @@ export default function SkillReviewStep({
 
             {/* Custom Skill Editor */}
             {isCreatingCustomSkill && (
-              <div data-testid="custom-skill-editor">
+              <div className="wizard-custom-editor" data-testid="custom-skill-editor">
                 <SkillEditor
                   worldId={worldData.id || ''}
                   mode={editingCustomSkillId ? 'edit' : 'create'}
@@ -764,22 +773,33 @@ export default function SkillReviewStep({
           </div>
         </div>
 
-        <div data-testid="skill-count-summary" data-tutorial="skill-summary">
-          <div>
-            <div>
+        <div
+          className="wizard-slot-summary"
+          data-testid="skill-count-summary"
+          data-tutorial="skill-summary"
+        >
+          <div className="wizard-slot-summary-text">
+            <div className="wizard-slot-summary-count">
               <span>Skills Selected: {acceptedCount} / 12</span>
               {acceptedCount >= 12 && <span>(Maximum reached)</span>}
             </div>
-            <div>
+            <div className="wizard-slot-summary-note">
               {acceptedCount < 12
                 ? `${12 - acceptedCount} slot${12 - acceptedCount !== 1 ? 's' : ''} available`
                 : 'All slots filled'}
             </div>
           </div>
-          <div>
-            <div>
+          <div className="wizard-slot-meter-wrap">
+            <div className="wizard-slot-meter">
               {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} />
+                <div
+                  key={i}
+                  className={
+                    i < acceptedCount
+                      ? 'wizard-slot-cell wizard-slot-cell-filled'
+                      : 'wizard-slot-cell'
+                  }
+                />
               ))}
             </div>
           </div>
@@ -793,18 +813,19 @@ export default function SkillReviewStep({
       {/* Clear Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
         <div
+          className="wizard-dialog-overlay"
           data-testid="clear-suggestions-dialog"
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="clear-skills-dialog-title"
         >
-          <div>
+          <div className="wizard-dialog-panel">
             <h3 id="clear-skills-dialog-title">Clear Suggestions?</h3>
             <p>
               This will remove all skill suggestions. You can still add custom
               skills or regenerate suggestions later.
             </p>
-            <div>
+            <div className="wizard-dialog-actions">
               <Button
                 type="button"
                 onClick={() => setShowClearConfirmation(false)}

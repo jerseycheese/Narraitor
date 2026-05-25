@@ -195,24 +195,24 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         title="Allocate Skill Points"
         description={`Choose up to ${maxSelectable} starting skills and distribute ${totalSkillPoints} skill points across them.`}
       >
-      <div>
+      <div className="wizard-skill-intro">
         <p>
           Each selected skill starts at its minimum level. Increase levels to invest skill points.
           Unspent points are allowed if you want to create a less experienced character.
         </p>
       </div>
 
-      <div>
+      <div className="wizard-skill-summary-row">
         <div className={wizardStyles.card.base}>
           <h3 className={wizardStyles.subheading}>Skill Points</h3>
-          <div>
-            <span className={wizardStyles.badge.secondary}>Total: {totalSkillPoints}</span>
-            <span className={wizardStyles.badge.primary}>Spent: {Math.max(spentPoints, 0)}</span>
-            <span className={wizardStyles.badge.secondary}>
+          <div className="wizard-badge-row">
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>Total: {totalSkillPoints}</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>Spent: {Math.max(spentPoints, 0)}</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
               Remaining: {Math.max(remainingPoints, 0)}
             </span>
             {totalSkillPoints > totalCapacity && (
-              <span className={wizardStyles.badge.secondary}>
+              <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
                 Cap: {totalCapacity}
               </span>
             )}
@@ -221,14 +221,14 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
         <div className={`${wizardStyles.card.base}`}>
           <h3 className={wizardStyles.subheading}>Skill Selection</h3>
-          <div>
-            <span className={wizardStyles.badge.primary}>Selected: {selectedSkills.length}</span>
-            <span className={wizardStyles.badge.secondary}>Maximum: {maxSelectable}</span>
+          <div className="wizard-badge-row">
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>Selected: {selectedSkills.length}</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>Maximum: {maxSelectable}</span>
           </div>
         </div>
       </div>
 
-      <div>
+      <div className="wizard-skill-allocation-list">
         {data.characterData.skills.map((skill, index) => {
           const bounds = boundsBySkillId.get(skill.skillId) ?? resolveSkillBounds(skill, worldConfig);
           const cost = costBySkillId.get(skill.skillId) ?? 0;
@@ -239,17 +239,17 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           return (
           <div 
             key={safeKey}
-            className={`${wizardStyles.card.base} ${skill.isSelected ? wizardStyles.card.selected : ''}`}
+            className={`${wizardStyles.card.base} wizard-skill-card ${skill.isSelected ? wizardStyles.card.selected : ''}`}
           >
             <div>
-              <div>
-                <div>
+              <div className="wizard-skill-card-head">
+                <div className="wizard-skill-card-info">
                   <span id={skillTitleId} >{skill.name}</span>
                   {skill.description && (
                     <p>{skill.description}</p>
                   )}
                   {skill.attributeIds && skill.attributeIds.length > 0 && worldConfig?.attributes && (
-                    <div>
+                    <div className="wizard-skill-card-linked">
                       Linked to:{' '}
                       {skill.attributeIds
                         .map(attrId => worldConfig.attributes?.find(attr => attr.id === attrId)?.name || 'Unknown')
@@ -268,8 +268,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
               </div>
 
               {skill.isSelected && (
-                <div>
-                  <div>
+                <div className="wizard-skill-level">
+                  <div className="wizard-skill-level-row">
                     <span>Level: {skill.level}</span>
                     <span>Allocated Points: {cost}</span>
                   </div>
@@ -284,7 +284,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                     isConstrained={maxAllowedLevel < bounds.maxLevel}
                     ariaLabelledBy={skillTitleId}
                   />
-                  <div>
+                  <div className="wizard-skill-level-row">
                     <span>Min: {bounds.minLevel}</span>
                     <span>Max: {bounds.maxLevel}</span>
                   </div>

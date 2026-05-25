@@ -60,6 +60,17 @@ async function captureStep(
   await expect(page).toHaveScreenshot(snapshotName, { fullPage: true });
 }
 
+async function captureWidget(
+  page: Page,
+  locator: ReturnType<Page['locator']>,
+  snapshotName: string
+): Promise<void> {
+  await locator.scrollIntoViewIfNeeded();
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
+  await expect(locator).toHaveScreenshot(snapshotName);
+}
+
 async function clickWizardNext(page: Page): Promise<void> {
   const nextButton = page
     .locator('.component-wizard-container')
@@ -257,8 +268,26 @@ test.describe('Wizard Theme Differentiation', () => {
         await page.getByRole('textbox', { name: 'Attribute Name *' }).fill(
           `Test Attribute ${theme.toUpperCase()}`
         );
+        // Internal widget: custom attribute editor (open state)
+        await captureWidget(
+          page,
+          page.locator('[data-testid="custom-attribute-editor"]'),
+          `wizard-world-${theme}-internal-custom-attribute-editor.png`
+        );
         await page.getByRole('button', { name: 'Create Attribute' }).click();
         await waitForContentStable(page);
+      }
+
+      // Internal widget: attribute slot meter / count summary
+      const attributeSummary = page.locator(
+        '[data-testid="attribute-count-summary"]'
+      );
+      if (await attributeSummary.count()) {
+        await captureWidget(
+          page,
+          attributeSummary,
+          `wizard-world-${theme}-internal-attribute-slot-meter.png`
+        );
       }
       await clickWizardNext(page);
       await waitForNavigationHeading(page, 'Review Skills', {
@@ -293,6 +322,12 @@ test.describe('Wizard Theme Differentiation', () => {
         if (await firstAttributeCheckbox.count()) {
           await firstAttributeCheckbox.check();
         }
+        // Internal widget: custom skill editor (open state)
+        await captureWidget(
+          page,
+          page.locator('[data-testid="custom-skill-editor"]'),
+          `wizard-world-${theme}-internal-custom-skill-editor.png`
+        );
         const createSkillButton = page.getByRole('button', {
           name: /create skill/i,
         });
@@ -367,6 +402,16 @@ test.describe('Wizard Theme Differentiation', () => {
         `wizard-character-${theme}-step2-attributes.png`
       );
 
+      // Internal widget: point-pool allocation manager
+      const pointPool = page.locator('.component-point-pool-manager');
+      if (await pointPool.count()) {
+        await captureWidget(
+          page,
+          pointPool,
+          `wizard-character-${theme}-internal-point-pool.png`
+        );
+      }
+
       await fillCharacterAttributes(page);
       await clickWizardNext(page);
       await waitForNavigationHeading(page, 'Allocate Skill Points', {
@@ -416,6 +461,16 @@ test.describe('Wizard Theme Differentiation', () => {
         theme,
         `wizard-character-${theme}-step5-portrait.png`
       );
+
+      // Internal widget: portrait controls + frame
+      const portraitControls = page.locator('.component-portrait-step');
+      if (await portraitControls.count()) {
+        await captureWidget(
+          page,
+          portraitControls,
+          `wizard-character-${theme}-internal-portrait-controls.png`
+        );
+      }
     });
   }
 });

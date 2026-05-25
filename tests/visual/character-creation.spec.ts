@@ -1,10 +1,41 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import {
   waitForContentStable,
   hideDynamicContent,
   waitForNavigationHeading,
 } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
+
+/** Capture a stable, full-page wizard screenshot with the app shell intact. */
+const captureFullStep = async (page: Page, name: string): Promise<void> => {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await waitForContentStable(page);
+  await page.evaluate(() => document.fonts.ready);
+  await hideDynamicContent(page);
+  // Chromium's full-page screenshot mis-places the app shell on pages taller
+  // than the viewport: the sticky header and the 100vh, own-scrolling sidebar
+  // render at the current scroll offset, leaving the page title floating above
+  // a displaced shell. Pin them into normal flow for the capture — at scroll 0
+  // the result matches the live layout, minus the artifact. (Same approach as
+  // world-creation.spec's captureWizardStep.)
+  await page.addStyleTag({
+    content: `
+      .workshop-sidebar {
+        position: static !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      header,
+      .component-wizard-progress {
+        position: static !important;
+      }
+    `,
+  });
+  await page.waitForTimeout(50);
+  await expect(page).toHaveScreenshot(name, { fullPage: true });
+};
 
 /**
  * Character Creation Wizard Visual Regression Test (Sequential)
@@ -62,8 +93,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       await customButton.click();
       await waitForNavigationHeading(page, 'Choose a Starting Template', { timeout: 5000, exact: true });
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('character-creation-step0-template-selection.png', { fullPage: true });
+    await captureFullStep(page, 'character-creation-step0-template-selection.png');
   });
 
   await test.step('Step 1: Basic Info', async () => {
@@ -73,8 +103,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       await skipTemplateBtn.click();
       await waitForNavigationHeading(page, 'Basic Information', { timeout: 5000, exact: true });
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('character-creation-step1-basic-info.png', { fullPage: true });
+    await captureFullStep(page, 'character-creation-step1-basic-info.png');
   });
 
   await test.step('Step 2: Attributes', async () => {
@@ -90,8 +119,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
       await waitForNavigationHeading(page, 'Allocate Attribute Points', { timeout: 5000, exact: true });
     }
 
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('character-creation-step2-attributes.png', { fullPage: true });
+    await captureFullStep(page, 'character-creation-step2-attributes.png');
 
     // Allocate required points so we can advance to the skills step.
     // Use the native value setter so React's onChange fires reliably.
@@ -188,8 +216,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     await expect(remainingBadge).toContainText('Remaining: 0', { timeout: 10000 });
     await expect(page.getByText(/^Allocated Points:/).first()).toBeVisible();
 
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('character-creation-step3-skills.png', { fullPage: true });
+    await captureFullStep(page, 'character-creation-step3-skills.png');
 
     const proceedToBackgroundBtn = page.locator('button:has-text("Next")');
     if (await proceedToBackgroundBtn.count() > 0) {
@@ -212,8 +239,7 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     await page.locator('#character-motivation').fill('Keep the resistance supplied with intel and tech.');
     await page.locator('#character-goals').fill('Liberate grid districts\nProtect resistance safehouses');
 
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('character-creation-step4-background.png', { fullPage: true });
+    await captureFullStep(page, 'character-creation-step4-background.png');
 
     const proceedToPortraitBtn = page.locator('button:has-text("Next")');
     if (await proceedToPortraitBtn.count() > 0) {
@@ -226,7 +252,6 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
   await test.step('Step 5: Portrait', async () => {
     await expect(page.getByRole('heading', { name: 'Character Portrait' })).toBeVisible();
 
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('character-creation-step5-portrait.png', { fullPage: true });
+    await captureFullStep(page, 'character-creation-step5-portrait.png');
   });
 });
