@@ -57,7 +57,20 @@ export async function POST(request: NextRequest) {
     }
 
     const { entry, world, customPrompt } = body;
-    logger.debug('generate-journal-image', 'Starting image generation for entry:', entry.id);
+
+    // The entry id becomes part of a saved file path (and a log line), so
+    // constrain it to a safe allowlist at the boundary. This rejects path
+    // separators / control characters outright, on top of the sanitizing
+    // saveBase64Image already does.
+    if (typeof entry.id !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(entry.id)) {
+      return NextResponse.json(
+        { error: 'Invalid journal entry id' },
+        { status: 400 }
+      );
+    }
+    const entryId = entry.id;
+
+    logger.debug('generate-journal-image', 'Starting image generation for entry:', entryId);
 
     const imagePrompt = customPrompt || generateImagePrompt(entry, world);
     const apiKey = process.env.GEMINI_API_KEY;
@@ -76,14 +89,14 @@ export async function POST(request: NextRequest) {
       const savedImage = await generateAndSaveImageWithGemini(
         imagePrompt,
         apiKey,
-        entry.id,
+        entryId,
         'journals'
       );
 
       if (savedImage) {
         logger.debug(
           'generate-journal-image',
-          `Gemini image saved successfully: ${savedImage.url} (${savedImage.fileSize} bytes)`
+          `Gemini image saved successfully (${savedImage.fileSize} bytes)`
         );
         return NextResponse.json({
           imageUrl: savedImage.url,

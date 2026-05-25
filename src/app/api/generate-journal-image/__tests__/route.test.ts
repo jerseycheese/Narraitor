@@ -80,6 +80,17 @@ describe('/api/generate-journal-image', () => {
     expect(data.error).toBe('Journal entry data is required');
   });
 
+  it('rejects an entry id with unsafe path characters', async () => {
+    const response = await POST(
+      makeRequest({ entry: { ...mockEntry, id: '../../etc/passwd' }, world: mockWorld })
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toBe('Invalid journal entry id');
+    expect(mockGenerateAndSave).not.toHaveBeenCalled();
+  });
+
   it('builds a prompt from the entry content and saves the image', async () => {
     mockGenerateAndSave.mockResolvedValue({ url: '/uploads/journals/entry-1.png', fileSize: 2048 });
 
