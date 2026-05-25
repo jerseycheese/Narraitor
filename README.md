@@ -72,6 +72,8 @@ npm run dev
 
 The app runs on `localhost:3000`. You'll see the world creation wizard first: either pick a template or build your own universe.
 
+> Running from a git worktree? `npm run dev` picks a stable per-worktree port automatically (the main checkout keeps 3000), so multiple worktrees can run side by side without fighting over the port. The chosen URL is printed on startup; set `PORT` to override.
+
 ## Development Setup
 
 I've been using a component-first approach with Storybook and TDD. Basically, build components in isolation first, then integrate them. It keeps things manageable.
