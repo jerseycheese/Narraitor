@@ -38,6 +38,19 @@ describe('SkillRangeEditor', () => {
     expect(slider).toHaveValue('3');
   });
 
+  it('exposes an accessible name naming the skill', () => {
+    render(
+      <SkillRangeEditor
+        skill={mockSkill}
+        onChange={mockOnChange}
+      />
+    );
+
+    expect(
+      screen.getByRole('slider', { name: 'Test Skill skill level' })
+    ).toBeInTheDocument();
+  });
+
   it('passes min and max values to the RangeSlider component', () => {
     // This test verifies the component is receiving the correct min/max props
     // We can't directly test the min/max DOM attributes due to how the component is rendered

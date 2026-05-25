@@ -121,7 +121,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
                 onChange={(e) => handleCustomPromptChange(e.target.value)}
                 placeholder={customPromptPlaceholder}
                 rows={3}
-                
+                aria-label={customPromptLabel}
               />
               <p>
                 {customPromptHelpText}

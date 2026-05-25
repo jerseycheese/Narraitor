@@ -52,6 +52,14 @@ describe('AttributeRangeEditor', () => {
     expect(screen.getByTestId('current-value')).toHaveTextContent('Current: 5');
   });
 
+  test('exposes an accessible name naming the attribute', () => {
+    render(<TestWrapper initialAttribute={mockAttribute} />);
+
+    expect(
+      screen.getByRole('slider', { name: 'Strength value' })
+    ).toBeInTheDocument();
+  });
+
   test('allows user to change value within valid range', () => {
     render(<TestWrapper initialAttribute={mockAttribute} />);
 
