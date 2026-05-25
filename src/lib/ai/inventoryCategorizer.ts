@@ -100,7 +100,7 @@ function parseAIResponse(raw: string): AIResponseShape | null {
   }
 }
 
-export async function categorizeInventoryItem(
+async function categorizeInventoryItem(
   input: CategorizeInventoryItemInput
 ): Promise<InventoryCategorizationResult> {
   const config = getAIConfig();
