@@ -9,7 +9,6 @@ interface ManuscriptSessionShellProps {
   hud?: React.ReactNode;
   actionRail?: React.ReactNode;
   marginContent?: React.ReactNode;
-  mobileTopContent?: React.ReactNode;
   className?: string;
 }
 
@@ -18,7 +17,6 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
   hud,
   actionRail,
   marginContent,
-  mobileTopContent,
   className,
 }) => {
   const { theme } = useTheme();
@@ -220,13 +218,11 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
           {/* Main Narrative Stage */}
           <main className="manuscript-overlay-main">
-            {mobileTopContent}
-
             <div className={clsx("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
                 {marginContent && (
                   <aside
                     className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
-                    aria-label="Characters present"
+                    aria-label="Scene status"
                     ref={railRef}
                   >
                     {marginContent}

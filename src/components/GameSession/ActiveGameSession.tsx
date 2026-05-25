@@ -35,7 +35,7 @@ import {
   ToolsMenuPanelContent,
 } from './ManuscriptDrawerPanels';
 import { CharacterSnapshot } from './CharacterSnapshot';
-import { ManuscriptCharactersRail } from './ManuscriptCharactersRail';
+import { SceneStatus } from './SceneStatus';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 
@@ -94,7 +94,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
   const { theme } = useTheme();
-  const isDS1 = theme === 'ds1';
   const isDS3 = theme === 'ds3';
 
   // Check for test data to support visual regression tests (guarded for SSR)
@@ -146,6 +145,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Fallback to absolute latest segment
     return state.segments[segmentIds[segmentIds.length - 1]] || null;
   });
+
+  // Show the scene status surface whenever the latest segment has participants
+  // or a location to report; mirrors SceneStatus' own empty check so the shell
+  // can collapse the rail column when there's nothing to show.
+  const hasSceneStatus =
+    !!latestSegmentWithParticipants &&
+    ((latestSegmentWithParticipants.characterIds?.length ?? 0) > 0 ||
+      (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0 ||
+      !!latestSegmentWithParticipants.metadata?.location);
 
   const hasExistingNarrative = segmentCount > 0;
 
@@ -451,16 +459,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           )}
         />
       }
-      marginContent={isDS1 && isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
-        ((latestSegmentWithParticipants.characterIds?.length ?? 0) > 0 ||
-         (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0) ? (
-        <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
+      marginContent={hasSceneStatus ? (
+        <SceneStatus segment={latestSegmentWithParticipants} />
       ) : null}
-      mobileTopContent={
-        isDS1 && isProgressiveDisclosureEnabled ? (
-          <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
-        ) : null
-      }
       actionRail={
         <ManuscriptActionRail
           isStreaming={isGenerating || isGeneratingChoices || isStreamingPreview}
