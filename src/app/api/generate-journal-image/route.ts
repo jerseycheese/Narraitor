@@ -59,16 +59,17 @@ export async function POST(request: NextRequest) {
     const { entry, world, customPrompt } = body;
 
     // The entry id becomes part of a saved file path (and a log line), so
-    // constrain it to a safe allowlist at the boundary. This rejects path
-    // separators / control characters outright, on top of the sanitizing
-    // saveBase64Image already does.
-    if (typeof entry.id !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(entry.id)) {
+    // constrain it to a safe allowlist at the boundary. Capture it into a
+    // single variable first, then guard *that* variable, so the validated
+    // value is the one that flows onward (rejects path separators / control
+    // characters outright, on top of saveBase64Image's own sanitizing).
+    const entryId = entry.id;
+    if (typeof entryId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(entryId)) {
       return NextResponse.json(
         { error: 'Invalid journal entry id' },
         { status: 400 }
       );
     }
-    const entryId = entry.id;
 
     logger.debug('generate-journal-image', 'Starting image generation for entry:', entryId);
 
