@@ -25,6 +25,7 @@ interface ImageGenerationSectionProps {
   className?: string;
   defaultCustomPromptChecked?: boolean; // Whether the custom prompt checkbox should be checked by default
   error?: string | null; // Inline error message for generation failures
+  headingLevel?: 'h2' | 'h3' | 'h4'; // Heading element for the title, to fit the surrounding heading order
 }
 
 export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
@@ -46,7 +47,8 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
   imageComponent,
   className = "",
   defaultCustomPromptChecked = !!currentPrompt,
-  error = null
+  error = null,
+  headingLevel: HeadingTag = 'h2'
 }) => {
   // Separate user input from API-returned prompts
   const [showCustomPrompt, setShowCustomPrompt] = useState(defaultCustomPromptChecked);
@@ -79,7 +81,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
 
   return (
     <div className={`${className}`}>
-      <h2>{title}</h2>
+      <HeadingTag>{title}</HeadingTag>
       <div>
         <div>
           {imageComponent}
