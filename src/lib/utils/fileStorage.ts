@@ -16,7 +16,7 @@ export interface SaveImageOptions {
   /**
    * Category/type of image (e.g., 'worlds', 'characters', 'portraits')
    */
-  category: 'worlds' | 'characters' | 'portraits' | 'items' | 'endings';
+  category: 'worlds' | 'characters' | 'portraits' | 'items' | 'endings' | 'journals';
 
   /**
    * Unique identifier for the entity (e.g., world ID, character ID)
@@ -71,7 +71,7 @@ function sanitizeEntityId(entityId: string): string {
  * Validate category is one of the allowed values
  */
 function validateCategory(category: string): asserts category is SaveImageOptions['category'] {
-  const validCategories: Array<SaveImageOptions['category']> = ['worlds', 'characters', 'portraits', 'items', 'endings'];
+  const validCategories: Array<SaveImageOptions['category']> = ['worlds', 'characters', 'portraits', 'items', 'endings', 'journals'];
 
   if (!validCategories.includes(category as SaveImageOptions['category'])) {
     throw new Error(`Invalid category: must be one of ${validCategories.join(', ')}`);
