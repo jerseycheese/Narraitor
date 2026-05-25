@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import SkillPrerequisitesEditor from '@/components/forms/SkillPrerequisitesEditor';
 
 const MAX_NAME_LENGTH = 100;
 const MAX_DESCRIPTION_LENGTH = 500;
@@ -70,6 +71,7 @@ export function SkillEditor({
     name: '',
     description: '',
     attributeIds: [],
+    attributePrerequisites: [],
     difficulty: DEFAULT_SKILL_DIFFICULTY,
     baseValue: 5,
     minValue: 1,
@@ -88,6 +90,7 @@ export function SkillEditor({
         setFormData({
           ...existingSkill,
           attributeIds: existingSkill.attributeIds || [],
+          attributePrerequisites: existingSkill.attributePrerequisites || [],
         });
       }
     }
@@ -171,6 +174,7 @@ export function SkillEditor({
       description: trimmedDescription,
       worldId,
       attributeIds: formData.attributeIds || [],
+      attributePrerequisites: formData.attributePrerequisites || [],
       difficulty: formData.difficulty || DEFAULT_SKILL_DIFFICULTY,
       baseValue: formData.baseValue || 5,
       minValue: formData.minValue || 1,
@@ -299,6 +303,16 @@ export function SkillEditor({
               </p>
             )}
           </div>
+
+          <SkillPrerequisitesEditor
+            attributes={existingAttributes}
+            prerequisites={formData.attributePrerequisites}
+            onChange={(attributePrerequisites) =>
+              setFormData((prev) => ({ ...prev, attributePrerequisites }))
+            }
+            idPrefix="skill-editor"
+            disabled={!canCreateSkill}
+          />
         </div>
 
         <div>

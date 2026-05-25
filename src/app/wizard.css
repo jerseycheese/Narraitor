@@ -564,6 +564,17 @@
   border-color: var(--color-border-strong);
 }
 
+.wizard-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wizard-toggle:disabled:hover {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
 /* ─── Utility Styles ─── */
 
 .wizard-divider {
@@ -2484,6 +2495,17 @@
   font-family: var(--font-system);
   font-size: 0.75rem;
   color: var(--color-text-muted);
+}
+
+.wizard-skill-card-locked {
+  opacity: 0.7;
+}
+
+.wizard-skill-card-requirement {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  margin-top: var(--space-1);
 }
 
 .wizard-skill-level {

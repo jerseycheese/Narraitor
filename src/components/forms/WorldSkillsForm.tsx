@@ -12,6 +12,7 @@ import {
   SkillDifficulty
 } from '@/lib/constants/skillDifficultyLevels';
 import SkillRangeEditor from './SkillRangeEditor';
+import SkillPrerequisitesEditor from './SkillPrerequisitesEditor';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -195,6 +196,15 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     />
                   </div>
                 </div>
+
+                <SkillPrerequisitesEditor
+                  attributes={attributes}
+                  prerequisites={skill.attributePrerequisites}
+                  onChange={(attributePrerequisites) =>
+                    handleUpdateSkill(index, { attributePrerequisites })
+                  }
+                  idPrefix={`skill-${index}`}
+                />
               </div>
             </div>
           ))}
