@@ -2264,7 +2264,7 @@
    divs) with no spacing, so the fields and action row read cramped. Space
    the text controls and the buttons directly — structure-agnostic, and skips
    checkboxes/radios so the skill editor's inline attribute list is untouched. */
-.wizard-custom-editor input:not([type="checkbox"]):not([type="radio"]),
+.wizard-custom-editor input:not([type="checkbox"], [type="radio"]),
 .wizard-custom-editor textarea,
 .wizard-custom-editor select {
   margin-bottom: var(--space-4);
