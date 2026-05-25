@@ -206,13 +206,13 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         <div className={wizardStyles.card.base}>
           <h3 className={wizardStyles.subheading}>Skill Points</h3>
           <div className="wizard-badge-row">
-            <span className={wizardStyles.badge.secondary}>Total: {totalSkillPoints}</span>
-            <span className={wizardStyles.badge.primary}>Spent: {Math.max(spentPoints, 0)}</span>
-            <span className={wizardStyles.badge.secondary}>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>Total: {totalSkillPoints}</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>Spent: {Math.max(spentPoints, 0)}</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
               Remaining: {Math.max(remainingPoints, 0)}
             </span>
             {totalSkillPoints > totalCapacity && (
-              <span className={wizardStyles.badge.secondary}>
+              <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
                 Cap: {totalCapacity}
               </span>
             )}
@@ -222,8 +222,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         <div className={`${wizardStyles.card.base}`}>
           <h3 className={wizardStyles.subheading}>Skill Selection</h3>
           <div className="wizard-badge-row">
-            <span className={wizardStyles.badge.primary}>Selected: {selectedSkills.length}</span>
-            <span className={wizardStyles.badge.secondary}>Maximum: {maxSelectable}</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>Selected: {selectedSkills.length}</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>Maximum: {maxSelectable}</span>
           </div>
         </div>
       </div>
