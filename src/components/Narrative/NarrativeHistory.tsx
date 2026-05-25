@@ -4,6 +4,8 @@ import { NarrativeDisplay } from './NarrativeDisplay';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useBufferedNarrativeSegments } from './hooks/useBufferedNarrativeSegments';
 import { useTheme } from '@/lib/theme/ThemeProvider';
+import { NarrativeTextSizeControl } from './NarrativeTextSizeControl';
+import { useUIPreferencesStore } from '@/state/uiPreferencesStore';
 
 interface NarrativeHistoryProps {
   segments: NarrativeSegment[];
@@ -31,6 +33,9 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
 
   const { theme } = useTheme();
   const { renderedSegments } = useBufferedNarrativeSegments(segments);
+  const narrativeTextSize = useUIPreferencesStore(
+    (state) => state.narrativeTextSize
+  );
 
   // Check if the viewport is near the bottom
   const getIsNearBottom = useCallback(() => {
@@ -287,7 +292,9 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
       className={['narrative-history-container', className].filter(Boolean).join(' ')}
       onKeyDown={handleKeyDown}
       tabIndex={0}
+      data-narrative-text-size={narrativeTextSize}
     >
+      <NarrativeTextSizeControl className="narrative-history-text-size-control" />
       <ScrollArea
         ref={scrollAreaRef}
         className="mobile-scroll"
