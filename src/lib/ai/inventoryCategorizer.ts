@@ -27,6 +27,10 @@ interface AIResponseShape {
   rationale?: string;
 }
 
+interface AIBatchEntryShape extends AIResponseShape {
+  index: number;
+}
+
 const fallbacks: Array<{ keywords: RegExp; category: StandardInventoryCategory }> = [
   { keywords: /(sword|blade|shield|armor|bow|staff|weapon|gear)/i, category: 'equipment' },
   { keywords: /(potion|elixir|herb|salve|scroll|kit|tonic)/i, category: 'consumables' },
@@ -96,7 +100,7 @@ function parseAIResponse(raw: string): AIResponseShape | null {
   }
 }
 
-export async function categorizeInventoryItem(
+async function categorizeInventoryItem(
   input: CategorizeInventoryItemInput
 ): Promise<InventoryCategorizationResult> {
   const config = getAIConfig();
@@ -155,5 +159,115 @@ Additional Context: ${input.context ? JSON.stringify(input.context) : 'none'}
   } catch (error) {
     logger.error('InventoryCategorizer', 'AI categorization failed', error);
     return determineFallbackCategory(input.name, input.description);
+  }
+}
+
+function parseAIBatchResponse(raw: string): AIBatchEntryShape[] | null {
+  const match = raw.match(/\[[\s\S]*\]/);
+  const candidate = match ? match[0] : raw;
+
+  try {
+    const parsed = JSON.parse(candidate);
+    return Array.isArray(parsed) ? (parsed as AIBatchEntryShape[]) : null;
+  } catch (error) {
+    logger.debug('InventoryCategorizer', 'Batch AI JSON parse failed', {
+      error,
+      preview: truncate(raw, 200),
+    });
+    return null;
+  }
+}
+
+/**
+ * Categorizes multiple items in a single AI call. Items that cannot be matched
+ * back to a valid AI result fall back to keyword-based categorization, so a
+ * partial or malformed batch response never blocks item acquisition.
+ */
+export async function categorizeInventoryItems(
+  inputs: CategorizeInventoryItemInput[]
+): Promise<InventoryCategorizationResult[]> {
+  if (inputs.length === 0) {
+    return [];
+  }
+
+  if (inputs.length === 1) {
+    return [await categorizeInventoryItem(inputs[0])];
+  }
+
+  const config = getAIConfig();
+
+  if (!config.geminiApiKey) {
+    logger.warn(
+      'InventoryCategorizer',
+      'No GEMINI_API_KEY configured, using fallback categorization for batch',
+      { count: inputs.length }
+    );
+    return inputs.map((input) => determineFallbackCategory(input.name, input.description));
+  }
+
+  try {
+    const client = new GeminiClient({
+      apiKey: config.geminiApiKey,
+      modelName: config.modelName,
+      maxRetries: config.maxRetries,
+      timeout: config.timeout,
+      generationConfig: getGenerationConfig(),
+      safetySettings: getSafetySettings(),
+    });
+
+    const itemList = inputs
+      .map(
+        (input, index) =>
+          `${index}. Name: ${input.name} | Description: ${input.description ?? 'n/a'}`
+      )
+      .join('\n');
+
+    const prompt = `You are an expert inventory categorizer for a narrative RPG.
+For each numbered item below, choose exactly one category from this list: ${STANDARD_CATEGORIES.join(', ')}.
+
+Respond with JSON only - an array with one entry per item in this shape:
+[{"index":0,"category":"equipment","confidence":0.9,"rationale":"Reason"}]
+- index must match the item number below.
+- confidence must be between 0 and 1.
+- Do not include any text outside the JSON array.
+
+Items:
+${itemList}
+`;
+
+    const response = await client.generateContent(prompt);
+    const parsed = parseAIBatchResponse(response.content);
+
+    if (!parsed) {
+      logger.warn('InventoryCategorizer', 'Batch AI response invalid, using fallback', {
+        count: inputs.length,
+        raw: truncate(response.content, 200),
+      });
+      return inputs.map((input) => determineFallbackCategory(input.name, input.description));
+    }
+
+    const byIndex = new Map<number, AIBatchEntryShape>();
+    for (const entry of parsed) {
+      if (entry && typeof entry.index === 'number') {
+        byIndex.set(entry.index, entry);
+      }
+    }
+
+    return inputs.map((input, index) => {
+      const entry = byIndex.get(index);
+      if (entry && STANDARD_CATEGORIES.includes(entry.category)) {
+        return {
+          categoryId: entry.category,
+          confidence: Math.min(Math.max(entry.confidence ?? 0.8, 0), 1),
+          rationale: entry.rationale,
+          model: config.modelName,
+          source: 'ai',
+        };
+      }
+      return determineFallbackCategory(input.name, input.description);
+    });
+  } catch (error) {
+    logger.error('InventoryCategorizer', 'Batch AI categorization failed', error);
+    return inputs.map((input) => determineFallbackCategory(input.name, input.description));
   }
 }

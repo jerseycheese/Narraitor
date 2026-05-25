@@ -261,11 +261,19 @@ Each acquired item should include:
 - description: Brief description of the item (optional but recommended)
 - quantity: Number of items acquired (default: 1)
 - acquisitionMethod: How the item was acquired - one of: "loot", "quest", "purchase", "craft", "reward", "gift", "manual", "unknown"
+- categoryHint: The item's category, inferred from story context - one of:
+  - "equipment": weapons, armor, tools, devices, gear carried and reused
+  - "consumables": food, potions, medicine, fuel, single-use items
+  - "quest-items": plot-critical items, keys, sigils, relics that drive the story
+  - "valuables": currency, gems, treasure, trade goods
+  - "documents": books, letters, maps, notes, records
+  - "personal": keepsakes, mementos, clothing, accessories, character-specific effects
+  - "miscellaneous": anything that fits none of the above
 
 Examples:
-- Character finds a sword: Include {name: "Ancient Sword", description: "A blade from ages past", quantity: 1, acquisitionMethod: "loot"}
-- Character buys 3 potions: Include {name: "Healing Potion", description: "Restores health", quantity: 3, acquisitionMethod: "purchase"}
-- Character receives a key as reward: Include {name: "Iron Key", description: "Opens the eastern gate", quantity: 1, acquisitionMethod: "reward"}
+- Character finds a sword: Include {name: "Ancient Sword", description: "A blade from ages past", quantity: 1, acquisitionMethod: "loot", categoryHint: "equipment"}
+- Character buys 3 potions: Include {name: "Healing Potion", description: "Restores health", quantity: 3, acquisitionMethod: "purchase", categoryHint: "consumables"}
+- Character receives a key as reward: Include {name: "Iron Key", description: "Opens the eastern gate", quantity: 1, acquisitionMethod: "reward", categoryHint: "quest-items"}
 
 Important:
 - Only include items the character ACTUALLY ACQUIRES AND KEEPS during this segment (not items they merely see, borrow momentarily, use as environmental tools, or were already carrying)
@@ -275,6 +283,7 @@ Important:
 - Example: if "Iron Sword" is already present, do not add another "Iron Sword" later. Either refine the original description or increase the quantity when the character truly acquires additional swords.
 - Be specific with item names and descriptions
 - Use an appropriate acquisitionMethod for the narrative context
+- Always include a categoryHint - you understand the item's role in the story better than a separate pass could
 - If the narrative mentions vague supplies, still include the best concrete description you can infer
 
 The items will be automatically added to the character's inventory with proper categorization and journal entries.`;

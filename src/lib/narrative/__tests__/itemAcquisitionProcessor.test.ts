@@ -2,11 +2,12 @@
 
 import { processAcquiredItems } from '../itemAcquisitionProcessor';
 import { useInventoryStore } from '@/state/inventoryStore';
-import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
+import { categorizeInventoryItemsClient } from '@/lib/inventory/categorizeInventoryItemClient';
 import { checkItemSimilarityClient } from '@/lib/inventory/checkItemSimilarityClient';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
 import type { InventoryItem } from '@/types/inventory.types';
+import type { InventoryCategorizationResponse } from '@/lib/inventory/categorizeInventoryItemClient';
 import { logger } from '@/lib/utils/logger';
 
 // Mock the dependencies
@@ -24,9 +25,16 @@ describe('itemAcquisitionProcessor', () => {
   let mockAddItem: jest.Mock;
   let mockGetCharacterItems: jest.Mock;
   let mockUpdateItemQuantity: jest.Mock;
-  const mockCategorize = categorizeInventoryItemClient as jest.MockedFunction<
-    typeof categorizeInventoryItemClient
+  const mockCategorizeBatch = categorizeInventoryItemsClient as jest.MockedFunction<
+    typeof categorizeInventoryItemsClient
   >;
+  // Tests configure per-item categorization through mockCategorize; the batch
+  // client mock below fans each batched item out to it so existing single-item
+  // expectations (call args, counts, order, rejection) keep working unchanged.
+  const mockCategorize = jest.fn<
+    Promise<InventoryCategorizationResponse>,
+    [{ name: string; description?: string }]
+  >();
   const mockCheckSimilarity = checkItemSimilarityClient as jest.MockedFunction<
     typeof checkItemSimilarityClient
   >;
@@ -35,6 +43,20 @@ describe('itemAcquisitionProcessor', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     characterItems = [] as InventoryItem[];
+
+    // Fan a batched categorization request out to the per-item mockCategorize,
+    // preserving order so mockResolvedValueOnce chains line up with inputs. If
+    // mockCategorize rejects, the whole batch rejects (matching the real client
+    // throwing on a failed request, which the processor then falls back from).
+    mockCategorizeBatch.mockImplementation(async (items) => {
+      const results: InventoryCategorizationResponse[] = [];
+      for (const item of items) {
+        results.push(
+          await mockCategorize({ name: item.name, description: item.description })
+        );
+      }
+      return results;
+    });
 
     // Mock AI similarity checker with smart matching logic
     mockCheckSimilarity.mockImplementation(async ({ name1, name2 }) => {
@@ -137,6 +159,92 @@ describe('itemAcquisitionProcessor', () => {
           acquiredAt: expect.any(String),
         },
       });
+    });
+
+    it('uses a valid category hint without calling the categorization client', async () => {
+      const itemMetadata: AcquiredItemMetadata = {
+        name: 'Rusty Key',
+        description: 'Opens the ancient door',
+        quantity: 1,
+        acquisitionMethod: 'loot',
+        categoryHint: 'quest-items',
+      };
+
+      await processAcquiredItems([itemMetadata], 'character-123', 'session-456');
+
+      expect(mockCategorizeBatch).not.toHaveBeenCalled();
+      expect(mockCategorize).not.toHaveBeenCalled();
+      expect(mockAddItem).toHaveBeenCalledWith(
+        'character-123',
+        expect.objectContaining({
+          name: 'Rusty Key',
+          categorization: expect.objectContaining({
+            categoryId: 'quest-items',
+            source: 'narrative-context',
+          }),
+        })
+      );
+    });
+
+    it('falls back to AI categorization when the hint is invalid', async () => {
+      const itemMetadata = {
+        name: 'Mystery Box',
+        description: 'Unmarked crate',
+        quantity: 1,
+        acquisitionMethod: 'loot',
+        categoryHint: 'not-a-real-category',
+      } as unknown as AcquiredItemMetadata;
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'miscellaneous',
+        source: 'ai',
+        confidence: 0.6,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems([itemMetadata], 'character-123', 'session-456');
+
+      expect(mockCategorize).toHaveBeenCalledTimes(1);
+      expect(mockAddItem).toHaveBeenCalledWith(
+        'character-123',
+        expect.objectContaining({
+          categorization: expect.objectContaining({ source: 'ai' }),
+        })
+      );
+    });
+
+    it('only sends hint-less items to the batch categorization client', async () => {
+      const items: AcquiredItemMetadata[] = [
+        {
+          name: 'Iron Sword',
+          description: 'A sturdy blade',
+          quantity: 1,
+          acquisitionMethod: 'loot',
+          categoryHint: 'equipment',
+        },
+        {
+          name: 'Strange Trinket',
+          description: 'Hard to place',
+          quantity: 1,
+          acquisitionMethod: 'loot',
+        },
+      ];
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'miscellaneous',
+        source: 'ai',
+        confidence: 0.5,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems(items, 'character-123', 'session-456');
+
+      // Batched once, carrying only the hint-less item.
+      expect(mockCategorizeBatch).toHaveBeenCalledTimes(1);
+      expect(mockCategorizeBatch).toHaveBeenCalledWith([
+        { name: 'Strange Trinket', description: 'Hard to place' },
+      ]);
+      expect(mockAddItem).toHaveBeenCalledTimes(2);
     });
 
     it('handles multiple items acquired at once', async () => {
