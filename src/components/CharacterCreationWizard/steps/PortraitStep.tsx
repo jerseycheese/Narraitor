@@ -128,7 +128,7 @@ export function PortraitStep({
 
   return (
     <div className="component-portrait-step">
-      <div>
+      <div className="portrait-step-header">
         <h3>Character Portrait</h3>
         <p>
           {data.characterData.background?.isKnownFigure
@@ -147,9 +147,9 @@ export function PortraitStep({
         />
       )}
 
-      <div>
+      <div className="portrait-step-body">
         {isGenerating ? (
-          <div>
+          <div className="portrait-step-loading">
             <LoadingState variant="spinner" size="md" centered={false} />
           </div>
         ) : (
@@ -173,12 +173,12 @@ export function PortraitStep({
         )}
 
         {portrait.type === 'ai-generated' && portrait.url && (
-          <div>
-            <p>
+          <div className="portrait-step-success">
+            <p className="portrait-step-success-label">
               <CheckCircle aria-hidden="true" />
               Portrait generated successfully
             </p>
-            <div>
+            <div className="portrait-step-actions">
               <button
                 type="button"
                 onClick={handleGeneratePortrait}
@@ -193,7 +193,7 @@ export function PortraitStep({
           </div>
         )}
 
-        <p>
+        <p className="portrait-step-hint">
           Portrait generation is optional. You can skip portrait generation and
           continue.
         </p>

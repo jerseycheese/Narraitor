@@ -107,10 +107,10 @@ export default function FinalizeStep({
         description="Review your world configuration before creating it. You can go back to make changes or proceed to create your world."
       >
 
-      <div>
+      <div className="wizard-review-summary">
         <div data-tutorial="finalize-review">
           <h3 className={wizardStyles.subheading}>Basic Information</h3>
-          <div>
+          <div className="wizard-review-fields">
             <DataField
               label="Name"
               value={<span data-testid="review-world-name">{worldData.name}</span>}
@@ -130,7 +130,10 @@ export default function FinalizeStep({
         </div>
 
         {/* World Image Section */}
-        <div className={wizardStyles.divider} data-tutorial="finalize-image">
+        <div
+          className={`${wizardStyles.divider} wizard-image-section`}
+          data-tutorial="finalize-image"
+        >
           <h3 className={wizardStyles.subheading}>World Image</h3>
           {onUpdateWorldData ? (
             <ImageGenerationSection
@@ -175,41 +178,43 @@ export default function FinalizeStep({
         <div className={wizardStyles.divider} data-testid="review-attributes-section" data-tutorial="finalize-attributes">
           <h3 className={wizardStyles.subheading}>Attributes ({worldData.attributes?.length || 0})</h3>
         {worldData.attributes && worldData.attributes.length > 0 ? (
-          <div>
+          <div className="wizard-review-custom-list">
             {worldData.attributes.map((attr, index) => (
-              <div key={index} className={`${wizardStyles.card.base}`} data-testid={`review-attribute-${index}`}>
-                <div>{attr.name}</div>
-                <div>{attr.description}</div>
-                <div>
+              <div key={index} className={`${wizardStyles.card.base} wizard-review-card`} data-testid={`review-attribute-${index}`}>
+                <div className="wizard-review-card-meta">{attr.name}</div>
+                <div className="wizard-review-card-detail">{attr.description}</div>
+                <div className="wizard-review-card-range">
                   Range: {attr.minValue} - {attr.maxValue}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p>No attributes selected</p>
+          <div className="wizard-empty-state">
+            <p>No attributes selected</p>
+          </div>
         )}
         </div>
 
         <div className={wizardStyles.divider} data-testid="review-skills-section" data-tutorial="finalize-skills">
           <h3 className={wizardStyles.subheading}>Skills ({worldData.skills?.length || 0})</h3>
         {worldData.skills && worldData.skills.length > 0 ? (
-          <div>
+          <div className="wizard-review-custom-list">
             {worldData.skills.map((skill, index) => (
-              <div key={index} className={`${wizardStyles.card.base}`} data-testid={`review-skill-${index}`}>
-                <div>
+              <div key={index} className={`${wizardStyles.card.base} wizard-review-card`} data-testid={`review-skill-${index}`}>
+                <div className="wizard-review-card-meta">
                   <span>{skill.name}</span>
                   <span className={`${wizardStyles.badge.base} ${
                     skill.difficulty === 'easy' ? wizardStyles.badge.success :
-                    skill.difficulty === 'medium' ? wizardStyles.badge.warning : 
+                    skill.difficulty === 'medium' ? wizardStyles.badge.warning :
                     wizardStyles.badge.danger
                   }`}>
                     {skill.difficulty}
                   </span>
                 </div>
-                <div>{skill.description}</div>
+                <div className="wizard-review-card-detail">{skill.description}</div>
                 {skill.attributeIds && skill.attributeIds.length > 0 && (
-                  <div>
+                  <div className="wizard-review-card-range">
                     Linked to: {skill.attributeIds
                       .map(id => worldData.attributes?.find(a => a.id === id)?.name)
                       .filter(Boolean)
@@ -220,7 +225,9 @@ export default function FinalizeStep({
             ))}
           </div>
         ) : (
-          <p>No skills selected</p>
+          <div className="wizard-empty-state">
+            <p>No skills selected</p>
+          </div>
         )}
         </div>
       </div>
@@ -232,8 +239,8 @@ export default function FinalizeStep({
         </div>
       )}
 
-      <div>
-        <div>
+      <div className="wizard-button-row">
+        <div className="wizard-nav-group">
           <Button
             type="button"
             onClick={onCancel || (() => window.history.back())}
@@ -241,7 +248,7 @@ export default function FinalizeStep({
           >
             Cancel
           </Button>
-          
+
           {onBack && (
             <Button
               type="button"

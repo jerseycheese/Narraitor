@@ -315,10 +315,10 @@ export default function AttributeReviewStep({
           </div>
         )}
 
-        <div>
-          <div>
+        <div className="wizard-review-list">
+          <div className="wizard-review-suggestions">
             {localSuggestions.length === 0 ? (
-              <div>
+              <div className="wizard-empty-state">
                 <p>No attribute suggestions available</p>
                 <p>
                   You can add attributes to your world later in the world
@@ -329,14 +329,14 @@ export default function AttributeReviewStep({
               localSuggestions.map((suggestion, index) => (
                 <div
                   key={index}
-                  className={wizardStyles.card.base}
+                  className={`${wizardStyles.card.base} wizard-review-card`}
                   data-testid={`attribute-card-${index}`}
                   {...(index === 0
                     ? { 'data-tutorial': 'attribute-suggestions' }
                     : {})}
                 >
-                  <div>
-                    <div>
+                  <div className="wizard-review-card-head">
+                    <div className="wizard-review-card-meta">
                       <span>{suggestion.name}</span>
                       {suggestion.category && (
                         <>
@@ -346,7 +346,7 @@ export default function AttributeReviewStep({
                       )}
                     </div>
 
-                    <div>
+                    <div className="wizard-review-card-tools">
                       <Button
                         type="button"
                         variant="link"
@@ -378,6 +378,7 @@ export default function AttributeReviewStep({
                   {suggestion.showDetails && (
                     <div
                       key={`attribute-expanded-${index}`}
+                      className="wizard-review-card-detail"
                       onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
                     >
                       <WizardFormGroup label="Name">
@@ -433,10 +434,10 @@ export default function AttributeReviewStep({
           </div>
 
           {/* Custom Attributes Section */}
-          <div data-tutorial="attribute-custom">
-            <div>
-              <div>
-                <h3>Custom Attributes</h3>
+          <div className="wizard-review-custom" data-tutorial="attribute-custom">
+            <div className="wizard-review-custom-head">
+              <div className="wizard-review-custom-heading">
+                <h3 className="wizard-subheading">Custom Attributes</h3>
                 <p>
                   Create your own unique attributes for this world (
                   {acceptedCount}/6 slots used)
@@ -454,7 +455,7 @@ export default function AttributeReviewStep({
             </div>
 
             {customAttributes.length === 0 && !isCreatingCustomAttribute ? (
-              <div>
+              <div className="wizard-empty-state">
                 <p>No custom attributes yet</p>
                 <p>
                   {acceptedCount < 6
@@ -463,22 +464,22 @@ export default function AttributeReviewStep({
                 </p>
               </div>
             ) : (
-              <div>
+              <div className="wizard-review-custom-list">
                 {customAttributes.map((attribute) => (
                   <div
                     key={attribute.id}
-                    className={`${wizardStyles.card.base}`}
+                    className={`${wizardStyles.card.base} wizard-review-card`}
                     data-testid={`custom-attribute-card-${attribute.id}`}
                   >
-                    <div>
-                      <div>
+                    <div className="wizard-review-card-head">
+                      <div className="wizard-review-card-meta">
                         <span>{attribute.name}</span>
                         <span>Custom</span>
                         {attribute.category && (
                           <span>{attribute.category}</span>
                         )}
                       </div>
-                      <div>
+                      <div className="wizard-review-card-tools">
                         <Button
                           type="button"
                           onClick={() =>
@@ -503,7 +504,7 @@ export default function AttributeReviewStep({
                         </Button>
                       </div>
                     </div>
-                    <div>{attribute.description}</div>
+                    <div className="wizard-review-card-detail">{attribute.description}</div>
                   </div>
                 ))}
               </div>
@@ -511,7 +512,7 @@ export default function AttributeReviewStep({
 
             {/* Custom Attribute Editor */}
             {isCreatingCustomAttribute && (
-              <div data-testid="custom-attribute-editor">
+              <div className="wizard-custom-editor" data-testid="custom-attribute-editor">
                 <AttributeEditor
                   worldId={worldData.id || ''}
                   mode={editingCustomAttributeId ? 'edit' : 'create'}
@@ -535,24 +536,32 @@ export default function AttributeReviewStep({
         </div>
 
         <div
+          className="wizard-slot-summary"
           data-testid="attribute-count-summary"
           data-tutorial="attribute-summary"
         >
-          <div>
-            <div>
+          <div className="wizard-slot-summary-text">
+            <div className="wizard-slot-summary-count">
               <span>Attributes Selected: {acceptedCount} / 6</span>
               {acceptedCount >= 6 && <span>(Maximum reached)</span>}
             </div>
-            <div>
+            <div className="wizard-slot-summary-note">
               {acceptedCount < 6
                 ? `${6 - acceptedCount} slot${6 - acceptedCount !== 1 ? 's' : ''} available`
                 : 'All slots filled'}
             </div>
           </div>
-          <div>
-            <div>
+          <div className="wizard-slot-meter-wrap">
+            <div className="wizard-slot-meter">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} />
+                <div
+                  key={i}
+                  className={
+                    i < acceptedCount
+                      ? 'wizard-slot-cell wizard-slot-cell-filled'
+                      : 'wizard-slot-cell'
+                  }
+                />
               ))}
             </div>
           </div>
@@ -566,18 +575,19 @@ export default function AttributeReviewStep({
       {/* Clear Suggestions Confirmation Dialog */}
       {showClearConfirmation && (
         <div
+          className="wizard-dialog-overlay"
           data-testid="clear-suggestions-dialog"
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="clear-dialog-title"
         >
-          <div>
+          <div className="wizard-dialog-panel">
             <h3 id="clear-dialog-title">Clear Suggestions?</h3>
             <p>
               This will remove all attribute suggestions. You can still add
               custom attributes or regenerate suggestions later.
             </p>
-            <div>
+            <div className="wizard-dialog-actions">
               <Button
                 type="button"
                 onClick={() => setShowClearConfirmation(false)}

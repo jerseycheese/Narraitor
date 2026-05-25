@@ -2104,6 +2104,660 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Step-internal widgets (#1265)
+
+   The wizard shell + shared hooks (cards, badges, forms, empty
+   states) are already DS-aware. This section gives the step-INTERNAL
+   widgets — review cards, custom attribute/skill editors, point-pool
+   allocation, portrait controls, image review, slot meters and the
+   inline confirm alert — a structural DS1/DS2/DS3 treatment so they
+   read as part of each tack instead of one default widget recolored
+   three ways.
+
+   DS1 — Drafting Table: sharp 2px chrome, ruled passages, accent
+     side-rules, square slot cells, monospace eyebrows.
+   DS2 — Warm Earth: soft 1rem radii, inset surface cards, pill slot
+     dots, serif voice, no hard rules.
+   DS3 — Command Strip: dense 4px chrome, dotted radial-gradient
+     separators, compact square cells, monospace labels.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Shared layout (theme-neutral) ─── */
+
+.wizard-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.wizard-review-suggestions,
+.wizard-review-custom-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.wizard-review-card-head {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wizard-review-card-meta {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.wizard-review-card-meta > span:nth-child(n + 2):not(.wizard-badge) {
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-review-card-tools {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.wizard-review-card-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-review-card-range {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.wizard-review-detail-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (width <= 768px) {
+  .wizard-review-detail-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wizard-skill-attr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--space-8) * 5), 1fr));
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.wizard-skill-attr-option {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.wizard-review-custom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.wizard-review-custom-head {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wizard-review-custom-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.wizard-review-custom-heading p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-custom-editor {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.wizard-custom-editor h2 {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ─── Slot meter (selected / available capacity) ─── */
+
+.wizard-slot-summary {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.wizard-slot-summary-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.wizard-slot-summary-count {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.wizard-slot-summary-note {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.wizard-slot-meter {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-1);
+}
+
+.wizard-slot-cell {
+  width: var(--space-3);
+  height: var(--space-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.wizard-slot-cell-filled {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+/* ─── Inline confirm alert (clear suggestions) ─── */
+
+.wizard-dialog-overlay {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-4);
+}
+
+.wizard-dialog-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.wizard-dialog-panel h3 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.wizard-dialog-panel p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* ─── Finalize review summary ─── */
+
+.wizard-review-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.wizard-review-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ─── Portrait controls / frame ─── */
+
+.portrait-step-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.portrait-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.portrait-step-success {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.portrait-step-success-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.portrait-step-success-label svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.portrait-step-actions {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-2);
+}
+
+.portrait-step-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── Skill allocation (character) ─── */
+
+.wizard-skill-summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+@media (width <= 768px) {
+  .wizard-skill-summary-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wizard-skill-allocation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.wizard-skill-card-head {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wizard-skill-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.wizard-skill-card-info > span:first-child {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.wizard-skill-card-info p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-skill-card-linked {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.wizard-skill-level {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.wizard-skill-level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* ════════════════════ DS1 — Drafting Table ════════════════════ */
+
+[data-theme="ds1"] .wizard-page .wizard-review-card-detail,
+[data-theme="ds1"] .wizard-page .wizard-skill-level {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-review-detail-row {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--color-accent);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-skill-attr-option {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-custom-editor {
+  border-radius: 2px;
+  border-width: 2px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: var(--space-5);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-custom-editor h2 {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-custom-editor input,
+[data-theme="ds1"] .wizard-page .wizard-custom-editor textarea,
+[data-theme="ds1"] .wizard-page .wizard-custom-editor select {
+  border-radius: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-slot-summary {
+  border-top-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-slot-cell {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-dialog-panel {
+  border-radius: 2px;
+  border-width: 2px;
+  border-left: 4px solid var(--color-accent);
+}
+
+[data-theme="ds1"] .wizard-page .component-portrait-step .component-character-portrait {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .component-portrait-step button {
+  border-radius: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .portrait-step-success {
+  border-radius: 2px;
+  border-width: 2px;
+  border-left: 4px solid var(--color-success);
+}
+
+[data-theme="ds1"] .wizard-page .component-point-pool-manager .point-pool-allocation {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .point-pool-allocation-value,
+[data-theme="ds1"] .wizard-page .range-slider-level-label {
+  font-family: var(--font-system);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-error-container {
+  border-radius: 2px;
+  border-width: 2px;
+  border-left: 4px solid var(--color-danger);
+}
+
+/* ════════════════════ DS2 — Warm Earth ════════════════════ */
+
+[data-theme="ds2"] .wizard-page .wizard-review-card-detail {
+  padding: var(--space-4);
+  border-radius: 1rem;
+  background: var(--color-canvas);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-skill-attr-option {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-custom-editor {
+  border-radius: 1rem;
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
+  background: var(--color-canvas);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-custom-editor h2 {
+  font-family: var(--font-narrative);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-custom-editor input,
+[data-theme="ds2"] .wizard-page .wizard-custom-editor textarea,
+[data-theme="ds2"] .wizard-page .wizard-custom-editor select {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-slot-summary {
+  border-top: none;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-slot-cell {
+  border-radius: var(--radius-full);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-slot-summary-note {
+  font-family: var(--font-narrative);
+  font-style: italic;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-dialog-panel {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .component-portrait-step .component-character-portrait {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .component-portrait-step button {
+  border-radius: var(--radius-full);
+  padding: var(--space-2_5) var(--space-5);
+}
+
+[data-theme="ds2"] .wizard-page .portrait-step-success {
+  border-radius: 1rem;
+  background: var(--color-accent-soft);
+}
+
+[data-theme="ds2"] .wizard-page .portrait-step-hint {
+  font-family: var(--font-narrative);
+  font-style: italic;
+}
+
+[data-theme="ds2"] .wizard-page .component-point-pool-manager .point-pool-allocation {
+  border-radius: 1rem;
+  padding: var(--space-4);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-error-container {
+  border-radius: 1rem;
+}
+
+/* ════════════════════ DS3 — Command Strip ════════════════════ */
+
+[data-theme="ds3"] .wizard-page .wizard-review-list {
+  gap: var(--space-4);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-review-suggestions,
+[data-theme="ds3"] .wizard-page .wizard-review-custom-list,
+[data-theme="ds3"] .wizard-page .wizard-skill-allocation-list {
+  gap: var(--space-2);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-review-card-detail,
+[data-theme="ds3"] .wizard-page .wizard-skill-level {
+  position: relative;
+  padding-top: var(--space-3);
+  gap: var(--space-2);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-review-card-detail::before,
+[data-theme="ds3"] .wizard-page .wizard-skill-level::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 8px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-skill-attr-option {
+  border-radius: 4px;
+  padding: var(--space-1_5);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-custom-editor {
+  border-radius: 4px;
+  padding: var(--space-3);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-custom-editor h2 {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-custom-editor input,
+[data-theme="ds3"] .wizard-page .wizard-custom-editor textarea,
+[data-theme="ds3"] .wizard-page .wizard-custom-editor select {
+  border-radius: 4px;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-slot-cell {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: 1px;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-slot-summary-count,
+[data-theme="ds3"] .wizard-page .wizard-skill-level-row {
+  font-family: var(--font-system);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-dialog-panel {
+  border-radius: 4px;
+  border-style: dashed;
+}
+
+[data-theme="ds3"] .wizard-page .component-portrait-step {
+  gap: var(--space-3);
+}
+
+[data-theme="ds3"] .wizard-page .component-portrait-step .component-character-portrait {
+  border-radius: 4px;
+}
+
+[data-theme="ds3"] .wizard-page .component-portrait-step button {
+  border-radius: 4px;
+  padding: var(--space-1_5) var(--space-3);
+}
+
+[data-theme="ds3"] .wizard-page .portrait-step-success {
+  border-radius: 4px;
+  border-style: dashed;
+}
+
+[data-theme="ds3"] .wizard-page .component-point-pool-manager {
+  gap: var(--space-2);
+}
+
+[data-theme="ds3"] .wizard-page .component-point-pool-manager .point-pool-allocation {
+  border-radius: 4px;
+  padding: var(--space-2_5);
+}
+
+[data-theme="ds3"] .wizard-page .point-pool-allocation-name,
+[data-theme="ds3"] .wizard-page .point-pool-allocation-value {
+  font-family: var(--font-system);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-error-container {
+  border-radius: 4px;
+  border-style: dashed;
+}
+
 /* ----------------------------------------------------------------------------
  * GuidedFirstTimeExperience — first-run wizard on the home empty state.
  * Renders inside WizardContainer with a `component-guided-first-time` class
