@@ -1,8 +1,35 @@
 import { defineConfig, devices } from '@playwright/test';
+import { execSync } from 'node:child_process';
+
+/**
+ * Resolve the base URL for local runs.
+ *
+ * CI always serves on 3000 (see the webServer block below) so visual baselines
+ * stay stable. Locally, follow this checkout's dev-server port so running tests
+ * from a git worktree targets that worktree's server, not a stray 3000.
+ * An explicit PLAYWRIGHT_BASE_URL always wins.
+ */
+function resolveBaseURL(): string {
+  if (process.env.PLAYWRIGHT_BASE_URL) {
+    return process.env.PLAYWRIGHT_BASE_URL;
+  }
+  if (process.env.CI) {
+    return 'http://localhost:3000';
+  }
+  try {
+    const port = execSync('node scripts/worktree-port.js', { encoding: 'utf8' }).trim();
+    if (port) {
+      return `http://localhost:${port}`;
+    }
+  } catch {
+    // Fall back to the canonical port below.
+  }
+  return 'http://localhost:3000';
+}
 
 /**
  * Playwright Configuration for Visual Regression Testing
- * 
+ *
  * Configures Playwright for consistent visual screenshot comparison
  * across multiple browsers and viewports. Optimized for CI/CD environments.
  */
@@ -49,7 +76,7 @@ export default defineConfig({
   // Global test setup
   use: {
     // Base URL for all tests
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    baseURL: resolveBaseURL(),
     
     // Reduced timeouts for faster execution
     actionTimeout: 10 * 1000,
