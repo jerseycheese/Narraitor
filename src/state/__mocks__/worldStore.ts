@@ -39,6 +39,7 @@ const createError = (
   message,
   retryable,
   type,
+  severity: 'error',
 });
 
 const syncWorldToEntities = (worldId: string) => {

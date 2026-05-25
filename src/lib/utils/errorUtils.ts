@@ -8,18 +8,28 @@
  */
 export enum ErrorType {
   NETWORK = 'network',
-  SERVICE = 'service', 
+  SERVICE = 'service',
   VALIDATION = 'validation',
   AUTH = 'auth',
   UNKNOWN = 'unknown'
 }
 
+/**
+ * User-facing severity, ordered from most to least prominent.
+ * Drives how prominently an error is displayed (see ErrorDisplay):
+ * critical is the most attention-grabbing, info the least intrusive.
+ */
+export type ErrorSeverity = 'critical' | 'error' | 'warning' | 'info';
+
 export interface UserFriendlyError {
   title: string;
   message: string;
+  /** Plain-language next step the user can take to resolve the issue. */
+  suggestion?: string;
   actionLabel?: string;
   retryable: boolean;
   type: ErrorType;
+  severity: ErrorSeverity;
 }
 
 /**
@@ -60,9 +70,11 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     return {
       title: 'Connection Problem',
       message: 'Unable to connect. Please check your internet connection.',
+      suggestion: 'Make sure you are online, then try again.',
       actionLabel: 'Try Again',
       retryable: true,
-      type: ErrorType.NETWORK
+      type: ErrorType.NETWORK,
+      severity: 'error'
     };
   }
 
@@ -71,9 +83,11 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     return {
       title: 'Request Timed Out',
       message: 'The request is taking too long. Please try again.',
+      suggestion: 'This is usually temporary — wait a moment and try again.',
       actionLabel: 'Try Again',
       retryable: true,
-      type: ErrorType.NETWORK
+      type: ErrorType.NETWORK,
+      severity: 'warning'
     };
   }
 
@@ -82,9 +96,11 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     return {
       title: 'Too Many Requests',
       message: 'Too many requests. Please wait a moment before trying again.',
+      suggestion: 'Wait a minute or so before trying again.',
       actionLabel: 'Try Again Later',
       retryable: true,
-      type: ErrorType.SERVICE
+      type: ErrorType.SERVICE,
+      severity: 'warning'
     };
   }
 
@@ -93,8 +109,10 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     return {
       title: 'Authentication Error',
       message: 'Authentication failed. Please check your credentials.',
+      suggestion: 'Check that your API key is set correctly in Settings.',
       retryable: false,
-      type: ErrorType.AUTH
+      type: ErrorType.AUTH,
+      severity: 'critical'
     };
   }
 
@@ -105,8 +123,10 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     return {
       title: 'Validation Error',
       message: 'The provided data is invalid. Please check your input and try again.',
+      suggestion: 'Review the highlighted fields and correct any invalid entries.',
       retryable: false,
-      type: ErrorType.VALIDATION
+      type: ErrorType.VALIDATION,
+      severity: 'warning'
     };
   }
 
@@ -114,9 +134,11 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   return {
     title: 'Something Went Wrong',
     message: 'An unexpected error occurred. Please try again.',
+    suggestion: 'If this keeps happening, try reloading the page.',
     actionLabel: 'Try Again',
     retryable: isRetryableError(error),
-    type: ErrorType.UNKNOWN
+    type: ErrorType.UNKNOWN,
+    severity: 'error'
   };
 }
 
@@ -130,6 +152,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
  * @param message - Detailed error message for user
  * @param type - Error type category (defaults to VALIDATION)
  * @param retryable - Whether the operation can be retried (defaults to false)
+ * @param options - Optional severity and suggested next step
  * @returns UserFriendlyError object
  *
  * @example
@@ -145,13 +168,16 @@ export function createStoreError(
   title: string,
   message: string,
   type: ErrorType = ErrorType.VALIDATION,
-  retryable = false
+  retryable = false,
+  options: { severity?: ErrorSeverity; suggestion?: string } = {}
 ): UserFriendlyError {
   return {
     title,
     message,
     retryable,
     type,
+    severity: options.severity ?? 'error',
+    ...(options.suggestion && { suggestion: options.suggestion }),
   };
 }
 
@@ -201,7 +227,9 @@ export function createAPIErrorResponse(
       error: friendlyError.message,
       title: friendlyError.title,
       type: friendlyError.type,
+      severity: friendlyError.severity,
       retryable: friendlyError.retryable,
+      ...(friendlyError.suggestion && { suggestion: friendlyError.suggestion }),
       ...(friendlyError.actionLabel && { actionLabel: friendlyError.actionLabel }),
       ...(details && { details })
     },

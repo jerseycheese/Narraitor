@@ -22,8 +22,8 @@ const meta: Meta<typeof ErrorDisplay> = {
     },
     severity: {
       control: 'select',
-      options: ['error', 'warning', 'info'],
-      description: 'Severity level affecting colors and styling',
+      options: ['critical', 'error', 'warning', 'info'],
+      description: 'Severity level affecting colors and prominence',
     },
     title: {
       control: 'text',
@@ -32,6 +32,10 @@ const meta: Meta<typeof ErrorDisplay> = {
     message: {
       control: 'text',
       description: 'The error message to display',
+    },
+    suggestion: {
+      control: 'text',
+      description: 'Plain-language suggested next step shown below the message',
     },
     showRetry: {
       control: 'boolean',
@@ -125,6 +129,51 @@ export const AllVariants: Story = {
   ),
 };
 
+// Severity ordering: critical is the most prominent, info the least intrusive.
+// Each shows a plain-language suggested next step under the message.
+export const SeverityLevels: Story = {
+  render: (args) => (
+    <div>
+      <ErrorDisplay
+        variant="section"
+        severity="critical"
+        title="Authentication Error"
+        message="We couldn't verify your AI service credentials."
+        suggestion="Check that your API key is set correctly in Settings."
+        showDismiss
+        onDismiss={args.onDismiss}
+      />
+      <ErrorDisplay
+        variant="section"
+        severity="error"
+        title="Connection Problem"
+        message="Unable to connect. Please check your internet connection."
+        suggestion="Make sure you are online, then try again."
+        showRetry
+        onRetry={args.onRetry}
+      />
+      <ErrorDisplay
+        variant="section"
+        severity="warning"
+        title="Request Timed Out"
+        message="The request is taking too long."
+        suggestion="This is usually temporary — wait a moment and try again."
+        showRetry
+        onRetry={args.onRetry}
+      />
+      <ErrorDisplay
+        variant="section"
+        severity="info"
+        title="Heads Up"
+        message="Some features are unavailable in offline mode."
+        suggestion="Reconnect to use AI-assisted tools."
+        showDismiss
+        onDismiss={args.onDismiss}
+      />
+    </div>
+  ),
+};
+
 // Form validation example
 export const FormValidation: Story = {
   render: () => (
@@ -175,6 +224,7 @@ export const Playground: Story = {
     severity: 'error',
     title: 'Operation Failed',
     message: 'Something went wrong while processing your request.',
+    suggestion: 'Try again. If the problem continues, reload the page.',
     showRetry: true,
     showDismiss: true,
   },

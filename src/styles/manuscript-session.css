@@ -3123,6 +3123,114 @@ body.manuscript-overlay-open {
   background: hsl(var(--destructive) / 6%);
 }
 
+/* ===========================================================================
+   Issue #222 — severity-aware error display.
+   Default ("error") rendering is intentionally left untouched above; the rules
+   below only re-color the WARNING / INFO severities and add prominence to
+   CRITICAL. Selector lists cover DS3 (base), DS1 and DS2 so the accent wins
+   over each theme's destructive-coloured section rule.
+   =========================================================================== */
+
+/* Suggested next step — secondary to the message, same in every variant. */
+.error-display-suggestion {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-2_5);
+}
+
+/* Inline errors previously had no colour; give them a severity accent. */
+.error-display-inline {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin: var(--space-1) 0 0;
+}
+
+.error-display-inline.error-display-error,
+.error-display-inline.error-display-critical {
+  color: hsl(var(--destructive));
+}
+
+.error-display-inline.error-display-warning {
+  color: hsl(var(--warning));
+}
+
+.error-display-inline.error-display-info {
+  color: hsl(var(--info));
+}
+
+/* --- WARNING (amber): less alarming than an error --- */
+.error-display-warning.error-display-section,
+[data-theme="ds1"] .error-display-warning.error-display-section,
+[data-theme="ds2"] .error-display-warning.error-display-section {
+  background: hsl(var(--warning) / 8%);
+  border-color: hsl(var(--warning) / 30%);
+}
+
+.error-display-warning .error-display-title,
+.error-display-warning .error-display-message,
+[data-theme="ds1"] .error-display-warning .error-display-title,
+[data-theme="ds1"] .error-display-warning .error-display-message,
+[data-theme="ds2"] .error-display-warning .error-display-title,
+[data-theme="ds2"] .error-display-warning .error-display-message {
+  color: hsl(var(--warning));
+}
+
+.error-display-warning .error-display-actions .error-display-retry,
+[data-theme="ds1"] .error-display-warning .error-display-actions .error-display-retry,
+[data-theme="ds2"] .error-display-warning .error-display-actions .error-display-retry {
+  background: hsl(var(--warning));
+  color: hsl(var(--warning-foreground));
+}
+
+.error-display-warning .error-display-actions .error-display-dismiss,
+[data-theme="ds1"] .error-display-warning .error-display-actions .error-display-dismiss,
+[data-theme="ds2"] .error-display-warning .error-display-actions .error-display-dismiss {
+  color: hsl(var(--warning));
+  border-color: hsl(var(--warning) / 30%);
+}
+
+/* --- INFO (blue): least intrusive --- */
+.error-display-info.error-display-section,
+[data-theme="ds1"] .error-display-info.error-display-section,
+[data-theme="ds2"] .error-display-info.error-display-section {
+  background: hsl(var(--info) / 7%);
+  border-color: hsl(var(--info) / 20%);
+}
+
+.error-display-info .error-display-title,
+.error-display-info .error-display-message,
+[data-theme="ds1"] .error-display-info .error-display-title,
+[data-theme="ds1"] .error-display-info .error-display-message,
+[data-theme="ds2"] .error-display-info .error-display-title,
+[data-theme="ds2"] .error-display-info .error-display-message {
+  color: hsl(var(--info));
+}
+
+.error-display-info .error-display-actions .error-display-retry,
+[data-theme="ds1"] .error-display-info .error-display-actions .error-display-retry,
+[data-theme="ds2"] .error-display-info .error-display-actions .error-display-retry {
+  background: hsl(var(--info));
+  color: hsl(var(--info-foreground));
+}
+
+.error-display-info .error-display-actions .error-display-dismiss,
+[data-theme="ds1"] .error-display-info .error-display-actions .error-display-dismiss,
+[data-theme="ds2"] .error-display-info .error-display-actions .error-display-dismiss {
+  color: hsl(var(--info));
+  border-color: hsl(var(--info) / 20%);
+}
+
+/* --- CRITICAL: same danger colour as an error, but more prominent --- */
+.error-display-critical.error-display-section,
+[data-theme="ds1"] .error-display-critical.error-display-section,
+[data-theme="ds2"] .error-display-critical.error-display-section {
+  border-width: 1px;
+  border-left-width: var(--space-1);
+  border-left-color: hsl(var(--destructive));
+  background: hsl(var(--destructive) / 12%);
+}
+
 /* Fix 69: DS1 tools menu items — compact, transparent background */
 [data-theme="ds1"] .manuscript-tools-menu-item {
   padding: var(--space-2) var(--space-2_5);

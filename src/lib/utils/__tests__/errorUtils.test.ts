@@ -180,6 +180,46 @@ describe('errorUtils', () => {
     });
   });
 
+  describe('getUserFriendlyError severity and suggestions', () => {
+    it('should classify auth failures as critical', () => {
+      const result = getUserFriendlyError(new Error('401 unauthorized'));
+      expect(result.severity).toBe('critical');
+      expect(result.suggestion).toBeTruthy();
+    });
+
+    it('should classify network errors as error severity', () => {
+      const result = getUserFriendlyError(new Error('network connection failed'));
+      expect(result.severity).toBe('error');
+    });
+
+    it('should classify timeout, rate-limit and validation as warning', () => {
+      expect(getUserFriendlyError(new Error('request timeout')).severity).toBe('warning');
+      expect(getUserFriendlyError(new Error('429 rate limit')).severity).toBe('warning');
+      expect(getUserFriendlyError(new Error('invalid input')).severity).toBe('warning');
+    });
+
+    it('should default unknown errors to error severity', () => {
+      expect(getUserFriendlyError(new Error('boom')).severity).toBe('error');
+    });
+
+    it('should include a plain-language suggestion for every mapped type', () => {
+      const cases = [
+        'network down',
+        'request timeout',
+        '429 rate limit',
+        '401 unauthorized',
+        'invalid input',
+        'totally unexpected',
+      ];
+
+      for (const message of cases) {
+        const result = getUserFriendlyError(new Error(message));
+        expect(typeof result.suggestion).toBe('string');
+        expect(result.suggestion!.length).toBeGreaterThan(0);
+      }
+    });
+  });
+
   describe('createStoreError', () => {
     it('should create error with default values', () => {
       const error = createStoreError('Not Found', 'The item could not be found');
@@ -188,6 +228,20 @@ describe('errorUtils', () => {
       expect(error.message).toBe('The item could not be found');
       expect(error.type).toBe(ErrorType.VALIDATION);
       expect(error.retryable).toBe(false);
+      expect(error.severity).toBe('error');
+    });
+
+    it('should accept custom severity and suggestion', () => {
+      const error = createStoreError(
+        'Heads Up',
+        'A minor issue occurred',
+        ErrorType.VALIDATION,
+        false,
+        { severity: 'warning', suggestion: 'Double-check your input.' }
+      );
+
+      expect(error.severity).toBe('warning');
+      expect(error.suggestion).toBe('Double-check your input.');
     });
 
     it('should create error with custom type', () => {
