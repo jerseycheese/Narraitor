@@ -48,4 +48,12 @@ describe('itemNamesMatch dedup heuristics', () => {
     // rather than declaring a match locally.
     expect(mockCheckSimilarity).toHaveBeenCalledTimes(1);
   });
+
+  it('does not treat a mid-word substring as a whole-word match', async () => {
+    // "ring" is a substring of "earring" but not a whole word - declaring a
+    // match here would merge genuinely different items. Defer to the AI.
+    await itemNamesMatch('Ring', 'Earring');
+
+    expect(mockCheckSimilarity).toHaveBeenCalledTimes(1);
+  });
 });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { categorizeInventoryItems } from '@/lib/ai/inventoryCategorizer';
+import type { InventoryCategorizationResult } from '@/lib/ai/inventoryCategorizer';
 import Logger from '@/lib/utils/logger';
 import { getTimestamp } from '@/lib/utils';
 
@@ -20,9 +21,24 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as CategorizeInventoryRequest;
 
     const items = Array.isArray(body.items) ? body.items : [];
-    const validItems = items.filter(
-      (item) => item?.name && item.name.trim().length > 0
-    );
+
+    // Track original indexes so results map back 1:1 to the input order. The
+    // caller consumes the response positionally, so dropping invalid items
+    // without holding their slots would shift categories onto the wrong items.
+    const validIndices: number[] = [];
+    const validItems = items
+      .filter((item, index) => {
+        const isValid = Boolean(item?.name && item.name.trim().length > 0);
+        if (isValid) {
+          validIndices.push(index);
+        }
+        return isValid;
+      })
+      .map((item) => ({
+        name: item.name,
+        description: item.description,
+        context: item.context,
+      }));
 
     if (validItems.length === 0) {
       return NextResponse.json(
@@ -31,26 +47,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const categorizations = await categorizeInventoryItems(
-      validItems.map((item) => ({
-        name: item.name,
-        description: item.description,
-        context: item.context,
-      }))
-    );
-
+    const categorizations = await categorizeInventoryItems(validItems);
     const classifiedAt = getTimestamp();
 
-    return NextResponse.json({
-      results: categorizations.map((result) => ({
-        categoryId: result.categoryId,
-        confidence: result.confidence,
-        rationale: result.rationale,
-        source: result.source,
-        model: result.model,
-        classifiedAt,
-      })),
+    // Map each categorization back to its original input slot, then emit a
+    // full-length, input-aligned array. Invalid slots get a fallback so
+    // positional consumers never receive shifted categories.
+    const byIndex = new Map<number, InventoryCategorizationResult>();
+    validIndices.forEach((originalIndex, position) => {
+      const result = categorizations[position];
+      if (result) {
+        byIndex.set(originalIndex, result);
+      }
     });
+
+    const results = items.map((_, index) => {
+      const result = byIndex.get(index);
+      return {
+        categoryId: result ? result.categoryId : 'miscellaneous',
+        confidence: result ? result.confidence : 0,
+        rationale: result ? result.rationale : 'Item name missing or invalid',
+        source: result ? result.source : 'fallback',
+        model: result?.model,
+        classifiedAt,
+      };
+    });
+
+    return NextResponse.json({ results });
   } catch (error) {
     logger.error('Failed to categorize inventory items', error);
     return NextResponse.json(

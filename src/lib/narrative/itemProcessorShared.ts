@@ -18,6 +18,16 @@ const RATE_LIMIT_DELAY_MS = 200;
 const MIN_SUBSTRING_LENGTH = 4;
 
 /**
+ * True when `shorter` appears in `longer` as a whole word-sequence (bounded by
+ * spaces or string ends), not mid-word. Padding both with spaces means
+ * "lantern" matches "rusty kerosene lantern" but "ring" does NOT match
+ * "earring" - the latter would merge genuinely different items.
+ */
+function containsAsWholeWords(longer: string, shorter: string): boolean {
+  return ` ${longer} `.includes(` ${shorter} `);
+}
+
+/**
  * Cheap, high-precision name-equivalence check used to skip the AI similarity
  * call for obvious duplicates ("Gold Coin" vs "Gold Coins", "Lantern" vs
  * "Rusty Kerosene Lantern"). Only ever returns true for confident matches;
@@ -31,8 +41,8 @@ function namesAreObviousMatch(normalized1: string, normalized2: string): boolean
   const longer =
     normalized1.length <= normalized2.length ? normalized2 : normalized1;
 
-  // Substring containment (handles descriptive expansions of a base noun).
-  if (shorter.length >= MIN_SUBSTRING_LENGTH && longer.includes(shorter)) {
+  // Whole-word containment (handles descriptive expansions of a base noun).
+  if (shorter.length >= MIN_SUBSTRING_LENGTH && containsAsWholeWords(longer, shorter)) {
     return true;
   }
 
