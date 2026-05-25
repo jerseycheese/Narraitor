@@ -2260,6 +2260,24 @@
   color: var(--color-text-primary);
 }
 
+/* AttributeEditor / SkillEditor render unclassed markup (fragments / bare
+   divs) with no spacing, so the fields and action row read cramped. Space
+   the text controls and the buttons directly — structure-agnostic, and skips
+   checkboxes/radios so the skill editor's inline attribute list is untouched. */
+.wizard-custom-editor input:not([type="checkbox"]):not([type="radio"]),
+.wizard-custom-editor textarea,
+.wizard-custom-editor select {
+  margin-bottom: var(--space-4);
+}
+
+.wizard-custom-editor button {
+  margin-top: var(--space-3);
+}
+
+.wizard-custom-editor button + button {
+  margin-left: var(--space-2);
+}
+
 /* ─── Slot meter (selected / available capacity) ─── */
 
 .wizard-slot-summary {
