@@ -534,6 +534,7 @@ export const useWorldStore = create<WorldStore>()(
               message: error instanceof Error ? error.message : 'Failed to fetch worlds',
               retryable: true,
               type: ErrorType.SERVICE,
+              severity: 'error',
             });
           }
         },

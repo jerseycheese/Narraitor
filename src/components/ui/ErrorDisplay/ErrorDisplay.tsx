@@ -1,18 +1,20 @@
 import React from 'react';
 import { cssClasses } from '@/lib/utils';
+import type { ErrorSeverity } from '@/lib/utils/errorUtils';
 
 type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
-type ErrorSeverity = 'error' | 'warning' | 'info';
 
 interface ErrorDisplayProps {
   /** The variant of error display */
   variant?: ErrorVariant;
-  /** Severity level of the error */
+  /** Severity level of the error — drives accent color and prominence */
   severity?: ErrorSeverity;
   /** Error title (for section and page variants) */
   title?: string;
   /** Error message */
   message: string;
+  /** Plain-language suggested next step shown below the message */
+  suggestion?: string;
   /** Show retry button */
   showRetry?: boolean;
   /** Retry button callback */
@@ -32,6 +34,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   severity = 'error',
   title,
   message,
+  suggestion,
   showRetry = false,
   onRetry,
   showDismiss = false,
@@ -39,10 +42,12 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   className,
   fieldName,
 }) => {
+  const severityClass = `error-display-${severity}`;
+
   if (variant === 'inline') {
     return (
       <p
-        className={className}
+        className={cssClasses('error-display', 'error-display-inline', severityClass, className)}
         role="alert"
         aria-live="polite"
         {...(fieldName && { id: `${fieldName}-error` })}
@@ -55,12 +60,13 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   if (variant === 'page') {
     return (
       <div
-        className={className}
+        className={cssClasses('error-display', 'error-display-page', severityClass, className)}
         role="alert"
         aria-live="polite"
       >
         {title && <h1>{title}</h1>}
         <p>{message}</p>
+        {suggestion && <p className="error-display-suggestion">{suggestion}</p>}
         {(showRetry || showDismiss) && (
           <div>
             {showRetry && onRetry && (
@@ -82,7 +88,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   if (variant === 'toast') {
     return (
       <div
-        className={className}
+        className={cssClasses('error-display', 'error-display-toast', severityClass, className)}
         role="alert"
         aria-live="assertive"
       >
@@ -90,10 +96,11 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
           <div>
             {title && <h3>{title}</h3>}
             <p>{message}</p>
+            {suggestion && <p className="error-display-suggestion">{suggestion}</p>}
           </div>
           {showDismiss && onDismiss && (
-            <button 
-              onClick={onDismiss} 
+            <button
+              onClick={onDismiss}
               aria-label="Dismiss"
               className="error-display-dismiss"
             >
@@ -108,12 +115,13 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   // Default: section variant
   return (
     <div
-      className={cssClasses('error-display', 'error-display-section', className)}
+      className={cssClasses('error-display', 'error-display-section', severityClass, className)}
       role="alert"
       aria-live="polite"
     >
       {title && <h2 className="error-display-title">{title}</h2>}
       <p className="error-display-message">{message}</p>
+      {suggestion && <p className="error-display-suggestion">{suggestion}</p>}
       {(showRetry || showDismiss) && (
         <div className="error-display-actions">
           {showRetry && onRetry && (

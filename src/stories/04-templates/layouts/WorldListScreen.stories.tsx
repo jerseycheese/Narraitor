@@ -140,7 +140,8 @@ export const WithError: Story = {
           title: 'Failed to load worlds',
           message: 'Failed to load worlds',
           retryable: false,
-          type: ErrorType.SERVICE
+          type: ErrorType.SERVICE,
+          severity: 'error'
         }
       });
       return <Story />;

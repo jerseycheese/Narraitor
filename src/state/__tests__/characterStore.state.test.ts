@@ -26,6 +26,7 @@ describe('useCharacterStore - State Management', () => {
         message: 'Something went wrong',
         type: ErrorType.VALIDATION,
         retryable: false,
+        severity: 'error' as const,
       };
 
       useCharacterStore.getState().setError(error);
@@ -51,6 +52,7 @@ describe('useCharacterStore - State Management', () => {
         message: 'State corrupted',
         type: ErrorType.UNKNOWN,
         retryable: false,
+        severity: 'error',
       });
 
       useCharacterStore.getState().setLoading(true);
