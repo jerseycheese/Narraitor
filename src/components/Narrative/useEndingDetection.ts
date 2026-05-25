@@ -22,6 +22,10 @@ const MIN_SEGMENTS_FOR_ANALYSIS = 3;
 const RECENT_SEGMENT_WINDOW = 5;
 const LONG_STORY_THRESHOLD = 10;
 const EARLIER_CONTEXT_TRUNCATE_CHARS = 500;
+// Outside of high-signal moments, only run the AI ending check every Nth
+// segment instead of after every single one. Natural endings cluster around
+// major events and critical outcomes, which always trigger a check below.
+const ROUTINE_CHECK_INTERVAL = 3;
 const ACCEPTED_CONFIDENCES = new Set(['high', 'medium']);
 const ACCEPTED_ENDING_TYPES = new Set<EndingType>([
   'story-complete',
@@ -35,6 +39,26 @@ interface UseEndingDetectionOptions {
   characterId?: string;
   segments: NarrativeSegment[];
   onEndingSuggested?: (reason: string, endingType: EndingType) => void;
+}
+
+/**
+ * Decides whether to spend an AI call checking for an ending on this segment.
+ * Always checks high-signal segments (major events, critical decision outcomes)
+ * since endings cluster there; otherwise throttles to every Nth segment.
+ */
+function shouldRunEndingCheck(
+  segment: NarrativeSegment,
+  totalSegments: number
+): boolean {
+  const outcome = segment.metadata?.decisionOutcome;
+  const isHighSignal =
+    Boolean(segment.metadata?.majorEvent) ||
+    outcome === 'critical-success' ||
+    outcome === 'critical-failure';
+
+  if (isHighSignal) return true;
+
+  return (totalSegments - MIN_SEGMENTS_FOR_ANALYSIS) % ROUTINE_CHECK_INTERVAL === 0;
 }
 
 export function useEndingDetection({
@@ -73,6 +97,8 @@ export function useEndingDetection({
 
       const allSegments = [...segments, newSegment];
       if (allSegments.length < MIN_SEGMENTS_FOR_ANALYSIS) return;
+
+      if (!shouldRunEndingCheck(newSegment, allSegments.length)) return;
 
       try {
         const client = createDefaultGeminiClient();

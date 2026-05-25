@@ -3,7 +3,7 @@
 import type { EntityID, TimestampedEntity } from './common.types';
 import type { World } from './world.types';
 import type { Character } from './character.types';
-import type { InventoryAcquisitionMethod } from './inventory.types';
+import type { InventoryAcquisitionMethod, StandardInventoryCategory } from './inventory.types';
 
 /**
  * Represents a segment of narrative in the game
@@ -143,6 +143,12 @@ export interface AcquiredItemMetadata {
   description?: string;
   quantity?: number;
   acquisitionMethod?: InventoryAcquisitionMethod;
+  /**
+   * Category the narrative AI inferred for this item from story context. When
+   * present and valid, it lets the acquisition pipeline skip the separate
+   * categorization AI call. Validated against StandardInventoryCategory before use.
+   */
+  categoryHint?: StandardInventoryCategory;
   /**
    * Indicates that this metadata refines the most recently acquired item
    * rather than representing a completely new pickup.

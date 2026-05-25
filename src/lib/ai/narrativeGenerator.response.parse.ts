@@ -1,4 +1,5 @@
 import { safeTrim } from '@/lib/utils';
+import { isValidCategory } from '@/lib/inventory/categories';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import type { GeneratedCharacterMetadata, LostItemMetadata } from '@/types/narrative.types';
 import type { ParsedNarrativeResponse, NarrativeExtractedMetadata } from './narrativeGenerator.response.types';
@@ -73,6 +74,7 @@ export const parseNarrativeResponse = (
                     description?: string;
                     quantity?: number;
                     acquisitionMethod?: string;
+                    categoryHint?: string;
                   };
                   return {
                     name: rawItem.name,
@@ -80,6 +82,11 @@ export const parseNarrativeResponse = (
                     quantity: rawItem.quantity,
                     acquisitionMethod:
                       rawItem.acquisitionMethod as InventoryAcquisitionMethod,
+                    categoryHint:
+                      typeof rawItem.categoryHint === 'string' &&
+                      isValidCategory(rawItem.categoryHint)
+                        ? rawItem.categoryHint
+                        : undefined,
                   };
                 })
               : undefined,

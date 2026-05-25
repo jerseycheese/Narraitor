@@ -4,6 +4,7 @@
 // AI-driven name similarity, rate-limit delay between item operations, and
 // the per-character processing-queue helper that serialises concurrent runs.
 
+import { distance } from 'fastest-levenshtein';
 import type { EntityID } from '@/types/common.types';
 import { normalizeText, NORM_NAME } from '@/lib/utils';
 
@@ -11,6 +12,37 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('ItemProcessorShared');
 
 const RATE_LIMIT_DELAY_MS = 200;
+
+// Shortest token length we trust for a substring match. Below this, substrings
+// produce false positives ("key" inside "donkey", "ash" inside "flask").
+const MIN_SUBSTRING_LENGTH = 4;
+
+/**
+ * Cheap, high-precision name-equivalence check used to skip the AI similarity
+ * call for obvious duplicates ("Gold Coin" vs "Gold Coins", "Lantern" vs
+ * "Rusty Kerosene Lantern"). Only ever returns true for confident matches;
+ * ambiguous pairs (synonyms, reorderings) still defer to the AI check.
+ */
+function namesAreObviousMatch(normalized1: string, normalized2: string): boolean {
+  if (!normalized1 || !normalized2) return false;
+
+  const shorter =
+    normalized1.length <= normalized2.length ? normalized1 : normalized2;
+  const longer =
+    normalized1.length <= normalized2.length ? normalized2 : normalized1;
+
+  // Substring containment (handles descriptive expansions of a base noun).
+  if (shorter.length >= MIN_SUBSTRING_LENGTH && longer.includes(shorter)) {
+    return true;
+  }
+
+  // Near-identical spellings (typos, singular/plural) within a small edit budget
+  // scaled to the longer string so longer names tolerate slightly more drift.
+  const maxLength = longer.length;
+  if (maxLength === 0) return false;
+  const editBudget = Math.max(1, Math.floor(maxLength * 0.15));
+  return distance(normalized1, normalized2) <= editBudget;
+}
 
 /**
  * Checks if two item names are semantically similar using AI.
@@ -25,6 +57,9 @@ export async function itemNamesMatch(name1: string, name2: string): Promise<bool
   const normalized2 = normalizeText(name2 || '', NORM_NAME).toLowerCase();
 
   if (normalized1 === normalized2) return true;
+
+  // Resolve obvious duplicates locally before paying for an AI similarity call.
+  if (namesAreObviousMatch(normalized1, normalized2)) return true;
 
   try {
     const { checkItemSimilarityClient } = await import('@/lib/inventory/checkItemSimilarityClient');

@@ -18,25 +18,38 @@ export interface CategorizeInventoryItemRequest {
   context?: Record<string, unknown>;
 }
 
-export async function categorizeInventoryItemClient(
-  payload: CategorizeInventoryItemRequest
-): Promise<InventoryCategorizationResponse> {
+/**
+ * Categorizes one or more inventory items in a single API call. Batching avoids
+ * firing N sequential categorization requests when a narrative segment yields
+ * multiple items without category hints. Responses are returned in input order.
+ */
+export async function categorizeInventoryItemsClient(
+  items: CategorizeInventoryItemRequest[]
+): Promise<InventoryCategorizationResponse[]> {
+  if (items.length === 0) {
+    return [];
+  }
+
   const response = await fetch('/api/inventory/categorize', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ items }),
   });
 
   if (!response.ok) {
     const details = await response.json().catch(() => ({}));
     logger.warn('Inventory categorization request failed', {
       status: response.status,
+      count: items.length,
       details,
     });
     throw new Error(details?.error ?? 'Inventory categorization failed');
   }
 
-  return (await response.json()) as InventoryCategorizationResponse;
+  const data = (await response.json()) as {
+    results?: InventoryCategorizationResponse[];
+  };
+  return data.results ?? [];
 }

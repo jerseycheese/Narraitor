@@ -1,5 +1,5 @@
 import type { GeneratedCharacterMetadata, LostItemMetadata } from '@/types/narrative.types';
-import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
+import type { InventoryAcquisitionMethod, StandardInventoryCategory } from '@/types/inventory.types';
 
 export interface NarrativeExtractedMetadata {
   location?: string;
@@ -18,6 +18,7 @@ export interface NarrativeExtractedMetadata {
     description?: string;
     quantity?: number;
     acquisitionMethod?: InventoryAcquisitionMethod;
+    categoryHint?: StandardInventoryCategory;
   }>;
   itemsLost?: LostItemMetadata[];
   characters?: GeneratedCharacterMetadata[];

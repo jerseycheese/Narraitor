@@ -1,7 +1,8 @@
 // src/lib/narrative/itemAcquisitionProcessor.ts
 
 import { useInventoryStore } from '@/state/inventoryStore';
-import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
+import { categorizeInventoryItemsClient } from '@/lib/inventory/categorizeInventoryItemClient';
+import { isValidCategory } from '@/lib/inventory/categories';
 import {
   getTimestamp,
   normalizeText,
@@ -61,8 +62,9 @@ export async function processAcquiredItems(
       const inventoryStore = useInventoryStore.getState();
       const now = getTimestamp();
 
-      const preparedItems = await Promise.all(
-        items.map((item) => prepareItem(item, now))
+      const categorizations = await categorizeItems(items, now);
+      const preparedItems = items.map((item, index) =>
+        prepareItem(item, categorizations[index])
       );
 
       const deduplicatedItems = await deduplicateBatch(preparedItems);
@@ -169,9 +171,11 @@ function buildNameKey(name: string): string {
   return normalizeText(name || '', NORM_NAME).toLowerCase();
 }
 
-async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<PreparedItem> {
+function prepareItem(
+  item: AcquiredItemMetadata,
+  categorization: InventoryItemCategorization
+): PreparedItem {
   const normalizedName = normalizeItemName(item.name);
-  const categorization = await getItemCategorization(item, now);
   const stackable = isStackableCategory(categorization.categoryId);
   const quantity = item.quantity ?? 1;
 
@@ -185,28 +189,91 @@ async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<Pre
   };
 }
 
-async function getItemCategorization(
+/**
+ * Resolves a categorization for every acquired item, preferring the narrative
+ * AI's category hint (zero extra API calls) and batching the remainder into a
+ * single categorization request instead of one call per item.
+ */
+async function categorizeItems(
+  items: AcquiredItemMetadata[],
+  now: string
+): Promise<InventoryItemCategorization[]> {
+  const results = new Array<InventoryItemCategorization>(items.length);
+  const needsAiIndices: number[] = [];
+
+  items.forEach((item, index) => {
+    const fromHint = hintCategorization(item, now);
+    if (fromHint) {
+      results[index] = fromHint;
+    } else {
+      needsAiIndices.push(index);
+    }
+  });
+
+  if (needsAiIndices.length === 0) {
+    return results;
+  }
+
+  const aiResults = await batchCategorize(
+    needsAiIndices.map((index) => items[index]),
+    now
+  );
+
+  needsAiIndices.forEach((index, position) => {
+    results[index] = aiResults[position];
+  });
+
+  return results;
+}
+
+/**
+ * Uses the narrative AI's category hint when it is present and valid, skipping
+ * the separate categorization API call entirely.
+ */
+function hintCategorization(
   item: AcquiredItemMetadata,
   now: string
-): Promise<InventoryItemCategorization> {
-  try {
-    const aiCategorization = await categorizeInventoryItemClient({
-      name: item.name,
-      description: item.description || '',
-    });
+): InventoryItemCategorization | null {
+  if (item.categoryHint && isValidCategory(item.categoryHint)) {
+    return {
+      categoryId: item.categoryHint,
+      source: 'narrative-context',
+      classifiedAt: now,
+      confidence: 0.95,
+      rationale: 'Category inferred from narrative context',
+    };
+  }
+  return null;
+}
 
-    return {
-      ...aiCategorization,
-      classifiedAt: now,
-    };
+const fallbackCategorization = (now: string): InventoryItemCategorization => ({
+  categoryId: 'miscellaneous',
+  source: 'fallback',
+  classifiedAt: now,
+  confidence: 0,
+  rationale: 'AI categorization unavailable',
+});
+
+async function batchCategorize(
+  items: AcquiredItemMetadata[],
+  now: string
+): Promise<InventoryItemCategorization[]> {
+  try {
+    const responses = await categorizeInventoryItemsClient(
+      items.map((item) => ({
+        name: item.name,
+        description: item.description || '',
+      }))
+    );
+
+    return items.map((_, index) => {
+      const response = responses[index];
+      return response
+        ? { ...response, classifiedAt: now }
+        : fallbackCategorization(now);
+    });
   } catch {
-    return {
-      categoryId: 'miscellaneous',
-      source: 'fallback',
-      classifiedAt: now,
-      confidence: 0,
-      rationale: 'AI categorization unavailable',
-    };
+    return items.map(() => fallbackCategorization(now));
   }
 }
 
