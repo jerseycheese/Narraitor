@@ -94,6 +94,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
                 onChange={newValue => handleValueChange(attr.id, newValue)}
                 disabled={false}
                 showLabel={false}
+                ariaLabel={`${worldAttr?.name || `Attribute ${index + 1}`} value`}
                 testId={`attribute-${attr.id}`}
               />
               <div className="attributes-form-meta">
