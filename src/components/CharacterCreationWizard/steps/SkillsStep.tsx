@@ -8,6 +8,11 @@ import RangeSlider from '@/components/ui/RangeSlider';
 import { World } from '@/types/world.types';
 import { validateSkills } from '../utils/validation';
 import { getSkillBounds as resolveSkillBounds } from '../utils/skillAllocation';
+import {
+  getUnmetPrerequisites,
+  formatUnmetPrerequisites,
+  type UnmetPrerequisite,
+} from '@/lib/utils/skillPrerequisites';
 
 const MAX_SKILL_SELECTION_LIMIT = 8;
 
@@ -22,9 +27,15 @@ interface CharacterWizardSkill {
   isSelected: boolean;
 }
 
+interface CharacterWizardAttribute {
+  attributeId: string;
+  value: number;
+}
+
 interface SkillsStepData {
   characterData: {
     skills: CharacterWizardSkill[];
+    attributes?: CharacterWizardAttribute[];
   };
   pointPools: {
     skills: {
@@ -63,6 +74,26 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       })),
     [worldConfig]
   );
+
+  const characterAttributes = useMemo(
+    () => data.characterData.attributes ?? [],
+    [data.characterData.attributes]
+  );
+
+  const unmetPrerequisitesBySkillId = useMemo(() => {
+    const map = new Map<string, UnmetPrerequisite[]>();
+    (worldConfig?.skills || []).forEach(skill => {
+      map.set(
+        skill.id,
+        getUnmetPrerequisites(
+          skill.attributePrerequisites,
+          characterAttributes,
+          worldConfig?.attributes || []
+        )
+      );
+    });
+    return map;
+  }, [worldConfig, characterAttributes]);
 
   const {
     remainingPoints,
@@ -142,12 +173,48 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     worldSkillBounds
   ]);
 
+  // Re-validate prerequisites when attributes change: a previously selected
+  // skill whose requirements are no longer met is automatically deselected.
+  useEffect(() => {
+    const hasInvalidSelection = data.characterData.skills.some(
+      skill =>
+        skill.isSelected &&
+        (unmetPrerequisitesBySkillId.get(skill.skillId)?.length ?? 0) > 0
+    );
+    if (!hasInvalidSelection) return;
+
+    const updatedSkills = data.characterData.skills.map(skill => {
+      const unmet = unmetPrerequisitesBySkillId.get(skill.skillId) ?? [];
+      if (skill.isSelected && unmet.length > 0) {
+        const bounds =
+          boundsBySkillId.get(skill.skillId) ?? resolveSkillBounds(skill, worldConfig);
+        return { ...skill, isSelected: false, level: bounds.minLevel };
+      }
+      return skill;
+    });
+
+    onUpdate({ skills: updatedSkills });
+  }, [
+    unmetPrerequisitesBySkillId,
+    data.characterData.skills,
+    boundsBySkillId,
+    onUpdate,
+    worldConfig,
+  ]);
+
   const hasUnallocatedPoints = remainingPoints > 0;
   const validation = data.validation[3];
   const showErrors = validation?.touched && !validation?.valid;
   const selectedSkills = data.characterData.skills.filter(skill => skill.isSelected);
   const maxSelectable = Math.min(worldConfig?.settings?.maxSkills ?? MAX_SKILL_SELECTION_LIMIT, MAX_SKILL_SELECTION_LIMIT);
   const handleSkillToggle = (skillId: string) => {
+    const target = data.characterData.skills.find(skill => skill.skillId === skillId);
+    const isLocked = (unmetPrerequisitesBySkillId.get(skillId)?.length ?? 0) > 0;
+    // Prevent selecting a skill whose attribute prerequisites are not met.
+    if (target && !target.isSelected && isLocked) {
+      return;
+    }
+
     const updatedSkills = data.characterData.skills.map(skill => {
       if (skill.skillId !== skillId) return skill;
       const bounds = boundsBySkillId.get(skillId) ?? resolveSkillBounds(skill, worldConfig);
@@ -235,11 +302,14 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           const safeKey = skill.skillId || `${skill.name}-${index}`;
           const maxAllowedLevel = maxAllowedLevelBySkillId.get(skill.skillId) ?? bounds.maxLevel;
           const skillTitleId = `skill-allocation-title-${safeKey}`;
+          const unmetPrerequisites = unmetPrerequisitesBySkillId.get(skill.skillId) ?? [];
+          const isLocked = unmetPrerequisites.length > 0;
+          const requirementText = formatUnmetPrerequisites(unmetPrerequisites);
 
           return (
-          <div 
+          <div
             key={safeKey}
-            className={`${wizardStyles.card.base} wizard-skill-card ${skill.isSelected ? wizardStyles.card.selected : ''}`}
+            className={`${wizardStyles.card.base} wizard-skill-card ${skill.isSelected ? wizardStyles.card.selected : ''} ${isLocked ? 'wizard-skill-card-locked' : ''}`}
           >
             <div>
               <div className="wizard-skill-card-head">
@@ -257,13 +327,24 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                         .join(', ') || 'Unknown attributes'}
                     </div>
                   )}
+                  {isLocked && (
+                    <div
+                      className="wizard-skill-card-requirement"
+                      role="note"
+                      data-testid={`skill-requirement-${safeKey}`}
+                    >
+                      {requirementText}
+                    </div>
+                  )}
                 </div>
                 <ToggleButton
                   isActive={skill.isSelected}
                   activeLabel="Selected"
-                  inactiveLabel="Not Selected"
+                  inactiveLabel={isLocked ? 'Locked' : 'Not Selected'}
                   onClick={() => handleSkillToggle(skill.skillId)}
                   testId={`skill-toggle-${safeKey}`}
+                  disabled={isLocked}
+                  title={isLocked ? requirementText : undefined}
                 />
               </div>
 

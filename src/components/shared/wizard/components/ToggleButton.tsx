@@ -8,6 +8,8 @@ export interface ToggleButtonProps {
   onClick: () => void;
   testId?: string;
   className?: string;
+  disabled?: boolean;
+  title?: string;
 }
 
 export const ToggleButton: React.FC<ToggleButtonProps> = ({
@@ -17,12 +19,16 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
   onClick,
   testId,
   className = '',
+  disabled = false,
+  title,
 }) => {
   return (
     <button
       type="button"
       data-testid={testId}
       onClick={onClick}
+      disabled={disabled}
+      title={title}
       className={`${wizardStyles.toggle.button} ${
         isActive ? wizardStyles.toggle.active : wizardStyles.toggle.inactive
       } ${className}`}

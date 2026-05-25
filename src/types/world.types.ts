@@ -48,6 +48,14 @@ export interface WorldAttribute extends NamedEntity {
 }
 
 /**
+ * A minimum attribute value a character must have before a skill can be selected
+ */
+export interface SkillAttributePrerequisite {
+  attributeId: EntityID;
+  minValue: number;
+}
+
+/**
  * Represents a skill within a world
  */
 export interface WorldSkill extends NamedEntity {
@@ -59,6 +67,7 @@ export interface WorldSkill extends NamedEntity {
   baseValue: number;
   minValue: number;
   maxValue: number;
+  attributePrerequisites?: SkillAttributePrerequisite[];
 }
 
 /**
