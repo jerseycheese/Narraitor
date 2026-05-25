@@ -90,11 +90,19 @@ describe('skillPrerequisites', () => {
       ).toEqual([]);
     });
 
-    it('falls back to a placeholder name when the attribute is unknown', () => {
+    it('ignores prerequisites that reference an attribute missing from the world', () => {
       const unmet = getUnmetPrerequisites(
-        [{ attributeId: 'attr-missing', minValue: 2 }],
+        [{ attributeId: 'attr-deleted', minValue: 2 }],
         [],
         attributes
+      );
+      expect(unmet).toEqual([]);
+    });
+
+    it('falls back to a placeholder name when no world attributes are provided', () => {
+      const unmet = getUnmetPrerequisites(
+        [{ attributeId: 'attr-str', minValue: 2 }],
+        []
       );
       expect(unmet[0].attributeName).toBe('Unknown attribute');
     });

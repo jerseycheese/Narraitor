@@ -41,6 +41,14 @@ export const getUnmetPrerequisites = (
 
   return prerequisites
     .filter((prereq) => prereq.minValue > 0)
+    .filter((prereq) => {
+      // Skip prerequisites that reference an attribute the world no longer
+      // has — a stale reference (e.g. after the attribute was deleted) should
+      // not permanently lock the skill. Only applies when we have the world's
+      // attribute list to check against.
+      if (worldAttributes.length === 0) return true;
+      return worldAttributes.some((attr) => attr.id === prereq.attributeId);
+    })
     .map((prereq) => ({
       attributeId: prereq.attributeId,
       attributeName:
