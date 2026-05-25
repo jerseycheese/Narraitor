@@ -69,6 +69,31 @@ describe('JournalEntryImage', () => {
     });
   });
 
+  it('clears a stale load error when a new image url arrives', () => {
+    const withImage = (url: string): JournalEntry => ({
+      ...entry,
+      metadata: {
+        ...entry.metadata,
+        image: { type: 'ai-generated', url, generatedAt: '2024-01-02T00:00:00.000Z', prompt: 'p' },
+      },
+    });
+
+    useJournalStore.setState({
+      entries: { [entry.id]: withImage('/a.png') },
+      sessionEntries: { [entry.sessionId]: [entry.id] },
+    });
+
+    const { rerender } = render(<JournalEntryImage entry={withImage('/a.png')} />);
+
+    fireEvent.error(screen.getByAltText(/illustration for/i));
+    expect(screen.getByText(/error loading image/i)).toBeInTheDocument();
+
+    rerender(<JournalEntryImage entry={withImage('/b.png')} />);
+
+    expect(screen.getByAltText(/illustration for/i)).toBeInTheDocument();
+    expect(screen.queryByText(/error loading image/i)).not.toBeInTheDocument();
+  });
+
   it('surfaces an error message when generation fails', async () => {
     mockGenerate.mockRejectedValue(new Error('generation failed'));
 

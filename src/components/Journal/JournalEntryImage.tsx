@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { ImageOff, AlertCircle } from 'lucide-react';
 import { JournalEntry } from '@/types/journal.types';
@@ -21,6 +21,12 @@ const EntryImagePreview: React.FC<{
   error?: string | null;
 }> = ({ image, title, error }) => {
   const [loadFailed, setLoadFailed] = useState(false);
+
+  // Clear a stale load failure when a new image is generated, otherwise the
+  // component stays stuck on "Error loading image" until a full remount.
+  useEffect(() => {
+    setLoadFailed(false);
+  }, [image?.url]);
 
   if (error || loadFailed) {
     return (
