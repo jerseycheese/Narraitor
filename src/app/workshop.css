@@ -4320,7 +4320,16 @@
 
 [data-theme="ds1"] .component-world-card .world-card-compare,
 [data-theme="ds3"] .component-world-card .world-card-compare {
-  display: none;
+  margin: var(--space-2) 0 0;
+}
+
+[data-theme="ds1"] .component-world-card .world-card-compare input[type="checkbox"],
+[data-theme="ds3"] .component-world-card .world-card-compare input[type="checkbox"] {
+  width: var(--space-4);
+  height: var(--space-4);
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
 }
 
 [data-theme="ds1"] .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
