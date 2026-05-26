@@ -47,7 +47,7 @@ test.describe('Character roster context', () => {
     baseURL,
   }) => {
     await page.addInitScript(
-      ({ getTimestampSource, seed }) => {
+      async ({ getTimestampSource, seed }) => {
         const instantiateGetTimestamp = (source: string) =>
           new Function(`return (${source});`)() as () => string;
         const getTs = instantiateGetTimestamp(getTimestampSource);
@@ -258,9 +258,11 @@ test.describe('Character roster context', () => {
           version: 2,
         } as const;
 
-        void put('narraitor-world-store', worldPersist);
-        void put('narraitor-character-store', characterPersist);
-        void put('narraitor-session-store', sessionPersist);
+        await Promise.all([
+          put('narraitor-world-store', worldPersist),
+          put('narraitor-character-store', characterPersist),
+          put('narraitor-session-store', sessionPersist),
+        ]);
       },
       { getTimestampSource: GET_TIMESTAMP_SOURCE, seed: SEED_PAYLOAD }
     );
