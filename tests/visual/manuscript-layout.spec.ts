@@ -168,7 +168,9 @@ test.describe('Manuscript Layout Specific Tests', () => {
       throw new Error('Expected mobile manuscript rail and action rail to be present');
     }
 
-    expect(mobileLayout.railDisplay).toBe('none');
+    // Scene status (the rail) now renders on mobile too, stacked above the
+    // narrative, replacing the old DS1-only mobile bar.
+    expect(mobileLayout.railDisplay).not.toBe('none');
     expect(mobileLayout.actionRailDisplay).not.toBe('none');
     expect(mobileLayout.choiceCount).toBeGreaterThan(0);
   });

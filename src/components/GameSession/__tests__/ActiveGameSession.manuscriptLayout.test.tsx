@@ -349,28 +349,23 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.getByText('Character Sheet')).toBeInTheDocument();
     });
 
-        it('renders suggested actions in margin when flag is ON', async () => {
+    it('renders the scene status rail when the latest segment has participants', async () => {
+      // Override narrative state with a segment that has characterIds
+      const mockNarrativeStateWithChars = {
+        segments: {
+          'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: ['npc-1'] },
+        },
+        sessionSegments: { [mockSessionId]: ['seg-1'] },
+        currentEnding: null,
+        isGeneratingEnding: false,
+        isSessionEnded: () => false,
+        generateEnding: jest.fn(),
+      };
+      (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector ? selector(mockNarrativeStateWithChars) : mockNarrativeStateWithChars
+      );
 
-          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
-
-          // Override narrative state with a segment that has characterIds
-          const mockNarrativeStateWithChars = {
-            segments: {
-              'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: ['npc-1'] },
-            },
-            sessionSegments: { [mockSessionId]: ['seg-1'] },
-            currentEnding: null,
-            isGeneratingEnding: false,
-            isSessionEnded: () => false,
-            generateEnding: jest.fn(),
-          };
-          (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) =>
-            selector ? selector(mockNarrativeStateWithChars) : mockNarrativeStateWithChars
-          );
-
-          render(
-
-
+      render(
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -378,10 +373,11 @@ describe('ActiveGameSession Manuscript Layout', () => {
         />
       );
 
-      // Margin content is inside an <aside>
-      const aside = await screen.findByRole('complementary', { name: /characters present/i });
+      // Scene status lives inside the <aside> rail and reflects the latest segment.
+      const aside = await screen.findByRole('complementary', { name: /scene status/i });
       expect(aside).toBeInTheDocument();
       expect(aside).toHaveClass('manuscript-characters-rail');
+      expect(screen.getByText('Characters Present')).toBeInTheDocument();
     });
 
         it('toggles Tools menu when Tools button is clicked', async () => {

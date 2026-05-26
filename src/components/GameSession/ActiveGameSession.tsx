@@ -35,7 +35,7 @@ import {
   ToolsMenuPanelContent,
 } from './ManuscriptDrawerPanels';
 import { CharacterSnapshot } from './CharacterSnapshot';
-import { ManuscriptCharactersRail } from './ManuscriptCharactersRail';
+import { SceneStatus } from './SceneStatus';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 
@@ -94,7 +94,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
   const { theme } = useTheme();
-  const isDS1 = theme === 'ds1';
   const isDS3 = theme === 'ds3';
 
   // Check for test data to support visual regression tests (guarded for SSR)
@@ -129,23 +128,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Selecting derived arrays from Zustand can cause non-cached snapshots.
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
-  // Get the latest narrative segment for the characters rail
-  // We look for the most recent segment that actually has participants, matching prototype logic
-  const latestSegmentWithParticipants = useNarrativeStore((state) => {
+  // Scene status reflects the absolute latest segment so location and
+  // participants track the current scene, not the last segment that happened to
+  // list characters (which would leave a newer location/participant set stale).
+  const latestSegment = useNarrativeStore((state) => {
     const segmentIds = state.sessionSegments[sessionId] || [];
     if (segmentIds.length === 0) return null;
-    
-    // Search backwards for a segment with characters
-    for (let i = segmentIds.length - 1; i >= 0; i--) {
-      const segment = state.segments[segmentIds[i]];
-      if (segment && ((segment.characterIds?.length ?? 0) > 0 || (segment.metadata?.characterIds?.length ?? 0) > 0)) {
-        return segment;
-      }
-    }
-    
-    // Fallback to absolute latest segment
     return state.segments[segmentIds[segmentIds.length - 1]] || null;
   });
+
+  // Show the scene status surface whenever the latest segment has participants
+  // or a location to report; mirrors SceneStatus' own empty check so the shell
+  // can collapse the rail column when there's nothing to show.
+  const hasSceneStatus =
+    !!latestSegment &&
+    ((latestSegment.characterIds?.length ?? 0) > 0 ||
+      (latestSegment.metadata?.characterIds?.length ?? 0) > 0 ||
+      !!latestSegment.metadata?.location);
 
   const hasExistingNarrative = segmentCount > 0;
 
@@ -451,16 +450,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           )}
         />
       }
-      marginContent={isDS1 && isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
-        ((latestSegmentWithParticipants.characterIds?.length ?? 0) > 0 ||
-         (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0) ? (
-        <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
+      marginContent={hasSceneStatus ? (
+        <SceneStatus segment={latestSegment} />
       ) : null}
-      mobileTopContent={
-        isDS1 && isProgressiveDisclosureEnabled ? (
-          <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
-        ) : null
-      }
       actionRail={
         <ManuscriptActionRail
           isStreaming={isGenerating || isGeneratingChoices || isStreamingPreview}

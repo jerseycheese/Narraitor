@@ -499,7 +499,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-characters-rail {
-  display: none;
+  display: block;
   box-sizing: border-box;
   background: var(--color-overlay-surface);
   border: 1px solid var(--color-border);
@@ -1087,7 +1087,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-characters-rail-mobile-stack {
-  order: 2;
+  order: -1;
 }
 
 @media (width >= 1024px) {
@@ -3350,9 +3350,21 @@ body.manuscript-overlay-open {
   grid-template-columns: 1fr;
 }
 
-[data-theme="ds2"] .manuscript-characters-rail,
 [data-theme="ds2"] .manuscript-rail-spacer {
   display: none;
+}
+
+/* Scene status reads as an ambient annotation above the narrative. */
+[data-theme="ds2"] .manuscript-characters-rail {
+  display: block;
+  max-width: 42.5rem;
+  margin: 0 auto var(--space-4);
+  padding: 0 0 var(--space-3);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  overflow: visible;
 }
 
 /* Tighter narrative column for journal feel */
@@ -3604,10 +3616,6 @@ body.manuscript-overlay-open {
 @media (width >= 1024px) {
   [data-theme="ds2"] .manuscript-main-stage {
     grid-template-columns: 1fr;
-  }
-
-  [data-theme="ds2"] .manuscript-characters-rail {
-    display: none;
   }
 
   [data-theme="ds2"] .manuscript-rail-spacer {
@@ -3991,9 +3999,14 @@ body.manuscript-overlay-open {
   grid-template-columns: 1fr;
 }
 
-[data-theme="ds3"] .manuscript-characters-rail,
 [data-theme="ds3"] .manuscript-rail-spacer {
   display: none;
+}
+
+/* Scene status as a compact console bar above the narrative. */
+[data-theme="ds3"] .manuscript-characters-rail {
+  display: block;
+  margin-bottom: var(--space-3);
 }
 
 [data-theme="ds3"] .manuscript-main-content {
@@ -4321,10 +4334,6 @@ body.manuscript-overlay-open {
 @media (width >= 1024px) {
   [data-theme="ds3"] .manuscript-main-stage {
     grid-template-columns: 1fr;
-  }
-
-  [data-theme="ds3"] .manuscript-characters-rail {
-    display: none;
   }
 
   [data-theme="ds3"] .manuscript-rail-spacer {
@@ -4845,3 +4854,128 @@ body.manuscript-overlay-open {
   }
 }
 
+/* =========================================================================
+   Scene Status surface (shared base)
+   Characters present + current location for the latest segment. Themed per
+   DS: DS1 keeps the left rail, DS2 reads it as an ambient line, DS3 condenses
+   it into a console bar (rail visibility handled in each DS block above).
+   ========================================================================= */
+.component-scene-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.scene-status-location {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.scene-status-location-label {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--color-text-muted);
+}
+
+.scene-status-location-value {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: var(--color-text-secondary);
+}
+
+.scene-status-participants {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* Mobile: collapse the surface into a compact horizontal bar above the story. */
+@media (width < 1024px) {
+  .manuscript-characters-rail {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .component-scene-status {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .scene-status-location {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-1_5);
+  }
+}
+
+/* DS2 — scene status as an ambient one-line annotation above the narrative. */
+[data-theme="ds2"] .component-scene-status,
+[data-theme="ds2"] .scene-status-participants {
+  flex-flow: row wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+}
+
+[data-theme="ds2"] .scene-status-location {
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds2"] .scene-status-location-value,
+[data-theme="ds2"] .scene-status-name {
+  font-family: var(--font-narrative);
+  font-style: italic;
+}
+
+[data-theme="ds2"] .scene-status-avatar {
+  display: none;
+}
+
+[data-theme="ds2"] .scene-status-badge {
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .scene-status-list {
+  gap: var(--space-1) var(--space-2);
+}
+
+[data-theme="ds2"] .scene-status-badge + .scene-status-badge::before {
+  content: "·";
+  margin-right: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+/* DS3 — scene status condensed into a mechanical console bar. */
+[data-theme="ds3"] .component-scene-status,
+[data-theme="ds3"] .scene-status-participants {
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+[data-theme="ds3"] .scene-status-location {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds3"] .scene-status-location-value {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+[data-theme="ds3"] .scene-status-badge {
+  padding: var(--space-0_5) var(--space-2);
+  font-size: 0.6875rem;
+}
