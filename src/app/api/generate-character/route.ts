@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
     const characterType = body?.characterType;
     const existingNames = body?.existingNames;
     const suggestedName = body?.suggestedName;
+    const concept = body?.concept;
     const worldData = body?.world;
     
     if (!worldData) {
@@ -39,7 +40,8 @@ export async function POST(request: NextRequest) {
       world,
       (Array.isArray(existingNames) ? existingNames : []) as string[],
       suggestedName as string | undefined,
-      (characterType as 'original' | 'known' | 'specific') || 'original'
+      (characterType as 'original' | 'known' | 'specific') || 'original',
+      typeof concept === 'string' ? concept : undefined
     );
 
     return NextResponse.json(generatedCharacter);

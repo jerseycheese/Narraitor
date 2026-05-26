@@ -18,7 +18,7 @@ const logger = new Logger('CharacterGenerator');
  * Generate character using AI
  */
 async function generateWithAI(options: CharacterGenerationOptions): Promise<GeneratedCharacterData> {
-  const { world, existingNames = [], suggestedName, generationType = 'known' } = options;
+  const { world, existingNames = [], suggestedName, generationType = 'known', concept } = options;
   
   // Validate the world data first
   const worldValidation = validateWorld(world);
@@ -44,6 +44,7 @@ You are creating a character for a ${world.genre} genre world${world.reference ?
 ${world.reference && world.relationship === 'set_within' ? `\nIMPORTANT: This world is set within the ${world.reference} universe. Characters must be from ${world.reference}.` : ''}
 ${world.reference && world.relationship === 'inspired_by' ? `\nThis world is inspired by ${world.reference} but has original characters.` : ''}
 ${world.description ? `\nWorld Context: ${world.description}` : ''}
+${concept ? `\nThe user describes this character concept: "${concept}". Build the character around this concept, fitting it to the world's theme and genre.` : ''}
 ${suggestedName ? `\nThe character should be named: "${suggestedName}"` : ''}
 ${existingNames.length > 0 ? `\nIMPORTANT: These character names already exist and must NOT be used: ${existingNames.join(', ')}` : ''}
 
@@ -356,13 +357,15 @@ export async function generateAICharacter(
   world: World,
   existingCharacterNames: string[],
   suggestedName?: string,
-  generationType: CharacterGenerationType = 'known'
+  generationType: CharacterGenerationType = 'known',
+  concept?: string
 ): Promise<GeneratedCharacterData> {
   return generateWithAI({
     method: 'ai',
     world,
     existingNames: existingCharacterNames,
     suggestedName,
-    generationType
+    generationType,
+    concept
   });
 }

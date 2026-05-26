@@ -35,6 +35,8 @@ export interface CharacterGenerationOptions {
   existingNames?: string[];
   suggestedName?: string;
   generationType?: CharacterGenerationType;
+  /** Free-text character concept from the user, used to steer AI suggestions. */
+  concept?: string;
 }
 
 /**
