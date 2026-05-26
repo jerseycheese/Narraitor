@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
 /**
@@ -27,6 +27,7 @@ async function settleTheme(
   await waitForContentStable(page);
   await hideDynamicContent(page);
   await page.evaluate(() => document.fonts.ready);
+  await pinAppShell(page);
 }
 
 async function gotoDetail(page: Page, route: string, anchor: string): Promise<void> {

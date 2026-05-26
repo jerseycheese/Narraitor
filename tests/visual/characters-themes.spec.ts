@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, pinAppShell } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
 /**
@@ -23,6 +23,7 @@ async function settleTheme(
   await waitForContentStable(page);
   await hideDynamicContent(page);
   await page.evaluate(() => document.fonts.ready);
+  await pinAppShell(page);
 }
 
 test.describe('Characters list theme differentiation', () => {
