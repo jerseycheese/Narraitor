@@ -158,6 +158,33 @@ describe('CharacterSuggestions', () => {
     expect(onAdopt).toHaveBeenCalledWith({ description: 'My edited description' });
   });
 
+  it('never adopts NaN when an attribute edit clears the input', async () => {
+    mockFetchOk(generated);
+    const onAdopt = renderPanel();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Suggest character details' })
+    );
+    await screen.findByRole('article', { name: 'Attributes suggestion' });
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Edit Attributes suggestion' })
+    );
+
+    // Clear the Strength number input (transient state — empty string parses to NaN).
+    await userEvent.clear(screen.getByLabelText('Strength value'));
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adopt Attributes suggestion' })
+    );
+
+    const call = onAdopt.mock.calls.find((c) => c[0]?.attributes);
+    expect(call).toBeDefined();
+    for (const attr of call![0].attributes) {
+      expect(Number.isFinite(attr.value)).toBe(true);
+    }
+  });
+
   it('shows an error when generation fails', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,

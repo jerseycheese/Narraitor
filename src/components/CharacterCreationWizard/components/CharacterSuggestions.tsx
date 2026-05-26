@@ -19,8 +19,12 @@ interface CharacterSuggestionsProps {
   onAdopt: (updates: Partial<CharacterCreationData>) => void;
 }
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.max(min, Math.min(max, value));
+const clamp = (value: number, min: number, max: number) => {
+  // Non-finite inputs (e.g. NaN from a transient "-" or cleared number field)
+  // would otherwise leak through Math.min/max and corrupt wizard state.
+  if (!Number.isFinite(value)) return min;
+  return Math.max(min, Math.min(max, value));
+};
 
 /**
  * AI-powered character development suggestions for the creation wizard.
@@ -115,9 +119,10 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
   const adoptAttributes = (values: Record<string, number>) => {
     const merged = characterData.attributes.map((attr) => {
       const next = values[attr.attributeId];
-      return next === undefined
-        ? attr
-        : { ...attr, value: clamp(next, attr.minValue, attr.maxValue) };
+      // Skip non-finite edits (cleared input, lone "-", etc.) so we never
+      // write NaN into wizard state — the existing value stays put.
+      if (next === undefined || !Number.isFinite(next)) return attr;
+      return { ...attr, value: clamp(next, attr.minValue, attr.maxValue) };
     });
     onAdopt({ attributes: merged });
     dismiss('attributes');
@@ -126,9 +131,8 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
   const adoptSkills = (values: Record<string, number>) => {
     const merged = characterData.skills.map((skill) => {
       const next = values[skill.skillId];
-      return next === undefined
-        ? skill
-        : { ...skill, level: clamp(next, skill.minLevel, skill.maxLevel), isSelected: true };
+      if (next === undefined || !Number.isFinite(next)) return skill;
+      return { ...skill, level: clamp(next, skill.minLevel, skill.maxLevel), isSelected: true };
     });
     onAdopt({ skills: merged });
     dismiss('skills');
