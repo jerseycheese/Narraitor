@@ -15,7 +15,3 @@ export function countTokens(text: string): number {
   if (!text) return 0;
   return getTokenizer().encode(text, { add_special_tokens: false }).length;
 }
-
-export function __resetForTests(): void {
-  instance = null;
-}
