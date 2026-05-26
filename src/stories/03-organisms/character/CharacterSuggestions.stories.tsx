@@ -96,7 +96,7 @@ const meta: Meta<typeof CharacterSuggestions> = {
     docs: {
       description: {
         component:
-          'AI-powered character development suggestions for the creation wizard. Generates world-aligned description, background, attributes, and skills, each with adopt / edit / dismiss controls.',
+          'Character development suggestions for the creation wizard. Generates world-aligned description, background, attributes, and skills from the user concept, each with adopt / edit / dismiss controls.',
       },
     },
   },

@@ -1,7 +1,7 @@
 /* Manuscript session layout rules (game session overlay, HUD, action rail, drawers) */
 @import url('../styles/manuscript-session.css');
 
-/* AI character development suggestions panel (character creation wizard) */
+/* Character development suggestions panel (character creation wizard) */
 @import url('../styles/character-suggestions.css');
 
 /* Skip link - visually hidden until focused (accessibility) */

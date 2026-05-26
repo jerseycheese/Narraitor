@@ -27,7 +27,7 @@ const clamp = (value: number, min: number, max: number) => {
 };
 
 /**
- * AI-powered character development suggestions for the creation wizard.
+ * Character development suggestions for the creation wizard.
  * Generates world-aligned description, background, attributes, and skills from
  * the user's concept, each with adopt / edit / dismiss controls.
  */
@@ -206,13 +206,13 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
     <section
       className="character-suggestions"
       role="region"
-      aria-label="AI character suggestions"
+      aria-label="Character suggestions"
       aria-busy={loading}
     >
       <div className="character-suggestions-intro">
         <p className="character-suggestions-lead">
-          Stuck for ideas? Let the AI suggest world-aligned character details based on your
-          concept. You can adopt, edit, or dismiss each suggestion.
+          Stuck for ideas? Generate world-aligned character details from your concept.
+          You can adopt, edit, or dismiss each suggestion.
         </p>
         <Button
           type="button"
