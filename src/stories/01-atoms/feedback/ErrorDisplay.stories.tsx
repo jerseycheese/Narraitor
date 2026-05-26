@@ -39,7 +39,19 @@ const meta: Meta<typeof ErrorDisplay> = {
     },
     showRetry: {
       control: 'boolean',
-      description: 'Show retry button',
+      description: 'Show retry button (only for recoverable errors)',
+    },
+    maxRetries: {
+      control: 'number',
+      description: 'Attempts allowed before the retry button degrades to a fallback action',
+    },
+    fallbackMessage: {
+      control: 'text',
+      description: 'Message shown once retries are exhausted',
+    },
+    fallbackLabel: {
+      control: 'text',
+      description: 'Label for the fallback action shown once retries are exhausted',
     },
     showDismiss: {
       control: 'boolean',
@@ -49,6 +61,7 @@ const meta: Meta<typeof ErrorDisplay> = {
   args: {
     onRetry: fn(),
     onDismiss: fn(),
+    onFallback: fn(),
   },
 };
 
@@ -216,6 +229,32 @@ export const FormValidation: Story = {
   ),
 };
 
+
+// Recoverable error: retry shows in-progress feedback, then degrades to a
+// fallback action after the configured number of attempts. Click "Try Again"
+// twice (each attempt simulates a ~1.2s failed call) to see the fallback appear.
+export const RetryWithFallback: Story = {
+  render: () => {
+    const failingRetry = () =>
+      new Promise<void>((resolve) => setTimeout(resolve, 1200));
+
+    return (
+      <ErrorDisplay
+        variant="section"
+        severity="error"
+        title="Couldn't Generate the Next Scene"
+        message="The AI service didn't respond in time."
+        suggestion="This is usually temporary — try again."
+        showRetry
+        onRetry={failingRetry}
+        maxRetries={2}
+        fallbackMessage="Still stuck after a couple of tries. You can head back to your worlds and pick up later."
+        fallbackLabel="Back to Worlds"
+        onFallback={fn()}
+      />
+    );
+  },
+};
 
 // Interactive playground
 export const Playground: Story = {
