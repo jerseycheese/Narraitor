@@ -84,9 +84,10 @@ export function CharacterCard({
       activeText="Currently Active Character"
       className="component-character-card"
     >
-      <div>
-        <div>
+      <div className="character-card-body">
+        <div className="character-card-inner">
           <div
+            className="character-card-portrait"
             onClick={(e) => {
               e.stopPropagation();
               onView();
@@ -101,6 +102,7 @@ export function CharacterCard({
             />
           </div>
           <h3
+            className="character-card-name"
             onClick={(e) => {
               e.stopPropagation();
               onView();
@@ -108,8 +110,8 @@ export function CharacterCard({
           >
             {character.name}
           </h3>
-          <div>
-            <span>Level {character.level || 1}</span>
+          <div className="character-card-meta">
+            <span className="character-card-level">Level {character.level || 1}</span>
             {character?.background?.isKnownFigure !== undefined && (
               <Badge
                 icon={
@@ -131,7 +133,7 @@ export function CharacterCard({
               </Badge>
             )}
           </div>
-          <p>
+          <p className="character-card-description">
             {(() => {
               const text = (character?.background?.history ||
                 character?.background?.personality ||
@@ -148,11 +150,11 @@ export function CharacterCard({
             })()}
           </p>
           {context?.relationships && context.relationships.length > 0 && (
-            <div>
+            <div className="character-card-connections">
               <h4>Connections</h4>
-              <div>
+              <div className="character-card-connections-list">
                 {context.relationships.map((relation) => (
-                  <div key={relation.characterId}>
+                  <div key={relation.characterId} className="character-card-connection">
                     {relation.portraitUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -160,7 +162,7 @@ export function CharacterCard({
                         alt={`${relation.characterName} portrait`}
                       />
                     ) : (
-                      <div>
+                      <div className="character-card-connection-initial">
                         <span>
                           {relation.characterName.charAt(0).toUpperCase()}
                         </span>
@@ -173,7 +175,7 @@ export function CharacterCard({
             </div>
           )}
           {context?.recentEvent && (
-            <div>
+            <div className="character-card-recent">
               <h4>Recent Event</h4>
               <p>{context.recentEvent}</p>
             </div>
@@ -182,7 +184,7 @@ export function CharacterCard({
         </div>
 
         {/* Footer with buttons - always at bottom */}
-        <footer>
+        <footer className="character-card-footer">
           <CardActionGroup
             primaryActions={[
               // Add Make Active button as first primary action for inactive characters
