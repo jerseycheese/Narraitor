@@ -4318,6 +4318,16 @@
   font-weight: 500;
 }
 
+[data-theme="ds1"] .component-world-card .world-card-compare,
+[data-theme="ds3"] .component-world-card .world-card-compare {
+  display: none;
+}
+
+[data-theme="ds1"] .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
+  grid-column: 1 / -1;
+  margin-top: var(--space-3);
+}
+
 [data-theme="ds1"] .component-world-card .world-card-body {
   display: contents;
 }
@@ -4715,6 +4725,11 @@
   font-size: 1rem;
   font-style: italic;
   font-family: var(--font-narrative);
+}
+
+[data-theme="ds3"] .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
+  grid-column: 1 / -1;
+  margin-top: var(--space-2);
 }
 
 [data-theme="ds3"] .component-world-card .world-card-body {
