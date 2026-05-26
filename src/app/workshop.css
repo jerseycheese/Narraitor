@@ -4243,6 +4243,14 @@
   background: var(--color-surface-hover);
 }
 
+/* ─── PointPoolDisplay ─── */
+
+.component-point-pool-display-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Issue #1224 — Worlds + Characters: Structural DS Differentiation
    DS1 Folio  · DS2 Bento · DS3 Console
@@ -4366,6 +4374,11 @@
 [data-theme="ds1"] .component-character-card .character-card-body,
 [data-theme="ds1"] .component-character-card .character-card-inner {
   display: contents;
+}
+
+[data-theme="ds1"] .component-character-card .active-state-indicator {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-2);
 }
 
 [data-theme="ds1"] .component-character-card .character-card-portrait {
@@ -4780,6 +4793,11 @@
   display: contents;
 }
 
+[data-theme="ds3"] .component-character-card .active-state-indicator {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-1);
+}
+
 [data-theme="ds3"] .component-character-card .character-card-portrait {
   grid-column: 1;
   align-self: center;
@@ -4896,13 +4914,13 @@
   }
 }
 
-/* DS3 edit — 3-col collapsible-section grid */
+/* DS3 edit — 2-col collapsible-section grid (3-col leaves orphans with the
+   current section counts; 2-col tiles 5 sections cleanly as hero + 2×2) */
 
 [data-theme="ds3"] .component-world-editor,
 [data-theme="ds3"] .component-character-editor {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-flow: dense;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
 }
 
@@ -4911,13 +4929,6 @@
 [data-theme="ds3"] .component-world-editor > .world-editor-actions,
 [data-theme="ds3"] .component-character-editor > .character-editor-actions {
   grid-column: 1 / -1;
-}
-
-@media (width <= 1024px) {
-  [data-theme="ds3"] .component-world-editor,
-  [data-theme="ds3"] .component-character-editor {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (width <= 640px) {
