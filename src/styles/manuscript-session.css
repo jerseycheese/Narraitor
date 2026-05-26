@@ -2990,6 +2990,39 @@ body.manuscript-overlay-open {
   background: hsl(var(--destructive) / 6%);
 }
 
+/* Issue #302 — retry in-progress + fallback after persistent failures.
+   Token-driven so each theme's --destructive / surface tokens carry through. */
+.error-display-actions .error-display-retry:disabled,
+.error-display-actions .error-display-retry[aria-busy="true"] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Alternative path offered once retries are exhausted — secondary styling so it
+   reads as a different action from the destructive retry. */
+.error-display-fallback {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-2_5);
+}
+
+.error-display-actions .error-display-fallback-action {
+  padding: var(--space-1_5) var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--color-surface);
+  color: hsl(var(--destructive));
+  border: 1px solid hsl(var(--destructive) / 30%);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.error-display-actions .error-display-fallback-action:hover {
+  background: hsl(var(--destructive) / 6%);
+}
+
 /* Fix 56: DS1 error container */
 [data-theme="ds1"] .error-display-section {
   margin: var(--space-4) 0;
