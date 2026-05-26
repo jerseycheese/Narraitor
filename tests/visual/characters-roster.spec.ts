@@ -263,6 +263,45 @@ test.describe('Character roster context', () => {
           put('narraitor-character-store', characterPersist),
           put('narraitor-session-store', sessionPersist),
         ]);
+
+        // Patch stores directly once they mount — bypasses the async IndexedDB
+        // hydration race. Mirrors the pattern in seedTestData.ts.
+        function patchStores(): boolean {
+          const tw = window as typeof window & {
+            useWorldStore?: { setState?: (fn: (s: unknown) => unknown) => void };
+            useCharacterStore?: { setState?: (fn: (s: unknown) => unknown) => void };
+          };
+          if (!tw.useWorldStore?.setState || !tw.useCharacterStore?.setState) {
+            return false;
+          }
+          tw.useWorldStore.setState((s: unknown) => ({
+            ...(s as object),
+            worlds: { ...(s as { worlds?: object }).worlds, ...worldPersist.state.worlds },
+            entities: { ...(s as { entities?: object }).entities, ...worldPersist.state.entities },
+            worldStates: { ...(s as { worldStates?: object }).worldStates, ...worldPersist.state.worldStates },
+            currentWorldId: worldPersist.state.currentWorldId,
+            currentEntityId: worldPersist.state.currentEntityId,
+          }));
+          tw.useCharacterStore.setState((s: unknown) => ({
+            ...(s as object),
+            characters: { ...(s as { characters?: object }).characters, ...characterPersist.state.characters },
+            entities: { ...(s as { entities?: object }).entities, ...characterPersist.state.entities },
+            worldCharacterIds: { ...(s as { worldCharacterIds?: object }).worldCharacterIds, ...characterPersist.state.worldCharacterIds },
+            currentCharacterId: characterPersist.state.currentCharacterId,
+            currentEntityId: characterPersist.state.currentEntityId,
+          }));
+          return true;
+        }
+
+        if (!patchStores()) {
+          let attempts = 0;
+          const intervalId = window.setInterval(() => {
+            attempts += 1;
+            if (patchStores() || attempts >= 50) {
+              window.clearInterval(intervalId);
+            }
+          }, 100);
+        }
       },
       { getTimestampSource: GET_TIMESTAMP_SOURCE, seed: SEED_PAYLOAD }
     );
