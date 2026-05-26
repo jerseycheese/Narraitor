@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   // React strict mode for development warnings
   reactStrictMode: true,
 
+  // Keep large server-only packages out of the Next.js bundle so they're
+  // required natively by Node.js rather than compiled by webpack.
+  serverExternalPackages: ['@lenml/tokenizer-gemini', '@lenml/tokenizers'],
+
   // ESLint and TypeScript checks are enabled
   eslint: {
     ignoreDuringBuilds: false,
