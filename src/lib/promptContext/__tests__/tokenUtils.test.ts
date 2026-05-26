@@ -1,45 +1,101 @@
 import { estimateTokenCount, truncateToTokenLimit } from '../tokenUtils';
 
-describe('tokenUtils', () => {
-  describe('estimateTokenCount', () => {
-    it('returns 0 for empty text', () => {
-      expect(estimateTokenCount('')).toBe(0);
-      expect(estimateTokenCount('   ')).toBe(0);
-      expect(estimateTokenCount(null)).toBe(0);
-      expect(estimateTokenCount(undefined)).toBe(0);
-    });
-
-    it('counts punctuation as extra tokens', () => {
-      expect(estimateTokenCount('Hello world')).toBeLessThan(
-        estimateTokenCount('Hello, world!')
-      );
-    });
-
-    it('treats very long words as more than one token', () => {
-      expect(estimateTokenCount('supercalifragilisticexpialidocious')).toBeGreaterThan(1);
-    });
+describe('estimateTokenCount', () => {
+  it('returns 0 for falsy input', () => {
+    expect(estimateTokenCount('')).toBe(0);
+    expect(estimateTokenCount('   ')).toBe(0);
+    expect(estimateTokenCount(null)).toBe(0);
+    expect(estimateTokenCount(undefined)).toBe(0);
   });
 
-  describe('truncateToTokenLimit', () => {
-    it('returns empty string when limit <= 0', () => {
-      expect(truncateToTokenLimit('Hello world', 0)).toBe('');
-      expect(truncateToTokenLimit('Hello world', -1)).toBe('');
-    });
+  it('returns a positive count for normal prose', () => {
+    // "Hello world" → 2 content tokens (no BOS special token)
+    expect(estimateTokenCount('Hello world')).toBe(2);
+  });
 
-    it('does not truncate when already within limit', () => {
-      const text = 'Hello world';
-      const limit = estimateTokenCount(text);
-      expect(truncateToTokenLimit(text, limit)).toBe(text);
-    });
+  it('counts punctuated text as more tokens than plain text', () => {
+    expect(estimateTokenCount('Hello world')).toBeLessThan(
+      estimateTokenCount('Hello, world! How are you?')
+    );
+  });
 
-    it('truncates long text and preserves word boundaries where possible', () => {
-      const text = `START ${new Array(2000).fill('word').join(' ')} END_MARKER`;
-      const truncated = truncateToTokenLimit(text, 200);
+  it('handles a single word', () => {
+    expect(estimateTokenCount('narraitor')).toBeGreaterThan(0);
+  });
 
-      expect(truncated).toContain('START');
-      expect(truncated).not.toContain('END_MARKER');
-      expect(estimateTokenCount(truncated)).toBeLessThanOrEqual(200);
-    });
+  it('handles a single character', () => {
+    // 'a' is a single ASCII character → 1 content token
+    expect(estimateTokenCount('a')).toBe(1);
+  });
+
+  it('returns a reasonable count for a typical sentence', () => {
+    // ~10–14 tokens is a reasonable Gemini estimate for this sentence
+    const count = estimateTokenCount('The quick brown fox jumps over the lazy dog.');
+    expect(count).toBeGreaterThanOrEqual(8);
+    expect(count).toBeLessThanOrEqual(16);
+  });
+
+  it('scales with text length', () => {
+    const short = estimateTokenCount('Hello');
+    const medium = estimateTokenCount('Hello world, this is a narrative game.');
+    const long = estimateTokenCount(
+      'You stand at the edge of an ancient forest. The trees loom overhead, their branches intertwined like grasping fingers. A cold wind stirs the undergrowth.'
+    );
+    expect(short).toBeLessThan(medium);
+    expect(medium).toBeLessThan(long);
+  });
+
+  it('handles unicode — emoji', () => {
+    const count = estimateTokenCount('Hello 🌍');
+    expect(count).toBeGreaterThan(0);
+  });
+
+  it('handles unicode — CJK characters', () => {
+    const count = estimateTokenCount('你好世界');
+    expect(count).toBeGreaterThan(0);
+  });
+
+  it('handles code-like text', () => {
+    const count = estimateTokenCount('const x = Math.ceil(text.length / 4);');
+    expect(count).toBeGreaterThan(5);
+  });
+
+  it('handles very long text without throwing', () => {
+    const longText = 'word '.repeat(2000);
+    const count = estimateTokenCount(longText);
+    expect(count).toBeGreaterThan(1000);
+  });
+
+  it('trims surrounding whitespace before counting', () => {
+    expect(estimateTokenCount('  hello  ')).toBe(estimateTokenCount('hello'));
   });
 });
 
+describe('truncateToTokenLimit', () => {
+  it('returns empty string when limit <= 0', () => {
+    expect(truncateToTokenLimit('Hello world', 0)).toBe('');
+    expect(truncateToTokenLimit('Hello world', -1)).toBe('');
+  });
+
+  it('returns empty string for null/undefined input', () => {
+    expect(truncateToTokenLimit(null, 10)).toBe('');
+    expect(truncateToTokenLimit(undefined, 10)).toBe('');
+  });
+
+  it('returns text unchanged when already within limit', () => {
+    const text = 'Hello world';
+    const limit = estimateTokenCount(text);
+    expect(truncateToTokenLimit(text, limit)).toBe(text);
+  });
+
+  it('truncates long text and the result stays within limit', () => {
+    const text = `START ${new Array(2000).fill('word').join(' ')} END_MARKER`;
+    const limit = 200;
+    const truncated = truncateToTokenLimit(text, limit);
+
+    expect(truncated).toContain('START');
+    expect(truncated).not.toContain('END_MARKER');
+    expect(estimateTokenCount(truncated)).toBeLessThanOrEqual(limit);
+  });
+
+});

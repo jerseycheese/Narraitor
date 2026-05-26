@@ -1,5 +1,12 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
+
+// jsdom doesn't expose TextEncoder/TextDecoder; polyfill for Node-only packages
+if (typeof global.TextEncoder === 'undefined') {
+  global.TextEncoder = TextEncoder as typeof global.TextEncoder;
+  global.TextDecoder = TextDecoder as typeof global.TextDecoder;
+}
 
 // Mock ResizeObserver for jsdom
 global.ResizeObserver = class ResizeObserver {
