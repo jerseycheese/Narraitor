@@ -68,6 +68,11 @@ function useRetryState(
     setIsRetrying(true);
     try {
       await onRetry();
+    } catch {
+      // A failed retry is the case this feature exists for: the caller keeps
+      // the error surfaced and the fallback appears once attempts run out. We
+      // absorb the rejection here so it doesn't escape the click handler as an
+      // unhandled promise rejection.
     } finally {
       setIsRetrying(false);
     }

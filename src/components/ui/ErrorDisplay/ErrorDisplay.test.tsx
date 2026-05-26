@@ -137,4 +137,35 @@ describe('ErrorDisplay', () => {
     expect(onFallback).toHaveBeenCalledTimes(1);
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
+
+  // A failed retry is the case this feature targets — the rejection must not
+  // escape the click handler, and the flow must still degrade to the fallback.
+  it('absorbs a rejected retry and still degrades to the fallback', async () => {
+    const onRetry = jest.fn().mockRejectedValue(new Error('still failing'));
+    const onFallback = jest.fn();
+
+    render(
+      <ErrorDisplay
+        variant="section"
+        message="Persistent failure."
+        showRetry
+        onRetry={onRetry}
+        maxRetries={1}
+        fallbackMessage="Still stuck. Head back to your worlds."
+        fallbackLabel="Back to Worlds"
+        onFallback={onFallback}
+      />
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    });
+
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: /try again/i })).toBeNull()
+    );
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Still stuck. Head back to your worlds.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back to worlds/i })).toBeInTheDocument();
+  });
 });
