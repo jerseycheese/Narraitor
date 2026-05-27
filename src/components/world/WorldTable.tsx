@@ -4,18 +4,18 @@
  */
 
 import * as React from 'react';
+import Image from 'next/image';
 import { type ColumnDef, type RowSelectionState } from '@tanstack/react-table';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Trash2, Globe } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCharacterStore } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
-import { semanticColors, primitiveColors } from '@/lib/design-tokens';
 import { getGenreLabel } from '@/lib/constants/genres';
 
 interface WorldTableProps {
@@ -26,55 +26,40 @@ interface WorldTableProps {
 }
 
 interface WorldTableRowProps {
-  world: World;
   isSelected: boolean;
   cells: React.ReactNode;
 }
 
-// Separate row component to properly handle hover state
+// Row wrapper keeps the selection state hook in one place; the world image
+// now renders as a thumbnail in the Name cell rather than as a full-row
+// backdrop (the old gradient overlay drowned the image and gave selected
+// rows inverse-color text inconsistent with the rest of the table).
 const WorldTableRow = React.memo(
-  ({ world, isSelected, cells }: WorldTableRowProps) => {
-    const [isHovered, setIsHovered] = React.useState(false);
-    const hasImage = Boolean(world.image?.url);
-
-    const rowStyle: React.CSSProperties = React.useMemo(() => {
-      if (hasImage && world.image?.url) {
-        const opacity = isHovered ? '0.75, 0.7' : '0.5, 0.45';
-        return {
-          backgroundImage: `linear-gradient(to right, rgba(0, 0, 0,${opacity.split(',')[0]}), rgba(0, 0, 0,${opacity.split(',')[1]})), url(${world.image.url})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          color: semanticColors.text.inverse,
-          transition: 'background-image 0.15s ease',
-        };
-      } else {
-        // Don't override background color when selected (let Tailwind classes handle it)
-        return {
-          backgroundColor:
-            !isSelected && isHovered ? primitiveColors.zinc[300] : undefined,
-          transition: 'background-color 0.15s ease',
-        };
-      }
-    }, [hasImage, isHovered, isSelected, world.image?.url]);
-
-    const baseClasses = '[&>td]:align-middle';
-
-    return (
-      <tr
-        data-state={isSelected ? 'selected' : undefined}
-        className={baseClasses}
-        style={rowStyle}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {cells}
-      </tr>
-    );
-  }
+  ({ isSelected, cells }: WorldTableRowProps) => (
+    <tr
+      data-state={isSelected ? 'selected' : undefined}
+      className="component-world-table-row"
+    >
+      {cells}
+    </tr>
+  )
 );
 
 WorldTableRow.displayName = 'WorldTableRow';
+
+interface WorldThumbnailProps {
+  url?: string | null;
+}
+
+const WorldThumbnail: React.FC<WorldThumbnailProps> = ({ url }) => (
+  <span className="component-world-table-thumb" aria-hidden="true">
+    {url ? (
+      <Image src={url} alt="" width={32} height={32} unoptimized />
+    ) : (
+      <Globe />
+    )}
+  </span>
+);
 
 /**
  * WorldTable - A data table component for comparing and managing multiple worlds
@@ -171,8 +156,12 @@ export function WorldTable({
         accessorKey: 'name',
         header: 'Name',
         cell: ({ row }) => (
-          <div onClick={() => handleViewWorld(row.original.id)}>
-            {row.getValue('name')}
+          <div
+            className="component-world-table-name"
+            onClick={() => handleViewWorld(row.original.id)}
+          >
+            <WorldThumbnail url={row.original.image?.url} />
+            <span>{row.getValue('name') as string}</span>
           </div>
         ),
         enableSorting: true,
@@ -271,7 +260,6 @@ export function WorldTable({
     );
   }
 
-  // Custom row renderer with background images
   const customRowRenderer = (
     row: { original: World; id: string },
     cells: React.ReactNode
@@ -281,7 +269,6 @@ export function WorldTable({
     return (
       <WorldTableRow
         key={row.id}
-        world={row.original}
         isSelected={isSelected}
         cells={cells}
       />

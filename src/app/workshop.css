@@ -4251,6 +4251,39 @@
   gap: var(--space-2) var(--space-3);
 }
 
+/* ─── WorldTable — thumbnail in the Name cell ─── */
+
+.component-world-table-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.component-world-table-thumb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--space-8);
+  height: var(--space-8);
+  overflow: hidden;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+}
+
+.component-world-table-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.component-world-table-thumb svg {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Issue #1224 — Worlds + Characters: Structural DS Differentiation
    DS1 Folio  · DS2 Bento · DS3 Console
