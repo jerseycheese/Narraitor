@@ -23,7 +23,7 @@ npm run deps:validate
 
 > **Note:** Dependency-cruiser v13+ auto-finds `.dependency-cruiser.cjs` - no `--config` flag needed!
 
-> **Looking for a live, click-through graph?** dependency-cruiser is great for validation and static diagrams; for interactive exploration ("what imports `characterStore`?", "how does this cycle actually loop?"), use [skott](using-skott.md) (`npm run skott:analyze` / `skott:circular`). Run `skott:circular` before cross-domain refactors and during code-health audits to catch new cycles early.
+> **Looking for a live, click-through graph?** dependency-cruiser produces the static diagrams here; for interactive exploration ("what imports `characterStore`?", "how does this cycle actually loop?"), use [skott](using-skott.md). New circular dependencies are blocked at CI by the `skott:check` budget — `using-skott.md` covers what to do when that fails.
 
 ## Generated Diagrams
 
