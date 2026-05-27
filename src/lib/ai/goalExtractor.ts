@@ -12,6 +12,7 @@ import {
   GoalStatus,
 } from '../../types/goal.types';
 import { capitalize, safeTrim, formatDateTime } from '@/lib/utils';
+import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
 class GoalExtractor {
   private geminiClient: AIClient;
@@ -143,7 +144,7 @@ class GoalExtractor {
     // Build context text within token limits
     for (const goal of prioritizedGoals) {
       const goalText = this.formatGoalForContext(goal);
-      const goalTokens = this.estimateTokens(goalText);
+      const goalTokens = estimateTokenCount(goalText);
 
       if (tokenCount + goalTokens <= maxTokens) {
         contextText += goalText;
@@ -505,12 +506,6 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
     return `${priority}${goal.title}: ${goal.contextSummary || goal.description}\n`;
   }
 
-  /**
-   * Estimate token count for text (rough approximation)
-   */
-  private estimateTokens(text: string): number {
-    return Math.ceil(text.split(/\s+/).length * 1.3);
-  }
 }
 
 // Export singleton instance

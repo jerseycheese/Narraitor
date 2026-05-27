@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@google/genai": "^0.13.0",
+    "@lenml/tokenizer-gemini": "^3.7.2",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-scroll-area": "^1.2.10",
