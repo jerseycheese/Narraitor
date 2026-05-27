@@ -5,6 +5,18 @@
 - **dependency-cruiser** — PR-blocking validation, static diagrams in `public_docs/architecture/`, architecture rules. See [dependency-analysis.md](dependency-analysis.md).
 - **skott** — daily debugging: "what depends on `characterStore`?", "how does this circular dep actually loop?", "show me everything in the narrative domain."
 
+## How it's integrated
+
+CI runs `npm run skott:check` (the `Skott circular-dep budget` job in `ci.yml`). That script invokes skott and fails the build if the count of circular dependencies reachable from `src/app/layout.tsx` is higher than the baseline in `.skott-baseline.json`. So new cycles can't sneak in without you noticing.
+
+When CI fails:
+
+1. Run `npm run skott:circular` locally — you get the file-tree view of every cycle, top-down.
+2. Diff against what was there before to find the new one. The list is small enough (currently 17) to eyeball.
+3. Either fix the cycle, or — if it's deliberate, like the `StoreEventBus` pattern — bump the integer in `.skott-baseline.json` and note the reason in the commit message.
+
+If a refactor *removes* cycles, `skott:check` prints a "consider lowering the baseline" notice but still passes. Tightening is on the next refactor.
+
 ## Quick start
 
 Open the interactive webapp (default — opens a browser):
