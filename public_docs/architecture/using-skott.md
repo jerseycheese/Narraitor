@@ -5,6 +5,15 @@
 - **dependency-cruiser** — PR-blocking validation, static diagrams in `public_docs/architecture/`, architecture rules. See [dependency-analysis.md](dependency-analysis.md).
 - **skott** — daily debugging: "what depends on `characterStore`?", "how does this circular dep actually loop?", "show me everything in the narrative domain."
 
+## When to reach for it
+
+Two concrete triggers, plus opportunistic use:
+
+1. **Before opening a refactor PR that moves files between domains, or when adding a new store** — run `npm run skott:circular`. If the count of circular dependencies goes up vs. develop, that's a new cycle to deal with before review. dependency-cruiser will eventually flag it in CI, but skott's file-tree view tells you *which loop* you introduced, faster.
+2. **As part of the recurring code-health audit** (`workflow-skills:code-health-audit`) — run `npm run skott:circular` once per pass to see whether the circular-dep count has crept up since the last sweep. New cycles are usually a cleanup candidate.
+
+Outside those, reach for it whenever a question like *"what imports `characterStore`?"* or *"how does this cycle actually loop?"* would otherwise turn into a grep session.
+
 ## Quick start
 
 Open the interactive webapp (default — opens a browser):
