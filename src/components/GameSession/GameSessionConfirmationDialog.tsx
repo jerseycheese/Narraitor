@@ -6,7 +6,7 @@ interface GameSessionConfirmationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  type: 'start-new' | 'character-switch';
+  type: 'start-new' | 'character-switch' | 'exit';
   characterName?: string;
   currentProgress?: number;
 }
@@ -30,6 +30,13 @@ const copyConfig: Record<GameSessionConfirmationDialogProps['type'], {
       'Switching characters ends the current session and starts a new one with the selected hero. Your existing progress is saved so you can return later.',
     confirmText: 'Switch Characters',
     cancelText: 'Stay with Current Character',
+  },
+  'exit': {
+    title: 'Leave the Story?',
+    description:
+      'Your progress is saved automatically, so you can resume from this exact spot any time. Are you sure you want to step away now?',
+    confirmText: 'Leave Story',
+    cancelText: 'Keep Playing',
   },
 };
 

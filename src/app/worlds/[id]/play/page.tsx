@@ -17,6 +17,7 @@ export default function PlayPage() {
   const worldId = params?.id as string;
   const [isClient, setIsClient] = useState(false);
   const [showStartNewConfirmation, setShowStartNewConfirmation] = useState(false);
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
 
   // Check for test data to support visual regression tests (guarded for SSR)
   // Always call hooks and use persisted store data
@@ -49,6 +50,22 @@ export default function PlayPage() {
     setShowStartNewConfirmation(false);
     router.push(`/worlds/${worldId}/play?fresh=true`);
   };
+
+  // Exit prompts confirmation only when there's narrative progress to abandon.
+  // Auto-save means data isn't lost either way; the prompt just guards against
+  // accidental clicks mid-story (issue #268).
+  const handleBackClick = () => {
+    if (currentProgress > 0) {
+      setShowExitConfirmation(true);
+    } else {
+      router.push(`/worlds/${worldId}`);
+    }
+  };
+
+  const handleConfirmedExit = () => {
+    setShowExitConfirmation(false);
+    router.push(`/worlds/${worldId}`);
+  };
   
   // For server rendering, show a simple placeholder
   if (!isClient) {
@@ -66,11 +83,11 @@ export default function PlayPage() {
 
   return (
     <div className="manuscript-play-page">
-      <GameSession 
-        worldId={worldId} 
+      <GameSession
+        worldId={worldId}
         disableAutoResume={disableAutoResume}
         onStartNew={handleStartNewClick}
-        onBack={() => router.push(`/worlds/${worldId}`)}
+        onBack={handleBackClick}
       />
 
       {/* Confirmation dialog for starting new session */}
@@ -79,6 +96,15 @@ export default function PlayPage() {
         onClose={() => setShowStartNewConfirmation(false)}
         onConfirm={handleConfirmedStartNew}
         type="start-new"
+        currentProgress={currentProgress}
+      />
+
+      {/* Confirmation dialog for exiting the session mid-story */}
+      <GameSessionConfirmationDialog
+        isOpen={showExitConfirmation}
+        onClose={() => setShowExitConfirmation(false)}
+        onConfirm={handleConfirmedExit}
+        type="exit"
         currentProgress={currentProgress}
       />
     </div>
