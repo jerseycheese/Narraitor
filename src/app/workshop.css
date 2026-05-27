@@ -4402,7 +4402,7 @@
   gap: var(--space-3);
 }
 
-.component-data-field {
+.world-detail-meta-grid .component-data-field {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
@@ -4412,7 +4412,7 @@
   background: var(--color-surface);
 }
 
-.component-data-field > span:first-child {
+.world-detail-meta-grid .component-data-field > span:first-child {
   font-family: var(--font-system);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -4421,16 +4421,16 @@
   color: var(--color-text-muted);
 }
 
-.component-data-field > p,
-.component-data-field > span:last-child,
-.component-data-field > div:last-child {
+.world-detail-meta-grid .component-data-field > p,
+.world-detail-meta-grid .component-data-field > span:last-child,
+.world-detail-meta-grid .component-data-field > div:last-child {
   margin: 0;
   font-family: var(--font-interface);
   font-size: 0.9375rem;
   color: var(--color-text-primary);
 }
 
-.component-data-field-stacked > div:first-child {
+.world-detail-meta-grid .component-data-field-stacked > div:first-child {
   font-family: var(--font-system);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -4443,7 +4443,7 @@
 
 [data-theme="ds1"] .world-detail-npc,
 [data-theme="ds1"] .world-detail-stat,
-[data-theme="ds1"] .component-data-field {
+[data-theme="ds1"] .world-detail-meta-grid .component-data-field {
   border-radius: 2px;
   background: transparent;
 }
@@ -4457,14 +4457,14 @@
 
 [data-theme="ds3"] .world-detail-npc,
 [data-theme="ds3"] .world-detail-stat,
-[data-theme="ds3"] .component-data-field {
+[data-theme="ds3"] .world-detail-meta-grid .component-data-field {
   position: relative;
   border-radius: 0;
 }
 
 [data-theme="ds3"] .world-detail-npc::before,
 [data-theme="ds3"] .world-detail-stat::before,
-[data-theme="ds3"] .component-data-field::before {
+[data-theme="ds3"] .world-detail-meta-grid .component-data-field::before {
   content: "";
   position: absolute;
   top: 0;
