@@ -33,14 +33,47 @@ export function generateLoreKey(worldId: string, category: string, name: string,
 }
 
 /**
+ * Generic NPC words that, when they make up the entire name, mark it as a
+ * non-specific group rather than a stored entity. Pair with the structural
+ * "plural" check below for harder cases like "Dothraki warriors".
+ */
+const GENERIC_NPC_DENYLIST = new Set([
+  'guards', 'guard',
+  'villagers',
+  'soldiers',
+  'warriors',
+  'townsfolk', 'townspeople',
+  'citizens',
+  'peasants',
+  'merchants',
+  'travelers',
+  'workers',
+  'farmers',
+  'bandits',
+  'thieves',
+  'mages',
+  'knights',
+  'crowd', 'mob', 'group', 'party',
+  'people', 'men', 'women', 'children',
+  'man', 'woman', 'child', 'boy', 'girl',
+  'figure', 'figures',
+  'stranger', 'strangers',
+  'person', 'persons',
+]);
+
+/**
  * Filters out generic/unnamed characters that shouldn't be stored as named entities,
  * which avoids cluttering the lore store with placeholders or vague groups.
  *
  * Rejects:
  * - Unnamed placeholders (e.g., "Unnamed warrior", "Unknown person")
  * - Descriptive phrases (e.g., "Man with sword")
- * - Plural/group entities (e.g., "guards", "villagers")
+ * - Plural/group entities (e.g., "guards", "Dothraki warriors") via a denylist
+ *   plus a structural plural heuristic
  * - Sentence-like names (too many words)
+ *
+ * Accepts faction-style names that include "of" ("Brothers of Steel") or a
+ * possessive ("King's Guard") even when they trip the plural heuristic.
  *
  * @param name - The character name to validate.
  * @returns True if the name should be stored, false otherwise.
@@ -56,16 +89,37 @@ export function shouldStoreExtractedCharacterName(name: string): boolean {
   if (normalized.startsWith('unnamed ') || normalized.startsWith('unknown ')) return false;
   if (normalized.includes(' with ')) return false;
 
-  // Reject obvious group/plural entities (usually not a stable, named character).
   const tokens = normalized.split(/\s+/).filter(Boolean);
-  const isPluralGroup =
-    tokens.length <= 3 &&
-    tokens.some((token) => token.endsWith('s')) &&
-    !canonicalName.includes("'"); // allow possessives/aliases like "King's Guard"
-  if (isPluralGroup) return false;
 
   // Avoid sentence-like "names".
   if (tokens.length > 6) return false;
+
+  const stopWords = new Set(['the', 'a', 'an']);
+  const meaningfulTokens = tokens.filter((token) => !stopWords.has(token));
+
+  // Every meaningful token is a generic NPC word → reject ("guards", "the villagers").
+  if (
+    meaningfulTokens.length > 0 &&
+    meaningfulTokens.every((token) => GENERIC_NPC_DENYLIST.has(token))
+  ) {
+    return false;
+  }
+
+  // Faction-style names with "of" or a possessive are explicit signals — accept
+  // even when the plural heuristic would otherwise reject ("Brothers of Steel",
+  // "King's Guard").
+  if (/\bof\b/i.test(canonicalName) || canonicalName.includes("'")) {
+    return true;
+  }
+
+  // Structural plural heuristic: short multi-word names whose tokens end in 's'
+  // are usually generic groups ("Dothraki warriors", "town guards"). Allow
+  // single-token proper nouns ending in 's' through ("James", "Artemis").
+  const isPluralGroup =
+    tokens.length >= 2 &&
+    tokens.length <= 3 &&
+    tokens.some((token) => token.endsWith('s'));
+  if (isPluralGroup) return false;
 
   return true;
 }
