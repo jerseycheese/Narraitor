@@ -182,7 +182,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
           })()}
         </Link>
         {onToggleSelect && (
-          <div>
+          <div className="world-card-compare">
             <Checkbox
               checked={isSelected}
               onChange={() => onToggleSelect(world.id)}

@@ -211,6 +211,32 @@ export async function hideNextDevOverlay(page: Page): Promise<void> {
 }
 
 /**
+ * Pin the sticky app shell (workshop sidebar + page header) into normal flow.
+ * Without this, locator and fullPage screenshots of tall pages get the sticky
+ * header overlaid mid-content, since the header sticks at its viewport position
+ * relative to where the locator was scrolled. Mirrors the shell-pinning step in
+ * world-creation.spec.ts captureWizardStep.
+ */
+export async function pinAppShell(page: Page): Promise<void> {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.addStyleTag({
+    content: `
+      .workshop-sidebar {
+        position: static !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      header {
+        position: static !important;
+      }
+    `,
+  });
+  await page.waitForTimeout(50);
+}
+
+/**
  * Expand all CollapsibleSection components on the page for consistent visual testing.
  * This ensures all collapsible content is visible in screenshots.
  */

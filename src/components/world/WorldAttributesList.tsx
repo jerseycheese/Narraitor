@@ -18,20 +18,20 @@ export function WorldAttributesList({ attributes }: WorldAttributesListProps) {
       className="world-detail-section"
       title="Attributes that apply to characters in this world"
     >
-      <div>
+      <div className="world-detail-stat-list">
         {attributes.map((attr, index) => (
-          <div key={`${attr.id ?? attr.name ?? index}`} >
-            <div>
-              <h3>{attr.name}</h3>
-              <span>
-                Range: {attr.minValue} - {attr.maxValue}
+          <div key={`${attr.id ?? attr.name ?? index}`} className="world-detail-stat">
+            <div className="world-detail-stat-head">
+              <h3 className="world-detail-stat-name">{attr.name}</h3>
+              <span className="world-detail-stat-range">
+                Range: {attr.minValue} – {attr.maxValue}
               </span>
             </div>
             {attr.description && (
-              <p>{attr.description}</p>
+              <p className="world-detail-stat-description">{attr.description}</p>
             )}
             {attr.baseValue !== undefined && (
-              <p>Default: {attr.baseValue}</p>
+              <p className="world-detail-stat-default">Default: {attr.baseValue}</p>
             )}
           </div>
         ))}

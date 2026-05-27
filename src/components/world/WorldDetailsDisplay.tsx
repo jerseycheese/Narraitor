@@ -65,22 +65,27 @@ export function WorldDetailsDisplay({
 
       {worldNpcs.length > 0 && (
         <section
-          className="world-detail-section"
+          className="world-detail-section world-detail-npcs"
           aria-labelledby="world-npcs-heading"
         >
           <h2 id="world-npcs-heading">Characters you may meet</h2>
-          <p>
+          <p className="world-detail-npcs-lede">
             These NPCs were generated alongside <span>{world.name}</span> and
             will appear in narrative scenes for this world.
           </p>
-          <ul>
+          <ul className="world-detail-npcs-grid">
             {worldNpcs.map((npc) => (
-              <li key={npc.id}>
+              <li key={npc.id} className="world-detail-npc">
                 {npc.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={npc.avatarUrl} alt={npc.name} loading="lazy" />
+                  <img
+                    className="world-detail-npc-avatar"
+                    src={npc.avatarUrl}
+                    alt={npc.name}
+                    loading="lazy"
+                  />
                 ) : (
-                  <div>
+                  <div className="world-detail-npc-avatar world-detail-npc-avatar-fallback" aria-hidden="true">
                     {npc.name
                       .split(' ')
                       .map((segment) => segment[0])
@@ -89,9 +94,9 @@ export function WorldDetailsDisplay({
                       .slice(0, 2)}
                   </div>
                 )}
-                <div>
-                  <p>{npc.name}</p>
-                  <p>{npc.description}</p>
+                <div className="world-detail-npc-meta">
+                  <p className="world-detail-npc-name">{npc.name}</p>
+                  <p className="world-detail-npc-description">{npc.description}</p>
                 </div>
               </li>
             ))}

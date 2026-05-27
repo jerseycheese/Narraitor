@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/seedTestData';
 
 /**
@@ -112,6 +112,7 @@ test.describe('Main Pages Visual Tests', () => {
     await page.goto('/worlds/world-cyberpunk-2077');
     await waitForContentStable(page);
     await hideDynamicContent(page);
+    await pinAppShell(page);
 
     // Take screenshot of world detail page - should show world info, characters, and actions
     await expect(page).toHaveScreenshot('world-detail.png', { fullPage: true });
@@ -124,7 +125,8 @@ test.describe('Main Pages Visual Tests', () => {
     await page.goto('/characters/char-cyberpunk-hacker');
     await waitForContentStable(page);
     await hideDynamicContent(page);
-    
+    await pinAppShell(page);
+
     // Take screenshot of character detail page - should show character sheet, attributes, skills
     await expect(page).toHaveScreenshot('character-detail.png', { fullPage: true });
   });
@@ -148,7 +150,8 @@ test.describe('Main Pages Visual Tests', () => {
     await expect(
       editor.locator('[data-testid="collapsible-section-toggle"]').filter({ hasText: '+' })
     ).toHaveCount(0);
-    
+    await pinAppShell(page);
+
     // Take screenshot of world edit page - should show world editing interface with all sections expanded
     await expect(page).toHaveScreenshot('world-edit.png', { fullPage: true });
   });
@@ -192,7 +195,8 @@ test.describe('Main Pages Visual Tests', () => {
       hasText: '+'
     }).count();
     console.log(`Found ${stillCollapsed} collapsed sections after expansion`);
-    
+    await pinAppShell(page);
+
     // Take screenshot of character edit page - should show character editing interface with all sections expanded
     await expect(page).toHaveScreenshot('character-edit.png', { fullPage: true });
   });

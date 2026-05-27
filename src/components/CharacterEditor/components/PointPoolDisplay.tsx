@@ -31,7 +31,7 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
       <div>
         <div>
           <span>{label}</span>
-          <div>
+          <div className="component-point-pool-display-stats">
             <span>
               Total: <span>{pool.total}</span>
             </span>
@@ -49,8 +49,7 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
           )}
         </div>
       </div>
-      {/* Visually hidden status for screen readers */}
-      <span>{statusText}</span>
+      <span className="sr-only">{statusText}</span>
     </div>
   );
 };
