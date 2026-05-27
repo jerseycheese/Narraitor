@@ -296,7 +296,8 @@ export const createLoreFactActions = (set: SetState, get: GetState) => ({
   getLoreContext: (
     worldId: EntityID,
     sessionId?: EntityID,
-    limit = 20
+    limit = 20,
+    options?: { categoryBalanced?: boolean }
   ): LoreContext => {
     const worldFacts = get().getFacts({ worldId });
 
@@ -307,18 +308,46 @@ export const createLoreFactActions = (set: SetState, get: GetState) => ({
       );
     });
 
-    const sortedFacts = visibleFacts.sort((a, b) => {
+    const byImportance = (a: LoreFact, b: LoreFact) => {
       const rankA = importanceRank(a.metadata?.importance);
       const rankB = importanceRank(b.metadata?.importance);
-
-      if (rankA !== rankB) {
-        return rankB - rankA;
-      }
-
+      if (rankA !== rankB) return rankB - rankA;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+    };
 
-    const selectedFacts = sortedFacts.slice(0, limit);
+    let selectedFacts: LoreFact[];
+
+    if (options?.categoryBalanced) {
+      // Round-robin across categories so character-heavy worlds don't crowd out
+      // locations / rules / events. Within each category we still prefer higher
+      // importance, falling back to recency.
+      const buckets: Record<LoreCategory, LoreFact[]> = {
+        characters: [],
+        locations: [],
+        events: [],
+        rules: [],
+      };
+      for (const fact of visibleFacts) {
+        buckets[fact.category]?.push(fact);
+      }
+      for (const category of Object.keys(buckets) as LoreCategory[]) {
+        buckets[category].sort(byImportance);
+      }
+      selectedFacts = [];
+      const order: LoreCategory[] = ['characters', 'locations', 'rules', 'events'];
+      while (selectedFacts.length < limit) {
+        const before = selectedFacts.length;
+        for (const category of order) {
+          if (selectedFacts.length >= limit) break;
+          const next = buckets[category].shift();
+          if (next) selectedFacts.push(next);
+        }
+        if (selectedFacts.length === before) break; // no more facts to draw
+      }
+    } else {
+      selectedFacts = [...visibleFacts].sort(byImportance).slice(0, limit);
+    }
+
     const factStrings = selectedFacts.map(
       (fact) => `${fact.category}: ${fact.key} = ${fact.value}`
     );
@@ -503,6 +532,7 @@ export const createLoreAliasActions = (_set: SetState, get: GetState) => {
     getFact: get().getById,
     updateFact: get().update,
     getFacts: get().getFacts,
+    getAllFacts: () => get().facts,
   });
 
   return {

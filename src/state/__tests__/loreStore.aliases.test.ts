@@ -459,6 +459,47 @@ describe('LoreStore - Alias Management', () => {
       expect(found2?.value).toBe('Lady Victoria');
     });
 
+    it('should stay correct after aliases are added, removed, and replaced (index invalidation)', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      let factId!: string;
+      act(() => {
+        factId = result.current.addFact(
+          'world-1:character_lady_seraphina',
+          'Lady Seraphina',
+          'characters',
+          'manual',
+          'world-1'
+        );
+        result.current.setAliases(factId, ['Seraphina', 'Lady Sera']);
+      });
+
+      // Index built from the post-setAliases facts record.
+      expect(result.current.findEntityByAnyName('Lady Sera', 'world-1')?.id).toBe(factId);
+
+      act(() => {
+        result.current.removeAlias(factId, 'Lady Sera');
+      });
+
+      // After mutation, the cached index for the old facts object is stale, but
+      // findEntityByAnyName looks up against the new facts record so it must miss.
+      expect(result.current.findEntityByAnyName('Lady Sera', 'world-1')).toBeNull();
+
+      act(() => {
+        result.current.addAlias(factId, 'Lady Sera');
+      });
+
+      // Re-adding should make it findable again.
+      expect(result.current.findEntityByAnyName('Lady Sera', 'world-1')?.id).toBe(factId);
+
+      act(() => {
+        result.current.deleteFact(factId);
+      });
+
+      // Deletion invalidates the index too.
+      expect(result.current.findEntityByAnyName('Lady Seraphina', 'world-1')).toBeNull();
+    });
+
     it('should handle special characters in names', () => {
       const { result } = renderHook(() => useLoreStore());
 

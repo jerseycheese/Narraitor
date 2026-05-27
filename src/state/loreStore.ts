@@ -61,7 +61,12 @@ export interface LoreStore extends CrudStore<LoreFact> {
   getFactHistory: (id: EntityID) => LoreFact[];
   validateFact: (fact: Partial<{ key: string; value: string; category: LoreCategory; worldId: EntityID }>) => boolean;
   validateKey: (key: string) => boolean;
-  getLoreContext: (worldId: EntityID, sessionId?: EntityID, limit?: number) => LoreContext;
+  getLoreContext: (
+    worldId: EntityID,
+    sessionId?: EntityID,
+    limit?: number,
+    options?: { categoryBalanced?: boolean }
+  ) => LoreContext;
   addStructuredLore: (extraction: StructuredLoreExtraction, worldId: EntityID, sessionId?: EntityID) => void;
   addAlias: (id: EntityID, alias: string) => void;
   removeAlias: (id: EntityID, alias: string) => void;
