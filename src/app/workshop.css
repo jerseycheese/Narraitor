@@ -4402,6 +4402,16 @@
   gap: var(--space-3);
 }
 
+/* At narrow viewports the auto-fill minmax above wins over container
+   width and pushes the grid past the viewport; collapse to 1fr. */
+@media (width <= 480px) {
+  .world-detail-npcs-grid,
+  .world-detail-stat-list,
+  .world-detail-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .world-detail-meta-grid .component-data-field {
   display: flex;
   flex-direction: column;
