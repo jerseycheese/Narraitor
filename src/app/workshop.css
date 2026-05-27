@@ -4836,7 +4836,7 @@
   gap: clamp(var(--space-5), 3vw, var(--space-8));
 }
 
-@media (width >= 1280px) {
+@media (width >= 1600px) {
   [data-theme="ds2"] .world-list-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -4851,6 +4851,13 @@
 [data-theme="ds2"] .component-world-card {
   border-radius: 1rem;
   padding: var(--space-3);
+}
+
+/* DS2 Bento — cap the character pill strip so a world with many NPCs
+   doesn't pull its card to several times the height of its neighbors. */
+[data-theme="ds2"] .component-world-card .world-card-character-pills {
+  max-height: 5.5rem;
+  overflow: hidden;
 }
 
 [data-theme="ds2"] .characters-grid {
