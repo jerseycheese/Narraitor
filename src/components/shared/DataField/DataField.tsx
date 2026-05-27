@@ -22,7 +22,7 @@ export function DataField({
 
   if (variant === 'outline') {
     return (
-      <div className={className} id={fieldId}>
+      <div className={`component-data-field component-data-field-${variant} ${className}`.trim()} id={fieldId}>
         <span aria-describedby={valueId}>
           {label}:
         </span>
@@ -35,7 +35,7 @@ export function DataField({
 
   if (variant === 'stacked') {
     return (
-      <div className={className} id={fieldId}>
+      <div className={`component-data-field component-data-field-${variant} ${className}`.trim()} id={fieldId}>
         <div aria-describedby={valueId}>
           {label}
         </div>

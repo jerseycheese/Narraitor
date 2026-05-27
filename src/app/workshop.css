@@ -4251,6 +4251,230 @@
   gap: var(--space-2) var(--space-3);
 }
 
+/* ─── World detail — section body treatments ───────────────────
+   The page-shell (per-theme silhouette) lives further up in the
+   DS1/DS2/DS3 blocks; these rules style the content INSIDE each
+   .world-detail-section so the raw markup doesn't read as a debug
+   dump. Universal across themes; per-theme tweaks layer on top. */
+
+.world-detail-section > p {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-interface);
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.world-detail-npcs-lede {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.world-detail-npcs-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+
+.world-detail-npc {
+  display: grid;
+  grid-template-columns: var(--space-8) 1fr;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.world-detail-npc-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  overflow: hidden;
+  border-radius: var(--radius-full, 9999px);
+  object-fit: cover;
+  background: var(--color-surface-hover);
+}
+
+.world-detail-npc-avatar-fallback {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.world-detail-npc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.world-detail-npc-name {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.world-detail-npc-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* Attributes / Skills lists */
+
+.world-detail-stat-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-3);
+}
+
+.world-detail-stat {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.world-detail-stat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.world-detail-stat-name {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.world-detail-stat-range {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.world-detail-stat-description {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.world-detail-stat-default {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.world-detail-stat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Settings / Info / Image-details meta grid (DataField rows) */
+
+.world-detail-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--space-3);
+}
+
+.component-data-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--color-surface);
+}
+
+.component-data-field > span:first-child {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.component-data-field > p,
+.component-data-field > span:last-child,
+.component-data-field > div:last-child {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+}
+
+.component-data-field-stacked > div:first-child {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* DS1 manuscript overlay — sharper borders, no card background */
+
+[data-theme="ds1"] .world-detail-npc,
+[data-theme="ds1"] .world-detail-stat,
+[data-theme="ds1"] .component-data-field {
+  border-radius: 2px;
+  background: transparent;
+}
+
+[data-theme="ds1"] .world-detail-stat-name {
+  font-family: var(--font-narrative);
+  font-weight: 500;
+}
+
+/* DS3 console — corner-bracket accent on stat/npc/data cards */
+
+[data-theme="ds3"] .world-detail-npc,
+[data-theme="ds3"] .world-detail-stat,
+[data-theme="ds3"] .component-data-field {
+  position: relative;
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .world-detail-npc::before,
+[data-theme="ds3"] .world-detail-stat::before,
+[data-theme="ds3"] .component-data-field::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+}
+
 /* ─── WorldTable — thumbnail in the Name cell ─── */
 
 .component-world-table-name {
