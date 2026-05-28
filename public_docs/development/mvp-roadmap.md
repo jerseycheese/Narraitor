@@ -129,7 +129,7 @@ Valuable but can launch with Gemini-only:
 
 ## Technical Debt & Infrastructure
 - Playwright visual regression testing — done (`tests/visual/`, runs in CI)
-- Dead-code and architecture tooling — done (knip, CSS audit, dependency-cruiser, mutation testing)
+- Dead-code and architecture tooling — done (knip, CSS audit, dependency-cruiser, mutation testing, skott circular-dep budget)
 - Optimize bundle size and performance
 - Enhance error boundaries and recovery
 - Improve TypeScript strictness
