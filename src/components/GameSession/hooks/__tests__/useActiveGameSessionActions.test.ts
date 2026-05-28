@@ -34,6 +34,7 @@ const buildOptions = (overrides = {}) => ({
   setIsGenerating: jest.fn(),
   setShouldTriggerGeneration: jest.fn(),
   setIsGeneratingChoices: jest.fn(),
+  setIsEvaluatingAction: jest.fn(),
   setLocalSelectedChoiceId: jest.fn(),
   choiceGenerationTimeoutRef: { current: null },
   scheduleChoiceFallback: jest.fn(),

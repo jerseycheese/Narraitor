@@ -13,6 +13,7 @@ interface ActiveGameSessionChoicesColumnProps {
   status: 'active' | 'paused' | 'ended';
   isGenerating: boolean;
   isGeneratingChoices: boolean;
+  isEvaluatingAction?: boolean;
   isSessionEnded: boolean;
   worldSkills: WorldSkill[];
   characterSkills: CharacterSkill[];
@@ -42,6 +43,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
   status,
   isGenerating,
   isGeneratingChoices,
+  isEvaluatingAction = false,
   isSessionEnded,
   worldSkills,
   characterSkills,
@@ -79,12 +81,19 @@ const ActiveGameSessionChoicesColumn: React.FC<
   );
 
   return (
-    <div className={className} aria-busy={isGeneratingChoices}>
-      {(isGenerating || isGeneratingChoices) && (
-        <div className="manuscript-streaming-indicator">
-          <span className="manuscript-streaming-dot" />
-          <span className="manuscript-streaming-label">Generating response...</span>
+    <div className={className} aria-busy={isGeneratingChoices || isEvaluatingAction}>
+      {isEvaluatingAction ? (
+        <div className="manuscript-evaluating-indicator" role="status">
+          <span className="manuscript-evaluating-die" aria-hidden="true" />
+          <span className="manuscript-evaluating-label">Evaluating action...</span>
         </div>
+      ) : (
+        (isGenerating || isGeneratingChoices) && (
+          <div className="manuscript-streaming-indicator">
+            <span className="manuscript-streaming-dot" />
+            <span className="manuscript-streaming-label">Generating response...</span>
+          </div>
+        )
       )}
       <div className="player-choices-container" data-tutorial={dataTutorial}>
         {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}

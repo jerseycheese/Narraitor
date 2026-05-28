@@ -2751,6 +2751,43 @@ body.manuscript-overlay-open {
   letter-spacing: 0.04em;
 }
 
+/* Issue #918: evaluating-action state — a tumbling-die motif distinguishes a
+   skill-check evaluation phase from generic generation. Hidden by default,
+   themed per design system below. */
+.manuscript-evaluating-indicator {
+  display: none;
+}
+
+[data-theme="ds1"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1_5);
+  padding: var(--space-2_5) var(--space-2_5) var(--space-1_5);
+}
+
+[data-theme="ds1"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-text-muted);
+  animation: manuscript-die-tumble 1s linear infinite;
+}
+
+[data-theme="ds1"] .manuscript-evaluating-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Shared tumble keyframe — a die rotating as it is cast. */
+@keyframes manuscript-die-tumble {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* DS1: always show expanded choices, hide mobile toggle */
 [data-theme="ds1"] .manuscript-mobile-rail-top-controls {
   display: none;
@@ -3801,6 +3838,32 @@ body.manuscript-overlay-open {
   50% { opacity: 1; }
 }
 
+/* DS2 evaluating-action — accent die, bolder to match the Bento accent language */
+[data-theme="ds2"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+[data-theme="ds2"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  animation: manuscript-die-tumble 0.9s ease-in-out infinite;
+}
+
+[data-theme="ds2"] .manuscript-evaluating-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 /* DS2 skeleton shimmer — warm gradient */
 [data-theme="ds2"] .manuscript-skeleton-pulse {
   background: linear-gradient(
@@ -4504,6 +4567,37 @@ body.manuscript-overlay-open {
 @keyframes ds3-streaming-pulse {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
+}
+
+/* DS3 evaluating-action — cool muted die + bracketed console-style label */
+[data-theme="ds3"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds3"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-text-muted);
+  animation: manuscript-die-tumble 1.3s linear infinite;
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label::before {
+  content: "[ ";
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label::after {
+  content: " ]";
 }
 
 /* DS3 skeleton shimmer — cool-toned gradient */
