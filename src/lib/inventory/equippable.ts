@@ -8,7 +8,7 @@ import { getCategoryMetadata } from './categories';
  * Everything else (consumables, valuables, documents, quest-items, etc.)
  * is carried but not "equipped" in a loadout sense.
  */
-export const EQUIPPABLE_CATEGORIES: StandardInventoryCategory[] = [
+const EQUIPPABLE_CATEGORIES: StandardInventoryCategory[] = [
   'equipment',
   'personal',
 ];
