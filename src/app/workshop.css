@@ -3291,16 +3291,6 @@
   }
 }
 
-/* ─── CharacterTable portrait ─── */
-
-.character-portrait-clickable {
-  width: var(--space-6);
-  height: var(--space-6);
-  cursor: pointer;
-  border-radius: var(--radius-full, 9999px);
-  overflow: hidden;
-}
-
 /* ═══════════════════════════════════════════════════════════════
    Journal
    ═══════════════════════════════════════════════════════════════ */
@@ -4407,7 +4397,8 @@
 @media (width <= 480px) {
   .world-detail-npcs-grid,
   .world-detail-stat-list,
-  .world-detail-meta-grid {
+  .world-detail-meta-grid,
+  .character-detail-derived-list {
     grid-template-columns: 1fr;
   }
 }
@@ -4516,6 +4507,198 @@
 .component-world-table-thumb svg {
   width: var(--space-5);
   height: var(--space-5);
+}
+
+/* ─── Character detail — derived stats (mirrors world-detail-stat) ─── */
+
+.character-detail-derived-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-3);
+}
+
+.character-detail-derived-stat {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.character-detail-derived-stat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.character-detail-derived-stat-name {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.character-detail-derived-stat-values {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.character-detail-derived-stat-current {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.character-detail-derived-stat-bar {
+  height: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-surface-hover);
+}
+
+.character-detail-derived-stat-fill {
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.character-detail-derived-stat-fill-low {
+  background: var(--color-warning);
+}
+
+.character-detail-derived-stat-fill-depleted {
+  background: var(--color-danger);
+}
+
+.character-detail-derived-stat-warning {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-danger);
+}
+
+/* ─── Character detail — background (mirrors world-detail meta cards) ─── */
+
+.character-detail-background {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.character-detail-background-section {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.character-detail-background-heading {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.character-detail-background-text {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+.character-detail-background-list {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.character-detail-background-list-item {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+/* DS1 manuscript overlay — sharper borders, no card background.
+   Extends the existing attribute/skill cards for content-treatment parity. */
+
+[data-theme="ds1"] .character-detail-derived-stat,
+[data-theme="ds1"] .character-detail-background-section,
+[data-theme="ds1"] .character-attribute-card,
+[data-theme="ds1"] .character-skill-card {
+  border-radius: 2px;
+  background: transparent;
+}
+
+[data-theme="ds1"] .character-detail-derived-stat-name {
+  font-family: var(--font-narrative);
+  font-weight: 500;
+}
+
+/* DS3 console — corner-bracket accent on character content cards */
+
+[data-theme="ds3"] .character-detail-derived-stat,
+[data-theme="ds3"] .character-detail-background-section,
+[data-theme="ds3"] .character-attribute-card,
+[data-theme="ds3"] .character-skill-card {
+  position: relative;
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .character-detail-derived-stat::before,
+[data-theme="ds3"] .character-detail-background-section::before,
+[data-theme="ds3"] .character-attribute-card::before,
+[data-theme="ds3"] .character-skill-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+}
+
+/* ─── CharacterTable — thumbnail in the Name cell (mirrors WorldTable) ─── */
+
+.component-character-table-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.component-character-table-thumb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--space-8);
+  height: var(--space-8);
+  overflow: hidden;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+}
+
+.component-character-table-thumb .component-character-portrait {
+  width: 100%;
+  height: 100%;
+}
+
+.component-character-table-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ═══════════════════════════════════════════════════════════════
