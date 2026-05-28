@@ -8,6 +8,7 @@ import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
 import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/sessionUtils';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { writeRecoveryMarker, clearRecoveryMarker } from '@/lib/utils/sessionRecoveryMarker';
 
 /**
  * Create logger instance for this store
@@ -38,6 +39,25 @@ const buildLifecycleMetadata = (
   status: params.status ?? 'active',
   lastActivity: params.lastActivity ?? getTimestamp(),
 });
+
+/**
+ * Keep the crash-recovery marker in step with the live session. Only an active
+ * session with full world/character context is recoverable, so that's the only
+ * shape we record. Called on activation and on each save/heartbeat (issue #221).
+ */
+const syncRecoveryMarker = (
+  state: Pick<SessionStore, 'id' | 'status' | 'worldId' | 'characterId'>,
+  lastActivity: string
+): void => {
+  if (state.status === 'active' && state.id && state.worldId && state.characterId) {
+    writeRecoveryMarker({
+      sessionId: state.id,
+      worldId: state.worldId,
+      characterId: state.characterId,
+      lastActivity,
+    });
+  }
+};
 
 /**
  * Initial state for the session store
@@ -214,8 +234,11 @@ export const useSessionStore = create<SessionStore>()(
           }
         };
       });
-      
-      
+
+      // Mark the session live for crash recovery (issue #221)
+      syncRecoveryMarker(get(), activationTimestamp);
+
+
       // Create session start journal entry (Issue #176)
       try {
         // Cache imported store modules to avoid repeated dynamic imports
@@ -288,7 +311,11 @@ export const useSessionStore = create<SessionStore>()(
   endSession: async () => {
     const state = get();
     const lifecycleUpdateTime = getTimestamp();
-    
+
+    // Clean exit: drop the crash-recovery marker so the next load doesn't
+    // mistake this for an abnormal end (issue #221)
+    clearRecoveryMarker();
+
     if (state.id && state.worldId && state.characterId) {
       
       // Create session end journal entry (Issue #176)
@@ -523,6 +550,8 @@ export const useSessionStore = create<SessionStore>()(
           sessionLifecycle: nextLifecycle,
         };
       });
+      // Mark the resumed session live for crash recovery (issue #221)
+      syncRecoveryMarker(get(), activationTimestamp);
       return true;
     }
     return false;
@@ -637,6 +666,10 @@ export const useSessionStore = create<SessionStore>()(
         sessionLifecycle: nextLifecycle,
       };
     });
+
+    // Heartbeat: refresh the crash-recovery marker as the story progresses so a
+    // crash recovers state from at most a few minutes ago (issue #221)
+    syncRecoveryMarker(get(), getTimestamp());
   },
 
   upsertSessionLifecycle: (metadata: SessionLifecycleMetadata) => {

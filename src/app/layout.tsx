@@ -23,6 +23,7 @@ import '@/lib/theme/themes/ds3.css';
 import { DevToolsProvider } from '@/components/devtools';
 import { ClientOnlyDevTools } from '@/components/ClientOnlyDevTools';
 import { AppSurfaceShell } from '@/components/layout/AppSurfaceShell';
+import { SessionRecoveryManager } from '@/components/GameSession/SessionRecoveryManager';
 import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
 import { SkipLinks } from '@/components/shared/SkipLinks';
 import { ToastProvider, Toaster } from '@/components/ui/toast';
@@ -139,6 +140,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   <AppSurfaceShell>
                     {children}
                   </AppSurfaceShell>
+                  <SessionRecoveryManager />
                   <ClientOnlyDevTools />
                   <Toaster />
                 </TutorialProvider>
