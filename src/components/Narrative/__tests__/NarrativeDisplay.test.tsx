@@ -156,9 +156,9 @@ describe('NarrativeDisplay', () => {
     render(<NarrativeDisplay segment={null} error={errorMessage} onRetry={mockRetry} />);
 
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
-    expect(screen.getByText('Try Again')).toBeInTheDocument();
+    expect(screen.getByText('Continue the story')).toBeInTheDocument();
 
-    await user.click(screen.getByText('Try Again'));
+    await user.click(screen.getByText('Continue the story'));
     expect(mockRetry).toHaveBeenCalledTimes(1);
   });
 

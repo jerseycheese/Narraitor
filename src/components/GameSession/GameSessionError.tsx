@@ -18,11 +18,12 @@ const GameSessionError: React.FC<GameSessionErrorProps> = ({
     <div data-testid="game-session-error">
       <ErrorDisplay
         variant="section"
-        title="Game Session Error"
+        title="The story paused"
         message={error}
         severity="error"
         showRetry
         onRetry={onRetry}
+        retryLabel="Continue the story"
         showDismiss={!!onDismiss}
         onDismiss={onDismiss}
       />

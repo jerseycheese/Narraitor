@@ -270,10 +270,10 @@ describe('AI error flow → ErrorDisplay/GameSessionError integration', () => {
 
       const wrapper = await screen.findByTestId('game-session-error');
       expect(wrapper).toBeInTheDocument();
-      expect(screen.getByText('Game Session Error')).toBeInTheDocument();
+      expect(screen.getByText('The story paused')).toBeInTheDocument();
 
       // Retry then dismiss both work through the GameSessionError surface.
-      fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+      fireEvent.click(screen.getByRole('button', { name: /continue the story/i }));
       await waitFor(() => {
         expect(screen.queryByTestId('game-session-error')).not.toBeInTheDocument();
       });
