@@ -319,19 +319,19 @@ describe('CharacterTable', () => {
     expect(mockOnView).toHaveBeenCalledWith('char-1');
   });
 
-  it('calls onView when portrait clicked', () => {
+  it('calls onView when the Name-cell portrait thumbnail is clicked', () => {
     const { container } = render(<CharacterTable {...defaultProps} />);
 
-    // Find the first table row's first cell (portrait column)
+    // Portrait now renders as a thumbnail inside the Name cell (mirrors
+    // WorldTable); clicking it bubbles to the cell's view handler.
     const firstRow = container.querySelector('tbody tr');
-    const portraitCell = firstRow?.querySelector(
-      'td:first-child div.character-portrait-clickable'
+    const thumb = firstRow?.querySelector(
+      '.component-character-table-name .component-character-table-thumb'
     );
 
-    // Test should fail if portrait cell isn't found
-    expect(portraitCell).toBeTruthy();
+    expect(thumb).toBeTruthy();
 
-    fireEvent.click(portraitCell!);
+    fireEvent.click(thumb!);
     expect(mockOnView).toHaveBeenCalledWith('char-1');
   });
 });
