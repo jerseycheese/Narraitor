@@ -2751,6 +2751,50 @@ body.manuscript-overlay-open {
   letter-spacing: 0.04em;
 }
 
+/* Issue #918: evaluating-action state — a tumbling-die motif distinguishes a
+   skill-check evaluation phase from generic generation. Hidden by default,
+   themed per design system below. */
+.manuscript-evaluating-indicator {
+  display: none;
+}
+
+[data-theme="ds1"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2_5) var(--space-2_5) var(--space-1_5);
+}
+
+/* DS1 — an outlined ink die tumbling end over end. */
+[data-theme="ds1"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  animation: manuscript-die-tumble 1.1s ease-in-out infinite;
+}
+
+[data-theme="ds1"] .manuscript-evaluating-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Shared tumble — a die turning over as it is cast. Spinning while squashing
+   vertically to a thin edge twice per turn fakes a cube flipping over (the
+   manuscript stylelint allow-list permits rotate + scale, not 3D rotates). */
+@keyframes manuscript-die-tumble {
+  0% { transform: rotate(0deg) scale(1, 1); }
+  25% { transform: rotate(90deg) scale(1, 0.18); }
+  50% { transform: rotate(180deg) scale(1, 1); }
+  75% { transform: rotate(270deg) scale(1, 0.18); }
+  100% { transform: rotate(360deg) scale(1, 1); }
+}
+
 /* DS1: always show expanded choices, hide mobile toggle */
 [data-theme="ds1"] .manuscript-mobile-rail-top-controls {
   display: none;
@@ -3801,6 +3845,34 @@ body.manuscript-overlay-open {
   50% { opacity: 1; }
 }
 
+/* DS2 evaluating-action — a solid accent die, bolder to match the Bento accent
+   language; faster, springier tumble. */
+[data-theme="ds2"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+[data-theme="ds2"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent-hover);
+  animation: manuscript-die-tumble 0.85s ease-in-out infinite;
+}
+
+[data-theme="ds2"] .manuscript-evaluating-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 /* DS2 skeleton shimmer — warm gradient */
 [data-theme="ds2"] .manuscript-skeleton-pulse {
   background: linear-gradient(
@@ -4504,6 +4576,48 @@ body.manuscript-overlay-open {
 @keyframes ds3-streaming-pulse {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
+}
+
+/* DS3 evaluating-action — an outlined cool die that ticks in mechanical
+   quarter-turns (console feel), plus a bracketed monospace label. */
+[data-theme="ds3"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds3"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  animation: manuscript-die-tick 1.4s ease-in-out infinite;
+}
+
+/* Quarter-turn ticks with brief holds — a clacking die, no steps() needed. */
+@keyframes manuscript-die-tick {
+  0%, 16% { transform: rotate(0deg); }
+  25%, 41% { transform: rotate(90deg); }
+  50%, 66% { transform: rotate(180deg); }
+  75%, 91% { transform: rotate(270deg); }
+  100% { transform: rotate(360deg); }
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label::before {
+  content: "[ ";
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label::after {
+  content: " ]";
 }
 
 /* DS3 skeleton shimmer — cool-toned gradient */

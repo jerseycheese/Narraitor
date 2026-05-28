@@ -81,6 +81,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+  const [isEvaluatingAction, setIsEvaluatingAction] = React.useState(false);
   const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
   const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
   const [lastOpenedDrawer, setLastOpenedDrawer] = React.useState<DrawerType | null>(null);
@@ -255,6 +256,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setIsGenerating,
     setShouldTriggerGeneration,
     setIsGeneratingChoices,
+    setIsEvaluatingAction,
     setLocalSelectedChoiceId,
     choiceGenerationTimeoutRef,
     scheduleChoiceFallback,
@@ -464,6 +466,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               status={status}
               isGenerating={isGenerating}
               isGeneratingChoices={isGeneratingChoices}
+              isEvaluatingAction={isEvaluatingAction}
               isSessionEnded={isSessionEnded(sessionId)}
               worldSkills={world?.skills || []}
               characterSkills={characterSkills}
