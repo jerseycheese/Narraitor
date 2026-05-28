@@ -20,6 +20,7 @@ import {
 } from '@/types/narrative.types';
 import { truncate } from '@/lib/utils';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
+import { getNarrativeError } from '@/lib/narrative/narrativeErrors';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
@@ -415,11 +416,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           }
         }
       }
-    } catch {
+    } catch (error) {
       // Unhandled error in generatePlayerChoices
-      setError(
-        'Unable to generate choices. Please check your connection and try again.'
-      );
+      setError(getNarrativeError(error as Error).message);
 
       // Even if we get an unhandled error, try to provide fallback choices
 
@@ -774,11 +773,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
             generatePlayerChoices();
           }, 500);
         }
-      } catch {
+      } catch (error) {
         // Surface the original error if fallback insert also fails
-        setError(
-          'Unable to generate narrative. Please check your connection and try again.'
-        );
+        setError(getNarrativeError(error as Error).message);
       }
     } finally {
       initialGenerationLocksRef.current.delete(lockKey);

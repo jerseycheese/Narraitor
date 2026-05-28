@@ -116,10 +116,11 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         <ErrorDisplay
           variant="section"
           severity="error"
-          title="Unable to Generate Narrative"
+          title="The story paused"
           message={error}
           showRetry={!!onRetry}
           onRetry={onRetry}
+          retryLabel="Continue the story"
         />
       </div>
     );
