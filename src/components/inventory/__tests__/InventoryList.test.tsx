@@ -76,6 +76,7 @@ const createMockInventoryStore = (
     getCharacterItems,
     clearCharacterInventory: jest.fn(),
     useItem: jest.fn(),
+    toggleEquipItem: jest.fn(() => ({ success: true, equipped: true })),
     setGeneratingImage: jest.fn(),
     setImageGenerationError: jest.fn(),
     ...overrides,
@@ -113,6 +114,7 @@ const createItem = (overrides: Partial<InventoryItem>): InventoryItem => {
       },
     createdAt: overrides.createdAt ?? baseTimestamp,
     updatedAt: overrides.updatedAt ?? baseTimestamp,
+    equipped: overrides.equipped,
   };
 };
 
@@ -288,5 +290,107 @@ describe('InventoryList', () => {
     
     // Should call removeItem
     expect(mockRemoveItem).toHaveBeenCalledWith(characterId, 'item-1', 1);
+  });
+
+  test('shows the equipped indicator for equipped items', () => {
+    const equippedItem = createItem({
+      id: 'item-eq',
+      name: 'Steel Sword',
+      categoryId: 'equipment',
+      stackable: false,
+      equipped: true,
+    });
+
+    const mockStore = createMockInventoryStore({
+      items: { [equippedItem.id]: equippedItem },
+      characterInventories: { [characterId]: [equippedItem.id] },
+    });
+    mockUseInventoryStore.mockImplementation((selector) =>
+      selector ? selector(mockStore) : mockStore
+    );
+
+    const { container } = render(<InventoryList characterId={characterId} />);
+
+    expect(screen.getByText('Equipped')).toBeInTheDocument();
+    expect(container.querySelector('.manuscript-inventory-item.is-equipped')).toBeInTheDocument();
+  });
+
+  test('toggles equip state for equippable items', async () => {
+    const user = userEvent.setup();
+    const item = createItem({
+      id: 'item-eq',
+      name: 'Steel Sword',
+      categoryId: 'equipment',
+      stackable: false,
+      equipped: false,
+    });
+    const toggleEquipItem = jest.fn(() => ({ success: true, equipped: true }));
+
+    const mockStore = createMockInventoryStore({
+      items: { [item.id]: item },
+      characterInventories: { [characterId]: [item.id] },
+      toggleEquipItem,
+    });
+    mockUseInventoryStore.mockImplementation((selector) =>
+      selector ? selector(mockStore) : mockStore
+    );
+
+    render(<InventoryList characterId={characterId} />);
+
+    await user.click(screen.getByRole('button', { name: 'Equip Steel Sword' }));
+
+    expect(toggleEquipItem).toHaveBeenCalledWith(characterId, 'item-eq');
+  });
+
+  test('hides the equip control for non-equippable items', () => {
+    const potion = createItem({
+      id: 'item-potion',
+      name: 'Health Potion',
+      categoryId: 'consumables',
+      quantity: 3,
+    });
+
+    const mockStore = createMockInventoryStore({
+      items: { [potion.id]: potion },
+      characterInventories: { [characterId]: [potion.id] },
+    });
+    mockUseInventoryStore.mockImplementation((selector) =>
+      selector ? selector(mockStore) : mockStore
+    );
+
+    render(<InventoryList characterId={characterId} />);
+
+    expect(screen.queryByRole('button', { name: /Equip Health Potion/i })).not.toBeInTheDocument();
+  });
+
+  test('surfaces a block message when the store rejects an equip', async () => {
+    const user = userEvent.setup();
+    const item = createItem({
+      id: 'item-personal',
+      name: 'Lucky Charm',
+      categoryId: 'personal',
+      stackable: false,
+      equipped: false,
+    });
+    const toggleEquipItem = jest.fn(() => ({
+      success: false,
+      equipped: false,
+      error: { type: 'validation', title: 'Cannot Equip Item', message: 'That cannot be equipped.' },
+    }));
+
+    const mockStore = createMockInventoryStore({
+      items: { [item.id]: item },
+      characterInventories: { [characterId]: [item.id] },
+      toggleEquipItem,
+    });
+    mockUseInventoryStore.mockImplementation((selector) =>
+      selector ? selector(mockStore) : mockStore
+    );
+
+    render(<InventoryList characterId={characterId} />);
+
+    await user.click(screen.getByRole('button', { name: 'Equip Lucky Charm' }));
+
+    expect(await screen.findByText('That cannot be equipped.')).toBeInTheDocument();
   });
 });

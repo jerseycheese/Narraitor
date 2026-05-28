@@ -85,7 +85,8 @@ export async function generateCharacterArchetypes(
           motivation,
           fears,
           physicalDescription: generatePhysicalDescription(template, world.genre, world.name)
-        }
+        },
+        startingInventory: template.startingInventory
       };
       
       archetypes.push(archetype);

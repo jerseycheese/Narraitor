@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { wizardStyles } from '@/components/shared/wizard';
 import { CharacterArchetype } from '@/types/world.types';
+import { applyStartingInventory } from '@/lib/inventory/startingInventory';
 import { useTutorial } from '@/components/TutorialProvider';
 
 import Logger from '@/lib/utils/logger';
@@ -182,6 +183,9 @@ export default function CharacterCreatePage() {
       // Create the character
       const characterId = createCharacter(characterData);
       setCurrentCharacter(characterId);
+
+      // Seed the character's archetype-appropriate starting inventory
+      applyStartingInventory(characterId, archetype.startingInventory);
 
       // Start a new game session
       await initializeSession(currentWorld.id, characterId, () => {
