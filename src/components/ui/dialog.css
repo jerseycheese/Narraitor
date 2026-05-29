@@ -1,0 +1,63 @@
+/*
+ * Production base styling for the Radix dialog primitive (#1276 / #1316).
+ *
+ * Lives in production so every modal — SimpleModal, PreviewModal, the
+ * confirmation dialogs, and the living style guide — renders the same thing.
+ * After the Tailwind removal (#1097) the dialog shipped unstyled (no backdrop,
+ * unpositioned panel); this restores it on design tokens, per-theme via the
+ * existing [data-theme] token cascade. The living style guide renders the real
+ * component with these styles rather than skinning it guide-locally.
+ *
+ * Content is fixed-centered (not flex-centered by the overlay) so it works for
+ * both DialogContent render paths — overlay-scroll (Content nested in Overlay)
+ * and content-scroll (Content a sibling of Overlay).
+ */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--color-scrim);
+}
+
+.dialog-content {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: calc(100vw - 2 * var(--space-4));
+  max-width: 30rem;
+  max-height: calc(100vh - 2 * var(--space-5));
+  padding: var(--space-5);
+  overflow-y: auto;
+  font-family: var(--font-interface);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+}
+
+.dialog-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

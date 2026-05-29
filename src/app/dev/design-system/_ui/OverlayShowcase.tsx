@@ -6,9 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { PreviewModal } from '@/components/shared/PreviewModal/PreviewModal';
 import type { DSTheme } from './DSToggle';
-// The `dso-*` overlay rules live in the component showcase stylesheet so the
-// DS pages don't load an extra stylesheet — see the note in
-// component-showcase.css. (Imports of the same file are deduped.)
+// Showcase layout classes (dso-group/dso-row/dso-preview) live in the shared
+// component showcase stylesheet. The modals themselves are styled in production
+// (dialog.css), not here.
 import './component-showcase.css';
 
 /**
@@ -18,11 +18,10 @@ import './component-showcase.css';
  * primitive stays in the Components section; this section covers the
  * higher-level modal/preview compositions built on top of it.
  *
- * The portaled overlay/panel are styled with showcase-scoped `dso-*` classes
- * that resolve to design tokens from the active `data-theme` (the page forces
- * the global theme so Radix portals theme to the page). Wiring those base
- * styles globally — so the app's own modals match — is the honest follow-up,
- * left out here to avoid moving production modal baselines.
+ * The modals carry their styling in production (`src/components/ui/dialog.css`),
+ * so the app's own modals and this showcase render the same thing — no
+ * showcase-local skinning. The page forces the global theme (ForceTheme) so the
+ * Radix portals theme to the page.
  */
 export function OverlayShowcase({ theme }: { theme: DSTheme }) {
   const [simpleOpen, setSimpleOpen] = useState(false);
@@ -47,10 +46,6 @@ export function OverlayShowcase({ theme }: { theme: DSTheme }) {
           title="Leave this scene?"
           description="Unsaved narration is lost if you leave before the turn resolves."
           showCloseButton={false}
-          overlayClassName="dso-modal-overlay"
-          className="dso-modal-panel"
-          contentClassName="dso-modal-body"
-          footerClassName="dso-modal-footer"
           footer={
             <>
               <Button variant="outline" size="sm" onClick={() => setSimpleOpen(false)}>
@@ -62,7 +57,7 @@ export function OverlayShowcase({ theme }: { theme: DSTheme }) {
             </>
           }
         >
-          <p className="dso-modal-text">
+          <p>
             The detective hesitates at the threshold. The rain hasn&apos;t let
             up, and neither has the feeling that someone&apos;s watching.
           </p>
@@ -95,8 +90,6 @@ export function OverlayShowcase({ theme }: { theme: DSTheme }) {
           confirmText="Use This World"
           cancelText="Back"
           footerNote="You can edit any of this after it's created."
-          className="dso-modal-panel"
-          overlayClassName="dso-modal-overlay"
           renderContent={(world) => (
             <div className="dso-preview">
               <div className="dso-preview-head">
@@ -105,7 +98,7 @@ export function OverlayShowcase({ theme }: { theme: DSTheme }) {
                   {world.genre}
                 </Badge>
               </div>
-              <p className="dso-modal-text">{world.summary}</p>
+              <p>{world.summary}</p>
             </div>
           )}
           onConfirm={() => setPreviewOpen(false)}

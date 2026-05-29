@@ -435,63 +435,6 @@
   align-items: center;
 }
 
-/* Portaled overlay + panel (Radix renders to <body>) */
-
-.dso-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4);
-  background: var(--color-scrim);
-}
-
-.dso-modal-panel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  width: 100%;
-  max-width: 30rem;
-  padding: var(--space-5);
-  font-family: var(--font-interface);
-  color: var(--color-text-primary);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-overlay);
-}
-
-.dso-modal-panel h2 {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1.0625rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.dso-modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.dso-modal-text {
-  margin: 0;
-  font-family: var(--font-narrative);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--color-text-secondary);
-}
-
-.dso-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-}
-
 /* PreviewModal preview body */
 
 .dso-preview {
