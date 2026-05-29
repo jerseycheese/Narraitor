@@ -5,6 +5,7 @@ import './design-system-3.css';
 import * as Icons from './icons';
 import SessionDemo from './SessionDemo';
 import { ComponentShowcase } from '../design-system/_ui/ComponentShowcase';
+import { OverlayShowcase } from '../design-system/_ui/OverlayShowcase';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { useActiveSection } from '@/hooks/useActiveSection';
 
@@ -603,8 +604,11 @@ export default function DesignSystem3Page() {
           <div className="ds3-section-number ds3-reveal">11 — Overlay</div>
           <h2 className="ds3-section-title ds3-reveal">Manuscript Overlay System</h2>
           <p className="ds3-section-subtitle ds3-reveal">
-            Floating panels and overlays use backdrop blur and surface tints to maintain context while presenting supplementary information.
+            The real <code>SimpleModal</code> and <code>PreviewModal</code> the app ships, themed by the Mechanical tokens.
           </p>
+          <div className="ds3-reveal" style={{ marginBottom: 24 }}>
+            <OverlayShowcase theme="ds3" />
+          </div>
           <div className="ds3-reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16, marginBottom: 24 }}>
             {[
               { name: 'Character Sheet', desc: 'Floating panel that slides in from the side. Semi-transparent backdrop with blur, anchored to the manuscript edge.', blur: '16px', bg: 'rgba(255,252,246,0.90)' },

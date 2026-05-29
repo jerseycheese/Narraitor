@@ -15,6 +15,7 @@ interface SimpleModalProps {
   title?: string;
   children?: React.ReactNode;
   className?: string;
+  overlayClassName?: string;
   contentClassName?: string;
   showCloseButton?: boolean;
   closeOnBackdropClick?: boolean;
@@ -41,6 +42,7 @@ export function SimpleModal({
   title,
   children,
   className,
+  overlayClassName,
   contentClassName,
   showCloseButton = true,
   closeOnBackdropClick = true,
@@ -67,6 +69,7 @@ export function SimpleModal({
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
         overlayScroll={scrollBehavior === 'overlay'}
+        overlayClassName={overlayClassName}
         className={className}
         onInteractOutside={(event) => {
           if (isJoyrideTooltipTarget(event.target)) {

@@ -15,6 +15,7 @@ interface PreviewModalProps<T> {
   cancelText?: string;
   footerNote?: string;
   className?: string;
+  overlayClassName?: string;
   closeOnBackdropClick?: boolean;
 }
 
@@ -30,6 +31,7 @@ function PreviewModalInner<T>({
   cancelText = 'Back',
   footerNote,
   className,
+  overlayClassName,
 }: PreviewModalProps<T>) {
   return (
     <SimpleModal
@@ -38,6 +40,7 @@ function PreviewModalInner<T>({
       title={title}
       showCloseButton={false}
       className={className}
+      overlayClassName={overlayClassName}
     >
       <p id="preview-modal-desc">
         {subtitle || 'Preview content before confirming your selection.'}

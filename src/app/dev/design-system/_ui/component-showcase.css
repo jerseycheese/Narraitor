@@ -378,3 +378,141 @@
   justify-content: flex-end;
   gap: var(--space-2);
 }
+
+/* ─── Overlay showcase: real SimpleModal / PreviewModal (issue #1276) ───
+ *
+ * Lives in this file (not a separate stylesheet) so the design-system pages
+ * load the same set of stylesheets they already did — adding a second
+ * showcase stylesheet nudged sub-pixel rounding on the components capture.
+ * Like the dialog rules above, the app ships these modals unstyled after the
+ * Tailwind removal, so the overlay/panel are skinned with showcase-only
+ * `dso-*` classes that resolve to tokens from the active `data-theme`. Wiring
+ * those base styles globally — so the app's own modals match — is the honest
+ * follow-up, left out here to avoid moving production modal baselines.
+ */
+
+.ds-overlay {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.dso-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dso-group-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dso-group-note {
+  margin: 0 0 var(--space-1);
+  max-width: 40rem;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.dso-group-note code {
+  font-family: var(--font-system);
+  font-size: 0.8125em;
+  padding: 0 var(--space-1);
+  background: var(--color-surface-hover);
+  border-radius: var(--radius-sm);
+}
+
+.dso-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+/* Portaled overlay + panel (Radix renders to <body>) */
+
+.dso-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: var(--color-scrim);
+}
+
+.dso-modal-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 30rem;
+  padding: var(--space-5);
+  font-family: var(--font-interface);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+}
+
+.dso-modal-panel h2 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dso-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dso-modal-text {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.dso-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* PreviewModal preview body */
+
+.dso-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.dso-preview-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dso-preview-name {
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}

@@ -8,6 +8,7 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { useActiveSection } from '@/hooks/useActiveSection';
 import ManuscriptDemo from './ManuscriptDemo';
 import { ComponentShowcase } from './_ui/ComponentShowcase';
+import { OverlayShowcase } from './_ui/OverlayShowcase';
 import './design-system.css';
 
 // ---------------------------------------------------------------------------
@@ -980,6 +981,12 @@ a:hover {
         <div className="ds1-section-inner">
           <div className="ds1-section-number ds1-reveal">11 — Overlay</div>
           <h2 className="ds1-section-title ds1-reveal">Manuscript Overlay System</h2>
+          <p className="ds1-stage-label" style={{ marginBottom: 24 }}>
+            The real <code>SimpleModal</code> and <code>PreviewModal</code> the app ships, themed by the Paper &amp; Ink tokens.
+          </p>
+          <div style={{ marginBottom: 32 }}>
+            <OverlayShowcase theme="ds1" />
+          </div>
           <div style={{ marginBottom: 32 }}>
             <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Overlay Tokens</h3>
             <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Translucent surface and gradient tokens for game-session overlays.</p>
