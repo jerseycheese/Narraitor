@@ -1,6 +1,0 @@
-{
-  "comment": "Grandfathered showcase-canon violations (guard for #1276). Each entry is a real DS primitive being skinned with a showcase-local class instead of being styled in production. The guard (scripts/verify-showcase-canon.cjs) fails on any NEW skinning; shrink this list as the canon rework moves styles downstream so the app inherits them. Tracking: #1316 (modals), #1317 (card/alert/tabs/table/checkbox/radio/dialog).",
-  "allowed": [
-    "src/app/dev/design-system/_ui/ComponentShowcase.tsx::overlayClassName::dsc-dialog-overlay"
-  ]
-}
