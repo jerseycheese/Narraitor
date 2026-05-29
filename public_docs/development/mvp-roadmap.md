@@ -55,7 +55,7 @@ is tightening consistency rather than building the foundation:
 ### Phase 2.5: Developer Infrastructure
 Building debugging and tooling for production support.
 
-**Priority 1: Error Handling (MVP Blocker)**
+**Priority 1: Error Handling (MVP Blocker)** — shipped (#902; see "Recently shipped" below)
 Cannot ship without graceful error handling:
 - Runtime error capture and display (#159, #158, #155)
 - AI service error viewing (#201-203)
@@ -86,14 +86,40 @@ This is about getting ready for broader use beyond just personal development.
 - Analytics to understand how people use it
 - Marketing website/landing page
 
-## Current Priority Queue — v1.0 (next release to main)
+## Current Priority Queue
 
-The earlier "Immediate / High Priority" queues here are done: error handling and retry
-resilience, lore entity management, context-window management, the narrative checkpoint
-system, the dashboard, onboarding, character templates, skill prerequisites, and table views
-have all landed. What's left for a real 1.0 is *visual finish* and the *launch gate*, tracked
-in the `v1.0` GitHub milestone and meta-issue **#1320**. The work is dependency-ordered there;
-the summary:
+The next release to main is **v1.0**: *visual finish* + the *launch gate*, tracked in the `v1.0`
+GitHub milestone and meta-issue **#1320**. Core MVP systems are done. The earlier Immediate /
+High Priority / Medium Priority queues are kept below as a record of what actually shipped (and
+what didn't), followed by the active v1.0 work — the roadmap is a running log, not a snapshot.
+
+### Recently shipped (prior queues, kept for history)
+
+**Core quality & reliability**
+- [x] Error handling and retry resilience (#902)
+- [x] Lore entity management — fuzzy matching (#446), Unicode keys (#447), entity resolution (#448), aliases (#449)
+- [x] Context-window management for long-running games (#408)
+- [x] Narrative checkpoint system (#411) — see `../features/story-checkpoints.md`
+
+**Player-facing features**
+- [x] Dashboard home page (#398)
+- [x] Guided onboarding tutorial (#399)
+- [x] Character creation templates (#393)
+- [x] Character portraits foundation — custom upload (#404), avatar library (#405); the preset+upload UX is revisited in #1299, deferred to 1.1
+- [x] Skill prerequisites (#392)
+- [x] Table views — character lists (#808), world comparison (#810)
+- [ ] Journal table view (#809) — still open, not pulled into v1.0
+
+**Development & infrastructure**
+- [x] Fixed skipped localStorage tests (#646)
+- [x] AI service documentation pass (#334)
+- [x] AI error-handling integration tests (#332)
+- [x] Token usage tracking (#326) and token-estimation optimization (#319)
+- [ ] Visual diff tooling (#652), Docker cross-platform visual consistency (#653), snapshot governance (#655), visual performance metrics (#656) — still open, not blocking 1.0
+
+### v1.0 — active (next release to main)
+
+The dependency order lives in #1320; the phases:
 
 ### Phase A: Visual blockers (Tailwind-removal fallout)
 The post-#1097 cleanup left several shared primitives shipping unstyled in the app while the
