@@ -38,7 +38,13 @@ const SKIN_PROPS = [
   'wrapperClassName',
   'bodyClassName',
 ];
-const skinRe = new RegExp(`\\b(${SKIN_PROPS.join('|')})\\s*=\\s*["']([^"']*)["']`, 'g');
+// Match the skin prop with a string OR expression value, so an expression form
+// (panelClassName={clsx(...)}, contentClassName={`dsc-${k}`}) can't bypass the
+// guard the way a literal-only match would.
+const skinRe = new RegExp(
+  `\\b(${SKIN_PROPS.join('|')})\\s*=\\s*(?:"([^"]*)"|'([^']*)'|(\\{[^}]*\\}))`,
+  'g'
+);
 
 function loadBaseline() {
   try {
@@ -49,14 +55,17 @@ function loadBaseline() {
 }
 
 const baseline = loadBaseline();
-const baselineSkin = new Set(baseline.skinning || []);
+const baselineSkinCounts = {};
+for (const k of baseline.skinning || []) baselineSkinCounts[k] = (baselineSkinCounts[k] || 0) + 1;
 const baselineCoverage = new Set(baseline.coverageGaps || []);
 const coverageExceptions = baseline.coverageExceptions || {};
 
 const guideFiles = glob.sync(GUIDE_GLOB, { cwd: ROOT, absolute: true, nodir: true });
 
 // --- Check 1: guide-local skinning -----------------------------------------
-const skinViolations = [];
+// Count occurrences per key so a NEW duplicate of a grandfathered value (same
+// file/prop/value) still fails instead of collapsing into the baseline entry.
+const skinByKey = new Map(); // key -> [{relPath, prop, value, line}]
 for (const file of guideFiles) {
   let content;
   try { content = fs.readFileSync(file, 'utf8'); } catch { continue; }
@@ -65,11 +74,19 @@ for (const file of guideFiles) {
     let m;
     skinRe.lastIndex = 0;
     while ((m = skinRe.exec(lineText)) !== null) {
-      const [, prop, value] = m;
+      const prop = m[1];
+      const value = m[2] !== undefined ? m[2] : m[3] !== undefined ? m[3] : m[4];
       const key = `${relPath}::${prop}::${value}`;
-      if (!baselineSkin.has(key)) skinViolations.push({ relPath, prop, value, line: i + 1 });
+      if (!skinByKey.has(key)) skinByKey.set(key, []);
+      skinByKey.get(key).push({ relPath, prop, value, line: i + 1 });
     }
   });
+}
+
+const skinViolations = [];
+for (const [key, occs] of skinByKey) {
+  const allowed = baselineSkinCounts[key] || 0;
+  if (occs.length > allowed) skinViolations.push(...occs.slice(allowed)); // only the excess
 }
 
 // --- Check 2: coverage -------------------------------------------------------
@@ -119,7 +136,7 @@ if (failed) {
   process.exit(1);
 }
 
-const skinN = baselineSkin.size;
+const skinN = (baseline.skinning || []).length;
 const gapN = baselineCoverage.size;
 const excN = Object.keys(coverageExceptions).length;
 console.log(`DS canon OK — ${primitives.length} primitives checked (${gapN} grandfathered coverage gap(s), ${excN} exception(s)); ${skinN} grandfathered skin(s) within baseline.`);
