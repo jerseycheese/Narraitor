@@ -1,0 +1,14 @@
+{
+  "comment": "Design-system canon guard (scripts/verify-ds-canon.cjs, npm run lint:ds-canon). The living style guide (src/app/dev/design-system*) must render REAL production components as canon, with styling defined in production so it flows downstream — the app must never be the canon source. Two checks: (1) skinning — the guide must not re-skin a real primitive with guide-local classes; (2) coverage — every src/components/ui/* primitive must be represented in the guide. Both fail only on NEW violations; existing ones are grandfathered below with tracking issues. Shrink these lists as canon work proceeds. Mirrors the .skott-baseline.json pattern.",
+  "skinning": [
+    "src/app/dev/design-system/_ui/ComponentShowcase.tsx::overlayClassName::dsc-dialog-overlay"
+  ],
+  "_coverageGapsTracking": "data-table + CollapsibleSection not yet in the living style guide — tracked in #1319; remove each once rendered there.",
+  "coverageGaps": [
+    "data-table",
+    "CollapsibleSection"
+  ],
+  "coverageExceptions": {
+    "scroll-area": "Behavior/utility wrapper (adds scroll styling around arbitrary content) — no visual variants/states to canonize."
+  }
+}

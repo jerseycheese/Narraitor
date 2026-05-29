@@ -95,6 +95,8 @@ jobs:
         run: npm run lint:css
       - name: Enforce non-self-closing PageLayout usage
         run: npm run lint:layout-usage
+      - name: Enforce design-system canon (living style guide)
+        run: npm run lint:ds-canon
 
   knip:
     name: Knip (unused code)
