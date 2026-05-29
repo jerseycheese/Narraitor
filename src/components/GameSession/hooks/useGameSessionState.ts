@@ -234,11 +234,15 @@ export const useGameSessionState = ({
     // Get current store state to check for existing session
     const currentStoreState = useSessionStore.getState();
     
-    // If store already has an active session that matches our requirements, don't initialize
+    // If store already has an active session that matches our requirements, don't
+    // re-initialize — but re-arm the crash-recovery marker. A clean refresh clears
+    // it on pagehide, and this remount path skips initializeSession/resumeSavedSession,
+    // so without this a crash before the next save would leave no marker (issue #221).
     if (!disableAutoResume &&
         currentStoreState.status === 'active' &&
         currentStoreState.worldId === worldId &&
         currentStoreState.characterId === sessionCharacterId) {
+      currentStoreState.refreshRecoveryMarker?.();
       return;
     }
     

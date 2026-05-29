@@ -4,6 +4,9 @@
 /* Character development suggestions panel (character creation wizard) */
 @import url('../styles/character-suggestions.css');
 
+/* Crash-recovery prompt (restore a session after an unexpected closure) */
+@import url('../styles/session-recovery.css');
+
 /* Skip link - visually hidden until focused (accessibility) */
 a[href="#main-content"] {
   position: absolute;
