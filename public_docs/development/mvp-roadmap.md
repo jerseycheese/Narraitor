@@ -86,46 +86,48 @@ This is about getting ready for broader use beyond just personal development.
 - Analytics to understand how people use it
 - Marketing website/landing page
 
-## Current Priority Queue
+## Current Priority Queue — v1.0 (next release to main)
 
-### Immediate: Core Quality & Reliability
-Cannot ship without these:
-- Error handling and retry resilience (#902)
-- Lore entity management (#446-449 - fuzzy matching, Unicode support, aliases, entity resolution)
-- Context window management for long games (#408)
-- Narrative checkpoint system (#411) - MVP implementation complete, see `../features/story-checkpoints.md`
+The earlier "Immediate / High Priority" queues here are done: error handling and retry
+resilience, lore entity management, context-window management, the narrative checkpoint
+system, the dashboard, onboarding, character templates, skill prerequisites, and table views
+have all landed. What's left for a real 1.0 is *visual finish* and the *launch gate*, tracked
+in the `v1.0` GitHub milestone and meta-issue **#1320**. The work is dependency-ordered there;
+the summary:
 
-### High Priority: Player-Facing Features
-Core user experience:
-- Dashboard home page to guide world-to-character flow (#398)
-- Guided onboarding tutorial (#399)
-- Character creation templates (#393)
-- Character portraits (custom upload #404, avatar library #405)
-- Skill prerequisites (#392)
-- Table views for journal/character/world lists (#808, #809, #810)
+### Phase A: Visual blockers (Tailwind-removal fallout)
+The post-#1097 cleanup left several shared primitives shipping unstyled in the app while the
+showcase looked fine — the exact drift the canon work exists to kill. One pattern: style the
+primitive *in production*, not in the showcase.
+- Shared modals unstyled — no backdrop, unpositioned panel (#1316, PR #1315) — establishes the pattern
+- Remaining DS primitives unstyled: card/alert/tabs/table/checkbox/radio (#1317) — after #1316
+- Render data-table + CollapsibleSection in the style guide for canon coverage (#1319) — after #1317
+
+### Phase B: DS canon + structural differentiation
+- Showcase = canon: render real production components, Session phase remaining (#1276)
+- [EPIC] Structural DS differentiation across surfaces (#1165)
+- Finish character-side detail/edit content treatment + CharacterTable alignment (#1295)
+- About page real content + DS1/DS2/DS3 treatment (#1135)
+
+### Phase C: Launch gate
+- [EPIC] MVP Launch Preparation — landing page, docs, legal, analytics (#495)
+
+### Supporting: visual-test coverage & hygiene
+De-risks the visual work above; not headline.
+- Audit visual specs for DS1/DS2/DS3 coverage (#1264)
+- Audit crawler hygiene: DS theme captures + seeded load + bbox cropping (#1297)
+- Stabilize tour & world-detail visual specs (#1198)
+- Split tutorial visual tests into a dedicated CI job (#1014); restore deleted tutorial coverage (#1239)
+
+### Deferred to 1.1+ (player-facing polish, not blocking 1.0)
+- Preset avatars + custom portrait upload (#1299)
+- Full keyboard control with focus indicators (#276)
 - Session pacing and reading milestones (#805)
 
-### Medium Priority: Development & Infrastructure
-Important for quality and debugging:
-- Fix skipped localStorage tests (#646)
-- Visual diff review tooling (#652)
-- Docker containers for cross-platform visual consistency (#653)
-- Snapshot governance (#655)
-- Visual performance metrics (#656)
-- AI service documentation enhancements (#334)
-- AI error handling integration tests (#332)
-- Token usage tracking (#326)
-- Token estimation optimization (#319)
-
 ### Deferred: Multi-Provider AI (Epic #878)
-Valuable but can launch with Gemini-only:
-- Provider abstraction layer (#890)
-- Secure configuration storage (#891)
-- Provider configuration UI (#892)
-- Gemini refactor to provider pattern (#893)
-- Claude native SDK (#894)
-- Generic OpenAI-compatible provider (#895)
-- See "Post-MVP Features" section for full multi-provider roadmap
+Valuable but can launch Gemini-only — see "Post-MVP Features" below. Provider abstraction
+(#890), secure key storage (#891), provider config UI (#892), Gemini refactor (#893), Claude
+native SDK (#894), generic OpenAI-compatible provider (#895).
 
 ## Technical Debt & Infrastructure
 - Playwright visual regression testing — done (`tests/visual/`, runs in CI)
@@ -175,4 +177,4 @@ Features that are valuable but not required for initial launch:
 - [ ] Marketing materials ready
 
 ---
-*Last Updated: 2026-05-22 - Reconciled status against shipped work: design-system migration, visual regression, dashboard, onboarding, table views, and lore entity management have all landed; remaining work is polish and release-readiness toward 1.0.*
+*Last Updated: 2026-05-29 - Scoped the next release to main as v1.0: visual finish (DS canon + primitives styled in production, structural differentiation) plus the launch gate. Created the `v1.0` milestone and tracking meta-issue #1320; reconciled the priority queue against open issues (the prior queue referenced closed work). Player-facing polish — portraits #1299, keyboard #276, pacing #805 — deferred to 1.1.*
