@@ -12,6 +12,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:layout-usage": "node scripts/verify-page-layout-usage.cjs",
+    "lint:showcase-canon": "node scripts/verify-showcase-canon.cjs",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
     "audit:css": "node scripts/audit-css.mjs",
