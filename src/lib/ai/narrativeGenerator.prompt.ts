@@ -227,16 +227,11 @@ const getEquippedItemIds = (characterIds: string[] | undefined): string[] => {
   }
 
   try {
-    const { characters } = useCharacterStore.getState();
-    const playerCharacter = characters[characterIds[0]];
-    const inventoryItems =
-      (playerCharacter?.inventory?.items as Array<{
-        id: string;
-        equipped?: boolean;
-      }>) ?? [];
-
-    return inventoryItems
-      .filter((item) => item?.equipped)
+    // Read equipped state from the canonical inventory store — the same source
+    // the displayed items and buildInventoryContext() draw from.
+    const { getCharacterItems } = useInventoryStore.getState();
+    return getCharacterItems(characterIds[0])
+      .filter((item) => item.equipped)
       .map((item) => item.id);
   } catch {
     return [];

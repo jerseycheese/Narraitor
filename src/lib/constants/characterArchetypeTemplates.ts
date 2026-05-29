@@ -9,6 +9,7 @@
  */
 
 import { GenreValue } from './genres';
+import type { InventoryItemInput } from '@/types/inventory.types';
 
 export interface ArchetypeTemplate {
   name: string;
@@ -20,6 +21,8 @@ export interface ArchetypeTemplate {
   motivations: string[];
   fears: string[][];
   nameTemplates: string[];
+  /** Archetype-appropriate equipment a character of this archetype starts with. */
+  startingInventory?: InventoryItemInput[];
 }
 
 const BASE_ARCHETYPE_TEMPLATES: Record<
@@ -48,7 +51,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Dishonor', 'Cowardice'],
         ['Being forgotten', 'Letting down allies']
       ],
-      nameTemplates: ['Aelric', 'Bjorn', 'Gareth', 'Thora', 'Valdris', 'Kendra']
+      nameTemplates: ['Aelric', 'Bjorn', 'Gareth', 'Thora', 'Valdris', 'Kendra'],
+      startingInventory: [
+        { name: 'Steel Sword', description: 'A well-balanced blade, kept sharp.', categoryId: 'equipment', equipped: true },
+        { name: 'Wooden Shield', description: 'Battered but reliable.', categoryId: 'equipment' },
+        { name: 'Health Potion', description: 'Restores vitality when wounded.', categoryId: 'consumables', quantity: 3, stackable: true, maxStack: 10 }
+      ]
     },
     {
       name: 'Mage',
@@ -71,7 +79,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Ignorance', 'Being intellectually surpassed'],
         ['Dark magic corruption', 'Forbidden knowledge']
       ],
-      nameTemplates: ['Lyra', 'Aldric', 'Seraphina', 'Mordecai', 'Celeste', 'Zephyr']
+      nameTemplates: ['Lyra', 'Aldric', 'Seraphina', 'Mordecai', 'Celeste', 'Zephyr'],
+      startingInventory: [
+        { name: 'Spellbook', description: 'Worn pages crowded with arcane notation.', categoryId: 'equipment', equipped: true },
+        { name: 'Traveler\'s Robes', description: 'Embroidered with protective sigils.', categoryId: 'personal', equipped: true },
+        { name: 'Mana Potion', description: 'Replenishes spent magical energy.', categoryId: 'consumables', quantity: 3, stackable: true, maxStack: 10 }
+      ]
     },
     {
       name: 'Scout',
@@ -94,7 +107,13 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Civilization', 'Crowds'],
         ['Being detected', 'Failing a mission']
       ],
-      nameTemplates: ['Kael', 'Aria', 'Hunter', 'Sage', 'Raven', 'Swift']
+      nameTemplates: ['Kael', 'Aria', 'Hunter', 'Sage', 'Raven', 'Swift'],
+      startingInventory: [
+        { name: 'Hunting Bow', description: 'Strung and ready for the trail.', categoryId: 'equipment', equipped: true },
+        { name: 'Bundle of Arrows', description: 'Fletched for a clean flight.', categoryId: 'equipment', quantity: 20, stackable: true, maxStack: 50 },
+        { name: 'Lockpicks', description: 'A slim set for stubborn locks.', categoryId: 'equipment' },
+        { name: 'Leather Cloak', description: 'Muted greens for blending in.', categoryId: 'personal', equipped: true }
+      ]
     }
   ],
 
@@ -120,7 +139,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Space madness', 'Isolation'],
         ['Losing their ship', 'Navigation errors']
       ],
-      nameTemplates: ['Nova', 'Ace', 'Vector', 'Cosmos', 'Stellar', 'Phoenix']
+      nameTemplates: ['Nova', 'Ace', 'Vector', 'Cosmos', 'Stellar', 'Phoenix'],
+      startingInventory: [
+        { name: 'Sidearm Blaster', description: 'Standard-issue, holstered at the hip.', categoryId: 'equipment', equipped: true },
+        { name: 'Flight Jacket', description: 'Insulated, patched at the elbows.', categoryId: 'personal', equipped: true },
+        { name: 'Ration Packs', description: 'Freeze-dried meals for long hauls.', categoryId: 'consumables', quantity: 3, stackable: true, maxStack: 10 }
+      ]
     },
     {
       name: 'Engineer',
@@ -143,7 +167,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Obsolescence', 'Being replaced by AI'],
         ['Critical malfunction', 'Lives depending on their work']
       ],
-      nameTemplates: ['Circuit', 'Gears', 'Quantum', 'Binary', 'Flux', 'Tesla']
+      nameTemplates: ['Circuit', 'Gears', 'Quantum', 'Binary', 'Flux', 'Tesla'],
+      startingInventory: [
+        { name: 'Multi-Tool', description: 'A dozen instruments folded into one.', categoryId: 'equipment', equipped: true },
+        { name: 'Diagnostic Scanner', description: 'Reads faults the eye can\'t catch.', categoryId: 'equipment' },
+        { name: 'Spare Parts', description: 'Couplings, wiring, and seals.', categoryId: 'equipment', quantity: 5, stackable: true, maxStack: 20 }
+      ]
     },
     {
       name: 'Medic',
@@ -166,7 +195,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Pandemic outbreaks', 'Incurable diseases'],
         ['Ethical dilemmas', 'Being unable to help']
       ],
-      nameTemplates: ['Haven', 'Grace', 'Mercy', 'Heal', 'Hope', 'Vita']
+      nameTemplates: ['Haven', 'Grace', 'Mercy', 'Heal', 'Hope', 'Vita'],
+      startingInventory: [
+        { name: 'Medkit', description: 'Field dressings, sealant, and tools.', categoryId: 'equipment', equipped: true },
+        { name: 'Med Scanner', description: 'Reads vitals through a sleeve.', categoryId: 'equipment' },
+        { name: 'Stim Injectors', description: 'Single-use shots that steady a patient.', categoryId: 'consumables', quantity: 3, stackable: true, maxStack: 10 }
+      ]
     }
   ],
 
@@ -192,7 +226,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Corruption', 'System failures'],
         ['Wrong accusations', 'Innocent people suffering']
       ],
-      nameTemplates: ['Sam', 'Alex', 'Jordan', 'Casey', 'Morgan', 'Quinn']
+      nameTemplates: ['Sam', 'Alex', 'Jordan', 'Casey', 'Morgan', 'Quinn'],
+      startingInventory: [
+        { name: 'Service Pistol', description: 'Holstered, with the safety on.', categoryId: 'equipment', equipped: true },
+        { name: 'Magnifying Glass', description: 'For the details everyone else misses.', categoryId: 'equipment' },
+        { name: 'Case Notebook', description: 'Dog-eared and full of leads.', categoryId: 'documents' }
+      ]
     },
     {
       name: 'Athlete',
@@ -215,7 +254,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Performance anxiety', 'Letting the team down'],
         ['Age and decline', 'Being surpassed']
       ],
-      nameTemplates: ['Max', 'Power', 'Swift', 'Strong', 'Ace', 'Champion']
+      nameTemplates: ['Max', 'Power', 'Swift', 'Strong', 'Ace', 'Champion'],
+      startingInventory: [
+        { name: 'Training Gear', description: 'Broken-in and built for movement.', categoryId: 'personal', equipped: true },
+        { name: 'Energy Bars', description: 'Quick fuel between efforts.', categoryId: 'consumables', quantity: 4, stackable: true, maxStack: 10 },
+        { name: 'Water Bottle', description: 'Insulated, always within reach.', categoryId: 'consumables' }
+      ]
     },
     {
       name: 'Scholar',
@@ -238,7 +282,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Book burning', 'Lost knowledge'],
         ['Being wrong', 'Spreading false information']
       ],
-      nameTemplates: ['Professor', 'Doctor', 'Sage', 'Scholar', 'Librarian', 'Teacher']
+      nameTemplates: ['Professor', 'Doctor', 'Sage', 'Scholar', 'Librarian', 'Teacher'],
+      startingInventory: [
+        { name: 'Reference Tome', description: 'Annotated in three different hands.', categoryId: 'equipment', equipped: true },
+        { name: 'Reading Glasses', description: 'Smudged, but they do the job.', categoryId: 'personal', equipped: true },
+        { name: 'Field Notebook', description: 'Half notes, half questions.', categoryId: 'documents' }
+      ]
     }
   ],
 
@@ -264,7 +313,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['The law catching up', 'Their past being revealed'],
         ['Innocents getting hurt', 'Becoming the villain']
       ],
-      nameTemplates: ['Doc', 'Ace', 'Jesse', 'Belle', 'Kid', 'Slim']
+      nameTemplates: ['Doc', 'Ace', 'Jesse', 'Belle', 'Kid', 'Slim'],
+      startingInventory: [
+        { name: 'Six-Shooter Revolver', description: 'Worn grip, oiled action.', categoryId: 'equipment', equipped: true },
+        { name: 'Worn Duster', description: 'Trail dust ground into every seam.', categoryId: 'personal', equipped: true },
+        { name: 'Box of Ammunition', description: 'Enough rounds to settle most arguments.', categoryId: 'equipment', quantity: 24, stackable: true, maxStack: 50 }
+      ]
     },
     {
       name: 'Sheriff',
@@ -287,7 +341,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Outlaws winning', 'Lawlessness spreading'],
         ['Innocent bloodshed', 'Becoming like the criminals']
       ],
-      nameTemplates: ['Marshal', 'Sheriff', 'Deputy', 'Wyatt', 'Justice', 'Badge']
+      nameTemplates: ['Marshal', 'Sheriff', 'Deputy', 'Wyatt', 'Justice', 'Badge'],
+      startingInventory: [
+        { name: 'Lawman\'s Revolver', description: 'Carried with the weight of the office.', categoryId: 'equipment', equipped: true },
+        { name: 'Sheriff\'s Badge', description: 'Tin star, polished by habit.', categoryId: 'personal', equipped: true },
+        { name: 'Set of Handcuffs', description: 'For the ones who come quietly.', categoryId: 'equipment' }
+      ]
     },
     {
       name: 'Cowboy',
@@ -310,7 +369,13 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Drought', 'Losing the herd'],
         ['Settling down', 'Civilization encroaching']
       ],
-      nameTemplates: ['Buck', 'Dusty', 'Tex', 'Montana', 'Dakota', 'Ranger']
+      nameTemplates: ['Buck', 'Dusty', 'Tex', 'Montana', 'Dakota', 'Ranger'],
+      startingInventory: [
+        { name: 'Lasso', description: 'Coiled and ready at the saddle.', categoryId: 'equipment', equipped: true },
+        { name: 'Hunting Knife', description: 'Earns its keep on the range.', categoryId: 'equipment' },
+        { name: 'Canteen', description: 'Dented, never empty for long.', categoryId: 'consumables' },
+        { name: 'Bedroll', description: 'Home wherever the day ends.', categoryId: 'personal' }
+      ]
     }
   ],
 
@@ -336,7 +401,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Failing their lord', 'Cowardice'],
         ['Being unworthy', 'Losing their status']
       ],
-      nameTemplates: ['Sir Galahad', 'Sir Lancelot', 'Lady Joan', 'Sir Richard', 'Dame Eleanor', 'Sir William']
+      nameTemplates: ['Sir Galahad', 'Sir Lancelot', 'Lady Joan', 'Sir Richard', 'Dame Eleanor', 'Sir William'],
+      startingInventory: [
+        { name: 'Steel Longsword', description: 'Crest etched near the hilt.', categoryId: 'equipment', equipped: true },
+        { name: 'Kite Shield', description: 'Bears the marks of past tourneys.', categoryId: 'equipment', equipped: true },
+        { name: 'Health Tonic', description: 'A field remedy for grievous wounds.', categoryId: 'consumables', quantity: 3, stackable: true, maxStack: 10 }
+      ]
     },
     {
       name: 'Merchant',
@@ -359,7 +429,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Pirates', 'Thieves'],
         ['Market collapse', 'Losing reputation']
       ],
-      nameTemplates: ['Giovanni', 'Marco', 'Isabella', 'Lorenzo', 'Catalina', 'Antonio']
+      nameTemplates: ['Giovanni', 'Marco', 'Isabella', 'Lorenzo', 'Catalina', 'Antonio'],
+      startingInventory: [
+        { name: 'Fine Cloak', description: 'Cut to signal means and taste.', categoryId: 'personal', equipped: true },
+        { name: 'Coin Purse', description: 'Heavy enough to open doors.', categoryId: 'valuables', quantity: 50, stackable: true, maxStack: 999 },
+        { name: 'Ledger', description: 'Every debt and favor, accounted for.', categoryId: 'documents' }
+      ]
     },
     {
       name: 'Blacksmith',
@@ -382,7 +457,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Poor materials', 'Substandard work'],
         ['Being forgotten', 'Craft dying out']
       ],
-      nameTemplates: ['John', 'Thomas', 'Mary', 'William', 'Agnes', 'Robert']
+      nameTemplates: ['John', 'Thomas', 'Mary', 'William', 'Agnes', 'Robert'],
+      startingInventory: [
+        { name: 'Smithing Hammer', description: 'Balanced from years at the anvil.', categoryId: 'equipment', equipped: true },
+        { name: 'Leather Apron', description: 'Scorched, scarred, and trusted.', categoryId: 'personal', equipped: true },
+        { name: 'Iron Ingots', description: 'Raw stock waiting for the forge.', categoryId: 'equipment', quantity: 5, stackable: true, maxStack: 20 }
+      ]
     }
   ],
 
@@ -408,7 +488,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Being consumed by darkness', 'Becoming a monster'],
         ['Forbidden knowledge', 'Things beyond comprehension']
       ],
-      nameTemplates: ['Arkham', 'Lovecraft', 'Poe', 'Raven', 'Shadow', 'Grimm']
+      nameTemplates: ['Arkham', 'Lovecraft', 'Poe', 'Raven', 'Shadow', 'Grimm'],
+      startingInventory: [
+        { name: 'Revolver', description: 'Six rounds against the dark.', categoryId: 'equipment', equipped: true },
+        { name: 'Electric Torch', description: 'The beam flickers when it shouldn\'t.', categoryId: 'equipment', equipped: true },
+        { name: 'Field Journal', description: 'Notes that read worse by lamplight.', categoryId: 'documents' }
+      ]
     },
     {
       name: 'Survivor',
@@ -431,7 +516,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['No one believing them', 'Being alone'],
         ['Losing their mind', 'Becoming what they fear']
       ],
-      nameTemplates: ['Ash', 'Ripley', 'Laurie', 'Final', 'Last', 'Sole']
+      nameTemplates: ['Ash', 'Ripley', 'Laurie', 'Final', 'Last', 'Sole'],
+      startingInventory: [
+        { name: 'Crowbar', description: 'Pries, pries open, and pries off.', categoryId: 'equipment', equipped: true },
+        { name: 'Bandages', description: 'Clean enough, mostly.', categoryId: 'consumables', quantity: 3, stackable: true, maxStack: 10 },
+        { name: 'Canned Food', description: 'Dented tins, labels long gone.', categoryId: 'consumables', quantity: 2, stackable: true, maxStack: 10 }
+      ]
     },
     {
       name: 'Occultist',
@@ -454,7 +544,12 @@ const BASE_ARCHETYPE_TEMPLATES: Record<
         ['Dark entities', 'Demons and spirits'],
         ['Corruption', 'Becoming evil']
       ],
-      nameTemplates: ['Crowley', 'Salem', 'Hex', 'Rune', 'Tarot', 'Witch']
+      nameTemplates: ['Crowley', 'Salem', 'Hex', 'Rune', 'Tarot', 'Witch'],
+      startingInventory: [
+        { name: 'Ritual Dagger', description: 'Cold to the touch, always.', categoryId: 'equipment', equipped: true },
+        { name: 'Tome of Rites', description: 'Bound in something best not named.', categoryId: 'documents' },
+        { name: 'Bundle of Candles', description: 'Black wax for the longer workings.', categoryId: 'consumables', quantity: 5, stackable: true, maxStack: 20 }
+      ]
     }
   ]
 };

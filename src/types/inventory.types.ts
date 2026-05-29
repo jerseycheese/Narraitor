@@ -46,6 +46,7 @@ export type InventoryAcquisitionMethod =
   | 'reward'
   | 'gift'
   | 'manual'
+  | 'starting-equipment'
   | 'unknown';
 
 export interface InventoryAcquisitionRecord {
@@ -82,6 +83,35 @@ export interface InventoryItem extends NamedEntity, TimestampedEntity {
   acquisitionHistory: InventoryAcquisitionRecord[];
   categorization: InventoryItemCategorization;
   image?: GeneratedImage; // AI-generated visual asset for the item
+  equipped?: boolean; // Whether the item is currently equipped (undefined === not equipped)
+}
+
+/**
+ * Lightweight declaration of a starting inventory item, used by character
+ * archetypes/templates to seed a freshly created character's inventory.
+ * Timestamps, IDs, and acquisition metadata are filled in when the item is added.
+ */
+export interface InventoryItemInput {
+  name: string;
+  description?: string;
+  categoryId: StandardInventoryCategory;
+  quantity?: number;
+  stackable?: boolean;
+  maxStack?: number;
+  equipped?: boolean;
+}
+
+/**
+ * Result of attempting to equip or unequip an item.
+ */
+export interface ItemEquipResult {
+  success: boolean;
+  equipped?: boolean;
+  error?: {
+    type: string;
+    title: string;
+    message: string;
+  };
 }
 
 /**

@@ -12,7 +12,9 @@ import {
   InventoryItemCategorization,
   InventoryAcquisitionRecord,
   ItemUsageResult,
+  ItemEquipResult,
 } from '@/types/inventory.types';
+import { canEquipItem } from '@/lib/inventory/equippable';
 import { EntityID, GeneratedImage } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
@@ -55,6 +57,10 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   getCharacterItems: (characterId: EntityID) => InventoryItem[];
   clearCharacterInventory: (characterId: EntityID) => void;
   useItem: (characterId: EntityID, itemId: EntityID) => ItemUsageResult;
+  toggleEquipItem: (
+    characterId: EntityID,
+    itemId: EntityID
+  ) => ItemEquipResult;
 
   // Image generation tracking
   setGeneratingImage: (itemId: EntityID, isGenerating: boolean) => void;
@@ -418,6 +424,10 @@ export const useInventoryStore = create<InventoryStore>()(
 
           if ('image' in updates) {
             normalizedUpdates.image = updates.image;
+          }
+
+          if ('equipped' in updates) {
+            normalizedUpdates.equipped = updates.equipped;
           }
 
           const now = getTimestamp();
@@ -972,6 +982,76 @@ export const useInventoryStore = create<InventoryStore>()(
             wasConsumed,
             remainingQuantity,
             previousQuantity,
+          };
+        },
+
+        toggleEquipItem: (characterId, itemId) => {
+          const state = get();
+          const item = state.items[itemId];
+
+          if (!item) {
+            const error = createStoreError(
+              'Item Not Found',
+              'The specified item could not be found.',
+              ErrorType.VALIDATION
+            );
+            set({ error });
+            return {
+              success: false,
+              error: {
+                type: error.type,
+                title: error.title,
+                message: error.message,
+              },
+            };
+          }
+
+          const characterItems = ensureCharacterInventory(characterId, state);
+          if (!characterItems.includes(itemId)) {
+            const error = createStoreError(
+              'Item Not In Inventory',
+              "The specified item is not in this character's inventory.",
+              ErrorType.VALIDATION
+            );
+            set({ error });
+            return {
+              success: false,
+              error: {
+                type: error.type,
+                title: error.title,
+                message: error.message,
+              },
+            };
+          }
+
+          // Unequipping is always allowed; equipping is gated by compatibility.
+          const nextEquipped = !item.equipped;
+          if (nextEquipped) {
+            const eligibility = canEquipItem(item);
+            if (!eligibility.allowed) {
+              const error = createStoreError(
+                'Cannot Equip Item',
+                eligibility.reason ?? 'This item cannot be equipped.',
+                ErrorType.VALIDATION
+              );
+              set({ error });
+              return {
+                success: false,
+                equipped: item.equipped ?? false,
+                error: {
+                  type: error.type,
+                  title: error.title,
+                  message: error.message,
+                },
+              };
+            }
+          }
+
+          get().update(itemId, { equipped: nextEquipped });
+
+          return {
+            success: true,
+            equipped: nextEquipped,
           };
         },
       };

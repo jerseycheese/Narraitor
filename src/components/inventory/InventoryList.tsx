@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { clsx } from 'clsx';
+import { Shield } from 'lucide-react';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
@@ -12,6 +14,7 @@ import {
   getCategoryMetadata,
   STANDARD_CATEGORIES,
 } from '@/lib/inventory/categories';
+import { isEquippableCategory } from '@/lib/inventory/equippable';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
 import { useItemDropConfirmation } from './hooks/useItemDropConfirmation';
@@ -63,8 +66,18 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       .filter((item): item is InventoryItem => Boolean(item));
   }, [itemsObject, characterInventories, characterId]);
   const sessionId = useSessionStore((state) => state.id);
+  const toggleEquipItem = useInventoryStore((state) => state.toggleEquipItem);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
   const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
+
+  // Equip or unequip an item; surface the block message if the store rejects it
+  const handleToggleEquip = (item: InventoryItem) => {
+    setErrorFeedback(null);
+    const result = toggleEquipItem(characterId, item.id);
+    if (!result.success && result.error) {
+      setErrorFeedback(result.error.message);
+    }
+  };
 
   // Handle item usage
   const handleUseItem = async (itemId: EntityID) => {
@@ -111,7 +124,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   // Empty state when no items
   if (items.length === 0) {
     return (
-      <div className={`${className}`}>
+      <div className={clsx('component-inventory-list', className)}>
         <EmptyState
           title="No items in inventory"
           description="Items will appear here as they are added"
@@ -123,7 +136,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 
   return (
     <div
-      className={`${className}`}
+      className={clsx('component-inventory-list', className)}
       role="region"
       aria-label="Character inventory"
     >
@@ -155,13 +168,17 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                 {categoryItems.map((item) => (
                   <article
                     key={item.id}
-                    className="manuscript-inventory-item"
+                    className={clsx(
+                      'manuscript-inventory-item',
+                      item.equipped && 'is-equipped'
+                    )}
+                    data-equipped={item.equipped ? 'true' : undefined}
                     role="listitem"
                   >
                     <div className="manuscript-inventory-item-header">
                       <h4 className="manuscript-inventory-item-name">{item.name}</h4>
                       {item.stackable && (
-                        <span 
+                        <span
                           className="manuscript-inventory-item-quantity"
                           aria-label={`Quantity: ${item.quantity}`}
                         >
@@ -169,6 +186,13 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                         </span>
                       )}
                     </div>
+
+                    {item.equipped && (
+                      <span className="manuscript-inventory-item-equipped-badge">
+                        <Shield aria-hidden="true" />
+                        Equipped
+                      </span>
+                    )}
 
                     {item.description && (
                       <p className="manuscript-inventory-item-description">{item.description}</p>
@@ -180,6 +204,21 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                       </span>
 
                       <div className="manuscript-inventory-actions">
+                        {isEquippableCategory(item.categoryId) && (
+                          <Button
+                            className="manuscript-inventory-action-button"
+                            variant={item.equipped ? 'secondary' : 'outline'}
+                            onClick={() => handleToggleEquip(item)}
+                            aria-pressed={item.equipped ?? false}
+                            aria-label={
+                              item.equipped
+                                ? `Unequip ${item.name}`
+                                : `Equip ${item.name}`
+                            }
+                          >
+                            {item.equipped ? 'UNEQUIP' : 'EQUIP'}
+                          </Button>
+                        )}
                         <Button
                           className="manuscript-inventory-action-button"
                           variant="outline"
