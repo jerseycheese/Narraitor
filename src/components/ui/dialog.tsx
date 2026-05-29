@@ -3,6 +3,8 @@
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import { clsx } from 'clsx';
+import './dialog.css';
 
 const Dialog = DialogPrimitive.Root;
 
@@ -16,7 +18,7 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={className}
+    className={clsx('dialog-overlay', className)}
     {...props}
   />
 ));
@@ -50,7 +52,7 @@ const DialogContent = React.forwardRef<
           >
             <DialogPrimitive.Content
               ref={ref}
-              className={className}
+              className={clsx('dialog-content', className)}
               {...props}
             >
               {children}
@@ -71,7 +73,7 @@ const DialogContent = React.forwardRef<
         <DialogOverlay />
         <DialogPrimitive.Content
           ref={ref}
-          className={className}
+          className={clsx('dialog-content', className)}
           {...props}
         >
           {children}
@@ -110,7 +112,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={className}
+    className={clsx('dialog-title', className)}
     {...props}
   />
 ));

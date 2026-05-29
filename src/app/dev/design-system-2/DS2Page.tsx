@@ -5,6 +5,7 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { useActiveSection } from '@/hooks/useActiveSection';
 import SessionDemo from './SessionDemo';
 import { ComponentShowcase } from '../design-system/_ui/ComponentShowcase';
+import { OverlayShowcase } from '../design-system/_ui/OverlayShowcase';
 import './design-system-2.css';
 
 // ─────────────────────────────────────────────────────────────────
@@ -888,8 +889,12 @@ export default function DesignSystem2Page() {
           <div className="ds2-section-number ds2-reveal">11 — Manuscript Overlay</div>
           <h2 className="ds2-section-title ds2-reveal">Overlay System</h2>
           <p className="ds2-section-subtitle ds2-reveal">
-            Layered manuscript interface with floating HUD, drawers, and action rail. Backdrop blur and gentle transparency.
+            The real <code>SimpleModal</code> and <code>PreviewModal</code> the app ships, themed by the Warm Earth tokens.
           </p>
+
+          <div className="ds2-reveal" style={{ marginBottom: '32px' }}>
+            <OverlayShowcase theme="ds2" />
+          </div>
 
           <details className="ds2-reveal">
             <summary className="ds2-component-label" style={{ cursor: 'pointer', userSelect: 'none' }}>Overlay Tokens</summary>

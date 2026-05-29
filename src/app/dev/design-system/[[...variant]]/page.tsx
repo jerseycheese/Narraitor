@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { DSToggle, type DSTheme } from '../_ui/DSToggle';
+import { ForceTheme } from '../_ui/ForceTheme';
 
 const DS1Page = dynamic(() => import('../DS1Page'));
 const DS2Page = dynamic(() => import('../../design-system-2/DS2Page'));
@@ -30,6 +31,7 @@ export default async function DesignSystemRoute({
 
   return (
     <div className="ds-variant-root" data-ds={theme}>
+      <ForceTheme theme={theme} />
       <DSToggle active={theme} />
       <PageBody />
     </div>

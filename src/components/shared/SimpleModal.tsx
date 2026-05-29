@@ -1,5 +1,6 @@
 import React, { useId } from 'react';
 import { X } from 'lucide-react';
+import { clsx } from 'clsx';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +16,7 @@ interface SimpleModalProps {
   title?: string;
   children?: React.ReactNode;
   className?: string;
+  overlayClassName?: string;
   contentClassName?: string;
   showCloseButton?: boolean;
   closeOnBackdropClick?: boolean;
@@ -41,6 +43,7 @@ export function SimpleModal({
   title,
   children,
   className,
+  overlayClassName,
   contentClassName,
   showCloseButton = true,
   closeOnBackdropClick = true,
@@ -67,6 +70,7 @@ export function SimpleModal({
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
         overlayScroll={scrollBehavior === 'overlay'}
+        overlayClassName={overlayClassName}
         className={className}
         onInteractOutside={(event) => {
           if (isJoyrideTooltipTarget(event.target)) {
@@ -111,7 +115,7 @@ export function SimpleModal({
 
         {(children !== undefined && children !== null) || !hasHeaderContent ? (
           <div
-            className={contentClassName}
+            className={clsx('dialog-body', contentClassName)}
             data-scroll-container={scrollBehavior === 'content' ? 'content' : undefined}
           >
             {children}
@@ -120,7 +124,7 @@ export function SimpleModal({
 
         {footer && (
           <div
-            className={footerClassName}
+            className={clsx('dialog-footer', footerClassName)}
             data-sticky-footer={stickyFooter ? 'true' : undefined}
           >
             {footer}
