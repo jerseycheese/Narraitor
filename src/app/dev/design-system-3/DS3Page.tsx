@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import './design-system-3.css';
 import * as Icons from './icons';
-import SessionDemo from './SessionDemo';
+import { SessionShowcase } from '../design-system/_ui/SessionShowcase';
 import { ComponentShowcase } from '../design-system/_ui/ComponentShowcase';
 import { OverlayShowcase } from '../design-system/_ui/OverlayShowcase';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
@@ -632,13 +632,13 @@ export default function DesignSystem3Page() {
       <section id="ds3-session" className="ds3-section">
         <div id="ds3-main-content" className="ds3-section-inner" style={{ maxWidth: 1100 }}>
           <div className="ds3-section-number ds3-reveal">12 — Game Session</div>
-          <h2 className="ds3-section-title ds3-reveal">Composition Demo</h2>
+          <h2 className="ds3-section-title ds3-reveal">Game Session</h2>
           <p className="ds3-section-subtitle ds3-reveal">
-            All components composed into the actual gameplay interface. A real scene with narrative, choices, HUD, and drawers.
+            The real game session surface, themed by The Mechanical Manuscript. Launches the canon ManuscriptSessionShell the app ships — narrative, choices, HUD, and scene status.
           </p>
-          <div className="ds3-reveal">
-            <SessionDemo />
-          </div>
+          {/* Not wrapped in ds3-reveal: its transform would become the
+              containing block for the shell's fixed full-screen overlay. */}
+          <SessionShowcase theme="ds3" />
         </div>
       </section>
 

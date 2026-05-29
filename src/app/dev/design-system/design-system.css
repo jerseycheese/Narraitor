@@ -422,18 +422,3 @@
   color: #9f1239;
 }
 
-/* ── Manuscript Demo Keyframes ─────────────────────────────────── */
-@keyframes ds1-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@keyframes ds1-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes ds1-pulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}

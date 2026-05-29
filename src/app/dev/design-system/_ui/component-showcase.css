@@ -459,3 +459,29 @@
   font-weight: 600;
   color: var(--color-text-primary);
 }
+
+/* ─── Session showcase: real ManuscriptSessionShell (issue #1276) ───
+ *
+ * The session section renders the one real session surface — the
+ * `ManuscriptSessionShell` with the real HUD, scene-status rail, narrative
+ * history, and choice selector. It is styled entirely in production
+ * (`src/styles/manuscript-session.css`), so the app and the guide render the
+ * same thing — no showcase-local skinning. The only rule here is the backdrop:
+ * the shell is a fixed full-screen overlay, and in the app it covers the opaque
+ * play page, but the guide only has this section behind it — so the backdrop
+ * gives the launched shell an opaque themed ground (matching the app) and keeps
+ * the DS3 translucent surface from revealing the page.
+ */
+
+.ds-session {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.ds-session-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 159;
+  background: var(--color-canvas);
+}
