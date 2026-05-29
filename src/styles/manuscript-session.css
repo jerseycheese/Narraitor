@@ -3726,6 +3726,12 @@ body.manuscript-overlay-open {
     grid-template-columns: 1fr;
   }
 
+  /* Keep the narrative in the single column — the desktop base places it in
+     grid-column 2, which otherwise splits the journal page (see DS3 note). */
+  [data-theme="ds2"] .manuscript-main-content {
+    grid-column: 1;
+  }
+
   [data-theme="ds2"] .manuscript-rail-spacer {
     display: none;
   }
@@ -4470,6 +4476,14 @@ body.manuscript-overlay-open {
 @media (width >= 1024px) {
   [data-theme="ds3"] .manuscript-main-stage {
     grid-template-columns: 1fr;
+  }
+
+  /* Keep the narrative in the single column. The desktop base places
+     .manuscript-main-content in grid-column 2; without this reset it lands in
+     an implicit second column and the scene-status rail inflates column 1,
+     splitting the stage instead of stacking the scene bar above the narrative. */
+  [data-theme="ds3"] .manuscript-main-content {
+    grid-column: 1;
   }
 
   [data-theme="ds3"] .manuscript-rail-spacer {
