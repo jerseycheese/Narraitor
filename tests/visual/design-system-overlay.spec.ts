@@ -35,7 +35,7 @@ test.describe('Design system overlay showcase', () => {
 
       // SimpleModal — the app's standard modal wrapper.
       await overlay.getByRole('button', { name: 'Leave this scene?' }).click();
-      const panel = page.locator('.dso-modal-panel');
+      const panel = page.locator('.dialog-content');
       await expect(panel).toBeVisible();
       await expect(panel.getByRole('button', { name: 'Stay' })).toBeVisible();
       await expect(panel.getByRole('button', { name: 'Leave' })).toBeVisible();
@@ -46,7 +46,7 @@ test.describe('Design system overlay showcase', () => {
       await expect(panel).toBeHidden();
 
       await overlay.getByRole('button', { name: 'Preview generated world' }).click();
-      const preview = page.locator('.dso-modal-panel');
+      const preview = page.locator('.dialog-content');
       await expect(preview).toBeVisible();
       await expect(preview.getByText('Rain City Noir')).toBeVisible();
       await expect(preview.getByRole('button', { name: 'Use This World' })).toBeVisible();
