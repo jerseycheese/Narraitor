@@ -88,4 +88,24 @@ describe('sessionStore crash-recovery marker (issue #221)', () => {
     useSessionStore.getState().updateSavedSessionNarrativeCount('orphan-session', 1);
     expect(readRecoveryMarker()).toBeNull();
   });
+
+  it('re-arms the marker for an active session after a clean refresh cleared it', () => {
+    // A clean refresh fires pagehide and clears the marker, but the session is
+    // still live in the persisted store. Remounting the play surface skips
+    // activation, so refreshRecoveryMarker must re-arm it (issue #221).
+    activateSession('session-refreshed', 'world-1', 'character-1');
+    expect(readRecoveryMarker()).toBeNull(); // cleared by the refresh
+
+    useSessionStore.getState().refreshRecoveryMarker();
+
+    const marker = readRecoveryMarker();
+    expect(marker?.sessionId).toBe('session-refreshed');
+    expect(marker?.worldId).toBe('world-1');
+    expect(marker?.characterId).toBe('character-1');
+  });
+
+  it('refreshRecoveryMarker does not arm when no session is active', () => {
+    useSessionStore.getState().refreshRecoveryMarker();
+    expect(readRecoveryMarker()).toBeNull();
+  });
 });

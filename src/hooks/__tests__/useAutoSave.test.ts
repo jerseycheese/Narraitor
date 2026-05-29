@@ -51,6 +51,7 @@ const mockSessionStore: SessionStore = {
   },
   initializeSession: jest.fn(),
   endSession: jest.fn(),
+  refreshRecoveryMarker: jest.fn(),
   setStatus: jest.fn(),
   setError: jest.fn(),
   setPlayerChoices: jest.fn(),

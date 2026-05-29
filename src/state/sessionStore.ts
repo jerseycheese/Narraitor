@@ -307,6 +307,15 @@ export const useSessionStore = create<SessionStore>()(
     }
   },
 
+  // Re-arm the crash-recovery marker for the current live session without
+  // re-running activation. The play surface clears the marker on a clean
+  // refresh (pagehide), but remounting an already-active session skips
+  // initializeSession/resumeSavedSession — so without this, a crash in the
+  // window before the next save would leave no marker and no recovery (issue #221).
+  refreshRecoveryMarker: () => {
+    syncRecoveryMarker(get(), getTimestamp());
+  },
+
   // End the current session (save it instead of destroying)
   endSession: async () => {
     const state = get();

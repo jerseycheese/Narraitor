@@ -91,6 +91,7 @@ export interface SessionStore {
   setCharacterId: (characterId: EntityID) => void;
   getSavedSession: (worldId: string, characterId: string) => SavedSessionInfo | undefined;
   resumeSavedSession: (sessionId: string) => boolean;
+  refreshRecoveryMarker: () => void;
   deleteSavedSession: (sessionId: string) => void;
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => void;
   fixExistingSessionNarrativeCounts: () => Promise<void>;
