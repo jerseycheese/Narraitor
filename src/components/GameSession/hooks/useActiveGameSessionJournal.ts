@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { useJournalStore } from '@/state/journalStore';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { safeTrim, truncate, getTimestamp } from '@/lib/utils';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('UseActiveGameSessionJournal');
@@ -48,6 +49,18 @@ export const useActiveGameSessionJournal = ({
     location?: string,
     decisionWeight?: 'minor' | 'major' | 'critical'
   ): Promise<{ summary: string; entryType: string; significance: string }> => {
+    // Under Playwright (E2E/visual) skip the live AI summarize call — it would
+    // hit /api/narrative/summarize with no AI key in CI, hang, and stall the
+    // page load (the visual suite's page.goto timeouts). Use the local fallback
+    // so seeded pages render deterministically. Mirrors EndingScreen (#1323).
+    if (isPlaywrightEnv()) {
+      return {
+        summary: createFallbackSummary(content),
+        entryType: 'character_event',
+        significance: decisionWeight || 'minor',
+      };
+    }
+
     try {
       const response = await fetch('/api/narrative/summarize', {
         method: 'POST',
