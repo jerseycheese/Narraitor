@@ -18,7 +18,27 @@ import {
   createMockCharacterStore,
 } from '@/lib/test-utils';
 import type { World } from '@/types/world.types';
+import type { NarrativeContext } from '@/types/narrative.types';
+import {
+  applyBudget,
+  limitNarrativeContextToBudget,
+} from '../narrativeGenerator.budget';
+import {
+  RequestBudget,
+  ComponentPriority,
+} from '@/lib/promptContext/tokenBudgetManager';
+import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
+import { logger } from '@/lib/utils/logger';
 
+jest.mock('@/lib/utils/logger', () => {
+  const mock = {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  };
+  return { __esModule: true, default: jest.fn(() => mock), logger: mock };
+});
 jest.mock('../loreContextHelper');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
 jest.mock('@/state/worldStore');
@@ -248,5 +268,107 @@ describe('NarrativeGenerator budget integration', () => {
     expect(capturedPrompt).toContain('NEWER_START');
     expect(capturedPrompt).toContain('OLDER_START');
     expect(capturedPrompt).not.toContain('OLDER_END_MARKER');
+  });
+});
+
+describe('budget logging', () => {
+  const buildBudget = (loreLimit: number) =>
+    new RequestBudget(
+      [
+        {
+          componentId: 'lore-context',
+          priority: ComponentPriority.MEDIUM,
+          min: 0,
+          target: loreLimit,
+          max: loreLimit,
+        },
+      ],
+      loreLimit,
+      true
+    );
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('warns when a component exceeds its budget and is truncated', () => {
+    const budget = buildBudget(5);
+    const longContent = Array.from({ length: 50 }, (_, i) => `word${i}`).join(' ');
+
+    applyBudget(longContent, 'lore-context', budget);
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Component exceeded token budget',
+      expect.objectContaining({
+        componentId: 'lore-context',
+        limit: 5,
+        truncated: true,
+      })
+    );
+  });
+
+  it('logs an info notice when a component crosses 90% utilization', () => {
+    const text = Array.from({ length: 20 }, (_, i) => `word${i}`).join(' ');
+    const tokens = estimateTokenCount(text);
+    // limit == estimate -> 100% utilization: within budget but past the 90% line
+    const budget = buildBudget(tokens);
+
+    expect(applyBudget(text, 'lore-context', budget)).toBe(text);
+    expect(logger.info).toHaveBeenCalledWith(
+      'Component approaching token budget',
+      expect.objectContaining({
+        componentId: 'lore-context',
+        estimated: tokens,
+        limit: tokens,
+      })
+    );
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('does not log when a component is comfortably under budget', () => {
+    const budget = buildBudget(1000);
+
+    applyBudget('short content', 'lore-context', budget);
+
+    expect(logger.info).not.toHaveBeenCalled();
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('warns when recent narrative is truncated to budget', () => {
+    const budget = new RequestBudget(
+      [
+        {
+          componentId: 'recent-narrative',
+          priority: ComponentPriority.HIGH,
+          min: 0,
+          target: 10,
+          max: 10,
+        },
+      ],
+      10,
+      true
+    );
+    const segment = {
+      id: 'seg-1',
+      type: 'scene' as const,
+      content: Array.from({ length: 100 }, (_, i) => `word${i}`).join(' '),
+      timestamp: new Date('2023-01-01T00:00:00Z'),
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: '2023-01-01T00:00:00Z',
+      metadata: { characterIds: [], tags: [] },
+    };
+
+    limitNarrativeContextToBudget(
+      { recentSegments: [segment] } as unknown as NarrativeContext,
+      budget
+    );
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Recent narrative truncated to token budget',
+      expect.objectContaining({
+        componentId: 'recent-narrative',
+        truncated: true,
+      })
+    );
   });
 });
