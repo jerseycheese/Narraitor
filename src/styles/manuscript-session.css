@@ -3726,6 +3726,12 @@ body.manuscript-overlay-open {
     grid-template-columns: 1fr;
   }
 
+  /* Keep the narrative in the single column — the desktop base places it in
+     grid-column 2, which otherwise splits the journal page (see DS3 note). */
+  [data-theme="ds2"] .manuscript-main-content {
+    grid-column: 1;
+  }
+
   [data-theme="ds2"] .manuscript-rail-spacer {
     display: none;
   }
@@ -4472,6 +4478,14 @@ body.manuscript-overlay-open {
     grid-template-columns: 1fr;
   }
 
+  /* Keep the narrative in the single column. The desktop base places
+     .manuscript-main-content in grid-column 2; without this reset it lands in
+     an implicit second column and the scene-status rail inflates column 1,
+     splitting the stage instead of stacking the scene bar above the narrative. */
+  [data-theme="ds3"] .manuscript-main-content {
+    grid-column: 1;
+  }
+
   [data-theme="ds3"] .manuscript-rail-spacer {
     display: none;
   }
@@ -4501,12 +4515,15 @@ body.manuscript-overlay-open {
     height: 1rem;
   }
 
-  /* DS3 outcome callout — float-right marginalia on desktop */
+  /* DS3 outcome callout — compact margin note pulled to the column's right
+     edge on desktop. The parent (.narrative-segment) is a flex column, so float
+     is inert here; align-self does the cross-axis pull. True page-gutter
+     marginalia is blocked by the narrative scroll container's overflow-x clip
+     (.scroll-smooth) — tracked as a separate follow-up. */
   [data-theme="ds3"] .choice-outcome-callout {
-    float: right;
-    clear: right;
+    align-self: flex-end;
     width: 220px;
-    margin: 0 0 var(--space-3) var(--space-3);
+    margin: 0 0 var(--space-3);
     padding: var(--space-3);
     box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   }

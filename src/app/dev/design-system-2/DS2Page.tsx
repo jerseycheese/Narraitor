@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { useActiveSection } from '@/hooks/useActiveSection';
-import SessionDemo from './SessionDemo';
+import { SessionShowcase } from '../design-system/_ui/SessionShowcase';
 import { ComponentShowcase } from '../design-system/_ui/ComponentShowcase';
 import { OverlayShowcase } from '../design-system/_ui/OverlayShowcase';
 import './design-system-2.css';
@@ -955,8 +955,8 @@ box-shadow: var(--shadow-elevated);`}
             A journal page, not an app. The narrative dominates; choices appear as footnotes below a thin rule. Clicking the character name or Tools in the running head opens floating paper-note panels. No rails, no chrome.
           </p>
 
-          {/* DS2 Session Demo — The Open Journal */}
-          <SessionDemo />
+          {/* The real game session surface, themed by The Open Journal */}
+          <SessionShowcase theme="ds2" />
 
           {/* Overlay Token Reference */}
           <details className="ds2-reveal" style={{ marginTop: '32px' }}>

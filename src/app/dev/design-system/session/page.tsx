@@ -1,34 +1,18 @@
 'use client';
 
-import ManuscriptDemo from '../ManuscriptDemo';
+import { ForceTheme } from '../_ui/ForceTheme';
+import { SessionShowcase } from '../_ui/SessionShowcase';
 
+/**
+ * Standalone fullscreen render of the canon game session, themed DS1 — used by
+ * the game-session-compare tool. The real ManuscriptSessionShell is a fixed
+ * full-screen overlay, so it fills the route on its own (issue #1276).
+ */
 export default function DesignSystemSessionPage() {
   return (
-    <div
-      className="design-system-session-fullscreen"
-      data-theme="ds1"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <style>{`
-        .design-system-session-fullscreen > div {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-          min-height: 0;
-        }
-        .design-system-session-fullscreen .manuscript-demo {
-          flex: 1;
-        }
-        .design-system-session-fullscreen .manuscript-demo > div {
-          height: 100%;
-        }
-      `}</style>
-      <ManuscriptDemo />
+    <div className="design-system-session-fullscreen" data-ds="ds1">
+      <ForceTheme theme="ds1" />
+      <SessionShowcase theme="ds1" defaultOpen showLauncher={false} />
     </div>
   );
 }

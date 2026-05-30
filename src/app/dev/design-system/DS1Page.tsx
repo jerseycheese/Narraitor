@@ -6,7 +6,7 @@ import { Globe, Users, Play, Sparkles } from 'lucide-react';
 import { primitiveColors } from '@/lib/design-tokens';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { useActiveSection } from '@/hooks/useActiveSection';
-import ManuscriptDemo from './ManuscriptDemo';
+import { SessionShowcase } from './_ui/SessionShowcase';
 import { ComponentShowcase } from './_ui/ComponentShowcase';
 import { OverlayShowcase } from './_ui/OverlayShowcase';
 import './design-system.css';
@@ -1041,12 +1041,12 @@ a:hover {
       <section id="ds1-session" className="ds1-section">
         <div className="ds1-section-inner">
           <div className="ds1-section-number ds1-reveal">12 — Session</div>
-          <h2 className="ds1-section-title ds1-reveal">Manuscript Demo</h2>
+          <h2 className="ds1-section-title ds1-reveal">Manuscript Session</h2>
           <div id="ds1-main-content" />
           <div style={{ marginBottom: 32 }}>
-            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Interactive Layout</h3>
-            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>Click buttons to toggle panels and drawers. Demonstrates progressive disclosure in the game session layout.</p>
-            <ManuscriptDemo />
+            <h3 className="font-interface" style={{ fontSize: 18, fontWeight: 500, marginBottom: 8, color: 'var(--color-text-primary)' }}>Game Session Layout</h3>
+            <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--color-text-secondary)' }}>The real game session surface, themed by Paper &amp; Ink. Launches the canon ManuscriptSessionShell the app ships.</p>
+            <SessionShowcase theme="ds1" />
           </div>
         </div>
       </section>
