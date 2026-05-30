@@ -4,10 +4,10 @@ import { seedTestData } from '../utils/seedTestData';
 import { mockApiEndpoints } from '../utils/mockApi';
 import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
-const steps = [15, 16, 17, 18];
+const steps = [12, 13, 14];
 
-test('World creation tour step 3 snapshots (steps 15-18)', async ({ page }) => {
-  test.setTimeout(120000);
+test('World creation tour: World Description (tour steps 12-14)', async ({ page }) => {
+  test.setTimeout(90000);
 
   await seedTestData(page);
   await mockApiEndpoints(page);
@@ -28,22 +28,17 @@ test('World creation tour step 3 snapshots (steps 15-18)', async ({ page }) => {
   await createOwnButton.click();
   await waitForContentStable(page);
 
-  await page.locator('[data-tutorial="genre-picker"]').selectOption('Cyberpunk');
-  await page.locator('[data-tutorial="world-name"]').fill('Test World');
-  await page.getByRole('button', { name: 'Next' }).click();
-  await waitForContentStable(page);
+  const genrePicker = page.locator('[data-tutorial="genre-picker"]');
+  await expect(genrePicker).toBeVisible({ timeout: 15000 });
+  await genrePicker.selectOption('Cyberpunk');
 
-  await page.locator('[data-tutorial="world-description"]').fill('A neon-lit cyberpunk world where megacorporations rule the streets and hackers fight for survival in the digital shadows. The air is thick with smog and the glow of holographic advertisements.');
-  
-  // Wait for the Next button to be enabled (description length >= 50)
+  const nameInput = page.locator('[data-tutorial="world-name"]');
+  await expect(nameInput).toBeVisible({ timeout: 15000 });
+  await nameInput.fill('Test World');
+
   const nextButton = page.getByRole('button', { name: 'Next' });
   await expect(nextButton).toBeEnabled({ timeout: 15000 });
   await nextButton.click();
-  
-  // Wait for AI analysis overlay to appear and then disappear
-  await page.waitForSelector('[data-testid="processing-overlay"]', { state: 'visible', timeout: 10000 }).catch(() => {});
-  await page.waitForSelector('[data-testid="processing-overlay"]', { state: 'hidden', timeout: 30000 }).catch(() => {});
-  
   await waitForContentStable(page);
 
   for (const stepIndex of steps) {
@@ -51,6 +46,6 @@ test('World creation tour step 3 snapshots (steps 15-18)', async ({ page }) => {
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-step${zeroPad(stepIndex)}.png`, { clip });
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-description-${zeroPad(stepIndex)}.png`, { clip });
   }
 });

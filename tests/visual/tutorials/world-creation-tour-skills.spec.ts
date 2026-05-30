@@ -4,9 +4,9 @@ import { seedTestData } from '../utils/seedTestData';
 import { mockApiEndpoints } from '../utils/mockApi';
 import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
-const steps = [23, 24, 25, 26, 27];
+const steps = [19, 20, 21, 22];
 
-test('World creation tour step 5 snapshots (steps 23-27)', async ({ page }) => {
+test('World creation tour: Review Skills (tour steps 19-22)', async ({ page }) => {
   test.setTimeout(120000);
 
   await seedTestData(page);
@@ -35,10 +35,12 @@ test('World creation tour step 5 snapshots (steps 23-27)', async ({ page }) => {
 
   await page.locator('[data-tutorial="world-description"]').fill('A neon-lit cyberpunk world where megacorporations rule the streets and hackers fight for survival in the digital shadows. The air is thick with smog and the glow of holographic advertisements.');
   await page.getByRole('button', { name: 'Next' }).click();
+  
+  // Wait for processing overlay
   await page.waitForSelector('[data-testid="processing-overlay"]', { state: 'hidden', timeout: 30000 }).catch(() => {});
   await waitForContentStable(page);
 
-  // Next on step 3 (AttributeReviewStep)
+  // Now on step 3 (AttributeReviewStep).
   // Add a minimal custom attribute to satisfy requirement and advance
   const addCustomAttributeBtn = page.locator('[data-testid="add-custom-attribute-button"]');
   if (await addCustomAttributeBtn.count() > 0) {
@@ -55,36 +57,7 @@ test('World creation tour step 5 snapshots (steps 23-27)', async ({ page }) => {
       }
     }
   }
-  await page.getByRole('button', { name: 'Next' }).click();
-  await waitForContentStable(page);
-
-  // Next on step 4 (SkillReviewStep)
-  // Add a minimal custom skill and advance
-  const addCustomSkillBtn = page.locator('button:has-text("Add Custom Skill")');
-  if (await addCustomSkillBtn.count() > 0) {
-    await addCustomSkillBtn.click();
-    await page.waitForTimeout(300);
-    const skillNameInput = page.getByRole('textbox', { name: /skill name/i }).first();
-    if (await skillNameInput.count() > 0) {
-      await skillNameInput.fill('Test Skill');
-      await page.waitForTimeout(150);
-      const descriptionInput = page.locator('textarea[placeholder*="Describe what this skill represents"]');
-      if (await descriptionInput.count() > 0) {
-        await descriptionInput.fill('A test skill for visual regression testing.');
-        await page.waitForTimeout(150);
-      }
-      const testAttributeCheckbox = page.getByTestId('custom-skill-editor').getByRole('checkbox', { name: 'Test Attribute' });
-      if (await testAttributeCheckbox.count() > 0) {
-        await testAttributeCheckbox.check();
-        await page.waitForTimeout(150);
-      }
-      const createSkillBtn = page.getByRole('button', { name: /create skill/i });
-      if (await createSkillBtn.count() > 0) {
-        await createSkillBtn.click();
-        await page.waitForTimeout(300);
-      }
-    }
-  }
+  
   await page.getByRole('button', { name: 'Next' }).click();
   await waitForContentStable(page);
 
@@ -93,6 +66,6 @@ test('World creation tour step 5 snapshots (steps 23-27)', async ({ page }) => {
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-step${zeroPad(stepIndex)}.png`, { clip });
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-skills-${zeroPad(stepIndex)}.png`, { clip });
   }
 });

@@ -30,7 +30,7 @@ async function scrollStepTargetIntoView(page: Page, stepIndex: number): Promise<
   await page.waitForTimeout(100);
 }
 
-test('World creation tour step 1 snapshots (steps 4-11)', async ({ page }) => {
+test('World creation tour: Basic Information (tour steps 4-11)', async ({ page }) => {
   test.setTimeout(90000);
 
   await seedTestData(page);
@@ -64,6 +64,6 @@ test('World creation tour step 1 snapshots (steps 4-11)', async ({ page }) => {
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-step${zeroPad(stepIndex)}.png`, { clip });
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-basic-info-${zeroPad(stepIndex)}.png`, { clip });
   }
 });

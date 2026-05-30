@@ -6,7 +6,7 @@ import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, ge
 
 const steps = [28, 29, 30, 31];
 
-test('World creation tour quickstart snapshots (steps 28-31)', async ({ page }) => {
+test('World creation tour: Quick Start (tour steps 28-31)', async ({ page }) => {
   test.setTimeout(180000);
 
   await seedTestData(page);
@@ -113,7 +113,7 @@ test('World creation tour quickstart snapshots (steps 28-31)', async ({ page }) 
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-step${zeroPad(stepIndex)}.png`, {
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-quickstart-${zeroPad(stepIndex)}.png`, {
       clip,
       mask: [archetypeCards],
     });
