@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/seedTestData';
+import { waitForStoreReady } from './utils/tutorial-helpers';
 
 /**
  * Main Pages Visual Regression Tests
@@ -102,14 +103,16 @@ test.describe('Main Pages Visual Tests', () => {
     await expect(page).toHaveScreenshot('characters-list.png', { fullPage: true });
   });
 
-  // Skipped pending #1198 — IndexedDB seed loses race against page render
-  // intermittently in CI (sidebar nav appears, main content empty). Passes
-  // locally; CI captures the empty-state render once seeding lags.
-  test.skip('World detail page should render consistently', async ({ page }) => {
+  test('World detail page should render consistently', async ({ page }) => {
     await seedTestData(page);
 
     // Navigate to the cyberpunk world detail page
     await page.goto('/worlds/world-cyberpunk-2077');
+    // Block on the seed flushing and the world actually rendering before
+    // capture — without this the IndexedDB seed loses the race in CI and the
+    // page paints empty (sidebar only). See #1198.
+    await waitForStoreReady(page);
+    await expect(page.getByText('Cyberpunk Neo-Tokyo').first()).toBeVisible({ timeout: 15000 });
     await waitForContentStable(page);
     await hideDynamicContent(page);
     await pinAppShell(page);
