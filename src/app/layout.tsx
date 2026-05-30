@@ -14,6 +14,7 @@ import './globals.css';
 import './workshop.css';
 import './wizard.css';
 import './dashboard.css';
+import './about.css';
 import './badge.css';
 import './character-display.css';
 import '@/lib/theme/themes/_shared-tokens.css';
