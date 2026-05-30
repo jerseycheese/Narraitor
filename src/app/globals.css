@@ -301,6 +301,32 @@ body > * {
   height: 1rem;
 }
 
+/* DataTable primitive layout (src/components/ui/data-table.tsx).
+ * Lives in production so the real CharacterTable / WorldTable get the same
+ * search/table/pagination layout the living style guide shows — not skinned
+ * guide-side. The table cells themselves still inherit the Table primitive. */
+.data-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.data-table-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.data-table-pagination-controls {
+  display: flex;
+  gap: var(--space-2);
+}
+
 /* Theme Switcher Controls */
 .theme-switcher,
 .dark-mode-toggle {

@@ -36,7 +36,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
       {/* Inventory Display - hidden when progressive disclosure is enabled */}
       {!isProgressiveDisclosureEnabled && characterId && (
         <div
-          className="manuscript-support-section"
+          className="manuscript-support-inventory"
           data-testid="inventory-collapsible"
           data-tutorial="inventory-toggle"
         >

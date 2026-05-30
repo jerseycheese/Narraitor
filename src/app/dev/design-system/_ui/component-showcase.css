@@ -284,6 +284,20 @@
   border-bottom: none;
 }
 
+/* ─── DataTable composes Table/Input/Button and carries its own layout in
+ *     production (.data-table in globals.css), so nothing is skinned here. ─── */
+
+/* ─── CollapsibleSection (fully styled in production; only the showcase
+ *     body copy needs to drop its default paragraph margin) ─── */
+
+.ds-components .dsc-collapsible-body {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
 /* ─── Checkbox & Radio (native inputs, unstyled primitives) ─── */
 
 .ds-components input[type='checkbox'],

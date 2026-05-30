@@ -34,6 +34,9 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { DataTable } from '@/components/ui/data-table';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
+import type { ColumnDef } from '@tanstack/react-table';
 import type { DSTheme } from './DSToggle';
 import './component-showcase.css';
 
@@ -60,6 +63,31 @@ const BADGE_VARIANTS = [
   'warning',
   'info',
 ] as const;
+
+interface ShowcaseItem {
+  id: string;
+  name: string;
+  type: string;
+  weight: number;
+  status: string;
+}
+
+const DATATABLE_ROWS: ShowcaseItem[] = [
+  { id: '1', name: 'Revolver', type: 'Weapon', weight: 2, status: 'Ready' },
+  { id: '2', name: 'Case File', type: 'Document', weight: 1, status: 'New' },
+  { id: '3', name: 'Lockpick Set', type: 'Tool', weight: 1, status: 'Worn' },
+  { id: '4', name: 'Whiskey Flask', type: 'Consumable', weight: 1, status: 'Half full' },
+  { id: '5', name: 'Pocket Watch', type: 'Valuable', weight: 1, status: 'Ticking' },
+  { id: '6', name: 'Matchbook', type: 'Tool', weight: 1, status: 'Three left' },
+  { id: '7', name: 'Bus Ticket', type: 'Document', weight: 1, status: 'Stamped' },
+];
+
+const DATATABLE_COLUMNS: ColumnDef<ShowcaseItem>[] = [
+  { accessorKey: 'name', header: 'Item', enableSorting: true },
+  { accessorKey: 'type', header: 'Type', enableSorting: true },
+  { accessorKey: 'weight', header: 'Weight', enableSorting: true },
+  { accessorKey: 'status', header: 'Status', enableSorting: false },
+];
 
 /**
  * Canonical primitive showcase. Renders the real `@/components/ui/*`
@@ -347,6 +375,46 @@ export function ComponentShowcase({ theme }: { theme: DSTheme }) {
             </TableRow>
           </TableBody>
         </Table>
+      </section>
+
+      {/* DataTable */}
+      <section className="dsc-group" aria-label="DataTable primitive">
+        <h3 className="dsc-group-title">DataTable</h3>
+        <p className="dsc-group-note">
+          The real <code>DataTable</code> — sortable columns, search, and
+          pagination composing the themed Table, Input, and Button primitives.
+        </p>
+        <DataTable
+          columns={DATATABLE_COLUMNS}
+          data={DATATABLE_ROWS}
+          ariaLabel="Inventory"
+          searchable={{ enabled: true, placeholder: 'Search items…' }}
+          pagination={{ pageSize: 5, showPagination: true }}
+        />
+      </section>
+
+      {/* Collapsible section */}
+      <section className="dsc-group" aria-label="CollapsibleSection primitive">
+        <h3 className="dsc-group-title">Collapsible Section</h3>
+        <p className="dsc-group-note">
+          The real <code>CollapsibleSection</code>, expanded and collapsed. Each
+          design system frames it differently — the eyebrow, accent rule, and
+          dividers come from production tokens.
+        </p>
+        <div className="dsc-stack">
+          <CollapsibleSection title="Case Notes">
+            <p className="dsc-collapsible-body">
+              The witness changed her story twice. The second time, she
+              mentioned a name she shouldn&apos;t have known.
+            </p>
+          </CollapsibleSection>
+          <CollapsibleSection title="Evidence Log" initialCollapsed>
+            <p className="dsc-collapsible-body">
+              A pocket watch stopped at 2:14, a matchbook from a club that
+              closed years ago, and a bus ticket stamped the morning after.
+            </p>
+          </CollapsibleSection>
+        </div>
       </section>
 
       {/* Dialog */}

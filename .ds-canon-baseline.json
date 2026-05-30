@@ -3,11 +3,7 @@
   "skinning": [
     "src/app/dev/design-system/_ui/ComponentShowcase.tsx::overlayClassName::dsc-dialog-overlay"
   ],
-  "_coverageGapsTracking": "data-table + CollapsibleSection not yet in the living style guide — tracked in #1319; remove each once rendered there.",
-  "coverageGaps": [
-    "data-table",
-    "CollapsibleSection"
-  ],
+  "coverageGaps": [],
   "coverageExceptions": {
     "scroll-area": "Behavior/utility wrapper (adds scroll styling around arbitrary content) — no visual variants/states to canonize."
   }
