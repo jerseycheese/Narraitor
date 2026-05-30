@@ -1,0 +1,431 @@
+/* ═══════════════════════════════════════════════════════════════
+   About Surface
+   Styles for the /about page and the <About /> component.
+   All values use design tokens for theme-awareness. Per-theme
+   structural treatments mirror dashboard.css:
+   DS1 = drafting-table (sharp, hairline rules, mono labels, grid)
+   DS2 = editorial (soft radius cards, airy, serif prose)
+   DS3 = mechanical manuscript (dot-grid, corner brackets, compact)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Base layout (token-driven, theme-agnostic) ─── */
+
+.component-about {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+@media (width >= 1024px) {
+  .component-about {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+
+/* ─── Hero ─── */
+
+.component-about-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.component-about-title {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+}
+
+.component-about-lead {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Generic section ─── */
+
+.component-about-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.component-about-section-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+.component-about-prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-about-prose p {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+.component-about-prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.component-about-prose a:hover {
+  color: var(--color-accent-hover);
+}
+
+.component-about-prose a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── How it works — step cards ─── */
+
+.component-about-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: about-step;
+}
+
+@media (width < 768px) {
+  .component-about-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.component-about-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.component-about-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-full);
+}
+
+.component-about-step-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-about-step-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+/* ─── CTA ─── */
+
+.component-about-cta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-6);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.component-about-cta-link {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-inverse);
+  background: var(--color-accent);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background-color 120ms ease;
+}
+
+.component-about-cta-link:hover {
+  background: var(--color-accent-hover);
+}
+
+.component-about-cta-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS1 — "The Drafting Table"
+   Archival / drafting: sharp radius, hairline rules between
+   sections, mono uppercase section labels, faint drafting grid.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds1"] .component-about {
+  gap: 0;
+  background-color: var(--color-canvas);
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-border-strong) 40%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-border-strong) 40%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
+  background-repeat: repeat;
+}
+
+[data-theme="ds1"] .component-about-hero,
+[data-theme="ds1"] .component-about-section,
+[data-theme="ds1"] .component-about-cta {
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-theme="ds1"] .component-about-cta {
+  border-bottom: none;
+  align-items: flex-start;
+}
+
+[data-theme="ds1"] .component-about-title {
+  font-family: var(--font-interface);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds1"] .component-about-section-title {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .component-about-steps {
+  gap: var(--space-3);
+}
+
+[data-theme="ds1"] .component-about-step {
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
+  gap: var(--space-3);
+}
+
+[data-theme="ds1"] .component-about-step-number {
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .component-about-cta-link {
+  border-radius: var(--radius-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS2 — "Warm Earth" editorial
+   Soft radius step cards, generous whitespace, serif prose, warm
+   surface fills, no background pattern.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds2"] .component-about {
+  gap: clamp(var(--space-8), 6vw, 4rem);
+}
+
+[data-theme="ds2"] .component-about-title {
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+[data-theme="ds2"] .component-about-lead {
+  font-family: var(--font-narrative);
+  font-size: 1.375rem;
+  line-height: 1.5;
+}
+
+[data-theme="ds2"] .component-about-section-title {
+  font-family: var(--font-narrative);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds2"] .component-about-prose p {
+  font-family: var(--font-narrative);
+  font-size: 1.1875rem;
+  line-height: 1.7;
+}
+
+[data-theme="ds2"] .component-about-steps {
+  gap: var(--space-6);
+}
+
+[data-theme="ds2"] .component-about-step {
+  padding: var(--space-6);
+  gap: var(--space-3);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-hover);
+}
+
+[data-theme="ds2"] .component-about-step-description {
+  font-family: var(--font-narrative);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+[data-theme="ds2"] .component-about-cta {
+  padding: var(--space-8);
+  border: none;
+  border-radius: var(--radius-lg);
+}
+
+[data-theme="ds2"] .component-about-cta-link {
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-6);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS3 — "Mechanical Manuscript"
+   Compact: dot-grid background, corner-bracket step cards, tighter
+   gaps, medium radius, mono section labels with a dot bullet.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds3"] .component-about {
+  gap: var(--space-6);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-text-primary) 16%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+  background-repeat: repeat;
+}
+
+[data-theme="ds3"] .component-about-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .component-about-section-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+[data-theme="ds3"] .component-about-lead {
+  font-family: var(--font-narrative);
+  font-size: 1.1875rem;
+  line-height: 1.55;
+}
+
+[data-theme="ds3"] .component-about-steps {
+  gap: var(--space-3);
+}
+
+[data-theme="ds3"] .component-about-step {
+  position: relative;
+  padding: var(--space-4);
+  gap: var(--space-2);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+/* Corner brackets — top-left + bottom-right L-marks in accent. */
+[data-theme="ds3"] .component-about-step::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+  pointer-events: none;
+}
+
+[data-theme="ds3"] .component-about-step::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid var(--color-accent);
+  border-right: 1px solid var(--color-accent);
+  pointer-events: none;
+}
+
+[data-theme="ds3"] .component-about-step-number {
+  border-radius: var(--radius-sm);
+  font-family: var(--font-system);
+}
+
+[data-theme="ds3"] .component-about-step-description {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+}
+
+[data-theme="ds3"] .component-about-cta {
+  border-radius: var(--radius-md);
+}
+
+[data-theme="ds3"] .component-about-cta-link {
+  border-radius: var(--radius-md);
+}
