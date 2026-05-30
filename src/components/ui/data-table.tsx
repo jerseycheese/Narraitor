@@ -101,7 +101,7 @@ export function DataTable<TData, TValue>({
     <div className="data-table">
       {/* Search Filter */}
       {searchable.enabled && (
-        <div>
+        <div className="data-table-toolbar">
           <Input
             placeholder={searchable.placeholder || 'Search...'}
             value={globalFilter}
@@ -216,12 +216,12 @@ export function DataTable<TData, TValue>({
 
       {/* Pagination */}
       {pagination.showPagination && (
-        <div>
-          <div>
+        <div className="data-table-pagination">
+          <div className="data-table-pagination-info">
             Page {table.getState().pagination.pageIndex + 1} of{' '}
             {table.getPageCount()}
           </div>
-          <div>
+          <div className="data-table-pagination-controls">
             <Button
               variant="outline"
               size="sm"
