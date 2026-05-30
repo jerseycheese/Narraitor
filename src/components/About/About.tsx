@@ -81,9 +81,9 @@ export default function About() {
         </h2>
         <div className="component-about-prose">
           <p>
-            Everything you create — worlds, characters, and the stories you play
-            through — is saved right in your browser. Your stories stay with you on
-            your own device, not on someone else&apos;s server.
+            Your worlds, characters, and saved stories live right in your
+            browser — kept on your own device, with no account to sign up for.
+            Come back any time and pick up where you left off.
           </p>
         </div>
       </section>
