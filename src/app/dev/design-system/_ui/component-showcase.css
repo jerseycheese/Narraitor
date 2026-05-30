@@ -284,6 +284,42 @@
   border-bottom: none;
 }
 
+/* ─── DataTable (composes Table/Input/Button; only its bare layout divs
+ *     need spacing — the themed look comes from those primitives) ─── */
+
+.ds-components .data-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds-components .data-table > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.ds-components .data-table > div:last-child > div:last-child {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ─── CollapsibleSection (fully styled in production; only the showcase
+ *     body copy needs to drop its default paragraph margin) ─── */
+
+.ds-components .dsc-collapsible-body {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
 /* ─── Checkbox & Radio (native inputs, unstyled primitives) ─── */
 
 .ds-components input[type='checkbox'],

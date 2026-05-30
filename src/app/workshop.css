@@ -1791,16 +1791,20 @@
   gap: var(--space-5);
 }
 
-.component-world-editor .component-collapsible-section {
+/* ─── CollapsibleSection (component-owned canon, issue #1319) ───
+ *
+ * Styled on the component's own class — not scoped to a host page — so the
+ * living style guide and every app surface render the same themed component.
+ * Base look here; the DS1/DS2/DS3 differentiation lives in each theme block. */
+
+.component-collapsible-section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
 
-.component-world-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
+.component-collapsible-section [data-testid="collapsible-section-header"] {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1810,9 +1814,7 @@
   cursor: pointer;
 }
 
-.component-world-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
+.component-collapsible-section [data-testid="collapsible-section-title"] {
   margin: 0;
   font-family: var(--font-interface);
   font-size: 1.125rem;
@@ -1820,14 +1822,11 @@
   color: var(--color-text-primary);
 }
 
-.component-world-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
+.component-collapsible-section [data-testid="collapsible-section-content"] {
   padding: 0 var(--space-5) var(--space-5);
 }
 
-.component-world-editor
-  .component-collapsible-section
+.component-collapsible-section
   [data-testid="collapsible-section-content"][aria-hidden="true"] {
   display: none;
 }
@@ -1845,12 +1844,11 @@
   gap: var(--space-4);
 }
 
-[data-theme="ds1"] .component-world-editor .component-collapsible-section {
+[data-theme="ds1"] .component-collapsible-section {
   border-radius: 2px;
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"] {
   padding: var(--space-3) var(--space-5);
@@ -1858,14 +1856,12 @@
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"][aria-expanded="false"] {
   border-bottom-color: transparent;
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"] {
   position: relative;
@@ -1875,7 +1871,6 @@
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"]::before {
   content: "Section";
@@ -1890,7 +1885,6 @@
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"]::after {
   content: "";
@@ -1902,7 +1896,6 @@
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding: var(--space-4) var(--space-5) var(--space-5);
@@ -1921,13 +1914,12 @@
   gap: clamp(var(--space-5), 3vw, var(--space-8));
 }
 
-[data-theme="ds2"] .component-world-editor .component-collapsible-section {
+[data-theme="ds2"] .component-collapsible-section {
   border-radius: 1rem;
   animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
 }
 
 [data-theme="ds2"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"] {
   padding: clamp(var(--space-4), 2vw, var(--space-5))
@@ -1935,7 +1927,6 @@
 }
 
 [data-theme="ds2"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"] {
   font-family: var(--font-narrative);
@@ -1945,7 +1936,6 @@
 }
 
 [data-theme="ds2"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding: 0 clamp(var(--space-5), 3vw, var(--space-6))
@@ -1955,14 +1945,12 @@
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"] {
   position: relative;
 }
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"][aria-expanded="true"]::after {
   content: "";
@@ -1983,7 +1971,6 @@
 }
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"] {
   position: relative;
@@ -1991,7 +1978,6 @@
 }
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"]::before {
   content: "• Section";
@@ -2006,7 +1992,6 @@
 }
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding-top: var(--space-4);
@@ -2693,47 +2678,6 @@
   gap: var(--space-5);
 }
 
-.component-character-editor .component-collapsible-section {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
-  cursor: pointer;
-}
-
-.component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding: 0 var(--space-5) var(--space-5);
-}
-
-.component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"][aria-hidden="true"] {
-  display: none;
-}
-
 .character-editor-actions,
 .world-editor-actions {
   display: flex;
@@ -2762,69 +2706,6 @@
   gap: var(--space-4);
 }
 
-[data-theme="ds1"] .component-character-editor .component-collapsible-section {
-  border-radius: 2px;
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  padding: var(--space-3) var(--space-5);
-  border-bottom: 1px solid var(--color-border);
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"][aria-expanded="false"] {
-  border-bottom-color: transparent;
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  position: relative;
-  padding-top: var(--space-3);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"]::before {
-  content: "Section";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"]::after {
-  content: "";
-  display: block;
-  width: 2px;
-  height: 18px;
-  margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding: var(--space-4) var(--space-5) var(--space-5);
-}
-
 [data-theme="ds1"] .component-character-editor .attributes-form-row,
 [data-theme="ds1"] .component-character-editor .skills-form-row {
   border-radius: 2px;
@@ -2844,37 +2725,6 @@
 
 [data-theme="ds2"] .component-character-editor {
   gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .component-character-editor .component-collapsible-section {
-  border-radius: 1rem;
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  padding: clamp(var(--space-4), 2vw, var(--space-5))
-    clamp(var(--space-5), 3vw, var(--space-6));
-}
-
-[data-theme="ds2"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  font-size: 1.375rem;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds2"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding: 0 clamp(var(--space-5), 3vw, var(--space-6))
-    clamp(var(--space-5), 3vw, var(--space-6));
 }
 
 [data-theme="ds2"] .component-character-editor .attributes-form-row,
@@ -2908,64 +2758,6 @@
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  position: relative;
-}
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"][aria-expanded="true"]::after {
-  content: "";
-  display: block;
-  position: absolute;
-  bottom: 0;
-  left: var(--space-5);
-  right: var(--space-5);
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-border-strong) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.7;
-}
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  position: relative;
-  padding-top: var(--space-3);
-}
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"]::before {
-  content: "• Section";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding-top: var(--space-4);
-}
 
 [data-theme="ds3"] .component-character-editor .attributes-form-list,
 [data-theme="ds3"] .component-character-editor .skills-form-list {
@@ -3285,8 +3077,7 @@
   [data-theme="ds2"] .character-detail-section,
   [data-theme="ds2"] .world-detail-section,
   [data-theme="ds2"] .settings-card,
-  [data-theme="ds2"] .component-character-editor .component-collapsible-section,
-  [data-theme="ds2"] .component-world-editor .component-collapsible-section {
+  [data-theme="ds2"] .component-collapsible-section {
     animation: none;
   }
 }
