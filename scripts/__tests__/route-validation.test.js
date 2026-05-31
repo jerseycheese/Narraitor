@@ -69,6 +69,23 @@ describe('extractReferences', () => {
     expect(refs[0].raw).toBe('/login');
   });
 
+  it('extracts navigateWithLoading() targets (the app nav helper)', () => {
+    const src = "navigateWithLoading('/worlds/create', 'Setting up...');";
+    const refs = extractReferences(src, 'a.tsx');
+    expect(refs[0].raw).toBe('/worlds/create');
+  });
+
+  it('extracts a literal href in a config object property', () => {
+    const src = "const items = [{ href: '/dev/world-card', label: 'World Card' }];";
+    const refs = extractReferences(src, 'a.tsx');
+    expect(refs[0].raw).toBe('/dev/world-card');
+  });
+
+  it('does not match a variable passed to navigateWithLoading', () => {
+    const refs = extractReferences('navigateWithLoading(path, message);', 'a.tsx');
+    expect(refs).toHaveLength(0);
+  });
+
   it('reports a 1-based line number', () => {
     const src = 'const x = 1;\nconst y = 2;\nrouter.push("/play");';
     const refs = extractReferences(src, 'a.tsx');
