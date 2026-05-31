@@ -32,6 +32,15 @@ export const applyBudget = (
   const limit = budget.getAllocation(componentId);
 
   if (!Number.isFinite(limit) || limit <= 0) {
+    if (estimatedTokens > 0) {
+      logger.warn('Component exceeded token budget', {
+        componentId,
+        estimated: estimatedTokens,
+        limit: Number.isFinite(limit) ? limit : 0,
+        overage: estimatedTokens,
+        truncated: true,
+      });
+    }
     budget.recordUsage(componentId, 0);
     return '';
   }

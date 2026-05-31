@@ -334,6 +334,27 @@ describe('budget logging', () => {
     expect(logger.warn).not.toHaveBeenCalled();
   });
 
+  it('warns when a zero allocation silently drops non-empty content', () => {
+    const budget = buildBudget(0);
+
+    expect(applyBudget('some dropped content', 'lore-context', budget)).toBe('');
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Component exceeded token budget',
+      expect.objectContaining({
+        componentId: 'lore-context',
+        limit: 0,
+        truncated: true,
+      })
+    );
+  });
+
+  it('does not warn when a zero allocation receives empty content', () => {
+    const budget = buildBudget(0);
+
+    expect(applyBudget('', 'lore-context', budget)).toBe('');
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
   it('warns when recent narrative is truncated to budget', () => {
     const budget = new RequestBudget(
       [

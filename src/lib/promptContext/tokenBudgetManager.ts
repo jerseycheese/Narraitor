@@ -167,6 +167,11 @@ export class RequestBudget {
    *
    * With a `componentId`, returns that component's snapshot. Without one,
    * returns the aggregate across every component that has recorded usage.
+   *
+   * The aggregate `estimated` covers all recorded components, but `actual` and
+   * `accuracy` are computed only over the subset that has provider counts — so
+   * accuracy stays an apples-to-apples ratio rather than dividing a full-set
+   * estimate by a partial-set actual.
    */
   getCalibrationData(componentId?: string): CalibrationData {
     if (componentId !== undefined) {
@@ -182,12 +187,21 @@ export class RequestBudget {
       estimated += value;
     }
 
+    // Aggregate actual/accuracy only over components that have an actual count,
+    // pairing each with its own estimate so the ratio compares the same subset.
     let actual: number | undefined;
-    for (const value of this.actualUsage.values()) {
-      actual = (actual ?? 0) + value;
+    let measuredEstimated = 0;
+    for (const [id, actualTokens] of this.actualUsage) {
+      actual = (actual ?? 0) + actualTokens;
+      measuredEstimated += this.usage.get(id) ?? 0;
     }
 
-    return buildCalibration(estimated, actual);
+    const accuracy =
+      actual !== undefined && measuredEstimated > 0
+        ? actual / measuredEstimated
+        : undefined;
+
+    return { estimated, actual, accuracy };
   }
 }
 

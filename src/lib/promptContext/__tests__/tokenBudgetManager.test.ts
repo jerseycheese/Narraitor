@@ -96,4 +96,17 @@ describe('RequestBudget calibration', () => {
     expect(calibration.actual).toBeUndefined();
     expect(calibration.accuracy).toBeUndefined();
   });
+
+  it('aggregates accuracy over only the components that have actuals', () => {
+    const budget = buildBudget();
+    budget.recordUsage('lore-context', 800, { actualTokens: 1000 });
+    budget.recordUsage('inventory', 200); // estimated only, no actual
+
+    const calibration = budget.getCalibrationData();
+    // estimated covers all recorded components...
+    expect(calibration.estimated).toBe(1000);
+    // ...but actual/accuracy pair only the measured subset (800 -> 1000)
+    expect(calibration.actual).toBe(1000);
+    expect(calibration.accuracy).toBeCloseTo(1.25);
+  });
 });
