@@ -13,19 +13,15 @@ export default function DevPage() {
     ],
     'World Management': [
       { href: '/dev/world-creation-wizard', label: 'World Creation Wizard', color: 'green' },
-      { href: '/dev/world-card', label: 'World Card', color: 'green' },
       { href: '/dev/world-list-screen', label: 'World List Screen', color: 'green' },
       { href: '/dev/world-generation', label: 'World Generation (AI)', color: 'orange' },
       { href: '/dev/attribute-editor', label: 'Attribute Editor', color: 'yellow' },
     ],
     'Character Management': [
       { href: '/dev/character-creation', label: 'Character Creation Wizard', color: 'purple' },
-      { href: '/dev/test-character-form', label: 'Character Form Debug', color: 'purple' },
       { href: '/dev/character-generation', label: 'Character Generation (AI)', color: 'orange' },
-      { href: '/dev/portrait-prompt-test', label: 'Portrait Testing', color: 'purple' },
     ],
     'Journal System': [
-      { href: '/dev/enhanced-journal', label: 'Enhanced Journal UI', color: 'amber' },
       { href: '/dev/journal-access', label: 'Basic Journal Access', color: 'orange' },
     ],
     'Navigation & UI': [

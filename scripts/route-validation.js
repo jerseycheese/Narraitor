@@ -1,0 +1,202 @@
+/**
+ * Route consistency validation -- pure logic (issue #420).
+ *
+ * No fs, no globals, no process: every function here takes its inputs and
+ * returns a value so it can be unit-tested against fixtures. The CLI wrapper
+ * (scripts/validate-routes.js) does the file I/O and feeds these functions.
+ *
+ * What it does: scans internal navigation targets (<Link href>, router.push /
+ * router.replace, redirect()) and checks each one resolves to a real App Router
+ * page (or a next.config redirect source). Catches broken links like the
+ * /worlds/create vs /world/create mismatch that motivated the issue.
+ */
+
+const PAGE_FILE_RE = /[/\\]page\.(?:tsx|ts|js)$/;
+
+/**
+ * Map an app-directory-relative page path to its route pattern.
+ * Returns null when the file is not a page (so callers can filter).
+ *
+ *   'page.tsx'                         -> '/'
+ *   'worlds/[id]/edit/page.tsx'        -> '/worlds/[id]/edit'
+ *   '(group)/about/page.tsx'           -> '/about'   (route groups dropped)
+ *   'dev/design-system/[[...v]]/page.tsx' -> '/dev/design-system/[[...v]]'
+ */
+export function appFileToRoutePattern(relPathFromAppDir) {
+  const normalized = relPathFromAppDir.replace(/\\/g, '/');
+  if (!PAGE_FILE_RE.test('/' + normalized)) return null;
+
+  const dir = normalized.replace(/\/?page\.(?:tsx|ts|js)$/, '');
+  const segments = dir
+    .split('/')
+    .filter((seg) => seg.length > 0)
+    // Route groups `(group)` and parallel-route slots `@slot` are organizational
+    // -- they don't appear in the URL.
+    .filter((seg) => !(seg.startsWith('(') && seg.endsWith(')')))
+    .filter((seg) => !seg.startsWith('@'));
+
+  return '/' + segments.join('/');
+}
+
+/** Split a route pattern or path into non-empty segments. '/' -> []. */
+export function toSegments(routeOrPath) {
+  return routeOrPath.split('/').filter((seg) => seg.length > 0);
+}
+
+// Matches the literal target of:
+//   - JSX href props:        href="..." / href={'...'} / href={`...`}
+//   - object-literal hrefs:  { href: '/...' }   (config arrays like dev/page.tsx)
+//   - navigation calls:      router.push('...') / router.replace("...") /
+//                            redirect(`...`) / navigateWithLoading('...')
+// navigateWithLoading is this app's own nav helper -- it forwards its first
+// argument straight to router.push (src/hooks/useNavigationLoading.ts), so a
+// literal route passed to it is exactly as real as a router.push target.
+// Group 1 = quote/backtick char, Group 2 = the literal contents.
+const REFERENCE_RE =
+  /(?:href\s*[:=]\s*\{?\s*|(?:router\s*\.\s*(?:push|replace)|redirect|navigateWithLoading)\s*\(\s*)(["'`])((?:\\.|(?!\1)[\s\S])*?)\1/g;
+
+/**
+ * Extract internal navigation references from a source file's text.
+ * Returns [{ raw, filePath, line }] -- raw is the literal href/path string
+ * (still containing any ${...} template holes); line is 1-based.
+ *
+ * Bare variable references (href={item.href}, navigateWithLoading(path)) capture
+ * no quote/backtick and are never matched here -- they're unresolvable
+ * statically. But a route defined as a literal in a config object
+ * (`{ href: '/dev/foo' }`) IS resolvable, so the `href:` form is matched too.
+ */
+export function extractReferences(content, filePath) {
+  const references = [];
+  REFERENCE_RE.lastIndex = 0;
+  let match;
+  while ((match = REFERENCE_RE.exec(content)) !== null) {
+    const raw = match[2];
+    const line = content.slice(0, match.index).split('\n').length;
+    references.push({ raw, filePath, line });
+  }
+  return references;
+}
+
+/**
+ * Normalize a raw reference into matchable segments.
+ * Returns { segments, skip }. `skip: true` means "not an internal app route,
+ * ignore it" (external URL, mailto/tel, pure hash, relative, or empty).
+ *
+ * ${...} template holes become a ':dynamic' token that matches any single
+ * segment, so `/worlds/${id}/play` lines up with `/worlds/[id]/play`.
+ */
+export function normalizeReference(raw) {
+  if (typeof raw !== 'string' || raw.length === 0) return { segments: [], skip: true };
+
+  // Drop query string and hash before anything else.
+  let path = raw.split('#')[0].split('?')[0];
+
+  // Replace template holes with a placeholder token first, so a leading
+  // `${...}` doesn't make the path look relative.
+  path = path.replace(/\$\{[^}]*\}/g, '__DYN__');
+
+  // Internal routes are absolute (start with '/'). Skip externals, protocol
+  // URLs, mailto:/tel:, pure hashes, and relative paths.
+  if (!path.startsWith('/') || path.startsWith('//')) return { segments: [], skip: true };
+
+  const segments = path
+    .split('/')
+    .filter((seg) => seg.length > 0)
+    .map((seg) => (seg.includes('__DYN__') ? ':dynamic' : seg));
+
+  return { segments, skip: false };
+}
+
+/**
+ * Does a reference's segments match one route pattern's segments?
+ *  - static segment: must be equal
+ *  - '[x]' or ':dynamic': matches exactly one non-empty segment
+ *  - '[...x]': catch-all, matches one or more segments (consumes the rest)
+ *  - '[[...x]]': optional catch-all, matches zero or more (consumes the rest)
+ */
+export function matchesRoute(refSegments, patternSegments) {
+  function walk(ri, pi) {
+    if (pi === patternSegments.length) return ri === refSegments.length;
+
+    const pat = patternSegments[pi];
+
+    if (pat.startsWith('[[...') && pat.endsWith(']]')) {
+      // Optional catch-all -- only valid as the final segment. Consumes
+      // everything that remains (including nothing).
+      return pi === patternSegments.length - 1;
+    }
+    if (pat.startsWith('[...') && pat.endsWith(']')) {
+      // Required catch-all -- needs at least one remaining segment.
+      return pi === patternSegments.length - 1 && ri < refSegments.length;
+    }
+
+    if (ri >= refSegments.length) return false;
+
+    const isDynamic = (pat.startsWith('[') && pat.endsWith(']')) || pat === ':dynamic';
+    // A static pattern segment matches a literal ref segment, or a ':dynamic'
+    // ref token (the template hole could resolve to this static value).
+    if (isDynamic || pat === refSegments[ri] || refSegments[ri] === ':dynamic') {
+      return walk(ri + 1, pi + 1);
+    }
+    return false;
+  }
+  return walk(0, 0);
+}
+
+/** True if the reference matches any known route pattern. */
+export function matchesAnyRoute(refSegments, routePatterns) {
+  return routePatterns.some((pattern) => matchesRoute(refSegments, toSegments(pattern)));
+}
+
+/**
+ * Pull redirect `source:` paths out of next.config text. A reference that
+ * matches a redirect source is valid -- the redirect forwards it to a real page.
+ * `:path*` style params are treated as catch-all-ish: we convert them to a
+ * ':dynamic'-friendly pattern.
+ */
+export function extractRedirectSources(nextConfigSource) {
+  const sources = [];
+  const re = /source\s*:\s*(["'`])((?:\\.|(?!\1)[\s\S])*?)\1/g;
+  let match;
+  while ((match = re.exec(nextConfigSource)) !== null) {
+    sources.push(match[2]);
+  }
+  return sources;
+}
+
+/**
+ * Normalize a redirect source into a route pattern string. Next.js path params
+ * (`:path*`, `:id`) become catch-all / dynamic markers so matching reuses
+ * matchesRoute.
+ */
+export function redirectSourceToPattern(source) {
+  const segments = source
+    .split('/')
+    .filter((seg) => seg.length > 0)
+    .map((seg) => {
+      if (/^:.+\*$/.test(seg)) return '[[...rest]]'; // :path* -> optional catch-all
+      if (/^:.+\+$/.test(seg)) return '[...rest]'; //  :path+ -> required catch-all
+      if (/^:.+$/.test(seg)) return '[param]'; //       :id    -> dynamic
+      return seg;
+    });
+  return '/' + segments.join('/');
+}
+
+/**
+ * Core check. Given extracted references, the known route patterns, and the
+ * redirect source strings, return the references that match nothing.
+ */
+export function findBrokenReferences({ references, routePatterns, redirectSources = [] }) {
+  const redirectPatterns = redirectSources.map(redirectSourceToPattern);
+  const allPatterns = [...routePatterns, ...redirectPatterns];
+
+  const broken = [];
+  for (const ref of references) {
+    const { segments, skip } = normalizeReference(ref.raw);
+    if (skip) continue;
+    if (!matchesAnyRoute(segments, allPatterns)) {
+      broken.push(ref);
+    }
+  }
+  return broken;
+}

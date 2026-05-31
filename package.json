@@ -16,6 +16,7 @@
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
     "audit:css": "node scripts/audit-css.mjs",
+    "validate:routes": "node scripts/validate-routes.js",
     "type-check": "tsc --noEmit",
     "knip": "knip",
     "knip:fix": "knip --fix --allow-remove-files",
