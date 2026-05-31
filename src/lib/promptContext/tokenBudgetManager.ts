@@ -20,11 +20,24 @@ export interface BudgetAllocation {
 }
 
 /**
+ * Calibration snapshot comparing the heuristic token estimate against an actual
+ * token count from the AI provider. `accuracy` (actual / estimated) is only
+ * present once an actual has been recorded and the estimate is non-zero.
+ */
+export interface CalibrationData {
+  componentId?: string;
+  estimated: number;
+  actual?: number;
+  accuracy?: number;
+}
+
+/**
  * Request budget instance for tracking allocations during a single request
  */
 export class RequestBudget {
   private allocations: Map<string, BudgetAllocation> = new Map();
   private usage: Map<string, number> = new Map();
+  private actualUsage: Map<string, number> = new Map();
   private enabled: boolean;
 
   constructor(
@@ -132,11 +145,78 @@ export class RequestBudget {
   }
 
   /**
-   * Record actual token usage for a component
+   * Record token usage for a component.
+   *
+   * `tokens` is the estimated (heuristic) count. Pass `options.actualTokens`
+   * when an actual count is known (e.g. from the AI provider's usage metadata)
+   * to enable calibration of the estimation heuristics.
    */
-  recordUsage(componentId: string, tokens: number): void {
+  recordUsage(
+    componentId: string,
+    tokens: number,
+    options?: { actualTokens?: number }
+  ): void {
     this.usage.set(componentId, tokens);
+    if (options?.actualTokens !== undefined) {
+      this.actualUsage.set(componentId, options.actualTokens);
+    }
   }
+
+  /**
+   * Get calibration data comparing estimated vs actual token counts.
+   *
+   * With a `componentId`, returns that component's snapshot. Without one,
+   * returns the aggregate across every component that has recorded usage.
+   *
+   * The aggregate `estimated` covers all recorded components, but `actual` and
+   * `accuracy` are computed only over the subset that has provider counts — so
+   * accuracy stays an apples-to-apples ratio rather than dividing a full-set
+   * estimate by a partial-set actual.
+   */
+  getCalibrationData(componentId?: string): CalibrationData {
+    if (componentId !== undefined) {
+      return buildCalibration(
+        this.usage.get(componentId) ?? 0,
+        this.actualUsage.get(componentId),
+        componentId
+      );
+    }
+
+    let estimated = 0;
+    for (const value of this.usage.values()) {
+      estimated += value;
+    }
+
+    // Aggregate actual/accuracy only over components that have an actual count,
+    // pairing each with its own estimate so the ratio compares the same subset.
+    let actual: number | undefined;
+    let measuredEstimated = 0;
+    for (const [id, actualTokens] of this.actualUsage) {
+      actual = (actual ?? 0) + actualTokens;
+      measuredEstimated += this.usage.get(id) ?? 0;
+    }
+
+    const accuracy =
+      actual !== undefined && measuredEstimated > 0
+        ? actual / measuredEstimated
+        : undefined;
+
+    return { estimated, actual, accuracy };
+  }
+}
+
+/**
+ * Build a calibration snapshot, computing accuracy only when an actual count is
+ * available and the estimate is non-zero (avoids divide-by-zero).
+ */
+function buildCalibration(
+  estimated: number,
+  actual: number | undefined,
+  componentId?: string
+): CalibrationData {
+  const accuracy =
+    actual !== undefined && estimated > 0 ? actual / estimated : undefined;
+  return { componentId, estimated, actual, accuracy };
 }
 
 /**
