@@ -1,5 +1,6 @@
 import * as React from "react"
 import { clsx } from 'clsx'
+import './alert.css'
 
 // Clean Slate: Removed cva and Tailwind variants.
 // Retaining semantic variant props for future styling hooks.

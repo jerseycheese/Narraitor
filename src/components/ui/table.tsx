@@ -4,6 +4,7 @@
  */
 
 import * as React from 'react';
+import './table.css';
 
 const Table = React.forwardRef<
   HTMLTableElement,

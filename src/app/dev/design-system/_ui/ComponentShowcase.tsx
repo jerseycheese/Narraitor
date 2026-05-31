@@ -213,7 +213,6 @@ export function ComponentShowcase({ theme }: { theme: DSTheme }) {
             <Checkbox label="Locked setting" disabled />
           </div>
           <RadioGroup
-            className="dsc-radio-group"
             name="dsc-tracking"
             value={tracking}
             onValueChange={setTracking}
@@ -254,36 +253,36 @@ export function ComponentShowcase({ theme }: { theme: DSTheme }) {
         <h3 className="dsc-group-title">Card</h3>
         <p className="dsc-group-note">Header, content, and footer slots composed together.</p>
         <div className="dsc-grid">
-          <Card className="dsc-card">
-            <CardHeader className="dsc-card-header">
-              <CardTitle className="dsc-card-title">Rain City Noir</CardTitle>
-              <CardDescription className="dsc-card-description">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rain City Noir</CardTitle>
+              <CardDescription>
                 Mystery · 3 sessions
               </CardDescription>
             </CardHeader>
-            <CardContent className="dsc-card-content">
+            <CardContent>
               A rain-soaked city of jazz clubs and back alleys where every witness
               has something to hide.
             </CardContent>
-            <CardFooter className="dsc-card-footer">
+            <CardFooter>
               <Button size="sm">Continue</Button>
               <Button size="sm" variant="outline">
                 Details
               </Button>
             </CardFooter>
           </Card>
-          <Card className="dsc-card">
-            <CardHeader className="dsc-card-header">
-              <CardTitle className="dsc-card-title">Starfall Station</CardTitle>
-              <CardDescription className="dsc-card-description">
+          <Card>
+            <CardHeader>
+              <CardTitle>Starfall Station</CardTitle>
+              <CardDescription>
                 Sci-Fi · 1 session
               </CardDescription>
             </CardHeader>
-            <CardContent className="dsc-card-content">
+            <CardContent>
               A deep-space mining station gone silent. The distress signal stopped
               two days ago.
             </CardContent>
-            <CardFooter className="dsc-card-footer">
+            <CardFooter>
               <Button size="sm">Continue</Button>
               <Button size="sm" variant="outline">
                 Details
@@ -298,36 +297,18 @@ export function ComponentShowcase({ theme }: { theme: DSTheme }) {
         <h3 className="dsc-group-title">Tabs</h3>
         <p className="dsc-group-note">Controlled tabs switching between panels.</p>
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="dsc-tabs-list">
-            <TabsTrigger
-              value="overview"
-              className="dsc-tabs-trigger"
-              aria-selected={tab === 'overview'}
-            >
-              Overview
-            </TabsTrigger>
-            <TabsTrigger
-              value="journal"
-              className="dsc-tabs-trigger"
-              aria-selected={tab === 'journal'}
-            >
-              Journal
-            </TabsTrigger>
-            <TabsTrigger
-              value="inventory"
-              className="dsc-tabs-trigger"
-              aria-selected={tab === 'inventory'}
-            >
-              Inventory
-            </TabsTrigger>
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="journal">Journal</TabsTrigger>
+            <TabsTrigger value="inventory">Inventory</TabsTrigger>
           </TabsList>
-          <TabsContent value="overview" className="dsc-tabs-content">
+          <TabsContent value="overview">
             A summary of the current scene, characters present, and open threads.
           </TabsContent>
-          <TabsContent value="journal" className="dsc-tabs-content">
+          <TabsContent value="journal">
             Logged discoveries, decisions, and warnings from the investigation.
           </TabsContent>
-          <TabsContent value="inventory" className="dsc-tabs-content">
+          <TabsContent value="inventory">
             Items carried into the scene and what each one might unlock.
           </TabsContent>
         </Tabs>
