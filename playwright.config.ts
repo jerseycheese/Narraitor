@@ -33,6 +33,23 @@ function resolveBaseURL(): string {
  * Configures Playwright for consistent visual screenshot comparison
  * across multiple browsers and viewports. Optimized for CI/CD environments.
  */
+
+// Shared Chromium settings for both the main visual project and the tutorial
+// project, so they render identically (viewport + font hinting).
+const chromiumUse = {
+  ...devices['Desktop Chrome'],
+  // Standard desktop viewport for consistent screenshots (height > 800px for test requirements)
+  viewport: { width: 1280, height: 1024 },
+  // Browser launch options for consistent font rendering
+  launchOptions: {
+    args: [
+      '--font-render-hinting=none',
+      '--disable-font-subpixel-positioning',
+      '--disable-lcd-text',
+    ],
+  },
+};
+
 export default defineConfig({
   // Test directory for visual regression tests
   testDir: './tests/visual',
@@ -99,20 +116,22 @@ export default defineConfig({
   // Configure projects for major browsers - optimized for CI speed
   projects: [
     {
+      // Main visual suite. Excludes the tutorial tours, which run in their own
+      // project (and dedicated CI job) to keep the main run lean — see #1014.
       name: 'chromium',
-      use: { 
-        ...devices['Desktop Chrome'],
-        // Standard desktop viewport for consistent screenshots (height > 800px for test requirements)
-        viewport: { width: 1280, height: 1024 },
-        // Browser launch options for consistent font rendering
-        launchOptions: {
-          args: [
-            '--font-render-hinting=none',
-            '--disable-font-subpixel-positioning',
-            '--disable-lcd-text',
-          ],
-        },
-      },
+      testIgnore: '**/tutorials/**',
+      use: { ...chromiumUse },
+    },
+    {
+      // Tutorial tours run as a separate project so they can be split into a
+      // dedicated CI job. snapshotPathTemplate pins the literal "-chromium"
+      // (instead of the default "{-projectName}") so the existing
+      // ...-chromium-darwin.png baselines stay valid — no regeneration.
+      name: 'tutorials',
+      testMatch: '**/tutorials/**/*.spec.ts',
+      snapshotPathTemplate:
+        '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-chromium{-snapshotSuffix}{ext}',
+      use: { ...chromiumUse },
     },
     // NOTE: Firefox and WebKit disabled for faster CI
     // Enable for comprehensive cross-browser testing when needed
