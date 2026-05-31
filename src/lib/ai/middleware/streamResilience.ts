@@ -21,7 +21,7 @@ const logger = new Logger('StreamResilience');
 export const DEFAULT_MAX_RESUMES = 2;
 
 /** Default pause before a resume attempt, giving a flaky connection a moment to settle. */
-export const DEFAULT_RESUME_DELAY_MS = 1000;
+const DEFAULT_RESUME_DELAY_MS = 1000;
 
 /** Details handed to `onResume` when a transient failure triggers a resume. */
 export interface ResumeInfo {
