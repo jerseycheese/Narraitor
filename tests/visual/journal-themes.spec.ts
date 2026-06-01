@@ -13,12 +13,12 @@ import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
  *
  * The play routes have no on-page DS switcher, so theme is set via localStorage
  * before load (ThemeProvider reads `narraitor-theme` on init), matching
- * session-themes.spec.ts.
+ * session-themes.spec.ts. Snapshot names are literals (one test per theme) so
+ * scripts/clean-visual-snapshots.cjs keeps the committed baselines.
  */
 
 const JOURNAL_URL = '/worlds/world-cyberpunk-2077/play/journal';
-const THEMES = ['ds1', 'ds2', 'ds3'] as const;
-type ThemeId = (typeof THEMES)[number];
+type ThemeId = 'ds1' | 'ds2' | 'ds3';
 
 const setupJournal = async (page: Page, theme: ThemeId): Promise<void> => {
   await page.addInitScript((t) => {
@@ -49,10 +49,18 @@ const setupJournal = async (page: Page, theme: ThemeId): Promise<void> => {
 };
 
 test.describe('Journal page theme differentiation', () => {
-  for (const theme of THEMES) {
-    test(`${theme} journal page renders consistently`, async ({ page }) => {
-      await setupJournal(page, theme);
-      await expect(page.locator('.journal-page')).toHaveScreenshot(`journal-${theme}.png`);
-    });
-  }
+  test('DS1 journal page renders consistently', async ({ page }) => {
+    await setupJournal(page, 'ds1');
+    await expect(page.locator('.journal-page')).toHaveScreenshot('journal-ds1.png');
+  });
+
+  test('DS2 journal page renders consistently', async ({ page }) => {
+    await setupJournal(page, 'ds2');
+    await expect(page.locator('.journal-page')).toHaveScreenshot('journal-ds2.png');
+  });
+
+  test('DS3 journal page renders consistently', async ({ page }) => {
+    await setupJournal(page, 'ds3');
+    await expect(page.locator('.journal-page')).toHaveScreenshot('journal-ds3.png');
+  });
 });

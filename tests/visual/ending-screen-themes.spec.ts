@@ -17,12 +17,13 @@ import {
  * Locator-scoped to `[data-testid="ending-screen"]` for local <-> CI stability.
  *
  * The play route has no on-page DS switcher, so theme is set via localStorage
- * before load, matching session-themes.spec.ts.
+ * before load, matching session-themes.spec.ts. Snapshot names are literals (one
+ * test per theme) so scripts/clean-visual-snapshots.cjs keeps the committed
+ * baselines.
  */
 
 const PLAY_URL = '/worlds/world-cyberpunk-2077/play';
-const THEMES = ['ds1', 'ds2', 'ds3'] as const;
-type ThemeId = (typeof THEMES)[number];
+type ThemeId = 'ds1' | 'ds2' | 'ds3';
 
 const ENDING_IMAGE =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZDcwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Ucml1bXBoYW50IEVuZGluZzwvdGV4dD48L3N2Zz4=';
@@ -103,13 +104,27 @@ const setupEnding = async (page: Page, theme: ThemeId): Promise<void> => {
 test.describe('Ending screen theme differentiation', () => {
   test.describe.configure({ timeout: 60000 });
 
-  for (const theme of THEMES) {
-    test(`${theme} ending screen renders consistently`, async ({ page }) => {
-      await setupEnding(page, theme);
-      await expect(page.locator('[data-testid="ending-screen"]')).toHaveScreenshot(
-        `ending-screen-${theme}.png`,
-        { threshold: 0.05 }
-      );
-    });
-  }
+  test('DS1 ending screen renders consistently', async ({ page }) => {
+    await setupEnding(page, 'ds1');
+    await expect(page.locator('[data-testid="ending-screen"]')).toHaveScreenshot(
+      'ending-screen-ds1.png',
+      { threshold: 0.05 }
+    );
+  });
+
+  test('DS2 ending screen renders consistently', async ({ page }) => {
+    await setupEnding(page, 'ds2');
+    await expect(page.locator('[data-testid="ending-screen"]')).toHaveScreenshot(
+      'ending-screen-ds2.png',
+      { threshold: 0.05 }
+    );
+  });
+
+  test('DS3 ending screen renders consistently', async ({ page }) => {
+    await setupEnding(page, 'ds3');
+    await expect(page.locator('[data-testid="ending-screen"]')).toHaveScreenshot(
+      'ending-screen-ds3.png',
+      { threshold: 0.05 }
+    );
+  });
 });
