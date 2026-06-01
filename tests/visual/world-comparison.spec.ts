@@ -2,6 +2,14 @@ import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
+/**
+ * Worlds comparison/table view — single-theme (default DS1).
+ *
+ * DS coverage (#1264): this spec exercises the grid/table toggle, selection
+ * checkboxes, and comparison-view persistence behaviour, not theme layout. The
+ * worlds list is covered across DS1/DS2/DS3 by tests/visual/worlds-themes.spec.ts.
+ */
+
 test.describe('World Comparison View', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(60000);

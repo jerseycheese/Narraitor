@@ -42,6 +42,12 @@ const captureFullStep = async (page: Page, name: string): Promise<void> => {
  *
  * Single initialization that walks through QuickStart → Steps 0–5,
  * taking screenshots at each stage to reduce flakiness and runtime.
+ *
+ * DS coverage (#1264): single-theme (default DS1) by design. All three design
+ * systems for the character wizard are already covered by the "Character creation
+ * wizard steps render <DS> structure" tests in tests/visual/wizard-themes.spec.ts.
+ * Tripling this full QuickStart→Step5 sequence would duplicate that coverage at
+ * much higher runtime/flake cost.
  */
 
 test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', async ({ page }) => {

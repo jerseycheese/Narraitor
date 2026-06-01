@@ -8,6 +8,10 @@ import { mockApiEndpoints } from './utils/mockApi';
  * 
  * Tests the story ending screen display with different emotional tones using the actual user flow.
  * Follows Playwright best practices by testing the real user journey.
+ *
+ * DS coverage (#1264): this spec covers the four emotional tones (content variants)
+ * in a single theme. The ending screen surface across DS1/DS2/DS3 is covered by
+ * tests/visual/ending-screen-themes.spec.ts.
  */
 
 test.describe('EndingScreen Visual Tests', () => {

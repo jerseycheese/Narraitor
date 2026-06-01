@@ -15,6 +15,14 @@ import {
 } from './utils/game-session-page-seeder';
 
 /**
+ * DS coverage (#1264): single-theme (default DS1). The play surface is covered
+ * across DS1/DS2/DS3 by tests/visual/session-themes.spec.ts (scene status +
+ * per-theme layout geometry) and tests/visual/design-system-session.spec.ts (the
+ * real ManuscriptSessionShell per theme). This spec focuses on populated gameplay
+ * content (history, HUD, choices, inventory, summary) rather than theme layout.
+ */
+
+/**
  * Game Session Visual Regression Tests
  * 
  * Tests the active gameplay interface including session management,

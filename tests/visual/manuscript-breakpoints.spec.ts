@@ -12,6 +12,16 @@ import {
   type AppDrawerName,
 } from './utils/manuscript-helpers';
 
+/**
+ * Manuscript session breakpoint matrix — single-theme (default DS1) across 11
+ * viewports x light/dark states.
+ *
+ * DS coverage (#1264): this spec's axis is responsive breakpoints + light/dark,
+ * not design system. The manuscript surface across DS1/DS2/DS3 is covered by
+ * tests/visual/manuscript-layout.spec.ts. Multiplying this breakpoint matrix by
+ * three themes would be prohibitively slow with no added theme-layout signal.
+ */
+
 interface BreakpointState {
   id: string;
   applyAppState: (page: Page) => Promise<void>;

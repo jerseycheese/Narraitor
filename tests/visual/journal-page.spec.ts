@@ -7,6 +7,10 @@ import { mockApiEndpoints } from './utils/mockApi';
  *
  * Tests that the dedicated journal page displays entries correctly
  * during an active game session.
+ *
+ * DS coverage (#1264): this spec is behaviour-focused (entries seed, detail pane
+ * opens) and single-theme. The journal surface across DS1/DS2/DS3 is covered by
+ * tests/visual/journal-themes.spec.ts.
  */
 
 test.describe('Journal Page', () => {

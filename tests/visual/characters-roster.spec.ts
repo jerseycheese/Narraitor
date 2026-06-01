@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test';
 import { getTimestamp } from '@/lib/utils';
 
+/**
+ * Character roster narrative context — single-theme (default DS1).
+ *
+ * DS coverage (#1264): this spec verifies roster *content* (narrative threads,
+ * relationships, major events, cross-character references), not theme layout. The
+ * characters roster surface is covered across DS1/DS2/DS3 by
+ * tests/visual/characters-themes.spec.ts.
+ */
+
 const WORLD_ID = 'world-roster-playwright';
 const CHAR_ALPHA = 'char-alpha-playwright';
 const CHAR_BETA = 'char-beta-playwright';

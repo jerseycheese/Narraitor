@@ -2,6 +2,14 @@ import { test, expect, type Page } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
+/**
+ * Mobile action-row overflow — already all-DS (#1264).
+ *
+ * This spec loops DS1/DS2/DS3 (see `themes` below) across two narrow viewports,
+ * asserting no horizontal overflow per theme. Listed here so the #1264 audit
+ * shows it as intentional all-theme coverage, not a single-theme gap.
+ */
+
 test.describe('Mobile Action Row Layout', () => {
   const themes = ['ds1', 'ds2', 'ds3'] as const;
   const mobileViewports = [
