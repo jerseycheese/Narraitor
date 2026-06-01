@@ -14,16 +14,40 @@ const glob = require('glob');
 const ROOT = process.cwd();
 const VISUAL_DIR = path.join(ROOT, 'tests', 'visual');
 
-// Extract explicit screenshot names from a spec file.
-// Supports both single and double quotes.
+// Extract expected snapshot name prefixes from a spec file.
+//
+// Handles two ways specs name snapshots, with single quotes, double quotes,
+// or backticks:
+//   1. Inline:  expect(x).toHaveScreenshot('name.png')
+//   2. Via a helper: captureStep(page, prepare, `name-${theme}.png`), where the
+//      snapshot name is the last argument and always ends in .png.
+//
+// Both are anchored on the call site rather than scanning every string literal
+// in the file -- prose in header comments (apostrophes, backtick spans) would
+// otherwise open phantom literals and desync the scan, silently dropping real
+// names.
+//
+// Template-literal names (e.g. `scene-status-${theme}-desktop.png`) are reduced
+// to their static prefix up to the first `${`, so the file.startsWith(base)
+// check keeps every interpolated variant. Keeping a prefix only ever broadens
+// what survives, so it's strictly safe against deleting a real baseline.
 function extractScreenshotNames(source) {
   const names = new Set();
-  const regex = /toHaveScreenshot\(\s*(["'])\s*([^\s"']+?)\s*\1/gm;
-  let m;
-  while ((m = regex.exec(source)) !== null) {
-    const file = m[2];
-    if (file && file.toLowerCase().endsWith('.png')) {
-      names.add(file);
+  const patterns = [
+    // 1. Direct toHaveScreenshot('name.png') / `name.png` argument.
+    /toHaveScreenshot\(\s*(["'`])([^"'`]*?\.png)\1/gi,
+    // 2. A quoted .png literal sitting as the final argument of a call
+    //    (e.g. captureStep/captureWidget) -- closing quote then ')'.
+    /(["'`])([^"'`\n]*?\.png)\1\s*\)/gi,
+  ];
+  for (const regex of patterns) {
+    let m;
+    while ((m = regex.exec(source)) !== null) {
+      let value = m[2];
+      // Reduce template-literal names to their static prefix.
+      const interp = value.indexOf('${');
+      if (interp !== -1) value = value.slice(0, interp);
+      if (value) names.add(value);
     }
   }
   return Array.from(names);
