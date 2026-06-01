@@ -14,7 +14,38 @@ const glob = require('glob');
 const ROOT = process.cwd();
 const VISUAL_DIR = path.join(ROOT, 'tests', 'visual');
 
-// Extract expected snapshot name prefixes from a spec file.
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Turn a snapshot name literal into a matcher tested against committed PNGs.
+//
+// Playwright appends a `-<browser>-<platform>` suffix before `.png`, so a
+// baseline for name `n` is `<n minus .png>-chromium-darwin.png`. The matcher
+// is therefore anchored at the start but open at the end (prefix semantics,
+// matching the original file.startsWith check).
+//
+// For template literals, each `${...}` becomes a single dash-free wildcard
+// ([^-]+) rather than truncating the whole name to its static prefix. That
+// preserves the static suffix, so a removed variant still gets pruned -- e.g.
+// `scene-status-${theme}-desktop.png` matches `scene-status-ds1-desktop-...`
+// but NOT a stale `scene-status-retired-layout-...`.
+//
+// [^-]+ matches one dash-free segment. Where an interpolated value can contain
+// dashes (e.g. manuscript `${state.id}` = `drawer-character`), it spans more
+// than one segment -- but in the suite today such values are only ever
+// followed by another interpolation or end-of-name, never a static suffix, so
+// the open-ended (prefix) matcher still keeps the real baseline. The only way
+// [^-]+ could wrongly prune a real baseline is a dash-containing value placed
+// immediately before a static suffix; no spec does that.
+function nameToMatcher(name) {
+  const withoutExt = name.replace(/\.png$/i, '');
+  const staticParts = withoutExt.split(/\$\{[^}]*\}/);
+  const pattern = '^' + staticParts.map(escapeRegExp).join('[^-]+');
+  return new RegExp(pattern);
+}
+
+// Extract expected snapshot name matchers from a spec file.
 //
 // Handles two ways specs name snapshots, with single quotes, double quotes,
 // or backticks:
@@ -26,12 +57,7 @@ const VISUAL_DIR = path.join(ROOT, 'tests', 'visual');
 // in the file -- prose in header comments (apostrophes, backtick spans) would
 // otherwise open phantom literals and desync the scan, silently dropping real
 // names.
-//
-// Template-literal names (e.g. `scene-status-${theme}-desktop.png`) are reduced
-// to their static prefix up to the first `${`, so the file.startsWith(base)
-// check keeps every interpolated variant. Keeping a prefix only ever broadens
-// what survives, so it's strictly safe against deleting a real baseline.
-function extractScreenshotNames(source) {
+function extractScreenshotMatchers(source) {
   const names = new Set();
   const patterns = [
     // 1. Direct toHaveScreenshot('name.png') / `name.png` argument.
@@ -43,14 +69,10 @@ function extractScreenshotNames(source) {
   for (const regex of patterns) {
     let m;
     while ((m = regex.exec(source)) !== null) {
-      let value = m[2];
-      // Reduce template-literal names to their static prefix.
-      const interp = value.indexOf('${');
-      if (interp !== -1) value = value.slice(0, interp);
-      if (value) names.add(value);
+      names.add(m[2]);
     }
   }
-  return Array.from(names);
+  return Array.from(names).map(nameToMatcher);
 }
 
 function pruneSnapshots() {
@@ -59,10 +81,9 @@ function pruneSnapshots() {
   let checked = 0;
 
   for (const specPath of specFiles) {
-    // Build expected base names for this spec
+    // Build expected snapshot matchers for this spec
     const source = fs.readFileSync(specPath, 'utf8');
-    const expectedFiles = extractScreenshotNames(source);
-    const expectedBases = expectedFiles.map((f) => f.replace(/\.png$/i, ''));
+    const expectedMatchers = extractScreenshotMatchers(source);
 
     const snapshotDir = `${specPath}-snapshots`;
     if (!fs.existsSync(snapshotDir)) continue;
@@ -73,7 +94,7 @@ function pruneSnapshots() {
       const file = ent.name;
       if (!file.toLowerCase().endsWith('.png')) continue;
 
-      const keep = expectedBases.some((base) => file.startsWith(base));
+      const keep = expectedMatchers.some((re) => re.test(file));
       checked++;
       if (!keep) {
         const full = path.join(snapshotDir, file);
