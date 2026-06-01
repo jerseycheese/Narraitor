@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, waitForImagesLoaded } from './utils/wait-helpers';
 import { seedBarelyStartedData } from './utils/seedTestData';
 
 /**
@@ -43,6 +43,7 @@ async function settleTheme(
   await waitForContentStable(page);
   await hideDynamicContent(page);
   await page.evaluate(() => document.fonts.ready);
+  await waitForImagesLoaded(page);
 }
 
 test.describe('Dashboard Theme Differentiation', () => {
