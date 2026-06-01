@@ -1,10 +1,19 @@
 import { test, expect } from '@playwright/test';
 import { getTimestamp } from '@/lib/utils';
+import { mockApiEndpoints } from './utils/mockApi';
 
 const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
 
 // Targeted smoke check for fresh-session skeleton → content transition.
 // Assumes dev server is available at baseURL (default http://localhost:3000).
+//
+// This is the one /play spec that intentionally exercises the live generation
+// path (isPlaywrightEnv() stays false here so NarrativeController generates the
+// first scene instead of waiting for seeded segments). It must mock the AI
+// endpoints — otherwise the fresh-generation + journal-summarize calls hit the
+// real routes, hang the single CI dev server, and time out unrelated specs in
+// the other worker (#1342). Mocks keep the skeleton→content transition this test
+// checks, just deterministically.
 
 test.describe('Fresh GameSession skeleton → content', () => {
   test('shows skeleton, then reveals active session with choices', async ({
@@ -23,6 +32,10 @@ test.describe('Fresh GameSession skeleton → content', () => {
         logs.push(txt);
       }
     });
+    // Intercept AI routes so fresh generation + journal summarize are mocked,
+    // not live (see file header / #1342).
+    await mockApiEndpoints(page);
+
     const path =
       '/worlds/world_8b927b31-f6d0-4e17-8391-74033dd8323a/play?fresh=true';
     // Seed IndexedDB before any app script runs to avoid hydration overwrites
