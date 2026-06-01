@@ -116,6 +116,24 @@ export async function mockApiEndpoints(
     });
   });
 
+  // Mock journal summarize endpoint. The journal flow
+  // (useActiveGameSessionJournal) calls this when narrative segments are added;
+  // it's normally skipped under isPlaywrightEnv(), but a spec that renders the
+  // session path without setting that flag would otherwise hit the live AI route,
+  // hang the single CI dev server, and time out unrelated specs (#1342).
+  await page.route('**/api/narrative/summarize', async (route) => {
+    console.log('🚫 Intercepted journal summarize API call - using mock summary');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        summary: 'The character advanced through the latest events.',
+        entryType: 'character_event',
+        significance: 'minor',
+      }),
+    });
+  });
+
   // Mock world generation endpoint
   await page.route('**/api/generate-world', async (route) => {
     console.log('Intercepted generate-world API call');
