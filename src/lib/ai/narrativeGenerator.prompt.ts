@@ -211,7 +211,9 @@ export const enhancePromptWithInventory = (
     const guidance =
       'When generating narrative, naturally reference these items only if they matter to the current situation. Avoid forced mentions or repetitive callbacks.';
 
-    if (budget && budget.isEnabled()) {
+    // Record the estimate for observability whether or not enforcement is on;
+    // when disabled, content above is left untruncated.
+    if (budget) {
       budget.recordUsage('inventory', tokenCount);
     }
 

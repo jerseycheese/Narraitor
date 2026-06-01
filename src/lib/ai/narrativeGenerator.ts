@@ -38,6 +38,7 @@ import {
 import {
   createRequestBudget,
   limitNarrativeContextToBudget,
+  recordRequestCalibration,
 } from './narrativeGenerator.budget';
 import {
   buildNarrativeContext,
@@ -142,6 +143,7 @@ export class NarrativeGenerator {
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+      recordRequestCalibration(budget, fullyEnhancedPrompt, response);
 
       if (response.content) {
         try {
@@ -369,6 +371,7 @@ export class NarrativeGenerator {
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+      recordRequestCalibration(budget, fullyEnhancedPrompt, response);
 
       if (response.content) {
         try {

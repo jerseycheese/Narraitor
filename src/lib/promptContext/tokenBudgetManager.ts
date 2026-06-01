@@ -32,6 +32,33 @@ export interface CalibrationData {
 }
 
 /**
+ * Per-component usage figures for the observability snapshot. `allocation` is
+ * the resolved target budget (the bar denominator); `estimated` is the recorded
+ * heuristic token count for the most recent request.
+ */
+export interface ComponentBudgetUsage {
+  componentId: string;
+  priority: ComponentPriority;
+  allocation: number;
+  estimated: number;
+}
+
+/**
+ * A read-only snapshot of a request's budget state, consumed by the DevTools
+ * TokenBudgetPanel. `calibration` is the request-level estimate-vs-actual
+ * reconciliation (see `recordUsage('request-total', ...)`).
+ */
+export interface TokenBudgetSnapshot {
+  enabled: boolean;
+  totalBudget: number;
+  components: ComponentBudgetUsage[];
+  calibration: CalibrationData;
+}
+
+/** Reserved component id for the request-level whole-prompt calibration. */
+export const REQUEST_TOTAL_COMPONENT_ID = 'request-total';
+
+/**
  * Request budget instance for tracking allocations during a single request
  */
 export class RequestBudget {
@@ -39,6 +66,7 @@ export class RequestBudget {
   private usage: Map<string, number> = new Map();
   private actualUsage: Map<string, number> = new Map();
   private enabled: boolean;
+  private totalBudget: number;
 
   constructor(
     allocations: BudgetAllocation[],
@@ -46,6 +74,7 @@ export class RequestBudget {
     enabled: boolean = true
   ) {
     this.enabled = enabled;
+    this.totalBudget = totalBudget;
 
     if (!enabled) {
       // When disabled, store allocations but don't enforce limits
@@ -202,6 +231,32 @@ export class RequestBudget {
         : undefined;
 
     return { estimated, actual, accuracy };
+  }
+
+  /**
+   * Build a read-only snapshot of the current budget state for observability.
+   *
+   * Covers the configured components (the reserved `request-total` lives only in
+   * the usage map, so it is naturally excluded from the per-component list and
+   * surfaced separately as `calibration`).
+   */
+  getSnapshot(): TokenBudgetSnapshot {
+    const components: ComponentBudgetUsage[] = [];
+    for (const [componentId, allocation] of this.allocations) {
+      components.push({
+        componentId,
+        priority: allocation.priority,
+        allocation: allocation.target,
+        estimated: this.usage.get(componentId) ?? 0,
+      });
+    }
+
+    return {
+      enabled: this.enabled,
+      totalBudget: this.totalBudget,
+      components,
+      calibration: this.getCalibrationData(REQUEST_TOTAL_COMPONENT_ID),
+    };
   }
 }
 

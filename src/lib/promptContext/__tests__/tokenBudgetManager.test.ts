@@ -2,6 +2,7 @@ import {
   ComponentPriority,
   DEFAULT_ALLOCATIONS,
   DEFAULT_TOTAL_BUDGET,
+  REQUEST_TOTAL_COMPONENT_ID,
   RequestBudget,
 } from '../tokenBudgetManager';
 
@@ -108,5 +109,47 @@ describe('RequestBudget calibration', () => {
     // ...but actual/accuracy pair only the measured subset (800 -> 1000)
     expect(calibration.actual).toBe(1000);
     expect(calibration.accuracy).toBeCloseTo(1.25);
+  });
+});
+
+describe('RequestBudget.getSnapshot', () => {
+  it('lists the configured components with allocation and recorded usage', () => {
+    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true);
+    budget.recordUsage('lore-context', 420);
+
+    const snapshot = budget.getSnapshot();
+
+    expect(snapshot.enabled).toBe(true);
+    expect(snapshot.totalBudget).toBe(DEFAULT_TOTAL_BUDGET);
+    expect(snapshot.components).toHaveLength(DEFAULT_ALLOCATIONS.length);
+
+    const lore = snapshot.components.find((c) => c.componentId === 'lore-context');
+    expect(lore?.estimated).toBe(420);
+    expect(lore?.allocation).toBeGreaterThan(0);
+    expect(lore?.priority).toBe(ComponentPriority.MEDIUM);
+  });
+
+  it('surfaces request-level calibration separately, not as a component row', () => {
+    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true);
+    budget.recordUsage(REQUEST_TOTAL_COMPONENT_ID, 2000, { actualTokens: 2200 });
+
+    const snapshot = budget.getSnapshot();
+
+    expect(
+      snapshot.components.some((c) => c.componentId === REQUEST_TOTAL_COMPONENT_ID)
+    ).toBe(false);
+    expect(snapshot.calibration.estimated).toBe(2000);
+    expect(snapshot.calibration.actual).toBe(2200);
+    expect(snapshot.calibration.accuracy).toBeCloseTo(1.1);
+  });
+
+  it('reports a disabled snapshot with raw allocation targets', () => {
+    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, false);
+    const snapshot = budget.getSnapshot();
+
+    expect(snapshot.enabled).toBe(false);
+    const base = snapshot.components.find((c) => c.componentId === 'base-template');
+    expect(base?.allocation).toBe(300);
+    expect(base?.estimated).toBe(0);
   });
 });

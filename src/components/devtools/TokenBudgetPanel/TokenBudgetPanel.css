@@ -1,0 +1,117 @@
+/**
+ * TokenBudgetPanel (dev-only) styles.
+ * Token-driven; the four utilization levels map to semantic color tokens.
+ * No dedicated "orange" token exists, so the `high` level uses an hsl() literal.
+ */
+.token-budget-panel {
+  --tbp-ok: var(--color-success);
+  --tbp-warn: var(--color-warning);
+  --tbp-high: hsl(28deg 90% 48%);
+  --tbp-over: var(--color-danger);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.token-budget-panel-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--color-text-muted);
+}
+
+.token-budget-panel-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.token-budget-panel-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.token-budget-panel-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.token-budget-panel-component {
+  font-weight: 600;
+  font-family: var(--font-mono, monospace);
+}
+
+.token-budget-panel-numbers {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.token-budget-panel-bar {
+  width: 100%;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-surface-muted, var(--color-border));
+  overflow: hidden;
+}
+
+.token-budget-panel-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.2s ease;
+}
+
+.token-budget-panel-bar-fill.is-ok {
+  background: var(--tbp-ok);
+}
+
+.token-budget-panel-bar-fill.is-warn {
+  background: var(--tbp-warn);
+}
+
+.token-budget-panel-bar-fill.is-high {
+  background: var(--tbp-high);
+}
+
+.token-budget-panel-bar-fill.is-over {
+  background: var(--tbp-over);
+}
+
+.token-budget-panel-suggestion {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.75rem;
+}
+
+.token-budget-panel-calibration {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.token-budget-panel-subheading {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.token-budget-panel-calibration-figures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.token-budget-panel-empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
