@@ -97,8 +97,12 @@ export async function waitForNavigationHeading(
  */
 export async function waitForImagesLoaded(page: Page, timeout: number = 5000): Promise<void> {
   try {
+    // waitForFunction signature is (fn, arg, options) — the timeout must go in
+    // the third slot, or it's serialized as the (unused) page-function arg and
+    // the call silently falls back to the default action timeout.
     await page.waitForFunction(
       () => Array.from(document.images).every((img) => img.complete),
+      undefined,
       { timeout }
     );
   } catch (error) {
