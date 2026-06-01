@@ -6,6 +6,8 @@ import { useActiveSection } from '@/hooks/useActiveSection';
 import { SessionShowcase } from '../design-system/_ui/SessionShowcase';
 import { ComponentShowcase } from '../design-system/_ui/ComponentShowcase';
 import { OverlayShowcase } from '../design-system/_ui/OverlayShowcase';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import './design-system-2.css';
 
 // ─────────────────────────────────────────────────────────────────
@@ -287,27 +289,23 @@ export default function DesignSystem2Page() {
           <div className="ds2-reveal" style={{ marginBottom: '48px' }}>
             <div className="ds2-component-label">Olive Moss Accent</div>
             <div className="ds2-accent-demo">
-              <div className="ds2-accent-panel ds2-accent-panel-light">
-                <div style={{ fontFamily: 'var(--font-system)', fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '16px', color: '#9C8D7E', fontWeight: 600 }}>
+              <div className="ds2-accent-panel ds2-accent-panel-light" data-theme="ds2">
+                <div style={{ fontFamily: 'var(--font-system)', fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '16px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
                   Light Mode — #7C8B6F (Olive Moss)
                 </div>
                 <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.0625rem', lineHeight: 1.7, marginBottom: '16px' }}>
-                  The archivist gestured toward <span style={{ color: '#7C8B6F', textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '3px', fontWeight: 500 }}>The Chronicle of Collected Memories</span>, its moss-green binding soft against weathered pages.
+                  The archivist gestured toward <span style={{ color: 'var(--color-accent)', textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '3px', fontWeight: 500 }}>The Chronicle of Collected Memories</span>, its moss-green binding soft against weathered pages.
                 </p>
-                <button type="button" style={{ padding: '10px 20px', background: '#7C8B6F', color: 'white', border: 'none', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, cursor: 'default' }}>
-                  Open Chronicle
-                </button>
+                <Button className="ds2-accent-button">Open Chronicle</Button>
               </div>
-              <div className="ds2-accent-panel ds2-accent-panel-dark">
-                <div style={{ fontFamily: 'var(--font-system)', fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '16px', color: '#9C8D7E', fontWeight: 600 }}>
+              <div className="ds2-accent-panel ds2-accent-panel-dark dark" data-theme="ds2">
+                <div style={{ fontFamily: 'var(--font-system)', fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '16px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
                   Dark Mode — #9CAA8A (Lighter Moss)
                 </div>
                 <p style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.0625rem', lineHeight: 1.7, marginBottom: '16px' }}>
-                  The archivist gestured toward <span style={{ color: '#9CAA8A', textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '3px', fontWeight: 500 }}>The Chronicle of Collected Memories</span>, its moss-green binding soft against weathered pages.
+                  The archivist gestured toward <span style={{ color: 'var(--color-accent)', textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '3px', fontWeight: 500 }}>The Chronicle of Collected Memories</span>, its moss-green binding soft against weathered pages.
                 </p>
-                <button type="button" style={{ padding: '10px 20px', background: '#9CAA8A', color: '#1A1614', border: 'none', borderRadius: '8px', fontFamily: 'var(--font-interface)', fontSize: '0.875rem', fontWeight: 600, cursor: 'default' }}>
-                  Open Chronicle
-                </button>
+                <Button className="ds2-accent-button">Open Chronicle</Button>
               </div>
             </div>
           </div>
@@ -315,18 +313,18 @@ export default function DesignSystem2Page() {
           {/* Semantic colors in narrative context */}
           <div className="ds2-reveal">
             <div className="ds2-component-label">Semantic Colors — In Context</div>
-            <div style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.125rem', lineHeight: 1.7, color: 'var(--color-text-primary)', maxWidth: '700px' }}>
+            <div data-theme="ds2" style={{ fontFamily: 'var(--font-narrative)', fontSize: '1.125rem', lineHeight: 1.7, color: 'var(--color-text-primary)', maxWidth: '700px' }}>
               <p style={{ marginBottom: '16px' }}>
                 The curator examined each scroll carefully, marking verified histories with a gentle stamp:{' '}
-                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '3px 12px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(6, 95, 70, 0.12)', color: '#065f46' }}>Verified</span>.
+                <Badge variant="success-static" className="ds2-semantic-badge">Verified</Badge>.
                 Questionable accounts received a cautious note{' '}
-                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '3px 12px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(146, 64, 14, 0.12)', color: '#92400e' }}>Needs review</span>,
+                <Badge variant="warning-static" className="ds2-semantic-badge">Needs review</Badge>,
                 while lost narratives were sealed away{' '}
-                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '3px 12px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(159, 18, 57, 0.12)', color: '#9f1239' }}>Incomplete</span>.
+                <Badge variant="destructive-static" className="ds2-semantic-badge">Incomplete</Badge>.
               </p>
               <p>
                 A small notation in warm ink read:{' '}
-                <span style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 9999, padding: '3px 12px', fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'var(--font-interface)', background: 'rgba(7, 89, 133, 0.12)', color: '#075985' }}>5 stories awaiting classification</span>.
+                <Badge variant="info-static" className="ds2-semantic-badge">5 stories awaiting classification</Badge>.
               </p>
             </div>
           </div>

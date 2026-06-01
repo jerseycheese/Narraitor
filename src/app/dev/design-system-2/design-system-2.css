@@ -505,13 +505,13 @@
 }
 
 .ds2-accent-panel-light {
-  background: #FFFDF7;
-  color: #2D2520;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
 }
 
 .ds2-accent-panel-dark {
-  background: #1A1614;
-  color: #F5F1E8;
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
 }
 
 /* ── Contrast Cards ──────────────────────────────────────────── */

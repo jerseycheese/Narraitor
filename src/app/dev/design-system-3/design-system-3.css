@@ -1067,156 +1067,6 @@
   overflow-x: auto;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   GAME SESSION DEMO STYLES
-   ═══════════════════════════════════════════════════════════════ */
-
-.ds3-session {
-  position: relative;
-  background: var(--color-canvas);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  min-height: 700px;
-  overflow: hidden;
-}
-
-.ds3-session-grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle,
-      var(--grid-dot-color) calc(var(--grid-dot-size) / 2),
-      transparent calc(var(--grid-dot-size) / 2));
-  background-size: var(--grid-dot-spacing) var(--grid-dot-spacing);
-  opacity: var(--grid-dot-opacity);
-}
-
-/* ── Floating HUD — Character Stats ──────────────────────────── */
-.ds3-hud-char {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  z-index: 10;
-}
-
-.ds3-hud-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--color-surface);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--color-border);
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: var(--font-system);
-  font-size: 13px;
-  color: var(--color-text-primary);
-  font-weight: 500;
-}
-
-.ds3-hud-pill:hover {
-  border-color: var(--color-accent);
-}
-
-.ds3-hud-panel {
-  width: 280px;
-  background: var(--color-surface);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-float);
-  padding: 16px;
-  animation: ds3-fade-in 0.15s ease;
-}
-
-@keyframes ds3-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.ds3-hud-name {
-  font-family: var(--font-interface);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.ds3-hud-level {
-  font-family: var(--font-system);
-  font-size: 10px;
-  color: var(--color-text-muted);
-  letter-spacing: 0.06em;
-}
-
-.ds3-hud-stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 3px 0;
-}
-
-.ds3-hud-stat-label {
-  font-family: var(--font-system);
-  font-size: 13px;
-  color: var(--color-text-secondary);
-}
-
-.ds3-hud-stat-value {
-  font-family: var(--font-system);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.ds3-hud-location {
-  font-family: var(--font-interface);
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
-
-/* ── Floating HUD — Session Controls ─────────────────────────── */
-.ds3-hud-controls {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 10;
-  display: flex;
-  gap: 2px;
-  background: var(--color-surface);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 4px;
-}
-
-.ds3-hud-ctrl-btn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.ds3-hud-ctrl-btn:hover {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-}
-
 /* ── Skip Link ───────────────────────────────────────────────── */
 .ds3-skip-link {
   position: absolute;
@@ -1301,10 +1151,6 @@
 
 /* ── True Marginalia — Desktop ───────────────────────────────── */
 @media (min-width: 1200px) {
-  .ds3-session {
-    overflow: visible;
-  }
-
   .ds3-narrative-col {
     overflow: visible;
   }
@@ -1533,29 +1379,6 @@
   }
 }
 
-/* ── Session State Overlays ──────────────────────────────────── */
-.ds3-overlay-frosted {
-  position: absolute;
-  inset: 0;
-  background: var(--color-surface);
-  backdrop-filter: blur(16px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  z-index: 50;
-  border-radius: var(--radius-lg);
-}
-
-.ds3-overlay-frosted h3 {
-  font-family: var(--font-interface);
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
 /* ── Loading Skeletons ───────────────────────────────────────── */
 .ds3-skeleton {
   height: 14px;
@@ -1611,13 +1434,6 @@
   border: 1px solid var(--color-border);
   vertical-align: middle;
   margin-right: 8px;
-}
-
-/* ── HUD Panel Demos ─────────────────────────────────────────── */
-.ds3-hud-demo {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
 }
 
 /* ── Responsive ──────────────────────────────────────────────── */
