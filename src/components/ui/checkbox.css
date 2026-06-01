@@ -1,0 +1,23 @@
+/* Checkbox — global semantic styles for src/components/ui/checkbox.tsx (#1317)
+ *
+ * The Checkbox is a native input themed via accent-color; this gives it and its
+ * optional label production token-based styling so the app renders them like the
+ * living style guide. Per-theme look comes from the design tokens under the
+ * active `data-theme` scope — no hardcoded colors.
+ */
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  margin: 0 var(--space-2) 0 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}

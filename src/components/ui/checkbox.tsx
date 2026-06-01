@@ -1,5 +1,6 @@
 import * as React from "react"
 import { clsx } from 'clsx'
+import './checkbox.css'
 
 interface CheckboxProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -10,12 +11,10 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   ({ className, label, ...props }, ref) => {
     if (label) {
       return (
-        <label>
+        <label className="checkbox-label">
           <input
             type="checkbox"
-            className={clsx(
-              className
-            )}
+            className={clsx("checkbox", className)}
             ref={ref}
             {...props}
           />
@@ -27,9 +26,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     return (
       <input
         type="checkbox"
-        className={clsx(
-          className
-        )}
+        className={clsx("checkbox", className)}
         ref={ref}
         {...props}
       />

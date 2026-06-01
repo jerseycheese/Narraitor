@@ -1,0 +1,55 @@
+/* Card — global semantic styles for src/components/ui/card.tsx (#1317)
+ *
+ * Follows the badge.css / dialog.css precedent: token-based base styling lives
+ * in production so the app and the living style guide render the same component.
+ * Per-theme look comes from the design tokens resolving under the active
+ * `data-theme` scope (src/lib/theme/themes/ds{1,2,3}.css) — no hardcoded colors.
+ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.card-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.card-description {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.card-content {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-narrative);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.card-footer {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-4);
+}

@@ -1,12 +1,13 @@
 /* Canonical component showcase (issue #1276)
  *
- * Skins the real `@/components/ui/*` primitives for the design-system pages.
- * Button, Badge, Input, Textarea, Select, and Label already carry global,
- * token-based styling; the rules here only cover primitives the app ships
- * unstyled (Alert, Card, Tabs, Table, Checkbox, Radio, Dialog) plus the
- * showcase layout. Everything is scoped under `.ds-components` so it stays
- * inside the showcase, and every value resolves to a design token from the
- * surrounding `data-theme` scope. No hardcoded colors.
+ * Holds the showcase layout scaffolding (`.dsc-*` groups/grids/stacks) plus the
+ * showcase-local skins for the Dialog/Overlay/Session demos. The app primitives
+ * — Button, Badge, Input, Textarea, Select, Label, Alert, Card, Tabs, Table,
+ * Checkbox, Radio — now carry global token-based styling in production
+ * (src/components/ui/*.css, src/app/badge.css, wizard.css form-*), so the guide
+ * renders the real components and the app inherits the same look (#1276, #1317).
+ * Every value resolves to a design token from the surrounding `data-theme`
+ * scope. No hardcoded colors.
  */
 
 .ds-components {
@@ -102,190 +103,11 @@
   }
 }
 
-/* ─── Alert (ships unstyled) ─── */
-
-.ds-components .alert {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  font-family: var(--font-interface);
-}
-
-.ds-components .alert-title {
-  margin: 0;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.ds-components .alert-description {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-}
-
-.ds-components .alert-destructive {
-  border-color: var(--color-danger);
-  background: hsl(var(--destructive) / 8%);
-}
-
-.ds-components .alert-destructive .alert-title {
-  color: var(--color-danger);
-}
-
-.ds-components .alert-warning {
-  border-color: var(--color-warning-border);
-  background: var(--color-warning-soft);
-}
-
-.ds-components .alert-warning .alert-title {
-  color: var(--color-warning);
-}
-
-.ds-components .alert-info {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
-}
-
-.ds-components .alert-info .alert-title {
-  color: var(--color-accent);
-}
-
-/* ─── Card (ships with no base class) ─── */
-
-.ds-components .dsc-card {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-
-.ds-components .dsc-card-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-4) var(--space-4) 0;
-}
-
-.ds-components .dsc-card-title {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.ds-components .dsc-card-description {
-  margin: 0;
-  font-family: var(--font-system);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.ds-components .dsc-card-content {
-  flex: 1;
-  padding: var(--space-3) var(--space-4);
-  font-family: var(--font-narrative);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--color-text-secondary);
-}
-
-.ds-components .dsc-card-footer {
-  display: flex;
-  gap: var(--space-2);
-  padding: 0 var(--space-4) var(--space-4);
-}
-
-/* ─── Tabs (only the root carries a class) ─── */
-
-.ds-components .component-tabs {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.ds-components .dsc-tabs-list {
-  display: inline-flex;
-  gap: var(--space-1);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.ds-components .dsc-tabs-trigger {
-  appearance: none;
-  padding: var(--space-2) var(--space-3);
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  font-family: var(--font-interface);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: color 120ms ease, border-color 120ms ease;
-}
-
-.ds-components .dsc-tabs-trigger:hover {
-  color: var(--color-text-primary);
-}
-
-.ds-components .dsc-tabs-trigger[aria-selected='true'] {
-  color: var(--color-accent);
-  border-bottom-color: var(--color-accent);
-}
-
-.ds-components .dsc-tabs-content {
-  font-family: var(--font-interface);
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-}
-
-/* ─── Table (only the wrapper carries a class) ─── */
-
-.ds-components .table-wrapper {
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-}
-
-.ds-components table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-interface);
-  font-size: 0.875rem;
-}
-
-.ds-components thead th {
-  padding: var(--space-2) var(--space-3);
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  background: var(--color-surface-hover);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.ds-components tbody td {
-  padding: var(--space-2) var(--space-3);
-  color: var(--color-text-secondary);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.ds-components tbody tr:last-child td {
-  border-bottom: none;
-}
-
-/* ─── DataTable composes Table/Input/Button and carries its own layout in
- *     production (.data-table in globals.css), so nothing is skinned here. ─── */
+/* ─── Card / Alert / Tabs / Table now carry token-based base styling in
+ *     production (src/components/ui/{card,alert,tabs,table}.css), so the guide
+ *     renders the real components with no showcase-local skinning (#1317).
+ *     DataTable composes Table/Input/Button and carries its own layout in
+ *     production (.data-table in globals.css). ─── */
 
 /* ─── CollapsibleSection (fully styled in production; only the showcase
  *     body copy needs to drop its default paragraph margin) ─── */
@@ -298,36 +120,9 @@
   color: var(--color-text-secondary);
 }
 
-/* ─── Checkbox & Radio (native inputs, unstyled primitives) ─── */
-
-.ds-components input[type='checkbox'],
-.ds-components input[type='radio'] {
-  width: 1rem;
-  height: 1rem;
-  margin: 0 var(--space-2) 0 0;
-  accent-color: var(--color-accent);
-  cursor: pointer;
-}
-
-.ds-components .dsc-stack label,
-.ds-components .dsc-radio-group label {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-interface);
-  font-size: 0.875rem;
-  color: var(--color-text-primary);
-}
-
-.ds-components .dsc-radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.ds-components .dsc-radio-group > div {
-  display: flex;
-  align-items: center;
-}
+/* ─── Checkbox & Radio now carry token-based base styling in production
+ *     (src/components/ui/{checkbox,radio-group}.css), so the guide renders the
+ *     real controls with no showcase-local skinning (#1317). ─── */
 
 /* ─── Status icon legend ─── */
 

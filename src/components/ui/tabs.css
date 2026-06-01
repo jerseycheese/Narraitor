@@ -1,0 +1,48 @@
+/* Tabs — global semantic styles for src/components/ui/tabs.tsx (#1317)
+ *
+ * Token-based base styling in production so the app and the living style guide
+ * render the same tabs. The Tabs root already carries `component-tabs`; the
+ * list / trigger / content now carry semantic classes too. Per-theme look comes
+ * from the design tokens under the active `data-theme` scope — no hardcoded colors.
+ */
+
+.component-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tabs-list {
+  display: inline-flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tabs-trigger {
+  appearance: none;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.tabs-trigger:hover {
+  color: var(--color-text-primary);
+}
+
+.tabs-trigger-active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.tabs-content {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
