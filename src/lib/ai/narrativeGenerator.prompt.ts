@@ -121,7 +121,7 @@ export const enhancePromptWithGoalContext = async (
     if (aiContext.goalContext && safeTrim(aiContext.goalContext)) {
       const goalSection = `\n\nCURRENT NARRATIVE GOALS:\n${aiContext.goalContext}\n\nPlease consider these goals when generating the narrative content.`;
 
-      if (!budget || !budget.isEnabled()) {
+      if (!budget) {
         return `${prompt}${goalSection}`;
       }
 
@@ -166,7 +166,7 @@ export const enhancePromptWithToneSettings = (
     cache.toneSettings.set(cacheKey, toneInstructions);
   }
 
-  if (!budget || !budget.isEnabled()) {
+  if (!budget) {
     return prompt + toneInstructions;
   }
 
@@ -211,7 +211,9 @@ export const enhancePromptWithInventory = (
     const guidance =
       'When generating narrative, naturally reference these items only if they matter to the current situation. Avoid forced mentions or repetitive callbacks.';
 
-    if (budget && budget.isEnabled()) {
+    // Record the estimate for observability whether or not enforcement is on;
+    // when disabled, content above is left untruncated.
+    if (budget) {
       budget.recordUsage('inventory', tokenCount);
     }
 
@@ -284,7 +286,7 @@ Important:
 The items will be automatically added to the character's inventory with proper categorization and journal entries.`;
   }
 
-  if (!budget || !budget.isEnabled()) {
+  if (!budget) {
     return prompt + cache.itemAcquisitionInstructions;
   }
 

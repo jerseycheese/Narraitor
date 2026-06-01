@@ -9,6 +9,7 @@ import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 import { LoreManagementSection } from '../LoreManagementSection';
+import { TokenBudgetPanel } from '../TokenBudgetPanel';
 import { AIMockingSection } from '../AIMockingSection';
 import { ErrorSection } from '../ErrorSection';
 import { DevToolsSection } from '../shared/DevToolsSection';
@@ -192,6 +193,7 @@ export const DevToolsPanel = () => {
               {(isSectionVisible(SectionId.AI_TESTING) ||
                 isSectionVisible(SectionId.AI_MOCKING) ||
                 isSectionVisible(SectionId.CONSISTENCY_VALIDATION) ||
+                isSectionVisible(SectionId.TOKEN_BUDGET) ||
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
                 <div>
                   <h3>
@@ -221,6 +223,12 @@ export const DevToolsPanel = () => {
                       <LoreManagementSection />
                     </CollapsibleSection>
                   )}
+
+                    {isSectionVisible(SectionId.TOKEN_BUDGET) && (
+                      <CollapsibleSection title="Token Budget" initialCollapsed={true}>
+                        <TokenBudgetPanel />
+                      </CollapsibleSection>
+                    )}
                 </div>
               </div>
             )}

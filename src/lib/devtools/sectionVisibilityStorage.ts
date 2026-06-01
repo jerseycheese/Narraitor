@@ -23,7 +23,8 @@ export enum DevToolsSection {
   CONSISTENCY_VALIDATION = 'consistencyValidation',
   RELEVANCE_DEBUGGER = 'relevanceDebugger',
   LORE_MANAGEMENT = 'loreManagement',
-  ERROR_SECTION = 'errorSection'
+  ERROR_SECTION = 'errorSection',
+  TOKEN_BUDGET = 'tokenBudget'
 }
 
 /**
@@ -45,6 +46,7 @@ export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
   [DevToolsSection.RELEVANCE_DEBUGGER]: true,
   [DevToolsSection.LORE_MANAGEMENT]: true,
   [DevToolsSection.ERROR_SECTION]: true,
+  [DevToolsSection.TOKEN_BUDGET]: true,
 };
 
 /**
