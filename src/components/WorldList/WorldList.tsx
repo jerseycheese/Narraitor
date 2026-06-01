@@ -12,12 +12,6 @@ interface WorldListProps {
   onDeleteWorld: (worldId: string) => void;
   selectedWorldIds?: EntityID[];
   onToggleSelect?: (worldId: EntityID) => void;
-  _router?: {
-    push: (url: string) => void;
-  };
-  _storeActions?: {
-    setCurrentWorld: (id: string) => void;
-  };
 }
 
 const WorldList: React.FC<WorldListProps> = ({
@@ -27,8 +21,6 @@ const WorldList: React.FC<WorldListProps> = ({
   onDeleteWorld,
   selectedWorldIds = [],
   onToggleSelect,
-  _router,
-  _storeActions,
 }) => {
   // Get character counts and character data for each world using proper hook
   const characters = useCharacterStore((state) => state.characters);
@@ -106,8 +98,6 @@ const WorldList: React.FC<WorldListProps> = ({
             characters={charactersByWorld[world.id] || []}
             onSelect={onSelectWorld}
             onDelete={onDeleteWorld}
-            _router={_router}
-            _storeActions={_storeActions}
           />
         ))}
       </div>

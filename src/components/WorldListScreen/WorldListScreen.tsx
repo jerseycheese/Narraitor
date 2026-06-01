@@ -21,19 +21,11 @@ import {
 import { readString, writeString } from '@/lib/utils/browserStorage';
 
 interface WorldListScreenProps {
-  _router?: {
-    push: (url: string) => void;
-  };
-  _storeActions?: {
-    setCurrentWorld: (id: string) => void;
-  };
   /** Callback to pass the view toggle component to parent for header placement */
   onViewToggleRender?: (toggle: React.ReactNode) => void;
 }
 
 const WorldListScreen: React.FC<WorldListScreenProps> = ({
-  _router,
-  _storeActions,
   onViewToggleRender,
 }) => {
   const [worlds, setWorlds] = useState<World[]>([]);
@@ -178,8 +170,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
           onDeleteWorld={(id) => handleDeleteClick(id)}
           selectedWorldIds={selectedWorldIds}
           onToggleSelect={toggleWorldSelection}
-          _router={_router}
-          _storeActions={_storeActions}
         />
       )}
       <DeleteConfirmationDialog

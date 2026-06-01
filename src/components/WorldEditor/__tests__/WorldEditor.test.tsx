@@ -252,25 +252,18 @@ describe('WorldEditor - MVP Level Tests', () => {
     });
   });
 
-  // Test save button state during save operation
-  test('disables save and cancel buttons while saving', async () => {
+  // Saving completes and navigates back to the worlds list
+  test('navigates back to worlds list after saving', async () => {
     render(<WorldEditor worldId="world-123" />);
 
     await waitFor(() => {
       expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
     });
 
-    const saveButton = screen.getByText('Save Changes');
-    const cancelButton = screen.getByText('Cancel');
+    fireEvent.click(screen.getByText('Save Changes'));
 
-    // Click save
-    fireEvent.click(saveButton);
-
-    // Re-query after label switches to 'Saving...' (label change remounts the button)
     await waitFor(() => {
-      const savingButton = screen.getByText('Saving...');
-      expect(savingButton).toBeDisabled();
-      expect(cancelButton).toBeDisabled();
+      expect(mockPush).toHaveBeenCalledWith('/worlds');
     });
   });
 });

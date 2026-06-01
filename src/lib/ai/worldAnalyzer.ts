@@ -104,9 +104,6 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       safetySettings: getSafetySettings()
     });
     
-    // Add a small delay to ensure loading overlay appears
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     logger.debug('Making AI request...');
     const response = await client.generateContent(prompt);
     logger.debug('Response received, length:', response.content.length);
