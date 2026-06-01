@@ -272,6 +272,16 @@ jobs:
     name: E2E Tests
     runs-on: macos-latest
     needs: [build]
+    # Shard across runners and force --workers=1 per shard. The visual suite's
+    # timeouts (#1344) come from worker concurrency against a single `next dev`
+    # server: two workers hitting two uncompiled routes at once stall the
+    # single-process dev server past the navigation timeout. One worker per shard
+    # removes that contention entirely; sharding keeps wall-clock reasonable.
+    # Stays on `next dev` so rendering (and committed baselines) is unchanged.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -306,19 +316,19 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
       - name: Run E2E tests (fail on visual diffs)
-        run: npm run test:e2e:critical
+        run: npm run test:e2e:critical -- --shard=${{ matrix.shard }}/2 --workers=1
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: e2e-test-failures
+          name: e2e-test-failures-shard${{ matrix.shard }}
           path: test-results/
           retention-days: 7
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-html-report
+          name: playwright-html-report-shard${{ matrix.shard }}
           path: |
             playwright-report/
             !playwright-report/**/*.zip

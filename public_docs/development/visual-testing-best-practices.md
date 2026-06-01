@@ -304,14 +304,17 @@ pages — `dashboard-themes`, `main-pages` (home, home-empty-state, world-edit,
 character-edit), and `theme-switcher` (theme-ds*-home) — do **not** match local renders
 and have their baselines **adopted from CI output**. For these:
 - Do **not** regenerate locally (it will pass locally but fail in CI).
-- After an intentional change, let the `E2E Tests` check fail, then
-  `gh run download <run-id> -n e2e-test-failures`, verify each `*-actual.png` is a correct
-  render (not a seeding/empty flake), and copy the verified actuals over the corresponding
-  `*-chromium-darwin.png` baselines.
+- After an intentional change, let the `E2E Tests` check fail, then download the failed
+  shard artifacts — `gh run download <run-id> --pattern 'e2e-test-failures-shard*'` (the E2E
+  job is sharded, so artifacts are named `e2e-test-failures-shard1` / `-shard2`; only failed
+  shards upload). Or just run `./scripts/download-playwright-report.sh <pr>`, which handles
+  this. Verify each `*-actual.png` is a correct render (not a seeding/empty flake), and copy
+  the verified actuals over the corresponding `*-chromium-darwin.png` baselines.
 
-**Parallel-load flakiness**: running many visual specs across workers can time out
-`waitForStoreReady` (store hydration). Re-run the affected specs with `--workers=1` — they
-pass reliably when not competing for the dev server.
+**Parallel-load flakiness**: worker concurrency against the single `next dev` server can time
+out navigations / `waitForStoreReady` (store hydration). CI runs the E2E job sharded with
+`--workers=1` per shard to avoid this (see `.github/workflows/ci.yml`). Locally, re-run the
+affected specs with `--workers=1` — they pass reliably when not competing for the dev server.
 
 ## Baseline Management and Review Process
 
