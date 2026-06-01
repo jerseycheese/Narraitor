@@ -72,17 +72,6 @@ const meta: Meta<typeof WorldList> = {
     onDeleteWorld: (worldId: string) => {
       console.log(`[Storybook] World deleted: ${worldId}`);
     },
-    _router: {
-      push: (url: string) => {
-        console.log(`[Storybook] Navigating to: ${url}`);
-        return Promise.resolve();
-      }
-    },
-    _storeActions: {
-      setCurrentWorld: (id: string) => {
-        console.log(`[Storybook] Setting current world: ${id}`);
-      }
-    }
   }
 };
 

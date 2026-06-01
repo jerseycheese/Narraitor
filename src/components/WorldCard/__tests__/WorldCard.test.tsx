@@ -3,6 +3,16 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import WorldCard from '../WorldCard';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { formatDate } from '@/lib/utils';
+import { useWorldStore } from '@/state/worldStore';
+
+const mockRouterPush = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockRouterPush }),
+}));
+
+beforeEach(() => {
+  mockRouterPush.mockClear();
+});
 
 // Regression: a world with no image previously rendered a white 1x1 data-URI
 // placeholder that showed as a bright rectangle in dark mode (#1113).
@@ -80,29 +90,23 @@ describe('WorldCard', () => {
 
   // New test for Play functionality (navigates to characters when no characters exist)
   test('sets current world and navigates to characters when Play is clicked', () => {
-    // Setup mocks
-    const mockSetCurrentWorld = jest.fn();
-    const mockRouterPush = jest.fn();
-    
-    // Directly pass mock dependencies to the component
-    render(
-      <WorldCard 
-        world={mockWorld} 
-        onSelect={jest.fn()} 
-        onDelete={jest.fn()}
-        _storeActions={{ setCurrentWorld: mockSetCurrentWorld }}
-        _router={{ push: mockRouterPush }}
-      />
+    const setCurrentWorldSpy = jest.spyOn(
+      useWorldStore.getState(),
+      'setCurrentWorld'
     );
-    
+
+    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+
     // Find and click the Play button
     fireEvent.click(screen.getByTestId('world-card-actions-play-button'));
-    
-    // Verify world is set as current world
-    expect(mockSetCurrentWorld).toHaveBeenCalledWith(mockWorld.id);
-    
+
+    // Verify world is set as current world via the store
+    expect(setCurrentWorldSpy).toHaveBeenCalledWith(mockWorld.id);
+
     // Verify navigation to characters page (since no characters exist in the world)
     expect(mockRouterPush).toHaveBeenCalledWith(`/characters?worldId=${mockWorld.id}`);
+
+    setCurrentWorldSpy.mockRestore();
   });
 
   // Test for character avatar pill styling
@@ -131,7 +135,6 @@ describe('WorldCard', () => {
         onSelect={jest.fn()}
         onDelete={jest.fn()}
         characters={[mockCharacter]}
-        _router={{ push: jest.fn() }}
       />
     );
 
@@ -174,22 +177,11 @@ describe('WorldCard', () => {
 
   // Test for Edit functionality
   test('navigates to edit page when Edit is clicked', () => {
-    // Setup mocks
-    const mockRouterPush = jest.fn();
-    
-    // Directly pass mock dependencies to the component
-    render(
-      <WorldCard 
-        world={mockWorld} 
-        onSelect={jest.fn()} 
-        onDelete={jest.fn()}
-        _router={{ push: mockRouterPush }}
-      />
-    );
-    
+    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+
     // Find and click the Edit button
     fireEvent.click(screen.getByTestId('world-card-actions-edit-button'));
-    
+
     // Verify navigation to edit page
     expect(mockRouterPush).toHaveBeenCalledWith(`/worlds/${mockWorld.id}/edit`);
   });

@@ -30,28 +30,15 @@ import FinalizeStep from './steps/FinalizeStep';
 import QuickStartStep from './steps/QuickStartStep';
 import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
 import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
-import { getTimestamp } from '@/lib/utils';
 import { generateWorldImage } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import { useTutorial } from '@/components/TutorialProvider';
 import { tourStepToWizardStep } from '@/lib/tutorial/worldCreationTour';
-import { safeJsonParse } from '@/lib/safeJsonParse';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('WorldCreationWizard');
-
-type PersistedWorldSummary = {
-  id: string;
-  name?: string;
-  genre?: string;
-  description?: string;
-  createdAt: string;
-  attributes: unknown[];
-  skills: unknown[];
-  image?: unknown;
-};
 
 // Efficient deep comparison for arrays of objects
 const areArraysEqual = <T extends object>(a: T[] = [], b: T[] = []): boolean => {
@@ -423,25 +410,6 @@ export default function WorldCreationWizard({
         // Start image generation in the background
         runWorldImageGeneration();
       }
-      
-      // Save to localStorage as temporary solution
-      if (typeof window !== 'undefined') {
-        const worlds = safeJsonParse<PersistedWorldSummary[]>(
-          localStorage.getItem('worlds'),
-          []
-        );
-        worlds.push({
-          id: worldId,
-          name: data.name,
-          genre: data.genre,
-          description: data.description,
-          createdAt: getTimestamp(),
-          attributes: data.attributes || [],
-          skills: data.skills || [],
-          image: data.image,
-        });
-        localStorage.setItem('worlds', JSON.stringify(worlds));
-      }
 
       void ensureWorldNpcRoster(worldId);
 
@@ -451,23 +419,6 @@ export default function WorldCreationWizard({
       // Fallback error handling — log so failures are observable
       logger.error('[WorldCreationWizard] handleComplete failed, using fallback world id:', error);
       const worldId = `world-${Date.now()}`;
-      if (typeof window !== 'undefined') {
-        const worlds = safeJsonParse<PersistedWorldSummary[]>(
-          localStorage.getItem('worlds'),
-          []
-        );
-        worlds.push({
-          id: worldId,
-          name: data.name,
-          genre: data.genre,
-          description: data.description,
-          createdAt: getTimestamp(),
-          attributes: data.attributes || [],
-          skills: data.skills || [],
-          image: data.image,
-        });
-        localStorage.setItem('worlds', JSON.stringify(worlds));
-      }
 
       // Store the world ID and move to quick start
       wizard.updateData({ createdWorldId: worldId });

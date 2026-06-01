@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import Logger from '@/lib/utils/logger';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
@@ -16,6 +17,8 @@ import WorldImageForm from '@/components/forms/WorldImageForm';
 interface WorldEditorProps {
   worldId: string;
 }
+
+const logger = new Logger('WorldEditor');
 
 const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   const router = useRouter();
@@ -32,8 +35,10 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
 
   // Kick off store hydration on mount
   useEffect(() => {
-    fetchWorlds().catch(() => {
-      // Swallow errors; UI will show fallback error state
+    fetchWorlds().catch((err) => {
+      logger.error('Failed to load worlds:', err);
+      setError('Failed to load world');
+      setLoading(false);
     });
   }, [fetchWorlds]);
 
@@ -70,9 +75,6 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
     try {
       const { updateWorld } = useWorldStore.getState();
       updateWorld(worldId, world);
-
-      // Small delay to show save state
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
       router.push('/worlds'); // Navigate back to worlds list
     } catch {

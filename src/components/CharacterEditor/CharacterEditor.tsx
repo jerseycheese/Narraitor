@@ -102,8 +102,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       const { updateCharacter } = useCharacterStore.getState();
       updateCharacter(characterId, editingCharacter);
 
-      await new Promise(resolve => setTimeout(resolve, 500));
-
       router.push(`/characters/${characterId}`);
     } catch (err) {
       setLoadError('Failed to save character');

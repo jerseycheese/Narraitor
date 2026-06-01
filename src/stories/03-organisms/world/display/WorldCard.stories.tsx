@@ -128,32 +128,10 @@ const mockWorld: World = {
   createdAt: '2023-01-01T10:00:00Z',
   updatedAt: '2023-12-15T14:30:00Z',
 };
-// Create a wrapper component that provides both router and store mocks
-const WorldCardWrapper = (args: Parameters<typeof WorldCard>[0]) => {
-  const mockRouter = {
-    push: (url: string) => {
-      console.log(`[Storybook] Navigating to: ${url}`);
-      return Promise.resolve();
-    },
-  };
-  const mockStoreActions = {
-    setCurrentWorld: (id: string) => {
-      console.log(`[Storybook] Setting current world: ${id}`);
-    },
-  };
-  // Use the component's test props to inject mocks
-  return (
-    <WorldCard
-      {...args}
-      _router={mockRouter}
-      _storeActions={mockStoreActions}
-    />
-  );
-};
 const meta: Meta<typeof WorldCard> = {
   title: '03-Organisms/world/display/WorldCard',
   component: WorldCard,
-  render: (args) => <WorldCardWrapper {...args} />,
+  render: (args) => <WorldCard {...args} />,
   parameters: {
     layout: 'centered',
     docs: {

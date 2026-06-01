@@ -3,8 +3,10 @@
 import { AIConfig, GenerationConfig, SafetySetting } from './types';
 
 /**
- * Gets AI configuration from environment variables
- * Following the pattern from Boot Hill project
+ * Gets AI configuration from environment variables.
+ * A missing key falls back to '' here rather than throwing, because config is
+ * also read in mock/test contexts; callers that make real requests validate it
+ * (see validateAPIKey in apiHelpers and the MOCK_API_KEY sentinel).
  * @returns Configuration object
  */
 export const getAIConfig = (): AIConfig => {

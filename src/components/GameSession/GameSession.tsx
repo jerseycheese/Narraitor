@@ -30,9 +30,6 @@ interface GameSessionProps {
     sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
     characterStore?: Partial<ReturnType<typeof useCharacterStore.getState>> | (() => Partial<ReturnType<typeof useCharacterStore.getState>>);
   };
-  _router?: {
-    push: (url: string) => void;
-  };
 }
 
 /**
@@ -47,15 +44,11 @@ const GameSession: React.FC<GameSessionProps> = ({
   initialState,
   disableAutoResume = false,
   _stores,
-  _router,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isClient, setIsClient] = useState(false);
-  
-  // Use provided router or real router
-  const actualRouter = _router || router;
-  
+
   // Check for auto-resume parameter
   const autoResume = searchParams?.get('autoResume') === 'true';
   const [hasAutoResumed, setHasAutoResumed] = useState(false);
@@ -84,7 +77,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     onSessionEnd,
     initialState: testSessionState || initialState,
     disableAutoResume,
-    router: actualRouter,
+    router,
     _stores,
   });
 
@@ -330,7 +323,7 @@ const GameSession: React.FC<GameSessionProps> = ({
             </p>
             <Button
               variant="default"
-              onClick={() => actualRouter?.push(`/characters/create?worldId=${worldId}`)}
+              onClick={() => router?.push(`/characters/create?worldId=${worldId}`)}
             >
               Create Character
             </Button>

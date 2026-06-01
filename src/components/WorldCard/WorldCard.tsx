@@ -29,14 +29,6 @@ interface WorldCardProps {
   onDelete: (worldId: string) => void;
   /** Characters in this world */
   characters?: Character[];
-  /** Optional store actions for testing */
-  _storeActions?: {
-    setCurrentWorld: (id: string) => void;
-  };
-  /** Optional router for testing */
-  _router?: {
-    push: (url: string) => void;
-  };
 }
 
 /**
@@ -74,13 +66,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
   onToggleSelect,
   onDelete,
   characters = [],
-  _storeActions,
-  _router,
 }) => {
-  // Only call useRouter if no mock is provided
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const router = _router ? null : useRouter();
-  const actualRouter = _router || router;
+  const router = useRouter();
 
   const handleMakeActive = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -93,8 +80,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
   const handlePlayClick = () => {
     try {
-      const storeActions = _storeActions || useWorldStore.getState();
-      storeActions.setCurrentWorld(world.id);
+      useWorldStore.getState().setCurrentWorld(world.id);
 
       // Check for characters in this world
       const characterState = useCharacterStore.getState();
@@ -104,29 +90,20 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
       if (worldCharacters.length === 0) {
         // No characters exist - redirect to characters page
-        if (actualRouter) {
-          actualRouter.push(`/characters?worldId=${world.id}`);
-        }
+        router.push(`/characters?worldId=${world.id}`);
         return;
       }
 
       // Check for saved session
-      let hasSession = false;
       const savedSession = useSessionStore
         .getState()
         .getSavedSession(world.id, worldCharacters[0]?.id);
 
-      if (savedSession) {
-        hasSession = true;
-      }
-
-      if (actualRouter) {
-        // Add query parameter to auto-resume if there's a saved session
-        const url = hasSession
-          ? `/worlds/${world.id}/play?autoResume=true`
-          : `/worlds/${world.id}/play`;
-        actualRouter.push(url);
-      }
+      // Add query parameter to auto-resume if there's a saved session
+      const url = savedSession
+        ? `/worlds/${world.id}/play?autoResume=true`
+        : `/worlds/${world.id}/play`;
+      router.push(url);
     } catch {
       // Handle navigation errors gracefully
     }
@@ -134,9 +111,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
   const handleEditClick = () => {
     try {
-      if (actualRouter) {
-        actualRouter.push(`/worlds/${world.id}/edit`);
-      }
+      router.push(`/worlds/${world.id}/edit`);
     } catch {
       // Handle navigation errors gracefully
     }
@@ -205,9 +180,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     className="world-card-character-pill"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (actualRouter) {
-                        actualRouter.push(`/characters/${char.id}`);
-                      }
+                      router.push(`/characters/${char.id}`);
                     }}
                     title={`Play as ${char.name} - Level ${char.level}`}
                   >
@@ -287,9 +260,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   text: 'Manage Characters',
                   onClick: (e) => {
                     e.stopPropagation();
-                    if (actualRouter) {
-                      actualRouter.push(`/characters?worldId=${world.id}`);
-                    }
+                    router.push(`/characters?worldId=${world.id}`);
                   },
                   variant: 'primary',
                   flex: true,
@@ -310,9 +281,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   text: 'View',
                   onClick: (e) => {
                     e.stopPropagation();
-                    if (actualRouter) {
-                      actualRouter.push(`/worlds/${world.id}`);
-                    }
+                    router.push(`/worlds/${world.id}`);
                   },
                   variant: 'secondary',
                   icon: <Eye aria-hidden="true" />,
