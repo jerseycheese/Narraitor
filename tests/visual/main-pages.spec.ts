@@ -16,6 +16,13 @@ import { waitForStoreReady } from './utils/tutorial-helpers';
  * take the actuals from a CI E2E run rather than regenerating with
  * `--update-snapshots` locally. See commit 2fe3941a for the original
  * rationale.
+ *
+ * DS coverage (#1264): single-theme (default DS1). Each page captured here has a
+ * focused all-DS companion — dashboard/home in tests/visual/dashboard-themes.spec.ts,
+ * worlds list in worlds-themes.spec.ts, characters list in characters-themes.spec.ts,
+ * world detail/edit in world-detail-themes.spec.ts, character detail/edit in
+ * character-detail-themes.spec.ts. Tripling this multi-page sweep (whose baselines
+ * are CI-adopted) would duplicate that coverage.
  */
 
 test.describe('Main Pages Visual Tests', () => {

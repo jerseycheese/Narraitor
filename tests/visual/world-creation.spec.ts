@@ -2,6 +2,15 @@ import { test, expect, type Page } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
+/**
+ * World creation wizard — full sequential flow, single-theme (default DS1).
+ *
+ * DS coverage (#1264): all three design systems for the world wizard are covered
+ * by the "World creation wizard steps render <DS> structure" tests in
+ * tests/visual/wizard-themes.spec.ts. Tripling this full six-step flow would
+ * duplicate that coverage at much higher runtime/flake cost.
+ */
+
 /** Capture a stable, full-page wizard screenshot with the app shell intact. */
 const captureWizardStep = async (page: Page, name: string): Promise<void> => {
   await page.evaluate(() => window.scrollTo(0, 0));

@@ -14,6 +14,11 @@ const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
 // real routes, hang the single CI dev server, and time out unrelated specs in
 // the other worker (#1342). Mocks keep the skeleton→content transition this test
 // checks, just deterministically.
+//
+// DS coverage (#1264): single-theme (default DS1) by design — this verifies the
+// skeleton -> active-session content *transition* behaviour, not theme layout.
+// The play surface's per-theme visuals are covered by
+// tests/visual/session-themes.spec.ts and design-system-session.spec.ts.
 
 test.describe('Fresh GameSession skeleton → content', () => {
   test('shows skeleton, then reveals active session with choices', async ({

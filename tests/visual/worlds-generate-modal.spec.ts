@@ -2,6 +2,14 @@ import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
+/**
+ * Generate-world modal content states — single-theme (default DS1).
+ *
+ * DS coverage (#1264): this spec covers the modal's content states (default,
+ * inspired-by, set-within). The modal surface across DS1/DS2/DS3 is covered by
+ * tests/visual/worlds-generate-modal-themes.spec.ts.
+ */
+
 test.describe('Worlds Generate Modal - Visual', () => {
   test.beforeEach(async ({ page }) => {
     await seedTestData(page);

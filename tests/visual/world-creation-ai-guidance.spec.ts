@@ -3,6 +3,15 @@ import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
+/**
+ * World creation AI-guidance — single-theme (default DS1).
+ *
+ * DS coverage (#1264): this spec exercises AI-guidance *behaviour and content*
+ * (genre-specific guidance, suggestion generation, outdated warnings), not theme
+ * layout. The wizard's structural theming is covered across DS1/DS2/DS3 by
+ * tests/visual/wizard-themes.spec.ts.
+ */
+
 test.describe('World Creation Wizard AI Guidance', () => {
   test.setTimeout(45000);
 
