@@ -4,13 +4,18 @@
  * published to the calibration store. See #1333.
  */
 
-import { recordRequestCalibration } from '../narrativeGenerator.budget';
+import {
+  applyBudget,
+  limitNarrativeContextToBudget,
+  recordRequestCalibration,
+} from '../narrativeGenerator.budget';
 import {
   RequestBudget,
   DEFAULT_ALLOCATIONS,
   DEFAULT_TOTAL_BUDGET,
   REQUEST_TOTAL_COMPONENT_ID,
 } from '@/lib/promptContext/tokenBudgetManager';
+import type { NarrativeContext } from '@/types/narrative.types';
 
 const recordSnapshot = jest.fn();
 
@@ -59,5 +64,38 @@ describe('recordRequestCalibration', () => {
         (c: { componentId: string }) => c.componentId === REQUEST_TOTAL_COMPONENT_ID
       )
     ).toBe(false);
+  });
+});
+
+describe('measurement decoupled from enforcement (disabled budget)', () => {
+  it('applyBudget records the estimate but does not truncate when disabled', () => {
+    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, false);
+    const content = 'lore content that should not be truncated '.repeat(60);
+
+    const out = applyBudget(content, 'lore-context', budget);
+
+    expect(out).toBe(content); // untouched when enforcement is off
+    const lore = budget
+      .getSnapshot()
+      .components.find((c) => c.componentId === 'lore-context');
+    expect(lore?.estimated).toBeGreaterThan(0);
+  });
+
+  it('limitNarrativeContextToBudget records recent-narrative usage without dropping segments when disabled', () => {
+    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, false);
+    const context = {
+      recentSegments: [
+        { content: 'segment one '.repeat(80) },
+        { content: 'segment two '.repeat(80) },
+      ],
+    } as unknown as NarrativeContext;
+
+    const out = limitNarrativeContextToBudget(context, budget);
+
+    expect(out?.recentSegments).toHaveLength(2); // nothing dropped
+    const recent = budget
+      .getSnapshot()
+      .components.find((c) => c.componentId === 'recent-narrative');
+    expect(recent?.estimated).toBeGreaterThan(0);
   });
 });

@@ -78,15 +78,16 @@ export class NarrativeGenerator {
       const template = this.getTemplate('scene');
 
       const budget = createRequestBudget();
-      const requestForTemplate = budget.isEnabled()
-        ? ({
-            ...request,
-            narrativeContext: limitNarrativeContextToBudget(
-              request.narrativeContext,
-              budget
-            ),
-          } as NarrativeGenerationRequest)
-        : request;
+      // Always route through the budget helper: it records the recent-narrative
+      // estimate for observability and only truncates when enforcement is on
+      // (returns the context unchanged otherwise).
+      const requestForTemplate = {
+        ...request,
+        narrativeContext: limitNarrativeContextToBudget(
+          request.narrativeContext,
+          budget
+        ),
+      } as NarrativeGenerationRequest;
 
       const context = buildNarrativeContext(world, requestForTemplate);
       const prompt = template(context);
@@ -622,6 +623,7 @@ export class NarrativeGenerator {
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+      recordRequestCalibration(budget, fullyEnhancedPrompt, response);
 
       let result = await formatNarrativeResponse(
         response,

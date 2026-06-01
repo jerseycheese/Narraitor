@@ -116,7 +116,7 @@ export const enhancePromptWithPersonalization = async (
       return prompt;
     }
 
-    if (!budget || !budget.isEnabled()) {
+    if (!budget) {
       return `${prompt}${personalizationSection}`;
     }
 

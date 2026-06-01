@@ -121,7 +121,7 @@ export const enhancePromptWithGoalContext = async (
     if (aiContext.goalContext && safeTrim(aiContext.goalContext)) {
       const goalSection = `\n\nCURRENT NARRATIVE GOALS:\n${aiContext.goalContext}\n\nPlease consider these goals when generating the narrative content.`;
 
-      if (!budget || !budget.isEnabled()) {
+      if (!budget) {
         return `${prompt}${goalSection}`;
       }
 
@@ -166,7 +166,7 @@ export const enhancePromptWithToneSettings = (
     cache.toneSettings.set(cacheKey, toneInstructions);
   }
 
-  if (!budget || !budget.isEnabled()) {
+  if (!budget) {
     return prompt + toneInstructions;
   }
 
@@ -286,7 +286,7 @@ Important:
 The items will be automatically added to the character's inventory with proper categorization and journal entries.`;
   }
 
-  if (!budget || !budget.isEnabled()) {
+  if (!budget) {
     return prompt + cache.itemAcquisitionInstructions;
   }
 
