@@ -53,31 +53,29 @@ describe('characterArchetypes', () => {
       const world = createMockWorld('fantasy');
       const archetypes = await generateCharacterArchetypes(world);
       
-      // Find the warrior archetype (should have high Strength)
-      const warrior = archetypes.find(a => a.name.includes('Warrior') || a.name.includes('Fighter'));
-      if (warrior) {
-        const strengthAttr = warrior.attributes.find(a => a.name === 'Strength');
-        expect(strengthAttr?.value).toBeGreaterThan(6); // Should be above average
-      }
-      
-      // Find the mage archetype (should have high Intelligence)  
-      const mage = archetypes.find(a => a.name.includes('Mage') || a.name.includes('Wizard'));
-      if (mage) {
-        const intAttr = mage.attributes.find(a => a.name === 'Intelligence');
-        expect(intAttr?.value).toBeGreaterThan(6); // Should be above average
-      }
+      // Find the warrior archetype by its role description (a.name is a generated
+      // character name, not the role, so it can't be matched on).
+      const warrior = archetypes.find(a => a.description.includes('fighter'));
+      expect(warrior).toBeDefined();
+      const strengthAttr = warrior!.attributes.find(a => a.name === 'Strength');
+      expect(strengthAttr?.value).toBeGreaterThan(6); // Should be above average
+
+      // Find the mage archetype (should have high Intelligence)
+      const mage = archetypes.find(a => a.description.includes('mystical arts'));
+      expect(mage).toBeDefined();
+      const intAttr = mage!.attributes.find(a => a.name === 'Intelligence');
+      expect(intAttr?.value).toBeGreaterThan(6); // Should be above average
     });
 
     test('ensures skill levels are appropriate for archetype roles', async () => {
       const world = createMockWorld('fantasy');
       const archetypes = await generateCharacterArchetypes(world);
 
-      // Find the warrior archetype (should have high Combat skill)
-      const warrior = archetypes.find(a => a.name.includes('Warrior') || a.name.includes('Fighter'));
-      if (warrior) {
-        const combatSkill = warrior.skills.find(s => s.name === 'Combat');
-        expect(combatSkill?.level).toBeGreaterThan(5); // Should be competent or better
-      }
+      // Find the warrior archetype by its role description.
+      const warrior = archetypes.find(a => a.description.includes('fighter'));
+      expect(warrior).toBeDefined();
+      const combatSkill = warrior!.skills.find(s => s.name === 'Combat');
+      expect(combatSkill?.level).toBeGreaterThan(5); // Should be competent or better
     });
 
     test('respects world attribute and skill bounds', async () => {

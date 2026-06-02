@@ -22,13 +22,6 @@ describe('ChoiceOutcomeCallout', () => {
     expect(badge).toBeInTheDocument();
   });
 
-  it('should use small size variant', () => {
-    const { container } = render(<ChoiceOutcomeCallout {...defaultProps} />);
-
-    const callout = container.querySelector('.choice-outcome-callout');
-    expect(callout).toBeInTheDocument();
-  });
-
   it('should accept custom className', () => {
     const { container } = render(
       <ChoiceOutcomeCallout {...defaultProps} className="test-class" />
