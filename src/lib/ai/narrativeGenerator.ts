@@ -13,7 +13,7 @@ import {
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
-import { ChoiceGenerator } from './choiceGenerator';
+import { generateChoices } from './choiceGenerator';
 import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
@@ -23,7 +23,6 @@ import {
   type WorldTemplate,
 } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
-import { PersonalizationEngine } from './personalizationEngine';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import { processLostItems } from '@/lib/narrative/itemLossProcessor';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
@@ -57,17 +56,11 @@ import { enforceLanguageComplexity } from './narrativeGenerator.languageComplexi
 import { buildNpcRoster, syncNpcMetadata } from './narrativeGenerator.npc';
 
 export class NarrativeGenerator {
-  private choiceGenerator: ChoiceGenerator;
-  private personalizationEngine: PersonalizationEngine;
-
   private staticContentCache: NarrativeStaticContentCache = {
     toneSettings: new Map(),
   };
 
-  constructor(private geminiClient: AIClient) {
-    this.choiceGenerator = new ChoiceGenerator(geminiClient);
-    this.personalizationEngine = new PersonalizationEngine();
-  }
+  constructor(private geminiClient: AIClient) {}
 
   async generateSegment(
     request: NarrativeGenerationRequest
@@ -115,7 +108,6 @@ export class NarrativeGenerator {
         goalEnhancedPrompt,
         request.worldId,
         request.characterIds || [],
-        this.personalizationEngine,
         request.sessionId,
         budget
       );
@@ -343,7 +335,6 @@ export class NarrativeGenerator {
         loreEnhancedPrompt,
         worldId,
         characterIds,
-        this.personalizationEngine,
         sessionId,
         budget
       );
@@ -707,7 +698,7 @@ export class NarrativeGenerator {
     sessionId?: EntityID
   ): Promise<Decision> {
     try {
-      const result = await this.choiceGenerator.generateChoices({
+      const result = await generateChoices(this.geminiClient, {
         worldId,
         narrativeContext,
         characterIds,

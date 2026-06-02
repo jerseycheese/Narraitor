@@ -5,7 +5,7 @@
  * rather than manually generating complex consequence instructions.
  */
 
-import { PersonalizationEngine } from '../personalizationEngine';
+import { generateNarrativeEnhancement } from '../personalizationEngine';
 import {
   PlayerDecision,
   PersonalizedNarrativeContext,
@@ -13,7 +13,7 @@ import {
 import { getTimestamp } from '@/lib/utils/timestamp';
 
 describe('PersonalizationEngine - Decision Enhancement', () => {
-  let personalizationEngine: PersonalizationEngine;
+  const personalizationEngine = { generateNarrativeEnhancement };
   let pastDecisions: PlayerDecision[];
 
   const mockCharacter = {
@@ -67,8 +67,6 @@ describe('PersonalizationEngine - Decision Enhancement', () => {
         },
       },
     ];
-
-    personalizationEngine = new PersonalizationEngine();
   });
 
   afterEach(() => {

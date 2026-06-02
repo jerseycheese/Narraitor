@@ -3,13 +3,21 @@
  * Focus on core acceptance criteria: providing raw data to LLM for personalization
  */
 
-import { PersonalizationEngine } from '../personalizationEngine';
+import {
+  analyzePlayerBehavior,
+  createPersonalizedContext,
+  generateNarrativeEnhancement,
+} from '../personalizationEngine';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { PlayerDecision } from '@/types/personalization.types';
 
 describe('PersonalizationEngine - MVP Tests', () => {
-  let engine: PersonalizationEngine;
+  const engine = {
+    analyzePlayerBehavior,
+    createPersonalizedContext,
+    generateNarrativeEnhancement,
+  };
   let mockCharacter: Character;
   let mockWorld: World;
 
@@ -28,7 +36,6 @@ describe('PersonalizationEngine - MVP Tests', () => {
   });
 
   beforeEach(() => {
-    engine = new PersonalizationEngine();
 
     mockCharacter = {
       id: 'char-1',

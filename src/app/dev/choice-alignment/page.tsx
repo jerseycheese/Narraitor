@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
+import { generateChoices as generateAlignedChoices } from '@/lib/ai/choiceGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
 import { Decision, NarrativeContext } from '@/types/narrative.types';
@@ -20,7 +20,7 @@ export default function ChoiceAlignmentTestPage() {
   const [error, setError] = useState<string | null>(null);
   const [worldId, setWorldId] = useState<string | null>(null);
 
-  const choiceGenerator = new ChoiceGenerator(createDefaultGeminiClient());
+  const geminiClient = createDefaultGeminiClient();
 
   // Create a test world when component mounts
   useEffect(() => {
@@ -114,7 +114,7 @@ export default function ChoiceAlignmentTestPage() {
         currentSituation: scenarios[scenario].situation
       };
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateAlignedChoices(geminiClient, {
         worldId: worldId,
         narrativeContext: mockNarrativeContext,
         characterIds: [generateUniqueId('character')],

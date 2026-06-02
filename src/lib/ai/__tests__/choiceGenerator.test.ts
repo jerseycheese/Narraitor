@@ -1,4 +1,4 @@
-import { ChoiceGenerator } from '../choiceGenerator';
+import { generateChoices } from '../choiceGenerator';
 import { AIClient } from '../types';
 import { EntityID } from '@/types/common.types';
 import { NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
@@ -78,11 +78,8 @@ const createMockNarrativeContext = (): NarrativeContext => {
 };
 
 describe('ChoiceGenerator', () => {
-  let choiceGenerator: ChoiceGenerator;
-  
   beforeEach(() => {
     jest.clearAllMocks();
-    choiceGenerator = new ChoiceGenerator(mockAIClient);
   });
 
   describe('generateChoices', () => {
@@ -100,7 +97,7 @@ describe('ChoiceGenerator', () => {
       
       mockAIClient.generateContent.mockResolvedValueOnce(mockResponse);
       
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1']
@@ -118,7 +115,7 @@ describe('ChoiceGenerator', () => {
     it('should handle AI errors and generate fallback choices', async () => {
       mockAIClient.generateContent.mockRejectedValueOnce(new Error('AI Service unavailable'));
       
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1']
@@ -134,7 +131,7 @@ describe('ChoiceGenerator', () => {
       // Mock an empty response
       mockAIClient.generateContent.mockResolvedValueOnce({ content: '', finishReason: 'STOP' });
       
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1']
@@ -199,7 +196,7 @@ Options:
         finishReason: 'STOP',
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1'],
@@ -245,7 +242,7 @@ Options:
         finishReason: 'STOP',
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1'],
