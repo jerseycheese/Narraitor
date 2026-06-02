@@ -48,11 +48,6 @@ interface UseGameSessionStateOptions {
   initialState?: Partial<GameSessionState>;
   disableAutoResume?: boolean;
   router?: { push: (url: string) => void };
-  _stores?: {
-    worldStore: Partial<ReturnType<typeof useWorldStore.getState>> | (() => Partial<ReturnType<typeof useWorldStore.getState>>);
-    sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
-    characterStore?: Partial<ReturnType<typeof useCharacterStore.getState>> | (() => Partial<ReturnType<typeof useCharacterStore.getState>>);
-  };
 }
 
 export const useGameSessionState = ({
@@ -63,7 +58,6 @@ export const useGameSessionState = ({
   initialState,
   disableAutoResume = false,
   router,
-  _stores,
 }: UseGameSessionStateOptions) => {
   const logger = useMemo(() => new Logger('GameSession'), []);
   
@@ -82,23 +76,9 @@ export const useGameSessionState = ({
   // Local state for error handling
   const [error, setError] = useState<Error | null>(null);
   
-  // Always call store hooks unconditionally
-  const worldStoreHook = useWorldStore();
-  const sessionStoreHook = useSessionStore();
-  const characterStoreHook = useCharacterStore();
-  
-  // Use provided stores or real stores for testing
-  const actualWorldState = _stores?.worldStore 
-    ? (typeof _stores.worldStore === 'function' ? _stores.worldStore() : _stores.worldStore) 
-    : worldStoreHook;
-  
-  const actualSessionState = _stores?.sessionStore
-    ? (typeof _stores.sessionStore === 'function' ? _stores.sessionStore() : _stores.sessionStore)
-    : sessionStoreHook;
-  
-  const actualCharacterState = _stores?.characterStore
-    ? (typeof _stores.characterStore === 'function' ? _stores.characterStore() : _stores.characterStore)
-    : characterStoreHook;
+  const actualWorldState = useWorldStore();
+  const actualSessionState = useSessionStore();
+  const actualCharacterState = useCharacterStore();
   
   // Check if world exists - only on client-side
   const worldExists = useMemo(() => {

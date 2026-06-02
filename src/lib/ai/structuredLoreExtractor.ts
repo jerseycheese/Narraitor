@@ -4,6 +4,7 @@
  */
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
+import { extractFencedJson } from './parseJSON';
 import type { StructuredLoreExtraction } from '@/types/lore.types';
 
 import Logger from '@/lib/utils/logger';
@@ -25,26 +26,21 @@ export async function extractStructuredLore(
       return getEmptyExtraction();
     }
 
-    // Try to parse the JSON response
-    const jsonMatch = response.content.match(/```json\s*([\s\S]*?)\s*```/);
-    if (!jsonMatch) {
-      if (process.env.NODE_ENV !== 'production') {
-        // If no JSON block found, try fallback mock extraction for testing/dev
-        logger.warn('No JSON block found in AI response, using mock extraction for testing/dev');
-        return createMockExtraction(narrativeText);
-      }
+    // Try to parse the fenced JSON response
+    const jsonStr = extractFencedJson(response.content);
+    if (jsonStr === null) {
+      // A missing JSON block is a real parse failure. Surface it (loudly in dev)
+      // and return nothing rather than fabricating lore from a prose regex,
+      // which would silently mask prompt/parse regressions.
+      logger.warn('No JSON block found in AI response; returning empty extraction');
       return getEmptyExtraction();
     }
 
-    const extractedLore = JSON.parse(jsonMatch[1]) as StructuredLoreExtraction;
+    const extractedLore = JSON.parse(jsonStr) as StructuredLoreExtraction;
     return validateAndCleanExtraction(extractedLore);
-    
+
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      logger.warn('Failed to extract structured lore:', error);
-      // Fallback to mock extraction for demonstration/testing
-      return createMockExtraction(narrativeText);
-    }
+    logger.warn('Failed to extract structured lore:', error);
     return getEmptyExtraction();
   }
 }
@@ -244,91 +240,4 @@ function getEmptyExtraction(): StructuredLoreExtraction {
     rules: [],
     relationships: []
   };
-}
-
-/**
- * Create mock extraction for testing when AI is not available
- */
-function createMockExtraction(narrativeText: string): StructuredLoreExtraction {
-  const extraction: StructuredLoreExtraction = {
-    characters: [],
-    locations: [],
-    events: [],
-    rules: [],
-    relationships: []
-  };
-
-  // Simple pattern matching for characters (titles + names)
-  const characterMatches = narrativeText.match(/\b(Sir|Lady|Lord|Captain|Master|Dr\.|Professor|King|Queen|Prince|Princess)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/g);
-  if (characterMatches) {
-    characterMatches.forEach(match => {
-      const name = match.trim();
-      extraction.characters.push({
-        name,
-        aliases: [], // Empty aliases for mock extraction
-        description: 'Character mentioned in narrative',
-        role: match.toLowerCase().includes('sir') ? 'Knight' :
-              match.toLowerCase().includes('lady') ? 'Noble' :
-              match.toLowerCase().includes('captain') ? 'Military Officer' : 'Person of importance',
-        importance: 'medium'
-      });
-    });
-  }
-
-  // Simple pattern for locations
-  const locationMatches = narrativeText.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:of\s+[A-Z][a-z]+|district|quarter|market|bridge|tower|citadel|castle|palace|temple|spire|dome|tavern)\b/gi);
-  if (locationMatches) {
-    locationMatches.forEach(match => {
-      const name = match.trim();
-      extraction.locations.push({
-        name,
-        aliases: [], // Empty aliases for mock extraction
-        description: 'Location mentioned in narrative',
-        type: match.toLowerCase().includes('temple') ? 'religious site' :
-              match.toLowerCase().includes('tavern') ? 'establishment' :
-              match.toLowerCase().includes('market') ? 'commercial area' : 'place',
-        importance: 'medium'
-      });
-    });
-  }
-
-  // Extract "city of X" patterns
-  const cityMatches = narrativeText.match(/\b(?:city|town|village)\s+of\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/gi);
-  if (cityMatches) {
-    cityMatches.forEach(match => {
-      const nameMatch = match.match(/of\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i);
-      if (nameMatch) {
-        extraction.locations.push({
-          name: nameMatch[1],
-          aliases: [], // Empty aliases for mock extraction
-          description: 'Settlement mentioned in narrative',
-          type: 'city',
-          importance: 'high'
-        });
-      }
-    });
-  }
-
-  // Simple events extraction - DISABLED to prevent generic hallucinations
-  // These triggers are too broad and create events that weren't in the narrative
-  // Better to extract zero events than incorrect ones
-  /*
-  if (narrativeText.toLowerCase().includes('enter') || narrativeText.toLowerCase().includes('approach')) {
-    extraction.events.push({
-      description: 'Character arrives at a new location',
-      significance: 'Beginning of a new scene or encounter',
-      importance: 'medium'
-    });
-  }
-
-  if (narrativeText.toLowerCase().includes('warn') || narrativeText.toLowerCase().includes('danger')) {
-    extraction.events.push({
-      description: 'Warning received about potential danger',
-      significance: 'Important information for future decisions',
-      importance: 'high'
-    });
-  }
-  */
-
-  return extraction;
 }

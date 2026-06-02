@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
+import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('EndingScreen');
@@ -165,10 +166,7 @@ export function EndingScreen() {
   // Load ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
     // Skip image generation in Storybook, test environment, or dev harness
-    const isStorybook =
-      typeof window !== 'undefined' &&
-      (window.location.port === '6006' ||
-        window.location.hostname.includes('storybook'));
+    const isStorybook = isStorybookEnv();
     const isTest = process.env.NODE_ENV === 'test';
     const isDevHarness =
       typeof window !== 'undefined' &&

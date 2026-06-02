@@ -62,22 +62,6 @@ export function PortraitDebugSection({
     | undefined;
   const effectiveWorldConfig = selectedWorld || worldConfig;
 
-  // Helper to safely access background properties
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getBackgroundProp = (prop: string): any => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const bg = effectiveCharacterData?.background as any;
-    return bg?.[prop];
-  };
-
-  // Helper to safely access status properties
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getStatusProp = (prop: string): any => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const status = effectiveCharacterData?.status as any;
-    return status?.[prop];
-  };
-
   /**
    * Creates a mock character object for API calls, centralizing the logic
    * to avoid duplication between different generation methods
@@ -133,11 +117,11 @@ export function PortraitDebugSection({
       skills: mockSkills,
       derivedStats: [],
       background: {
-        history: getBackgroundProp('history') || '',
-        personality: getBackgroundProp('personality') || '',
-        goals: getBackgroundProp('goals') || [],
-        fears: getBackgroundProp('fears') || [],
-        relationships: getBackgroundProp('relationships') || [],
+        history: effectiveCharacterData.background?.history || '',
+        personality: effectiveCharacterData.background?.personality || '',
+        goals: effectiveCharacterData.background?.goals || [],
+        fears: effectiveCharacterData.background?.fears || [],
+        relationships: effectiveCharacterData.background?.relationships || [],
       },
       inventory: {
         items: [],
@@ -147,9 +131,12 @@ export function PortraitDebugSection({
         itemOrder: [],
       },
       status: {
-        health: getStatusProp('health') || getStatusProp('hp') || 100,
-        maxHealth: getStatusProp('maxHealth') || 100,
-        conditions: getStatusProp('conditions') || [],
+        health:
+          effectiveCharacterData.status?.health ||
+          (effectiveCharacterData.status as { hp?: number } | undefined)?.hp ||
+          100,
+        maxHealth: effectiveCharacterData.status?.maxHealth || 100,
+        conditions: effectiveCharacterData.status?.conditions || [],
       },
       createdAt: getTimestamp(),
       updatedAt: getTimestamp(),
@@ -174,7 +161,7 @@ export function PortraitDebugSection({
       const requestBody = {
         character: mockCharacter,
         world: effectiveWorldConfig,
-        customDescription: getBackgroundProp('physicalDescription'),
+        customDescription: effectiveCharacterData.background?.physicalDescription,
         promptOnly: true, // Add a flag to return only the prompt
       };
 

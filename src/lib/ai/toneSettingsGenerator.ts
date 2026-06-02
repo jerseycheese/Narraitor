@@ -2,6 +2,7 @@ import { AIClient } from './types';
 import { ContentRating, NarrativeStyle, LanguageComplexity } from '@/types/tone-settings.types';
 import { World } from '@/types/world.types';
 import { logger } from '@/lib/utils/logger';
+import { extractJsonObject } from './parseJSON';
 
 export interface WorldAnalysisData {
   name: string;
@@ -105,12 +106,12 @@ function parseResponse(content: string): ToneAnalysisResult {
       throw new Error('AI service returned empty response');
     }
 
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const jsonStr = extractJsonObject(content);
+    if (jsonStr === null) {
       throw new Error('No JSON found in AI response');
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(jsonStr);
     validateParsedResponse(parsed);
 
     return {

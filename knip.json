@@ -10,8 +10,6 @@
   "ignoreDependencies": [
     "@storybook/addon-essentials",
     "@storybook/addon-a11y",
-    "@storybook/addon-onboarding",
-    "@storybook/addon-styling-webpack",
     "@chromatic-com/storybook",
     "eslint-plugin-storybook",
     "eslint-config-prettier",

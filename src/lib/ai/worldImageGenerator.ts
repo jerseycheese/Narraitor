@@ -5,6 +5,7 @@ import { GeneratedImage } from '../../types/common.types';
 import { getTimestamp } from '@/lib/utils';
 
 import Logger from '@/lib/utils/logger';
+import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
 const logger = new Logger('WorldImageGenerator');
 
 function buildPrompt(world: World): string {
@@ -53,9 +54,7 @@ export async function generateWorldImage(world: World, customPrompt?: string): P
   try {
     const prompt = customPrompt || buildPrompt(world);
 
-    const isStorybook = typeof window !== 'undefined' && window.location.port === '6006';
-
-    if (isStorybook) {
+    if (isStorybookEnv()) {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       const mockImages: Record<string, string> = {

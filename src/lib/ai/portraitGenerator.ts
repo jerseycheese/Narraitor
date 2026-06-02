@@ -7,6 +7,7 @@ import { capitalize, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 
 import Logger from '@/lib/utils/logger';
+import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
 const logger = new Logger('PortraitGenerator');
 
 interface PortraitGenerationOptions {
@@ -599,9 +600,7 @@ export async function generatePortrait(
   }
 
   try {
-    const isStorybook = typeof window !== 'undefined' && window.location.port === '6006';
-
-    if (isStorybook) {
+    if (isStorybookEnv()) {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       const mockPortraits: Record<string, string> = {

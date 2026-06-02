@@ -5,6 +5,7 @@ import { useAiContextStore } from '@/state/aiContextStore';
 import type { EntityID } from '@/types/common.types';
 import type { World } from '@/types/world.types';
 import type { CharacterGoal } from '@/types/personalization.types';
+import type { NarrativeGoal } from '@/types/goal.types';
 import { safeTrim } from '@/lib/utils';
 import {
   summarizeThreadHighlight,
@@ -76,9 +77,7 @@ export const enhancePromptWithPersonalization = async (
       ? await useAiContextStore.getState().buildContextForSession(sessionId)
       : null;
     const narrativeGoals = aiContext?.activeGoals || [];
-    const characterGoals = convertToCharacterGoals(
-      narrativeGoals as unknown as Array<Record<string, unknown>>
-    );
+    const characterGoals = convertToCharacterGoals(narrativeGoals);
 
     const personalizedContext = createPersonalizedContext(
       playerCharacter,
@@ -189,14 +188,14 @@ export const convertToPersonalizationCharacter = (
 };
 
 const convertToCharacterGoals = (
-  narrativeGoals: Array<Record<string, unknown>>
+  narrativeGoals: NarrativeGoal[]
 ): CharacterGoal[] =>
   narrativeGoals.map((goal) => ({
-    id: goal.id as string,
-    description: (goal.description || goal.title) as string,
-    priority: mapGoalPriority(goal.priority as string),
+    id: goal.id,
+    description: goal.description || goal.title,
+    priority: mapGoalPriority(goal.priority),
     progress: calculateGoalProgress(goal),
-    establishedAt: goal.createdAt as string,
+    establishedAt: goal.createdAt,
     isActive: goal.status === 'active',
   }));
 
@@ -213,7 +212,7 @@ const mapGoalPriority = (priority: string): 'primary' | 'secondary' | 'minor' =>
   }
 };
 
-const calculateGoalProgress = (goal: Record<string, unknown>): number => {
+const calculateGoalProgress = (goal: NarrativeGoal): number => {
   if (goal.status === 'completed') return 100;
   if (goal.status === 'abandoned') return 0;
 

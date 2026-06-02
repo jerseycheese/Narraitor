@@ -2,6 +2,7 @@
 
 import { AIClient } from './types';
 import { createDefaultGeminiClient } from './defaultGeminiClient';
+import { extractFencedJson } from './parseJSON';
 import {
   NarrativeGoal,
   GoalExtractionRequest,
@@ -254,13 +255,13 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
     request: GoalExtractionRequest
   ): GoalExtractionResult {
     try {
-      // Extract JSON from response
-      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
-      if (!jsonMatch) {
+      // Extract JSON from the fenced block; fall back when absent.
+      const jsonStr = extractFencedJson(content);
+      if (jsonStr === null) {
         return this.createFallbackExtractionResult(request);
       }
 
-      const parsed = JSON.parse(jsonMatch[1]);
+      const parsed = JSON.parse(jsonStr);
 
       // Validate and clean the response
       const result: GoalExtractionResult = {
