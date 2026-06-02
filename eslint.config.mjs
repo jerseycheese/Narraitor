@@ -44,8 +44,8 @@ const eslintConfig = [
   },
   {
     files: [
-      "**/*.test.{js,jsx,ts,tsx}",
-      "**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "**/*.test.{js,mjs,jsx,ts,tsx}",
+      "**/__tests__/**/*.{js,mjs,jsx,ts,tsx}",
       "**/__mocks__/**/*.{js,jsx,ts,tsx}",
       "**/*.stories.{js,jsx,ts,tsx}",
       "**/*.stories.helpers.{js,jsx,ts,tsx}",
@@ -67,8 +67,8 @@ const eslintConfig = [
     // dev tooling). warn keeps these out of the blocking CI gate as a first-pass
     // introduction, matching the markup-hygiene rules above.
     files: [
-      "**/*.test.{js,jsx,ts,tsx}",
-      "**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "**/*.test.{js,mjs,jsx,ts,tsx}",
+      "**/__tests__/**/*.{js,mjs,jsx,ts,tsx}",
     ],
     plugins: { jest },
     rules: {

@@ -10,7 +10,7 @@
     "build": "next build && rm -rf public/storybook-static && npm run build-storybook && cp -r storybook-static public/",
     "build:app": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint && eslint \"__tests__/**/*.test.{js,jsx,ts,tsx}\" \"scripts/**/*.test.{js,mjs}\"",
     "lint:layout-usage": "node scripts/verify-page-layout-usage.cjs",
     "lint:ds-canon": "node scripts/verify-ds-canon.cjs",
     "lint:css": "stylelint \"**/*.css\"",
