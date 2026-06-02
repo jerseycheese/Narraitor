@@ -3,7 +3,7 @@
  * Focus on ensuring character skills are included in choice generation context
  */
 
-import { ChoiceGenerator } from '../choiceGenerator';
+import { generateChoices } from '../choiceGenerator';
 import type { AIClient } from '../types';
 import type { NarrativeContext } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
@@ -19,7 +19,6 @@ jest.mock('@/state/npcStore');
 
 describe('ChoiceGenerator - Skill-Based Choices', () => {
   let mockAIClient: AIClient;
-  let choiceGenerator: ChoiceGenerator;
   let mockWorld: World;
   let mockCharacter: Character;
 
@@ -34,8 +33,6 @@ describe('ChoiceGenerator - Skill-Based Choices', () => {
 Decision Weight: [minor]`,
       }),
     } as unknown as AIClient;
-
-    choiceGenerator = new ChoiceGenerator(mockAIClient);
 
     // Mock world with skills
     mockWorld = {
@@ -177,7 +174,7 @@ Decision Weight: [minor]`,
         currentSituation: 'You stand before a locked door',
       };
 
-      await choiceGenerator.generateChoices({
+      await generateChoices(mockAIClient,{
         worldId: 'world-1',
         narrativeContext,
         characterIds: ['char-1'],
@@ -205,7 +202,7 @@ Decision Weight: [minor]`,
         currentSituation: 'A locked chest sits before you',
       };
 
-      await choiceGenerator.generateChoices({
+      await generateChoices(mockAIClient,{
         worldId: 'world-1',
         narrativeContext,
         characterIds: ['char-1'],
@@ -247,7 +244,7 @@ Decision Weight: [minor]`,
         currentSituation: 'An empty room',
       };
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient,{
         worldId: 'world-1',
         narrativeContext,
         characterIds: ['char-1'],
@@ -296,7 +293,7 @@ Decision Weight: [minor]`,
         currentSituation: 'Enemies ahead',
       };
 
-      await choiceGenerator.generateChoices({
+      await generateChoices(mockAIClient,{
         worldId: 'world-1',
         narrativeContext,
         characterIds: ['char-1', 'char-2'],

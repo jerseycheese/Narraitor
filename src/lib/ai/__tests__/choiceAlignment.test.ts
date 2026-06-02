@@ -1,4 +1,4 @@
-import { ChoiceGenerator } from '../choiceGenerator';
+import { generateChoices } from '../choiceGenerator';
 import { MockGeminiClient } from '../__mocks__/geminiClient.mock';
 import { useWorldStore } from '@/state/worldStore';
 import { NarrativeContext } from '@/types/narrative.types';
@@ -17,14 +17,12 @@ jest.mock('@/state/inventoryStore', () => ({
 }));
 
 describe('ChoiceGenerator - Alignment System', () => {
-  let choiceGenerator: ChoiceGenerator;
   let mockWorld: World;
   let mockNarrativeContext: NarrativeContext;
   let mockGeminiClient: MockGeminiClient;
 
   beforeEach(() => {
     mockGeminiClient = new MockGeminiClient();
-    choiceGenerator = new ChoiceGenerator(mockGeminiClient);
     mockWorld = {
       id: 'test-world',
       name: 'Test World',
@@ -77,7 +75,7 @@ Options:
         content: mockResponse
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
@@ -103,7 +101,7 @@ Options:
         content: mockResponse
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
@@ -125,7 +123,7 @@ Options:
         content: mockResponse
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
@@ -161,7 +159,7 @@ Options:
         content: mockResponse
       });
 
-      await choiceGenerator.generateChoices({
+      await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
@@ -203,7 +201,7 @@ Options:
         content: mockResponse
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
@@ -226,7 +224,7 @@ Options:
       // Force an error to trigger fallback
       (mockGeminiClient.generateContent as jest.Mock).mockRejectedValueOnce(new Error('AI Error'));
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
@@ -245,7 +243,7 @@ Options:
         content: mockResponse
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
@@ -270,7 +268,7 @@ Options:
         content: mockResponse
       });
 
-      await choiceGenerator.generateChoices({
+      await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1']
@@ -297,7 +295,7 @@ Options:
         content: mockResponse
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
@@ -323,7 +321,7 @@ Options:
         content: mockResponse
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockGeminiClient,{
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],

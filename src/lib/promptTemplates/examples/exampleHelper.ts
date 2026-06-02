@@ -5,21 +5,9 @@
  * with token-aware selection.
  */
 
-import { exampleManager } from './exampleManager';
+import { selectExamples } from './exampleManager';
 import { allExamples } from './exampleLibrary';
 import { PromptCategory, ExampleSelectionOptions } from './types';
-
-/**
- * Initialize the global example manager with all examples
- * This should be called once at application startup
- */
-function initializeExampleLibrary(): void {
-  // Clear any existing examples
-  exampleManager.clearExamples();
-
-  // Add all examples from the library
-  exampleManager.addExamples(allExamples);
-}
 
 /**
  * Get formatted examples for a specific prompt category with token budget
@@ -34,7 +22,7 @@ export function getExamplesForPrompt(
   tokenBudget: number = 150,
   options: Partial<ExampleSelectionOptions> = {}
 ): string {
-  const result = exampleManager.selectExamples({
+  const result = selectExamples(allExamples, {
     category,
     tokenBudget,
     ...options,
@@ -72,6 +60,3 @@ export function shouldIncludeExamples(
 
   return true;
 }
-
-// Initialize the library on module load
-initializeExampleLibrary();

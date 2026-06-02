@@ -1,6 +1,5 @@
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { AIClient } from '../types';
-import { ChoiceGenerator } from '../choiceGenerator';
 import { NarrativeContext } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
@@ -9,7 +8,7 @@ const mockAIClient: jest.Mocked<AIClient> = {
   generateContent: jest.fn()
 };
 
-// Mock the ChoiceGenerator class
+// Mock the generateChoices free function
 const mockGenerateChoices = jest.fn().mockResolvedValue({
   id: 'mock-decision',
   prompt: 'What will you do next?',
@@ -20,15 +19,9 @@ const mockGenerateChoices = jest.fn().mockResolvedValue({
   ]
 });
 
-jest.mock('../choiceGenerator', () => {
-  return {
-    ChoiceGenerator: jest.fn().mockImplementation(() => {
-      return {
-        generateChoices: mockGenerateChoices
-      };
-    })
-  };
-});
+jest.mock('../choiceGenerator', () => ({
+  generateChoices: (...args: unknown[]) => mockGenerateChoices(...args)
+}));
 
 // Mock the worldStore
 jest.mock('@/state/worldStore', () => ({
@@ -91,11 +84,8 @@ describe('NarrativeGenerator - Player Choices', () => {
       expect(result.options).toHaveLength(3);
       expect(result.options[0].text).toBe('Investigate the noise');
       
-      // Verify that the ChoiceGenerator was instantiated and used correctly
-      expect(ChoiceGenerator).toHaveBeenCalledWith(mockAIClient);
-      
-      // Verify that generateChoices was called with the correct parameters
-      expect(mockGenerateChoices).toHaveBeenCalledWith({
+      // Verify that generateChoices was called with the client and correct parameters
+      expect(mockGenerateChoices).toHaveBeenCalledWith(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: mockNarrativeContext,
         characterIds: ['character-1'],

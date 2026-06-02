@@ -13,7 +13,10 @@ import {
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
-import { PersonalizationEngine } from './personalizationEngine';
+import {
+  createPersonalizedContext,
+  generateNarrativeEnhancement,
+} from './personalizationEngine';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { applyBudget } from './narrativeGenerator.budget';
 const MAX_OTHER_CHARACTER_THREADS = 3;
@@ -23,7 +26,6 @@ export const enhancePromptWithPersonalization = async (
   prompt: string,
   worldId: EntityID,
   characterIds: string[],
-  personalizationEngine: PersonalizationEngine,
   sessionId?: EntityID,
   budget?: RequestBudget
 ): Promise<string> => {
@@ -78,7 +80,7 @@ export const enhancePromptWithPersonalization = async (
       narrativeGoals as unknown as Array<Record<string, unknown>>
     );
 
-    const personalizedContext = personalizationEngine.createPersonalizedContext(
+    const personalizedContext = createPersonalizedContext(
       playerCharacter,
       world,
       relevantDecisions,
@@ -88,7 +90,7 @@ export const enhancePromptWithPersonalization = async (
     );
 
     const enhancementText =
-      personalizationEngine.generateNarrativeEnhancement(personalizedContext);
+      generateNarrativeEnhancement(personalizedContext);
     const cleanedEnhancementText = prompt.includes('CURRENT NARRATIVE GOALS:')
       ? enhancementText
           .split('\n\n')

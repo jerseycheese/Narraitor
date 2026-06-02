@@ -2,7 +2,7 @@
  * Tests for choice generator lore context integration
  */
 
-import { ChoiceGenerator } from '../choiceGenerator';
+import { generateChoices } from '../choiceGenerator';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
 import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
@@ -44,7 +44,6 @@ const mockWorld = {
 } satisfies World;
 
 describe('ChoiceGenerator lore context integration', () => {
-  let choiceGenerator: ChoiceGenerator;
   let mockAIClient: { generateContent: jest.Mock };
   let mockGetLoreContextForPrompt: jest.MockedFunction<
     typeof getLoreContextForPrompt
@@ -56,8 +55,6 @@ describe('ChoiceGenerator lore context integration', () => {
     mockAIClient = {
       generateContent: jest.fn(),
     };
-
-    choiceGenerator = new ChoiceGenerator(mockAIClient);
 
     // Setup mocks
     mockGetLoreContextForPrompt =
@@ -109,7 +106,7 @@ rules: magic_rule = Magic requires concentration
       characterIds: ['char-1'],
     };
 
-    await choiceGenerator.generateChoices(params);
+    await generateChoices(mockAIClient,params);
 
     // Verify lore context was requested for the correct world and session
     expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123', 'session-1', {
@@ -149,7 +146,7 @@ rules: magic_rule = Magic requires concentration
       characterIds: ['char-1'],
     };
 
-    const result = await choiceGenerator.generateChoices(params);
+    const result = await generateChoices(mockAIClient,params);
 
     expect(result.options).toHaveLength(3);
     expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123', 'session-1', {
@@ -193,7 +190,7 @@ rules: travel_rule = The marshlands cannot be crossed at night
       characterIds: ['char-1'],
     };
 
-    const result = await choiceGenerator.generateChoices(params);
+    const result = await generateChoices(mockAIClient,params);
 
     expect(result.options).toHaveLength(3);
     expect(result.options[0].text).toContain('Lady Elara');
@@ -229,7 +226,7 @@ rules: combat_rule = Magic users become exhausted after casting spells
       characterIds: ['char-1'],
     };
 
-    await choiceGenerator.generateChoices(params);
+    await generateChoices(mockAIClient,params);
 
     // Verify the final enhanced prompt includes both base content and lore context
     const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
