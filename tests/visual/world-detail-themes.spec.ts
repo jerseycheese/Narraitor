@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell, waitForImagesLoaded } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
 /**
@@ -27,6 +27,7 @@ async function settleTheme(
   await waitForContentStable(page);
   await hideDynamicContent(page);
   await page.evaluate(() => document.fonts.ready);
+  await waitForImagesLoaded(page);
   await pinAppShell(page);
 }
 
