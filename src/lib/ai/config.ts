@@ -12,7 +12,7 @@ import { AIConfig, GenerationConfig, SafetySetting } from './types';
 export const getAIConfig = (): AIConfig => {
   return {
     geminiApiKey: process.env.GEMINI_API_KEY || '',
-    modelName: 'gemini-2.0-flash',
+    modelName: 'gemini-2.5-flash',
     imageModelName: 'gemini-2.5-flash-image',
     maxRetries: 3,
     timeout: 30000
