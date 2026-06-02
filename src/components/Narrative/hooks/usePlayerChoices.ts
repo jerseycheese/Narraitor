@@ -132,7 +132,7 @@ export function usePlayerChoices({
         previousSegments: recentSegments,
         currentTags:
           recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
-        sessionId: sessionId || 'temp-session',
+        sessionId,
         recentSegments,
         currentLocation:
           recentSegments[recentSegments.length - 1]?.metadata?.location ||
