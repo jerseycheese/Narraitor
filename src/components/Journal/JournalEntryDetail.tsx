@@ -12,7 +12,7 @@ import {
 } from '@/lib/utils';
 import { formatSessionDuration } from '@/lib/utils/sessionUtils';
 import { Play, Square, Settings } from 'lucide-react';
-import { getSignificanceBadgeVariant } from './journalUtils';
+import { getSignificanceBadgeVariant, isSystemEntry } from './journalUtils';
 import { JournalEntryImage } from './JournalEntryImage';
 
 interface JournalEntryDetailProps {
@@ -27,9 +27,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
   showBackButton = false,
 }) => {
   // Detect system events (Issue #176)
-  const isSystemEvent =
-    entry.metadata.automaticEntry &&
-    (entry.type === 'session_start' || entry.type === 'session_end');
+  const isSystemEvent = isSystemEntry(entry);
 
   return (
     <div className="journal-entry-detail">

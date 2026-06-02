@@ -73,6 +73,7 @@ const TabsTrigger: React.FC<TabsTriggerProps> = ({
 
   return (
     <button
+      type="button"
       className={clsx('tabs-trigger', isActive && 'tabs-trigger-active', className)}
       onClick={() => context.onValueChange(value)}
       {...props}

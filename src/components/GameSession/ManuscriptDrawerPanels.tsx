@@ -194,6 +194,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
       <div className="manuscript-tools-menu-items">
         {onOpenCharacterPanel && (
           <button
+            type="button"
             className="manuscript-tools-menu-item manuscript-tools-menu-item-mobile-only"
             onClick={() => {
               onClosePanel();
@@ -206,6 +207,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
 
         {drawerButtons.map((button) => (
           <button
+            type="button"
             key={button.id}
             className={clsx(
               'manuscript-tools-menu-item',
@@ -221,6 +223,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
         ))}
 
         <button
+            type="button"
           className="manuscript-tools-menu-item manuscript-tools-menu-item-secondary"
           onClick={() => {
             onClosePanel();
@@ -236,6 +239,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
 
         {onSimulateTurn && (
           <button
+            type="button"
             className="manuscript-tools-menu-item"
             onClick={() => {
               onClosePanel();
@@ -248,6 +252,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
 
         {onToggleStreamingPreview && (
           <button
+            type="button"
             className={clsx(
               'manuscript-tools-menu-item',
               isStreamingPreview && 'manuscript-tools-menu-item-active'
@@ -261,6 +266,7 @@ export const ToolsMenuPanelContent: React.FC<ToolsMenuPanelContentProps> = ({
 
         {onToggleEndingSuggestionPreview && (
           <button
+            type="button"
             className={clsx(
               'manuscript-tools-menu-item',
               isEndingSuggestionPreview && 'manuscript-tools-menu-item-active'

@@ -4,9 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameSessionState } from '@/types/game.types';
 import { useSessionStore } from '@/state/sessionStore';
-import { useWorldStore } from '@/state/worldStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { useCharacterStore } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
@@ -24,12 +22,6 @@ interface GameSessionProps {
   onBack?: () => void;
   initialState?: Partial<GameSessionState>;
   disableAutoResume?: boolean; // For testing/dev harnesses
-  // Optional testing props
-  _stores?: {
-    worldStore: Partial<ReturnType<typeof useWorldStore.getState>> | (() => Partial<ReturnType<typeof useWorldStore.getState>>);
-    sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
-    characterStore?: Partial<ReturnType<typeof useCharacterStore.getState>> | (() => Partial<ReturnType<typeof useCharacterStore.getState>>);
-  };
 }
 
 /**
@@ -43,7 +35,6 @@ const GameSession: React.FC<GameSessionProps> = ({
   onBack,
   initialState,
   disableAutoResume = false,
-  _stores,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -78,7 +69,6 @@ const GameSession: React.FC<GameSessionProps> = ({
     initialState: testSessionState || initialState,
     disableAutoResume,
     router,
-    _stores,
   });
 
   // Override session state for test mode

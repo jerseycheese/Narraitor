@@ -106,13 +106,17 @@ export function extractImageFromResponse(
 }
 
 /**
- * High-level function to generate an image using Gemini
- * Combines API call and image extraction into one operation
+ * High-level function to generate an image using Gemini.
+ * Combines API call and image extraction into one operation and returns a
+ * base64 data URL. This is the right choice when the image is persisted by the
+ * caller (e.g. into a store / IndexedDB) rather than written to disk, since
+ * runtime file writes don't survive on serverless hosts. Used by the journal,
+ * portrait, and ending image routes. For the disk-backed variant (file URL),
+ * see generateAndSaveImageWithGemini.
  *
  * @param prompt - The text prompt for image generation
  * @param apiKey - The Gemini API key
  * @returns The generated image data, or null if generation failed
- * @deprecated Use generateAndSaveImageWithGemini instead for better performance
  */
 export async function generateImageWithGemini(
   prompt: string,

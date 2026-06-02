@@ -4,6 +4,12 @@ import React, { useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 
+// Stacking order applied when the rail + panels are pinned (position: fixed)
+// during a fullPage capture. Mirrors the workshop rail z-index scale: the
+// character/tools panels sit above the rail.
+const PINNED_PANEL_Z_INDEX = '40';
+const PINNED_RAIL_Z_INDEX = '20';
+
 interface ManuscriptSessionShellProps {
   children: React.ReactNode;
   hud?: React.ReactNode;
@@ -140,7 +146,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           characterPanel.style.top = `${panelTop}px`;
           characterPanel.style.left = `${mainStageRect.left}px`;
           characterPanel.style.width = `${railWidth}px`;
-          characterPanel.style.zIndex = '40';
+          characterPanel.style.zIndex = PINNED_PANEL_Z_INDEX;
           characterPanel.style.removeProperty('height');
         }
         if (toolsPanel) {
@@ -149,7 +155,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           toolsPanel.style.top = `${panelTop}px`;
           toolsPanel.style.left = `${mainStageRect.left}px`;
           toolsPanel.style.width = `${railWidth}px`;
-          toolsPanel.style.zIndex = '40';
+          toolsPanel.style.zIndex = PINNED_PANEL_Z_INDEX;
           toolsPanel.style.removeProperty('height');
         }
 
@@ -159,7 +165,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
         rail.style.removeProperty('bottom');
         rail.style.left = `${mainStageRect.left}px`;
         rail.style.width = `${railWidth}px`;
-        rail.style.zIndex = '20';
+        rail.style.zIndex = PINNED_RAIL_Z_INDEX;
       });
     };
 

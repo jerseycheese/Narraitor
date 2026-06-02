@@ -36,22 +36,7 @@ export const syncNpcMetadata = (
   }
 
   try {
-    const npcStore = useNPCStore.getState();
-    const { getById, createNPC, updateNPC } = npcStore as unknown as {
-      getById?: (id: string) => NPC | undefined;
-      createNPC?: (
-        npc: Omit<NPC, 'createdAt' | 'updatedAt'> & { id?: string }
-      ) => string;
-      updateNPC?: (id: string, updates: Partial<NPC>) => void;
-    };
-
-    if (
-      typeof getById !== 'function' ||
-      typeof createNPC !== 'function' ||
-      typeof updateNPC !== 'function'
-    ) {
-      return;
-    }
+    const { getById, createNPC, updateNPC } = useNPCStore.getState();
 
     characters.forEach((character) => {
       if (!character?.id || !character.name) {

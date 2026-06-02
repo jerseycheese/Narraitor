@@ -105,13 +105,15 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
             </div>
             
             <div className="manuscript-end-story-footer">
-              <button 
+              <button
+                type="button"
                 className="manuscript-end-story-cancel"
                 onClick={onCloseEndStory}
               >
                 Cancel
               </button>
-              <button 
+              <button
+                type="button"
                 className="manuscript-end-story-confirm"
                 onClick={onConfirmEndStory}
               >

@@ -13,6 +13,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
 import { CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('WorldCard');
 
 interface WorldCardProps {
   /** The world data to display */
@@ -104,16 +107,16 @@ const WorldCard: React.FC<WorldCardProps> = ({
         ? `/worlds/${world.id}/play?autoResume=true`
         : `/worlds/${world.id}/play`;
       router.push(url);
-    } catch {
-      // Handle navigation errors gracefully
+    } catch (error) {
+      logger.error('handlePlayClick', 'Failed to navigate to play world', error);
     }
   };
 
   const handleEditClick = () => {
     try {
       router.push(`/worlds/${world.id}/edit`);
-    } catch {
-      // Handle navigation errors gracefully
+    } catch (error) {
+      logger.error('handleEditClick', 'Failed to navigate to edit world', error);
     }
   };
 
