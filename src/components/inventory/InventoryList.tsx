@@ -128,7 +128,6 @@ export const InventoryList: React.FC<InventoryListProps> = ({
         <EmptyState
           title="No items in inventory"
           description="Items will appear here as they are added"
-          variant="centered"
         />
       </div>
     );
