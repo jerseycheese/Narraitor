@@ -1,6 +1,7 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
+import jest from "eslint-plugin-jest";
 import noHardcodedColors from "./eslint-rules/no-hardcoded-colors.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -43,8 +44,8 @@ const eslintConfig = [
   },
   {
     files: [
-      "**/*.test.{js,jsx,ts,tsx}",
-      "**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "**/*.test.{js,mjs,jsx,ts,tsx}",
+      "**/__tests__/**/*.{js,mjs,jsx,ts,tsx}",
       "**/__mocks__/**/*.{js,jsx,ts,tsx}",
       "**/*.stories.{js,jsx,ts,tsx}",
       "**/*.stories.helpers.{js,jsx,ts,tsx}",
@@ -59,6 +60,24 @@ const eslintConfig = [
       "design-tokens/no-hardcoded-colors": "off", // Allow hardcoded colors in tests, dev tools, design tokens, and stories
       "no-console": "off", // Dev tooling, tests, and stories legitimately use console
       "@typescript-eslint/no-explicit-any": "warn", // Allow `any` in dev tools and tests, but flag it
+    },
+  },
+  {
+    // Dead/low-value test detection. Scoped to real test files (not stories or
+    // dev tooling). warn keeps these out of the blocking CI gate as a first-pass
+    // introduction, matching the markup-hygiene rules above.
+    files: [
+      "**/*.test.{js,mjs,jsx,ts,tsx}",
+      "**/__tests__/**/*.{js,mjs,jsx,ts,tsx}",
+    ],
+    plugins: { jest },
+    rules: {
+      // A test with no expect() asserts nothing. Recognize custom assertion
+      // helpers (assertChoicesVisible, etc.) so delegating tests aren't flagged.
+      "jest/expect-expect": ["warn", { assertFunctionNames: ["expect", "assert*"] }],
+      // Indefinitely skipped / commented-out tests are dead weight.
+      "jest/no-disabled-tests": "warn",
+      "jest/no-commented-out-tests": "warn",
     },
   },
 ];
