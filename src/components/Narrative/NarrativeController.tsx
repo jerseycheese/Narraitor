@@ -12,7 +12,6 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useEndingDetection } from './useEndingDetection';
 import {
   Decision,
-  DecisionOutcome,
   DecisionWeight,
   NarrativeContext,
   NarrativeSegment,
@@ -21,14 +20,13 @@ import {
 import { truncate } from '@/lib/utils';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
 import { getNarrativeError } from '@/lib/narrative/narrativeErrors';
+import { evaluateDecisionSkillChecks } from '@/lib/narrative/evaluateDecisionSkillChecks';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
-import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
-import type { Character as UtilCharacter } from '@/types/character.types';
 import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
@@ -830,170 +828,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         }
       }
 
-      // Evaluate skill requirements if present
-      const skillCheckTags: string[] = [];
-      const rollResults: SkillCheckRoll[] = [];
-
-      if (selectedOption?.requirements && characterId) {
-        const character = characters[characterId];
-        const world = worlds[worldId];
-
-        if (character && world) {
-          // Filter for skill requirements only
-          const skillRequirements = selectedOption.requirements.filter(
-            (req) => req.type === 'skill'
-          );
-
-          for (const requirement of skillRequirements) {
-            const requiredLevel =
-              typeof requirement.value === 'number'
-                ? requirement.value
-                : parseInt(requirement.value, 10);
-
-            // ChoiceGenerator has already converted skill names to IDs
-            // targetId now contains the skill ID directly
-            const skillCheck = {
-              skillId: requirement.targetId,
-              difficulty: requiredLevel,
-            };
-
-            // Adapt store character format to evaluator's expected format
-            const adaptedCharacter: UtilCharacter = {
-              id: character.id,
-              name: character.name,
-              description: character.description,
-              worldId: character.worldId,
-              skills: character.skills.map((skill) => ({
-                skillId: skill.worldSkillId || skill.id,
-                level: skill.level,
-                experience: 0,
-                isActive: true,
-              })),
-              attributes: character.attributes.map((attr) => ({
-                attributeId: attr.worldAttributeId || attr.id,
-                value: attr.modifiedValue || attr.baseValue,
-              })),
-              derivedStats: [],
-              background: {
-                history: character.background?.history || '',
-                personality: character.background?.personality || '',
-                goals: character.background?.goals || [],
-                fears: character.background?.fears || [],
-                relationships: [],
-              },
-              inventory: {
-                characterId: character.inventory.characterId,
-                items: [],
-                capacity: character.inventory.capacity,
-                categories: [],
-                itemOrder: [],
-              },
-              status: character.status,
-              createdAt: character.createdAt,
-              updatedAt: character.updatedAt,
-            };
-
-            try {
-              const rollResult = evaluateSkillCheck(
-                adaptedCharacter,
-                skillCheck,
-                world.skills || []
-              );
-              rollResults.push(rollResult);
-
-              // Build tags based on outcome
-              if (rollResult.isCriticalSuccess) {
-                skillCheckTags.push(
-                  `skill-critical-success:${requirement.targetId}`
-                );
-              } else if (rollResult.isCriticalFailure) {
-                skillCheckTags.push(
-                  `skill-critical-failure:${requirement.targetId}`
-                );
-              } else if (rollResult.success) {
-                skillCheckTags.push(`skill-success:${requirement.targetId}`);
-              } else {
-                skillCheckTags.push(`skill-failure:${requirement.targetId}`);
-              }
-
-              skillCheckTags.push(`skill-roll:${rollResult.diceRoll}`);
-            } catch (error) {
-              logger.error('Skill check failed:', error);
-              skillCheckTags.push(`skill-error:${requirement.targetId}`);
-            }
-          }
-        }
-      }
-
-      // Pass results to parent component
-      onSkillCheckPerformed?.(rollResults);
-
-      // Show toast notifications for skill check results
-      // Use longer duration (8 seconds) so players have time to read the roll details
-      rollResults.forEach((result) => {
-        // Build detailed breakdown for description
-        const buildBreakdown = () => {
-          const parts = [`d20: ${result.diceRoll}`];
-          if (result.skillLevel > 0) parts.push(`skill: +${result.skillLevel}`);
-          if (result.attributeBonus > 0)
-            parts.push(`attribute: +${result.attributeBonus}`);
-
-          // If no bonuses, explicitly show that
-          const hasAnyBonus =
-            result.skillLevel > 0 || result.attributeBonus > 0;
-          const breakdown = hasAnyBonus
-            ? parts.join(', ')
-            : `${parts[0]} (no bonuses)`;
-
-          return `${breakdown} = ${result.total} (need ${result.dc})`;
-        };
-
-        if (result.isCriticalSuccess) {
-          toast.addToast({
-            title: `Critical Success! ${result.skillName}`,
-            description: `Natural 20! Automatic success regardless of modifiers.`,
-            variant: 'success',
-            duration: 8000,
-          });
-        } else if (result.isCriticalFailure) {
-          toast.addToast({
-            title: `Critical Failure! ${result.skillName}`,
-            description: `Natural 1! Automatic failure regardless of modifiers.`,
-            variant: 'error',
-            duration: 8000,
-          });
-        } else if (result.success) {
-          toast.addToast({
-            title: `${result.skillName} Check: Success`,
-            description: buildBreakdown(),
-            variant: 'success',
-            duration: 8000,
-          });
-        } else {
-          toast.addToast({
-            title: `${result.skillName} Check: Failed`,
-            description: buildBreakdown(),
-            variant: 'warning',
-            duration: 8000,
-          });
-        }
-      });
-
-      let decisionOutcome: DecisionOutcome | undefined;
-      if (rollResults.length > 0) {
-        const successCount = rollResults.filter((r) => r.success).length;
-        const failureCount = rollResults.length - successCount;
-        const hasCriticalSuccess = rollResults.some((r) => r.isCriticalSuccess);
-        const hasCriticalFailure = rollResults.some((r) => r.isCriticalFailure);
-
-        if (failureCount === 0) {
-          decisionOutcome = hasCriticalSuccess ? 'critical-success' : 'success';
-        } else if (successCount === 0) {
-          decisionOutcome = hasCriticalFailure ? 'critical-failure' : 'failure';
-        } else {
-          decisionOutcome = 'mixed';
-        }
-      }
+      // Evaluate skill requirements (rolls, tags, outcome, per-roll toasts, and
+      // the parent onSkillCheckPerformed notification are handled in the helper)
+      const character = characterId ? characters[characterId] : undefined;
+      const world = worlds[worldId];
+      const { skillCheckTags, rollResults, decisionOutcome } =
+        evaluateDecisionSkillChecks({
+          selectedOption,
+          character,
+          world,
+          toast,
+          onSkillCheckPerformed,
+        });
 
       // Fatal outcome check: Any failure on a critical decision ends the game
       // This makes critical decisions truly life-or-death
