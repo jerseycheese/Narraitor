@@ -43,6 +43,8 @@ export interface GenerationConfig {
   topP?: number;
   topK?: number;
   maxOutputTokens?: number;
+  /** Gemini 2.5 thinking control. thinkingBudget: 0 disables dynamic thinking. */
+  thinkingConfig?: { thinkingBudget?: number };
 }
 
 /**

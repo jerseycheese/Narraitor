@@ -28,7 +28,10 @@ export const getGenerationConfig = (): GenerationConfig => {
     temperature: 0.7,
     topP: 1.0,
     topK: 40,
-    maxOutputTokens: 2048
+    maxOutputTokens: 2048,
+    // gemini-2.5-flash does dynamic "thinking" by default, which burns latency
+    // and output-token budget on these interactive game requests. Disable it.
+    thinkingConfig: { thinkingBudget: 0 }
   };
 };
 

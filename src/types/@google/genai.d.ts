@@ -6,6 +6,7 @@ declare module '@google/genai' {
     topP?: number;
     topK?: number;
     maxOutputTokens?: number;
+    thinkingConfig?: { thinkingBudget?: number };
   }
 
   export interface SafetySetting {

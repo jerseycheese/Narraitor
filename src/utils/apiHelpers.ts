@@ -261,7 +261,10 @@ export async function processGeminiTextRequest(
           temperature: requestData.config?.temperature || temperature,
           topP: 1.0,
           topK: 40,
-          maxOutputTokens: requestData.config?.maxTokens || maxTokens
+          maxOutputTokens: requestData.config?.maxTokens || maxTokens,
+          // Disable gemini-2.5-flash dynamic thinking: it adds latency and eats
+          // into the (small) maxOutputTokens budget meant for visible prose.
+          thinkingConfig: { thinkingBudget: 0 }
         },
         safetySettings: getSafetySettingsFromPrompt(requestData.prompt)
       }
