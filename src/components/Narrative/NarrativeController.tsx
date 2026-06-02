@@ -108,7 +108,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     new Set()
   );
   const mountedRef = useRef(false);
-  const generateCount = useRef(0);
   const warnedMissingSessionIdRef = useRef(false);
 
   const warnMissingSessionId = useCallback((context: string) => {
@@ -143,7 +142,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     // Reset state when session changes
     setProcessedChoices(new Set());
     setError(null);
-    generateCount.current = 0;
 
     // Set mounted flag
     mountedRef.current = true;
@@ -235,7 +233,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         setInitialGenerationCompleted(true);
         initialGenerationInitiated.current = true;
 
-        generateCount.current += 1;
         generateInitialNarrative();
       }
       // Choice-based generation (only if we haven't processed this choice already)
@@ -248,7 +245,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           return updated;
         });
 
-        generateCount.current += 1;
         generateNextSegment(choiceId);
       }
       // Log if we're skipping generation
