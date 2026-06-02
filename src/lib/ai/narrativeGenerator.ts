@@ -243,7 +243,7 @@ export class NarrativeGenerator {
           previousSegmentContent: previousSegment?.content,
           previousSegmentType: previousSegment?.type,
           tokenUsage: result.tokenUsage,
-          modelUsed: 'gemini-2.0-flash',
+          modelUsed: 'gemini-2.5-flash',
         };
 
         result.metadata.debugInfo = buildPromptDebugInfo(debugInfoContext);
