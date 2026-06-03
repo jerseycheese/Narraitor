@@ -21,7 +21,6 @@ export enum DevToolsSection {
   PORTRAIT_DEBUG = 'portraitDebug',
   ENDING_IMAGE_DEBUG = 'endingImageDebug',
   CONSISTENCY_VALIDATION = 'consistencyValidation',
-  RELEVANCE_DEBUGGER = 'relevanceDebugger',
   LORE_MANAGEMENT = 'loreManagement',
   ERROR_SECTION = 'errorSection',
   TOKEN_BUDGET = 'tokenBudget'
@@ -43,7 +42,6 @@ export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
   [DevToolsSection.PORTRAIT_DEBUG]: true,
   [DevToolsSection.ENDING_IMAGE_DEBUG]: true,
   [DevToolsSection.CONSISTENCY_VALIDATION]: true,
-  [DevToolsSection.RELEVANCE_DEBUGGER]: true,
   [DevToolsSection.LORE_MANAGEMENT]: true,
   [DevToolsSection.ERROR_SECTION]: true,
   [DevToolsSection.TOKEN_BUDGET]: true,
