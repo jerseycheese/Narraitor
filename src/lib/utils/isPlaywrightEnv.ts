@@ -5,6 +5,10 @@
  *
  * Centralized so every call site agrees on the flag name and shape — a prior
  * copy-paste used the wrong casing (`__playwright`) and silently never matched.
+ *
+ * Note: this gates render-path behaviour (AI generation, checkpoints) on top of
+ * dev-UI suppression, so keep it tied to the explicit Playwright flag. Panel
+ * suppression that needs to catch *any* automation lives in ClientOnlyDevTools.
  */
 export const isPlaywrightEnv = (): boolean =>
   typeof window !== 'undefined' &&
