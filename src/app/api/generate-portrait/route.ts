@@ -25,11 +25,16 @@ async function buildPortraitPrompt(
       characterName
     );
 
-    // Use only the character detection part, not the full image generation
-    const { buildPortraitPrompt: buildPortraitPromptFn } = await import('@/lib/ai/portraitGenerator');
-    const { createDefaultGeminiClient } = await import(
-      '@/lib/ai/defaultGeminiClient'
-    );
+    // Use only the character detection part, not the full image generation.
+    // These two dynamic imports are independent, so load them in parallel
+    // rather than awaiting one after the other.
+    const [
+      { buildPortraitPrompt: buildPortraitPromptFn },
+      { createDefaultGeminiClient },
+    ] = await Promise.all([
+      import('@/lib/ai/portraitGenerator'),
+      import('@/lib/ai/defaultGeminiClient'),
+    ]);
 
     logger.debug('generate-portrait API', 'Creating AI client and generator');
     const aiClient = createDefaultGeminiClient();

@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
 import { getAIConfig } from '../lib/ai/config';
+import { createAPIErrorResponse } from '../lib/utils/errorUtils';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ApiHelpers');
@@ -220,9 +221,6 @@ export async function processGeminiTextRequest(
     temperature = 0.7,
     errorContext = 'Generation'
   } = options;
-
-  // Lazy import to avoid circular dependency
-  const { createAPIErrorResponse } = await import('../lib/utils/errorUtils');
 
   try {
     // Rate limiting
