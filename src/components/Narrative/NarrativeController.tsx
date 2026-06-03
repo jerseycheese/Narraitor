@@ -79,9 +79,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     []
   );
 
-  // Access character and world stores for skill evaluation
-  const characters = useCharacterStore((state) => state.characters);
-  const worlds = useWorldStore((state) => state.worlds);
   const npcIds = useNPCStore(
     useCallback((state) => state.worldNpcs[worldId] ?? EMPTY_NPC_IDS, [worldId])
   );
@@ -601,8 +598,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
       // Evaluate skill requirements (rolls, tags, outcome, per-roll toasts, and
       // the parent onSkillCheckPerformed notification are handled in the helper)
-      const character = characterId ? characters[characterId] : undefined;
-      const world = worlds[worldId];
+      // Read characters/worlds at call time via getState() rather than
+      // subscribing — they're only needed here inside this async handler, so a
+      // store subscription would re-render the controller on every character/
+      // world write for no benefit (issue #1358).
+      const character = characterId
+        ? useCharacterStore.getState().characters[characterId]
+        : undefined;
+      const world = useWorldStore.getState().worlds[worldId];
       const { skillCheckTags, rollResults, decisionOutcome } =
         evaluateDecisionSkillChecks({
           selectedOption,

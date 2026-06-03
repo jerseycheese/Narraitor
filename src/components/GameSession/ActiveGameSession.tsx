@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
@@ -122,8 +123,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   );
   const characterSkills = character?.skills ?? [];
   
-  // Get narrative store for ending functionality
-  const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
+  // Get narrative store for ending functionality. Scope to just the ending
+  // slice (via useShallow) so the game shell doesn't re-render on every
+  // narrative-store write — segments stream in continuously during play.
+  const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } =
+    useNarrativeStore(
+      useShallow((state) => ({
+        currentEnding: state.currentEnding,
+        isGeneratingEnding: state.isGeneratingEnding,
+        generateEnding: state.generateEnding,
+        isSessionEnded: state.isSessionEnded,
+      }))
+    );
 
   // Reactively track segment count using a stable snapshot to avoid infinite loops.
   // Selecting derived arrays from Zustand can cause non-cached snapshots.

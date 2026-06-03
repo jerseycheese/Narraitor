@@ -184,18 +184,43 @@ export const useActiveGameSessionEffects = ({
 
   // Keep currentDecision synchronized with store updates (supports external generators like item usage)
   useEffect(() => {
+    // Only react when this session's decisions or segments actually change,
+    // rather than on every narrative-store write (segments stream in
+    // token-by-token during play). The body is a pure function of these three
+    // references, so gating on them preserves behavior; the first store event
+    // always runs so the initial sync matches the prior behavior (issue #1358).
+    let initialized = false;
+    let prevDecisionIds: unknown;
+    let prevSegmentIds: unknown;
+    let prevLatestDecision: unknown;
+
     const unsubscribe = useNarrativeStore.subscribe((state) => {
       const decisionIds = state.sessionDecisions[sessionId];
       const ids = decisionIds || [];
       const latestId = ids[ids.length - 1];
+      const latestDecision = latestId ? (state.decisions[latestId] || null) : null;
+      const segmentIds = state.sessionSegments[sessionId];
+
+      if (
+        initialized &&
+        decisionIds === prevDecisionIds &&
+        latestDecision === prevLatestDecision &&
+        segmentIds === prevSegmentIds
+      ) {
+        return;
+      }
+      initialized = true;
+      prevDecisionIds = decisionIds;
+      prevLatestDecision = latestDecision;
+      prevSegmentIds = segmentIds;
+
       if (latestId) {
-        const latest = state.decisions[latestId] || null;
-        setCurrentDecision(latest);
+        setCurrentDecision(latestDecision);
         setIsGeneratingChoices(false);
       } else {
         setCurrentDecision(null);
         // If narrative already exists, surface a loading state while choices regenerate
-        const hasSegments = (state.sessionSegments[sessionId]?.length ?? 0) > 0;
+        const hasSegments = (segmentIds?.length ?? 0) > 0;
         if (hasSegments) {
           setIsGeneratingChoices(true);
         }

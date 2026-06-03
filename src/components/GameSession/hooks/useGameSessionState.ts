@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
@@ -76,9 +77,29 @@ export const useGameSessionState = ({
   // Local state for error handling
   const [error, setError] = useState<Error | null>(null);
   
-  const actualWorldState = useWorldStore();
-  const actualSessionState = useSessionStore();
-  const actualCharacterState = useCharacterStore();
+  // Scope each store subscription to the slice this hook actually uses, so the
+  // game session doesn't re-render on every unrelated store write during play.
+  // Session state itself is consumed via the dedicated subscription below; here
+  // we only need its (stable) action methods (issue #1358).
+  const actualWorldState = useWorldStore(
+    useShallow((state) => ({ worlds: state.worlds }))
+  );
+  const actualSessionState = useSessionStore(
+    useShallow((state) => ({
+      initializeSession: state.initializeSession,
+      selectChoice: state.selectChoice,
+      endSession: state.endSession,
+      getSavedSession: state.getSavedSession,
+      resumeSavedSession: state.resumeSavedSession,
+    }))
+  );
+  const actualCharacterState = useCharacterStore(
+    useShallow((state) => ({
+      characters: state.characters,
+      currentCharacterId: state.currentCharacterId,
+      setCurrentCharacter: state.setCurrentCharacter,
+    }))
+  );
   
   // Check if world exists - only on client-side
   const worldExists = useMemo(() => {

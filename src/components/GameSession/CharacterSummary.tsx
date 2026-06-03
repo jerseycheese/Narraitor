@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { useWorldStore } from '@/state/worldStore';
+import { useShallow } from 'zustand/react/shallow';
 import { Button } from '@/components/ui/button';
 
 interface CharacterBackground {
@@ -79,7 +80,9 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({
   variant = 'default'
 }) => {
   const [isExpanded, setIsExpanded] = useState(variant === 'drawer' ? true : initialExpanded);
-  const worldStore = useWorldStore();
+  // Scope to the worlds slice so this panel doesn't re-render on unrelated
+  // world-store writes (worldStates churns during play).
+  const worldStore = useWorldStore(useShallow((state) => ({ worlds: state.worlds })));
   const world = worldStore.worlds[character.worldId];
 
   const isDrawer = variant === 'drawer';
