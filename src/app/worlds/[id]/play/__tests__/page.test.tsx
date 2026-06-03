@@ -37,15 +37,15 @@ describe('Play Page', () => {
     expect(screen.queryByTestId('mock-game-session')).not.toBeInTheDocument();
   });
 
-  test('renders GameSession with worldId from params on client', () => {
+  test('renders GameSession with worldId from params on client', async () => {
     // Mock useState to simulate client-side rendering
     jest.spyOn(React, 'useState').mockImplementationOnce(() => [true, jest.fn()]);
-    
+
     // Act
     render(<PlayPage />);
 
-    // Assert
-    expect(screen.getByTestId('mock-game-session')).toBeInTheDocument();
+    // Assert — GameSession is loaded via next/dynamic, so await its appearance
+    expect(await screen.findByTestId('mock-game-session')).toBeInTheDocument();
     expect(screen.getByTestId('mock-game-session')).toHaveTextContent('Game Session for world-1');
   });
 
@@ -91,18 +91,18 @@ describe('Play Page', () => {
     expect(notFound).toHaveBeenCalled();
   });
   
-  test('passes the worldId correctly to GameSession component', () => {
+  test('passes the worldId correctly to GameSession component', async () => {
     // Mock useState to simulate client-side rendering
     jest.spyOn(React, 'useState').mockImplementationOnce(() => [true, jest.fn()]);
-    
+
     // Test with a specific worldId
     const testWorldId = 'test-world-123';
     (useParams as jest.Mock).mockReturnValueOnce({ id: testWorldId });
-    
+
     // Act
     render(<PlayPage />);
-    
-    // Assert
-    expect(screen.getByTestId('mock-game-session')).toHaveTextContent(`Game Session for ${testWorldId}`);
+
+    // Assert — GameSession is loaded via next/dynamic, so await its appearance
+    expect(await screen.findByTestId('mock-game-session')).toHaveTextContent(`Game Session for ${testWorldId}`);
   });
 });

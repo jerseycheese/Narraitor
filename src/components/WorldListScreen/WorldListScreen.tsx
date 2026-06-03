@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useWorldStore } from '@/state/worldStore';
 import WorldList from '@/components/WorldList/WorldList';
-import { WorldTable } from '@/components/world/WorldTable';
 import {
   WorldViewToggle,
   WorldViewMode,
@@ -19,6 +19,16 @@ import {
   ErrorType,
 } from '@/lib/utils/errorUtils';
 import { readString, writeString } from '@/lib/utils/browserStorage';
+
+// WorldTable pulls @tanstack/react-table but only renders in table view; the
+// list defaults to grid, so load it on demand (issue #1357).
+const WorldTable = dynamic(
+  () =>
+    import('@/components/world/WorldTable').then((m) => ({
+      default: m.WorldTable,
+    })),
+  { ssr: false }
+);
 
 interface WorldListScreenProps {
   /** Callback to pass the view toggle component to parent for header placement */

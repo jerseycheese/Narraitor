@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
-import GameSession from '@/components/GameSession/GameSession';
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
@@ -14,6 +14,13 @@ import { Button } from '@/components/ui/button';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('Play');
+
+// GameSession drags in the full narrative/AI chain; load it on demand and reuse
+// the page's existing loading state so first paint stays light (issue #1357).
+const GameSession = dynamic(() => import('@/components/GameSession/GameSession'), {
+  ssr: false,
+  loading: () => <LoadingPulse message="Preparing your adventure..." />,
+});
 
 type PersistApi = {
   persist?: {

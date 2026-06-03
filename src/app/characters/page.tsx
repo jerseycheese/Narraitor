@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { Plus, Sparkles, Globe } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCharacterStore, type Character } from '@/state/characterStore';
@@ -11,7 +12,6 @@ import { deleteCharacterWithCleanup } from '@/services/characterDeletionService'
 import { getTimestamp } from '@/lib/utils';
 import { readString, writeString } from '@/lib/utils/browserStorage';
 import { CharacterCard } from '@/components/CharacterCard';
-import { CharacterTable } from '@/components/character/CharacterTable';
 import {
   CharacterViewToggle,
   type CharacterViewMode,
@@ -22,7 +22,6 @@ import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
-import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
 import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
@@ -30,6 +29,24 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { GeneratedImage } from '@/types/common.types';
 import { generatePortrait } from '@/lib/api/generatePortrait';
+
+// CharacterTable pulls @tanstack/react-table but only renders in table view,
+// and the generate dialog only matters once the page is interactive. Load both
+// on demand so the grid-default list page ships less up front (issue #1357).
+const CharacterTable = dynamic(
+  () =>
+    import('@/components/character/CharacterTable').then((m) => ({
+      default: m.CharacterTable,
+    })),
+  { ssr: false }
+);
+const GenerateCharacterDialog = dynamic(
+  () =>
+    import('@/components/GenerateCharacterDialog').then((m) => ({
+      default: m.GenerateCharacterDialog,
+    })),
+  { ssr: false }
+);
 
 type CharacterPortraitUpdate = {
   portrait: GeneratedImage;

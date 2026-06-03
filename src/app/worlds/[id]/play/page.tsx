@@ -1,11 +1,24 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { notFound, useParams, useSearchParams, useRouter } from 'next/navigation';
-import GameSession from '@/components/GameSession/GameSession';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
+
+// GameSession pulls the heaviest chain in the app (ActiveGameSession ->
+// NarrativeController -> @google/genai + every drawer panel). The page already
+// shows this same placeholder before it renders, so loading it on demand keeps
+// the play route's first paint cheap without changing what the user sees.
+const GameSession = dynamic(() => import('@/components/GameSession/GameSession'), {
+  ssr: false,
+  loading: () => (
+    <div className="manuscript-play-page-loading">
+      <p>Creating your game...</p>
+    </div>
+  ),
+});
 
 /**
  * Play page component that initializes a game session with a worldId

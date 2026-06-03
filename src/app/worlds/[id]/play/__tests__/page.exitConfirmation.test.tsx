@@ -54,40 +54,42 @@ describe('PlayPage exit confirmation (#268)', () => {
     for (const key of Object.keys(segmentsBySession)) delete segmentsBySession[key];
   });
 
-  test('routes directly back when there is no narrative progress to abandon', () => {
+  // GameSession (which renders the mock back button) loads via next/dynamic,
+  // so await its appearance before interacting.
+  test('routes directly back when there is no narrative progress to abandon', async () => {
     render(<PlayPage />);
 
-    fireEvent.click(screen.getByTestId('mock-back-btn'));
+    fireEvent.click(await screen.findByTestId('mock-back-btn'));
 
     expect(pushMock).toHaveBeenCalledWith('/worlds/world-1');
     expect(screen.queryByText('Leave the Story?')).not.toBeInTheDocument();
   });
 
-  test('prompts for confirmation when there is narrative progress', () => {
+  test('prompts for confirmation when there is narrative progress', async () => {
     segmentsBySession['session-1'] = ['seg-a', 'seg-b'];
     render(<PlayPage />);
 
-    fireEvent.click(screen.getByTestId('mock-back-btn'));
+    fireEvent.click(await screen.findByTestId('mock-back-btn'));
 
     expect(pushMock).not.toHaveBeenCalled();
     expect(screen.getByText('Leave the Story?')).toBeInTheDocument();
   });
 
-  test('confirming the exit dialog navigates back to the world page', () => {
+  test('confirming the exit dialog navigates back to the world page', async () => {
     segmentsBySession['session-1'] = ['seg-a'];
     render(<PlayPage />);
 
-    fireEvent.click(screen.getByTestId('mock-back-btn'));
+    fireEvent.click(await screen.findByTestId('mock-back-btn'));
     fireEvent.click(screen.getByRole('button', { name: /leave story/i }));
 
     expect(pushMock).toHaveBeenCalledWith('/worlds/world-1');
   });
 
-  test('cancelling the exit dialog keeps the player on the page', () => {
+  test('cancelling the exit dialog keeps the player on the page', async () => {
     segmentsBySession['session-1'] = ['seg-a'];
     render(<PlayPage />);
 
-    fireEvent.click(screen.getByTestId('mock-back-btn'));
+    fireEvent.click(await screen.findByTestId('mock-back-btn'));
     fireEvent.click(screen.getByRole('button', { name: /keep playing/i }));
 
     expect(pushMock).not.toHaveBeenCalled();
