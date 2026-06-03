@@ -261,8 +261,12 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         setStepIndex(nextIndex);
       }
     } else if (type === EVENTS.TARGET_NOT_FOUND) {
-      if (!stepMapping) return;
-      
+      // Pause instead of freezing when a target is missing. Tours without a
+      // stepMapping (e.g. firstPlay) used to bail here, which left Joyride mounted
+      // on a step it can't render — a dark overlay with no tooltip and no way out.
+      // Falling through to the pause path below unmounts the overlay and degrades
+      // gracefully if an anchor is ever absent (e.g. the Tools button isn't present
+      // in DS3 or the legacy non-progressive-disclosure layout).
       const mappedWizardStep = stepMapping?.[index];
       // If mappedWizardStep is undefined, it means this tour step isn't tied to a specific wizard step
       // So we assume we are on the "correct" page and it's just a missing element (retry).

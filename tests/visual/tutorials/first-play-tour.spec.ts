@@ -3,12 +3,12 @@ import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
 import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
-// Smoke-level coverage of the in-play (firstPlay) tour. The tour defines 7 steps,
-// but only steps 0-1 target elements that are reliably present on the resting play
-// surface (narrative-display, player-choices). Steps 2-6 point at elements behind the
-// collapsed Tools menu / Character panel and conditionally-rendered Story/History
-// sections, which aren't in the DOM at this viewport without driving those controls
-// open — fragile to screenshot and out of scope for a smoke restore. See #1239.
+// Smoke-level coverage of the in-play (firstPlay) tour, which now has 4 steps:
+// 0-1 (narrative-display, player-choices) and 2-3 (session-character, session-tools)
+// anchored to the always-present Character/Tools HUD buttons. This spec snapshots
+// steps 0-1; steps 2-3 are reliably targetable now, but their frame includes the live
+// save-indicator timestamp, so adding screenshots there needs dynamic content masked
+// first (follow-up). See #1239.
 const steps = [0, 1];
 
 test('First play tour snapshots (steps 0-1)', async ({ page }) => {
