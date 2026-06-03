@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   // React strict mode for development warnings
   reactStrictMode: true,
 
+  // Tree-shake barrel imports from icon-heavy packages so a cold start only
+  // ships the icons actually used, not the full lucide-react module graph.
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
+
   // Keep large server-only packages out of the Next.js bundle so they're
   // required natively by Node.js rather than compiled by webpack.
   serverExternalPackages: ['@lenml/tokenizer-gemini', '@lenml/tokenizers'],

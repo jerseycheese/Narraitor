@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useState, useCallback, useEffect, ReactNode, useRef } from 'react';
-import Joyride, { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joyride';
+import type { Step, CallBackProps } from 'react-joyride';
 import { useSessionStore } from '@/state/sessionStore';
 import { joyrideStyles, getTourOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
@@ -10,6 +10,9 @@ import Logger from '@/lib/utils/logger';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
 import { useTourTargetRetry } from './useTourTargetRetry';
+
+// The full react-joyride module, loaded on demand (see ensureJoyrideRuntime).
+type JoyrideModule = typeof import('react-joyride');
 
 type PauseReason = 'end-of-page' | 'missing-target' | null;
 
@@ -82,6 +85,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const runRef = useRef(false);
   const isPausedRef = useRef(false);
   const missingTargetRef = useRef<{ index: number; target: string | null } | null>(null);
+  // Mirror the loaded runtime in a ref so the Joyride callback can read its
+  // STATUS/ACTIONS/EVENTS enums without re-subscribing; state drives the render.
+  const joyrideRuntimeRef = useRef<JoyrideModule | null>(null);
+  const [joyrideRuntime, setJoyrideRuntime] = useState<JoyrideModule | null>(null);
 
   useTutorialAutoScroll(run, steps, stepIndex);
 
@@ -128,6 +135,26 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     isPausedRef.current = isPaused;
   }, [isPaused]);
 
+  // react-joyride bundles its whole runtime (tour engine + @floating-ui) into a
+  // single ~67KB module. TutorialProvider sits in the root layout, so a static
+  // import would ship that runtime on every page even though most sessions never
+  // start a tour. Load it on first tour start instead, and read its
+  // STATUS/ACTIONS/EVENTS enums from the loaded module (issue #1357).
+  const ensureJoyrideRuntime = useCallback(async (): Promise<JoyrideModule | null> => {
+    if (joyrideRuntimeRef.current) {
+      return joyrideRuntimeRef.current;
+    }
+    try {
+      const runtime = await import('react-joyride');
+      joyrideRuntimeRef.current = runtime;
+      setJoyrideRuntime(runtime);
+      return runtime;
+    } catch (error) {
+      logger.error('Failed to load tour runtime', error);
+      return null;
+    }
+  }, []);
+
   const startTour = useCallback(async (tourId: TutorialPhase | string, initialStepIndex = 0) => {
     const { steps: loadedSteps, mapping } = await loadTour(tourId);
     
@@ -151,6 +178,11 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         }
       }
 
+      const runtime = await ensureJoyrideRuntime();
+      if (!runtime) {
+        return;
+      }
+
       setSteps(loadedSteps);
       setStepMapping(mapping);
       setActiveTour(tourId);
@@ -171,11 +203,11 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       }
 
       setStepIndex(nextStepIndex);
-      
+
       setRun(true);
       setIsPaused(false);
     }
-  }, [tutorialProgress.phases, currentWizardStep]);
+  }, [tutorialProgress.phases, currentWizardStep, ensureJoyrideRuntime]);
 
   const stopTour = useCallback(() => {
     setSteps([]);
@@ -196,6 +228,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   }, []);
 
   const resumeTour = useCallback(async () => {
+    const runtime = await ensureJoyrideRuntime();
+    if (!runtime) {
+      return;
+    }
     // Re-load steps to ensure they are fresh and correctly targeted
     if (activeTour) {
       const { steps: loadedSteps } = await loadTour(activeTour);
@@ -205,9 +241,12 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setIsPaused(false);
     setPauseReason(null);
     missingTargetRef.current = null;
-  }, [activeTour]);
+  }, [activeTour, ensureJoyrideRuntime]);
 
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
+    const runtime = joyrideRuntimeRef.current;
+    if (!runtime) return;
+    const { STATUS, ACTIONS, EVENTS } = runtime;
     const { status, type, index, action } = data;
 
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
@@ -404,7 +443,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }}>
       {children}
       <TutorialProgressWidget />
-      {steps.length > 0 && run && (() => {
+      {steps.length > 0 && run && joyrideRuntime && (() => {
+        const Joyride = joyrideRuntime.default;
         const tourOptions = getTourOptions(activeTour || '');
         return (
           <Joyride

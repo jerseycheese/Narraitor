@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Step } from 'react-joyride';
+import type { Step } from 'react-joyride';
 
 export function useTutorialAutoScroll(
   run: boolean,
