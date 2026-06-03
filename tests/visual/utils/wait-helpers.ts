@@ -125,7 +125,7 @@ export async function waitForImagesLoaded(page: Page, timeout: number = 5000): P
 export async function waitForImagesLoadedIn(
   page: Page,
   selector: string,
-  timeout: number = 10000
+  timeout: number = 30000
 ): Promise<void> {
   try {
     await page.evaluate((sel) => {
@@ -134,11 +134,16 @@ export async function waitForImagesLoadedIn(
         if (img.loading === 'lazy') img.loading = 'eager';
       });
     }, selector);
+    // Require naturalWidth > 0, not just `complete`: a next/image banner served
+    // through on-demand optimization can be slow to first-paint on CI, and
+    // `complete` flips true for the empty box before the pixels arrive.
     await page.waitForFunction(
       (sel) => {
         const root = document.querySelector(sel);
         if (!root) return false;
-        return Array.from(root.querySelectorAll('img')).every((img) => img.complete);
+        return Array.from(root.querySelectorAll('img')).every(
+          (img) => img.complete && img.naturalWidth > 0
+        );
       },
       selector,
       { timeout }
