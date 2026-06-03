@@ -194,7 +194,9 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     mutationObserver.observe(container, { childList: true, subtree: true });
 
     window.addEventListener('resize', syncPosition);
-    window.addEventListener('scroll', syncPosition);
+    // Passive: syncPosition never calls preventDefault, so let the browser
+    // scroll without waiting on this handler (issue #1358).
+    window.addEventListener('scroll', syncPosition, { passive: true });
 
     return () => {
       if (frameId !== null) {

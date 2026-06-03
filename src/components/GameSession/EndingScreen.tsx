@@ -10,6 +10,7 @@ import React, {
   useMemo,
 } from 'react';
 import { useRouter } from 'next/navigation';
+import { useShallow } from 'zustand/react/shallow';
 import { Play } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -48,8 +49,14 @@ export function EndingScreen() {
     updateCurrentEnding,
   } = useNarrativeStore();
 
-  const { characters } = useCharacterStore();
-  const { worlds } = useWorldStore();
+  // Scope to the entity maps (via useShallow) so the ending screen doesn't
+  // re-render on unrelated character/world-store writes.
+  const { characters } = useCharacterStore(
+    useShallow((state) => ({ characters: state.characters }))
+  );
+  const { worlds } = useWorldStore(
+    useShallow((state) => ({ worlds: state.worlds }))
+  );
 
   // Get story checkpoints for this session (must be called before early returns)
   const worldState = useWorldStore((state) =>

@@ -257,7 +257,9 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
       const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
       if (viewport) {
         scrollViewportRef.current = viewport;
-        viewport.addEventListener('scroll', handleScroll);
+        // Passive: handleScroll only reads scroll position (no preventDefault),
+        // so mark it passive to avoid blocking scroll (issue #1358).
+        viewport.addEventListener('scroll', handleScroll, { passive: true });
 
         // ResizeObserver: anchor scroll to bottom during content growth
         const contentEl = scrollContentRef.current;

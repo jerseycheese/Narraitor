@@ -1,6 +1,7 @@
 import React from 'react';
 import { Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useShallow } from 'zustand/react/shallow';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 interface CharacterSnapshotProps {
@@ -8,7 +9,9 @@ interface CharacterSnapshotProps {
 }
 
 export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character }) => {
-  const worldStore = useWorldStore();
+  // Scope to the worlds slice so this panel doesn't re-render on unrelated
+  // world-store writes (worldStates churns during play).
+  const worldStore = useWorldStore(useShallow((state) => ({ worlds: state.worlds })));
   const world = worldStore.worlds[character.worldId];
   const normalizedSkills = React.useMemo(() => {
     if (!world) return [];
