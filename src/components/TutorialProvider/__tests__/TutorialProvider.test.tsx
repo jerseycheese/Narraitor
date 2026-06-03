@@ -31,6 +31,7 @@ jest.mock('react-joyride', () => {
         <button onClick={() => callback({ status: STATUS.FINISHED })}>Complete Tour</button>
         <button onClick={() => callback({ status: STATUS.SKIPPED })}>Skip Tour</button>
         <button onClick={() => callback({ type: EVENTS.TARGET_NOT_FOUND })}>Target Missing</button>
+        <button onClick={() => callback({ type: EVENTS.TARGET_NOT_FOUND, index: steps.length - 1 })}>Target Missing Last</button>
       </div>
     );
   };
@@ -71,6 +72,7 @@ const TestComponent = () => {
       <div data-testid="step-index">{stepIndex}</div>
       <button onClick={() => startTour('worldCreation')}>Start World Tour</button>
       <button onClick={() => startTour('characterCreationWizard')}>Start Character Wizard Tour</button>
+      <button onClick={() => startTour('firstPlay')}>Start First Play Tour</button>
       <button onClick={stopTour}>Stop Tour</button>
       <button onClick={() => setCurrentWizardStep(1)}>Wizard Step 1</button>
     </div>
@@ -220,5 +222,31 @@ describe('TutorialProvider', () => {
 
     expect(screen.getByTestId('joyride-mock')).toBeInTheDocument();
     expect(screen.getByTestId('step-index')).toHaveTextContent('2');
+  });
+
+  it('completes a mapping-less tour when its final target is missing instead of hanging', async () => {
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Start First Play Tour').click();
+    });
+    await screen.findByTestId('joyride-mock');
+    expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
+
+    // firstPlay has no stepMapping; a missing final anchor (e.g. the Tools button in
+    // DS3 / progressive-disclosure-off) must end the tour and mark the phase complete,
+    // not leave it paused with isTourActive stuck true.
+    await act(async () => {
+      screen.getByText('Target Missing Last').click();
+    });
+
+    expect(screen.getByTestId('tour-status')).toHaveTextContent('Inactive');
+    expect(
+      useSessionStore.getState().tutorialProgress.phases.firstPlay.completed
+    ).toBe(true);
   });
 });

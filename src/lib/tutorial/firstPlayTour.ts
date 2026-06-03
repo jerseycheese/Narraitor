@@ -1,5 +1,11 @@
 import { Step } from 'react-joyride';
 
+// Targets the manuscript play surface (progressive disclosure, default ON):
+// narrative + choices are always rendered, and the character sheet / inventory /
+// story recap / choice history / journal now live behind the always-present
+// "Character" and "Tools" HUD buttons. Steps 2-3 point at those entry points
+// rather than the individual controls (which only mount once a panel/drawer is
+// open), so the tour never anchors to an element that isn't on screen yet.
 export const firstPlayTour: Step[] = [
   {
     target: '[data-tutorial="narrative-display"]',
@@ -14,33 +20,13 @@ export const firstPlayTour: Step[] = [
     data: { autoScroll: 'down' },
   },
   {
-    target: '[data-tutorial="character-sheet-toggle"]',
-    content: 'Check your character sheet anytime to see your stats, health, and current status.',
+    target: '[data-tutorial="session-character"]',
+    content: 'Open the Character panel anytime to check your stats, health, and current status.',
     placement: 'bottom',
-    data: { autoScroll: 'down' },
   },
   {
-    target: '[data-tutorial="inventory-toggle"]',
-    content: 'Manage your inventory here. You can equip items or use consumables during your adventure.',
+    target: '[data-tutorial="session-tools"]',
+    content: 'Your inventory, the Story So Far recap, your choice history, and your journal all live in here.',
     placement: 'bottom',
-    data: { autoScroll: 'down' },
-  },
-  {
-    target: '[data-tutorial="story-summary-section"]',
-    content: 'Catch up on major plot points here. The "Story So Far" updates automatically as your adventure progresses.',
-    placement: 'top',
-    data: { autoScroll: 'down' },
-  },
-  {
-    target: '[data-tutorial="choice-history-section"]',
-    content: 'Review your past decisions and their consequences. It helps to remember what path you took!',
-    placement: 'top',
-    data: { autoScroll: 'down' },
-  },
-  {
-    target: '[data-tutorial="journal-toggle"]',
-    content: 'Your journal keeps track of your quests, important notes, and the history of your adventure.',
-    placement: 'top',
-    data: { autoScroll: 'down' },
   },
 ];

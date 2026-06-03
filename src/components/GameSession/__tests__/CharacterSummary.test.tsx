@@ -67,13 +67,6 @@ describe('CharacterSummary', () => {
       expect(screen.getByText('Raised in a noble family, trained in the art of combat since childhood')).toBeInTheDocument();
     });
 
-    it('marks the details toggle as a tutorial anchor', () => {
-      render(<CharacterSummary character={mockCharacter} />);
-
-      const toggleButton = screen.getByRole('button', { name: /show details/i });
-      expect(toggleButton).toHaveAttribute('data-tutorial', 'character-sheet-toggle');
-    });
-
     it('displays character level', () => {
       render(<CharacterSummary character={mockCharacter} />);
       

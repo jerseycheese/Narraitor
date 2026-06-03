@@ -47,7 +47,6 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
   return (
     <section
       data-testid="story-summary-section"
-      data-tutorial="story-summary-section"
       className="manuscript-story-summary"
     >
       {summaryParagraphs.length > 0 ? (

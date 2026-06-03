@@ -261,8 +261,28 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         setStepIndex(nextIndex);
       }
     } else if (type === EVENTS.TARGET_NOT_FOUND) {
-      if (!stepMapping) return;
-      
+      // Tours without a stepMapping (e.g. firstPlay) have no wizard that will mount
+      // the target later, so a missing anchor won't reappear. Skip past the
+      // unrenderable step instead of freezing on it — the old early-return left
+      // Joyride mounted on a step it couldn't draw (a dark overlay with no tooltip
+      // and no way out). Reaching the end completes the phase so onboarding doesn't
+      // re-arm every session and isTourActive resolves. The default DS1 +
+      // progressive-disclosure layout has every anchor present and never hits this;
+      // it's the safety net for DS3 and the legacy flat layout, where the Tools
+      // anchor isn't rendered.
+      if (!stepMapping) {
+        const nextIndex = index + 1;
+        if (Number.isInteger(nextIndex) && nextIndex < steps.length) {
+          setStepIndex(nextIndex);
+        } else {
+          if (activeTour && activeTour in tutorialProgress.phases) {
+            completeTutorialPhase(activeTour as TutorialPhase);
+          }
+          stopTour();
+        }
+        return;
+      }
+
       const mappedWizardStep = stepMapping?.[index];
       // If mappedWizardStep is undefined, it means this tour step isn't tied to a specific wizard step
       // So we assume we are on the "correct" page and it's just a missing element (retry).
@@ -288,7 +308,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         }
       }, 100);
     }
-  }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour, stepMapping, currentWizardStep, steps, tutorialProgress.phases]);
+  }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour, stopTour, stepMapping, currentWizardStep, steps, tutorialProgress.phases]);
   
   const lastWizardStepRef = useRef<number | null>(null);
 

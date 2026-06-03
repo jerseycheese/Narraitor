@@ -38,7 +38,6 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
         <div
           className="manuscript-support-inventory"
           data-testid="inventory-collapsible"
-          data-tutorial="inventory-toggle"
         >
           <CollapsibleSection title="Inventory" initialCollapsed>
             <InventoryList characterId={characterId} />
@@ -71,7 +70,6 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
             onClick={onOpenJournal}
             variant="outline"
             className="manuscript-journal-button"
-            data-tutorial="journal-toggle"
           >
             <span className="manuscript-journal-button-label">
               Open Journal
