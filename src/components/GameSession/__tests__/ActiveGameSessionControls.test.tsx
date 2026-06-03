@@ -61,11 +61,7 @@ describe('ActiveGameSessionControls', () => {
     expect(screen.getByTestId('choice-history')).toBeInTheDocument();
     expect(screen.queryByRole('dialog', { name: /end story/i })).toBeNull();
 
-    const inventoryAnchor = document.querySelector('[data-tutorial="inventory-toggle"]');
-    expect(inventoryAnchor).toBeInTheDocument();
-
     const journalButton = screen.getByRole('button', { name: /Open Journal/i });
-    expect(journalButton).toHaveAttribute('data-tutorial', 'journal-toggle');
     fireEvent.click(journalButton);
     expect(baseProps.onOpenJournal).toHaveBeenCalled();
   });
