@@ -86,6 +86,14 @@ export const useGameSessionState = ({
   );
   const actualSessionState = useSessionStore(
     useShallow((state) => ({
+      // savedSessions is part of the slice (not just the actions) because the
+      // savedSession memo below derives from getSavedSession(savedSessions). If
+      // IndexedDB hydration populates saved sessions after the world/character
+      // ids are already stable, the resume prompt still needs to refresh — so we
+      // subscribe to it. It changes far less often than the streaming session
+      // fields (status/playerChoices/currentSceneId), which is where the
+      // mid-stream re-render churn we're avoiding actually comes from.
+      savedSessions: state.savedSessions,
       initializeSession: state.initializeSession,
       selectChoice: state.selectChoice,
       endSession: state.endSession,
