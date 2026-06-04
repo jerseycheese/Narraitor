@@ -5,6 +5,7 @@ import { useDevTools } from '../DevToolsContext';
 import { DevToolsSection } from '@/lib/devtools/sectionVisibilityStorage';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
+import './SectionVisibilityControls.css';
 
 /**
  * Section information for display
@@ -16,7 +17,6 @@ const SECTION_INFO = {
   [DevToolsSection.PORTRAIT_DEBUG]: 'Portrait Debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'Ending Image Debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'Consistency Validation',
-  [DevToolsSection.RELEVANCE_DEBUGGER]: 'Relevance Debugger',
   [DevToolsSection.LORE_MANAGEMENT]: 'Lore Management',
 } as const;
 
@@ -30,7 +30,6 @@ const SECTION_TEST_IDS = {
   [DevToolsSection.PORTRAIT_DEBUG]: 'toggle-portrait-debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'toggle-ending-image-debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'toggle-consistency-validation',
-  [DevToolsSection.RELEVANCE_DEBUGGER]: 'toggle-relevance-debugger',
   [DevToolsSection.LORE_MANAGEMENT]: 'toggle-lore-management',
 } as const;
 
@@ -83,7 +82,7 @@ export const SectionVisibilityControls = () => {
   };
 
   return (
-    <div data-testid="section-visibility-controls">
+    <div className="section-visibility-controls" data-testid="section-visibility-controls">
       <Button
         onClick={toggleDropdown}
         variant="ghost"
@@ -97,39 +96,38 @@ export const SectionVisibilityControls = () => {
       </Button>
 
       {isDropdownOpen && (
-        <div data-testid="visibility-dropdown" role="menu">
-          {/* Header with bulk actions */}
-          <div>
-            <div>
-              <Button
-                onClick={handleShowAll}
-                variant="ghost"
-                size="sm"
-                data-testid="show-all-sections"
-                role="menuitem"
-              >
-                Show All
-              </Button>
-              <Button
-                onClick={handleHideAll}
-                variant="ghost"
-                size="sm"
-                data-testid="hide-all-sections"
-                role="menuitem"
-              >
-                Hide All
-              </Button>
-            </div>
+        <div className="section-visibility-menu" data-testid="visibility-dropdown" role="menu">
+          {/* Bulk actions */}
+          <div className="section-visibility-menu-actions">
+            <Button
+              onClick={handleShowAll}
+              variant="ghost"
+              size="sm"
+              data-testid="show-all-sections"
+              role="menuitem"
+            >
+              Show All
+            </Button>
+            <Button
+              onClick={handleHideAll}
+              variant="ghost"
+              size="sm"
+              data-testid="hide-all-sections"
+              role="menuitem"
+            >
+              Hide All
+            </Button>
           </div>
 
           {/* Individual section toggles */}
-          <div>
+          <div className="section-visibility-menu-list">
             {Object.entries(SECTION_INFO).map(([sectionId, displayName]) => {
               const isVisible = isSectionVisible?.(sectionId) ?? true;
 
               return (
                 <Button
                   key={sectionId}
+                  className="section-visibility-item"
                   onClick={() => handleSectionToggle(sectionId)}
                   variant="ghost"
                   size="sm"
@@ -140,7 +138,7 @@ export const SectionVisibilityControls = () => {
                   aria-checked={isVisible}
                   aria-label={`Toggle ${displayName} visibility`}
                 >
-                  <span>
+                  <span className="section-visibility-item-check">
                     {isVisible && (
                       <span aria-hidden="true">
                         <Check aria-hidden="true" />
@@ -154,7 +152,7 @@ export const SectionVisibilityControls = () => {
           </div>
 
           {/* Footer */}
-          <div>
+          <div className="section-visibility-menu-footer">
             <Button
               onClick={() => setIsDropdownOpen(false)}
               variant="ghost"
@@ -170,6 +168,7 @@ export const SectionVisibilityControls = () => {
       {/* Click outside to close */}
       {isDropdownOpen && (
         <div
+          className="section-visibility-backdrop"
           onClick={() => setIsDropdownOpen(false)}
           data-testid="dropdown-backdrop"
         />

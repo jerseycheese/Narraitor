@@ -111,6 +111,49 @@ export async function waitForImagesLoaded(page: Page, timeout: number = 5000): P
 }
 
 /**
+ * Wait until the images inside a container have finished loading.
+ *
+ * Scoped to a selector so an offscreen lazy image elsewhere on the page can't
+ * poison the wait (a global document.images check stays false forever and times
+ * out). Lazy (IntersectionObserver) images inside the container are forced to
+ * `eager` first, so a full-element screenshot doesn't capture them mid-load —
+ * those images otherwise only fetch when scrolled into view, after this wait.
+ *
+ * Use for locator screenshots of image-bearing surfaces (e.g. the worlds-list
+ * banners), where the global waitForImagesLoaded is unreliable on CI.
+ */
+export async function waitForImagesLoadedIn(
+  page: Page,
+  selector: string,
+  timeout: number = 30000
+): Promise<void> {
+  try {
+    await page.evaluate((sel) => {
+      const root = document.querySelector(sel);
+      root?.querySelectorAll('img').forEach((img) => {
+        if (img.loading === 'lazy') img.loading = 'eager';
+      });
+    }, selector);
+    // Require naturalWidth > 0, not just `complete`: a next/image banner served
+    // through on-demand optimization can be slow to first-paint on CI, and
+    // `complete` flips true for the empty box before the pixels arrive.
+    await page.waitForFunction(
+      (sel) => {
+        const root = document.querySelector(sel);
+        if (!root) return false;
+        return Array.from(root.querySelectorAll('img')).every(
+          (img) => img.complete && img.naturalWidth > 0
+        );
+      },
+      selector,
+      { timeout }
+    );
+  } catch (error) {
+    console.log(`Scoped image wait failed for ${selector}: ${(error as Error).message}`);
+  }
+}
+
+/**
  * Wait for the document height to remain stable for a short period.
  */
 export async function waitForStableScrollHeight(
