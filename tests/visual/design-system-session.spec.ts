@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable } from './utils/wait-helpers';
+import { readSessionStageLayout } from './utils/manuscript-helpers';
 
 /**
  * Design-system session showcase visual regression (issue #1276).
@@ -47,6 +48,24 @@ test.describe('Design system session showcase', () => {
       await page.addStyleTag({ content: '.ds-toggle { display: none; }' });
       // Let the DS1 rail/panel geometry sync settle before capture.
       await page.waitForTimeout(1200);
+
+      // #1325: assert the composed stage lays out as intended on the CANON
+      // surface too, so showcase drift trips an invariant — not only the pixel
+      // baseline below (a baseline bakes in a pre-existing bug; an invariant
+      // catches it). Same contract the production play route asserts.
+      const geo = await readSessionStageLayout(page);
+      expect(geo, 'expected composed session-stage nodes in the showcase').not.toBeNull();
+      if (geo) {
+        if (id === 'ds1') {
+          // DS1: three-column stage, scene status as a rail left of the column.
+          expect(geo.trackCount).toBe(3);
+          expect(geo.railLeft).toBeLessThan(geo.mainLeft);
+        } else {
+          // DS2/DS3: single-column stage, scene status stacked above the column.
+          expect(geo.trackCount).toBe(1);
+          expect(geo.railTop).toBeLessThan(geo.mainTop);
+        }
+      }
 
       await expect(shell).toHaveScreenshot(`ds-session-${id}.png`);
     });

@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 import { hideDynamicContent, waitForContentStable } from './utils/wait-helpers';
+import { readSessionStageLayout } from './utils/manuscript-helpers';
 
 /**
  * Game-session theme differentiation (#1225 + #986).
@@ -48,25 +49,6 @@ const setupSession = async (page: Page, theme: ThemeId): Promise<void> => {
   await page.evaluate(() => document.fonts.ready);
 };
 
-const sceneStatusGeometry = (page: Page) =>
-  page.evaluate(() => {
-    const rail = document.querySelector('.manuscript-characters-rail');
-    const main = document.querySelector('.manuscript-main-content');
-    const shell = document.querySelector('.manuscript-viewport-shell');
-    if (!rail || !main || !shell) return null;
-    const r = rail.getBoundingClientRect();
-    const m = main.getBoundingClientRect();
-    return {
-      railLeft: Math.round(r.left),
-      railRight: Math.round(r.right),
-      railTop: Math.round(r.top),
-      railBottom: Math.round(r.bottom),
-      mainLeft: Math.round(m.left),
-      mainTop: Math.round(m.top),
-      shellBg: window.getComputedStyle(shell).backgroundImage,
-    };
-  });
-
 test.describe('Game session theme differentiation', () => {
   for (const theme of THEMES) {
     test(`${theme} desktop: scene status renders and is themed`, async ({ page }) => {
@@ -79,13 +61,25 @@ test.describe('Game session theme differentiation', () => {
       await expect(sceneStatus.getByText('Characters Present')).toBeVisible();
       await expect(sceneStatus.getByText('Location')).toBeVisible();
 
-      const geo = await sceneStatusGeometry(page);
+      const geo = await readSessionStageLayout(page);
       expect(geo).not.toBeNull();
       if (!geo) throw new Error('expected session layout nodes');
 
+      // #1325: layout-invariant assertions for the composed session stage, per
+      // theme. These catch intended-layout drift (like the DS2/DS3 grid split
+      // fixed in PR #1324) regardless of any screenshot baseline — a baseline
+      // bakes in whatever production renders first, so it can't flag a
+      // pre-existing structural bug; an invariant can.
       if (theme === 'ds1') {
-        // DS1: scene status sits as a side rail to the left of the reading column.
+        // DS1: three-column stage with scene status as a rail LEFT of the column.
+        expect(geo.trackCount).toBe(3);
         expect(geo.railLeft).toBeLessThan(geo.mainLeft);
+      } else {
+        // DS2/DS3: single-column stage with scene status STACKED ABOVE the
+        // narrative. The #1324 regression left the narrative in grid-column 2,
+        // splitting the stage into a too-wide rail + cramped column instead.
+        expect(geo.trackCount).toBe(1);
+        expect(geo.railTop).toBeLessThan(geo.mainTop);
       }
 
       // DS3 alone paints the mechanical dot grid on the shell.
@@ -107,7 +101,7 @@ test.describe('Game session theme differentiation', () => {
       await expect(sceneStatus.getByText('Characters Present')).toBeVisible();
 
       // On mobile every theme stacks scene status above the narrative.
-      const geo = await sceneStatusGeometry(page);
+      const geo = await readSessionStageLayout(page);
       expect(geo).not.toBeNull();
       if (!geo) throw new Error('expected session layout nodes');
       expect(geo.railTop).toBeLessThanOrEqual(geo.mainTop + 4);
