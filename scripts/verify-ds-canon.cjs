@@ -13,6 +13,9 @@
 //   2. Full coverage — every production primitive (src/components/ui/*) must be
 //      represented in the living style guide. If the app uses a primitive the guide
 //      doesn't render, the app has become the canon source. (#1317)
+//   3. Storybook coverage — every production primitive must also appear in a story
+//      under `src/stories/**`, so Storybook stays a real canon surface and doesn't
+//      silently drift from the guide and the app. (#1325)
 //
 // Existing violations are grandfathered in `.ds-canon-baseline.json` (mirrors the
 // .skott-baseline.json pattern). The guard fails only on NEW violations, so it
@@ -26,6 +29,7 @@ const glob = require('glob');
 const ROOT = process.cwd();
 const GUIDE_GLOB = 'src/app/dev/design-system*/**/*.{ts,tsx}';
 const PRIMITIVES_GLOB = 'src/components/ui/*.tsx';
+const STORIES_GLOB = 'src/stories/**/*.stories.tsx';
 const BASELINE_PATH = path.join(ROOT, '.ds-canon-baseline.json');
 
 // Component-specific styling props — present only on DS primitives, never on raw HTML.
@@ -59,6 +63,7 @@ const baselineSkinCounts = {};
 for (const k of baseline.skinning || []) baselineSkinCounts[k] = (baselineSkinCounts[k] || 0) + 1;
 const baselineCoverage = new Set(baseline.coverageGaps || []);
 const coverageExceptions = baseline.coverageExceptions || {};
+const baselineStorybook = new Set(baseline.storybookGaps || []);
 
 const guideFiles = glob.sync(GUIDE_GLOB, { cwd: ROOT, absolute: true, nodir: true });
 
@@ -112,6 +117,29 @@ for (const name of primitives) {
   coverageViolations.push(name);
 }
 
+// --- Check 3: Storybook coverage --------------------------------------------
+// Storybook is a real canon surface for the primitives (#1325). Every
+// src/components/ui/* primitive must appear in a story under src/stories/**, or
+// Storybook silently drifts from the guide + the app. Mirrors Check 2: scan
+// story files for `@/components/ui/<name>` imports.
+const storyFiles = glob.sync(STORIES_GLOB, { cwd: ROOT, absolute: true, nodir: true });
+const storyImports = new Set();
+for (const file of storyFiles) {
+  let content;
+  try { content = fs.readFileSync(file, 'utf8'); } catch { continue; }
+  importRe.lastIndex = 0;
+  let m;
+  while ((m = importRe.exec(content)) !== null) storyImports.add(m[1]);
+}
+
+const storybookViolations = [];
+for (const name of primitives) {
+  if (storyImports.has(name)) continue;            // has a story
+  if (coverageExceptions[name]) continue;          // documented non-visual exception
+  if (baselineStorybook.has(name)) continue;       // grandfathered gap (tracked)
+  storybookViolations.push(name);
+}
+
 // --- Report ------------------------------------------------------------------
 let failed = false;
 
@@ -131,12 +159,21 @@ if (coverageViolations.length > 0) {
   console.error('\nIf it is a non-visual behavior/utility wrapper, add it to "coverageExceptions" in .ds-canon-baseline.json with a reason.');
 }
 
+if (storybookViolations.length > 0) {
+  failed = true;
+  console.error('Canon violation — production primitive(s) without a Storybook story:');
+  console.error('Every src/components/ui/* primitive must appear in a story under src/stories/**, or Storybook drifts from canon.\n');
+  for (const name of storybookViolations) console.error(` - ${name} (src/components/ui/${name}.tsx) — add a story under src/stories/**`);
+  console.error('\nIf it is a non-visual behavior/utility wrapper, add it to "coverageExceptions" in .ds-canon-baseline.json with a reason.');
+}
+
 if (failed) {
-  console.error('\nSee #1276 (canon flows downstream), #1316, #1317.');
+  console.error('\nSee #1276 (canon flows downstream), #1316, #1317, #1325.');
   process.exit(1);
 }
 
 const skinN = (baseline.skinning || []).length;
 const gapN = baselineCoverage.size;
+const sbN = baselineStorybook.size;
 const excN = Object.keys(coverageExceptions).length;
-console.log(`DS canon OK — ${primitives.length} primitives checked (${gapN} grandfathered coverage gap(s), ${excN} exception(s)); ${skinN} grandfathered skin(s) within baseline.`);
+console.log(`DS canon OK — ${primitives.length} primitives checked (${gapN} grandfathered guide gap(s), ${sbN} grandfathered storybook gap(s), ${excN} exception(s)); ${skinN} grandfathered skin(s) within baseline.`);
