@@ -29,7 +29,13 @@ const glob = require('glob');
 const ROOT = process.cwd();
 const GUIDE_GLOB = 'src/app/dev/design-system*/**/*.{ts,tsx}';
 const PRIMITIVES_GLOB = 'src/components/ui/*.tsx';
-const STORIES_GLOB = 'src/stories/**/*.stories.tsx';
+// Match Storybook's configured story patterns (.storybook/main.cjs) so a
+// primitive covered by a .stories.{js,jsx,ts} or .mdx story isn't falsely
+// flagged as missing.
+const STORIES_GLOBS = [
+  'src/stories/**/*.stories.{js,jsx,ts,tsx}',
+  'src/stories/**/*.mdx',
+];
 const BASELINE_PATH = path.join(ROOT, '.ds-canon-baseline.json');
 
 // Component-specific styling props — present only on DS primitives, never on raw HTML.
@@ -122,7 +128,9 @@ for (const name of primitives) {
 // src/components/ui/* primitive must appear in a story under src/stories/**, or
 // Storybook silently drifts from the guide + the app. Mirrors Check 2: scan
 // story files for `@/components/ui/<name>` imports.
-const storyFiles = glob.sync(STORIES_GLOB, { cwd: ROOT, absolute: true, nodir: true });
+const storyFiles = STORIES_GLOBS.flatMap((g) =>
+  glob.sync(g, { cwd: ROOT, absolute: true, nodir: true }),
+);
 const storyImports = new Set();
 for (const file of storyFiles) {
   let content;
