@@ -6,6 +6,7 @@ import { notFound, useParams, useSearchParams, useRouter } from 'next/navigation
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
+import { ProviderGate } from '@/components/ai/ProviderGate';
 
 // GameSession pulls the heaviest chain in the app (ActiveGameSession ->
 // NarrativeController -> @google/genai + every drawer panel). The page already
@@ -96,6 +97,8 @@ export default function PlayPage() {
 
   return (
     <div className="manuscript-play-page">
+      <ProviderGate />
+
       <GameSession
         worldId={worldId}
         disableAutoResume={disableAutoResume}
