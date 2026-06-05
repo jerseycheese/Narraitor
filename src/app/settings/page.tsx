@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { ExportImportControls } from '@/components/shared/ExportImportControls';
 import {
@@ -29,8 +30,30 @@ export default function SettingsPage() {
       title="Settings"
       description="Manage your application settings and backup your game data. Export creates a downloadable backup file, and import restores your data from a previously exported file."
     >
-      {/* Data Management Section */}
+      {/* Settings Sections */}
       <div className="settings-page">
+        <section className="settings-section">
+          <h2>Providers</h2>
+          <Card className="settings-card">
+            <CardHeader>
+              <CardTitle>Generation provider</CardTitle>
+              <CardDescription>
+                Connect the provider key used to generate your stories. It stays
+                in this browser, encrypted, and never leaves your device except to
+                your chosen provider.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link
+                href="/settings/providers"
+                className="button button-default button-size-default"
+              >
+                Manage providers
+              </Link>
+            </CardContent>
+          </Card>
+        </section>
+
         <section className="settings-section">
           <h2>Data Management</h2>
           <Card className="settings-card">

@@ -10,7 +10,7 @@ import {
   encryptSecret,
   type EncryptedPayload,
 } from '@/lib/storage/encryption';
-import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
+import { validateProviderKey } from '@/lib/ai/validateProviderClient';
 import type {
   ProviderConfig,
   ProviderValidationRecord,
@@ -165,21 +165,13 @@ export const useProviderStore = create<ProviderStore>()(
           : null;
 
         try {
-          const response = await fetch('/api/ai/validate-provider', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(key ? { [PROVIDER_API_KEY_HEADER]: key } : {}),
-            },
-            body: JSON.stringify({
-              type: config.type,
-              endpoint: config.endpoint,
-              model: config.model,
-              checkImage: config.capabilities.images,
-            }),
+          const data = await validateProviderKey({
+            apiKey: key,
+            type: config.type,
+            endpoint: config.endpoint,
+            model: config.model,
+            checkImage: config.capabilities.images,
           });
-
-          const data = await response.json();
           const valid = Boolean(data.valid);
 
           set((state) => ({
