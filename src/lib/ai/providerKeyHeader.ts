@@ -1,0 +1,7 @@
+/**
+ * Header carrying a player's bring-your-own API key from the browser to our own
+ * API routes. The key is sent per request, used server-side for that one call,
+ * and never logged or persisted. Shared by the client (request side) and the
+ * server (resolution side) so the name can't drift.
+ */
+export const PROVIDER_API_KEY_HEADER = 'x-provider-api-key';
