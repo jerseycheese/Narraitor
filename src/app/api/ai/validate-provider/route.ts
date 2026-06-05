@@ -76,11 +76,47 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (response.status === 401 || response.status === 403) return fail('INVALID_KEY');
-    if (response.status === 404) return fail('INVALID_MODEL');
-    if (response.status === 429) return fail('RATE_LIMITED');
-    return fail('VALIDATION_FAILED');
+    return fail(classifyUpstreamError(response.status, await readUpstreamError(response)));
   } catch {
     return fail('NETWORK');
   }
+}
+
+interface UpstreamError {
+  status?: string;
+  message: string;
+}
+
+/** Pull Google's { error: { status, message } } without ever logging it. */
+async function readUpstreamError(response: Response): Promise<UpstreamError> {
+  try {
+    const body = (await response.json()) as { error?: { status?: string; message?: string } };
+    return { status: body.error?.status, message: (body.error?.message ?? '').toLowerCase() };
+  } catch {
+    return { message: '' };
+  }
+}
+
+/**
+ * Map Google's response to a stable error code. A bad key comes back as HTTP 400
+ * INVALID_ARGUMENT ("API key not valid"), not 401 — so we lean on the error body,
+ * not just the status.
+ */
+function classifyUpstreamError(httpStatus: number, upstream: UpstreamError): ValidationError {
+  const { status, message } = upstream;
+
+  if (httpStatus === 429 || status === 'RESOURCE_EXHAUSTED') return 'RATE_LIMITED';
+  if (
+    httpStatus === 401 ||
+    httpStatus === 403 ||
+    status === 'UNAUTHENTICATED' ||
+    status === 'PERMISSION_DENIED' ||
+    message.includes('api key')
+  ) {
+    return 'INVALID_KEY';
+  }
+  if (httpStatus === 404 || status === 'NOT_FOUND' || message.includes('not found') || message.includes('not supported')) {
+    return 'INVALID_MODEL';
+  }
+  return 'VALIDATION_FAILED';
 }

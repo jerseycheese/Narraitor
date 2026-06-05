@@ -25,8 +25,12 @@ function buildRequest(opts: { key?: string; body?: unknown } = {}): NextRequest 
   });
 }
 
-function fakeResponse(status: number): Response {
-  return { ok: status >= 200 && status < 300, status } as Response;
+function fakeResponse(status: number, body: unknown = {}): Response {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => body,
+  } as Response;
 }
 
 beforeEach(() => {
@@ -69,6 +73,20 @@ describe('POST /api/ai/validate-provider', () => {
     const data = await response.json();
 
     expect(data.valid).toBe(false);
+    expect(data.error).toBe('INVALID_KEY');
+  });
+
+  test('maps Google 400 "API key not valid" to INVALID_KEY', async () => {
+    // Gemini returns 400 INVALID_ARGUMENT (not 401) for a bad key.
+    mockMakeGeminiRequest.mockResolvedValue(
+      fakeResponse(400, {
+        error: { status: 'INVALID_ARGUMENT', message: 'API key not valid. Please pass a valid API key.' },
+      })
+    );
+
+    const response = await POST(buildRequest({ key: KEY }));
+    const data = await response.json();
+
     expect(data.error).toBe('INVALID_KEY');
   });
 
