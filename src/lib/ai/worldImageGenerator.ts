@@ -6,6 +6,7 @@ import { getTimestamp } from '@/lib/utils';
 
 import Logger from '@/lib/utils/logger';
 import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
+import { aiFetch } from './aiFetch';
 const logger = new Logger('WorldImageGenerator');
 
 function buildPrompt(world: World): string {
@@ -79,7 +80,7 @@ export async function generateWorldImage(world: World, customPrompt?: string): P
       };
     }
 
-    const response = await fetch('/api/generate-world-image', {
+    const response = await aiFetch('/api/generate-world-image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

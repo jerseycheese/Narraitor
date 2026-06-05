@@ -5,6 +5,7 @@ import { World } from '@/types/world.types';
 import { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
 import Logger from '@/lib/utils/logger';
+import { aiFetch } from './aiFetch';
 
 const logger = new Logger('JournalImageGenerator');
 
@@ -18,7 +19,7 @@ export async function generateJournalImage(
   customPrompt?: string
 ): Promise<GeneratedImage> {
   try {
-    const response = await fetch('/api/generate-journal-image', {
+    const response = await aiFetch('/api/generate-journal-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ entry, world, customPrompt }),

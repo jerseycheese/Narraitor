@@ -1,4 +1,5 @@
 import type { GeneratedImage } from '@/types/common.types';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 export interface PortraitRequest {
   character?: unknown;
@@ -16,7 +17,7 @@ export interface PortraitResponse {
 export async function generatePortrait(
   payload: PortraitRequest
 ): Promise<PortraitResponse> {
-  const response = await fetch('/api/generate-portrait', {
+  const response = await aiFetch('/api/generate-portrait', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

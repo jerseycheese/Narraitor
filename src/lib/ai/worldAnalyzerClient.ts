@@ -1,6 +1,7 @@
 // Client-side world analyzer that calls the secure API endpoint
 import Logger from '@/lib/utils/logger';
 import { WorldAnalysisResult } from './worldAnalyzer';
+import { aiFetch } from './aiFetch';
 
 const logger = new Logger('WorldAnalyzerClient');
 
@@ -8,7 +9,7 @@ export async function analyzeWorldDescriptionClient(description: string): Promis
   logger.debug('analyzeWorldDescriptionClient called with:', description.substring(0, 50) + '...');
   
   try {
-    const response = await fetch('/api/ai/analyze-world', {
+    const response = await aiFetch('/api/ai/analyze-world', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

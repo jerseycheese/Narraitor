@@ -5,6 +5,7 @@ import { useJournalStore } from '@/state/journalStore';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { safeTrim, truncate, getTimestamp } from '@/lib/utils';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('UseActiveGameSessionJournal');
@@ -62,7 +63,7 @@ export const useActiveGameSessionJournal = ({
     }
 
     try {
-      const response = await fetch('/api/narrative/summarize', {
+      const response = await aiFetch('/api/narrative/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -33,6 +33,8 @@ interface ImageGenerationConfig {
   loggerContext: string;
   /** Additional fields to include in response */
   responseFields?: Record<string, unknown>;
+  /** Resolved key for this request (player's BYO key); falls back to env when omitted. */
+  apiKey?: string | null;
 }
 
 /**
@@ -86,7 +88,7 @@ function getGeminiApiKey(): string | null {
 export async function generateImageWithFallback(
   config: ImageGenerationConfig
 ): Promise<NextResponse> {
-  const apiKey = getGeminiApiKey();
+  const apiKey = config.apiKey ?? getGeminiApiKey();
 
   // Mock mode - return placeholder immediately
   if (!apiKey) {

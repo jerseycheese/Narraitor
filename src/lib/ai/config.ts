@@ -49,13 +49,16 @@ export const getSafetySettings = (): SafetySetting[] => {
 };
 
 /**
- * Gets default configuration for AI service
+ * Gets default configuration for AI service.
+ * @param apiKeyOverride - the player's bring-your-own key for this request; when
+ *   omitted, falls back to the server env key (today's behavior).
  * @returns Complete AI service configuration
  */
-export const getDefaultConfig = () => {
+export const getDefaultConfig = (apiKeyOverride?: string | null) => {
   const aiConfig = getAIConfig();
   return {
-    apiKey: aiConfig.geminiApiKey,
+    // The player's resolved key (passed by the route) -> server env key.
+    apiKey: apiKeyOverride ?? aiConfig.geminiApiKey,
     modelName: aiConfig.modelName,
     maxRetries: aiConfig.maxRetries,
     timeout: aiConfig.timeout,

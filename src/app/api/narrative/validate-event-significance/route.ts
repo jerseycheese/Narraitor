@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { validateEventSignificance, ValidationContext } from '@/lib/ai/eventSignificanceValidator';
 
 import Logger from '@/lib/utils/logger';
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await validateEventSignificance(majorEvent, context);
+    const result = await validateEventSignificance(majorEvent, context, resolveApiKey(request));
 
     return NextResponse.json(result);
   } catch (error) {

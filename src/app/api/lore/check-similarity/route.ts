@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getDefaultConfig } from '@/lib/ai/config';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('CheckLoreSimilarityAPI');
@@ -65,7 +66,7 @@ For uncertain cases, adjust confidence accordingly.
 
 Response (JSON only):`;
 
-    const config = getDefaultConfig();
+    const config = getDefaultConfig(resolveApiKey(request));
     const client = new GeminiClient(config);
     const response = await client.generateContent(prompt);
 

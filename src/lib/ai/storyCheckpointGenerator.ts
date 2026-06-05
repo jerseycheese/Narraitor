@@ -146,8 +146,9 @@ const parseResponse = (content: string): StoryCheckpointResponseBody => {
 
 export const generateStoryCheckpointSummary = async (
   payload: StoryCheckpointRequestBody,
+  apiKey?: string | null,
 ): Promise<StoryCheckpointResponseBody> => {
-  const client = createDefaultGeminiClient();
+  const client = createDefaultGeminiClient(apiKey);
   const prompt = buildPrompt(payload);
 
   const response = await client.generateContent(prompt);

@@ -5,6 +5,7 @@ import Logger from '@/lib/utils/logger';
 import type { InventoryItem } from '@/types/inventory.types';
 import { buildItemPrompt } from '@/lib/ai/itemImageGenerator';
 import { generateImageWithFallback } from '@/lib/api/imageGenerationHelpers';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 
 const logger = new Logger('API');
 
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
     // Use centralized helper for image generation with fallback
     return generateImageWithFallback({
       prompt,
+      apiKey: resolveApiKey(request),
       fallback: {
         variant: 'shapes',
         seed: item.name,

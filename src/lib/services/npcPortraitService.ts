@@ -5,6 +5,7 @@ import { useNPCStore } from '@/state/npcStore';
 import { useWorldStore } from '@/state/worldStore';
 import Logger from '@/lib/utils/logger';
 import { ImageRequestCoordinator } from './imageRequestCoordinator';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 const logger = new Logger('NPCPortraitService');
 
@@ -59,7 +60,7 @@ class NPCPortraitService {
       genre: world.genre,
     });
 
-    const response = await fetch('/api/generate-portrait', {
+    const response = await aiFetch('/api/generate-portrait', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

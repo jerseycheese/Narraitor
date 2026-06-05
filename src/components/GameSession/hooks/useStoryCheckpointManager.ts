@@ -8,6 +8,7 @@ import { StoryCheckpointDecisionPayload, StoryCheckpointResponseBody } from '@/t
 import { generateUniqueId, safeTrim } from '@/lib/utils';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { buildStoryCheckpointPayload } from '@/lib/narrative/storyCheckpointPayload';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 interface UseStoryCheckpointManagerArgs {
   worldId: string;
@@ -252,7 +253,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
         toneSettings: world?.toneSettings,
       });
 
-      const response = await fetch('/api/narrative/story-checkpoint', {
+      const response = await aiFetch('/api/narrative/story-checkpoint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -3,6 +3,7 @@ import type { JournalEntry } from '@/types/journal.types';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
 import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('JournalImageAPI');
@@ -60,9 +61,9 @@ export async function POST(request: NextRequest) {
     logger.debug('generate-journal-image', 'Starting image generation');
 
     const imagePrompt = customPrompt || generateImagePrompt(entry, world);
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = resolveApiKey(request);
 
-    if (!apiKey || apiKey === 'MOCK_API_KEY') {
+    if (!apiKey) {
       logger.debug('generate-journal-image', 'No Gemini API key configured, using fallback');
       return NextResponse.json({
         imageUrl: generateFallbackImage(entry, world),

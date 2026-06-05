@@ -13,6 +13,7 @@ import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('CharacterEditor');
@@ -126,7 +127,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     setGeneratingPortrait(true);
     setPortraitError(null); // Clear previous portrait errors
     try {
-      const response = await fetch('/api/generate-portrait', {
+      const response = await aiFetch('/api/generate-portrait', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

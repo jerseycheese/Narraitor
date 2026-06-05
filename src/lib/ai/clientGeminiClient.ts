@@ -2,6 +2,7 @@
 
 import { AIClient, AIResponse, AIImageResponse } from './types';
 import { userFriendlyError } from './userFriendlyErrors';
+import { aiFetch } from './aiFetch';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ClientGeminiClient');
@@ -28,7 +29,7 @@ export class ClientGeminiClient implements AIClient {
       const isChoiceGeneration = this.isChoiceGenerationPrompt(prompt);
       const endpoint = isChoiceGeneration ? '/api/narrative/choices' : '/api/narrative/generate';
       
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const response = await aiFetch(`${this.baseUrl}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +95,7 @@ export class ClientGeminiClient implements AIClient {
    */
   async generateChoices(prompt: string): Promise<AIResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/narrative/choices`, {
+      const response = await aiFetch(`${this.baseUrl}/api/narrative/choices`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +142,7 @@ export class ClientGeminiClient implements AIClient {
    */
   async generateImage(prompt: string): Promise<AIImageResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/generate-portrait`, {
+      const response = await aiFetch(`${this.baseUrl}/api/generate-portrait`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -182,7 +183,7 @@ export class ClientGeminiClient implements AIClient {
   async isAvailable(): Promise<boolean> {
     try {
       // Make a simple request to check if the API is responding
-      const response = await fetch(`${this.baseUrl}/api/narrative/generate`, {
+      const response = await aiFetch(`${this.baseUrl}/api/narrative/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

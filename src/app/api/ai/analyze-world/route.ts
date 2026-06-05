@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { analyzeWorldDescription } from '@/lib/ai/worldAnalyzer';
 import Logger from '@/lib/utils/logger';
 
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     logger.debug('analyze-world API', 'Analyzing world description...');
 
     // Analyze the world description using the AI service
-    const analysis = await analyzeWorldDescription(body.description);
+    const analysis = await analyzeWorldDescription(body.description, resolveApiKey(request));
     
     logger.debug('analyze-world API', 'Analysis completed successfully');
 

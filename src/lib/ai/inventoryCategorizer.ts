@@ -101,22 +101,24 @@ function parseAIResponse(raw: string): AIResponseShape | null {
 }
 
 async function categorizeInventoryItem(
-  input: CategorizeInventoryItemInput
+  input: CategorizeInventoryItemInput,
+  apiKey?: string | null
 ): Promise<InventoryCategorizationResult> {
   const config = getAIConfig();
+  const effectiveKey = apiKey ?? config.geminiApiKey;
   const baseLogContext = {
     name: input.name,
     description: truncate(input.description ?? '', 100),
   };
 
-  if (!config.geminiApiKey) {
+  if (!effectiveKey) {
     logger.warn('InventoryCategorizer', 'No GEMINI_API_KEY configured, using fallback categorization', baseLogContext);
     return determineFallbackCategory(input.name, input.description);
   }
 
   try {
     const client = new GeminiClient({
-      apiKey: config.geminiApiKey,
+      apiKey: effectiveKey,
       modelName: config.modelName,
       maxRetries: config.maxRetries,
       timeout: config.timeout,
@@ -184,19 +186,21 @@ function parseAIBatchResponse(raw: string): AIBatchEntryShape[] | null {
  * partial or malformed batch response never blocks item acquisition.
  */
 export async function categorizeInventoryItems(
-  inputs: CategorizeInventoryItemInput[]
+  inputs: CategorizeInventoryItemInput[],
+  apiKey?: string | null
 ): Promise<InventoryCategorizationResult[]> {
   if (inputs.length === 0) {
     return [];
   }
 
   if (inputs.length === 1) {
-    return [await categorizeInventoryItem(inputs[0])];
+    return [await categorizeInventoryItem(inputs[0], apiKey)];
   }
 
   const config = getAIConfig();
+  const effectiveKey = apiKey ?? config.geminiApiKey;
 
-  if (!config.geminiApiKey) {
+  if (!effectiveKey) {
     logger.warn(
       'InventoryCategorizer',
       'No GEMINI_API_KEY configured, using fallback categorization for batch',
@@ -207,7 +211,7 @@ export async function categorizeInventoryItems(
 
   try {
     const client = new GeminiClient({
-      apiKey: config.geminiApiKey,
+      apiKey: effectiveKey,
       modelName: config.modelName,
       maxRetries: config.maxRetries,
       timeout: config.timeout,

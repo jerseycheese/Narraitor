@@ -5,6 +5,7 @@
 
 import Logger from '@/lib/utils/logger';
 import type { LoreCategory } from '@/types/lore.types';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 const logger = new Logger('LoreSimilarityClient');
 
@@ -27,7 +28,7 @@ export interface LoreSimilarityRequest {
 export async function checkLoreSimilarityClient(
   payload: LoreSimilarityRequest
 ): Promise<LoreSimilarityResponse> {
-  const response = await fetch('/api/lore/check-similarity', {
+  const response = await aiFetch('/api/lore/check-similarity', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

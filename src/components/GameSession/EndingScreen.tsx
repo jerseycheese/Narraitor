@@ -29,6 +29,7 @@ import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('EndingScreen');
@@ -121,7 +122,7 @@ export function EndingScreen() {
         .slice(-5)
         .map((segment) => segment.content);
 
-      const response = await fetch('/api/generate-ending-image', {
+      const response = await aiFetch('/api/generate-ending-image', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 // src/app/api/narrative/ending/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { generateEnding } from '../../../../lib/ai/endingGenerator';
 import { logger } from '../../../../lib/utils/logger';
 import type { EndingGenerationRequest, EndingType, EndingTone } from '../../../../types/narrative.types';
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate the ending
-    const result = await generateEnding(endingRequest);
+    const result = await generateEnding(endingRequest, resolveApiKey(request));
 
     logger.info('Story ending generated successfully', { 
       sessionId,

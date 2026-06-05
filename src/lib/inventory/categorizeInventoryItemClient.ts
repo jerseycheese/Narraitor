@@ -1,5 +1,6 @@
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 import Logger from '@/lib/utils/logger';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 const logger = new Logger('InventoryCategorizeClient');
 
@@ -30,7 +31,7 @@ export async function categorizeInventoryItemsClient(
     return [];
   }
 
-  const response = await fetch('/api/inventory/categorize', {
+  const response = await aiFetch('/api/inventory/categorize', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
