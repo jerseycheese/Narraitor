@@ -69,11 +69,15 @@ describe('POST /api/inventory/categorize', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
 
-    // Only valid items are sent to the categorizer.
-    expect(mockCategorize).toHaveBeenCalledWith([
-      { name: 'Iron Sword', description: 'A blade', context: undefined },
-      { name: 'Gold Coins', description: 'Currency', context: undefined },
-    ]);
+    // Only valid items are sent to the categorizer, with the request-resolved
+    // key (null here: no BYO header and the env key is the MOCK sentinel).
+    expect(mockCategorize).toHaveBeenCalledWith(
+      [
+        { name: 'Iron Sword', description: 'A blade', context: undefined },
+        { name: 'Gold Coins', description: 'Currency', context: undefined },
+      ],
+      null
+    );
 
     // Response is full-length and positionally aligned to the input.
     expect(data.results).toHaveLength(3);

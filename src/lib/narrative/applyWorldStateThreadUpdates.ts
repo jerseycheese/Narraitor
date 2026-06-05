@@ -7,6 +7,7 @@ import type {
 } from '@/types/world-state.types';
 import { generateUniqueId, getTimestamp } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
+import { aiFetch } from '@/lib/ai/aiFetch';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 
@@ -177,7 +178,7 @@ export async function applyWorldStateThreadUpdates({
         }];
       } else {
         try {
-          const validationResponse = await fetch('/api/narrative/validate-event-significance', {
+          const validationResponse = await aiFetch('/api/narrative/validate-event-significance', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

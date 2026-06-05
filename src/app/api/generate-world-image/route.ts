@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
 import { generateAndSaveImageWithGemini } from '@/lib/ai/geminiImageGenerator';
@@ -59,7 +60,8 @@ export async function POST(request: NextRequest) {
 
     try {
       // Use custom prompt if provided, otherwise generate one using AI
-      const client = createDefaultGeminiClient();
+      const apiKey = resolveApiKey(request);
+      const client = createDefaultGeminiClient(apiKey);
       let imagePrompt: string;
       
       if (body.customPrompt) {
@@ -97,10 +99,8 @@ export async function POST(request: NextRequest) {
       let aiGenerated = false;
       let placeholder = true;
 
-      // Check if we have Gemini API key for image generation
-      const apiKey = process.env.GEMINI_API_KEY;
-
-      if (apiKey && apiKey !== 'MOCK_API_KEY') {
+      // Use the key resolved above (player's BYO key -> env fallback).
+      if (apiKey) {
         try {
           logger.debug('generate-world-image', 'Attempting Gemini image generation with model: gemini-2.5-flash-image');
 

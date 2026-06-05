@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('Summarize');
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const geminiClient = createDefaultGeminiClient();
+    const geminiClient = createDefaultGeminiClient(resolveApiKey(request));
     
     const prompt = `${instructions}
 

@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
 import { getAIConfig } from '../lib/ai/config';
+import { resolveApiKey } from '../lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '../lib/utils/errorUtils';
 
 import Logger from '@/lib/utils/logger';
@@ -77,19 +78,6 @@ async function validateAIRequest(request: NextRequest): Promise<{
   } catch {
     return null;
   }
-}
-
-/**
- * Get and validate API key
- */
-function validateAPIKey(): string | null {
-  const apiKey = process.env.GEMINI_API_KEY;
-  
-  if (!apiKey || apiKey === 'MOCK_API_KEY') {
-    return null;
-  }
-  
-  return apiKey;
 }
 
 /**
@@ -238,8 +226,8 @@ export async function processGeminiTextRequest(
       );
     }
 
-    // Validate API key
-    const apiKey = validateAPIKey();
+    // Resolve the effective key: the player's BYO key (header) -> env fallback.
+    const apiKey = resolveApiKey(request);
     if (!apiKey) {
       return createAPIErrorResponse(
         new Error('Service configuration error: API key not configured'),

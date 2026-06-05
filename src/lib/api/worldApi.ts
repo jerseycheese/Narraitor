@@ -1,4 +1,5 @@
 import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 export interface GenerateWorldParams {
   worldReference?: string;
@@ -30,7 +31,7 @@ export const worldApi = {
    * Generate a new world using AI
    */
   async generateWorld(params: GenerateWorldParams): Promise<GeneratedWorldData> {
-    const response = await fetch('/api/generate-world', {
+    const response = await aiFetch('/api/generate-world', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ export const worldApi = {
    * Generate an image for a world
    */
   async generateWorldImage(params: WorldImageParams): Promise<WorldImageResponse> {
-    const response = await fetch('/api/generate-world-image', {
+    const response = await aiFetch('/api/generate-world-image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getDefaultConfig } from '@/lib/ai/config';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('CheckSimilarityAPI');
@@ -54,7 +55,7 @@ If they're definitely different items, return similar: false.
 
 Response (JSON only):`;
 
-    const config = getDefaultConfig();
+    const config = getDefaultConfig(resolveApiKey(request));
     const client = new GeminiClient(config);
     const response = await client.generateContent(prompt);
 

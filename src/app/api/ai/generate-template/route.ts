@@ -3,6 +3,7 @@ import { generateWorldTemplate } from '@/lib/ai/templateGenerator';
 import { TemplateGenerationContext } from '@/lib/ai/templatePrompts';
 import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import Logger from '@/lib/utils/logger';
 import { TEMPLATE_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Generate the template using the secure server-side client with timeout
     const aiConfig = getAIConfig();
     const client = new GeminiClient({
-      apiKey: aiConfig.geminiApiKey,
+      apiKey: resolveApiKey(request) ?? aiConfig.geminiApiKey,
       modelName: aiConfig.modelName,
       maxRetries: aiConfig.maxRetries,
       timeout: aiConfig.timeout,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '@/lib/utils/errorUtils';
 import { generateCharacter } from '@/lib/ai/characterGenerator';
 import { World } from '@/types/world.types';
@@ -41,7 +42,8 @@ export async function POST(request: NextRequest) {
       (Array.isArray(existingNames) ? existingNames : []) as string[],
       suggestedName as string | undefined,
       (characterType as 'original' | 'known' | 'specific') || 'original',
-      typeof concept === 'string' ? concept : undefined
+      typeof concept === 'string' ? concept : undefined,
+      resolveApiKey(request)
     );
 
     return NextResponse.json(generatedCharacter);

@@ -13,6 +13,7 @@ import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 import { applyWorldStateThreadUpdates } from '../lib/narrative/applyWorldStateThreadUpdates';
+import { aiFetch } from '@/lib/ai/aiFetch';
 import { createIndexedDBStorage } from './persistence';
 import {
   NPCRelationshipUpdate,
@@ -919,7 +920,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
 
       // Route through server API to keep AI usage server-side and enable test mocking
-      const response = await fetch('/api/narrative/ending', {
+      const response = await aiFetch('/api/narrative/ending', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

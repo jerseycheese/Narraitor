@@ -29,6 +29,7 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { GeneratedImage } from '@/types/common.types';
 import { generatePortrait } from '@/lib/api/generatePortrait';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 // CharacterTable pulls @tanstack/react-table but only renders in table view,
 // and the generate dialog only matters once the page is interactive. Load both
@@ -309,7 +310,7 @@ export default function CharactersPage() {
       const nameToUse =
         generationType === 'specific' ? characterName : undefined;
 
-      const response = await fetch('/api/generate-character', {
+      const response = await aiFetch('/api/generate-character', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

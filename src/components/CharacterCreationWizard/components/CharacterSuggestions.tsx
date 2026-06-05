@@ -9,6 +9,7 @@ import { ErrorBlock } from '@/components/shared';
 import { World } from '@/types/world.types';
 import { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 type CardKey = 'description' | 'background' | 'attributes' | 'skills';
 
@@ -58,7 +59,7 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/generate-character', {
+      const response = await aiFetch('/api/generate-character', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -127,7 +127,7 @@ function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function generateEnding(request: EndingGenerationRequest): Promise<EndingGenerationResult> {
+export async function generateEnding(request: EndingGenerationRequest, apiKey?: string | null): Promise<EndingGenerationResult> {
   try {
     logger.debug('Generating story ending', { request });
 
@@ -166,7 +166,7 @@ export async function generateEnding(request: EndingGenerationRequest): Promise<
     let lastError: Error | null = null;
     for (let i = 0; i <= MAX_RETRIES; i++) {
       try {
-        const client = createDefaultGeminiClient();
+        const client = createDefaultGeminiClient(apiKey);
         const response = await client.generateContent(finalPrompt);
         const result = parseResponse(response.content);
 
