@@ -56,7 +56,7 @@ describe('Legal pages are reachable (#1366)', () => {
   it('exposes footer links to privacy, terms, and about', () => {
     render(<PrivacyPage />);
 
-    const footer = screen.getByRole('contentinfo', { name: /more information/i });
+    const footer = screen.getByRole('navigation', { name: /more information/i });
     expect(within(footer).getByRole('link', { name: /privacy/i })).toHaveAttribute(
       'href',
       '/privacy'
@@ -74,7 +74,7 @@ describe('Legal pages are reachable (#1366)', () => {
   it('exposes privacy and terms links from the About page', () => {
     render(<About />);
 
-    const footer = screen.getByRole('contentinfo', { name: /site information/i });
+    const footer = screen.getByRole('navigation', { name: /site information/i });
     expect(within(footer).getByRole('link', { name: /privacy/i })).toHaveAttribute(
       'href',
       '/privacy'

@@ -120,14 +120,14 @@ export default function About() {
         </section>
       </main>
 
-      <footer className="component-about-footer" aria-label="Site information">
+      <nav className="component-about-footer" aria-label="Site information">
         <Link href="/privacy" className="component-about-footer-link">
           Privacy
         </Link>
         <Link href="/terms" className="component-about-footer-link">
           Terms
         </Link>
-      </footer>
+      </nav>
     </>
   );
 }

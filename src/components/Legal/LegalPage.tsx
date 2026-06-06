@@ -33,7 +33,7 @@ export function LegalPage({ title, lead, updated, children }: LegalPageProps) {
 
       {children}
 
-      <footer className="component-legal-footer" aria-label="More information">
+      <nav className="component-legal-footer" aria-label="More information">
         <Link href="/about" className="component-legal-footer-link">
           About
         </Link>
@@ -43,7 +43,7 @@ export function LegalPage({ title, lead, updated, children }: LegalPageProps) {
         <Link href="/terms" className="component-legal-footer-link">
           Terms
         </Link>
-      </footer>
+      </nav>
     </main>
   );
 }
