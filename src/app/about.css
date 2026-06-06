@@ -193,6 +193,45 @@
   outline-offset: 2px;
 }
 
+/* ─── Footer links (Privacy / Terms) ───
+   Rendered as a sibling of .component-about so the About visual baselines
+   (which screenshot the .component-about locator) stay unchanged; it self-
+   centers to the same measure. */
+
+.component-about-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+@media (width >= 1024px) {
+  .component-about-footer {
+    padding: var(--space-5) var(--space-6);
+  }
+}
+
+.component-about-footer-link {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.component-about-footer-link:hover {
+  color: var(--color-accent);
+}
+
+.component-about-footer-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    DS1 — "The Drafting Table"
    Archival / drafting: sharp radius, hairline rules between
