@@ -104,7 +104,7 @@ export default function Landing() {
         </ul>
       </section>
 
-      <footer className="component-landing-footer" aria-label="Site information">
+      <nav className="component-landing-footer" aria-label="Site information">
         <Link href="/about" className="component-landing-footer-link">
           About
         </Link>
@@ -114,7 +114,7 @@ export default function Landing() {
         <Link href="/terms" className="component-landing-footer-link">
           Terms
         </Link>
-      </footer>
+      </nav>
     </main>
   );
 }

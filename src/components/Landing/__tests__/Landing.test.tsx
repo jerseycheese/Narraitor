@@ -39,7 +39,7 @@ describe('Landing page (#1365)', () => {
   it('exposes footer links to about, privacy, and terms', () => {
     render(<WelcomePage />);
 
-    const footer = screen.getByRole('contentinfo', { name: /site information/i });
+    const footer = screen.getByRole('navigation', { name: /site information/i });
     expect(within(footer).getByRole('link', { name: /about/i })).toHaveAttribute(
       'href',
       '/about'
