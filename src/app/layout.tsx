@@ -31,6 +31,8 @@ import { ToastProvider, Toaster } from '@/components/ui/toast';
 import { TutorialProvider } from '@/components/TutorialProvider';
 import { ThemeProvider } from '@/lib/theme';
 import { THEME_INIT_SCRIPT } from '@/lib/theme/themeInitScript';
+import { Analytics } from '@vercel/analytics/next';
+import { FunnelAnalytics } from '@/components/analytics/FunnelAnalytics';
 
 /* DS1 fonts (preloaded - default theme) */
 const lora = Lora({
@@ -149,6 +151,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
             </DevToolsProvider>
           </NavigationLoadingProvider>
         </ThemeProvider>
+        <FunnelAnalytics />
+        <Analytics />
       </body>
     </html>
   );
