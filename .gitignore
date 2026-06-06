@@ -117,6 +117,15 @@ dependency-violations.html
 CLAUDE.md
 CLAUDE.local.md
 
+# Claude Code cloud (web sessions): commit only these reviewed, shareable files.
+# Everything else under .claude/ (incl. .github_token, settings.local.json) stays ignored.
+!.claude/settings.json
+!/CLAUDE.md
+!.claude/skills/
+!.claude/agents/
+# never commit macOS cruft, even within the re-included dirs above
+.claude/**/.DS_Store
+
 # Codex
 .codex/
 AGENTS.local.md

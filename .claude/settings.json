@@ -1,0 +1,24 @@
+{
+  "allowedTools": {
+    "Edit": true,
+    "Bash": ["npm", "node", "ls", "cat", "git*", "find", "grep", "cd", "mkdir", "touch", "rm", "cp", "mv", "echo", "pwd", "test", "head", "tail", "less", "more", "nano", "wc", "sort", "uniq", "cut", "sed", "awk", "curl", "wget", "diff", "patch", "tar", "zip", "unzip", "jq", "npm run*"],
+    "Fetch": true,
+    "mcp__modelcontextprotocol-server-github__server-github": true
+  },
+  "defaultShell": "bash",
+  "memory": {
+    "format": "markdown",
+    "enabled": true
+  },
+  "includeCoAuthoredBy": false,
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/install_pkgs.sh" }
+        ]
+      }
+    ]
+  }
+}
