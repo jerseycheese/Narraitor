@@ -76,7 +76,7 @@
         }
       },
       {
-        "files": ["src/app/workshop.css", "src/app/dashboard.css", "src/app/wizard.css", "src/app/about.css"],
+        "files": ["src/app/workshop.css", "src/app/dashboard.css", "src/app/wizard.css", "src/app/about.css", "src/app/legal.css"],
         "rules": {
           "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate", "linear-gradient", "radial-gradient", "color-mix", "clamp", "cubic-bezier", "brightness", "blur", "repeat", "minmax"],
           "function-disallowed-list": [],
