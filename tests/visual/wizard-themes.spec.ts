@@ -57,7 +57,9 @@ async function captureStep(
   await waitForContentStable(page);
   await setTheme(page, theme);
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
-  await expect(page).toHaveScreenshot(snapshotName, { fullPage: true });
+  // Soft so one run surfaces every stale step's diff instead of stopping at the
+  // first — multi-step fullPage specs otherwise cascade one step per CI run.
+  await expect.soft(page).toHaveScreenshot(snapshotName, { fullPage: true });
 }
 
 async function captureWidget(
@@ -68,7 +70,7 @@ async function captureWidget(
   await locator.scrollIntoViewIfNeeded();
   await waitForContentStable(page);
   await hideDynamicContent(page);
-  await expect(locator).toHaveScreenshot(snapshotName);
+  await expect.soft(locator).toHaveScreenshot(snapshotName);
 }
 
 async function clickWizardNext(page: Page): Promise<void> {
