@@ -961,12 +961,30 @@
   gap: var(--space-4);
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--space-3) var(--space-4);
+  padding-block: var(--space-3);
+  padding-inline: var(--space-4);
+}
+
+/* Match the page-content gutter at each breakpoint so the logo lines up with
+   the page's left edge and the CTA with its right edge. default-surface-inner
+   uses space-3 (<768), space-4 (768-1024), space-6 (>=1024). */
+@media (width < 768px) {
+  .header-nav-inner {
+    padding-inline: var(--space-3);
+  }
+}
+
+@media (width >= 1024px) {
+  .header-nav-inner {
+    padding-inline: var(--space-6);
+  }
 }
 
 .header-nav-left {
   display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
 }
 
