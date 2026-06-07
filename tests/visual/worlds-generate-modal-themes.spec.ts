@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { applyTheme } from './utils/applyTheme';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
@@ -22,11 +23,7 @@ async function settleTheme(
   theme?: { id: 'ds2' | 'ds3'; label: 'DS2' | 'DS3' }
 ): Promise<void> {
   if (theme) {
-    await page.getByRole('radio', { name: theme.label }).click();
-    await page.waitForFunction(
-      (t) => document.documentElement.getAttribute('data-theme') === t,
-      theme.id
-    );
+    await applyTheme(page, theme.id);
   }
   await waitForContentStable(page);
   await hideDynamicContent(page);

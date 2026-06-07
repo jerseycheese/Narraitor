@@ -1,19 +1,21 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { applyTheme } from './utils/applyTheme';
 
 /**
  * Theme Switcher Visual Regression Tests
  *
- * Tests that the design system switcher and dark mode toggle
- * work correctly across theme combinations.
+ * The design-system skins and color-mode toggle now live inside the Appearance
+ * menu (a palette-icon dropdown) rather than inline DS1/DS2/DS3 radios. These
+ * tests verify the menu exposes both controls and that each theme / dark mode
+ * renders correctly on the home page.
  *
  * NOTE: the committed baselines are the CI runner's render, not a local one.
- * Full-page heights and any text rows take their height from OS-rendered font
+ * Full-page heights and text rows take their height from OS-rendered font
  * metrics, which differ between a dev machine and the CI macOS image, so a
  * locally-generated baseline drifts against CI. To refresh these snapshots,
  * take the actuals from a CI E2E run rather than regenerating with
- * `--update-snapshots` locally. See commit 2fe3941a for the original
- * rationale.
+ * `--update-snapshots` locally. See commit 2fe3941a for the original rationale.
  */
 
 test.describe('Theme Switcher', () => {
@@ -22,61 +24,58 @@ test.describe('Theme Switcher', () => {
     await waitForContentStable(page);
     await hideDynamicContent(page);
 
-    // Verify DS1 is the default
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds1');
 
-    await expect(page).toHaveScreenshot('theme-ds1-home.png', { fullPage: true });
+    await expect(page).toHaveScreenshot('theme-ds1-home.png', {
+      fullPage: true,
+    });
   });
 
-  test('Theme switcher visible in header nav', async ({ page }) => {
+  test('Appearance menu exposes theme and color mode', async ({ page }) => {
     await page.goto('/');
     await waitForContentStable(page);
 
-    const themeSwitcher = page.getByRole('radiogroup', { name: 'Design system theme' });
-    await expect(themeSwitcher).toBeVisible();
+    const appearance = page.getByRole('button', { name: 'Appearance' });
+    await expect(appearance).toBeVisible();
 
-    const darkModeToggle = page.getByRole('radiogroup', { name: 'Color scheme' });
-    await expect(darkModeToggle).toBeVisible();
+    await appearance.click();
+    // Skins and the color-scheme toggle both live inside the one menu now.
+    await expect(page.getByText('Warm Earth')).toBeVisible();
+    await expect(
+      page.getByRole('radiogroup', { name: 'Color scheme' })
+    ).toBeVisible();
   });
 
   test('Switch to DS2 changes visual appearance', async ({ page }) => {
     await page.goto('/');
-    await waitForContentStable(page);
-
-    // Click DS2 button
-    await page.getByRole('radio', { name: 'DS2' }).click();
-    await page.waitForFunction(() =>
-      document.documentElement.getAttribute('data-theme') === 'ds2'
-    );
+    await applyTheme(page, 'ds2');
     await waitForContentStable(page);
     await hideDynamicContent(page);
 
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds2');
-    await expect(page).toHaveScreenshot('theme-ds2-home.png', { fullPage: true });
+    await expect(page).toHaveScreenshot('theme-ds2-home.png', {
+      fullPage: true,
+    });
   });
 
   test('Switch to DS3 changes visual appearance', async ({ page }) => {
     await page.goto('/');
-    await waitForContentStable(page);
-
-    // Click DS3 button
-    await page.getByRole('radio', { name: 'DS3' }).click();
-    await page.waitForFunction(() =>
-      document.documentElement.getAttribute('data-theme') === 'ds3'
-    );
+    await applyTheme(page, 'ds3');
     await waitForContentStable(page);
     await hideDynamicContent(page);
 
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
-    await expect(page).toHaveScreenshot('theme-ds3-home.png', { fullPage: true });
+    await expect(page).toHaveScreenshot('theme-ds3-home.png', {
+      fullPage: true,
+    });
   });
 
-  test('Dark mode toggle works within DS1', async ({ page }) => {
+  test('Dark mode renders within DS1', async ({ page }) => {
+    // Seed the color scheme before load; ThemeProvider reads it on mount.
+    await page.addInitScript(() =>
+      localStorage.setItem('narraitor-color-scheme', 'dark')
+    );
     await page.goto('/');
-    await waitForContentStable(page);
-
-    // Click dark mode button
-    await page.getByRole('radio', { name: 'Dark' }).click();
     await page.waitForFunction(() =>
       document.documentElement.classList.contains('dark')
     );
@@ -84,24 +83,27 @@ test.describe('Theme Switcher', () => {
     await hideDynamicContent(page);
 
     await expect(page.locator('html')).toHaveClass(/dark/);
-    await expect(page).toHaveScreenshot('theme-ds1-dark-home.png', { fullPage: true });
+    await expect(page).toHaveScreenshot('theme-ds1-dark-home.png', {
+      fullPage: true,
+    });
   });
 
-  test('Theme persists across page navigation', async ({ page }) => {
+  test('Theme selected from the menu persists across navigation', async ({
+    page,
+  }) => {
     await page.goto('/');
     await waitForContentStable(page);
 
-    // Switch to DS2
-    await page.getByRole('radio', { name: 'DS2' }).click();
-    await page.waitForFunction(() =>
-      document.documentElement.getAttribute('data-theme') === 'ds2'
+    // Select Warm Earth (ds2) through the real Appearance menu.
+    await page.getByRole('button', { name: 'Appearance' }).click();
+    await page.getByRole('menuitemradio', { name: /Warm Earth/ }).click();
+    await page.waitForFunction(
+      () => document.documentElement.getAttribute('data-theme') === 'ds2'
     );
 
-    // Navigate to worlds page
     await page.goto('/worlds');
     await waitForContentStable(page);
 
-    // Verify DS2 persisted
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds2');
   });
 });

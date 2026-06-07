@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
+import { applyTheme } from './utils/applyTheme';
 
 /**
  * Workshop Sidebar Theme Differentiation Visual Tests
@@ -37,12 +38,11 @@ async function settleTheme(
   theme?: { id: 'ds2' | 'ds3'; label: 'DS2' | 'DS3' }
 ): Promise<void> {
   if (theme) {
-    // Scope to the rail's ThemeSwitcher so we don't match a hidden duplicate.
-    await page.locator(SIDEBAR).getByRole('radio', { name: theme.label }).click();
-    await page.waitForFunction(
-      (t) => document.documentElement.getAttribute('data-theme') === t,
-      theme.id
-    );
+    await applyTheme(page, theme.id);
+    // applyTheme reloads, so wait for the seeded rail to re-render.
+    await page.waitForSelector('.workshop-sidebar-worlds-section', {
+      timeout: 8000,
+    });
   }
   await waitForContentStable(page);
   await hideDynamicContent(page);
