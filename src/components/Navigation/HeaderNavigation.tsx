@@ -9,8 +9,7 @@ import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 import { Breadcrumbs } from './Breadcrumbs';
 import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { TutorialMenu } from './TutorialMenu';
-import { ThemeSwitcher } from './ThemeSwitcher';
-import { DarkModeToggle } from './DarkModeToggle';
+import { ThemeMenu } from './ThemeMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
@@ -101,6 +100,31 @@ export function HeaderNavigation() {
     navigateWithLoading(`/worlds/${worldId}`, `Loading ${worldName}...`);
   };
 
+  const cta = currentWorld ? (
+    <Button
+      type="button"
+      onClick={() =>
+        navigateWithLoading(
+          `/worlds/${currentWorld.id}/play`,
+          `Starting ${currentWorld.name}...`
+        )
+      }
+      variant="default"
+    >
+      <Play aria-hidden="true" />
+      Play
+    </Button>
+  ) : !hasWorldsStore ? (
+    <Button
+      type="button"
+      onClick={() =>
+        navigateWithLoading('/worlds/create', 'Setting up world creation...')
+      }
+    >
+      Create Your First World
+    </Button>
+  ) : null;
+
   if (pathname.startsWith('/dev')) {
     return null;
   }
@@ -128,9 +152,9 @@ export function HeaderNavigation() {
                   </Button>
                 )}
 
-                <Link href="/">
+                <Link href="/" className="app-brand">
                   <LogoIcon size="small" className="logo-icon-inverted" />
-                  <LogoText size="sm" />
+                  <LogoText size="sm" className="app-wordmark" />
                 </Link>
 
                 <div
@@ -154,101 +178,90 @@ export function HeaderNavigation() {
               </div>
 
               <div className="header-nav-actions">
-                <ThemeSwitcher />
-                <DarkModeToggle />
-                <TutorialMenu />
+                <div className="header-nav-actions-group">
+                  <ThemeMenu />
+                  <TutorialMenu />
+                  <SSRClientOnly>
+                    <RecentPagesDropdown />
+                  </SSRClientOnly>
+                </div>
+
                 {hasWorlds && (
-                  <div ref={dropdownRef}>
-                    <Button
-                      onClick={() => setShowWorldSwitcher(!showWorldSwitcher)}
-                      variant="ghost"
-                      className={headerDropdownTriggerClass}
-                    >
-                      <Globe aria-hidden="true" />
-                      <span>
-                        {currentWorld ? currentWorld.name : 'Select World'}
-                      </span>
-                      {currentWorld && worldCharacterCount > 0 && (
-                        <span>{worldCharacterCount}</span>
-                      )}
-                      <ChevronDown aria-hidden="true" />
-                    </Button>
+                  <>
+                    <span className="header-nav-divider" aria-hidden="true" />
+                    <div ref={dropdownRef} className="header-nav-actions-group">
+                      <Button
+                        onClick={() => setShowWorldSwitcher(!showWorldSwitcher)}
+                        variant="ghost"
+                        className={`${headerDropdownTriggerClass} header-world-trigger${currentWorld ? ' header-world-trigger-active' : ''}`}
+                      >
+                        <Globe aria-hidden="true" />
+                        <span>
+                          {currentWorld ? currentWorld.name : 'Select World'}
+                        </span>
+                        {currentWorld && worldCharacterCount > 0 && (
+                          <span className="header-world-count">
+                            {worldCharacterCount}{' '}
+                            {worldCharacterCount === 1 ? 'character' : 'characters'}
+                          </span>
+                        )}
+                        <ChevronDown aria-hidden="true" />
+                      </Button>
 
-                    {showWorldSwitcher && (
-                      <div className={headerDropdownMenuClass}>
-                        {Object.values(worlds).map((world) => {
-                          const worldCharacters = (
-                            Object.values(characters) as Character[]
-                          ).filter((char) => char.worldId === world.id).length;
+                      {showWorldSwitcher && (
+                        <div className={headerDropdownMenuClass}>
+                          {Object.values(worlds).map((world) => {
+                            const worldCharacters = (
+                              Object.values(characters) as Character[]
+                            ).filter((char) => char.worldId === world.id).length;
 
-                          return (
-                            <Button
-                              key={world.id}
-                              onClick={() => handleWorldSwitch(world.id)}
-                              variant="ghost"
-                              className={headerDropdownItemClass}
-                            >
-                              <div>
-                                <div>{world.name}</div>
+                            return (
+                              <Button
+                                key={world.id}
+                                onClick={() => handleWorldSwitch(world.id)}
+                                variant="ghost"
+                                className={headerDropdownItemClass}
+                              >
                                 <div>
-                                  {getGenreLabel(world.genre)} •{' '}
-                                  {worldCharacters} characters
+                                  <div>{world.name}</div>
+                                  <div>
+                                    {getGenreLabel(world.genre)} •{' '}
+                                    {worldCharacters} characters
+                                  </div>
                                 </div>
-                              </div>
-                              {world.id === currentWorldId && (
-                                <Check aria-hidden="true" />
-                              )}
-                            </Button>
-                          );
-                        })}
+                                {world.id === currentWorldId && (
+                                  <Check aria-hidden="true" />
+                                )}
+                              </Button>
+                            );
+                          })}
 
-                        <div className={headerDropdownDividerClass}>
-                          <Link
-                            href="/worlds"
-                            className={headerDropdownItemClass}
-                            onClick={() => setShowWorldSwitcher(false)}
-                          >
-                            <Plus aria-hidden="true" />
-                            Create a world
-                          </Link>
+                          <div className={headerDropdownDividerClass}>
+                            <Link
+                              href="/worlds"
+                              className={headerDropdownItemClass}
+                              onClick={() => setShowWorldSwitcher(false)}
+                            >
+                              <Plus aria-hidden="true" />
+                              Create a world
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  </>
                 )}
 
                 <SSRClientOnly>
-                  <RecentPagesDropdown />
-                </SSRClientOnly>
-
-                <SSRClientOnly>
-                  {currentWorld ? (
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        navigateWithLoading(
-                          `/worlds/${currentWorld.id}/play`,
-                          `Starting ${currentWorld.name}...`
-                        )
-                      }
-                      variant="success"
-                    >
-                      <Play aria-hidden="true" />
-                      Play
-                    </Button>
-                  ) : !hasWorldsStore ? (
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        navigateWithLoading(
-                          '/worlds/create',
-                          'Setting up world creation...'
-                        )
-                      }
-                    >
-                      Create Your First World
-                    </Button>
-                  ) : null}
+                  {cta && (
+                    <>
+                      <span
+                        className="header-nav-divider"
+                        aria-hidden="true"
+                      />
+                      {cta}
+                    </>
+                  )}
                 </SSRClientOnly>
               </div>
             </div>

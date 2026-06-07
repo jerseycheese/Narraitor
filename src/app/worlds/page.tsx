@@ -161,7 +161,7 @@ export default function WorldsPage() {
   return (
     <PageLayout
       title="My Worlds"
-      description="Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar."
+      description="Create unique story worlds, then manage characters and play through interactive narratives. Your active world is highlighted below."
       actions={
         <>
           {viewToggle}

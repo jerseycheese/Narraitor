@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { ExportImportControls } from '@/components/shared/ExportImportControls';
+import { ThemeMenu } from '@/components/Navigation/ThemeMenu';
 import {
   Card,
   CardHeader,
@@ -50,6 +51,25 @@ export default function SettingsPage() {
               >
                 Manage providers
               </Link>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="settings-section">
+          <h2>Appearance</h2>
+          <Card className="settings-card">
+            <CardHeader>
+              <CardTitle>Theme &amp; color</CardTitle>
+              <CardDescription>
+                Choose a visual style and light/dark mode. Your choice is saved
+                in this browser and applies across the app.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="settings-appearance-row">
+                <span className="settings-appearance-label">Appearance</span>
+                <ThemeMenu />
+              </div>
             </CardContent>
           </Card>
         </section>

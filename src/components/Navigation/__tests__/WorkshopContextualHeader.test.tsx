@@ -13,9 +13,11 @@ const mockSessionStore = {
   setCurrentCharacter: jest.fn(),
 };
 
+let mockPathname = '/characters';
+
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn(), pathname: '/worlds' }),
-  usePathname: () => '/worlds',
+  useRouter: () => ({ push: jest.fn(), pathname: mockPathname }),
+  usePathname: () => mockPathname,
 }));
 
 jest.mock('@/state/worldStore', () => ({
@@ -59,6 +61,7 @@ describe('WorkshopContextualHeader', () => {
     jest.clearAllMocks();
     mockWorldStore.worlds = {};
     mockWorldStore.currentWorldId = null;
+    mockPathname = '/characters';
   });
 
   it('renders the mobile sidebar trigger and workshop title', () => {
@@ -100,6 +103,21 @@ describe('WorkshopContextualHeader', () => {
     );
 
     expect(screen.getByRole('button', { name: /^Play$/i })).toBeInTheDocument();
+  });
+
+  it('suppresses the CTA on the worlds index, where the page owns those actions', () => {
+    mockPathname = '/worlds';
+
+    render(
+      <WorkshopContextualHeader
+        sidebarOpen={false}
+        onToggleSidebar={jest.fn()}
+      />
+    );
+
+    expect(
+      screen.queryByText('Create Your First World')
+    ).not.toBeInTheDocument();
   });
 
   it('renders breadcrumbs and recent pages on the desktop side of the header', () => {
