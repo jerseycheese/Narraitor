@@ -3,25 +3,24 @@ import type { Page } from '@playwright/test';
 export type ThemeId = 'ds1' | 'ds2' | 'ds3';
 
 /**
- * Switch the active design system in a visual spec, deterministically.
+ * Switch the active design system in a visual spec, in place.
  *
  * The theme control moved out of inline DS1/DS2/DS3 radios and into the
- * Appearance menu (a closed dropdown), so the old "click the radio" approach no
- * longer works. Instead seed the `narraitor-theme` key the ThemeProvider reads
- * on mount.
+ * Appearance menu, so the old "click the radio" approach no longer works. We
+ * replicate what the radio click did — flip the design system without a reload
+ * — by setting `data-theme` directly (the attribute ThemeProvider's effect
+ * writes) plus the `narraitor-theme` key it reads on mount.
  *
- * seedTestData registers an addInitScript that calls `localStorage.clear()` on
- * every navigation, so we register OUR init script after it (in the test body)
- * and reload — init scripts run in registration order, so the theme is written
- * after the clear and survives. Mirrors the seeding in about-page.spec /
- * mobile-overflow.spec; the rendered output is identical to clicking, so the
- * committed baselines are unchanged.
+ * NB: this must NOT reload. A reload re-races store hydration against
+ * seedTestData's IndexedDB writes, so data-dependent routes (e.g. the character
+ * editor) come back empty and the snapshot height collapses. Setting the
+ * attribute in place keeps the already-rendered, seeded page intact.
  */
 export async function applyTheme(page: Page, themeId: ThemeId): Promise<void> {
-  await page.addInitScript((t) => {
+  await page.evaluate((t) => {
     localStorage.setItem('narraitor-theme', t);
+    document.documentElement.setAttribute('data-theme', t);
   }, themeId);
-  await page.reload();
   await page.waitForFunction(
     (t) => document.documentElement.getAttribute('data-theme') === t,
     themeId

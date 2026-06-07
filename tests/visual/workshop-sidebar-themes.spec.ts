@@ -39,10 +39,6 @@ async function settleTheme(
 ): Promise<void> {
   if (theme) {
     await applyTheme(page, theme.id);
-    // applyTheme reloads, so wait for the seeded rail to re-render.
-    await page.waitForSelector('.workshop-sidebar-worlds-section', {
-      timeout: 8000,
-    });
   }
   await waitForContentStable(page);
   await hideDynamicContent(page);
