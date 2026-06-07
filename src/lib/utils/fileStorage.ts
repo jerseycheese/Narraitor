@@ -89,7 +89,6 @@ function getExtensionFromMimeType(mimeType: string): string {
     'image/jpg': 'jpg',
     'image/webp': 'webp',
     'image/gif': 'gif',
-    'image/svg+xml': 'svg',
   };
 
   const extension = mimeMap[mimeType.toLowerCase()];
