@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 interface HeroProps {
   /** The title to display over the image */
@@ -72,8 +73,14 @@ export const Hero: React.FC<HeroProps> = ({
           width={800}
           height={400}
 
-          // Use unoptimized for data URLs and tests to avoid Next optimization proxy
-          unoptimized={typeof image.url === 'string' && image.url.startsWith('data:')}
+          // Skip Next's optimization proxy for data URLs and under Playwright.
+          // The on-demand optimizer cold-starts slowly on CI and leaves the
+          // banner blank past the visual-test image wait (#1346); serving the
+          // raw file keeps the banner deterministic in tests.
+          unoptimized={
+            isPlaywrightEnv() ||
+            (typeof image.url === 'string' && image.url.startsWith('data:'))
+          }
         />
       )}
 

@@ -1,0 +1,259 @@
+/* ═══════════════════════════════════════════════════════════════
+   Legal Surface
+   Styles for /privacy and /terms and the <LegalPage /> component.
+   All values use design tokens for theme-awareness. Per-theme
+   structural treatments mirror about.css, but tuned for dense text:
+   readability comes first, so there are no full-page background
+   patterns — differentiation lives in the hero, section titles,
+   and rhythm.
+   DS1 = drafting-table (hairline section rules, mono uppercase labels)
+   DS2 = editorial (serif prose, airy rhythm)
+   DS3 = mechanical manuscript (mono labels with a dot bullet, compact)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Base layout (token-driven, theme-agnostic) ─── */
+
+.component-legal {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+@media (width >= 1024px) {
+  .component-legal {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+
+/* ─── Hero ─── */
+
+.component-legal-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-legal-eyebrow {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.component-legal-title {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.component-legal-lead {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.component-legal-updated {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── Section ─── */
+
+.component-legal-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-legal-section-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.1875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+.component-legal-prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-legal-prose p {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+.component-legal-prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.component-legal-prose a:hover {
+  color: var(--color-accent-hover);
+}
+
+.component-legal-prose a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Footer links ─── */
+
+.component-legal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.component-legal-footer-link {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.component-legal-footer-link:hover {
+  color: var(--color-accent);
+}
+
+.component-legal-footer-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS1 — "The Drafting Table"
+   Hairline rules between sections, mono uppercase section labels,
+   tight rhythm, sharp footer rule.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds1"] .component-legal {
+  gap: 0;
+}
+
+[data-theme="ds1"] .component-legal-hero {
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .component-legal-section {
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .component-legal-title {
+  font-family: var(--font-interface);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds1"] .component-legal-section-title {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .component-legal-footer {
+  padding-top: var(--space-6);
+  border-top-color: var(--color-border-strong);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS2 — "Warm Earth" editorial
+   Serif prose, generous whitespace, large serif section titles.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds2"] .component-legal {
+  gap: clamp(var(--space-8), 5vw, 3.5rem);
+}
+
+[data-theme="ds2"] .component-legal-lead {
+  font-family: var(--font-narrative);
+  font-size: 1.25rem;
+  line-height: 1.55;
+}
+
+[data-theme="ds2"] .component-legal-section-title {
+  font-family: var(--font-narrative);
+  font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds2"] .component-legal-prose p {
+  font-family: var(--font-narrative);
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS3 — "Mechanical Manuscript"
+   Compact: mono uppercase section labels with a dot bullet, mono
+   prose, tighter rhythm.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds3"] .component-legal {
+  gap: var(--space-6);
+}
+
+[data-theme="ds3"] .component-legal-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .component-legal-section-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+[data-theme="ds3"] .component-legal-lead {
+  font-family: var(--font-narrative);
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+[data-theme="ds3"] .component-legal-prose p {
+  font-family: var(--font-system);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
