@@ -8,6 +8,10 @@ import { useCharacterStore, CharacterStore } from '../../state/characterStore';
 import { useSessionStore } from '../../state/sessionStore';
 import { useJournalStore } from '../../state/journalStore';
 import { useNarrativeStore } from '../../state/narrativeStore';
+import { useInventoryStore } from '../../state/inventoryStore';
+import { useLoreStore } from '../../state/loreStore';
+import { useGoalStore } from '../../state/goalStore';
+import { useNPCStore } from '../../state/npcStore';
 import { validateWorld } from '@/lib/utils/typeGuards';
 import { getTimestamp } from '../utils';
 
@@ -22,6 +26,10 @@ interface GameStateExport {
   sessionState: unknown;
   journalState?: unknown;
   narrativeState?: unknown;
+  inventoryState?: unknown;
+  loreState?: unknown;
+  goalState?: unknown;
+  npcState?: unknown;
 }
 
 interface ExportResult {
@@ -36,7 +44,7 @@ export interface ImportResult {
   error?: string;
 }
 
-async function exportGameState(): Promise<ExportResult> {
+export async function exportGameState(): Promise<ExportResult> {
   try {
     const gameState: GameStateExport = {
       version: CURRENT_VERSION,
@@ -46,6 +54,10 @@ async function exportGameState(): Promise<ExportResult> {
       sessionState: useSessionStore.getState(),
       journalState: useJournalStore.getState(),
       narrativeState: useNarrativeStore.getState(),
+      inventoryState: useInventoryStore.getState(),
+      loreState: useLoreStore.getState(),
+      goalState: useGoalStore.getState(),
+      npcState: useNPCStore.getState(),
     };
 
     return { success: true, data: gameState };
@@ -145,6 +157,22 @@ async function importGameState(gameState: unknown): Promise<ImportResult> {
 
     if (validatedGameState.narrativeState) {
       useNarrativeStore.setState(validatedGameState.narrativeState);
+    }
+
+    if (validatedGameState.inventoryState) {
+      useInventoryStore.setState(validatedGameState.inventoryState);
+    }
+
+    if (validatedGameState.loreState) {
+      useLoreStore.setState(validatedGameState.loreState);
+    }
+
+    if (validatedGameState.goalState) {
+      useGoalStore.setState(validatedGameState.goalState);
+    }
+
+    if (validatedGameState.npcState) {
+      useNPCStore.setState(validatedGameState.npcState);
     }
 
     return { success: true, message: 'Game state imported successfully' };
