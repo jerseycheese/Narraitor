@@ -33,6 +33,11 @@ jest.mock('@/components/shared/PageLayout', () => {
   };
 });
 
+// Mock the appearance control (it depends on ThemeProvider context)
+jest.mock('@/components/Navigation/ThemeMenu', () => ({
+  ThemeMenu: () => <div data-testid="theme-menu" />,
+}));
+
 // Mock the Card components
 jest.mock('@/components/ui/card', () => {
   return {

@@ -21,10 +21,11 @@
   --color-text-muted: rgb(128 113 98);
   --color-text-inverse: rgb(255 255 255);
 
-  /* Sage Green accent */
-  --color-accent: rgb(124 139 111);
-  --color-accent-hover: rgb(106 119 96);
-  --color-accent-soft: rgb(124 139 111 / 12%);
+  /* Sage Green accent — darkened so white button text clears WCAG AA (4.5:1);
+     ~5.3:1 on white vs the previous ~3.6:1, still reads as Warm Earth. */
+  --color-accent: rgb(99 111 89);
+  --color-accent-hover: rgb(82 92 73);
+  --color-accent-soft: rgb(99 111 89 / 12%);
 
   /* shadcn/ui HSL tokens */
   --background: 40 33% 97%;

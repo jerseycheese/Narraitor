@@ -961,12 +961,30 @@
   gap: var(--space-4);
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--space-3) var(--space-4);
+  padding-block: var(--space-3);
+  padding-inline: var(--space-4);
+}
+
+/* Match the page-content gutter at each breakpoint so the logo lines up with
+   the page's left edge and the CTA with its right edge. default-surface-inner
+   uses space-3 (<768), space-4 (768-1024), space-6 (>=1024). */
+@media (width < 768px) {
+  .header-nav-inner {
+    padding-inline: var(--space-3);
+  }
+}
+
+@media (width >= 1024px) {
+  .header-nav-inner {
+    padding-inline: var(--space-6);
+  }
 }
 
 .header-nav-left {
   display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
 }
 
@@ -977,9 +995,20 @@
 }
 
 .header-nav-desktop-links {
-  display: flex;
+  /* Hidden at/under 768px: the hamburger + drawer own primary navigation there.
+     Shown inline above 768px. The `> 768` boundary matches the hamburger's
+     `max-width: 768px` (useMobileNavigation) so neither double-renders at the
+     exact 768px edge (iPad Mini portrait). Mobile-first so the base rule isn't
+     overridden by later source-order declarations. */
+  display: none;
   align-items: center;
   gap: var(--space-4);
+}
+
+@media (width > 768px) {
+  .header-nav-desktop-links {
+    display: flex;
+  }
 }
 
 .header-nav-links a[data-navigation] {
@@ -998,10 +1027,99 @@
 .header-nav-actions {
   display: flex;
   align-items: center;
+  gap: var(--space-3);
+}
+
+/* Brand lockup: icon + serif wordmark, no link underline. */
+.app-brand {
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-2);
+  text-decoration: none;
+  color: var(--color-text-primary);
+}
+
+/* Wordmark in the per-theme narrative serif (Lora / Crimson Pro / Newsreader)
+   so the brand carries the app's literary identity instead of plain UI sans. */
+.app-wordmark {
+  font-family: var(--font-narrative);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+/* Grouped toolbar: utility icons | world context | primary action. */
+.header-nav-actions-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Active world reads as "your story": a subtle wash of the theme accent. */
+.header-world-trigger-active {
+  background: var(--color-accent-soft);
+}
+
+.header-nav-divider {
+  width: 1px;
+  height: 1.375rem;
+  background: var(--color-border);
+}
+
+/* Active-world character count as a subtle labeled badge, not a bare number. */
+.header-world-count {
+  font-family: var(--font-interface);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-surface-hover);
+  padding: 0.0625rem var(--space-1_5);
+  border-radius: 999px;
 }
 
 /* ─── Dropdown Menu ─── */
+
+/* Positioning context so the dropdown anchors under the palette trigger. */
+.theme-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Bound the appearance dropdown so it fits the narrow workshop rail (which
+   clips overflow) and let the skin descriptions wrap instead of forcing the
+   menu wider than its container. */
+.theme-menu .header-dropdown-menu {
+  width: 15rem;
+}
+
+.theme-menu-item-text {
+  min-width: 0;
+}
+
+.theme-menu-item-text > div {
+  white-space: normal;
+}
+
+/* Color-mode section inside the appearance dropdown, below the theme list. */
+.theme-menu-mode {
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.theme-menu-mode .dark-mode-toggle {
+  margin-top: var(--space-1);
+}
+
+/* In the workshop rail the trigger sits at the bottom-left, so the default
+   top-right dropdown placement clips off the bottom and left edges. Flip it to
+   open upward and align to the trigger's left edge. */
+.workshop-sidebar-toolbar .theme-menu .header-dropdown-menu {
+  inset: auto auto 100% 0;
+  margin-top: 0;
+  margin-bottom: var(--space-1);
+}
 
 .header-dropdown-trigger {
   display: inline-flex;
@@ -2879,6 +2997,20 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-5);
+}
+
+.settings-appearance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.settings-appearance-label {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
 }
 
 .settings-export-import {
