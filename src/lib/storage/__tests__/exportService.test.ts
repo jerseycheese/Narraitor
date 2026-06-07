@@ -64,4 +64,23 @@ describe('exportService full-state coverage', () => {
     expect((useGoalStore.getState().entities as any).g9).toEqual({ id: 'g9' });
     expect((useNPCStore.getState().entities as any).n9).toEqual({ id: 'n9' });
   });
+
+  it('survives a JSON round-trip without clobbering inventory Set/Map fields', async () => {
+    useInventoryStore.setState({ items: { i7: { id: 'i7' } } } as any);
+
+    // Mirror the real flow: exportGameState -> JSON.stringify (downloadGameState)
+    // -> JSON.parse (importFromFile). A whole-store dump would serialize the
+    // transient Set/Map as {} and the store would later choke on new Set({}).
+    const exported = await exportGameState();
+    const json = JSON.stringify(exported.data);
+    const fakeFile = { text: async () => json } as unknown as File;
+
+    const res = await importFromFile(fakeFile);
+
+    expect(res.success).toBe(true);
+    expect((useInventoryStore.getState().items as any).i7).toEqual({ id: 'i7' });
+    // Transient fields must remain usable Set/Map, not plain objects from JSON.
+    expect(useInventoryStore.getState().generatingImageFor).toBeInstanceOf(Set);
+    expect(useInventoryStore.getState().imageGenerationErrors).toBeInstanceOf(Map);
+  });
 });

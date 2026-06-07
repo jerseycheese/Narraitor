@@ -46,6 +46,12 @@ export interface ImportResult {
 
 export async function exportGameState(): Promise<ExportResult> {
   try {
+    // inventoryStore carries transient Set/Map fields (generatingImageFor,
+    // imageGenerationErrors) that JSON.stringify turns into {} and that the
+    // store later rebuilds via new Set()/new Map() — exporting them would throw
+    // on re-import. Export only the durable fields (its persist partialize set).
+    const inventory = useInventoryStore.getState();
+
     const gameState: GameStateExport = {
       version: CURRENT_VERSION,
       exportedAt: getTimestamp(),
@@ -54,7 +60,11 @@ export async function exportGameState(): Promise<ExportResult> {
       sessionState: useSessionStore.getState(),
       journalState: useJournalStore.getState(),
       narrativeState: useNarrativeStore.getState(),
-      inventoryState: useInventoryStore.getState(),
+      inventoryState: {
+        items: inventory.items,
+        entities: inventory.entities,
+        characterInventories: inventory.characterInventories,
+      },
       loreState: useLoreStore.getState(),
       goalState: useGoalStore.getState(),
       npcState: useNPCStore.getState(),
