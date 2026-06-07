@@ -140,11 +140,6 @@
       }
     }
   },
-  "eslintConfig": {
-    "extends": [
-      "plugin:storybook/recommended"
-    ]
-  },
   "description": "AI-powered storytelling app that runs narrative RPG experiences in any world — fictional or real — with mechanics and tone tailored to that world.",
   "directories": {
     "doc": "docs",
@@ -156,7 +151,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jerseycheese/Narraitor/issues"
   },
