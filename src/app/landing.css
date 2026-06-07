@@ -1,0 +1,460 @@
+/* ═══════════════════════════════════════════════════════════════
+   Landing Surface
+   Styles for /welcome and the <Landing /> component — the free public
+   front door. All values use design tokens for theme-awareness. The
+   composition is intentionally bolder than the About surface (large
+   display hero, a stepped grid, a distinct "how it's free" band) so it
+   reads as a front door, not a centered template. Per-theme structural
+   treatments mirror about.css:
+   DS1 = drafting-table (drafting grid, hairline rules, mono uppercase labels)
+   DS2 = editorial (large serif display, airy rhythm, soft surfaces)
+   DS3 = mechanical manuscript (dot-grid, corner-bracket cards, mono labels)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Base layout (token-driven, theme-agnostic) ─── */
+
+.component-landing {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--space-8), 6vw, 5rem);
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+@media (width >= 1024px) {
+  .component-landing {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+
+/* ─── Hero ─── */
+
+.component-landing-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 760px;
+}
+
+.component-landing-eyebrow {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+/* Scoped (.component-landing prefix) to outrank the default-surface h1
+   baseline in workshop.css (.app-surface-default h1) — the hero title is
+   deliberately a large display heading, not the 2rem surface default. */
+.component-landing .component-landing-title {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.component-landing-lead {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.component-landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.component-landing-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--color-text-inverse);
+  background: var(--color-accent);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background-color 120ms ease;
+}
+
+.component-landing-cta:hover {
+  background: var(--color-accent-hover);
+}
+
+.component-landing-cta:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.component-landing-cta-secondary {
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.component-landing-cta-secondary:hover {
+  color: var(--color-accent);
+}
+
+.component-landing-cta-secondary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Shared section title ─── */
+
+.component-landing-section-title {
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-interface);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ─── Steps ─── */
+
+.component-landing-step-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width < 768px) {
+  .component-landing-step-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.component-landing-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.component-landing-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-family: var(--font-system);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-full);
+}
+
+.component-landing-step-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-landing-step-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+/* ─── "How it's free" honest band ─── */
+
+.component-landing-note {
+  padding: var(--space-6);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+@media (width >= 1024px) {
+  .component-landing-note {
+    padding: var(--space-8);
+  }
+}
+
+.component-landing-note-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width < 768px) {
+  .component-landing-note-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.component-landing-note-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-landing-note-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-landing-note-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Footer links ─── */
+
+.component-landing-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.component-landing-footer-link {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.component-landing-footer-link:hover {
+  color: var(--color-accent);
+}
+
+.component-landing-footer-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS1 — "The Drafting Table"
+   Faint drafting grid, hairline rules, mono uppercase labels, sharp
+   radius, a bold sans display title. Structural, architectural.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds1"] .component-landing {
+  background-color: var(--color-canvas);
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-border-strong) 35%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-border-strong) 35%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
+  background-repeat: repeat;
+}
+
+[data-theme="ds1"] .component-landing-title {
+  font-family: var(--font-interface);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+[data-theme="ds1"] .component-landing-section-title {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .component-landing-cta,
+[data-theme="ds1"] .component-landing-step {
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="ds1"] .component-landing-step-number {
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .component-landing-note {
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border-strong);
+  background: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS2 — "Warm Earth" editorial
+   Large serif display, generous whitespace, soft surfaces, no
+   pattern. Magazine cover energy.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds2"] .component-landing {
+  gap: clamp(var(--space-8), 7vw, 6rem);
+}
+
+[data-theme="ds2"] .component-landing-title {
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+[data-theme="ds2"] .component-landing-lead {
+  font-family: var(--font-narrative);
+  font-size: 1.5rem;
+  line-height: 1.5;
+}
+
+[data-theme="ds2"] .component-landing-section-title {
+  font-family: var(--font-narrative);
+  font-size: clamp(1.625rem, 3vw, 2.125rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds2"] .component-landing-step {
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-hover);
+  padding: var(--space-6);
+}
+
+[data-theme="ds2"] .component-landing-step-description {
+  font-family: var(--font-narrative);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+[data-theme="ds2"] .component-landing-note {
+  border: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DS3 — "Mechanical Manuscript"
+   Dot-grid field, mono labels with a dot bullet, corner-bracket step
+   cards, compact rhythm, mono prose.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="ds3"] .component-landing {
+  gap: clamp(var(--space-6), 5vw, 3.5rem);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-text-primary) 14%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+  background-repeat: repeat;
+}
+
+[data-theme="ds3"] .component-landing-eyebrow {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .component-landing-lead {
+  font-family: var(--font-narrative);
+  font-size: 1.1875rem;
+  line-height: 1.55;
+}
+
+[data-theme="ds3"] .component-landing-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds3"] .component-landing-section-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+[data-theme="ds3"] .component-landing-step {
+  position: relative;
+  border: none;
+  background: var(--color-surface);
+}
+
+/* Corner brackets — top-left + bottom-right L-marks in accent. */
+[data-theme="ds3"] .component-landing-step::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+  pointer-events: none;
+}
+
+[data-theme="ds3"] .component-landing-step::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  border-right: 1px solid var(--color-accent);
+  border-bottom: 1px solid var(--color-accent);
+  pointer-events: none;
+}
+
+[data-theme="ds3"] .component-landing-step-number {
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="ds3"] .component-landing-step-description,
+[data-theme="ds3"] .component-landing-note-description {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+}
