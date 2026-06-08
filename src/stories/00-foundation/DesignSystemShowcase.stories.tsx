@@ -43,19 +43,32 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Color Swatch Component
+//
+// Render the color as a div `background` rather than an SVG `<rect fill>`:
+// a percentage-sized SVG with a square viewBox stretched each swatch to the
+// full page width (~1393px tall), ballooning the showcase to ~27,000px.
 const ColorSwatch = ({ color, name }: { color: string; name: string }) => (
-  <div>
-    <div>
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 32 32"
-        role="img"
-        aria-label={`${name} swatch`}
-      >
-        <rect x="0" y="0" width="32" height="32" fill={color} />
-      </svg>
-    </div>
+  <div
+    className="ds-color-swatch"
+    style={{
+      display: 'inline-block',
+      verticalAlign: 'top',
+      marginRight: 'var(--space-4)',
+      marginBottom: 'var(--space-3)',
+    }}
+  >
+    <div
+      className="ds-color-swatch-chip"
+      style={{
+        background: color,
+        width: '3rem',
+        height: '3rem',
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--color-border)',
+      }}
+      role="img"
+      aria-label={`${name} swatch`}
+    />
     <div>
       <div>{name}</div>
       <div>{color}</div>
@@ -93,13 +106,21 @@ export const CompleteShowcase: Story = {
           <h3>Primitive Colors</h3>
           <div>
             {Object.entries(primitiveColors).map(([colorName, shades]) =>
-              Object.entries(shades as Record<string, string>).map(
-                ([shade, color]) => (
-                  <ColorSwatch
-                    key={`${colorName}-${shade}`}
-                    color={color}
-                    name={`${colorName}-${shade}`}
-                  />
+              // `white`/`black` are bare strings, not shade maps. Iterating a
+              // string with Object.entries yields its characters ("#", "f", ...),
+              // which rendered junk swatches with an invalid "#" fill — render a
+              // single swatch for them instead.
+              typeof shades === 'string' ? (
+                <ColorSwatch key={colorName} color={shades} name={colorName} />
+              ) : (
+                Object.entries(shades as Record<string, string>).map(
+                  ([shade, color]) => (
+                    <ColorSwatch
+                      key={`${colorName}-${shade}`}
+                      color={color}
+                      name={`${colorName}-${shade}`}
+                    />
+                  )
                 )
               )
             )}

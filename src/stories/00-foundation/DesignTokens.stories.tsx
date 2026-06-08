@@ -13,13 +13,32 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 // Color Swatch Component
+//
+// Render the color as a div `background` rather than an SVG `<rect fill>`:
+// the percentage-sized SVG with a square viewBox stretched each swatch to the
+// full page width, blowing up the page height.
 const ColorSwatch = ({ color, name, description }: { color: string; name: string; description?: string }) => (
-  <div>
-    <div>
-    <svg width="100%" height="100%" viewBox="0 0 48 48" role="img" aria-label={`${name} swatch`}>
-        <rect x="0" y="0" width="48" height="48" fill={color} />
-      </svg>
-    </div>
+  <div
+    className="ds-color-swatch"
+    style={{
+      display: 'inline-block',
+      verticalAlign: 'top',
+      marginRight: 'var(--space-4)',
+      marginBottom: 'var(--space-3)',
+    }}
+  >
+    <div
+      className="ds-color-swatch-chip"
+      style={{
+        background: color,
+        width: '3rem',
+        height: '3rem',
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--color-border)',
+      }}
+      role="img"
+      aria-label={`${name} swatch`}
+    />
     <div>
       <div>{name}</div>
       <div>{color}</div>
@@ -151,11 +170,18 @@ export const ContextualTokens: Story = {
                 <div>
                   bg: {colors.background} | border: {colors.border}
                 </div>
-                <div>
-                <svg width="100%" height="32" viewBox="0 0 200 32" role="img" aria-label={`${category} example`}>
-                    <rect x="0" y="0" width="200" height="32" fill={colors.background} stroke={colors.border} />
-                  </svg>
-                </div>
+                <div
+                  className="ds-lore-swatch"
+                  style={{
+                    background: colors.background,
+                    border: `1px solid ${colors.border}`,
+                    width: '100%',
+                    height: '32px',
+                    borderRadius: 'var(--radius-sm)',
+                  }}
+                  role="img"
+                  aria-label={`${category} example`}
+                />
               </div>
             ))}
           </div>
