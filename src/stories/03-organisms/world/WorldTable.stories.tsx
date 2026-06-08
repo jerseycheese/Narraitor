@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import React, { useState } from 'react';
+import React from 'react';
 import { WorldTable } from '@/components/world/WorldTable';
 import { useCharacterStore } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
-import { EntityID } from '@/types/common.types';
 
 const meta = {
   title: '03-Organisms/world/WorldTable',
@@ -81,11 +80,8 @@ const mockWorlds: World[] = [
 ];
 
 const MockStoreDecorator = (StoryComponent: React.ComponentType) => {
-  // We need to inject state into the store for the component to read
+  // Inject character counts into the store so the Characters column renders.
   React.useEffect(() => {
-    // Access the internal store API to set state directly for testing
-    // This is a bit of a hack but necessary since we can't easily mock the hook return value
-    // in this environment without a more complex setup
     useCharacterStore.setState({
       worldCharacterIds: {
         'world-1': ['char-1', 'char-2', 'char-3'],
@@ -101,61 +97,14 @@ const MockStoreDecorator = (StoryComponent: React.ComponentType) => {
 export const Default: Story = {
   args: {
     worlds: mockWorlds,
-    selectedWorldIds: [],
-    onToggleSelect: () => {},
     onDeleteWorld: () => {},
   },
-  decorators: [MockStoreDecorator],
-};
-
-export const WithSelection: Story = {
-  args: {
-    worlds: mockWorlds,
-    selectedWorldIds: ['world-1', 'world-3'],
-    onToggleSelect: () => {},
-    onDeleteWorld: () => {},
-  },
-  decorators: [MockStoreDecorator],
-};
-
-// Create a proper React component for the interactive story
-const InteractiveWorldTable = () => {
-  const [selectedIds, setSelectedIds] = useState<EntityID[]>([]);
-
-  const handleToggle = (id: EntityID) => {
-    setSelectedIds(prev =>
-      prev.includes(id)
-        ? prev.filter(p => p !== id)
-        : prev.length < 5 ? [...prev, id] : prev
-    );
-  };
-
-  return (
-    <WorldTable
-      worlds={mockWorlds}
-      selectedWorldIds={selectedIds}
-      onToggleSelect={handleToggle}
-      onDeleteWorld={() => console.log('Delete clicked')}
-    />
-  );
-};
-
-export const Interactive: Story = {
-  args: {
-    worlds: mockWorlds,
-    selectedWorldIds: [],
-    onToggleSelect: () => {},
-    onDeleteWorld: () => {},
-  },
-  render: () => <InteractiveWorldTable />,
   decorators: [MockStoreDecorator],
 };
 
 export const Empty: Story = {
   args: {
     worlds: [],
-    selectedWorldIds: [],
-    onToggleSelect: () => {},
     onDeleteWorld: () => {},
   },
   decorators: [MockStoreDecorator],

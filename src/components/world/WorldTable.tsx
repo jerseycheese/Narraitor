@@ -1,15 +1,14 @@
 /**
  * WorldTable - Table view for world management
- * Displays worlds with sorting, filtering, selection, and actions
+ * Displays worlds with sorting, filtering, and actions
  */
 
 import * as React from 'react';
 import Image from 'next/image';
-import { type ColumnDef, type RowSelectionState } from '@tanstack/react-table';
+import { type ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, Pencil, Trash2, Globe } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCharacterStore } from '@/state/characterStore';
@@ -20,28 +19,14 @@ import { getGenreLabel } from '@/lib/constants/genres';
 
 interface WorldTableProps {
   worlds: World[];
-  selectedWorldIds: EntityID[];
-  onToggleSelect: (worldId: EntityID) => void;
   onDeleteWorld: (worldId: EntityID, e: React.MouseEvent) => void;
 }
 
-interface WorldTableRowProps {
-  isSelected: boolean;
-  cells: React.ReactNode;
-}
-
-// Row wrapper keeps the selection state hook in one place; the world image
-// now renders as a thumbnail in the Name cell rather than as a full-row
-// backdrop (the old gradient overlay drowned the image and gave selected
-// rows inverse-color text inconsistent with the rest of the table).
+// Row wrapper renders the world image as a thumbnail in the Name cell rather
+// than as a full-row backdrop, and carries the table-row class for styling.
 const WorldTableRow = React.memo(
-  ({ isSelected, cells }: WorldTableRowProps) => (
-    <tr
-      data-state={isSelected ? 'selected' : undefined}
-      className="component-world-table-row"
-    >
-      {cells}
-    </tr>
+  ({ cells }: { cells: React.ReactNode }) => (
+    <tr className="component-world-table-row">{cells}</tr>
   )
 );
 
@@ -62,22 +47,18 @@ const WorldThumbnail: React.FC<WorldThumbnailProps> = ({ url }) => (
 );
 
 /**
- * WorldTable - A data table component for comparing and managing multiple worlds
+ * WorldTable - A data table component for managing multiple worlds
  *
  * Displays worlds in a row-based format with columns for key metrics like
- * attribute counts, skill counts, and character counts. Includes selection
- * checkboxes for side-by-side comparison and action buttons for CRUD operations.
+ * attribute counts, skill counts, and character counts, plus action buttons
+ * for CRUD operations.
  *
  * @param props - Component properties
  * @param props.worlds - Array of World objects to display in the table
- * @param props.selectedWorldIds - Array of IDs for currently selected worlds
- * @param props.onToggleSelect - Callback to toggle a world's selection for comparison
  * @param props.onDeleteWorld - Callback for deleting a world from the list
  */
 export function WorldTable({
   worlds,
-  selectedWorldIds,
-  onToggleSelect,
   onDeleteWorld,
 }: WorldTableProps) {
   const router = useRouter();
@@ -100,58 +81,8 @@ export function WorldTable({
     [router]
   );
 
-  // Convert selectedWorldIds to TanStack RowSelectionState
-  const rowSelection = React.useMemo(() => {
-    const selection: RowSelectionState = {};
-    selectedWorldIds.forEach((id) => {
-      selection[id] = true;
-    });
-    return selection;
-  }, [selectedWorldIds]);
-
   const columns: ColumnDef<World>[] = React.useMemo(
     () => [
-      {
-        id: 'select',
-        header: () => {
-          const allSelected =
-            worlds.length > 0 &&
-            selectedWorldIds.length === Math.min(worlds.length, 5);
-
-          return (
-            <Checkbox
-              checked={allSelected}
-              onChange={() => {
-                if (selectedWorldIds.length > 0) {
-                  // Clear all selections
-                  selectedWorldIds.forEach((id) => onToggleSelect(id));
-                } else {
-                  // Select up to 5 worlds
-                  worlds.slice(0, 5).forEach((w) => {
-                    if (!selectedWorldIds.includes(w.id)) {
-                      onToggleSelect(w.id);
-                    }
-                  });
-                }
-              }}
-              aria-label={`Select up to ${Math.min(worlds.length, 5)} worlds`}
-            />
-          );
-        },
-        cell: ({ row }) => (
-          <Checkbox
-            checked={selectedWorldIds.includes(row.original.id)}
-            onChange={() => onToggleSelect(row.original.id)}
-            aria-label={`Select ${row.original.name} for comparison`}
-            disabled={
-              !selectedWorldIds.includes(row.original.id) &&
-              selectedWorldIds.length >= 5
-            }
-          />
-        ),
-        enableSorting: false,
-        size: 40,
-      },
       {
         accessorKey: 'name',
         header: 'Name',
@@ -241,15 +172,7 @@ export function WorldTable({
         enableSorting: false,
       },
     ],
-    [
-      worlds,
-      selectedWorldIds,
-      onToggleSelect,
-      onDeleteWorld,
-      worldCharacterIds,
-      handleViewWorld,
-      handleEditWorld,
-    ]
+    [onDeleteWorld, worldCharacterIds, handleViewWorld, handleEditWorld]
   );
 
   if (worlds.length === 0) {
@@ -263,17 +186,7 @@ export function WorldTable({
   const customRowRenderer = (
     row: { original: World; id: string },
     cells: React.ReactNode
-  ) => {
-    const isSelected = selectedWorldIds.includes(row.original.id);
-
-    return (
-      <WorldTableRow
-        key={row.id}
-        isSelected={isSelected}
-        cells={cells}
-      />
-    );
-  };
+  ) => <WorldTableRow key={row.id} cells={cells} />;
 
   return (
     <DataTable
@@ -287,7 +200,6 @@ export function WorldTable({
         enabled: true,
         placeholder: 'Search worlds...',
       }}
-      rowSelection={rowSelection}
       ariaLabel="Worlds table"
       customRowRenderer={customRowRenderer}
     />

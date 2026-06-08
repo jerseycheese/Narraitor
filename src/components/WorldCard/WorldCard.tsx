@@ -9,7 +9,6 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
 import { CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
@@ -22,12 +21,8 @@ interface WorldCardProps {
   world: World;
   /** Whether this world is currently active */
   isActive?: boolean;
-  /** Whether this world is selected for comparison */
-  isSelected?: boolean;
   /** Callback when user selects this world */
   onSelect: (worldId: string) => void;
-  /** Callback when user toggles selection for comparison */
-  onToggleSelect?: (worldId: string) => void;
   /** Callback when user wants to delete this world */
   onDelete: (worldId: string) => void;
   /** Characters in this world */
@@ -64,9 +59,7 @@ interface WorldCardProps {
 const WorldCard: React.FC<WorldCardProps> = ({
   world,
   isActive = false,
-  isSelected = false,
   onSelect,
-  onToggleSelect,
   onDelete,
   characters = [],
 }) => {
@@ -159,15 +152,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
             );
           })()}
         </Link>
-        {onToggleSelect && (
-          <div className="world-card-compare">
-            <Checkbox
-              checked={isSelected}
-              onChange={() => onToggleSelect(world.id)}
-              aria-label={`Select ${world.name} for comparison`}
-            />
-          </div>
-        )}
       </div>
 
       <div className="world-card-body">
