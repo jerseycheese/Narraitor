@@ -6,7 +6,7 @@ import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 export const worldCreationTour: Step[] = [
   {
     target: '[data-tutorial="world-creation-header"]',
-    content: 'Welcome to the World Creation Wizard! You can choose a path: start from scratch on the left, or use a template on the right.',
+    content: 'Welcome to the World Creation Wizard! You can choose a path: start from scratch and define everything yourself, or use a template to jump-start your world.',
     placement: 'bottom',
     tooltipComponent: WorldCreationStartTooltip,
     disableBeacon: true,
