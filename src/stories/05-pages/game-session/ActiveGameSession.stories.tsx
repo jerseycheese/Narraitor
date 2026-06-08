@@ -6,6 +6,7 @@ import { NarrativeSegment, Decision } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { ToastProvider } from '@/components/ui/toast';
 import { getTimestamp } from '@/lib/utils';
 
 const meta: Meta<typeof ActiveGameSession> = {
@@ -27,6 +28,8 @@ const meta: Meta<typeof ActiveGameSession> = {
     },
   },
   decorators: [
+    // ActiveGameSession's useAutoSave calls useToast, so every story needs a ToastProvider ancestor.
+    (Story) => <ToastProvider><Story /></ToastProvider>,
     (Story) => {
       // Reset stores before each story and clear any endings to prevent endscreen display
       useNarrativeStore.setState({

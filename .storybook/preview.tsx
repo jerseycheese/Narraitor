@@ -19,6 +19,8 @@ import '../src/app/globals.css';
 import '../src/app/workshop.css';
 import '../src/app/wizard.css';
 import '../src/app/dashboard.css';
+import '../src/app/badge.css';
+import '../src/lib/theme/themes/_shared-tokens.css';
 import '../src/lib/theme/themes/ds1.css';
 import '../src/lib/theme/themes/ds2.css';
 import '../src/lib/theme/themes/ds3.css';
