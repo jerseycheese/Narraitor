@@ -1,0 +1,32 @@
+/* WorldTypeSelector — option row layout.
+ *
+ * Each option is a <label> wrapping a RadioGroupItem (the radio) and a text
+ * block (name + description). The radio must sit inline to the left of the
+ * text. Without this, the label's block-level children stacked the radio on
+ * its own line above the option name. All values use design tokens.
+ */
+
+.world-type-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.world-type-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+}
+
+.world-type-option-label {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.world-type-option-description {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}

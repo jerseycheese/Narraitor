@@ -1130,10 +1130,10 @@
 [data-theme="ds1"] .wizard-page .wizard-step-title::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .wizard-page .wizard-archetype-grid .wizard-step-title::before,
