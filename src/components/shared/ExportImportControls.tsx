@@ -111,9 +111,8 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
         </Button>
 
         <div className="settings-export-import-files">
-          <label htmlFor="import-file" >
-            Import Game Data
-          </label>
+          {/* Visually hidden: the styled Button below is the trigger (clicks this
+              via ref). Kept in the DOM with an aria-label for assistive tech. */}
           <input
             id="import-file"
             ref={fileInputRef}
@@ -121,7 +120,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
             accept=".json"
             onChange={handleFileChange}
             disabled={isLoading}
-
+            className="sr-only"
             aria-label="Import game data from file"
           />
           <Button

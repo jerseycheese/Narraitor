@@ -53,7 +53,7 @@ export function TutorialMenu() {
   };
 
   return (
-    <div ref={dropdownRef}>
+    <div ref={dropdownRef} className="tutorial-menu">
       <Button
         onClick={() => setIsOpen(!isOpen)}
         variant="ghost"
