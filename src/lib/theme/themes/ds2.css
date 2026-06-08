@@ -51,7 +51,9 @@
   --radius: 0.75rem;
 
   /* Extended semantic tokens */
-  --success: 142 71% 45%;
+
+  /* Darkened from 45% so the filled .button-success (Play) carries white text at WCAG AA: white on #16833E = 4.83:1. See #1387. Dark mode is left to #1379. */
+  --success: 142 71% 30%;
   --success-foreground: 210 40% 98%;
   --success-text: 154 86% 20%;
   --success-background: 142 50% 88%;
