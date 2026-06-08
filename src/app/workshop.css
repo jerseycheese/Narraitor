@@ -173,10 +173,10 @@
 [data-theme="ds1"] .home-hero-title::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 48px;
+  width: 3rem;
+  height: 2px;
   margin: var(--space-4) auto var(--space-2);
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .home-hero-tagline {
@@ -1829,10 +1829,10 @@
 [data-theme="ds1"] .world-detail-section h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 /* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
@@ -2007,10 +2007,10 @@
   [data-testid="collapsible-section-title"]::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"]
@@ -2331,10 +2331,10 @@
 [data-theme="ds1"] .component-character-card h3::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .characters-empty {
@@ -2352,10 +2352,10 @@
 [data-theme="ds1"] .characters-empty h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 32px;
+  width: 2.5rem;
+  height: 2px;
   margin: var(--space-3) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 /* ─── DS2: Warm Earth ───────────────────────────────────────────
@@ -2623,10 +2623,10 @@
 [data-theme="ds1"] .character-detail-header-info h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .character-detail-section {
@@ -2655,10 +2655,10 @@
 [data-theme="ds1"] .character-detail-section h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 /* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
@@ -2799,6 +2799,7 @@
 .character-editor-actions,
 .world-editor-actions {
   display: flex;
+  gap: var(--space-3);
   margin-top: var(--space-8);
   padding: var(--space-4) var(--space-5);
   background: var(--color-surface);
@@ -3090,10 +3091,10 @@
 [data-theme="ds1"] .settings-section h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .settings-export-import-help {
