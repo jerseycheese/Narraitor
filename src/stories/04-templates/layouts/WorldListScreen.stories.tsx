@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
@@ -62,6 +63,11 @@ const meta: Meta<typeof WorldListScreen> = {
   component: WorldListScreen,
   parameters: {
     layout: 'padded',
+  },
+  args: {
+    // Explicit spy so Storybook 8 doesn't treat this on* prop as an implicit
+    // action arg, which crashes the render (the component calls it on mount).
+    onViewToggleRender: fn(),
   },
   tags: ['autodocs'],
   decorators: [

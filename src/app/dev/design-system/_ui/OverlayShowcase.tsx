@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { clsx } from 'clsx';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { PreviewModal } from '@/components/shared/PreviewModal/PreviewModal';
 import type { DSTheme } from './DSToggle';
+import { useResolvedDark } from './useResolvedDark';
 // Showcase layout classes (dso-group/dso-row/dso-preview) live in the shared
 // component showcase stylesheet. The modals themselves are styled in production
 // (dialog.css), not here.
@@ -26,9 +28,14 @@ import './component-showcase.css';
 export function OverlayShowcase({ theme }: { theme: DSTheme }) {
   const [simpleOpen, setSimpleOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const isDark = useResolvedDark();
 
   return (
-    <div className="ds-overlay" data-theme={theme} data-testid="ds-overlay">
+    <div
+      className={clsx('ds-overlay', isDark && 'dark')}
+      data-theme={theme}
+      data-testid="ds-overlay"
+    >
       {/* SimpleModal — the app's standard modal wrapper */}
       <section className="dso-group" aria-label="SimpleModal composition">
         <h3 className="dso-group-title">SimpleModal</h3>

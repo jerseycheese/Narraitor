@@ -446,12 +446,17 @@
 
 .ds2-palette-band {
   flex: 1;
+  /* Allow bands to shrink below their nowrap label width; without this,
+     min-width:auto lets 8 labels sum past the strip and spill the band
+     ~133px past the viewport (clipped, not scrolled, by .ds2 overflow-x). */
+  min-width: 0;
   position: relative;
   transition: flex 0.4s cubic-bezier(0.19, 1, 0.22, 1);
   cursor: default;
   display: flex;
   align-items: flex-end;
   padding: var(--space-2);
+  overflow: hidden;
 }
 
 .ds2-palette-band:hover {

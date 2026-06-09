@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { clsx } from 'clsx';
 import { Button } from '@/components/ui/button';
 import { ManuscriptSessionShell } from '@/components/GameSession/ManuscriptSessionShell';
 import { ManuscriptFloatingHud } from '@/components/GameSession/ManuscriptFloatingHud';
@@ -13,6 +14,7 @@ import { useNPCStore } from '@/state/npcStore';
 import type { NPC } from '@/types/npc.types';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 import type { DSTheme } from './DSToggle';
+import { useResolvedDark } from './useResolvedDark';
 // Showcase layout classes (dso-group/dso-row) live in the shared component
 // showcase stylesheet. The session surface itself is styled in production
 // (manuscript-session.css), not here.
@@ -206,6 +208,7 @@ export function SessionShowcase({
   const [open, setOpen] = useState(defaultOpen);
   const [isCharacterOpen, setIsCharacterOpen] = useState(false);
   const characterButtonRef = useRef<HTMLButtonElement>(null);
+  const isDark = useResolvedDark();
 
   // Seed demo NPCs so the real SceneStatus resolves participant names (the
   // canon path: SceneStatus reads npcStore). Idempotent, demo-only ids.
@@ -225,7 +228,11 @@ export function SessionShowcase({
   const latestSegment = DEMO_SEGMENTS[DEMO_SEGMENTS.length - 1];
 
   return (
-    <div className="ds-session" data-theme={theme} data-testid="ds-session">
+    <div
+      className={clsx('ds-session', isDark && 'dark')}
+      data-theme={theme}
+      data-testid="ds-session"
+    >
       {showLauncher && (
         <section className="dso-group" aria-label="Game session composition">
           <h3 className="dso-group-title">Game Session</h3>
