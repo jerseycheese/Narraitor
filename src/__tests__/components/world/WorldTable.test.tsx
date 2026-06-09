@@ -82,7 +82,6 @@ const mockWorlds: World[] = [
 ];
 
 describe('WorldTable', () => {
-  const mockOnToggleSelect = jest.fn();
   const mockOnDeleteWorld = jest.fn();
 
   beforeEach(() => {
@@ -94,16 +93,8 @@ describe('WorldTable', () => {
   });
 
   it('renders table with all columns', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
+    render(<WorldTable worlds={mockWorlds} onDeleteWorld={mockOnDeleteWorld} />);
 
-    // Check column headers
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Genre')).toBeInTheDocument();
     expect(screen.getByText('Attributes')).toBeInTheDocument();
@@ -114,14 +105,7 @@ describe('WorldTable', () => {
   });
 
   it('renders world data correctly', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
+    render(<WorldTable worlds={mockWorlds} onDeleteWorld={mockOnDeleteWorld} />);
 
     expect(screen.getByText('Fantasy Realm')).toBeInTheDocument();
     expect(screen.getByText('Sci-Fi Universe')).toBeInTheDocument();
@@ -132,94 +116,14 @@ describe('WorldTable', () => {
   });
 
   it('displays character counts from store', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
+    render(<WorldTable worlds={mockWorlds} onDeleteWorld={mockOnDeleteWorld} />);
 
     const characterCells = screen.getAllByText('2');
     expect(characterCells.length).toBeGreaterThan(0); // world-1 has 2 characters
   });
 
-  it('renders selection checkboxes', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
-
-    // Header checkbox
-    expect(screen.getByLabelText(/Select up to/)).toBeInTheDocument();
-
-    // Row checkboxes
-    expect(screen.getByLabelText('Select Fantasy Realm for comparison')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select Sci-Fi Universe for comparison')).toBeInTheDocument();
-  });
-
-  it('calls onToggleSelect when checkbox is clicked', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
-
-    const checkbox = screen.getByLabelText('Select Fantasy Realm for comparison');
-    fireEvent.click(checkbox);
-
-    expect(mockOnToggleSelect).toHaveBeenCalledWith('world-1');
-  });
-
-  it('disables checkboxes when 5 worlds are selected', () => {
-    const selectedIds = ['world-3', 'world-4', 'world-5', 'world-6', 'world-7'] as EntityID[];
-
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={selectedIds}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
-
-    const checkbox = screen.getByLabelText('Select Fantasy Realm for comparison');
-    expect(checkbox).toBeDisabled();
-  });
-
-  it('does not disable already selected checkboxes when limit reached', () => {
-    const selectedIds = ['world-1', 'world-3', 'world-4', 'world-5', 'world-6'] as EntityID[];
-
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={selectedIds}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
-
-    const checkbox = screen.getByLabelText('Select Fantasy Realm for comparison');
-    expect(checkbox).not.toBeDisabled();
-  });
-
   it('renders action buttons for each world', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
+    render(<WorldTable worlds={mockWorlds} onDeleteWorld={mockOnDeleteWorld} />);
 
     expect(screen.getByLabelText('View Fantasy Realm')).toBeInTheDocument();
     expect(screen.getByLabelText('Edit Fantasy Realm')).toBeInTheDocument();
@@ -227,14 +131,7 @@ describe('WorldTable', () => {
   });
 
   it('calls onDeleteWorld when delete button clicked', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
+    render(<WorldTable worlds={mockWorlds} onDeleteWorld={mockOnDeleteWorld} />);
 
     const deleteBtn = screen.getByLabelText('Delete Fantasy Realm');
     fireEvent.click(deleteBtn);
@@ -243,27 +140,13 @@ describe('WorldTable', () => {
   });
 
   it('shows empty state when no worlds', () => {
-    render(
-      <WorldTable
-        worlds={[]}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
+    render(<WorldTable worlds={[]} onDeleteWorld={mockOnDeleteWorld} />);
 
     expect(screen.getByText('No worlds found. Create your first world to get started!')).toBeInTheDocument();
   });
 
   it('includes search functionality', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
+    render(<WorldTable worlds={mockWorlds} onDeleteWorld={mockOnDeleteWorld} />);
 
     const searchInput = screen.getByPlaceholderText('Search worlds...');
     expect(searchInput).toBeInTheDocument();
@@ -283,56 +166,9 @@ describe('WorldTable', () => {
       name: `World ${i}`,
     }));
 
-    render(
-      <WorldTable
-        worlds={manyWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
+    render(<WorldTable worlds={manyWorlds} onDeleteWorld={mockOnDeleteWorld} />);
 
     // Pagination should show page info
     expect(screen.getByText(/Page \d+ of \d+/)).toBeInTheDocument();
-  });
-
-  it('Select All respects 5-world limit', () => {
-    const manyWorlds = Array.from({ length: 10 }, (_, i) => ({
-      ...mockWorlds[0],
-      id: `world-${i}` as EntityID,
-      name: `World ${i}`,
-    }));
-
-    render(
-      <WorldTable
-        worlds={manyWorlds}
-        selectedWorldIds={[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
-
-    const selectAllCheckbox = screen.getByLabelText(/Select up to 5 worlds/);
-    fireEvent.click(selectAllCheckbox);
-
-    // Should only select first 5 worlds
-    expect(mockOnToggleSelect).toHaveBeenCalledTimes(5);
-  });
-
-  it('Select All clears selections when some are selected', () => {
-    render(
-      <WorldTable
-        worlds={mockWorlds}
-        selectedWorldIds={['world-1'] as EntityID[]}
-        onToggleSelect={mockOnToggleSelect}
-        onDeleteWorld={mockOnDeleteWorld}
-      />
-    );
-
-    const selectAllCheckbox = screen.getByLabelText(/Select up to/);
-    fireEvent.click(selectAllCheckbox);
-
-    // Should toggle off the selected world
-    expect(mockOnToggleSelect).toHaveBeenCalledWith('world-1');
   });
 });

@@ -12,7 +12,6 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/Dele
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { World } from '@/types/world.types';
-import { EntityID } from '@/types/common.types';
 import {
   getUserFriendlyError,
   UserFriendlyError,
@@ -44,7 +43,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
   const [error, setError] = useState<UserFriendlyError | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [worldToDeleteId, setWorldToDeleteId] = useState<string | null>(null);
-  const [selectedWorldIds, setSelectedWorldIds] = useState<EntityID[]>([]);
 
   // View mode with localStorage persistence (following inventory pattern)
   const [viewMode, setViewMode] = useState<WorldViewMode>(
@@ -101,14 +99,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
     useWorldStore.getState().setCurrentWorld(worldId);
   };
 
-  const toggleWorldSelection = (worldId: EntityID) => {
-    setSelectedWorldIds((prev) => {
-      if (prev.includes(worldId)) return prev.filter((id) => id !== worldId);
-      if (prev.length >= 5) return prev; // Max 5 for comparison
-      return [...prev, worldId];
-    });
-  };
-
   const handleDeleteClick = (worldId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setWorldToDeleteId(worldId);
@@ -123,10 +113,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
   const handleConfirmDelete = async () => {
     if (worldToDeleteId) {
       await useWorldStore.getState().deleteWorld(worldToDeleteId);
-      // Also remove from selection if deleted
-      setSelectedWorldIds((prev) =>
-        prev.filter((id) => id !== worldToDeleteId)
-      );
     }
     handleCloseDeleteDialog();
   };
@@ -168,8 +154,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
       {viewMode === 'table' ? (
         <WorldTable
           worlds={worlds}
-          selectedWorldIds={selectedWorldIds}
-          onToggleSelect={toggleWorldSelection}
           onDeleteWorld={handleDeleteClick}
         />
       ) : (
@@ -178,8 +162,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
           currentWorldId={currentWorldId}
           onSelectWorld={handleSelectWorld}
           onDeleteWorld={(id) => handleDeleteClick(id)}
-          selectedWorldIds={selectedWorldIds}
-          onToggleSelect={toggleWorldSelection}
         />
       )}
       <DeleteConfirmationDialog
