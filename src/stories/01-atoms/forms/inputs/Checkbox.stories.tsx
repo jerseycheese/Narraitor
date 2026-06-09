@@ -30,12 +30,14 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     checked: false,
+    label: 'Enable option',
   },
 };
 
 export const Checked: Story = {
   args: {
     checked: true,
+    label: 'Enable option',
   },
 };
 

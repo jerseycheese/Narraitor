@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { clsx } from 'clsx';
 import { Search, Info, AlertTriangle, CheckCircle2, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +39,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { DSTheme } from './DSToggle';
+import { useResolvedDark } from './useResolvedDark';
 import './component-showcase.css';
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -101,9 +103,14 @@ export function ComponentShowcase({ theme }: { theme: DSTheme }) {
   const [tracking, setTracking] = useState('investigate');
   const [spoilers, setSpoilers] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const isDark = useResolvedDark();
 
   return (
-    <div className="ds-components" data-theme={theme} data-testid="ds-components">
+    <div
+      className={clsx('ds-components', isDark && 'dark')}
+      data-theme={theme}
+      data-testid="ds-components"
+    >
       {/* Buttons */}
       <section className="dsc-group" aria-label="Button primitive">
         <h3 className="dsc-group-title">Button</h3>

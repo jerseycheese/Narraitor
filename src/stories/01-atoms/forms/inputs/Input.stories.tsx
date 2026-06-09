@@ -38,6 +38,7 @@ type Story = StoryObj<typeof Input>;
 export const Default: Story = {
   args: {
     placeholder: 'Enter your name',
+    'aria-label': 'Name',
   },
 };
 
@@ -76,6 +77,7 @@ export const Disabled: Story = {
     placeholder: 'Disabled input',
     disabled: true,
     value: 'This input is disabled',
+    'aria-label': 'Disabled field',
   },
 };
 
@@ -83,20 +85,20 @@ export const Types: Story = {
   render: () => (
     <div>
       <div>
-        <Label>Text Input</Label>
-        <Input type="text" placeholder="Enter text" />
+        <Label htmlFor="text-input">Text Input</Label>
+        <Input id="text-input" type="text" placeholder="Enter text" />
       </div>
       <div>
-        <Label>Email Input</Label>
-        <Input type="email" placeholder="Enter email" />
+        <Label htmlFor="email-input">Email Input</Label>
+        <Input id="email-input" type="email" placeholder="Enter email" />
       </div>
       <div>
-        <Label>Password Input</Label>
-        <Input type="password" placeholder="Enter password" />
+        <Label htmlFor="password-input">Password Input</Label>
+        <Input id="password-input" type="password" placeholder="Enter password" />
       </div>
       <div>
-        <Label>Number Input</Label>
-        <Input type="number" placeholder="Enter number" />
+        <Label htmlFor="number-input">Number Input</Label>
+        <Input id="number-input" type="number" placeholder="Enter number" />
       </div>
     </div>
   ),
