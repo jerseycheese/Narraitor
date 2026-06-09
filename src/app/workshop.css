@@ -926,6 +926,13 @@
     display: none;
   }
 
+  /* Drop the secondary help icon on mobile too (alongside breadcrumbs + recent)
+     so the "Workshop" title and the primary CTA no longer collide under
+     space-between at narrow widths (<= ~415px). */
+  .workshop-context-header .tutorial-menu {
+    display: none;
+  }
+
   .workshop-workspace-main {
     min-height: calc(100vh - 3.5rem);
   }
@@ -1028,6 +1035,17 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+}
+
+/* Below the hamburger breakpoint the mobile drawer owns Theme/Tutorial/Recent,
+   the world switcher, and the primary CTA, so the inline actions cluster is
+   redundant and its intrinsic width overflows narrow viewports. Hide it there;
+   the drawer carries everything (ThemeMenu added there for parity). Placed
+   after the base rule so equal-specificity source order keeps display:none. */
+@media (width <= 768px) {
+  .header-nav-actions {
+    display: none;
+  }
 }
 
 /* Brand lockup: icon + serif wordmark, no link underline. */
