@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import './TabNavigation.css';
 
 export interface TabOption<T = string> {
   value: T;

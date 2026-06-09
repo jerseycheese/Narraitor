@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { primitiveColors } from '@/lib/design-tokens';
+import clsx from 'clsx';
+import './toast.css';
 
 /**
  * Props for the Toast component
@@ -22,21 +23,6 @@ interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Callback function called when the toast is dismissed */
   onDismiss?: () => void;
 }
-
-const toastVariants = {
-  success: {
-    style: { backgroundColor: primitiveColors.green[50] },
-  },
-  error: {
-    style: { backgroundColor: primitiveColors.red[50] },
-  },
-  warning: {
-    style: { backgroundColor: primitiveColors.amber[50] },
-  },
-  info: {
-    style: { backgroundColor: primitiveColors.blue[50] },
-  },
-};
 
 /**
  * Toast component for displaying temporary notification messages
@@ -87,23 +73,20 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
 
     if (!isVisible) return null;
 
-    const variantConfig = toastVariants[variant];
-
     return (
       <div
         ref={ref}
-        className={className}
-        style={variantConfig.style}
+        className={clsx('toast', className)}
         role="alert"
         aria-live="polite"
         aria-atomic="true"
         data-variant={variant}
         {...props}
       >
-        <div>
-          <div>
-            <div>{title}</div>
-            {description && <div>{description}</div>}
+        <div className="toast-row">
+          <div className="toast-content">
+            <div className="toast-title">{title}</div>
+            {description && <div className="toast-description">{description}</div>}
           </div>
           <button className="toast-dismiss" onClick={handleDismiss} aria-label="Dismiss notification">
             <X aria-hidden="true" />
