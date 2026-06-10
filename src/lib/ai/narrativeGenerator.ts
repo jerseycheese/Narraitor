@@ -54,6 +54,11 @@ import {
 import { formatNarrativeResponse } from './narrativeGenerator.response';
 import { enforceLanguageComplexity } from './narrativeGenerator.languageComplexity';
 import { buildNpcRoster, syncNpcMetadata } from './narrativeGenerator.npc';
+import {
+  applyContinuityGuardrail,
+  buildContinuityContractFromStores,
+  enhancePromptWithContinuityExpectations,
+} from './narrativeGenerator.continuity';
 
 export class NarrativeGenerator {
   private staticContentCache: NarrativeStaticContentCache = {
@@ -135,16 +140,40 @@ export class NarrativeGenerator {
         characterInventory
       );
 
-      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
-      recordRequestCalibration(budget, fullyEnhancedPrompt, response);
+      const continuityContract = buildContinuityContractFromStores(request);
+      const finalPrompt = enhancePromptWithContinuityExpectations(
+        fullyEnhancedPrompt,
+        continuityContract
+      );
 
-      if (response.content) {
+      const response = await this.geminiClient.generateContent(finalPrompt);
+      recordRequestCalibration(budget, finalPrompt, response);
+
+      let result = await formatNarrativeResponse(
+        response,
+        inferSegmentType(response.content || ''),
+        this.geminiClient
+      );
+
+      result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
+
+      result = await applyContinuityGuardrail({
+        result,
+        contract: continuityContract,
+        client: this.geminiClient,
+        worldId: request.worldId,
+        sessionId: request.sessionId,
+      });
+
+      // Lore extraction runs on the final (possibly corrected) prose so a
+      // contradicted draft never pollutes the lore store.
+      if (result.content) {
         try {
           if (process.env.NODE_ENV !== 'production') {
             logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
               worldId: request.worldId,
               sessionId: request.sessionId,
-              contentLength: response.content.length,
+              contentLength: result.content.length,
             });
           }
 
@@ -152,7 +181,7 @@ export class NarrativeGenerator {
             recordUsage: false,
           });
           const structuredLore = await extractStructuredLore(
-            response.content,
+            result.content,
             existingLoreContext
           );
 
@@ -179,14 +208,6 @@ export class NarrativeGenerator {
           logger.error('[NarrativeGenerator] Failed to extract lore:', error);
         }
       }
-
-      let result = await formatNarrativeResponse(
-        response,
-        inferSegmentType(response.content || ''),
-        this.geminiClient
-      );
-
-      result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
 
       if (
         (!result.metadata.itemsLost || result.metadata.itemsLost.length === 0) &&
@@ -226,7 +247,7 @@ export class NarrativeGenerator {
         const templateType = 'scene';
 
         const debugInfoContext: DebugInfoContext = {
-          fullPrompt: fullyEnhancedPrompt,
+          fullPrompt: finalPrompt,
           templateName: this.getTemplateName(templateType),
           world,
           toneSettings,
@@ -281,6 +302,8 @@ export class NarrativeGenerator {
     }
   }
 
+  // Deliberately not continuity-guarded: at session start there are no
+  // decisions or NPC relationships to validate against (#409/#412).
   async generateInitialScene(
     worldId: string,
     characterIds: string[],
