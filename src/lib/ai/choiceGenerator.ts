@@ -1,5 +1,6 @@
 import { AIClient } from './types';
 import { useWorldStore } from '@/state/worldStore';
+import { useNPCStore } from '@/state/npcStore';
 import { Decision, NarrativeContext, DecisionRequirement } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
@@ -7,7 +8,7 @@ import { checkAndRecordLoreMentions } from './loreContextHelper';
 import { safeTrim } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
 import { buildChoicePrompt } from './choiceGenerator.prompt';
-import { parseChoiceResponse } from './choiceGenerator.parser';
+import { parseChoiceResponse, applyAlignmentConsequences, type KnownNpc } from './choiceGenerator.parser';
 import { generateFallbackChoices } from './choiceGenerator.fallback';
 
 /**
@@ -53,10 +54,10 @@ export async function generateChoices(
 
     if (!response?.content || safeTrim(response?.content ?? '') === '') {
       const fallbackDecision = generateFallbackChoices(world, narrativeContext);
-      return ensureSkillChecksForAllOptions(fallbackDecision, world);
+      return applyAlignmentConsequences(ensureSkillChecksForAllOptions(fallbackDecision, world));
     }
 
-    const decision = parseChoiceResponse(response.content, narrativeContext, world);
+    const decision = parseChoiceResponse(response.content, narrativeContext, world, getKnownNpcs(worldId));
 
     try {
       checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');
@@ -83,7 +84,7 @@ export async function generateChoices(
       decision.options = decision.options.slice(0, maxOptions);
     }
 
-    return ensureSkillChecksForAllOptions(decision, world);
+    return applyAlignmentConsequences(ensureSkillChecksForAllOptions(decision, world));
   } catch (error) {
     const errorDetails = {
       error: error instanceof Error ? error.message : String(error),
@@ -99,9 +100,24 @@ export async function generateChoices(
 
     const world = getWorld(params.worldId);
     const fallbackDecision = generateFallbackChoices(world, params.narrativeContext);
-    return ensureSkillChecksForAllOptions(fallbackDecision, world);
+    return applyAlignmentConsequences(ensureSkillChecksForAllOptions(fallbackDecision, world));
   }
 }
+
+/**
+ * NPC roster for the world, used to resolve consequence targets by name.
+ * Mirrors getWorld's defensive store read.
+ */
+const getKnownNpcs = (worldId: string): KnownNpc[] => {
+  try {
+    return useNPCStore
+      .getState()
+      .getNPCsByWorld(worldId)
+      .map((npc) => ({ id: npc.id, name: npc.name }));
+  } catch {
+    return [];
+  }
+};
 
 /**
  * Get world data from the store

@@ -1,6 +1,7 @@
 import { getNarrativeTemplate } from '../promptTemplates/narrativeTemplateManager';
 import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useNPCStore } from '@/state/npcStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
@@ -120,7 +121,19 @@ const buildContext = (
       name: skill.name,
       description: skill.description,
     })) || [],
+  worldNpcs: getWorldNpcs(world.id),
 });
+
+const getWorldNpcs = (worldId: string): Array<{ id: string; name: string }> => {
+  try {
+    return useNPCStore
+      .getState()
+      .getNPCsByWorld(worldId)
+      .map((npc) => ({ id: npc.id, name: npc.name }));
+  } catch {
+    return [];
+  }
+};
 const enhancePromptWithLore = (
   prompt: string,
   worldId: string,
