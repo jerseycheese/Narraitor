@@ -14,10 +14,13 @@ const SECTION_INFO = {
   [DevToolsSection.STATE_SECTION]: 'State Section',
   [DevToolsSection.TEST_DATA_GENERATOR]: 'Test Data Generator',
   [DevToolsSection.AI_TESTING]: 'AI Testing Panel',
+  [DevToolsSection.AI_MOCKING]: 'AI Mocking',
   [DevToolsSection.PORTRAIT_DEBUG]: 'Portrait Debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'Ending Image Debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'Consistency Validation',
   [DevToolsSection.LORE_MANAGEMENT]: 'Lore Management',
+  [DevToolsSection.ERROR_SECTION]: 'Error Tracking',
+  [DevToolsSection.TOKEN_BUDGET]: 'Token Budget',
   [DevToolsSection.DECISION_CONSOLE]: 'Decision Console',
   [DevToolsSection.DECISION_FLOW]: 'Decision Creation Flow',
 } as const;
@@ -29,10 +32,13 @@ const SECTION_TEST_IDS = {
   [DevToolsSection.STATE_SECTION]: 'toggle-state-section',
   [DevToolsSection.TEST_DATA_GENERATOR]: 'toggle-test-data-generator',
   [DevToolsSection.AI_TESTING]: 'toggle-ai-testing',
+  [DevToolsSection.AI_MOCKING]: 'toggle-ai-mocking',
   [DevToolsSection.PORTRAIT_DEBUG]: 'toggle-portrait-debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'toggle-ending-image-debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'toggle-consistency-validation',
   [DevToolsSection.LORE_MANAGEMENT]: 'toggle-lore-management',
+  [DevToolsSection.ERROR_SECTION]: 'toggle-error-section',
+  [DevToolsSection.TOKEN_BUDGET]: 'toggle-token-budget',
   [DevToolsSection.DECISION_CONSOLE]: 'toggle-decision-console',
   [DevToolsSection.DECISION_FLOW]: 'toggle-decision-flow',
 } as const;
@@ -45,15 +51,20 @@ const SECTION_TEST_IDS = {
  */
 export const SectionVisibilityControls = () => {
   const {
-    sectionVisibility,
     toggleSectionVisibility,
     setSectionVisibility,
     isSectionVisible,
   } = useDevTools();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const visibleCount = Object.values(sectionVisibility).filter(Boolean).length;
-  const totalCount = Object.keys(SECTION_INFO).length;
+  // Count over the same universe the dropdown lists (SECTION_INFO), using the
+  // same resolver the per-row checkmarks use, so numerator and denominator can't
+  // diverge from stale keys in the persisted visibility map.
+  const sectionIds = Object.keys(SECTION_INFO);
+  const totalCount = sectionIds.length;
+  const visibleCount = sectionIds.filter(
+    (sectionId) => isSectionVisible?.(sectionId) ?? true
+  ).length;
 
   const handleShowAll = () => {
     const allVisible = Object.keys(SECTION_INFO).reduce(

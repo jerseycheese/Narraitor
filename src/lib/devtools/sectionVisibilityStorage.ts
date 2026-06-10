@@ -41,6 +41,7 @@ export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
   [DevToolsSection.STATE_SECTION]: true,
   [DevToolsSection.TEST_DATA_GENERATOR]: true,
   [DevToolsSection.AI_TESTING]: true,
+  [DevToolsSection.AI_MOCKING]: true,
   [DevToolsSection.PORTRAIT_DEBUG]: true,
   [DevToolsSection.ENDING_IMAGE_DEBUG]: true,
   [DevToolsSection.CONSISTENCY_VALIDATION]: true,
