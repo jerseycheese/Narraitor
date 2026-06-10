@@ -5170,6 +5170,12 @@ body.manuscript-overlay-open {
   min-width: 0;
 }
 
+/* Let name + disposition wrap inside the narrow rail instead of clipping. */
+.scene-status-badge {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
 /* Disposition label next to a participant's name; only rendered when
    relationship state exists for that NPC. */
 .scene-status-disposition {
