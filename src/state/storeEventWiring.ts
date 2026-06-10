@@ -23,5 +23,18 @@ import {
 } from '@/lib/state/storePubSub';
 import { handleSessionStarted, handleSessionEnded } from '@/lib/session/sessionJournalEntries';
 
-storeEvents.subscribe<SessionStartedEvent>(StoreEventTypes.SESSION_STARTED, handleSessionStarted);
-storeEvents.subscribe<SessionEndedEvent>(StoreEventTypes.SESSION_ENDED, handleSessionEnded);
+// subscribeOnce (keyed, deduped per bus instance) so a re-evaluated module —
+// HMR in dev, or this side-effect import being pulled in more than once —
+// can't stack duplicate journal handlers and write a session_start/end entry
+// twice. The store-tail subscriptions in narrativeStore/inventoryStore stay on
+// plain subscribe: their handlers only clear data, so a double-fire is a no-op.
+storeEvents.subscribeOnce<SessionStartedEvent>(
+  StoreEventTypes.SESSION_STARTED,
+  handleSessionStarted,
+  'session-journal:started'
+);
+storeEvents.subscribeOnce<SessionEndedEvent>(
+  StoreEventTypes.SESSION_ENDED,
+  handleSessionEnded,
+  'session-journal:ended'
+);
