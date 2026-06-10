@@ -107,6 +107,8 @@ export interface CharacterStore extends CrudStore<Character> {
     character: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>
   ) => EntityID;
   updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
+  /** Shift the lawful/chaotic alignment axis by delta, clamped to -100..100. */
+  applyAlignmentShift: (characterId: EntityID, delta: number) => void;
   deleteCharacter: (id: EntityID) => Promise<void>;
   setCurrentCharacter: (id: EntityID) => void;
 
@@ -481,6 +483,22 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
           // Domain-specific aliases
           createCharacter: (characterData) => get().create(characterData),
           updateCharacter: (id, updates) => get().update(id, updates),
+
+          applyAlignmentShift: (characterId, delta) => {
+            const character = get().characters[characterId];
+            if (!character) {
+              logger.warn('applyAlignmentShift: unknown character', characterId);
+              return;
+            }
+            if (!Number.isFinite(delta) || delta === 0) {
+              return;
+            }
+
+            const current = character.alignment ?? 0;
+            const next = Math.max(-100, Math.min(100, current + delta));
+            get().update(characterId, { alignment: next });
+          },
+
           deleteCharacter: async (id) => await get().delete(id),
           setCurrentCharacter: (id) => get().setCurrent(id),
 

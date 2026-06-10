@@ -128,7 +128,7 @@ export interface SkillCheckRoll {
  * Represents a consequence of a decision
  */
 export interface Consequence {
-  type: 'attribute' | 'skill' | 'item' | 'relationship' | 'narrative';
+  type: 'attribute' | 'skill' | 'item' | 'relationship' | 'narrative' | 'alignment';
   action: 'add' | 'remove' | 'modify';
   targetId: EntityID;
   value: string | number | boolean | Record<string, unknown>;
