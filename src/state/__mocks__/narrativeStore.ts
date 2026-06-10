@@ -16,12 +16,14 @@ const mockState = {
   sessionSegments: {},
   decisions: {},
   sessionDecisions: {},
+  endedSessions: {},
   currentEnding: null,
   isGeneratingEnding: false,
   endingError: null,
   error: null,
   loading: false,
-  
+  _hasHydrated: true,
+
   // Actions
   addSegment: createMockFn('segment-123'),
   updateSegment: createMockFn(),
@@ -38,13 +40,18 @@ const mockState = {
   setError: createMockFn(),
   clearError: createMockFn(),
   setLoading: createMockFn(),
-  
+  setHasHydrated: createMockFn(),
+
   // Ending actions
   generateEnding: createMockFn(),
   clearEnding: createMockFn(),
+  setCurrentEnding: createMockFn(),
+  updateCurrentEnding: createMockFn(),
   saveEndingToHistory: createMockFn(),
   hasActiveEnding: createMockFn(false),
-  getEndingForSession: createMockFn(null)
+  getEndingForSession: createMockFn(null),
+  isSessionEnded: createMockFn(false),
+  markSessionEnded: createMockFn()
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
