@@ -2254,6 +2254,40 @@ body.manuscript-overlay-open {
   color: var(--color-text-primary);
 }
 
+/* Alignment row + lawful/chaotic meter. Hidden entirely until the
+   character's alignment has been shifted by a choice. */
+.manuscript-character-snapshot-alignment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.manuscript-character-snapshot-alignment-track {
+  position: relative;
+  height: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--color-border);
+}
+
+/* Center notch marking neutral on the -100..100 axis. */
+.manuscript-character-snapshot-alignment-track::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  bottom: -1px;
+  width: 1px;
+  background: var(--color-text-muted);
+}
+
+.manuscript-character-snapshot-alignment-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+}
+
 /* Choice Outcome Callout */
 .choice-outcome-callout {
   border-radius: var(--radius-sm);
@@ -2279,6 +2313,51 @@ body.manuscript-overlay-open {
   line-height: 1.5;
   color: var(--color-text-secondary);
   margin: 0;
+}
+
+/* Structured consequence chips under the callout text (trust deltas,
+   alignment shifts). Rendered only when the chosen option carried
+   consequences. */
+.choice-outcome-consequences {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1_5);
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+
+.choice-outcome-chip {
+  font-family: var(--font-system), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  padding: var(--space-0_5) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.choice-outcome-chip[data-kind="relationship"][data-direction="positive"] {
+  border-color: var(--color-success);
+  color: var(--color-success-text);
+}
+
+.choice-outcome-chip[data-kind="relationship"][data-direction="negative"] {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.choice-outcome-chip[data-kind="alignment"][data-direction="positive"] {
+  border-color: var(--color-alignment-lawful-border);
+  background: var(--color-alignment-lawful-bg);
+  color: var(--color-alignment-lawful-text);
+}
+
+.choice-outcome-chip[data-kind="alignment"][data-direction="negative"] {
+  border-color: var(--color-alignment-chaotic-border);
+  background: var(--color-alignment-chaotic-bg);
+  color: var(--color-alignment-chaotic-text);
 }
 
 /* ─── Game Session Skeleton ─── */
@@ -5091,6 +5170,30 @@ body.manuscript-overlay-open {
   min-width: 0;
 }
 
+/* Disposition label next to a participant's name; only rendered when
+   relationship state exists for that NPC. */
+.scene-status-disposition {
+  font-family: var(--font-system), ui-monospace, monospace;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+}
+
+.scene-status-disposition[data-disposition="hostile"] {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.scene-status-disposition[data-disposition="friendly"],
+.scene-status-disposition[data-disposition="trusted"] {
+  border-color: var(--color-success);
+  color: var(--color-success-text);
+}
+
 /* Mobile: collapse the surface into a compact horizontal bar above the story. */
 @media (width < 1024px) {
   .manuscript-characters-rail {
@@ -5132,6 +5235,14 @@ body.manuscript-overlay-open {
 
 [data-theme="ds2"] .scene-status-avatar {
   display: none;
+}
+
+/* DS2's badges are borderless text, so the disposition rides inline as a
+   bare annotation instead of a bordered tag. */
+[data-theme="ds2"] .scene-status-disposition {
+  border: none;
+  padding: 0;
+  margin-left: var(--space-1);
 }
 
 [data-theme="ds2"] .scene-status-badge {

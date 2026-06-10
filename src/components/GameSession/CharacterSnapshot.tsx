@@ -8,6 +8,13 @@ interface CharacterSnapshotProps {
   character: Character;
 }
 
+/** -100..-34 Chaotic, -33..33 Neutral, 34..100 Lawful. */
+const getAlignmentLabel = (alignment: number): string => {
+  if (alignment > 33) return 'Lawful';
+  if (alignment < -33) return 'Chaotic';
+  return 'Neutral';
+};
+
 export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character }) => {
   // Scope to the worlds slice so this panel doesn't re-render on unrelated
   // world-store writes (worldStates churns during play).
@@ -55,6 +62,29 @@ export const CharacterSnapshot: React.FC<CharacterSnapshotProps> = ({ character 
               <span className="manuscript-character-snapshot-item-label">Level</span>
               <span className="manuscript-character-snapshot-item-value">{character.level}</span>
             </div>
+            {typeof character.alignment === 'number' && (
+              <div
+                className="manuscript-character-snapshot-alignment"
+                data-testid="character-snapshot-alignment"
+              >
+                <div className="manuscript-character-snapshot-item">
+                  <span className="manuscript-character-snapshot-item-label">Alignment</span>
+                  <span className="manuscript-character-snapshot-item-value">
+                    {getAlignmentLabel(character.alignment)}
+                  </span>
+                </div>
+                <div
+                  className="manuscript-character-snapshot-alignment-track"
+                  role="img"
+                  aria-label={`Alignment ${getAlignmentLabel(character.alignment)} (${character.alignment} on a -100 chaotic to +100 lawful scale)`}
+                >
+                  <div
+                    className="manuscript-character-snapshot-alignment-fill"
+                    style={{ left: `${Math.min(50, 50 + character.alignment / 2)}%`, width: `${Math.abs(character.alignment) / 2}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SceneStatus } from '../SceneStatus';
 import { useNPCStore } from '@/state/npcStore';
+import { useWorldStore } from '@/state/worldStore';
 import type { NarrativeSegment } from '@/types/narrative.types';
 
 jest.mock('@/state/npcStore');
@@ -53,5 +54,47 @@ describe('SceneStatus', () => {
   it('returns null when there is no segment', () => {
     const { container } = render(<SceneStatus segment={null} />);
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe('SceneStatus dispositions', () => {
+  const mockWorldStates = (worldStates: Record<string, unknown>) => {
+    (useWorldStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector({ worldStates })
+    );
+  };
+
+  beforeEach(() => {
+    mockWorldStates({});
+  });
+
+  it('shows no disposition when no relationship state exists', () => {
+    const { container } = render(
+      <SceneStatus segment={makeSegment({ worldId: 'world-1', characterIds: ['npc-guard'] })} />
+    );
+
+    expect(container.querySelector('.scene-status-disposition')).toBeNull();
+  });
+
+  it('shows a trust-derived disposition label when relationship state exists', () => {
+    mockWorldStates({
+      'world-1': {
+        npcRelationships: {
+          'npc-guard': {
+            trust: 22,
+            sentiment: -40,
+            lastInteraction: '2026-01-01T00:00:00.000Z',
+            sessionId: 'session-1',
+          },
+        },
+      },
+    });
+
+    render(
+      <SceneStatus segment={makeSegment({ worldId: 'world-1', characterIds: ['npc-guard'] })} />
+    );
+
+    const disposition = screen.getByText('Hostile');
+    expect(disposition).toHaveAttribute('data-disposition', 'hostile');
   });
 });

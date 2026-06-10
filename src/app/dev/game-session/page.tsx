@@ -10,6 +10,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useNPCStore } from '@/state/npcStore';
 import Logger from '@/lib/utils/logger';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 import { getTimestamp } from '@/lib/utils';
@@ -254,6 +255,37 @@ export default function GameSessionTestHarness() {
         loading: false,
       });
       logger.info('Test character created');
+    }
+
+    // Seed a couple of NPCs so consequence targets resolve by name in the
+    // choice contract and the SceneStatus disposition labels have data (#468).
+    const npcStore = useNPCStore.getState();
+    const seededNpcs = [
+      { id: 'npc-marta', name: 'Marta' },
+      { id: 'npc-guard-bren', name: 'Guard Bren' },
+    ];
+    const missingNpcs = seededNpcs.filter((npc) => !npcStore.npcs[npc.id]);
+    if (missingNpcs.length > 0) {
+      const now = getTimestamp();
+      useNPCStore.setState((state) => ({
+        npcs: {
+          ...state.npcs,
+          ...Object.fromEntries(
+            missingNpcs.map((npc) => [
+              npc.id,
+              { ...npc, description: 'Dev harness NPC', worldId: mockWorld.id, createdAt: now, updatedAt: now },
+            ])
+          ),
+        },
+        worldNpcs: {
+          ...state.worldNpcs,
+          [mockWorld.id]: [
+            ...(state.worldNpcs[mockWorld.id] ?? []),
+            ...missingNpcs.map((npc) => npc.id),
+          ],
+        },
+      }));
+      logger.info('Test NPCs created');
     }
   }, [logger]);
 
