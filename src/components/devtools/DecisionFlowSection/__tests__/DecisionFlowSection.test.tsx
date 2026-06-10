@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { DecisionFlowSection } from '../DecisionFlowSection';
 
 jest.mock('@/state/narrativeStore', () => {
@@ -15,9 +15,20 @@ jest.mock('@/state/narrativeStore', () => {
     decisionWeight: 'major',
     narrativeSegmentId: 'segment-1',
   };
+  // Same session, same selected choice text as decision-1, but a different
+  // prompt — the case that cross-links to the newest tracker record without a
+  // prompt discriminator.
+  const sameTextDecision = {
+    id: 'decision-2',
+    prompt: 'A toll collector demands payment',
+    options: [{ id: 'option-3', text: 'Bribe the guard', alignment: 'chaotic' }],
+    selectedOptionId: 'option-3',
+    selectedAt: new Date('2026-06-09T11:00:00.000Z'),
+    decisionWeight: 'minor',
+  };
   const state = {
-    decisions: { 'decision-1': decision },
-    sessionDecisions: { 'session-1': ['decision-1'] },
+    decisions: { 'decision-1': decision, 'decision-2': sameTextDecision },
+    sessionDecisions: { 'session-1': ['decision-1', 'decision-2'] },
     segments: {
       'segment-1': {
         id: 'segment-1',
@@ -50,7 +61,19 @@ jest.mock('@/state/narrativeStore', () => {
 
 jest.mock('@/lib/ai/playerDecisionTracker', () => ({
   playerDecisionTracker: {
+    // Newest-first, as the tracker unshifts. Both records share choiceText
+    // 'Bribe the guard' but differ in prompt.
     getAllDecisions: () => [
+      {
+        id: 'pd-2',
+        prompt: 'A toll collector demands payment',
+        choiceText: 'Bribe the guard',
+        choiceType: 'aggressive',
+        timestamp: '2026-06-09T11:00:00.000Z',
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        context: {},
+      },
       {
         id: 'pd-1',
         prompt: 'A guard blocks the gate',
@@ -64,8 +87,8 @@ jest.mock('@/lib/ai/playerDecisionTracker', () => ({
     ],
     analyzeChoicePatterns: () => ({
       dominantChoiceTypes: ['chaotic'],
-      choiceDistribution: { chaotic: 1 },
-      patternStrength: 100,
+      choiceDistribution: { chaotic: 1, aggressive: 1 },
+      patternStrength: 50,
     }),
   },
 }));
@@ -87,10 +110,11 @@ describe('DecisionFlowSection', () => {
     render(<DecisionFlowSection />);
 
     expect(screen.getByTestId('devtools-decision-flow-section')).toBeInTheDocument();
-    expect(screen.getByTestId('decision-flow-trace-decision-1')).toBeInTheDocument();
-    expect(screen.getByText('A guard blocks the gate')).toBeInTheDocument();
-    expect(screen.getByText('Bribe the guard')).toBeInTheDocument();
-    expect(screen.getByText('Ask politely')).toBeInTheDocument();
+    const trace = screen.getByTestId('decision-flow-trace-decision-1');
+    expect(trace).toBeInTheDocument();
+    expect(within(trace).getByText('A guard blocks the gate')).toBeInTheDocument();
+    expect(within(trace).getByText('Bribe the guard')).toBeInTheDocument();
+    expect(within(trace).getByText('Ask politely')).toBeInTheDocument();
   });
 
   it('marks the selected option and links the tracker record', () => {
@@ -103,7 +127,8 @@ describe('DecisionFlowSection', () => {
     expect(screen.getByTestId('decision-flow-option-option-2')).not.toHaveAttribute(
       'data-selected'
     );
-    expect(screen.getByTestId('decision-flow-tracker-record')).toBeInTheDocument();
+    const trace = screen.getByTestId('decision-flow-trace-decision-1');
+    expect(within(trace).getByTestId('decision-flow-tracker-record')).toBeInTheDocument();
   });
 
   it('shows the outcome segment and its prompt debug info', () => {
@@ -113,5 +138,18 @@ describe('DecisionFlowSection', () => {
     expect(screen.getByTestId('decision-flow-debug-info')).toBeInTheDocument();
     expect(screen.getByText('Scene Template')).toBeInTheDocument();
     expect(screen.getByText('FULL PROMPT TEXT')).toBeInTheDocument();
+  });
+
+  it('matches the tracker record by prompt, not just choice text', () => {
+    render(<DecisionFlowSection />);
+
+    // decision-1 ("A guard blocks the gate") and decision-2 ("A toll collector
+    // demands payment") both selected "Bribe the guard". Matching on choice
+    // text alone would link decision-1 to the newest record (aggressive);
+    // the prompt discriminator keeps it on its own record (chaotic).
+    const trace1 = screen.getByTestId('decision-flow-trace-decision-1');
+    const record1 = within(trace1).getByTestId('decision-flow-tracker-record');
+    expect(within(record1).getByText('chaotic')).toBeInTheDocument();
+    expect(within(record1).queryByText('aggressive')).not.toBeInTheDocument();
   });
 });

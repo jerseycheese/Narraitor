@@ -27,7 +27,12 @@ const formatDate = (value: Date | string | undefined): string => {
 
 /**
  * Finds the tracker record for a decision: same session, and the sanitized
- * selected-option text the tracker persisted matches the option chosen here.
+ * prompt + selected-option text both match what the tracker persisted. The
+ * store records `decision.prompt` (sanitized to 500) and `selectedOption.text`
+ * (sanitized to 300), so matching on both disambiguates same-session decisions
+ * that happen to share a choice text but differ in prompt — without the prompt
+ * discriminator, `find` would return the newest record (tracker stores
+ * newest-first) for every such decision.
  */
 const findTrackerRecord = (
   decision: Decision,
@@ -43,8 +48,12 @@ const findTrackerRecord = (
     selectedOption.customText || selectedOption.text,
     300
   );
+  const selectedPrompt = normalizeForTrackerMatch(decision.prompt, 500);
   return trackerDecisions.find(
-    (record) => record.sessionId === sessionId && record.choiceText === selectedText
+    (record) =>
+      record.sessionId === sessionId &&
+      record.choiceText === selectedText &&
+      normalizeForTrackerMatch(record.prompt, 500) === selectedPrompt
   );
 };
 
