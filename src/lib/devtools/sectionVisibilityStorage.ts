@@ -23,7 +23,9 @@ export enum DevToolsSection {
   CONSISTENCY_VALIDATION = 'consistencyValidation',
   LORE_MANAGEMENT = 'loreManagement',
   ERROR_SECTION = 'errorSection',
-  TOKEN_BUDGET = 'tokenBudget'
+  TOKEN_BUDGET = 'tokenBudget',
+  DECISION_CONSOLE = 'decisionConsole',
+  DECISION_FLOW = 'decisionFlow'
 }
 
 /**
@@ -45,6 +47,8 @@ export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
   [DevToolsSection.LORE_MANAGEMENT]: true,
   [DevToolsSection.ERROR_SECTION]: true,
   [DevToolsSection.TOKEN_BUDGET]: true,
+  [DevToolsSection.DECISION_CONSOLE]: true,
+  [DevToolsSection.DECISION_FLOW]: true,
 };
 
 /**

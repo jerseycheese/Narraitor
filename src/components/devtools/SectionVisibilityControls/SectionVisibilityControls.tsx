@@ -18,6 +18,8 @@ const SECTION_INFO = {
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'Ending Image Debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'Consistency Validation',
   [DevToolsSection.LORE_MANAGEMENT]: 'Lore Management',
+  [DevToolsSection.DECISION_CONSOLE]: 'Decision Console',
+  [DevToolsSection.DECISION_FLOW]: 'Decision Creation Flow',
 } as const;
 
 /**
@@ -31,6 +33,8 @@ const SECTION_TEST_IDS = {
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'toggle-ending-image-debug',
   [DevToolsSection.CONSISTENCY_VALIDATION]: 'toggle-consistency-validation',
   [DevToolsSection.LORE_MANAGEMENT]: 'toggle-lore-management',
+  [DevToolsSection.DECISION_CONSOLE]: 'toggle-decision-console',
+  [DevToolsSection.DECISION_FLOW]: 'toggle-decision-flow',
 } as const;
 
 /**

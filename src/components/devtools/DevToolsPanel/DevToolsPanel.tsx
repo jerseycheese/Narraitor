@@ -12,6 +12,8 @@ import { LoreManagementSection } from '../LoreManagementSection';
 import { TokenBudgetPanel } from '../TokenBudgetPanel';
 import { AIMockingSection } from '../AIMockingSection';
 import { ErrorSection } from '../ErrorSection';
+import { DecisionConsoleSection } from '../DecisionConsoleSection';
+import { DecisionFlowSection } from '../DecisionFlowSection';
 import { DevToolsSection } from '../shared/DevToolsSection';
 import { SectionVisibilityControls } from '../SectionVisibilityControls';
 import { DevToolsSection as SectionId } from '@/lib/devtools/sectionVisibilityStorage';
@@ -160,6 +162,27 @@ export const DevToolsPanel = () => {
                 <div className="devtools-panel-group">
                   <h3 className="devtools-panel-group-title">State Management</h3>
                   <StateSection defaultCollapsed={true} />
+                </div>
+              )}
+
+              {/* Decisions Group - only show if any child sections are visible */}
+              {(isSectionVisible(SectionId.DECISION_CONSOLE) ||
+                isSectionVisible(SectionId.DECISION_FLOW)) && (
+                <div className="devtools-panel-group">
+                  <h3 className="devtools-panel-group-title">Decisions</h3>
+                  <div className="devtools-panel-subgroup">
+                    {isSectionVisible(SectionId.DECISION_CONSOLE) && (
+                      <CollapsibleSection title="Decision Console" initialCollapsed={true}>
+                        <DecisionConsoleSection />
+                      </CollapsibleSection>
+                    )}
+
+                    {isSectionVisible(SectionId.DECISION_FLOW) && (
+                      <CollapsibleSection title="Decision Creation Flow" initialCollapsed={true}>
+                        <DecisionFlowSection />
+                      </CollapsibleSection>
+                    )}
+                  </div>
                 </div>
               )}
 
