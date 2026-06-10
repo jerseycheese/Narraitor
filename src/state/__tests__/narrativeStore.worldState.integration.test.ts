@@ -117,6 +117,121 @@ describe('Narrative store world state integration', () => {
       'The kingdom celebrates your diplomatic victory.'
     );
   });
+  it('applies option-level trust deltas and alignment shifts from one selection', () => {
+    const worldId = useWorldStore.getState().createWorld({
+      name: 'Test Realm',
+      description: 'A realm for integration tests',
+      genre: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 5,
+        maxSkills: 5,
+        attributePointPool: 10,
+        skillPointPool: 10,
+      },
+    });
+    const sessionId = 'session-consequences';
+    const npcId = 'npc-marta';
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
+    useSessionStore.getState().upsertSessionLifecycle({
+      id: sessionId,
+      worldId,
+      characterId,
+      status: 'active',
+      lastActivity: new Date().toISOString(),
+    });
+    const segmentTimestamp = new Date();
+    useNarrativeStore.getState().addSegment(sessionId, {
+      worldId,
+      content: 'Marta slides the ledger across the table.',
+      type: 'scene',
+      metadata: { tags: [], characterIds: [characterId] },
+      timestamp: segmentTimestamp,
+      updatedAt: segmentTimestamp.toISOString(),
+    });
+    const optionId = 'option-betray';
+    const decisionId = useNarrativeStore.getState().addDecision(sessionId, {
+      prompt: 'What do you do with the ledger?',
+      options: [
+        {
+          id: optionId,
+          text: 'Pocket the ledger while Marta is distracted.',
+          alignment: 'chaotic',
+          consequences: [
+            {
+              type: 'relationship',
+              action: 'modify',
+              targetId: npcId,
+              value: { trustDelta: -15 },
+            },
+            {
+              type: 'alignment',
+              action: 'add',
+              targetId: 'player-alignment',
+              value: -8,
+            },
+          ],
+        },
+      ],
+    });
+
+    useNarrativeStore
+      .getState()
+      .selectDecisionOption(decisionId, optionId, characterId);
+
+    const worldState = useWorldStore.getState().getWorldState(worldId);
+    // Trust starts at the default 50 and the delta lands on top
+    expect(worldState.npcRelationships[npcId].trust).toBe(35);
+    expect(
+      useCharacterStore.getState().characters[characterId].alignment
+    ).toBe(-8);
+  });
+  it('writes nothing when the selected option has no consequences', () => {
+    const worldId = useWorldStore.getState().createWorld({
+      name: 'Quiet Realm',
+      description: 'No consequences here',
+      genre: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 5,
+        maxSkills: 5,
+        attributePointPool: 10,
+        skillPointPool: 10,
+      },
+    });
+    const sessionId = 'session-quiet';
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
+    const segmentTimestamp = new Date();
+    useNarrativeStore.getState().addSegment(sessionId, {
+      worldId,
+      content: 'A quiet moment passes.',
+      type: 'scene',
+      metadata: { tags: [], characterIds: [characterId] },
+      timestamp: segmentTimestamp,
+      updatedAt: segmentTimestamp.toISOString(),
+    });
+    const optionId = 'option-wait';
+    const decisionId = useNarrativeStore.getState().addDecision(sessionId, {
+      prompt: 'What now?',
+      options: [{ id: optionId, text: 'Wait quietly.', alignment: 'neutral' }],
+    });
+
+    useNarrativeStore
+      .getState()
+      .selectDecisionOption(decisionId, optionId, characterId);
+
+    const worldState = useWorldStore.getState().getWorldState(worldId);
+    expect(Object.keys(worldState.npcRelationships)).toHaveLength(0);
+    expect(
+      useCharacterStore.getState().characters[characterId].alignment
+    ).toBeUndefined();
+  });
   it('marks session lifecycle status as ended when markSessionEnded is called', () => {
     const worldId = 'existing-world';
     const sessionId = 'session-ending';

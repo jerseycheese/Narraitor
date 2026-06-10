@@ -14,6 +14,8 @@ import {
 export interface ExtractedWorldStateImpact {
   relationships: Record<EntityID, NPCRelationshipUpdate>;
   events: WorldStateMajorEventInput[];
+  /** Net lawful(+)/chaotic(-) shift from 'alignment' consequences. */
+  alignmentDelta: number;
 }
 
 export type DecisionWorldStatePayload = {
@@ -21,6 +23,7 @@ export type DecisionWorldStatePayload = {
   sessionId: EntityID;
   relationships: Record<EntityID, NPCRelationshipUpdate>;
   events: WorldStateMajorEventInput[];
+  alignmentDelta: number;
 };
 
 const MAJOR_EVENT_PATTERNS: RegExp[] = [
@@ -101,9 +104,18 @@ export const extractWorldStateImpacts = (
   const events: WorldStateMajorEventInput[] = [];
   const processedDescriptions = new Set<string>();
   const timestamp = getTimestamp();
+  let alignmentDelta = 0;
 
   const handleConsequence = (consequence?: Consequence) => {
     if (!consequence) {
+      return;
+    }
+
+    if (consequence.type === 'alignment') {
+      const numeric = parseNumericValue(consequence.value);
+      if (typeof numeric === 'number') {
+        alignmentDelta += numeric;
+      }
       return;
     }
 
@@ -216,6 +228,7 @@ export const extractWorldStateImpacts = (
   return {
     relationships,
     events,
+    alignmentDelta,
   };
 };
 
