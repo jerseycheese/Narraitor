@@ -60,6 +60,9 @@ export const storeEvents = new StoreEventBus();
 export const StoreEventTypes = {
   CHARACTER_DELETED: 'character:deleted',
   WORLD_DELETED: 'world:deleted',
+  SESSION_FRESH_START: 'session:fresh-start',
+  SESSION_STARTED: 'session:started',
+  SESSION_ENDED: 'session:ended',
 } as const;
 
 export interface CharacterDeletedEvent {
@@ -68,4 +71,34 @@ export interface CharacterDeletedEvent {
 
 export interface WorldDeletedEvent {
   worldId: string;
+}
+
+/**
+ * Emitted by sessionStore.initializeSession before a fresh/new session
+ * activates, so sibling stores can reset their per-session data.
+ * narrativeStore clears segments/decisions when isNewSession; inventoryStore
+ * clears the character inventory when isForcedFresh.
+ */
+export interface SessionFreshStartEvent {
+  sessionId: string;
+  worldId: string;
+  characterId: string;
+  isNewSession: boolean;
+  isForcedFresh: boolean;
+}
+
+/** Emitted after a session activates; drives the session-start journal entry. */
+export interface SessionStartedEvent {
+  sessionId: string;
+  worldId: string;
+  characterId: string;
+  startedAt: string;
+}
+
+/** Emitted while endSession still holds the session identity; drives the session-end journal entry. */
+export interface SessionEndedEvent {
+  sessionId: string;
+  worldId: string;
+  characterId: string;
+  endedAt: string;
 }

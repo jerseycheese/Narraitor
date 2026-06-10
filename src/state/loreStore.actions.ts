@@ -23,7 +23,7 @@ import { logger } from '@/lib/utils/logger';
 
 import { getInitialState } from './loreStore.state';
 import { importanceRank } from './loreStore.helpers';
-import type { LoreStore } from './loreStore';
+import type { LoreStore } from './loreStore.types';
 import {
   addStructuredLoreImpl,
   type AddStructuredLoreContext,

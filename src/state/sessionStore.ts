@@ -6,23 +6,20 @@ import { EntityID } from '../types/common.types';
 import { SessionLifecycleMetadata, SessionLifecycleStatus } from '../types/session.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
-import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/sessionUtils';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { writeRecoveryMarker, clearRecoveryMarker } from '@/lib/utils/sessionRecoveryMarker';
+import {
+  storeEvents,
+  StoreEventTypes,
+  type SessionFreshStartEvent,
+  type SessionStartedEvent,
+  type SessionEndedEvent,
+} from '@/lib/state/storePubSub';
 
 /**
  * Create logger instance for this store
  */
 const logger = new Logger('SessionStore');
-
-/**
- * Cached store modules to avoid repeated dynamic imports
- */
-let journalStoreModule: typeof import('./journalStore') | null = null;
-let worldStoreModule: typeof import('./worldStore') | null = null;
-let characterStoreModule: typeof import('./characterStore') | null = null;
-let narrativeStoreModule: typeof import('./narrativeStore') | null = null;
-let inventoryStoreModule: typeof import('./inventoryStore') | null = null;
 
 const buildLifecycleMetadata = (
   params: {
@@ -133,64 +130,21 @@ export const useSessionStore = create<SessionStore>()(
       ? `session-${worldId}-${characterId}-${Date.now()}` 
       : currentState.id;
     
-    // Clear narrative data only for the new session to prevent inheritance
-    // IMPORTANT: We preserve old session data when changing characters to avoid data loss
-    if (sessionId && (isNewCharacterSession || !currentState.id)) {
-      try {
-        const { useNarrativeStore } = await import('./narrativeStore');
-        const narrativeStore = useNarrativeStore.getState();
-
-        // CHANGED: We no longer clear old session data when changing characters
-        // The old session data is preserved so users can return to it later
-        if (isNewCharacterSession && currentState.id) {
-          // Save the current session before switching (but don't clear its data)
-          // The old session data remains intact in the narrative store
-        }
-
-        // Only clear data for the new session if it exists (to start fresh)
-        const existingSegments = narrativeStore.getSessionSegments(sessionId);
-        if (existingSegments.length > 0) {
-          narrativeStore.clearSessionSegments(sessionId);
-          narrativeStore.clearSessionDecisions(sessionId);
-        }
-
-        // Always clear any global ending state
-        narrativeStore.clearEnding();
-      } catch (error) {
-        logger.warn('Failed to clear narrative data:', error);
-      }
-    }
-    if (force) {
-      try {
-        if (!inventoryStoreModule) {
-          inventoryStoreModule = await import('./inventoryStore');
-        }
-        const { useInventoryStore } = inventoryStoreModule;
-        const clearInventory = () => {
-          try {
-            useInventoryStore.getState().clearCharacterInventory(characterId);
-          } catch (clearError) {
-            logger.warn('Failed to clear inventory for fresh session (during hydration callback):', clearError);
-          }
-        };
-
-        const persistApi = (useInventoryStore as unknown as {
-          persist?: {
-            hasHydrated?: () => boolean;
-            onFinishHydration?: (callback: () => void) => () => void;
-          };
-        }).persist;
-
-        if (persistApi?.hasHydrated?.()) {
-          clearInventory();
-        } else if (persistApi?.onFinishHydration) {
-          persistApi.onFinishHydration(clearInventory);
-        } else {
-          clearInventory();
-        }
-      } catch (error) {
-        logger.warn('Failed to clear inventory for fresh session:', error);
-      }
+    // Let sibling stores reset their per-session data via the event bus.
+    // The dynamic store imports that used to live here were the hub of every
+    // import cycle in src/state; this store stays a leaf now. narrativeStore
+    // clears the new session's segments/decisions (isNewSession) and
+    // inventoryStore clears the character inventory (isForcedFresh) — old
+    // session data is still preserved when changing characters.
+    const isNewSession = isNewCharacterSession || !currentState.id;
+    if (sessionId && (isNewSession || force)) {
+      await storeEvents.emit<SessionFreshStartEvent>(StoreEventTypes.SESSION_FRESH_START, {
+        sessionId,
+        worldId,
+        characterId,
+        isNewSession,
+        isForcedFresh: force,
+      });
     }
     const lifecycleEntry: SessionLifecycleMetadata = {
       id: sessionId,
@@ -239,62 +193,15 @@ export const useSessionStore = create<SessionStore>()(
       syncRecoveryMarker(get(), activationTimestamp);
 
 
-      // Create session start journal entry (Issue #176)
-      try {
-        // Cache imported store modules to avoid repeated dynamic imports
-        if (!journalStoreModule) {
-          journalStoreModule = await import('./journalStore');
-        }
-        if (!worldStoreModule) {
-          worldStoreModule = await import('./worldStore');
-        }
-        if (!characterStoreModule) {
-          characterStoreModule = await import('./characterStore');
-        }
-        
-        const { useJournalStore } = journalStoreModule;
-        const { useWorldStore } = worldStoreModule;
-        const { useCharacterStore } = characterStoreModule;
-        
-        const journalStore = useJournalStore.getState();
-        const worldStore = useWorldStore.getState();
-        const characterStore = useCharacterStore.getState();
-        
-        const world = worldStore.worlds[worldId];
-        const character = characterStore.characters[characterId];
-        
-        const sessionStartTime = getTimestamp();
-        
-        // Get all journal entries to calculate session number
-        const allEntries = Object.values(journalStore.entries).flat();
-        const sessionNumber = calculateNextSessionNumber(allEntries);
-        
-        journalStore.addEntry(sessionId, {
-          type: 'session_start',
-          worldId,
-          characterId,
-          title: 'Adventure Begins',
-          content: `A new journey starts${world ? ` in ${world.name}` : ''}`,
-          significance: 'minor' as const,
-          isRead: false,
-          relatedEntities: [],
-          metadata: {
-            tags: ['system', 'session'],
-            automaticEntry: true,
-            sessionStartTime,
-            sessionContext: {
-              worldName: world?.name || 'Unknown World',
-              characterName: character?.name || 'Unknown Character',
-              sessionNumber
-            }
-          },
-          updatedAt: sessionStartTime
-        });
-        
-      } catch (error) {
-        logger.warn('Failed to create session start journal entry:', error);
-      }
-      
+      // Session-start journal entry (Issue #176) — created by the
+      // SESSION_STARTED subscriber in src/lib/session/sessionJournalEntries.ts
+      await storeEvents.emit<SessionStartedEvent>(StoreEventTypes.SESSION_STARTED, {
+        sessionId,
+        worldId,
+        characterId,
+        startedAt: getTimestamp(),
+      });
+
       if (onComplete) {
         onComplete();
       }
@@ -326,84 +233,18 @@ export const useSessionStore = create<SessionStore>()(
     clearRecoveryMarker();
 
     if (state.id && state.worldId && state.characterId) {
-      
-      // Create session end journal entry (Issue #176)
-      try {
-        const sessionEndTime = getTimestamp();
-        const sessionId = state.id;
-        
-        // Calculate session duration by looking for session start entry
-        let sessionDuration = 0;
-        try {
-          // Use cached imports to improve performance
-          if (!journalStoreModule) {
-            journalStoreModule = await import('./journalStore');
-          }
-          if (!worldStoreModule) {
-            worldStoreModule = await import('./worldStore');
-          }
-          if (!characterStoreModule) {
-            characterStoreModule = await import('./characterStore');
-          }
-          if (!narrativeStoreModule) {
-            narrativeStoreModule = await import('./narrativeStore');
-          }
-          
-          const { useJournalStore } = journalStoreModule;
-          const { useWorldStore } = worldStoreModule;
-          const { useCharacterStore } = characterStoreModule;
-          const { useNarrativeStore } = narrativeStoreModule;
-          
-          const journalStore = useJournalStore.getState();
-          const sessionEntries = journalStore.getSessionEntries(sessionId);
-          
-          const sessionStartEntry = sessionEntries.find(entry => entry.type === 'session_start');
-          if (sessionStartEntry?.metadata.sessionStartTime) {
-            const startTime = new Date(sessionStartEntry.metadata.sessionStartTime);
-            const endTime = new Date(sessionEndTime);
-            sessionDuration = endTime.getTime() - startTime.getTime();
-          }
-          
-          const worldStore = useWorldStore.getState();
-          const characterStore = useCharacterStore.getState();
-          const narrativeStore = useNarrativeStore.getState();
-          
-          const world = worldStore.worlds[state.worldId];
-          const character = characterStore.characters[state.characterId];
-          const narrativeSegments = narrativeStore.getSessionSegments(sessionId);
-          
-          const durationText = sessionDuration > 0 ? formatSessionDuration(sessionDuration) : 'unknown duration';
-          const segmentCount = narrativeSegments.length;
-          
-          journalStore.addEntry(sessionId, {
-            type: 'session_end',
-            worldId: state.worldId,
-            characterId: state.characterId,
-            title: 'Adventure Concluded',
-            content: `Session completed after ${durationText}${segmentCount > 0 ? ` with ${segmentCount} story segment${segmentCount !== 1 ? 's' : ''}` : ''}`,
-            significance: 'minor' as const,
-            isRead: false,
-            relatedEntities: [],
-            metadata: {
-              tags: ['system', 'session'],
-              automaticEntry: true,
-              sessionDuration,
-              sessionContext: {
-                worldName: world?.name || 'Unknown World',
-                characterName: character?.name || 'Unknown Character',
-                sessionNumber: sessionStartEntry?.metadata.sessionContext?.sessionNumber ?? calculateNextSessionNumber(Object.values(journalStore.entries).flat())
-              }
-            },
-            updatedAt: sessionEndTime
-          });
-          
-        } catch (journalError) {
-          logger.warn('Failed to access journal store for session end entry:', journalError);
-        }
-      } catch (error) {
-        logger.warn('Failed to create session end journal entry:', error);
-      }
-      
+
+      // Session-end journal entry with duration + segment count (Issue #176) —
+      // created by the SESSION_ENDED subscriber in
+      // src/lib/session/sessionJournalEntries.ts. Emitted while this store
+      // still holds the session identity (state resets just below).
+      await storeEvents.emit<SessionEndedEvent>(StoreEventTypes.SESSION_ENDED, {
+        sessionId: state.id,
+        worldId: state.worldId,
+        characterId: state.characterId,
+        endedAt: lifecycleUpdateTime,
+      });
+
       // Save session info without narrative count for now
       // We'll update it separately to avoid circular dependency
       const sessionId = state.id!;
@@ -848,37 +689,27 @@ export const useSessionStore = create<SessionStore>()(
     return !state.tutorialProgress.phases.intro.completed && !state.tutorialProgress.phases.intro.skipped;
   },
   
-  // Fix existing session narrative counts by recalculating from narrative store
-  fixExistingSessionNarrativeCounts: async () => {
-    try {
-      const { useNarrativeStore } = await import('./narrativeStore');
-      const narrativeStore = useNarrativeStore.getState();
-      const state = get();
-      
-      // Update each saved session's narrative count
+  // Patch saved sessions' narrativeCount values. The counts are computed by
+  // the caller from narrativeStore (src/lib/session/fixSessionNarrativeCounts.ts)
+  // so this store doesn't import it back. Deliberately leaves lastPlayed alone.
+  repairSavedSessionNarrativeCounts: (counts) => {
+    set(state => {
       const updatedSessions = { ...state.savedSessions };
       let hasUpdates = false;
 
-      for (const sessionId of Object.keys(updatedSessions)) {
-        const sessionSegments = narrativeStore.sessionSegments[sessionId] || [];
-        const actualCount = sessionSegments.length;
-        const currentCount = updatedSessions[sessionId].narrativeCount;
-        
-        if (currentCount !== actualCount) {
+      for (const [sessionId, actualCount] of Object.entries(counts)) {
+        const saved = updatedSessions[sessionId];
+        if (saved && saved.narrativeCount !== actualCount) {
           updatedSessions[sessionId] = {
-            ...updatedSessions[sessionId],
-            narrativeCount: actualCount
+            ...saved,
+            narrativeCount: actualCount,
           };
           hasUpdates = true;
         }
       }
-      
-      if (hasUpdates) {
-        set({ savedSessions: updatedSessions });
-      }
-    } catch (error) {
-      logger.error('Failed to fix existing session narrative counts:', error);
-    }
+
+      return hasUpdates ? { savedSessions: updatedSessions } : {};
+    });
   },
 
   shouldShowOnboarding: () => {

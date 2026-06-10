@@ -5,6 +5,10 @@ import { useSessionRecovery } from '@/hooks/useSessionRecovery';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { GameSessionRecoveryPrompt } from './GameSessionRecoveryPrompt';
+// Wires cross-store event subscriptions (session-boundary journal entries,
+// fresh-session data resets). This component mounts in the root layout, so
+// importing the wiring here guarantees it's live on every route.
+import '@/state/storeEventWiring';
 
 /**
  * Watches for a session that ended abnormally and surfaces the recovery prompt

@@ -10,7 +10,7 @@ import {
   validateFormula,
 } from '../derivedStatCalculator';
 import { DerivedStatFormula } from '@/types/world.types';
-import { CharacterAttribute } from '@/state/characterStore';
+import { CharacterAttribute } from '@/state/characterStore.types';
 
 describe('calculateDerivedStat', () => {
   // Helper to create test attributes
