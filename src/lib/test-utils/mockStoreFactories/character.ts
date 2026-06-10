@@ -22,6 +22,7 @@ export function createMockCharacterStore(
     setLoading: jest.fn(),
     createCharacter: jest.fn(),
     updateCharacter: jest.fn(),
+    applyAlignmentShift: jest.fn(),
     deleteCharacter: jest.fn(),
     setCurrentCharacter: jest.fn(),
     addAttribute: jest.fn(),

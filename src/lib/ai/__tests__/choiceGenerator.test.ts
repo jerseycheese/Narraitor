@@ -257,3 +257,79 @@ Options:
     });
   });
 });
+
+// NPC roster for consequence-target resolution (hoisted by jest)
+jest.mock('@/state/npcStore', () => ({
+  useNPCStore: {
+    getState: jest.fn().mockReturnValue({
+      getNPCsByWorld: () => [{ id: 'npc-1', name: 'Marta', worldId: 'world-1' }],
+    }),
+  },
+}));
+
+describe('generateChoices structured consequences', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('carries parsed trust deltas and composed alignment shifts on options', async () => {
+    mockAIClient.generateContent.mockResolvedValue({
+      content: `Decision Weight: [major]
+Decision: What do you do?
+
+1. [Lawful] Return the ledger to Marta
+   Consequences: Marta trust +10
+2. [Neutral] Ask around quietly
+3. [Chaotic] Torch the ledger in the square
+   Consequences: Marta trust -15`,
+      finishReason: 'stop',
+    });
+
+    const decision = await generateChoices(mockAIClient, {
+      worldId: 'world-1',
+      narrativeContext: createMockNarrativeContext(),
+      characterIds: ['char-1'],
+    });
+
+    const lawful = decision.options.find((o) => o.alignment === 'lawful');
+    expect(lawful?.consequences).toEqual(
+      expect.arrayContaining([
+        { type: 'relationship', action: 'modify', targetId: 'npc-1', value: { trustDelta: 10 } },
+        { type: 'alignment', action: 'add', targetId: 'player-alignment', value: 8 },
+      ])
+    );
+
+    const chaotic = decision.options.find((o) => o.alignment === 'chaotic');
+    expect(chaotic?.consequences).toEqual(
+      expect.arrayContaining([
+        { type: 'relationship', action: 'modify', targetId: 'npc-1', value: { trustDelta: -15 } },
+        { type: 'alignment', action: 'add', targetId: 'player-alignment', value: -8 },
+      ])
+    );
+
+    const neutral = decision.options.find((o) => o.alignment === 'neutral');
+    expect(neutral?.consequences ?? []).toHaveLength(0);
+  });
+
+  it('composes alignment consequences on the fallback path too', async () => {
+    mockAIClient.generateContent.mockRejectedValue(new Error('AI down'));
+
+    const decision = await generateChoices(mockAIClient, {
+      worldId: 'world-1',
+      narrativeContext: createMockNarrativeContext(),
+      characterIds: ['char-1'],
+    });
+
+    const aligned = decision.options.filter(
+      (o) => o.alignment === 'lawful' || o.alignment === 'chaotic'
+    );
+    expect(aligned.length).toBeGreaterThan(0);
+    for (const option of aligned) {
+      expect(option.consequences).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: 'alignment', targetId: 'player-alignment' }),
+        ])
+      );
+    }
+  });
+});

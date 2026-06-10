@@ -5,6 +5,7 @@ import { mapAlignmentToChoiceType } from '../lib/narrative/choiceType';
 import { logger } from '../lib/utils/logger';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 import { useWorldStore } from './worldStore';
+import { useCharacterStore } from './characterStore';
 import {
   extractWorldStateImpacts,
   extractDecisionContext,
@@ -128,12 +129,17 @@ export const createNarrativeDecisionActions = (
 
       if (sessionId && worldId) {
         const impacts = extractWorldStateImpacts(decision, selectedOption, characterId);
-        if (Object.keys(impacts.relationships).length > 0 || impacts.events.length > 0) {
+        if (
+          Object.keys(impacts.relationships).length > 0 ||
+          impacts.events.length > 0 ||
+          impacts.alignmentDelta !== 0
+        ) {
           worldStatePayload = {
             worldId,
             sessionId,
             relationships: impacts.relationships,
             events: impacts.events,
+            alignmentDelta: impacts.alignmentDelta,
           };
         }
       }
@@ -149,17 +155,27 @@ export const createNarrativeDecisionActions = (
 
     const payload = worldStatePayload;
     if (payload) {
-      try {
-        useWorldStore.getState().updateWorldState(
-          payload.worldId,
-          {
-            npcRelationships: payload.relationships,
-            majorEvents: payload.events,
-          },
-          payload.sessionId
-        );
-      } catch (error) {
-        logger.warn('Failed to apply world state update from decision', error);
+      if (Object.keys(payload.relationships).length > 0 || payload.events.length > 0) {
+        try {
+          useWorldStore.getState().updateWorldState(
+            payload.worldId,
+            {
+              npcRelationships: payload.relationships,
+              majorEvents: payload.events,
+            },
+            payload.sessionId
+          );
+        } catch (error) {
+          logger.warn('Failed to apply world state update from decision', error);
+        }
+      }
+
+      if (payload.alignmentDelta !== 0 && characterId) {
+        try {
+          useCharacterStore.getState().applyAlignmentShift(characterId, payload.alignmentDelta);
+        } catch (error) {
+          logger.warn('Failed to apply alignment shift from decision', error);
+        }
       }
     }
   },

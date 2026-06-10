@@ -13,6 +13,10 @@ interface PlayerChoiceTemplateContext {
     name: string;
     description: string;
   }>;
+  worldNpcs?: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 /**
@@ -20,7 +24,7 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt and options based on the current narrative context
  */
 export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills, optionCount } = context;
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount } = context;
   const choiceCount =
     typeof optionCount === 'number' && Number.isFinite(optionCount)
       ? Math.max(1, Math.floor(optionCount))
@@ -56,12 +60,35 @@ AVAILABLE SKILLS IN THIS WORLD:
 ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
   }
 
+  // Build the known-character roster + consequence instructions. Only emitted
+  // when the world has NPCs, so the parser has names to resolve against.
+  const hasNpcs = !!worldNpcs && worldNpcs.length > 0;
+  const npcInfo = hasNpcs
+    ? `
+
+KNOWN CHARACTERS (use these exact names):
+${worldNpcs.map(npc => `- ${npc.name}`).join('\n')}`
+    : '';
+  const consequencesInstructions = hasNpcs
+    ? `
+
+CONSEQUENCES (REQUIRED WHEN A KNOWN CHARACTER IS AFFECTED):
+- When an option would plausibly change how a known character feels about the player, add a Consequences line for that option.
+- Format EXACTLY: Consequences: CharacterName trust +N  (or -N), comma-separated for multiple characters.
+- Use ONLY names from the KNOWN CHARACTERS list. Omit the line entirely when no known character is affected.
+- Scale N to the Decision Weight: MINOR 2-5, MAJOR 5-12, CRITICAL 10-20.`
+    : '';
+  const consequencesFormatLine = hasNpcs
+    ? `
+   Consequences: [Optional - CharacterName trust +/-N]`
+    : '';
+
   const baseContent = `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
 CURRENT CONTEXT (brief summary):
 ${shortContext}
-${location ? `Current location: ${location}` : ''}${skillsInfo}
+${location ? `Current location: ${location}` : ''}${skillsInfo}${npcInfo}
 
 INSTRUCTIONS:
 Based on the ENTIRE narrative context (both beginning and end if provided), create ${choiceCount} distinct action choices that:
@@ -131,7 +158,7 @@ Context Summary: [Brief 1-2 sentence summary of the current situation that led t
 Options:
 ${Array.from({ length: choiceCount }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
    Hint: [Optional explanation]
-   Requirements: [Optional - SkillName X+]`).join('\n\n')}
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}`).join('\n\n')}${consequencesInstructions}
 
 ALIGNMENT INSTRUCTIONS: 
 - Always include alignment tags [LAWFUL], [NEUTRAL], or [CHAOTIC] at the start of each choice

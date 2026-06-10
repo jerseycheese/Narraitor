@@ -95,3 +95,55 @@ describe('CharacterSnapshot', () => {
     expect(container.querySelectorAll('.manuscript-character-snapshot-item')).toHaveLength(2);
   });
 });
+
+describe('CharacterSnapshot alignment row', () => {
+  const mockCharacter = {
+    id: 'char-1',
+    name: 'Test Hero',
+    description: '',
+    worldId: 'world-1',
+    level: 3,
+    attributes: [],
+    skills: [],
+    derivedStats: [],
+    background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+    isPlayer: true,
+    status: { health: 10, maxHealth: 10, conditions: [] },
+    inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  };
+
+  beforeEach(() => {
+    (useWorldStore as unknown as jest.Mock).mockReturnValue({
+      worlds: {
+        'world-1': { id: 'world-1', attributes: [], skills: [] },
+      },
+    });
+  });
+
+  it('hides the alignment row when alignment is undefined', () => {
+    render(<CharacterSnapshot character={mockCharacter} />);
+
+    expect(screen.queryByTestId('character-snapshot-alignment')).toBeNull();
+  });
+
+  it('shows the label and meter once alignment is set', () => {
+    render(
+      <CharacterSnapshot character={{ ...mockCharacter, alignment: -42 }} />
+    );
+
+    const row = screen.getByTestId('character-snapshot-alignment');
+    expect(row).toBeInTheDocument();
+    expect(screen.getByText('Alignment')).toBeInTheDocument();
+    expect(screen.getByText('Chaotic')).toBeInTheDocument();
+  });
+
+  it('labels mid-range alignment as Neutral', () => {
+    render(
+      <CharacterSnapshot character={{ ...mockCharacter, alignment: 10 }} />
+    );
+
+    expect(screen.getByText('Neutral')).toBeInTheDocument();
+  });
+});

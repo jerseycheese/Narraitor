@@ -55,6 +55,12 @@ export interface Character {
   description: string;
   worldId: EntityID;
   level: number;
+  /**
+   * Lawful/chaotic moral axis, shifted by chosen decision options
+   * (-100 fully chaotic .. +100 fully lawful). Absent until the first
+   * alignment-bearing choice is made — UI hides the row when undefined.
+   */
+  alignment?: number;
   attributes: CharacterAttribute[];
   skills: CharacterSkill[];
   derivedStats: DerivedStat[];

@@ -11,6 +11,10 @@ interface PlayerChoiceTemplateContext {
     name: string;
     description: string;
   }>;
+  worldNpcs?: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 /**
@@ -18,7 +22,7 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt with 1 lawful, 2 neutral, and 1 chaotic option
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills } = context;
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs } = context;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
@@ -48,7 +52,30 @@ export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): str
 AVAILABLE SKILLS IN THIS WORLD:
 ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
   }
-  
+
+  // Known-character roster + consequence contract; only emitted when the
+  // world has NPCs so the parser has names to resolve against.
+  const hasNpcs = !!worldNpcs && worldNpcs.length > 0;
+  const npcInfo = hasNpcs
+    ? `
+
+KNOWN CHARACTERS (use these exact names):
+${worldNpcs.map(npc => `- ${npc.name}`).join('\n')}`
+    : '';
+  const consequencesInstructions = hasNpcs
+    ? `
+
+CONSEQUENCES (REQUIRED WHEN A KNOWN CHARACTER IS AFFECTED):
+- When an option would plausibly change how a known character feels about the player, add a Consequences line for that option.
+- Format EXACTLY: Consequences: CharacterName trust +N  (or -N), comma-separated for multiple characters.
+- Use ONLY names from the KNOWN CHARACTERS list. Omit the line entirely when no known character is affected.
+- Scale N to the Decision Weight: MINOR 2-5, MAJOR 5-12, CRITICAL 10-20.`
+    : '';
+  const consequencesFormatLine = hasNpcs
+    ? `
+   Consequences: [Optional - CharacterName trust +/-N]`
+    : '';
+
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
@@ -57,7 +84,7 @@ LOCATION: ${location || 'Unknown location'}
 SITUATION: ${narrativeContext?.currentSituation || 'General scenario'}
 
 FULL CONTEXT:
-${shortContext}${skillsInfo}
+${shortContext}${skillsInfo}${npcInfo}
 
 === CRITICAL INSTRUCTIONS ===
 You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.
@@ -111,13 +138,13 @@ Decision: What will you do?
 
 Options:
 1. [LAWFUL] [First choice - follows rules/authority/order]
-   Requirements: [Optional - SkillName X+]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
 2. [NEUTRAL] [Second choice - balanced/practical approach]
-   Requirements: [Optional - SkillName X+]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
 3. [NEUTRAL] [Third choice - different practical approach]
-   Requirements: [Optional - SkillName X+]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
 4. [CHAOTIC] [Fourth choice - WILDLY UNEXPECTED action that could completely change the situation - be creative and dramatic!]
-   Requirements: [Optional - SkillName X+]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}${consequencesInstructions}
 
 Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary line, then Decision and Options sections with alignment tags.`;
 };
