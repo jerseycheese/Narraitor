@@ -4,6 +4,7 @@ import type { EntityID, TimestampedEntity } from './common.types';
 import type { World } from './world.types';
 import type { Character } from './character.types';
 import type { InventoryAcquisitionMethod, StandardInventoryCategory } from './inventory.types';
+import type { ContinuitySegmentNote } from './continuity.types';
 
 /**
  * Represents a segment of narrative in the game
@@ -269,6 +270,8 @@ export interface NarrativeMetadata {
   causedByDecisionId?: EntityID;
   causedByDecisionText?: string;
   decisionOutcome?: DecisionOutcome;
+  // Continuity guardrail outcome (#409/#412)
+  continuity?: ContinuitySegmentNote;
   // Debug information (dev mode only)
   debugInfo?: PromptDebugInfo;
 }
@@ -375,6 +378,8 @@ export interface NarrativeGenerationResult {
     itemsLost?: LostItemMetadata[];
     // Major event tracking
     majorEvent?: string;
+    // Continuity guardrail outcome (#409/#412)
+    continuity?: ContinuitySegmentNote;
     // Debug information (dev mode only)
     debugInfo?: PromptDebugInfo;
   };
