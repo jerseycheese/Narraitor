@@ -103,10 +103,6 @@ const getInitialState = () => ({
   imageGenerationErrors: new Map<EntityID, string>(),
 });
 
-export const createInventoryInitialState = (): ReturnType<
-  typeof getInitialState
-> => getInitialState();
-
 const sanitizeInventoryValue = (
   characterId: EntityID,
   value: unknown

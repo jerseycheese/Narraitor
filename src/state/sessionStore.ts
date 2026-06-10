@@ -6,7 +6,6 @@ import { EntityID } from '../types/common.types';
 import { SessionLifecycleMetadata, SessionLifecycleStatus } from '../types/session.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
-import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/sessionUtils';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { writeRecoveryMarker, clearRecoveryMarker } from '@/lib/utils/sessionRecoveryMarker';
 import {
