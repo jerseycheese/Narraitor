@@ -66,7 +66,7 @@ const mockSessionStore: SessionStore = {
   resumeSavedSession: jest.fn(),
   deleteSavedSession: jest.fn(),
   updateSavedSessionNarrativeCount: jest.fn(),
-  fixExistingSessionNarrativeCounts: jest.fn(),
+  repairSavedSessionNarrativeCounts: jest.fn(),
   upsertSessionLifecycle: jest.fn(),
   setSessionLifecycleStatus: jest.fn(),
   getSessionLifecycle: jest.fn(),

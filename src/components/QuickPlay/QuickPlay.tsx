@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
+import { fixExistingSessionNarrativeCounts } from '@/lib/session/fixSessionNarrativeCounts';
 import { Globe, Users, Play } from 'lucide-react';
 
 import Logger from '@/lib/utils/logger';
@@ -31,19 +32,14 @@ export function QuickPlay() {
   const shouldShowOnboarding = useSessionStore(
     (state) => state.shouldShowOnboarding
   );
-  const fixExistingSessionNarrativeCounts = useSessionStore(
-    (state) => state.fixExistingSessionNarrativeCounts
-  );
   const actualWorlds = worlds;
   const actualCharacters = characters;
   const actualSavedSessions = savedSessions;
 
   // Fix existing session narrative counts on component mount
   useEffect(() => {
-    if (fixExistingSessionNarrativeCounts) {
-      fixExistingSessionNarrativeCounts();
-    }
-  }, [fixExistingSessionNarrativeCounts]);
+    fixExistingSessionNarrativeCounts();
+  }, []);
 
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

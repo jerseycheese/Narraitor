@@ -25,6 +25,7 @@ import {
   storeEvents,
   StoreEventTypes,
   type CharacterDeletedEvent,
+  type SessionFreshStartEvent,
 } from '@/lib/state/storePubSub';
 
 import Logger from '@/lib/utils/logger';
@@ -1080,5 +1081,39 @@ storeEvents.subscribe<CharacterDeletedEvent>(
   StoreEventTypes.CHARACTER_DELETED,
   ({ characterId }) => {
     useInventoryStore.getState().clearCharacterInventory(characterId);
+  }
+);
+
+// Clear the character's inventory when a forced-fresh session starts.
+// Subscribed here (rather than sessionStore importing this store) to keep
+// sessionStore a leaf in the store import graph. Waits for persist hydration
+// so the clear isn't overwritten by rehydrating stale data.
+storeEvents.subscribe<SessionFreshStartEvent>(
+  StoreEventTypes.SESSION_FRESH_START,
+  ({ characterId, isForcedFresh }) => {
+    if (!isForcedFresh) return;
+
+    const clearInventory = () => {
+      try {
+        useInventoryStore.getState().clearCharacterInventory(characterId);
+      } catch (clearError) {
+        logger.warn('Failed to clear inventory for fresh session (during hydration callback):', clearError);
+      }
+    };
+
+    const persistApi = (useInventoryStore as unknown as {
+      persist?: {
+        hasHydrated?: () => boolean;
+        onFinishHydration?: (callback: () => void) => () => void;
+      };
+    }).persist;
+
+    if (persistApi?.hasHydrated?.()) {
+      clearInventory();
+    } else if (persistApi?.onFinishHydration) {
+      persistApi.onFinishHydration(clearInventory);
+    } else {
+      clearInventory();
+    }
   }
 );

@@ -48,7 +48,7 @@ export function createMockSessionStore(
     resumeSavedSession: jest.fn(() => false),
     deleteSavedSession: jest.fn(),
     updateSavedSessionNarrativeCount: jest.fn(),
-    fixExistingSessionNarrativeCounts: jest.fn().mockResolvedValue(undefined),
+    repairSavedSessionNarrativeCounts: jest.fn(),
     upsertSessionLifecycle: jest.fn(),
     setSessionLifecycleStatus: jest.fn(),
     getSessionLifecycle: jest.fn(() => undefined),
