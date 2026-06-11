@@ -362,8 +362,8 @@ jobs:
       - name: Prepare security report directory
         run: mkdir -p ci-security
 
-      - name: Run npm audit (fails on high severity only)
-        run: npm audit --production --audit-level=high | tee ci-security/npm-audit.txt
+      - name: Run npm audit (fails on moderate severity or higher)
+        run: npm audit --production --audit-level=moderate | tee ci-security/npm-audit.txt
         continue-on-error: false
 
       - name: Generate npm audit JSON report
