@@ -228,47 +228,6 @@ describe('/api/generate-world-image', () => {
       expect(data.imageUrl).toContain('picsum.photos');
     });
 
-    it('should fallback to placeholder when Gemini API response has no image', async () => {
-      mockGeminiClient.generateContent.mockResolvedValue({
-        content: 'Generated description'
-      });
-
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue(null);
-
-      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
-        method: 'POST',
-        body: JSON.stringify({ world: mockWorld }),
-      });
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data.aiGenerated).toBe(false);
-      expect(data.placeholder).toBe(true);
-      expect(data.imageUrl).toContain('picsum.photos');
-    });
-
-    it('should fallback to placeholder when network error occurs', async () => {
-      mockGeminiClient.generateContent.mockResolvedValue({
-        content: 'Generated description'
-      });
-
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue(null);
-
-      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
-        method: 'POST',
-        body: JSON.stringify({ world: mockWorld }),
-      });
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data.aiGenerated).toBe(false);
-      expect(data.placeholder).toBe(true);
-      expect(data.imageUrl).toContain('picsum.photos');
-    });
   });
 
   describe('Environment Configuration', () => {

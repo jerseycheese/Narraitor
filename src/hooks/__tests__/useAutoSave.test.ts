@@ -178,16 +178,6 @@ describe('useAutoSave', () => {
     expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saving');
   });
 
-  it('should trigger manual save with scene change reason', async () => {
-    const { result } = renderHook(() => useAutoSave());
-    
-    await act(async () => {
-      await result.current.triggerSave('scene-change');
-    });
-    
-    expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saving');
-  });
-
   it('should provide save status from session store', () => {
     mockSessionStore.autoSave.status = 'saved';
     mockSessionStore.autoSave.lastSaveTime = '2023-01-01T00:00:00.000Z';

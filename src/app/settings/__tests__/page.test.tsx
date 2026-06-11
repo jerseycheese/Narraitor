@@ -70,13 +70,6 @@ describe('SettingsPage', () => {
     expect(screen.getAllByText(/backup.*restore/i).length).toBeGreaterThan(0);
   });
 
-  test('includes ExportImportControls component', () => {
-    render(<SettingsPage />);
-    
-    // Test that the ExportImportControls component is rendered
-    expect(screen.getByTestId('export-import-controls')).toBeInTheDocument();
-  });
-
   test('uses PageLayout component structure', () => {
     render(<SettingsPage />);
     

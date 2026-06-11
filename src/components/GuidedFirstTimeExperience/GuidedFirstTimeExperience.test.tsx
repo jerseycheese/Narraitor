@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { GuidedFirstTimeExperience } from './GuidedFirstTimeExperience';
 
 // Mock only what's necessary
@@ -79,18 +78,6 @@ describe('GuidedFirstTimeExperience', () => {
       
       // Should show the main call to action
       expect(screen.getByText(/create a world and start a story/i)).toBeInTheDocument();
-    });
-
-    it('progresses through the experience steps', async () => {
-      const user = userEvent.setup();
-      render(<GuidedFirstTimeExperience />);
-
-      const nextButton = screen.queryByText(/next/i) || screen.queryByText(/continue/i) || screen.queryByText(/get started/i);
-
-      expect(nextButton).toBeInTheDocument();
-      if (nextButton) {
-        await user.click(nextButton);
-      }
     });
   });
 

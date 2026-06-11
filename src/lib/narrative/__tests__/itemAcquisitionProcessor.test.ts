@@ -749,21 +749,5 @@ describe('itemAcquisitionProcessor', () => {
         quantity: 3, // All three merged correctly
       }));
     });
-
-    it('documents that AI handles complex semantic matches', () => {
-      // This test documents the expected behavior for AI-based matching.
-      // In real usage with the actual AI API, it would handle cases like:
-      // - "Photo of Mom" vs "Photo of your mother" (synonyms + possessives)
-      // - "Dad's Watch" vs "Father's Timepiece" (synonyms + word order)
-      // - "Healing Draught" vs "Curative Elixir" (complete synonym replacement)
-      //
-      // The mock in beforeEach() simulates this by handling:
-      // - Exact matches
-      // - Substring matches (e.g., "Potion" in "Health Potion")
-      // - Singular/plural (e.g., "Coin" vs "Coins")
-      //
-      // Real AI would go beyond simple string matching to understand semantic meaning.
-      expect(mockCheckSimilarity).toBeDefined();
-    });
   });
 });
