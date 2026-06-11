@@ -97,6 +97,8 @@ jobs:
         run: npm run lint:layout-usage
       - name: Enforce design-system canon (living style guide)
         run: npm run lint:ds-canon
+      - name: Enforce dependency boundaries (no new cycles or dev-dep leaks)
+        run: npm run deps:validate
 
   knip:
     name: Knip (unused code)
