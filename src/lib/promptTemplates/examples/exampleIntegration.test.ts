@@ -86,8 +86,7 @@ describe('Example Library Template Integration', () => {
       const result = baseNarrativeTemplate(context);
 
       // With default budget and short context, examples should be included
-      // This test verifies the default behavior works
-      expect(result).toBeDefined();
+      expect(result).toContain('EXAMPLES:');
     });
 
     it('should differentiate between 0 and undefined for token budget', () => {
@@ -239,9 +238,8 @@ describe('Example Library Template Integration', () => {
 
       const result = skillAcknowledgmentTemplate(context);
 
-      // Should not default to failure guidance
-      // The template should handle neutral/undefined results gracefully
-      expect(result).toBeDefined();
+      // Should not default to failure guidance for a neutral/undefined result
+      expect(result).not.toContain('FAILURE ACKNOWLEDGMENT');
     });
   });
 });

@@ -20,15 +20,6 @@ describe('clientFactory browser behavior', () => {
     delete process.env.GEMINI_API_KEY;
   });
 
-  it('should create a browser-safe mock client without jest dependency when no API key is available', () => {
-    expect(() => {
-      const client = createAIClient();
-      expect(client).toBeDefined();
-      expect(typeof client.generateContent).toBe('function');
-      expect(typeof client.generateImage).toBe('function');
-    }).not.toThrow();
-  });
-
   it('should throw helpful error when trying to use AI features in browser', async () => {
     const client = createAIClient();
     

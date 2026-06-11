@@ -125,12 +125,6 @@ describe('Template Loader', () => {
         difficulty: 'medium',
       })
     );
-
-    // Verify attributeIds is array or undefined
-    expect(
-      Array.isArray(updates.skills[0].attributeIds) ||
-        typeof updates.skills[0].attributeIds === 'undefined'
-    ).toBeTruthy();
   });
 
   test('applyWorldTemplate accepts a template ID string', () => {

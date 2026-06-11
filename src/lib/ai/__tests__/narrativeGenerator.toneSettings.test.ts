@@ -60,23 +60,6 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
     expect(narrativePrompt).toContain('Focus on character development and emotional depth');
   });
 
-  test('should respect content rating in generated content validation', async () => {
-    const explicitContent = 'This contains explicit violence and mature themes...';
-    mockAiClient.setMockResponse({
-      content: explicitContent,
-    });
-
-    const result = await generator.generateSegment({
-      worldId,
-      sessionId: 'test-session',
-      characterIds: ['test-character']
-    });
-
-    // Should validate content against rating
-    expect(result.content).toBeDefined();
-    // Content should be filtered or modified based on PG-13 rating
-  });
-
   test('should maintain consistent tone across multiple generations', async () => {
     mockAiClient.setMockResponse({
       content: 'Consistent dramatic narrative',
