@@ -1,16 +1,31 @@
 import type { NextConfig } from "next";
 
-// Content Security Policy. Shipped as Report-Only for now: the app relies on
-// inline scripts (the theme-init script in layout.tsx, Next.js hydration
-// bootstrap, Vercel Analytics) that a strict enforced policy would block
-// without nonces/hashes. Report-Only lets us observe violations in the browser
-// console before moving to enforcement. Fonts are self-hosted by next/font, so
-// no external font origin is needed; image origins mirror images.remotePatterns.
+// Content Security Policy (enforced). 'unsafe-inline' is kept for script/style
+// because the app relies on inline scripts (the theme-init script in
+// layout.tsx, Next.js hydration bootstrap, Vercel Analytics); dropping it would
+// require per-request nonces via middleware, which opts every page out of
+// static generation. Enforcement was verified clean first: a headless crawl of
+// the public/creation/settings/dev routes produced zero violations, generated
+// images are base64 data: URLs, and no client code fetches non-self origins.
+// The /dev/design-system-{2,3} showcase routes @import Google Fonts, so
+// googleapis (stylesheet) and gstatic (font files) are allowlisted; the
+// production app self-hosts fonts via next/font.
+const isDev = process.env.NODE_ENV !== 'production';
+
+// Development-only script sources, omitted from production builds to keep the
+// shipped policy strict:
+// - 'unsafe-eval': `next dev` evaluates the HMR / React Fast Refresh runtime
+//   with eval(); production (next build) never uses eval.
+// - va.vercel-scripts.com: Vercel Analytics loads its debug script from this
+//   origin in dev; in production it is served same-origin (/_vercel/insights).
+const devScriptSrc = isDev ? ["'unsafe-eval'", 'https://va.vercel-scripts.com'] : [];
+const scriptSrc = ["'self'", "'unsafe-inline'", ...devScriptSrc].join(' ');
+
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
-  "font-src 'self'",
+  `script-src ${scriptSrc}`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://picsum.photos https://i.pravatar.cc https://api.dicebear.com",
   "connect-src 'self' https://vitals.vercel-insights.com",
   "frame-ancestors 'none'",
@@ -21,7 +36,7 @@ const contentSecurityPolicy = [
 
 // Hardening headers that are safe to enforce immediately.
 const securityHeaders = [
-  { key: 'Content-Security-Policy-Report-Only', value: contentSecurityPolicy },
+  { key: 'Content-Security-Policy', value: contentSecurityPolicy },
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
