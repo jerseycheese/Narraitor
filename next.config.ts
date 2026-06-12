@@ -7,12 +7,25 @@ import type { NextConfig } from "next";
 // static generation. Enforcement was verified clean first: a headless crawl of
 // the public/creation/settings/dev routes produced zero violations, generated
 // images are base64 data: URLs, and no client code fetches non-self origins.
-// Fonts are self-hosted by next/font; image origins mirror images.remotePatterns.
+// The /dev/design-system-{2,3} showcase routes @import Google Fonts, so
+// googleapis (stylesheet) and gstatic (font files) are allowlisted; the
+// production app self-hosts fonts via next/font.
+const isDev = process.env.NODE_ENV !== 'production';
+
+// Development-only script sources, omitted from production builds to keep the
+// shipped policy strict:
+// - 'unsafe-eval': `next dev` evaluates the HMR / React Fast Refresh runtime
+//   with eval(); production (next build) never uses eval.
+// - va.vercel-scripts.com: Vercel Analytics loads its debug script from this
+//   origin in dev; in production it is served same-origin (/_vercel/insights).
+const devScriptSrc = isDev ? ["'unsafe-eval'", 'https://va.vercel-scripts.com'] : [];
+const scriptSrc = ["'self'", "'unsafe-inline'", ...devScriptSrc].join(' ');
+
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
-  "font-src 'self'",
+  `script-src ${scriptSrc}`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://picsum.photos https://i.pravatar.cc https://api.dicebear.com",
   "connect-src 'self' https://vitals.vercel-insights.com",
   "frame-ancestors 'none'",
