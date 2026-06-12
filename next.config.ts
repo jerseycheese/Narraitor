@@ -1,8 +1,53 @@
 import type { NextConfig } from "next";
 
+// Content Security Policy. Shipped as Report-Only for now: the app relies on
+// inline scripts (the theme-init script in layout.tsx, Next.js hydration
+// bootstrap, Vercel Analytics) that a strict enforced policy would block
+// without nonces/hashes. Report-Only lets us observe violations in the browser
+// console before moving to enforcement. Fonts are self-hosted by next/font, so
+// no external font origin is needed; image origins mirror images.remotePatterns.
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "img-src 'self' data: blob: https://picsum.photos https://i.pravatar.cc https://api.dicebear.com",
+  "connect-src 'self' https://vitals.vercel-insights.com",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join('; ');
+
+// Hardening headers that are safe to enforce immediately.
+const securityHeaders = [
+  { key: 'Content-Security-Policy-Report-Only', value: contentSecurityPolicy },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
+  },
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(), geolocation=()',
+  },
+];
+
 const nextConfig: NextConfig = {
   // React strict mode for development warnings
   reactStrictMode: true,
+
+  // Security headers applied to every route. See securityHeaders above.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+    ];
+  },
 
   // Tree-shake barrel imports from icon-heavy packages so a cold start only
   // ships the icons actually used, not the full lucide-react module graph.
