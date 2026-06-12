@@ -1,11 +1,13 @@
 import type { NextConfig } from "next";
 
-// Content Security Policy. Shipped as Report-Only for now: the app relies on
-// inline scripts (the theme-init script in layout.tsx, Next.js hydration
-// bootstrap, Vercel Analytics) that a strict enforced policy would block
-// without nonces/hashes. Report-Only lets us observe violations in the browser
-// console before moving to enforcement. Fonts are self-hosted by next/font, so
-// no external font origin is needed; image origins mirror images.remotePatterns.
+// Content Security Policy (enforced). 'unsafe-inline' is kept for script/style
+// because the app relies on inline scripts (the theme-init script in
+// layout.tsx, Next.js hydration bootstrap, Vercel Analytics); dropping it would
+// require per-request nonces via middleware, which opts every page out of
+// static generation. Enforcement was verified clean first: a headless crawl of
+// the public/creation/settings/dev routes produced zero violations, generated
+// images are base64 data: URLs, and no client code fetches non-self origins.
+// Fonts are self-hosted by next/font; image origins mirror images.remotePatterns.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
@@ -21,7 +23,7 @@ const contentSecurityPolicy = [
 
 // Hardening headers that are safe to enforce immediately.
 const securityHeaders = [
-  { key: 'Content-Security-Policy-Report-Only', value: contentSecurityPolicy },
+  { key: 'Content-Security-Policy', value: contentSecurityPolicy },
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
