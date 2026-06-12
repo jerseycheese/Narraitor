@@ -110,11 +110,10 @@ public_docs/architecture/*.dot
 public_docs/architecture/*.html
 dependency-violations.html
 
-# Claude Code
+# Claude Code (CLAUDE.md is committed canon; the rest stays local)
 .claude/*
 .claude-workflow/
 .clauderc
-CLAUDE.md
 CLAUDE.local.md
 
 # Claude Code cloud (web sessions): commit only these reviewed, shareable files.
