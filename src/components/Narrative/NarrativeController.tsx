@@ -649,32 +649,48 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         skillCheckContext = ` [Skill checks: ${skillResultDescriptions.join(', ')}]`;
       }
 
-      const result = await narrativeGenerator.generateSegment({
-        worldId,
-        sessionId,
-        characterIds: characterId ? [characterId] : [],
-        narrativeContext: {
-          worldId,
-          currentSceneId: `scene-${Date.now()}`,
-          characterIds: characterId ? [characterId] : [],
-          previousSegments: recentSegments,
-          currentTags,
-          sessionId: sessionId || 'temp-session',
-          recentSegments,
-          currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
-        },
-        generationParameters: {
-          includedTopics: [choiceText],
-          desiredLength: 'short',
-          decisionWeight,
-          // Critical decisions with critical failures should have tragic tone
-          desiredTone:
-            decisionWeight === 'critical' &&
-            rollResults.some((r) => r.isCriticalFailure)
-              ? 'tragic'
-              : undefined,
-        },
+      const segmentTimeoutPromise = new Promise<
+        ReturnType<typeof narrativeGenerator.generateSegment>
+      >((_, reject) => {
+        setTimeout(
+          () =>
+            reject(
+              new Error(`Segment generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
+            ),
+          AI_GENERATION_TIMEOUT_MS
+        );
       });
+      const result = await Promise.race([
+        narrativeGenerator.generateSegment({
+          worldId,
+          sessionId,
+          characterIds: characterId ? [characterId] : [],
+          narrativeContext: {
+            worldId,
+            currentSceneId: `scene-${Date.now()}`,
+            characterIds: characterId ? [characterId] : [],
+            previousSegments: recentSegments,
+            currentTags,
+            sessionId: sessionId || 'temp-session',
+            recentSegments,
+            currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
+          },
+          generationParameters: {
+            includedTopics: [choiceText],
+            desiredLength: 'short',
+            decisionWeight,
+            // Critical decisions with critical failures should have tragic tone
+            desiredTone:
+              decisionWeight === 'critical' &&
+              rollResults.some((r) => r.isCriticalFailure)
+                ? 'tragic'
+                : undefined,
+          },
+        }),
+        segmentTimeoutPromise as unknown as ReturnType<
+          typeof narrativeGenerator.generateSegment
+        >,
+      ]);
 
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
