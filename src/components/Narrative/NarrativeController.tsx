@@ -671,7 +671,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
             characterIds: characterId ? [characterId] : [],
             previousSegments: recentSegments,
             currentTags,
-            sessionId: sessionId || 'temp-session',
+            sessionId,
             recentSegments,
             currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
           },
