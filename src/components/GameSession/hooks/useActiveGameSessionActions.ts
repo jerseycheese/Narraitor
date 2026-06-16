@@ -114,6 +114,12 @@ export const useActiveGameSessionActions = ({
       return;
     }
 
+    // Can't register a custom action without an active decision; bail before touching
+    // generation state so we never fire onChoiceSelected with an id that backs no option.
+    if (!currentDecision) {
+      return;
+    }
+
     // Handle custom player input
     const customChoiceId = generateUniqueId('custom');
 
