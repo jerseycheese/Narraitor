@@ -129,15 +129,39 @@ export const createNarrativeDecisionActions = (
 
       if (sessionId && worldId) {
         const impacts = extractWorldStateImpacts(decision, selectedOption, characterId);
+
+        // Gate NPC relationship updates on scene presence. An NPC counts as
+        // present if its id appears in the latest segment's characterIds (the
+        // same model useNarrativeParticipants uses for the Scene Status panel).
+        const segmentIds = state.sessionSegments[sessionId] || [];
+        const latestSegment = segmentIds.length
+          ? state.segments[segmentIds[segmentIds.length - 1]]
+          : undefined;
+        const presentNpcIds = new Set<EntityID>([
+          ...(latestSegment?.metadata?.characterIds ?? []),
+          ...(latestSegment?.characterIds ?? []),
+        ]);
+
+        const gatedRelationships: Record<EntityID, typeof impacts.relationships[EntityID]> = {};
+        for (const [npcId, update] of Object.entries(impacts.relationships)) {
+          if (presentNpcIds.has(npcId as EntityID)) {
+            gatedRelationships[npcId as EntityID] = update;
+          } else {
+            logger.warn(
+              `Dropped relationship update for absent NPC "${npcId}" — not present in the current scene`
+            );
+          }
+        }
+
         if (
-          Object.keys(impacts.relationships).length > 0 ||
+          Object.keys(gatedRelationships).length > 0 ||
           impacts.events.length > 0 ||
           impacts.alignmentDelta !== 0
         ) {
           worldStatePayload = {
             worldId,
             sessionId,
-            relationships: impacts.relationships,
+            relationships: gatedRelationships,
             events: impacts.events,
             alignmentDelta: impacts.alignmentDelta,
           };

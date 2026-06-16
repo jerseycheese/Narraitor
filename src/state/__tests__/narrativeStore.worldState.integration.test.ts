@@ -75,7 +75,7 @@ describe('Narrative store world state integration', () => {
       worldId,
       content: 'The guard eyes you suspiciously.',
       type: 'scene',
-      metadata: { tags: [], characterIds: [characterId] },
+      metadata: { tags: [], characterIds: [characterId, npcId] },
       timestamp: segmentTimestamp,
       updatedAt: segmentTimestamp.toISOString(),
     });
@@ -148,7 +148,7 @@ describe('Narrative store world state integration', () => {
       worldId,
       content: 'Marta slides the ledger across the table.',
       type: 'scene',
-      metadata: { tags: [], characterIds: [characterId] },
+      metadata: { tags: [], characterIds: [characterId, npcId] },
       timestamp: segmentTimestamp,
       updatedAt: segmentTimestamp.toISOString(),
     });
@@ -232,6 +232,81 @@ describe('Narrative store world state integration', () => {
       useCharacterStore.getState().characters[characterId].alignment
     ).toBeUndefined();
   });
+  it('drops relationship deltas for NPCs not present in the latest segment', () => {
+    const worldId = useWorldStore.getState().createWorld({
+      name: 'Presence Test Realm',
+      description: 'A realm for presence-gate tests',
+      genre: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 5,
+        maxSkills: 5,
+        attributePointPool: 10,
+        skillPointPool: 10,
+      },
+    });
+    const sessionId = 'session-presence-gate';
+    const presentNpcId = 'npc-present';
+    const absentNpcId = 'npc-absent';
+    const characterId = useCharacterStore
+      .getState()
+      .createCharacter(createTestCharacterData({ worldId }));
+    useSessionStore.getState().upsertSessionLifecycle({
+      id: sessionId,
+      worldId,
+      characterId,
+      status: 'active',
+      lastActivity: new Date().toISOString(),
+    });
+    // Only npc-present is in the scene; npc-absent is not.
+    const segmentTimestamp = new Date();
+    useNarrativeStore.getState().addSegment(sessionId, {
+      worldId,
+      content: 'The present NPC watches you from the corner.',
+      type: 'scene',
+      metadata: { tags: [], characterIds: [characterId, presentNpcId] },
+      timestamp: segmentTimestamp,
+      updatedAt: segmentTimestamp.toISOString(),
+    });
+    const optionId = 'option-act';
+    const decisionId = useNarrativeStore.getState().addDecision(sessionId, {
+      prompt: 'What do you do?',
+      options: [
+        {
+          id: optionId,
+          text: 'Do something notable.',
+          alignment: 'neutral',
+          consequences: [
+            {
+              type: 'relationship',
+              action: 'add',
+              targetId: presentNpcId,
+              value: 12,
+            },
+            {
+              type: 'relationship',
+              action: 'add',
+              targetId: absentNpcId,
+              value: 8,
+            },
+          ],
+        },
+      ],
+    });
+
+    useNarrativeStore
+      .getState()
+      .selectDecisionOption(decisionId, optionId, characterId);
+
+    const worldState = useWorldStore.getState().getWorldState(worldId);
+    // Present NPC trust should move (default 50 + 12 = 62)
+    expect(worldState.npcRelationships[presentNpcId]).toBeDefined();
+    expect(worldState.npcRelationships[presentNpcId].trust).toBe(62);
+    // Absent NPC should get nothing
+    expect(worldState.npcRelationships[absentNpcId]).toBeUndefined();
+  });
+
   it('marks session lifecycle status as ended when markSessionEnded is called', () => {
     const worldId = 'existing-world';
     const sessionId = 'session-ending';
