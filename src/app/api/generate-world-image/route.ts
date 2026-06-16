@@ -3,7 +3,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
-import { generateAndSaveImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('WorldImageAPI');
@@ -116,20 +116,18 @@ Requirements:
 - No text, logos, or watermarks
 - Landscape orientation suitable for world imagery`;
 
-          // Generate and save the image to the file system
-          const savedImage = await generateAndSaveImageWithGemini(
+          // Generate image as a data URL so it persists in IndexedDB (no disk write)
+          const generatedImage = await generateImageWithGemini(
             imagePromptForGemini,
-            apiKey,
-            body.world.id,
-            'worlds'
+            apiKey
           );
 
-          if (savedImage) {
-            imageUrl = savedImage.url;
+          if (generatedImage) {
+            imageUrl = generatedImage.url;
             aiGenerated = true;
             placeholder = false;
 
-            logger.debug('generate-world-image', `Gemini image saved successfully: ${savedImage.url} (${savedImage.fileSize} bytes)`);
+            logger.debug('generate-world-image', `Gemini image generated successfully: ${generatedImage.url.slice(0, 50)}...`);
           } else {
             logger.warn('generate-world-image', 'Image generation failed, using fallback');
             imageUrl = generateFallbackImage(body.world);

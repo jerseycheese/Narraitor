@@ -6,7 +6,6 @@
 jest.mock('@/lib/ai/defaultGeminiClient');
 jest.mock('@/lib/ai/geminiImageGenerator', () => ({
   generateImageWithGemini: jest.fn(),
-  generateAndSaveImageWithGemini: jest.fn(),
 }));
 jest.mock('@/lib/utils/logger', () => {
   return jest.fn().mockImplementation(() => ({
@@ -28,13 +27,12 @@ jest.mock('@/lib/utils/genrePromptGuide', () => ({
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-import { generateImageWithGemini, generateAndSaveImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import type { World } from '@/types/world.types';
 
 // Create typed mocks
 const mockCreateDefaultGeminiClient = createDefaultGeminiClient as jest.MockedFunction<typeof createDefaultGeminiClient>;
 const mockGenerateImageWithGemini = generateImageWithGemini as jest.MockedFunction<typeof generateImageWithGemini>;
-const mockGenerateAndSaveImageWithGemini = generateAndSaveImageWithGemini as jest.MockedFunction<typeof generateAndSaveImageWithGemini>;
 
 describe('/api/generate-world-image', () => {
   const mockWorld: World = {
@@ -61,7 +59,7 @@ describe('/api/generate-world-image', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreateDefaultGeminiClient.mockReturnValue(mockGeminiClient as unknown as ReturnType<typeof createDefaultGeminiClient>);
-    
+
     // Mock environment variable
     process.env.GEMINI_API_KEY = 'test-api-key';
   });
@@ -103,12 +101,13 @@ describe('/api/generate-world-image', () => {
       const customPrompt = 'A dark and stormy castle on a hilltop';
 
       mockGeminiClient.generateContent.mockResolvedValue({
-        content: customPrompt // Use custom prompt directly when provided
+        content: customPrompt
       });
 
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue({
-        url: '/uploads/worlds/test-world.png',
-        fileSize: 102400
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,abc123',
+        mimeType: 'image/png',
+        base64Data: 'abc123',
       });
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
@@ -125,7 +124,7 @@ describe('/api/generate-world-image', () => {
       expect(response.status).toBe(200);
       expect(data.aiGenerated).toBe(true);
       expect(data.placeholder).toBe(false);
-      expect(data.imageUrl).toBe('/uploads/worlds/test-world.png');
+      expect(data.imageUrl).toBe('data:image/png;base64,abc123');
       expect(data.description).toBe(customPrompt);
     });
 
@@ -160,7 +159,7 @@ describe('/api/generate-world-image', () => {
       delete process.env.GEMINI_API_KEY;
 
       const testGenres = ['fantasy', 'sci-fi', 'cyberpunk'];
-      
+
       for (const genre of testGenres) {
         const worldWithGenre = { ...mockWorld, genre };
         const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
@@ -186,9 +185,10 @@ describe('/api/generate-world-image', () => {
         content: 'Generated image description'
       });
 
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue({
-        url: '/uploads/worlds/test-world.png',
-        fileSize: 102400
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,abc123',
+        mimeType: 'image/png',
+        base64Data: 'abc123',
       });
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
@@ -202,9 +202,9 @@ describe('/api/generate-world-image', () => {
       expect(response.status).toBe(200);
       expect(data.aiGenerated).toBe(true);
       expect(data.placeholder).toBe(false);
-      expect(data.imageUrl).toBe('/uploads/worlds/test-world.png');
+      expect(data.imageUrl).toBe('data:image/png;base64,abc123');
       expect(data.service).toBe('gemini-image-generation');
-      expect(mockGenerateAndSaveImageWithGemini).toHaveBeenCalled();
+      expect(mockGenerateImageWithGemini).toHaveBeenCalled();
     });
 
     it('should fallback to placeholder when Gemini API fails', async () => {
@@ -212,7 +212,7 @@ describe('/api/generate-world-image', () => {
         content: 'Generated description'
       });
 
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue(null);
+      mockGenerateImageWithGemini.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
