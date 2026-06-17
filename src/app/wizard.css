@@ -217,6 +217,10 @@
   place-items: center;
   width: calc(var(--space-8) * 8);
   max-width: 100%;
+
+  /* Explicit height so the size-variant rule can't shrink this preview — it
+     previously inherited height:100% from the base portrait rule (#1393). */
+  height: 100%;
   aspect-ratio: 1;
   overflow: hidden;
   border: 1px solid var(--color-border);
