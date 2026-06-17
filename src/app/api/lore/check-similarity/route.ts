@@ -59,8 +59,10 @@ Consider:
 - Nicknames and shortened forms (Elizabeth vs Liz, Jonathan vs Jon)
 - Special characters and punctuation ("Sir John's Tavern" vs "Sir Johns Tavern")
 - Common fantasy name variations
+- Role or descriptor references (e.g. "Maya the counselor" and "Maya Chandra" — one names a role/occupation, the other a full name, sharing a given name)
 
 If they clearly refer to the same entity, return similar: true with high confidence.
+When one name is a role, title, or descriptor attached to a shared given name (e.g. "<Name> the <role>"), treat it as the SAME entity as a known character with that given name, unless the context clearly indicates two different people.
 If they're definitely different entities, return similar: false.
 For uncertain cases, adjust confidence accordingly.
 
