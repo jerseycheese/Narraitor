@@ -13,6 +13,24 @@ interface GenerateWorldImageRequest {
   customPrompt?: string;
 }
 
+// Summarize the world's defined attributes/skills so a thin free-text description
+// still grounds the image in the world's actual theme. The manual wizard carries
+// these (via FinalizeStep's full world); the /worlds Generate path passes none, so
+// its prompt is unchanged. Names only — keep the prompt tight. (#1437)
+function describeWorldElements(world: World): string {
+  const attributeNames = (world.attributes || []).map((attr) => attr.name).filter(Boolean);
+  const skillNames = (world.skills || []).map((skill) => skill.name).filter(Boolean);
+
+  const parts: string[] = [];
+  if (attributeNames.length > 0) {
+    parts.push(`defining attributes (${attributeNames.join(', ')})`);
+  }
+  if (skillNames.length > 0) {
+    parts.push(`signature skills (${skillNames.join(', ')})`);
+  }
+  return parts.join(' and ');
+}
+
 // Generate a detailed image prompt based on world characteristics
 function generateImagePrompt(world: World): string {
   const genre = world.genre || 'fantasy';
@@ -22,10 +40,15 @@ function generateImagePrompt(world: World): string {
   // Create a detailed prompt for image generation
   const basePrompt = `Create a highly detailed, cinematic landscape image representing the world "${name}". Genre: ${genre}. Description: ${description}`;
 
+  const worldElements = describeWorldElements(world);
+  const elementsBlock = worldElements
+    ? `\n\nWorld elements to reflect: ${worldElements}.`
+    : '';
+
   // Get genre-specific style guidance from shared utility
   const styleGuidance = getGenreStyleGuidance(genre, 'landscape');
 
-  return `${basePrompt}
+  return `${basePrompt}${elementsBlock}
 
 ${styleGuidance}
 

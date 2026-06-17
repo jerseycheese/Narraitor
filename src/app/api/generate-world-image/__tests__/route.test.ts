@@ -153,6 +153,83 @@ describe('/api/generate-world-image', () => {
     });
   });
 
+  describe('World Element Grounding', () => {
+    // The manual world wizard passes the full world (attributes + skills) but the
+    // /worlds Generate path passes only id/name/description/genre. Grounding the
+    // prompt in the world's structured elements when present enriches thin manual
+    // descriptions (#1437) without changing the /worlds-shape prompt.
+    it('includes world attribute and skill names in the AI elaboration prompt', async () => {
+      mockGeminiClient.generateContent.mockResolvedValue({
+        content: 'AI-generated detailed description',
+      });
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,abc123',
+        mimeType: 'image/png',
+        base64Data: 'abc123',
+      });
+
+      const worldWithElements: World = {
+        ...mockWorld,
+        attributes: [
+          {
+            id: 'attr-1',
+            worldId: 'test-world',
+            name: 'Arcane Resonance',
+            description: 'Attunement to ambient magic',
+            baseValue: 5,
+            minValue: 1,
+            maxValue: 10,
+          },
+        ],
+        skills: [
+          {
+            id: 'skill-1',
+            worldId: 'test-world',
+            name: 'Runeweaving',
+            description: 'Binding spells into objects',
+            difficulty: 'medium',
+            baseValue: 5,
+            minValue: 1,
+            maxValue: 10,
+          },
+        ],
+      };
+
+      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
+        method: 'POST',
+        body: JSON.stringify({ world: worldWithElements }),
+      });
+
+      await POST(request);
+
+      expect(mockGeminiClient.generateContent).toHaveBeenCalled();
+      const elaborationPrompt = mockGeminiClient.generateContent.mock.calls[0][0] as string;
+      expect(elaborationPrompt).toContain('Arcane Resonance');
+      expect(elaborationPrompt).toContain('Runeweaving');
+    });
+
+    it('omits the world-elements block when no attributes or skills are defined', async () => {
+      mockGeminiClient.generateContent.mockResolvedValue({
+        content: 'AI-generated detailed description',
+      });
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,abc123',
+        mimeType: 'image/png',
+        base64Data: 'abc123',
+      });
+
+      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
+        method: 'POST',
+        body: JSON.stringify({ world: mockWorld }),
+      });
+
+      await POST(request);
+
+      const elaborationPrompt = mockGeminiClient.generateContent.mock.calls[0][0] as string;
+      expect(elaborationPrompt).not.toContain('World elements');
+    });
+  });
+
   describe('Genre-Specific Image Generation', () => {
     it('should generate appropriate fallback for different genres', async () => {
       // Mock no API key to force fallback
