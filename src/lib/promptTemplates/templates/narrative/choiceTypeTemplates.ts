@@ -94,7 +94,7 @@ Based on the SPECIFIC narrative situation above, create 4 distinct action choice
 ALIGNMENT DEFINITIONS:
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
-- CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. These should be dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. Think "throw a fireball at the ceiling," "start singing loudly to distract everyone," "pretend to be possessed by a spirit," or "challenge them to a dance-off." The goal is to provide players with options that can dramatically shift the narrative in surprising ways.
+- CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. Dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. VARY THE KIND of chaos and do NOT default to making noise (yelling, shouting, singing). Draw from a wide range, fitted to the scene: sudden physical risk ("leap from the balcony onto the chandelier," "kick over the lantern to set the drapes alight"), trickery or deception ("impersonate the captain and bark orders," "bluff an outrageous lie with total confidence"), sabotage or destruction ("cut the rope bridge behind you," "smash the control panel," "throw open the cells and free the prisoners"), turning the tables ("start a brawl to scatter the room," "switch sides mid-negotiation"), or abandoning the obvious goal for something no one expects. The goal is options that dramatically shift the narrative in surprising ways.
 
 PERSONALITY-INFORMED CHOICES (when character personality context is provided):
 - Within the REQUIRED alignment distribution (1 lawful, 2 neutral, 1 chaotic), create options that offer ways to express the character's traits
@@ -129,7 +129,7 @@ Carefully evaluate the narrative situation and determine the significance of thi
 - MAJOR: Important choices that significantly impact the story direction (meeting key characters, choosing major paths, using powerful abilities, entering dangerous areas, making moral choices)
 - CRITICAL: Life-changing decisions with major consequences (combat with deadly enemies, final confrontations, destiny-altering choices, choosing between life and death)
 
-Consider the stakes, potential consequences, and story impact. Don't default to MINOR - use MAJOR for interesting story moments and CRITICAL for climactic situations.
+Consider the stakes, potential consequences, and story impact. MOST decisions are MINOR or MAJOR: MINOR for everyday beats, MAJOR for the interesting story moments. Reserve CRITICAL for the RARE, genuinely life-or-death turning points - deadly combat, final confrontations, or choices where failure would plausibly end the character's story. When unsure between MAJOR and CRITICAL, choose MAJOR.
 
 FORMAT (REQUIRED - include alignment tags, decision weight, and context summary):
 Decision Weight: [MINOR/MAJOR/CRITICAL]

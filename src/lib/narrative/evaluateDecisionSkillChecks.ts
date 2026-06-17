@@ -12,6 +12,7 @@ import type { World } from '@/types/world.types';
 import type {
   DecisionOption,
   DecisionOutcome,
+  DecisionWeight,
   SkillCheckRoll,
 } from '@/types/narrative.types';
 import type { ToastData } from '@/components/ui/toast/toaster';
@@ -200,4 +201,24 @@ export function evaluateDecisionSkillChecks({
   }
 
   return { skillCheckTags, rollResults, decisionOutcome };
+}
+
+/**
+ * Whether a decision's skill rolls should end the run outright.
+ *
+ * A CRITICAL-weight decision is fatal only on a true critical-failure roll
+ * (natural 1) — a catastrophic outcome that feels earned. An ordinary missed
+ * roll on a critical decision is a survivable setback: the narrative reflects
+ * the failure, and the AI can still mark the segment fatal in genuinely lethal
+ * context. This keeps deadly stakes for the worst rolls without ending the
+ * story on a single unlucky-but-ordinary failure (issue #1426).
+ */
+export function isFatalCriticalDecision(
+  decisionWeight: DecisionWeight | undefined,
+  rollResults: Pick<SkillCheckRoll, 'isCriticalFailure'>[]
+): boolean {
+  return (
+    decisionWeight === 'critical' &&
+    rollResults.some((r) => r.isCriticalFailure)
+  );
 }

@@ -107,7 +107,7 @@ NEGATIVE CONSTRAINTS (CRITICAL):
 ALIGNMENT VARIETY (when appropriate):
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response  
-- CHAOTIC: Unexpected, disruptive actions that change the situation dramatically
+- CHAOTIC: Unexpected, disruptive actions that change the situation dramatically. Vary the KIND of chaos and do not default to making noise (yelling, shouting, singing) - draw from physical risk, trickery/deception, sabotage/destruction, turning the tables, or abandoning the obvious goal
 
 PERSONALITY-INFORMED CHOICES (when character personality context is provided):
 - Create options that offer ways to express the character's traits
@@ -148,7 +148,7 @@ Carefully evaluate the narrative situation and determine the significance of thi
 - MAJOR: Important choices that significantly impact the story direction (meeting key characters, choosing major paths, using powerful abilities, entering dangerous areas, making moral choices)
 - CRITICAL: Life-changing decisions with major consequences (combat with deadly enemies, final confrontations, destiny-altering choices, choosing between life and death)
 
-Consider the stakes, potential consequences, and story impact. Don't default to MINOR - use MAJOR for interesting story moments and CRITICAL for climactic situations.
+Consider the stakes, potential consequences, and story impact. MOST decisions are MINOR or MAJOR: MINOR for everyday beats, MAJOR for the interesting story moments. Reserve CRITICAL for the RARE, genuinely life-or-death turning points - deadly combat, final confrontations, or choices where failure would plausibly end the character's story. When unsure between MAJOR and CRITICAL, choose MAJOR.
 
 FORMAT:
 Decision Weight: [MINOR/MAJOR/CRITICAL]
