@@ -2156,6 +2156,39 @@ body.manuscript-overlay-open {
   object-fit: cover;
 }
 
+/* Size variants give the portrait an intrinsic square size for the size prop
+   (small/medium/large/xlarge). They only take effect where no wrapper sizes the
+   portrait — Storybook, the QuickPlay CTA, the editor preview. Every consumer
+   that frames the portrait in a sized wrapper does so with a higher-specificity
+   `.wrapper .component-character-portrait` rule, so those layouts are unchanged. */
+.component-character-portrait-small {
+  width: 3rem;
+  height: 3rem;
+}
+
+.component-character-portrait-medium {
+  width: 5rem;
+  height: 5rem;
+}
+
+.component-character-portrait-large {
+  width: 8rem;
+  height: 8rem;
+}
+
+.component-character-portrait-xlarge {
+  width: 12rem;
+  height: 12rem;
+}
+
+/* CharacterCard sizes its own wrapper and lets the portrait fill it. Keep that
+   fill so the size variant doesn't override the card's framing (the other
+   wrapper-sized consumers already carry an equivalent override). */
+.character-card-portrait .component-character-portrait {
+  width: 100%;
+  height: 100%;
+}
+
 .manuscript-character-snapshot-portrait {
   position: relative;
   width: 80px;
