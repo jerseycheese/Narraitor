@@ -56,7 +56,8 @@ describe('generateStoryCheckpointSummary', () => {
         includedEvents: 1,
         includedDecisions: 1,
         lastEventTimestamp: '2025-11-20T18:00:00Z',
-        model: 'gemini-test',
+        // Stale value the prompt example used to teach the model to echo (#1430 F37).
+        model: 'gemini-1.5-pro',
       }),
     });
 
@@ -65,7 +66,8 @@ describe('generateStoryCheckpointSummary', () => {
     expect(result.segment).toContain('Maera disbanded the council');
     expect(result.highlights).toEqual(['Council dissolved', 'Royal guard split']);
     expect(result.majorEvents).toEqual(['Maera disbands the council']);
-    expect(result.model).toBe('gemini-test');
+    // Records the model the default client actually runs on, not the AI echo.
+    expect(result.model).toBe('gemini-2.5-flash');
     expect(mockClient.generateContent).toHaveBeenCalledTimes(1);
   });
 

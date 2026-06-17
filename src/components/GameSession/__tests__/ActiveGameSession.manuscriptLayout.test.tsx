@@ -322,6 +322,27 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.getByRole('button', { name: /toggle tools menu/i })).toBeInTheDocument();
     });
 
+    it('keeps dev-only authoring tools out of the Tools menu outside development', async () => {
+      // NODE_ENV is 'test' here, which the dev-tools gate treats like production,
+      // so the authoring affordances must not render for real players (#1430 F58).
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+      fireEvent.click(toolsToggle);
+
+      expect(screen.queryByRole('button', { name: /simulate next turn/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /toggle streaming state/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /ending suggestion/i })).not.toBeInTheDocument();
+    });
+
         it('opens character drawer from Tools menu when trigger is clicked (flag ON)', async () => {
 
           (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
