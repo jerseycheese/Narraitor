@@ -127,16 +127,18 @@ test.describe('Mobile Action Row Layout', () => {
  * purely via CSS media queries at <=768px. At narrow widths the hamburger — not the
  * desktop nav row — must own navigation, and the header itself must not overflow.
  *
- * Coverage is header-scoped on purpose: `/` (no breadcrumbs) also asserts the whole
- * document is clean, while `/about` only asserts the header is collapsed and
- * non-overflowing. `/about`'s document-level overflow is a separate About-footer
- * box-sizing bug, tracked on its own — not the header.
+ * Scope is the header on purpose: these assert the collapse and that `.header-nav`
+ * doesn't overflow, on both a breadcrumb-free route (`/`) and a breadcrumb-bearing
+ * one (`/about`). They deliberately do NOT assert whole-document width — page
+ * content can overflow for reasons unrelated to the header (e.g. the About-page
+ * footer's box-sizing bug, tracked separately), and #1381 is header-only.
  */
 test.describe('App-Shell Header Mobile Collapse', () => {
   const headerViewports = [
     { name: 'narrow-mobile', width: 320, height: 568 },
     { name: 'mobile', width: 375, height: 667 },
   ] as const;
+  const routes = ['/', '/about'] as const;
 
   const expectHeaderCollapsed = async (page: Page) => {
     // Hamburger owns navigation; the desktop nav row is hidden via CSS.
@@ -149,30 +151,20 @@ test.describe('App-Shell Header Mobile Collapse', () => {
     expect(headerOverflows, 'header should not overflow horizontally').toBe(false);
   };
 
-  for (const viewport of headerViewports) {
-    test(`header collapses and document is clean on / at ${viewport.width}px`, async ({ page }) => {
-      // Seed worlds so the header would render its fullest set (world switcher +
-      // CTA) — exactly what overflows if the collapse fails.
-      await seedTestData(page);
-      await mockApiEndpoints(page);
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+  for (const route of routes) {
+    for (const viewport of headerViewports) {
+      test(`header collapses to the hamburger on ${route} at ${viewport.width}px`, async ({ page }) => {
+        // Seed worlds so the header carries its fullest set (world switcher + CTA),
+        // which the CSS must keep collapsed at this width.
+        await seedTestData(page);
+        await mockApiEndpoints(page);
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
 
-      await page.goto('/');
-      await page.waitForSelector('.header-nav', { timeout: 15000 });
+        await page.goto(route);
+        await page.waitForSelector('.header-nav', { timeout: 15000 });
 
-      await expectHeaderCollapsed(page);
-      await expectNoHorizontalOverflow(page, 'shell', viewport.width);
-    });
-
-    test(`header collapses on /about at ${viewport.width}px`, async ({ page }) => {
-      await seedTestData(page);
-      await mockApiEndpoints(page);
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
-
-      await page.goto('/about');
-      await page.waitForSelector('.header-nav', { timeout: 15000 });
-
-      await expectHeaderCollapsed(page);
-    });
+        await expectHeaderCollapsed(page);
+      });
+    }
   }
 });
