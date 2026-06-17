@@ -43,20 +43,19 @@ interface UseEndingDetectionOptions {
 
 /**
  * Decides whether to spend an AI call checking for an ending on this segment.
- * Always checks high-signal segments (major events, critical decision outcomes)
- * since endings cluster there; otherwise throttles to every Nth segment.
+ * Always checks segments flagged as a major event (endings cluster there);
+ * otherwise throttles to every Nth segment. Critical decision outcomes are
+ * deliberately NOT treated as high-signal: under the rebalanced lethality a
+ * critical failure is usually a survivable setback, not an ending, so running
+ * the ending check on every critical outcome surfaced spurious "wrap it up"
+ * prompts mid-story (issue #1426). Genuinely lethal moments still end the run
+ * via the fatal-outcome tag, and climactic resolutions get majorEvent.
  */
 function shouldRunEndingCheck(
   segment: NarrativeSegment,
   totalSegments: number
 ): boolean {
-  const outcome = segment.metadata?.decisionOutcome;
-  const isHighSignal =
-    Boolean(segment.metadata?.majorEvent) ||
-    outcome === 'critical-success' ||
-    outcome === 'critical-failure';
-
-  if (isHighSignal) return true;
+  if (segment.metadata?.majorEvent) return true;
 
   return (totalSegments - MIN_SEGMENTS_FOR_ANALYSIS) % ROUTINE_CHECK_INTERVAL === 0;
 }

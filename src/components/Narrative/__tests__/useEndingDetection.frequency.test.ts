@@ -82,13 +82,15 @@ describe('useEndingDetection frequency gating', () => {
     expect(mockGenerateContent).toHaveBeenCalledTimes(1);
   });
 
-  it('always runs on a critical decision outcome even off-interval', async () => {
+  it('does NOT treat a critical decision outcome as high-signal (throttles like routine)', async () => {
+    // Under the rebalanced lethality (#1426) a critical failure is usually a
+    // survivable setback, so it no longer forces an off-interval ending check.
     const { result } = renderDetection(makeSegments(4)); // total 5 -> off-interval
     await result.current.checkForEndingIndicators(
       segment('5', { decisionOutcome: 'critical-failure' })
     );
 
-    expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+    expect(mockGenerateContent).not.toHaveBeenCalled();
   });
 
   it('runs again once the routine interval comes back around', async () => {

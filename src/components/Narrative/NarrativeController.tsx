@@ -19,7 +19,10 @@ import {
 } from '@/types/narrative.types';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
 import { getNarrativeError } from '@/lib/narrative/narrativeErrors';
-import { evaluateDecisionSkillChecks } from '@/lib/narrative/evaluateDecisionSkillChecks';
+import {
+  evaluateDecisionSkillChecks,
+  isFatalCriticalDecision,
+} from '@/lib/narrative/evaluateDecisionSkillChecks';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
@@ -615,14 +618,19 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           onSkillCheckPerformed,
         });
 
-      // Fatal outcome check: Any failure on a critical decision ends the game
-      // This makes critical decisions truly life-or-death
-      const hasCriticalFailure =
-        decisionWeight === 'critical' && rollResults.some((r) => !r.success);
+      // Fatal outcome check: a critical decision only ends the run on a true
+      // critical-failure roll (natural 1). An ordinary missed roll is a
+      // survivable setback the AI narrates (and can still escalate via the
+      // fatal-outcome tag below), so one unlucky-but-ordinary roll no longer
+      // ends the story (issue #1426).
+      const isFatalCriticalFailure = isFatalCriticalDecision(
+        decisionWeight,
+        rollResults
+      );
 
-      if (hasCriticalFailure) {
+      if (isFatalCriticalFailure) {
         suggestEnding(
-          'fatal: failure on a pivotal decision left the character unable to continue.',
+          'fatal: a catastrophic failure on a pivotal decision left the character unable to continue.',
           'story-complete'
         );
       }
@@ -748,14 +756,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       await checkForEndingIndicators(newSegment);
 
       // Generate choices if enabled - skip when the session is ending
-      // (fatal/ending segment or a critical-decision failure).
-      // A critical failure only ends the session when an ending handler is
-      // wired: suggestEnding() is a no-op without onEndingSuggested. Without a
-      // handler, keep generating choices so a standalone controller (harness,
+      // (fatal/ending segment or a fatal critical-decision failure).
+      // A fatal critical failure only ends the session when an ending handler
+      // is wired: suggestEnding() is a no-op without onEndingSuggested. Without
+      // a handler, keep generating choices so a standalone controller (harness,
       // story, embedder) can still move forward instead of stalling with no
       // ending and no choices.
       const criticalFailureEndsSession =
-        hasCriticalFailure && Boolean(onEndingSuggested);
+        isFatalCriticalFailure && Boolean(onEndingSuggested);
       if (
         generateChoices &&
         !isSessionEndingSegment(newSegment) &&

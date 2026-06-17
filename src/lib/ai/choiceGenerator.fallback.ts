@@ -66,7 +66,7 @@ export const generateFallbackChoices = (
         { id: generateUniqueId('option'), text: 'Access the terminal', alignment: 'lawful' },
         {
           id: generateUniqueId('option'),
-          text: 'Reroute power to the coffee machine',
+          text: 'Override the airlock and vent the corridor',
           alignment: 'chaotic',
         }
       );
@@ -77,7 +77,7 @@ export const generateFallbackChoices = (
         { id: generateUniqueId('option'), text: 'Call for help', alignment: 'lawful' },
         {
           id: generateUniqueId('option'),
-          text: 'Start laughing maniacally',
+          text: 'Set the room ablaze and run for the door',
           alignment: 'chaotic',
         }
       );
@@ -88,7 +88,7 @@ export const generateFallbackChoices = (
         { id: generateUniqueId('option'), text: 'Talk to someone', alignment: 'lawful' },
         {
           id: generateUniqueId('option'),
-          text: 'Do something completely unexpected',
+          text: 'Upend the table and seize the upper hand',
           alignment: 'chaotic',
         }
       );
