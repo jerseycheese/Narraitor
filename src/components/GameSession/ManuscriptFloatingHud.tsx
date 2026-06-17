@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useTheme } from '@/lib/theme/ThemeProvider';
-import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History, X } from 'lucide-react';
+import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History } from 'lucide-react';
+import { HudCloseButton } from './HudCloseButton';
 
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
@@ -260,15 +261,7 @@ function DS3FloatingPill({
           >
             <RotateCcw size={16} aria-hidden="true" />
           </button>
-          <button
-            type="button"
-            onClick={onBack}
-            title="Close"
-            aria-label="Close"
-            className="manuscript-hud-icon-button"
-          >
-            <X size={16} aria-hidden="true" />
-          </button>
+          <HudCloseButton variant="icon" onBack={onBack} />
           <button
             type="button"
             onClick={onEndStory}

@@ -25,6 +25,7 @@ import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
 import { ManuscriptSessionShell } from './ManuscriptSessionShell';
 import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
+import { HudCloseButton } from './HudCloseButton';
 import { ManuscriptActionRail } from './ManuscriptActionRail';
 import { ManuscriptDrawer } from './ManuscriptDrawer';
 import {
@@ -451,14 +452,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               >
                 Reset
               </button>
-              <button
-                type="button"
-                onClick={onBack}
-                title="Close"
-                className="manuscript-hud-text-button"
-              >
-                Close
-              </button>
+              <HudCloseButton variant="text" onBack={onBack} />
             </div>
           )}
         />
