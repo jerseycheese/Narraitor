@@ -10,19 +10,12 @@ import { mockApiEndpoints } from './utils/mockApi';
  * shows it as intentional all-theme coverage, not a single-theme gap.
  */
 
-test.describe('Mobile Action Row Layout', () => {
-  const themes = ['ds1', 'ds2', 'ds3'] as const;
-  const mobileViewports = [
-    { name: 'narrow-mobile', width: 320, height: 568 },
-    { name: 'mobile', width: 375, height: 667 },
-  ] as const;
-
-  const expectNoHorizontalOverflow = async (
-    page: Page,
-    theme: string,
-    width: number,
-    selector?: string
-  ) => {
+const expectNoHorizontalOverflow = async (
+  page: Page,
+  theme: string,
+  width: number,
+  selector?: string
+) => {
     const overflow = await page.evaluate((targetSelector) => {
       const doc = document.documentElement;
       const body = document.body;
@@ -56,6 +49,13 @@ test.describe('Mobile Action Row Layout', () => {
       `Should not have horizontal overflow in ${theme} at ${width}px`
     ).toBe(false);
   };
+
+test.describe('Mobile Action Row Layout', () => {
+  const themes = ['ds1', 'ds2', 'ds3'] as const;
+  const mobileViewports = [
+    { name: 'narrow-mobile', width: 320, height: 568 },
+    { name: 'mobile', width: 375, height: 667 },
+  ] as const;
 
   for (const theme of themes) {
     for (const viewport of mobileViewports) {
@@ -115,6 +115,55 @@ test.describe('Mobile Action Row Layout', () => {
         await expect(page.getByRole('button', { name: 'Play in World' })).toBeVisible();
 
         await expectNoHorizontalOverflow(page, theme, viewport.width);
+      });
+    }
+  }
+});
+
+/**
+ * App-shell header mobile collapse (#1381).
+ *
+ * The header's desktop nav row, action cluster, and hamburger toggle all collapse
+ * purely via CSS media queries at <=768px. At narrow widths the hamburger — not the
+ * desktop nav row — must own navigation, and the header itself must not overflow.
+ *
+ * Scope is the header on purpose: these assert the collapse and that `.header-nav`
+ * doesn't overflow, on both a breadcrumb-free route (`/`) and a breadcrumb-bearing
+ * one (`/about`). They deliberately do NOT assert whole-document width — page
+ * content can overflow for reasons unrelated to the header (e.g. the About-page
+ * footer's box-sizing bug, tracked separately), and #1381 is header-only.
+ */
+test.describe('App-Shell Header Mobile Collapse', () => {
+  const headerViewports = [
+    { name: 'narrow-mobile', width: 320, height: 568 },
+    { name: 'mobile', width: 375, height: 667 },
+  ] as const;
+  const routes = ['/', '/about'] as const;
+
+  const expectHeaderCollapsed = async (page: Page) => {
+    // Hamburger owns navigation; the desktop nav row is hidden via CSS.
+    await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible();
+    await expect(page.locator('.header-nav-desktop-links')).toBeHidden();
+    const headerOverflows = await page.evaluate(() => {
+      const h = document.querySelector('.header-nav');
+      return h ? h.scrollWidth > h.clientWidth : true;
+    });
+    expect(headerOverflows, 'header should not overflow horizontally').toBe(false);
+  };
+
+  for (const route of routes) {
+    for (const viewport of headerViewports) {
+      test(`header collapses to the hamburger on ${route} at ${viewport.width}px`, async ({ page }) => {
+        // Seed worlds so the header carries its fullest set (world switcher + CTA),
+        // which the CSS must keep collapsed at this width.
+        await seedTestData(page);
+        await mockApiEndpoints(page);
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+
+        await page.goto(route);
+        await page.waitForSelector('.header-nav', { timeout: 15000 });
+
+        await expectHeaderCollapsed(page);
       });
     }
   }

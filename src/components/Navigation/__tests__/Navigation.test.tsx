@@ -159,6 +159,17 @@ describe('HeaderNavigation', () => {
 
       expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
     });
+
+    it('always renders the hamburger toggle so CSS (not JS matchMedia) gates its visibility', () => {
+      // The useMobileNavigation mock returns isMobile: false (desktop). The toggle
+      // must still be in the DOM — visibility is owned by the .header-nav-mobile-toggle
+      // media query, giving the header one source of truth for the collapse (#1381).
+      render(<HeaderNavigation />);
+
+      expect(
+        screen.getByRole('button', { name: 'Open menu' })
+      ).toBeInTheDocument();
+    });
   });
 
   describe('Theme Controls', () => {
