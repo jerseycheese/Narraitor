@@ -199,6 +199,10 @@
    centers to the same measure. */
 
 .component-about-footer {
+  /* Without this it falls back to content-box, so width:100% + the inline
+     padding overflows the viewport (~20px) and margin:0 auto resolves both
+     auto margins negative. Matches .component-about. */
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-5);
