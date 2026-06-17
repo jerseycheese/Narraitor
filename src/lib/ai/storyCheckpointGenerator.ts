@@ -1,4 +1,5 @@
 import { createDefaultGeminiClient } from './defaultGeminiClient';
+import { getAIConfig } from './config';
 import { StoryCheckpointRequestBody, StoryCheckpointResponseBody } from '@/types/story-checkpoint.types';
 import { safeTrim } from '@/lib/utils';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
@@ -13,8 +14,7 @@ const RESPONSE_SCHEMA = `{
   "themes": ["Optional list of tonal throughlines"],
   "includedEvents": 3,
   "includedDecisions": 1,
-  "lastEventTimestamp": "2025-11-20T15:31:39Z",
-  "model": "gemini-1.5-pro"
+  "lastEventTimestamp": "2025-11-20T15:31:39Z"
 }`;
 
 const formatEvents = (events: StoryCheckpointRequestBody['events']): string => {
@@ -140,7 +140,10 @@ const parseResponse = (content: string): StoryCheckpointResponseBody => {
     includedEvents: typeof parsed.includedEvents === 'number' ? parsed.includedEvents : 0,
     includedDecisions: typeof parsed.includedDecisions === 'number' ? parsed.includedDecisions : 0,
     lastEventTimestamp: sanitizeString(parsed.lastEventTimestamp),
-    model: sanitizeString(parsed.model),
+    // Record the model the default client actually runs on, not whatever the AI
+    // echoed back. The prompt used to carry a stale "gemini-1.5-pro" example and
+    // the model dutifully repeated it, mislabelling every checkpoint (#1430 F37).
+    model: getAIConfig().modelName,
   };
 };
 

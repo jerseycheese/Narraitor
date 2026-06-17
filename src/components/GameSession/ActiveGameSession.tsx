@@ -95,6 +95,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
+  // Authoring-only Tools-menu affordances (Simulate Next Turn, Toggle Streaming
+  // State, Show Ending Suggestion). NODE_ENV is statically replaced at build time,
+  // so these callbacks are stripped from a production bundle and the menu hides
+  // each button when its callback is absent (#1430 F58).
+  const showDevTools = process.env.NODE_ENV === 'development';
   const { theme } = useTheme();
   const isDS3 = theme === 'ds3';
 
@@ -390,21 +395,21 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               onOpenCharacterPanel={() => {
                 setIsCharacterSummaryExpanded(true);
               }}
-              onSimulateTurn={() => {
+              onSimulateTurn={showDevTools ? () => {
                 const fallbackChoiceId = currentDecision?.options?.[0]?.id;
                 if (fallbackChoiceId) {
                   handleChoiceSelected(fallbackChoiceId);
                   return;
                 }
                 handleCustomSubmit('Simulate next turn');
-              }}
-              onToggleStreamingPreview={() => {
+              } : undefined}
+              onToggleStreamingPreview={showDevTools ? () => {
                 setIsStreamingPreview((prev) => !prev);
-              }}
+              } : undefined}
               isStreamingPreview={isStreamingPreview}
-              onToggleEndingSuggestionPreview={() => {
+              onToggleEndingSuggestionPreview={showDevTools ? () => {
                 setIsEndingSuggestionPreview((prev) => !prev);
-              }}
+              } : undefined}
               isEndingSuggestionPreview={isEndingSuggestionPreview}
             />
           )}
