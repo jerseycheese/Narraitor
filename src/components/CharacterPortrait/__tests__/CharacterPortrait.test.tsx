@@ -68,28 +68,40 @@ describe('CharacterPortrait', () => {
   });
 
   describe('size variants', () => {
-    it('renders different sizes appropriately', () => {
+    it('applies the size modifier class so each size renders distinctly', () => {
       const { rerender } = render(
-        <CharacterPortrait 
-          portrait={{ type: 'placeholder', url: null }} 
+        <CharacterPortrait
+          portrait={{ type: 'placeholder', url: null }}
           characterName="Test"
           size="small"
         />
       );
 
-      // Small size should still display initials correctly
-      expect(screen.getByText('TE')).toBeInTheDocument();
+      const portrait = screen.getByTestId('character-portrait');
+      expect(portrait).toHaveClass('component-character-portrait');
+      expect(portrait).toHaveClass('component-character-portrait-small');
+      expect(portrait).not.toHaveClass('component-character-portrait-large');
 
       rerender(
-        <CharacterPortrait 
-          portrait={{ type: 'placeholder', url: null }} 
+        <CharacterPortrait
+          portrait={{ type: 'placeholder', url: null }}
           characterName="Test"
           size="large"
         />
       );
 
-      // Large size should still display initials correctly
-      expect(screen.getByText('TE')).toBeInTheDocument();
+      expect(screen.getByTestId('character-portrait')).toHaveClass('component-character-portrait-large');
+    });
+
+    it('defaults to the medium size modifier when no size is given', () => {
+      render(
+        <CharacterPortrait
+          portrait={{ type: 'placeholder', url: null }}
+          characterName="Test"
+        />
+      );
+
+      expect(screen.getByTestId('character-portrait')).toHaveClass('component-character-portrait-medium');
     });
   });
 
