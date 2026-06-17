@@ -46,7 +46,7 @@ export function HeaderNavigation() {
     navigateWithLoading,
     setCurrentWorld,
   } = useNavigationData();
-  const { isMenuOpen, isMobile, closeMenu, toggleMenu } = useMobileNavigation();
+  const { isMenuOpen, closeMenu, toggleMenu } = useMobileNavigation();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -136,7 +136,10 @@ export function HeaderNavigation() {
           <div className="header-nav-inner">
             <div className="header-nav-left">
               <div className="header-nav-links">
-                {isMobile && (
+                {/* Always rendered; CSS (not JS matchMedia) gates visibility to
+                    <=768px, so the collapse has a single source of truth and can't
+                    desync the layout (#1381). */}
+                <div className="header-nav-mobile-toggle">
                   <Button
                     onClick={toggleMenu}
                     variant="ghost"
@@ -150,7 +153,7 @@ export function HeaderNavigation() {
                       <Menu aria-hidden="true" />
                     )}
                   </Button>
-                )}
+                </div>
 
                 <Link href="/" className="app-brand">
                   <LogoIcon size="small" className="logo-icon-inverted" />

@@ -1003,10 +1003,10 @@
 
 .header-nav-desktop-links {
   /* Hidden at/under 768px: the hamburger + drawer own primary navigation there.
-     Shown inline above 768px. The `> 768` boundary matches the hamburger's
-     `max-width: 768px` (useMobileNavigation) so neither double-renders at the
-     exact 768px edge (iPad Mini portrait). Mobile-first so the base rule isn't
-     overridden by later source-order declarations. */
+     Shown inline above 768px. The `> 768` boundary is the complement of
+     `.header-nav-mobile-toggle`'s `<= 768px` so exactly one renders at the 768px
+     edge (iPad Mini portrait). Mobile-first so the base rule isn't overridden by
+     later source-order declarations. */
   display: none;
   align-items: center;
   gap: var(--space-4);
@@ -1015,6 +1015,20 @@
 @media (width > 768px) {
   .header-nav-desktop-links {
     display: flex;
+  }
+}
+
+/* Hamburger toggle: hidden above 768px, shown at/under it. CSS-gated (not JS
+   matchMedia) so the header's mobile collapse has one source of truth and can't
+   desync from the layout viewport (#1381). Complements the desktop links and
+   actions, which already collapse purely via media queries. */
+.header-nav-mobile-toggle {
+  display: none;
+}
+
+@media (width <= 768px) {
+  .header-nav-mobile-toggle {
+    display: inline-flex;
   }
 }
 
