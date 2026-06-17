@@ -123,7 +123,13 @@ export function DashboardHome() {
   const isFirstTimeUser = dashboardState === 'first-time';
 
   if (isFirstTimeUser) {
-    return <GuidedFirstTimeExperience />;
+    // Center the onboarding card in the available height so the empty
+    // dashboard doesn't read as a short card stranded above dead space (#1431).
+    return (
+      <div className="component-dashboard-first-time">
+        <GuidedFirstTimeExperience />
+      </div>
+    );
   }
 
   return (

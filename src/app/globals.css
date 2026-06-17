@@ -35,6 +35,18 @@ a[href="#main-content"]:focus {
   outline-offset: 2px;
 }
 
+/* react-joyride appends its portal as the last child of <body>, where it picks
+   up position: relative in normal flow and lands below all page content. That
+   pushed the tour overlay + spotlight roughly a viewport down, so the dim
+   backdrop and target highlight never appeared and tour popovers floated over
+   bright content (the World-Creation tour read as garbled). Anchor the portal
+   at the document origin so the overlay and spotlight measure from the top. (#1431) */
+#react-joyride-portal {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 /* Visually hidden content helper */
 .sr-only {
   position: absolute;

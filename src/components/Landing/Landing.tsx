@@ -1,5 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 /**
  * Landing — the free public front door for a first-time visitor (#1365).
@@ -10,32 +12,33 @@ import Link from 'next/link';
  *   DS2 = editorial (serif display, airy rhythm, soft surfaces)
  *   DS3 = mechanical manuscript (dot-grid, corner-bracket cards, mono labels)
  *
- * Outcome-framed copy — it leads with what you do, not the machinery.
+ * Outcome-framed copy — it leads with the wedge (a structured solo RPG with
+ * real skill checks and tracked state), not the machinery.
  */
 
 const STEPS: { title: string; description: string }[] = [
   {
     title: 'Build a world',
     description:
-      'Describe a setting — a noir city, a space opera, Middle Earth, the beaches of Normandy. Real or invented, the world is yours.',
+      'Describe a setting: a noir city, a space opera, Middle Earth, the beaches of Normandy. Real or invented, the world is yours.',
   },
   {
     title: 'Create a character',
     description:
-      'Decide who you play: their traits, their history, what they are after. The story leans on the details you give it.',
+      'Decide who you play: their traits, their history, what they’re after. They have real skills, and the story leans on them.',
   },
   {
     title: 'Play the story',
     description:
-      'Make choices and watch the story bend around them. No two playthroughs unfold the same way.',
+      'Make choices and watch the story bend around them. Skill checks carry real stakes, and the world keeps track of the path you took.',
   },
 ];
 
 const PROMISES: { title: string; description: string }[] = [
   {
-    title: 'Free to play',
+    title: 'Free, on your own key',
     description:
-      'It runs on your own provider key, set up once — so you are never footing the bill for anyone else.',
+      'It runs on a key you get from a model provider, set up once and kept in your browser, so the stories you generate run on your account rather than someone else’s bill.',
   },
   {
     title: 'Runs in your browser',
@@ -45,7 +48,7 @@ const PROMISES: { title: string; description: string }[] = [
   {
     title: 'No accounts',
     description:
-      'Nothing to sign up for, no profile, no email. Just open it and start.',
+      'Nothing to sign up for. No profile, no email. Just open it and start.',
   },
 ];
 
@@ -53,13 +56,14 @@ export default function Landing() {
   return (
     <main className="component-landing">
       <section className="component-landing-hero" aria-labelledby="landing-hero-heading">
-        <p className="component-landing-eyebrow">A solo narrative RPG</p>
+        <p className="component-landing-eyebrow">A solo role-playing game</p>
         <h1 id="landing-hero-heading" className="component-landing-title">
           Play a story in any world you can imagine
         </h1>
         <p className="component-landing-lead">
-          Build a world, create a character, and make the choices that shape an
-          adventure that adapts to you. Free, in your browser, and yours to keep.
+          Build a world, create a character, and make the choices that steer the
+          story. Your decisions are tested against your character’s skills, so
+          what happens next is earned. Free, in your browser, and yours to keep.
         </p>
         <div className="component-landing-actions">
           <Link href="/worlds/create" className="component-landing-cta">
@@ -68,6 +72,17 @@ export default function Landing() {
           <Link href="/about" className="component-landing-cta-secondary">
             How it works
           </Link>
+        </div>
+        <div className="component-landing-visual">
+          <Image
+            className="component-landing-visual-image"
+            src="/visual-assets/world-cyberpunk.png"
+            alt="A neon-lit city skyline from one of Narraitor's worlds"
+            width={1024}
+            height={426}
+            priority
+            unoptimized={isPlaywrightEnv()}
+          />
         </div>
       </section>
 
@@ -90,7 +105,7 @@ export default function Landing() {
 
       <section className="component-landing-note" aria-labelledby="landing-note-heading">
         <h2 id="landing-note-heading" className="component-landing-section-title">
-          Straight about how it works
+          What to know up front
         </h2>
         <ul className="component-landing-note-list">
           {PROMISES.map((promise) => (
