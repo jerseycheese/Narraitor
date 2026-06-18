@@ -36,9 +36,9 @@ const STEPS: { title: string; description: string }[] = [
 
 const PROMISES: { title: string; description: string }[] = [
   {
-    title: 'Free, on your own key',
+    title: 'Your own key',
     description:
-      'It runs on a key you get from a model provider, set up once and kept in your browser, so the stories you generate run on your account rather than someone else’s bill.',
+      'It runs on a key you get from a model provider, set up once and kept in your browser, so the stories you generate run on your own account.',
   },
   {
     title: 'Runs in your browser',
@@ -63,7 +63,8 @@ export default function Landing() {
         <p className="component-landing-lead">
           Build a world, create a character, and make the choices that steer the
           story. Your decisions are tested against your character’s skills, so
-          what happens next is earned. Free, in your browser, and yours to keep.
+          what happens next is earned. It runs in your browser, and your stories
+          are yours to keep.
         </p>
         <div className="component-landing-actions">
           <Link href="/worlds/create" className="component-landing-cta">

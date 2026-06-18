@@ -2809,17 +2809,6 @@
  * touching the rest of the wizard surface. (#1199)
  * -------------------------------------------------------------------------- */
 
-/* Center the onboarding card in the dashboard's available height so the empty
-   first-run home reads as a focused panel, not a short card stranded above
-   dead space (#1431). Viewport-based so it doesn't depend on the percentage-
-   height ancestor chain; content taller than this just grows past it. */
-.component-dashboard-first-time {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 70vh;
-}
-
 .component-guided-first-time {
   box-sizing: border-box;
   padding: var(--space-6) var(--space-5);

@@ -99,13 +99,13 @@ export default function About() {
 
         <section className="component-about-section" aria-labelledby="about-free-heading">
           <h2 id="about-free-heading" className="component-about-section-title">
-            Free, on your own key
+            Your own key
           </h2>
           <div className="component-about-prose">
             <p>
-              Narraitor is free. It runs on a key you get from a model provider,
-              set up once and kept in your browser, so the stories you generate
-              run on your account rather than someone else’s bill.
+              Narraitor runs on a key you get from a model provider, set up once
+              and kept in your browser, so the stories you generate run on your
+              own account.
             </p>
           </div>
         </section>

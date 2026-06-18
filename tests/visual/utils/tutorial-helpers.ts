@@ -98,17 +98,15 @@ export const waitForTooltip = async (page: Page): Promise<void> => {
 };
 
 /**
- * Hide the Joyride overlay and spotlight (but keep the tooltip) before a tour
- * screenshot. The spotlight currently drifts far below its target, so its
- * absolutely-positioned overlay paints a grey wash over any empty area below
- * short wizard steps. Hiding it keeps the baseline clean while still showing
- * the tooltip and the UI it points at.
+ * Hide only the Joyride beacon before a tour screenshot. The overlay and
+ * spotlight used to drift far below their target (so the overlay washed grey
+ * over empty space and had to be hidden) — that drift is fixed in #1431, so the
+ * semi-transparent dim and the target highlight are now part of the intended
+ * tour UI and are captured in the baselines.
  */
 export const hideTourOverlay = async (page: Page): Promise<void> => {
   await page.addStyleTag({
     content: `
-      .react-joyride__overlay,
-      .react-joyride__spotlight,
       .react-joyride__beacon {
         display: none !important;
         visibility: hidden !important;
