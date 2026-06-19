@@ -2873,19 +2873,12 @@
   background: var(--color-canvas);
 }
 
-.component-guided-first-time-step-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--color-accent);
-}
-
 .component-guided-first-time-step-num {
   font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-accent);
 }
 
 .component-guided-first-time-step-heading {

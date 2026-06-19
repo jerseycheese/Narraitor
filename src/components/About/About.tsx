@@ -1,27 +1,33 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 /**
  * About — the marketing/explainer page for Narraitor. Token-driven, server
  * component. Per-theme structural treatment lives in src/app/about.css under
  * [data-theme="dsN"] .component-about* selectors (mirrors the dashboard pattern).
+ *
+ * Copy leads with the wedge (a structured solo RPG with real skill checks and
+ * tracked state), explains the provider key in plain terms, and stays
+ * outcome-framed.
  */
 
 const STEPS: { title: string; description: string }[] = [
   {
     title: 'Build a world',
     description:
-      'Define a setting — Middle Earth, a noir city, a space opera, the beaches of Normandy. Real or invented, the world is yours to describe.',
+      'Define a setting: Middle Earth, a noir city, a space opera, the beaches of Normandy. Real or invented, the world is yours to describe.',
   },
   {
     title: 'Create characters',
     description:
-      'Shape who you play: their traits, their history, what they want. The story leans on the details you give them.',
+      'Shape who you play: their traits, their history, what they want. They have real skills, and the story leans on them.',
   },
   {
     title: 'Play the story',
     description:
-      'Step in and make choices. The narrative responds to what you do, so no two playthroughs unfold the same way.',
+      'Step in and make choices. The story responds to what you do, so no two playthroughs unfold the same way.',
   },
 ];
 
@@ -34,10 +40,22 @@ export default function About() {
             About Narraitor
           </h1>
           <p className="component-about-lead">
-            Narraitor is a narrative RPG you play on your own, in any world you can
-            describe. Pick a setting, create a character, and make the choices that
-            steer the story — one that adapts to you as you go.
+            Narraitor is a solo role-playing game you play in any world you can
+            describe. Pick a setting, create a character with real strengths and
+            weaknesses, and make the choices that steer the story. It adapts to
+            what you do, and your character’s skills decide how far you get.
           </p>
+          <div className="component-about-hero-visual">
+            <Image
+              className="component-about-hero-image"
+              src="/visual-assets/world-cyberpunk.png"
+              alt="A neon-lit city skyline from one of Narraitor's worlds"
+              width={1024}
+              height={426}
+              priority
+              unoptimized={isPlaywrightEnv()}
+            />
+          </div>
         </section>
 
         <section className="component-about-section" aria-labelledby="about-what-heading">
@@ -46,15 +64,18 @@ export default function About() {
           </h2>
           <div className="component-about-prose">
             <p>
-              It is a solo role-playing experience for any world — fictional or
-              real. Want to walk the streets of a rain-soaked detective city,
-              command a starship at the edge of known space, or live a quiet story
-              somewhere entirely of your own making? You set the stage, and the
-              choices you make shape where the story goes.
+              It’s a structured RPG, not a chat. You set the world and your
+              character, then play through a story that keeps track of what
+              you’ve done and what it cost you. Walk a rain-soaked detective
+              city, command a starship at the edge of known space, or live a
+              quiet story somewhere of your own making. You set the stage, and
+              the choices you make shape where it goes.
             </p>
             <p>
-              There is no fixed script. Every decision matters, and the narrative
-              bends around the path you take.
+              Skill checks carry real stakes. Some choices ask more of your
+              character than others, and a failed roll bends the story instead
+              of handing you a win. There’s no fixed script, and the world
+              remembers the path you took.
             </p>
           </div>
         </section>
@@ -76,6 +97,19 @@ export default function About() {
           </ol>
         </section>
 
+        <section className="component-about-section" aria-labelledby="about-free-heading">
+          <h2 id="about-free-heading" className="component-about-section-title">
+            Your own key
+          </h2>
+          <div className="component-about-prose">
+            <p>
+              Narraitor runs on a key you get from a model provider, set up once
+              and kept in your browser, so the stories you generate run on your
+              own account.
+            </p>
+          </div>
+        </section>
+
         <section className="component-about-section" aria-labelledby="about-privacy-heading">
           <h2 id="about-privacy-heading" className="component-about-section-title">
             Your stories stay with you
@@ -83,8 +117,8 @@ export default function About() {
           <div className="component-about-prose">
             <p>
               Your worlds, characters, and saved stories live right in your
-              browser — kept on your own device, with no account to sign up for.
-              Come back any time and pick up where you left off.
+              browser, on your own device, with no account to sign up for. Come
+              back any time and pick up where you left off.
             </p>
           </div>
         </section>
@@ -95,9 +129,8 @@ export default function About() {
           </h2>
           <div className="component-about-prose component-about-credit">
             <p>
-              Narraitor was created by Jack as a personal project, and it is
-              open-source. You can read the code, file an issue, or help shape where
-              it goes next on{' '}
+              Narraitor is an open-source project. You can read the code, file an
+              issue, or help shape where it goes next on{' '}
               <a
                 href="https://github.com/jerseycheese/Narraitor"
                 target="_blank"

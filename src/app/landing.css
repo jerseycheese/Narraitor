@@ -39,6 +39,20 @@
   max-width: 760px;
 }
 
+.component-landing-visual {
+  margin-top: var(--space-2);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  line-height: 0;
+}
+
+.component-landing-visual-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .component-landing-eyebrow {
   margin: 0;
   font-family: var(--font-system);

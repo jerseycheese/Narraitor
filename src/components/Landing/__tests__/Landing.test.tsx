@@ -27,9 +27,13 @@ describe('Landing page (#1365)', () => {
   it('states the honest "free / local / no accounts" promises', () => {
     render(<WelcomePage />);
 
-    expect(screen.getByText(/free to play/i)).toBeInTheDocument();
-    expect(screen.getByText(/runs in your browser/i)).toBeInTheDocument();
-    expect(screen.getByText(/your own provider key/i)).toBeInTheDocument();
+    expect(screen.getByText(/your own key/i)).toBeInTheDocument();
+    // Exact match: "runs in your browser" also appears in the hero lead.
+    expect(screen.getByText('Runs in your browser')).toBeInTheDocument();
+    // Provider key explained in plain terms (F3): a key from a model provider.
+    expect(
+      screen.getByText(/a key you get from a model provider/i)
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/stay on your device/i)
     ).toBeInTheDocument();
