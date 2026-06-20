@@ -87,7 +87,9 @@ async function clickWizardNext(page: Page): Promise<void> {
 
 async function openWorldWizard(page: Page, theme: ThemeId): Promise<void> {
   await seedTestData(page);
-  await page.goto('/worlds/create?step=1');
+  // Opens on the Basic Info step (step 0). The template-choice entry screen was
+  // removed in #1454, so there's no longer a step to skip past.
+  await page.goto('/worlds/create');
   await page.waitForSelector('.component-world-creation-wizard', {
     timeout: 10000,
   });
@@ -195,27 +197,7 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step1-template.png`
-      );
-
-      const westernTemplateCard = page.locator(
-        '[data-testid="template-card-western"]'
-      );
-      if (await westernTemplateCard.count()) {
-        await westernTemplateCard.click();
-        await page.waitForTimeout(300);
-        const useTemplateButton = page.getByRole('button', {
-          name: 'Use Selected Template',
-        });
-        if (await useTemplateButton.count()) {
-          await useTemplateButton.click();
-          await waitForContentStable(page);
-        }
-      }
-      await captureStep(
-        page,
-        theme,
-        `wizard-world-${theme}-step2-basic-info.png`
+        `wizard-world-${theme}-step1-basic-info.png`
       );
 
       const nameInput = page.locator(
@@ -240,7 +222,7 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step3-description.png`
+        `wizard-world-${theme}-step2-description.png`
       );
 
       const descriptionInput = page.locator(
@@ -259,7 +241,7 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step4-attributes.png`
+        `wizard-world-${theme}-step3-attributes.png`
       );
 
       const addCustomAttributeButton = page.locator(
@@ -299,7 +281,7 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step5-skills.png`
+        `wizard-world-${theme}-step4-skills.png`
       );
 
       const addCustomSkillButton = page.getByRole('button', {
@@ -346,7 +328,7 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step6-finalize.png`
+        `wizard-world-${theme}-step5-finalize.png`
       );
     });
 

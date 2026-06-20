@@ -4,9 +4,9 @@ import { seedTestData } from '../utils/seedTestData';
 import { mockApiEndpoints } from '../utils/mockApi';
 import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
-const steps = [12, 13, 14];
+const steps = [8, 9, 10];
 
-test('World creation tour: World Description (tour steps 12-14)', async ({ page }) => {
+test('World creation tour: World Description (tour steps 8-10)', async ({ page }) => {
   test.setTimeout(90000);
 
   await seedTestData(page);
@@ -22,11 +22,6 @@ test('World creation tour: World Description (tour steps 12-14)', async ({ page 
     characterCreation: { completed: true, skipped: true, lastStep: 0 },
     firstPlay: { completed: true, skipped: true },
   });
-
-  const createOwnButton = page.locator('[data-tutorial="create-own-world-btn"]');
-  await expect(createOwnButton).toBeVisible({ timeout: 15000 });
-  await createOwnButton.click();
-  await waitForContentStable(page);
 
   const genrePicker = page.locator('[data-tutorial="genre-picker"]');
   await expect(genrePicker).toBeVisible({ timeout: 15000 });

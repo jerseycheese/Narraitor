@@ -202,7 +202,6 @@ test.describe('Fresh GameSession skeleton → content', () => {
             worldId: null,
             characterId: null,
             savedSessions: {},
-            templateHistory: [],
             autoSave: {
               enabled: true,
               lastSaveTime: null,

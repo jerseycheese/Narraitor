@@ -4,9 +4,9 @@ import { seedTestData } from '../utils/seedTestData';
 import { mockApiEndpoints } from '../utils/mockApi';
 import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
-const steps = [28, 29, 30, 31];
+const steps = [24, 25, 26, 27];
 
-test('World creation tour: Quick Start (tour steps 28-31)', async ({ page }) => {
+test('World creation tour: Quick Start (tour steps 24-27)', async ({ page }) => {
   test.setTimeout(180000);
 
   await seedTestData(page);
@@ -23,11 +23,6 @@ test('World creation tour: Quick Start (tour steps 28-31)', async ({ page }) => 
     firstPlay: { completed: true, skipped: true },
   });
 
-  const createOwnButton = page.locator('[data-tutorial="create-own-world-btn"]');
-  await expect(createOwnButton).toBeVisible({ timeout: 15000 });
-  await createOwnButton.click();
-  await waitForContentStable(page);
-
   await page.locator('[data-tutorial="genre-picker"]').selectOption('Cyberpunk');
   await page.locator('[data-tutorial="world-name"]').fill('Test World');
   await page.getByRole('button', { name: 'Next' }).click();
@@ -38,7 +33,7 @@ test('World creation tour: Quick Start (tour steps 28-31)', async ({ page }) => 
   await page.waitForSelector('[data-testid="processing-overlay"]', { state: 'hidden', timeout: 30000 }).catch(() => {});
   await waitForContentStable(page);
 
-  // Next on step 3
+  // Next on step 2 (AttributeReviewStep)
   // Add a minimal custom attribute to satisfy requirement and advance
   const addCustomAttributeBtn = page.locator('[data-testid="add-custom-attribute-button"]');
   if (await addCustomAttributeBtn.count() > 0) {
@@ -58,7 +53,7 @@ test('World creation tour: Quick Start (tour steps 28-31)', async ({ page }) => 
   await page.getByRole('button', { name: 'Next' }).click();
   await waitForContentStable(page);
 
-  // Next on step 4
+  // Next on step 3 (SkillReviewStep)
   // Add a minimal custom skill and advance
   const addCustomSkillBtn = page.locator('button:has-text("Add Custom Skill")');
   if (await addCustomSkillBtn.count() > 0) {
@@ -88,13 +83,13 @@ test('World creation tour: Quick Start (tour steps 28-31)', async ({ page }) => 
   await page.getByRole('button', { name: 'Next' }).click();
   await waitForContentStable(page);
 
-  // Create World on step 5 (FinalizeStep)
+  // Create World on step 4 (FinalizeStep)
   const createWorldButton = page.getByRole('button', { name: 'Create World' });
   await expect(createWorldButton).toBeVisible({ timeout: 15000 });
   await createWorldButton.click();
   await waitForContentStable(page);
 
-  // Now on QuickStartStep (step 6)
+  // Now on QuickStartStep (step 5)
   await page.waitForSelector('[data-tutorial="quickstart-archetypes"]', { timeout: 15000 });
 
   // The three quickstart archetype cards are seeded off the freshly-created

@@ -3,7 +3,7 @@ import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
 import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
-const steps = [4, 5, 6, 7, 8, 9, 10, 11];
+const steps = [0, 1, 2, 3, 4, 5, 6, 7];
 
 // These worldCreation tour steps all live on the tall BasicInfoStep form. The
 // reference + tone targets sit below the 1024px fold, so a `placement: 'top'`
@@ -11,14 +11,14 @@ const steps = [4, 5, 6, 7, 8, 9, 10, 11];
 // settles. Scroll the active step's target to centre first (same approach as
 // character-creation-wizard-tour.spec.ts) so the tooltip renders fully in view.
 const stepTargets: Record<number, string> = {
-  4: '[data-tutorial="world-name"]',
-  5: '[data-tutorial="genre-picker"]',
-  6: '[data-tutorial="world-type"]',
-  7: '[data-tutorial="world-reference"]',
-  8: '[data-tutorial="tone-content-rating"]',
-  9: '[data-tutorial="tone-narrative-style"]',
-  10: '[data-tutorial="tone-language-complexity"]',
-  11: '[data-tutorial="tone-custom-instructions"]',
+  0: '[data-tutorial="world-name"]',
+  1: '[data-tutorial="genre-picker"]',
+  2: '[data-tutorial="world-type"]',
+  3: '[data-tutorial="world-reference"]',
+  4: '[data-tutorial="tone-content-rating"]',
+  5: '[data-tutorial="tone-narrative-style"]',
+  6: '[data-tutorial="tone-language-complexity"]',
+  7: '[data-tutorial="tone-custom-instructions"]',
 };
 
 async function scrollStepTargetIntoView(page: Page, stepIndex: number): Promise<void> {
@@ -30,7 +30,7 @@ async function scrollStepTargetIntoView(page: Page, stepIndex: number): Promise<
   await page.waitForTimeout(100);
 }
 
-test('World creation tour: Basic Information (tour steps 4-11)', async ({ page }) => {
+test('World creation tour: Basic Information (tour steps 0-7)', async ({ page }) => {
   test.setTimeout(90000);
 
   await seedTestData(page);
@@ -46,12 +46,7 @@ test('World creation tour: Basic Information (tour steps 4-11)', async ({ page }
     firstPlay: { completed: true, skipped: true },
   });
 
-  const createOwnButton = page.locator('[data-tutorial="create-own-world-btn"]');
-  await expect(createOwnButton).toBeVisible({ timeout: 15000 });
-  await createOwnButton.click();
-  await waitForContentStable(page);
-
-  // Tour step 7 targets [data-tutorial="world-reference"], which only renders
+  // Tour step 3 targets [data-tutorial="world-reference"], which only renders
   // when a referenced world type is chosen ({worldData.relationship && ...} in
   // BasicInfoStep). Pick "Inspired By" so the target exists and its tooltip can
   // settle — otherwise waitForTooltip never resolves on a missing target.

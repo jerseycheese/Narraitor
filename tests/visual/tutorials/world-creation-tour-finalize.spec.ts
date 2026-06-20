@@ -4,9 +4,9 @@ import { seedTestData } from '../utils/seedTestData';
 import { mockApiEndpoints } from '../utils/mockApi';
 import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
-const steps = [23, 24, 25, 26, 27];
+const steps = [19, 20, 21, 22, 23];
 
-test('World creation tour: Finalize (tour steps 23-27)', async ({ page }) => {
+test('World creation tour: Finalize (tour steps 19-23)', async ({ page }) => {
   test.setTimeout(120000);
 
   await seedTestData(page);
@@ -23,11 +23,6 @@ test('World creation tour: Finalize (tour steps 23-27)', async ({ page }) => {
     firstPlay: { completed: true, skipped: true },
   });
 
-  const createOwnButton = page.locator('[data-tutorial="create-own-world-btn"]');
-  await expect(createOwnButton).toBeVisible({ timeout: 15000 });
-  await createOwnButton.click();
-  await waitForContentStable(page);
-
   await page.locator('[data-tutorial="genre-picker"]').selectOption('Cyberpunk');
   await page.locator('[data-tutorial="world-name"]').fill('Test World');
   await page.getByRole('button', { name: 'Next' }).click();
@@ -38,7 +33,7 @@ test('World creation tour: Finalize (tour steps 23-27)', async ({ page }) => {
   await page.waitForSelector('[data-testid="processing-overlay"]', { state: 'hidden', timeout: 30000 }).catch(() => {});
   await waitForContentStable(page);
 
-  // Next on step 3 (AttributeReviewStep)
+  // Next on step 2 (AttributeReviewStep)
   // Add a minimal custom attribute to satisfy requirement and advance
   const addCustomAttributeBtn = page.locator('[data-testid="add-custom-attribute-button"]');
   if (await addCustomAttributeBtn.count() > 0) {
@@ -58,7 +53,7 @@ test('World creation tour: Finalize (tour steps 23-27)', async ({ page }) => {
   await page.getByRole('button', { name: 'Next' }).click();
   await waitForContentStable(page);
 
-  // Next on step 4 (SkillReviewStep)
+  // Next on step 3 (SkillReviewStep)
   // Add a minimal custom skill and advance
   const addCustomSkillBtn = page.locator('button:has-text("Add Custom Skill")');
   if (await addCustomSkillBtn.count() > 0) {
