@@ -5,36 +5,6 @@ import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
 export const worldCreationTour: Step[] = [
   {
-    target: '[data-tutorial="world-creation-header"]',
-    content: 'Welcome to the World Creation Wizard! You can choose a path: start from scratch and define everything yourself, or use a template to jump-start your world.',
-    placement: 'bottom',
-    tooltipComponent: WorldCreationStartTooltip,
-    disableBeacon: true,
-    hideBackButton: true,
-  },
-  {
-    target: '[data-tutorial="create-own-world-btn"]',
-    content: 'This option lets you start from scratch with Create My Own World and define everything yourself.',
-    placement: 'top',
-    tooltipComponent: WorldCreationStartTooltip,
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tutorial="template-list"]',
-    content: 'You can use a template to jump-start your world with a curated setup.',
-    placement: 'top',
-    tooltipComponent: WorldCreationStartTooltip,
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tutorial="generate-tab"]',
-    content: 'The Generate tab lets you create a new template you can customize.',
-    placement: 'top',
-    tooltipComponent: WorldCreationStartTooltip,
-    disableBeacon: true,
-    data: { isEndOfPage: true },
-  },
-  {
     target: '[data-tutorial="world-name"]',
     content: TutorialContent({
       children: "Here's where you'll name your world to make it feel distinct.",
@@ -289,36 +259,38 @@ export const worldCreationTour: Step[] = [
 ];
 
 export const tourStepToWizardStep: Record<number, number> = {
+  // Basic Information (step 0)
   0: 0,
   1: 0,
   2: 0,
   3: 0,
-  4: 1,
-  5: 1,
-  6: 1,
-  7: 1,
+  4: 0,
+  5: 0,
+  6: 0,
+  7: 0,
+  // World Description (step 1)
   8: 1,
   9: 1,
   10: 1,
-  11: 1,
+  // Review Attributes (step 2)
+  11: 2,
   12: 2,
   13: 2,
   14: 2,
+  // Review Skills (step 3)
   15: 3,
   16: 3,
   17: 3,
   18: 3,
+  // Finalize (step 4)
   19: 4,
   20: 4,
   21: 4,
   22: 4,
-  23: 5,
+  23: 4,
+  // Quick Start (step 5)
   24: 5,
   25: 5,
   26: 5,
   27: 5,
-  28: 6,
-  29: 6,
-  30: 6,
-  31: 6,
 };

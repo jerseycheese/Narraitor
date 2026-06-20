@@ -14,7 +14,6 @@ const resetSessionStore = () => {
     characterId: null,
     savedSessions: {},
     sessionLifecycle: {},
-    templateHistory: [],
     autoSave: {
       enabled: true,
       lastSaveTime: null,

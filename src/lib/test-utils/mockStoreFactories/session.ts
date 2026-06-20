@@ -13,7 +13,6 @@ export function createMockSessionStore(
     characterId: null,
     savedSessions: {},
     sessionLifecycle: {},
-    templateHistory: [],
     autoSave: {
       enabled: true,
       status: 'idle',
@@ -52,9 +51,6 @@ export function createMockSessionStore(
     upsertSessionLifecycle: jest.fn(),
     setSessionLifecycleStatus: jest.fn(),
     getSessionLifecycle: jest.fn(() => undefined),
-    addTemplateToHistory: jest.fn(),
-    getTemplateHistory: jest.fn(() => []),
-    clearTemplateHistory: jest.fn(),
     setAutoSaveEnabled: jest.fn(),
     updateAutoSaveStatus: jest.fn(),
     recordAutoSave: jest.fn(),

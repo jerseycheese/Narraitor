@@ -19,8 +19,5 @@ export const CHOICE_FALLBACK_DELAY_MS = 15000;
 /** Fallback delay during session bootstrap before proceeding without AI. */
 export const BOOTSTRAP_FALLBACK_DELAY_MS = 4000;
 
-/** Server-side timeout for world-template generation. */
-export const TEMPLATE_GENERATION_TIMEOUT_MS = 45_000;
-
 /** Safety timeout to auto-clear a stuck navigation loading state. */
 export const NAV_SAFETY_TIMEOUT_MS = 30000;
