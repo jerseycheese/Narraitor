@@ -40,7 +40,7 @@ const captureFullStep = async (page: Page, name: string): Promise<void> => {
 /**
  * Character Creation Wizard Visual Regression Test (Sequential)
  *
- * Single initialization that walks through QuickStart → Steps 0–5,
+ * Single initialization that walks through QuickStart → Steps 1–5,
  * taking screenshots at each stage to reduce flakiness and runtime.
  *
  * DS coverage (#1264): single-theme (default DS1) by design. All three design
@@ -50,7 +50,7 @@ const captureFullStep = async (page: Page, name: string): Promise<void> => {
  * much higher runtime/flake cost.
  */
 
-test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', async ({ page }) => {
+test('Character creation wizard visual sequence (QuickStart → Steps 1–5)', async ({ page }) => {
   test.setTimeout(90000); // Extended timeout for complex wizard
   // Seed once and open worlds page so the app picks up state
   await seedTestData(page);
@@ -92,21 +92,12 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
     });
   });
 
-  await test.step('Step 0: Template Selection', async () => {
-    // Click Create Custom Character if visible
+  await test.step('Step 1: Basic Info', async () => {
+    // Create Custom Character now lands directly on Basic Info — the
+    // template-selection step was removed for 1.0 (#1455).
     const customButton = page.locator('button:has-text("Create Custom Character")');
     if (await customButton.count() > 0) {
       await customButton.click();
-      await waitForNavigationHeading(page, 'Choose a Starting Template', { timeout: 5000, exact: true });
-    }
-    await captureFullStep(page, 'character-creation-step0-template-selection.png');
-  });
-
-  await test.step('Step 1: Basic Info', async () => {
-    // Skip template selection by clicking Next
-    const skipTemplateBtn = page.locator('button:has-text("Next")');
-    if (await skipTemplateBtn.count() > 0) {
-      await skipTemplateBtn.click();
       await waitForNavigationHeading(page, 'Basic Information', { timeout: 5000, exact: true });
     }
     await captureFullStep(page, 'character-creation-step1-basic-info.png');

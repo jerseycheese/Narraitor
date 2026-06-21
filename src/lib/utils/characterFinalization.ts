@@ -3,7 +3,6 @@ import { World } from '@/types/world.types';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { applyStartingInventory } from '@/lib/inventory/startingInventory';
 import { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 
 /**
@@ -78,13 +77,6 @@ export function finalizeCharacterCreation(
 
   // Calculate derived stats from world formulas
   useCharacterStore.getState().recalculateDerivedStats(characterId);
-
-  // Seed archetype-appropriate starting inventory when a quick-start template
-  // was used as the basis for this character.
-  const selectedTemplate = world?.characterTemplates?.find(
-    (template) => template.id === data.selectedTemplateId
-  );
-  applyStartingInventory(characterId, selectedTemplate?.startingInventory);
 
   // Set as current character
   useCharacterStore.getState().setCurrentCharacter(characterId);

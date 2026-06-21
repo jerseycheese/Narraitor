@@ -18,7 +18,6 @@ export interface CharacterCreationData {
   name: string;
   description: string;
   portraitPlaceholder: string;
-  selectedTemplateId?: EntityID | null;  // Track which template was selected
   portrait?: {
     type: 'ai-generated' | 'placeholder';
     url: string | null;
@@ -56,12 +55,11 @@ export interface CharacterCreationData {
 }
 
 const steps: WizardStepType[] = [
-  { id: 'template-selection', label: 'Template' },   // NEW Step 0
-  { id: 'basic-info', label: 'Basic Info' },         // Now Step 1
-  { id: 'attributes', label: 'Attributes' },         // Now Step 2
-  { id: 'skills', label: 'Skills' },                 // Now Step 3
-  { id: 'background', label: 'Background' },         // Now Step 4
-  { id: 'portrait', label: 'Portrait' }              // Now Step 5
+  { id: 'basic-info', label: 'Basic Info' },   // Step 0
+  { id: 'attributes', label: 'Attributes' },   // Step 1
+  { id: 'skills', label: 'Skills' },           // Step 2
+  { id: 'background', label: 'Background' },    // Step 3
+  { id: 'portrait', label: 'Portrait' }        // Step 4
 ];
 
 interface UseCharacterCreationWizardProps {
@@ -83,8 +81,7 @@ export function useCharacterCreationWizard({
   // Create step validators
   const stepValidators = useMemo((): Record<number, Validator<CharacterCreationData>> => {
     return {
-      0: alwaysValid, // Template selection - always valid (optional)
-      1: validateFields<CharacterCreationData>({
+      0: validateFields<CharacterCreationData>({
         name: [
           createValidationRules.required('Character name is required'),
           createValidationRules.minLength(2, 'Character name must be at least 2 characters'),
@@ -94,11 +91,11 @@ export function useCharacterCreationWizard({
           ),
         ],
       }),
-      2: (data) => {
+      1: (data) => {
         const result = validateAttributes(data.attributes, world?.settings.attributePointPool || 0);
         return { ...result, touched: true };
       },
-      3: (data) => {
+      2: (data) => {
         const result = validateSkills(
           data.skills,
           world?.settings.skillPointPool || 0,
@@ -110,11 +107,11 @@ export function useCharacterCreationWizard({
         );
         return { ...result, touched: true };
       },
-      4: (data) => {
+      3: (data) => {
         const result = validateBackground(data.background);
         return { ...result, touched: true };
       },
-      5: alwaysValid, // Portrait - optional
+      4: alwaysValid, // Portrait - optional
     };
   }, [worldId, world]);
 
