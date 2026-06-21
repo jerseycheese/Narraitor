@@ -26,7 +26,6 @@ export default function DevPage() {
     ],
     'Navigation & UI': [
       { href: '/dev/navigation-flow', label: 'Navigation Flow', color: 'teal' },
-      { href: '/dev/template-selector', label: 'Template Selector', color: 'cyan' },
     ],
   };
 

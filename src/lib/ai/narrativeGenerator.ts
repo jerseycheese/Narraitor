@@ -17,12 +17,6 @@ import { generateChoices } from './choiceGenerator';
 import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
-import {
-  generateWorldTemplate as generateWorldTemplateFn,
-  convertTemplateToWorld as convertTemplateToWorldFn,
-  type WorldTemplate,
-} from './templateGenerator';
-import { TemplateGenerationContext } from './templatePrompts';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import { processLostItems } from '@/lib/narrative/itemLossProcessor';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
@@ -764,18 +758,6 @@ export class NarrativeGenerator {
         }, ${narrativeContext.currentSituation || 'making a decision'}.`,
       };
     }
-  }
-
-  async generateWorldTemplate(
-    context: TemplateGenerationContext
-  ): Promise<WorldTemplate> {
-    return generateWorldTemplateFn(this.geminiClient, context);
-  }
-
-  convertTemplateToWorld(
-    template: WorldTemplate
-  ): Omit<World, 'id' | 'createdAt' | 'updatedAt'> {
-    return convertTemplateToWorldFn(template);
   }
 
   private syncNpcMetadata(

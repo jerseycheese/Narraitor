@@ -7,7 +7,7 @@ import { seedTestData } from './utils/seedTestData';
  *
  * DS coverage (#1264): all three design systems for the world wizard are covered
  * by the "World creation wizard steps render <DS> structure" tests in
- * tests/visual/wizard-themes.spec.ts. Tripling this full six-step flow would
+ * tests/visual/wizard-themes.spec.ts. Tripling this full five-step flow would
  * duplicate that coverage at much higher runtime/flake cost.
  */
 
@@ -46,11 +46,11 @@ const captureWizardStep = async (page: Page, name: string): Promise<void> => {
 /**
  * World Creation Wizard Visual Regression Test (Sequential)
  *
- * Single initialization that walks through Steps 1–6,
+ * Single initialization that walks through Steps 1–5,
  * taking screenshots at each stage to reduce flakiness and runtime.
  */
 
-test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => {
+test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
   test.setTimeout(45000); // Extended timeout for complex wizard
   await seedTestData(page);
   await page.goto('/worlds');
@@ -90,26 +90,12 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
     await overlay.waitFor({ state: 'detached', timeout: 2000 }).catch(() => {});
   };
 
-  await test.step('Step 1: Template', async () => {
+  await test.step('Step 1: Basic Info', async () => {
     await dismissTutorialOverlay();
-    await captureWizardStep(page, 'world-creation-step1-template.png');
+    await captureWizardStep(page, 'world-creation-step1-basic-info.png');
   });
 
-  await test.step('Step 2: Basic Info', async () => {
-    const westernTemplateCard = page.locator('[data-testid="template-card-western"]');
-    if (await westernTemplateCard.count() > 0) {
-      await westernTemplateCard.click();
-      await page.waitForTimeout(300);
-      const useTemplateButton = page.locator('button:has-text("Use Selected Template")');
-      if (await useTemplateButton.count() > 0) {
-        await useTemplateButton.click();
-        await page.waitForTimeout(600);
-      }
-    }
-    await captureWizardStep(page, 'world-creation-step2-basic-info.png');
-  });
-
-  await test.step('Step 3: Description', async () => {
+  await test.step('Step 2: Description', async () => {
     const nameInput = page.locator('input[placeholder*="world name"], input[name="name"], input[placeholder*="Enter name"]');
     if (await nameInput.count() > 0) {
       await nameInput.fill('Test World');
@@ -133,10 +119,10 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton.click();
       await page.waitForTimeout(700);
     }
-    await captureWizardStep(page, 'world-creation-step3-description.png');
+    await captureWizardStep(page, 'world-creation-step2-description.png');
   });
 
-  await test.step('Step 4: Attributes Review', async () => {
+  await test.step('Step 3: Attributes Review', async () => {
     // Full Description requires at least 50 characters before Next is enabled.
     const descriptionInput = page.locator('[data-testid="world-full-description"]');
     await descriptionInput.fill(
@@ -151,10 +137,10 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton2.click();
       await page.waitForTimeout(700);
     }
-    await captureWizardStep(page, 'world-creation-step4-attributes.png');
+    await captureWizardStep(page, 'world-creation-step3-attributes.png');
   });
 
-  await test.step('Step 5: Skills Review', async () => {
+  await test.step('Step 4: Skills Review', async () => {
     // Add a minimal custom attribute to satisfy requirement and advance
     const addCustomAttributeBtn = page.locator('[data-testid="add-custom-attribute-button"]');
     if (await addCustomAttributeBtn.count() > 0) {
@@ -179,10 +165,10 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton3.click();
       await page.waitForTimeout(700);
     }
-    await captureWizardStep(page, 'world-creation-step5-skills.png');
+    await captureWizardStep(page, 'world-creation-step4-skills.png');
   });
 
-  await test.step('Step 6: Finalize', async () => {
+  await test.step('Step 5: Finalize', async () => {
     // Add a minimal custom skill and advance
     const addCustomSkillBtn = page.locator('button:has-text("Add Custom Skill")');
     if (await addCustomSkillBtn.count() > 0) {
@@ -217,6 +203,6 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton4.click();
       await page.waitForTimeout(700);
     }
-    await captureWizardStep(page, 'world-creation-step6-finalize.png');
+    await captureWizardStep(page, 'world-creation-step5-finalize.png');
   });
 });

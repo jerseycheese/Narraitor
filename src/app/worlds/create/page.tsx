@@ -5,12 +5,10 @@ import { useEffect, useState } from 'react';
 import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
 import { readJSON, removeKey } from '@/lib/utils/browserStorage';
 
-// Session keys used to hand off generated/template world data into the wizard.
-// Each key is read once on mount and then cleared so refreshes don't replay.
+// Session key used to hand off generated world data into the wizard.
+// Read once on mount and then cleared so refreshes don't replay.
 const HANDOFF_KEYS = [
   'generated-world-data',
-  'smart-template-data',
-  'recent-template-data',
 ] as const;
 
 export default function CreateWorldPage() {

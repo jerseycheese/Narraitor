@@ -5,6 +5,7 @@ import {
   waitForNavigationHeading,
 } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
+import { mockApiEndpoints } from './utils/mockApi';
 
 type ThemeId = 'ds1' | 'ds2' | 'ds3';
 
@@ -57,6 +58,25 @@ async function captureStep(
   await waitForContentStable(page);
   await setTheme(page, theme);
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+  // Mocked AI suggestions can still grow the page a beat after networkidle, so a
+  // fullPage capture taken too early differs in height run-to-run. Wait until the
+  // document height holds steady across a few polls before snapshotting.
+  await page
+    .waitForFunction(
+      () => {
+        const h = document.documentElement.scrollHeight;
+        const w = window as unknown as { __wtHeight?: number; __wtStable?: number };
+        if (w.__wtHeight === h) {
+          w.__wtStable = (w.__wtStable ?? 0) + 1;
+        } else {
+          w.__wtHeight = h;
+          w.__wtStable = 0;
+        }
+        return (w.__wtStable ?? 0) >= 3;
+      },
+      { timeout: 6000, polling: 200 }
+    )
+    .catch(() => {});
   // Soft so one run surfaces every stale step's diff instead of stopping at the
   // first — multi-step fullPage specs otherwise cascade one step per CI run.
   await expect.soft(page).toHaveScreenshot(snapshotName, { fullPage: true });
@@ -87,7 +107,14 @@ async function clickWizardNext(page: Page): Promise<void> {
 
 async function openWorldWizard(page: Page, theme: ThemeId): Promise<void> {
   await seedTestData(page);
-  await page.goto('/worlds/create?step=1');
+  // #1454 moved the AI attribute-suggestion trigger onto the description->
+  // attributes step. Mock it so the suggested attributes settle deterministically;
+  // otherwise the list re-renders and the add-custom-attribute control never
+  // stabilises enough to click.
+  await mockApiEndpoints(page);
+  // Opens on the Basic Info step (step 0). The template-choice entry screen was
+  // removed in #1454, so there's no longer a step to skip past.
+  await page.goto('/worlds/create');
   await page.waitForSelector('.component-world-creation-wizard', {
     timeout: 10000,
   });
@@ -195,27 +222,7 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step1-template.png`
-      );
-
-      const westernTemplateCard = page.locator(
-        '[data-testid="template-card-western"]'
-      );
-      if (await westernTemplateCard.count()) {
-        await westernTemplateCard.click();
-        await page.waitForTimeout(300);
-        const useTemplateButton = page.getByRole('button', {
-          name: 'Use Selected Template',
-        });
-        if (await useTemplateButton.count()) {
-          await useTemplateButton.click();
-          await waitForContentStable(page);
-        }
-      }
-      await captureStep(
-        page,
-        theme,
-        `wizard-world-${theme}-step2-basic-info.png`
+        `wizard-world-${theme}-step1-basic-info.png`
       );
 
       const nameInput = page.locator(
@@ -240,26 +247,33 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step3-description.png`
+        `wizard-world-${theme}-step2-description.png`
       );
 
-      const descriptionInput = page.locator(
-        'textarea[placeholder*="Describe your world"], textarea[placeholder*="description"], textarea[name="description"]'
-      );
+      // The description step's full-description field is data-testid keyed (the
+      // same one world-creation.spec fills); placeholder-based selectors miss it,
+      // leaving it empty so Next stays disabled and the wizard never advances.
+      const descriptionInput = page.locator('[data-testid="world-full-description"]');
       if (await descriptionInput.count()) {
         await descriptionInput.fill(
-          'A test world created for all-theme visual regression testing.'
+          'A dusty frontier town on the edge of the territory, where law is scarce and every stranger hides a past worth burying.'
         );
       }
       await clickWizardNext(page);
+      // Advancing off the description step triggers AI attribute analysis (#1454
+      // moved the suggestion trigger here); let its processing overlay clear
+      // before waiting for the Attributes heading.
+      await page
+        .waitForSelector('[data-testid="processing-overlay"]', { state: 'hidden', timeout: 30000 })
+        .catch(() => {});
       await waitForNavigationHeading(page, 'Review Attributes', {
-        timeout: 10000,
+        timeout: 20000,
         exact: true,
       });
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step4-attributes.png`
+        `wizard-world-${theme}-step3-attributes.png`
       );
 
       const addCustomAttributeButton = page.locator(
@@ -299,7 +313,7 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step5-skills.png`
+        `wizard-world-${theme}-step4-skills.png`
       );
 
       const addCustomSkillButton = page.getByRole('button', {
@@ -346,7 +360,7 @@ test.describe('Wizard Theme Differentiation', () => {
       await captureStep(
         page,
         theme,
-        `wizard-world-${theme}-step6-finalize.png`
+        `wizard-world-${theme}-step5-finalize.png`
       );
     });
 

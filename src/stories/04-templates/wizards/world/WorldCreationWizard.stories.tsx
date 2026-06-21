@@ -27,32 +27,17 @@ export const Default: Story = {
   args: {},
 };
 
-// Story showing the template selection step
-export const TemplateSelectionStep: Story = {
-  args: {
-    initialStep: 0,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows the first step of the wizard where users choose a world template'
-      }
-    }
-  }
-};
-
-// Story showing the basic info step
+// Story showing the basic info step (now the first step)
 export const BasicInfoStep: Story = {
   args: {
-    initialStep: 1,
+    initialStep: 0,
     initialData: {
       settings: {
         maxAttributes: 10,
         maxSkills: 10,
         attributePointPool: 20,
         skillPointPool: 20
-      },
-      selectedTemplateId: "fantasy"
+      }
     }
   },
   parameters: {
@@ -67,7 +52,7 @@ export const BasicInfoStep: Story = {
 // Story showing the description step
 export const DescriptionStep: Story = {
   args: {
-    initialStep: 2,
+    initialStep: 1,
     initialData: {
       name: 'Fantasy Kingdom',
       genre: 'fantasy',
@@ -91,7 +76,7 @@ export const DescriptionStep: Story = {
 // Story showing the attribute review step
 export const AttributeReviewStep: Story = {
   args: {
-    initialStep: 3,
+    initialStep: 2,
     initialData: {
       name: 'Fantasy Kingdom',
       genre: 'fantasy',
@@ -127,7 +112,7 @@ export const AttributeReviewStep: Story = {
 // Story showing the skill review step
 export const SkillReviewStep: Story = {
   args: {
-    initialStep: 4,
+    initialStep: 3,
     initialData: {
       name: 'Fantasy Kingdom',
       genre: 'fantasy',
@@ -174,7 +159,7 @@ export const SkillReviewStep: Story = {
 // Story showing the finalize step
 export const FinalizeStep: Story = {
   args: {
-    initialStep: 5,
+    initialStep: 4,
     initialData: {
       name: 'Fantasy Kingdom',
       genre: 'fantasy',

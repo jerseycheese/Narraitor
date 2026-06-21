@@ -29,7 +29,6 @@ const mockSessionStore: SessionStore = {
   characterId: 'char-1',
   savedSessions: {},
   sessionLifecycle: {},
-  templateHistory: [],
   autoSave: {
     enabled: true,
     lastSaveTime: null,
@@ -70,9 +69,6 @@ const mockSessionStore: SessionStore = {
   upsertSessionLifecycle: jest.fn(),
   setSessionLifecycleStatus: jest.fn(),
   getSessionLifecycle: jest.fn(),
-  addTemplateToHistory: jest.fn(),
-  getTemplateHistory: jest.fn(),
-  clearTemplateHistory: jest.fn(),
   setAutoSaveEnabled: jest.fn(),
   updateAutoSaveStatus: jest.fn(),
   recordAutoSave: jest.fn(),

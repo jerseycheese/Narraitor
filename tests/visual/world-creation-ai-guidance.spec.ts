@@ -62,11 +62,9 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await page.goto('/worlds/create');
     await waitForContentStable(page);
     await hideDynamicContent(page);
-    // Navigate to the Basic Info step by clicking "Create My Own World"
-    const createOwnButton = page.getByRole('button', { name: 'Create My Own World' });
-    await expect(createOwnButton).toBeEnabled({ timeout: 15000 });
-    await createOwnButton.click();
-    await page.waitForTimeout(300);
+    // The wizard now opens directly on the Basic Info step (the template-choice
+    // entry screen was removed in #1454), so there's no longer a "Create My Own
+    // World" button to click through.
   });
 
   test('should display genre-specific guidance on Basic Info step', async ({ page }) => {

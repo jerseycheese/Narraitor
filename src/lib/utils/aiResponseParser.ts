@@ -117,35 +117,3 @@ export function validateArrayFields(
     }
   }
 }
-
-/**
- * Generic AI response handler with retry logic and validation
- */
-export async function handleAIRequest<T>(
-  aiCall: () => Promise<AIResponse>,
-  parser: (response: AIResponse) => T,
-  maxRetries: number = 2
-): Promise<T> {
-  let lastError: Error;
-  
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      const response = await aiCall();
-      return parser(response);
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Unknown error');
-      
-      // Don't retry on parsing errors, only on network/AI errors
-      if (lastError.message.includes('parse') || lastError.message.includes('Invalid')) {
-        break;
-      }
-      
-      if (attempt < maxRetries) {
-        // Wait before retry (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
-      }
-    }
-  }
-  
-  throw lastError!;
-}

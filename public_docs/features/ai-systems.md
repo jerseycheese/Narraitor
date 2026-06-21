@@ -145,22 +145,6 @@ import { WorldCreationWizard } from '@/components/World';
 />
 ```
 
-## Smart Templates
-
-The AI can generate complete world templates in three ways: "Inspired By" takes your description and builds a template from it, "Genre Mixer" combines multiple genres for unique worlds, and "Surprise Me" generates unexpected concepts.
-
-```tsx
-import { SmartTemplates } from '@/components/World/SmartTemplates';
-
-<SmartTemplates
-  onTemplateGenerated={(template) => {
-    // Use generated template
-  }}
-/>
-```
-
-Each template includes the world name and description, suggested attributes and skills, theme and genre info, and a preview modal so you can review before using it.
-
 ## Goal Tracking System
 
 The AI automatically extracts and tracks player objectives to keep the narrative consistent. It identifies goals from the story (both explicit and implicit), monitors progress and completion, and includes active goals in AI prompts so the narrative stays focused on what matters.

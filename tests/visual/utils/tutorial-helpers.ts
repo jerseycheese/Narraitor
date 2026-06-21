@@ -114,6 +114,10 @@ export const hideTourOverlay = async (page: Page): Promise<void> => {
       }
     `,
   });
+  // Joyride positions the tooltip via @floating-ui after it mounts; the visible
+  // clip is measured off the tooltip's bottom edge, so capturing before it
+  // settles yields a different clip height run-to-run. Let it settle first.
+  await page.waitForTimeout(500);
 };
 
 export const getVisibleTutorialClip = async (

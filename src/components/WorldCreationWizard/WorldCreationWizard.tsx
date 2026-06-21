@@ -21,7 +21,6 @@ import {
   WizardStep 
 } from '@/components/shared/wizard';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
-import TemplateStep from './steps/TemplateStep';
 import BasicInfoStep from './steps/BasicInfoStep';
 import DescriptionStep from './steps/DescriptionStep';
 import AttributeReviewStep from './steps/AttributeReviewStep';
@@ -71,8 +70,6 @@ interface WorldCreationData extends Partial<World> {
     skills: SkillSuggestion[];
   };
   aiSuggestionsGenerated?: boolean;
-  selectedTemplateId?: string | null;
-  createOwnWorld?: boolean;
   worldType?: 'original' | 'inspired_by' | 'set_within';
   createdWorldId?: string;
   aiSuggestionMeta?: {
@@ -123,8 +120,6 @@ export default function WorldCreationWizard({
     },
     aiSuggestions: initialData?.aiSuggestions,
     aiSuggestionsGenerated: initialData?.aiSuggestionsGenerated || false,
-    selectedTemplateId: initialData?.selectedTemplateId || null,
-    createOwnWorld: initialData?.createOwnWorld || false,
     worldType: initialData?.worldType || 'original',
     // Spread initialData last to ensure external overrides take precedence
     ...initialData,
@@ -133,43 +128,19 @@ export default function WorldCreationWizard({
   // Create step validators
   const stepValidators = useMemo((): Record<number, Validator<WorldCreationData>> => {
     return {
-      0: (data) => {
-        const isValid = data.selectedTemplateId !== null || data.createOwnWorld === true;
-        return {
-          valid: isValid,
-          errors: isValid ? [] : ['Please select a template or choose to create your own world'],
-          touched: true,
-        };
-      },
-      1: validateFields<WorldCreationData>({
+      0: validateFields<WorldCreationData>({
         genre: [createValidationRules.required('World genre is required')],
       }),
-      2: validateFields<WorldCreationData>({
+      1: validateFields<WorldCreationData>({
         description: [
           createValidationRules.required<string | undefined>('World description is required'),
           createValidationRules.minLength(50, 'Description must be at least 50 characters') as ValidationRule<string | undefined>,
         ],
       }),
-      3: (data) => {
-        if (data.createOwnWorld) return { valid: true, errors: [], touched: true };
-        const hasAttributes = (data.attributes?.length || 0) > 0;
-        return {
-          valid: hasAttributes,
-          errors: hasAttributes ? [] : ['At least one attribute is required'],
-          touched: true,
-        };
-      },
-      4: (data) => {
-        if (data.createOwnWorld) return { valid: true, errors: [], touched: true };
-        const hasSkills = (data.skills?.length || 0) > 0;
-        return {
-          valid: hasSkills,
-          errors: hasSkills ? [] : ['At least one skill is required'],
-          touched: true,
-        };
-      },
-      5: alwaysValid, // Finalize step is always valid
-      6: alwaysValid, // Quick start step is always valid
+      2: alwaysValid, // Attributes step — suggestions are optional
+      3: alwaysValid, // Skills step — suggestions are optional
+      4: alwaysValid, // Finalize step is always valid
+      5: alwaysValid, // Quick start step is always valid
     };
   }, []);
 
@@ -288,17 +259,12 @@ export default function WorldCreationWizard({
     });
   }, [wizard]);
 
-  const handleNext = useCallback(async (createOwnWorld?: boolean) => {
-    // Handle special case for step 0 where createOwnWorld might be passed
-    if (wizard.state.currentStep === 0 && createOwnWorld !== undefined) {
-      wizard.updateData({ createOwnWorld });
-    }
-    
-    // Special handling for step 2 (Description step) when creating own world
-    if (wizard.state.currentStep === 2 && wizard.state.data.createOwnWorld && !wizard.state.data.aiSuggestionsGenerated) {
+  const handleNext = useCallback(async () => {
+    // Auto-generate attribute/skill suggestions when leaving the Description step (step 1)
+    if (wizard.state.currentStep === 1 && !wizard.state.data.aiSuggestionsGenerated) {
       await generateAISuggestions();
     }
-    
+
     wizard.goNext();
   }, [wizard, generateAISuggestions]);
 
@@ -430,10 +396,6 @@ export default function WorldCreationWizard({
     wizard.updateData(updates);
   }, [wizard]);
 
-  const updateWizardState = useCallback((updates: Partial<WorldCreationData>) => {
-    wizard.updateData(updates);
-  }, [wizard]);
-
   const stepProps = {
     worldData: wizard.state.data,
     errors: wizard.state.errors || {},
@@ -461,22 +423,10 @@ export default function WorldCreationWizard({
       case 0:
         return (
           <div>
-            <TemplateStep
-              selectedTemplateId={wizard.state.data.selectedTemplateId}
-              onUpdate={updateWizardState}
-              onComplete={handleNext}
-              onCancel={handleCancel}
-              errors={wizard.state.errors || {}}
-            />
-          </div>
-        );
-      case 1:
-        return (
-          <div>
             <BasicInfoStep {...stepProps} />
           </div>
         );
-      case 2:
+      case 1:
         return (
           <div>
             <DescriptionStep
@@ -489,7 +439,7 @@ export default function WorldCreationWizard({
             />
           </div>
         );
-      case 3:
+      case 2:
         return (
           <div>
             <AttributeReviewStep
@@ -499,7 +449,7 @@ export default function WorldCreationWizard({
             />
           </div>
         );
-      case 4:
+      case 3:
         return (
           <div>
             <SkillReviewStep
@@ -509,7 +459,7 @@ export default function WorldCreationWizard({
             />
           </div>
         );
-      case 5:
+      case 4:
         return (
           <div>
             <FinalizeStep
@@ -521,9 +471,9 @@ export default function WorldCreationWizard({
             />
           </div>
         );
-      case 6:
+      case 5:
         // Quick Start Step
-        const createdWorld = wizard.state.data.createdWorldId 
+        const createdWorld = wizard.state.data.createdWorldId
           ? useWorldStore.getState().worlds[wizard.state.data.createdWorldId]
           : null;
         
@@ -574,8 +524,8 @@ export default function WorldCreationWizard({
           </div>
         </WizardStep>
         
-        {/* Hide main navigation on template step (0), finalize step (5), and quick start step (6) since they have their own navigation */}
-        {wizard.state.currentStep > 0 && wizard.state.currentStep < WIZARD_STEPS.length - 2 && (
+        {/* Hide main navigation on finalize step (4) and quick start step (5) since they have their own navigation */}
+        {wizard.state.currentStep < WIZARD_STEPS.length - 2 && (
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizard.canGoBack ? handleBack : undefined}
