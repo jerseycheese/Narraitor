@@ -23,6 +23,7 @@ jest.mock('@/components/CharacterCreationWizard', () => ({
 const mockWorldStore = {
   currentWorldId: 'world-1',
   setCurrentWorld: jest.fn(),
+  worlds: { 'world-1': { id: 'world-1', name: 'Test World' } },
 };
 
 jest.mock('@/state/worldStore', () => ({

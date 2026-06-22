@@ -13,7 +13,7 @@ import { useTutorial } from '@/components/TutorialProvider';
 export default function CharacterCreatePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentWorldId, setCurrentWorld } = useWorldStore();
+  const { currentWorldId, setCurrentWorld, worlds } = useWorldStore();
   const { startTour, isTourActive } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('characterCreation'));
   const [mounted, setMounted] = useState(false);
@@ -21,6 +21,10 @@ export default function CharacterCreatePage() {
   // Get worldId from URL parameter or use current world
   const worldIdFromUrl = searchParams.get('worldId');
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
+  // The wizard seeds its attribute/skill allocation from the world and captures it
+  // once on mount, so it must not render until the world is actually hydrated — else
+  // the attributes step comes up with no sliders to allocate (#1455).
+  const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
 
   // If URL has worldId but store doesn't, set it in the store
   useEffect(() => {
@@ -36,13 +40,13 @@ export default function CharacterCreatePage() {
 
   // Start the character-creation wizard tour once the wizard is on screen
   useEffect(() => {
-    if (mounted && effectiveWorldId && shouldShowTour && !isTourActive) {
+    if (mounted && currentWorld && shouldShowTour && !isTourActive) {
       const timer = setTimeout(() => {
         startTour('characterCreationWizard');
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [mounted, effectiveWorldId, shouldShowTour, isTourActive, startTour]);
+  }, [mounted, currentWorld, shouldShowTour, isTourActive, startTour]);
 
   if (!effectiveWorldId) {
     return (
@@ -69,6 +73,14 @@ export default function CharacterCreatePage() {
             ]}
           />
         </div>
+      </div>
+    );
+  }
+
+  if (!currentWorld) {
+    return (
+      <div className="component-create-character-page wizard-page">
+        <div className="wizard-empty-state">Preparing character creation…</div>
       </div>
     );
   }
