@@ -229,33 +229,6 @@ export const worldCreationTour: Step[] = [
     disableBeacon: true,
     disableScrolling: true,
   },
-  {
-    target: '[data-tutorial="quickstart-archetypes"]',
-    content: 'You can pick a pre-made character to jump straight into the story.',
-    placement: 'top',
-    disableBeacon: true,
-    hideBackButton: true,
-  },
-  {
-    target: '[data-tutorial="quickstart-random"]',
-    content: 'This button generates a fresh random character if you want a new option.',
-    placement: 'top',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tutorial="quickstart-custom"]',
-    content: 'This option lets you create a custom character with full control over details.',
-    placement: 'top',
-    disableBeacon: true,
-    disableScrolling: true,
-  },
-  {
-    target: '[data-tutorial="quickstart-skip"]',
-    content: 'You can skip this for now and jump into the game. You can create a character later.',
-    placement: 'top',
-    disableBeacon: true,
-    disableScrolling: true,
-  },
 ];
 
 export const tourStepToWizardStep: Record<number, number> = {
@@ -288,9 +261,4 @@ export const tourStepToWizardStep: Record<number, number> = {
   21: 4,
   22: 4,
   23: 4,
-  // Quick Start (step 5)
-  24: 5,
-  25: 5,
-  26: 5,
-  27: 5,
 };

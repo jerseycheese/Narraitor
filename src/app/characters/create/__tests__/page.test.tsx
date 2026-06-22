@@ -1,39 +1,19 @@
-import React, { useEffect } from 'react';
-import { act, render, waitFor } from '@testing-library/react';
+import React from 'react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 
 const mockStartTour = jest.fn();
-let triggerCustomize = false;
+let worldIdParam: string | null = null;
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
-  useSearchParams: () => ({ get: () => null }),
+  useSearchParams: () => ({ get: () => worldIdParam }),
 }));
 
 jest.mock('@/components/TutorialProvider', () => ({
   useTutorial: () => ({
     startTour: mockStartTour,
     isTourActive: false,
-    stopTour: jest.fn(),
   }),
-}));
-
-jest.mock('@/components/QuickStartCharacters/QuickStartCharacters', () => ({
-  QuickStartCharacters: ({
-    onReady,
-    onCustomizeClick,
-  }: {
-    onReady?: () => void;
-    onCustomizeClick?: () => void;
-  }) => {
-    useEffect(() => {
-      onReady?.();
-      if (triggerCustomize) {
-        triggerCustomize = false;
-        onCustomizeClick?.();
-      }
-    }, [onReady, onCustomizeClick]);
-    return <div data-testid="quickstart-characters" />;
-  },
 }));
 
 jest.mock('@/components/CharacterCreationWizard', () => ({
@@ -43,30 +23,14 @@ jest.mock('@/components/CharacterCreationWizard', () => ({
 const mockWorldStore = {
   currentWorldId: 'world-1',
   setCurrentWorld: jest.fn(),
-  worlds: {
-    'world-1': { id: 'world-1', name: 'Test World' },
-  },
 };
 
-const mockCharacterStore = {
-  createCharacter: jest.fn(),
-  setCurrentCharacter: jest.fn(),
-};
+jest.mock('@/state/worldStore', () => ({
+  useWorldStore: () => mockWorldStore,
+}));
 
 const mockSessionStore = {
-  initializeSession: jest.fn(),
-  updateTutorialProgress: jest.fn(),
   shouldShowTutorialPhase: jest.fn(() => true),
-  tutorialProgress: {
-    phases: {
-      characterCreation: {
-        quickStartCompleted: false,
-        completed: false,
-        skipped: false,
-        lastStep: 0,
-      },
-    },
-  },
 };
 
 jest.mock('@/state/sessionStore', () => {
@@ -76,73 +40,34 @@ jest.mock('@/state/sessionStore', () => {
   return { useSessionStore };
 });
 
-jest.mock('@/state/worldStore', () => ({
-  useWorldStore: () => mockWorldStore,
-}));
-
-jest.mock('@/state/characterStore', () => ({
-  useCharacterStore: () => mockCharacterStore,
-}));
-
-const setQuickStartCompleted = (quickStartCompleted: boolean) => {
-  mockSessionStore.tutorialProgress.phases.characterCreation.quickStartCompleted = quickStartCompleted;
-};
-
-const setTriggerCustomize = (value: boolean) => {
-  triggerCustomize = value;
-};
-
-const resetSessionStore = () => ({
-  initializeSession: jest.fn(),
-  updateTutorialProgress: jest.fn(),
-  shouldShowTutorialPhase: jest.fn(() => true),
-  tutorialProgress: {
-    phases: {
-      characterCreation: {
-        quickStartCompleted: false,
-        completed: false,
-        skipped: false,
-        lastStep: 0,
-      },
-    },
-  },
-});
-
-describe('CharacterCreatePage tutorial start', () => {
+describe('CharacterCreatePage', () => {
   beforeEach(() => {
     mockStartTour.mockClear();
-    Object.assign(mockSessionStore, resetSessionStore());
-    setTriggerCustomize(false);
+    worldIdParam = null;
+    mockWorldStore.currentWorldId = 'world-1';
+    mockSessionStore.shouldShowTutorialPhase = jest.fn(() => true);
   });
 
-  it('starts quick start tour when not completed', async () => {
-    setQuickStartCompleted(false);
+  it('renders the character creation wizard for the active world', async () => {
+    const { default: Page } = await import('../page');
+    render(<Page />);
+
+    expect(await screen.findByTestId('character-wizard')).toBeInTheDocument();
+  });
+
+  it('starts the character-creation wizard tour for new players', async () => {
     const { default: Page } = await import('../page');
     render(<Page />);
 
     await waitFor(() => {
-      expect(mockStartTour).toHaveBeenCalledWith('quickStartSelection');
+      expect(mockStartTour).toHaveBeenCalledWith('characterCreationWizard');
     });
   });
 
-  it('does not restart quick start tour after completion', async () => {
-    setQuickStartCompleted(true);
-    const { default: Page } = await import('../page');
-    render(<Page />);
-
-    await waitFor(() => {
-      expect(mockStartTour).not.toHaveBeenCalled();
-    });
-  });
-
-  it('does not auto-start wizard tour after character creation is completed', async () => {
+  it('does not start the tour once the character-creation phase is done', async () => {
     jest.useFakeTimers();
     try {
-      setQuickStartCompleted(true);
-      mockSessionStore.tutorialProgress.phases.characterCreation.completed = true;
       mockSessionStore.shouldShowTutorialPhase = jest.fn(() => false);
-      setTriggerCustomize(true);
-
       const { default: Page } = await import('../page');
       render(<Page />);
 

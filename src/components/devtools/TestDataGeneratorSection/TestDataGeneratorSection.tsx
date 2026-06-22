@@ -3,8 +3,6 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { Button } from '@/components/ui/button';
-// Using API routes for secure AI operations - combines both approaches
-import { generateFromTemplate } from '@/lib/generators/characterTemplates';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
@@ -187,101 +185,6 @@ export const TestDataGeneratorSection: React.FC = () => {
       alert(
         `Error generating test worlds: ${error instanceof Error ? error.message : 'Unknown error'}\\n\\nGenerated ${createdWorlds.length} worlds before error.`
       );
-    }
-  };
-
-  const handleGenerateCharacter = async () => {
-    const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
-    if (!currentWorld) {
-      alert('Please select a world first');
-      return;
-    }
-
-    // Generate test data using the traditional approach for form filling
-    const templateData = generateFromTemplate({
-      method: 'template',
-      world: currentWorld,
-    });
-
-    // Convert to the format expected by devtools
-    const testData = {
-      name: templateData.name,
-      attributes: currentWorld.attributes.map((attr) => {
-        const generated = templateData.attributes.find((a) => a.id === attr.id);
-        return {
-          attributeId: attr.id,
-          value:
-            generated?.value ||
-            Math.floor(Math.random() * (attr.maxValue - attr.minValue + 1)) +
-              attr.minValue,
-        };
-      }),
-      skills: currentWorld.skills.map((skill) => {
-        const generated = templateData.skills.find((s) => s.id === skill.id);
-        return {
-          skillId: skill.id,
-          level: generated?.level || Math.floor(Math.random() * 5) + 1,
-          experience: 0,
-          isActive: !!generated,
-        };
-      }),
-      background: {
-        history: templateData.background.description,
-        personality: templateData.background.personality,
-        goals: [templateData.background.motivation],
-        motivation: templateData.background.motivation,
-        physicalDescription: templateData.background.physicalDescription,
-        isKnownFigure: templateData.isKnownFigure,
-      },
-    };
-
-    // Store the complete wizard state
-    const wizardState = {
-      currentStep: 0,
-      worldId: currentWorld.id,
-      characterData: testData,
-      validation: {},
-      pointPools: {
-        attributes: {
-          total: currentWorld.settings.attributePointPool,
-          spent: testData.attributes.reduce((sum, attr) => sum + attr.value, 0),
-          remaining:
-            currentWorld.settings.attributePointPool -
-            testData.attributes.reduce((sum, attr) => sum + attr.value, 0),
-        },
-        skills: {
-          total: currentWorld.settings.skillPointPool,
-          spent: testData.skills
-            .filter((s) => s.isActive)
-            .reduce((sum, skill) => sum + skill.level, 0),
-          remaining:
-            currentWorld.settings.skillPointPool -
-            testData.skills
-              .filter((s) => s.isActive)
-              .reduce((sum, skill) => sum + skill.level, 0),
-        },
-      },
-    };
-
-    // Store it in sessionStorage
-    const storageKey = `character-creation-${currentWorld.id}`;
-    try {
-      sessionStorage.setItem(storageKey, JSON.stringify(wizardState));
-
-      // Verify it was stored
-      const stored = sessionStorage.getItem(storageKey);
-      if (!stored) {
-        throw new Error('Failed to store data in sessionStorage');
-      }
-
-      // Force a small delay to ensure storage is committed
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      // Use window.location for a hard navigation to ensure fresh page load
-      window.location.href = '/characters/create';
-    } catch (error) {
-      logger.error('[TestDataGenerator] Error storing test data:', error);
-      alert('Failed to store test data. Check console for details.');
     }
   };
 
@@ -720,17 +623,6 @@ export const TestDataGeneratorSection: React.FC = () => {
           title="Creates 5 diverse AI worlds with mix of original, 'set in', and 'based on' types for comprehensive testing"
         >
           Generate 5 Diverse AI Worlds
-        </Button>
-
-        <Button
-          onClick={handleGenerateCharacter}
-          
-          size="sm"
-          variant="success"
-          disabled={!effectiveWorldId}
-          title="Creates test character data and navigates to character creation form"
-        >
-          Generate & Fill Character Form
         </Button>
 
         <Button
