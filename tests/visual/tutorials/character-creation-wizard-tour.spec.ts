@@ -59,11 +59,13 @@ test('Character creation wizard tour snapshots (steps 0-4)', async ({
     firstPlay: { completed: true, skipped: true },
   });
 
-  const customizeButton = page.getByRole('button', {
-    name: 'Create Custom Character',
-  });
-  await expect(customizeButton).toBeVisible({ timeout: 15000 });
-  await customizeButton.click();
+  // The create page now lands directly on the wizard's Basic Info step —
+  // QuickStart was removed for 1.0 (#1455), so there's no "Create Custom
+  // Character" gate to click through.
+  const basicInfoName = page.locator(
+    'input[placeholder*="Enter character name"]'
+  );
+  await expect(basicInfoName).toBeVisible({ timeout: 15000 });
   await waitForContentStable(page);
 
   const wizardNext = page.locator(
