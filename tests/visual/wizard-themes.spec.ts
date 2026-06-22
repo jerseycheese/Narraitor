@@ -370,24 +370,12 @@ test.describe('Wizard Theme Differentiation', () => {
       test.setTimeout(120000);
       await openCharacterWizard(page, theme);
 
-      await captureStep(
-        page,
-        theme,
-        `wizard-character-${theme}-quickstart.png`
-      );
-
-      // Create Custom Character now lands directly on Basic Info — the
-      // template-selection step was removed for 1.0 (#1455).
-      const customButton = page.getByRole('button', {
-        name: 'Create Custom Character',
+      // The create page now lands directly on the wizard's Basic Info step —
+      // QuickStart and the template-selection step were removed for 1.0 (#1455).
+      await waitForNavigationHeading(page, 'Basic Information', {
+        timeout: 10000,
+        exact: true,
       });
-      if (await customButton.count()) {
-        await customButton.click();
-        await waitForNavigationHeading(page, 'Basic Information', {
-          timeout: 10000,
-          exact: true,
-        });
-      }
       await captureStep(
         page,
         theme,
