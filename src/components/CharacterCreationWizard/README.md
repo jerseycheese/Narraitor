@@ -100,5 +100,4 @@ The wizard appearance can be customized through:
 - [ ] Character portrait upload
 - [ ] AI-suggested backgrounds
 - [ ] Skill prerequisites
-- [ ] Character templates/archetypes
 - [ ] Import/export functionality

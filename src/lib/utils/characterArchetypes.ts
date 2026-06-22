@@ -134,44 +134,6 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
   return `${ageRange}-year-old human with a ${selectedBuild} build and ${selectedFeature}, perfectly suited for the ${genre} setting of ${worldName || 'this world'}.`;
 }
 
-/**
- * Generate a random archetype from the available options
- */
-export async function generateRandomArchetype(world: World, existingNames: string[] = []): Promise<CharacterArchetype> {
-  
-  const archetypes = await generateCharacterArchetypes(world, existingNames);
-  const randomIndex = Math.floor(globalRandom() * archetypes.length);
-  
-  // Modify the selected archetype to be more randomized
-  const selectedArchetype = archetypes[randomIndex];
-  
-  // Randomize the name further
-  const templates = getArchetypeTemplatesForGenre(world.genre);
-  const allNameTemplates = templates.flatMap(t => t.nameTemplates);
-  const randomBaseName = allNameTemplates[Math.floor(globalRandom() * allNameTemplates.length)];
-  
-  selectedArchetype.name = generateCharacterName(
-    { ...templates[0], nameTemplates: [randomBaseName] }, 
-    existingNames
-  );
-  
-  // Add some random variation to attributes (±1)
-  selectedArchetype.attributes = selectedArchetype.attributes.map(attr => ({
-    ...attr,
-    value: Math.max(
-      world.attributes.find(wa => wa.id === attr.id)?.minValue || 1,
-      Math.min(
-        world.attributes.find(wa => wa.id === attr.id)?.maxValue || 10,
-        attr.value + (globalRandom() > 0.5 ? 1 : -1)
-      )
-    )
-  }));
-  
-  // Reset random function if it was overridden elsewhere
-  resetRandomFunction();
-  
-  return selectedArchetype;
-}
 function generateCharacterName(template: ArchetypeTemplate, existingNames: string[] = []): string {
   const baseName = template.nameTemplates[Math.floor(globalRandom() * template.nameTemplates.length)];
   

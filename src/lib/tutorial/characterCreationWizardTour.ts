@@ -3,17 +3,6 @@ import { TutorialContent } from '@/components/TutorialProvider/TutorialContent';
 
 export const characterCreationWizardTour: Step[] = [
   {
-    target: '[data-tutorial="template-selector"]',
-    content: TutorialContent({
-      children: 'You can choose a character template to get a head start, or build your hero from scratch.',
-      example: 'Warrior for a combat-focused character with high Strength',
-    }),
-    placement: 'top',
-    disableBeacon: true,
-    disableScrolling: true,
-    data: { isEndOfPage: true },
-  },
-  {
     target: '[data-tutorial="basic-info"]',
     content: TutorialContent({
       children: "Here's where you'll name your character and add a description.",
@@ -68,5 +57,4 @@ export const tourStepToWizardStep: Record<number, number> = {
   2: 2,
   3: 3,
   4: 4,
-  5: 5,
 };

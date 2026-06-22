@@ -14,7 +14,6 @@ import {
 } from '@/components/shared/wizard';
 import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
-import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { BasicInfoStep } from './steps/BasicInfoStep';
 import { AttributesStep } from './steps/AttributesStep';
 import { SkillsStep } from './steps/SkillsStep';
@@ -253,35 +252,29 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     switch (wizard.state.currentStep) {
       case 0:
         return (
-          <div data-tutorial="template-selector">
-            <TemplateSelectionStep {...props} />
-          </div>
-        );
-      case 1:
-        return (
           <div data-tutorial="basic-info">
             <BasicInfoStep {...props} />
           </div>
         );
-      case 2:
+      case 1:
         return (
           <div data-tutorial="attribute-allocation">
             <AttributesStep {...props} />
           </div>
         );
-      case 3:
+      case 2:
         return (
           <div data-tutorial="skill-selection">
             <SkillsStep {...props} />
           </div>
         );
-      case 4:
+      case 3:
         return (
           <div data-tutorial="background-editor">
             <BackgroundStep {...props} />
           </div>
         );
-      case 5:
+      case 4:
         return (
           <div data-tutorial="portrait-generator">
             <PortraitStep {...props} />

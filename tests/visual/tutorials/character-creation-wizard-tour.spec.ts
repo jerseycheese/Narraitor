@@ -11,10 +11,9 @@ import {
   zeroPad,
 } from '../utils/tutorial-helpers';
 
-const steps = [0, 1, 2, 3, 4, 5];
+const steps = [0, 1, 2, 3, 4];
 
 const tutorialScrollTargets = [
-  '[data-tutorial="template-selector"]',
   '[data-tutorial="basic-info"]',
   '[data-tutorial="attribute-allocation"]',
   '[data-tutorial="skill-selection"]',
@@ -37,7 +36,7 @@ async function scrollTutorialTargetIntoView(
   await page.waitForTimeout(100);
 }
 
-test('Character creation wizard tour snapshots (steps 0-5)', async ({
+test('Character creation wizard tour snapshots (steps 0-4)', async ({
   page,
 }) => {
   test.setTimeout(180000);
@@ -60,11 +59,13 @@ test('Character creation wizard tour snapshots (steps 0-5)', async ({
     firstPlay: { completed: true, skipped: true },
   });
 
-  const customizeButton = page.getByRole('button', {
-    name: 'Create Custom Character',
-  });
-  await expect(customizeButton).toBeVisible({ timeout: 15000 });
-  await customizeButton.click();
+  // The create page now lands directly on the wizard's Basic Info step —
+  // QuickStart was removed for 1.0 (#1455), so there's no "Create Custom
+  // Character" gate to click through.
+  const basicInfoName = page.locator(
+    'input[placeholder*="Enter character name"]'
+  );
+  await expect(basicInfoName).toBeVisible({ timeout: 15000 });
   await waitForContentStable(page);
 
   const wizardNext = page.locator(
@@ -76,11 +77,7 @@ test('Character creation wizard tour snapshots (steps 0-5)', async ({
     await stopTour(page);
 
     if (stepIndex === 1) {
-      // Step 0 -> Step 1 (Basic Info)
-      await wizardNext.click();
-      await waitForContentStable(page);
-    } else if (stepIndex === 2) {
-      // Step 1 -> Step 2 (Attributes)
+      // Step 0 (Basic Info) -> Step 1 (Attributes): name is required
       const nameInput = page.locator(
         'input[placeholder*="Enter character name"]'
       );
@@ -88,8 +85,8 @@ test('Character creation wizard tour snapshots (steps 0-5)', async ({
       await nameInput.fill('Test Character');
       await wizardNext.click();
       await waitForContentStable(page);
-    } else if (stepIndex === 3) {
-      // Step 2 -> Step 3 (Skills)
+    } else if (stepIndex === 2) {
+      // Step 1 (Attributes) -> Step 2 (Skills)
       // Allocate required points so we can advance to the skills step.
       await page.evaluate(() => {
         const sliders = Array.from(
@@ -136,8 +133,8 @@ test('Character creation wizard tour snapshots (steps 0-5)', async ({
       await waitForContentStable(page);
       await wizardNext.click();
       await waitForContentStable(page);
-    } else if (stepIndex === 4) {
-      // Step 3 -> Step 4 (Background)
+    } else if (stepIndex === 3) {
+      // Step 2 (Skills) -> Step 3 (Background)
       // Skill selection is required (at least 2 and points allocated)
       const skillToggles = page.locator(
         'button:has-text("Excluded"), button:has-text("Not Selected")'
@@ -179,8 +176,8 @@ test('Character creation wizard tour snapshots (steps 0-5)', async ({
 
       await wizardNext.click();
       await waitForContentStable(page);
-    } else if (stepIndex === 5) {
-      // Step 4 -> Step 5 (Portrait)
+    } else if (stepIndex === 4) {
+      // Step 3 (Background) -> Step 4 (Portrait)
       // Background history (50+) and personality (20+) are required
       const historyTextarea = page.locator('textarea[placeholder*="history"]');
       const personalityTextarea = page.locator(

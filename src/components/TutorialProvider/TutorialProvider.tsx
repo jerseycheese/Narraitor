@@ -50,9 +50,6 @@ const loadTour = async (tourId: TutorialPhase | string): Promise<{ steps: Step[]
       case 'worldGeneration':
         const { worldGenerationTour } = await import('@/lib/tutorial/worldGenerationTour');
         return { steps: normalizeSteps(worldGenerationTour) };
-      case 'quickStartSelection':
-        const { quickStartTour } = await import('@/lib/tutorial/quickStartTour');
-        return { steps: normalizeSteps(quickStartTour) };
       case 'characterCreationWizard':
         const { characterCreationWizardTour, tourStepToWizardStep: charMapping } = await import('@/lib/tutorial/characterCreationWizardTour');
         return { steps: normalizeSteps(characterCreationWizardTour), mapping: charMapping };
@@ -257,9 +254,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       missingTargetRef.current = null;
       if (activeTour) {
         if (status === STATUS.FINISHED) {
-          if (activeTour === 'quickStartSelection') {
-            updateTutorialProgress('characterCreation', { quickStartCompleted: true });
-          } else if (activeTour === 'characterCreationWizard') {
+          if (activeTour === 'characterCreationWizard') {
             completeTutorialPhase('characterCreation');
           } else if (stepMapping) {
             const wizardStepValues = Object.values(stepMapping);
@@ -279,7 +274,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
             }
           }
         } else {
-          if (activeTour === 'quickStartSelection' || activeTour === 'characterCreationWizard') {
+          if (activeTour === 'characterCreationWizard') {
             updateTutorialProgress('characterCreation', { skipped: true });
           } else if (activeTour in tutorialProgress.phases) {
             updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });
@@ -429,7 +424,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setPauseReason(null);
     missingTargetRef.current = null;
     if (activeTour) {
-      if (activeTour === 'quickStartSelection' || activeTour === 'characterCreationWizard') {
+      if (activeTour === 'characterCreationWizard') {
         updateTutorialProgress('characterCreation', { skipped: true });
       } else if (activeTour in tutorialProgress.phases) {
         updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });

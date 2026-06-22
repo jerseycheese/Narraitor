@@ -40,17 +40,17 @@ const captureFullStep = async (page: Page, name: string): Promise<void> => {
 /**
  * Character Creation Wizard Visual Regression Test (Sequential)
  *
- * Single initialization that walks through QuickStart → Steps 0–5,
+ * Single initialization that walks through the wizard Steps 1–5,
  * taking screenshots at each stage to reduce flakiness and runtime.
  *
  * DS coverage (#1264): single-theme (default DS1) by design. All three design
  * systems for the character wizard are already covered by the "Character creation
  * wizard steps render <DS> structure" tests in tests/visual/wizard-themes.spec.ts.
- * Tripling this full QuickStart→Step5 sequence would duplicate that coverage at
+ * Tripling this full Step1→Step5 sequence would duplicate that coverage at
  * much higher runtime/flake cost.
  */
 
-test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', async ({ page }) => {
+test('Character creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
   test.setTimeout(90000); // Extended timeout for complex wizard
   // Seed once and open worlds page so the app picks up state
   await seedTestData(page);
@@ -63,52 +63,10 @@ test('Character creation wizard visual sequence (QuickStart → Steps 0–5)', a
   // Ensure main structure is present
   await page.waitForSelector('h1', { timeout: 10000 });
 
-  await test.step('QuickStart screenshot', async () => {
-    // Allow archetype generation to complete - this needs extra time
-    await waitForContentStable(page);
-    await page.waitForFunction(
-      () => {
-        const text = document.body.textContent ?? '';
-        if (!text.includes('Creating archetypes')) {
-          return true;
-        }
-        return Array.from(document.querySelectorAll('button')).some((button) =>
-          button.textContent?.includes('Create Custom Character')
-        );
-      },
-      { timeout: 10000 }
-    );
-
-    await hideDynamicContent(page);
-    // Wait for any Joyride scroll animation, then force scroll to top so
-    // the sidebar logo is in frame, and clip to viewport-sized region.
-    // Avoids the Joyride overlay phantom that absolute-positions below
-    // the visible content. See PR #1233.
-    await page.waitForTimeout(400);
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(100);
-    await expect(page).toHaveScreenshot('character-creation-quickstart.png', {
-      clip: { x: 0, y: 0, width: 1280, height: 1080 },
-    });
-  });
-
-  await test.step('Step 0: Template Selection', async () => {
-    // Click Create Custom Character if visible
-    const customButton = page.locator('button:has-text("Create Custom Character")');
-    if (await customButton.count() > 0) {
-      await customButton.click();
-      await waitForNavigationHeading(page, 'Choose a Starting Template', { timeout: 5000, exact: true });
-    }
-    await captureFullStep(page, 'character-creation-step0-template-selection.png');
-  });
-
   await test.step('Step 1: Basic Info', async () => {
-    // Skip template selection by clicking Next
-    const skipTemplateBtn = page.locator('button:has-text("Next")');
-    if (await skipTemplateBtn.count() > 0) {
-      await skipTemplateBtn.click();
-      await waitForNavigationHeading(page, 'Basic Information', { timeout: 5000, exact: true });
-    }
+    // The create page now lands directly on the wizard's Basic Info step —
+    // QuickStart and the template-selection step were removed for 1.0 (#1455).
+    await waitForNavigationHeading(page, 'Basic Information', { timeout: 10000, exact: true });
     await captureFullStep(page, 'character-creation-step1-basic-info.png');
   });
 
