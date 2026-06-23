@@ -5197,14 +5197,18 @@ body.manuscript-overlay-open {
   min-width: 0;
 }
 
-/* F49: keep the location pinned to the top of the scene-status surface so a
-   crowded scene's character list can't scroll it out of view. Inert where the
-   surface doesn't scroll (the DS2/DS3 inline bars have no scroll ancestor). */
 .scene-status-location {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   min-width: 0;
+}
+
+/* F49: pin the location to the top of the DS1 scene-status rail so a crowded
+   scene's character list can't scroll it out of view. DS2/DS3 render the
+   location as an always-visible top bar, so the sticky is scoped to DS1 (the
+   only theme whose rail scrolls). */
+[data-theme="ds1"] .scene-status-location {
   position: sticky;
   top: 0;
 }
