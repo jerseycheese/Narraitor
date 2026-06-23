@@ -2,12 +2,17 @@
 
 import { useInventoryStore } from '@/state/inventoryStore';
 import { applyStartingInventory } from '../startingInventory';
-import { ARCHETYPE_TEMPLATES } from '@/lib/constants/characterArchetypeTemplates';
+import type { InventoryItemInput } from '@/types/inventory.types';
 import { setupTestTimers, cleanupTestTimers } from '@/lib/test-utils/testTimers';
 
-const warriorInventory = () =>
-  ARCHETYPE_TEMPLATES.fantasy.find((template) => template.name === 'Warrior')
-    ?.startingInventory;
+// Inline starting-inventory fixture (previously read from the now-removed archetype
+// templates): an equipped weapon, an unequipped item, and a stackable consumable —
+// enough to exercise applyStartingInventory's tagging and equip handling.
+const warriorInventory = (): InventoryItemInput[] => [
+  { name: 'Steel Sword', description: 'A well-balanced blade, kept sharp.', categoryId: 'equipment', equipped: true },
+  { name: 'Wooden Shield', description: 'Battered but reliable.', categoryId: 'equipment' },
+  { name: 'Health Potion', description: 'Restores vitality when wounded.', categoryId: 'consumables', quantity: 3, stackable: true, maxStack: 10 },
+];
 
 describe('applyStartingInventory', () => {
   const characterId = 'char-start';
