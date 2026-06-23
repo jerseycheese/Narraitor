@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { World, WorldAttribute } from '@/types/world.types';
 import { AttributeSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import AttributeRangeEditor from '@/components/forms/AttributeRangeEditor';
 import { AttributeEditor } from '@/components/world/AttributeEditor/AttributeEditor';
 import {
   wizardStyles,
@@ -14,6 +13,7 @@ import {
   WizardTextArea,
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import type { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 
 interface WorldDataWithMeta extends Partial<World> {
@@ -402,30 +402,30 @@ export default function AttributeReviewStep({
                         />
                       </WizardFormGroup>
 
-                      {/* Fixed min/max range controls (for MVP) */}
-                      <div>
-                        <AttributeRangeEditor
-                          attribute={{
-                            id: '',
-                            worldId: '',
-                            name: suggestion.name,
-                            description: suggestion.description,
-                            baseValue: suggestion.baseValue,
-                            minValue: 1, // Fixed for MVP
-                            maxValue: 10, // Fixed for MVP
+                      {/* Starting value (min/max fixed to 1–10 for MVP). A
+                          number stepper matches the custom-attribute editor's
+                          Min/Max fields and reads cleaner than a 1–10 slider. */}
+                      <WizardFormGroup label="Starting Value (1–10)">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={10}
+                          step={1}
+                          value={suggestion.baseValue}
+                          className="wizard-attribute-value-input"
+                          data-testid={`attribute-base-value-input-${index}`}
+                          aria-label={`Starting value for ${suggestion.name}`}
+                          onChange={(e) => {
+                            const next = Number(e.target.value);
+                            if (Number.isNaN(next)) return;
+                            handleModifyAttribute(
+                              index,
+                              'baseValue',
+                              Math.min(10, Math.max(1, next))
+                            );
                           }}
-                          onChange={(updates) => {
-                            if (updates.baseValue !== undefined) {
-                              handleModifyAttribute(
-                                index,
-                                'baseValue',
-                                updates.baseValue
-                              );
-                            }
-                          }}
-                          showLabels={false}
                         />
-                      </div>
+                      </WizardFormGroup>
                     </div>
                   )}
                 </div>

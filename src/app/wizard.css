@@ -3109,3 +3109,178 @@
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   World-wizard DS pass (#1433)
+
+   Scoped to .component-world-creation-wizard (or world-only classes)
+   so a parallel character-wizard branch can't collide. Appended last
+   so source order wins over the shared rules above for the world wizard.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── F8 + F13 — DS3: vertical step-nav, Back/Next moved to the bottom ─── */
+
+[data-theme="ds3"] .component-world-creation-wizard {
+  grid-template-areas:
+    "progress"
+    "content"
+    "actions";
+}
+
+[data-theme="ds3"] .component-world-creation-wizard > .component-wizard-progress {
+  overflow-x: visible;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-row {
+  flex-flow: column nowrap;
+  align-items: stretch;
+  gap: var(--space-1_5);
+  min-width: 0;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container {
+  padding: var(--space-3);
+}
+
+/* ─── F10 — world-type radio controls ─── */
+
+.component-world-creation-wizard .wizard-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-world-creation-wizard .wizard-radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2_5);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+/* Native radios inherit .form-input's width:100% from the shared Input
+   component; pin them back to their intrinsic size (the F10 stretch fix). */
+.component-world-creation-wizard .wizard-radio-option input[type="radio"].form-input {
+  width: auto;
+  flex: 0 0 auto;
+  margin-top: var(--space-0_5);
+}
+
+.component-world-creation-wizard .wizard-radio-option:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.component-world-creation-wizard .wizard-radio-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+  min-width: 0;
+}
+
+.component-world-creation-wizard .wizard-radio-option-desc {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+/* ─── F11 — suggestions panel spacing ─── */
+
+.component-world-creation-wizard .wizard-suggestion-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.component-world-creation-wizard .wizard-suggestion-actions {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.component-world-creation-wizard .wizard-suggestion-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.component-world-creation-wizard .wizard-suggestion-preview {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-5);
+}
+
+.component-world-creation-wizard .wizard-suggestion-preview-group {
+  flex: 1 1 calc(var(--space-8) * 8);
+  min-width: 0;
+}
+
+.component-world-creation-wizard .wizard-suggestion-preview-heading {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-world-creation-wizard .wizard-suggestion-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.component-world-creation-wizard .wizard-suggestion-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+}
+
+.component-world-creation-wizard .wizard-suggestion-item-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-world-creation-wizard .wizard-suggestion-item-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+/* ─── F12 — attribute starting-value number field ─── */
+
+.component-world-creation-wizard .wizard-attribute-value-input {
+  max-width: calc(var(--space-8) * 5);
+}
+
+/* ─── F15 — skill difficulty legend ─── */
+
+.component-world-creation-wizard .wizard-difficulty-legend {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.component-world-creation-wizard .wizard-difficulty-legend-label {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* ─── F17 — densify review cards ─── */
+
+.component-world-creation-wizard .wizard-review-card {
+  padding: var(--space-3);
+  gap: var(--space-1_5);
+}
+
+.component-world-creation-wizard .wizard-review-card-head {
+  gap: var(--space-2);
+}
