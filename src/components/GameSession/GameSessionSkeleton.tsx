@@ -49,7 +49,7 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
         <div className="manuscript-skeleton-footer-content">
           <div className="manuscript-skeleton-prompt manuscript-skeleton-pulse" />
           <div className="manuscript-skeleton-choice-grid">
-            {[1, 2].map((i) => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="manuscript-skeleton-choice manuscript-skeleton-pulse" />
             ))}
           </div>

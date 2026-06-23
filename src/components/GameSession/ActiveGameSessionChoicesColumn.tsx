@@ -120,9 +120,13 @@ const ActiveGameSessionChoicesColumn: React.FC<
           </div>
         )}
 
-        {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
-        {currentDecision?.decisionWeight ||
-        (currentDecision && segmentCount > 0) ? (
+        {/* Render ChoiceSelector if we have a decision OR if this is a resumed
+            session with existing segments — but while the next turn's choices
+            are generating, fall through to the skeleton so stale choices don't
+            linger then flip (F48). */}
+        {(currentDecision?.decisionWeight ||
+          (currentDecision && segmentCount > 0)) &&
+        !isGeneratingChoices ? (
           !hideChoices && (
             <div className={isProgressiveDisclosureEnabled ? (showSuggestedActions ? 'show-mobile-actions' : 'hide-mobile-actions') : ''}>
               <ChoiceSelector

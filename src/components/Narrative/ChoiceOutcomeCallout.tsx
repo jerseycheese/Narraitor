@@ -52,7 +52,7 @@ const buildConsequenceChips = (
         key: `relationship-${consequence.targetId}-${index}`,
         kind: 'relationship',
         direction: delta > 0 ? 'positive' : 'negative',
-        label: `${npcName} — trust ${delta > 0 ? '+' : '−'}${Math.abs(delta)}`,
+        label: `${npcName} ${delta > 0 ? '+' : '−'}${Math.abs(delta)} trust`,
       });
       return;
     }
@@ -65,7 +65,7 @@ const buildConsequenceChips = (
         key: `alignment-${index}`,
         kind: 'alignment',
         direction: value > 0 ? 'positive' : 'negative',
-        label: value > 0 ? 'Alignment — toward order' : 'Alignment — toward chaos',
+        label: value > 0 ? 'Order rises' : 'Chaos rises',
       });
     }
   });

@@ -198,10 +198,6 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     )}
 
                     <div className="manuscript-inventory-item-footer">
-                      <span className="manuscript-inventory-item-category">
-                        {categoryName}
-                      </span>
-
                       <div className="manuscript-inventory-actions">
                         {isEquippableCategory(item.categoryId) && (
                           <Button

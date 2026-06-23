@@ -166,16 +166,23 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Skill Requirements', () => {
-    it('shows skill-name badges without including requirement numbers in option text', () => {
+    it('surfaces a skill-and-DC badge for skill-gated options without leaking numbers into the option label', () => {
       const characterSkills = createCharacterSkills({ 'stealth-skill': 5, 'intimidation-skill': 7 });
       renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills, characterSkills});
       assertChoicesVisible(['Sneak past', 'Intimidate the guard', 'Walk directly']);
 
-      expect(screen.getByText(/^Stealth$/i)).toBeInTheDocument();
-      expect(screen.getByText(/^Intimidation$/i)).toBeInTheDocument();
+      // F47: the skill and its DC are shown up front so the player can see the gate.
+      expect(screen.getByText(/Stealth.*DC 10/i)).toBeInTheDocument();
+      expect(screen.getByText(/Intimidation.*DC 14/i)).toBeInTheDocument();
       expect(screen.queryByText(/^Skill$/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/Stealth\s*\d+/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/Intimidation\s*\d+/i)).not.toBeInTheDocument();
+    });
+
+    it('still surfaces the skill-and-DC badge when the character lacks the skill (F47)', () => {
+      // No character skills at all — the gate should still be visible before choosing.
+      renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills, characterSkills: []});
+
+      expect(screen.getByText(/Stealth.*DC 10/i)).toBeInTheDocument();
+      expect(screen.getByText(/Intimidation.*DC 14/i)).toBeInTheDocument();
     });
 
     it('limits the number of choices to 3', () => {

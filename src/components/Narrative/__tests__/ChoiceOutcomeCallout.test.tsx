@@ -127,8 +127,8 @@ describe('ChoiceOutcomeCallout consequence chips', () => {
       <ChoiceOutcomeCallout decisionId="decision-1" decisionText="You choose to pocket the ledger" />
     );
 
-    expect(screen.getByText('Marta — trust −15')).toBeInTheDocument();
-    expect(screen.getByText('Alignment — toward chaos')).toBeInTheDocument();
+    expect(screen.getByText('Marta −15 trust')).toBeInTheDocument();
+    expect(screen.getByText('Chaos rises')).toBeInTheDocument();
     expect(container.querySelectorAll('.choice-outcome-chip')).toHaveLength(2);
   });
 
@@ -159,6 +159,6 @@ describe('ChoiceOutcomeCallout consequence chips', () => {
     );
 
     expect(container.querySelectorAll('.choice-outcome-chip')).toHaveLength(1);
-    expect(screen.getByText('Alignment — toward order')).toBeInTheDocument();
+    expect(screen.getByText('Order rises')).toBeInTheDocument();
   });
 });

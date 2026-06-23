@@ -142,6 +142,16 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           />
         )}
 
+      {/* Rendered before the prose so the desktop float-right note sits in the
+          margin beside the text — a float only wraps content that follows it in
+          source order. Mobile renders it as a bottom sheet via CSS (F41). */}
+      {activeTerm && (
+        <TermDefinition
+          term={activeTerm}
+          onDismiss={handleTermDismiss}
+        />
+      )}
+
       <FormattedNarrativeContent
         content={formattedContent}
         className={clsx(
@@ -154,13 +164,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         definitionTerms={termNames}
         onTermClick={handleTermClick}
       />
-
-      {activeTerm && (
-        <TermDefinition
-          term={activeTerm}
-          onDismiss={handleTermDismiss}
-        />
-      )}
 
       {/* Debug Information Section (dev mode only) */}
       {settings.showPromptDebugInfo && resolvedSegment.metadata?.debugInfo && (

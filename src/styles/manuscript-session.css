@@ -1304,6 +1304,14 @@ body.manuscript-overlay-open {
 
 }
 
+/* F47: a skill the player hasn't met yet reads as a muted/locked gate rather
+   than the accent "you have this" treatment. Choice stays selectable. */
+.manuscript-skill-check-badge[data-met="false"] {
+  background: rgb(from var(--color-text-muted) r g b / 12%);
+  color: var(--color-text-muted);
+  border-color: rgb(from var(--color-text-muted) r g b / 25%);
+}
+
 .manuscript-suggested-action.is-selected .manuscript-skill-check-badge {
 
   background: rgb(from var(--color-text-inverse) r g b / 20%);
@@ -1393,7 +1401,9 @@ body.manuscript-overlay-open {
   z-index: 1;
   border-color: var(--color-border);
   background: var(--color-surface);
-  overflow-y: visible;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   padding: var(--space-4);
   pointer-events: auto;
   animation: manuscript-slide-in-right 220ms ease;
@@ -1470,7 +1480,9 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-drawer-content {
-  overflow: visible;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   display: block;
   padding: 0;
   color: var(--color-text-secondary);
@@ -1772,23 +1784,17 @@ body.manuscript-overlay-open {
 
 .manuscript-inventory-item-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-top: auto;
   padding-top: var(--space-3);
   border-top: 1px dashed var(--color-border);
 }
 
-.manuscript-inventory-item-category {
-  font-family: var(--font-system);
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-}
-
 .manuscript-inventory-actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--space-2);
 }
 
@@ -1799,6 +1805,7 @@ body.manuscript-overlay-open {
   letter-spacing: 0.05em;
   height: 1.75rem;
   padding-inline: var(--space-3);
+  white-space: nowrap;
 }
 
 /* Manuscript Choice History Styling */
@@ -2495,25 +2502,21 @@ body.manuscript-overlay-open {
 
 .manuscript-skeleton-prompt {
   height: 1.5rem;
-  width: 33%;
+  width: 60%;
   border-radius: var(--radius-sm);
 }
 
+/* Match the real choices block: single column, space-2 gap (F46). */
 .manuscript-skeleton-choice-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
-@media (width >= 768px) {
-  .manuscript-skeleton-choice-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
+/* Match the real suggested-action footprint: min-height 4.125rem, sharp radius. */
 .manuscript-skeleton-choice {
-  height: 3rem;
-  border-radius: var(--radius-md);
+  height: 4.125rem;
+  border-radius: var(--radius-sm);
 }
 
 .manuscript-skeleton-input {
@@ -3463,6 +3466,19 @@ body.manuscript-overlay-open {
   padding: var(--space-2) var(--space-2_5);
   background: transparent;
   font-size: 0.75rem;
+}
+
+/* F40: the transparent override above ties on specificity with the base active
+   rule and wins on source order, leaving the active button transparent while
+   its text flips to inverse — invisible. Restore the active fill for DS1. */
+[data-theme="ds1"] .manuscript-tools-menu-item-active {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+[data-theme="ds1"] .manuscript-tools-menu-item-active:hover {
+  background: var(--color-accent-hover);
+  color: var(--color-text-inverse);
 }
 
 /* Fix 70: DS1 tools menu item spacing — tighter gap between items */
@@ -5181,11 +5197,16 @@ body.manuscript-overlay-open {
   min-width: 0;
 }
 
+/* F49: keep the location pinned to the top of the scene-status surface so a
+   crowded scene's character list can't scroll it out of view. Inert where the
+   surface doesn't scroll (the DS2/DS3 inline bars have no scroll ancestor). */
 .scene-status-location {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   min-width: 0;
+  position: sticky;
+  top: 0;
 }
 
 .scene-status-location-label {
