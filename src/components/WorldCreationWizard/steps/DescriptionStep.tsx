@@ -99,16 +99,23 @@ export default function DescriptionStep({
     const skillList = (aiSuggestions?.skills || []).slice(0, 3);
 
     return (
-      <div data-testid="ai-suggestion-preview">
-        <div>
-          <h4>Attributes to explore</h4>
-          <ul>
+      <div className="wizard-suggestion-preview" data-testid="ai-suggestion-preview">
+        <div className="wizard-suggestion-preview-group">
+          <h4 className="wizard-suggestion-preview-heading">Attributes to explore</h4>
+          <ul className="wizard-suggestion-preview-list">
             {attributeList.length > 0 ? (
               attributeList.map((attribute, index) => (
-                <li key={`${attribute.name}-${index}`}>
-                  <span>{attribute.name}</span>
+                <li
+                  key={`${attribute.name}-${index}`}
+                  className="wizard-suggestion-item"
+                >
+                  <span className="wizard-suggestion-item-name">
+                    {attribute.name}
+                  </span>
                   {attribute.description ? (
-                    <span>{attribute.description}</span>
+                    <span className="wizard-suggestion-item-desc">
+                      {attribute.description}
+                    </span>
                   ) : null}
                 </li>
               ))
@@ -117,14 +124,23 @@ export default function DescriptionStep({
             )}
           </ul>
         </div>
-        <div>
-          <h4>Skill ideas</h4>
-          <ul>
+        <div className="wizard-suggestion-preview-group">
+          <h4 className="wizard-suggestion-preview-heading">Skill ideas</h4>
+          <ul className="wizard-suggestion-preview-list">
             {skillList.length > 0 ? (
               skillList.map((skill, index) => (
-                <li key={`${skill.name}-${index}`}>
-                  <span>{skill.name}</span>
-                  {skill.description ? <span>{skill.description}</span> : null}
+                <li
+                  key={`${skill.name}-${index}`}
+                  className="wizard-suggestion-item"
+                >
+                  <span className="wizard-suggestion-item-name">
+                    {skill.name}
+                  </span>
+                  {skill.description ? (
+                    <span className="wizard-suggestion-item-desc">
+                      {skill.description}
+                    </span>
+                  ) : null}
                 </li>
               ))
             ) : (
@@ -168,8 +184,8 @@ export default function DescriptionStep({
         title="Attribute & Skill Suggestions"
         description="Suggested attributes and skills based on your world description."
       >
-        <div>
-          <div>
+        <div className="wizard-suggestion-section">
+          <div className="wizard-suggestion-actions">
             <Button
               type="button"
               onClick={() => {
@@ -185,7 +201,7 @@ export default function DescriptionStep({
                   ? 'Regenerate suggestions'
                   : 'Generate suggestions'}
             </Button>
-            <span>
+            <span className="wizard-suggestion-hint">
               {hasAISuggestions && suggestionMeta?.source
                 ? SUGGESTION_SOURCE_LABELS[suggestionMeta.source]
                 : meetsAIMinimumLength
