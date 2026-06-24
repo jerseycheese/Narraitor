@@ -190,9 +190,15 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
           await descriptionInput.fill('A test skill for visual regression testing.');
           await page.waitForTimeout(150);
         }
-        const testAttributeCheckbox = page.locator('input[type="checkbox"]:near(:text("Test Attribute"))');
-        if (await testAttributeCheckbox.count() > 0) {
-          await testAttributeCheckbox.check();
+        // The SkillEditor lists one checkbox per world attribute (ids start
+        // with "attribute-"). With the AI suggestions mocked there are several,
+        // so the old ':near(Test Attribute)' match resolved to multiple
+        // elements and threw a strict-mode violation. Checking the first
+        // attribute satisfies the "at least one attribute" rule the editor
+        // requires before "Create Skill" enables.
+        const attributeCheckbox = page.locator('input[id^="attribute-"]').first();
+        if (await attributeCheckbox.count() > 0) {
+          await attributeCheckbox.check();
           await page.waitForTimeout(150);
         }
         const createSkillBtn = page.getByRole('button', { name: /create skill/i });
