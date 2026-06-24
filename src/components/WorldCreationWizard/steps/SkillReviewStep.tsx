@@ -72,6 +72,16 @@ interface SkillReviewStepProps {
  * @param props - Component props
  * @returns JSX element for the skill review step
  */
+const difficultyBadgeClass = (difficulty: string): string => {
+  const variant =
+    difficulty === 'easy'
+      ? wizardStyles.badge.success
+      : difficulty === 'medium'
+        ? wizardStyles.badge.warning
+        : wizardStyles.badge.danger;
+  return `${wizardStyles.badge.base} ${variant}`;
+};
+
 export default function SkillReviewStep({
   worldData,
   suggestions,
@@ -429,6 +439,23 @@ export default function SkillReviewStep({
         )}
 
         <div className="wizard-review-list">
+          {(localSuggestions.length > 0 || customSkills.length > 0) && (
+            <div
+              className="wizard-difficulty-legend"
+              data-testid="skill-difficulty-legend"
+            >
+              <span className="wizard-difficulty-legend-label">Difficulty</span>
+              {SKILL_DIFFICULTIES.map((difficulty) => (
+                <span
+                  key={difficulty.value}
+                  className={difficultyBadgeClass(difficulty.value)}
+                  title={difficulty.description}
+                >
+                  {difficulty.label}
+                </span>
+              ))}
+            </div>
+          )}
           <div className="wizard-review-suggestions">
             {localSuggestions.length === 0 ? (
               <div className="wizard-empty-state">
@@ -450,15 +477,7 @@ export default function SkillReviewStep({
                   <div className="wizard-review-card-head">
                     <div className="wizard-review-card-meta">
                       <span>{suggestion.name}</span>
-                      <span
-                        className={`${wizardStyles.badge.base} ${
-                          suggestion.difficulty === 'easy'
-                            ? wizardStyles.badge.success
-                            : suggestion.difficulty === 'medium'
-                              ? wizardStyles.badge.warning
-                              : wizardStyles.badge.danger
-                        }`}
-                      >
+                      <span className={difficultyBadgeClass(suggestion.difficulty)}>
                         {suggestion.difficulty}
                       </span>
                       {suggestion.isModified && <span>Modified</span>}
@@ -588,13 +607,6 @@ export default function SkillReviewStep({
                                 </p>
                               )}
                             </div>
-                            {suggestion.selectedAttributeNames &&
-                              suggestion.selectedAttributeNames.length > 0 && (
-                                <div>
-                                  Selected:{' '}
-                                  {suggestion.selectedAttributeNames.join(', ')}
-                                </div>
-                              )}
                           </WizardFormGroup>
                         </div>
                       </div>
@@ -696,15 +708,7 @@ export default function SkillReviewStep({
                       <div className="wizard-review-card-meta">
                         <span>{skill.name}</span>
                         <span>Custom</span>
-                        <span
-                          className={`${wizardStyles.badge.base} ${
-                            skill.difficulty === 'easy'
-                              ? wizardStyles.badge.success
-                              : skill.difficulty === 'medium'
-                                ? wizardStyles.badge.warning
-                                : wizardStyles.badge.danger
-                          }`}
-                        >
+                        <span className={difficultyBadgeClass(skill.difficulty)}>
                           {skill.difficulty}
                         </span>
                         {skill.attributeIds &&

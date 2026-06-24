@@ -1841,21 +1841,8 @@
 
 [data-theme="ds1"] .world-detail-section h2 {
   position: relative;
-  padding-top: var(--space-3);
   font-weight: 500;
   letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"] .world-detail-section h2::before {
-  content: "Section";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
 }
 
 [data-theme="ds1"] .world-detail-section h2::after {
@@ -4225,8 +4212,9 @@
 }
 
 .world-detail-npc {
+  --world-detail-npc-avatar-size: 3.5rem;
   display: grid;
-  grid-template-columns: var(--space-8) 1fr;
+  grid-template-columns: var(--world-detail-npc-avatar-size) 1fr;
   align-items: start;
   gap: var(--space-3);
   padding: var(--space-3);
@@ -4239,8 +4227,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--space-8);
-  height: var(--space-8);
+  width: var(--world-detail-npc-avatar-size);
+  height: var(--world-detail-npc-avatar-size);
   overflow: hidden;
   border-radius: var(--radius-full, 9999px);
   object-fit: cover;
@@ -4394,6 +4382,22 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-muted);
+}
+
+/* F25 — World image details: densify. The generation prompt is long, so let it
+   span the full grid width as a compact block (fewer wrapped lines) and tighten
+   the surrounding rhythm so the section stops dominating the page. */
+section[aria-labelledby="image-details-heading"] .world-detail-meta-grid {
+  gap: var(--space-2);
+}
+
+section[aria-labelledby="image-details-heading"] .component-data-field-stacked {
+  grid-column: 1 / -1;
+}
+
+section[aria-labelledby="image-details-heading"] .component-data-field-stacked > div:last-child {
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 /* DS1 manuscript overlay — sharper borders, no card background */
@@ -4865,7 +4869,12 @@
 
 /* DS1 detail — manuscript spread with margin rail */
 
-[data-theme="ds1"] .world-detail-body,
+[data-theme="ds1"] .world-detail-body {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  column-gap: var(--space-6);
+}
+
 [data-theme="ds1"] .character-detail-body {
   display: grid;
   grid-template-columns: 12rem 1fr;
@@ -5023,6 +5032,13 @@
 
 [data-theme="ds2"] .world-detail-section:first-child,
 [data-theme="ds2"] .character-detail-section:first-child {
+  grid-column: 1 / -1;
+}
+
+/* F23 — balance the 2-col grid: a lone trailing section (even count, i.e. odd
+   number of cards after the full-width hero) spans the row instead of leaving
+   an empty half. */
+[data-theme="ds2"] .world-detail-section:last-child:nth-child(even) {
   grid-column: 1 / -1;
 }
 
@@ -5301,6 +5317,12 @@
 
 [data-theme="ds3"] .world-detail-section:first-child,
 [data-theme="ds3"] .character-detail-section:first-child {
+  grid-column: 1 / -1;
+}
+
+/* F23 — balance the 3-col grid: a lone trailing section (one card left over
+   after the full-width hero) spans the row instead of stranding a single card. */
+[data-theme="ds3"] .world-detail-section:last-child:nth-child(3n + 2) {
   grid-column: 1 / -1;
 }
 

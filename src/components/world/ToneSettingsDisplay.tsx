@@ -49,7 +49,7 @@ export function ToneSettingsDisplay({
         world.
       </p>
 
-      <div>
+      <div className="world-detail-meta-grid">
         <DataField
           label="Content Rating"
           value={getContentRatingDisplay()}
