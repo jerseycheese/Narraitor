@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
+import { mockApiEndpoints } from './utils/mockApi';
 
 /**
  * World creation wizard — full sequential flow, single-theme (default DS1).
@@ -52,6 +53,12 @@ const captureWizardStep = async (page: Page, name: string): Promise<void> => {
 
 test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
   test.setTimeout(45000); // Extended timeout for complex wizard
+  // Deterministic AI: Step 3 (description -> attributes) calls
+  // /api/ai/analyze-world, which has no key in CI and throws — leaving the
+  // attributes panel mid-render when the capture fires, so the full-page
+  // screenshot comes back short and the diff fails (a develop-wide flake).
+  // Mocking the AI routes makes the analysis resolve instantly and stably.
+  await mockApiEndpoints(page);
   await seedTestData(page);
   await page.goto('/worlds');
   await waitForContentStable(page);
@@ -183,9 +190,15 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
           await descriptionInput.fill('A test skill for visual regression testing.');
           await page.waitForTimeout(150);
         }
-        const testAttributeCheckbox = page.locator('input[type="checkbox"]:near(:text("Test Attribute"))');
-        if (await testAttributeCheckbox.count() > 0) {
-          await testAttributeCheckbox.check();
+        // The SkillEditor lists one checkbox per world attribute (ids start
+        // with "attribute-"). With the AI suggestions mocked there are several,
+        // so the old ':near(Test Attribute)' match resolved to multiple
+        // elements and threw a strict-mode violation. Checking the first
+        // attribute satisfies the "at least one attribute" rule the editor
+        // requires before "Create Skill" enables.
+        const attributeCheckbox = page.locator('input[id^="attribute-"]').first();
+        if (await attributeCheckbox.count() > 0) {
+          await attributeCheckbox.check();
           await page.waitForTimeout(150);
         }
         const createSkillBtn = page.getByRole('button', { name: /create skill/i });
