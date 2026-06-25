@@ -51,17 +51,18 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     }
   }, [getIsNearBottom]);
 
-  // Auto-scroll to bottom when new segments are added (only if near bottom)
+  // Auto-scroll to the newest segment when one is appended. A new segment
+  // means the player advanced the story (a deliberate turn), so re-arm
+  // bottom-anchoring and scroll into view even if they'd scrolled up to
+  // re-read — the streaming-growth ResizeObserver then keeps it in view (F51).
   useEffect(() => {
     if (segments.length > prevSegmentCountRef.current && scrollViewportRef.current) {
-      // Only auto-scroll if user hasn't manually scrolled or is near bottom
-      if (!hasUserScrollInteractionRef.current || isNearBottomRef.current) {
-        scrollViewportRef.current.scrollTo({
-          top: scrollViewportRef.current.scrollHeight,
-          behavior: 'auto'
-        });
-        hasUserScrollInteractionRef.current = false;
-      }
+      hasUserScrollInteractionRef.current = false;
+      isNearBottomRef.current = true;
+      scrollViewportRef.current.scrollTo({
+        top: scrollViewportRef.current.scrollHeight,
+        behavior: 'auto'
+      });
     }
     prevSegmentCountRef.current = segments.length;
   }, [segments.length]);

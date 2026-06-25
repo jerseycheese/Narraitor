@@ -76,6 +76,16 @@ describe('ActiveGameSessionChoicesColumn', () => {
     expect(root).toHaveAttribute('aria-busy', 'true');
   });
 
+  it('shows the loading skeleton instead of stale choices while the next turn generates (F48)', () => {
+    const { container } = render(
+      <ActiveGameSessionChoicesColumn {...baseProps} isGeneratingChoices={true} />
+    );
+
+    // The stale decision's ChoiceSelector is suppressed in favor of the skeleton.
+    expect(ChoiceSelector).not.toHaveBeenCalled();
+    expect(container.querySelector('.manuscript-choices-skeleton')).toBeInTheDocument();
+  });
+
   it('shows suggested actions count when progressive disclosure is enabled', () => {
     render(
       <ActiveGameSessionChoicesColumn
