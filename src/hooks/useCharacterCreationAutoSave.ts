@@ -47,8 +47,7 @@ interface RecoveryDataPreview {
  * - Recovery data detection on mount
  * - Visual save status feedback
  * - Manual save clearing on completion
- * - Migration from sessionStorage to localStorage
- * 
+ *
  * @param worldId - The ID of the world for which the character is being created
  * @returns Object containing save state, data handlers, and recovery status
  * 
