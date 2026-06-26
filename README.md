@@ -46,7 +46,7 @@ Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 ## Getting It Running
 
-You'll need Node.js (v18+), npm, and a Google Gemini API key. The API key stays server-side for security; no client exposure.
+You'll need Node.js (v18+), npm, and a Google Gemini API key. For local development the key lives in a server-side env file (`GEMINI_API_KEY`, below). In normal use, players bring their own key — see [AI Integration Details](#ai-integration-details).
 
 ```bash
 # Clone and set up
@@ -229,13 +229,13 @@ The app separates concerns into clear domains:
 
 **State Persistence**: Zustand stores with IndexedDB backing. Game sessions persist across browser sessions, and there's graceful fallback to memory-only if IndexedDB fails.
 
-**Security**: API keys stay server-side. All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse.
+**Security**: All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse. Players bring their own Gemini key, sent per request and used server-side for that one call — never persisted or logged. A server-side `GEMINI_API_KEY` env var acts as a local/dev fallback.
 
 **Design System**: Three structurally-different design systems (DS1/DS2/DS3) ship together; the user picks one. See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts), [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for the rationale, and [public_docs/design-system/](public_docs/design-system/) for the full reference. Canon order is **showcase routes (`/dev/design-system{,-2,-3}`) > Storybook (`npm run storybook`) > app** — Storybook's toolbar has a DS1/DS2/DS3 + light/dark switcher for verifying components across all six combinations.
 
 ## AI Integration Details
 
-The AI system routes everything through Next.js API endpoints (`/api/narrative/generate`, `/api/narrative/choices`) for security. Your API key never touches the browser.
+The AI system routes everything through Next.js API endpoints (`/api/narrative/generate`, `/api/narrative/choices`). A player's own Gemini key travels from the browser to those routes in a per-request header (`x-provider-api-key`), gets used server-side for that single call, and is never logged or persisted. The `GEMINI_API_KEY` env var below is a local/dev fallback that stays server-side.
 
 ```bash
 # .env.local
