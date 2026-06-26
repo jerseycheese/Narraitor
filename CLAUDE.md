@@ -66,7 +66,7 @@ Committed under `.claude/` and shipped with the repo:
 - `narraitor-pattern-alignment-skill` — run AFTER any code change touching src/, before committing.
 - `style-port` skill — the only sanctioned way to port reference/demo inline styles into production CSS (rigid 6-phase process, token-based, no `!important`).
 - `review` skill — PR review flow: fetch the latest remote diff, run lint + tests, verdict.
-- Agents: design-system-cop, formatting-cop, issue-prioritizer, pr-closer, test-fixer.
+- Agents: design-system-enforcer, format-check, issue-prioritizer, pr-merge-issue-updater, test-fix.
 
 ## Running in Claude Code cloud
 
