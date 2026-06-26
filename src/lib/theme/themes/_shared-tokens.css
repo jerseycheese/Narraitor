@@ -19,4 +19,8 @@
 
   /* Universal radius token */
   --radius-full: 9999px;
+
+  /* Standard reading width for primary content surfaces (dashboard, default
+   * pages, top nav). Workshop creation pages stay narrower next to their rail. */
+  --content-max-width: 1200px;
 }

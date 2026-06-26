@@ -1,8 +1,18 @@
+/* Surface roots mount/unmount when the route crosses surface modes (default ↔
+ * workshop ↔ manuscript) in AppSurfaceShell, so a fade on mount smooths the
+ * otherwise-jarring top-nav→sidebar snap (#1432 F7) without firing on
+ * same-surface navigation. Disabled under reduced-motion. */
+@keyframes surface-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .app-surface-default {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background: var(--color-canvas);
+  animation: surface-fade-in 180ms ease;
 }
 
 .app-surface-manuscript {
@@ -20,7 +30,7 @@
 .default-surface-inner {
   box-sizing: border-box;
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-4);
 }
@@ -353,6 +363,14 @@
   min-height: 100vh;
   background: var(--color-canvas);
   position: relative;
+  animation: surface-fade-in 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-surface-default,
+  .app-surface-workshop {
+    animation: none;
+  }
 }
 
 .workshop-sidebar {
@@ -836,7 +854,11 @@
 }
 
 .workshop-workspace-main {
-  min-height: 100vh;
+  /* Fill the remaining workspace height after the sticky context header rather
+   * than forcing a fresh 100vh — stacking 100vh on top of the header overflowed
+   * the viewport and left a tall empty surface panel on short pages (#1432 F57). */
+  flex: 1;
+  min-height: 0;
 }
 
 .workshop-workspace-inner {
@@ -966,7 +988,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding-block: var(--space-3);
   padding-inline: var(--space-4);
@@ -1218,7 +1240,7 @@
 }
 
 .breadcrumbs-inner {
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-2) var(--space-4);
 }
