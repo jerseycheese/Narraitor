@@ -22,7 +22,7 @@ export default defineConfig({
   timeout: 60 * 1000,
   expect: {
     toHaveScreenshot: {
-      maxDiffPixels: 500,
+      maxDiffPixels: 10000,
       threshold: 0.2,
       animations: 'disabled',
     },
@@ -35,7 +35,7 @@ export default defineConfig({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `maxDiffPixels` | `number` | `500` | Maximum allowed pixel differences |
+| `maxDiffPixels` | `number` | `10000` | Maximum allowed pixel differences |
 | `threshold` | `number` | `0.2` | Pixel difference threshold (0-1) |
 | `animations` | `'disabled' \| 'allow'` | `'allow'` | Animation handling during screenshots |
 | `clip` | `{x, y, width, height}` | `undefined` | Clip screenshot to specific region |
@@ -50,7 +50,7 @@ projects: [
     name: 'chromium',
     use: { 
       ...devices['Desktop Chrome'],
-      viewport: { width: 1280, height: 720 },
+      viewport: { width: 1280, height: 1024 },
       launchOptions: {
         args: [
           '--font-render-hinting=none',

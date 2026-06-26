@@ -121,7 +121,7 @@ interface SkillSuggestion {
   description: string;
   difficulty: 'easy' | 'medium' | 'hard';
   category?: string;
-  linkedAttributeName?: string;
+  linkedAttributeNames?: string[];
   accepted: boolean;
 }
 ```

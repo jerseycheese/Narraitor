@@ -62,7 +62,6 @@ helps, so it fails fast instead of burning quota.
 
 ## Where it's used
 
-The world and template generators lean on this (`src/lib/generators/worldGenerator.ts`,
-`src/lib/ai/templateGenerator.ts`). It sits alongside the more specialized extractors like
+The world generator leans on this (`src/lib/generators/worldGenerator.ts`). It sits alongside the more specialized extractors like
 `goalExtractor` (`src/lib/ai/goalExtractor.ts`) — those handle domain-specific extraction, while
 `aiResponseParser` handles the generic "turn an AI response into a validated object" step.

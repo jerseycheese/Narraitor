@@ -104,7 +104,7 @@ function WorldList() {
   const createWorld = useWorldStore((state) => state.createWorld);
 
   const handleCreate = () => {
-    const id = createWorld({ name: 'New World', theme: 'fantasy' });
+    const id = createWorld({ name: 'New World', genre: 'fantasy' });
   };
 
   // ...

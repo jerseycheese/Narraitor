@@ -102,7 +102,7 @@ interface UseWizardStateOptions<T> {
 
 **Features:**
 - Step navigation with bounds checking
-- Data persistence to sessionStorage
+- Data persistence to localStorage
 - Optional per-step validation via `validation` config
 - Async completion handling
 
