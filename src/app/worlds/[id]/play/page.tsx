@@ -41,7 +41,6 @@ export default function PlayPage() {
   // Check if this should be a fresh session (from "Start New Session" button)
   const disableAutoResume = searchParams?.get('fresh') === 'true';
 
-  // Get current session progress for confirmation dialog
   const currentProgress = currentSessionId ? getSessionSegments(currentSessionId).length : 0;
 
   // Set isClient to true once component mounts

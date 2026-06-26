@@ -22,7 +22,6 @@ export default function WorldViewPage() {
   const setCurrentWorld = useWorldStore((state) => state.setCurrentWorld);
   const characters = useCharacterStore((state) => state.characters);
 
-  // Check if this world has any characters
   const worldCharacters = Object.values(characters).filter((char): char is Character => char.worldId === worldId);
   const isActive = currentWorldId === worldId;
 

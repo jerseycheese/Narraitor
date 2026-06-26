@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create the ending generation request
     const endingRequest: EndingGenerationRequest = {
       sessionId,
       characterId,
@@ -74,7 +73,6 @@ export async function POST(request: NextRequest) {
       tokenUsage: result.tokenUsage
     });
 
-    // Return the generated ending
     return NextResponse.json({
       success: true,
       data: result
@@ -85,7 +83,6 @@ export async function POST(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error'
     });
 
-    // Return appropriate error response
     if (error instanceof Error) {
       if (error.message.includes('not found')) {
         return NextResponse.json(

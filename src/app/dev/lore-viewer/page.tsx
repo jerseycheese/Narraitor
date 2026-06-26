@@ -156,7 +156,6 @@ export default function LoreViewerTestPage() {
       return;
     }
 
-    // Add aliases to the first few characters
     characterFacts.slice(0, 3).forEach(fact => {
       if (fact.value.includes('Marcus')) {
         setAliases(fact.id, ['Marcus', 'The Brave', 'Hero of Willowbrook']);
@@ -165,7 +164,6 @@ export default function LoreViewerTestPage() {
       } else if (fact.value.includes('Gareth')) {
         setAliases(fact.id, ['Gareth', 'Captain', 'Guard Captain']);
       } else {
-        // Add generic aliases for other characters
         const firstName = fact.value.split(' ')[0];
         setAliases(fact.id, [firstName, fact.value]);
       }

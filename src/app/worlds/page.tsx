@@ -38,7 +38,6 @@ export default function WorldsPage() {
   );
   const tourStartedRef = useRef(false);
 
-  // Reset tour started flag when modal closes
   useEffect(() => {
     if (!showPrompt) {
       tourStartedRef.current = false;
@@ -115,7 +114,6 @@ export default function WorldsPage() {
         suggestedName: worldName || undefined,
       });
 
-      // Create the world using the service
       setGeneratingStatus('Creating world...');
       const { worldId } = await worldCreationService.createWorldFromGeneration({
         generatedData,
@@ -126,7 +124,6 @@ export default function WorldsPage() {
       setGeneratingStatus('Generating world image...');
       // Image generation is handled by the service in the background
 
-      // Set as current world
       useWorldStore.getState().setCurrentWorld(worldId);
 
       // Hide the prompt and reset state

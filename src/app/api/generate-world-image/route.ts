@@ -37,7 +37,6 @@ function generateImagePrompt(world: World): string {
   const name = world.name;
   const description = world.description;
 
-  // Create a detailed prompt for image generation
   const basePrompt = `Create a highly detailed, cinematic landscape image representing the world "${name}". Genre: ${genre}. Description: ${description}`;
 
   const worldElements = describeWorldElements(world);

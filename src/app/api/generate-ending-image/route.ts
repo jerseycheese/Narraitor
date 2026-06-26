@@ -32,7 +32,6 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
   const characterName = character?.name || 'The Hero';
   const tone = ending.tone;
   
-  // Create a detailed prompt for ending image generation
   const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of ${characterName}'s story in ${worldName}. This is a ${tone} ending to their journey.`;
   
   // Add tone-specific visual guidance
