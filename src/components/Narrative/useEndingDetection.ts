@@ -1,7 +1,7 @@
 // src/components/Narrative/useEndingDetection.ts
 //
-// Pure AI-based ending detection extracted from NarrativeController so the
-// controller can stay focused on orchestrating narrative generation. Sends
+// Pure AI-based ending detection, kept separate so the controller can stay
+// focused on orchestrating narrative generation. Sends
 // recent narrative context to Gemini and asks whether the story has reached
 // a natural conclusion. Only fires onEndingSuggested for medium/high
 // confidence responses; silent on any AI/parse/network failure (no fallback).

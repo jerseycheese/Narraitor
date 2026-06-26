@@ -106,11 +106,11 @@ This is how goals get fed into the AI system. When generating new narrative cont
 #### Goal Context Building
 ```typescript
 // Build complete context for session including goals
-buildContextForSession(sessionId: EntityID, options?: ContextBuildOptions): AISessionContext
+buildContextForSession(sessionId: EntityID, options?: ContextBuildOptions): Promise<AISessionContext>
 
 interface ContextBuildOptions {
   includeGoals?: boolean; // Default: true
-  maxTokens?: number; // Default: 1000
+  maxChars?: number; // Default: 5000
   prioritizeRecent?: boolean; // Default: false
 }
 

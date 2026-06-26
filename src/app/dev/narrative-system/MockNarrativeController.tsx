@@ -50,18 +50,12 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       setHasGeneratedInitial(true);
       logger.debug('[MockNarrativeController] Marked initial generation as completed');
     } else {
-      // Reset state for new sessions
       setHasGeneratedInitial(false);
       logger.debug('[MockNarrativeController] Reset initial generation flag');
     }
-    
-    // Update segments state
+
     setSegments(existingSegments);
-    
-    // Reset loading state
     setIsLoading(false);
-    
-    // Reset lastChoiceId for new sessions
     setLastChoiceId(null);
     
     // Cleanup function - important for unmounting properly

@@ -104,8 +104,8 @@ const handleGenerate = async () => {
 
 ### Timeout Settings
 ```typescript
-// NavigationLoadingProvider.tsx
-const SAFETY_TIMEOUT = 30000; // 30 seconds
+// @/lib/constants/timeouts.ts (imported by NavigationLoadingProvider.tsx)
+export const NAV_SAFETY_TIMEOUT_MS = 30000; // 30 seconds
 
 // useNavigationLoading.ts
 const MIN_LOADING_DURATION = 150; // Minimum display time

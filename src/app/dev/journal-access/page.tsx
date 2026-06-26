@@ -315,7 +315,6 @@ export default function JournalAccessTestPage() {
             </button>
             <button
               onClick={() => {
-                // Clear existing journal entries for this session
                 useJournalStore.getState().reset();
                 // Force re-creation with proper content
                 setEntryCount(0);

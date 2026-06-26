@@ -45,7 +45,6 @@ interface World extends NamedEntity, TimestampedEntity {
   reference?: string;
   relationship?: 'set_within' | 'inspired_by';
   toneSettings?: ToneSettings;
-  characterTemplates?: CharacterTemplate[];
 }
 
 interface WorldAttribute extends NamedEntity {

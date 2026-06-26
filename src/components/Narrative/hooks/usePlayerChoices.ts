@@ -34,7 +34,7 @@ interface UsePlayerChoicesResult {
 /**
  * Owns player-choice generation for the active session: the AI call (with a
  * timeout race and fallback choices), decision persistence, and the overlap
- * guard. Extracted from NarrativeController with no behavior change.
+ * guard.
  */
 export function usePlayerChoices({
   sessionId,

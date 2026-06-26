@@ -6,8 +6,7 @@ const logger = new Logger('NarrativeParser');
 /**
  * Parse narrative content from AI responses with multiple fallback strategies
  * Handles JSON code blocks, malformed JSON, and control character sanitization
- * 
- * This function implements the same parsing logic previously embedded in NarrativeDisplay component.
+ *
  * It handles various AI response formats and provides graceful fallback mechanisms.
  * 
  * @param content - Raw content from AI response

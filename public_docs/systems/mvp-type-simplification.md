@@ -26,7 +26,6 @@ We cut out all the fancy RPG mechanics that would take months to implement prope
 **Removed Properties:**
 - `weight` - Advanced encumbrance system (Post-MVP)
 - `value` - Economy/trading system (Post-MVP)
-- `equipped` - Equipment system (Post-MVP)
 - `properties` - Complex item effects (Post-MVP)
 
 **Kept Properties:**
