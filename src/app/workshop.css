@@ -742,7 +742,7 @@
 
 [data-theme="ds3"] .workshop-sidebar-primary-link[data-active="true"] {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
 }
 
 [data-theme="ds3"] .workshop-sidebar-section-label {
@@ -1506,7 +1506,7 @@
 /* Card action variant overrides - applied via CardActionGroup variant prop */
 .card-action-variant-primary {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
@@ -1794,8 +1794,8 @@
 
 .world-list-empty-tip {
   padding: var(--space-3) var(--space-4);
-  border-left: 3px solid var(--color-accent);
-  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  background: var(--color-accent-soft);
   border-radius: var(--radius-sm);
 }
 
@@ -2063,8 +2063,7 @@
 [data-theme="ds1"] .character-editor-actions,
 [data-theme="ds1"] .world-editor-actions {
   border-radius: 2px;
-  border-left: 2px solid var(--color-accent);
-  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-4);
 }
 
 /* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
@@ -2240,6 +2239,44 @@
   max-width: 48rem;
 }
 
+/* Per-theme list-header voice. The shared list surfaces (worlds, characters)
+   shouldn't read as one app in three palettes — so the title's typeface, scale,
+   and the header's vertical rhythm diverge per theme, mirroring how the
+   settings-section heading already expresses each design system.
+   DS1 = sharp compact sans · DS2 = warm serif display · DS3 = drafting serif. */
+[data-theme="ds1"] .page-layout-header {
+  /* Exception: tighter than --space-8 for DS1's compact drafting rhythm */
+  margin-bottom: 2.5rem;
+}
+
+[data-theme="ds1"] .page-layout-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds2"] .page-layout-title {
+  font-family: var(--font-narrative);
+  font-size: 2.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds2"] .page-layout-description {
+  font-family: var(--font-narrative);
+  font-size: 1.0625rem;
+}
+
+[data-theme="ds3"] .page-layout-header {
+  /* Exception: medium rhythm between DS1's compact and DS2's airy headers */
+  margin-bottom: 3rem;
+}
+
+[data-theme="ds3"] .page-layout-title {
+  font-family: var(--font-narrative);
+  font-size: 2.125rem;
+  font-weight: 500;
+}
+
 .page-layout-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2381,7 +2418,6 @@
 [data-theme="ds1"] .characters-empty {
   padding: var(--space-6) var(--space-5);
   border-radius: 2px;
-  border-left: 2px solid var(--color-accent);
 }
 
 [data-theme="ds1"] .characters-empty h2 {
@@ -2873,8 +2909,7 @@
 
 [data-theme="ds1"] .character-editor-actions {
   border-radius: 2px;
-  border-left: 2px solid var(--color-accent);
-  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-4);
 }
 
 /* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
@@ -3107,7 +3142,6 @@
 
 [data-theme="ds1"] .settings-card {
   border-radius: 2px;
-  border-left: 2px solid var(--color-accent);
 }
 
 [data-theme="ds1"] .settings-section h2 {
@@ -4120,7 +4154,7 @@
 [data-theme="ds1"] .component-ending-screen-achievement {
   border-radius: 2px;
   border-width: 2px;
-  border-left: 4px solid var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 [data-theme="ds2"] .component-ending-screen-hero-frame {

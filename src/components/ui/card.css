@@ -30,13 +30,16 @@
   color: var(--color-text-primary);
 }
 
+/* Description is prose the user reads (helper/explanatory copy), so it uses the
+ * interface sans in sentence case at body size — not the mono/uppercase "kicker"
+ * treatment, which fails legibility for instructional content (DESIGN.md reserves
+ * font-system + text-muted for IDs/debug, not copy). */
 .card-description {
   margin: 0;
-  font-family: var(--font-system);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
 }
 
 .card-content {

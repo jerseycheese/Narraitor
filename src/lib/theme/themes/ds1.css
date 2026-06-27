@@ -21,6 +21,10 @@
   --color-text-muted: rgb(113 113 122);
   --color-text-inverse: rgb(255 255 255);
 
+  /* Text on a filled accent surface. Light mode: accent is dark, so white.
+   * Dark mode (below): accent is light, so a dark ink keeps button labels AA. */
+  --color-on-accent: rgb(255 255 255);
+
   /* Mechanical Accent - Archival Ink Blue */
   --color-accent: rgb(49 46 129);
   --color-accent-hover: rgb(30 27 75);
@@ -148,6 +152,7 @@
   --color-text-secondary: rgb(212 212 216);
   --color-text-muted: rgb(129 129 138);
   --color-text-inverse: rgb(255 255 255);
+  --color-on-accent: rgb(9 9 11);
 
   --color-accent: rgb(129 140 248);
 
