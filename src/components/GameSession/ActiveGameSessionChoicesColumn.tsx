@@ -91,7 +91,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
         (isGenerating || isGeneratingChoices) && (
           <div className="manuscript-streaming-indicator">
             <span className="manuscript-streaming-dot" />
-            <span className="manuscript-streaming-label">Generating response...</span>
+            <span className="manuscript-streaming-label">Continuing your story...</span>
           </div>
         )
       )}

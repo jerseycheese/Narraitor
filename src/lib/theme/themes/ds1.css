@@ -150,7 +150,10 @@
   --color-text-inverse: rgb(255 255 255);
 
   --color-accent: rgb(129 140 248);
-  --color-accent-hover: rgb(165 180 252);
+
+  /* Hover darkens (not lightens) so white button/CTA text stays legible in dark
+   * mode — white-on-hover ~6.3:1. Base-state contrast tracked separately (#1379). */
+  --color-accent-hover: rgb(79 70 229);
   --color-accent-soft: rgb(129 140 248 / 10%);
 
   --background: 240 10% 3.9%;
