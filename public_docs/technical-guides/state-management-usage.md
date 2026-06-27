@@ -15,7 +15,7 @@ Each domain gets its own store - World, Character, Narrative, etc. They all foll
 
 ## Available Stores
 
-There are eleven domain stores, all in `src/state/` and exported as `useXStore` hooks:
+There are fourteen domain stores, all in `src/state/` and exported as `useXStore` hooks:
 
 | Store | Purpose | Features |
 |-------|---------|----------|
@@ -30,6 +30,9 @@ There are eleven domain stores, all in `src/state/` and exported as `useXStore` 
 | `useGoalStore` | Goals/objectives | Character goal tracking |
 | `useLoreStore` | World knowledge base | Facts, aliases, deduplication, resolution (split `loreStore.*` family) |
 | `useAiContextStore` | AI prompt context | Context building, token management |
+| `useCalibrationStore` | Token-budget snapshots (DevTools) | Ephemeral, dev-only, not persisted |
+| `useContinuityStore` | Continuity validation (DevTools) | Ephemeral, dev-only, not persisted |
+| `useProviderStore` | AI provider config | Provider/model selection, encrypted keys, persisted |
 
 ## Basic Usage
 

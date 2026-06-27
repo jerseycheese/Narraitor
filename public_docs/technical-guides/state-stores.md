@@ -14,7 +14,7 @@ lives in `src/state/` and is exported as a `useXStore` hook.
 
 ## The stores
 
-There are eleven domain stores today:
+There are fourteen domain stores today:
 
 1. **`useWorldStore`** — game worlds, their attributes, skills, and configuration.
 2. **`useCharacterStore`** — player characters, scoped to a world, with their attributes and skills.
@@ -30,6 +30,9 @@ There are eleven domain stores today:
     family of files (`loreStore.ts` plus `loreStore.actions`, `.aliases`, `.deduplication`,
     `.extraction`, `.helpers`, `.import-export`, `.resolution`, `.state`, `.utils`), which keeps
     the dedup/resolution logic out of the core store file.
+12. **`useCalibrationStore`** — token-budget request snapshots for the DevTools panel. Ephemeral, dev-only observability; never persisted.
+13. **`useContinuityStore`** — narrative-continuity validation results for the DevTools panel. Ephemeral, dev-only observability; never persisted.
+14. **`useProviderStore`** — AI provider configuration: provider/model selection and encrypted key storage. Persisted.
 
 Two more files in `src/state/` support the stores rather than being stores themselves:
 

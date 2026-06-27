@@ -116,17 +116,16 @@ Located in `utils/validation.ts`:
 Centralized styling in `wizardStyles.ts`:
 
 ```typescript
+// Semantic class hooks only — no Tailwind. The visual rules live in the
+// design-system CSS, so theming happens there, not here.
 export const wizardStyles = {
-  container: "max-w-2xl mx-auto p-6",
-  card: {
-    base: "bg-white rounded-lg shadow-md p-6 mb-6",
-    hover: "hover:shadow-lg transition-shadow",
-  },
-  form: {
-    label: "block text-sm font-medium text-gray-700 mb-2",
-    input: "w-full px-3 py-2 border border-gray-300 rounded-md...",
-    error: "mt-1 text-sm text-red-600",
-  }
+  container: "wizard-container",
+  header: "wizard-header",
+  title: "wizard-title",
+  step: { title: "wizard-step-title", description: "wizard-step-description", content: "wizard-step-content" },
+  form: { group: "form-group", label: "form-label", input: "form-input", error: "form-error" },
+  card: { base: "wizard-card", selected: "wizard-card-selected", unselected: "wizard-card-unselected" },
+  // ...navigation, progress, badge, and toggle groups follow the same semantic pattern
 };
 ```
 

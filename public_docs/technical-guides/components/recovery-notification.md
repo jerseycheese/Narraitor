@@ -196,24 +196,16 @@ const validDate = formattedDate && formattedDate !== 'Invalid date' ? formattedD
 
 ### ARIA Attributes
 
-Dialog accessibility:
+Dialog accessibility is handled by the shared `SimpleModal` wrapper, which owns the overlay, the dialog role and labelling, and focus trapping — the component doesn't hand-roll any of it:
 
 ```typescript
-<div
-  className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-  role="alertdialog"
-  aria-labelledby="recovery-title"
-  aria-describedby="recovery-description"
+<SimpleModal
+  isOpen={isVisible}
+  onClose={onDismiss}
+  title="Character Creation Progress Found"
 >
-  <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
-    <h3 id="recovery-title" className="text-lg font-medium text-gray-900">
-      Character Creation Progress Found
-    </h3>
-    <div id="recovery-description" className="mb-6">
-      {/* Dialog content */}
-    </div>
-  </div>
-</div>
+  {/* Dialog content */}
+</SimpleModal>
 ```
 
 ### Focus Management
@@ -428,6 +420,6 @@ Storybook stories:
 When upgrading or integrating the component:
 
 1. **Props Interface**: Component props may evolve - check TypeScript definitions
-2. **CSS Classes**: Uses Tailwind CSS classes - ensure Tailwind is configured
+2. **CSS Classes**: Styling comes from the design system's semantic CSS classes and the shared `SimpleModal` — there's no Tailwind to configure
 3. **Dependencies**: Requires `Button` component from UI system
 4. **Accessibility**: Maintains WCAG 2.1 AA compliance requirements
