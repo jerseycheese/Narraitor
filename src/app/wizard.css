@@ -245,7 +245,7 @@
   border: none;
   border-radius: var(--radius-md);
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   font-family: var(--font-interface);
   font-size: 0.875rem;
   font-weight: 500;
@@ -286,7 +286,7 @@
   border: none;
   border-radius: var(--radius-md);
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   font-family: var(--font-interface);
   font-size: 0.875rem;
   font-weight: 500;
@@ -413,7 +413,7 @@
 
 .wizard-progress-circle-active {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   border: 2px solid var(--color-accent);
 }
 
@@ -548,7 +548,7 @@
 
 .wizard-toggle-active {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
@@ -1152,8 +1152,8 @@
 [data-theme="ds1"] .wizard-page .wizard-info-banner {
   border-radius: 2px;
   border-width: 2px;
-  border-left-width: 4px;
-  border-left-color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
 }
 
 [data-theme="ds1"] .wizard-page .wizard-empty-state {
@@ -1930,7 +1930,7 @@
 [data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-active {
   border-color: var(--color-accent);
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
 }
 
 [data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-label,
@@ -2462,8 +2462,6 @@
 [data-theme="ds1"] .wizard-page .wizard-custom-editor {
   border-radius: 2px;
   border-width: 2px;
-  border-left: 4px solid var(--color-accent);
-  padding-left: var(--space-5);
 }
 
 [data-theme="ds1"] .wizard-page .wizard-custom-editor h2 {
@@ -2493,7 +2491,6 @@
 [data-theme="ds1"] .wizard-page .wizard-dialog-panel {
   border-radius: 2px;
   border-width: 2px;
-  border-left: 4px solid var(--color-accent);
 }
 
 [data-theme="ds1"] .wizard-page .component-portrait-step .component-character-portrait {
@@ -2508,7 +2505,8 @@
 [data-theme="ds1"] .wizard-page .portrait-step-success {
   border-radius: 2px;
   border-width: 2px;
-  border-left: 4px solid var(--color-success);
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
 }
 
 [data-theme="ds1"] .wizard-page .component-point-pool-manager .point-pool-allocation {
@@ -2524,7 +2522,7 @@
 [data-theme="ds1"] .wizard-page .wizard-error-container {
   border-radius: 2px;
   border-width: 2px;
-  border-left: 4px solid var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 /* ════════════════════ DS2 — Warm Earth ════════════════════ */
@@ -2886,7 +2884,6 @@
 [data-theme="ds1"] .component-guided-first-time-step-item {
   border-radius: 2px;
   border-width: 2px;
-  border-left: 4px solid var(--color-accent);
 }
 
 [data-theme="ds1"] .component-guided-first-time-step-heading {

@@ -174,13 +174,17 @@ body > * {
 /* Variant: default (primary action) */
 .button-default {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   border: 1px solid var(--color-accent);
 }
 
 .button-default:hover {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
+
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
 }
 
 /* Variant: secondary */
@@ -266,7 +270,7 @@ body > * {
 
 .button-info:hover {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
 }
 
 /* Variant: warning */

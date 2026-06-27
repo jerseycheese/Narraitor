@@ -16,7 +16,6 @@
   padding: var(--space-3) var(--space-4);
   overflow: hidden;
   border: 1px solid var(--color-border);
-  border-left-width: 3px;
   border-radius: var(--radius-md);
   background: var(--color-surface);
   box-shadow: var(--shadow-overlay);
@@ -75,11 +74,11 @@
   background: var(--color-surface-hover);
 }
 
-/* Variant accent — left border stripe + matching title color.
+/* Variant accent — full semantic border + matching title color (no side stripe).
    Uses the base semantic color tokens, which exist in every theme and in
    both light and dark, so the accent adapts everywhere. */
 .toast[data-variant='success'] {
-  border-left-color: var(--color-success);
+  border-color: var(--color-success);
 }
 
 .toast[data-variant='success'] .toast-title {
@@ -87,7 +86,7 @@
 }
 
 .toast[data-variant='error'] {
-  border-left-color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 .toast[data-variant='error'] .toast-title {
@@ -95,7 +94,7 @@
 }
 
 .toast[data-variant='warning'] {
-  border-left-color: var(--color-warning);
+  border-color: var(--color-warning);
 }
 
 .toast[data-variant='warning'] .toast-title {
@@ -103,7 +102,7 @@
 }
 
 .toast[data-variant='info'] {
-  border-left-color: var(--color-info);
+  border-color: var(--color-info);
 }
 
 .toast[data-variant='info'] .toast-title {

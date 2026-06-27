@@ -21,6 +21,9 @@
   --color-text-muted: rgb(125 113 99);
   --color-text-inverse: rgb(255 255 255);
 
+  /* Text on a filled accent surface — white in light, dark ink in dark (see dark block). */
+  --color-on-accent: rgb(255 255 255);
+
   /* Steel Blue accent */
   --color-accent: rgb(91 122 140);
   --color-accent-hover: rgb(74 105 120);
@@ -146,6 +149,7 @@
   --color-text-secondary: rgb(168 156 142);
   --color-text-muted: rgb(141 130 121);
   --color-text-inverse: rgb(255 255 255);
+  --color-on-accent: rgb(23 19 16);
 
   --color-accent: rgb(123 160 180);
 
