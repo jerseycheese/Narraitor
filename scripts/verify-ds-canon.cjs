@@ -13,9 +13,12 @@
 //   2. Full coverage — every production primitive (src/components/ui/*) must be
 //      represented in the living style guide. If the app uses a primitive the guide
 //      doesn't render, the app has become the canon source. (#1317)
-//   3. Storybook coverage — every production primitive must also appear in a story
-//      under `src/stories/**`, so Storybook stays a real canon surface and doesn't
-//      silently drift from the guide and the app. (#1325)
+//   3. Storybook coverage (broadened, #1486) — every in-scope component must
+//      appear in a story under `src/stories/**`. Scope is no longer just flat
+//      `ui/*`: it's `componentScope` from the baseline (nested `ui/**` + the
+//      whole `shared/**` presentational layer + an explicit domain allowlist of
+//      presentational cards/portraits/displays). This is the surface that keeps
+//      Storybook canon as it becomes the single source of truth (#1325, #1484).
 //
 // Existing violations are grandfathered in `.ds-canon-baseline.json` (mirrors the
 // .skott-baseline.json pattern). The guard fails only on NEW violations, so it
@@ -25,6 +28,11 @@
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
+const {
+  dedupeByName,
+  collectComponentImportSegments,
+  findUncovered,
+} = require('./ds-canon-lib.cjs');
 
 const ROOT = process.cwd();
 const GUIDE_GLOB = 'src/app/dev/design-system*/**/*.{ts,tsx}';
@@ -123,30 +131,35 @@ for (const name of primitives) {
   coverageViolations.push(name);
 }
 
-// --- Check 3: Storybook coverage --------------------------------------------
-// Storybook is a real canon surface for the primitives (#1325). Every
-// src/components/ui/* primitive must appear in a story under src/stories/**, or
-// Storybook silently drifts from the guide + the app. Mirrors Check 2: scan
-// story files for `@/components/ui/<name>` imports.
-const storyFiles = STORIES_GLOBS.flatMap((g) =>
-  glob.sync(g, { cwd: ROOT, absolute: true, nodir: true }),
-);
-const storyImports = new Set();
-for (const file of storyFiles) {
-  let content;
-  try { content = fs.readFileSync(file, 'utf8'); } catch { continue; }
-  importRe.lastIndex = 0;
-  let m;
-  while ((m = importRe.exec(content)) !== null) storyImports.add(m[1]);
-}
+// --- Check 3: Storybook coverage (broadened, #1486) -------------------------
+// Storybook is THE canon surface (#1484). Every in-scope component — nested
+// `ui/**`, the whole `shared/**` presentational layer, and the explicit domain
+// allowlist — must appear in a story under src/stories/**, or it can drift with
+// nothing catching it. Scope comes from `componentScope` in the baseline; story
+// coverage is matched by import path segments (works across nested/shared/domain
+// dirs), not just `@/components/ui/<name>`.
+const scope = baseline.componentScope || {};
+const scopeGlobs = scope.globs || [];
+const domainAllowlist = scope.domainAllowlist || [];
 
-const storybookViolations = [];
-for (const name of primitives) {
-  if (storyImports.has(name)) continue;            // has a story
-  if (coverageExceptions[name]) continue;          // documented non-visual exception
-  if (baselineStorybook.has(name)) continue;       // grandfathered gap (tracked)
-  storybookViolations.push(name);
-}
+const scopeFiles = scopeGlobs
+  .flatMap((g) => glob.sync(g, { cwd: ROOT, nodir: true }))
+  .concat(domainAllowlist);
+const inScopeByName = dedupeByName(scopeFiles); // name -> relPath
+const inScopeNames = [...inScopeByName.keys()];
+
+const storyFiles = STORIES_GLOBS.flatMap((g) =>
+  glob.sync(g, { cwd: ROOT, nodir: true }),
+);
+const storyContents = storyFiles.map((f) => {
+  try { return fs.readFileSync(path.join(ROOT, f), 'utf8'); } catch { return ''; }
+});
+const coveredNames = collectComponentImportSegments(storyContents);
+
+const storybookViolations = findUncovered(inScopeNames, coveredNames, {
+  exceptions: coverageExceptions,
+  grandfathered: baselineStorybook,
+}).map((name) => ({ name, file: inScopeByName.get(name) }));
 
 // --- Report ------------------------------------------------------------------
 let failed = false;
@@ -169,9 +182,9 @@ if (coverageViolations.length > 0) {
 
 if (storybookViolations.length > 0) {
   failed = true;
-  console.error('Canon violation — production primitive(s) without a Storybook story:');
-  console.error('Every src/components/ui/* primitive must appear in a story under src/stories/**, or Storybook drifts from canon.\n');
-  for (const name of storybookViolations) console.error(` - ${name} (src/components/ui/${name}.tsx) — add a story under src/stories/**`);
+  console.error('Canon violation — in-scope component(s) without a Storybook story:');
+  console.error('Every in-scope component (componentScope in .ds-canon-baseline.json) must appear in a story under src/stories/**, or it can drift uncaught.\n');
+  for (const v of storybookViolations) console.error(` - ${v.name} (${v.file}) — add a story under src/stories/**`);
   console.error('\nIf it is a non-visual behavior/utility wrapper, add it to "coverageExceptions" in .ds-canon-baseline.json with a reason.');
 }
 
@@ -184,4 +197,8 @@ const skinN = (baseline.skinning || []).length;
 const gapN = baselineCoverage.size;
 const sbN = baselineStorybook.size;
 const excN = Object.keys(coverageExceptions).length;
-console.log(`DS canon OK — ${primitives.length} primitives checked (${gapN} grandfathered guide gap(s), ${sbN} grandfathered storybook gap(s), ${excN} exception(s)); ${skinN} grandfathered skin(s) within baseline.`);
+console.log(
+  `DS canon OK — ${primitives.length} guide primitive(s) + ${inScopeNames.length} in-scope Storybook component(s) checked ` +
+  `(${gapN} grandfathered guide gap(s), ${sbN} grandfathered storybook gap(s), ${excN} exception(s)); ` +
+  `${skinN} grandfathered skin(s) within baseline.`,
+);
