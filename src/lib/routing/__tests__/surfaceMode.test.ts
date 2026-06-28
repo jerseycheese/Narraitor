@@ -29,7 +29,7 @@ describe('getSurfaceMode', () => {
   });
 
   describe('default routes', () => {
-    test.each(['/', '/about', '/dev', '/dev/design-system'])(
+    test.each(['/', '/about', '/dev', '/dev/game-session'])(
       'returns default for %s',
       (path) => {
         expect(getSurfaceMode(path)).toBe('default');

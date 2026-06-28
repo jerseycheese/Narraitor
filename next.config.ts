@@ -7,9 +7,11 @@ import type { NextConfig } from "next";
 // static generation. Enforcement was verified clean first: a headless crawl of
 // the public/creation/settings/dev routes produced zero violations, generated
 // images are base64 data: URLs, and no client code fetches non-self origins.
-// The /dev/design-system-{2,3} showcase routes @import Google Fonts, so
-// googleapis (stylesheet) and gstatic (font files) are allowlisted; the
-// production app self-hosts fonts via next/font.
+// googleapis (stylesheet) and gstatic (font files) remain allowlisted. Their
+// only consumer was the retired /dev/design-system showcase routes (which
+// @import Google Fonts); the production app self-hosts fonts via next/font, so
+// this allowlist is now vestigial and can be tightened once re-verified with a
+// headless crawl (TODO: separate security pass).
 const isDev = process.env.NODE_ENV !== 'production';
 
 // Development-only script sources, omitted from production builds to keep the
@@ -98,20 +100,6 @@ const nextConfig: NextConfig = {
         source: '/app/dev/:path*',
         destination: '/dev/:path*',
         permanent: true,
-      },
-      // Unify the three design system pages under one URL pattern.
-      // The legacy /dev/design-system-2 and /dev/design-system-3 routes
-      // are kept alive only for their /session subroutes; the bare paths
-      // redirect into the unified catch-all so existing links survive.
-      {
-        source: '/dev/design-system-2',
-        destination: '/dev/design-system/2',
-        permanent: false,
-      },
-      {
-        source: '/dev/design-system-3',
-        destination: '/dev/design-system/3',
-        permanent: false,
       },
     ];
   },

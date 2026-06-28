@@ -91,7 +91,7 @@ npm run dev
 # Then visit /dev routes for component testing
 ```
 
-There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/game-session`, `/dev/design-system`, etc. These let you test components with real data without going through the full app flow.
+There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/game-session`, etc. These let you test components with real data without going through the full app flow. For the design-system catalog (every component, themed, with mock data), use Storybook (`npm run storybook`).
 
 ### Feature Flags
 
@@ -231,7 +231,7 @@ The app separates concerns into clear domains:
 
 **Security**: All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse. Players bring their own Gemini key, sent per request and used server-side for that one call — never persisted or logged. A server-side `GEMINI_API_KEY` env var acts as a local/dev fallback.
 
-**Design System**: Three structurally-different design systems (DS1/DS2/DS3) ship together; the user picks one. See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts), [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for the rationale, and [public_docs/design-system/](public_docs/design-system/) for the full reference. Canon order is **showcase routes (`/dev/design-system{,-2,-3}`) > Storybook (`npm run storybook`) > app** — Storybook's toolbar has a DS1/DS2/DS3 + light/dark switcher for verifying components across all six combinations.
+**Design System**: Three structurally-different design systems (DS1/DS2/DS3) ship together; the user picks one. See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts), [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for the rationale, and [public_docs/design-system/](public_docs/design-system/) for the full reference. **Storybook (`npm run storybook`) is the single canon surface** — every component, themed, with mock data and no backend; its toolbar has a DS1/DS2/DS3 + light/dark switcher for verifying components across all six combinations. See [ADR-012](public_docs/architecture/ADR-012-storybook-single-canon-surface.md).
 
 ## AI Integration Details
 

@@ -7,8 +7,10 @@ updated: 2026-05-10
 
 # ADR-011: Three structurally-differentiated design systems (DS1/DS2/DS3)
 
-**Status**: Accepted - Implemented
+**Status**: Accepted - Implemented (canon-surface ordering superseded by [ADR-012](ADR-012-storybook-single-canon-surface.md))
 **Date**: 2026-05-10
+
+> **Note (2026-06-28):** The "canon order: showcase pages > Storybook > app" decision below was reversed by [ADR-012](ADR-012-storybook-single-canon-surface.md) — Storybook is now the single canon surface and the `/dev/design-system*` showcase routes were retired. The three-design-system architecture (DS1/DS2/DS3, `data-theme` switching, structural differentiation) described here is unchanged.
 
 ## The Situation
 

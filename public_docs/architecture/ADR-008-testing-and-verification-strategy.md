@@ -80,8 +80,8 @@ bug earlier is cheaper.
 - Run units with `npm run test` (Jest), visual with `npm run test:visual` (Playwright,
   self-seeding via `tests/visual/utils/seedTestData.ts`), mutation with the Stryker config when
   touching state/storage/narrative.
-- New components get a Storybook story; verify visual changes against the
-  `/dev/design-system{,-2,-3}` showcase routes first (the canon), then Storybook, then the app.
+- New in-scope components get a Storybook story (enforced by `npm run lint:ds-canon`);
+  verify visual changes in Storybook (the canon — ADR-012), then the app.
 - Don't rig tests to pass, and don't add Vitest back — Jest is the one runner.
 - See the [Testing Guide](../development/testing-guide.md) and
   [PR & testing workflow](../development/workflows/pr-and-testing-workflow.md).

@@ -1,5 +1,5 @@
 {
-  "comment": "Design-system canon guard (scripts/verify-ds-canon.cjs, npm run lint:ds-canon). Storybook is the canonical, backend-free view of the frontend (#1484); the living style guide (src/app/dev/design-system*) is being retired. Three checks: (1) skinning — the guide must not re-skin a real primitive with guide-local classes; (2) guide coverage — every src/components/ui/* primitive must be represented in the guide (stays until the guide is retired in Phase 4 / #1488); (3) storybook coverage (#1486) — every in-scope component must appear in a story under src/stories/**. In-scope = componentScope below (nested ui/** + the whole shared/** presentational layer + an explicit domain allowlist of presentational cards/portraits/displays). All checks fail only on NEW violations; existing gaps are grandfathered here with tracking. Shrink storybookGaps to empty in Phase 3 (#1487). Mirrors the .skott-baseline.json pattern.",
+  "comment": "Storybook canon guard (scripts/verify-ds-canon.cjs, npm run lint:ds-canon). Storybook is the single canonical, backend-free view of the frontend (#1484, ADR-012). One check: every in-scope component must appear in a story under src/stories/**. In-scope = componentScope below (nested ui/** + the whole shared/** presentational layer + an explicit domain allowlist of presentational cards/portraits/displays). Fails only on NEW uncovered components; existing gaps are grandfathered in storybookGaps with tracking. coverageExceptions documents non-visual wrappers that legitimately have no story. The living style guide and its skinning/guide-coverage checks were retired in #1488. Mirrors the .skott-baseline.json pattern.",
   "componentScope": {
     "globs": [
       "src/components/ui/**/*.{tsx,jsx}",
@@ -23,10 +23,6 @@
       "src/components/world/WorldImageDisplay.tsx"
     ]
   },
-  "skinning": [
-    "src/app/dev/design-system/_ui/ComponentShowcase.tsx::overlayClassName::dsc-dialog-overlay"
-  ],
-  "coverageGaps": [],
   "coverageExceptions": {
     "scroll-area": "Behavior/utility wrapper (adds scroll styling around arbitrary content) — no visual variants/states to canonize.",
     "choiceStyling": "Styling helper — exports class-name maps for ChoiceSelector, not a rendered component.",
