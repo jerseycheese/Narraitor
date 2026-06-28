@@ -67,11 +67,13 @@
   --warning-border: 36 38% 70%;
   --warning-muted: 36 38% 88%;
 
-  /* Manuscript warning button colors */
-  --color-warning: rgb(140 109 63);
-  --color-warning-soft: rgb(140 109 63 / 14%);
-  --color-warning-border: rgb(140 109 63 / 50%);
-  --color-warning-muted: rgb(140 109 63 / 10%);
+  /* Manuscript warning button colors.
+   * Darkened from rgb(140 109 63): the soft warning button (colored text on the
+   * translucent fill) only read 3.68:1 in light mode; same bronze hue, deeper, now 4.97:1. */
+  --color-warning: rgb(113 88 51);
+  --color-warning-soft: rgb(113 88 51 / 14%);
+  --color-warning-border: rgb(113 88 51 / 50%);
+  --color-warning-muted: rgb(113 88 51 / 10%);
   --color-success: rgb(74 124 89);
   --color-success-bg: rgb(74 124 89 / 10%);
   --color-info: rgb(91 122 140);
