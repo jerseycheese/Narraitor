@@ -53,7 +53,7 @@ npm run lint:css           # Stylelint over **/*.css — run after ANY .css edit
 - Style with design tokens, not hardcoded values. Stylelint enforces it: no hex, no named colors, no rgb/rgba in product CSS (theme files have scoped overrides). Avoid `!important`.
 - Put an identifying class attribute on components.
 - Look for an existing pattern/utility before adding a new one. One canon version per file — no `simple`/`enhanced` variants.
-- Three design systems coexist deliberately — that's ADR-011, not an accident. The showcase routes are canon; DESIGN.md is the map.
+- Three design systems coexist deliberately — that's ADR-011, not an accident. Storybook (`npm run storybook`) is the single canon surface — ADR-012; the old `/dev/design-system*` living style guide was retired. DESIGN.md is the map.
 - State: CRUD-style store methods; cross-store events via `storeEvents`/`StoreEventTypes`; static imports only (`eval(require())` was eradicated in #1206). Wizard step state goes through sessionStorage (`generated-world-data`); theme prefs through localStorage.
 - Current house style: no wrapper services (ExportService was removed on purpose), use `clsx` directly, extract hooks/helpers before things get clever.
 - Issue work runs the standard global pipeline: analyze-issue, then tdd-implement, then post-merge.
@@ -94,4 +94,4 @@ For truly automatic execution, select "Yes, and don't ask again this session" on
 ## Pointers
 
 - README.md — product overview.
-- DESIGN.md and ADR-011 (#1210) — design-system architecture.
+- DESIGN.md, ADR-011 (#1210), and ADR-012 (#1484) — design-system architecture and the Storybook-as-canon surface.
