@@ -81,7 +81,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
 
   return (
     <div className={`${className}`}>
-      <HeadingTag>{title}</HeadingTag>
+      {title && <HeadingTag>{title}</HeadingTag>}
       <div>
         <div>
           {imageComponent}

@@ -114,6 +114,7 @@ export default function WorldViewPage() {
       <div className="world-detail-hero">
         <Hero
           title={world.name}
+          titleElement="h2"
           image={world.image?.url ? {
             url: world.image.url,
             alt: `${world.name} world`
