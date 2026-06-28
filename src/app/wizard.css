@@ -28,6 +28,15 @@
   margin: 0;
 }
 
+/* The wizard title renders as <h1> or <h2> depending on whether the page already
+   owns the page heading (#1473). The .app-surface-* rules set line-height per tag
+   (h1 1.2 vs h2 1.25) at a higher specificity than the bare .wizard-title class,
+   so without this the character-creation title (now an h2) shifts vertically.
+   Container-scoped selector outranks .app-surface-* h2 to keep it visual-neutral. */
+.component-wizard-container .wizard-title {
+  line-height: 1.2;
+}
+
 /* ─── Step Styles ─── */
 
 .wizard-step-title {
