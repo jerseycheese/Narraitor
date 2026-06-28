@@ -25,6 +25,12 @@
    * Dark mode (below): accent is light, so a dark ink keeps button labels AA. */
   --color-on-accent: rgb(255 255 255);
 
+  /* Text on filled semantic surfaces (success/danger/warning). Same logic as
+   * --color-on-accent: white here, dark ink in dark mode (see dark block). #1379 */
+  --color-on-success: rgb(255 255 255);
+  --color-on-danger: rgb(255 255 255);
+  --color-on-warning: rgb(255 255 255);
+
   /* Mechanical Accent - Archival Ink Blue */
   --color-accent: rgb(49 46 129);
   --color-accent-hover: rgb(30 27 75);
@@ -153,6 +159,11 @@
   --color-text-muted: rgb(129 129 138);
   --color-text-inverse: rgb(255 255 255);
   --color-on-accent: rgb(9 9 11);
+
+  /* Dark ink on the light semantic fills so filled buttons clear AA in dark mode. #1379 */
+  --color-on-success: rgb(9 9 11);
+  --color-on-danger: rgb(9 9 11);
+  --color-on-warning: rgb(9 9 11);
 
   --color-accent: rgb(129 140 248);
 

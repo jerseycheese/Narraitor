@@ -24,6 +24,11 @@
   /* Text on a filled accent surface — white in light, dark ink in dark (see dark block). */
   --color-on-accent: rgb(255 255 255);
 
+  /* Text on filled semantic surfaces — white here, dark ink in dark mode. #1379 */
+  --color-on-success: rgb(255 255 255);
+  --color-on-danger: rgb(255 255 255);
+  --color-on-warning: rgb(255 255 255);
+
   /* Sage Green accent — darkened so white button text clears WCAG AA (4.5:1);
      ~5.3:1 on white vs the previous ~3.6:1, still reads as Warm Earth. */
   --color-accent: rgb(99 111 89);
@@ -153,6 +158,11 @@
   --color-text-muted: rgb(156 141 126);
   --color-text-inverse: rgb(255 255 255);
   --color-on-accent: rgb(26 22 20);
+
+  /* Dark ink on the light semantic fills so filled buttons clear AA in dark mode. #1379 */
+  --color-on-success: rgb(26 22 20);
+  --color-on-danger: rgb(26 22 20);
+  --color-on-warning: rgb(26 22 20);
 
   --color-accent: rgb(156 170 138);
 
