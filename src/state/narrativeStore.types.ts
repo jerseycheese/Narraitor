@@ -2,6 +2,7 @@ import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone } from 
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import type { Character } from './characterStore.types';
+import type { NarrativeError } from '../lib/narrative/narrativeErrors';
 
 /**
  * Narrative store interface with state and actions.
@@ -22,6 +23,13 @@ export interface NarrativeStore {
   isGeneratingEnding: boolean;
   endingError: string | null;
   error: string | null;
+  /**
+   * Classified failure from the live story-generation loop (timeout, network,
+   * provider 429/5xx, bad key). Holds the already-categorized NarrativeError so
+   * the choices column can show transient-vs-terminal copy + a Retry without
+   * re-deriving retryability. Transient UI state — intentionally not persisted.
+   */
+  generationError: NarrativeError | null;
   loading: boolean;
   _hasHydrated: boolean; // Track if persistence has loaded
 
@@ -47,6 +55,8 @@ export interface NarrativeStore {
   clearSessionDecisions: (sessionId: EntityID) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
+  setGenerationError: (error: NarrativeError | null) => void;
+  clearGenerationError: () => void;
   setLoading: (loading: boolean) => void;
   setHasHydrated: (hasHydrated: boolean) => void;
 

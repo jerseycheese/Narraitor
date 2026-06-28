@@ -32,6 +32,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
       reset: () => set(() => initialState),
       setError: (error: string | null) => set(() => ({ error })),
       clearError: () => set(() => ({ error: null })),
+      setGenerationError: (generationError) => set(() => ({ generationError })),
+      clearGenerationError: () => set(() => ({ generationError: null })),
       setLoading: (loading: boolean) => set(() => ({ loading })),
       setHasHydrated: (hasHydrated: boolean) => {
         set({ _hasHydrated: hasHydrated });

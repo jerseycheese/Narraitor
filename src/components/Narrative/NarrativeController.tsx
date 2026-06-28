@@ -50,6 +50,12 @@ interface NarrativeControllerProps {
   className?: string;
   generateChoices?: boolean; // Whether to generate choices after narrative
   hideHistory?: boolean; // Whether to hide the narrative history UI
+  /**
+   * Bumping this counter re-runs the last failed generation. Lets an external
+   * surface (the choices column's Retry) drive recovery without exposing the
+   * controller's internal retry handler. Ignored at its initial value.
+   */
+  retryToken?: number;
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
@@ -65,6 +71,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   className,
   generateChoices = true,
   hideHistory = false,
+  retryToken = 0,
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -75,6 +82,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const addSegment = useNarrativeStore((state) => state.addSegment);
   const getSessionSegments = useNarrativeStore(
     (state) => state.getSessionSegments
+  );
+  const setGenerationError = useNarrativeStore(
+    (state) => state.setGenerationError
+  );
+  const clearGenerationError = useNarrativeStore(
+    (state) => state.clearGenerationError
   );
   const hasHydrated = useNarrativeStore((state) => state._hasHydrated);
   const narrativeGenerator = useMemo(
@@ -566,6 +579,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
     setIsLoading(true);
     setError(null);
+    clearGenerationError();
 
     try {
       // Use recent segments for context (last 3 segments for efficiency)
@@ -781,11 +795,15 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           }, 500); // Normal timeout for predefined choices
         }
       }
-    } catch {
-      // Error generating narrative
+    } catch (err) {
+      // Error generating narrative. Classify the failure (transient network/
+      // 429/5xx/timeout vs terminal bad-key) into shared store state so the
+      // play surface can surface inline error + Retry copy. Keep the local
+      // string error for the (hidden) NarrativeHistory path too.
       setError(
         'Unable to generate narrative. Please check your connection and try again.'
       );
+      setGenerationError(getNarrativeError(err as Error));
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
@@ -795,6 +813,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   const handleRetry = () => {
     setError(null);
+    clearGenerationError();
 
     // If we have no segments, retry initial generation
     if (segments.length === 0) {
@@ -812,6 +831,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setError(null);
     }
   };
+
+  // Re-run the failed generation when an external surface bumps retryToken
+  // (e.g. the choices column's Retry button). Skips the initial 0 value so a
+  // fresh mount never triggers a spurious regeneration.
+  useEffect(() => {
+    if (retryToken > 0) {
+      handleRetry();
+    }
+    // handleRetry closes over the latest choiceId/segments each render; depending
+    // only on retryToken keeps this a one-shot per bump.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retryToken]);
 
   return (
     <div className={`narrative-controller ${className || ''}`}>
