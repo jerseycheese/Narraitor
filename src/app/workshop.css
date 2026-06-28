@@ -1981,6 +1981,20 @@
   color: var(--color-text-primary);
 }
 
+/* The section title became an <h2> for correct heading order (#1473). On the
+   default/workshop surfaces the .app-surface-* rules set line-height per tag
+   (h2 1.25 vs h3 1.35), so without this the section would shift vertically.
+   Scope the pin to those surfaces only — the manuscript surface (play/ending)
+   has no per-tag rules, so pinning there would over-apply and shift it instead. */
+.app-surface-default
+  .component-collapsible-section
+  [data-testid="collapsible-section-title"],
+.app-surface-workshop
+  .component-collapsible-section
+  [data-testid="collapsible-section-title"] {
+  line-height: 1.35;
+}
+
 .component-collapsible-section [data-testid="collapsible-section-content"] {
   padding: 0 var(--space-5) var(--space-5);
 }

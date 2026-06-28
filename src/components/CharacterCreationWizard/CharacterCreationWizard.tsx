@@ -291,7 +291,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   return (
     <>
-      <WizardContainer title={`Create Character in ${world.name}`} className="component-character-creation-wizard">
+      <WizardContainer title={`Create Character in ${world.name}`} titleElement="h2" className="component-character-creation-wizard">
         <div>
           {/* Auto-save status indicator */}
           <div>

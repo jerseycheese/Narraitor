@@ -32,4 +32,20 @@ describe('ImageGenerationSection accessibility', () => {
       })
     ).toBeInTheDocument();
   });
+
+  it('renders a heading when a title is provided', () => {
+    render(<ImageGenerationSection {...baseProps} headingLevel="h3" />);
+
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Character Portrait' })
+    ).toBeInTheDocument();
+  });
+
+  it('omits the heading entirely when the title is empty', () => {
+    // FinalizeStep passes title="" so the surrounding section owns the heading;
+    // the component must not emit an empty <h2> (#1473).
+    render(<ImageGenerationSection {...baseProps} title="" />);
+
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+  });
 });

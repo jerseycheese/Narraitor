@@ -104,7 +104,7 @@ export default function CharacterViewPage() {
               alt: `${world.name} world`,
             }}
             subtitle={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
-            titleElement="h1"
+            titleElement="h2"
           />
         </div>
       )}

@@ -47,11 +47,10 @@ export default function CreateWorldPage() {
   return (
     <section
       className="component-create-world-page wizard-page"
-      aria-labelledby="create-world-title"
+      aria-label="Create New World"
     >
-      <h1 id="create-world-title" className="sr-only">
-        Create New World
-      </h1>
+      {/* The wizard header (WizardContainer) renders the visible <h1>; a
+          second sr-only <h1> here only duplicated it for screen readers (#1473). */}
       <WorldCreationWizard
         onComplete={handleComplete}
         onCancel={handleCancel}
