@@ -240,19 +240,23 @@ body > * {
 /* Variant: destructive */
 .button-destructive {
   background: var(--color-danger);
-  color: var(--color-text-inverse);
+  color: var(--color-on-danger);
   border: 1px solid var(--color-danger);
 }
 
 .button-destructive:hover {
   background: var(--color-danger-hover);
   border-color: var(--color-danger-hover);
+
+  /* Hover darkens the fill, so white clears AA here even though the lighter
+   * base fill uses dark ink (mirrors .button-default). #1379 */
+  color: var(--color-text-inverse);
 }
 
 /* Variant: success */
 .button-success {
   background: var(--color-success);
-  color: var(--color-text-inverse);
+  color: var(--color-on-success);
   border: 1px solid var(--color-success);
 }
 
@@ -282,7 +286,10 @@ body > * {
 
 .button-warning:hover {
   background: var(--color-warning);
-  color: var(--color-text-inverse);
+
+  /* Filled hover: the warning fill is a light amber in dark mode, so dark ink
+   * (not white) keeps the label AA. Base/soft state keeps its colored text. #1379 */
+  color: var(--color-on-warning);
 }
 
 /* Size: default — applied via .button-size-default */
