@@ -33,33 +33,5 @@
     "SSRClientOnly": "Behavior wrapper — defers render to the client; no visual variants/states to canonize.",
     "toaster": "Infra mount — renders the toast viewport/portal; exercised via the toast stories."
   },
-  "storybookGaps": [
-    "dialog",
-    "table",
-    "ActiveStateIndicator",
-    "BackNavigation",
-    "CharacterDerivedStatsDisplay",
-    "DashboardContinueCard",
-    "DataField",
-    "ErrorBlock",
-    "ExportImportControls",
-    "FormComponents",
-    "ImageGenerationSection",
-    "NotFoundState",
-    "PortraitCustomizationSection",
-    "PreviewModal",
-    "ProviderCard",
-    "RequirementBadges",
-    "SectionWrapper",
-    "SimpleModal",
-    "SkipLinks",
-    "ToggleButton",
-    "ToneSettingsDisplay",
-    "WizardContainer",
-    "WizardNavigation",
-    "WizardProgress",
-    "WizardStep",
-    "WorldFormFields",
-    "WorldImageDisplay"
-  ]
+  "storybookGaps": []
 }
