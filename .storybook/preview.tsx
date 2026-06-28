@@ -11,9 +11,11 @@ import {
   Fira_Code,
   DM_Sans,
 } from 'next/font/google';
+import { initialize, mswLoader } from 'msw-storybook-addon';
 import { ThemeProvider, useTheme } from '../src/lib/theme/ThemeProvider';
 import type { DesignSystem, ColorScheme } from '../src/lib/theme';
 import { TutorialProvider } from '../src/components/TutorialProvider/TutorialProvider';
+import { handlers } from './msw/handlers';
 
 import '../src/app/globals.css';
 import '../src/app/workshop.css';
@@ -44,6 +46,11 @@ const fontVariables = [
   crimsonPro.variable, jetbrainsMono.variable, manrope.variable,
   newsreader.variable, firaCode.variable, dmSans.variable,
 ].join(' ');
+
+// Start the MSW service worker once. `onUnhandledRequest: 'bypass'` lets
+// fonts/static assets through while the default handlers (./msw/handlers)
+// intercept the app's AI/HTTP routes, so stories never hit the real network.
+initialize({ onUnhandledRequest: 'bypass' });
 
 // Syncs Storybook toolbar selections into ThemeProvider's React context
 // so components using useTheme() render the correct theme variant.
@@ -113,7 +120,16 @@ const preview: Preview = {
     colorScheme: 'light',
   },
   decorators: [withTheme],
+  loaders: [mswLoader],
   parameters: {
+    msw: { handlers },
+    viewport: {
+      viewports: {
+        mobile: { name: 'Mobile (375)', styles: { width: '375px', height: '720px' } },
+        tablet: { name: 'Tablet (768)', styles: { width: '768px', height: '1024px' } },
+        desktop: { name: 'Desktop (1280)', styles: { width: '1280px', height: '900px' } },
+      },
+    },
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
       matchers: {
