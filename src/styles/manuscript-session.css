@@ -2903,6 +2903,68 @@ body.manuscript-overlay-open {
   letter-spacing: 0.04em;
 }
 
+/* Issue #1478: inline generation-failure surface in the choices column. A
+   hung or failed turn now drops the loading skeleton and shows this instead of
+   spinning "Continuing your story..." forever. Transient (retryable) errors
+   offer a Retry; terminal ones (bad key) get the danger accent and point the
+   player at Settings. Visible across all three design systems on purpose. */
+.manuscript-generation-error {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1_5);
+  padding: var(--space-3);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.manuscript-generation-error-terminal {
+  border-color: var(--color-danger);
+}
+
+.manuscript-generation-error-title {
+  font-family: var(--font-interface), system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.manuscript-generation-error-message {
+  color: var(--color-text);
+  font-size: 0.875rem;
+}
+
+.manuscript-generation-error-suggestion {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.manuscript-generation-error-retry {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-family: var(--font-interface), system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.manuscript-generation-error-retry:hover {
+  background: var(--color-accent-hover);
+}
+
+.manuscript-generation-error-retry:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* Issue #918: evaluating-action state — a tumbling-die motif distinguishes a
    skill-check evaluation phase from generic generation. Hidden by default,
    themed per design system below. */

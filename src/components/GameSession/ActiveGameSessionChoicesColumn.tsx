@@ -6,6 +6,7 @@ import type { Decision } from '@/types/narrative.types';
 import type { WorldSkill } from '@/types/world.types';
 import type { InventoryItem } from '@/types/inventory.types';
 import type { CharacterSkill } from '@/state/characterStore';
+import type { NarrativeError } from '@/lib/narrative/narrativeErrors';
 
 interface ActiveGameSessionChoicesColumnProps {
   currentDecision: Decision | null;
@@ -33,6 +34,10 @@ interface ActiveGameSessionChoicesColumnProps {
     onAccept: () => void;
     onDismiss: () => void;
   };
+  /** Classified narrative-generation failure for the current turn, if any. */
+  generationError?: NarrativeError | null;
+  /** Retry the failed turn (only meaningful for transient/retryable errors). */
+  onRetryGeneration?: () => void;
 }
 
 const ActiveGameSessionChoicesColumn: React.FC<
@@ -59,8 +64,19 @@ const ActiveGameSessionChoicesColumn: React.FC<
   dataTutorial = 'player-choices',
   className = '',
   endingSuggestion,
+  generationError = null,
+  onRetryGeneration,
 }) => {
   const [showSuggestedActions, setShowSuggestedActions] = React.useState(false);
+
+  // Show the failure surface only once the turn has settled into an error —
+  // never mid-generation — so a Retry that flips isGenerating back on hides it
+  // immediately instead of flashing under the spinner.
+  const showGenerationError =
+    !!generationError &&
+    !isGenerating &&
+    !isGeneratingChoices &&
+    !isEvaluatingAction;
   const renderEndStoryAction = React.useCallback(() => {
     if (!endStoryAction) {
       return null;
@@ -96,6 +112,36 @@ const ActiveGameSessionChoicesColumn: React.FC<
         )
       )}
       <div className="player-choices-container" data-tutorial={dataTutorial}>
+        {showGenerationError ? (
+          <div
+            className={`manuscript-generation-error${
+              generationError.retryable ? '' : ' manuscript-generation-error-terminal'
+            }`}
+            role="alert"
+          >
+            <p className="manuscript-generation-error-title">
+              {generationError.title}
+            </p>
+            <p className="manuscript-generation-error-message">
+              {generationError.message}
+            </p>
+            {generationError.suggestion && (
+              <p className="manuscript-generation-error-suggestion">
+                {generationError.suggestion}
+              </p>
+            )}
+            {generationError.retryable && onRetryGeneration && (
+              <button
+                type="button"
+                className="manuscript-generation-error-retry"
+                onClick={onRetryGeneration}
+              >
+                {generationError.retryLabel}
+              </button>
+            )}
+          </div>
+        ) : (
+        <>
         {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}
         {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && !hidePrompt && (
           <p className="manuscript-context-summary">
@@ -169,6 +215,8 @@ const ActiveGameSessionChoicesColumn: React.FC<
               </div>
             </div>
           )
+        )}
+        </>
         )}
       </div>
     </div>

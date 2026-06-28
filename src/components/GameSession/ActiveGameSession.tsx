@@ -79,6 +79,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
+  const [retryToken, setRetryToken] = React.useState(0);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Track choice generation for UI state
@@ -141,6 +142,28 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         isSessionEnded: state.isSessionEnded,
       }))
     );
+
+  // Live story-generation failure for the current turn (timeout, network,
+  // provider 429/5xx, bad key). Captured in the store by NarrativeController so
+  // the choices column can surface inline error + Retry — see issue #1478.
+  const generationError = useNarrativeStore((state) => state.generationError);
+
+  // A failure must drop the "Continuing your story..." spinner/skeleton —
+  // otherwise the turn hangs on the loading state forever (the original #1478
+  // bug). Clearing both generation flags lets the error surface take over.
+  React.useEffect(() => {
+    if (generationError) {
+      setIsGenerating(false);
+      setIsGeneratingChoices(false);
+    }
+  }, [generationError]);
+
+  // Retry the failed turn: show the spinner again and bump the token the
+  // NarrativeController watches to re-run the last generation.
+  const handleRetryGeneration = React.useCallback(() => {
+    setIsGenerating(true);
+    setRetryToken((token) => token + 1);
+  }, []);
 
   // Reactively track segment count using a stable snapshot to avoid infinite loops.
   // Selecting derived arrays from Zustand can cause non-cached snapshots.
@@ -487,6 +510,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               endStoryAction={endStoryAction}
               isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
               endingSuggestion={endingSuggestion}
+              generationError={generationError}
+              onRetryGeneration={handleRetryGeneration}
             />
           </div>
         </ManuscriptActionRail>
@@ -507,6 +532,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         onChoicesGenerated={handleChoicesGenerated}
         onEndingSuggested={handleEndingSuggested}
         segmentCount={segmentCount}
+        retryToken={retryToken}
       />
 
       <div className="manuscript-secondary-controls">

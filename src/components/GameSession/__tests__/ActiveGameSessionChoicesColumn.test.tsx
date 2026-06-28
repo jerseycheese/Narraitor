@@ -129,4 +129,73 @@ describe('ActiveGameSessionChoicesColumn', () => {
 
     expect(selectorProps.inputActions).toBeTruthy();
   });
+
+  describe('generation error surface (#1478)', () => {
+    const transientError = {
+      title: 'The story paused',
+      message: 'We lost the connection needed to continue your story.',
+      suggestion: 'Check that you are online, then pick up where you left off.',
+      retryable: true,
+      retryLabel: 'Continue the story',
+      severity: 'error' as const,
+    };
+
+    const terminalError = {
+      title: 'The story can\'t continue',
+      message: 'Your story can\'t continue until your account settings are sorted out.',
+      suggestion: 'Open Settings to check your access, then return to your story.',
+      retryable: false,
+      retryLabel: 'Continue the story',
+      severity: 'critical' as const,
+    };
+
+    it('shows the error and a Retry for a transient (retryable) failure', () => {
+      const onRetryGeneration = jest.fn();
+      render(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={null}
+          generationError={transientError}
+          onRetryGeneration={onRetryGeneration}
+        />
+      );
+
+      expect(screen.getByRole('alert')).toHaveTextContent('The story paused');
+      const retry = screen.getByRole('button', { name: 'Continue the story' });
+      fireEvent.click(retry);
+      expect(onRetryGeneration).toHaveBeenCalledTimes(1);
+      // The skeleton/choices are suppressed in favor of the error surface.
+      expect(ChoiceSelector).not.toHaveBeenCalled();
+    });
+
+    it('shows terminal copy without a Retry for a non-retryable failure', () => {
+      render(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={null}
+          generationError={terminalError}
+          onRetryGeneration={jest.fn()}
+        />
+      );
+
+      expect(screen.getByRole('alert')).toHaveTextContent('can\'t continue');
+      expect(
+        screen.queryByRole('button', { name: 'Continue the story' })
+      ).toBeNull();
+    });
+
+    it('hides the error while a turn is generating so it never flashes under the spinner', () => {
+      render(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={null}
+          isGenerating={true}
+          generationError={transientError}
+          onRetryGeneration={jest.fn()}
+        />
+      );
+
+      expect(screen.queryByRole('alert')).toBeNull();
+    });
+  });
 });
