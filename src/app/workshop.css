@@ -1977,14 +1977,22 @@
   margin: 0;
   font-family: var(--font-interface);
   font-size: 1.125rem;
-
-  /* Pin line-height so the section title stays visually identical regardless of
-     its heading level — it became an <h2> for correct heading order (#1473), and
-     the .app-surface-* rules set a different line-height per tag (h2 1.25 vs h3
-     1.35). Without this the whole section would shift vertically. */
-  line-height: 1.35;
   font-weight: 600;
   color: var(--color-text-primary);
+}
+
+/* The section title became an <h2> for correct heading order (#1473). On the
+   default/workshop surfaces the .app-surface-* rules set line-height per tag
+   (h2 1.25 vs h3 1.35), so without this the section would shift vertically.
+   Scope the pin to those surfaces only — the manuscript surface (play/ending)
+   has no per-tag rules, so pinning there would over-apply and shift it instead. */
+.app-surface-default
+  .component-collapsible-section
+  [data-testid="collapsible-section-title"],
+.app-surface-workshop
+  .component-collapsible-section
+  [data-testid="collapsible-section-title"] {
+  line-height: 1.35;
 }
 
 .component-collapsible-section [data-testid="collapsible-section-content"] {
