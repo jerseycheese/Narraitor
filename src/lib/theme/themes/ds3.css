@@ -158,6 +158,7 @@
 
   /* Dark ink on the light semantic fills so filled buttons clear AA in dark mode. #1379 */
   --color-on-success: rgb(23 19 16);
+
   /* Slightly deeper than the canvas ink: ds3's muted-red danger fill needs it to clear 4.5:1 (4.72:1). */
   --color-on-danger: rgb(15 12 10);
   --color-on-warning: rgb(23 19 16);
