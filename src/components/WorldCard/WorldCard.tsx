@@ -11,7 +11,7 @@ import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
-import { CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
+import { CheckCircle, Play, Pencil, Trash } from 'lucide-react';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('WorldCard');
@@ -249,7 +249,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     e.stopPropagation();
                     router.push(`/characters?worldId=${world.id}`);
                   },
-                  variant: 'primary',
+                  variant: 'secondary',
                   flex: true,
                 },
                 {
@@ -263,16 +263,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 },
               ]}
               secondaryActions={[
-                {
-                  key: 'view',
-                  text: 'View',
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    router.push(`/worlds/${world.id}`);
-                  },
-                  variant: 'secondary',
-                  icon: <Eye aria-hidden="true" />,
-                },
                 {
                   key: 'edit',
                   text: 'Edit',
