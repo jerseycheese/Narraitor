@@ -20,8 +20,11 @@ const isDev = process.env.NODE_ENV !== 'production';
 //   with eval(); production (next build) never uses eval.
 // - va.vercel-scripts.com: Vercel Analytics loads its debug script from this
 //   origin in dev; in production it is served same-origin (/_vercel/insights).
+// Dev-only allowance so impeccable live mode (http://localhost:8400) can load.
+// Guarded by NODE_ENV; never present in production builds.
+const impeccableLiveDev = isDev ? ['http://localhost:8400'] : [];
 const devScriptSrc = isDev ? ["'unsafe-eval'", 'https://va.vercel-scripts.com'] : [];
-const scriptSrc = ["'self'", "'unsafe-inline'", ...devScriptSrc].join(' ');
+const scriptSrc = ["'self'", "'unsafe-inline'", ...devScriptSrc, ...impeccableLiveDev].join(' ');
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -29,7 +32,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://picsum.photos https://i.pravatar.cc https://api.dicebear.com",
-  "connect-src 'self' https://vitals.vercel-insights.com",
+  `connect-src ${["'self'", 'https://vitals.vercel-insights.com', ...impeccableLiveDev].join(' ')}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

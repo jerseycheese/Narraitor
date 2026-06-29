@@ -153,3 +153,9 @@ build-output.log
 
 \n# Local tool logs\n.bdg/
 characters-debug.png
+
+# impeccable (design tool): keep local state out of git, share only the live config
+.impeccable/*
+!.impeccable/live/
+.impeccable/live/*
+!.impeccable/live/config.json
