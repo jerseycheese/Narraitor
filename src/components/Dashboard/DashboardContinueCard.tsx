@@ -84,9 +84,6 @@ export function DashboardContinueCard({
             </dl>
 
             <p className="dashboard-continue-card-meta">
-              <span className="dashboard-continue-card-progress">
-                {session.narrativeCount} entries
-              </span>
               <time dateTime={session.lastPlayed}>
                 Last played {lastPlayedText}
               </time>
@@ -106,7 +103,7 @@ export function DashboardContinueCard({
             {
               label: 'Delete',
               onClick: () => setIsDeleteDialogOpen(true),
-              variant: 'danger',
+              variant: 'ghost',
             },
           ]}
         />
