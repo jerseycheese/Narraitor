@@ -7,11 +7,6 @@ import type { NextConfig } from "next";
 // static generation. Enforcement was verified clean first: a headless crawl of
 // the public/creation/settings/dev routes produced zero violations, generated
 // images are base64 data: URLs, and no client code fetches non-self origins.
-// googleapis (stylesheet) and gstatic (font files) remain allowlisted. Their
-// only consumer was the retired /dev/design-system showcase routes (which
-// @import Google Fonts); the production app self-hosts fonts via next/font, so
-// this allowlist is now vestigial and can be tightened once re-verified with a
-// headless crawl (TODO: separate security pass).
 const isDev = process.env.NODE_ENV !== 'production';
 
 // Development-only script sources, omitted from production builds to keep the
@@ -29,8 +24,8 @@ const scriptSrc = ["'self'", "'unsafe-inline'", ...devScriptSrc, ...impeccableLi
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src ${scriptSrc}`,
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
   "img-src 'self' data: blob: https://picsum.photos https://i.pravatar.cc https://api.dicebear.com",
   `connect-src ${["'self'", 'https://vitals.vercel-insights.com', ...impeccableLiveDev].join(' ')}`,
   "frame-ancestors 'none'",

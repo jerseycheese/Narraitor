@@ -70,6 +70,29 @@ test.describe('Manuscript Layout Specific Tests', () => {
       timeout: 10000,
     });
 
+    // The character panel's width is matched to the rail by a deferred layout
+    // effect in ManuscriptSessionShell (a ResizeObserver + requestAnimationFrame
+    // that copies the measured rail width onto the panel). Measuring synchronously
+    // the instant the panel mounts races that sync, which is flaky across runners
+    // (issue #1497; previously skip-listed in #1185). Wait for the widths to
+    // settle before asserting instead of sampling mid-sync.
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const rail = document.querySelector('.manuscript-characters-rail');
+            const panel = document.querySelector('.manuscript-hud-character-panel');
+            if (!rail || !panel) return Number.POSITIVE_INFINITY;
+            return Math.abs(
+              Math.round(
+                panel.getBoundingClientRect().width - rail.getBoundingClientRect().width,
+              ),
+            );
+          }),
+        { timeout: 5000 },
+      )
+      .toBeLessThanOrEqual(2);
+
     const desktopLayout = await page.evaluate(() => {
       const rail = document.querySelector('.manuscript-characters-rail');
       const mainContent = document.querySelector('.manuscript-main-content');
