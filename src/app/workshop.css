@@ -1503,37 +1503,41 @@
   height: 0.875rem;
 }
 
-/* Card action variant overrides - applied via CardActionGroup variant prop */
-.card-action-variant-primary {
+/* Card action variant overrides — applied via CardActionGroup variant prop.
+   Scoped under `.card-action-group button` so they out-specify the base
+   button rule (.card-action-group button, which sets the surface bg + muted
+   text). Without this scope the variants are (0,1,0) and lose to the (0,1,1)
+   base, so success/primary/danger colors silently never render. */
+.card-action-group button.card-action-variant-primary {
   background: var(--color-accent);
   color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
-.card-action-variant-primary:hover {
+.card-action-group button.card-action-variant-primary:hover {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
   color: var(--color-text-inverse);
 }
 
-.card-action-variant-success {
+.card-action-group button.card-action-variant-success {
   background: hsl(var(--success));
   color: hsl(var(--success-foreground));
   border-color: hsl(var(--success));
 }
 
-.card-action-variant-success:hover {
+.card-action-group button.card-action-variant-success:hover {
   opacity: 0.9;
   color: hsl(var(--success-foreground));
 }
 
-.card-action-variant-danger {
+.card-action-group button.card-action-variant-danger {
   color: var(--color-danger);
   border-color: transparent;
   background: transparent;
 }
 
-.card-action-variant-danger:hover {
+.card-action-group button.card-action-variant-danger:hover {
   background: hsl(var(--destructive) / 8%);
   color: var(--color-danger-hover);
 }
