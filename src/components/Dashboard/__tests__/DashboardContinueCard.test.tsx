@@ -66,7 +66,6 @@ describe('DashboardContinueCard', () => {
 
     expect(screen.getByText('Fantasy Realm')).toBeInTheDocument();
     expect(screen.getByText('Aragorn')).toBeInTheDocument();
-    expect(screen.getByText(/15.*entries/i)).toBeInTheDocument();
   });
 
   it('calls onContinue when continue button clicked', async () => {

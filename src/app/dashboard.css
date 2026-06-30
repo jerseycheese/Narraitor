@@ -174,25 +174,11 @@
   text-overflow: ellipsis;
 }
 
-/* Progress + last-played as one consistent muted meta line. */
+/* Last-played timestamp as a single muted meta line. */
 .dashboard-continue-card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-1) var(--space-3);
   margin: 0;
   font-family: var(--font-system);
   font-size: 0.75rem;
-  color: var(--color-text-muted);
-}
-
-.dashboard-continue-card-progress {
-  font-weight: 600;
-  color: var(--color-text-secondary);
-}
-
-.dashboard-continue-card-meta time {
-  font-family: var(--font-system);
   color: var(--color-text-muted);
 }
 
@@ -210,7 +196,7 @@
   }
 
   .dashboard-continue-card-meta {
-    justify-content: center;
+    text-align: center;
   }
 }
 
