@@ -1,5 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
+import './EmptyState.css';
 
 export interface EmptyStateProps {
   title: string;
@@ -23,11 +24,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div className={clsx('component-empty-state', className)}>
       {icon && (
-        <div>
+        <div className="component-empty-state-icon">
           {icon}
         </div>
       )}
-      <div>
+      <div className="component-empty-state-content">
         <h3>
           {title}
         </h3>
@@ -38,7 +39,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         )}
       </div>
       {action && (
-        <div>
+        <div className="component-empty-state-actions">
           {action}
         </div>
       )}

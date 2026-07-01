@@ -139,6 +139,26 @@ body.manuscript-overlay-open {
   min-height: 100vh;
 }
 
+/* Play-entry early-exit states (world-not-found, no-characters, session-not-started,
+   generation error). The manuscript surface is deliberately chrome-free for immersion,
+   so these states get their own centered treatment with an explicit way back to
+   navigation, rather than stranding the player on a bare top-left banner (#1479). */
+.manuscript-play-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 60vh;
+  padding: var(--space-8) var(--space-4);
+}
+
+.manuscript-play-entry-debug {
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
 /* ─── /play route wrapper ───
    `.play-page` wraps every render path of /src/app/play/page.tsx so per-theme
    typography lands on PageLayout's unstyled <header>/<h1>/<p>. DS3 = base;

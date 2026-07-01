@@ -13,6 +13,8 @@ import ActiveGameSession from './ActiveGameSession';
 import GameSessionResume from './GameSessionResume';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
+import { Users, BookOpen } from 'lucide-react';
 
 interface GameSessionProps {
   worldId: string;
@@ -270,17 +272,19 @@ const GameSession: React.FC<GameSessionProps> = ({
   // Client-side only checks from here on
   if (!worldExists) {
     return (
-      <div data-testid="game-session-error-container">
+      <div className="manuscript-play-entry" data-testid="game-session-error-container">
         <ErrorDisplay
           variant="section"
           title="World Not Found"
           message="The world you're trying to access doesn't exist or has been deleted."
           severity="error"
-          showRetry
-          onRetry={handleRetry}
-          showDismiss
-          onDismiss={handleDismissError}
         />
+        <Button
+          variant="default"
+          onClick={() => router?.push('/worlds')}
+        >
+          Back to Worlds
+        </Button>
       </div>
     );
   }
@@ -305,40 +309,60 @@ const GameSession: React.FC<GameSessionProps> = ({
     // Check if there are any characters for this world
     if (worldCharacters.length === 0) {
       return (
-        <div data-testid="game-session-no-characters" >
-          <div>
-            <h2>No Characters Found</h2>
-            <p>
-              You need to create a character before you can start playing in this world.
-            </p>
-            <Button
-              variant="default"
-              onClick={() => router?.push(`/characters/create?worldId=${worldId}`)}
-            >
-              Create Character
-            </Button>
-          </div>
+        <div className="manuscript-play-entry" data-testid="game-session-no-characters">
+          <EmptyState
+            icon={<Users aria-hidden="true" />}
+            title="No Characters Found"
+            description="You'll need a character before you can start playing in this world."
+            action={
+              <>
+                <Button
+                  variant="default"
+                  onClick={() => router?.push(`/characters/create?worldId=${worldId}`)}
+                >
+                  Create Character
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => router?.push('/worlds')}
+                >
+                  Back to Worlds
+                </Button>
+              </>
+            }
+          />
         </div>
       );
     }
     
     return (
-      <div data-testid="game-session-initializing" >
-        <div>
-          <h2>Session Not Started</h2>
-          <p>No active game session.</p>
-          {process.env.NODE_ENV === 'development' && (
-            <div>
-              Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
-            </div>
-          )}
-          <Button
-            variant="default"
-            onClick={startSession}
-          >
-            Start Session
-          </Button>
-        </div>
+      <div className="manuscript-play-entry" data-testid="game-session-initializing">
+        <EmptyState
+          icon={<BookOpen aria-hidden="true" />}
+          title="Session Not Started"
+          description="No active game session yet."
+          action={
+            <>
+              <Button
+                variant="default"
+                onClick={startSession}
+              >
+                Start Session
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => router?.push('/worlds')}
+              >
+                Back to Worlds
+              </Button>
+            </>
+          }
+        />
+        {process.env.NODE_ENV === 'development' && (
+          <div className="manuscript-play-entry-debug">
+            Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
+          </div>
+        )}
       </div>
     );
   }
@@ -351,11 +375,19 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   if (error || sessionState.error) {
     return (
-      <GameSessionError 
-        error={(error?.message || sessionState.error || 'Unknown error')}
-        onRetry={handleRetry}
-        onDismiss={handleDismissError}
-      />
+      <div className="manuscript-play-entry">
+        <GameSessionError
+          error={(error?.message || sessionState.error || 'Unknown error')}
+          onRetry={handleRetry}
+          onDismiss={handleDismissError}
+        />
+        <Button
+          variant="ghost"
+          onClick={() => router?.push('/worlds')}
+        >
+          Back to Worlds
+        </Button>
+      </div>
     );
   }
   
