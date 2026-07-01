@@ -20,6 +20,8 @@ import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
 import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
+import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
+import { Button } from '@/components/ui/button';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 import { World } from '@/types/world.types';
@@ -496,24 +498,18 @@ export default function CharactersPage() {
 
   if (mounted && (!effectiveWorldId || !currentWorld)) {
     return (
-      <PageLayout
-        title="My Characters"
-        description="Choose a world to view your characters."
-      >
-        <div>
-          <Globe aria-hidden="true" />
-          <h2>Choose Your World</h2>
-          <ActionButtonGroup
-            actions={[
-              {
-                label: 'Go to Worlds',
-                onClick: () => router.push('/worlds'),
-                variant: 'primary',
-                size: 'lg',
-              },
-            ]}
-          />
-        </div>
+      <PageLayout title="My Characters">
+        <EmptyState
+          className="characters-empty-no-world"
+          icon={<Globe aria-hidden="true" />}
+          title="Choose Your World"
+          description="Characters live inside a world. Head to Worlds to pick one, then come back here to view and create characters."
+          action={
+            <Button variant="default" onClick={() => router.push('/worlds')}>
+              Go to Worlds
+            </Button>
+          }
+        />
       </PageLayout>
     );
   }
