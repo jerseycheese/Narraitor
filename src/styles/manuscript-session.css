@@ -2215,11 +2215,17 @@ body.manuscript-overlay-open {
   height: 100%;
 }
 
-/* The character editor's portrait preview (PortraitSection) fills its section
-   rather than taking the size variant, so keep it filling. */
+/* The character editor's portrait preview (PortraitSection) shows a bounded
+   square avatar. Its section provides no height for `height: 100%` to resolve
+   against, so aspect-ratio supplies the height — otherwise the placeholder
+   collapses to the initials' line-height and a filled image collapses to zero
+   (#1495). Mirrors the wizard PortraitStep preview size. */
 .component-character-editor .component-character-portrait {
-  width: 100%;
-  height: 100%;
+  width: calc(var(--space-8) * 8);
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
 }
 
 .manuscript-character-snapshot-portrait {
