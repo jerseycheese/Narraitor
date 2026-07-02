@@ -23,7 +23,7 @@ import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import { Button } from '@/components/ui/button';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
+import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator';
 import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
@@ -31,7 +31,7 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { GeneratedImage } from '@/types/common.types';
 import { generatePortrait } from '@/lib/api/generatePortrait';
-import { aiFetch } from '@/lib/ai/aiFetch';
+import { characterApi } from '@/lib/api/characterApi';
 
 // CharacterTable pulls @tanstack/react-table but only renders in table view,
 // and the generate dialog only matters once the page is interactive. Load both
@@ -312,24 +312,13 @@ export default function CharactersPage() {
       const nameToUse =
         generationType === 'specific' ? characterName : undefined;
 
-      const response = await aiFetch('/api/generate-character', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          worldId: effectiveWorldId,
-          characterType: generationType,
-          existingNames: existingNames,
-          suggestedName: nameToUse,
-          world: currentWorld,
-        }),
+      const generatedData: GeneratedCharacterData = await characterApi.generateCharacter({
+        worldId: effectiveWorldId,
+        characterType: generationType,
+        existingNames: existingNames,
+        suggestedName: nameToUse,
+        world: currentWorld,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate character');
-      }
-
-      const generatedData: GeneratedCharacterData = await response.json();
 
       const characterId = createCharacter({
         name: generatedData.name,

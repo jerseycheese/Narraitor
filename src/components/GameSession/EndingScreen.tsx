@@ -29,7 +29,7 @@ import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
-import { aiFetch } from '@/lib/ai/aiFetch';
+import { generateEndingImage as requestEndingImage } from '@/lib/api/endingImageApi';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('EndingScreen');
@@ -122,24 +122,12 @@ export function EndingScreen() {
         .slice(-5)
         .map((segment) => segment.content);
 
-      const response = await aiFetch('/api/generate-ending-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ending: currentEnding,
-          world,
-          character,
-          recentNarrative,
-        }),
+      const data = await requestEndingImage({
+        ending: currentEnding,
+        world,
+        character,
+        recentNarrative,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to load ending image');
-      }
-
-      const data = await response.json();
       setEndingImage(data.imageUrl);
 
       // Update the ending in the store with the image URL

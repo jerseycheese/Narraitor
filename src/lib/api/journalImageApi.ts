@@ -5,7 +5,7 @@ import { World } from '@/types/world.types';
 import { GeneratedImage } from '@/types/common.types';
 import { getTimestamp } from '@/lib/utils';
 import Logger from '@/lib/utils/logger';
-import { aiFetch } from './aiFetch';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 const logger = new Logger('JournalImageGenerator');
 

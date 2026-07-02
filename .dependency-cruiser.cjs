@@ -153,15 +153,19 @@ module.exports = {
     },
     {
       name: 'components-no-direct-lib-imports',
-      severity: 'info',
+      severity: 'error',
       comment:
-        'Components importing directly from lib/ services. Consider if this business logic ' +
-        'should be in a store instead for better testability and separation of concerns.',
+        'Components must reach the AI layer through lib/api services or hooks/ (worldApi ' +
+        'pattern), not import lib/ai internals directly. Devtools panels are exempt — they ' +
+        'exist to poke internals. Known stragglers live in the baseline; do not add new ones.',
       from: {
-        path: '^src/components/'
+        path: '^src/components/',
+        // Exempt: devtools (exist to poke internals), colocated hook files
+        // (use*.ts ARE the mediating layer), and tests.
+        pathNot: '^src/components/devtools/|/use[A-Z][^/]*\\.ts$|\\.(test|spec)\\.[jt]sx?$'
       },
       to: {
-        path: '^src/lib/(?:gemini|prompt)/'
+        path: '^src/lib/ai/'
       }
     },
     {
