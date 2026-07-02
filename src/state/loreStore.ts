@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createIndexedDBStorage } from './persistence';
+import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { getInitialState } from './loreStore.state';
 import {
   createLoreBaseActions,
@@ -34,7 +35,17 @@ export const useLoreStore = create<LoreStore>()(
         factHistory: state.factHistory,
         mergeAuditLog: state.mergeAuditLog,
       }),
-      migrate: () => getInitialState(),
+      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
+);
+
+// Cascade cleanup: deleting a world orphans its lore facts otherwise (mirrors
+// characterStore's WORLD_DELETED subscription). Plain subscribe — the handler
+// only clears data, so a double-fire is a no-op.
+storeEvents.subscribe<WorldDeletedEvent>(
+  StoreEventTypes.WORLD_DELETED,
+  ({ worldId }) => {
+    useLoreStore.getState().clearFacts(worldId);
+  }
 );
