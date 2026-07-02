@@ -17,7 +17,7 @@ import { timeoutSignal } from './abortTimeout';
 // its internal retries: worst case ~93s at 3x30s attempts plus backoff).
 // GeminiClient enforces its own per-attempt timeout; this catches everything
 // else so a hung request can't block the story loop forever.
-export const AI_REQUEST_TIMEOUT_MS = 120_000;
+const AI_REQUEST_TIMEOUT_MS = 120_000;
 
 export async function aiFetch(input: string, init: RequestInit = {}): Promise<Response> {
   const key = await getActiveProviderKey().catch(() => null);
