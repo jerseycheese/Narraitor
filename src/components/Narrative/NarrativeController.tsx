@@ -6,8 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
-import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
-import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { useNarrativeGenerator } from '@/hooks/useNarrativeGenerator';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useEndingDetection } from './useEndingDetection';
 import { usePlayerChoices } from './hooks/usePlayerChoices';
@@ -90,10 +89,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     (state) => state.clearGenerationError
   );
   const hasHydrated = useNarrativeStore((state) => state._hasHydrated);
-  const narrativeGenerator = useMemo(
-    () => new NarrativeGenerator(createDefaultGeminiClient()),
-    []
-  );
+  const narrativeGenerator = useNarrativeGenerator();
 
   const npcIds = useNPCStore(
     useCallback((state) => state.worldNpcs[worldId] ?? EMPTY_NPC_IDS, [worldId])

@@ -120,6 +120,7 @@ export async function POST(request: NextRequest) {
     let prompt: string;
     let character: Character | undefined;
     let world: World | undefined;
+    const apiKey = resolveApiKey(request);
 
     if (typeof body === 'string') {
       prompt = body;
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
           physicalDesc,
           worldGenre,
           isKnownFigure,
-          resolveApiKey(request)
+          apiKey
         );
 
         return NextResponse.json({
@@ -175,7 +176,7 @@ export async function POST(request: NextRequest) {
           physicalDesc,
           worldGenre,
           isKnownFigure,
-          resolveApiKey(request)
+          apiKey
         );
       }
     } else {
@@ -197,8 +198,6 @@ export async function POST(request: NextRequest) {
       'Generating portrait with prompt:',
       truncate(prompt, 100)
     );
-
-    const apiKey = resolveApiKey(request);
 
     if (!apiKey) {
       // Return a mock portrait for development

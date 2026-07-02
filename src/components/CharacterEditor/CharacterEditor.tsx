@@ -13,7 +13,7 @@ import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
-import { aiFetch } from '@/lib/ai/aiFetch';
+import { generatePortrait } from '@/lib/api/generatePortrait';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('CharacterEditor');
@@ -127,22 +127,11 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     setGeneratingPortrait(true);
     setPortraitError(null); // Clear previous portrait errors
     try {
-      const response = await aiFetch('/api/generate-portrait', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          character: { ...editingCharacter, id: characterId },
-          world: world,
-          customDescription: customDescription
-        }),
+      const { portrait } = await generatePortrait({
+        character: { ...editingCharacter, id: characterId },
+        world: world,
+        customDescription: customDescription,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate portrait');
-      }
-
-      const { portrait } = await response.json();
 
       // Update both local editing state and store
       setEditingCharacter({ ...editingCharacter, portrait });

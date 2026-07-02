@@ -581,5 +581,68 @@
       "severity": "warn",
       "name": "no-orphans"
     }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
+    "to": "src/lib/ai/worldImageGenerator.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
+    "to": "src/lib/ai/worldAnalyzerClient.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/WorldCreationWizard/steps/FinalizeStep.tsx",
+    "to": "src/lib/ai/worldImageGenerator.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/forms/WorldImageForm.tsx",
+    "to": "src/lib/ai/worldImageGenerator.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/ai/ProviderWizard.tsx",
+    "to": "src/lib/ai/validateProviderClient.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/ai/ProviderWizard.tsx",
+    "to": "src/lib/ai/presets.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/ai/ProviderPresets.tsx",
+    "to": "src/lib/ai/presets.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
   }
 ]

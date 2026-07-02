@@ -4,9 +4,9 @@ import '@testing-library/jest-dom';
 import { JournalEntryImage } from '../JournalEntryImage';
 import { useJournalStore } from '@/state/journalStore';
 import { JournalEntry } from '@/types/journal.types';
-import { generateJournalImage } from '@/lib/ai/journalImageGenerator';
+import { generateJournalImage } from '@/lib/api/journalImageApi';
 
-jest.mock('@/lib/ai/journalImageGenerator', () => ({
+jest.mock('@/lib/api/journalImageApi', () => ({
   generateJournalImage: jest.fn(),
 }));
 

@@ -1,4 +1,4 @@
-import { generateJournalImage } from '../journalImageGenerator';
+import { generateJournalImage } from '../journalImageApi';
 import type { JournalEntry } from '@/types/journal.types';
 
 const entry: JournalEntry = {

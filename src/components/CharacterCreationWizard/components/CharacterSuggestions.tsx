@@ -8,8 +8,8 @@ import { Label } from '@/components/ui/label';
 import { ErrorBlock } from '@/components/shared';
 import { World } from '@/types/world.types';
 import { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
-import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
-import { aiFetch } from '@/lib/ai/aiFetch';
+import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator';
+import { characterApi } from '@/lib/api/characterApi';
 
 type CardKey = 'description' | 'background' | 'attributes' | 'skills';
 
@@ -59,23 +59,12 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const response = await aiFetch('/api/generate-character', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          world,
-          concept,
-          characterType: 'original',
-          existingNames: [],
-        }),
+      const data: GeneratedCharacterData = await characterApi.generateCharacter({
+        world,
+        concept,
+        characterType: 'original',
+        existingNames: [],
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to generate suggestions');
-      }
-
-      const data: GeneratedCharacterData = await response.json();
       setSuggestion(data);
       setDismissed(new Set());
       setEditingCard(null);

@@ -6,7 +6,7 @@ import { ImageOff, AlertCircle } from 'lucide-react';
 import { JournalEntry } from '@/types/journal.types';
 import { GeneratedImage } from '@/types/common.types';
 import { ImageGenerationSection } from '@/components/shared';
-import { generateJournalImage } from '@/lib/ai/journalImageGenerator';
+import { generateJournalImage } from '@/lib/api/journalImageApi';
 import { useJournalStore } from '@/state/journalStore';
 import { useWorldStore } from '@/state/worldStore';
 import { getTimestamp } from '@/lib/utils';
