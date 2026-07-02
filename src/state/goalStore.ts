@@ -12,6 +12,7 @@ import type { NarrativeSegment } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
+import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { goalExtractor } from '../lib/ai/goalExtractor';
 import { CrudStore } from './createCrudStore';
 
@@ -40,6 +41,7 @@ export interface GoalStore extends CrudStore<NarrativeGoal> {
   incrementMentionCount: (goalId: EntityID) => void;
   addProgressNote: (goalId: EntityID, note: string) => void;
   clearSessionGoals: (sessionId: EntityID) => void;
+  clearWorldGoals: (worldId: EntityID) => void;
   processSegmentForGoals: (segment: NarrativeSegment, sessionId: EntityID, characterId?: EntityID) => Promise<ProcessSegmentResult>;
 }
 
@@ -282,6 +284,14 @@ export const useGoalStore = create<GoalStore>()(
         goalIds.forEach((goalId) => get().delete(goalId));
       },
 
+      clearWorldGoals: (worldId) => {
+        // Goals without a worldId can't be attributed to the deleted world,
+        // so they're left alone.
+        Object.values(get().goals)
+          .filter((goal) => goal.worldId === worldId)
+          .forEach((goal) => get().delete(goal.id));
+      },
+
       processSegmentForGoals: async (segment, sessionId, characterId) => {
         set({ loading: true, error: null });
         try {
@@ -365,4 +375,14 @@ export const useGoalStore = create<GoalStore>()(
       migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
+);
+
+// Cascade cleanup: deleting a world orphans its goals otherwise (mirrors
+// characterStore's WORLD_DELETED subscription). Plain subscribe — the handler
+// only clears data, so a double-fire is a no-op.
+storeEvents.subscribe<WorldDeletedEvent>(
+  StoreEventTypes.WORLD_DELETED,
+  ({ worldId }) => {
+    useGoalStore.getState().clearWorldGoals(worldId);
+  }
 );

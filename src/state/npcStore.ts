@@ -6,6 +6,7 @@ import { NPC } from '../types/npc.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
+import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { CrudStore } from './createCrudStore';
 
 export interface NPCStore extends CrudStore<NPC> {
@@ -241,3 +242,13 @@ export const useNPCStore = create<NPCStore>()(
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
   window.useNPCStore = useNPCStore;
 }
+
+// Cascade cleanup: deleting a world orphans its NPCs otherwise (mirrors
+// characterStore's WORLD_DELETED subscription). Plain subscribe — the handler
+// only clears data, so a double-fire is a no-op.
+storeEvents.subscribe<WorldDeletedEvent>(
+  StoreEventTypes.WORLD_DELETED,
+  ({ worldId }) => {
+    useNPCStore.getState().clearWorldNPCs(worldId);
+  }
+);

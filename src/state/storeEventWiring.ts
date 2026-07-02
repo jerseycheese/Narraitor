@@ -15,6 +15,12 @@
  */
 import './narrativeStore';
 import './inventoryStore';
+// World-deletion cascade subscribers (WORLD_DELETED at each module tail).
+// Imported here so the cleanup is registered on every route — a world can be
+// deleted from a page that never renders NPCs, goals, or lore.
+import './npcStore';
+import './goalStore';
+import './loreStore';
 import {
   storeEvents,
   StoreEventTypes,
