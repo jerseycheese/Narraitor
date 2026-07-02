@@ -13,9 +13,6 @@ import type {
 } from '../../types/narrative.types';
 import type { JournalEntry } from '../../types/journal.types';
 
-const MAX_RETRIES = 2;
-const RETRY_DELAY_MS = 1000;
-
 function extractRecentNarrative(segments: NarrativeSegment[]): string[] {
   const recentSegments = segments
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
@@ -123,10 +120,6 @@ function parseResponse(response: string): EndingGenerationResult {
   }
 }
 
-function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export async function generateEnding(request: EndingGenerationRequest, apiKey?: string | null): Promise<EndingGenerationResult> {
   try {
     logger.debug('Generating story ending', { request });
@@ -163,34 +156,24 @@ export async function generateEnding(request: EndingGenerationRequest, apiKey?: 
 
     finalPrompt += '\n\nIMPORTANT: Return ONLY valid JSON with no additional text, markdown formatting, or commentary. The response must be parseable JSON.';
 
-    let lastError: Error | null = null;
-    for (let i = 0; i <= MAX_RETRIES; i++) {
-      try {
-        const client = createDefaultGeminiClient(apiKey);
-        const response = await client.generateContent(finalPrompt);
-        const result = parseResponse(response.content);
+    // Retryable API errors are already retried inside GeminiClient
+    // (config.maxRetries with backoff) — an outer loop here multiplied the
+    // attempts. Parse failures throw straight to the caller, matching how
+    // narrativeGenerator and choiceGenerator handle them.
+    const client = createDefaultGeminiClient(apiKey);
+    const response = await client.generateContent(finalPrompt);
+    const result = parseResponse(response.content);
 
-        if (context.sessionStartTime) {
-          result.playTime = Math.floor((Date.now() - context.sessionStartTime.getTime()) / 1000);
-        }
-
-        logger.debug('Story ending generated successfully', {
-          tone: result.tone,
-          achievementCount: result.achievements.length
-        });
-
-        return result;
-      } catch (error) {
-        lastError = error as Error;
-        logger.warn(`Ending generation attempt ${i + 1} failed`, { error });
-
-        if (i < MAX_RETRIES) {
-          await delay(RETRY_DELAY_MS * (i + 1));
-        }
-      }
+    if (context.sessionStartTime) {
+      result.playTime = Math.floor((Date.now() - context.sessionStartTime.getTime()) / 1000);
     }
 
-    throw new Error(`Failed to create ending after ${MAX_RETRIES + 1} attempts: ${lastError?.message}`);
+    logger.debug('Story ending generated successfully', {
+      tone: result.tone,
+      achievementCount: result.achievements.length
+    });
+
+    return result;
   } catch (error) {
     logger.error('Failed to create ending', {
       error,

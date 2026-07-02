@@ -127,6 +127,22 @@ describe('ChoiceGenerator', () => {
       expect(result.prompt).toBeTruthy();
     });
     
+    it('prefers the explicit generateChoices entry point when the client has one', async () => {
+      const routingClient: jest.Mocked<AIClient> = {
+        generateContent: jest.fn(),
+        generateChoices: jest.fn().mockResolvedValueOnce({ content: '', finishReason: 'STOP' }),
+      };
+
+      await generateChoices(routingClient, {
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1']
+      });
+
+      expect(routingClient.generateChoices).toHaveBeenCalled();
+      expect(routingClient.generateContent).not.toHaveBeenCalled();
+    });
+
     it('should handle empty or malformed AI responses', async () => {
       // Mock an empty response
       mockAIClient.generateContent.mockResolvedValueOnce({ content: '', finishReason: 'STOP' });

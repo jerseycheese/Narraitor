@@ -47,4 +47,28 @@ describe('aiFetch', () => {
 
     expect(lastFetchHeaders().has('x-provider-api-key')).toBe(false);
   });
+
+  test('attaches a timeout signal by default when the runtime supports it', async () => {
+    // jsdom's AbortSignal has no static timeout; emulate the browser/Node API.
+    const signal = new AbortController().signal;
+    (AbortSignal as unknown as { timeout?: (ms: number) => AbortSignal }).timeout = jest.fn(() => signal);
+    try {
+      mockGetKey.mockResolvedValue(null);
+      await aiFetch('/api/x');
+
+      const init = (global.fetch as jest.Mock).mock.calls[0][1];
+      expect(init.signal).toBe(signal);
+    } finally {
+      delete (AbortSignal as unknown as { timeout?: unknown }).timeout;
+    }
+  });
+
+  test('preserves a caller-supplied signal', async () => {
+    mockGetKey.mockResolvedValue(null);
+    const controller = new AbortController();
+    await aiFetch('/api/x', { signal: controller.signal });
+
+    const init = (global.fetch as jest.Mock).mock.calls[0][1];
+    expect(init.signal).toBe(controller.signal);
+  });
 });

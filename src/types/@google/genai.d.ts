@@ -31,6 +31,8 @@ declare module '@google/genai' {
   export interface GenerateContentConfig {
     generationConfig?: GenerationConfig;
     safetySettings?: SafetySetting[];
+    // Client-side cancellation only; the service still bills the request.
+    abortSignal?: AbortSignal;
   }
 
   export interface ModelInterface {

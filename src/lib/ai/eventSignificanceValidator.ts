@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { logger } from '@/lib/utils/logger';
 import { getAIConfig } from './config';
+import { extractJsonObject } from './parseJSON';
 
 /**
  * Event Significance Validation Result
@@ -150,12 +151,12 @@ Respond ONLY with valid JSON in this exact format:
 function parseValidationResponse(responseText: string): SignificanceValidationResult {
   try {
     // Extract JSON from the response (handle cases where LLM adds extra text)
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const json = extractJsonObject(responseText);
+    if (!json) {
       throw new Error('No JSON found in response');
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(json);
 
     if (typeof parsed.isSignificant !== 'boolean') {
       throw new Error('Invalid response: isSignificant must be boolean');

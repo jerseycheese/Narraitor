@@ -4,6 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 import { AIResponse, AIServiceConfig, AIClient } from './types';
 import { isRetryableError } from '@/lib/utils/errorUtils';
 import { getGenerationConfig, getSafetySettings } from './config';
+import { timeoutSignal } from './abortTimeout';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('GeminiClient');
@@ -70,7 +71,10 @@ export class GeminiClient implements AIClient {
         contents: prompt,
         config: {
           generationConfig: this.config.generationConfig,
-          safetySettings: this.config.safetySettings
+          safetySettings: this.config.safetySettings,
+          // config.timeout existed but was never enforced — a hung request
+          // previously blocked forever (retries only fire on rejection).
+          abortSignal: timeoutSignal(this.config.timeout)
         }
       });
 
