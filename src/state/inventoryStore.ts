@@ -18,7 +18,7 @@ import { canEquipItem } from '@/lib/inventory/equippable';
 import { EntityID, GeneratedImage } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { CrudStore } from './createCrudStore';
+import { CrudStore } from './crudStore.types';
 import { isValidCategory } from '@/lib/inventory/categories';
 import { createAcquisitionJournalEntry } from '@/lib/inventory/journalIntegration';
 import {

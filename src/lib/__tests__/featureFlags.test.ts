@@ -20,12 +20,10 @@ describe('featureFlags', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: undefined,
       NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE: undefined,
-      NEXT_PUBLIC_FEATURE_VIRTUALIZATION: undefined,
     });
 
     expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(false);
     expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
-    expect(isFeatureEnabled('VIRTUALIZATION')).toBe(false);
   });
 
   it('enables BUFFERED_STREAMING only when env var is true', () => {
@@ -39,11 +37,11 @@ describe('featureFlags', () => {
   it('treats non-true values as disabled', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE: 'TRUE',
-      NEXT_PUBLIC_FEATURE_VIRTUALIZATION: '1',
+      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: '1',
     });
 
     expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
-    expect(isFeatureEnabled('VIRTUALIZATION')).toBe(false);
+    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(false);
   });
 
   it('supports downstream gating decisions for BUFFERED_STREAMING', () => {

@@ -1,4 +1,4 @@
-import { generateCharacter } from '@/lib/ai/characterGenerator';
+import { generateAICharacter } from '@/lib/generators/characterGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import {
   createMockWorld,
@@ -41,7 +41,7 @@ describe('characterGenerator concept threading', () => {
   });
 
   it('includes the user concept in the AI prompt', async () => {
-    await generateCharacter(world, [], undefined, 'original', 'a grizzled detective');
+    await generateAICharacter(world, [], undefined, 'original', 'a grizzled detective');
 
     expect(mockGenerateContent).toHaveBeenCalled();
     const prompt = mockGenerateContent.mock.calls[0][0] as string;
@@ -49,7 +49,7 @@ describe('characterGenerator concept threading', () => {
   });
 
   it('omits the concept clause when no concept is given', async () => {
-    await generateCharacter(world, [], undefined, 'original');
+    await generateAICharacter(world, [], undefined, 'original');
 
     const prompt = mockGenerateContent.mock.calls[0][0] as string;
     expect(prompt).not.toContain('The user describes this character concept');

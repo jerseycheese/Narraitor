@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import {
-  generateCharacter,
+  generateAICharacter,
   type GeneratedCharacterData,
-} from '@/lib/ai/characterGenerator';
+} from '@/lib/generators/characterGenerator';
 
 export default function CharacterGenerationTestPage() {
   const [generationType, setGenerationType] = useState<
@@ -41,7 +41,7 @@ export default function CharacterGenerationTestPage() {
         .filter((c) => c.worldId === selectedWorldId)
         .map((c) => c.name);
 
-      const result = await generateCharacter(
+      const result = await generateAICharacter(
         world,
         existingNames,
         generationType === 'specific' ? suggestedName : undefined,

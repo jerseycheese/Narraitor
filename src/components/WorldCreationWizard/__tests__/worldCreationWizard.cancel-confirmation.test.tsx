@@ -25,7 +25,7 @@ jest.mock('@/state/worldStore', () => ({
   useWorldStore: jest.fn(),
 }));
 
-jest.mock('@/lib/ai', () => ({
+jest.mock('@/lib/ai/clientFactory', () => ({
   createAIClient: jest.fn(),
 }));
 

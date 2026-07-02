@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { generatePortrait as generatePortraitDirect } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai';
+import { createAIClient } from '@/lib/ai/clientFactory';
 import {
   useCharacterStore,
   type Character as StoreCharacter,

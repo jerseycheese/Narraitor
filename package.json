@@ -26,7 +26,6 @@
     "build-storybook": "storybook build",
     "deploy-storybook": "npm run build-storybook && gh-pages -d storybook-static",
     "test": "jest --config=jest.config.cjs",
-    "test:prompt-templates": "jest --config=jest.config.cjs src/lib/promptTemplates/promptTemplateManager.test.ts",
     "test:coverage": "jest --config=jest.config.cjs --coverage",
     "test:ci": "node --max-old-space-size=4096 node_modules/.bin/jest --config=jest.config.cjs --coverage",
     "test:e2e:critical": "playwright test --project=chromium",
