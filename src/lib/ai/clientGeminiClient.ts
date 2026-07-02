@@ -20,73 +20,57 @@ export class ClientGeminiClient implements AIClient {
   }
 
   /**
-   * Generate content via server-side API route
-   * Automatically routes to the appropriate endpoint based on prompt content
+   * POSTs to an API route and unwraps the JSON payload, normalizing the
+   * shared error branches (rate limiting, HTTP errors, network failures)
+   * into user-friendly messages.
    */
-  async generateContent(prompt: string): Promise<AIResponse> {
+  private async postJson<T>(endpoint: string, body: unknown, logContext: string): Promise<T> {
     try {
-      // Detect if this is a choice generation request based on prompt content
-      const isChoiceGeneration = this.isChoiceGenerationPrompt(prompt);
-      const endpoint = isChoiceGeneration ? '/api/narrative/choices' : '/api/narrative/generate';
-      
       const response = await aiFetch(`${this.baseUrl}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          prompt,
-          config: {
-            temperature: 0.7,
-            maxTokens: 1024
-          }
-        })
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
-        if (response.status === 429) {
-          // Rate limiting error
-          const data = await response.json();
-          throw new Error(data.error || 'Rate limit exceeded. Please try again later.');
-        }
-        
         const errorData = await response.json();
+        if (response.status === 429) {
+          throw new Error(errorData.error || 'Rate limit exceeded. Please try again later.');
+        }
         throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      
-      return {
-        content: data.content,
-        finishReason: data.finishReason || 'STOP',
-        promptTokens: data.promptTokens,
-        completionTokens: data.completionTokens
-      };
+      return await response.json();
     } catch (error) {
-      logger.error('ClientGeminiClient error:', error);
-      
-      // Use existing error handling utilities
+      logger.error(`ClientGeminiClient ${logContext} error:`, error);
       const friendlyMessage = userFriendlyError(error instanceof Error ? error : new Error('Unknown error'));
       throw new Error(friendlyMessage);
     }
   }
 
+  private toAIResponse(data: { content: string; finishReason?: string; promptTokens?: number; completionTokens?: number }): AIResponse {
+    return {
+      content: data.content,
+      finishReason: data.finishReason || 'STOP',
+      promptTokens: data.promptTokens,
+      completionTokens: data.completionTokens,
+    };
+  }
+
   /**
-   * Detect if a prompt is for choice generation based on content patterns
+   * Generate narrative content via the server-side API route. Choice
+   * generation goes through generateChoices() — callers pick the endpoint
+   * explicitly instead of this method inferring it from prompt content.
    */
-  private isChoiceGenerationPrompt(prompt: string): boolean {
-    const choiceIndicators = [
-      'create 4 distinct action choices',
-      'generate player choices',
-      'ALIGNMENT DEFINITIONS',
-      'alignedPlayerChoice',
-      'playerChoice',
-      'create choices',
-      'decision options'
-    ];
-    
-    const lowerPrompt = prompt.toLowerCase();
-    return choiceIndicators.some(indicator => lowerPrompt.includes(indicator.toLowerCase()));
+  async generateContent(prompt: string): Promise<AIResponse> {
+    const data = await this.postJson<{ content: string; finishReason?: string; promptTokens?: number; completionTokens?: number }>(
+      '/api/narrative/generate',
+      { prompt, config: { temperature: 0.7, maxTokens: 1024 } },
+      'generation'
+    );
+    return this.toAIResponse(data);
   }
 
   /**
@@ -94,86 +78,27 @@ export class ClientGeminiClient implements AIClient {
    * This method is used specifically for choice generation
    */
   async generateChoices(prompt: string): Promise<AIResponse> {
-    try {
-      const response = await aiFetch(`${this.baseUrl}/api/narrative/choices`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt,
-          config: {
-            temperature: 0.7,
-            maxTokens: 1024
-          }
-        })
-      });
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          // Rate limiting error
-          const data = await response.json();
-          throw new Error(data.error || 'Rate limit exceeded. Please try again later.');
-        }
-        
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      
-      return {
-        content: data.content,
-        finishReason: data.finishReason || 'STOP',
-        promptTokens: data.promptTokens,
-        completionTokens: data.completionTokens
-      };
-    } catch (error) {
-      logger.error('ClientGeminiClient choice generation error:', error);
-      
-      // Use existing error handling utilities
-      const friendlyMessage = userFriendlyError(error instanceof Error ? error : new Error('Unknown error'));
-      throw new Error(friendlyMessage);
-    }
+    const data = await this.postJson<{ content: string; finishReason?: string; promptTokens?: number; completionTokens?: number }>(
+      '/api/narrative/choices',
+      { prompt, config: { temperature: 0.7, maxTokens: 1024 } },
+      'choice generation'
+    );
+    return this.toAIResponse(data);
   }
 
   /**
    * Generate portrait image via existing server-side API route
    */
   async generateImage(prompt: string): Promise<AIImageResponse> {
-    try {
-      const response = await aiFetch(`${this.baseUrl}/api/generate-portrait`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt })
-      });
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          // Rate limiting error
-          const data = await response.json();
-          throw new Error(data.error || 'Rate limit exceeded. Please try again later.');
-        }
-        
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      
-      return {
-        image: data.image,
-        prompt: data.prompt
-      };
-    } catch (error) {
-      logger.error('ClientGeminiClient image generation error:', error);
-      
-      // Use existing error handling utilities
-      const friendlyMessage = userFriendlyError(error instanceof Error ? error : new Error('Unknown error'));
-      throw new Error(friendlyMessage);
-    }
+    const data = await this.postJson<{ image: string; prompt: string }>(
+      '/api/generate-portrait',
+      { prompt },
+      'image generation'
+    );
+    return {
+      image: data.image,
+      prompt: data.prompt,
+    };
   }
 
   /**

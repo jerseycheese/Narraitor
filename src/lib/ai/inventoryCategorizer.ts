@@ -2,6 +2,7 @@ import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
 import { STANDARD_CATEGORIES } from '@/lib/inventory/categories';
 import { truncate } from '@/lib/utils';
+import { extractFencedJson, extractJsonObject } from '@/lib/ai/parseJSON';
 import { logger } from '@/lib/utils/logger';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
 
@@ -70,27 +71,27 @@ function parseAIResponse(raw: string): AIResponseShape | null {
       preview: truncate(raw, 150),
     });
 
-    const match = raw.match(/```json\s*([\s\S]*?)```/i);
-    if (match) {
+    const fenced = extractFencedJson(raw);
+    if (fenced) {
       try {
-        return JSON.parse(match[1]) as AIResponseShape;
+        return JSON.parse(fenced) as AIResponseShape;
       } catch (blockError) {
         logger.debug('InventoryCategorizer', 'Failed to parse AI code block', {
           error: blockError,
-          preview: truncate(match[1], 150),
+          preview: truncate(fenced, 150),
         });
         return null;
       }
     }
 
-    const jsonLike = raw.match(/\{[\s\S]*\}/);
+    const jsonLike = extractJsonObject(raw);
     if (jsonLike) {
       try {
-        return JSON.parse(jsonLike[0]) as AIResponseShape;
+        return JSON.parse(jsonLike) as AIResponseShape;
       } catch (fallbackError) {
         logger.debug('InventoryCategorizer', 'Failed to parse AI JSON fallback', {
           error: fallbackError,
-          preview: truncate(jsonLike[0], 150),
+          preview: truncate(jsonLike, 150),
         });
         return null;
       }

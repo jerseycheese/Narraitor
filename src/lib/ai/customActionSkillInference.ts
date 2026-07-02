@@ -9,6 +9,7 @@ import type { World, WorldSkill } from '@/types/world.types';
 import type { Character } from '@/state/characterStore';
 import type { DecisionRequirement, NarrativeSegment } from '@/types/narrative.types';
 import { safeTrim } from '@/lib/utils';
+import { extractFencedJson } from './parseJSON';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('CustomActionSkillInference');
@@ -109,14 +110,14 @@ function parseInferenceResponse(
   content: string,
   worldSkills: WorldSkill[]
 ): DecisionRequirement[] {
-  const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
-  if (!jsonMatch) {
+  const fenced = extractFencedJson(content);
+  if (!fenced) {
     return [];
   }
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(jsonMatch[1]);
+    parsed = JSON.parse(fenced);
   } catch {
     return [];
   }

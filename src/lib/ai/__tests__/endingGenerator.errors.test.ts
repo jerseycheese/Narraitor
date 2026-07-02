@@ -120,9 +120,9 @@ describe('EndingGenerator - Error Handling and Retry', () => {
   });
 
   describe('Retry Generation', () => {
-    it('should retry failed generation attempts', async () => {
-      // Use real timers for this test since it involves retry delays
-      jest.useRealTimers();
+    // Retries live inside GeminiClient (config.maxRetries); the generator
+    // makes exactly one call and surfaces failures to the caller.
+    it('makes a single generation call and propagates client failures', async () => {
       const mockRequest: EndingGenerationRequest = {
         sessionId: 'session-789',
         characterId: 'char-456',
@@ -138,22 +138,10 @@ describe('EndingGenerator - Error Handling and Retry', () => {
       };
 
       mockBuildEndingContext.mockResolvedValue(mockContext);
+      mockGeminiClient.generateContent.mockRejectedValueOnce(new Error('API error'));
 
-      // First attempt fails, second succeeds
-      mockGeminiClient.generateContent
-        .mockRejectedValueOnce(new Error('API error'))
-        .mockResolvedValueOnce({ content: `{
-          "epilogue": "Success after retry...",
-          "characterLegacy": "A persistent hero...",
-          "worldImpact": "Changed through determination...",
-          "tone": "triumphant",
-          "achievements": ["Never Give Up"]
-        }` });
-
-      const result = await generateEnding(mockRequest);
-
-      expect(result.epilogue).toContain('Success after retry');
-      expect(mockGeminiClient.generateContent).toHaveBeenCalledTimes(2);
+      await expect(generateEnding(mockRequest)).rejects.toThrow('Failed to create ending: API error');
+      expect(mockGeminiClient.generateContent).toHaveBeenCalledTimes(1);
     });
   });
 });

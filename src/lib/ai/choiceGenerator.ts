@@ -49,7 +49,12 @@ export async function generateChoices(
       maxOptions,
     });
 
-    const response = await aiClient.generateContent(prompt);
+    // Prefer the explicit choices entry point when the client has one (the
+    // browser proxy routes it to /api/narrative/choices); server-side clients
+    // hit the SDK directly so generateContent is equivalent there.
+    const response = aiClient.generateChoices
+      ? await aiClient.generateChoices(prompt)
+      : await aiClient.generateContent(prompt);
 
 
     if (!response?.content || safeTrim(response?.content ?? '') === '') {
