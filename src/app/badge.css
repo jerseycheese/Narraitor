@@ -65,7 +65,7 @@
 
 .badge-destructive,
 .badge-destructive-static {
-  background: hsl(var(--destructive) / 12%);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
   color: var(--color-danger);
   border-color: var(--color-danger);
 }

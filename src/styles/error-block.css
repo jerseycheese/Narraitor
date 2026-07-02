@@ -1,0 +1,26 @@
+/* Error display styling for ErrorBlock and wizard form errors.
+   Replaces Tailwind utility strings that went inert when Tailwind was
+   removed — these components rendered unstyled until this file. */
+
+.error-block {
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  border: 1px solid var(--color-danger);
+
+  /* radius-md, not -lg: DS1 (the default theme) defines no --radius-lg. */
+  border-radius: var(--radius-md);
+}
+
+.error-block-message {
+  margin-top: var(--space-1);
+  font-size: 0.875rem;
+  color: var(--color-danger);
+}
+
+.input-error {
+  border-color: var(--color-danger);
+}
+
+.input-error:focus-visible {
+  outline-color: var(--color-danger);
+}

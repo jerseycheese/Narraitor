@@ -3218,22 +3218,22 @@ body.manuscript-overlay-open {
 .error-display-section {
   margin: var(--space-4) 0;
   padding: var(--space-3) var(--space-3_5);
-  background: hsl(var(--destructive) / 8%);
-  border: 1px solid hsl(var(--destructive) / 30%);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
   border-radius: var(--radius-md);
 }
 
 .error-display-title {
   font-size: 1rem;
   font-weight: 600;
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
   margin: 0 0 var(--space-1_5);
 }
 
 .error-display-message {
   font-size: 0.875rem;
   line-height: 1.5;
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
   margin: 0 0 var(--space-2_5);
 }
 
@@ -3246,8 +3246,8 @@ body.manuscript-overlay-open {
   padding: var(--space-1_5) var(--space-3);
   font-size: 0.875rem;
   font-weight: 500;
-  background: hsl(var(--destructive));
-  color: hsl(var(--destructive-foreground));
+  background: var(--color-danger);
+  color: var(--color-on-danger);
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -3255,7 +3255,7 @@ body.manuscript-overlay-open {
 }
 
 .error-display-actions .error-display-retry:hover {
-  background: hsl(var(--destructive) / 90%);
+  background: color-mix(in srgb, var(--color-danger) 90%, transparent);
 }
 
 .error-display-actions .error-display-dismiss {
@@ -3263,15 +3263,15 @@ body.manuscript-overlay-open {
   font-size: 0.875rem;
   font-weight: 500;
   background: var(--color-surface);
-  color: hsl(var(--destructive));
-  border: 1px solid hsl(var(--destructive) / 30%);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
   border-radius: var(--radius-sm);
   cursor: pointer;
   text-decoration: none;
 }
 
 .error-display-actions .error-display-dismiss:hover {
-  background: hsl(var(--destructive) / 6%);
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
 }
 
 /* Issue #302 — retry in-progress + fallback after persistent failures.
@@ -3296,15 +3296,15 @@ body.manuscript-overlay-open {
   font-size: 0.875rem;
   font-weight: 500;
   background: var(--color-surface);
-  color: hsl(var(--destructive));
-  border: 1px solid hsl(var(--destructive) / 30%);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
   border-radius: var(--radius-sm);
   cursor: pointer;
   text-decoration: none;
 }
 
 .error-display-actions .error-display-fallback-action:hover {
-  background: hsl(var(--destructive) / 6%);
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
 }
 
 /* Fix 56: DS1 error container */
@@ -3374,8 +3374,8 @@ body.manuscript-overlay-open {
 [data-theme="ds2"] .error-display-section {
   margin: var(--space-4) 0;
   padding: var(--space-4) var(--space-4);
-  background: hsl(var(--destructive) / 6%);
-  border: 1px solid hsl(var(--destructive) / 25%);
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
   border-radius: var(--radius-md);
 }
 
@@ -3383,7 +3383,7 @@ body.manuscript-overlay-open {
   font-family: var(--font-narrative);
   font-size: 1.125rem;
   font-weight: 600;
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
   margin: 0 0 var(--space-2);
   letter-spacing: 0;
   text-transform: none;
@@ -3393,7 +3393,7 @@ body.manuscript-overlay-open {
   font-family: var(--font-narrative);
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
   margin: 0 0 var(--space-3);
 }
 
@@ -3407,8 +3407,8 @@ body.manuscript-overlay-open {
   padding: var(--space-1_5) var(--space-3);
   font-size: 0.875rem;
   font-weight: 500;
-  background: hsl(var(--destructive));
-  color: hsl(var(--destructive-foreground));
+  background: var(--color-danger);
+  color: var(--color-on-danger);
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -3418,7 +3418,7 @@ body.manuscript-overlay-open {
 }
 
 [data-theme="ds2"] .error-display-actions .error-display-retry:hover {
-  background: hsl(var(--destructive) / 90%);
+  background: color-mix(in srgb, var(--color-danger) 90%, transparent);
 }
 
 [data-theme="ds2"] .error-display-actions .error-display-dismiss {
@@ -3427,8 +3427,8 @@ body.manuscript-overlay-open {
   font-size: 0.875rem;
   font-weight: 500;
   background: transparent;
-  color: hsl(var(--destructive));
-  border: 1px solid hsl(var(--destructive) / 30%);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
   border-radius: var(--radius-md);
   cursor: pointer;
   letter-spacing: 0;
@@ -3437,7 +3437,7 @@ body.manuscript-overlay-open {
 }
 
 [data-theme="ds2"] .error-display-actions .error-display-dismiss:hover {
-  background: hsl(var(--destructive) / 6%);
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
 }
 
 /* ===========================================================================
@@ -3465,7 +3465,7 @@ body.manuscript-overlay-open {
 
 .error-display-inline.error-display-error,
 .error-display-inline.error-display-critical {
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
 }
 
 .error-display-inline.error-display-warning {
@@ -3544,8 +3544,8 @@ body.manuscript-overlay-open {
 [data-theme="ds2"] .error-display-critical.error-display-section {
   border-width: 1px;
   border-left-width: var(--space-1);
-  border-left-color: hsl(var(--destructive));
-  background: hsl(var(--destructive) / 12%);
+  border-left-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
 }
 
 /* Fix 69: DS1 tools menu items — compact, transparent background */

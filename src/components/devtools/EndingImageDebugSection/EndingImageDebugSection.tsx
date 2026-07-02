@@ -8,7 +8,6 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding, EndingTone, EndingType } from '@/types/narrative.types';
 import { capitalize, getTimestamp } from '@/lib/utils';
-import { endingTones } from '@/lib/design-tokens/tokens/contextual';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -200,11 +199,11 @@ export function EndingImageDebugSection() {
     return `ending-${tone}`;
   };
 
-  // Get tone background color from design tokens
-  const getToneBackgroundColor = (tone: EndingTone) => {
-    const toneConfig = endingTones[tone as keyof typeof endingTones];
-    return toneConfig?.background ?? '#6b7280';
-  };
+  // Tone backgrounds come from the live theme (--ending-* in the ds* theme
+  // files) so the preview matches what EndingScreen actually renders under
+  // the active data-theme. Muted-text token as the unknown-tone fallback.
+  const getToneBackgroundColor = (tone: EndingTone) =>
+    `var(--ending-${tone}, var(--color-text-muted))`;
 
   const currentCharacter = currentEnding ? characters[currentEnding.characterId] : (Object.values(characters) as Character[])[0];
   const currentWorld = currentEnding ? worlds[currentEnding.worldId] : Object.values(worlds)[0];
