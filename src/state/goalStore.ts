@@ -13,8 +13,8 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
-import { goalExtractor } from '../lib/ai/goalExtractor';
-import { CrudStore } from './createCrudStore';
+import { extractGoalsFromNarrative } from '../lib/ai/goalExtractor';
+import { CrudStore } from './crudStore.types';
 
 interface ProcessSegmentResult {
   newGoalsCreated: number;
@@ -320,7 +320,7 @@ export const useGoalStore = create<GoalStore>()(
           };
 
           const extractionResult: GoalExtractionResult =
-            await goalExtractor.extractGoalsFromNarrative(extractionRequest);
+            await extractGoalsFromNarrative(extractionRequest);
 
           let newGoalsCreated = 0;
           let goalsUpdated = 0;

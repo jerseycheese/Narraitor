@@ -6,7 +6,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
-import { CrudStore } from './createCrudStore';
+import { CrudStore } from './crudStore.types';
 import { createStoreError, ErrorType } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world';

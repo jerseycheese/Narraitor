@@ -14,7 +14,7 @@ import type {
 } from '../types/lore.types';
 import type { EntityID } from '../types/common.types';
 import type { UserFriendlyError } from '@/lib/utils/errorUtils';
-import type { CrudStore } from './createCrudStore';
+import type { CrudStore } from './crudStore.types';
 import type { FactHistory } from './loreStore.state';
 
 // The store interface lives here (not in loreStore.ts) so the action-factory

@@ -15,7 +15,7 @@ import {
   getTimestamp,
 } from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
-import { CrudStore } from './createCrudStore';
+import { CrudStore } from './crudStore.types';
 import { calculateDerivedStat } from '@/lib/utils/derivedStatCalculator';
 import { storeEvents, StoreEventTypes, type CharacterDeletedEvent, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 

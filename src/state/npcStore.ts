@@ -7,7 +7,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
-import { CrudStore } from './createCrudStore';
+import { CrudStore } from './crudStore.types';
 
 export interface NPCStore extends CrudStore<NPC> {
   npcs: Record<EntityID, NPC>;

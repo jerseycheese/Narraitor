@@ -37,24 +37,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/stories/02-molecules/forms/editors/AttributeRangeEditor.stories.tsx",
-    "to": "node_modules/@storybook/addon-actions/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/02-molecules/forms/editors/AttributeRangeEditor.stories.tsx",
-    "to": "node_modules/@storybook/react/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/stories/02-molecules/forms/editors/SkillRangeEditor.stories.tsx",
     "to": "node_modules/@storybook/react/dist/index.d.ts",
     "rule": {
