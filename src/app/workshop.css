@@ -1538,7 +1538,7 @@
 }
 
 .card-action-group button.card-action-variant-danger:hover {
-  background: hsl(var(--destructive) / 8%);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   color: var(--color-danger-hover);
 }
 

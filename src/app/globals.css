@@ -7,6 +7,9 @@
 /* Crash-recovery prompt (restore a session after an unexpected closure) */
 @import url('../styles/session-recovery.css');
 
+/* Error blocks and form error states (ErrorBlock, wizard FormComponents) */
+@import url('../styles/error-block.css');
+
 /* Skip link - visually hidden until focused (accessibility) */
 a[href="#main-content"] {
   position: absolute;

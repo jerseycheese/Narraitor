@@ -108,7 +108,7 @@
 
 .form-input-error:focus {
   border-color: var(--color-danger);
-  box-shadow: 0 0 0 2px hsl(var(--destructive) / 15%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-danger) 15%, transparent);
 }
 
 .form-textarea {
@@ -532,7 +532,7 @@
 }
 
 .wizard-badge-danger {
-  background: hsl(var(--destructive) / 10%);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   color: var(--color-danger);
 }
 
@@ -614,7 +614,7 @@
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-danger);
   border-radius: var(--radius-md);
-  background: hsl(var(--destructive) / 8%);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   color: var(--color-danger);
   font-family: var(--font-interface);
   font-size: 0.875rem;

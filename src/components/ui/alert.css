@@ -31,7 +31,7 @@
 
 .alert-destructive {
   border-color: var(--color-danger);
-  background: hsl(var(--destructive) / 8%);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
 }
 
 .alert-destructive .alert-title {

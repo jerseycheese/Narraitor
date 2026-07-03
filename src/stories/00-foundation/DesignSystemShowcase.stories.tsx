@@ -18,12 +18,6 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Settings } from 'lucide-react';
-import {
-  primitiveColors,
-  semanticColors,
-  endingTones,
-  loreCategories,
-} from '@/lib/design-tokens';
 
 const meta: Meta = {
   title: '00-Foundation/Design System Showcase',
@@ -42,14 +36,19 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Color Swatch Component
+// CSS Var Swatch Component
+//
+// Renders a swatch whose background is the live CSS custom property value
+// (via `var(...)`), so it automatically tracks whichever theme (DS1/DS2/DS3)
+// is active in the Storybook toolbar rather than a hardcoded, possibly-stale
+// hex value.
 //
 // Render the color as a div `background` rather than an SVG `<rect fill>`:
 // a percentage-sized SVG with a square viewBox stretched each swatch to the
 // full page width (~1393px tall), ballooning the showcase to ~27,000px.
-const ColorSwatch = ({ color, name }: { color: string; name: string }) => (
+const CssVarSwatch = ({ token }: { token: string }) => (
   <div
-    className="ds-color-swatch"
+    className="ds-css-var-swatch"
     style={{
       display: 'inline-block',
       verticalAlign: 'top',
@@ -58,20 +57,19 @@ const ColorSwatch = ({ color, name }: { color: string; name: string }) => (
     }}
   >
     <div
-      className="ds-color-swatch-chip"
+      className="ds-css-var-swatch-chip"
       style={{
-        background: color,
+        background: `var(${token})`,
         width: '3rem',
         height: '3rem',
         borderRadius: 'var(--radius-md)',
         border: '1px solid var(--color-border)',
       }}
       role="img"
-      aria-label={`${name} swatch`}
+      aria-label={`${token} swatch`}
     />
     <div>
-      <div>{name}</div>
-      <div>{color}</div>
+      <div>{token}</div>
     </div>
   </div>
 );
@@ -101,47 +99,66 @@ export const CompleteShowcase: Story = {
       <section>
         <h2>Color System</h2>
 
-        {/* Primitive Colors */}
+        {/* Theme Tokens */}
         <div>
-          <h3>Primitive Colors</h3>
-          <div>
-            {Object.entries(primitiveColors).map(([colorName, shades]) =>
-              // `white`/`black` are bare strings, not shade maps. Iterating a
-              // string with Object.entries yields its characters ("#", "f", ...),
-              // which rendered junk swatches with an invalid "#" fill — render a
-              // single swatch for them instead.
-              typeof shades === 'string' ? (
-                <ColorSwatch key={colorName} color={shades} name={colorName} />
-              ) : (
-                Object.entries(shades as Record<string, string>).map(
-                  ([shade, color]) => (
-                    <ColorSwatch
-                      key={`${colorName}-${shade}`}
-                      color={color}
-                      name={`${colorName}-${shade}`}
-                    />
-                  )
-                )
-              )
-            )}
-          </div>
-        </div>
+          <h3>Theme Tokens</h3>
+          <p>
+            Swatches render the live CSS custom property value, so they
+            automatically track the DS1/DS2/DS3 theme selected in the
+            toolbar above.
+          </p>
 
-        {/* Semantic Colors */}
-        <div>
-          <h3>Semantic Colors</h3>
+          <h4>Core</h4>
           <div>
-            {Object.entries(semanticColors).map(([colorName, shades]) =>
-              Object.entries(shades as Record<string, string>).map(
-                ([shade, color]) => (
-                  <ColorSwatch
-                    key={`${colorName}-${shade}`}
-                    color={color}
-                    name={`${colorName}-${shade}`}
-                  />
-                )
-              )
-            )}
+            {[
+              '--color-accent',
+              '--color-accent-hover',
+              '--color-accent-soft',
+              '--color-on-accent',
+            ].map((token) => (
+              <CssVarSwatch key={token} token={token} />
+            ))}
+          </div>
+
+          <h4>Text</h4>
+          <div>
+            {[
+              '--color-text-primary',
+              '--color-text-secondary',
+              '--color-text-muted',
+              '--color-text-inverse',
+            ].map((token) => (
+              <CssVarSwatch key={token} token={token} />
+            ))}
+          </div>
+
+          <h4>Surfaces</h4>
+          <div>
+            {[
+              '--color-canvas',
+              '--color-surface',
+              '--color-surface-hover',
+              '--color-border',
+              '--color-border-strong',
+            ].map((token) => (
+              <CssVarSwatch key={token} token={token} />
+            ))}
+          </div>
+
+          <h4>Feedback</h4>
+          <div>
+            {[
+              '--color-danger',
+              '--color-danger-hover',
+              '--color-on-danger',
+              '--color-success',
+              '--color-on-success',
+              '--color-warning',
+              '--color-on-warning',
+              '--color-info',
+            ].map((token) => (
+              <CssVarSwatch key={token} token={token} />
+            ))}
           </div>
         </div>
       </section>
@@ -471,17 +488,15 @@ export const CompleteShowcase: Story = {
         <div>
           <h3>Ending Tones</h3>
           <div>
-            {Object.entries(endingTones).map(([tone, colors]) =>
-              Object.entries(colors as Record<string, string>).map(
-                ([shade, color]) => (
-                  <ColorSwatch
-                    key={`${tone}-${shade}`}
-                    color={color}
-                    name={`${tone}-${shade}`}
-                  />
-                )
-              )
-            )}
+            {[
+              '--ending-triumphant',
+              '--ending-hopeful',
+              '--ending-bittersweet',
+              '--ending-mysterious',
+              '--ending-tragic',
+            ].map((token) => (
+              <CssVarSwatch key={token} token={token} />
+            ))}
           </div>
         </div>
 
@@ -489,17 +504,22 @@ export const CompleteShowcase: Story = {
         <div>
           <h3>Lore Categories</h3>
           <div>
-            {Object.entries(loreCategories).map(([category, colors]) =>
-              Object.entries(colors as Record<string, string>).map(
-                ([shade, color]) => (
-                  <ColorSwatch
-                    key={`${category}-${shade}`}
-                    color={color}
-                    name={`${category}-${shade}`}
-                  />
-                )
-              )
-            )}
+            {[
+              '--lore-characters-bg',
+              '--lore-characters-border',
+              '--lore-characters-text',
+              '--lore-events-bg',
+              '--lore-events-border',
+              '--lore-events-text',
+              '--lore-locations-bg',
+              '--lore-locations-border',
+              '--lore-locations-text',
+              '--lore-rules-bg',
+              '--lore-rules-border',
+              '--lore-rules-text',
+            ].map((token) => (
+              <CssVarSwatch key={token} token={token} />
+            ))}
           </div>
         </div>
       </section>
