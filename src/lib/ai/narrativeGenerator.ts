@@ -54,6 +54,18 @@ import {
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
 
+/**
+ * Stop an abandoned generation before its side effects run. Callers that race
+ * generation against a UI timeout abort this signal on race loss; without the
+ * check, a generation that loses the race would still write lore, inventory,
+ * and NPC state minutes after the UI took the fallback path.
+ */
+function throwIfAborted(signal?: AbortSignal): void {
+  if (signal?.aborted) {
+    throw new Error('Narrative generation aborted by caller');
+  }
+}
+
 export class NarrativeGenerator {
   private staticContentCache: NarrativeStaticContentCache = {
     toneSettings: new Map(),
@@ -62,7 +74,8 @@ export class NarrativeGenerator {
   constructor(private geminiClient: AIClient) {}
 
   async generateSegment(
-    request: NarrativeGenerationRequest
+    request: NarrativeGenerationRequest,
+    options?: { signal?: AbortSignal }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -140,7 +153,10 @@ export class NarrativeGenerator {
         continuityContract
       );
 
-      const response = await this.geminiClient.generateContent(finalPrompt);
+      const response = await this.geminiClient.generateContent(finalPrompt, {
+        signal: options?.signal,
+      });
+      throwIfAborted(options?.signal);
       recordRequestCalibration(budget, finalPrompt, response);
 
       let result = await formatNarrativeResponse(
@@ -158,6 +174,9 @@ export class NarrativeGenerator {
         worldId: request.worldId,
         sessionId: request.sessionId,
       });
+      // Re-check before the store-mutating tail (lore extraction, item
+      // acquisition/loss, NPC sync) in case the caller aborted mid-pipeline.
+      throwIfAborted(options?.signal);
 
       // Lore extraction runs on the final (possibly corrected) prose so a
       // contradicted draft never pollutes the lore store.
@@ -302,7 +321,7 @@ export class NarrativeGenerator {
     worldId: string,
     characterIds: string[],
     sessionId?: string,
-    options?: { generationParameters?: GenerationParameters }
+    options?: { generationParameters?: GenerationParameters; signal?: AbortSignal }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
@@ -379,7 +398,10 @@ export class NarrativeGenerator {
         characterInventory
       );
 
-      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt, {
+        signal: options?.signal,
+      });
+      throwIfAborted(options?.signal);
       recordRequestCalibration(budget, fullyEnhancedPrompt, response);
 
       if (response.content) {

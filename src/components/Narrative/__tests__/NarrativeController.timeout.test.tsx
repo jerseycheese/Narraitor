@@ -174,4 +174,38 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
     // Loading state must have cleared — we should NOT see the loading indicator
     expect(screen.queryByTestId('loading-indicator')).toBeNull();
   });
+
+  it('aborts the losing generation when the race times out', async () => {
+    // Losing the race must cancel the request itself, not just abandon the
+    // promise — otherwise the fetch lives on until aiFetch's outer ceiling
+    // (a zombie that wastes spend and mutates stores when it settles).
+    mockGenerateSegment.mockReturnValue(new Promise(() => {}));
+
+    renderWithToast(
+      <NarrativeController
+        worldId="test-world"
+        sessionId="test-session"
+        triggerGeneration={true}
+        generateChoices={false}
+        choiceId="choice-1"
+      />
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mockGenerateSegment).toHaveBeenCalledTimes(1);
+    const options = mockGenerateSegment.mock.calls[0][1] as
+      | { signal?: AbortSignal }
+      | undefined;
+    expect(options?.signal).toBeInstanceOf(AbortSignal);
+    expect(options?.signal?.aborted).toBe(false);
+
+    await act(async () => {
+      jest.advanceTimersByTime(AI_GENERATION_TIMEOUT_MS + 100);
+    });
+
+    expect(options?.signal?.aborted).toBe(true);
+  });
 });

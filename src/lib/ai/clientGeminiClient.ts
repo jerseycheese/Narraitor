@@ -1,8 +1,9 @@
 // src/lib/ai/clientGeminiClient.ts
 
-import { AIClient, AIResponse, AIImageResponse } from './types';
+import { AIClient, AIGenerateOptions, AIResponse, AIImageResponse } from './types';
 import { userFriendlyError } from './userFriendlyErrors';
 import { aiFetch } from './aiFetch';
+import { SINGLE_ATTEMPT_TEXT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ClientGeminiClient');
@@ -24,15 +25,25 @@ export class ClientGeminiClient implements AIClient {
    * shared error branches (rate limiting, HTTP errors, network failures)
    * into user-friendly messages.
    */
-  private async postJson<T>(endpoint: string, body: unknown, logContext: string): Promise<T> {
+  private async postJson<T>(
+    endpoint: string,
+    body: unknown,
+    logContext: string,
+    options: AIGenerateOptions & { timeoutMs?: number } = {}
+  ): Promise<T> {
     try {
-      const response = await aiFetch(`${this.baseUrl}${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await aiFetch(
+        `${this.baseUrl}${endpoint}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+          signal: options.signal,
         },
-        body: JSON.stringify(body),
-      });
+        { timeoutMs: options.timeoutMs }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -64,11 +75,14 @@ export class ClientGeminiClient implements AIClient {
    * generation goes through generateChoices() — callers pick the endpoint
    * explicitly instead of this method inferring it from prompt content.
    */
-  async generateContent(prompt: string): Promise<AIResponse> {
+  async generateContent(prompt: string, options?: AIGenerateOptions): Promise<AIResponse> {
     const data = await this.postJson<{ content: string; finishReason?: string; promptTokens?: number; completionTokens?: number }>(
       '/api/narrative/generate',
       { prompt, config: { temperature: 0.7, maxTokens: 1024 } },
-      'generation'
+      'generation',
+      // The route makes a single 30s Gemini attempt (makeGeminiRequest), so
+      // the wait ceiling is that budget + headroom, not the retry worst case.
+      { signal: options?.signal, timeoutMs: SINGLE_ATTEMPT_TEXT_TIMEOUT_MS }
     );
     return this.toAIResponse(data);
   }
@@ -77,11 +91,12 @@ export class ClientGeminiClient implements AIClient {
    * Generate choices via server-side API route
    * This method is used specifically for choice generation
    */
-  async generateChoices(prompt: string): Promise<AIResponse> {
+  async generateChoices(prompt: string, options?: AIGenerateOptions): Promise<AIResponse> {
     const data = await this.postJson<{ content: string; finishReason?: string; promptTokens?: number; completionTokens?: number }>(
       '/api/narrative/choices',
       { prompt, config: { temperature: 0.7, maxTokens: 1024 } },
-      'choice generation'
+      'choice generation',
+      { signal: options?.signal, timeoutMs: SINGLE_ATTEMPT_TEXT_TIMEOUT_MS }
     );
     return this.toAIResponse(data);
   }

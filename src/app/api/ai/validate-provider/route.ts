@@ -17,6 +17,9 @@ import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
  * UNSUPPORTED_PROVIDER.
  */
 
+// Vercel function budget: one single-attempt Gemini ping (30s) + overhead.
+export const maxDuration = 60;
+
 const GEMINI_MODELS_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 
