@@ -31,6 +31,7 @@ import {
   createMockCharacter,
   createMockNarrativeSegments,
   createMockJournalEntries,
+  createMixedSignificanceJournalEntries,
   setupTestTimers,
   cleanupTestTimers
 } from './endingGenerator.testHelpers';
@@ -170,6 +171,46 @@ describe('EndingGenerator - Advanced Features', () => {
     await endingGenerator.generateEnding(mockRequest);
 
     expect(mockGeminiClient.generateContent).toHaveBeenCalled();
+  });
+
+  it('should prioritize critical journal entries in the ending prompt', async () => {
+    const mockRequest: EndingGenerationRequest = {
+      sessionId: 'session-789',
+      characterId: 'char-456',
+      worldId: 'world-123',
+      endingType: 'story-complete'
+    };
+
+    const mockContext = {
+      world: mockWorld,
+      character: mockCharacter,
+      narrativeSegments: mockNarrativeSegments,
+      journalEntries: createMixedSignificanceJournalEntries()
+    };
+
+    mockBuildEndingContext.mockResolvedValue(mockContext);
+    mockGeminiClient.generateContent.mockResolvedValue({ content: `{
+      "epilogue": "The journey ends...",
+      "characterLegacy": "A true hero...",
+      "worldImpact": "Forever changed...",
+      "tone": "triumphant",
+      "achievements": ["Victory"]
+    }` });
+
+    await endingGenerator.generateEnding(mockRequest);
+
+    const prompt = mockGeminiClient.generateContent.mock.calls[0][0] as string;
+
+    // Critical entries survive the top-5 cut even when listed after five major entries
+    expect(prompt).toContain('Critical moment: shattered the lich king\'s phylactery');
+    expect(prompt).toContain('Critical moment: sacrificed the enchanted blade to seal the rift');
+
+    // Critical entries displace the lowest-priority major entries
+    expect(prompt).not.toContain('Major moment 4');
+    expect(prompt).not.toContain('Major moment 5');
+
+    // Minor non-achievement entries stay excluded
+    expect(prompt).not.toContain('Restocked supplies at the village market');
   });
 
   it('should generate appropriate endings for each ending type', async () => {

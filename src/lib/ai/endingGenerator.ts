@@ -117,9 +117,20 @@ class EndingGenerator {
   private extractJournalSummary(entries?: JournalEntry[]): string[] {
     if (!entries || entries.length === 0) return [];
 
-    // Get important journal entries (use significance instead of importance)
+    // Rank critical above major so the story's defining moments survive the top-5 cut
+    const significanceRank: Record<JournalEntry['significance'], number> = {
+      critical: 0,
+      major: 1,
+      minor: 2
+    };
+
     const importantEntries = entries
-      .filter(entry => entry.significance === 'major' || entry.type === 'achievement')
+      .filter(entry =>
+        entry.significance === 'critical' ||
+        entry.significance === 'major' ||
+        entry.type === 'achievement'
+      )
+      .sort((a, b) => significanceRank[a.significance] - significanceRank[b.significance])
       .slice(0, 5);
 
     return importantEntries.map(entry => entry.content);

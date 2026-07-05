@@ -139,6 +139,56 @@ export function createMockJournalEntries(): JournalEntry[] {
 }
 
 /**
+ * Creates journal entries with mixed significance for testing summary filtering.
+ * Five major entries come first so that critical entries only survive the
+ * top-5 cut if they are ranked above major, not merely included in the filter.
+ */
+export function createMixedSignificanceJournalEntries(): JournalEntry[] {
+  const baseEntry = {
+    sessionId: 'session-789',
+    characterId: 'char-456',
+    worldId: 'world-123',
+    title: '',
+    isRead: false,
+    relatedEntities: [],
+    metadata: { tags: [], automaticEntry: false },
+    createdAt: getTimestamp(),
+    updatedAt: getTimestamp(),
+  };
+
+  return [
+    {
+      ...baseEntry,
+      id: 'journal-minor-1',
+      type: 'character_event' as const,
+      content: 'Restocked supplies at the village market',
+      significance: 'minor' as const,
+    },
+    ...[1, 2, 3, 4, 5].map(n => ({
+      ...baseEntry,
+      id: `journal-major-${n}`,
+      type: 'character_event' as const,
+      content: `Major moment ${n}: won a hard-fought skirmish`,
+      significance: 'major' as const,
+    })),
+    {
+      ...baseEntry,
+      id: 'journal-critical-1',
+      type: 'decision' as const,
+      content: 'Critical moment: shattered the lich king\'s phylactery',
+      significance: 'critical' as const,
+    },
+    {
+      ...baseEntry,
+      id: 'journal-critical-2',
+      type: 'decision' as const,
+      content: 'Critical moment: sacrificed the enchanted blade to seal the rift',
+      significance: 'critical' as const,
+    },
+  ];
+}
+
+/**
  * Creates a standard mock ending response
  */
 export function createMockEndingResponse(overrides?: {
