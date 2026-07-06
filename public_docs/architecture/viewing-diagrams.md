@@ -1,11 +1,12 @@
 # Viewing Architecture Diagrams
 
-> **⚠️ First Time Setup:** Diagrams are not committed to git. Generate them first:
+> **First-time setup:** The generated diagrams aren't committed to git, so generate them first:
 > ```bash
 > npm run deps:diagram:all  # Mermaid + SVG + folder view
-> npm run deps:diagram:interactive  # Interactive HTML (recommended!)
+> npm run deps:diagram:interactive  # Interactive HTML (recommended)
 > ```
-> This creates all diagram files in `public_docs/architecture/`. They're ignored by git and must be regenerated after pulling updates.
+> This creates all diagram files in `public_docs/architecture/`. They're gitignored, so
+> regenerate them after pulling updates.
 
 ## Working with Known Violations
 
@@ -20,12 +21,11 @@ The baseline file `.dependency-cruiser-known-violations.json` captures all curre
 ```bash
 # Normal validation (ignores known violations)
 npm run deps:validate
-# ✅ Pass: No new violations
-# ⚠️  82 known violations ignored
+# Pass: no new violations; the ~82 known violations are ignored
 
 # Strict validation (shows everything)
 npm run deps:validate:strict
-# Shows all 82+ violations including known ones
+# Shows all violations including the known ones
 ```
 
 ### When You Fix Violations
@@ -40,9 +40,9 @@ git commit -m "fix: resolve circular dependencies in state stores"
 
 The baseline file size will decrease as violations are fixed, providing visible progress metrics.
 
-All diagram files come in multiple formats optimized for different use cases.
+All diagram files come in multiple formats suited to different use cases.
 
-## 🎯 Recommended: Interactive HTML
+## Recommended: Interactive HTML
 
 **Best for:** Exploration and understanding relationships
 
@@ -52,13 +52,13 @@ open public_docs/architecture/dependency-graph-interactive.html
 ```
 
 **Features:**
-- ✅ Hover over any module to see incoming/outgoing dependencies
-- ✅ Click to highlight and "pin" relationships
-- ✅ Self-contained HTML file (works offline)
-- ✅ No size limits - handles large codebases
-- ✅ Press ESC to clear highlights
+- Hover over any module to see incoming/outgoing dependencies
+- Click to highlight and "pin" relationships
+- Self-contained HTML file (works offline)
+- No size limits, so it handles large codebases
+- Press ESC to clear highlights
 
-This is dependency-cruiser's most powerful visualization option!
+This is dependency-cruiser's most capable visualization option.
 
 ## Recommended: Mermaid Live Editor
 
@@ -134,17 +134,17 @@ The diagrams are generated at **multiple zoom levels** to avoid rendering issues
 
 | File | Format | Lines | VS Code | Description |
 |------|--------|-------|---------|-------------|
-| `dependency-graph-interactive.html` | HTML | N/A | ➖ | **Interactive** - Hover/click exploration |
-| `dependency-graph-folders.svg` | SVG | ~200 | ➖ | **Folder-level** - Directory dependencies only |
-| `dependency-graph-domains.mmd` | Mermaid | ~54 | ✅ | **Start here** - Domain level (state, components, lib, etc.) |
-| `dependency-graph-detailed.mmd` | Mermaid | ~5000+ | ❌ | All files - Use Mermaid Live only |
+| `dependency-graph-interactive.html` | HTML | N/A | n/a | Interactive hover/click exploration |
+| `dependency-graph-folders.svg` | SVG | ~200 | n/a | Folder-level, directory dependencies only |
+| `dependency-graph-domains.mmd` | Mermaid | ~54 | yes | Start here; domain level (state, components, lib, etc.) |
+| `dependency-graph-detailed.mmd` | Mermaid | ~5000+ | no | All files; use Mermaid Live only |
 
 ### Focused Views
 
 | File | Lines | VS Code | Description |
 |------|-------|---------|-------------|
-| `component-dependencies.mmd` | ~112 | ✅ | High-level component folders |
-| `stores-dependencies.mmd` | ~275 | ✅ | Zustand store relationships |
+| `component-dependencies.mmd` | ~112 | yes | High-level component folders |
+| `stores-dependencies.mmd` | ~275 | yes | Zustand store relationships |
 
 **Recommendation:** 
 - **VS Code:** Use `*-domains.mmd` and focused views

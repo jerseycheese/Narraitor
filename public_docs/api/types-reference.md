@@ -35,7 +35,7 @@ interface TimestampedEntity {
 Worlds define the setting and rules for storytelling. They're like game systems - each world has its own attributes, skills, and tone settings:
 
 ```typescript
-interface World extends NamedEntity {
+interface World extends NamedEntity, TimestampedEntity {
   description: string;
   genre: GenreValue;
   attributes: WorldAttribute[];

@@ -3,6 +3,21 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import WorldCard from '../WorldCard';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { formatDate } from '@/lib/utils';
+import { useWorldStore } from '@/state/worldStore';
+
+const mockRouterPush = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockRouterPush }),
+}));
+
+beforeEach(() => {
+  mockRouterPush.mockClear();
+});
+
+// Regression: a world with no image previously rendered a white 1x1 data-URI
+// placeholder that showed as a bright rectangle in dark mode (#1113).
+const WHITE_PLACEHOLDER =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
 
 describe('WorldCard', () => {
   const mockWorld = createMockWorld({
@@ -75,29 +90,23 @@ describe('WorldCard', () => {
 
   // New test for Play functionality (navigates to characters when no characters exist)
   test('sets current world and navigates to characters when Play is clicked', () => {
-    // Setup mocks
-    const mockSetCurrentWorld = jest.fn();
-    const mockRouterPush = jest.fn();
-    
-    // Directly pass mock dependencies to the component
-    render(
-      <WorldCard 
-        world={mockWorld} 
-        onSelect={jest.fn()} 
-        onDelete={jest.fn()}
-        _storeActions={{ setCurrentWorld: mockSetCurrentWorld }}
-        _router={{ push: mockRouterPush }}
-      />
+    const setCurrentWorldSpy = jest.spyOn(
+      useWorldStore.getState(),
+      'setCurrentWorld'
     );
-    
+
+    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+
     // Find and click the Play button
     fireEvent.click(screen.getByTestId('world-card-actions-play-button'));
-    
-    // Verify world is set as current world
-    expect(mockSetCurrentWorld).toHaveBeenCalledWith(mockWorld.id);
-    
+
+    // Verify world is set as current world via the store
+    expect(setCurrentWorldSpy).toHaveBeenCalledWith(mockWorld.id);
+
     // Verify navigation to characters page (since no characters exist in the world)
     expect(mockRouterPush).toHaveBeenCalledWith(`/characters?worldId=${mockWorld.id}`);
+
+    setCurrentWorldSpy.mockRestore();
   });
 
   // Test for character avatar pill styling
@@ -126,7 +135,6 @@ describe('WorldCard', () => {
         onSelect={jest.fn()}
         onDelete={jest.fn()}
         characters={[mockCharacter]}
-        _router={{ push: jest.fn() }}
       />
     );
 
@@ -134,24 +142,46 @@ describe('WorldCard', () => {
     expect(characterButton).toHaveClass('world-card-character-pill');
   });
 
+  // Regression test for #1113 - no white placeholder image in the no-image case
+  test('renders no placeholder image when the world has no image', () => {
+    const worldWithoutImage = createMockWorld({ image: undefined });
+
+    const { container } = render(
+      <WorldCard world={worldWithoutImage} onSelect={jest.fn()} onDelete={jest.fn()} />
+    );
+
+    // The themed empty-state hero renders (tokenized background via CSS), but
+    // there should be no hero <img> and no white data-URI placeholder.
+    expect(container.querySelector('.component-hero')).toBeInTheDocument();
+    expect(container.querySelector('.component-hero-image')).not.toBeInTheDocument();
+    expect(container.querySelector(`img[src="${WHITE_PLACEHOLDER}"]`)).not.toBeInTheDocument();
+  });
+
+  // Real (AI-generated) world images still render unchanged
+  test('renders the world image when one is provided', () => {
+    const worldWithImage = createMockWorld({
+      image: {
+        url: '/visual-assets/world-cyberpunk.png',
+        type: 'ai-generated',
+      },
+    });
+
+    const { container } = render(
+      <WorldCard world={worldWithImage} onSelect={jest.fn()} onDelete={jest.fn()} />
+    );
+
+    const heroImage = container.querySelector('.component-hero-image');
+    expect(heroImage).toBeInTheDocument();
+    expect(heroImage?.getAttribute('src')).not.toBe(WHITE_PLACEHOLDER);
+  });
+
   // Test for Edit functionality
   test('navigates to edit page when Edit is clicked', () => {
-    // Setup mocks
-    const mockRouterPush = jest.fn();
-    
-    // Directly pass mock dependencies to the component
-    render(
-      <WorldCard 
-        world={mockWorld} 
-        onSelect={jest.fn()} 
-        onDelete={jest.fn()}
-        _router={{ push: mockRouterPush }}
-      />
-    );
-    
+    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+
     // Find and click the Edit button
     fireEvent.click(screen.getByTestId('world-card-actions-edit-button'));
-    
+
     // Verify navigation to edit page
     expect(mockRouterPush).toHaveBeenCalledWith(`/worlds/${mockWorld.id}/edit`);
   });

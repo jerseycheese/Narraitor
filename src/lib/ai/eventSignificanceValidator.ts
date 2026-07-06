@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { logger } from '@/lib/utils/logger';
 import { getAIConfig } from './config';
+import { extractJsonObject } from './parseJSON';
 
 /**
  * Event Significance Validation Result
@@ -34,7 +35,8 @@ export interface ValidationContext {
  */
 export async function validateEventSignificance(
   majorEvent: string,
-  context: ValidationContext = {}
+  context: ValidationContext = {},
+  apiKey?: string | null
 ): Promise<SignificanceValidationResult> {
   const startTime = Date.now();
 
@@ -47,9 +49,9 @@ export async function validateEventSignificance(
     // Build the validation prompt
     const prompt = buildValidationPrompt(majorEvent, context);
 
-    // Call Gemini Flash for validation
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+    // Call Gemini Flash for validation (player's BYO key -> env fallback)
+    const effectiveKey = apiKey ?? process.env.GEMINI_API_KEY;
+    if (!effectiveKey) {
       logger.warn('EventSignificanceValidator', 'GEMINI_API_KEY not found, defaulting to accepting event');
       return {
         isSignificant: true,
@@ -57,7 +59,7 @@ export async function validateEventSignificance(
       };
     }
 
-    const genAI = new GoogleGenAI({ apiKey });
+    const genAI = new GoogleGenAI({ apiKey: effectiveKey });
     const model = getAIConfig().modelName;
 
     const result = await genAI.models.generateContent({
@@ -149,12 +151,12 @@ Respond ONLY with valid JSON in this exact format:
 function parseValidationResponse(responseText: string): SignificanceValidationResult {
   try {
     // Extract JSON from the response (handle cases where LLM adds extra text)
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const json = extractJsonObject(responseText);
+    if (!json) {
       throw new Error('No JSON found in response');
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(json);
 
     if (typeof parsed.isSignificant !== 'boolean') {
       throw new Error('Invalid response: isSignificant must be boolean');

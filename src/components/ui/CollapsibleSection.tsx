@@ -65,13 +65,12 @@ export const CollapsibleSection = ({
         aria-expanded={isExpanded}
         aria-controls={`section-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
       >
-        <h3 
+        <h2
           id={`section-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
           data-testid="collapsible-section-title"
-          
         >
           {title}
-        </h3>
+        </h2>
         <Button
           type="button"
           variant="ghost"

@@ -13,7 +13,7 @@ import {
   truncate,
 } from '@/lib/utils';
 import { Play, Square, Settings } from 'lucide-react';
-import { getSignificanceBadgeVariant } from './journalUtils';
+import { getSignificanceBadgeVariant, isSystemEntry } from './journalUtils';
 
 interface JournalEntryListProps {
   entries: JournalEntry[];
@@ -32,9 +32,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
     <div className={clsx('journal-entry-list', className)}>
       {entries.map((entry) => {
         // Detect system events for list styling (Issue #176)
-        const isSystemEvent =
-          entry.metadata.automaticEntry &&
-          (entry.type === 'session_start' || entry.type === 'session_end');
+        const isSystemEvent = isSystemEntry(entry);
 
         return (
           <Card
@@ -73,7 +71,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
                 )}
                 {entry.title || titleCase(entry.type.replace('_', ' '))}
               </h4>
-              {!entry.isRead && <div></div>}
+              {!entry.isRead && <div />}
             </div>
 
             <p>

@@ -165,8 +165,10 @@ describe('DashboardHome', () => {
     it('shows progress card with session metrics', () => {
       render(<DashboardHome />);
 
-      // Should show metrics including session count
-      expect(screen.getByText(/15.*entries/i)).toBeInTheDocument();
+      // The entries count is surfaced by the progress card's labeled stat,
+      // not the continue card.
+      const entriesStat = screen.getByText('Entries').closest('.dashboard-progress-stat');
+      expect(entriesStat).toHaveTextContent('15');
     });
 
     it('shows recent worlds for quick access', () => {

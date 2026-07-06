@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { Plus, Sparkles, Globe } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { CharacterDeletionService } from '@/services/characterDeletionService';
+import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
 import { getTimestamp } from '@/lib/utils';
+import { readString, writeString } from '@/lib/utils/browserStorage';
 import { CharacterCard } from '@/components/CharacterCard';
-import { CharacterTable } from '@/components/character/CharacterTable';
 import {
   CharacterViewToggle,
   type CharacterViewMode,
@@ -19,9 +20,10 @@ import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
 import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
+import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
+import { Button } from '@/components/ui/button';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
-import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
+import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator';
 import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
@@ -29,6 +31,25 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { GeneratedImage } from '@/types/common.types';
 import { generatePortrait } from '@/lib/api/generatePortrait';
+import { characterApi } from '@/lib/api/characterApi';
+
+// CharacterTable pulls @tanstack/react-table but only renders in table view,
+// and the generate dialog only matters once the page is interactive. Load both
+// on demand so the grid-default list page ships less up front (issue #1357).
+const CharacterTable = dynamic(
+  () =>
+    import('@/components/character/CharacterTable').then((m) => ({
+      default: m.CharacterTable,
+    })),
+  { ssr: false }
+);
+const GenerateCharacterDialog = dynamic(
+  () =>
+    import('@/components/GenerateCharacterDialog').then((m) => ({
+      default: m.GenerateCharacterDialog,
+    })),
+  { ssr: false }
+);
 
 type CharacterPortraitUpdate = {
   portrait: GeneratedImage;
@@ -162,21 +183,15 @@ export default function CharactersPage() {
   const [viewMode, setViewMode] = useState<CharacterViewMode>('grid');
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(
-        'character-view-mode'
-      ) as CharacterViewMode | null;
-      if (saved === 'grid' || saved === 'table') {
-        setViewMode(saved);
-      }
+    const saved = readString('local', 'character-view-mode');
+    if (saved === 'grid' || saved === 'table') {
+      setViewMode(saved);
     }
   }, []);
 
   const handleViewModeChange = (mode: CharacterViewMode) => {
     setViewMode(mode);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('character-view-mode', mode);
-    }
+    writeString('local', 'character-view-mode', mode);
   };
 
   const worldIdFromUrl = searchParams.get('worldId');
@@ -297,24 +312,13 @@ export default function CharactersPage() {
       const nameToUse =
         generationType === 'specific' ? characterName : undefined;
 
-      const response = await fetch('/api/generate-character', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          worldId: effectiveWorldId,
-          characterType: generationType,
-          existingNames: existingNames,
-          suggestedName: nameToUse,
-          world: currentWorld,
-        }),
+      const generatedData: GeneratedCharacterData = await characterApi.generateCharacter({
+        worldId: effectiveWorldId,
+        characterType: generationType,
+        existingNames: existingNames,
+        suggestedName: nameToUse,
+        world: currentWorld,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate character');
-      }
-
-      const generatedData: GeneratedCharacterData = await response.json();
 
       const characterId = createCharacter({
         name: generatedData.name,
@@ -410,9 +414,7 @@ export default function CharactersPage() {
 
     try {
       const characterName = deleteDialog.characterName;
-      await CharacterDeletionService.deleteCharacterWithCleanup(
-        deleteDialog.characterId
-      );
+      await deleteCharacterWithCleanup(deleteDialog.characterId);
       addToast({
         title: 'Character Deleted',
         description: `${characterName} has been permanently deleted`,
@@ -485,24 +487,18 @@ export default function CharactersPage() {
 
   if (mounted && (!effectiveWorldId || !currentWorld)) {
     return (
-      <PageLayout
-        title="My Characters"
-        description="Choose a world to view your characters."
-      >
-        <div>
-          <Globe aria-hidden="true" />
-          <h2>Choose Your World</h2>
-          <ActionButtonGroup
-            actions={[
-              {
-                label: 'Go to Worlds',
-                onClick: () => router.push('/worlds'),
-                variant: 'primary',
-                size: 'lg',
-              },
-            ]}
-          />
-        </div>
+      <PageLayout title="My Characters">
+        <EmptyState
+          className="characters-empty-no-world"
+          icon={<Globe aria-hidden="true" />}
+          title="Choose Your World"
+          description="Characters live inside a world. Head to Worlds to pick one, then come back here to view and create characters."
+          action={
+            <Button variant="default" onClick={() => router.push('/worlds')}>
+              Go to Worlds
+            </Button>
+          }
+        />
       </PageLayout>
     );
   }
@@ -546,7 +542,7 @@ export default function CharactersPage() {
             mode={viewMode}
             onModeChange={handleViewModeChange}
           />
-          <ActionButtonGroup actions={actionButtons} />
+          <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
         </div>
       )}
 
@@ -555,6 +551,8 @@ export default function CharactersPage() {
           <div className="characters-empty">
             <h2>No characters in {currentWorld?.name || 'this world'} yet</h2>
             <ActionButtonGroup
+              layout="horizontal"
+              gap="sm"
               actions={[
                 {
                   label: isGenerating

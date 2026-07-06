@@ -4,17 +4,17 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameSessionState } from '@/types/game.types';
 import { useSessionStore } from '@/state/sessionStore';
-import { useWorldStore } from '@/state/worldStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { useCharacterStore } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
 import ActiveGameSession from './ActiveGameSession';
 import GameSessionResume from './GameSessionResume';
-import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
+import { Users, BookOpen } from 'lucide-react';
 
 interface GameSessionProps {
   worldId: string;
@@ -24,15 +24,6 @@ interface GameSessionProps {
   onBack?: () => void;
   initialState?: Partial<GameSessionState>;
   disableAutoResume?: boolean; // For testing/dev harnesses
-  // Optional testing props
-  _stores?: {
-    worldStore: Partial<ReturnType<typeof useWorldStore.getState>> | (() => Partial<ReturnType<typeof useWorldStore.getState>>);
-    sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
-    characterStore?: Partial<ReturnType<typeof useCharacterStore.getState>> | (() => Partial<ReturnType<typeof useCharacterStore.getState>>);
-  };
-  _router?: {
-    push: (url: string) => void;
-  };
 }
 
 /**
@@ -46,16 +37,11 @@ const GameSession: React.FC<GameSessionProps> = ({
   onBack,
   initialState,
   disableAutoResume = false,
-  _stores,
-  _router,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isClient, setIsClient] = useState(false);
-  
-  // Use provided router or real router
-  const actualRouter = _router || router;
-  
+
   // Check for auto-resume parameter
   const autoResume = searchParams?.get('autoResume') === 'true';
   const [hasAutoResumed, setHasAutoResumed] = useState(false);
@@ -84,8 +70,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     onSessionEnd,
     initialState: testSessionState || initialState,
     disableAutoResume,
-    router: actualRouter,
-    _stores,
+    router,
   });
 
   // Override session state for test mode
@@ -100,7 +85,6 @@ const GameSession: React.FC<GameSessionProps> = ({
     handleDismissError,
     startSession,
     handleSelectChoice,
-    handleEndSession,
     savedSession,
     handleResumeSession,
     handleNewSession,
@@ -251,7 +235,6 @@ const GameSession: React.FC<GameSessionProps> = ({
       // In development mode with fast refresh, don't end sessions
       // This prevents the infinite reset loop during hot reloading
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔧 Development mode: Skipping session cleanup to prevent fast refresh issues');
         return;
       }
       
@@ -289,16 +272,19 @@ const GameSession: React.FC<GameSessionProps> = ({
   // Client-side only checks from here on
   if (!worldExists) {
     return (
-      <div data-testid="game-session-error-container">
-        <SectionError 
+      <div className="manuscript-play-entry" data-testid="game-session-error-container">
+        <ErrorDisplay
+          variant="section"
           title="World Not Found"
           message="The world you're trying to access doesn't exist or has been deleted."
           severity="error"
-          showRetry
-          onRetry={handleRetry}
-          showDismiss
-          onDismiss={handleDismissError}
         />
+        <Button
+          variant="default"
+          onClick={() => router?.push('/worlds')}
+        >
+          Back to Worlds
+        </Button>
       </div>
     );
   }
@@ -323,40 +309,60 @@ const GameSession: React.FC<GameSessionProps> = ({
     // Check if there are any characters for this world
     if (worldCharacters.length === 0) {
       return (
-        <div data-testid="game-session-no-characters" >
-          <div>
-            <h2>No Characters Found</h2>
-            <p>
-              You need to create a character before you can start playing in this world.
-            </p>
-            <Button
-              variant="default"
-              onClick={() => actualRouter?.push(`/characters/create?worldId=${worldId}`)}
-            >
-              Create Character
-            </Button>
-          </div>
+        <div className="manuscript-play-entry" data-testid="game-session-no-characters">
+          <EmptyState
+            icon={<Users aria-hidden="true" />}
+            title="No Characters Found"
+            description="You'll need a character before you can start playing in this world."
+            action={
+              <>
+                <Button
+                  variant="default"
+                  onClick={() => router?.push(`/characters/create?worldId=${worldId}`)}
+                >
+                  Create Character
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => router?.push('/worlds')}
+                >
+                  Back to Worlds
+                </Button>
+              </>
+            }
+          />
         </div>
       );
     }
     
     return (
-      <div data-testid="game-session-initializing" >
-        <div>
-          <h2>Session Not Started</h2>
-          <p>No active game session.</p>
-          {process.env.NODE_ENV === 'development' && (
-            <div>
-              Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
-            </div>
-          )}
-          <Button
-            variant="default"
-            onClick={startSession}
-          >
-            Start Session
-          </Button>
-        </div>
+      <div className="manuscript-play-entry" data-testid="game-session-initializing">
+        <EmptyState
+          icon={<BookOpen aria-hidden="true" />}
+          title="Session Not Started"
+          description="No active game session yet."
+          action={
+            <>
+              <Button
+                variant="default"
+                onClick={startSession}
+              >
+                Start Session
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => router?.push('/worlds')}
+              >
+                Back to Worlds
+              </Button>
+            </>
+          }
+        />
+        {process.env.NODE_ENV === 'development' && (
+          <div className="manuscript-play-entry-debug">
+            Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
+          </div>
+        )}
       </div>
     );
   }
@@ -369,11 +375,19 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   if (error || sessionState.error) {
     return (
-      <GameSessionError 
-        error={(error?.message || sessionState.error || 'Unknown error')}
-        onRetry={handleRetry}
-        onDismiss={handleDismissError}
-      />
+      <div className="manuscript-play-entry">
+        <GameSessionError
+          error={(error?.message || sessionState.error || 'Unknown error')}
+          onRetry={handleRetry}
+          onDismiss={handleDismissError}
+        />
+        <Button
+          variant="ghost"
+          onClick={() => router?.push('/worlds')}
+        >
+          Back to Worlds
+        </Button>
+      </div>
     );
   }
   
@@ -387,7 +401,6 @@ const GameSession: React.FC<GameSessionProps> = ({
         // Map 'loading' to 'active' to keep the UI enabled
         status={sessionState.status === 'paused' ? 'paused' : 'active'}
         onChoiceSelected={handleSelectChoice}
-        onEnd={handleEndSession}
         onStartNew={onStartNew}
         onBack={onBack}
         choices={sessionState.playerChoices || []}

@@ -6,7 +6,9 @@ import { NarrativeSegment, Decision } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { ToastProvider } from '@/components/ui/toast';
 import { getTimestamp } from '@/lib/utils';
+import { withStores } from '../../../../.storybook/decorators/withStores';
 
 const meta: Meta<typeof ActiveGameSession> = {
   title: '05-Pages/game-session/ActiveGameSession',
@@ -21,16 +23,19 @@ const meta: Meta<typeof ActiveGameSession> = {
   },
   argTypes: {
     onChoiceSelected: { action: 'choice selected' },
-    onEnd: { action: 'session ended' },
     status: {
       control: 'select',
       options: ['active', 'paused', 'ended'],
     },
   },
   decorators: [
-    (Story) => {
-      // Reset stores before each story and clear any endings to prevent endscreen display
-      useNarrativeStore.setState({
+    // ActiveGameSession's useAutoSave calls useToast, so every story needs a ToastProvider ancestor.
+    (Story) => <ToastProvider><Story /></ToastProvider>,
+    // Reset stores to a clean active-session baseline before each story (clears
+    // any ending so the endscreen doesn't show). Per-story decorators layer
+    // character/narrative data on top. Dogfoods the shared withStores helper.
+    withStores({
+      narrative: {
         segments: {},
         sessionSegments: {},
         decisions: {},
@@ -39,9 +44,8 @@ const meta: Meta<typeof ActiveGameSession> = {
         isGeneratingEnding: false,
         error: null,
         loading: false,
-      });
-      
-      useSessionStore.setState({
+      },
+      session: {
         id: 'session-123',
         status: 'active',
         currentSceneId: null,
@@ -50,19 +54,16 @@ const meta: Meta<typeof ActiveGameSession> = {
         worldId: 'world-123',
         characterId: 'char-123',
         savedSessions: {},
-      });
-      
-      useCharacterStore.setState({
+      },
+      character: {
         characters: {},
         entities: {},
         currentCharacterId: null,
         currentEntityId: null,
         error: null,
         loading: false,
-      });
-      
-      return <Story />;
-    },
+      },
+    }),
   ],
 };
 

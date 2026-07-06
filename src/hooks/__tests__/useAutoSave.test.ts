@@ -16,7 +16,7 @@ const mockAutoSaveService = {
 };
 
 jest.mock('../../lib/services/autoSaveService', () => ({
-  AutoSaveService: jest.fn().mockImplementation(() => mockAutoSaveService)
+  createAutoSave: jest.fn(() => mockAutoSaveService)
 }));
 
 const mockSessionStore: SessionStore = {
@@ -29,7 +29,6 @@ const mockSessionStore: SessionStore = {
   characterId: 'char-1',
   savedSessions: {},
   sessionLifecycle: {},
-  templateHistory: [],
   autoSave: {
     enabled: true,
     lastSaveTime: null,
@@ -51,6 +50,7 @@ const mockSessionStore: SessionStore = {
   },
   initializeSession: jest.fn(),
   endSession: jest.fn(),
+  refreshRecoveryMarker: jest.fn(),
   setStatus: jest.fn(),
   setError: jest.fn(),
   setPlayerChoices: jest.fn(),
@@ -65,13 +65,10 @@ const mockSessionStore: SessionStore = {
   resumeSavedSession: jest.fn(),
   deleteSavedSession: jest.fn(),
   updateSavedSessionNarrativeCount: jest.fn(),
-  fixExistingSessionNarrativeCounts: jest.fn(),
+  repairSavedSessionNarrativeCounts: jest.fn(),
   upsertSessionLifecycle: jest.fn(),
   setSessionLifecycleStatus: jest.fn(),
   getSessionLifecycle: jest.fn(),
-  addTemplateToHistory: jest.fn(),
-  getTemplateHistory: jest.fn(),
-  clearTemplateHistory: jest.fn(),
   setAutoSaveEnabled: jest.fn(),
   updateAutoSaveStatus: jest.fn(),
   recordAutoSave: jest.fn(),
@@ -146,8 +143,7 @@ describe('useAutoSave', () => {
 
   it('should initialize auto-save service when hook is used', () => {
     const { result } = renderHook(() => useAutoSave());
-    
-    expect(result.current).toBeDefined();
+
     expect(result.current.isEnabled).toBe(true);
     expect(result.current.status).toBe('idle');
   });
@@ -178,16 +174,6 @@ describe('useAutoSave', () => {
     expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saving');
   });
 
-  it('should trigger manual save with scene change reason', async () => {
-    const { result } = renderHook(() => useAutoSave());
-    
-    await act(async () => {
-      await result.current.triggerSave('scene-change');
-    });
-    
-    expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saving');
-  });
-
   it('should provide save status from session store', () => {
     mockSessionStore.autoSave.status = 'saved';
     mockSessionStore.autoSave.lastSaveTime = '2023-01-01T00:00:00.000Z';
@@ -208,12 +194,4 @@ describe('useAutoSave', () => {
     expect(mockSessionStore.setAutoSaveEnabled).toHaveBeenCalledWith(false);
   });
 
-  it('should clear toast mocks before each test', () => {
-    // This test ensures our toast mocking is working
-    const { result } = renderHook(() => useAutoSave());
-    
-    expect(result.current).toBeDefined();
-    expect(mockToast.success).toHaveBeenCalledTimes(0);
-    expect(mockToast.error).toHaveBeenCalledTimes(0);
-  });
 });

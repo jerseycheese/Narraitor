@@ -6,8 +6,8 @@ const delay = (ms: number): Promise<void> =>
 /**
  * Shared in-flight cache + rate-limited batch runner used by the NPC portrait
  * and item image services. Each service supplies its own entity lookup,
- * payload building, and store updates; the coordinator owns the bits that
- * were previously duplicated (Promise cache, error cleanup, batch pacing).
+ * payload building, and store updates; the coordinator owns the Promise
+ * cache, error cleanup, and batch pacing.
  */
 export class ImageRequestCoordinator<TResult> {
   private readonly cache = new Map<string, Promise<TResult>>();

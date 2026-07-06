@@ -159,14 +159,26 @@ describe('HeaderNavigation', () => {
 
       expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
     });
+
+    it('always renders the hamburger toggle so CSS (not JS matchMedia) gates its visibility', () => {
+      // The useMobileNavigation mock returns isMobile: false (desktop). The toggle
+      // must still be in the DOM — visibility is owned by the .header-nav-mobile-toggle
+      // media query, giving the header one source of truth for the collapse (#1381).
+      render(<HeaderNavigation />);
+
+      expect(
+        screen.getByRole('button', { name: 'Open menu' })
+      ).toBeInTheDocument();
+    });
   });
 
   describe('Theme Controls', () => {
-    it('renders theme switcher and dark mode toggle', () => {
+    it('renders the appearance menu (theme + color mode live inside it)', () => {
       render(<HeaderNavigation />);
 
-      expect(screen.getByRole('radiogroup', { name: 'Design system theme' })).toBeInTheDocument();
-      expect(screen.getByRole('radiogroup', { name: 'Color scheme' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Appearance' })
+      ).toBeInTheDocument();
     });
   });
 
@@ -182,17 +194,12 @@ describe('HeaderNavigation', () => {
       expect(screen.getByText('Settings')).toBeInTheDocument();
     });
 
-    it('renders theme controls in sidebar bottom toolbar', () => {
+    it('renders the appearance menu in the sidebar bottom toolbar', () => {
       render(<SidebarNavigation />);
 
-      const themeGroup = screen.getByRole('radiogroup', { name: 'Design system theme' });
-      const schemeGroup = screen.getByRole('radiogroup', { name: 'Color scheme' });
-      expect(themeGroup).toBeInTheDocument();
-      expect(schemeGroup).toBeInTheDocument();
-
-      const toolbar = themeGroup.closest('.workshop-sidebar-toolbar');
-      expect(toolbar).not.toBeNull();
-      expect(toolbar).toContainElement(schemeGroup);
+      const appearance = screen.getByRole('button', { name: 'Appearance' });
+      expect(appearance).toBeInTheDocument();
+      expect(appearance.closest('.workshop-sidebar-toolbar')).not.toBeNull();
     });
 
     it('does not render the contextual CTA inside the rail (it lives in the workspace header on desktop)', () => {

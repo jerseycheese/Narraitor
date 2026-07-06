@@ -1,7 +1,10 @@
 // src/stories/02-molecules/narrative/ChoiceOutcomeCallout.stories.tsx
 
 import type { Meta, StoryObj } from '@storybook/react';
+import React, { useEffect, useState } from 'react';
 import { ChoiceOutcomeCallout } from '@/components/Narrative/ChoiceOutcomeCallout';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useNPCStore } from '@/state/npcStore';
 
 const meta: Meta<typeof ChoiceOutcomeCallout> = {
   title: '02-Molecules/narrative/ChoiceOutcomeCallout',
@@ -88,4 +91,57 @@ export const WithOutcome: Story = {
     decisionText: 'You choose to slip past the guards',
     decisionOutcome: 'success',
   },
+};
+
+/**
+ * Structured consequence chips (#468): the chosen option carried a trust
+ * delta and an alignment shift, surfaced under the decision text. Seeds the
+ * narrative + NPC stores so the callout can resolve them.
+ */
+function ConsequencesHarness() {
+  const [seeded, setSeeded] = useState(false);
+  const iso = '2026-01-01T12:00:00.000Z';
+
+  useEffect(() => {
+    useNPCStore.setState({
+      npcs: {
+        'sb-npc-marta': { id: 'sb-npc-marta', name: 'Marta', description: '', worldId: 'sb-demo-world', createdAt: iso, updatedAt: iso },
+      },
+    });
+    useNarrativeStore.setState({
+      decisions: {
+        'sb-decision-consequences': {
+          id: 'sb-decision-consequences',
+          prompt: 'What do you do with the ledger?',
+          selectedOptionId: 'sb-opt-1',
+          options: [
+            {
+              id: 'sb-opt-1',
+              text: 'Pocket the ledger while Marta is distracted',
+              alignment: 'chaotic',
+              consequences: [
+                { type: 'relationship', action: 'modify', targetId: 'sb-npc-marta', value: { trustDelta: -15 } },
+                { type: 'alignment', action: 'add', targetId: 'player-alignment', value: -8 },
+              ],
+            },
+          ],
+        },
+      },
+    });
+    setSeeded(true);
+  }, []);
+
+  if (!seeded) return null;
+
+  return (
+    <ChoiceOutcomeCallout
+      decisionId="sb-decision-consequences"
+      decisionText="You choose to pocket the ledger while Marta is distracted"
+      decisionOutcome="success"
+    />
+  );
+}
+
+export const WithConsequences: Story = {
+  render: () => <ConsequencesHarness />,
 };

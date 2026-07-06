@@ -18,29 +18,9 @@ Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 **World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
 
-![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/world-creation-wizard-clean.png)
-
-*Seven-step wizard with template selection, AI generation, and custom world building*
-
 **Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
 
-![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/characters-page-clean.png)
-
-*Character management screen with AI-generated portraits and quick access to play*
-
-![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/world-detail-page-clean.png)
-
-*Complete world configuration showing custom attributes, skills, and character requirements*
-
-![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/character-detail-page-clean.png)
-
-*Detailed character sheet showing attributes, skill progression, and full background story*
-
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
-
-![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/public_docs/images/gameplay-session-clean.png)
-
-*Active gameplay session with AI-generated narrative, multiple choice paths, and skill-based actions*
 
 **Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
@@ -66,7 +46,7 @@ Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 ## Getting It Running
 
-You'll need Node.js (v18+), npm, and a Google Gemini API key. The API key stays server-side for security; no client exposure.
+You'll need Node.js (v18+), npm, and a Google Gemini API key. For local development the key lives in a server-side env file (`GEMINI_API_KEY`, below). In normal use, players bring their own key — see [AI Integration Details](#ai-integration-details).
 
 ```bash
 # Clone and set up
@@ -92,6 +72,8 @@ npm run dev
 
 The app runs on `localhost:3000`. You'll see the world creation wizard first: either pick a template or build your own universe.
 
+> Running from a git worktree? `npm run dev` picks a stable per-worktree port automatically (the main checkout keeps 3000), so multiple worktrees can run side by side without fighting over the port. The chosen URL is printed on startup; set `PORT` to override.
+
 ## Development Setup
 
 I've been using a component-first approach with Storybook and TDD. Basically, build components in isolation first, then integrate them. It keeps things manageable.
@@ -109,7 +91,7 @@ npm run dev
 # Then visit /dev routes for component testing
 ```
 
-There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/devtools-test`, etc. These let you test components with real data without going through the full app flow.
+There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/game-session`, etc. These let you test components with real data without going through the full app flow. For the design-system catalog (every component, themed, with mock data), use Storybook (`npm run storybook`).
 
 ### Feature Flags
 
@@ -139,13 +121,13 @@ src/
 └── utils/                  # Helper functions
 ```
 
-The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/WorldEditor/` instead of `components/editors/WorldEditor/`. Makes it easier to find related functionality.
+The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/SkillEditor/` instead of `components/editors/SkillEditor/`. Makes it easier to find related functionality.
 
 ## Roadmap
 
 The core MVP functionality is basically complete - you can create worlds, build characters, play through AI-generated stories, and everything persists properly. The focus now has shifted to polish and getting things ready for a proper 1.0 release.
 
-### What's Already Working ✅
+### What's Already Working
 
 The foundation is solid:
 - **World Creation System** with AI assistance and template worlds
@@ -247,13 +229,13 @@ The app separates concerns into clear domains:
 
 **State Persistence**: Zustand stores with IndexedDB backing. Game sessions persist across browser sessions, and there's graceful fallback to memory-only if IndexedDB fails.
 
-**Security**: API keys stay server-side. All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse.
+**Security**: All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse. Players bring their own Gemini key, sent per request and used server-side for that one call — never persisted or logged. A server-side `GEMINI_API_KEY` env var acts as a local/dev fallback.
 
-**Design System**: Three structurally-different design systems (DS1/DS2/DS3) ship together; the user picks one. See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts), [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for the rationale, and [public_docs/design-system/](public_docs/design-system/) for the full reference. Canon order is **showcase routes (`/dev/design-system{,-2,-3}`) > Storybook (`npm run storybook`) > app** — Storybook's toolbar has a DS1/DS2/DS3 + light/dark switcher for verifying components across all six combinations.
+**Design System**: Three structurally-different design systems (DS1/DS2/DS3) ship together; the user picks one. See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts), [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for the rationale, and [public_docs/design-system/](public_docs/design-system/) for the full reference. **Storybook (`npm run storybook`) is the single canon surface** — every component, themed, with mock data and no backend; its toolbar has a DS1/DS2/DS3 + light/dark switcher for verifying components across all six combinations. See [ADR-012](public_docs/architecture/ADR-012-storybook-single-canon-surface.md).
 
 ## AI Integration Details
 
-The AI system routes everything through Next.js API endpoints (`/api/narrative/generate`, `/api/narrative/choices`) for security. Your API key never touches the browser.
+The AI system routes everything through Next.js API endpoints (`/api/narrative/generate`, `/api/narrative/choices`). A player's own Gemini key travels from the browser to those routes in a per-request header (`x-provider-api-key`), gets used server-side for that single call, and is never logged or persisted. The `GEMINI_API_KEY` env var below is a local/dev fallback that stays server-side.
 
 ```bash
 # .env.local

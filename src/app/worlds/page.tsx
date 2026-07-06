@@ -7,7 +7,7 @@ import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { useWorldStore } from '@/state/worldStore';
-import { InlineError } from '@/components/shared';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import {
   WorldTypeSelector,
   WorldTypeData,
@@ -38,7 +38,6 @@ export default function WorldsPage() {
   );
   const tourStartedRef = useRef(false);
 
-  // Reset tour started flag when modal closes
   useEffect(() => {
     if (!showPrompt) {
       tourStartedRef.current = false;
@@ -115,7 +114,6 @@ export default function WorldsPage() {
         suggestedName: worldName || undefined,
       });
 
-      // Create the world using the service
       setGeneratingStatus('Creating world...');
       const { worldId } = await worldCreationService.createWorldFromGeneration({
         generatedData,
@@ -126,7 +124,6 @@ export default function WorldsPage() {
       setGeneratingStatus('Generating world image...');
       // Image generation is handled by the service in the background
 
-      // Set as current world
       useWorldStore.getState().setCurrentWorld(worldId);
 
       // Hide the prompt and reset state
@@ -161,12 +158,12 @@ export default function WorldsPage() {
   return (
     <PageLayout
       title="My Worlds"
-      description="Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar."
+      description="Create unique story worlds, then manage characters and play through interactive narratives. Your active world is highlighted below."
       actions={
-        <div>
+        <>
           {viewToggle}
-          <ActionButtonGroup actions={actionButtons} />
-        </div>
+          <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
+        </>
       }
     >
       {/* World Generation Prompt */}
@@ -175,10 +172,11 @@ export default function WorldsPage() {
         onClose={() => setShowPrompt(false)}
         title="Generate World"
         showCloseButton={false}
-        size="xl"
         ariaDescribedBy="generate-world-desc"
         footer={
           <ActionButtonGroup
+            layout="horizontal"
+            gap="md"
             actions={[
               {
                 label: 'Cancel',
@@ -201,6 +199,7 @@ export default function WorldsPage() {
                     !worldTypeData.worldReference?.trim()),
                 icon: <Sparkles aria-hidden="true" />,
                 dataTutorial: 'generate-world-button',
+                flex: true,
               },
             ]}
           />
@@ -226,11 +225,11 @@ export default function WorldsPage() {
             layout="vertical"
             size="medium"
           />
-          {error && <InlineError error={error} />}
+          {error && <ErrorDisplay variant="inline" message={error} />}
 
           {isGenerating && (
             <p>
-              <span></span>
+              <span />
               {generatingStatus}
             </p>
           )}

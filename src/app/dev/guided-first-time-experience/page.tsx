@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
 import { useSessionStore } from '@/state/sessionStore';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('GuidedFTEDev');
 
 export default function GuidedFirstTimeExperienceTestHarness() {
   const [resetKey, setResetKey] = useState(0);
@@ -49,7 +52,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
         // Force page reload to reinitialize stores
         window.location.reload();
       } catch (error) {
-        console.error('Error clearing storage:', error);
+        logger.error('Error clearing storage:', error);
       }
     }
   };

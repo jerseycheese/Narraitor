@@ -8,13 +8,17 @@ import { useCharacterStore, CharacterStore } from '../../state/characterStore';
 import { useSessionStore } from '../../state/sessionStore';
 import { useJournalStore } from '../../state/journalStore';
 import { useNarrativeStore } from '../../state/narrativeStore';
+import { useInventoryStore } from '../../state/inventoryStore';
+import { useLoreStore } from '../../state/loreStore';
+import { useGoalStore } from '../../state/goalStore';
+import { useNPCStore } from '../../state/npcStore';
 import { validateWorld } from '@/lib/utils/typeGuards';
 import { getTimestamp } from '../utils';
 
 const CURRENT_VERSION = '1.0.0';
 const COMPATIBLE_VERSIONS = ['1.0.0'];
 
-export interface GameStateExport {
+interface GameStateExport {
   version: string;
   exportedAt: string;
   worldState: unknown;
@@ -22,9 +26,13 @@ export interface GameStateExport {
   sessionState: unknown;
   journalState?: unknown;
   narrativeState?: unknown;
+  inventoryState?: unknown;
+  loreState?: unknown;
+  goalState?: unknown;
+  npcState?: unknown;
 }
 
-export interface ExportResult {
+interface ExportResult {
   success: boolean;
   data?: GameStateExport;
   error?: string;
@@ -38,6 +46,12 @@ export interface ImportResult {
 
 export async function exportGameState(): Promise<ExportResult> {
   try {
+    // inventoryStore carries transient Set/Map fields (generatingImageFor,
+    // imageGenerationErrors) that JSON.stringify turns into {} and that the
+    // store later rebuilds via new Set()/new Map() — exporting them would throw
+    // on re-import. Export only the durable fields (its persist partialize set).
+    const inventory = useInventoryStore.getState();
+
     const gameState: GameStateExport = {
       version: CURRENT_VERSION,
       exportedAt: getTimestamp(),
@@ -46,6 +60,14 @@ export async function exportGameState(): Promise<ExportResult> {
       sessionState: useSessionStore.getState(),
       journalState: useJournalStore.getState(),
       narrativeState: useNarrativeStore.getState(),
+      inventoryState: {
+        items: inventory.items,
+        entities: inventory.entities,
+        characterInventories: inventory.characterInventories,
+      },
+      loreState: useLoreStore.getState(),
+      goalState: useGoalStore.getState(),
+      npcState: useNPCStore.getState(),
     };
 
     return { success: true, data: gameState };
@@ -79,7 +101,7 @@ export async function downloadGameState(): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
-export async function importGameState(gameState: unknown): Promise<ImportResult> {
+async function importGameState(gameState: unknown): Promise<ImportResult> {
   try {
     const validationResult = validateGameState(gameState);
 
@@ -147,6 +169,22 @@ export async function importGameState(gameState: unknown): Promise<ImportResult>
       useNarrativeStore.setState(validatedGameState.narrativeState);
     }
 
+    if (validatedGameState.inventoryState) {
+      useInventoryStore.setState(validatedGameState.inventoryState);
+    }
+
+    if (validatedGameState.loreState) {
+      useLoreStore.setState(validatedGameState.loreState);
+    }
+
+    if (validatedGameState.goalState) {
+      useGoalStore.setState(validatedGameState.goalState);
+    }
+
+    if (validatedGameState.npcState) {
+      useNPCStore.setState(validatedGameState.npcState);
+    }
+
     return { success: true, message: 'Game state imported successfully' };
   } catch {
     return { success: false, error: 'Failed to import game state' };
@@ -190,8 +228,7 @@ function validateGameState(gameState: unknown): { valid: boolean; error?: string
   }
 
   if (state.worldState && typeof state.worldState === 'object') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const worldState = state.worldState as any;
+    const worldState = state.worldState as Record<string, unknown>;
     if (worldState.worlds && typeof worldState.worlds === 'object') {
       for (const [worldId, worldData] of Object.entries(worldState.worlds)) {
         const validation = validateWorld(worldData);
@@ -206,15 +243,4 @@ function validateGameState(gameState: unknown): { valid: boolean; error?: string
   }
 
   return { valid: true };
-}
-
-export async function getExportSize(): Promise<number> {
-  const exportResult = await exportGameState();
-
-  if (!exportResult.success || !exportResult.data) {
-    return 0;
-  }
-
-  const json = JSON.stringify(exportResult.data);
-  return new Blob([json]).size;
 }

@@ -1,0 +1,141 @@
+/**
+ * DecisionFlowSection (dev-only) styles. Token-driven.
+ */
+.devtools-decision-flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: 0.8125rem;
+}
+
+.devtools-decision-flow-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.devtools-decision-flow-controls .form-select {
+  flex: 1 1 12rem;
+  font-size: 0.8125rem;
+}
+
+.devtools-decision-flow-traces {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.devtools-decision-flow-trace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+}
+
+.devtools-decision-flow-trace-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.devtools-decision-flow-trace-time {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.devtools-decision-flow-step,
+.devtools-decision-flow-segment,
+.devtools-decision-flow-tracker,
+.devtools-decision-flow-debug {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.devtools-decision-flow-segment,
+.devtools-decision-flow-tracker {
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.devtools-decision-flow-segment-content {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.devtools-decision-flow-step-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+.devtools-decision-flow-prompt-text {
+  margin: 0;
+  font-weight: 600;
+}
+
+.devtools-decision-flow-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.devtools-decision-flow-option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.devtools-decision-flow-option.is-selected {
+  border-color: var(--color-accent);
+  background: var(--color-surface);
+}
+
+.devtools-decision-flow-option-hint {
+  flex-basis: 100%;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.devtools-decision-flow-tracker > span {
+  color: var(--color-text-muted);
+}
+
+.devtools-decision-flow-debug-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.devtools-decision-flow-prompt {
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+}
+
+.devtools-decision-flow-empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}

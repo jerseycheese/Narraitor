@@ -1,0 +1,30 @@
+/**
+ * Shared DevToolsSection wrapper styles.
+ * Token-driven card used by the panel's sections (environment info, consistency
+ * validation, lore management). Restores the framing the Tailwind removal
+ * stripped out, leaving the component with an empty class string.
+ */
+.devtools-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+}
+
+.devtools-section-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+.devtools-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}

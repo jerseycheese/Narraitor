@@ -2,81 +2,108 @@
 title: Repository Structure
 tags: [architecture, structure, files]
 created: 2025-04-28
-updated: 2025-06-26
+updated: 2026-05-22
 ---
 
 # Repository Structure
 
-This the project structure follows domain-driven design principles with Next.js App Router. The idea is to group related functionality together rather than organizing by file type: which makes finding related code much easier.
+The project follows domain-driven organization on top of the Next.js App Router. Code is
+grouped by what part of the app it serves rather than by file type, so when you're working on
+character creation the components, state, types, and pages for it sit near each other instead
+of being scattered across `components/`, `state/`, and `pages/` folders that each hold a bit of
+everything.
 
 ## Structure
 
 ```
 narraitor/
 ├── .github/
-│   ├── workflows/
-│   │   └── ci.yml               # Basic CI for tests and builds
-│   └── PULL_REQUEST_TEMPLATE.md # Enforce the TDD approach
+│   ├── workflows/                # CI, CodeQL, Storybook deploy/preview, focused Playwright
+│   ├── ISSUE_TEMPLATE/
+│   └── PULL_REQUEST_TEMPLATE.md
 ├── src/
-│   ├── app/                     # Next.js App Router
-│   │   ├── api/                 # API routes (server-side only)
-│   │   ├── dev/                 # Development test harnesses
-│   │   ├── world/               # World management pages
-│   │   ├── character/           # Character management pages
-│   │   └── game/                # Game session pages
-│   ├── components/              # React components by domain
-│   │   ├── ui/                  # shadcn/ui components
-│   │   ├── forms/               # Form components
-│   │   ├── world/               # World components
-│   │   ├── character/           # Character components
-│   │   └── narrative/           # Narrative components
-│   ├── lib/                     # Utilities and integrations
-│   │   ├── ai/                  # AI service integration
-│   │   ├── storage/             # IndexedDB persistence
-│   │   └── utils/               # Shared utilities
-│   ├── state/                   # Zustand stores
-│   │   ├── worldStore.ts
-│   │   ├── characterStore.ts
-│   │   ├── narrativeStore.ts
-│   │   ├── journalStore.ts
-│   │   └── sessionStore.ts
-│   ├── types/                   # TypeScript definitions
-│   │   ├── common.types.ts
-│   │   ├── world.types.ts
-│   │   ├── character.types.ts
-│   │   └── narrative.types.ts
-│   └── stories/                 # Storybook stories
-├── public/                      # Static assets
-├── __tests__/                   # Jest tests
-├── .storybook/                  # Storybook configuration
-├── public_docs/                 # Public documentation
-├── docs/                        # Private/local docs (gitignored)
-├── eslint.config.mjs            # ESLint configuration
-├── .prettierrc                  # Prettier configuration
-├── jest.config.cjs              # Jest configuration
-├── next.config.ts               # Next.js configuration
-├── tailwind.config.ts           # Tailwind CSS configuration
-├── tsconfig.json                # TypeScript configuration
-└── package.json                 # Dependencies and scripts
+│   ├── app/                      # Next.js App Router (pages + API routes)
+│   │   ├── api/                  # Server-side API routes (all AI calls live here)
+│   │   ├── dev/                  # Component test harnesses + DS showcase routes
+│   │   ├── worlds/               # World list, create, detail, edit, play
+│   │   ├── characters/           # Character list, create, detail, edit
+│   │   ├── play/                 # Standalone play entry
+│   │   ├── settings/
+│   │   └── about/
+│   ├── components/               # React components, grouped by domain
+│   │   ├── ui/                   # shadcn/ui-based shared primitives
+│   │   ├── shared/               # Cross-domain pieces (wizard, cards, selectors)
+│   │   ├── forms/  layout/  devtools/  inventory/
+│   │   ├── world/  character/  characters/
+│   │   └── GameSession/  Narrative/  WorldCreationWizard/  ...  # feature components (PascalCase dirs)
+│   ├── lib/                      # Domain logic, integrations, utilities
+│   │   ├── ai/                   # Gemini integration via @google/genai
+│   │   ├── promptContext/  promptTemplates/   # Prompt assembly + token budgeting
+│   │   ├── narrative/  narrativeStreaming/    # Narrative generation
+│   │   ├── lore/  inventory/  journal/  world/  generators/
+│   │   ├── storage/             # IndexedDB persistence helpers
+│   │   ├── state/               # storePubSub cross-store event bus
+│   │   ├── design-tokens/  theme/             # Design tokens + per-theme CSS
+│   │   ├── tutorial/  routing/  services/  devtools/  api/
+│   │   └── utils/  hooks/  constants/  test-utils/
+│   ├── state/                    # Zustand stores (see note below)
+│   ├── services/  hooks/  utils/
+│   ├── types/                    # TypeScript definitions, by domain
+│   ├── stories/                  # Storybook stories (00-foundation ... 06-patterns)
+│   ├── styles/
+│   └── __tests__/
+├── tests/visual/                 # Playwright visual-regression specs (self-seeding)
+├── scripts/                      # Build, audit (audit-css.mjs), and agent scripts
+├── public/                       # Static assets
+├── public_docs/                  # Public documentation (this directory)
+├── docs/                         # Private/local docs (gitignored)
+├── .storybook/                   # Storybook configuration
+├── eslint.config.mjs             # ESLint (flat config)
+├── .stylelintrc.json             # Stylelint (design-token enforcement)
+├── .prettierrc                   # Prettier
+├── jest.config.cjs               # Jest
+├── playwright.config.ts          # Playwright (visual regression)
+├── stryker.config.json           # Mutation testing
+├── knip.json                     # Unused-code detection
+├── .dependency-cruiser.cjs       # Architecture/dependency rules
+├── next.config.ts                # Next.js
+├── tsconfig.json                 # TypeScript
+└── package.json
 ```
 
-## How Domain Organization Works
+There's no `tailwind.config.ts` because there's no Tailwind — styling is plain CSS driven by
+design-token custom properties, with per-theme CSS files under `src/lib/theme/themes/`. See the
+design-system docs for how tokens and themes are wired.
 
-Instead of having all components in one giant folder, they're grouped by what part of the app they serve:
+## How domain organization works
 
-- **`components/world/`** - Everything related to world creation and management
-- **`components/character/`** - Character creation, editing, display components
-- **`components/narrative/`** - Story generation, choice presentation, narrative flow
-- **`components/ui/`** - Shared shadcn/ui components used everywhere
+Components are grouped by the part of the app they serve, not lumped into one giant folder:
 
-Same pattern for stores, types, and pages. When you're working on character creation, all the related files are in the same area.
+- **`components/world/`, `WorldCreationWizard/`, etc.** — world creation, editing, and display.
+- **`components/character/`, `CharacterCreationWizard/`, etc.** — character creation, editing, display.
+- **`components/Narrative/`, `GameSession/`** — story generation, choice presentation, gameplay flow.
+- **`components/ui/`** — shared shadcn/ui-based primitives used everywhere.
+- **`components/shared/`** — cross-domain pieces like the wizard framework and card layouts.
 
-## Notable Features
+The same domain grouping carries through `lib/`, `state/`, and `types/`. One thing to note: the
+casing is mixed — feature components live in PascalCase directories (`GameSession/`,
+`WorldCreationWizard/`) while broader groupings are lowercase (`world/`, `shared/`, `ui/`).
 
-**Development routes** - The `/dev/*` pages let you test components in isolation with real data. Really helpful for debugging complex interactions.
+## State
 
-**API security** - All AI requests go through server-side routes with rate limiting. API keys never touch the browser.
+State lives in `src/state/` as Zustand stores, one per domain — eleven of them today
+(`useWorldStore`, `useCharacterStore`, `useNarrativeStore`, `useJournalStore`,
+`useSessionStore`, `useAiContextStore`, `useNPCStore`, `useInventoryStore`, `useGoalStore`,
+`useNavigationStore`, `useLoreStore`). Alongside them, `persistence.ts` holds the IndexedDB
+storage adapter and `createCrudStore.ts` holds the shared `CrudStore<T>` type contract.
+Cross-store cascades go through the event bus in `src/lib/state/storePubSub.ts`. The
+[State Management Guide](state-management-guide.md) covers the patterns in detail.
 
-**State persistence** - Zustand stores automatically sync with IndexedDB, so game sessions persist across browser restarts.
+## Notable features
 
-**Type safety** - TypeScript everywhere with domain-specific type definitions. Makes refactoring much safer.
+The `/dev/*` routes are component test harnesses — they render components in isolation with
+real seeded data, which makes debugging complex interactions (and reviewing the design system)
+much easier. All AI requests go through server-side routes under `src/app/api/`, so the Gemini
+API key never reaches the browser. Stores persist to IndexedDB automatically, so game sessions
+survive a browser restart. And TypeScript runs strict throughout, with domain-specific type
+definitions in `src/types/` that make refactoring safer.

@@ -4,7 +4,7 @@ This wizard handles character creation with point allocation, skill selection, a
 
 ## What It Does
 
-**Guided 4-step process**: Basic info → Attribute allocation → Skill selection → Background creation. Each step builds on your world's specific rules and constraints.
+**Guided 4-step process**: basic info, then attribute allocation, then skill selection, then background creation. Each step builds on your world's specific rules and constraints.
 
 **Smart validation**: Prevents duplicate names, enforces point pool limits, provides real-time feedback. You can't accidentally create invalid characters.
 
@@ -100,5 +100,4 @@ The wizard appearance can be customized through:
 - [ ] Character portrait upload
 - [ ] AI-suggested backgrounds
 - [ ] Skill prerequisites
-- [ ] Character templates/archetypes
 - [ ] Import/export functionality

@@ -9,34 +9,24 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
-import { CheckCircle, Play, Eye, Pencil, Trash } from 'lucide-react';
+import { CheckCircle, Play, Pencil, Trash } from 'lucide-react';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('WorldCard');
 
 interface WorldCardProps {
   /** The world data to display */
   world: World;
   /** Whether this world is currently active */
   isActive?: boolean;
-  /** Whether this world is selected for comparison */
-  isSelected?: boolean;
   /** Callback when user selects this world */
   onSelect: (worldId: string) => void;
-  /** Callback when user toggles selection for comparison */
-  onToggleSelect?: (worldId: string) => void;
   /** Callback when user wants to delete this world */
   onDelete: (worldId: string) => void;
   /** Characters in this world */
   characters?: Character[];
-  /** Optional store actions for testing */
-  _storeActions?: {
-    setCurrentWorld: (id: string) => void;
-  };
-  /** Optional router for testing */
-  _router?: {
-    push: (url: string) => void;
-  };
 }
 
 /**
@@ -69,18 +59,11 @@ interface WorldCardProps {
 const WorldCard: React.FC<WorldCardProps> = ({
   world,
   isActive = false,
-  isSelected = false,
   onSelect,
-  onToggleSelect,
   onDelete,
   characters = [],
-  _storeActions,
-  _router,
 }) => {
-  // Only call useRouter if no mock is provided
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const router = _router ? null : useRouter();
-  const actualRouter = _router || router;
+  const router = useRouter();
 
   const handleMakeActive = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -93,8 +76,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
   const handlePlayClick = () => {
     try {
-      const storeActions = _storeActions || useWorldStore.getState();
-      storeActions.setCurrentWorld(world.id);
+      useWorldStore.getState().setCurrentWorld(world.id);
 
       // Check for characters in this world
       const characterState = useCharacterStore.getState();
@@ -104,41 +86,30 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
       if (worldCharacters.length === 0) {
         // No characters exist - redirect to characters page
-        if (actualRouter) {
-          actualRouter.push(`/characters?worldId=${world.id}`);
-        }
+        router.push(`/characters?worldId=${world.id}`);
         return;
       }
 
       // Check for saved session
-      let hasSession = false;
       const savedSession = useSessionStore
         .getState()
         .getSavedSession(world.id, worldCharacters[0]?.id);
 
-      if (savedSession) {
-        hasSession = true;
-      }
-
-      if (actualRouter) {
-        // Add query parameter to auto-resume if there's a saved session
-        const url = hasSession
-          ? `/worlds/${world.id}/play?autoResume=true`
-          : `/worlds/${world.id}/play`;
-        actualRouter.push(url);
-      }
-    } catch {
-      // Handle navigation errors gracefully
+      // Add query parameter to auto-resume if there's a saved session
+      const url = savedSession
+        ? `/worlds/${world.id}/play?autoResume=true`
+        : `/worlds/${world.id}/play`;
+      router.push(url);
+    } catch (error) {
+      logger.error('handlePlayClick', 'Failed to navigate to play world', error);
     }
   };
 
   const handleEditClick = () => {
     try {
-      if (actualRouter) {
-        actualRouter.push(`/worlds/${world.id}/edit`);
-      }
-    } catch {
-      // Handle navigation errors gracefully
+      router.push(`/worlds/${world.id}/edit`);
+    } catch (error) {
+      logger.error('handleEditClick', 'Failed to navigate to edit world', error);
     }
   };
 
@@ -155,18 +126,13 @@ const WorldCard: React.FC<WorldCardProps> = ({
       <div>
         <Link href={`/worlds/${world.id}`}>
           {(() => {
-            // Use seeded placeholder image during Playwright tests if world has no image
-            const isPlaywright =
-              typeof window !== 'undefined' &&
-              (window.navigator.userAgent.includes('Playwright') ||
-                (window as unknown as Record<string, unknown>).__playwright);
-            const STABLE_PLACEHOLDER =
-              'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
-            const heroImageUrl =
-              world.image?.url ||
-              (isPlaywright ? STABLE_PLACEHOLDER : undefined);
-            const heroImage = heroImageUrl
-              ? { url: heroImageUrl, alt: `${world.name} world` }
+            // When a world has no image, render no <img> at all and let Hero
+            // fall back to its tokenized themed background (see .component-hero
+            // in workshop.css). A previous white 1x1 placeholder rendered as a
+            // bright rectangle in dark mode (#1113). The themed empty-state is
+            // deterministic CSS, so it stays stable under visual tests too.
+            const heroImage = world.image?.url
+              ? { url: world.image.url, alt: `${world.name} world` }
               : undefined;
 
             return (
@@ -186,15 +152,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
             );
           })()}
         </Link>
-        {onToggleSelect && (
-          <div>
-            <Checkbox
-              checked={isSelected}
-              onChange={() => onToggleSelect(world.id)}
-              aria-label={`Select ${world.name} for comparison`}
-            />
-          </div>
-        )}
       </div>
 
       <div className="world-card-body">
@@ -210,9 +167,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     className="world-card-character-pill"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (actualRouter) {
-                        actualRouter.push(`/characters/${char.id}`);
-                      }
+                      router.push(`/characters/${char.id}`);
                     }}
                     title={`Play as ${char.name} - Level ${char.level}`}
                   >
@@ -292,11 +247,9 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   text: 'Manage Characters',
                   onClick: (e) => {
                     e.stopPropagation();
-                    if (actualRouter) {
-                      actualRouter.push(`/characters?worldId=${world.id}`);
-                    }
+                    router.push(`/characters?worldId=${world.id}`);
                   },
-                  variant: 'primary',
+                  variant: 'secondary',
                   flex: true,
                 },
                 {
@@ -310,18 +263,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 },
               ]}
               secondaryActions={[
-                {
-                  key: 'view',
-                  text: 'View',
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    if (actualRouter) {
-                      actualRouter.push(`/worlds/${world.id}`);
-                    }
-                  },
-                  variant: 'secondary',
-                  icon: <Eye aria-hidden="true" />,
-                },
                 {
                   key: 'edit',
                   text: 'Edit',

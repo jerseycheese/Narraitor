@@ -6,8 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { TutorialMenu } from './TutorialMenu';
-import { ThemeSwitcher } from './ThemeSwitcher';
-import { DarkModeToggle } from './DarkModeToggle';
+import { ThemeMenu } from './ThemeMenu';
 import { useNavigationData } from './useNavigationData';
 import { Check } from 'lucide-react';
 import { getGenreLabel } from '@/lib/constants/genres';
@@ -79,7 +78,7 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
           className="workshop-sidebar-brand"
         >
           <LogoIcon size="small" className="logo-icon-inverted" />
-          <LogoText size="sm" />
+          <LogoText size="sm" className="app-wordmark" />
         </Link>
       </div>
 
@@ -129,7 +128,7 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
                       {world.name}
                     </span>
                     <span className="workshop-sidebar-world-meta">
-                      {getGenreLabel(world.genre)} · {worldCharacters} characters
+                      {getGenreLabel(world.genre)} · {worldCharacters} {worldCharacters === 1 ? 'character' : 'characters'}
                     </span>
                     {isActive && <Check aria-hidden="true" />}
                   </Button>
@@ -143,8 +142,7 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
       <div className="workshop-sidebar-spacer" aria-hidden="true" />
 
       <div className="workshop-sidebar-toolbar">
-        <ThemeSwitcher compact />
-        <DarkModeToggle compact />
+        <ThemeMenu />
         <TutorialMenu />
       </div>
     </nav>

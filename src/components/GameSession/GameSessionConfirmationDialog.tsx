@@ -1,12 +1,12 @@
 'use client';
 
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 
 interface GameSessionConfirmationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  type: 'start-new' | 'character-switch';
+  type: 'start-new' | 'character-switch' | 'exit';
   characterName?: string;
   currentProgress?: number;
 }
@@ -31,6 +31,13 @@ const copyConfig: Record<GameSessionConfirmationDialogProps['type'], {
     confirmText: 'Switch Characters',
     cancelText: 'Stay with Current Character',
   },
+  'exit': {
+    title: 'Leave the Story?',
+    description:
+      'Your progress is saved automatically, so you can resume from this exact spot any time. Are you sure you want to step away now?',
+    confirmText: 'Leave Story',
+    cancelText: 'Keep Playing',
+  },
 };
 
 export function GameSessionConfirmationDialog({
@@ -44,13 +51,12 @@ export function GameSessionConfirmationDialog({
   const config = copyConfig[type];
   const variant = type === 'character-switch' ? 'info' : 'warning';
 
-  const progressSuffix =
-    currentProgress > 0 ? ` (${currentProgress} story segments so far).` : '';
-
-  const description =
+  const descriptionWithContext =
     type === 'start-new'
-      ? `${config.description}${progressSuffix}`
-      : `${config.description.replace('hero', characterName || 'selected hero')}${progressSuffix}`;
+      ? `${config.description}${currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''}`
+      : `${config.description.replace('hero', characterName || 'selected hero')}${
+          currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''
+        }`;
 
   const confirmText =
     type === 'character-switch' && characterName
@@ -63,11 +69,10 @@ export function GameSessionConfirmationDialog({
       onClose={onClose}
       onConfirm={onConfirm}
       title={config.title}
-      message={description}
+      message={descriptionWithContext}
       variant={variant}
       confirmText={confirmText}
       cancelText={config.cancelText}
-      size="md"
     />
   );
 }

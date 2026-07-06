@@ -7,10 +7,7 @@ import {
   useWizardState,
   WizardStep as WizardStepType,
 } from '@/hooks/useWizardState';
-import {
-  createWizardValidator,
-  WizardStepValidator,
-} from '@/lib/utils/wizardValidation';
+import { Validator, alwaysValid } from '@/lib/utils/wizardValidation';
 import { WorldSelectionStep } from './steps/WorldSelectionStep';
 import { CharacterSelectionStep } from './steps/CharacterSelectionStep';
 import { GameReadyStep } from './steps/GameReadyStep';
@@ -61,26 +58,19 @@ export function GameStartWizard({
   );
 
   // Create step validators
-  const stepValidators = useMemo((): Record<
-    number,
-    WizardStepValidator<GameStartData>
-  > => {
+  const stepValidators = useMemo((): Record<number, Validator<GameStartData>> => {
     return {
-      0: createWizardValidator<GameStartData>()
-        .customValidation((data) => ({
-          valid: !!data.selectedWorldId,
-          errors: data.selectedWorldId ? [] : ['Please select a world'],
-          touched: true,
-        }))
-        .build(),
-      1: createWizardValidator<GameStartData>()
-        .customValidation((data) => ({
-          valid: !!data.selectedCharacterId,
-          errors: data.selectedCharacterId ? [] : ['Please select a character'],
-          touched: true,
-        }))
-        .build(),
-      2: createWizardValidator<GameStartData>().build(), // Ready step is always valid
+      0: (data) => ({
+        valid: !!data.selectedWorldId,
+        errors: data.selectedWorldId ? [] : ['Please select a world'],
+        touched: true,
+      }),
+      1: (data) => ({
+        valid: !!data.selectedCharacterId,
+        errors: data.selectedCharacterId ? [] : ['Please select a character'],
+        touched: true,
+      }),
+      2: alwaysValid, // Ready step is always valid
     };
   }, []);
 
@@ -92,7 +82,7 @@ export function GameStartWizard({
     onStepValidation: (stepIndex, data) => {
       const validator = stepValidators[stepIndex];
       return validator
-        ? validator.validate(data)
+        ? validator(data)
         : { valid: true, errors: [], touched: true };
     },
   });

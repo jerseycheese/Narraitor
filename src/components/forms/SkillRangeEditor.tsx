@@ -53,6 +53,7 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
       disabled={disabled}
       showLabel={showLabels}
       labelText="Default Value"
+      ariaLabel={`${skill.name} skill level`}
       levelDescriptions={levelDescriptions}
       showLevelDescription={showLevelDescriptions}
       testId="skill-range-editor"

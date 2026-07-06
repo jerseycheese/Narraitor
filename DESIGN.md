@@ -97,7 +97,7 @@ Three design systems ship together — **DS1 "The Drafting Table"**, **DS2 "Warm
 1. **Reading first.** Long-form narrative is the most-viewed surface. Line lengths, line heights, and paragraph rhythm get optimized before anything else.
 2. **Tokens carry variation; components stay theme-blind.** No `theme === 'ds1'` branching in JSX. Components consume `var(--token-name)` and let the active theme decide.
 3. **Structural differentiation.** A theme is a coherent point of view about how interfaces should feel — different shape language, spacing, density. Same shape with three palettes reads as one app wearing three hats.
-4. **Canon order: showcase pages > Storybook > app.** [`/dev/design-system`](src/app/dev/design-system/page.tsx), [`-2`](src/app/dev/design-system-2/page.tsx), [`-3`](src/app/dev/design-system-3/page.tsx) and their [`/session/`](src/app/dev/design-system/session/page.tsx) subroutes are the highest authority — when they disagree with anything else, they win. **Storybook** (`npm run storybook`) is the next layer down: component-level reference with `00-Foundation/Design System Showcase` and `00-Foundation/Design Tokens` foundation stories, per-component stories for variants, and a DS1/DS2/DS3 + light/dark toolbar switcher. Production app code is the lowest authority — when production drifts from showcase or Storybook, the production code is wrong, not the canon.
+4. **Storybook is canon; app code is the lowest authority.** **Storybook** (`npm run storybook`) is the single source of truth for the frontend — `00-Foundation/Design System Showcase` and `00-Foundation/Design Tokens` foundation stories, per-component stories for variants, whole-page stories seeded with mock data, and a DS1/DS2/DS3 + light/dark toolbar switcher (plus mobile/tablet/desktop viewports). Every in-scope component must have a story; the `lint:ds-canon` guard fails any that don't. When production drifts from Storybook, the production code is wrong, not the canon. The old `/dev/design-system*` living style guide was retired — see [ADR-012](public_docs/architecture/ADR-012-storybook-single-canon-surface.md).
 5. **No inline styles, no hardcoded values.** Every visual value comes from a token. Hex codes and pixel literals in component code are bugs.
 
 ## Colors
@@ -180,7 +180,7 @@ There is no named typographic scale yet (no `headline-lg`, `body-md`). Sizes are
 
 ## Layout & Spacing
 
-Spacing is on a 4px base scale, Tailwind-aligned:
+Spacing is on a 4px base scale (the same increments Tailwind used, kept as `--space-*` tokens):
 
 - **xs** `4px` (`--space-1`) — between an icon and its label
 - **sm** `8px` (`--space-2`) — between tightly-related elements
@@ -244,6 +244,13 @@ Component rules apply to all three themes. The token references resolve per-them
 - Height **36px** to match button default. Background `surface`, border `1px solid var(--color-border)`, radius `var(--radius-md)`, padding `8px 12px`.
 - Focus: `2px` accent outline, no border color change.
 
+### Action Groups
+
+- **Never use floating or adjacent raw `<Button>` tags** for toolbars or card footers. Wrap them in `<ActionButtonGroup>` or `<CardActionGroup>`.
+- **Layout & Spacing**: Use `layout="horizontal" | "vertical"` and `gap="sm" | "md" | "lg"` props on the group to rely on strict design system spacing tokens instead of ad-hoc padding/margins.
+- **Responsive Flex**: For buttons that should stretch to fill available width (like "Play" or "Save"), pass `flex: true` to the action definition. Do not use custom `flex-1` classes.
+- **Page-Level Placement**: Primary "create" actions on list routes must be placed in the `actions` prop of the `<PageLayout>` component to ensure consistent top-right alignment.
+
 ### Badge
 
 - Pill shape (`var(--radius-full)`), padding `2px 8px`, font `font-interface` at `0.75rem` weight 500.
@@ -257,7 +264,7 @@ The don'ts here come from real failures during the design-system migration. They
 
 - **Don't hardcode hex codes or pixel values in component code.** Use `var(--token-name)` or the matching utility class. The build doesn't catch this — review does.
 - **Don't branch on theme inside JSX.** No `theme === 'ds2' ? <FluffyCard /> : <SharpCard />`. If you can't express the variation as a CSS variable, the structural difference is large enough to question whether it should exist.
-- **Don't use Tailwind utility classes that bypass the token system** (`bg-blue-500`, `rounded-full` is fine but `rounded-[6px]` is not). The semantic Tailwind classes (`bg-primary`, `text-muted-foreground`) are wired into the token system; the literal-color ones aren't.
+- **Don't hardcode literal color or size values that bypass the token system** (`#3b82f6`, `rounded-[6px]`, `color: blue`). Use the design tokens via `var(--token-name)` so the value resolves per theme. There is no Tailwind here — it was removed in the design-system migration (`#1097`), so there are no utility classes to reach for.
 - **Don't use `!important` to override theme values.** If you need to override, you're fighting the system — fix the token instead.
 - **Don't add a token to one theme file without adding it to all three.** A missing variable in DS2 silently falls back to undefined and breaks layout.
 - **Don't put two solid-accent (primary) buttons on the same screen.** One primary action per view. Secondary actions go in `secondary`, `outline`, or `ghost`.
@@ -272,8 +279,8 @@ The don'ts here come from real failures during the design-system migration. They
 - **Do build new components against tokens, not raw values**, even when the value happens to match.
 - **Do verify every visual change in DS1, DS2, and DS3** before merging.
 - **Do use the showcase pages as the spec.** When implementing a new pattern, find the closest match in `/dev/design-system{,-2,-3}` and align to it.
-- **Do prefer semantic Tailwind classes** (`bg-primary`, `text-muted-foreground`, `border-border`) over `var(--token)` in JSX when the token has a Tailwind alias.
-- **Do consume tokens via `var()` in component CSS** when the value isn't covered by a Tailwind class.
+- **Do put styling in CSS, keyed off semantic class names.** JSX carries class names like `badge badge-success` (composed with `clsx`); the component's CSS resolves those against `var(--token)` values.
+- **Do consume tokens via `var()` in component CSS** rather than repeating literal values.
 - **Do add new tokens to all three theme files** with values that fit each theme's voice — not the same value copy-pasted across.
 
 ## Theme switching mechanism

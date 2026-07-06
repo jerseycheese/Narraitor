@@ -14,20 +14,27 @@ import './globals.css';
 import './workshop.css';
 import './wizard.css';
 import './dashboard.css';
+import './about.css';
+import './legal.css';
+import './landing.css';
 import './badge.css';
 import './character-display.css';
+import '@/lib/theme/themes/_shared-tokens.css';
 import '@/lib/theme/themes/ds1.css';
 import '@/lib/theme/themes/ds2.css';
 import '@/lib/theme/themes/ds3.css';
 import { DevToolsProvider } from '@/components/devtools';
 import { ClientOnlyDevTools } from '@/components/ClientOnlyDevTools';
 import { AppSurfaceShell } from '@/components/layout/AppSurfaceShell';
+import { SessionRecoveryManager } from '@/components/GameSession/SessionRecoveryManager';
 import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
-import { NavigationPersistenceProvider } from '@/components/shared/NavigationPersistenceProvider';
 import { SkipLinks } from '@/components/shared/SkipLinks';
 import { ToastProvider, Toaster } from '@/components/ui/toast';
 import { TutorialProvider } from '@/components/TutorialProvider';
 import { ThemeProvider } from '@/lib/theme';
+import { THEME_INIT_SCRIPT } from '@/lib/theme/themeInitScript';
+import { Analytics } from '@vercel/analytics/next';
+import { FunnelAnalytics } from '@/components/analytics/FunnelAnalytics';
 
 /* DS1 fonts (preloaded - default theme) */
 const lora = Lora({
@@ -106,8 +113,6 @@ const fontVariables = [
   dmSans.variable,
 ].join(' ');
 
-const themeScript = `(function(){try{var t=localStorage.getItem('narraitor-theme');if(t)document.documentElement.setAttribute('data-theme',t);var c=localStorage.getItem('narraitor-color-scheme');if(c==='dark'||(c==='system'&&matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
-
 export const metadata: Metadata = {
   title: 'Narraitor',
   description: 'A narrative-driven RPG framework using AI',
@@ -128,27 +133,28 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" data-theme="ds1" className={fontVariables} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body suppressHydrationWarning>
         <SkipLinks />
         <ThemeProvider>
           <NavigationLoadingProvider>
-            <NavigationPersistenceProvider>
-              <DevToolsProvider>
-                <ToastProvider>
-                  <TutorialProvider>
-                    <AppSurfaceShell>
-                      {children}
-                    </AppSurfaceShell>
-                    <ClientOnlyDevTools />
-                    <Toaster />
-                  </TutorialProvider>
-                </ToastProvider>
-              </DevToolsProvider>
-            </NavigationPersistenceProvider>
+            <DevToolsProvider>
+              <ToastProvider>
+                <TutorialProvider>
+                  <AppSurfaceShell>
+                    {children}
+                  </AppSurfaceShell>
+                  <SessionRecoveryManager />
+                  <ClientOnlyDevTools />
+                  <Toaster />
+                </TutorialProvider>
+              </ToastProvider>
+            </DevToolsProvider>
           </NavigationLoadingProvider>
         </ThemeProvider>
+        <FunnelAnalytics />
+        <Analytics />
       </body>
     </html>
   );

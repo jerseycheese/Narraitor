@@ -1,5 +1,5 @@
 import { AIClient } from './types';
-import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
+import { getNarrativeTemplate } from '../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import {
@@ -13,13 +13,10 @@ import {
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
-import { ChoiceGenerator } from './choiceGenerator';
+import { generateChoices } from './choiceGenerator';
 import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
-import { TemplateGenerator, WorldTemplate } from './templateGenerator';
-import { TemplateGenerationContext } from './templatePrompts';
-import { PersonalizationEngine } from './personalizationEngine';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import { processLostItems } from '@/lib/narrative/itemLossProcessor';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
@@ -34,6 +31,7 @@ import {
 import {
   createRequestBudget,
   limitNarrativeContextToBudget,
+  recordRequestCalibration,
 } from './narrativeGenerator.budget';
 import {
   buildNarrativeContext,
@@ -50,21 +48,18 @@ import {
 import { formatNarrativeResponse } from './narrativeGenerator.response';
 import { enforceLanguageComplexity } from './narrativeGenerator.languageComplexity';
 import { buildNpcRoster, syncNpcMetadata } from './narrativeGenerator.npc';
+import {
+  applyContinuityGuardrail,
+  buildContinuityContractFromStores,
+  enhancePromptWithContinuityExpectations,
+} from './narrativeGenerator.continuity';
 
 export class NarrativeGenerator {
-  private choiceGenerator: ChoiceGenerator;
-  private templateGenerator: TemplateGenerator;
-  private personalizationEngine: PersonalizationEngine;
-
   private staticContentCache: NarrativeStaticContentCache = {
     toneSettings: new Map(),
   };
 
-  constructor(private geminiClient: AIClient) {
-    this.choiceGenerator = new ChoiceGenerator(geminiClient);
-    this.templateGenerator = new TemplateGenerator(geminiClient);
-    this.personalizationEngine = new PersonalizationEngine();
-  }
+  constructor(private geminiClient: AIClient) {}
 
   async generateSegment(
     request: NarrativeGenerationRequest
@@ -75,15 +70,16 @@ export class NarrativeGenerator {
       const template = this.getTemplate('scene');
 
       const budget = createRequestBudget();
-      const requestForTemplate = budget.isEnabled()
-        ? ({
-            ...request,
-            narrativeContext: limitNarrativeContextToBudget(
-              request.narrativeContext,
-              budget
-            ),
-          } as NarrativeGenerationRequest)
-        : request;
+      // Always route through the budget helper: it records the recent-narrative
+      // estimate for observability and only truncates when enforcement is on
+      // (returns the context unchanged otherwise).
+      const requestForTemplate = {
+        ...request,
+        narrativeContext: limitNarrativeContextToBudget(
+          request.narrativeContext,
+          budget
+        ),
+      } as NarrativeGenerationRequest;
 
       const context = buildNarrativeContext(world, requestForTemplate);
       const prompt = template(context);
@@ -111,7 +107,6 @@ export class NarrativeGenerator {
         goalEnhancedPrompt,
         request.worldId,
         request.characterIds || [],
-        this.personalizationEngine,
         request.sessionId,
         budget
       );
@@ -139,15 +134,40 @@ export class NarrativeGenerator {
         characterInventory
       );
 
-      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+      const continuityContract = buildContinuityContractFromStores(request);
+      const finalPrompt = enhancePromptWithContinuityExpectations(
+        fullyEnhancedPrompt,
+        continuityContract
+      );
 
-      if (response.content) {
+      const response = await this.geminiClient.generateContent(finalPrompt);
+      recordRequestCalibration(budget, finalPrompt, response);
+
+      let result = await formatNarrativeResponse(
+        response,
+        inferSegmentType(response.content || ''),
+        this.geminiClient
+      );
+
+      result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
+
+      result = await applyContinuityGuardrail({
+        result,
+        contract: continuityContract,
+        client: this.geminiClient,
+        worldId: request.worldId,
+        sessionId: request.sessionId,
+      });
+
+      // Lore extraction runs on the final (possibly corrected) prose so a
+      // contradicted draft never pollutes the lore store.
+      if (result.content) {
         try {
           if (process.env.NODE_ENV !== 'production') {
             logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
               worldId: request.worldId,
               sessionId: request.sessionId,
-              contentLength: response.content.length,
+              contentLength: result.content.length,
             });
           }
 
@@ -155,7 +175,7 @@ export class NarrativeGenerator {
             recordUsage: false,
           });
           const structuredLore = await extractStructuredLore(
-            response.content,
+            result.content,
             existingLoreContext
           );
 
@@ -182,14 +202,6 @@ export class NarrativeGenerator {
           logger.error('[NarrativeGenerator] Failed to extract lore:', error);
         }
       }
-
-      let result = await formatNarrativeResponse(
-        response,
-        inferSegmentType(response.content || ''),
-        this.geminiClient
-      );
-
-      result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
 
       if (
         (!result.metadata.itemsLost || result.metadata.itemsLost.length === 0) &&
@@ -229,7 +241,7 @@ export class NarrativeGenerator {
         const templateType = 'scene';
 
         const debugInfoContext: DebugInfoContext = {
-          fullPrompt: fullyEnhancedPrompt,
+          fullPrompt: finalPrompt,
           templateName: this.getTemplateName(templateType),
           world,
           toneSettings,
@@ -238,7 +250,7 @@ export class NarrativeGenerator {
           previousSegmentContent: previousSegment?.content,
           previousSegmentType: previousSegment?.type,
           tokenUsage: result.tokenUsage,
-          modelUsed: 'gemini-2.0-flash',
+          modelUsed: 'gemini-2.5-flash',
         };
 
         result.metadata.debugInfo = buildPromptDebugInfo(debugInfoContext);
@@ -284,6 +296,8 @@ export class NarrativeGenerator {
     }
   }
 
+  // Deliberately not continuity-guarded: at session start there are no
+  // decisions or NPC relationships to validate against (#409/#412).
   async generateInitialScene(
     worldId: string,
     characterIds: string[],
@@ -338,7 +352,6 @@ export class NarrativeGenerator {
         loreEnhancedPrompt,
         worldId,
         characterIds,
-        this.personalizationEngine,
         sessionId,
         budget
       );
@@ -367,6 +380,7 @@ export class NarrativeGenerator {
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+      recordRequestCalibration(budget, fullyEnhancedPrompt, response);
 
       if (response.content) {
         try {
@@ -528,7 +542,7 @@ export class NarrativeGenerator {
 
   private getTemplate(segmentType: string) {
     const templateKey = `narrative/${segmentType}`;
-    return narrativeTemplateManager.getTemplate(templateKey);
+    return getNarrativeTemplate(templateKey);
   }
 
   private getTemplateName(segmentType: string): string {
@@ -617,6 +631,7 @@ export class NarrativeGenerator {
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+      recordRequestCalibration(budget, fullyEnhancedPrompt, response);
 
       let result = await formatNarrativeResponse(
         response,
@@ -700,7 +715,7 @@ export class NarrativeGenerator {
     sessionId?: EntityID
   ): Promise<Decision> {
     try {
-      const result = await this.choiceGenerator.generateChoices({
+      const result = await generateChoices(this.geminiClient, {
         worldId,
         narrativeContext,
         characterIds,
@@ -743,18 +758,6 @@ export class NarrativeGenerator {
         }, ${narrativeContext.currentSituation || 'making a decision'}.`,
       };
     }
-  }
-
-  async generateWorldTemplate(
-    context: TemplateGenerationContext
-  ): Promise<WorldTemplate> {
-    return this.templateGenerator.generateWorldTemplate(context);
-  }
-
-  convertTemplateToWorld(
-    template: WorldTemplate
-  ): Omit<World, 'id' | 'createdAt' | 'updatedAt'> {
-    return this.templateGenerator.convertTemplateToWorld(template);
   }
 
   private syncNpcMetadata(

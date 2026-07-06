@@ -6,12 +6,14 @@
 // Mock stores at module level (before imports)
 jest.mock('@/state/worldStore');
 jest.mock('@/state/characterStore');
+jest.mock('../choiceGenerator');
 
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { NarrativeContext } from '@/types/narrative.types';
 import { createMockAIClient, createMockWorldWithSkills, createMockCharacterWithSkills } from './narrativeGenerator.skill.testHelpers';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { generateChoices } from '../choiceGenerator';
 import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils/mockStoreFactories';
 
 describe('NarrativeGenerator - Skill-Based Choices', () => {
@@ -39,36 +41,30 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
   });
 
   test('should pass character skills to choice generator', async () => {
-    // Mock the choice generator to spy on the context passed to it
-    const mockChoiceGenerator = {
-      generateChoices: jest.fn().mockResolvedValue({
-        id: 'decision-with-skills',
-        prompt: 'What approach will you take?',
-        options: [
-          {
-            id: 'opt-1',
-            text: 'Climb the wall',
-            requirements: [{ type: 'skill' as const, targetId: 'athletics', operator: 'gte' as const, value: 5 }],
-            hint: 'Requires athletic ability'
-          },
-          {
-            id: 'opt-2',
-            text: 'Cast a levitation spell',
-            requirements: [{ type: 'skill' as const, targetId: 'magic', operator: 'gte' as const, value: 4 }],
-            hint: 'Requires magical knowledge'
-          },
-          {
-            id: 'opt-3',
-            text: 'Look for another way',
-            alignment: 'neutral' as const
-          }
-        ]
-      })
-    };
-
-    // Replace the choice generator in the narrative generator
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (narrativeGenerator as any).choiceGenerator = mockChoiceGenerator;
+    // Spy on the context passed to the choice generator
+    (generateChoices as jest.Mock).mockResolvedValue({
+      id: 'decision-with-skills',
+      prompt: 'What approach will you take?',
+      options: [
+        {
+          id: 'opt-1',
+          text: 'Climb the wall',
+          requirements: [{ type: 'skill' as const, targetId: 'athletics', operator: 'gte' as const, value: 5 }],
+          hint: 'Requires athletic ability'
+        },
+        {
+          id: 'opt-2',
+          text: 'Cast a levitation spell',
+          requirements: [{ type: 'skill' as const, targetId: 'magic', operator: 'gte' as const, value: 4 }],
+          hint: 'Requires magical knowledge'
+        },
+        {
+          id: 'opt-3',
+          text: 'Look for another way',
+          alignment: 'neutral' as const
+        }
+      ]
+    });
 
     const narrativeContext: NarrativeContext = {
       worldId: 'skill-world',
@@ -87,8 +83,8 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       ['char-1']
     );
 
-    // Verify the choice generator was called with correct parameters
-    expect(mockChoiceGenerator.generateChoices).toHaveBeenCalledWith({
+    // Verify the choice generator was called with the client and correct parameters
+    expect(generateChoices).toHaveBeenCalledWith(mockAIClient, {
       worldId: 'skill-world',
       narrativeContext,
       characterIds: ['char-1'],

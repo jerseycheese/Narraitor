@@ -1,8 +1,18 @@
+/* Surface roots mount/unmount when the route crosses surface modes (default ↔
+ * workshop ↔ manuscript) in AppSurfaceShell, so a fade on mount smooths the
+ * otherwise-jarring top-nav→sidebar snap (#1432 F7) without firing on
+ * same-surface navigation. Disabled under reduced-motion. */
+@keyframes surface-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .app-surface-default {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background: var(--color-canvas);
+  animation: surface-fade-in 180ms ease;
 }
 
 .app-surface-manuscript {
@@ -18,8 +28,9 @@
 }
 
 .default-surface-inner {
+  box-sizing: border-box;
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-4);
 }
@@ -172,10 +183,10 @@
 [data-theme="ds1"] .home-hero-title::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 48px;
+  width: 3rem;
+  height: 2px;
   margin: var(--space-4) auto var(--space-2);
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .home-hero-tagline {
@@ -352,6 +363,14 @@
   min-height: 100vh;
   background: var(--color-canvas);
   position: relative;
+  animation: surface-fade-in 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-surface-default,
+  .app-surface-workshop {
+    animation: none;
+  }
 }
 
 .workshop-sidebar {
@@ -519,6 +538,273 @@
   flex-shrink: 0;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Workshop sidebar — per-theme structural differentiation (#1232)
+   Each theme gives the rail a distinct compositional tack, the same
+   way the dashboard became Drafting Table / Spread / Mechanical
+   Manuscript (#1222). The personalities match the rest of the app:
+   DS1 = a ruled architectural register, DS2 = airy floating modules,
+   DS3 = a dense dotted control rail.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── DS1 — Drafting Table: the rail as a ruled index/register ───
+   Tight density, sharp corners, hairline rules dividing every row.
+   Primary nav and the world switcher both read as ruled catalogue
+   entries; the active row is marked by a sharp accent rule, not a
+   filled pill. Section labels become tracked eyebrow tags over a
+   strong hairline — the world switcher reads as a titled register. */
+
+[data-theme="ds1"] .workshop-sidebar {
+  border-right: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .workshop-sidebar-nav {
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-3) var(--space-2);
+}
+
+[data-theme="ds1"] .workshop-sidebar-brand-row {
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .workshop-sidebar-primary {
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .workshop-sidebar-primary-link {
+  padding: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="ds1"]
+  .workshop-sidebar-primary
+  li:first-child
+  .workshop-sidebar-primary-link {
+  border-top: none;
+}
+
+[data-theme="ds1"] .workshop-sidebar-primary-link[data-active="true"] {
+  background: var(--color-surface);
+  border-left-color: var(--color-accent);
+  font-weight: 600;
+}
+
+[data-theme="ds1"] .workshop-sidebar-section-label {
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--color-border-strong);
+  font-family: var(--font-interface);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+[data-theme="ds1"] .workshop-sidebar-worlds-list {
+  gap: 0;
+}
+
+[data-theme="ds1"] .workshop-sidebar-world-item {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  padding: var(--space-2);
+}
+
+[data-theme="ds1"]
+  .workshop-sidebar-worlds-list
+  li:first-child
+  .workshop-sidebar-world-item {
+  border-top: none;
+}
+
+[data-theme="ds1"] .workshop-sidebar-world-item[data-active="true"] {
+  background: var(--color-surface);
+  border-left-color: var(--color-accent);
+}
+
+[data-theme="ds1"] .workshop-sidebar-world-name {
+  font-family: var(--font-interface);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+/* ─── DS2 — The Spread: airy rail with floating modules ───
+   Generous spacing, soft radii, narrative-serif section labels in
+   normal case. The nav links become roomy rounded pills and the
+   world switcher is lifted into its own rounded surface module that
+   floats on the rail — the unmistakable editorial-spread move. */
+
+[data-theme="ds2"] .workshop-sidebar-nav {
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-4) var(--space-4);
+}
+
+[data-theme="ds2"] .workshop-sidebar-brand-row {
+  padding-bottom: var(--space-4);
+  border-bottom: none;
+}
+
+[data-theme="ds2"] .workshop-sidebar-primary {
+  gap: var(--space-1);
+}
+
+[data-theme="ds2"] .workshop-sidebar-primary-link {
+  padding: var(--space-2) var(--space-3);
+  border-left: none;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+}
+
+[data-theme="ds2"] .workshop-sidebar-primary-link[data-active="true"] {
+  background: var(--color-surface);
+}
+
+[data-theme="ds2"] .workshop-sidebar-worlds-section {
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+[data-theme="ds2"] .workshop-sidebar-section-label {
+  font-family: var(--font-narrative);
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .workshop-sidebar-worlds-list {
+  gap: var(--space-2);
+}
+
+[data-theme="ds2"] .workshop-sidebar-world-item {
+  padding: var(--space-3);
+  border-color: transparent;
+  border-radius: var(--radius-md);
+}
+
+[data-theme="ds2"] .workshop-sidebar-world-item[data-active="true"] {
+  background: var(--color-surface-hover);
+  border-color: transparent;
+}
+
+[data-theme="ds2"] .workshop-sidebar-world-name {
+  font-size: 1rem;
+}
+
+/* ─── DS3 — Mechanical Manuscript: dense dotted control rail ───
+   Condensed entries, monospace eyebrow labels with a bullet, dotted
+   rules in place of solid borders, and a high-contrast filled active
+   nav state. The world switcher tightens into a compact status
+   readout — dense rows with a dotted active frame. */
+
+[data-theme="ds3"] .workshop-sidebar-nav {
+  gap: var(--space-3);
+}
+
+[data-theme="ds3"] .workshop-sidebar-brand-row {
+  position: relative;
+  padding-bottom: var(--space-2);
+  border-bottom: none;
+}
+
+[data-theme="ds3"] .workshop-sidebar-brand-row::after {
+  content: "";
+  position: absolute;
+  left: var(--space-1);
+  right: var(--space-1);
+  bottom: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.7;
+}
+
+[data-theme="ds3"] .workshop-sidebar-primary-link {
+  padding: var(--space-1) var(--space-2);
+  border-left: none;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+[data-theme="ds3"] .workshop-sidebar-primary-link[data-active="true"] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+[data-theme="ds3"] .workshop-sidebar-section-label {
+  position: relative;
+  padding-bottom: var(--space-2);
+}
+
+[data-theme="ds3"] .workshop-sidebar-section-label::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  margin-right: var(--space-1);
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+[data-theme="ds3"] .workshop-sidebar-section-label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .workshop-sidebar-worlds-list {
+  gap: 0;
+}
+
+[data-theme="ds3"] .workshop-sidebar-world-item {
+  gap: 0 var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-style: dotted;
+  border-color: transparent;
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .workshop-sidebar-world-item[data-active="true"] {
+  background: var(--color-accent-soft);
+  border-style: dotted;
+  border-color: var(--color-accent);
+}
+
+[data-theme="ds3"] .workshop-sidebar-world-name {
+  font-size: 0.875rem;
+}
+
+[data-theme="ds3"] .workshop-sidebar-world-meta {
+  font-size: 0.65rem;
+}
+
 .workshop-workspace {
   flex: 1;
   min-width: 0;
@@ -568,10 +854,15 @@
 }
 
 .workshop-workspace-main {
-  min-height: 100vh;
+  /* Fill the remaining workspace height after the sticky context header rather
+   * than forcing a fresh 100vh — stacking 100vh on top of the header overflowed
+   * the viewport and left a tall empty surface panel on short pages (#1432 F57). */
+  flex: 1;
+  min-height: 0;
 }
 
 .workshop-workspace-inner {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1024px;
   margin: 0 auto;
@@ -657,6 +948,13 @@
     display: none;
   }
 
+  /* Drop the secondary help icon on mobile too (alongside breadcrumbs + recent)
+     so the "Workshop" title and the primary CTA no longer collide under
+     space-between at narrow widths (<= ~415px). */
+  .workshop-context-header .tutorial-menu {
+    display: none;
+  }
+
   .workshop-workspace-main {
     min-height: calc(100vh - 3.5rem);
   }
@@ -685,18 +983,37 @@
 }
 
 .header-nav-inner {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: var(--space-3) var(--space-4);
+  padding-block: var(--space-3);
+  padding-inline: var(--space-4);
+}
+
+/* Match the page-content gutter at each breakpoint so the logo lines up with
+   the page's left edge and the CTA with its right edge. default-surface-inner
+   uses space-3 (<768), space-4 (768-1024), space-6 (>=1024). */
+@media (width < 768px) {
+  .header-nav-inner {
+    padding-inline: var(--space-3);
+  }
+}
+
+@media (width >= 1024px) {
+  .header-nav-inner {
+    padding-inline: var(--space-6);
+  }
 }
 
 .header-nav-left {
   display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
 }
 
@@ -704,6 +1021,37 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
+}
+
+.header-nav-desktop-links {
+  /* Hidden at/under 768px: the hamburger + drawer own primary navigation there.
+     Shown inline above 768px. The `> 768` boundary is the complement of
+     `.header-nav-mobile-toggle`'s `<= 768px` so exactly one renders at the 768px
+     edge (iPad Mini portrait). Mobile-first so the base rule isn't overridden by
+     later source-order declarations. */
+  display: none;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+@media (width > 768px) {
+  .header-nav-desktop-links {
+    display: flex;
+  }
+}
+
+/* Hamburger toggle: hidden above 768px, shown at/under it. CSS-gated (not JS
+   matchMedia) so the header's mobile collapse has one source of truth and can't
+   desync from the layout viewport (#1381). Complements the desktop links and
+   actions, which already collapse purely via media queries. */
+.header-nav-mobile-toggle {
+  display: none;
+}
+
+@media (width <= 768px) {
+  .header-nav-mobile-toggle {
+    display: inline-flex;
+  }
 }
 
 .header-nav-links a[data-navigation] {
@@ -722,10 +1070,110 @@
 .header-nav-actions {
   display: flex;
   align-items: center;
+  gap: var(--space-3);
+}
+
+/* Below the hamburger breakpoint the mobile drawer owns Theme/Tutorial/Recent,
+   the world switcher, and the primary CTA, so the inline actions cluster is
+   redundant and its intrinsic width overflows narrow viewports. Hide it there;
+   the drawer carries everything (ThemeMenu added there for parity). Placed
+   after the base rule so equal-specificity source order keeps display:none. */
+@media (width <= 768px) {
+  .header-nav-actions {
+    display: none;
+  }
+}
+
+/* Brand lockup: icon + serif wordmark, no link underline. */
+.app-brand {
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-2);
+  text-decoration: none;
+  color: var(--color-text-primary);
+}
+
+/* Wordmark in the per-theme narrative serif (Lora / Crimson Pro / Newsreader)
+   so the brand carries the app's literary identity instead of plain UI sans. */
+.app-wordmark {
+  font-family: var(--font-narrative);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+/* Grouped toolbar: utility icons | world context | primary action. */
+.header-nav-actions-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Active world reads as "your story": a subtle wash of the theme accent. */
+.header-world-trigger-active {
+  background: var(--color-accent-soft);
+}
+
+.header-nav-divider {
+  width: 1px;
+  height: 1.375rem;
+  background: var(--color-border);
+}
+
+/* Active-world character count as a subtle labeled badge, not a bare number. */
+.header-world-count {
+  font-family: var(--font-interface);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-surface-hover);
+  padding: 0.0625rem var(--space-1_5);
+  border-radius: 999px;
 }
 
 /* ─── Dropdown Menu ─── */
+
+/* Positioning context so the dropdown anchors under the palette trigger. */
+.theme-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Bound the appearance dropdown so it fits the narrow workshop rail (which
+   clips overflow) and let the skin descriptions wrap instead of forcing the
+   menu wider than its container. */
+.theme-menu .header-dropdown-menu {
+  width: 15rem;
+}
+
+.theme-menu-item-text {
+  min-width: 0;
+}
+
+.theme-menu-item-text > div {
+  white-space: normal;
+}
+
+/* Color-mode section inside the appearance dropdown, below the theme list. */
+.theme-menu-mode {
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.theme-menu-mode .dark-mode-toggle {
+  margin-top: var(--space-1);
+}
+
+/* In the workshop rail the trigger sits at the bottom-left, so the default
+   top-right dropdown placement clips off the bottom and left edges. Flip it to
+   open upward and align to the trigger's left edge. */
+.workshop-sidebar-toolbar .theme-menu .header-dropdown-menu {
+  inset: auto auto 100% 0;
+  margin-top: 0;
+  margin-bottom: var(--space-1);
+}
 
 .header-dropdown-trigger {
   display: inline-flex;
@@ -792,7 +1240,7 @@
 }
 
 .breadcrumbs-inner {
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-2) var(--space-4);
 }
@@ -968,19 +1416,61 @@
   height: 0.875rem;
 }
 
-.card-action-group {
+.card-action-group,
+.action-button-group {
   display: flex;
+  width: 100%;
+  padding-bottom: var(--space-2);
+}
+
+.card-action-group[data-layout="vertical"],
+.action-button-group[data-layout="vertical"] {
   flex-direction: column;
+}
+
+.card-action-group[data-layout="horizontal"],
+.action-button-group[data-layout="horizontal"] {
+  flex-flow: row wrap;
+  align-items: stretch;
+}
+
+/* Base gap for groups and rows */
+.card-action-group,
+.action-button-group,
+.card-action-row {
   gap: var(--space-3);
 }
 
-.card-action-group > div {
+.card-action-row {
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+
+.card-action-group[data-gap="sm"],
+.action-button-group[data-gap="sm"] {
   gap: var(--space-2);
 }
 
+.card-action-group[data-gap="md"],
+.action-button-group[data-gap="md"] {
+  gap: var(--space-3);
+}
+
+.card-action-group[data-gap="lg"],
+.action-button-group[data-gap="lg"] {
+  gap: var(--space-4);
+}
+
+.card-action-group button[data-flex="true"],
+.action-button-group button[data-flex="true"] {
+  flex: 1 1 0%;
+}
+
 .card-action-group button {
+  min-height: 2.5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1013,38 +1503,42 @@
   height: 0.875rem;
 }
 
-/* Card action variant overrides - applied via CardActionGroup variant prop */
-.card-action-variant-primary {
+/* Card action variant overrides — applied via CardActionGroup variant prop.
+   Scoped under `.card-action-group button` so they out-specify the base
+   button rule (.card-action-group button, which sets the surface bg + muted
+   text). Without this scope the variants are (0,1,0) and lose to the (0,1,1)
+   base, so success/primary/danger colors silently never render. */
+.card-action-group button.card-action-variant-primary {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
-.card-action-variant-primary:hover {
+.card-action-group button.card-action-variant-primary:hover {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
   color: var(--color-text-inverse);
 }
 
-.card-action-variant-success {
+.card-action-group button.card-action-variant-success {
   background: hsl(var(--success));
   color: hsl(var(--success-foreground));
   border-color: hsl(var(--success));
 }
 
-.card-action-variant-success:hover {
+.card-action-group button.card-action-variant-success:hover {
   opacity: 0.9;
   color: hsl(var(--success-foreground));
 }
 
-.card-action-variant-danger {
+.card-action-group button.card-action-variant-danger {
   color: var(--color-danger);
   border-color: transparent;
   background: transparent;
 }
 
-.card-action-variant-danger:hover {
-  background: hsl(var(--destructive) / 8%);
+.card-action-group button.card-action-variant-danger:hover {
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   color: var(--color-danger-hover);
 }
 
@@ -1304,8 +1798,8 @@
 
 .world-list-empty-tip {
   padding: var(--space-3) var(--space-4);
-  border-left: 3px solid var(--color-accent);
-  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  background: var(--color-accent-soft);
   border-radius: var(--radius-sm);
 }
 
@@ -1373,30 +1867,17 @@
 
 [data-theme="ds1"] .world-detail-section h2 {
   position: relative;
-  padding-top: var(--space-3);
   font-weight: 500;
   letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"] .world-detail-section h2::before {
-  content: "Section";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
 }
 
 [data-theme="ds1"] .world-detail-section h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 /* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
@@ -1473,16 +1954,20 @@
   gap: var(--space-5);
 }
 
-.component-world-editor .component-collapsible-section {
+/* ─── CollapsibleSection (component-owned canon, issue #1319) ───
+ *
+ * Styled on the component's own class — not scoped to a host page — so the
+ * living style guide and every app surface render the same themed component.
+ * Base look here; the DS1/DS2/DS3 differentiation lives in each theme block. */
+
+.component-collapsible-section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
 
-.component-world-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
+.component-collapsible-section [data-testid="collapsible-section-header"] {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1492,9 +1977,7 @@
   cursor: pointer;
 }
 
-.component-world-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
+.component-collapsible-section [data-testid="collapsible-section-title"] {
   margin: 0;
   font-family: var(--font-interface);
   font-size: 1.125rem;
@@ -1502,14 +1985,25 @@
   color: var(--color-text-primary);
 }
 
-.component-world-editor
+/* The section title became an <h2> for correct heading order (#1473). On the
+   default/workshop surfaces the .app-surface-* rules set line-height per tag
+   (h2 1.25 vs h3 1.35), so without this the section would shift vertically.
+   Scope the pin to those surfaces only — the manuscript surface (play/ending)
+   has no per-tag rules, so pinning there would over-apply and shift it instead. */
+.app-surface-default
   .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
+  [data-testid="collapsible-section-title"],
+.app-surface-workshop
+  .component-collapsible-section
+  [data-testid="collapsible-section-title"] {
+  line-height: 1.35;
+}
+
+.component-collapsible-section [data-testid="collapsible-section-content"] {
   padding: 0 var(--space-5) var(--space-5);
 }
 
-.component-world-editor
-  .component-collapsible-section
+.component-collapsible-section
   [data-testid="collapsible-section-content"][aria-hidden="true"] {
   display: none;
 }
@@ -1527,12 +2021,11 @@
   gap: var(--space-4);
 }
 
-[data-theme="ds1"] .component-world-editor .component-collapsible-section {
+[data-theme="ds1"] .component-collapsible-section {
   border-radius: 2px;
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"] {
   padding: var(--space-3) var(--space-5);
@@ -1540,14 +2033,12 @@
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"][aria-expanded="false"] {
   border-bottom-color: transparent;
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"] {
   position: relative;
@@ -1557,7 +2048,6 @@
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"]::before {
   content: "Section";
@@ -1572,28 +2062,26 @@
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"]::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding: var(--space-4) var(--space-5) var(--space-5);
 }
 
+[data-theme="ds1"] .character-editor-actions,
 [data-theme="ds1"] .world-editor-actions {
   border-radius: 2px;
-  border-left: 2px solid var(--color-accent);
-  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-4);
 }
 
 /* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
@@ -1602,13 +2090,12 @@
   gap: clamp(var(--space-5), 3vw, var(--space-8));
 }
 
-[data-theme="ds2"] .component-world-editor .component-collapsible-section {
+[data-theme="ds2"] .component-collapsible-section {
   border-radius: 1rem;
   animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
 }
 
 [data-theme="ds2"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"] {
   padding: clamp(var(--space-4), 2vw, var(--space-5))
@@ -1616,7 +2103,6 @@
 }
 
 [data-theme="ds2"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"] {
   font-family: var(--font-narrative);
@@ -1626,32 +2112,21 @@
 }
 
 [data-theme="ds2"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding: 0 clamp(var(--space-5), 3vw, var(--space-6))
     clamp(var(--space-5), 3vw, var(--space-6));
 }
 
-[data-theme="ds2"] .world-editor-actions {
-  border-radius: 1rem;
-  padding: clamp(var(--space-4), 2vw, var(--space-5))
-    clamp(var(--space-5), 3vw, var(--space-6));
-  justify-content: center;
-  gap: clamp(var(--space-3), 2vw, var(--space-5));
-}
-
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"] {
   position: relative;
 }
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-header"][aria-expanded="true"]::after {
   content: "";
@@ -1672,7 +2147,6 @@
 }
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"] {
   position: relative;
@@ -1680,7 +2154,6 @@
 }
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-title"]::before {
   content: "• Section";
@@ -1695,33 +2168,9 @@
 }
 
 [data-theme="ds3"]
-  .component-world-editor
   .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding-top: var(--space-4);
-}
-
-[data-theme="ds3"] .world-editor-actions {
-  position: relative;
-  padding-top: var(--space-5);
-}
-
-[data-theme="ds3"] .world-editor-actions::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: var(--space-5);
-  right: var(--space-5);
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-border-strong) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
 }
 
 /* ─── CharacterCard ─── */
@@ -1771,6 +2220,106 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* ─── PageLayout ─── */
+
+.page-layout-header {
+  /* Exception: Requires layout spacing larger than the maximum --space-8 token */
+  margin-bottom: 3.5rem;
+}
+
+[data-theme="ds2"] .page-layout-header {
+  /* Exception: Requires layout spacing larger than the maximum --space-8 token */
+  margin-bottom: clamp(3.5rem, 6vw, 6rem);
+}
+
+.page-layout-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.page-layout-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.page-layout-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  max-width: 48rem;
+}
+
+/* Per-theme list-header voice. The shared list surfaces (worlds, characters)
+   shouldn't read as one app in three palettes — so the title's typeface, scale,
+   and the header's vertical rhythm diverge per theme, mirroring how the
+   settings-section heading already expresses each design system.
+   DS1 = sharp compact sans · DS2 = warm serif display · DS3 = drafting serif. */
+[data-theme="ds1"] .page-layout-header {
+  /* Exception: tighter than --space-8 for DS1's compact drafting rhythm */
+  margin-bottom: 2.5rem;
+}
+
+[data-theme="ds1"] .page-layout-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds2"] .page-layout-title {
+  font-family: var(--font-narrative);
+  font-size: 2.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="ds2"] .page-layout-description {
+  font-family: var(--font-narrative);
+  font-size: 1.0625rem;
+}
+
+[data-theme="ds3"] .page-layout-header {
+  /* Exception: medium rhythm between DS1's compact and DS2's airy headers */
+  margin-bottom: 3rem;
+}
+
+[data-theme="ds3"] .page-layout-title {
+  font-family: var(--font-narrative);
+  font-size: 2.125rem;
+  font-weight: 500;
+}
+
+.page-layout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* When action groups sit alongside a view toggle, let them size to content */
+.page-layout-actions .action-button-group,
+.characters-toolbar .action-button-group {
+  width: auto;
+}
+
+@media (width <= 640px) {
+  .page-layout-actions {
+    width: 100%;
+  }
+  .page-layout-actions .action-button-group {
+    width: 100%;
+  }
+  .page-layout-actions .action-button-group .button {
+    flex: 1 1 auto;
+  }
+}
+
 /* ─── Characters Page Layout ─── */
 
 .characters-toolbar {
@@ -1779,13 +2328,40 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  margin-bottom: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.view-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+/* .view-mode-toggle .button overrides button-size-* and button-variant
+   border/radius so the outer .view-mode-toggle border provides the group
+   chrome instead. (0,2,0) specificity beats the (0,1,0) variant rules. */
+.view-mode-toggle .button {
+  border: none;
+  border-radius: 0;
+  min-height: 2.25rem; /* matches button-size-default; no --space token at this value */
+}
+
+.view-mode-toggle .button:first-child {
+  border-right: 1px solid var(--color-border); /* divider between toggle options */
+}
+
+.view-mode-toggle .button.active {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
 }
 
 .characters-body {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  margin-top: var(--space-8);
 }
 
 .characters-grid {
@@ -1829,14 +2405,6 @@
   border-bottom: 1px solid var(--color-border-strong);
 }
 
-[data-theme="ds1"] .characters-grid {
-  gap: var(--space-3);
-}
-
-[data-theme="ds1"] .component-character-card {
-  border-radius: 2px;
-}
-
 [data-theme="ds1"] .component-character-card h3 {
   position: relative;
   font-weight: 500;
@@ -1859,16 +2427,15 @@
 [data-theme="ds1"] .component-character-card h3::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .characters-empty {
   padding: var(--space-6) var(--space-5);
   border-radius: 2px;
-  border-left: 2px solid var(--color-accent);
 }
 
 [data-theme="ds1"] .characters-empty h2 {
@@ -1880,10 +2447,10 @@
 [data-theme="ds1"] .characters-empty h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 32px;
+  width: 2.5rem;
+  height: 2px;
   margin: var(--space-3) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 /* ─── DS2: Warm Earth ───────────────────────────────────────────
@@ -1893,10 +2460,6 @@
 
 [data-theme="ds2"] .characters-toolbar {
   margin-bottom: clamp(var(--space-4), 2vw, var(--space-6));
-}
-
-[data-theme="ds2"] .characters-grid {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
 }
 
 [data-theme="ds2"] .component-character-card {
@@ -1976,10 +2539,6 @@
   background-size: 12px 4px;
   background-repeat: repeat-x;
   opacity: 0.7;
-}
-
-[data-theme="ds3"] .characters-grid {
-  gap: var(--space-4);
 }
 
 [data-theme="ds3"] .component-character-card h3 {
@@ -2159,10 +2718,10 @@
 [data-theme="ds1"] .character-detail-header-info h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .character-detail-section {
@@ -2191,10 +2750,10 @@
 [data-theme="ds1"] .character-detail-section h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 /* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
@@ -2332,73 +2891,20 @@
   gap: var(--space-5);
 }
 
-.component-character-editor .component-collapsible-section {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
+.character-editor-actions,
+.world-editor-actions {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
-  cursor: pointer;
-}
-
-.component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding: 0 var(--space-5) var(--space-5);
-}
-
-.component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"][aria-hidden="true"] {
-  display: none;
-}
-
-.character-editor-actions {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
+  margin-top: var(--space-8);
   padding: var(--space-4) var(--space-5);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-}
-
-.character-editor-actions-primary {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-2);
 }
 
 @media (width <= 640px) {
-  .character-editor-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .character-editor-actions-primary {
+  .character-editor-actions,
+  .world-editor-actions {
     flex-direction: column;
     align-items: stretch;
   }
@@ -2414,69 +2920,6 @@
   gap: var(--space-4);
 }
 
-[data-theme="ds1"] .component-character-editor .component-collapsible-section {
-  border-radius: 2px;
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  padding: var(--space-3) var(--space-5);
-  border-bottom: 1px solid var(--color-border);
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"][aria-expanded="false"] {
-  border-bottom-color: transparent;
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  position: relative;
-  padding-top: var(--space-3);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"]::before {
-  content: "Section";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"]::after {
-  content: "";
-  display: block;
-  width: 2px;
-  height: 18px;
-  margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
-}
-
-[data-theme="ds1"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding: var(--space-4) var(--space-5) var(--space-5);
-}
-
 [data-theme="ds1"] .component-character-editor .attributes-form-row,
 [data-theme="ds1"] .component-character-editor .skills-form-row {
   border-radius: 2px;
@@ -2484,8 +2927,7 @@
 
 [data-theme="ds1"] .character-editor-actions {
   border-radius: 2px;
-  border-left: 2px solid var(--color-accent);
-  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-4);
 }
 
 /* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
@@ -2496,37 +2938,6 @@
 
 [data-theme="ds2"] .component-character-editor {
   gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .component-character-editor .component-collapsible-section {
-  border-radius: 1rem;
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  padding: clamp(var(--space-4), 2vw, var(--space-5))
-    clamp(var(--space-5), 3vw, var(--space-6));
-}
-
-[data-theme="ds2"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  font-size: 1.375rem;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds2"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding: 0 clamp(var(--space-5), 3vw, var(--space-6))
-    clamp(var(--space-5), 3vw, var(--space-6));
 }
 
 [data-theme="ds2"] .component-character-editor .attributes-form-row,
@@ -2551,77 +2962,15 @@
   font-weight: 400;
 }
 
-[data-theme="ds2"] .character-editor-actions {
+[data-theme="ds2"] .character-editor-actions,
+[data-theme="ds2"] .world-editor-actions {
   border-radius: 1rem;
   padding: clamp(var(--space-4), 2vw, var(--space-5))
     clamp(var(--space-5), 3vw, var(--space-6));
   justify-content: center;
-  gap: clamp(var(--space-3), 2vw, var(--space-5));
-}
-
-[data-theme="ds2"] .character-editor-actions-primary {
-  gap: var(--space-3);
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  position: relative;
-}
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"][aria-expanded="true"]::after {
-  content: "";
-  display: block;
-  position: absolute;
-  bottom: 0;
-  left: var(--space-5);
-  right: var(--space-5);
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-border-strong) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.7;
-}
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  position: relative;
-  padding-top: var(--space-3);
-}
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"]::before {
-  content: "• Section";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds3"]
-  .component-character-editor
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding-top: var(--space-4);
-}
 
 [data-theme="ds3"] .component-character-editor .attributes-form-list,
 [data-theme="ds3"] .component-character-editor .skills-form-list {
@@ -2684,12 +3033,17 @@
   font-weight: 400;
 }
 
-[data-theme="ds3"] .character-editor-actions {
+[data-theme="ds3"] .character-editor-actions,
+[data-theme="ds3"] .world-editor-actions {
   position: relative;
   padding-top: var(--space-5);
+  background: transparent;
+  border: none;
+  border-radius: 0;
 }
 
-[data-theme="ds3"] .character-editor-actions::before {
+[data-theme="ds3"] .character-editor-actions::before,
+[data-theme="ds3"] .world-editor-actions::before {
   content: "";
   display: block;
   position: absolute;
@@ -2738,6 +3092,20 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-5);
+}
+
+.settings-appearance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.settings-appearance-label {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
 }
 
 .settings-export-import {
@@ -2792,7 +3160,6 @@
 
 [data-theme="ds1"] .settings-card {
   border-radius: 2px;
-  border-left: 2px solid var(--color-accent);
 }
 
 [data-theme="ds1"] .settings-section h2 {
@@ -2817,10 +3184,10 @@
 [data-theme="ds1"] .settings-section h2::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 [data-theme="ds1"] .settings-export-import-help {
@@ -2936,20 +3303,9 @@
   [data-theme="ds2"] .character-detail-section,
   [data-theme="ds2"] .world-detail-section,
   [data-theme="ds2"] .settings-card,
-  [data-theme="ds2"] .component-character-editor .component-collapsible-section,
-  [data-theme="ds2"] .component-world-editor .component-collapsible-section {
+  [data-theme="ds2"] .component-collapsible-section {
     animation: none;
   }
-}
-
-/* ─── CharacterTable portrait ─── */
-
-.character-portrait-clickable {
-  width: var(--space-6);
-  height: var(--space-6);
-  cursor: pointer;
-  border-radius: var(--radius-full, 9999px);
-  overflow: hidden;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3192,6 +3548,29 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+/* Per-entry AI image generation (#975).
+   The "Entry Image" heading renders as an h4 and inherits the shared
+   .journal-entry-detail h4 label styling. */
+.journal-entry-image-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface-recessed);
+  color: var(--color-text-muted);
+}
+
+.journal-entry-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .journal-empty-state {
@@ -3793,7 +4172,7 @@
 [data-theme="ds1"] .component-ending-screen-achievement {
   border-radius: 2px;
   border-width: 2px;
-  border-left: 4px solid var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 [data-theme="ds2"] .component-ending-screen-hero-frame {
@@ -3869,4 +4248,1211 @@
 .toast-dismiss:hover {
   color: var(--color-text-primary);
   background: var(--color-surface-hover);
+}
+
+/* ─── PointPoolDisplay ─── */
+
+.component-point-pool-display-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* ─── World detail — section body treatments ───────────────────
+   The page-shell (per-theme silhouette) lives further up in the
+   DS1/DS2/DS3 blocks; these rules style the content INSIDE each
+   .world-detail-section so the raw markup doesn't read as a debug
+   dump. Universal across themes; per-theme tweaks layer on top. */
+
+.world-detail-section > p {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-interface);
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.world-detail-npcs-lede {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.world-detail-npcs-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+
+.world-detail-npc {
+  --world-detail-npc-avatar-size: 3.5rem;
+  display: grid;
+  grid-template-columns: var(--world-detail-npc-avatar-size) 1fr;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.world-detail-npc-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--world-detail-npc-avatar-size);
+  height: var(--world-detail-npc-avatar-size);
+  overflow: hidden;
+  border-radius: var(--radius-full, 9999px);
+  object-fit: cover;
+  background: var(--color-surface-hover);
+}
+
+.world-detail-npc-avatar-fallback {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.world-detail-npc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.world-detail-npc-name {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.world-detail-npc-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* Attributes / Skills lists */
+
+.world-detail-stat-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-3);
+}
+
+.world-detail-stat {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.world-detail-stat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.world-detail-stat-name {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.world-detail-stat-range {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.world-detail-stat-description {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.world-detail-stat-default {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.world-detail-stat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Settings / Info / Image-details meta grid (DataField rows) */
+
+.world-detail-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--space-3);
+}
+
+/* At narrow viewports the auto-fill minmax above wins over container
+   width and pushes the grid past the viewport; collapse to 1fr. */
+@media (width <= 480px) {
+  .world-detail-npcs-grid,
+  .world-detail-stat-list,
+  .world-detail-meta-grid,
+  .character-detail-derived-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.world-detail-meta-grid .component-data-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--color-surface);
+}
+
+.world-detail-meta-grid .component-data-field > span:first-child {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.world-detail-meta-grid .component-data-field > p,
+.world-detail-meta-grid .component-data-field > span:last-child,
+.world-detail-meta-grid .component-data-field > div:last-child {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+}
+
+.world-detail-meta-grid .component-data-field-stacked > div:first-child {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* F25 — World image details: densify. The generation prompt is long, so let it
+   span the full grid width as a compact block (fewer wrapped lines) and tighten
+   the surrounding rhythm so the section stops dominating the page. */
+section[aria-labelledby="image-details-heading"] .world-detail-meta-grid {
+  gap: var(--space-2);
+}
+
+section[aria-labelledby="image-details-heading"] .component-data-field-stacked {
+  grid-column: 1 / -1;
+}
+
+section[aria-labelledby="image-details-heading"] .component-data-field-stacked > div:last-child {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+/* DS1 manuscript overlay — sharper borders, no card background */
+
+[data-theme="ds1"] .world-detail-npc,
+[data-theme="ds1"] .world-detail-stat,
+[data-theme="ds1"] .world-detail-meta-grid .component-data-field {
+  border-radius: 2px;
+  background: transparent;
+}
+
+[data-theme="ds1"] .world-detail-stat-name {
+  font-family: var(--font-narrative);
+  font-weight: 500;
+}
+
+/* DS3 console — corner-bracket accent on stat/npc/data cards */
+
+[data-theme="ds3"] .world-detail-npc,
+[data-theme="ds3"] .world-detail-stat,
+[data-theme="ds3"] .world-detail-meta-grid .component-data-field {
+  position: relative;
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .world-detail-npc::before,
+[data-theme="ds3"] .world-detail-stat::before,
+[data-theme="ds3"] .world-detail-meta-grid .component-data-field::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+}
+
+/* ─── WorldTable — thumbnail in the Name cell ─── */
+
+.component-world-table-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.component-world-table-thumb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--space-8);
+  height: var(--space-8);
+  overflow: hidden;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+}
+
+.component-world-table-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.component-world-table-thumb svg {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+/* ─── Character detail — derived stats (mirrors world-detail-stat) ─── */
+
+.character-detail-derived-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-3);
+}
+
+.character-detail-derived-stat {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.character-detail-derived-stat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.character-detail-derived-stat-name {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.character-detail-derived-stat-values {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.character-detail-derived-stat-current {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.character-detail-derived-stat-bar {
+  height: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-surface-hover);
+}
+
+.character-detail-derived-stat-fill {
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.character-detail-derived-stat-fill-low {
+  background: var(--color-warning);
+}
+
+.character-detail-derived-stat-fill-depleted {
+  background: var(--color-danger);
+}
+
+.character-detail-derived-stat-warning {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-danger);
+}
+
+/* ─── Character detail — background (mirrors world-detail meta cards) ─── */
+
+.character-detail-background {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.character-detail-background-section {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.character-detail-background-heading {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.character-detail-background-text {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+.character-detail-background-list {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.character-detail-background-list-item {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+/* DS1 manuscript overlay — sharper borders, no card background.
+   Extends the existing attribute/skill cards for content-treatment parity. */
+
+[data-theme="ds1"] .character-detail-derived-stat,
+[data-theme="ds1"] .character-detail-background-section,
+[data-theme="ds1"] .character-attribute-card,
+[data-theme="ds1"] .character-skill-card {
+  border-radius: 2px;
+  background: transparent;
+}
+
+[data-theme="ds1"] .character-detail-derived-stat-name {
+  font-family: var(--font-narrative);
+  font-weight: 500;
+}
+
+/* DS3 console — corner-bracket accent on character content cards */
+
+[data-theme="ds3"] .character-detail-derived-stat,
+[data-theme="ds3"] .character-detail-background-section,
+[data-theme="ds3"] .character-attribute-card,
+[data-theme="ds3"] .character-skill-card {
+  position: relative;
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .character-detail-derived-stat::before,
+[data-theme="ds3"] .character-detail-background-section::before,
+[data-theme="ds3"] .character-attribute-card::before,
+[data-theme="ds3"] .character-skill-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+}
+
+/* ─── CharacterTable — thumbnail in the Name cell (mirrors WorldTable) ─── */
+
+.component-character-table-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.component-character-table-thumb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--space-8);
+  height: var(--space-8);
+  overflow: hidden;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+}
+
+.component-character-table-thumb .component-character-portrait {
+  width: 100%;
+  height: 100%;
+}
+
+.component-character-table-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Issue #1224 — Worlds + Characters: Structural DS Differentiation
+   DS1 Folio  · DS2 Bento · DS3 Console
+   Per-theme compositional tacks for list, detail, and edit surfaces.
+   Mirrors the dashboard.css pattern (#1222). Tokens-only, no Tailwind.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── DS1 — Folio ────────────────────────────────────────────────
+   Lists: single-column typeset index with a left folio rail (date /
+   serial) and a right action set, ruled hairlines between rows.
+   Detail/edit: manuscript spread with a left margin rail and ruled
+   section separators.
+*/
+
+[data-theme="ds1"] .worlds-screen {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .world-list-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+[data-theme="ds1"] .component-world-card {
+  display: grid;
+  grid-template-columns: 11rem 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-5);
+  align-items: start;
+  padding: var(--space-4) var(--space-2);
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-theme="ds1"] .component-world-card > div:first-child,
+[data-theme="ds1"] .component-world-card > div:first-child > a,
+[data-theme="ds1"] .component-world-card .component-hero,
+[data-theme="ds1"] .component-world-card .component-hero-overlay {
+  display: contents;
+}
+
+[data-theme="ds1"] .component-world-card .component-hero-image {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  position: static;
+  width: 100%;
+  height: 5.5rem;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+[data-theme="ds1"] .component-world-card .component-hero-content {
+  grid-column: 2;
+  grid-row: 1;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+[data-theme="ds1"] .component-world-card .component-hero-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+[data-theme="ds1"] .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
+  grid-column: 1 / -1;
+  margin-top: var(--space-3);
+}
+
+[data-theme="ds1"] .component-world-card .world-card-body {
+  display: contents;
+}
+
+[data-theme="ds1"] .component-world-card .world-card-content {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 0;
+}
+
+[data-theme="ds1"] .component-world-card footer {
+  display: contents;
+}
+
+[data-theme="ds1"] .world-card-footer-meta {
+  grid-column: 1;
+  grid-row: 2;
+  padding: var(--space-2) 0 0;
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-top: 0;
+}
+
+[data-theme="ds1"] .world-card-footer-actions {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/* DS1 character list — folio rail with portrait thumb */
+
+[data-theme="ds1"] .characters-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-strong);
+}
+
+[data-theme="ds1"] .component-character-card {
+  display: grid;
+  grid-template-columns: 7rem 1fr auto;
+  column-gap: var(--space-5);
+  align-items: center;
+  padding: var(--space-4) var(--space-2);
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-theme="ds1"] .component-character-card .character-card-body,
+[data-theme="ds1"] .component-character-card .character-card-inner {
+  display: contents;
+}
+
+[data-theme="ds1"] .component-character-card .active-state-indicator {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-2);
+}
+
+[data-theme="ds1"] .component-character-card .character-card-portrait {
+  grid-column: 1;
+  align-self: center;
+  padding: 0;
+  width: 5.5rem;
+  height: 5.5rem;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+[data-theme="ds1"] .component-character-card .character-card-name {
+  grid-column: 2;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-narrative);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+[data-theme="ds1"] .component-character-card .character-card-meta {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .component-character-card .character-card-description,
+[data-theme="ds1"] .component-character-card .character-card-connections,
+[data-theme="ds1"] .component-character-card .character-card-recent {
+  grid-column: 2;
+}
+
+[data-theme="ds1"] .component-character-card .character-card-description {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds1"] .component-character-card .character-card-footer {
+  grid-column: 3;
+  align-self: center;
+  padding: 0;
+  border-top: 0;
+}
+
+@media (width <= 640px) {
+  [data-theme="ds1"] .component-world-card,
+  [data-theme="ds1"] .component-character-card {
+    grid-template-columns: 5rem 1fr;
+  }
+  [data-theme="ds1"] .world-card-footer-actions,
+  [data-theme="ds1"] .component-character-card .character-card-footer {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-self: stretch;
+    padding-top: var(--space-3);
+  }
+  [data-theme="ds1"] .component-world-card .component-hero-image {
+    grid-row: 1;
+    height: 4rem;
+  }
+}
+
+/* DS1 detail — manuscript spread with margin rail */
+
+[data-theme="ds1"] .world-detail-body {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  column-gap: var(--space-6);
+}
+
+[data-theme="ds1"] .character-detail-body {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  column-gap: var(--space-6);
+}
+
+[data-theme="ds1"] .world-detail-body > *,
+[data-theme="ds1"] .character-detail-body > * {
+  grid-column: 2;
+}
+
+[data-theme="ds1"] .world-detail-body::before,
+[data-theme="ds1"] .character-detail-body::before {
+  content: "";
+  grid-column: 1;
+  grid-row: 1 / -1;
+  border-right: 1px solid var(--color-border);
+  align-self: stretch;
+}
+
+[data-theme="ds1"] .world-detail-sections,
+[data-theme="ds1"] .character-detail-sections {
+  position: relative;
+}
+
+[data-theme="ds1"] .world-detail-section,
+[data-theme="ds1"] .character-detail-section {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  padding: var(--space-5) 0;
+}
+
+[data-theme="ds1"] .world-detail-section:first-child,
+[data-theme="ds1"] .character-detail-section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+@media (width <= 768px) {
+  [data-theme="ds1"] .world-detail-body,
+  [data-theme="ds1"] .character-detail-body {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+  [data-theme="ds1"] .world-detail-body > *,
+  [data-theme="ds1"] .character-detail-body > * {
+    grid-column: 1;
+  }
+  [data-theme="ds1"] .world-detail-body::before,
+  [data-theme="ds1"] .character-detail-body::before {
+    display: none;
+  }
+}
+
+/* DS1 edit — same manuscript spread silhouette around the editor */
+
+[data-theme="ds1"] .component-world-editor,
+[data-theme="ds1"] .component-character-editor {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: var(--space-5) var(--space-6);
+}
+
+[data-theme="ds1"] .component-world-editor > *,
+[data-theme="ds1"] .component-character-editor > * {
+  grid-column: 2;
+}
+
+[data-theme="ds1"] .component-world-editor::before,
+[data-theme="ds1"] .component-character-editor::before {
+  content: "";
+  grid-column: 1;
+  grid-row: 1 / -1;
+  border-right: 1px solid var(--color-border);
+  align-self: stretch;
+}
+
+@media (width <= 768px) {
+  [data-theme="ds1"] .component-world-editor,
+  [data-theme="ds1"] .component-character-editor {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+  [data-theme="ds1"] .component-world-editor > *,
+  [data-theme="ds1"] .component-character-editor > * {
+    grid-column: 1;
+  }
+  [data-theme="ds1"] .component-world-editor::before,
+  [data-theme="ds1"] .component-character-editor::before {
+    display: none;
+  }
+}
+
+/* ─── DS2 — Bento ────────────────────────────────────────────────
+   Lists: composed card grid with generous clamp() gaps. Detail /
+   edit: 2-col module grid; long-form sections span both columns.
+*/
+
+[data-theme="ds2"] .world-list-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+@media (width >= 1600px) {
+  [data-theme="ds2"] .world-list-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width <= 768px) {
+  [data-theme="ds2"] .world-list-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+[data-theme="ds2"] .component-world-card {
+  border-radius: 1rem;
+  padding: var(--space-3);
+}
+
+/* DS2 Bento — cap the character pill strip so a world with many NPCs
+   doesn't pull its card to several times the height of its neighbors. */
+[data-theme="ds2"] .component-world-card .world-card-character-pills {
+  max-height: 5.5rem;
+  overflow: hidden;
+}
+
+[data-theme="ds2"] .characters-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+@media (width >= 1280px) {
+  [data-theme="ds2"] .characters-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width <= 768px) {
+  [data-theme="ds2"] .characters-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* DS2 detail — 2-col module stack */
+
+[data-theme="ds2"] .world-detail-sections,
+[data-theme="ds2"] .character-detail-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+[data-theme="ds2"] .world-detail-section:first-child,
+[data-theme="ds2"] .character-detail-section:first-child {
+  grid-column: 1 / -1;
+}
+
+/* F23 — balance the 2-col grid: a lone trailing section (even count, i.e. odd
+   number of cards after the full-width hero) spans the row instead of leaving
+   an empty half. */
+[data-theme="ds2"] .world-detail-section:last-child:nth-child(even) {
+  grid-column: 1 / -1;
+}
+
+@media (width <= 768px) {
+  [data-theme="ds2"] .world-detail-sections,
+  [data-theme="ds2"] .character-detail-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* DS2 edit — 2-col collapsible-section grid */
+
+[data-theme="ds2"] .component-world-editor,
+[data-theme="ds2"] .component-character-editor {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(var(--space-5), 3vw, var(--space-8));
+}
+
+[data-theme="ds2"] .component-world-editor > .component-collapsible-section:first-child,
+[data-theme="ds2"] .component-character-editor > .component-collapsible-section:first-child,
+[data-theme="ds2"] .component-world-editor > .world-editor-actions,
+[data-theme="ds2"] .component-character-editor > .character-editor-actions {
+  grid-column: 1 / -1;
+}
+
+@media (width <= 768px) {
+  [data-theme="ds2"] .component-world-editor,
+  [data-theme="ds2"] .component-character-editor {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── DS3 — Console ──────────────────────────────────────────────
+   Lists: dense condensed rows — each card becomes a 5-column line.
+   Detail/edit: 3-col multi-column readout with corner-bracket
+   accents on each section.
+*/
+
+[data-theme="ds3"] .worlds-screen {
+  font-feature-settings: "tnum";
+}
+
+[data-theme="ds3"] .world-list-grid {
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+}
+
+[data-theme="ds3"] .component-world-card {
+  display: grid;
+  grid-template-columns: 9rem 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3) var(--space-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  position: relative;
+}
+
+[data-theme="ds3"] .component-world-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+}
+
+[data-theme="ds3"] .component-world-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid var(--color-accent);
+  border-right: 1px solid var(--color-accent);
+}
+
+[data-theme="ds3"] .component-world-card > div:first-child,
+[data-theme="ds3"] .component-world-card > div:first-child > a,
+[data-theme="ds3"] .component-world-card .component-hero,
+[data-theme="ds3"] .component-world-card .component-hero-overlay {
+  display: contents;
+}
+
+[data-theme="ds3"] .component-world-card .component-hero-image {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  position: static;
+  width: 100%;
+  height: 4.5rem;
+  object-fit: cover;
+}
+
+[data-theme="ds3"] .component-world-card .component-hero-content {
+  grid-column: 2;
+  grid-row: 1;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+[data-theme="ds3"] .component-world-card .component-hero-title {
+  font-size: 1rem;
+  font-style: italic;
+  font-family: var(--font-narrative);
+}
+
+[data-theme="ds3"] .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
+  grid-column: 1 / -1;
+  margin-top: var(--space-2);
+}
+
+[data-theme="ds3"] .component-world-card .world-card-body {
+  display: contents;
+}
+
+[data-theme="ds3"] .component-world-card .world-card-content {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 0;
+}
+
+[data-theme="ds3"] .component-world-card footer {
+  display: contents;
+}
+
+[data-theme="ds3"] .world-card-footer-meta {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 0;
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  border-top: 0;
+}
+
+[data-theme="ds3"] .world-card-footer-actions {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/* DS3 character list — dense row */
+
+[data-theme="ds3"] .characters-grid {
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+}
+
+[data-theme="ds3"] .component-character-card {
+  display: grid;
+  grid-template-columns: 5rem 1fr auto;
+  column-gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  position: relative;
+}
+
+[data-theme="ds3"] .component-character-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+}
+
+[data-theme="ds3"] .component-character-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid var(--color-accent);
+  border-right: 1px solid var(--color-accent);
+}
+
+[data-theme="ds3"] .component-character-card .character-card-body,
+[data-theme="ds3"] .component-character-card .character-card-inner {
+  display: contents;
+}
+
+[data-theme="ds3"] .component-character-card .active-state-indicator {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-1);
+}
+
+[data-theme="ds3"] .component-character-card .character-card-portrait {
+  grid-column: 1;
+  align-self: center;
+  padding: 0;
+  width: 4rem;
+  height: 4rem;
+  overflow: hidden;
+}
+
+[data-theme="ds3"] .component-character-card .character-card-name {
+  grid-column: 2;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-narrative);
+  font-style: italic;
+  font-size: 1rem;
+}
+
+[data-theme="ds3"] .component-character-card .character-card-meta {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .component-character-card .character-card-description {
+  grid-column: 2;
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+[data-theme="ds3"] .component-character-card .character-card-connections,
+[data-theme="ds3"] .component-character-card .character-card-recent {
+  display: none;
+}
+
+[data-theme="ds3"] .component-character-card .character-card-footer {
+  grid-column: 3;
+  align-self: center;
+  padding: 0;
+  border-top: 0;
+}
+
+@media (width <= 640px) {
+  [data-theme="ds3"] .component-world-card,
+  [data-theme="ds3"] .component-character-card {
+    grid-template-columns: 4rem 1fr;
+  }
+  [data-theme="ds3"] .world-card-footer-actions,
+  [data-theme="ds3"] .component-character-card .character-card-footer {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    padding-top: var(--space-2);
+  }
+}
+
+/* DS3 detail — 3-col readout with corner brackets */
+
+[data-theme="ds3"] .world-detail-sections,
+[data-theme="ds3"] .character-detail-sections {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: var(--space-4);
+}
+
+[data-theme="ds3"] .world-detail-section:first-child,
+[data-theme="ds3"] .character-detail-section:first-child {
+  grid-column: 1 / -1;
+}
+
+/* F23 — balance the 3-col grid: a lone trailing section (one card left over
+   after the full-width hero) spans the row instead of stranding a single card. */
+[data-theme="ds3"] .world-detail-section:last-child:nth-child(3n + 2) {
+  grid-column: 1 / -1;
+}
+
+[data-theme="ds3"] .world-detail-section,
+[data-theme="ds3"] .character-detail-section {
+  position: relative;
+  padding: var(--space-4);
+  border-radius: 0;
+}
+
+[data-theme="ds3"] .world-detail-section::before,
+[data-theme="ds3"] .character-detail-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+}
+
+@media (width <= 1024px) {
+  [data-theme="ds3"] .world-detail-sections,
+  [data-theme="ds3"] .character-detail-sections {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width <= 640px) {
+  [data-theme="ds3"] .world-detail-sections,
+  [data-theme="ds3"] .character-detail-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* DS3 edit — 2-col collapsible-section grid (3-col leaves orphans with the
+   current section counts; 2-col tiles 5 sections cleanly as hero + 2×2) */
+
+[data-theme="ds3"] .component-world-editor,
+[data-theme="ds3"] .component-character-editor {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+[data-theme="ds3"] .component-world-editor > .component-collapsible-section:first-child,
+[data-theme="ds3"] .component-character-editor > .component-collapsible-section:first-child,
+[data-theme="ds3"] .component-world-editor > .world-editor-actions,
+[data-theme="ds3"] .component-character-editor > .character-editor-actions {
+  grid-column: 1 / -1;
+}
+
+@media (width <= 640px) {
+  [data-theme="ds3"] .component-world-editor,
+  [data-theme="ds3"] .component-character-editor {
+    grid-template-columns: 1fr;
+  }
 }

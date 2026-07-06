@@ -155,6 +155,55 @@ describe('WorldSkillsForm - MVP Level Tests', () => {
     ]);
   });
 
+  // Issue #392: attribute prerequisites
+  test('allows setting an attribute prerequisite', () => {
+    render(
+      <WorldSkillsForm
+        skills={mockSkills}
+        attributes={mockAttributes}
+        worldId="world-123"
+        onChange={mockOnChange}
+      />
+    );
+
+    const prereqInput = screen.getByLabelText('Minimum Strength');
+    fireEvent.change(prereqInput, { target: { value: '5' } });
+
+    expect(mockOnChange).toHaveBeenCalledWith([
+      {
+        ...mockSkills[0],
+        attributePrerequisites: [{ attributeId: 'attr-1', minValue: 5 }],
+      },
+    ]);
+  });
+
+  test('clears an attribute prerequisite when set to zero', () => {
+    const skillsWithPrereq: WorldSkill[] = [
+      {
+        ...mockSkills[0],
+        attributePrerequisites: [{ attributeId: 'attr-1', minValue: 5 }],
+      },
+    ];
+
+    render(
+      <WorldSkillsForm
+        skills={skillsWithPrereq}
+        attributes={mockAttributes}
+        worldId="world-123"
+        onChange={mockOnChange}
+      />
+    );
+
+    const prereqInput = screen.getByLabelText('Minimum Strength');
+    expect(prereqInput).toHaveValue(5);
+
+    fireEvent.change(prereqInput, { target: { value: '0' } });
+
+    expect(mockOnChange).toHaveBeenCalledWith([
+      { ...skillsWithPrereq[0], attributePrerequisites: [] },
+    ]);
+  });
+
   // Test empty state
   test('displays empty state when no skills exist', () => {
     render(

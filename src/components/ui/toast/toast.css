@@ -1,0 +1,110 @@
+/* Toast — global semantic styles for src/components/ui/toast/toast.tsx
+ *
+ * The Toast primitive emits a `toast` surface class plus `toast-*` part
+ * classes and a `data-variant` attribute. This gives them production
+ * token-based styling so a notification reads as a distinct, elevated
+ * floating surface rather than a faint tint. Per-theme + light/dark look
+ * comes from the design tokens under the active `data-theme` scope — no
+ * hardcoded colors.
+ */
+
+.toast {
+  position: relative;
+  display: flex;
+  min-width: 18rem;
+  max-width: 24rem;
+  padding: var(--space-3) var(--space-4);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-overlay);
+  font-family: var(--font-interface);
+}
+
+/* Row: title/description block on the left, dismiss button pinned
+   top-right. align-items: flex-start keeps the button on the title row
+   instead of stacking it below a multi-line body. */
+.toast-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.toast-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.toast-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.toast-description {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.toast-dismiss {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: calc(var(--space-1) * -1) calc(var(--space-1) * -1) 0 0;
+  padding: var(--space-1);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.toast-dismiss:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+
+/* Variant accent — full semantic border + matching title color (no side stripe).
+   Uses the base semantic color tokens, which exist in every theme and in
+   both light and dark, so the accent adapts everywhere. */
+.toast[data-variant='success'] {
+  border-color: var(--color-success);
+}
+
+.toast[data-variant='success'] .toast-title {
+  color: var(--color-success);
+}
+
+.toast[data-variant='error'] {
+  border-color: var(--color-danger);
+}
+
+.toast[data-variant='error'] .toast-title {
+  color: var(--color-danger);
+}
+
+.toast[data-variant='warning'] {
+  border-color: var(--color-warning);
+}
+
+.toast[data-variant='warning'] .toast-title {
+  color: var(--color-warning);
+}
+
+.toast[data-variant='info'] {
+  border-color: var(--color-info);
+}
+
+.toast[data-variant='info'] .toast-title {
+  color: var(--color-info);
+}

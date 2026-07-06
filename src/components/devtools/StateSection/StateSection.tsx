@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useMemo } from 'react';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { JsonViewer } from '../JsonViewer';
 
@@ -11,7 +10,7 @@ import { useNPCStore } from '@/state/npcStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { aiContextStore, useAiContextStore } from '@/state/aiContextStore';
+import { useAiContextStore } from '@/state/aiContextStore';
 import { useLoreStore } from '@/state/loreStore';
 import { useNavigationStore } from '@/state/navigationStore';
 import { useGoalStore } from '@/state/goalStore';
@@ -27,52 +26,31 @@ interface StateSectionProps {
 
 /**
  * StateSection Component
- * 
- * Displays the current state of all Zustand stores in collapsible sections.
- * Each store's state is shown using the JsonViewer component.
+ *
+ * Displays the live state of every Zustand store in collapsible sections.
+ * Each store is read through its hook, so the inspector re-renders as state
+ * changes instead of freezing on a mount-time snapshot.
  */
 export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) => {
-  // Get all store states
-  const storeStates = useMemo(() => {
-    // Create an object to hold all store states
-    const states: Record<string, unknown> = {};
-
-    // Map of store names to store instances
-    const storeMap = {
-      useWorldStore,
-      useCharacterStore,
-      useNPCStore,
-      useNarrativeStore,
-      useJournalStore,
-      useSessionStore,
-      aiContextStore,
-      useAiContextStore,
-      useLoreStore,
-      useNavigationStore,
-      useGoalStore,
-      useInventoryStore,
-    };
-
-    // Extract the state from each store
-    Object.entries(storeMap).forEach(([name, store]) => {
-      if (typeof store === 'function' && store.getState) {
-        try {
-          states[name] = store.getState();
-        } catch (err) {
-          // Use a generic message to capture any errors accessing store state
-          states[name] = { error: `Error accessing store state: ${err instanceof Error ? err.message : 'Unknown error'}` };
-        }
-      }
-    });
-
-    return states;
-  }, []);
+  // Subscribe to every store so the view reflects current state, not a snapshot.
+  const storeStates: Record<string, unknown> = {
+    useWorldStore: useWorldStore(),
+    useCharacterStore: useCharacterStore(),
+    useNPCStore: useNPCStore(),
+    useNarrativeStore: useNarrativeStore(),
+    useJournalStore: useJournalStore(),
+    useSessionStore: useSessionStore(),
+    useAiContextStore: useAiContextStore(),
+    useLoreStore: useLoreStore(),
+    useNavigationStore: useNavigationStore(),
+    useGoalStore: useGoalStore(),
+    useInventoryStore: useInventoryStore(),
+  };
 
   return (
-    <div data-testid="devtools-state-section" >
-      
+    <div data-testid="devtools-state-section">
       {Object.entries(storeStates).map(([storeName, storeState]) => (
-        <CollapsibleSection 
+        <CollapsibleSection
           key={storeName}
           title={storeName}
           initialCollapsed={defaultCollapsed}
@@ -81,12 +59,6 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
           <JsonViewer data={storeState} />
         </CollapsibleSection>
       ))}
-      
-      {Object.keys(storeStates).length === 0 && (
-        <div>
-          No stores available
-        </div>
-      )}
     </div>
   );
 };

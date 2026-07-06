@@ -12,18 +12,24 @@ import {
   InventoryItemCategorization,
   InventoryAcquisitionRecord,
   ItemUsageResult,
+  ItemEquipResult,
 } from '@/types/inventory.types';
+import { canEquipItem } from '@/lib/inventory/equippable';
 import { EntityID, GeneratedImage } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { CrudStore } from './createCrudStore';
+import { CrudStore } from './crudStore.types';
 import { isValidCategory } from '@/lib/inventory/categories';
 import { createAcquisitionJournalEntry } from '@/lib/inventory/journalIntegration';
 import {
   storeEvents,
   StoreEventTypes,
   type CharacterDeletedEvent,
+  type SessionFreshStartEvent,
 } from '@/lib/state/storePubSub';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('InventoryStore');
 
 export interface InventoryStore extends CrudStore<InventoryItem> {
   items: Record<EntityID, InventoryItem>;
@@ -52,6 +58,10 @@ export interface InventoryStore extends CrudStore<InventoryItem> {
   getCharacterItems: (characterId: EntityID) => InventoryItem[];
   clearCharacterInventory: (characterId: EntityID) => void;
   useItem: (characterId: EntityID, itemId: EntityID) => ItemUsageResult;
+  toggleEquipItem: (
+    characterId: EntityID,
+    itemId: EntityID
+  ) => ItemEquipResult;
 
   // Image generation tracking
   setGeneratingImage: (itemId: EntityID, isGenerating: boolean) => void;
@@ -92,10 +102,6 @@ const getInitialState = () => ({
   generatingImageFor: new Set<EntityID>(),
   imageGenerationErrors: new Map<EntityID, string>(),
 });
-
-export const createInventoryInitialState = (): ReturnType<
-  typeof getInitialState
-> => getInitialState();
 
 const sanitizeInventoryValue = (
   characterId: EntityID,
@@ -237,7 +243,7 @@ const createJournalEntryForAcquisition = async (
     journalStore.addEntry(sessionId, journalEntry);
   } catch (error) {
     // Silently fail journal entry creation - don't block inventory operations
-    console.warn('Failed to create journal entry for item acquisition:', error);
+    logger.warn('Failed to create journal entry for item acquisition:', error);
   }
 };
 
@@ -417,6 +423,10 @@ export const useInventoryStore = create<InventoryStore>()(
             normalizedUpdates.image = updates.image;
           }
 
+          if ('equipped' in updates) {
+            normalizedUpdates.equipped = updates.equipped;
+          }
+
           const now = getTimestamp();
           const updatedItem: InventoryItem = {
             ...existingItem,
@@ -438,9 +448,7 @@ export const useInventoryStore = create<InventoryStore>()(
           }
 
           set((state) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [itemId]: _removedItem, ...remainingItems } = state.items;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [itemId]: _removedEntity, ...remainingEntities } =
               state.entities;
 
@@ -973,6 +981,76 @@ export const useInventoryStore = create<InventoryStore>()(
             previousQuantity,
           };
         },
+
+        toggleEquipItem: (characterId, itemId) => {
+          const state = get();
+          const item = state.items[itemId];
+
+          if (!item) {
+            const error = createStoreError(
+              'Item Not Found',
+              'The specified item could not be found.',
+              ErrorType.VALIDATION
+            );
+            set({ error });
+            return {
+              success: false,
+              error: {
+                type: error.type,
+                title: error.title,
+                message: error.message,
+              },
+            };
+          }
+
+          const characterItems = ensureCharacterInventory(characterId, state);
+          if (!characterItems.includes(itemId)) {
+            const error = createStoreError(
+              'Item Not In Inventory',
+              "The specified item is not in this character's inventory.",
+              ErrorType.VALIDATION
+            );
+            set({ error });
+            return {
+              success: false,
+              error: {
+                type: error.type,
+                title: error.title,
+                message: error.message,
+              },
+            };
+          }
+
+          // Unequipping is always allowed; equipping is gated by compatibility.
+          const nextEquipped = !item.equipped;
+          if (nextEquipped) {
+            const eligibility = canEquipItem(item);
+            if (!eligibility.allowed) {
+              const error = createStoreError(
+                'Cannot Equip Item',
+                eligibility.reason ?? 'This item cannot be equipped.',
+                ErrorType.VALIDATION
+              );
+              set({ error });
+              return {
+                success: false,
+                equipped: item.equipped ?? false,
+                error: {
+                  type: error.type,
+                  title: error.title,
+                  message: error.message,
+                },
+              };
+            }
+          }
+
+          get().update(itemId, { equipped: nextEquipped });
+
+          return {
+            success: true,
+            equipped: nextEquipped,
+          };
+        },
       };
     },
     {
@@ -991,8 +1069,7 @@ export const useInventoryStore = create<InventoryStore>()(
 
 // Expose store globally in development for easier debugging & manual seeding
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useInventoryStore = useInventoryStore;
+  window.useInventoryStore = useInventoryStore;
 }
 
 // Subscribe to store events
@@ -1000,5 +1077,39 @@ storeEvents.subscribe<CharacterDeletedEvent>(
   StoreEventTypes.CHARACTER_DELETED,
   ({ characterId }) => {
     useInventoryStore.getState().clearCharacterInventory(characterId);
+  }
+);
+
+// Clear the character's inventory when a forced-fresh session starts.
+// Subscribed here (rather than sessionStore importing this store) to keep
+// sessionStore a leaf in the store import graph. Waits for persist hydration
+// so the clear isn't overwritten by rehydrating stale data.
+storeEvents.subscribe<SessionFreshStartEvent>(
+  StoreEventTypes.SESSION_FRESH_START,
+  ({ characterId, isForcedFresh }) => {
+    if (!isForcedFresh) return;
+
+    const clearInventory = () => {
+      try {
+        useInventoryStore.getState().clearCharacterInventory(characterId);
+      } catch (clearError) {
+        logger.warn('Failed to clear inventory for fresh session (during hydration callback):', clearError);
+      }
+    };
+
+    const persistApi = (useInventoryStore as unknown as {
+      persist?: {
+        hasHydrated?: () => boolean;
+        onFinishHydration?: (callback: () => void) => () => void;
+      };
+    }).persist;
+
+    if (persistApi?.hasHydrated?.()) {
+      clearInventory();
+    } else if (persistApi?.onFinishHydration) {
+      persistApi.onFinishHydration(clearInventory);
+    } else {
+      clearInventory();
+    }
   }
 );

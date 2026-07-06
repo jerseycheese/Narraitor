@@ -10,6 +10,7 @@ import React, {
   useMemo,
 } from 'react';
 import { useRouter } from 'next/navigation';
+import { useShallow } from 'zustand/react/shallow';
 import { Play } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -26,6 +27,12 @@ import {
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
+import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
+import { generateEndingImage as requestEndingImage } from '@/lib/api/endingImageApi';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('EndingScreen');
 
 /**
  * EndingScreen displays the story ending with narrative closure
@@ -43,8 +50,14 @@ export function EndingScreen() {
     updateCurrentEnding,
   } = useNarrativeStore();
 
-  const { characters } = useCharacterStore();
-  const { worlds } = useWorldStore();
+  // Scope to the entity maps (via useShallow) so the ending screen doesn't
+  // re-render on unrelated character/world-store writes.
+  const { characters } = useCharacterStore(
+    useShallow((state) => ({ characters: state.characters }))
+  );
+  const { worlds } = useWorldStore(
+    useShallow((state) => ({ worlds: state.worlds }))
+  );
 
   // Get story checkpoints for this session (must be called before early returns)
   const worldState = useWorldStore((state) =>
@@ -109,24 +122,12 @@ export function EndingScreen() {
         .slice(-5)
         .map((segment) => segment.content);
 
-      const response = await fetch('/api/generate-ending-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ending: currentEnding,
-          world,
-          character,
-          recentNarrative,
-        }),
+      const data = await requestEndingImage({
+        ending: currentEnding,
+        world,
+        character,
+        recentNarrative,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to load ending image');
-      }
-
-      const data = await response.json();
       setEndingImage(data.imageUrl);
 
       // Update the ending in the store with the image URL
@@ -143,7 +144,7 @@ export function EndingScreen() {
         };
       });
     } catch (error) {
-      console.error('Failed to load ending image:', error);
+      logger.error('Failed to load ending image:', error);
       setImageError('Failed to load ending image');
       generatedForEndingRef.current = null; // Reset on error so user can retry
     } finally {
@@ -161,18 +162,12 @@ export function EndingScreen() {
   // Load ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
     // Skip image generation in Storybook, test environment, or dev harness
-    const isStorybook =
-      typeof window !== 'undefined' &&
-      (window.location.port === '6006' ||
-        window.location.hostname.includes('storybook'));
+    const isStorybook = isStorybookEnv();
     const isTest = process.env.NODE_ENV === 'test';
     const isDevHarness =
       typeof window !== 'undefined' &&
       window.location.pathname.includes('/dev/ending-screen');
-    const isPlaywright =
-      typeof window !== 'undefined' &&
-      (window.navigator.userAgent.includes('Playwright') ||
-        !!(window as unknown as Record<string, unknown>).__PLAYWRIGHT__);
+    const isPlaywright = isPlaywrightEnv();
 
     if (
       currentEnding &&

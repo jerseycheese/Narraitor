@@ -4,6 +4,7 @@
  */
 
 import * as React from 'react';
+import './table.css';
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -103,9 +104,9 @@ export {
   Table,
   TableHeader,
   TableBody,
-  TableFooter,
+  
   TableHead,
   TableRow,
   TableCell,
-  TableCaption,
+  
 };

@@ -100,6 +100,7 @@ describe('npcStore - Validation and Error Handling', () => {
         message: 'Persistence failed',
         retryable: false,
         type: ErrorType.UNKNOWN,
+        severity: 'error',
       });
       expect(useNPCStore.getState().error?.title).toBe('Persistence failed');
 

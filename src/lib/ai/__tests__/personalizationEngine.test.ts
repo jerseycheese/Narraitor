@@ -3,13 +3,21 @@
  * Focus on core acceptance criteria: providing raw data to LLM for personalization
  */
 
-import { PersonalizationEngine } from '../personalizationEngine';
+import {
+  analyzePlayerBehavior,
+  createPersonalizedContext,
+  generateNarrativeEnhancement,
+} from '../personalizationEngine';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { PlayerDecision } from '@/types/personalization.types';
 
 describe('PersonalizationEngine - MVP Tests', () => {
-  let engine: PersonalizationEngine;
+  const engine = {
+    analyzePlayerBehavior,
+    createPersonalizedContext,
+    generateNarrativeEnhancement,
+  };
   let mockCharacter: Character;
   let mockWorld: World;
 
@@ -28,7 +36,6 @@ describe('PersonalizationEngine - MVP Tests', () => {
   });
 
   beforeEach(() => {
-    engine = new PersonalizationEngine();
 
     mockCharacter = {
       id: 'char-1',
@@ -133,9 +140,9 @@ describe('PersonalizationEngine - MVP Tests', () => {
         []
       );
 
-      // We aggregate choice types but don't infer complex narrative styles
+      // We aggregate choice types; trait inference is delegated to the LLM at narrative-generation time
       expect(analysis.preferences.preferredChoiceTypes).toContain('aggressive');
-      expect(analysis.detectedTraits).toContain('direct');
+      expect(analysis.detectedTraits).toEqual([]);
     });
 
     test('sanitizes dangerous input in narrative enhancement', () => {
@@ -184,7 +191,7 @@ describe('PersonalizationEngine - MVP Tests', () => {
         []
       );
 
-      expect(analysis.detectedTraits).toContain('diplomatic');
+      expect(analysis.detectedTraits).toEqual([]);
       expect(analysis.preferences.preferredChoiceTypes).toContain('diplomatic');
     });
   });

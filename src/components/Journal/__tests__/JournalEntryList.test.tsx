@@ -67,26 +67,4 @@ describe('JournalEntryList', () => {
     expect(onEntrySelect).toHaveBeenCalledWith(entry);
   });
 
-  it('shows unread indicator and system event styling', () => {
-    const entries = [
-      createEntry({ id: 'entry-1', isRead: false }),
-      createEntry({
-        id: 'entry-2',
-        type: 'session_end',
-        title: 'Session End',
-        metadata: { tags: [], automaticEntry: true },
-      }),
-    ];
-
-    const { container } = render(
-      <JournalEntryList
-        entries={entries}
-        selectedEntryId={null}
-        onEntrySelect={jest.fn()}
-      />
-    );
-
-
-    const systemCard = screen.getByRole('button', { name: /select entry: session end/i });
-  });
 });

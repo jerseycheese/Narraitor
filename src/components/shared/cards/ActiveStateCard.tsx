@@ -106,4 +106,3 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   );
 };
 
-export default ActiveStateCard;

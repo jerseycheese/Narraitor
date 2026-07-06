@@ -12,7 +12,7 @@ import {
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { dedupeStrings, dedupeEntityIds, dedupeThreadReferences } from './deduplication';
 
-export const clamp = (value: number, min: number, max: number): number =>
+const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
 
 export const ensureState = (state: WorldState | undefined, worldId: EntityID): WorldState => {

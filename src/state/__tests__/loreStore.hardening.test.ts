@@ -13,14 +13,20 @@ import type { EntityID } from '@/types/common.types';
 import { normalizeText, NORM_NAME } from '@/lib/utils/textNormalization';
 
 // Mock logger to suppress output during tests
-jest.mock('@/lib/utils/logger', () => ({
-  logger: {
+jest.mock('@/lib/utils/logger', () => {
+  const methods = {
     info: jest.fn(),
     debug: jest.fn(),
     error: jest.fn(),
     warn: jest.fn(),
-  },
-}));
+  };
+  return {
+    __esModule: true,
+    logger: methods,
+    Logger: jest.fn().mockImplementation(() => methods),
+    default: jest.fn().mockImplementation(() => methods),
+  };
+});
 
 describe('Lore Extraction Hardening Logic', () => {
   // Test Suite 1: Character Name Validation
@@ -66,9 +72,14 @@ describe('Lore Extraction Hardening Logic', () => {
       expect(shouldStoreExtractedCharacterName('Woman with hood')).toBe(false);
     });
 
-    it('should reject plural groups (short names ending in s without apostrophe)', () => {
+    it('should reject names made entirely of generic NPC words (denylist)', () => {
       expect(shouldStoreExtractedCharacterName('guards')).toBe(false);
       expect(shouldStoreExtractedCharacterName('villagers')).toBe(false);
+      expect(shouldStoreExtractedCharacterName('the villagers')).toBe(false);
+    });
+
+    it('should reject plural-group structures like "Dothraki warriors"', () => {
+      expect(shouldStoreExtractedCharacterName('Dothraki warriors')).toBe(false);
       expect(shouldStoreExtractedCharacterName('town guards')).toBe(false);
     });
 
@@ -76,11 +87,17 @@ describe('Lore Extraction Hardening Logic', () => {
       expect(shouldStoreExtractedCharacterName('The tall mysterious figure wearing a dark hooded cloak')).toBe(false);
     });
 
-    // Edge Cases explicitly mentioned in plan
-    it('should reject short names ending in s without apostrophe (heuristic)', () => {
-      expect(shouldStoreExtractedCharacterName('James')).toBe(false);
-      expect(shouldStoreExtractedCharacterName('Artemis')).toBe(false);
-      expect(shouldStoreExtractedCharacterName('Charles')).toBe(false);
+    // Single-token proper names ending in 's' shouldn't be rejected as plural
+    // groups — that was the structural false-positive #1301 calls out.
+    it('should accept single-token proper names that end in s', () => {
+      expect(shouldStoreExtractedCharacterName('James')).toBe(true);
+      expect(shouldStoreExtractedCharacterName('Artemis')).toBe(true);
+      expect(shouldStoreExtractedCharacterName('Charles')).toBe(true);
+    });
+
+    it('should accept faction-style names with "of" or a possessive', () => {
+      expect(shouldStoreExtractedCharacterName('Brothers of Steel')).toBe(true);
+      expect(shouldStoreExtractedCharacterName("King's Guard")).toBe(true);
     });
   });
 

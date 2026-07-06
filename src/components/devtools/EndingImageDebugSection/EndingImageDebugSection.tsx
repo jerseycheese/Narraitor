@@ -8,10 +8,12 @@ import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding, EndingTone, EndingType } from '@/types/narrative.types';
 import { capitalize, getTimestamp } from '@/lib/utils';
-import { endingTones } from '@/lib/design-tokens/tokens/contextual';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('EndingImageDebug');
 
 export function EndingImageDebugSection() {
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
@@ -32,8 +34,7 @@ export function EndingImageDebugSection() {
   
   // Get data from stores
   const { currentEnding, getSessionSegments } = useNarrativeStore();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const characters = useCharacterStore((state: any) => state.characters);
+  const characters = useCharacterStore(state => state.characters);
   const worlds = useWorldStore((state) => state.worlds);
   
   const toneOptions: EndingTone[] = ['triumphant', 'mysterious', 'tragic', 'hopeful'];
@@ -98,7 +99,7 @@ export function EndingImageDebugSection() {
         promptOnly: true // Flag to return only the prompt
       };
       
-      console.log('Calling ending image API with data:', requestBody);
+      logger.debug('Calling ending image API with data:', requestBody);
       
       const response = await fetch('/api/generate-ending-image', {
         method: 'POST',
@@ -112,7 +113,7 @@ export function EndingImageDebugSection() {
       }
       
       const result = await response.json();
-      console.log('API response result:', result);
+      logger.debug('API response result:', result);
       
       const prompt = result.prompt || result.imageGenerationPrompt || 'No prompt returned';
       setGeneratedPrompt(prompt);
@@ -163,7 +164,7 @@ export function EndingImageDebugSection() {
         recentNarrative
       };
       
-      console.log('Generating full ending image with data:', requestBody);
+      logger.debug('Generating full ending image with data:', requestBody);
       
       const response = await fetch('/api/generate-ending-image', {
         method: 'POST',
@@ -198,11 +199,11 @@ export function EndingImageDebugSection() {
     return `ending-${tone}`;
   };
 
-  // Get tone background color from design tokens
-  const getToneBackgroundColor = (tone: EndingTone) => {
-    const toneConfig = endingTones[tone as keyof typeof endingTones];
-    return toneConfig?.background ?? '#6b7280';
-  };
+  // Tone backgrounds come from the live theme (--ending-* in the ds* theme
+  // files) so the preview matches what EndingScreen actually renders under
+  // the active data-theme. Muted-text token as the unknown-tone fallback.
+  const getToneBackgroundColor = (tone: EndingTone) =>
+    `var(--ending-${tone}, var(--color-text-muted))`;
 
   const currentCharacter = currentEnding ? characters[currentEnding.characterId] : (Object.values(characters) as Character[])[0];
   const currentWorld = currentEnding ? worlds[currentEnding.worldId] : Object.values(worlds)[0];

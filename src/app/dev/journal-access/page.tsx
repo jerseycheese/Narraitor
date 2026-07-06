@@ -10,6 +10,9 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useWorldStore } from '@/state/worldStore';
 import { JournalEntry } from '@/types/journal.types';
 import { getTimestamp } from '@/lib/utils';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('JournalAccessDev');
 
 /**
  * Test Harness for Issue #278: Journal Access During Gameplay
@@ -312,7 +315,6 @@ export default function JournalAccessTestPage() {
             </button>
             <button
               onClick={() => {
-                // Clear existing journal entries for this session
                 useJournalStore.getState().reset();
                 // Force re-creation with proper content
                 setEntryCount(0);
@@ -361,9 +363,8 @@ export default function JournalAccessTestPage() {
             sessionId="test-session-1"
             status={gameStatus}
             onChoiceSelected={(choiceId) =>
-              console.log('Choice selected:', choiceId)
+              logger.debug('Choice selected:', choiceId)
             }
-            onEnd={() => console.log('Session ended')}
           />
         </div>
       </div>

@@ -51,10 +51,20 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     
     // Load initial segments
     loadSegments();
-    
-    // Subscribe to store updates
-    const unsubscribe = useNarrativeStore.subscribe(loadSegments);
-    
+
+    // Only re-run the dedup/sort when THIS session's segment list actually
+    // changes, instead of on every narrative-store write. Segments stream in
+    // token-by-token during play (each a store write), and addSegment replaces
+    // sessionSegments[sessionId] with a new array, so a reference check catches
+    // every add/remove for this session (issue #1358).
+    let prevSegmentIds = useNarrativeStore.getState().sessionSegments[sessionId];
+    const unsubscribe = useNarrativeStore.subscribe((state) => {
+      const nextSegmentIds = state.sessionSegments[sessionId];
+      if (nextSegmentIds === prevSegmentIds) return;
+      prevSegmentIds = nextSegmentIds;
+      loadSegments();
+    });
+
     // Cleanup on unmount
     return () => {
       unsubscribe();

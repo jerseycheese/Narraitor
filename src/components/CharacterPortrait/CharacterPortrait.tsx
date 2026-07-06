@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { clsx } from 'clsx';
 import { GeneratedImage } from '@/types/common.types';
 
 interface CharacterPortraitProps {
@@ -48,7 +49,10 @@ export function CharacterPortrait({
       .toUpperCase();
   };
 
-  const containerClasses = 'component-character-portrait';
+  const containerClasses = clsx(
+    'component-character-portrait',
+    `component-character-portrait-${size}`
+  );
 
   if (isGenerating) {
     return (

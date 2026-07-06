@@ -7,6 +7,7 @@ import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { TutorialMenu } from './TutorialMenu';
+import { ThemeMenu } from './ThemeMenu';
 import { X, Globe, User, Settings, Check, Play, Plus } from 'lucide-react';
 
 const SWIPE_THRESHOLD = 100;
@@ -120,10 +121,11 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
       <div className="mobile-nav-header">
         <div className="mobile-nav-brand">
           <LogoIcon size="small" className="logo-icon-inverted" />
-          <LogoText size="sm" />
+          <LogoText size="sm" className="app-wordmark" />
         </div>
         <div className="mobile-nav-header-actions">
-          {/* Tutorial menu for mobile feature parity with desktop */}
+          {/* Appearance + tutorial menus for mobile parity with the desktop header */}
+          <ThemeMenu />
           <TutorialMenu />
           <Button
             onClick={onClose}

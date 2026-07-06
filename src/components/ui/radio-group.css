@@ -1,0 +1,42 @@
+/* RadioGroup — global semantic styles for src/components/ui/radio-group.tsx (#1317)
+ *
+ * Token-based base styling in production so the app's radios (e.g. the
+ * WorldTypeSelector in the generate-world modal) render like the living style
+ * guide instead of as bare native controls. The radio is a native input themed
+ * via accent-color. Orientation is driven by `data-orientation` — this also
+ * restores the orientation prop, which had been dead since the Tailwind removal
+ * (#1097) left `grid-flow-col` as a no-op class. Per-theme look comes from the
+ * design tokens under the active `data-theme` scope — no hardcoded colors.
+ */
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.radio-group[data-orientation='horizontal'] {
+  flex-flow: row wrap;
+  gap: var(--space-4);
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+}
+
+.radio-item {
+  width: 1rem;
+  height: 1rem;
+  margin: 0 var(--space-2) 0 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.radio-label {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}

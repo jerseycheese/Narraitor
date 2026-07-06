@@ -51,9 +51,7 @@ test.describe('Manuscript Layout Specific Tests', () => {
     });
   });
 
-  // Skipped pending #1183 — desktop DS1 panel/rail width sync regressed by 30px,
-  // likely a box-sizing or ResizeObserver-timing issue introduced in #1094.
-  test.skip('Desktop should keep character rail on left and sync panel width', async ({ page }) => {
+  test('Desktop should keep character rail on left and sync panel width', async ({ page }) => {
     // Seed full test data including narrative segments
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -71,6 +69,29 @@ test.describe('Manuscript Layout Specific Tests', () => {
       state: 'visible',
       timeout: 10000,
     });
+
+    // The character panel's width is matched to the rail by a deferred layout
+    // effect in ManuscriptSessionShell (a ResizeObserver + requestAnimationFrame
+    // that copies the measured rail width onto the panel). Measuring synchronously
+    // the instant the panel mounts races that sync, which is flaky across runners
+    // (issue #1497; previously skip-listed in #1185). Wait for the widths to
+    // settle before asserting instead of sampling mid-sync.
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const rail = document.querySelector('.manuscript-characters-rail');
+            const panel = document.querySelector('.manuscript-hud-character-panel');
+            if (!rail || !panel) return Number.POSITIVE_INFINITY;
+            return Math.abs(
+              Math.round(
+                panel.getBoundingClientRect().width - rail.getBoundingClientRect().width,
+              ),
+            );
+          }),
+        { timeout: 5000 },
+      )
+      .toBeLessThanOrEqual(2);
 
     const desktopLayout = await page.evaluate(() => {
       const rail = document.querySelector('.manuscript-characters-rail');
@@ -170,7 +191,9 @@ test.describe('Manuscript Layout Specific Tests', () => {
       throw new Error('Expected mobile manuscript rail and action rail to be present');
     }
 
-    expect(mobileLayout.railDisplay).toBe('none');
+    // Scene status (the rail) now renders on mobile too, stacked above the
+    // narrative, replacing the old DS1-only mobile bar.
+    expect(mobileLayout.railDisplay).not.toBe('none');
     expect(mobileLayout.actionRailDisplay).not.toBe('none');
     expect(mobileLayout.choiceCount).toBeGreaterThan(0);
   });

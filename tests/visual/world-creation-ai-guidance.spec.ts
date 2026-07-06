@@ -3,6 +3,15 @@ import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
+/**
+ * World creation AI-guidance — single-theme (default DS1).
+ *
+ * DS coverage (#1264): this spec exercises AI-guidance *behaviour and content*
+ * (genre-specific guidance, suggestion generation, outdated warnings), not theme
+ * layout. The wizard's structural theming is covered across DS1/DS2/DS3 by
+ * tests/visual/wizard-themes.spec.ts.
+ */
+
 test.describe('World Creation Wizard AI Guidance', () => {
   test.setTimeout(45000);
 
@@ -53,11 +62,9 @@ test.describe('World Creation Wizard AI Guidance', () => {
     await page.goto('/worlds/create');
     await waitForContentStable(page);
     await hideDynamicContent(page);
-    // Navigate to the Basic Info step by clicking "Create My Own World"
-    const createOwnButton = page.getByRole('button', { name: 'Create My Own World' });
-    await expect(createOwnButton).toBeEnabled({ timeout: 15000 });
-    await createOwnButton.click();
-    await page.waitForTimeout(300);
+    // The wizard now opens directly on the Basic Info step (the template-choice
+    // entry screen was removed in #1454), so there's no longer a "Create My Own
+    // World" button to click through.
   });
 
   test('should display genre-specific guidance on Basic Info step', async ({ page }) => {

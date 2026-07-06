@@ -1,1 +1,0 @@
-export { RecentTemplates } from './RecentTemplates';

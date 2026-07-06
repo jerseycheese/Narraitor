@@ -17,7 +17,7 @@ For the design rationale behind having three structurally-different design syste
 
 The token system uses a three-tier hierarchy of CSS custom properties, defined per-theme in dedicated CSS files:
 
-**Global Tokens** → **Semantic Tokens** → **Component Tokens**
+**Global Tokens** to **Semantic Tokens** to **Component Tokens**
 
 Each design system (DS1, DS2, DS3) defines all three tiers under a `[data-theme]` attribute selector, with separate blocks for light and dark mode. Changing the active theme swaps the entire token set at the root level — every component that consumes `var(--token-name)` updates automatically.
 
@@ -111,9 +111,12 @@ These map intent and context onto the global foundation. Status feedback, storyt
 }
 ```
 
-### Tier 3: Component Tokens (shadcn/ui)
+### Tier 3: Component Tokens (shadcn-derived)
 
-HSL-based tokens that integrate with the shadcn/ui component library. These are consumed by component classes like `bg-primary`, `text-muted-foreground`, etc.
+HSL-based tokens carried over from the shadcn/ui component foundation. They're consumed via
+`var()` in component CSS (typically wrapped in `hsl()`, e.g. `background: hsl(var(--primary))`).
+These predate the Tailwind removal, so despite the `bg-primary`-style naming there are no
+matching Tailwind utility classes — the values are reached through `var()` like every other token.
 
 ```css
 [data-theme="ds1"] {
@@ -163,36 +166,37 @@ Use `var()` to consume tokens. This is the primary pattern:
 }
 ```
 
-### In Tailwind Classes
+### In Components
 
-Semantic Tailwind classes consume the component-tier tokens automatically:
+JSX carries semantic class names (composed with `clsx`); the styling lives in the component's
+CSS, which consumes the tokens via `var()`:
 
 ```tsx
-// Good — uses semantic design tokens
-const Button = ({ variant = 'primary' }) => {
-  return (
-    <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
-      Click me
-    </button>
-  )
+import { clsx } from 'clsx';
+
+const Button = ({ variant = 'primary' }) => (
+  <button className={clsx('btn', `btn-${variant}`)}>Click me</button>
+);
+
+const WarningAlert = () => (
+  <div className="alert alert-warning">Warning message</div>
+);
+```
+
+```css
+.btn-primary {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
 }
 
-// Bad — hardcodes specific color values
-const BadButton = () => {
-  return (
-    <button className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-900">
-      Click me
-    </button>
-  )
-}
-
-// Good — uses semantic warning tokens
-const WarningAlert = () => {
-  return (
-    <div className="bg-warning-background border border-warning-border text-warning-foreground p-3 rounded-md">
-      Warning message
-    </div>
-  )
+.alert-warning {
+  background: hsl(var(--warning-background));
+  border: 1px solid hsl(var(--warning-border));
+  color: var(--color-text-primary);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
 }
 ```
 
@@ -245,7 +249,7 @@ Two shadow tokens handle different elevation contexts:
 /* DS1 dark  */ --shadow-drawer: -12px 0 24px rgb(0 0 0 / 40%);
 ```
 
-The pattern: dark mode increases shadow opacity (8% → 40%) because shadows need more contrast against dark backgrounds to remain visible. The `-12px` x-offset on drawer shadows keeps the shadow on the leading edge of a left-anchored panel.
+The pattern: dark mode increases shadow opacity (8% to 40%) because shadows need more contrast against dark backgrounds to remain visible. The `-12px` x-offset on drawer shadows keeps the shadow on the leading edge of a left-anchored panel.
 
 ## What Stays Hardcoded
 
@@ -260,7 +264,7 @@ These values live in `globals.css` or component-level CSS, not in theme files.
 
 ## Storybook Documentation
 
-All design tokens are documented in Storybook with interactive swatches. Navigate to "Foundation → Design Tokens" to explore the complete system visually.
+All design tokens are documented in Storybook with interactive swatches. Navigate to "Foundation, then Design Tokens" to explore the complete system visually.
 
 ## Accessibility & Contrast
 

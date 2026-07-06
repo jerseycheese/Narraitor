@@ -1,10 +1,12 @@
 import { safeTrim } from './index';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('NarrativeParser');
+
 /**
  * Parse narrative content from AI responses with multiple fallback strategies
  * Handles JSON code blocks, malformed JSON, and control character sanitization
- * 
- * This function implements the same parsing logic previously embedded in NarrativeDisplay component.
+ *
  * It handles various AI response formats and provides graceful fallback mechanisms.
  * 
  * @param content - Raw content from AI response
@@ -79,7 +81,7 @@ export function parseNarrativeContent(content: string): string {
         }
       } catch {
         // If proper JSON parsing fails, try more lenient regex approaches
-        console.warn('Strict JSON parsing failed, trying regex extraction');
+        logger.warn('Strict JSON parsing failed, trying regex extraction');
         
         // For malformed JSON, try regex extraction
         // Handle incomplete JSON (missing closing quotes/braces)
@@ -106,7 +108,7 @@ export function parseNarrativeContent(content: string): string {
       // If all parsing failed, return original
       return content;
     } catch (error) {
-      console.error('Failed to parse code block content:', error);
+      logger.error('Failed to parse code block content:', error);
       return content;
     }
   }

@@ -28,6 +28,17 @@
   margin: 0;
 }
 
+/* The wizard title renders as <h1> or <h2> depending on whether the page already
+   owns the page heading (#1473). The .app-surface-* rules style headings per tag
+   at a higher specificity than the bare .wizard-title class (h1 2rem/1.2 vs h2
+   1.5rem/1.25), so the demoted character-creation title (now an h2) would shrink
+   and shift. Pin to the h1 surface values, container-scoped to outrank
+   .app-surface-* h2, so the title looks identical at either level. */
+.component-wizard-container .wizard-title {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
 /* ─── Step Styles ─── */
 
 .wizard-step-title {
@@ -97,7 +108,7 @@
 
 .form-input-error:focus {
   border-color: var(--color-danger);
-  box-shadow: 0 0 0 2px hsl(var(--destructive) / 15%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-danger) 15%, transparent);
 }
 
 .form-textarea {
@@ -161,6 +172,112 @@
   margin: 0;
 }
 
+/* ─── Portrait Step ─── */
+
+.component-portrait-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.component-portrait-step > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.component-portrait-step label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.component-portrait-step input,
+.component-portrait-step textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.component-portrait-step textarea {
+  min-height: calc(var(--space-8) * 3);
+  resize: vertical;
+}
+
+.component-portrait-step p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.component-portrait-step .component-character-portrait {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(var(--space-8) * 8);
+  max-width: 100%;
+
+  /* Explicit height so the size-variant rule can't shrink this preview — it
+     previously inherited height:100% from the base portrait rule (#1393). */
+  height: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.component-portrait-step .component-character-portrait img {
+  object-fit: cover;
+}
+
+.component-portrait-step button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.component-portrait-step button:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.component-portrait-step button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.component-portrait-step button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* ─── Navigation Buttons ─── */
 
 .wizard-nav-container {
@@ -180,7 +297,7 @@
   border: none;
   border-radius: var(--radius-md);
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   font-family: var(--font-interface);
   font-size: 0.875rem;
   font-weight: 500;
@@ -307,7 +424,7 @@
 
 .wizard-progress-circle-active {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   border: 2px solid var(--color-accent);
 }
 
@@ -415,7 +532,7 @@
 }
 
 .wizard-badge-danger {
-  background: hsl(var(--destructive) / 10%);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   color: var(--color-danger);
 }
 
@@ -442,7 +559,7 @@
 
 .wizard-toggle-active {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
@@ -462,14 +579,25 @@
   border-color: var(--color-border-strong);
 }
 
+.wizard-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wizard-toggle:disabled:hover {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
 /* ─── Utility Styles ─── */
 
 .wizard-divider {
   width: 100%;
-  height: 1px;
-  background: var(--color-border);
-  border: none;
-  margin: var(--space-2) 0;
+  min-width: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-4);
 }
 
 .wizard-subheading {
@@ -486,7 +614,7 @@
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-danger);
   border-radius: var(--radius-md);
-  background: hsl(var(--destructive) / 8%);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   color: var(--color-danger);
   font-family: var(--font-interface);
   font-size: 0.875rem;
@@ -587,83 +715,6 @@
   justify-content: center;
   min-width: var(--space-3);
   padding-top: 1rem;
-}
-
-/* ─── Template-mode grid (TemplateStep choice panels) ─── */
-
-.wizard-template-mode-grid {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: var(--space-4);
-  align-items: stretch;
-}
-
-.wizard-template-mode-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-}
-
-.wizard-template-mode-divider::before,
-.wizard-template-mode-divider::after {
-  content: "";
-  display: block;
-  width: 1.5rem;
-  height: 1px;
-  background: var(--color-border);
-}
-
-@media (width <= 768px) {
-  .wizard-template-mode-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .wizard-template-mode-divider {
-    padding: var(--space-1) 0;
-  }
-}
-
-/* ─── Wizard panel (non-clickable card-like container) ─── */
-
-.wizard-panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-
-/* ─── Template list (TemplateSelector traditional mode) ─── */
-
-.wizard-template-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-/* ─── Card content helpers ─── */
-
-.wizard-card-title {
-  font-family: var(--font-interface);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.wizard-card-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
 }
 
 /* ─── Button rows ─── */
@@ -778,6 +829,162 @@
   margin: 0;
 }
 
+/* ─── Range sliders / point-pool controls ─── */
+
+.component-range-slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.range-slider-header,
+.point-pool-summary-row,
+.point-pool-allocation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.range-slider-label-text,
+.point-pool-allocation-name {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.range-slider-level-label,
+.point-pool-allocation-value {
+  font-family: var(--font-interface);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.range-slider-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.range-slider-scale {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  padding-top: var(--space-2);
+}
+
+.range-slider-notches,
+.range-slider-labels {
+  position: relative;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.range-slider-notches {
+  height: var(--space-2);
+}
+
+.range-slider-labels {
+  height: var(--space-4);
+}
+
+.range-slider-notch,
+.range-slider-scale-label {
+  position: absolute;
+}
+
+.range-slider-notch {
+  top: 0;
+  width: 0;
+  height: var(--space-2);
+  border-left: 1px solid var(--color-border);
+}
+
+.range-slider-scale-label {
+  top: 0;
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+.range-slider-input-wrapper {
+  min-width: 0;
+}
+
+.range-slider {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.range-slider-description {
+  font-family: var(--font-system);
+  color: var(--color-text-secondary);
+}
+
+.range-slider-description span {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-point-pool-manager,
+.point-pool-allocation-list,
+.point-pool-allocation,
+.point-pool-allocation-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.point-pool-summary,
+.point-pool-allocation {
+  min-width: 0;
+}
+
+.point-pool-totals,
+.point-pool-status,
+.point-pool-limit,
+.point-pool-limit-note {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.point-pool-totals {
+  color: var(--color-text-secondary);
+}
+
+.point-pool-status,
+.point-pool-limit-note {
+  color: var(--color-success);
+}
+
+.point-pool-status svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.point-pool-limit {
+  color: var(--color-warning);
+}
+
+.point-pool-limit-note span[aria-hidden="true"] {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-warning);
+}
+
+.point-pool-allocation-description {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Per-theme structural differentiation (#1167)
 
@@ -850,10 +1057,15 @@
 [data-theme="ds1"] .wizard-page .wizard-step-title::after {
   content: "";
   display: block;
-  width: 2px;
-  height: 18px;
+  width: 2rem;
+  height: 2px;
   margin: var(--space-2) 0 0;
-  background: linear-gradient(to bottom, var(--color-accent), transparent);
+  background: linear-gradient(to right, var(--color-accent), transparent);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-archetype-grid .wizard-step-title::before,
+[data-theme="ds1"] .wizard-page .wizard-archetype-grid .wizard-step-title::after {
+  content: none;
 }
 
 [data-theme="ds1"] .wizard-page .wizard-form-section {
@@ -951,8 +1163,8 @@
 [data-theme="ds1"] .wizard-page .wizard-info-banner {
   border-radius: 2px;
   border-width: 2px;
-  border-left-width: 4px;
-  border-left-color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
 }
 
 [data-theme="ds1"] .wizard-page .wizard-empty-state {
@@ -1201,6 +1413,10 @@
   color: var(--color-text-muted);
 }
 
+[data-theme="ds3"] .wizard-page .wizard-archetype-grid .wizard-step-title::before {
+  content: none;
+}
+
 [data-theme="ds3"] .wizard-page .wizard-form-section {
   position: relative;
   padding-top: var(--space-4);
@@ -1383,6 +1599,439 @@
   opacity: 0.5;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Wizard structural differentiation (#1223)
+
+   DS1 — Manuscript Worksheet: numbered contents rail + ruled passages.
+   DS2 — Sectioned Module: centered card stack + distinct command tray.
+   DS3 — Command Strip: compact top controls + dense field stacking.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Shared wizard flow hooks ─── */
+
+[data-theme="ds1"] .component-world-creation-wizard,
+[data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header),
+[data-theme="ds2"] .component-world-creation-wizard,
+[data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header),
+[data-theme="ds3"] .component-world-creation-wizard,
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) {
+  width: 100%;
+  min-width: 0;
+}
+
+[data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header) > :first-child:not(.component-wizard-progress),
+[data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) > :first-child:not(.component-wizard-progress),
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > :first-child:not(.component-wizard-progress) {
+  grid-column: 1 / -1;
+  justify-self: end;
+}
+
+/* ─── DS1 — Manuscript Worksheet ─── */
+
+[data-theme="ds1"] .component-create-world-page > .wizard-container,
+[data-theme="ds1"] .component-create-character-page .component-character-creation-wizard {
+  max-width: calc(var(--space-8) * 40);
+  margin: 0 auto;
+}
+
+[data-theme="ds1"] .component-world-creation-wizard,
+[data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header) {
+  position: relative;
+  display: grid;
+  grid-template-columns: calc(var(--space-8) * 7) minmax(0, 1fr);
+  grid-template-areas:
+    "progress content"
+    "progress actions";
+  gap: var(--space-5) var(--space-8);
+  align-items: start;
+}
+
+[data-theme="ds1"] .component-world-creation-wizard::before,
+[data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc((var(--space-8) * 7) + (var(--space-8) / 2));
+  width: 1px;
+  background: var(--color-border-strong);
+}
+
+[data-theme="ds1"] .component-world-creation-wizard > .component-wizard-progress,
+[data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress {
+  grid-area: progress;
+  position: sticky;
+  top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+[data-theme="ds1"] .component-world-creation-wizard > .wizard-step-content,
+[data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
+  grid-area: content;
+  gap: var(--space-5);
+  min-width: 0;
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--color-border-strong);
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .component-world-creation-wizard > .wizard-nav-container,
+[data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
+  grid-area: actions;
+  margin-top: 0;
+}
+
+[data-theme="ds1"] .component-world-creation-wizard .wizard-progress-row,
+[data-theme="ds1"] .component-character-creation-wizard .wizard-progress-row {
+  flex-flow: column nowrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0;
+}
+
+[data-theme="ds1"] .component-world-creation-wizard .wizard-progress-step-wrapper,
+[data-theme="ds1"] .component-character-creation-wizard .wizard-progress-step-wrapper {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .component-world-creation-wizard .wizard-progress-step-wrapper:last-of-type,
+[data-theme="ds1"] .component-character-creation-wizard .wizard-progress-step-wrapper:last-of-type {
+  border-bottom: none;
+}
+
+[data-theme="ds1"] .component-world-creation-wizard .wizard-progress-connector-wrapper,
+[data-theme="ds1"] .component-character-creation-wizard .wizard-progress-connector-wrapper {
+  display: none;
+}
+
+[data-theme="ds1"] .component-world-creation-wizard .wizard-progress-circle,
+[data-theme="ds1"] .component-character-creation-wizard .wizard-progress-circle {
+  flex: 0 0 auto;
+  width: var(--space-6);
+  height: var(--space-6);
+}
+
+[data-theme="ds1"] .component-world-creation-wizard .wizard-progress-label,
+[data-theme="ds1"] .component-character-creation-wizard .wizard-progress-label {
+  text-align: left;
+}
+
+[data-theme="ds1"] .component-world-creation-wizard .wizard-form-section,
+[data-theme="ds1"] .component-character-creation-wizard .wizard-form-section {
+  margin: 0;
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .component-world-creation-wizard .wizard-form-section:first-of-type,
+[data-theme="ds1"] .component-character-creation-wizard .wizard-form-section:first-of-type {
+  border-top: none;
+}
+
+/* Collapse the manuscript rail below 1024px: its fixed ~448px column plus the
+   ~288px app sidebar can't fit a content column in the 768–1024 band. */
+@media (width < 1024px) {
+  [data-theme="ds1"] .component-world-creation-wizard,
+  [data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "progress"
+      "content"
+      "actions";
+    gap: var(--space-4);
+  }
+
+  [data-theme="ds1"] .component-world-creation-wizard::before,
+  [data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header)::before {
+    display: none;
+  }
+
+  [data-theme="ds1"] .component-world-creation-wizard > .component-wizard-progress,
+  [data-theme="ds1"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress {
+    position: static;
+  }
+}
+
+/* ─── DS2 — Sectioned Module ─── */
+
+[data-theme="ds2"] .component-create-world-page > .wizard-container,
+[data-theme="ds2"] .component-create-character-page .component-character-creation-wizard {
+  max-width: calc(var(--space-8) * 36);
+  margin: 0 auto;
+}
+
+[data-theme="ds2"] .component-world-creation-wizard,
+[data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "progress"
+    "content"
+    "actions";
+  gap: clamp(var(--space-4), 3vw, var(--space-6));
+}
+
+[data-theme="ds2"] .component-world-creation-wizard > .component-wizard-progress,
+[data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress,
+[data-theme="ds2"] .component-world-creation-wizard > .wizard-step-content,
+[data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
+  padding: clamp(var(--space-4), 3vw, var(--space-6));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+[data-theme="ds2"] .component-world-creation-wizard > .component-wizard-progress,
+[data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress {
+  grid-area: progress;
+}
+
+[data-theme="ds2"] .component-world-creation-wizard > .wizard-step-content,
+[data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
+  grid-area: content;
+  min-width: 0;
+}
+
+[data-theme="ds2"] .component-world-creation-wizard > .wizard-nav-container,
+[data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
+  grid-area: actions;
+  margin-top: 0;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-hover);
+  justify-content: space-between;
+}
+
+[data-theme="ds2"] .component-world-creation-wizard .wizard-progress-row,
+[data-theme="ds2"] .component-character-creation-wizard .wizard-progress-row {
+  align-items: center;
+}
+
+[data-theme="ds2"] .component-world-creation-wizard .wizard-form-section,
+[data-theme="ds2"] .component-character-creation-wizard .wizard-form-section {
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-canvas);
+}
+
+[data-theme="ds2"] .component-world-creation-wizard .wizard-form-section + .wizard-form-section,
+[data-theme="ds2"] .component-character-creation-wizard .wizard-form-section + .wizard-form-section {
+  margin-top: var(--space-4);
+}
+
+@media (width < 768px) {
+  [data-theme="ds2"] .component-world-creation-wizard > .wizard-nav-container,
+  [data-theme="ds2"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  [data-theme="ds2"] .component-world-creation-wizard .wizard-nav-group,
+  [data-theme="ds2"] .component-character-creation-wizard .wizard-nav-group {
+    justify-content: stretch;
+  }
+
+  [data-theme="ds2"] .component-world-creation-wizard .wizard-nav-group > *,
+  [data-theme="ds2"] .component-character-creation-wizard .wizard-nav-group > * {
+    flex: 1 1 auto;
+  }
+}
+
+/* ─── DS3 — Command Strip ─── */
+
+[data-theme="ds3"] .component-create-world-page > .wizard-container,
+[data-theme="ds3"] .component-create-character-page .component-character-creation-wizard {
+  max-width: calc(var(--space-8) * 44);
+  margin: 0 auto;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard,
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "progress"
+    "actions"
+    "content";
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-text-primary) 14%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: calc(var(--space-6) + var(--space-2)) calc(var(--space-6) + var(--space-2));
+  background-repeat: repeat;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard > .component-wizard-progress,
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress,
+[data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container,
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container,
+[data-theme="ds3"] .component-world-creation-wizard > .wizard-step-content,
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard > .component-wizard-progress,
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress {
+  grid-area: progress;
+  min-width: 0;
+  padding: var(--space-2);
+  overflow-x: auto;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container,
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
+  grid-area: actions;
+  margin-top: 0;
+  padding: var(--space-2) var(--space-3);
+  align-items: center;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard > .wizard-step-content,
+[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
+  grid-area: content;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-row,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-row {
+  flex-flow: row nowrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--space-1);
+  min-width: max-content;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-connector-wrapper,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-connector-wrapper {
+  display: none;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-wrapper,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-wrapper {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1_5) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-canvas);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-active,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-active {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-label,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-active .wizard-progress-label {
+  color: var(--color-text-inverse);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-circle-active,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-active .wizard-progress-circle-active {
+  background: var(--color-text-inverse);
+  color: var(--color-accent);
+  border-color: var(--color-text-inverse);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-circle,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-circle {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-label,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-label {
+  white-space: nowrap;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-form-section,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-form-section {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-form-section + .wizard-form-section,
+[data-theme="ds3"] .component-character-creation-wizard .wizard-form-section + .wizard-form-section {
+  margin-top: var(--space-3);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .form-group,
+[data-theme="ds3"] .component-character-creation-wizard .form-group {
+  gap: var(--space-1);
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .form-input,
+[data-theme="ds3"] .component-world-creation-wizard .form-textarea,
+[data-theme="ds3"] .component-world-creation-wizard .form-select,
+[data-theme="ds3"] .component-character-creation-wizard .form-input,
+[data-theme="ds3"] .component-character-creation-wizard .form-textarea,
+[data-theme="ds3"] .component-character-creation-wizard .form-select {
+  padding: var(--space-1_5) var(--space-2_5);
+}
+
+@media (width < 768px) {
+  [data-theme="ds3"] .component-world-creation-wizard,
+  [data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) {
+    padding: var(--space-2);
+
+    /* Move the action bar below the form on narrow screens so Next/Back are
+       reachable after a long mobile form (desktop keeps the command-strip top). */
+    grid-template-areas:
+      "progress"
+      "content"
+      "actions";
+  }
+
+  [data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container,
+  [data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  [data-theme="ds3"] .component-world-creation-wizard .wizard-nav-group,
+  [data-theme="ds3"] .component-character-creation-wizard .wizard-nav-group {
+    justify-content: stretch;
+  }
+
+  [data-theme="ds3"] .component-world-creation-wizard .wizard-nav-group > *,
+  [data-theme="ds3"] .component-character-creation-wizard .wizard-nav-group > * {
+    flex: 1 1 auto;
+  }
+}
+
+@media (width < 768px) {
+  .component-create-character-page .wizard-page-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 /* Reduced-motion override — colocated with the DS2 animation rule above so
    it wins the cascade. workshop.css's reduced-motion block can't reach this
    because wizard.css imports after workshop.css in src/app/layout.tsx. */
@@ -1393,6 +2042,687 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Step-internal widgets (#1265)
+
+   The wizard shell + shared hooks (cards, badges, forms, empty
+   states) are already DS-aware. This section gives the step-INTERNAL
+   widgets — review cards, custom attribute/skill editors, point-pool
+   allocation, portrait controls, image review, slot meters and the
+   inline confirm alert — a structural DS1/DS2/DS3 treatment so they
+   read as part of each tack instead of one default widget recolored
+   three ways.
+
+   DS1 — Drafting Table: sharp 2px chrome, ruled passages, accent
+     side-rules, square slot cells, monospace eyebrows.
+   DS2 — Warm Earth: soft 1rem radii, inset surface cards, pill slot
+     dots, serif voice, no hard rules.
+   DS3 — Command Strip: dense 4px chrome, dotted radial-gradient
+     separators, compact square cells, monospace labels.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Shared layout (theme-neutral) ─── */
+
+.wizard-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.wizard-review-suggestions,
+.wizard-review-custom-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.wizard-review-card-head {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wizard-review-card-meta {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.wizard-review-card-meta > span:nth-child(n + 2):not(.wizard-badge) {
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-review-card-tools {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.wizard-review-card-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-review-card-range {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.wizard-review-detail-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (width <= 768px) {
+  .wizard-review-detail-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wizard-skill-attr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--space-8) * 5), 1fr));
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.wizard-skill-attr-option {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.wizard-review-custom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.wizard-review-custom-head {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wizard-review-custom-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.wizard-review-custom-heading p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-custom-editor {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.wizard-custom-editor h2 {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* AttributeEditor / SkillEditor render unclassed markup (fragments / bare
+   divs) with no spacing, so the fields and action row read cramped. Space
+   the text controls and the buttons directly — structure-agnostic, and skips
+   checkboxes/radios so the skill editor's inline attribute list is untouched. */
+.wizard-custom-editor input:not([type="checkbox"], [type="radio"]),
+.wizard-custom-editor textarea,
+.wizard-custom-editor select {
+  margin-bottom: var(--space-4);
+}
+
+.wizard-custom-editor button {
+  margin-top: var(--space-3);
+}
+
+.wizard-custom-editor button + button {
+  margin-left: var(--space-2);
+}
+
+/* ─── Slot meter (selected / available capacity) ─── */
+
+.wizard-slot-summary {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.wizard-slot-summary-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.wizard-slot-summary-count {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.wizard-slot-summary-note {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.wizard-slot-meter {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-1);
+}
+
+.wizard-slot-cell {
+  width: var(--space-3);
+  height: var(--space-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.wizard-slot-cell-filled {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+/* ─── Inline confirm alert (clear suggestions) ─── */
+
+.wizard-dialog-overlay {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-4);
+}
+
+.wizard-dialog-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.wizard-dialog-panel h3 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.wizard-dialog-panel p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* ─── Finalize review summary ─── */
+
+.wizard-review-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.wizard-review-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ─── Portrait controls / frame ─── */
+
+.portrait-step-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.portrait-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.portrait-step-success {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.portrait-step-success-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.portrait-step-success-label svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.portrait-step-actions {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-2);
+}
+
+.portrait-step-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── Skill allocation (character) ─── */
+
+.wizard-skill-summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+@media (width <= 768px) {
+  .wizard-skill-summary-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wizard-skill-allocation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.wizard-skill-card-head {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wizard-skill-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.wizard-skill-card-info > span:first-child {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.wizard-skill-card-info p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.wizard-skill-card-linked {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.wizard-skill-card-locked {
+  opacity: 0.7;
+}
+
+.wizard-skill-card-requirement {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  margin-top: var(--space-1);
+}
+
+.wizard-skill-level {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.wizard-skill-level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* ════════════════════ DS1 — Drafting Table ════════════════════ */
+
+[data-theme="ds1"] .wizard-page .wizard-review-card-detail,
+[data-theme="ds1"] .wizard-page .wizard-skill-level {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-review-detail-row {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--color-accent);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-skill-attr-option {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-custom-editor {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-custom-editor h2 {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-custom-editor input,
+[data-theme="ds1"] .wizard-page .wizard-custom-editor textarea,
+[data-theme="ds1"] .wizard-page .wizard-custom-editor select {
+  border-radius: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-slot-summary {
+  border-top-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-slot-cell {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .wizard-dialog-panel {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .component-portrait-step .component-character-portrait {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .component-portrait-step button {
+  border-radius: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .portrait-step-success {
+  border-radius: 2px;
+  border-width: 2px;
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+[data-theme="ds1"] .wizard-page .component-point-pool-manager .point-pool-allocation {
+  border-radius: 2px;
+  border-width: 2px;
+}
+
+[data-theme="ds1"] .wizard-page .point-pool-allocation-value,
+[data-theme="ds1"] .wizard-page .range-slider-level-label {
+  font-family: var(--font-system);
+}
+
+[data-theme="ds1"] .wizard-page .wizard-error-container {
+  border-radius: 2px;
+  border-width: 2px;
+  border-color: var(--color-danger);
+}
+
+/* ════════════════════ DS2 — Warm Earth ════════════════════ */
+
+[data-theme="ds2"] .wizard-page .wizard-review-card-detail {
+  padding: var(--space-4);
+  border-radius: 1rem;
+  background: var(--color-canvas);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-skill-attr-option {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-custom-editor {
+  border-radius: 1rem;
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
+  background: var(--color-canvas);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-custom-editor h2 {
+  font-family: var(--font-narrative);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-custom-editor input,
+[data-theme="ds2"] .wizard-page .wizard-custom-editor textarea,
+[data-theme="ds2"] .wizard-page .wizard-custom-editor select {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-slot-summary {
+  border-top: none;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-slot-cell {
+  border-radius: var(--radius-full);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-slot-summary-note {
+  font-family: var(--font-narrative);
+  font-style: italic;
+}
+
+[data-theme="ds2"] .wizard-page .wizard-dialog-panel {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .component-portrait-step .component-character-portrait {
+  border-radius: 1rem;
+}
+
+[data-theme="ds2"] .wizard-page .component-portrait-step button {
+  border-radius: var(--radius-full);
+  padding: var(--space-2_5) var(--space-5);
+}
+
+[data-theme="ds2"] .wizard-page .portrait-step-success {
+  border-radius: 1rem;
+  background: var(--color-accent-soft);
+}
+
+[data-theme="ds2"] .wizard-page .portrait-step-hint {
+  font-family: var(--font-narrative);
+  font-style: italic;
+}
+
+[data-theme="ds2"] .wizard-page .component-point-pool-manager .point-pool-allocation {
+  border-radius: 1rem;
+  padding: var(--space-4);
+}
+
+[data-theme="ds2"] .wizard-page .wizard-error-container {
+  border-radius: 1rem;
+}
+
+/* ════════════════════ DS3 — Command Strip ════════════════════ */
+
+[data-theme="ds3"] .wizard-page .wizard-review-list {
+  gap: var(--space-4);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-review-suggestions,
+[data-theme="ds3"] .wizard-page .wizard-review-custom-list,
+[data-theme="ds3"] .wizard-page .wizard-skill-allocation-list {
+  gap: var(--space-2);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-review-card-detail,
+[data-theme="ds3"] .wizard-page .wizard-skill-level {
+  position: relative;
+  padding-top: var(--space-3);
+  gap: var(--space-2);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-review-card-detail::before,
+[data-theme="ds3"] .wizard-page .wizard-skill-level::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-border-strong) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 8px 4px;
+  background-repeat: repeat-x;
+  opacity: 0.6;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-skill-attr-option {
+  border-radius: 4px;
+  padding: var(--space-1_5);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-custom-editor {
+  border-radius: 4px;
+  padding: var(--space-3);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-custom-editor h2 {
+  font-family: var(--font-system);
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-custom-editor input,
+[data-theme="ds3"] .wizard-page .wizard-custom-editor textarea,
+[data-theme="ds3"] .wizard-page .wizard-custom-editor select {
+  border-radius: 4px;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-slot-cell {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: 1px;
+}
+
+[data-theme="ds3"] .wizard-page .wizard-slot-summary-count,
+[data-theme="ds3"] .wizard-page .wizard-skill-level-row {
+  font-family: var(--font-system);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-dialog-panel {
+  border-radius: 4px;
+  border-style: dashed;
+}
+
+[data-theme="ds3"] .wizard-page .component-portrait-step {
+  gap: var(--space-3);
+}
+
+[data-theme="ds3"] .wizard-page .component-portrait-step .component-character-portrait {
+  border-radius: 4px;
+}
+
+[data-theme="ds3"] .wizard-page .component-portrait-step button {
+  border-radius: 4px;
+  padding: var(--space-1_5) var(--space-3);
+}
+
+[data-theme="ds3"] .wizard-page .portrait-step-success {
+  border-radius: 4px;
+  border-style: dashed;
+}
+
+[data-theme="ds3"] .wizard-page .component-point-pool-manager {
+  gap: var(--space-2);
+}
+
+[data-theme="ds3"] .wizard-page .component-point-pool-manager .point-pool-allocation {
+  border-radius: 4px;
+  padding: var(--space-2_5);
+}
+
+[data-theme="ds3"] .wizard-page .point-pool-allocation-name,
+[data-theme="ds3"] .wizard-page .point-pool-allocation-value {
+  font-family: var(--font-system);
+}
+
+[data-theme="ds3"] .wizard-page .wizard-error-container {
+  border-radius: 4px;
+  border-style: dashed;
+}
+
 /* ----------------------------------------------------------------------------
  * GuidedFirstTimeExperience — first-run wizard on the home empty state.
  * Renders inside WizardContainer with a `component-guided-first-time` class
@@ -1401,6 +2731,7 @@
  * -------------------------------------------------------------------------- */
 
 .component-guided-first-time {
+  box-sizing: border-box;
   padding: var(--space-6) var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -1463,19 +2794,12 @@
   background: var(--color-canvas);
 }
 
-.component-guided-first-time-step-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--color-accent);
-}
-
 .component-guided-first-time-step-num {
   font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-accent);
 }
 
 .component-guided-first-time-step-heading {
@@ -1571,7 +2895,6 @@
 [data-theme="ds1"] .component-guided-first-time-step-item {
   border-radius: 2px;
   border-width: 2px;
-  border-left: 4px solid var(--color-accent);
 }
 
 [data-theme="ds1"] .component-guided-first-time-step-heading {
@@ -1793,4 +3116,179 @@
   [data-theme="ds2"] .component-guided-first-time-step {
     animation: none;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   World-wizard DS pass (#1433)
+
+   Scoped to .component-world-creation-wizard (or world-only classes)
+   so a parallel character-wizard branch can't collide. Appended last
+   so source order wins over the shared rules above for the world wizard.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── F8 + F13 — DS3: vertical step-nav, Back/Next moved to the bottom ─── */
+
+[data-theme="ds3"] .component-world-creation-wizard {
+  grid-template-areas:
+    "progress"
+    "content"
+    "actions";
+}
+
+[data-theme="ds3"] .component-world-creation-wizard > .component-wizard-progress {
+  overflow-x: visible;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-row {
+  flex-flow: column nowrap;
+  align-items: stretch;
+  gap: var(--space-1_5);
+  min-width: 0;
+}
+
+[data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container {
+  padding: var(--space-3);
+}
+
+/* ─── F10 — world-type radio controls ─── */
+
+.component-world-creation-wizard .wizard-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-world-creation-wizard .wizard-radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2_5);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+/* Native radios inherit .form-input's width:100% from the shared Input
+   component; pin them back to their intrinsic size (the F10 stretch fix). */
+.component-world-creation-wizard .wizard-radio-option input[type="radio"].form-input {
+  width: auto;
+  flex: 0 0 auto;
+  margin-top: var(--space-0_5);
+}
+
+.component-world-creation-wizard .wizard-radio-option:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.component-world-creation-wizard .wizard-radio-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+  min-width: 0;
+}
+
+.component-world-creation-wizard .wizard-radio-option-desc {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+/* ─── F11 — suggestions panel spacing ─── */
+
+.component-world-creation-wizard .wizard-suggestion-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.component-world-creation-wizard .wizard-suggestion-actions {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.component-world-creation-wizard .wizard-suggestion-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.component-world-creation-wizard .wizard-suggestion-preview {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-5);
+}
+
+.component-world-creation-wizard .wizard-suggestion-preview-group {
+  flex: 1 1 calc(var(--space-8) * 8);
+  min-width: 0;
+}
+
+.component-world-creation-wizard .wizard-suggestion-preview-heading {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-world-creation-wizard .wizard-suggestion-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.component-world-creation-wizard .wizard-suggestion-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+}
+
+.component-world-creation-wizard .wizard-suggestion-item-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-world-creation-wizard .wizard-suggestion-item-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+/* ─── F12 — attribute starting-value number field ─── */
+
+.component-world-creation-wizard .wizard-attribute-value-input {
+  max-width: calc(var(--space-8) * 5);
+}
+
+/* ─── F15 — skill difficulty legend ─── */
+
+.component-world-creation-wizard .wizard-difficulty-legend {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.component-world-creation-wizard .wizard-difficulty-legend-label {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* ─── F17 — densify review cards ─── */
+
+.component-world-creation-wizard .wizard-review-card {
+  padding: var(--space-3);
+  gap: var(--space-1_5);
+}
+
+.component-world-creation-wizard .wizard-review-card-head {
+  gap: var(--space-2);
 }

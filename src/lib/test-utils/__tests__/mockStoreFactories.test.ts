@@ -47,16 +47,6 @@ describe('mockZustandStore', () => {
     const result = mockHook();
     expect(result).toMatchObject({ loading: true });
   });
-
-  it('properly types the mock return value', () => {
-    const mockHook = jest.fn();
-    const mockState = createMockCharacterStore();
-
-    const typedMock = mockZustandStore(mockHook, mockState);
-
-    // This test verifies TypeScript compilation - if types are wrong, this won't compile
-    expect(jest.isMockFunction(typedMock)).toBe(true);
-  });
 });
 
 describe('createMockCharacterStore', () => {
@@ -72,13 +62,6 @@ describe('createMockCharacterStore', () => {
     expect(mock.create).toBe(customCreate);
     expect(mock.loading).toBe(true);
     expect(mock.characters).toHaveProperty('char-1');
-  });
-
-  it('returns properly typed CharacterStore', () => {
-    const mock = createMockCharacterStore();
-
-    // TypeScript compilation ensures type safety
-    expect(mock).toBeDefined();
   });
 });
 

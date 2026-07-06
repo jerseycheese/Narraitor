@@ -4,6 +4,11 @@ import { useCallback } from 'react';
 import { useJournalStore } from '@/state/journalStore';
 import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { safeTrim, truncate, getTimestamp } from '@/lib/utils';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
+import { aiFetch } from '@/lib/ai/aiFetch';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('UseActiveGameSessionJournal');
 
 const YOU_PREFIX_REGEX = /^you\s+/i; // Remove leading "you" (case-insensitive) and following whitespace
 const QUESTION_MARK_SUFFIX_REGEX = /\?$/; // Remove trailing question mark
@@ -45,8 +50,20 @@ export const useActiveGameSessionJournal = ({
     location?: string,
     decisionWeight?: 'minor' | 'major' | 'critical'
   ): Promise<{ summary: string; entryType: string; significance: string }> => {
+    // Under Playwright (E2E/visual) skip the live AI summarize call — it would
+    // hit /api/narrative/summarize with no AI key in CI, hang, and stall the
+    // page load (the visual suite's page.goto timeouts). Use the local fallback
+    // so seeded pages render deterministically. Mirrors EndingScreen (#1323).
+    if (isPlaywrightEnv()) {
+      return {
+        summary: createFallbackSummary(content),
+        entryType: 'character_event',
+        significance: decisionWeight || 'minor',
+      };
+    }
+
     try {
-      const response = await fetch('/api/narrative/summarize', {
+      const response = await aiFetch('/api/narrative/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -69,7 +86,7 @@ export const useActiveGameSessionJournal = ({
         }
       }
     } catch (error) {
-      console.warn('Failed to generate AI summary for journal entry:', error);
+      logger.warn('Failed to generate AI summary for journal entry:', error);
     }
 
     // Return fallback values using decision weight for significance
@@ -131,7 +148,7 @@ export const useActiveGameSessionJournal = ({
         updatedAt: getTimestamp(),
       });
     } catch (error) {
-      console.warn('Failed to create decision journal entry:', error);
+      logger.warn('Failed to create decision journal entry:', error);
     }
   }, [addEntry, characterId, sessionId, worldId]);
 
@@ -164,10 +181,10 @@ export const useActiveGameSessionJournal = ({
           updatedAt: getTimestamp(),
         });
       } catch (error) {
-        console.warn('Failed to create journal entry from narrative segment:', error);
+        logger.warn('Failed to create journal entry from narrative segment:', error);
       }
     }).catch(error => {
-      console.warn('Failed to generate journal summary, using fallback:', error);
+      logger.warn('Failed to generate journal summary, using fallback:', error);
       // Use fallback if AI completely fails
       try {
         const fallbackSignificance = relatedDecisionWeight || 'minor';
@@ -189,7 +206,7 @@ export const useActiveGameSessionJournal = ({
           updatedAt: getTimestamp(),
         });
       } catch (fallbackError) {
-        console.warn('Failed to create fallback journal entry:', fallbackError);
+        logger.warn('Failed to create fallback journal entry:', fallbackError);
       }
     });
   }, [addEntry, characterId, createFallbackSummary, generateJournalSummary, sessionId, worldId]);

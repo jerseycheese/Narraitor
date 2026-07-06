@@ -1,23 +1,31 @@
 // src/components/Narrative/useEndingDetection.ts
 //
-// Pure AI-based ending detection extracted from NarrativeController so the
-// controller can stay focused on orchestrating narrative generation. Sends
+// Pure AI-based ending detection, kept separate so the controller can stay
+// focused on orchestrating narrative generation. Sends
 // recent narrative context to Gemini and asks whether the story has reached
 // a natural conclusion. Only fires onEndingSuggested for medium/high
 // confidence responses; silent on any AI/parse/network failure (no fallback).
 
 import { useCallback, useEffect, useRef } from 'react';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-import { truncate, safeTrim } from '@/lib/utils';
+import { truncate } from '@/lib/utils';
+import { safeParseNarrativeAnalysis } from '@/lib/ai/parseNarrativeResponse';
 import type {
   EndingType,
   NarrativeSegment,
 } from '@/types/narrative.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('UseEndingDetection');
+
 const MIN_SEGMENTS_FOR_ANALYSIS = 3;
 const RECENT_SEGMENT_WINDOW = 5;
 const LONG_STORY_THRESHOLD = 10;
 const EARLIER_CONTEXT_TRUNCATE_CHARS = 500;
+// Outside of high-signal moments, only run the AI ending check every Nth
+// segment instead of after every single one. Natural endings cluster around
+// major events and critical outcomes, which always trigger a check below.
+const ROUTINE_CHECK_INTERVAL = 3;
 const ACCEPTED_CONFIDENCES = new Set(['high', 'medium']);
 const ACCEPTED_ENDING_TYPES = new Set<EndingType>([
   'story-complete',
@@ -31,6 +39,25 @@ interface UseEndingDetectionOptions {
   characterId?: string;
   segments: NarrativeSegment[];
   onEndingSuggested?: (reason: string, endingType: EndingType) => void;
+}
+
+/**
+ * Decides whether to spend an AI call checking for an ending on this segment.
+ * Always checks segments flagged as a major event (endings cluster there);
+ * otherwise throttles to every Nth segment. Critical decision outcomes are
+ * deliberately NOT treated as high-signal: under the rebalanced lethality a
+ * critical failure is usually a survivable setback, not an ending, so running
+ * the ending check on every critical outcome surfaced spurious "wrap it up"
+ * prompts mid-story (issue #1426). Genuinely lethal moments still end the run
+ * via the fatal-outcome tag, and climactic resolutions get majorEvent.
+ */
+function shouldRunEndingCheck(
+  segment: NarrativeSegment,
+  totalSegments: number
+): boolean {
+  if (segment.metadata?.majorEvent) return true;
+
+  return (totalSegments - MIN_SEGMENTS_FOR_ANALYSIS) % ROUTINE_CHECK_INTERVAL === 0;
 }
 
 export function useEndingDetection({
@@ -69,6 +96,8 @@ export function useEndingDetection({
 
       const allSegments = [...segments, newSegment];
       if (allSegments.length < MIN_SEGMENTS_FOR_ANALYSIS) return;
+
+      if (!shouldRunEndingCheck(newSegment, allSegments.length)) return;
 
       try {
         const client = createDefaultGeminiClient();
@@ -123,37 +152,22 @@ Respond with JSON format:
 
         const response = await client.generateContent(analysisPrompt);
 
-        try {
-          let jsonContent = response.content;
-          if (jsonContent.includes('```json')) {
-            jsonContent = jsonContent
-              .replace(/```json\s*/g, '')
-              .replace(/```\s*/g, '');
-          } else if (jsonContent.includes('```')) {
-            jsonContent = jsonContent.replace(/```\s*/g, '');
-          }
-          jsonContent = safeTrim(jsonContent);
+        const analysis = safeParseNarrativeAnalysis(response.content);
 
-          const analysis = JSON.parse(jsonContent);
+        if (
+          analysis &&
+          analysis.suggestEnding &&
+          ACCEPTED_CONFIDENCES.has(analysis.confidence)
+        ) {
+          const endingType: EndingType = ACCEPTED_ENDING_TYPES.has(analysis.endingType)
+            ? analysis.endingType
+            : 'story-complete';
 
-          if (
-            analysis.suggestEnding &&
-            ACCEPTED_CONFIDENCES.has(analysis.confidence)
-          ) {
-            const endingType: EndingType = ACCEPTED_ENDING_TYPES.has(
-              analysis.endingType
-            )
-              ? analysis.endingType
-              : 'story-complete';
-
-            endingSuggestedRef.current = true;
-            onEndingSuggested(analysis.reason, endingType);
-          }
-        } catch (parseError) {
-          console.error('Failed to parse AI ending analysis:', parseError);
+          endingSuggestedRef.current = true;
+          onEndingSuggested(analysis.reason, endingType);
         }
       } catch (error) {
-        console.error('Failed to analyze ending indicators with AI:', error);
+        logger.error('Failed to analyze ending indicators with AI:', error);
       }
     },
     [segments, onEndingSuggested]

@@ -46,14 +46,14 @@ import { SkillEditor } from '@/components/world/SkillEditor';
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
-| `worldId` | `EntityID` | ✅ | ID of the world the skill belongs to |
-| `mode` | `'create' \| 'edit'` | ✅ | Whether to create a new skill or edit existing |
-| `skillId` | `EntityID` | ⚠️ | Required for edit mode - ID of skill to edit |
-| `onSave` | `(skill: WorldSkill) => void` | ✅ | Called when skill is saved |
-| `onDelete` | `(skillId: EntityID) => void` | ❌ | Called when skill is deleted (edit mode only) |
-| `onCancel` | `() => void` | ✅ | Called when user cancels |
-| `existingAttributes` | `WorldAttribute[]` | ❌ | Available attributes for linking (default: []) |
-| `existingSkills` | `WorldSkill[]` | ❌ | Existing skills for validation (default: []) |
+| `worldId` | `EntityID` | Yes | ID of the world the skill belongs to |
+| `mode` | `'create' \| 'edit'` | Yes | Whether to create a new skill or edit existing |
+| `skillId` | `EntityID` | Conditional | Required for edit mode - ID of skill to edit |
+| `onSave` | `(skill: WorldSkill) => void` | Yes | Called when skill is saved |
+| `onDelete` | `(skillId: EntityID) => void` | No | Called when skill is deleted (edit mode only) |
+| `onCancel` | `() => void` | Yes | Called when user cancels |
+| `existingAttributes` | `WorldAttribute[]` | No | Available attributes for linking (default: []) |
+| `existingSkills` | `WorldSkill[]` | No | Existing skills for validation (default: []) |
 
 ## The Data Structure Evolution
 
@@ -76,7 +76,7 @@ interface WorldSkill extends NamedEntity {
 The validation rules are pretty straightforward, but there are a few gotchas:
 
 - **Name**: Required (1-100 characters), must be unique within the world
-- **Description**: Required (1-500 characters) 
+- **Description**: Required (1-500 characters)
 - **Attribute Links**: At least one attribute must be selected (this catches people sometimes)
 - **Value Ranges**: minValue must be less than maxValue (seems obvious, but you'd be surprised)
 - **Base Value**: Must be between minValue and maxValue

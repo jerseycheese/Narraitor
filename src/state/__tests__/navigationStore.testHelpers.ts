@@ -22,7 +22,7 @@ jest.mock('@/lib/utils/logger', () => {
 /**
  * Creates mock storage objects for sessionStorage and localStorage
  */
-export function createMockStorage() {
+function createMockStorage() {
   return {
     getItem: jest.fn(),
     setItem: jest.fn(),

@@ -14,7 +14,7 @@ This guide explains how to set up secure AI image generation for character portr
    # Add to your .env.local file (server-side only)
    GEMINI_API_KEY=your_actual_api_key_here
    ```
-   
+
    **Important**: Use `GEMINI_API_KEY` (not `NEXT_PUBLIC_GEMINI_API_KEY`) to keep the API key secure on the server side.
 
 3. **Test Image Generation**:
@@ -36,7 +36,7 @@ When a valid API key is available, the system:
 
 ### Secure Architecture
 ```
-Browser → /api/generate-portrait (Rate Limited) → Google Gemini API → Response
+Browser calls /api/generate-portrait (rate limited), which calls the Google Gemini API and returns the response
 ```
 This server-side proxy approach:
 - Keeps API keys completely secure (never exposed to browser)
@@ -138,7 +138,7 @@ With `NEXT_PUBLIC_DEBUG_LOGGING=true` in your `.env.local`, check the browser co
 5. **Check Regional Availability**: Image generation may not be available in all regions
 
 #### Getting Fallback Images Instead of Real Generation
-1. **Open Browser DevTools** → Console tab
+1. **Open Browser DevTools**, then the Console tab
 2. **Generate a portrait** and look for error messages
 3. **Common errors**:
    - `400 Bad Request`: Invalid prompt or request format
@@ -162,9 +162,9 @@ With `NEXT_PUBLIC_DEBUG_LOGGING=true` in your `.env.local`, check the browser co
 2. **Click "Generate Portrait"** in character creation
 3. **Look for these logs**:
    ```
-   API Response: {candidates: [...]}  // ✅ Success
-   API Error Response: {...}          // ❌ API Error
-   Image generation error: ...        // ❌ Network/Other Error
+   API Response: {candidates: [...]}  // Success
+   API Error Response: {...}          // API Error
+   Image generation error: ...        // Network/Other Error
    ```
 
 ## Cost Considerations

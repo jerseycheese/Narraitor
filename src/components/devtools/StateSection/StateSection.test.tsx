@@ -2,88 +2,64 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { StateSection } from './StateSection';
 
-// Mock the individual stores
+// Mock the individual stores. StateSection reads each store through its hook
+// (e.g. useWorldStore()), so the mock's call signature must return the state.
 jest.mock('@/state/worldStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({
-      worlds: { 'world-1': { id: 'world-1', name: 'Test World' } },
-      currentWorld: 'world-1'
-    })
-  });
-  return { useWorldStore: mockStore };
+  const state = {
+    worlds: { 'world-1': { id: 'world-1', name: 'Test World' } },
+    currentWorld: 'world-1'
+  };
+  return { useWorldStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/characterStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ characters: {} })
-  });
-  return { useCharacterStore: mockStore };
+  const state = { characters: {} };
+  return { useCharacterStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/npcStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ npcs: {} })
-  });
-  return { useNPCStore: mockStore };
+  const state = { npcs: {} };
+  return { useNPCStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/narrativeStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ segments: [] })
-  });
-  return { useNarrativeStore: mockStore };
+  const state = { segments: [] };
+  return { useNarrativeStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/journalStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ entries: [] })
-  });
-  return { useJournalStore: mockStore };
+  const state = { entries: [] };
+  return { useJournalStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/sessionStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ sessions: {} })
-  });
-  return { useSessionStore: mockStore };
+  const state = { sessions: {} };
+  return { useSessionStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/aiContextStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ contexts: {} })
-  });
-  return {
-    aiContextStore: mockStore,
-    useAiContextStore: mockStore
-  };
+  const state = { contexts: {} };
+  return { useAiContextStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/loreStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ lore: [] })
-  });
-  return { useLoreStore: mockStore };
+  const state = { lore: [] };
+  return { useLoreStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/navigationStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ currentPath: '/' })
-  });
-  return { useNavigationStore: mockStore };
+  const state = { currentPath: '/' };
+  return { useNavigationStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/goalStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ goals: [] })
-  });
-  return { useGoalStore: mockStore };
+  const state = { goals: [] };
+  return { useGoalStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 jest.mock('@/state/inventoryStore', () => {
-  const mockStore = Object.assign(() => {}, {
-    getState: jest.fn().mockReturnValue({ items: {} })
-  });
-  return { useInventoryStore: mockStore };
+  const state = { items: {} };
+  return { useInventoryStore: Object.assign(() => state, { getState: () => state }) };
 });
 
 // Mock the CollapsibleSection component
@@ -103,12 +79,20 @@ jest.mock('../JsonViewer', () => ({
 }));
 
 describe('StateSection', () => {
-  it('renders all store states', () => {
+  it('renders a section per store', () => {
     render(<StateSection />);
 
     expect(screen.getByTestId('devtools-state-section')).toBeInTheDocument();
 
-    // Check for world store state
+    // A titled section is rendered for each store.
     expect(screen.getByText(/useWorldStore/)).toBeInTheDocument();
+  });
+
+  it('renders the current store state, not an empty snapshot', () => {
+    render(<StateSection />);
+
+    // The value read from the store hook reaches the viewer — this is the live
+    // path that the old useMemo([]) snapshot froze.
+    expect(screen.getByText(/Test World/)).toBeInTheDocument();
   });
 });

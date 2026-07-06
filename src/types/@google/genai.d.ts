@@ -6,6 +6,7 @@ declare module '@google/genai' {
     topP?: number;
     topK?: number;
     maxOutputTokens?: number;
+    thinkingConfig?: { thinkingBudget?: number };
   }
 
   export interface SafetySetting {
@@ -13,16 +14,25 @@ declare module '@google/genai' {
     threshold: string;
   }
 
+  export interface GenerateContentResponseUsageMetadata {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+    totalTokenCount?: number;
+  }
+
   export interface GenerateContentResponse {
     text: string;
     result?: {
       finishReason: string;
     };
+    usageMetadata?: GenerateContentResponseUsageMetadata;
   }
 
   export interface GenerateContentConfig {
     generationConfig?: GenerationConfig;
     safetySettings?: SafetySetting[];
+    // Client-side cancellation only; the service still bills the request.
+    abortSignal?: AbortSignal;
   }
 
   export interface ModelInterface {

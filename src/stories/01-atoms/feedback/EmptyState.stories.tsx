@@ -29,11 +29,6 @@ const meta: Meta<typeof EmptyState> = {
     action: {
       description: 'Optional action button or element'
     },
-    variant: {
-      control: 'select',
-      options: ['default', 'centered', 'compact'],
-      description: 'Visual variant of the empty state'
-    },
     className: {
       control: 'text',
       description: 'Additional CSS classes'
@@ -68,7 +63,6 @@ export const JournalEmpty: Story = {
     title: 'This journal awaits its first entry',
     description: 'Updates will appear here as things unfold',
     icon: JournalIcon,
-    variant: 'centered',
   },
   parameters: {
     docs: {
@@ -86,7 +80,6 @@ export const WithAction: Story = {
     action: (
       <Button>Create World</Button>
     ),
-    variant: 'centered',
   },
   parameters: {
     docs: {
@@ -97,25 +90,9 @@ export const WithAction: Story = {
   },
 };
 
-export const Compact: Story = {
-  args: {
-    title: 'No results found',
-    description: 'Try adjusting your search criteria',
-    variant: 'compact',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Compact variant for smaller spaces.',
-      },
-    },
-  },
-};
-
 export const TitleOnly: Story = {
   args: {
     title: 'Nothing to show',
-    variant: 'centered',
   },
   parameters: {
     docs: {

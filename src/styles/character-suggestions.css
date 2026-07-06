@@ -1,0 +1,131 @@
+/* Character development suggestions panel (issue #305) */
+
+.character-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  font-family: var(--font-interface);
+}
+
+.character-suggestions-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.character-suggestions-lead {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.character-suggestions-generate {
+  align-self: flex-start;
+}
+
+.character-suggestions-status {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.character-suggestions-error {
+  margin: 0;
+}
+
+.character-suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.character-suggestion-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-canvas);
+}
+
+.character-suggestion-card-title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.character-suggestion-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--color-text-primary);
+}
+
+.character-suggestion-text {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.character-suggestion-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.character-suggestion-defs {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-3);
+}
+
+.character-suggestion-defs dt {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.character-suggestion-defs dd {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.character-suggestion-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.character-suggestion-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.character-suggestion-stat-name {
+  color: var(--color-text-secondary);
+}
+
+.character-suggestion-stat-value {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.character-suggestion-stat-input {
+  width: 5rem;
+}
+
+.character-suggestion-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

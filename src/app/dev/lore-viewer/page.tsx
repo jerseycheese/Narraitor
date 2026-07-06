@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { LoreViewer } from '@/components/LoreViewer';
 import { useLoreStore } from '@/state/loreStore';
 import { extractStructuredLore } from '@/lib/ai/structuredLoreExtractor';
@@ -8,11 +8,50 @@ import { useWorldStore } from '@/state/worldStore';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import type { EntityID } from '@/types';
 
+const STATUS_AUTO_DISMISS_MS = 5000;
+
+/**
+ * Show a status message that auto-clears after a single configurable delay.
+ * Replaces a previous pattern of unmanaged setTimeout calls scattered across handlers:
+ * each new message cancels the prior timer, and any pending timer is cleared on unmount.
+ */
+function useTransientStatus(autoDismissMs = STATUS_AUTO_DISMISS_MS) {
+  const [message, setMessage] = useState('');
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearPending = useCallback(() => {
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const show = useCallback((next: string, opts?: { sticky?: boolean }) => {
+    clearPending();
+    setMessage(next);
+    if (!opts?.sticky) {
+      timerRef.current = setTimeout(() => {
+        setMessage('');
+        timerRef.current = null;
+      }, autoDismissMs);
+    }
+  }, [autoDismissMs, clearPending]);
+
+  const clear = useCallback(() => {
+    clearPending();
+    setMessage('');
+  }, [clearPending]);
+
+  useEffect(() => clearPending, [clearPending]);
+
+  return { message, show, clear };
+}
+
 export default function LoreViewerTestPage() {
   const { addFact, clearFacts, getFacts, addStructuredLore, setAliases, searchFacts, findEntityByAnyName } = useLoreStore();
   const { worlds, createWorld } = useWorldStore();
+  const status = useTransientStatus();
   const [showSessionOnly, setShowSessionOnly] = useState(false);
-  const [extractionResult, setExtractionResult] = useState<string>('');
   const [customNarrative, setCustomNarrative] = useState('');
   const [worldId, setWorldId] = useState<EntityID | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,19 +114,17 @@ export default function LoreViewerTestPage() {
     
     const sampleNarrative = customNarrative || `You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares. A mysterious woman named Lady Seraphina approaches you with an urgent request. She tells you about the Lost Temple of Aethon, deep in the Whispering Woods. The temple is said to contain the Crystal of Truth, a powerful artifact. Sir Gareth, the captain of the guard, warns you that the woods are dangerous. Many adventurers have entered the Whispering Woods, but few have returned. The local tavern, The Dragon's Rest, might have more information.`;
     
+    status.show('Extracting structured lore with AI...', { sticky: true });
     try {
-      setExtractionResult('Extracting structured lore with AI...');
       const structuredLore = await extractStructuredLore(sampleNarrative);
       addStructuredLore(structuredLore, worldId, sessionId);
-      
+
       const afterCount = getFacts({ worldId }).length;
       const extracted = afterCount - beforeCount;
-      
-      setExtractionResult(`AI extracted ${extracted} new structured facts! Check all categories for rich metadata.`);
-      setTimeout(() => setExtractionResult(''), 7000);
+
+      status.show(`AI extracted ${extracted} new structured facts! Check all categories for rich metadata.`);
     } catch (error) {
-      setExtractionResult(`Failed to extract structured lore: ${error}`);
-      setTimeout(() => setExtractionResult(''), 5000);
+      status.show(`Failed to extract structured lore: ${error}`);
     }
   };
 
@@ -96,7 +133,7 @@ export default function LoreViewerTestPage() {
 
     const sampleNarrative = customNarrative || `You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares. A mysterious woman named Lady Seraphina approaches you with an urgent request. She tells you about the Lost Temple of Aethon, deep in the Whispering Woods. The temple is said to contain the Crystal of Truth, a powerful artifact. Sir Gareth, the captain of the guard, warns you that the woods are dangerous. Many adventurers have entered the Whispering Woods, but few have returned. The local tavern, The Dragon's Rest, might have more information.`;
 
-    setExtractionResult('Testing AI extraction with error handling...');
+    status.show('Testing AI extraction with error handling...', { sticky: true });
 
     try {
       const structuredLore = await extractStructuredLore(sampleNarrative);
@@ -104,12 +141,9 @@ export default function LoreViewerTestPage() {
       const afterCount = getFacts({ worldId }).length;
       const extracted = afterCount - beforeCount;
 
-      setExtractionResult(`AI extraction successful! Added ${extracted} facts with robust error handling.`);
-      setTimeout(() => setExtractionResult(''), 7000);
-
+      status.show(`AI extraction successful! Added ${extracted} facts with robust error handling.`);
     } catch (error) {
-      setExtractionResult(`AI extraction failed gracefully: ${error}`);
-      setTimeout(() => setExtractionResult(''), 5000);
+      status.show(`AI extraction failed gracefully: ${error}`);
     }
   };
 
@@ -118,12 +152,10 @@ export default function LoreViewerTestPage() {
     const characterFacts = facts.filter(f => f.category === 'characters');
 
     if (characterFacts.length === 0) {
-      setExtractionResult('Add some facts first before testing aliases!');
-      setTimeout(() => setExtractionResult(''), 3000);
+      status.show('Add some facts first before testing aliases!');
       return;
     }
 
-    // Add aliases to the first few characters
     characterFacts.slice(0, 3).forEach(fact => {
       if (fact.value.includes('Marcus')) {
         setAliases(fact.id, ['Marcus', 'The Brave', 'Hero of Willowbrook']);
@@ -132,50 +164,43 @@ export default function LoreViewerTestPage() {
       } else if (fact.value.includes('Gareth')) {
         setAliases(fact.id, ['Gareth', 'Captain', 'Guard Captain']);
       } else {
-        // Add generic aliases for other characters
         const firstName = fact.value.split(' ')[0];
         setAliases(fact.id, [firstName, fact.value]);
       }
     });
 
-    setExtractionResult('Added aliases to character facts! Check the display above.');
-    setTimeout(() => setExtractionResult(''), 5000);
+    status.show('Added aliases to character facts! Check the display above.');
   };
 
   const testAliasSearch = () => {
     if (!searchQuery.trim()) {
-      setExtractionResult('Enter a search query first!');
-      setTimeout(() => setExtractionResult(''), 3000);
+      status.show('Enter a search query first!');
       return;
     }
 
     const results = searchFacts(searchQuery, { worldId });
     const entityByName = findEntityByAnyName(searchQuery, worldId);
 
-    let message = `Search for "${searchQuery}":\n`;
-    message += `- Found ${results.length} facts via search\n`;
-    message += entityByName
-      ? `- Found exact match: ${entityByName.value}`
-      : `- No exact match found`;
-
-    setExtractionResult(message);
-    setTimeout(() => setExtractionResult(''), 7000);
+    const lines = [
+      `Search for "${searchQuery}":`,
+      `- Found ${results.length} facts via search`,
+      entityByName ? `- Found exact match: ${entityByName.value}` : `- No exact match found`,
+    ];
+    status.show(lines.join('\n'));
   };
 
   const testAliasExtraction = async () => {
     const narrativeWithAliases = `You encounter Lady Seraphina Moonwhisper in the market. The locals call her "Sera" or "The Mysterious Woman". She's accompanied by Sir Gareth "The Iron", captain of the guard, who many simply call "Captain". They speak of Goldenhaven (also known as "The Golden City" or "Haven") and its troubles. The Dragon's Rest tavern, which locals affectionately call "The Dragon" or "Dragon's", is nearby.`;
 
-    setExtractionResult('Testing AI alias extraction...');
+    status.show('Testing AI alias extraction...', { sticky: true });
 
     try {
       const structuredLore = await extractStructuredLore(narrativeWithAliases);
       addStructuredLore(structuredLore, worldId, sessionId);
 
-      setExtractionResult('AI alias extraction complete! Check if aliases were detected in the display above.');
-      setTimeout(() => setExtractionResult(''), 7000);
+      status.show('AI alias extraction complete! Check if aliases were detected in the display above.');
     } catch (error) {
-      setExtractionResult(`AI alias extraction failed: ${error}`);
-      setTimeout(() => setExtractionResult(''), 5000);
+      status.show(`AI alias extraction failed: ${error}`);
     }
   };
 
@@ -206,8 +231,7 @@ export default function LoreViewerTestPage() {
           <button
             onClick={() => {
               clearFacts(worldId);
-              setExtractionResult('All facts cleared from this world');
-              setTimeout(() => setExtractionResult(''), 3000);
+              status.show('All facts cleared from this world');
             }}
           >
             Clear All Facts
@@ -253,13 +277,13 @@ export default function LoreViewerTestPage() {
             </button>
           </div>
         </div>
-        
-        {extractionResult && (
-          <div>
-            {extractionResult}
+
+        {status.message && (
+          <div role="status" aria-live="polite" style={{ whiteSpace: 'pre-line' }}>
+            {status.message}
           </div>
         )}
-        
+
         <div>
           <label>
             Custom Narrative Text (optional - leave empty to use sample)

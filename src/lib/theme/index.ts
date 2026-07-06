@@ -20,4 +20,3 @@ export const STORAGE_KEY_THEME = 'narraitor-theme';
 export const STORAGE_KEY_COLOR_SCHEME = 'narraitor-color-scheme';
 
 export { ThemeProvider, useTheme } from './ThemeProvider';
-export type { ThemeContextValue } from './ThemeProvider';

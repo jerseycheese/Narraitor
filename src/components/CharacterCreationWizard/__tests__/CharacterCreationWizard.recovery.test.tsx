@@ -68,7 +68,6 @@ jest.mock('@/hooks/useCharacterCreationWizard', () => ({
       setValidation: jest.fn(),
     },
     steps: [
-      { id: 'template', label: 'Template' },
       { id: 'basic', label: 'Basic Info' },
     ],
     stepValidators: [],
@@ -112,10 +111,6 @@ jest.mock('@/state/worldStore', () => ({
       },
     },
   }),
-}));
-
-jest.mock('../steps/TemplateSelectionStep', () => ({
-  TemplateSelectionStep: () => <div data-testid="template-step" />,
 }));
 
 jest.mock('../steps/BasicInfoStep', () => ({

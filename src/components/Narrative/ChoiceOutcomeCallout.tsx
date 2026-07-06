@@ -3,7 +3,9 @@
 import React from 'react';
 import { EntityID } from '@/types/common.types';
 import { clsx } from 'clsx';
-import { DecisionOutcome } from '@/types/narrative.types';
+import { Consequence, DecisionOutcome } from '@/types/narrative.types';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useNPCStore } from '@/state/npcStore';
 
 interface ChoiceOutcomeCalloutProps {
   decisionId: EntityID;
@@ -11,6 +13,65 @@ interface ChoiceOutcomeCalloutProps {
   decisionOutcome?: DecisionOutcome;
   className?: string;
 }
+
+interface ConsequenceChip {
+  key: string;
+  kind: 'relationship' | 'alignment';
+  direction: 'positive' | 'negative';
+  label: string;
+}
+
+const parseTrustDelta = (value: Consequence['value']): number | undefined => {
+  if (value && typeof value === 'object' && 'trustDelta' in value) {
+    const delta = (value as { trustDelta?: unknown }).trustDelta;
+    if (typeof delta === 'number' && Number.isFinite(delta) && delta !== 0) {
+      return delta;
+    }
+  }
+  return undefined;
+};
+
+/**
+ * Maps the selected option's structured consequences to display chips.
+ * Relationship chips need a resolvable NPC name; alignment chips render by
+ * shift direction. Anything unresolvable is skipped rather than guessed.
+ */
+const buildConsequenceChips = (
+  consequences: Consequence[],
+  getNpcName: (id: EntityID) => string | undefined
+): ConsequenceChip[] => {
+  const chips: ConsequenceChip[] = [];
+
+  consequences.forEach((consequence, index) => {
+    if (consequence.type === 'relationship') {
+      const delta = parseTrustDelta(consequence.value);
+      const npcName = getNpcName(consequence.targetId);
+      if (delta === undefined || !npcName) return;
+
+      chips.push({
+        key: `relationship-${consequence.targetId}-${index}`,
+        kind: 'relationship',
+        direction: delta > 0 ? 'positive' : 'negative',
+        label: `${npcName} ${delta > 0 ? '+' : '−'}${Math.abs(delta)} trust`,
+      });
+      return;
+    }
+
+    if (consequence.type === 'alignment') {
+      const value = typeof consequence.value === 'number' ? consequence.value : 0;
+      if (value === 0) return;
+
+      chips.push({
+        key: `alignment-${index}`,
+        kind: 'alignment',
+        direction: value > 0 ? 'positive' : 'negative',
+        label: value > 0 ? 'Order rises' : 'Chaos rises',
+      });
+    }
+  });
+
+  return chips;
+};
 
 /**
  * Displays a badge indicating that a narrative segment resulted from a player decision
@@ -60,6 +121,9 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
   decisionOutcome,
   className,
 }) => {
+  const decision = useNarrativeStore((state) => state.decisions[decisionId]);
+  const getNpcById = useNPCStore((state) => state.getById);
+
   const displayDecisionText = buildOutcomeDecisionText(
     decisionText,
     decisionOutcome
@@ -68,6 +132,14 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
   const outcomeLabel = decisionOutcome
     ? outcomeLabels[decisionOutcome]
     : 'Decision Logged';
+
+  const selectedOption = decision?.options?.find(
+    (option) => option.id === decision.selectedOptionId
+  );
+  const chips = buildConsequenceChips(
+    selectedOption?.consequences ?? [],
+    (id) => getNpcById(id)?.name
+  );
 
   return (
     <div
@@ -80,6 +152,20 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     >
       <div className="choice-outcome-label">{outcomeLabel}</div>
       <p className="choice-outcome-text">{displayDecisionText}</p>
+      {chips.length > 0 && (
+        <ul className="choice-outcome-consequences">
+          {chips.map((chip) => (
+            <li
+              key={chip.key}
+              className="choice-outcome-chip"
+              data-kind={chip.kind}
+              data-direction={chip.direction}
+            >
+              {chip.label}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

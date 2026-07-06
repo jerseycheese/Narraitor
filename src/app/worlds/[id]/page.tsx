@@ -20,11 +20,9 @@ export default function WorldViewPage() {
   const world = useWorldStore((state) => state.worlds[worldId]);
   const currentWorldId = useWorldStore((state) => state.currentWorldId);
   const setCurrentWorld = useWorldStore((state) => state.setCurrentWorld);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const characters = useCharacterStore((state: any) => state.characters);
-  
-  // Check if this world has any characters
-  const worldCharacters = (Object.values(characters) as Character[]).filter(char => char.worldId === worldId);
+  const characters = useCharacterStore((state) => state.characters);
+
+  const worldCharacters = Object.values(characters).filter((char): char is Character => char.worldId === worldId);
   const isActive = currentWorldId === worldId;
 
   useEffect(() => setMounted(true), []);
@@ -98,11 +96,25 @@ export default function WorldViewPage() {
 
 
   return (
-    <PageLayout>
+    <PageLayout
+      title={world.name}
+      description={world.genre ? getGenreLabel(world.genre) : undefined}
+      actions={
+        <ActionButtonGroup
+          actions={actionButtons.map(btn => ({
+            ...btn,
+            flex: btn.variant === 'primary' || btn.variant === 'success'
+          }))}
+          layout="horizontal"
+          gap="sm"
+        />
+      }
+    >
       {/* Hero section with image or themed background */}
       <div className="world-detail-hero">
         <Hero
           title={world.name}
+          titleElement="h2"
           image={world.image?.url ? {
             url: world.image.url,
             alt: `${world.name} world`
@@ -111,8 +123,6 @@ export default function WorldViewPage() {
           theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
         />
       </div>
-
-      <ActionButtonGroup actions={actionButtons} />
 
       <section className="world-detail-body" aria-label="World details">
         <WorldDetailsDisplay world={world} />

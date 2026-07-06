@@ -21,10 +21,19 @@
   --color-text-muted: rgb(128 113 98);
   --color-text-inverse: rgb(255 255 255);
 
-  /* Sage Green accent */
-  --color-accent: rgb(124 139 111);
-  --color-accent-hover: rgb(106 119 96);
-  --color-accent-soft: rgb(124 139 111 / 12%);
+  /* Text on a filled accent surface — white in light, dark ink in dark (see dark block). */
+  --color-on-accent: rgb(255 255 255);
+
+  /* Text on filled semantic surfaces — white here, dark ink in dark mode. #1379 */
+  --color-on-success: rgb(255 255 255);
+  --color-on-danger: rgb(255 255 255);
+  --color-on-warning: rgb(255 255 255);
+
+  /* Sage Green accent — darkened so white button text clears WCAG AA (4.5:1);
+     ~5.3:1 on white vs the previous ~3.6:1, still reads as Warm Earth. */
+  --color-accent: rgb(99 111 89);
+  --color-accent-hover: rgb(82 92 73);
+  --color-accent-soft: rgb(99 111 89 / 12%);
 
   /* shadcn/ui HSL tokens */
   --background: 40 33% 97%;
@@ -42,15 +51,15 @@
   --muted-foreground: 20 13% 46%;
   --accent: 33 23% 93%;
   --accent-foreground: 20 17% 15%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 100%;
   --border: 30 20% 83%;
   --input: 30 20% 83%;
   --ring: 104 11% 49%;
   --radius: 0.75rem;
 
   /* Extended semantic tokens */
-  --success: 142 71% 45%;
+
+  /* Darkened from 45% so the filled .button-success (Play) carries white text at WCAG AA: white on #16833E = 4.83:1. See #1387. Dark mode is left to #1379. */
+  --success: 142 71% 30%;
   --success-foreground: 210 40% 98%;
   --success-text: 154 86% 20%;
   --success-background: 142 50% 88%;
@@ -129,24 +138,10 @@
   --color-danger: rgb(185 28 28);
   --color-danger-hover: rgb(153 27 27);
 
-  /* Spacing scale (Tailwind-aligned) */
-  --space-0_5: 0.125rem;
-  --space-1:   0.25rem;
-  --space-1_5: 0.375rem;
-  --space-2:   0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3:   0.75rem;
-  --space-3_5: 0.875rem;
-  --space-4:   1rem;
-  --space-5:   1.25rem;
-  --space-6:   1.5rem;
-  --space-8:   2rem;
-
-  /* Radius tokens */
+  /* Radius tokens (per-theme; --radius-full lives in _shared-tokens.css) */
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-full: 9999px;
 }
 
 /* DS2 Dark Mode */
@@ -160,9 +155,18 @@
   --color-text-secondary: rgb(212 201 186);
   --color-text-muted: rgb(156 141 126);
   --color-text-inverse: rgb(255 255 255);
+  --color-on-accent: rgb(26 22 20);
+
+  /* Dark ink on the light semantic fills so filled buttons clear AA in dark mode. #1379 */
+  --color-on-success: rgb(26 22 20);
+  --color-on-danger: rgb(26 22 20);
+  --color-on-warning: rgb(26 22 20);
 
   --color-accent: rgb(156 170 138);
-  --color-accent-hover: rgb(176 190 160);
+
+  /* Hover darkens (not lightens) so white button/CTA text stays legible in dark
+   * mode — white-on-hover ~5.3:1. Base-state contrast tracked separately (#1379). */
+  --color-accent-hover: rgb(99 111 89);
   --color-accent-soft: rgb(156 170 138 / 15%);
 
   --background: 17 13% 9%;
@@ -180,8 +184,6 @@
   --muted-foreground: 30 10% 55%;
   --accent: 20 10% 16%;
   --accent-foreground: 33 23% 94%;
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 210 40% 98%;
   --border: 17 12% 21%;
   --input: 17 12% 21%;
   --ring: 104 14% 60%;
@@ -259,25 +261,6 @@
   --shadow-drawer: -12px 0 24px rgb(0 0 0 / 40%);
   --color-danger: rgb(239 68 68);
   --color-danger-hover: rgb(220 38 38);
-
-  /* Spacing scale (Tailwind-aligned) */
-  --space-0_5: 0.125rem;
-  --space-1:   0.25rem;
-  --space-1_5: 0.375rem;
-  --space-2:   0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3:   0.75rem;
-  --space-3_5: 0.875rem;
-  --space-4:   1rem;
-  --space-5:   1.25rem;
-  --space-6:   1.5rem;
-  --space-8:   2rem;
-
-  /* Radius tokens */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-full: 9999px;
 }
 
 /* DS2 Background Pattern - Clean, no grid */

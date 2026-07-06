@@ -1,24 +1,50 @@
 import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
 import { validateWorld } from '@/lib/utils/typeGuards';
-import { 
-  GeneratedCharacterData, 
-  CharacterGenerationOptions, 
-  CharacterGenerationType, 
-  CHARACTER_LEVEL_RANGE,
-  generateFromTemplate
-} from './characterTemplates';
 
-// Re-export types and template generator for backward compatibility
-export * from './characterTemplates';
+// Character level range for generated characters
+const CHARACTER_LEVEL_RANGE = { min: 1, max: 5 };
+
+export interface GeneratedCharacterData {
+  name: string;
+  background: {
+    description: string;
+    personality: string;
+    motivation: string;
+    fears: string[];
+    physicalDescription?: string;
+  };
+  attributes: Array<{
+    id: string;
+    value: number;
+  }>;
+  skills: Array<{
+    id: string;
+    level: number;
+  }>;
+  level: number;
+  isKnownFigure?: boolean;
+  characterType?: 'protagonist' | 'antagonist' | 'supporting' | 'original';
+}
+
+export type CharacterGenerationType = 'known' | 'original' | 'specific';
+
+interface CharacterGenerationOptions {
+  world: World;
+  existingNames?: string[];
+  suggestedName?: string;
+  generationType?: CharacterGenerationType;
+  /** Free-text character concept from the user, used to steer AI suggestions. */
+  concept?: string;
+}
 
 const logger = new Logger('CharacterGenerator');
 
 /**
  * Generate character using AI
  */
-async function generateWithAI(options: CharacterGenerationOptions): Promise<GeneratedCharacterData> {
-  const { world, existingNames = [], suggestedName, generationType = 'known' } = options;
+async function generateWithAI(options: CharacterGenerationOptions, apiKey?: string | null): Promise<GeneratedCharacterData> {
+  const { world, existingNames = [], suggestedName, generationType = 'known', concept } = options;
   
   // Validate the world data first
   const worldValidation = validateWorld(world);
@@ -44,6 +70,7 @@ You are creating a character for a ${world.genre} genre world${world.reference ?
 ${world.reference && world.relationship === 'set_within' ? `\nIMPORTANT: This world is set within the ${world.reference} universe. Characters must be from ${world.reference}.` : ''}
 ${world.reference && world.relationship === 'inspired_by' ? `\nThis world is inspired by ${world.reference} but has original characters.` : ''}
 ${world.description ? `\nWorld Context: ${world.description}` : ''}
+${concept ? `\nThe user describes this character concept: "${concept}". Build the character around this concept, fitting it to the world's theme and genre.` : ''}
 ${suggestedName ? `\nThe character should be named: "${suggestedName}"` : ''}
 ${existingNames.length > 0 ? `\nIMPORTANT: These character names already exist and must NOT be used: ${existingNames.join(', ')}` : ''}
 
@@ -101,7 +128,7 @@ CRITICAL INSTRUCTIONS:
 
     // Import and use the AI client directly for server-side usage
     const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
-    const client = createDefaultGeminiClient();
+    const client = createDefaultGeminiClient(apiKey);
     
     // Generate with AI
     const response = await client.generateContent(prompt);
@@ -324,31 +351,18 @@ CRITICAL INSTRUCTIONS:
 
     return characterData;
   } catch (error) {
-    // Don't fall back for certain types of validation errors
+    // Re-throw duplicate name errors immediately
     if (error instanceof Error && error.message.includes('already exists in this world')) {
-      throw error; // Re-throw duplicate name errors immediately
+      throw error;
     }
-    
+
     logger.error('CharacterGenerator', 'AI generation failed:', error);
-    
-    // For known figures, we should never fall back to template generation
+
     if (generationType === 'known' || generationType === 'specific') {
       throw new Error(`Failed to generate known character from ${world.reference || 'this world'}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-    
-    // Only fall back to template generation for original characters
-    try {
-      return generateFromTemplate({ 
-        method: 'template', 
-        world, 
-        existingNames, 
-        suggestedName,
-        generationType 
-      });
-    } catch (templateError) {
-      logger.error('CharacterGenerator', 'Template generation also failed:', templateError);
-      throw error; // Throw the original AI error
-    }
+
+    throw new Error(`Failed to generate character: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -356,13 +370,15 @@ export async function generateAICharacter(
   world: World,
   existingCharacterNames: string[],
   suggestedName?: string,
-  generationType: CharacterGenerationType = 'known'
+  generationType: CharacterGenerationType = 'known',
+  concept?: string,
+  apiKey?: string | null
 ): Promise<GeneratedCharacterData> {
   return generateWithAI({
-    method: 'ai',
     world,
     existingNames: existingCharacterNames,
     suggestedName,
-    generationType
-  });
+    generationType,
+    concept
+  }, apiKey);
 }

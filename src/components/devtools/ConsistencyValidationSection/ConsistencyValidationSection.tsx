@@ -3,11 +3,25 @@
 import React, { useState, useMemo } from 'react';
 import { useLoreStore } from '@/state/loreStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useContinuityStore } from '@/state/continuityStore';
 import { generateConsistencyInstructions } from '@/lib/ai/consistencyInstructions';
 import { buildLoreContext } from '@/lib/lore/loreContext';
 import { JsonViewer } from '@/components/devtools/JsonViewer';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
+import type { ContinuityStatus } from '@/types/continuity.types';
+
+const CONTINUITY_BADGE_VARIANTS: Record<
+  ContinuityStatus,
+  'success-static' | 'info-static' | 'warning-static'
+> = {
+  clean: 'success-static',
+  corrected: 'info-static',
+  flagged: 'warning-static',
+};
 
 /**
  * Consistency Validation Debug Section
@@ -45,6 +59,7 @@ export const ConsistencyValidationSection = () => {
   const [selectedWorldId, setSelectedWorldId] = useState<string>('');
   const { facts, getFacts } = useLoreStore();
   const { worlds } = useWorldStore();
+  const { results: continuityResults, clear: clearContinuityResults } = useContinuityStore();
 
   // Get available world IDs from lore facts
   const availableWorldIds = useMemo(() => {
@@ -91,6 +106,60 @@ export const ConsistencyValidationSection = () => {
 
   return (
     <div>
+      {/* Runtime continuity guardrail results (#409/#412) */}
+      <DevToolsSection title="Runtime Validation" className="devtools-continuity-validation">
+        <div data-testid="devtools-continuity-validation">
+          {continuityResults.length === 0 ? (
+            <p className="devtools-continuity-validation-empty">
+              No segments validated yet this session.
+            </p>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearContinuityResults}
+                data-testid="continuity-validation-clear"
+              >
+                Clear
+              </Button>
+              {[...continuityResults].reverse().map((result) => (
+                <div
+                  key={result.id}
+                  className="devtools-continuity-validation-entry"
+                  data-testid={`continuity-validation-result-${result.id}`}
+                >
+                  <div>
+                    <Badge variant={CONTINUITY_BADGE_VARIANTS[result.status]} size="sm">
+                      {result.status}
+                    </Badge>{' '}
+                    <span>{new Date(result.timestamp).toLocaleTimeString()}</span>
+                    {' — '}
+                    <span>
+                      detection {result.detectionMs}ms
+                      {result.correctionMs !== undefined
+                        ? `, correction ${result.correctionMs}ms`
+                        : ''}
+                    </span>
+                  </div>
+                  {result.issues.length > 0 && (
+                    <div>
+                      Issues:{' '}
+                      {result.issues
+                        .map((issue) => `${issue.entity} (${issue.type})`)
+                        .join(', ')}
+                    </div>
+                  )}
+                  <CollapsibleSection title="Details" initialCollapsed={true}>
+                    <JsonViewer data={result} />
+                  </CollapsibleSection>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </DevToolsSection>
+
       {/* World Selection */}
       <DevToolsSection>
         <label>

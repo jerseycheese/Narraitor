@@ -142,5 +142,8 @@ describe('NarrativeController context summary persistence', () => {
         contextSummary: 'A tense standoff unfolds at the crossroads.',
       })
     );
+
+    // Post-hydration choice generation should fire exactly once (no double-trigger).
+    expect(addDecision).toHaveBeenCalledTimes(1);
   });
 });

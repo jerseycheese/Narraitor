@@ -28,3 +28,13 @@ export const NoSkills: Story = {
     } as never,
   },
 };
+
+/** Alignment row + meter appear once a choice has shifted the axis (#468). */
+export const WithAlignment: Story = {
+  args: {
+    character: {
+      ...mockCharacter,
+      alignment: -42,
+    } as never,
+  },
+};

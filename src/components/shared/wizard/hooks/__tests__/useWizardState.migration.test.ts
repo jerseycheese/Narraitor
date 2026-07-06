@@ -130,6 +130,83 @@ describe('useWizardState - localStorage migration', () => {
     expect(result.current.state.currentStep).toBe(0);
   });
 
+  test('ignores persisted value that is not a wizard state', () => {
+    // A persistKey can hold a value that isn't a WizardState (foreign writer,
+    // manual edit, corruption). It must not be spread into state, since it
+    // lacks required fields like `errors` and `currentStep`.
+    localStorageMock.getItem.mockReturnValue(
+      JSON.stringify({ completed: true, completedAt: 1778435386391 })
+    );
+
+    const initialData: TestData = {
+      name: '',
+      genre: 'fantasy',
+      worldTypeData: {
+        worldType: 'original',
+        worldReference: '',
+        additionalDetails: ''
+      }
+    };
+
+    const { result } = renderHook(() =>
+      useWizardState({
+        steps: [{ id: 'test', label: 'Test' }],
+        initialData,
+        onComplete: () => {},
+        persistKey: 'test-wizard',
+      })
+    );
+
+    expect(result.current.state.data).toEqual(initialData);
+    expect(result.current.state.currentStep).toBe(0);
+    expect(result.current.state.errors).toEqual({});
+    expect(result.current.currentError).toBeUndefined();
+  });
+
+  test('rebuilds missing top-level fields from a partial persisted state', () => {
+    // Persisted state missing `errors` (e.g. from an older schema) must not
+    // leave `state.errors` undefined.
+    localStorageMock.getItem.mockReturnValue(
+      JSON.stringify({
+        currentStep: 1,
+        data: {
+          name: 'Partial World',
+          genre: 'fantasy',
+          worldTypeData: {
+            worldType: 'original',
+            worldReference: '',
+            additionalDetails: ''
+          }
+        },
+      })
+    );
+
+    const initialData: TestData = {
+      name: '',
+      genre: 'fantasy',
+      worldTypeData: {
+        worldType: 'original',
+        worldReference: '',
+        additionalDetails: ''
+      }
+    };
+
+    const { result } = renderHook(() =>
+      useWizardState({
+        steps: [{ id: 'test', label: 'Test' }],
+        initialData,
+        onComplete: () => {},
+        persistKey: 'test-wizard',
+      })
+    );
+
+    expect(result.current.state.currentStep).toBe(1);
+    expect(result.current.state.data.name).toBe('Partial World');
+    expect(result.current.state.errors).toEqual({});
+    expect(result.current.state.validation).toEqual({});
+    expect(result.current.state.isProcessing).toBe(false);
+  });
+
   test('computes initial step validation on first render when validateStep is provided', () => {
     localStorageMock.getItem.mockReturnValue(null);
 

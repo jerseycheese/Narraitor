@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import { useNavigationStore } from '@/state/navigationStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import { Button } from '@/components/ui/button';
-import { Clock, X, List } from 'lucide-react';
+import { Clock, X } from 'lucide-react';
 import { formatRelativeTime, capitalize } from '@/lib/utils';
 import {
-  headerDropdownDividerClass,
   headerDropdownHeaderClass,
   headerDropdownItemClass,
   headerDropdownMenuClass,
@@ -184,19 +182,6 @@ export function RecentPagesDropdown({
               {index < recentPages.length - 1 && <div />}
             </div>
           ))}
-
-          {recentPages.length > 0 && (
-            <div className={headerDropdownDividerClass}>
-              <Link
-                href="/recent"
-                className={`${headerDropdownItemClass}`}
-                onClick={() => setShowRecentPages(false)}
-              >
-                <List aria-hidden="true" />
-                View all recent pages
-              </Link>
-            </div>
-          )}
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { CharacterDeletionService } from '../characterDeletionService';
+import { deleteCharacterWithCleanup } from '../characterDeletionService';
 import { useJournalStore } from '@/state/journalStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { JournalEntryType } from '@/types/journal.types';
@@ -90,6 +90,7 @@ describe('CharacterDeletionService', () => {
     getAll: jest.fn(),
     createCharacter: jest.fn(),
     updateCharacter: jest.fn(),
+    applyAlignmentShift: jest.fn(),
     deleteCharacter: jest.fn(),
     setCurrentCharacter: jest.fn(),
     addAttribute: jest.fn(),
@@ -123,7 +124,7 @@ describe('CharacterDeletionService', () => {
 
   describe('deleteCharacterWithCleanup', () => {
     test('deletes character and cleans up related journal sessions', async () => {
-      await CharacterDeletionService.deleteCharacterWithCleanup('char-1');
+      await deleteCharacterWithCleanup('char-1');
 
       // Should clean up journal sessions for this character
       expect(mockJournalStore.deleteSessionEntries).toHaveBeenCalledWith(
@@ -147,7 +148,7 @@ describe('CharacterDeletionService', () => {
 
       // Should not throw an error
       await expect(
-        CharacterDeletionService.deleteCharacterWithCleanup('char-1')
+        deleteCharacterWithCleanup('char-1')
       ).resolves.toBeUndefined();
 
       // Character deletion should still proceed
@@ -156,7 +157,7 @@ describe('CharacterDeletionService', () => {
 
     test('handles character with no journal entries', async () => {
       // Character with no journal entries
-      await CharacterDeletionService.deleteCharacterWithCleanup('char-3');
+      await deleteCharacterWithCleanup('char-3');
 
       // Should not call any journal cleanup
       expect(mockJournalStore.deleteSessionEntries).not.toHaveBeenCalled();
@@ -174,7 +175,7 @@ describe('CharacterDeletionService', () => {
 
       // Should not throw an error
       await expect(
-        CharacterDeletionService.deleteCharacterWithCleanup('char-1')
+        deleteCharacterWithCleanup('char-1')
       ).resolves.toBeUndefined();
 
       // Character deletion should still proceed

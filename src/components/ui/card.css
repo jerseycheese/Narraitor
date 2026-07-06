@@ -1,0 +1,58 @@
+/* Card — global semantic styles for src/components/ui/card.tsx (#1317)
+ *
+ * Follows the badge.css / dialog.css precedent: token-based base styling lives
+ * in production so the app and the living style guide render the same component.
+ * Per-theme look comes from the design tokens resolving under the active
+ * `data-theme` scope (src/lib/theme/themes/ds{1,2,3}.css) — no hardcoded colors.
+ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.card-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Description is prose the user reads (helper/explanatory copy), so it uses the
+ * interface sans in sentence case at body size — not the mono/uppercase "kicker"
+ * treatment, which fails legibility for instructional content (DESIGN.md reserves
+ * font-system + text-muted for IDs/debug, not copy). */
+.card-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.card-content {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-narrative);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.card-footer {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-4);
+}

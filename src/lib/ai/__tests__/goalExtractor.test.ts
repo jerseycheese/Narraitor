@@ -1,6 +1,10 @@
-// src/lib/ai/__tests__/goalExtractor.test.ts
+// src/lib/ai/__tests__/test.ts
 
-import { goalExtractor } from '../goalExtractor';
+import {
+  extractGoalsFromNarrative,
+  detectGoalCompletion,
+  buildGoalContext,
+} from '../goalExtractor';
 import { NarrativeGoal, GoalExtractionRequest } from '../../../types/goal.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
@@ -27,7 +31,7 @@ describe('goalExtractor', () => {
         existingGoals: [],
       };
 
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      const result = await extractGoalsFromNarrative(request);
 
       expect(result.newGoals).toHaveLength(1);
       expect(result.newGoals[0].title).toContain('investigate');
@@ -48,7 +52,7 @@ describe('goalExtractor', () => {
         existingGoals: [],
       };
 
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      const result = await extractGoalsFromNarrative(request);
 
       expect(result.newGoals).toHaveLength(1);
       expect(result.newGoals[0].title).toMatch(/key|find|unlock|door/i);
@@ -82,7 +86,7 @@ describe('goalExtractor', () => {
         existingGoals: [existingGoal],
       };
 
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      const result = await extractGoalsFromNarrative(request);
 
       expect(result.completedGoals).toContain('goal-123');
       expect(result.updatedGoals).toHaveLength(1);
@@ -115,7 +119,7 @@ describe('goalExtractor', () => {
         existingGoals: [existingGoal],
       };
 
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      const result = await extractGoalsFromNarrative(request);
 
       expect(result.updatedGoals).toHaveLength(1);
       expect(result.updatedGoals[0].goalId).toBe('goal-456');
@@ -133,7 +137,7 @@ describe('goalExtractor', () => {
         existingGoals: [],
       };
 
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      const result = await extractGoalsFromNarrative(request);
 
       expect(result.newGoals).toHaveLength(3);
       
@@ -155,7 +159,7 @@ describe('goalExtractor', () => {
         existingGoals: [],
       };
 
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      const result = await extractGoalsFromNarrative(request);
 
       expect(result.newGoals).toHaveLength(2);
       
@@ -186,7 +190,7 @@ describe('goalExtractor', () => {
 
       const narrativeContent = 'With a satisfying click, the chest opens to reveal a treasure trove of golden coins and precious gems.';
 
-      const isComplete = await goalExtractor.detectGoalCompletion(goal, narrativeContent);
+      const isComplete = await detectGoalCompletion(goal, narrativeContent);
 
       expect(isComplete).toBe(true);
     });
@@ -208,7 +212,7 @@ describe('goalExtractor', () => {
 
       const narrativeContent = 'The tavern burns down completely, leaving nothing but ashes and rubble. The fire department says it was an electrical fault.';
 
-      const isComplete = await goalExtractor.detectGoalCompletion(goal, narrativeContent);
+      const isComplete = await detectGoalCompletion(goal, narrativeContent);
 
       expect(isComplete).toBe(true);
     });
@@ -230,7 +234,7 @@ describe('goalExtractor', () => {
 
       const narrativeContent = 'You practice your fire spell in the academy courtyard, managing to create a small flame that dances in your palm.';
 
-      const isComplete = await goalExtractor.detectGoalCompletion(goal, narrativeContent);
+      const isComplete = await detectGoalCompletion(goal, narrativeContent);
 
       expect(isComplete).toBe(false);
     });
@@ -269,7 +273,7 @@ describe('goalExtractor', () => {
         }
       ];
 
-      const context = goalExtractor.buildGoalContext(goals, 500);
+      const context = buildGoalContext(goals, 500);
 
       expect(context.activeGoals).toHaveLength(2);
       expect(context.criticalGoals).toHaveLength(1);
@@ -309,7 +313,7 @@ describe('goalExtractor', () => {
         }
       ];
 
-      const context = goalExtractor.buildGoalContext(goals, 50); // Very limited tokens
+      const context = buildGoalContext(goals, 50); // Very limited tokens
 
       expect(context.contextText).toContain('collapsing building');
       expect(context.contextText).not.toContain('groceries');
@@ -326,7 +330,7 @@ describe('goalExtractor', () => {
         existingGoals: [],
       };
 
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      const result = await extractGoalsFromNarrative(request);
 
       expect(result.newGoals).toHaveLength(0);
       expect(result.updatedGoals).toHaveLength(0);
@@ -346,7 +350,7 @@ describe('goalExtractor', () => {
       };
 
       // This should not throw but return empty result
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      const result = await extractGoalsFromNarrative(request);
 
       expect(result.newGoals).toHaveLength(0);
       expect(result.confidence).toBe(0);
@@ -368,13 +372,12 @@ describe('goalExtractor', () => {
         existingGoals: [malformedGoal],
       };
 
-      // Should handle gracefully and not crash
-      const result = await goalExtractor.extractGoalsFromNarrative(request);
+      // Should handle gracefully and not crash, returning empty arrays
+      const result = await extractGoalsFromNarrative(request);
 
-      expect(result).toBeDefined();
-      expect(result.newGoals).toBeDefined();
-      expect(result.updatedGoals).toBeDefined();
-      expect(result.completedGoals).toBeDefined();
+      expect(result.newGoals).toEqual([]);
+      expect(result.updatedGoals).toEqual([]);
+      expect(result.completedGoals).toEqual([]);
     });
   });
 });

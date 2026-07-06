@@ -2,7 +2,7 @@
 title: Visual Testing Best Practices
 tags: [testing, best-practices, visual-testing, playwright, guidelines]
 created: 2025-08-20
-updated: 2025-08-21
+updated: 2026-05-23
 ---
 
 # What actually works for visual testing
@@ -27,6 +27,18 @@ Here's what I've learned about writing visual tests that catch real issues witho
 
 ## Writing Effective Visual Tests
 
+### Cover All Design Systems by Default
+
+Narraitor ships three structurally different design systems, so user-facing visual coverage should normally test all three: DS1, DS2, and DS3. A one-theme screenshot can miss the same class of problem a Drupal site would miss if QA only reviewed the default theme and never checked the alternate theme implementation.
+
+Use one of these patterns:
+
+- **Small surface**: loop over `['ds1', 'ds2', 'ds3']` and capture one baseline per theme.
+- **Long workflow**: keep the full sequential workflow in one theme, then add a focused theme-differentiation spec that captures the shared surface or representative state once in DS1, DS2, and DS3.
+- **Known exception**: leave an inline comment explaining why only one theme is covered and link to the tracking issue if the gap is temporary.
+
+Snapshot names should include the design-system id, such as `dashboard-ds3.png` or `wizard-character-ds2.png`.
+
 ### Split Testing Strategy (2025 Best Practice)
 
 **Use different tolerance levels for different content types**:
@@ -38,7 +50,7 @@ test('AI content with permissive thresholds', async ({ page }) => {
     page.locator('p').filter({ hasText: /The .* (adventure|quest|journey)/ }),
     page.locator('[role="radiogroup"] label'), // AI-generated choices
   ];
-  
+
   await expect(page).toHaveScreenshot('game-session-dynamic.png', {
     mask: dynamicContentAreas,
     maxDiffPixels: 410000,  // High tolerance for AI content variation
@@ -49,7 +61,7 @@ test('AI content with permissive thresholds', async ({ page }) => {
 test('static UI with strict thresholds', async ({ page }) => {
   // For stable UI components that should not change
   const staticComponent = page.locator('[data-testid="navigation-header"]');
-  
+
   await expect(staticComponent).toHaveScreenshot('navigation-header.png', {
     maxDiffPixels: 500,     // Low tolerance for static elements
     threshold: 0.2          // 20% tolerance - catch real regressions
@@ -71,7 +83,7 @@ test.describe('Authentication Interface', () => {
   test('login form layout', async ({ page }) => {
     // Test implementation
   });
-  
+
   test('password reset flow', async ({ page }) => {
     // Test implementation
   });
@@ -80,11 +92,11 @@ test.describe('Authentication Interface', () => {
 
 **Use descriptive test and screenshot names**:
 ```typescript
-// ✅ Good: Clear, specific names
+// Good: Good: Clear, specific names
 await expect(page).toHaveScreenshot('checkout-payment-form-desktop.png');
 await expect(errorMessage).toHaveScreenshot('validation-error-empty-email.png');
 
-// ❌ Bad: Vague, generic names
+// Avoid: Bad: Vague, generic names
 await expect(page).toHaveScreenshot('test1.png');
 await expect(element).toHaveScreenshot('component.png');
 ```
@@ -98,7 +110,7 @@ test('dashboard with consistent timestamps', async ({ page }) => {
   await page.addInitScript(() => {
     Date.now = () => new Date('2025-01-01T12:00:00Z').getTime();
   });
-  
+
   await page.goto('/dashboard');
   await expect(page).toHaveScreenshot('dashboard-consistent-time.png');
 });
@@ -118,7 +130,7 @@ test('character list with stable data', async ({ page }) => {
       }
     });
   });
-  
+
   await page.goto('/characters');
   await expect(page).toHaveScreenshot('character-list-stable.png');
 });
@@ -128,7 +140,7 @@ test('character list with stable data', async ({ page }) => {
 ```typescript
 test('dashboard hiding dynamic elements', async ({ page }) => {
   await page.goto('/dashboard');
-  
+
   // Hide elements that change frequently
   await page.addStyleTag({
     content: `
@@ -137,7 +149,7 @@ test('dashboard hiding dynamic elements', async ({ page }) => {
       }
     `
   });
-  
+
   await expect(page).toHaveScreenshot('dashboard-no-dynamic-content.png');
 });
 ```
@@ -149,13 +161,13 @@ test('dashboard hiding dynamic elements', async ({ page }) => {
 async function waitForAppReady(page) {
   // Wait for network requests to complete
   await page.waitForLoadState('networkidle', { timeout: 30000 });
-  
+
   // Wait for main content to appear
   await page.waitForSelector('main', { timeout: 15000 });
-  
+
   // Wait for fonts to load (critical for consistent rendering)
   await page.waitForFunction(() => document.fonts.ready, { timeout: 10000 });
-  
+
   // Additional stabilization time
   await page.waitForTimeout(2000);
 }
@@ -165,13 +177,13 @@ async function waitForAppReady(page) {
 ```typescript
 test('component after data loads', async ({ page }) => {
   await page.goto('/data-view');
-  
+
   // Wait for specific content to indicate loading is complete
   await page.waitForSelector('[data-testid="data-loaded"]');
-  
+
   // Wait for animations to complete
   await page.waitForTimeout(1000);
-  
+
   await expect(page).toHaveScreenshot('data-view-loaded.png');
 });
 ```
@@ -182,11 +194,11 @@ test('component after data loads', async ({ page }) => {
 ```typescript
 test('button component states', async ({ page }) => {
   await page.goto('/dev/button-showcase');
-  
+
   // Test individual component states
   const primaryButton = page.locator('[data-testid="primary-button"]');
   await expect(primaryButton).toHaveScreenshot('button-primary.png');
-  
+
   const disabledButton = page.locator('[data-testid="disabled-button"]');
   await expect(disabledButton).toHaveScreenshot('button-disabled.png');
 });
@@ -197,7 +209,7 @@ test('button component states', async ({ page }) => {
 test('complete checkout flow', async ({ page }) => {
   await page.goto('/checkout');
   await waitForAppReady(page);
-  
+
   // Test entire page layout
   await expect(page).toHaveScreenshot('checkout-full-page.png', {
     fullPage: true
@@ -241,12 +253,12 @@ test('responsive navigation component', async ({ page }) => {
     { name: 'tablet', width: 768, height: 1024 },
     { name: 'desktop', width: 1280, height: 720 }
   ];
-  
+
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     await page.goto('/');
     await waitForAppReady(page);
-    
+
     const navigation = page.locator('nav');
     await expect(navigation).toHaveScreenshot(`navigation-${viewport.name}.png`);
   }
@@ -281,25 +293,44 @@ test('responsive navigation component', async ({ page }) => {
 
 **Recommended approach**:
 1. **Generate baselines locally** where you can see changes
-2. **Use appropriate tolerances** for CI environment differences  
+2. **Use appropriate tolerances** for CI environment differences
 3. **Test locally first** before pushing to CI
 4. **Review visual diffs** in test results when CI fails
+
+**CI-adopted baselines (important exception)**:
+Visual regression runs on `macos-latest`. Most baselines (wizard, tour flows) match a
+local Mac within tolerance, so regenerating them locally is fine. But some content-heavy
+pages — `dashboard-themes`, `main-pages` (home, home-empty-state, world-edit,
+character-edit), and `theme-switcher` (theme-ds*-home) — do **not** match local renders
+and have their baselines **adopted from CI output**. For these:
+- Do **not** regenerate locally (it will pass locally but fail in CI).
+- After an intentional change, let the `E2E Tests` check fail, then download the failed
+  shard artifacts — `gh run download <run-id> --pattern 'e2e-test-failures-shard*'` (the E2E
+  job is sharded, so artifacts are named `e2e-test-failures-shard1` / `-shard2`; only failed
+  shards upload). Or just run `./scripts/download-playwright-report.sh <pr>`, which handles
+  this. Verify each `*-actual.png` is a correct render (not a seeding/empty flake), and copy
+  the verified actuals over the corresponding `*-chromium-darwin.png` baselines.
+
+**Parallel-load flakiness**: worker concurrency against the single `next dev` server can time
+out navigations / `waitForStoreReady` (store hydration). CI runs the E2E job sharded with
+`--workers=1` per shard to avoid this (see `.github/workflows/ci.yml`). Locally, re-run the
+affected specs with `--workers=1` — they pass reliably when not competing for the dev server.
 
 ## Baseline Management and Review Process
 
 ### When to Update Baselines
 
 **Update baselines for**:
-- ✅ Intentional design changes
-- ✅ Component library updates
-- ✅ Approved UI improvements
-- ✅ Brand guideline changes
+- Intentional design changes
+- Component library updates
+- Approved UI improvements
+- Brand guideline changes
 
 **Don't update baselines for**:
-- ❌ Unexplained test failures
-- ❌ Random CI failures
-- ❌ "Making tests pass" without investigation
-- ❌ Platform-specific rendering differences
+- Unexplained test failures
+- Random CI failures
+- "Making tests pass" without investigation
+- Platform-specific rendering differences
 
 ### Review Process
 
@@ -331,7 +362,7 @@ git commit -m "feat: update visual baselines for new button styles"
 
 ## Common Anti-Patterns to Avoid
 
-### ❌ Testing Implementation Details
+### Anti-pattern: Testing Implementation Details
 ```typescript
 // Bad: Testing CSS classes or implementation
 await expect(page.locator('.btn-primary')).toHaveClass('btn btn-primary');
@@ -340,7 +371,7 @@ await expect(page.locator('.btn-primary')).toHaveClass('btn btn-primary');
 await expect(page.locator('[data-testid="primary-button"]')).toHaveScreenshot('button-primary.png');
 ```
 
-### ❌ Overly Broad Screenshots
+### Anti-pattern: Overly Broad Screenshots
 ```typescript
 // Bad: Full page when component would suffice
 await expect(page).toHaveScreenshot('entire-page-for-button-test.png');
@@ -349,7 +380,7 @@ await expect(page).toHaveScreenshot('entire-page-for-button-test.png');
 await expect(page.locator('[data-testid="submit-button"]')).toHaveScreenshot('submit-button.png');
 ```
 
-### ❌ Ignoring Dynamic Content
+### Anti-pattern: Ignoring Dynamic Content
 ```typescript
 // Bad: Not handling changing content
 test('dashboard with live data', async ({ page }) => {
@@ -367,7 +398,7 @@ test('dashboard with stable data', async ({ page }) => {
 });
 ```
 
-### ❌ Inconsistent Wait Strategies
+### Anti-pattern: Inconsistent Wait Strategies
 ```typescript
 // Bad: Arbitrary waits
 await page.waitForTimeout(5000); // Hope everything loads

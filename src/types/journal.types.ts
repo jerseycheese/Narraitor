@@ -1,6 +1,6 @@
 // src/types/journal.types.ts
 
-import { EntityID, TimestampedEntity } from './common.types';
+import { EntityID, TimestampedEntity, GeneratedImage } from './common.types';
 
 /**
  * Represents a journal entry in the game
@@ -40,7 +40,7 @@ export type JournalEntryType =
 /**
  * Represents an entity related to a journal entry
  */
-export interface RelatedEntity {
+interface RelatedEntity {
   type: 'character' | 'item' | 'location' | 'event';
   id: EntityID;
   name: string;
@@ -49,7 +49,7 @@ export interface RelatedEntity {
 /**
  * Metadata for journal entries
  */
-export interface JournalMetadata {
+interface JournalMetadata {
   tags: string[];
   automaticEntry: boolean;
   narrativeSegmentId?: EntityID;
@@ -71,4 +71,6 @@ export interface JournalMetadata {
     characterName?: string;
     sessionNumber?: number;
   };
+  // AI-generated visual for the entry (issue #975)
+  image?: GeneratedImage;
 }

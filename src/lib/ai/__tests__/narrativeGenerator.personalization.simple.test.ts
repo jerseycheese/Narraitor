@@ -3,13 +3,21 @@
  * Focus on core functionality without complex mocking
  */
 
-import { PersonalizationEngine } from '../personalizationEngine';
+import {
+  analyzePlayerBehavior,
+  createPersonalizedContext,
+  generateNarrativeEnhancement,
+} from '../personalizationEngine';
 import { PlayerDecisionTracker } from '../playerDecisionTracker';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 
 describe('NarrativeGenerator Personalization - Core Tests', () => {
-  let personalizationEngine: PersonalizationEngine;
+  const personalizationEngine = {
+    analyzePlayerBehavior,
+    createPersonalizedContext,
+    generateNarrativeEnhancement,
+  };
   let tracker: PlayerDecisionTracker;
   let mockCharacter: Character;
   let mockWorld: World;
@@ -29,7 +37,6 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
   });
 
   beforeEach(() => {
-    personalizationEngine = new PersonalizationEngine();
     tracker = new PlayerDecisionTracker({
       storageKey: 'test_personalization_decisions',
     });
@@ -166,6 +173,9 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       []
     );
 
-    expect(behaviorAnalysis.detectedTraits).toContain('diplomatic');
+    // Trait inference is delegated to the LLM at narrative-generation time.
+    // We still surface the dominant choice type via preferredChoiceTypes for the prompt.
+    expect(behaviorAnalysis.detectedTraits).toEqual([]);
+    expect(behaviorAnalysis.preferences.preferredChoiceTypes).toContain('diplomatic');
   });
 });

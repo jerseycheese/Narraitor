@@ -2,6 +2,14 @@ import { test, expect } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
 
+/**
+ * Character table/grid view — single-theme (default DS1).
+ *
+ * DS coverage (#1264): this spec exercises the grid/table view-toggle and
+ * persistence behaviour, not theme layout. The characters roster is covered
+ * across DS1/DS2/DS3 by tests/visual/characters-themes.spec.ts.
+ */
+
 test.describe('Character Table View', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(60000);

@@ -269,6 +269,42 @@ describe('SkillEditor', () => {
     });
   });
 
+  describe('Attribute Prerequisites (Issue #392)', () => {
+    it('saves attribute prerequisites set by the world creator', async () => {
+      const user = renderAndSetup();
+      await fillSkillForm(user, 'Climbing', 'Scale sheer walls', ['Strength']);
+
+      await user.type(screen.getByLabelText('Minimum Strength'), '4');
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+
+      expect(mockProps.onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Climbing',
+          attributePrerequisites: [{ attributeId: 'attr-1', minValue: 4 }],
+        })
+      );
+    });
+
+    it('loads existing attribute prerequisites in edit mode', () => {
+      const skillWithPrereq: WorldSkill = {
+        ...mockSkills[0],
+        attributePrerequisites: [{ attributeId: 'attr-1', minValue: 6 }],
+      };
+
+      render(
+        <SkillEditor
+          {...mockProps}
+          mode="edit"
+          skillId="skill-1"
+          existingSkills={[skillWithPrereq]}
+          onDelete={jest.fn()}
+        />
+      );
+
+      expect(screen.getByLabelText('Minimum Strength')).toHaveValue(6);
+    });
+  });
+
   describe('Cancel Functionality', () => {
     it('calls onCancel and does not save when cancel is clicked', async () => {
       const user = renderAndSetup();

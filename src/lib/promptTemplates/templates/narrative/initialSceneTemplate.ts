@@ -1,6 +1,7 @@
 import { majorEventGuidelines } from './majorEventGuidelines';
+import type { NarrativeTemplateContext } from './context';
 
-export const initialSceneTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+export const initialSceneTemplate = (context: NarrativeTemplateContext) => {
   const {
     worldName,
     worldDescription,
@@ -22,7 +23,7 @@ World Attributes: ${JSON.stringify(attributes)}
 ${playerCharacterName ? `Player Character: ${playerCharacterName} (THE PLAYER - write from their perspective using "you")` : ''}
 ${playerCharacterBackground ? `Player Background: ${JSON.stringify(playerCharacterBackground)}` : ''}
 ${enhancedCharacterContext ? enhancedCharacterContext : ''}
-${characterIds?.length > 1 ? `Other Characters: ${characterIds.slice(1).join(', ')}` : ''}
+${characterIds && characterIds.length > 1 ? `Other Characters: ${characterIds.slice(1).join(', ')}` : ''}
 
 ${Array.isArray(npcRoster) && npcRoster.length > 0 ? `NPC ROSTER (Reference IDs for metadata.characterIds):
 ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- ${npc.name} [${npc.id}]${npc.description ? ` — ${npc.description}` : ''}`).join('\n')}

@@ -1,0 +1,71 @@
+/**
+ * SectionVisibilityControls (dev-only) dropdown styles.
+ * Anchors the menu to the toggle and floats it above the panel as a real
+ * surface; the backdrop is a transparent click-catcher behind the menu.
+ */
+.section-visibility-controls {
+  position: relative;
+  display: inline-flex;
+}
+
+.section-visibility-menu {
+  position: absolute;
+
+  /* The panel is docked at the bottom of the page, so open the menu upward to
+     keep it on-screen rather than below the viewport fold. */
+  bottom: calc(100% + 0.25rem);
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 240px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-overlay-surface-strong);
+  box-shadow: var(--shadow-overlay);
+}
+
+.section-visibility-menu-actions {
+  display: flex;
+  gap: var(--space-1);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section-visibility-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+/* Menu items are shared DS Buttons; left-align and fill the menu width.
+   Scoped (0,2,0) so it beats the base .button (0,1,0) regardless of bundle order. */
+.section-visibility-menu-list .section-visibility-item {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.section-visibility-item-check {
+  display: inline-flex;
+  width: 1rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-visibility-menu-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--color-border);
+}
+
+.section-visibility-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}

@@ -37,7 +37,7 @@ describe('createAcquisitionJournalEntry', () => {
     };
   });
 
-  it('creates journal entry with item name and category', () => {
+  it('creates journal entry with item name in title and category in tags', () => {
     const entry = createAcquisitionJournalEntry(
       mockItem,
       mockWorldId,
@@ -45,10 +45,13 @@ describe('createAcquisitionJournalEntry', () => {
     );
 
     expect(entry.title).toContain('Rusty Sword');
-    expect(entry.content).toContain('equipment');
+    expect(entry.metadata.tags).toContain('equipment');
+    // Content should be human-readable prose, not raw "Category: equipment" field
+    expect(entry.content).not.toContain('Category:');
+    expect(entry.content).not.toContain('Method:');
   });
 
-  it('includes acquisition context in entry content', () => {
+  it('includes acquisition context in entry content as readable prose', () => {
     const entry = createAcquisitionJournalEntry(
       mockItem,
       mockWorldId,
@@ -56,7 +59,8 @@ describe('createAcquisitionJournalEntry', () => {
     );
 
     expect(entry.content).toContain('Found in the abandoned castle');
-    expect(entry.content).toContain('loot');
+    expect(entry.content).toContain('as loot');
+    expect(entry.content).toContain('Rusty Sword');
   });
 
   it('links back to acquired item via relatedEntities', () => {
@@ -141,7 +145,7 @@ describe('createAcquisitionJournalEntry', () => {
     );
 
     expect(entry.content).toContain('Rusty Sword');
-    expect(entry.content).toContain('loot');
+    expect(entry.content).toContain('as loot');
   });
 
   it('includes quantity in entry for multiple items', () => {

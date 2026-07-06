@@ -121,7 +121,7 @@ interface SkillSuggestion {
   description: string;
   difficulty: 'easy' | 'medium' | 'hard';
   category?: string;
-  linkedAttributeName?: string;
+  linkedAttributeNames?: string[];
   accepted: boolean;
 }
 ```
@@ -180,11 +180,10 @@ Test coverage:
 
 ## Future Enhancements
 
-1. **Template Worlds** - Pre-configured world templates
-2. **Import/Export** - Save and load world configurations
-3. **Preview Mode** - Live preview of world settings
-4. **Collaborative Creation** - Multi-user world building
-5. **Advanced AI Options** - Custom prompts for suggestions
+1. **Import/Export** - Save and load world configurations
+2. **Preview Mode** - Live preview of world settings
+3. **Collaborative Creation** - Multi-user world building
+4. **Advanced AI Options** - Custom prompts for suggestions
 
 ## Related Documentation
 

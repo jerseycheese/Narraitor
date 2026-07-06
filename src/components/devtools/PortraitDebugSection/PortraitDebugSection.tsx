@@ -3,11 +3,14 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai';
+import { generatePortrait as generatePortraitDirect } from '@/lib/ai/portraitGenerator';
+import { createAIClient } from '@/lib/ai/clientFactory';
 import {
   useCharacterStore,
   type Character as StoreCharacter,
+  type CharacterAttribute,
+  type CharacterSkill,
+  type CharacterStore,
 } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
@@ -17,6 +20,9 @@ import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
 import { generatePortrait } from '@/lib/api/generatePortrait';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('PortraitDebug');
 
 interface PortraitDebugSectionProps {
   characterData?: Partial<Character>;
@@ -36,8 +42,7 @@ export function PortraitDebugSection({
   const [showBreakdown, setShowBreakdown] = useState(false);
 
   // Get characters from store
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const characters = useCharacterStore((state: any) => state.characters);
+  const characters = useCharacterStore((state: CharacterStore) => state.characters);
   const charactersArray = Object.values(characters) as StoreCharacter[];
   const selectedCharacter = selectedCharacterId
     ? characters[selectedCharacterId]
@@ -49,25 +54,13 @@ export function PortraitDebugSection({
     ? worlds[selectedCharacter.worldId]
     : null;
 
-  // Use selected character data or passed props
-  const effectiveCharacterData = selectedCharacter || characterData;
+  // Use selected character data or passed props. Widened to Partial<StoreCharacter>
+  // because the prop's Character type (from @/types) lacks store-only fields like
+  // `level` / `isPlayer` that the mock builder reads with || fallbacks.
+  const effectiveCharacterData = (selectedCharacter || characterData) as
+    | Partial<StoreCharacter>
+    | undefined;
   const effectiveWorldConfig = selectedWorld || worldConfig;
-
-  // Helper to safely access background properties
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getBackgroundProp = (prop: string): any => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const bg = effectiveCharacterData?.background as any;
-    return bg?.[prop];
-  };
-
-  // Helper to safely access status properties
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getStatusProp = (prop: string): any => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const status = effectiveCharacterData?.status as any;
-    return status?.[prop];
-  };
 
   /**
    * Creates a mock character object for API calls, centralizing the logic
@@ -93,19 +86,25 @@ export function PortraitDebugSection({
       isActive?: boolean;
     };
 
-    const mockAttributes =
-      effectiveCharacterData.attributes?.map((attr: AnyAttribute) => ({
+    // The mock shape below intentionally diverges from CharacterAttribute /
+    // CharacterSkill — downstream portrait generation duck-types on these
+    // loose fields. Cast at the boundary to satisfy the StoreCharacter return
+    // without rewriting the mock builder.
+    const mockAttributes = (effectiveCharacterData.attributes?.map(
+      (attr: AnyAttribute) => ({
         attributeId: attr.attributeId || attr.id || 'attr-1',
         value: attr.value || attr.baseValue || 10,
-      })) || [];
+      }),
+    ) || []) as unknown as CharacterAttribute[];
 
-    const mockSkills =
-      effectiveCharacterData.skills?.map((skill: AnySkill) => ({
+    const mockSkills = (effectiveCharacterData.skills?.map(
+      (skill: AnySkill) => ({
         skillId: skill.skillId || skill.id || 'skill-1',
         level: skill.level || 1,
         experience: skill.experience || 0,
         isActive: skill.isActive !== undefined ? skill.isActive : true,
-      })) || [];
+      }),
+    ) || []) as unknown as CharacterSkill[];
 
     return {
       id,
@@ -118,11 +117,11 @@ export function PortraitDebugSection({
       skills: mockSkills,
       derivedStats: [],
       background: {
-        history: getBackgroundProp('history') || '',
-        personality: getBackgroundProp('personality') || '',
-        goals: getBackgroundProp('goals') || [],
-        fears: getBackgroundProp('fears') || [],
-        relationships: getBackgroundProp('relationships') || [],
+        history: effectiveCharacterData.background?.history || '',
+        personality: effectiveCharacterData.background?.personality || '',
+        goals: effectiveCharacterData.background?.goals || [],
+        fears: effectiveCharacterData.background?.fears || [],
+        relationships: effectiveCharacterData.background?.relationships || [],
       },
       inventory: {
         items: [],
@@ -132,9 +131,12 @@ export function PortraitDebugSection({
         itemOrder: [],
       },
       status: {
-        health: getStatusProp('health') || getStatusProp('hp') || 100,
-        maxHealth: getStatusProp('maxHealth') || 100,
-        conditions: getStatusProp('conditions') || [],
+        health:
+          effectiveCharacterData.status?.health ||
+          (effectiveCharacterData.status as { hp?: number } | undefined)?.hp ||
+          100,
+        maxHealth: effectiveCharacterData.status?.maxHealth || 100,
+        conditions: effectiveCharacterData.status?.conditions || [],
       },
       createdAt: getTimestamp(),
       updatedAt: getTimestamp(),
@@ -142,16 +144,16 @@ export function PortraitDebugSection({
   };
 
   const generatePromptPreview = async () => {
-    console.log('generatePromptPreview called');
+    logger.debug('generatePromptPreview called');
     if (!effectiveCharacterData) {
-      console.log('No effective character data');
+      logger.debug('No effective character data');
       setGeneratedPrompt(
         'No character data available. Please select a character or provide character data.'
       );
       return;
     }
 
-    console.log('Starting prompt generation with API...');
+    logger.debug('Starting prompt generation with API...');
     try {
       const mockCharacter = createMockCharacter('preview');
 
@@ -159,22 +161,22 @@ export function PortraitDebugSection({
       const requestBody = {
         character: mockCharacter,
         world: effectiveWorldConfig,
-        customDescription: getBackgroundProp('physicalDescription'),
+        customDescription: effectiveCharacterData.background?.physicalDescription,
         promptOnly: true, // Add a flag to return only the prompt
       };
 
-      console.log('Calling API with character:', mockCharacter.name);
-      console.log('Custom description:', requestBody.customDescription);
-      console.log('Request body:', requestBody);
-      console.log('promptOnly flag:', requestBody.promptOnly);
+      logger.debug('Calling API with character:', mockCharacter.name);
+      logger.debug('Custom description:', requestBody.customDescription);
+      logger.debug('Request body:', requestBody);
+      logger.debug('promptOnly flag:', requestBody.promptOnly);
 
       const result = await generatePortrait(requestBody);
-      console.log('API response result:', result);
+      logger.debug('API response result:', result);
       const prompt = result.prompt || result.portrait?.prompt;
-      console.log('Extracted prompt:', prompt);
+      logger.debug('Extracted prompt:', prompt);
 
       setGeneratedPrompt(prompt ?? '');
-      console.log('Prompt set successfully');
+      logger.debug('Prompt set successfully');
     } catch (error) {
       setGeneratedPrompt(
         `Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -188,11 +190,11 @@ export function PortraitDebugSection({
     setIsGenerating(true);
     try {
       const aiClient = createAIClient();
-      const generator = new PortraitGenerator(aiClient);
 
       const mockCharacter = createMockCharacter('test');
 
-      const result = await generator.generatePortrait(
+      const result = await generatePortraitDirect(
+        aiClient,
         mockCharacter as unknown as Character,
         {
           worldGenre: effectiveWorldConfig?.genre,

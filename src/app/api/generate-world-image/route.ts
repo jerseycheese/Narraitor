@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
-import { generateAndSaveImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('WorldImageAPI');
@@ -12,19 +13,41 @@ interface GenerateWorldImageRequest {
   customPrompt?: string;
 }
 
+// Summarize the world's defined attributes/skills so a thin free-text description
+// still grounds the image in the world's actual theme. The manual wizard carries
+// these (via FinalizeStep's full world); the /worlds Generate path passes none, so
+// its prompt is unchanged. Names only — keep the prompt tight. (#1437)
+function describeWorldElements(world: World): string {
+  const attributeNames = (world.attributes || []).map((attr) => attr.name).filter(Boolean);
+  const skillNames = (world.skills || []).map((skill) => skill.name).filter(Boolean);
+
+  const parts: string[] = [];
+  if (attributeNames.length > 0) {
+    parts.push(`defining attributes (${attributeNames.join(', ')})`);
+  }
+  if (skillNames.length > 0) {
+    parts.push(`signature skills (${skillNames.join(', ')})`);
+  }
+  return parts.join(' and ');
+}
+
 // Generate a detailed image prompt based on world characteristics
 function generateImagePrompt(world: World): string {
   const genre = world.genre || 'fantasy';
   const name = world.name;
   const description = world.description;
 
-  // Create a detailed prompt for image generation
   const basePrompt = `Create a highly detailed, cinematic landscape image representing the world "${name}". Genre: ${genre}. Description: ${description}`;
+
+  const worldElements = describeWorldElements(world);
+  const elementsBlock = worldElements
+    ? `\n\nWorld elements to reflect: ${worldElements}.`
+    : '';
 
   // Get genre-specific style guidance from shared utility
   const styleGuidance = getGenreStyleGuidance(genre, 'landscape');
 
-  return `${basePrompt}
+  return `${basePrompt}${elementsBlock}
 
 ${styleGuidance}
 
@@ -59,7 +82,8 @@ export async function POST(request: NextRequest) {
 
     try {
       // Use custom prompt if provided, otherwise generate one using AI
-      const client = createDefaultGeminiClient();
+      const apiKey = resolveApiKey(request);
+      const client = createDefaultGeminiClient(apiKey);
       let imagePrompt: string;
       
       if (body.customPrompt) {
@@ -97,10 +121,8 @@ export async function POST(request: NextRequest) {
       let aiGenerated = false;
       let placeholder = true;
 
-      // Check if we have Gemini API key for image generation
-      const apiKey = process.env.GEMINI_API_KEY;
-
-      if (apiKey && apiKey !== 'MOCK_API_KEY') {
+      // Use the key resolved above (player's BYO key -> env fallback).
+      if (apiKey) {
         try {
           logger.debug('generate-world-image', 'Attempting Gemini image generation with model: gemini-2.5-flash-image');
 
@@ -116,20 +138,18 @@ Requirements:
 - No text, logos, or watermarks
 - Landscape orientation suitable for world imagery`;
 
-          // Generate and save the image to the file system
-          const savedImage = await generateAndSaveImageWithGemini(
+          // Generate image as a data URL so it persists in IndexedDB (no disk write)
+          const generatedImage = await generateImageWithGemini(
             imagePromptForGemini,
-            apiKey,
-            body.world.id,
-            'worlds'
+            apiKey
           );
 
-          if (savedImage) {
-            imageUrl = savedImage.url;
+          if (generatedImage) {
+            imageUrl = generatedImage.url;
             aiGenerated = true;
             placeholder = false;
 
-            logger.debug('generate-world-image', `Gemini image saved successfully: ${savedImage.url} (${savedImage.fileSize} bytes)`);
+            logger.debug('generate-world-image', `Gemini image generated successfully: ${generatedImage.url.slice(0, 50)}...`);
           } else {
             logger.warn('generate-world-image', 'Image generation failed, using fallback');
             imageUrl = generateFallbackImage(body.world);

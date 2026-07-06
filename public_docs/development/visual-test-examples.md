@@ -1,7 +1,7 @@
 ---
 title: Visual Test Examples
 tags: [examples, visual-testing, playwright, patterns]
-created: 2025-08-20  
+created: 2025-08-20
 updated: 2025-08-20
 ---
 
@@ -29,7 +29,7 @@ async function waitForAppReady(page) {
 test('homepage layout', async ({ page }) => {
   await page.goto('/');
   await waitForAppReady(page);
-  
+
   await expect(page).toHaveScreenshot('homepage-layout.png');
 });
 ```
@@ -42,13 +42,13 @@ test('homepage layout', async ({ page }) => {
 test('full page content', async ({ page }) => {
   await page.goto('/long-page');
   await waitForAppReady(page);
-  
+
   // Capture only what's visible in viewport
   await expect(page).toHaveScreenshot('page-viewport.png');
-  
+
   // Capture entire scrollable page
-  await expect(page).toHaveScreenshot('page-full.png', { 
-    fullPage: true 
+  await expect(page).toHaveScreenshot('page-full.png', {
+    fullPage: true
   });
 });
 ```
@@ -65,10 +65,10 @@ Test a specific component in isolation:
 test('character card component', async ({ page }) => {
   await page.goto('/characters');
   await waitForAppReady(page);
-  
+
   // Wait for character cards to load
   await page.waitForSelector('[data-testid="character-card"]');
-  
+
   // Screenshot just the first character card
   const characterCard = page.locator('[data-testid="character-card"]').first();
   await expect(characterCard).toHaveScreenshot('character-card.png');
@@ -83,20 +83,20 @@ test('character card component', async ({ page }) => {
 test('button component states', async ({ page }) => {
   await page.goto('/dev/button-showcase'); // Use dev harness if available
   await waitForAppReady(page);
-  
+
   const primaryButton = page.locator('[data-testid="primary-button"]');
-  
+
   // Default state
   await expect(primaryButton).toHaveScreenshot('button-default.png');
-  
+
   // Hover state
   await primaryButton.hover();
   await expect(primaryButton).toHaveScreenshot('button-hover.png');
-  
-  // Focus state  
+
+  // Focus state
   await primaryButton.focus();
   await expect(primaryButton).toHaveScreenshot('button-focus.png');
-  
+
   // Disabled state
   await page.locator('[data-testid="disable-button"]').click();
   await expect(primaryButton).toHaveScreenshot('button-disabled.png');
@@ -113,21 +113,21 @@ test('button component states', async ({ page }) => {
 test('character creation form', async ({ page }) => {
   await page.goto('/characters/create');
   await waitForAppReady(page);
-  
+
   // Empty form
   await expect(page).toHaveScreenshot('form-empty.png');
-  
+
   // Fill form partially
   await page.fill('[name="name"]', 'Test Character');
   await page.selectOption('[name="class"]', 'warrior');
   await expect(page).toHaveScreenshot('form-partial.png');
-  
+
   // Trigger validation error
   await page.fill('[name="name"]', ''); // Clear required field
   await page.click('[data-testid="submit"]');
   await page.waitForSelector('.error-message');
   await expect(page).toHaveScreenshot('form-validation-error.png');
-  
+
   // Success state
   await page.fill('[name="name"]', 'Valid Character');
   await page.click('[data-testid="submit"]');
@@ -144,18 +144,18 @@ test('character creation form', async ({ page }) => {
 test('world creation wizard', async ({ page }) => {
   await page.goto('/worlds/create');
   await waitForAppReady(page);
-  
+
   // Step 1: Template selection
   await expect(page).toHaveScreenshot('wizard-step-1.png');
-  
+
   // Select template and proceed
   await page.click('[data-testid="fantasy-template"]');
   await page.click('[data-testid="next-step"]');
-  
+
   // Wait for step 2 to load
   await page.waitForSelector('[data-testid="attributes-step"]');
   await expect(page).toHaveScreenshot('wizard-step-2.png');
-  
+
   // Add custom attribute
   await page.click('[data-testid="add-attribute"]');
   await page.waitForSelector('[data-testid="new-attribute-form"]');
@@ -182,7 +182,7 @@ viewports.forEach(({ name, width, height }) => {
     await page.setViewportSize({ width, height });
     await page.goto('/');
     await waitForAppReady(page);
-    
+
     await expect(page).toHaveScreenshot(`homepage-${name}.png`);
   });
 });
@@ -199,11 +199,11 @@ test('navigation responsive behavior', async ({ page }) => {
   await page.goto('/');
   await waitForAppReady(page);
   await expect(page.locator('nav')).toHaveScreenshot('nav-desktop.png');
-  
+
   // Mobile - hamburger menu
   await page.setViewportSize({ width: 375, height: 667 });
   await expect(page.locator('nav')).toHaveScreenshot('nav-mobile-closed.png');
-  
+
   // Mobile menu open
   await page.click('[data-testid="mobile-menu-button"]');
   await page.waitForSelector('[data-testid="mobile-menu"]');
@@ -230,13 +230,13 @@ test('character list with loading states', async ({ page }) => {
       ])
     });
   });
-  
+
   await page.goto('/characters');
-  
+
   // Capture loading state
   await page.waitForSelector('[data-testid="loading-spinner"]');
   await expect(page).toHaveScreenshot('characters-loading.png');
-  
+
   // Wait for content to load
   await page.waitForSelector('[data-testid="character-list"]');
   await expect(page).toHaveScreenshot('characters-loaded.png');
@@ -257,10 +257,10 @@ test('API error handling', async ({ page }) => {
       body: JSON.stringify({ error: 'Server error' })
     });
   });
-  
+
   await page.goto('/characters');
   await waitForAppReady(page);
-  
+
   // Wait for error message to appear
   await page.waitForSelector('[data-testid="error-message"]');
   await expect(page).toHaveScreenshot('characters-error.png');
@@ -278,18 +278,18 @@ test('active game session', async ({ page }) => {
   // Use test harness for game states
   await page.goto('/dev/game-session');
   await waitForAppReady(page);
-  
+
   // Start a test game
   await page.click('[data-testid="start-test-game"]');
   await page.waitForSelector('[data-testid="narrative-text"]');
-  
+
   // Capture initial narrative
   await expect(page).toHaveScreenshot('game-session-initial.png');
-  
+
   // Capture choices interface
   const choicesSection = page.locator('[data-testid="choices-section"]');
   await expect(choicesSection).toHaveScreenshot('game-choices.png');
-  
+
   // Select a choice and capture result
   await page.click('[data-testid="choice-0"]');
   await page.waitForSelector('[data-testid="narrative-updated"]');
@@ -305,12 +305,12 @@ test('active game session', async ({ page }) => {
 test('journal page states', async ({ page }) => {
   await page.goto('/worlds/world-cyberpunk-2077/play');
   await waitForAppReady(page);
-  
+
   // Open journal from gameplay
   const journalButton = page.getByRole('button', { name: /open journal/i });
   await journalButton.click();
   await page.waitForURL('**/play/journal');
-  
+
   // Journal page with entries
   await expect(page).toHaveScreenshot('journal-page.png');
 });
@@ -327,17 +327,17 @@ test('component transitions', async ({ page }) => {
   // Animations should be disabled by global config
   await page.goto('/components/animated-card');
   await waitForAppReady(page);
-  
+
   const card = page.locator('[data-testid="animated-card"]');
-  
+
   // Initial state
   await expect(card).toHaveScreenshot('card-initial.png');
-  
+
   // Trigger transition
   await card.hover();
   // No need to wait for animation since they're disabled
   await expect(card).toHaveScreenshot('card-hover.png');
-  
+
   // After click
   await card.click();
   await expect(card).toHaveScreenshot('card-clicked.png');
@@ -352,21 +352,21 @@ test('component transitions', async ({ page }) => {
 test('stable state after interactions', async ({ page }) => {
   await page.goto('/interactive-demo');
   await waitForAppReady(page);
-  
+
   // Perform multiple interactions
   await page.click('[data-testid="button-1"]');
   await page.fill('[data-testid="input-1"]', 'test value');
   await page.selectOption('[data-testid="select-1"]', 'option-2');
-  
+
   // Wait for any state changes to complete
   await page.waitForTimeout(500);
-  
+
   // Ensure UI is in stable state
   await page.waitForFunction(() => {
     const loadingElements = document.querySelectorAll('[data-loading="true"]');
     return loadingElements.length === 0;
   });
-  
+
   await expect(page).toHaveScreenshot('interactive-final-state.png');
 });
 ```
@@ -382,7 +382,7 @@ test('stable state after interactions', async ({ page }) => {
 test('cross-browser compatibility', async ({ page, browserName }) => {
   await page.goto('/');
   await waitForAppReady(page);
-  
+
   // Take screenshot with browser name in filename
   await expect(page).toHaveScreenshot(`homepage-${browserName}.png`);
 });
@@ -391,10 +391,10 @@ test('cross-browser compatibility', async ({ page, browserName }) => {
 test('webkit-specific font rendering', async ({ page, browserName }) => {
   // Skip this test on other browsers
   test.skip(browserName !== 'webkit', 'WebKit-specific test');
-  
+
   await page.goto('/typography');
   await waitForAppReady(page);
-  
+
   await expect(page).toHaveScreenshot('webkit-fonts.png');
 });
 ```
@@ -408,10 +408,10 @@ test('webkit-specific font rendering', async ({ page, browserName }) => {
 ```typescript
 test('lightweight component test', async ({ page }) => {
   await page.goto('/simple-component');
-  
+
   // Minimal wait for simple components
   await page.waitForSelector('[data-testid="simple-component"]');
-  
+
   // Screenshot just the component, not full page
   const component = page.locator('[data-testid="simple-component"]');
   await expect(component).toHaveScreenshot('simple-component.png');
@@ -426,7 +426,7 @@ test('lightweight component test', async ({ page }) => {
 test('header component only', async ({ page }) => {
   await page.goto('/');
   await waitForAppReady(page);
-  
+
   // Screenshot only the header region
   const header = page.locator('header');
   await expect(header).toHaveScreenshot('site-header.png');
@@ -435,7 +435,7 @@ test('header component only', async ({ page }) => {
 test('main content area', async ({ page }) => {
   await page.goto('/');
   await waitForAppReady(page);
-  
+
   // Screenshot main content, excluding header/footer
   const main = page.locator('main');
   await expect(main).toHaveScreenshot('main-content.png');
@@ -493,10 +493,10 @@ test('character list with test data', async ({ page }) => {
       ])
     });
   });
-  
+
   await page.goto('/characters');
   await waitForAppReady(page);
-  
+
   await expect(page).toHaveScreenshot('characters-test-data.png');
 });
 ```
@@ -507,13 +507,14 @@ test('character list with test data', async ({ page }) => {
 
 When creating visual tests, ensure:
 
-- ✅ **Content is fully loaded** (use `waitForAppReady`)
-- ✅ **Fonts are loaded** (included in `waitForAppReady`)
-- ✅ **Animations are stable** (disabled in config)
-- ✅ **Test data is consistent** (mock APIs if needed)
-- ✅ **Screenshots are focused** (component vs full page)
-- ✅ **Filenames are descriptive** (`component-state.png`)
-- ✅ **Different states are tested** (default, hover, error, etc.)
+- **Content is fully loaded** (use `waitForAppReady`)
+- **Fonts are loaded** (included in `waitForAppReady`)
+- **Animations are stable** (disabled in config)
+- **Test data is consistent** (mock APIs if needed)
+- **Screenshots are focused** (component vs full page)
+- **DS1, DS2, and DS3 are covered** for user-facing surfaces, or the spec documents why it is intentionally single-theme
+- **Filenames are descriptive** (`component-state.png`)
+- **Different states are tested** (default, hover, error, etc.)
 
 ## Related Documentation
 

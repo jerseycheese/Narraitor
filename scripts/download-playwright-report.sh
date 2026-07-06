@@ -21,8 +21,10 @@ fi
 
 echo "📋 Checking PR #$PR_NUMBER for failed Playwright tests..."
 
-# Get the failed E2E Tests (which include visual regression tests) run ID
-RUN_ID=$(gh pr view $PR_NUMBER --json statusCheckRollup | jq -r '.statusCheckRollup[] | select(.name == "E2E Tests" and .conclusion == "FAILURE") | .detailsUrl' | head -1 | sed 's|.*/runs/||' | sed 's|/job/.*||')
+# Get the failed E2E Tests (which include visual regression tests) run ID.
+# The E2E job is sharded, so its checks are named "E2E Tests (1)" / "E2E Tests (2)";
+# match any failed shard leg (all shards share one workflow run id).
+RUN_ID=$(gh pr view $PR_NUMBER --json statusCheckRollup | jq -r '.statusCheckRollup[] | select((.name | startswith("E2E Tests")) and .conclusion == "FAILURE") | .detailsUrl' | head -1 | sed 's|.*/runs/||' | sed 's|/job/.*||')
 
 if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
     echo "❌ No failed E2E Tests found for PR #$PR_NUMBER"
@@ -66,12 +68,26 @@ if [ -f "index.html" ]; then
     rm -f index.html
 fi
 
-# Download the artifacts
-echo "📦 Downloading test results..."
-gh run download $RUN_ID --name e2e-test-failures --dir "$ARTIFACTS_DIR"
+# Download the artifacts. The E2E job is sharded and only failed shards upload,
+# so artifacts are named e2e-test-failures-shard{1,2} / playwright-html-report-shard{1,2}.
+# Pull every failed shard by pattern (|| true: a pattern may match nothing if only
+# one shard failed or the report wasn't produced).
+echo "📦 Downloading test results (failed shards)..."
+gh run download "$RUN_ID" --pattern 'e2e-test-failures-shard*' --dir "$ARTIFACTS_DIR" || true
 
-echo "📦 Downloading HTML report..."
-gh run download $RUN_ID --name playwright-html-report --dir "$ARTIFACTS_DIR"
+echo "📦 Downloading HTML report (failed shards)..."
+gh run download "$RUN_ID" --pattern 'playwright-html-report-shard*' --dir "$ARTIFACTS_DIR" || true
+
+# gh --pattern nests each artifact in its own subdir; flatten the shard subdirs
+# (merging contents) into the layout the rest of this script expects.
+shopt -s nullglob
+for shard_dir in "$ARTIFACTS_DIR"/e2e-test-failures-shard* "$ARTIFACTS_DIR"/playwright-html-report-shard*; do
+    [ -d "$shard_dir" ] || continue
+    echo "📁 Flattening $(basename "$shard_dir")..."
+    cp -R "$shard_dir"/. "$ARTIFACTS_DIR"/
+    rm -rf "$shard_dir"
+done
+shopt -u nullglob
 
 # Note: e2e-test-failures contains all the test results, images and diffs
 # playwright-html-report contains the interactive HTML report

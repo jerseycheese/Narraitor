@@ -65,6 +65,7 @@ export async function scanForDuplicatesImpl(
       message: 'Failed to scan for duplicates',
       retryable: true,
       type: ErrorType.SERVICE,
+      severity: 'error',
     });
     return [];
   }
@@ -194,6 +195,7 @@ export function mergeFactsImpl(
       message: 'Failed to merge facts',
       retryable: false,
       type: ErrorType.SERVICE,
+      severity: 'error',
     });
     throw error;
   }

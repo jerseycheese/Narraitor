@@ -187,20 +187,3 @@ export function createMixedSignificanceJournalEntries(): JournalEntry[] {
     },
   ];
 }
-
-/**
- * Creates a standard mock ending response
- */
-export function createMockEndingResponse(overrides?: {
-  epilogue?: string;
-  tone?: string;
-  achievements?: string[];
-}) {
-  return `{
-    "epilogue": "${overrides?.epilogue || 'The journey ends...'}",
-    "characterLegacy": "A true hero...",
-    "worldImpact": "Forever changed...",
-    "tone": "${overrides?.tone || 'triumphant'}",
-    "achievements": ${JSON.stringify(overrides?.achievements || ['Victory'])}
-  }`;
-}

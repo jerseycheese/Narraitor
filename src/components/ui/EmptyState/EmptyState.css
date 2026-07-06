@@ -1,0 +1,61 @@
+/* EmptyState — global semantic styles for src/components/ui/EmptyState/EmptyState.tsx (#1479)
+ *
+ * The canonical empty-state primitive (Journal, Inventory, the play-entry branches,
+ * the characters list) shipped the `.component-empty-state` class with no styling, so
+ * each empty state rendered as bare top-left text. This gives the shared component one
+ * token-based treatment — centered, comfortable measure, clear hierarchy — so every
+ * empty state reads as finished. Per-theme look comes from the design tokens under the
+ * active `data-theme` scope (ds{1,2,3}.css); no hardcoded colors.
+ */
+
+.component-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+}
+
+.component-empty-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.component-empty-state-icon svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.component-empty-state-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-empty-state-content h3 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-empty-state-content p {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.component-empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+}

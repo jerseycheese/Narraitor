@@ -1,9 +1,10 @@
+/* eslint-disable no-console -- this module is the console wrapper */
 /**
  * Logger utility for standardized debug logging across the application.
  * Provides severity levels, environment-based toggling, and formatted output.
  */
 
-export enum LogLevel {
+enum LogLevel {
   DEBUG = 0,
   INFO = 1,
   WARN = 2,
@@ -23,13 +24,14 @@ interface LogColors {
   [key: string]: string;
 }
 
-import { primitiveColors } from '@/lib/design-tokens';
-
+// Browser-console styling only — not app UI, so these stay literal hex
+// rather than design-system tokens (CSS custom properties can't reach
+// console.log %c styles).
 const LOG_COLORS: LogColors = {
-  [LogLevel.DEBUG]: `color: ${primitiveColors.zinc[500]}; font-weight: normal;`,
-  [LogLevel.INFO]: `color: ${primitiveColors.blue[500]}; font-weight: normal;`,
-  [LogLevel.WARN]: `color: ${primitiveColors.amber[500]}; font-weight: bold;`,
-  [LogLevel.ERROR]: `color: ${primitiveColors.red[500]}; font-weight: bold;`,
+  [LogLevel.DEBUG]: 'color: #71717a; font-weight: normal;',
+  [LogLevel.INFO]: 'color: #3b82f6; font-weight: normal;',
+  [LogLevel.WARN]: 'color: #f59e0b; font-weight: bold;',
+  [LogLevel.ERROR]: 'color: #ef4444; font-weight: bold;',
   [LogLevel.NONE]: ''
 };
 
@@ -48,7 +50,7 @@ function parseLogLevel(level?: string): LogLevel {
   }
 }
 
-export class Logger {
+class Logger {
   private context: string;
   public isEnabled: boolean;
   private minLevel: LogLevel;

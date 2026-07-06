@@ -124,7 +124,6 @@ export const useJournalStore = create<JournalStore>()(
       return state;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [entryId]: _deletedEntry, ...remainingEntries } = state.entries;
     
     // Remove from session entries
@@ -235,7 +234,6 @@ export const useJournalStore = create<JournalStore>()(
     });
     
     // Remove session entries mapping
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [sessionId]: _sessionEntries, ...remainingSessionEntries } = state.sessionEntries;
     
     return {
@@ -264,6 +262,5 @@ export const useJournalStore = create<JournalStore>()(
 
 // Expose store globally in development for easier debugging & manual seeding
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useJournalStore = useJournalStore;
+  window.useJournalStore = useJournalStore;
 }

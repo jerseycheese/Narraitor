@@ -3,12 +3,15 @@
  * Focus on acceptance criteria: narrative enhancement includes character attributes and skills
  */
 
-import { PersonalizationEngine } from '../personalizationEngine';
+import {
+  createPersonalizedContext,
+  generateNarrativeEnhancement,
+} from '../personalizationEngine';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 
 describe('PersonalizationEngine - Attribute & Skill Integration', () => {
-  let engine: PersonalizationEngine;
+  const engine = { createPersonalizedContext, generateNarrativeEnhancement };
   let mockCharacter: Character;
   let mockWorld: World;
 
@@ -27,8 +30,6 @@ describe('PersonalizationEngine - Attribute & Skill Integration', () => {
   });
 
   beforeEach(() => {
-    engine = new PersonalizationEngine();
-
     mockCharacter = {
       id: 'char-1',
       name: 'Skilled Rogue',

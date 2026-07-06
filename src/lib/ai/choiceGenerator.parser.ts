@@ -6,6 +6,7 @@ import type {
   DecisionOption,
   NarrativeContext,
   ChoiceAlignment,
+  Consequence,
 } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import { logger } from '@/lib/utils/logger';
@@ -16,10 +17,19 @@ type ParsedSkillRequirement = {
   value: number;
 };
 
+/** NPC roster entry used to resolve consequence targets by name. */
+export type KnownNpc = {
+  id: string;
+  name: string;
+};
+
+const MAX_TRUST_DELTA = 20;
+
 export const parseChoiceResponse = (
   content: string,
   narrativeContext: NarrativeContext,
-  world: World
+  world: World,
+  knownNpcs: KnownNpc[] = []
 ): Decision => {
   const decisionId = generateUniqueId('decision');
 
@@ -38,26 +48,6 @@ export const parseChoiceResponse = (
         decisionWeight = 'major';
       } else if (weightText === 'critical') {
         decisionWeight = 'critical';
-      }
-    } else {
-      const segmentCount = narrativeContext.previousSegments?.length || 0;
-      const randomValue = Math.random();
-      if (segmentCount > 12) {
-        if (randomValue > 0.85) {
-          decisionWeight = 'critical';
-        } else if (randomValue > 0.6) {
-          decisionWeight = 'major';
-        }
-      } else if (segmentCount > 8) {
-        if (randomValue > 0.9) {
-          decisionWeight = 'critical';
-        } else if (randomValue > 0.75) {
-          decisionWeight = 'major';
-        }
-      } else if (segmentCount > 4) {
-        if (randomValue > 0.85) {
-          decisionWeight = 'major';
-        }
       }
     }
 
@@ -154,6 +144,15 @@ export const parseChoiceResponse = (
             addSkillRequirement(currentOption, parsedRequirement);
           }
         }
+        continue;
+      }
+
+      const consMatch = trimmed.match(/^Consequences?:\s*(.+)$/i);
+      if (consMatch && currentOption) {
+        const consequences = parseConsequencesText(consMatch[1], knownNpcs);
+        if (consequences.length > 0) {
+          currentOption.consequences = consequences;
+        }
       }
     }
 
@@ -238,7 +237,100 @@ const finalizeOption = (
     finalOption.requirements = option.requirements;
   }
 
+  if (option.consequences && option.consequences.length > 0) {
+    finalOption.consequences = option.consequences;
+  }
+
   return finalOption;
+};
+
+/**
+ * Parses a per-option "Consequences:" line into structured relationship
+ * consequences, e.g. "Marta trust -15, Guild Master trust +5". Names are
+ * resolved case-insensitively against the world's NPC roster; unknown names
+ * are dropped with a warning (mirrors skill-requirement handling). The
+ * emitted value shape ({ trustDelta }) is exactly what narrativeStore's
+ * extractWorldStateImpacts already consumes.
+ */
+const parseConsequencesText = (
+  text: string,
+  knownNpcs: KnownNpc[]
+): Consequence[] => {
+  const consequences: Consequence[] = [];
+
+  for (const clause of text.split(/[,;]/)) {
+    const trimmedClause = safeTrim(clause);
+    if (!trimmedClause) continue;
+
+    const match = trimmedClause.match(/^(.+?)\s+trust\s+([+-]?\d+)$/i);
+    if (!match) continue;
+
+    const name = safeTrim(match[1]).replace(/\s+/g, ' ');
+    const npc = knownNpcs.find(
+      (candidate) => safeTrim(candidate.name).toLowerCase() === name.toLowerCase()
+    );
+
+    if (!npc) {
+      logger.warn(
+        `[ChoiceGenerator] Unknown character "${name}" in consequence - skipping`
+      );
+      continue;
+    }
+
+    const rawDelta = parseInt(match[2], 10);
+    if (!Number.isFinite(rawDelta) || rawDelta === 0) continue;
+    const trustDelta = Math.max(-MAX_TRUST_DELTA, Math.min(MAX_TRUST_DELTA, rawDelta));
+
+    consequences.push({
+      type: 'relationship',
+      action: 'modify',
+      targetId: npc.id,
+      value: { trustDelta },
+    });
+  }
+
+  return consequences;
+};
+
+/** Alignment shift magnitude per decision weight. */
+const ALIGNMENT_SHIFT_BY_WEIGHT: Record<'minor' | 'major' | 'critical', number> = {
+  minor: 4,
+  major: 8,
+  critical: 12,
+};
+
+/**
+ * Composes a deterministic alignment consequence onto every lawful/chaotic
+ * option, scaled by the decision weight. This is client-side composition
+ * from the option's existing alignment tag — the choice contract carries a
+ * structured alignment shift even when the model emits nothing extra.
+ * Neutral options get no alignment consequence.
+ */
+export const applyAlignmentConsequences = (decision: Decision): Decision => {
+  const magnitude = ALIGNMENT_SHIFT_BY_WEIGHT[decision.decisionWeight ?? 'minor'];
+
+  decision.options = decision.options.map((option) => {
+    if (option.alignment !== 'lawful' && option.alignment !== 'chaotic') {
+      return option;
+    }
+    if (option.consequences?.some((consequence) => consequence.type === 'alignment')) {
+      return option;
+    }
+
+    const alignmentConsequence: Consequence = {
+      type: 'alignment',
+      action: 'add',
+      targetId: 'player-alignment',
+      value: option.alignment === 'lawful' ? magnitude : -magnitude,
+    };
+
+    return {
+      ...option,
+      consequences: [...(option.consequences ?? []), alignmentConsequence],
+    };
+  });
+
+  return decision;
 };
 
 const parseSkillRequirementText = (

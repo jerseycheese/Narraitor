@@ -4,16 +4,14 @@ import React, { useEffect, useRef } from 'react';
 import { SimpleModal } from '@/components/shared/SimpleModal';
 import { Button } from '@/components/ui/button';
 
-export type ConfirmationVariant = 'default' | 'destructive' | 'warning' | 'info';
+type ConfirmationVariant = 'default' | 'destructive' | 'warning' | 'info';
 
 export interface ConfirmationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   title?: string;
-  message?: React.ReactNode;
-  /** Extra body rendered as modal children below the description. */
-  customBody?: React.ReactNode;
+  message: React.ReactNode;
   variant?: ConfirmationVariant;
   confirmText?: string;
   cancelText?: string;
@@ -21,17 +19,9 @@ export interface ConfirmationDialogProps {
   cancelAriaLabel?: string;
   isLoading?: boolean;
   loadingText?: string;
-  size?: string;
 }
 
 const confirmButtonVariants: Record<ConfirmationVariant, 'default' | 'destructive' | 'warning' | 'info'> = {
-  default: 'default',
-  destructive: 'destructive',
-  warning: 'warning',
-  info: 'info',
-};
-
-const modalToneMap: Record<ConfirmationVariant, NonNullable<React.ComponentProps<typeof SimpleModal>['tone']>> = {
   default: 'default',
   destructive: 'destructive',
   warning: 'warning',
@@ -44,7 +34,6 @@ export function ConfirmationDialog({
   onConfirm,
   title,
   message,
-  customBody,
   variant = 'default',
   confirmText = 'Confirm',
   cancelText = 'Cancel',
@@ -52,7 +41,6 @@ export function ConfirmationDialog({
   cancelAriaLabel,
   isLoading = false,
   loadingText = 'Loading...',
-  size = 'lg',
 }: ConfirmationDialogProps) {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
@@ -77,14 +65,11 @@ export function ConfirmationDialog({
       onClose={onClose}
       title={title || 'Confirmation Required'}
       showCloseButton={false}
-      size={size}
-      tone={modalToneMap[variant]}
       description={message}
       footer={(
         <div>
           <Button
             ref={cancelButtonRef}
-            type="button"
             onClick={onClose}
             variant="outline"
             disabled={isLoading}
@@ -94,7 +79,6 @@ export function ConfirmationDialog({
           </Button>
           <Button
             ref={confirmButtonRef}
-            type="button"
             onClick={onConfirm}
             variant={confirmButtonVariants[variant]}
             disabled={isLoading}
@@ -104,8 +88,6 @@ export function ConfirmationDialog({
           </Button>
         </div>
       )}
-    >
-      {customBody}
-    </SimpleModal>
+    />
   );
 }

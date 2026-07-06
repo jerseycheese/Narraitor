@@ -254,7 +254,7 @@ describe('Character Creation Wizard with Portrait Integration', () => {
   it('should save character with placeholder portrait by default', async () => {
     render(
       <TutorialProvider>
-        <CharacterCreationWizard worldId="world-1" initialStep={5} />
+        <CharacterCreationWizard worldId="world-1" initialStep={4} />
       </TutorialProvider>
     );
 

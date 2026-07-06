@@ -5,14 +5,13 @@
  * Images are saved to the public directory for easy serving.
  */
 
-import { writeFile, mkdir } from 'fs/promises';
 import { join, resolve } from 'path';
 import { existsSync } from 'fs';
 import Logger from './logger';
 
 const logger = new Logger('FileStorage');
 
-export interface SaveImageOptions {
+interface SaveImageOptions {
   /**
    * Category/type of image (e.g., 'worlds', 'characters', 'portraits')
    */
@@ -34,23 +33,6 @@ export interface SaveImageOptions {
   base64Data: string;
 }
 
-export interface SaveImageResult {
-  /**
-   * Public URL path to access the saved image
-   * Format: /uploads/{category}/{entityId}.{ext}
-   */
-  url: string;
-
-  /**
-   * Absolute file system path where the image was saved
-   */
-  filePath: string;
-
-  /**
-   * File size in bytes
-   */
-  fileSize: number;
-}
 
 /**
  * Sanitize entity ID to prevent path traversal attacks
@@ -78,28 +60,6 @@ function validateCategory(category: string): asserts category is SaveImageOption
   }
 }
 
-/**
- * Validate and get file extension from MIME type
- * Only allows whitelisted image MIME types
- */
-function getExtensionFromMimeType(mimeType: string): string {
-  const mimeMap: Record<string, string> = {
-    'image/png': 'png',
-    'image/jpeg': 'jpg',
-    'image/jpg': 'jpg',
-    'image/webp': 'webp',
-    'image/gif': 'gif',
-    'image/svg+xml': 'svg',
-  };
-
-  const extension = mimeMap[mimeType.toLowerCase()];
-
-  if (!extension) {
-    throw new Error(`Invalid MIME type: ${mimeType}. Only image types are allowed.`);
-  }
-
-  return extension;
-}
 
 /**
  * Validate that the final file path is within the allowed directory
@@ -120,72 +80,6 @@ function validatePathWithinDirectory(filePath: string, allowedDirectory: string)
   return absoluteFilePath;
 }
 
-/**
- * Save a base64 encoded image to the file system
- *
- * @param options - Configuration for saving the image
- * @returns Information about the saved file
- * @throws Error if save fails
- */
-export async function saveBase64Image(options: SaveImageOptions): Promise<SaveImageResult> {
-  const { category, entityId, mimeType, base64Data } = options;
-
-  try {
-    // Validate and sanitize inputs to prevent path traversal
-    validateCategory(category);
-    const safeEntityId = sanitizeEntityId(entityId);
-
-    // Get file extension from MIME type
-    const extension = getExtensionFromMimeType(mimeType);
-
-    // Create filename: entityId.ext (e.g., world-123.png)
-    const filename = `${safeEntityId}.${extension}`;
-
-    // Define directory path: public/uploads/{category}
-    const uploadDir = join(process.cwd(), 'public', 'uploads', category);
-
-    // Create directory if it doesn't exist
-    if (!existsSync(uploadDir)) {
-      logger.debug('saveBase64Image', `Creating directory: ${uploadDir}`);
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // Full file path
-    const filePath = join(uploadDir, filename);
-
-    // Final security check: ensure path is within allowed directory and get validated absolute path
-    const validatedPath = validatePathWithinDirectory(filePath, uploadDir);
-
-    // Convert base64 to buffer (validated user data, safe to write)
-    const imageBuffer = Buffer.from(base64Data, 'base64');
-
-    // Save file to validated path
-    // Path is validated through defense-in-depth:
-    // 1. entityId sanitized (alphanumeric + hyphens/underscores only)
-    // 2. category validated against whitelist
-    // 3. MIME type validated against whitelist
-    // 4. Path constructed using safe join()
-    // 5. Final absolute path validated to be within allowed directory
-    logger.debug('saveBase64Image', `Saving image to: ${validatedPath} (${imageBuffer.length} bytes)`);
-    // codeql[js/path-injection]
-    await writeFile(validatedPath, imageBuffer);
-
-    // Generate public URL (relative to public directory)
-    const publicUrl = `/uploads/${category}/${filename}`;
-
-    logger.info('saveBase64Image', `Image saved successfully: ${publicUrl}`);
-
-    return {
-      url: publicUrl,
-      filePath,
-      fileSize: imageBuffer.length,
-    };
-
-  } catch (error) {
-    logger.error('saveBase64Image', 'Failed to save image:', error);
-    throw new Error(`Failed to save image: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
-}
 
 /**
  * Delete an image file
@@ -235,7 +129,7 @@ export async function deleteImage(url: string): Promise<boolean> {
     }
 
     const { unlink } = await import('fs/promises');
-    // Path is validated through defense-in-depth (same as saveBase64Image)
+    // Path is validated through defense-in-depth: category whitelist, entity ID sanitization, path boundary check
     // codeql[js/path-injection]
     await unlink(validatedPath);
 

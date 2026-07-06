@@ -28,21 +28,21 @@ Three design systems ship with the app, each providing a complete set of CSS cus
 Sharp lines, archival ink, graph paper grid. Technical and precise.
 - **Fonts**: Lora (narrative), IBM Plex Mono (system), IBM Plex Sans (interface)
 - **Accent**: Archival Ink Blue `rgb(49 46 129)`
-- **Radius**: `0.5rem` — square and deliberate
+- **Radius**: `--radius-md: 4px` — square and deliberate (each theme picks its own radius scale on purpose; tighter corners read as more technical)
 - **Background**: Mechanical drafting grid (72x72px)
 
 ### DS2 — "Warm Earth"
 Organic earth tones, soft forms, breathing space. Welcoming and grounded.
 - **Fonts**: Crimson Pro (narrative), JetBrains Mono (system), Manrope (interface)
 - **Accent**: Sage Green `rgb(124 139 111)`
-- **Radius**: `0.75rem` — soft and rounded
+- **Radius**: `--radius-md: 12px` — soft and rounded
 - **Background**: Clean solid (no pattern)
 
 ### DS3 — "Mechanical Manuscript"
 Aged paper, drafting ink, dot grid aesthetic. Textured and literary.
 - **Fonts**: Newsreader (narrative), Fira Code (system), DM Sans (interface)
 - **Accent**: Steel Blue `rgb(91 122 140)`
-- **Radius**: `0.375rem` — tight and compact
+- **Radius**: `--radius-md: 6px` — tight and compact
 - **Background**: Dot grid (24x24px)
 
 ### Theme Implementation
@@ -56,6 +56,14 @@ Aged paper, drafting ink, dot grid aesthetic. Textured and literary.
 See [design-tokens.md](../design-system/design-tokens.md) for the full token reference and [global-styles.md](../design-system/global-styles.md) for the `useTheme()` API.
 
 ## Component Design
+
+### Action Groups & Buttons
+To maintain consistent spacing and unified flexbox behavior across all design systems:
+- **Action Groups**: Never use raw floating `<Button>` clusters for toolbars or card footers. Always wrap buttons in the `<ActionButtonGroup>` or `<CardActionGroup>` components.
+- **Layout Attributes**: Use `layout="horizontal"` or `layout="vertical"` and `gap="sm" | "md" | "lg"` props on action groups to rely on standard design system space tokens instead of ad-hoc padding/margins.
+- **Flexible Primary Actions**: For buttons that should fill available width (like "Play" or "Save"), pass `flex: true` to the action definition. This uses a standardized `flex: 1 1 0%` CSS rule without requiring custom classes.
+- **Page-Level Actions**: Place primary page actions (like "Create World" or "Generate Character") inside the `actions` prop of the `<PageLayout>` component. This ensures they align to the top-right of the page header consistently.
+- **Segmented Controls**: For view toggles (like grid vs. table), wrap buttons in a `.view-mode-toggle` container and set the buttons to `size="icon"`.
 
 ### Interactive Elements
 - **Buttons**: Clear states (default, hover, active, disabled) with proper ARIA attributes
@@ -164,7 +172,7 @@ Use React DevTools Profiler to catch re-render issues.
 ### Theme-Aware Development
 1. Add new tokens to all 3 theme CSS files (`ds1.css`, `ds2.css`, `ds3.css`) — both light and dark blocks
 2. Consume tokens in component CSS via `var(--token-name)`
-3. Use semantic Tailwind classes (`bg-primary`, `text-muted-foreground`) for shadcn/ui-integrated components
+3. Style components with semantic CSS classes that consume design tokens via `var(--token)` — there are no Tailwind utility classes (Tailwind was removed in the design-system migration)
 4. Test across all 6 combinations (3 design systems x 2 color schemes)
 5. Verify WCAG contrast in both light and dark mode
 

@@ -9,7 +9,7 @@ updated: 2025-06-15
 
 # Narraitor Global Styles
 
-The global styling system provides a theme-aware foundation built on CSS custom properties and Tailwind CSS v4. Three design systems (DS1, DS2, DS3) with light and dark modes are fully supported — components consume tokens through `var()` and adapt automatically when the user switches themes.
+The global styling system provides a theme-aware foundation built on plain CSS and design-token custom properties. (There's no Tailwind — it was removed in the design-system migration, `#1097`.) Three design systems (DS1, DS2, DS3) with light and dark modes are fully supported — components consume tokens through `var()` and adapt automatically when the user switches themes.
 
 For the rationale behind having three design systems (and the structural-differentiation principle that shaped the per-theme CSS files referenced below), see [ADR-011](../architecture/ADR-011-three-design-systems.md).
 
@@ -17,10 +17,9 @@ For the rationale behind having three design systems (and the structural-differe
 
 The styling stack loads in this order:
 
-1. **Theme CSS files** (`src/lib/theme/themes/ds1.css`, `ds2.css`, `ds3.css`) — define all CSS custom properties under `[data-theme]` selectors
+1. **Theme CSS files** (`src/lib/theme/themes/ds1.css`, `ds2.css`, `ds3.css`, plus `_shared-tokens.css`) — define all CSS custom properties under `[data-theme]` selectors
 2. **Global styles** (`src/app/globals.css`) — base element resets and defaults that consume `var(--token)` values
-3. **Component CSS** — co-located styles for specific components
-4. **Tailwind utilities** — atomic utility classes for layout, spacing, and responsive design
+3. **Component CSS** — co-located styles for specific components, keyed off semantic class names
 
 ## Design Token Integration
 
@@ -30,11 +29,11 @@ This file works with the [design token system](./design-tokens.md) to provide co
 
 **The Golden Rule: No Inline Styles**
 
-We stick to Tailwind classes and CSS custom properties because inline styles bypass the theme system:
+Styling stays in CSS keyed off semantic class names, because inline styles bypass the theme system:
 
-- Always use Tailwind utility classes or `var(--token)` references
-- Never use inline styles (`style` prop) in components
-- If Tailwind doesn't provide what you need, create a custom CSS class that consumes tokens
+- Put styling in a CSS class that consumes `var(--token)` values
+- Compose class names in JSX with `clsx` (`clsx('card', isActive && 'card-active')`)
+- Never use inline styles (`style` prop) for anything the theme should control
 
 ### In Component CSS
 
@@ -54,26 +53,32 @@ We stick to Tailwind classes and CSS custom properties because inline styles byp
 }
 ```
 
-### In Tailwind Classes
+### In Components
 
 ```tsx
-// Good — uses semantic design tokens via Tailwind
-const CustomButton = ({ children }) => {
-  return (
-    <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
-      {children}
-    </button>
-  );
-};
+import { clsx } from 'clsx';
 
-// Bad — bypasses theme system with hardcoded colors
-const BadButton = ({ children }) => {
+// Good — a semantic class name; the styling lives in CSS keyed off it
+const CustomButton = ({ children, variant = 'primary' }) => {
   return (
-    <button className="bg-blue-600 px-4 py-2 rounded-md text-white hover:bg-blue-700">
+    <button className={clsx('btn', `btn-${variant}`)}>
       {children}
     </button>
   );
 };
+```
+
+```css
+/* btn styling consumes tokens, so it adapts per theme */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
 ```
 
 ## Theme Resolution Chain
@@ -96,8 +101,8 @@ These files are imported in `src/app/layout.tsx` so all tokens are available glo
 An inline `<script>` in `layout.tsx` runs before React hydrates, reading stored preferences from `localStorage` and applying them immediately to avoid a flash of unstyled content:
 
 ```javascript
-// Reads narraitor-theme → sets data-theme attribute
-// Reads narraitor-color-scheme → adds .dark class if needed
+// Reads narraitor-theme, sets the data-theme attribute
+// Reads narraitor-color-scheme, adds the .dark class if needed
 // Runs synchronously before first paint
 ```
 
@@ -110,8 +115,8 @@ After React hydrates, `ThemeProvider` takes over. It syncs React state from `loc
 ### 4. CSS Selectors Resolve
 
 The browser resolves `var(--token-name)` references based on the active selectors:
-- `[data-theme="ds2"]` → DS2 light tokens win
-- `[data-theme="ds2"].dark` → DS2 dark tokens override
+- `[data-theme="ds2"]` selects DS2 light tokens
+- `[data-theme="ds2"].dark` lets DS2 dark tokens override
 
 Components never need to know which theme is active — they just reference `var(--color-surface)` and the cascade handles the rest.
 

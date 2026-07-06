@@ -33,6 +33,11 @@ jest.mock('@/components/shared/PageLayout', () => {
   };
 });
 
+// Mock the appearance control (it depends on ThemeProvider context)
+jest.mock('@/components/Navigation/ThemeMenu', () => ({
+  ThemeMenu: () => <div data-testid="theme-menu" />,
+}));
+
 // Mock the Card components
 jest.mock('@/components/ui/card', () => {
   return {
@@ -63,13 +68,6 @@ describe('SettingsPage', () => {
     
     // Test that the description mentions backup and restore functionality
     expect(screen.getAllByText(/backup.*restore/i).length).toBeGreaterThan(0);
-  });
-
-  test('includes ExportImportControls component', () => {
-    render(<SettingsPage />);
-    
-    // Test that the ExportImportControls component is rendered
-    expect(screen.getByTestId('export-import-controls')).toBeInTheDocument();
   });
 
   test('uses PageLayout component structure', () => {

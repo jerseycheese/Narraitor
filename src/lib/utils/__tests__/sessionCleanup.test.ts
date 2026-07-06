@@ -2,11 +2,13 @@ import { cleanupSessionData } from '../sessionCleanup';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { logger } from '@/lib/utils/logger';
 
 // Mock stores
 jest.mock('@/state/narrativeStore');
 jest.mock('@/state/journalStore');
 jest.mock('@/state/sessionStore');
+jest.mock('@/lib/utils/logger');
 
 describe('sessionCleanup', () => {
   let mockClearSessionSegments: jest.Mock;
@@ -49,10 +51,7 @@ describe('sessionCleanup', () => {
 
   it('should handle errors during cleanup gracefully', async () => {
     const sessionId = 'test-session-1';
-    
-    // Mock console.error to prevent error logging during test
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-    
+
     mockClearSessionSegments.mockImplementation(() => {
       throw new Error('Cleanup failed');
     });
@@ -64,9 +63,7 @@ describe('sessionCleanup', () => {
     expect(mockClearSessionDecisions).toHaveBeenCalledWith(sessionId);
     expect(mockDeleteSessionEntries).toHaveBeenCalledWith(sessionId);
     expect(mockDeleteSavedSession).toHaveBeenCalledWith(sessionId);
-    expect(consoleSpy).toHaveBeenCalledWith('Error during session cleanup:', expect.any(Array));
-    
-    consoleSpy.mockRestore();
+    expect(logger.error).toHaveBeenCalledWith('Error during session cleanup:', expect.any(Array));
   });
 
   it('should clean up in the correct order to maintain data integrity', async () => {

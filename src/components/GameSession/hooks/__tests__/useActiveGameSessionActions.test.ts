@@ -10,6 +10,7 @@ const mockSessionStoreState = {
 const mockNarrativeStoreState = {
   selectDecisionOption: jest.fn(),
   updateDecision: jest.fn(),
+  getSessionSegments: jest.fn(() => []),
 };
 
 jest.mock('@/state/sessionStore', () => ({
@@ -26,6 +27,24 @@ jest.mock('@/state/narrativeStore', () => ({
   ),
 }));
 
+jest.mock('@/state/characterStore', () => ({
+  useCharacterStore: Object.assign(
+    jest.fn(),
+    { getState: jest.fn(() => ({ characters: {} })) }
+  ),
+}));
+
+jest.mock('@/state/worldStore', () => ({
+  useWorldStore: Object.assign(
+    jest.fn(),
+    { getState: jest.fn(() => ({ worlds: {} })) }
+  ),
+}));
+
+jest.mock('@/lib/ai/customActionSkillInference', () => ({
+  inferCustomActionSkillChecks: jest.fn(async () => []),
+}));
+
 const buildOptions = (overrides = {}) => ({
   sessionId: 'session-1',
   characterId: 'character-1',
@@ -34,6 +53,7 @@ const buildOptions = (overrides = {}) => ({
   setIsGenerating: jest.fn(),
   setShouldTriggerGeneration: jest.fn(),
   setIsGeneratingChoices: jest.fn(),
+  setIsEvaluatingAction: jest.fn(),
   setLocalSelectedChoiceId: jest.fn(),
   choiceGenerationTimeoutRef: { current: null },
   scheduleChoiceFallback: jest.fn(),
@@ -60,11 +80,14 @@ describe('useActiveGameSessionActions', () => {
     expect(mockSessionStoreState.completeTutorialPhase).toHaveBeenCalledWith('firstPlay');
   });
 
-  it('marks first play tutorial as completed after a custom choice', () => {
-    const { result } = renderHook(() => useActiveGameSessionActions(buildOptions()));
+  it('marks first play tutorial as completed after a custom choice', async () => {
+    const decision = { id: 'decision-1', prompt: 'What do you do?', options: [] };
+    const { result } = renderHook(() =>
+      useActiveGameSessionActions(buildOptions({ currentDecision: decision }))
+    );
 
-    act(() => {
-      result.current.handleCustomSubmit('Custom choice');
+    await act(async () => {
+      await result.current.handleCustomSubmit('Custom choice');
     });
 
     expect(mockSessionStoreState.completeTutorialPhase).toHaveBeenCalledWith('firstPlay');
@@ -79,5 +102,48 @@ describe('useActiveGameSessionActions', () => {
     });
 
     expect(mockSessionStoreState.completeTutorialPhase).not.toHaveBeenCalled();
+  });
+
+  describe('handleCustomSubmit — decision guard', () => {
+    it('does nothing when there is no active decision', async () => {
+      const onChoiceSelected = jest.fn();
+      const { result } = renderHook(() =>
+        useActiveGameSessionActions(buildOptions({ currentDecision: null, onChoiceSelected }))
+      );
+
+      await act(async () => {
+        await result.current.handleCustomSubmit('I yell into the void');
+      });
+
+      expect(onChoiceSelected).not.toHaveBeenCalled();
+      expect(mockNarrativeStoreState.updateDecision).not.toHaveBeenCalled();
+    });
+
+    it('registers the option and triggers generation when a decision is active', async () => {
+      const onChoiceSelected = jest.fn();
+      const decision = {
+        id: 'decision-2',
+        prompt: 'What do you do?',
+        options: [{ id: 'opt-1', text: 'Run away' }],
+      };
+      const { result } = renderHook(() =>
+        useActiveGameSessionActions(buildOptions({ currentDecision: decision, onChoiceSelected }))
+      );
+
+      await act(async () => {
+        await result.current.handleCustomSubmit('I draw my sword');
+      });
+
+      expect(mockNarrativeStoreState.updateDecision).toHaveBeenCalledTimes(1);
+      const [updatedId, patch] = mockNarrativeStoreState.updateDecision.mock.calls[0];
+      expect(updatedId).toBe('decision-2');
+      expect(patch.options).toHaveLength(2);
+      expect(patch.options[1].text).toBe('I draw my sword');
+      expect(patch.options[1].isCustomInput).toBe(true);
+
+      // onChoiceSelected must be called with the same id that was registered
+      expect(onChoiceSelected).toHaveBeenCalledTimes(1);
+      expect(onChoiceSelected).toHaveBeenCalledWith(patch.selectedOptionId);
+    });
   });
 });

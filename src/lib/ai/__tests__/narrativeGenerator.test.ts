@@ -1,6 +1,6 @@
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { GeminiClient } from '../geminiClient';
-import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { createMockWorldStore } from '@/lib/test-utils';
@@ -66,7 +66,7 @@ describe('NarrativeGenerator', () => {
 
     // Mock prompt template
     const mockTemplate = jest.fn().mockReturnValue('Generated prompt');
-    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+    (getNarrativeTemplate as jest.Mock).mockReturnValue(
       mockTemplate
     );
 
@@ -106,7 +106,7 @@ describe('NarrativeGenerator', () => {
       // Segment type is inferred from content - this should be 'scene' (descriptive content)
       expect(result.segmentType).toBe('scene');
       expect(result.metadata.mood).toBe('mysterious');
-      expect(narrativeTemplateManager.getTemplate).toHaveBeenCalledWith(
+      expect(getNarrativeTemplate).toHaveBeenCalledWith(
         'narrative/scene'
       );
     });
@@ -269,7 +269,7 @@ describe('NarrativeGenerator', () => {
 
       expect(result.content).toContain('Mystical Forest');
       expect(result.segmentType).toBe('scene');
-      expect(narrativeTemplateManager.getTemplate).toHaveBeenCalledWith(
+      expect(getNarrativeTemplate).toHaveBeenCalledWith(
         'narrative/initialScene'
       );
     });

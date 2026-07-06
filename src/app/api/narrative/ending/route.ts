@@ -1,7 +1,8 @@
 // src/app/api/narrative/ending/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { endingGenerator } from '../../../../lib/ai/endingGenerator';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { generateEnding } from '../../../../lib/ai/endingGenerator';
 import { logger } from '../../../../lib/utils/logger';
 import type { EndingGenerationRequest, EndingType, EndingTone } from '../../../../types/narrative.types';
 
@@ -40,7 +41,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create the ending generation request
     const endingRequest: EndingGenerationRequest = {
       sessionId,
       characterId,
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate the ending
-    const result = await endingGenerator.generateEnding(endingRequest);
+    const result = await generateEnding(endingRequest, resolveApiKey(request));
 
     logger.info('Story ending generated successfully', { 
       sessionId,
@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
       tokenUsage: result.tokenUsage
     });
 
-    // Return the generated ending
     return NextResponse.json({
       success: true,
       data: result
@@ -84,7 +83,6 @@ export async function POST(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error'
     });
 
-    // Return appropriate error response
     if (error instanceof Error) {
       if (error.message.includes('not found')) {
         return NextResponse.json(

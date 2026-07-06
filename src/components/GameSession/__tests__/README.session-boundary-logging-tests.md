@@ -69,7 +69,7 @@ mockUseJournalStore.mockReturnValue({
   // ... other methods
 });
 
-// Session Store Mock  
+// Session Store Mock
 mockUseSessionStore.mockReturnValue({
   id: 'test-session-123',
   status: 'active',
@@ -97,7 +97,7 @@ mockUseSessionStore.mockReturnValue({
 **Session End Entry**:
 ```typescript
 {
-  type: 'session_end', 
+  type: 'session_end',
   title: 'Chapter Closes',
   content: 'Session completed after 45 minutes',
   metadata: {
@@ -114,9 +114,9 @@ mockUseSessionStore.mockReturnValue({
 
 ## Test Status
 
-✅ **Journal Store Tests**: 7/7 passing
-✅ **UI Display Tests**: Covered in journal page component tests
-✅ **Integration Tests**: 3/4 passing (1 test needs GameSession import fix)
+- **Journal Store Tests**: 7/7 passing
+- **UI Display Tests**: Covered in journal page component tests
+- **Integration Tests**: 3/4 passing (1 test needs GameSession import fix)
 
 ## Known Issues and Fixes Needed
 
@@ -124,7 +124,7 @@ mockUseSessionStore.mockReturnValue({
 - **Issue**: Multiple elements with same text content (list + detail views)
 - **Fix**: Use `getAllByText()` and filter by specific containers
 
-### Integration Tests  
+### Integration Tests
 - **Issue**: GameSession import error in one test
 - **Fix**: Use default import instead of named import
 
@@ -137,7 +137,7 @@ Based on the tests, the actual implementation needs:
 // Add to session store
 initializeSession: (worldId, characterId, onComplete) => {
   // ... existing logic
-  
+
   // Add journal entry for session start
   const journalStore = useJournalStore.getState();
   journalStore.addEntry(sessionId, {
@@ -158,7 +158,7 @@ initializeSession: (worldId, characterId, onComplete) => {
 endSession: () => {
   // Calculate duration and stats
   const duration = endTime - startTime;
-  
+
   // Add journal entry for session end
   journalStore.addEntry(sessionId, {
     type: 'session_end',
@@ -179,11 +179,11 @@ endSession: () => {
 
 ## Acceptance Criteria Verification
 
-✅ **Session start creates journal entry**: Verified in journal store tests
-✅ **Session end creates journal entry with duration**: Verified in journal store tests  
-✅ **System events distinguishable from narrative**: Verified in mixed entry tests
-✅ **Session metadata included**: Verified in all metadata tests
-✅ **UI displays events with distinct formatting**: Verified in UI display tests
+- **Session start creates journal entry**: Verified in journal store tests
+- **Session end creates journal entry with duration**: Verified in journal store tests
+- **System events distinguishable from narrative**: Verified in mixed entry tests
+- **Session metadata included**: Verified in all metadata tests
+- **UI displays events with distinct formatting**: Verified in UI display tests
 
 ## Next Steps
 

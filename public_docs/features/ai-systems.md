@@ -7,7 +7,7 @@ updated: 2025-10-11
 
 # AI Systems
 
-This the AI integration here is pretty central to the whole experience. The key insight was that generic AI story generation produces bland results, but if you give the AI specific context about your world's rules and tone, it can generate content that feels authentic to that setting.
+The AI integration is pretty central to the whole experience. Generic AI story generation produces bland results, but giving the AI specific context about a world's rules and tone gets you content that feels authentic to that setting.
 
 ## What the AI Does
 
@@ -27,7 +27,7 @@ This the AI integration here is pretty central to the whole experience. The key 
 
 The AI requests all go through secure server-side routes to keep API keys protected:
 
-- **Rate limiting**: 50 requests/hour per IP to prevent abuse and control costs
+- **Rate limiting**: 50 requests/hour per IP in production (500 in dev) on the narrative generation routes, via `src/utils/rateLimiter.ts`; over the limit returns 429 with `X-RateLimit-*` headers
 - **Server-side keys**: `GEMINI_API_KEY` never reaches the browser
 - **Proxy pattern**: Client-side code calls Next.js API routes, which handle the actual AI communication
 
@@ -35,7 +35,7 @@ The AI requests all go through secure server-side routes to keep API keys protec
 
 ### Client-side Usage
 ```typescript
-import { createDefaultGeminiClient } from '@/lib/ai/gemini-client';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
 const client = createDefaultGeminiClient();
 const response = await client.generateContent('Generate a story about a cowboy');
@@ -43,7 +43,7 @@ const response = await client.generateContent('Generate a story about a cowboy')
 
 ### Server-side Usage (API Routes Only)
 ```typescript
-import { GeminiClient } from '@/lib/ai/gemini-client';
+import { GeminiClient } from '@/lib/ai/geminiClient';
 
 const client = new GeminiClient({
   apiKey: process.env.GEMINI_API_KEY,
@@ -145,22 +145,6 @@ import { WorldCreationWizard } from '@/components/World';
 />
 ```
 
-## Smart Templates
-
-The AI can generate complete world templates in three ways: "Inspired By" takes your description and builds a template from it, "Genre Mixer" combines multiple genres for unique worlds, and "Surprise Me" generates unexpected concepts.
-
-```tsx
-import { SmartTemplates } from '@/components/World/SmartTemplates';
-
-<SmartTemplates
-  onTemplateGenerated={(template) => {
-    // Use generated template
-  }}
-/>
-```
-
-Each template includes the world name and description, suggested attributes and skills, theme and genre info, and a preview modal so you can review before using it.
-
 ## Goal Tracking System
 
 The AI automatically extracts and tracks player objectives to keep the narrative consistent. It identifies goals from the story (both explicit and implicit), monitors progress and completion, and includes active goals in AI prompts so the narrative stays focused on what matters.
@@ -179,15 +163,15 @@ const narrative = "The wizard warned me that the dragon will attack at dawn. I m
 
 ### Context Building
 ```typescript
-import { aiContextStore } from '@/state/aiContextStore';
+import { useAiContextStore } from '@/state/aiContextStore';
 
-const context = aiContextStore.buildContextForSession(sessionId, {
+const context = await useAiContextStore.getState().buildContextForSession(sessionId, {
   includeGoals: true,
   maxTokens: 500,
   prioritizeRecent: true
 });
 
-// Returns formatted goal context for AI consumption
+// Returns formatted goal context for AI consumption (async)
 ```
 
 ### Detailed Documentation
@@ -257,7 +241,7 @@ You can also create custom scenarios if you need to test specific response patte
 The nice thing about the integration is that existing AI service calls don't need to change. When mocking is enabled, the system automatically returns mock responses instead of making real API calls:
 
 ```typescript
-import { createDefaultGeminiClient } from '@/lib/ai/gemini-client';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
 const client = createDefaultGeminiClient();
 // Returns mock response if mocking enabled, otherwise calls real API

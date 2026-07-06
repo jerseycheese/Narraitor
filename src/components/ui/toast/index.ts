@@ -58,5 +58,3 @@ export { Toast } from './toast'
 export { Toaster, ToastProvider, useToast } from './toaster'
 
 // Type definitions
-export type { ToastProps } from './toast'
-export type { ToastData, ToasterProps } from './toaster'

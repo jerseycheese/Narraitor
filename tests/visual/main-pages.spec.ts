@@ -1,12 +1,28 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/seedTestData';
+import { waitForStoreReady } from './utils/tutorial-helpers';
 
 /**
  * Main Pages Visual Regression Tests
- * 
+ *
  * Tests core application pages for visual consistency.
  * Covers both empty states (first-time users) and populated states (returning users).
+ *
+ * NOTE: the committed baselines are the CI runner's render, not a local one.
+ * Full-page heights and any text rows take their height from OS-rendered font
+ * metrics, which differ between a dev machine and the CI macOS image, so a
+ * locally-generated baseline drifts against CI. To refresh these snapshots,
+ * take the actuals from a CI E2E run rather than regenerating with
+ * `--update-snapshots` locally. See commit 2fe3941a for the original
+ * rationale.
+ *
+ * DS coverage (#1264): single-theme (default DS1). Each page captured here has a
+ * focused all-DS companion — dashboard/home in tests/visual/dashboard-themes.spec.ts,
+ * worlds list in worlds-themes.spec.ts, characters list in characters-themes.spec.ts,
+ * world detail/edit in world-detail-themes.spec.ts, character detail/edit in
+ * character-detail-themes.spec.ts. Tripling this multi-page sweep (whose baselines
+ * are CI-adopted) would duplicate that coverage.
  */
 
 test.describe('Main Pages Visual Tests', () => {
@@ -94,16 +110,19 @@ test.describe('Main Pages Visual Tests', () => {
     await expect(page).toHaveScreenshot('characters-list.png', { fullPage: true });
   });
 
-  // Skipped pending #1198 — IndexedDB seed loses race against page render
-  // intermittently in CI (sidebar nav appears, main content empty). Passes
-  // locally; CI captures the empty-state render once seeding lags.
-  test.skip('World detail page should render consistently', async ({ page }) => {
+  test('World detail page should render consistently', async ({ page }) => {
     await seedTestData(page);
 
     // Navigate to the cyberpunk world detail page
     await page.goto('/worlds/world-cyberpunk-2077');
+    // Block on the seed flushing and the world actually rendering before
+    // capture — without this the IndexedDB seed loses the race in CI and the
+    // page paints empty (sidebar only). See #1198.
+    await waitForStoreReady(page);
+    await expect(page.getByText('Cyberpunk Neo-Tokyo').first()).toBeVisible({ timeout: 15000 });
     await waitForContentStable(page);
     await hideDynamicContent(page);
+    await pinAppShell(page);
 
     // Take screenshot of world detail page - should show world info, characters, and actions
     await expect(page).toHaveScreenshot('world-detail.png', { fullPage: true });
@@ -116,7 +135,8 @@ test.describe('Main Pages Visual Tests', () => {
     await page.goto('/characters/char-cyberpunk-hacker');
     await waitForContentStable(page);
     await hideDynamicContent(page);
-    
+    await pinAppShell(page);
+
     // Take screenshot of character detail page - should show character sheet, attributes, skills
     await expect(page).toHaveScreenshot('character-detail.png', { fullPage: true });
   });
@@ -140,7 +160,8 @@ test.describe('Main Pages Visual Tests', () => {
     await expect(
       editor.locator('[data-testid="collapsible-section-toggle"]').filter({ hasText: '+' })
     ).toHaveCount(0);
-    
+    await pinAppShell(page);
+
     // Take screenshot of world edit page - should show world editing interface with all sections expanded
     await expect(page).toHaveScreenshot('world-edit.png', { fullPage: true });
   });
@@ -184,7 +205,8 @@ test.describe('Main Pages Visual Tests', () => {
       hasText: '+'
     }).count();
     console.log(`Found ${stillCollapsed} collapsed sections after expansion`);
-    
+    await pinAppShell(page);
+
     // Take screenshot of character edit page - should show character editing interface with all sections expanded
     await expect(page).toHaveScreenshot('character-edit.png', { fullPage: true });
   });

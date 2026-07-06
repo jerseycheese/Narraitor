@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import type { StoryEnding } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import type { Character } from '@/types/character.types';
@@ -31,7 +32,6 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
   const characterName = character?.name || 'The Hero';
   const tone = ending.tone;
   
-  // Create a detailed prompt for ending image generation
   const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of ${characterName}'s story in ${worldName}. This is a ${tone} ending to their journey.`;
   
   // Add tone-specific visual guidance
@@ -114,8 +114,9 @@ export async function POST(request: NextRequest) {
     logger.debug('generate-ending-image', 'Starting image generation for ending:', body.ending.id);
 
     try {
-      // Generate image prompt using AI
-      const client = createDefaultGeminiClient();
+      // Generate image prompt using AI (player's BYO key -> env fallback)
+      const apiKey = resolveApiKey(request);
+      const client = createDefaultGeminiClient(apiKey);
       const imagePrompt = generateImagePrompt(body.ending, body.world, body.character, body.recentNarrative);
       
       logger.debug('generate-ending-image', 'Generated image prompt:', imagePrompt);
@@ -149,10 +150,8 @@ export async function POST(request: NextRequest) {
       let aiGenerated = false;
       let placeholder = true;
 
-      // Check if we have Gemini API key for image generation
-      const apiKey = process.env.GEMINI_API_KEY;
-      
-      if (apiKey && apiKey !== 'MOCK_API_KEY') {
+      // Use the key resolved above (player's BYO key -> env fallback).
+      if (apiKey) {
         try {
           logger.debug('generate-ending-image', 'Attempting Gemini image generation');
           

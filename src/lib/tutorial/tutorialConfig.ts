@@ -1,3 +1,5 @@
+import type { Placement } from '@popperjs/core';
+
 export const joyrideStyles = {
   options: {
     primaryColor: 'hsl(var(--primary))',
@@ -17,6 +19,11 @@ export const joyrideStyles = {
   },
   overlay: {
     pointerEvents: 'none' as const,
+    // The dim comes from the spotlight's ring shadow below, so keep the overlay
+    // itself clear and let that shadow extend past it (#1431).
+    backgroundColor: 'transparent',
+    mixBlendMode: 'normal' as const,
+    overflow: 'visible' as const,
   },
   tooltipContent: {
     textAlign: 'left' as const,
@@ -26,6 +33,13 @@ export const joyrideStyles = {
   },
   spotlight: {
     pointerEvents: 'none' as const,
+    // Dim everything except the highlighted target with one large ring shadow.
+    // react-joyride's default hard-light overlay composited to a no-op in this
+    // app's stacking context, so the tour never showed a backdrop (#1431).
+    backgroundColor: 'transparent',
+    mixBlendMode: 'normal' as const,
+    // eslint-disable-next-line design-tokens/no-hardcoded-colors
+    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.45)',
   },
   buttonNext: {
     backgroundColor: 'hsl(var(--primary))',
@@ -45,7 +59,7 @@ export const joyrideStyles = {
   },
 };
 
-export const joyrideOptions = {
+const joyrideOptions = {
   continuous: true,
   scrollToFirstStep: false,
   showProgress: false,
@@ -55,7 +69,9 @@ export const joyrideOptions = {
   floaterProps: {
     modifiers: {
       flip: {
-        fallbackPlacements: ['bottom', 'top'],
+        options: {
+          fallbackPlacements: ['bottom', 'top', 'left', 'right'] as Placement[],
+        },
       },
     },
   },
@@ -65,13 +81,13 @@ export const joyrideOptions = {
  * Tours that run inside modals need scrolling disabled to prevent
  * the page underneath from scrolling, which breaks spotlight positioning
  */
-export const MODAL_TOURS = [] as const;
+const MODAL_TOURS = [] as const;
 
 /**
  * Tours that use the custom useTutorialAutoScroll hook
  * (Native Joyride scrolling must be disabled)
  */
-export const MANUAL_SCROLL_TOURS = [
+const MANUAL_SCROLL_TOURS = [
   'firstPlay',
 ] as const;
 

@@ -9,15 +9,6 @@ import {
 import type { SkillDifficulty } from './skill-difficulty.types';
 import type { ToneSettings } from './tone-settings.types';
 import type { GenreValue } from './genre.types';
-import type { CharacterArchetype } from '@/types/archetype.types';
-
-export type { CharacterArchetype };
-
-/**
- * Character template for quick character creation
- * Structurally identical to CharacterArchetype but stored per-world
- */
-export type CharacterTemplate = CharacterArchetype;
 
 /**
  * Represents a game world configuration
@@ -32,7 +23,6 @@ export interface World extends NamedEntity, TimestampedEntity {
   reference?: string;
   relationship?: 'set_within' | 'inspired_by';
   toneSettings?: ToneSettings;
-  characterTemplates?: CharacterTemplate[];
 }
 
 /**
@@ -48,6 +38,14 @@ export interface WorldAttribute extends NamedEntity {
 }
 
 /**
+ * A minimum attribute value a character must have before a skill can be selected
+ */
+export interface SkillAttributePrerequisite {
+  attributeId: EntityID;
+  minValue: number;
+}
+
+/**
  * Represents a skill within a world
  */
 export interface WorldSkill extends NamedEntity {
@@ -59,6 +57,7 @@ export interface WorldSkill extends NamedEntity {
   baseValue: number;
   minValue: number;
   maxValue: number;
+  attributePrerequisites?: SkillAttributePrerequisite[];
 }
 
 /**

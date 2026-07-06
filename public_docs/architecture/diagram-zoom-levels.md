@@ -1,124 +1,66 @@
 # Diagram Zoom Levels - Quick Reference
 
-## Choose Your View
+The dependency diagrams come at several zoom levels, because one diagram can't be both a
+readable overview and a complete file-by-file map. Pick the level that matches what you're
+trying to do.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│  ZOOM LEVEL          │  FILE                    │  FORMAT       │
-├──────────────────────────────────────────────────────────────────┤
-│  🎯 Interactive      │  *-interactive.html      │  HTML (BEST)  │
-│  (hover/click)       │  Explore relationships   │               │
-│                      │  RECOMMENDED             │               │
-├──────────────────────────────────────────────────────────────────┤
-│  📁 Folders          │  *-folders.svg           │  SVG          │
-│  (directory deps)    │  Directory level only    │               │
-├──────────────────────────────────────────────────────────────────┤
-│  🌍 Domains          │  *-domains.mmd           │  Mermaid ✅   │
-│  (state, lib, etc)   │  ~54 lines               │               │
-│                      │  START HERE              │               │
-├──────────────────────────────────────────────────────────────────┤
-│  🧩 Components       │  component-*.mmd         │  Mermaid ✅   │
-│  (GameSession, etc)  │  ~112 lines              │               │
-├──────────────────────────────────────────────────────────────────┤
-│  🏪 Stores           │  stores-*.mmd            │  Mermaid ✅   │
-│  (sessionStore, etc) │  ~275 lines              │               │
-├──────────────────────────────────────────────────────────────────┤
-│  📄 All Files        │  *-detailed.mmd          │  Mermaid ❌   │
-│  (every .ts/.tsx)    │  5000+ lines             │  Use Live     │
-└──────────────────────────────────────────────────────────────────┘
-```
+## Choose your view
 
-## ⭐ New: Interactive HTML
+| Zoom level | File | Format | Notes |
+|------------|------|--------|-------|
+| Interactive | `*-interactive.html` | HTML | Best for exploring; hover/click relationships |
+| Folders | `*-folders.svg` | SVG | Directory-to-directory dependencies only |
+| Domains | `*-domains.mmd` | Mermaid | Start here; ~54 lines, renders in VS Code |
+| Components | `component-*.mmd` | Mermaid | ~112 lines, renders in VS Code |
+| Stores | `stores-*.mmd` | Mermaid | ~275 lines, renders in VS Code |
+| All files | `*-detailed.mmd` | Mermaid | 5000+ lines; use Mermaid Live, not VS Code |
 
-**The best way to explore dependencies:**
+## Interactive HTML
+
+The most useful way to explore dependencies:
 
 ```bash
 npm run deps:diagram:interactive
 open public_docs/architecture/dependency-graph-interactive.html
 ```
 
-- Hover to highlight connections
-- Click to "pin" relationships
-- Self-contained (works offline)
-- No size limitations
+Hover to highlight a module's connections, click to pin a relationship, and press ESC to clear.
+It's self-contained, works offline, and has no size limit.
 
-## What Each Level Shows
+## What each level shows
 
-### 📁 Folder Level (dependency-graph-folders.svg)
-```
-Shows directory-to-directory dependencies:
+### Folder level (dependency-graph-folders.svg)
 
-src/state/ → src/lib/
-src/components/ → src/state/
-src/app/ → src/components/
-```
+Directory-to-directory dependencies — for instance, `src/state/` depending on `src/lib/`,
+`src/components/` depending on `src/state/`, and `src/app/` depending on `src/components/`. Use
+it when you're checking module boundaries or hunting architectural issues.
 
-**Use when:** Understanding module boundaries, finding architectural issues
+### Domain level (dependency-graph-domains.mmd)
 
-### 🌍 Domain Level (dependency-graph-domains.mmd)
-```
-Shows your architecture at the highest level:
+The highest-level view of the architecture: `state/` (domain stores), `components/` (UI),
+`lib/` (domain logic), `types/`, `utils/`, and `app/` (Next.js routes). Use it to get oriented
+or to explain the architecture to someone.
 
-src/
-├── state/          ← Domain stores
-├── components/     ← UI layer
-├── lib/            ← Business logic
-├── types/          ← Type definitions
-├── utils/          ← Pure functions
-└── app/            ← Next.js routes
-```
+### Component level (component-dependencies.mmd)
 
-**Use when:** Getting oriented, explaining architecture to others
+Major component folders and how they relate — `GameSession/`, `WorldCreationWizard/`,
+`CharacterEditor/`, `shared/`, `ui/`, and so on. Use it when understanding component
+relationships or planning a UI refactor.
 
-### 🧩 Component Level (component-dependencies.mmd)
-```
-Shows major component folders:
+### Store level (stores-dependencies.mmd)
 
-components/
-├── GameSession/
-├── WorldCreationWizard/
-├── CharacterEditor/
-├── shared/
-└── ui/
-```
+All the Zustand stores and their connections: `worldStore`, `characterStore`, `npcStore`,
+`sessionStore`, `narrativeStore`, `journalStore`, `inventoryStore`, `goalStore`,
+`navigationStore`, `aiContextStore`, and `loreStore`. Use it when debugging state issues or
+tracing data flow — this is also where the known store-to-store circular dependencies show up.
 
-**Use when:** Understanding component relationships, refactoring UI
+### Full detail (dependency-graph-detailed.mmd)
 
-### 🏪 Store Level (stores-dependencies.mmd)
-```
-Shows all Zustand stores and their connections:
+Every file and import, including tests and mocks. Use it only when tracking down a specific
+circular dependency. It's too big for VS Code (1000+ edges), so paste it into the Mermaid Live
+Editor at https://mermaid.live.
 
-state/
-├── worldStore
-├── characterStore
-├── sessionStore
-├── narrativeStore
-├── journalStore
-├── inventoryStore
-├── goalStore
-└── loreStore
-```
-
-**Use when:** Debugging state issues, understanding data flow
-
-### 📄 Full Detail (dependency-graph-detailed.mmd)
-```
-Shows EVERY file and import:
-
-state/
-├── worldStore.ts
-├── worldStore.test.ts
-├── __mocks__/
-│   └── worldStore.ts
-└── persistence.ts
-```
-
-**Use when:** Tracking down specific circular dependencies
-
-**⚠️ Warning:** Too complex for VS Code (1000+ edges limit)
-Use Mermaid Live Editor: https://mermaid.live
-
-## Quick Commands
+## Quick commands
 
 ```bash
 # View domains in VS Code
@@ -131,15 +73,10 @@ cat public_docs/architecture/dependency-graph-detailed.mmd | pbcopy
 npm run deps:diagram:all
 ```
 
-## When VS Code Shows Errors
+## When VS Code shows errors
 
-**"Edge limit exceeded" or "Cannot set properties"**
-→ Diagram too complex, use Mermaid Live Editor instead
-
-**"Syntax error in text"**
-→ Try a higher-level zoom (domains instead of detailed)
-
-**General rule:**
-- <100 lines = Fast in VS Code ✅
-- 100-500 lines = Works in VS Code ⚠️
-- 500+ lines = Use Mermaid Live ❌
+An "edge limit exceeded" or "Cannot set properties" error means the diagram is too complex —
+use the Mermaid Live Editor instead. A "syntax error in text" usually means you should drop to a
+higher-level zoom (domains rather than detailed). As a rule of thumb, diagrams under ~100 lines
+are fast in VS Code, 100-500 lines work but can be slow, and anything past ~500 lines belongs in
+Mermaid Live.

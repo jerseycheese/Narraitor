@@ -6,6 +6,15 @@ interface PlayerChoiceTemplateContext {
   genre?: string;
   narrativeContext?: NarrativeContext;
   characterIds?: string[];
+  worldSkills?: Array<{
+    id: string;
+    name: string;
+    description: string;
+  }>;
+  worldNpcs?: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 /**
@@ -13,7 +22,7 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt with 1 lawful, 2 neutral, and 1 chaotic option
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext } = context;
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs } = context;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
@@ -36,7 +45,37 @@ export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): str
     const lastPart = recentContent.slice(-400);
     shortContext = `${firstPart}\n\n[...narrative continues...]\n\n${lastPart}`;
   }
-  
+
+  let skillsInfo = '';
+  if (worldSkills && worldSkills.length > 0) {
+    skillsInfo = `
+AVAILABLE SKILLS IN THIS WORLD:
+${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
+  }
+
+  // Known-character roster + consequence contract; only emitted when the
+  // world has NPCs so the parser has names to resolve against.
+  const hasNpcs = !!worldNpcs && worldNpcs.length > 0;
+  const npcInfo = hasNpcs
+    ? `
+
+KNOWN CHARACTERS (use these exact names):
+${worldNpcs.map(npc => `- ${npc.name}`).join('\n')}`
+    : '';
+  const consequencesInstructions = hasNpcs
+    ? `
+
+CONSEQUENCES (REQUIRED WHEN A KNOWN CHARACTER IS AFFECTED):
+- When an option would plausibly change how a known character feels about the player, add a Consequences line for that option.
+- Format EXACTLY: Consequences: CharacterName trust +N  (or -N), comma-separated for multiple characters.
+- Use ONLY names from the KNOWN CHARACTERS list. Omit the line entirely when no known character is affected.
+- Scale N to the Decision Weight: MINOR 2-5, MAJOR 5-12, CRITICAL 10-20.`
+    : '';
+  const consequencesFormatLine = hasNpcs
+    ? `
+   Consequences: [Optional - CharacterName trust +/-N]`
+    : '';
+
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
@@ -45,7 +84,7 @@ LOCATION: ${location || 'Unknown location'}
 SITUATION: ${narrativeContext?.currentSituation || 'General scenario'}
 
 FULL CONTEXT:
-${shortContext}
+${shortContext}${skillsInfo}${npcInfo}
 
 === CRITICAL INSTRUCTIONS ===
 You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.
@@ -55,7 +94,7 @@ Based on the SPECIFIC narrative situation above, create 4 distinct action choice
 ALIGNMENT DEFINITIONS:
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
-- CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. These should be dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. Think "throw a fireball at the ceiling," "start singing loudly to distract everyone," "pretend to be possessed by a spirit," or "challenge them to a dance-off." The goal is to provide players with options that can dramatically shift the narrative in surprising ways.
+- CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. Dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. VARY THE KIND of chaos and do NOT default to making noise (yelling, shouting, singing). Draw from a wide range, fitted to the scene: sudden physical risk ("leap from the balcony onto the chandelier," "kick over the lantern to set the drapes alight"), trickery or deception ("impersonate the captain and bark orders," "bluff an outrageous lie with total confidence"), sabotage or destruction ("cut the rope bridge behind you," "smash the control panel," "throw open the cells and free the prisoners"), turning the tables ("start a brawl to scatter the room," "switch sides mid-negotiation"), or abandoning the obvious goal for something no one expects. The goal is options that dramatically shift the narrative in surprising ways.
 
 PERSONALITY-INFORMED CHOICES (when character personality context is provided):
 - Within the REQUIRED alignment distribution (1 lawful, 2 neutral, 1 chaotic), create options that offer ways to express the character's traits
@@ -75,12 +114,14 @@ REQUIREMENTS:
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
 SKILL REQUIREMENTS (CRITICAL FOR MVP):
-Generate choices with skill requirements when the situation naturally calls for specialized abilities:
-- Analyze the current scene for opportunities where skills would logically apply
-- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Persuasion for social encounters, Stealth for avoiding detection, Athletics for physical challenges)
+Generate choices with skill requirements only when the situation naturally calls for specialized abilities AND the skill exists in the "AVAILABLE SKILLS" list:
+- ONLY use the exact skill names from the "AVAILABLE SKILLS" list provided above.
+- NEVER invent new skills or use generic skills (like "Stealth", "Persuasion", "Athletics", etc.) unless they are explicitly listed in the "AVAILABLE SKILLS" for this world.
+- If NO "AVAILABLE SKILLS" are listed for this world, do NOT include any "Requirements:" lines in your options.
+- Analyze the current scene for opportunities where the provided world skills would logically apply.
 - Include a mix of skill-required and non-skill choices for player agency
 - Vary skill requirements across choices - use different character abilities when possible
-- Format skill requirements as: [SkillName X+] where X is the minimum level
+- Format skill requirements as: Requirements: SkillName X+
 
 DECISION WEIGHT ANALYSIS:
 Carefully evaluate the narrative situation and determine the significance of this decision:
@@ -88,7 +129,7 @@ Carefully evaluate the narrative situation and determine the significance of thi
 - MAJOR: Important choices that significantly impact the story direction (meeting key characters, choosing major paths, using powerful abilities, entering dangerous areas, making moral choices)
 - CRITICAL: Life-changing decisions with major consequences (combat with deadly enemies, final confrontations, destiny-altering choices, choosing between life and death)
 
-Consider the stakes, potential consequences, and story impact. Don't default to MINOR - use MAJOR for interesting story moments and CRITICAL for climactic situations.
+Consider the stakes, potential consequences, and story impact. MOST decisions are MINOR or MAJOR: MINOR for everyday beats, MAJOR for the interesting story moments. Reserve CRITICAL for the RARE, genuinely life-or-death turning points - deadly combat, final confrontations, or choices where failure would plausibly end the character's story. When unsure between MAJOR and CRITICAL, choose MAJOR.
 
 FORMAT (REQUIRED - include alignment tags, decision weight, and context summary):
 Decision Weight: [MINOR/MAJOR/CRITICAL]
@@ -97,15 +138,14 @@ Decision: What will you do?
 
 Options:
 1. [LAWFUL] [First choice - follows rules/authority/order]
-   Requirements: [Optional - SkillName X+]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
 2. [NEUTRAL] [Second choice - balanced/practical approach]
-   Requirements: [Optional - SkillName X+]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
 3. [NEUTRAL] [Third choice - different practical approach]
-   Requirements: [Optional - SkillName X+]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
 4. [CHAOTIC] [Fourth choice - WILDLY UNEXPECTED action that could completely change the situation - be creative and dramatic!]
-   Requirements: [Optional - SkillName X+]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}${consequencesInstructions}
 
 Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary line, then Decision and Options sections with alignment tags.`;
 };
 
-export default alignedChoiceTemplate;

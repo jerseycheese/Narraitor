@@ -1,15 +1,43 @@
 import React from 'react';
-import { 
-  wizardStyles, 
+import {
+  wizardStyles,
   WizardFormSection
 } from '@/components/shared/wizard';
 import { PointPoolManager, PointAllocation } from '@/components/shared/PointPoolManager';
+import { World } from '@/types/world.types';
+
+interface CharacterWizardAttribute {
+  attributeId: string;
+  name: string;
+  value: number;
+  minValue: number;
+  maxValue: number;
+  description?: string;
+}
+
+interface AttributesStepData {
+  characterData: {
+    attributes: CharacterWizardAttribute[];
+  };
+  pointPools: {
+    attributes: {
+      total: number;
+      spent: number;
+      remaining: number;
+    };
+  };
+  validation: Record<number, {
+    valid: boolean;
+    touched: boolean;
+    errors: string[];
+  }>;
+}
 
 interface AttributesStepProps {
-  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onUpdate: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  data: AttributesStepData;
+  onUpdate: (updates: Record<string, unknown>) => void;
   onValidation: (valid: boolean, errors: string[]) => void;
-  worldConfig: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  worldConfig: World;
 }
 
 export const AttributesStep: React.FC<AttributesStepProps> = ({
@@ -17,7 +45,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
   onUpdate,
 }) => {
   // Convert attributes to PointAllocation format
-  const allocations: PointAllocation[] = data.characterData.attributes.map((attr: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
+  const allocations: PointAllocation[] = data.characterData.attributes.map((attr) => ({
     id: attr.attributeId,
     name: attr.name,
     value: attr.value,
@@ -27,7 +55,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
   }));
 
   const handleAttributeChange = (attributeId: string, value: number) => {
-    const updatedAttributes = data.characterData.attributes.map((attr: any) => // eslint-disable-line @typescript-eslint/no-explicit-any
+    const updatedAttributes = data.characterData.attributes.map((attr) =>
       attr.attributeId === attributeId ? { ...attr, value } : attr
     );
     onUpdate({ attributes: updatedAttributes });
@@ -35,9 +63,9 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
 
   const validation = data.validation[2];
   const showErrors = validation?.touched && !validation?.valid;
-  
+
   // Calculate if all points are allocated
-  const totalSpent = data.characterData.attributes.reduce((sum: number, attr: any) => sum + attr.value, 0); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const totalSpent = data.characterData.attributes.reduce((sum, attr) => sum + attr.value, 0);
   const remaining = data.pointPools.attributes.total - totalSpent;
 
   return (

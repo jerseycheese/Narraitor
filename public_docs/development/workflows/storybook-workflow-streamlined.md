@@ -73,7 +73,7 @@ title: 'Domain/ComponentName'
 
 Examples:
 - 'Character/CharacterCard'
-- 'World/WorldEditor' 
+- 'World/WorldEditor'
 - 'Narrative/ChoiceDisplay'
 - 'UI/Button'
 - 'Forms/InputField'
@@ -147,7 +147,7 @@ interface ComponentProps {
   // Required props
   data: DataType;
   onAction: (action: ActionType) => void;
-  
+
   // Optional props with defaults
   variant?: 'primary' | 'secondary';
   loading?: boolean;
@@ -194,7 +194,7 @@ export const InteractionTest: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    
+
     await userEvent.click(canvas.getByRole('button'));
     await expect(args.onSubmit).toHaveBeenCalled();
   },
@@ -211,8 +211,8 @@ npm run storybook
 # Build Storybook
 npm run build-storybook
 
-# Run Storybook tests
-npm run test-storybook
+# Build a static Storybook (used for visual review and CI)
+npm run build-storybook
 ```
 
 ### Workflow Integration

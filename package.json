@@ -4,27 +4,33 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bash scripts/kill-port.sh 3000 && next dev -p 3000",
-    "dev:turbo": "next dev --turbopack",
+    "dev": "bash scripts/dev.sh",
+    "dev:turbo": "bash scripts/dev.sh --turbopack",
     "kill": "pkill -f 'next dev' || true",
     "build": "next build && rm -rf public/storybook-static && npm run build-storybook && cp -r storybook-static public/",
     "build:app": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint && eslint \"__tests__/**/*.test.{js,jsx,ts,tsx}\" \"scripts/**/*.test.{js,mjs}\"",
     "lint:layout-usage": "node scripts/verify-page-layout-usage.cjs",
+    "lint:ds-canon": "node scripts/verify-ds-canon.cjs",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
+    "audit:css": "node scripts/audit-css.mjs",
+    "validate:routes": "node scripts/validate-routes.js",
     "type-check": "tsc --noEmit",
+    "knip": "knip",
+    "knip:fix": "knip --fix --allow-remove-files",
+    "knip:production": "knip --production",
     "storybook": "storybook dev -p 6006",
     "storybook:dev": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy-storybook": "npm run build-storybook && gh-pages -d storybook-static",
     "test": "jest --config=jest.config.cjs",
-    "test:prompt-templates": "jest --config=jest.config.cjs src/lib/promptTemplates/promptTemplateManager.test.ts",
     "test:coverage": "jest --config=jest.config.cjs --coverage",
     "test:ci": "node --max-old-space-size=4096 node_modules/.bin/jest --config=jest.config.cjs --coverage",
-    "test:e2e:critical": "playwright test",
+    "test:e2e:critical": "playwright test --project=chromium",
     "test:visual": "playwright test --project=chromium",
+    "test:visual:tutorials": "playwright test --project=tutorials",
     "test:visual:update": "playwright test --update-snapshots",
     "test:visual:prune": "node scripts/clean-visual-snapshots.cjs",
     "test:visual:headed": "playwright test --headed",
@@ -45,37 +51,40 @@
     "deps:html": "depcruise src --output-type err-html > public_docs/architecture/dependency-violations.html",
     "analyze": "npm run deps:validate && npm run deps:diagram:all",
     "docs:design-system:build": "node scripts/build-design-system-docs.mjs",
-    "docs:design-system:check": "npm run docs:design-system:build && git diff --exit-code -- public_docs/design-system/redesign-planning/design-system.html public/design-system/index.html"
+    "docs:design-system:check": "npm run docs:design-system:build && git diff --exit-code -- public_docs/design-system/redesign-planning/design-system.html public/design-system/index.html",
+    "skott:analyze": "skott --displayMode=webapp --tsconfig=./tsconfig.json --ignorePattern=**/*.test.* --ignorePattern=**/*.stories.* --ignorePattern=**/__tests__/** --exitCodeOnCircularDependencies=0 src/app/layout.tsx",
+    "skott:circular": "skott --showCircularDependencies --displayMode=file-tree --tsconfig=./tsconfig.json --ignorePattern=**/*.test.* --ignorePattern=**/*.stories.* --ignorePattern=**/__tests__/** --exitCodeOnCircularDependencies=0 src/app/layout.tsx",
+    "skott:graph": "skott --displayMode=graph --tsconfig=./tsconfig.json --ignorePattern=**/*.test.* --ignorePattern=**/*.stories.* --ignorePattern=**/__tests__/** --exitCodeOnCircularDependencies=0 src/app/layout.tsx",
+    "skott:watch": "skott --displayMode=webapp --watch --tsconfig=./tsconfig.json --ignorePattern=**/*.test.* --ignorePattern=**/*.stories.* --ignorePattern=**/__tests__/** --exitCodeOnCircularDependencies=0 src/app/layout.tsx",
+    "skott:check": "node scripts/check-circular-count.mjs"
   },
   "dependencies": {
     "@google/genai": "^0.13.0",
+    "@lenml/tokenizer-gemini": "^3.7.2",
+    "@popperjs/core": "^2.11.8",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@tanstack/react-table": "^8.21.3",
+    "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "csv-parse": "^5.6.0",
     "fastest-levenshtein": "^1.0.16",
-    "img-diff-js": "^0.5.4",
     "lucide-react": "^0.548.0",
     "next": "^15.5.7",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-joyride": "^3.0.0-7",
+    "react-joyride": "3.0.0-7",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.7",
     "@eslint/eslintrc": "^3",
     "@jest/globals": "^29.7.0",
+    "@octokit/graphql": "^9.0.3",
     "@playwright/test": "^1.56.1",
     "@storybook/addon-a11y": "^8.6.14",
     "@storybook/addon-actions": "^8.6.14",
     "@storybook/addon-essentials": "^8.6.12",
-    "@storybook/addon-onboarding": "^8.6.12",
-    "@storybook/addon-styling-webpack": "^1.0.1",
-    "@storybook/blocks": "^8.6.12",
-    "@storybook/experimental-addon-test": "^8.6.12",
-    "@storybook/experimental-nextjs-vite": "^8.6.12",
     "@storybook/nextjs": "^8.6.14",
     "@storybook/react": "^8.6.12",
     "@storybook/test": "^8.6.14",
@@ -86,36 +95,35 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/react-joyride": "^2.0.2",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
-    "@vitest/browser": "^3.1.2",
-    "@vitest/coverage-v8": "^3.1.2",
     "autoprefixer": "^10.4.21",
-    "depcheck": "^1.4.7",
     "dependency-cruiser": "^17.3.6",
     "eslint": "^9.25.1",
     "eslint-config-next": "^15.5.7",
     "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-jest": "^29.15.2",
     "eslint-plugin-storybook": "^0.12.0",
-    "fishery": "^2.3.1",
     "gh-pages": "^6.3.0",
     "glob": "^11.0.2",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "kill-port": "^2.0.1",
+    "knip": "^6.13.1",
+    "msw": "^2.14.6",
+    "msw-storybook-addon": "^2.0.7",
     "playwright": "^1.56.1",
-    "postcss": "^8.5.6",
+    "postcss": "^8.5.10",
     "postcss-load-config": "^6.0.1",
     "postcss-nested": "^7.0.2",
     "prettier": "^3.5.3",
+    "purgecss": "^8.0.0",
+    "skott": "^0.35.11",
     "storybook": "^8.6.12",
     "stylelint": "^16.23.1",
     "stylelint-config-standard": "^39.0.0",
     "ts-jest": "^29.4.0",
-    "typescript": "^5.9.3",
-    "vite": "^6.0.7",
-    "vitest": "^3.1.2"
+    "typescript": "^5.9.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -131,15 +139,11 @@
         "react": "$react",
         "react-dom": "$react-dom"
       }
-    }
+    },
+    "postcss": "$postcss",
+    "uuid": "^11.1.1"
   },
-  "eslintConfig": {
-    "extends": [
-      "plugin:storybook/recommended"
-    ]
-  },
-  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
-  "main": "index.js",
+  "description": "AI-powered storytelling app that runs narrative RPG experiences in any world — fictional or real — with mechanics and tone tailored to that world.",
   "directories": {
     "doc": "docs",
     "test": "tests"
@@ -150,9 +154,14 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jerseycheese/Narraitor/issues"
   },
-  "homepage": "https://github.com/jerseycheese/Narraitor#readme"
+  "homepage": "https://github.com/jerseycheese/Narraitor#readme",
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
 }

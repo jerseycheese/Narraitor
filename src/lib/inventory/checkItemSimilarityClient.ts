@@ -1,6 +1,7 @@
 // src/lib/inventory/checkItemSimilarityClient.ts
 
 import Logger from '@/lib/utils/logger';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 const logger = new Logger('ItemSimilarityClient');
 
@@ -22,7 +23,7 @@ export interface CheckItemSimilarityRequest {
 export async function checkItemSimilarityClient(
   payload: CheckItemSimilarityRequest
 ): Promise<ItemSimilarityResponse> {
-  const response = await fetch('/api/inventory/check-similarity', {
+  const response = await aiFetch('/api/inventory/check-similarity', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

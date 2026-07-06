@@ -3,11 +3,6 @@ export interface ValidationResult {
   errors: string[];
 }
 
-export interface FieldValidation {
-  field: string;
-  error: string | null;
-}
-
 // Type for unknown values that need validation
 type UnknownValue = unknown;
 
@@ -77,40 +72,3 @@ export function validateField<T>(
   }
   return null;
 }
-
-// Validate multiple fields
-export function validateFields<T = UnknownValue>(
-  fields: Array<{
-    name: string;
-    value: T;
-    validations: Array<(value: T) => string | null>;
-  }>
-): Record<string, string> {
-  const errors: Record<string, string> = {};
-  
-  for (const field of fields) {
-    const error = validateField(field.value, field.validations);
-    if (error) {
-      errors[field.name] = error;
-    }
-  }
-  
-  return errors;
-}
-
-// Convert field errors to validation result
-export function createValidationResult(errors: Record<string, string>): ValidationResult {
-  const errorMessages = Object.values(errors);
-  return {
-    valid: errorMessages.length === 0,
-    errors: errorMessages,
-  };
-}
-
-// Common validation patterns
-export const patterns = {
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  alphanumeric: /^[a-zA-Z0-9]+$/,
-  alphanumericWithSpaces: /^[a-zA-Z0-9\s]+$/,
-  noSpecialChars: /^[a-zA-Z0-9\s\-_]+$/,
-};

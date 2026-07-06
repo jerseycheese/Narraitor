@@ -1,10 +1,11 @@
 import * as React from "react"
 import { clsx } from 'clsx'
+import './alert.css'
 
 // Clean Slate: Removed cva and Tailwind variants.
 // Retaining semantic variant props for future styling hooks.
 
-export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
+interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "destructive" | "warning" | "info"
 }
 

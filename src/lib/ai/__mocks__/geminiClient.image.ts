@@ -2,7 +2,6 @@
 
 import { AIClient, AIImageResponse } from '../types';
 import { MockGeminiClient } from './geminiClient.mock';
-import { primitiveColors } from '@/lib/design-tokens';
 
 /**
  * Mock Gemini client with image generation for testing
@@ -12,8 +11,8 @@ export class MockGeminiImageClient extends MockGeminiClient implements AIClient 
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Generate a simple SVG for testing
-    const primaryBlue = primitiveColors.blue[500];
+    // Generate a simple SVG for testing (test fixture — literal color is fine)
+    const primaryBlue = '#3b82f6';
     const svg = `
       <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
         <rect width="100" height="100" fill="${primaryBlue}"/>

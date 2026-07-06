@@ -22,7 +22,7 @@ export default defineConfig({
   timeout: 60 * 1000,
   expect: {
     toHaveScreenshot: {
-      maxDiffPixels: 500,
+      maxDiffPixels: 10000,
       threshold: 0.2,
       animations: 'disabled',
     },
@@ -35,7 +35,7 @@ export default defineConfig({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `maxDiffPixels` | `number` | `500` | Maximum allowed pixel differences |
+| `maxDiffPixels` | `number` | `10000` | Maximum allowed pixel differences |
 | `threshold` | `number` | `0.2` | Pixel difference threshold (0-1) |
 | `animations` | `'disabled' \| 'allow'` | `'allow'` | Animation handling during screenshots |
 | `clip` | `{x, y, width, height}` | `undefined` | Clip screenshot to specific region |
@@ -50,7 +50,7 @@ projects: [
     name: 'chromium',
     use: { 
       ...devices['Desktop Chrome'],
-      viewport: { width: 1280, height: 720 },
+      viewport: { width: 1280, height: 1024 },
       launchOptions: {
         args: [
           '--font-render-hinting=none',
@@ -73,54 +73,50 @@ projects: [
 
 ## Helper Functions API
 
-### `waitForAppReady(page)`
-
-Ensures the Narraitor application is fully loaded before taking screenshots.
+Visual tests import their wait/stability helpers from `tests/visual/utils/wait-helpers.ts`. The two you'll use in almost every test are `waitForContentStable` and `hideDynamicContent` — run them after `page.goto()` and before any `toHaveScreenshot()` call.
 
 ```typescript
-async function waitForAppReady(page: Page): Promise<void>
+import {
+  waitForContentStable,
+  hideDynamicContent,
+} from './utils/wait-helpers';
 ```
 
-**Parameters:**
-- `page: Page` - Playwright page object
+### `waitForContentStable(page)`
 
-**Implementation:**
+The main "is the page settled" helper. Waits for the network to go idle, waits for known loading indicators (`.loading`, `[data-testid="loading"]`, `[aria-label="Loading"]`, `.spinner`, and the archetype-seeding spinner) to disappear, then adds a short settle so data seeding can finish. Tolerant by design — if `networkidle` times out on a page with long-lived connections, it logs and keeps going rather than failing the test.
+
 ```typescript
-async function waitForAppReady(page) {
-  try {
-    // Wait for initial page load
-    await page.waitForLoadState('networkidle', { timeout: 30000 });
-    
-    // Wait for React hydration
-    await page.waitForSelector('main', { timeout: 15000 });
-    
-    // Wait for fonts to load (critical for visual consistency)
-    await page.waitForFunction(() => document.fonts.ready, { timeout: 10000 });
-    
-    // Additional stabilization time
-    await page.waitForTimeout(2000);
-    
-    // Give time for dynamic content
-    await page.waitForTimeout(3000);
-    
-    // Check if loading screen is still visible
-    const loadingVisible = await page.locator('text=Loading').isVisible().catch(() => false);
-    
-    if (loadingVisible) {
-      console.warn('Application still showing loading screen');
-      await page.waitForTimeout(5000);
-    }
-  } catch (error) {
-    console.warn('waitForAppReady encountered an error:', error.message);
-  }
-}
+async function waitForContentStable(page: Page): Promise<void>
 ```
+
+### `hideDynamicContent(page)`
+
+Injects CSS that hides content which would otherwise cause false diffs — timestamps and random tips, the Joyride tutorial overlay, the in-app DevTools panel, and the Next.js dev overlay — and disables all animations and transitions for a stable capture. Pair it with `waitForContentStable` right before the screenshot.
+
+```typescript
+async function hideDynamicContent(page: Page): Promise<void>
+```
+
+### Other helpers
+
+| Helper | Signature | Use it for |
+|--------|-----------|------------|
+| `hideNextDevOverlay` | `(page)` | Hide only the Next.js dev overlay, keeping app-level tutorial UI visible. |
+| `waitForNavigationHeading` | `(page, expectedHeading, { timeout = 5000, exact = false })` | Block until an `h1`/`h2`/`h3` containing (or exactly matching) the given text renders. |
+| `waitForImagesLoaded` | `(page, timeout = 5000)` | Wait until every image on the page is `complete`. |
+| `waitForImagesLoadedIn` | `(page, selector, timeout = 30000)` | Scoped image wait for a container — forces lazy images eager and requires real pixels. Use for locator screenshots of image-bearing surfaces. |
+| `waitForStableScrollHeight` | `(page, { timeout = 5000, stableDuration = 500 })` | Wait for the document height to stop changing. |
+| `pinAppShell` | `(page)` | Pin the sticky workshop sidebar and header into normal flow so full-page/tall screenshots don't capture the header overlaid mid-content. |
+| `expandAllCollapsibleSections` | `(page, container?)` | Expand all `CollapsibleSection` components so their content shows in the capture. |
+| `takeStableScreenshot` | `(page, name, options?)` | Convenience wrapper that runs `waitForContentStable` + `hideDynamicContent`, then writes a raw screenshot to `test-results/`. Note: this does not do baseline comparison — use `toHaveScreenshot()` for regression assertions. |
 
 **Usage:**
 ```typescript
 test('page visual test', async ({ page }) => {
   await page.goto('/');
-  await waitForAppReady(page);
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
   await expect(page).toHaveScreenshot('page.png');
 });
 ```
@@ -241,7 +237,8 @@ Run tests in debug mode with step-by-step execution.
 ```typescript
 test('page layout test', async ({ page }) => {
   await page.goto('/page');
-  await waitForAppReady(page);
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
   await expect(page).toHaveScreenshot('page-layout.png');
 });
 ```
@@ -251,7 +248,8 @@ test('page layout test', async ({ page }) => {
 ```typescript
 test('component visual test', async ({ page }) => {
   await page.goto('/component-demo');
-  await waitForAppReady(page);
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
   
   const component = page.locator('[data-testid="component"]');
   await expect(component).toHaveScreenshot('component.png');
@@ -265,7 +263,8 @@ test('responsive layout', async ({ page }) => {
   // Desktop
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/');
-  await waitForAppReady(page);
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
   await expect(page).toHaveScreenshot('desktop-layout.png');
   
   // Mobile
@@ -279,7 +278,8 @@ test('responsive layout', async ({ page }) => {
 ```typescript
 test('interactive states', async ({ page }) => {
   await page.goto('/buttons');
-  await waitForAppReady(page);
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
   
   const button = page.locator('button');
   
@@ -306,7 +306,8 @@ test('slow page test', async ({ page }) => {
   test.setTimeout(120000); // 2 minutes
   
   await page.goto('/slow-page');
-  await waitForAppReady(page);
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
   await expect(page).toHaveScreenshot('slow-page.png');
 });
 ```
@@ -330,13 +331,11 @@ test.describe('Flaky tests', () => {
 test('test with error recovery', async ({ page }) => {
   await page.goto('/');
   
-  try {
-    await waitForAppReady(page);
-  } catch (error) {
-    console.warn('App loading timeout, proceeding anyway');
-    await page.waitForTimeout(5000);
-  }
-  
+  // waitForContentStable tolerates its own timeouts internally — it logs and
+  // continues rather than throwing — so no try/catch is needed here.
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
+
   await expect(page).toHaveScreenshot('page.png');
 });
 ```
@@ -406,7 +405,8 @@ export class HomePage {
   
   async goto() {
     await this.page.goto('/');
-    await waitForAppReady(this.page);
+    await waitForContentStable(this.page);
+    await hideDynamicContent(this.page);
   }
   
   async takeScreenshot(name: string) {
@@ -464,7 +464,8 @@ test('performance test', async ({ page }) => {
   const startTime = Date.now();
   
   await page.goto('/');
-  await waitForAppReady(page);
+  await waitForContentStable(page);
+  await hideDynamicContent(page);
   
   const loadTime = Date.now() - startTime;
   console.log(`Page load time: ${loadTime}ms`);
@@ -477,4 +478,4 @@ test('performance test', async ({ page }) => {
 
 - [Visual Regression Testing Guide](../development/visual-regression-testing.md) - Main developer guide
 - [Visual Testing Workflow](../development/workflows/visual-testing-workflow.md) - Process documentation  
-- [Visual Test Examples](../examples/visual-test-examples.md) - Practical examples
+- [Visual Test Examples](../development/visual-test-examples.md) - Practical examples

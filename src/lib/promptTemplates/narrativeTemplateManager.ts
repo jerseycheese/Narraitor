@@ -1,31 +1,20 @@
 import { narrativeTemplates } from './templates/narrative';
+import type { NarrativeTemplateContext } from './templates/narrative/context';
 
-// Create a simple manager for narrative templates
-class NarrativeTemplateManager {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private templates: Map<string, (context: any) => string> = new Map();
+type TemplateGenerator = (context: NarrativeTemplateContext) => string;
 
-  constructor() {
-    this.loadNarrativeTemplates();
-  }
-
-  private loadNarrativeTemplates() {
-    narrativeTemplates.forEach(template => {
-      if (template.generate) {
-        this.templates.set(template.id, template.generate);
-      }
-    });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getTemplate(id: string): (context: any) => string {
-    const template = this.templates.get(id);
-    if (!template) {
-      throw new Error(`Template with id '${id}' not found`);
-    }
-    
-    return template;
+const templates = new Map<string, TemplateGenerator>();
+for (const template of narrativeTemplates) {
+  if (template.generate) {
+    templates.set(template.id, template.generate);
   }
 }
 
-export const narrativeTemplateManager = new NarrativeTemplateManager();
+export function getNarrativeTemplate(id: string): TemplateGenerator {
+  const template = templates.get(id);
+  if (!template) {
+    throw new Error(`Template with id '${id}' not found`);
+  }
+
+  return template;
+}

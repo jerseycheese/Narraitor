@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { ExportImportControls } from '@/components/shared/ExportImportControls';
+import { ThemeMenu } from '@/components/Navigation/ThemeMenu';
 import {
   Card,
   CardHeader,
@@ -29,8 +31,49 @@ export default function SettingsPage() {
       title="Settings"
       description="Manage your application settings and backup your game data. Export creates a downloadable backup file, and import restores your data from a previously exported file."
     >
-      {/* Data Management Section */}
+      {/* Settings Sections */}
       <div className="settings-page">
+        <section className="settings-section">
+          <h2>Providers</h2>
+          <Card className="settings-card">
+            <CardHeader>
+              <CardTitle>Generation provider</CardTitle>
+              <CardDescription>
+                Connect the provider key used to generate your stories. It stays
+                in this browser, encrypted, and never leaves your device except to
+                your chosen provider.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link
+                href="/settings/providers"
+                className="button button-default button-size-default"
+              >
+                Manage providers
+              </Link>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="settings-section">
+          <h2>Appearance</h2>
+          <Card className="settings-card">
+            <CardHeader>
+              <CardTitle>Theme &amp; color</CardTitle>
+              <CardDescription>
+                Choose a visual style and light/dark mode. Your choice is saved
+                in this browser and applies across the app.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="settings-appearance-row">
+                <span className="settings-appearance-label">Appearance</span>
+                <ThemeMenu />
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
         <section className="settings-section">
           <h2>Data Management</h2>
           <Card className="settings-card">

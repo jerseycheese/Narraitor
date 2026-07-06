@@ -1,7 +1,6 @@
-// src/components/shared/SimpleModal.tsx
-
 import React, { useId } from 'react';
 import { X } from 'lucide-react';
+import { clsx } from 'clsx';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -10,43 +9,24 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { clsx } from 'clsx';
 
 interface SimpleModalProps {
-  /** Whether the modal is open */
   isOpen: boolean;
-  /** Called when modal should close */
   onClose: () => void;
-  /** Modal title */
   title?: string;
-  /** Modal content */
   children?: React.ReactNode;
-  /** Additional CSS classes for the modal content */
   className?: string;
-  /** Optional classes for the scrolling content wrapper */
+  overlayClassName?: string;
   contentClassName?: string;
-  /** Whether to show the close button */
   showCloseButton?: boolean;
-  /** Whether to close on backdrop click */
   closeOnBackdropClick?: boolean;
-  /** Whether to close on escape key */
   closeOnEscape?: boolean;
-  /** ID of element describing the modal content */
   ariaDescribedBy?: string;
-  /** Optional contextual descriptor rendered under the title */
   description?: React.ReactNode;
-  /** Footer region rendered inside a padded container */
   footer?: React.ReactNode;
-  /** Optional class overrides for the footer wrapper */
   footerClassName?: string;
-  /** Scroll behavior: 'overlay' (default) or 'content' */
   scrollBehavior?: 'overlay' | 'content';
-  /** Whether the footer should stick to the bottom */
   stickyFooter?: boolean;
-  /** Modal size (deprecated/unused in clean slate) */
-  size?: string;
-  /** Modal tone/variant (deprecated/unused in clean slate) */
-  tone?: string;
 }
 
 export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
@@ -57,18 +37,13 @@ export const isJoyrideTooltipTarget = (target: EventTarget | null): boolean => {
   return Boolean(target.closest('.react-joyride__tooltip'));
 };
 
-/**
- * SimpleModal - Accessible dialog wrapper using the shared design-system primitives.
- *
- * Provides consistent styling, Radix-driven focus management, and configurable
- * close affordances while keeping the existing component API intact.
- */
 export function SimpleModal({
   isOpen,
   onClose,
   title,
   children,
   className,
+  overlayClassName,
   contentClassName,
   showCloseButton = true,
   closeOnBackdropClick = true,
@@ -79,8 +54,6 @@ export function SimpleModal({
   footerClassName,
   scrollBehavior = 'overlay',
   stickyFooter,
-  size, // Destructure but ignore for now to satisfy interface
-  tone, // Destructure but ignore
 }: SimpleModalProps) {
   const fallbackDescriptionId = useId();
   const resolvedDescriptionId =
@@ -97,9 +70,8 @@ export function SimpleModal({
         aria-describedby={resolvedDescriptionId}
         showCloseButton={false}
         overlayScroll={scrollBehavior === 'overlay'}
-        className={clsx(
-          className
-        )}
+        overlayClassName={overlayClassName}
+        className={className}
         onInteractOutside={(event) => {
           if (isJoyrideTooltipTarget(event.target)) {
             event.preventDefault();
@@ -143,7 +115,7 @@ export function SimpleModal({
 
         {(children !== undefined && children !== null) || !hasHeaderContent ? (
           <div
-            className={contentClassName}
+            className={clsx('dialog-body', contentClassName)}
             data-scroll-container={scrollBehavior === 'content' ? 'content' : undefined}
           >
             {children}
@@ -152,7 +124,7 @@ export function SimpleModal({
 
         {footer && (
           <div
-            className={footerClassName}
+            className={clsx('dialog-footer', footerClassName)}
             data-sticky-footer={stickyFooter ? 'true' : undefined}
           >
             {footer}

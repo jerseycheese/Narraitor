@@ -2,6 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 import { Menu, X, Play, Plus, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
@@ -36,11 +37,16 @@ export function WorkshopContextualHeader({
     hasWorldsStore,
     navigateWithLoading,
   } = useNavigationData();
+  const pathname = usePathname();
+
+  // The worlds index owns its own create/generate/select actions, so the
+  // contextual CTA would just duplicate them. Suppress it there.
+  const showCta = pathname !== '/worlds';
 
   const cta = currentWorld ? (
     <Button
       type="button"
-      variant="success"
+      variant="default"
       className="workshop-context-header-cta"
       onClick={() =>
         navigateWithLoading(
@@ -100,7 +106,7 @@ export function WorkshopContextualHeader({
           <RecentPagesDropdown className="workshop-context-header-recent" />
         </SSRClientOnly>
         {/* SSR-defer the CTA: without it the button flickers between server-rendered "Browse Worlds" and the hydrated "Play" once the world store loads. */}
-        <SSRClientOnly>{cta}</SSRClientOnly>
+        {showCta && <SSRClientOnly>{cta}</SSRClientOnly>}
       </div>
     </header>
   );

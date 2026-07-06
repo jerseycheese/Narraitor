@@ -1,22 +1,16 @@
 import React from 'react';
 import { CharacterPortraitPlaceholder } from '../components/CharacterPortraitPlaceholder';
+import { CharacterSuggestions } from '../components/CharacterSuggestions';
 import { WizardFormSection } from '@/components/shared/wizard';
 import { ErrorBlock } from '@/components/shared';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { World } from '@/types/world.types';
+import { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 
 interface CharacterWizardData {
-  characterData: {
-    name: string;
-    description: string;
-    background?: {
-      physicalDescription?: string;
-      [key: string]: unknown;
-    };
-    [key: string]: unknown;
-  };
+  characterData: CharacterCreationData;
   validation: {
     [stepNumber: number]: {
       valid: boolean;
@@ -28,7 +22,7 @@ interface CharacterWizardData {
 
 interface BasicInfoStepProps {
   data: CharacterWizardData;
-  onUpdate: (updates: Record<string, unknown>) => void;
+  onUpdate: (updates: Partial<CharacterCreationData>) => void;
   onValidation: (valid: boolean, errors: string[]) => void;
   worldConfig?: World;
 }
@@ -36,6 +30,7 @@ interface BasicInfoStepProps {
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   data,
   onUpdate,
+  worldConfig,
 }) => {
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({ name: e.target.value });
@@ -112,6 +107,15 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               placeholder="Describe your character's role and background"
             />
           </div>
+
+          {worldConfig && (
+            <CharacterSuggestions
+              world={worldConfig}
+              concept={data.characterData.description}
+              characterData={data.characterData}
+              onAdopt={onUpdate}
+            />
+          )}
 
           <div>
             <Label htmlFor="physical-description">

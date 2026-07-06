@@ -89,17 +89,3 @@ export interface ExampleSelectionResult {
   /** Formatted string of examples ready for prompt inclusion */
   formattedContent: string;
 }
-
-/**
- * Configuration for the example library
- */
-export interface ExampleLibraryConfig {
-  /** Default token budget if not specified in selection options */
-  defaultTokenBudget?: number;
-
-  /** Whether to automatically calculate token counts for examples */
-  autoCalculateTokens?: boolean;
-
-  /** Custom formatter for example content */
-  formatter?: (examples: PromptExample[]) => string;
-}
