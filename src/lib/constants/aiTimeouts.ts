@@ -14,9 +14,10 @@ export const GEMINI_ATTEMPT_TIMEOUT_MS = 30_000;
 
 /**
  * Headroom the browser grants on top of the server budget it's waiting on:
- * transport, serverless cold start, queuing, and JSON handling.
+ * transport, serverless cold start, queuing, and JSON handling. Module-local —
+ * only used to derive the single-attempt ceiling below.
  */
-export const AI_CLIENT_HEADROOM_MS = 15_000;
+const AI_CLIENT_HEADROOM_MS = 15_000;
 
 /**
  * Browser ceiling for single-attempt text routes (/api/narrative/generate,
