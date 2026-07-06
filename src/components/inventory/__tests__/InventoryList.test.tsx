@@ -307,6 +307,33 @@ describe('InventoryList', () => {
     ).toBeInTheDocument();
   });
 
+  test('shows the image-unavailable affordance for an image object with a null URL', () => {
+    const mockItems = [
+      createItem({
+        id: 'item-null-url',
+        name: 'Faded Locket',
+        categoryId: 'personal',
+        image: { type: 'placeholder', url: null },
+      }),
+    ];
+
+    const mockItemsById = { 'item-null-url': mockItems[0] };
+    const mockCharacterInventories = { [characterId]: ['item-null-url'] };
+    const mockStore = createMockInventoryStore({
+      items: mockItemsById,
+      characterInventories: mockCharacterInventories,
+    });
+    mockUseInventoryStore.mockImplementation((selector) =>
+      selector ? selector(mockStore) : mockStore
+    );
+
+    render(<InventoryList characterId={characterId} />);
+
+    expect(
+      screen.getByLabelText('Image unavailable for Faded Locket')
+    ).toBeInTheDocument();
+  });
+
   test('shows a loading affordance while an image is generating', () => {
     const mockItems = [
       createItem({ id: 'item-gen', name: 'Summoned Blade', categoryId: 'equipment' }),

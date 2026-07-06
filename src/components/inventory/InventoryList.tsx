@@ -34,10 +34,17 @@ interface InventoryItemImageProps {
 /**
  * Renders the visual slot for an inventory item.
  *
- * Priority: an in-flight generation shows a loading affordance, a completed
- * image (AI-generated or placeholder) renders as an <img>, and a failed
- * generation surfaces the error recorded in inventoryStore.imageGenerationErrors.
- * Items with nothing to show render no slot to keep manually-added items clean.
+ * Priority:
+ * - an in-flight generation shows a loading affordance;
+ * - a completed image with a renderable URL (AI-generated or placeholder)
+ *   renders as an <img>;
+ * - a recorded generation error surfaces the message from
+ *   inventoryStore.imageGenerationErrors;
+ * - an image object that resolved to no URL (GeneratedImage.url is
+ *   `string | null`) falls back to an "image unavailable" affordance rather
+ *   than an empty slot.
+ * Items with nothing to show (no image, not generating, no error) render no
+ * slot to keep manually-added items clean.
  */
 const InventoryItemImage: React.FC<InventoryItemImageProps> = ({
   item,
@@ -72,7 +79,10 @@ const InventoryItemImage: React.FC<InventoryItemImageProps> = ({
     );
   }
 
-  if (error) {
+  // Either a recorded error, or an image object that resolved to a null URL,
+  // yields an "image unavailable" affordance. The error variant carries the
+  // failure message as a tooltip; a null-URL image is a benign miss.
+  if (error || item.image) {
     return (
       <div className="manuscript-inventory-item-image-wrapper">
         <div
