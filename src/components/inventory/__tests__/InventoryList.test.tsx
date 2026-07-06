@@ -113,6 +113,7 @@ const createItem = (overrides: Partial<InventoryItem>): InventoryItem => {
       },
     createdAt: overrides.createdAt ?? baseTimestamp,
     updatedAt: overrides.updatedAt ?? baseTimestamp,
+    ...(overrides.image ? { image: overrides.image } : {}),
   };
 };
 
@@ -249,6 +250,82 @@ describe('InventoryList', () => {
     rerender(<InventoryList characterId={characterId} />);
 
     expect(screen.getByText('Arcane Tome')).toBeInTheDocument();
+  });
+
+  test('renders the item image when one has been generated', () => {
+    const mockItems = [
+      createItem({
+        id: 'item-img',
+        name: 'Enchanted Ring',
+        categoryId: 'valuables',
+        image: {
+          type: 'ai-generated',
+          url: 'https://example.com/ring.png',
+        },
+      }),
+    ];
+
+    const mockItemsById = { 'item-img': mockItems[0] };
+    const mockCharacterInventories = { [characterId]: ['item-img'] };
+    const mockStore = createMockInventoryStore({
+      items: mockItemsById,
+      characterInventories: mockCharacterInventories,
+    });
+    mockUseInventoryStore.mockImplementation((selector) =>
+      selector ? selector(mockStore) : mockStore
+    );
+
+    render(<InventoryList characterId={characterId} />);
+
+    const image = screen.getByAltText('Enchanted Ring') as HTMLImageElement;
+    expect(image).toBeInTheDocument();
+    expect(image.src).toBe('https://example.com/ring.png');
+  });
+
+  test('surfaces an error affordance when image generation failed', () => {
+    const mockItems = [
+      createItem({ id: 'item-err', name: 'Broken Compass', categoryId: 'equipment' }),
+    ];
+
+    const mockItemsById = { 'item-err': mockItems[0] };
+    const mockCharacterInventories = { [characterId]: ['item-err'] };
+    const mockStore = createMockInventoryStore({
+      items: mockItemsById,
+      characterInventories: mockCharacterInventories,
+      imageGenerationErrors: new Map([['item-err', 'Image generation failed: 500']]),
+    });
+    mockUseInventoryStore.mockImplementation((selector) =>
+      selector ? selector(mockStore) : mockStore
+    );
+
+    render(<InventoryList characterId={characterId} />);
+
+    expect(
+      screen.getByLabelText('Image unavailable for Broken Compass')
+    ).toBeInTheDocument();
+  });
+
+  test('shows a loading affordance while an image is generating', () => {
+    const mockItems = [
+      createItem({ id: 'item-gen', name: 'Summoned Blade', categoryId: 'equipment' }),
+    ];
+
+    const mockItemsById = { 'item-gen': mockItems[0] };
+    const mockCharacterInventories = { [characterId]: ['item-gen'] };
+    const mockStore = createMockInventoryStore({
+      items: mockItemsById,
+      characterInventories: mockCharacterInventories,
+      generatingImageFor: new Set(['item-gen']),
+    });
+    mockUseInventoryStore.mockImplementation((selector) =>
+      selector ? selector(mockStore) : mockStore
+    );
+
+    render(<InventoryList characterId={characterId} />);
+
+    expect(
+      screen.getByLabelText('Generating image for Summoned Blade')
+    ).toBeInTheDocument();
   });
 
   test('opens confirmation dialog on drop click', async () => {

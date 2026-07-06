@@ -22,6 +22,71 @@ interface InventoryListProps {
   className?: string;
 }
 
+interface InventoryItemImageProps {
+  item: InventoryItem;
+  isGenerating: boolean;
+  error?: string;
+}
+
+/**
+ * Renders the visual slot for an inventory item.
+ *
+ * Priority: an in-flight generation shows a loading affordance, a completed
+ * image (AI-generated or placeholder) renders as an <img>, and a failed
+ * generation surfaces the error recorded in inventoryStore.imageGenerationErrors.
+ * Items with nothing to show render no slot to keep manually-added items clean.
+ */
+const InventoryItemImage: React.FC<InventoryItemImageProps> = ({
+  item,
+  isGenerating,
+  error,
+}) => {
+  const imageUrl = item.image?.url ?? null;
+
+  if (isGenerating) {
+    return (
+      <div className="manuscript-inventory-item-image-wrapper">
+        <div
+          className="manuscript-inventory-item-image-placeholder manuscript-skeleton-pulse"
+          role="img"
+          aria-label={`Generating image for ${item.name}`}
+        />
+      </div>
+    );
+  }
+
+  if (imageUrl) {
+    return (
+      <div className="manuscript-inventory-item-image-wrapper">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imageUrl}
+          alt={item.name}
+          className="manuscript-inventory-item-image"
+          loading="lazy"
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="manuscript-inventory-item-image-wrapper">
+        <div
+          className="manuscript-inventory-item-image-placeholder manuscript-inventory-item-image-placeholder-error"
+          role="img"
+          aria-label={`Image unavailable for ${item.name}`}
+          title={error}
+        >
+          No image
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 /**
  * Responsive inventory list component with categorized item display.
  * Displays items grouped by category with responsive grid layout.
@@ -41,6 +106,13 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   const itemsObject = useInventoryStore((state) => state.items);
   const characterInventories = useInventoryStore(
     (state) => state.characterInventories
+  );
+  // Image generation lifecycle state, surfaced per item in the card image slot
+  const generatingImageFor = useInventoryStore(
+    (state) => state.generatingImageFor
+  );
+  const imageGenerationErrors = useInventoryStore(
+    (state) => state.imageGenerationErrors
   );
 
   const {
@@ -158,6 +230,12 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     className="manuscript-inventory-item"
                     role="listitem"
                   >
+                    <InventoryItemImage
+                      item={item}
+                      isGenerating={generatingImageFor.has(item.id)}
+                      error={imageGenerationErrors.get(item.id)}
+                    />
+
                     <div className="manuscript-inventory-item-header">
                       <h4 className="manuscript-inventory-item-name">{item.name}</h4>
                       {item.stackable && (

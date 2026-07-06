@@ -127,7 +127,21 @@ export async function generateImageWithGemini(
       return null;
     }
 
-    const data = await response.json();
+    // Parse the body separately so a malformed/non-JSON success response is
+    // distinguishable from a network failure in the logs, rather than being
+    // collapsed into the same silent null by the outer catch.
+    let data: GeminiImageResponse;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      logger.error(
+        'generateImageWithGemini',
+        'Failed to parse Gemini response as JSON:',
+        parseError
+      );
+      return null;
+    }
+
     return extractImageFromResponse(data);
 
   } catch (error) {

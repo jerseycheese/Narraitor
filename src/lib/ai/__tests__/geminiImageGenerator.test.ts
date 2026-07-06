@@ -244,6 +244,17 @@ describe('Gemini Image Generator', () => {
       expect(result).toBeNull();
     });
 
+    it('should return null if a 200 response has a malformed JSON body', async () => {
+      // A 200 OK whose body is not valid JSON: response.json() rejects.
+      // This must resolve to null (placeholder fallback), not throw.
+      const mockResponse = new Response('not valid json {', { status: 200 });
+      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+
+      const result = await generateImageWithGemini('test prompt', 'test-key');
+
+      expect(result).toBeNull();
+    });
+
     it('should return null if fetch throws an error', async () => {
       (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
