@@ -75,14 +75,23 @@ export interface AIImageResponse {
 }
 
 /**
+ * Per-call options for AI clients. `signal` lets a caller cancel the
+ * underlying request (e.g. when a UI-level timeout races the generation);
+ * implementations that can't cancel may ignore it.
+ */
+export interface AIGenerateOptions {
+  signal?: AbortSignal;
+}
+
+/**
  * Interface for AI clients (both real and mock)
  */
 export interface AIClient {
-  generateContent(prompt: string): Promise<AIResponse>;
+  generateContent(prompt: string, options?: AIGenerateOptions): Promise<AIResponse>;
   // Choice generation is a distinct endpoint on the browser path; callers that
   // need it (choiceGenerator) prefer this over generateContent so routing is
   // explicit rather than inferred from prompt content.
-  generateChoices?(prompt: string): Promise<AIResponse>;
+  generateChoices?(prompt: string, options?: AIGenerateOptions): Promise<AIResponse>;
   generateImage?(prompt: string): Promise<AIImageResponse>;
   generateStructuredContent?<T = unknown>(prompt: string, schema: unknown): Promise<T>;
   isAvailable?(): Promise<boolean>;

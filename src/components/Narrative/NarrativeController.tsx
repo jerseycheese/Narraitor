@@ -408,6 +408,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     }
     initialGenerationLocksRef.current.add(lockKey);
 
+    let generationTimeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
       // CHECK FIRST: Don't generate an initial scene if one already exists
       // Do a fresh check of the store to get the latest state
@@ -425,27 +426,27 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setIsLoading(true);
       setError(null);
 
-      // Race AI generation with a timeout so we can fallback gracefully
-      const timeoutPromise = new Promise<
-        ReturnType<typeof narrativeGenerator.generateInitialScene>
-      >((_, reject) => {
-        setTimeout(
-          () =>
-            reject(
-              new Error(`Initial generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
-            ),
-          AI_GENERATION_TIMEOUT_MS
-        );
+      // Race AI generation with a timeout so we can fallback gracefully.
+      // Losing the race must also ABORT the generation: without the signal,
+      // the abandoned request keeps running (and spending) until aiFetch's
+      // ceiling, then mutates lore/inventory/NPC state when it settles.
+      const generationAbort = new AbortController();
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        generationTimeoutId = setTimeout(() => {
+          generationAbort.abort();
+          reject(
+            new Error(`Initial generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
+          );
+        }, AI_GENERATION_TIMEOUT_MS);
       });
       const result = await Promise.race([
         narrativeGenerator.generateInitialScene(
           worldId,
           characterId ? [characterId] : [],
-          sessionId
+          sessionId,
+          { signal: generationAbort.signal }
         ),
-        timeoutPromise as unknown as Promise<
-          ReturnType<typeof narrativeGenerator.generateInitialScene>
-        >,
+        timeoutPromise,
       ]);
 
       // Skip if component unmounted during async operation
@@ -556,6 +557,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         setError(getNarrativeError(error as Error).message);
       }
     } finally {
+      clearTimeout(generationTimeoutId);
       initialGenerationLocksRef.current.delete(lockKey);
       if (mountedRef.current) {
         setIsLoading(false);
@@ -577,6 +579,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     setError(null);
     clearGenerationError();
 
+    let segmentTimeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
       // Use recent segments for context (last 3 segments for efficiency)
       const recentSegments = segments.slice(-3);
@@ -667,47 +670,49 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         skillCheckContext = ` [Skill checks: ${skillResultDescriptions.join(', ')}]`;
       }
 
-      const segmentTimeoutPromise = new Promise<
-        ReturnType<typeof narrativeGenerator.generateSegment>
-      >((_, reject) => {
-        setTimeout(
-          () =>
-            reject(
-              new Error(`Segment generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
-            ),
-          AI_GENERATION_TIMEOUT_MS
-        );
+      // Same contract as the initial-scene race: losing the race aborts the
+      // generation at the fetch layer instead of orphaning it until aiFetch's
+      // ceiling fires.
+      const segmentAbort = new AbortController();
+      const segmentTimeoutPromise = new Promise<never>((_, reject) => {
+        segmentTimeoutId = setTimeout(() => {
+          segmentAbort.abort();
+          reject(
+            new Error(`Segment generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
+          );
+        }, AI_GENERATION_TIMEOUT_MS);
       });
       const result = await Promise.race([
-        narrativeGenerator.generateSegment({
-          worldId,
-          sessionId,
-          characterIds: characterId ? [characterId] : [],
-          narrativeContext: {
+        narrativeGenerator.generateSegment(
+          {
             worldId,
-            currentSceneId: `scene-${Date.now()}`,
-            characterIds: characterId ? [characterId] : [],
-            previousSegments: recentSegments,
-            currentTags,
             sessionId,
-            recentSegments,
-            currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
+            characterIds: characterId ? [characterId] : [],
+            narrativeContext: {
+              worldId,
+              currentSceneId: `scene-${Date.now()}`,
+              characterIds: characterId ? [characterId] : [],
+              previousSegments: recentSegments,
+              currentTags,
+              sessionId,
+              recentSegments,
+              currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
+            },
+            generationParameters: {
+              includedTopics: [choiceText],
+              desiredLength: 'short',
+              decisionWeight,
+              // Critical decisions with critical failures should have tragic tone
+              desiredTone:
+                decisionWeight === 'critical' &&
+                rollResults.some((r) => r.isCriticalFailure)
+                  ? 'tragic'
+                  : undefined,
+            },
           },
-          generationParameters: {
-            includedTopics: [choiceText],
-            desiredLength: 'short',
-            decisionWeight,
-            // Critical decisions with critical failures should have tragic tone
-            desiredTone:
-              decisionWeight === 'critical' &&
-              rollResults.some((r) => r.isCriticalFailure)
-                ? 'tragic'
-                : undefined,
-          },
-        }),
-        segmentTimeoutPromise as unknown as ReturnType<
-          typeof narrativeGenerator.generateSegment
-        >,
+          { signal: segmentAbort.signal }
+        ),
+        segmentTimeoutPromise,
       ]);
 
       // Skip if component unmounted during async operation
@@ -801,6 +806,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       );
       setGenerationError(getNarrativeError(err as Error));
     } finally {
+      clearTimeout(segmentTimeoutId);
       if (mountedRef.current) {
         setIsLoading(false);
       }

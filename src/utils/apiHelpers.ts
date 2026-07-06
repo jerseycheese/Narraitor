@@ -5,6 +5,7 @@ import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimi
 import { getAIConfig } from '../lib/ai/config';
 import { resolveApiKey } from '../lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '../lib/utils/errorUtils';
+import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../lib/constants/aiTimeouts';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ApiHelpers');
@@ -139,7 +140,7 @@ export async function makeGeminiRequest(
   endpoint: string,
   apiKey: string,
   payload: object,
-  timeoutMs: number = 30000
+  timeoutMs: number = GEMINI_ATTEMPT_TIMEOUT_MS
 ): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);

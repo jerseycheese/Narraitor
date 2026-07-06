@@ -71,4 +71,37 @@ describe('aiFetch', () => {
     const init = (global.fetch as jest.Mock).mock.calls[0][1];
     expect(init.signal).toBe(controller.signal);
   });
+
+  test('composes a caller signal WITH the timeout ceiling instead of replacing it', async () => {
+    // Emulate a runtime with AbortSignal.timeout so the ceiling exists.
+    const ceiling = new AbortController();
+    (AbortSignal as unknown as { timeout?: (ms: number) => AbortSignal }).timeout =
+      jest.fn(() => ceiling.signal);
+    try {
+      mockGetKey.mockResolvedValue(null);
+      const caller = new AbortController();
+      await aiFetch('/api/x', { signal: caller.signal });
+
+      const init = (global.fetch as jest.Mock).mock.calls[0][1];
+      // The composed signal fires when the CALLER aborts (race loss)…
+      expect(init.signal.aborted).toBe(false);
+      caller.abort();
+      expect(init.signal.aborted).toBe(true);
+    } finally {
+      delete (AbortSignal as unknown as { timeout?: unknown }).timeout;
+    }
+  });
+
+  test('honors a per-call timeoutMs budget', async () => {
+    const timeoutSpy = jest.fn(() => new AbortController().signal);
+    (AbortSignal as unknown as { timeout?: (ms: number) => AbortSignal }).timeout = timeoutSpy;
+    try {
+      mockGetKey.mockResolvedValue(null);
+      await aiFetch('/api/narrative/generate', {}, { timeoutMs: 45_000 });
+
+      expect(timeoutSpy).toHaveBeenCalledWith(45_000);
+    } finally {
+      delete (AbortSignal as unknown as { timeout?: unknown }).timeout;
+    }
+  });
 });

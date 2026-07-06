@@ -1,6 +1,7 @@
 // src/lib/ai/config.ts
 
 import { AIConfig, GenerationConfig, SafetySetting } from './types';
+import { GEMINI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
 /**
  * Gets AI configuration from environment variables.
@@ -15,7 +16,7 @@ export const getAIConfig = (): AIConfig => {
     modelName: 'gemini-2.5-flash',
     imageModelName: 'gemini-2.5-flash-image',
     maxRetries: 3,
-    timeout: 30000
+    timeout: GEMINI_ATTEMPT_TIMEOUT_MS
   };
 };
 

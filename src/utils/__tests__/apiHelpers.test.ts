@@ -17,6 +17,7 @@ jest.mock('../rateLimiter', () => ({
 
 import { getSafetySettingsFromPrompt, makeGeminiRequest } from '../apiHelpers';
 import { getAIConfig } from '../../lib/ai/config';
+import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../../lib/constants/aiTimeouts';
 
 describe('getSafetySettingsFromPrompt', () => {
   it('returns BLOCK_MEDIUM_AND_ABOVE for G-rated content', () => {
@@ -153,5 +154,32 @@ describe('makeGeminiRequest', () => {
     await makeGeminiRequest(endpoint, 'test-key', {});
 
     expect(global.fetch).toHaveBeenCalledWith(endpoint, expect.any(Object));
+  });
+
+  it('rejects at the shared single-attempt budget when the upstream hangs', async () => {
+    jest.useFakeTimers();
+    try {
+      // Hang forever, but honor the abort signal like a real fetch would.
+      (global.fetch as jest.Mock).mockImplementation(
+        (_endpoint: string, init: RequestInit) =>
+          new Promise((_, reject) => {
+            init.signal?.addEventListener('abort', () =>
+              reject(Object.assign(new Error('The operation was aborted'), { name: 'AbortError' }))
+            );
+          })
+      );
+
+      const pending = makeGeminiRequest('https://example.test/gemini', 'test-key', {});
+      const outcome = expect(pending).rejects.toThrow('Request timeout - please try again');
+
+      // Still in-flight just before the 30s budget…
+      jest.advanceTimersByTime(GEMINI_ATTEMPT_TIMEOUT_MS - 1);
+      // …and aborted the moment it elapses.
+      jest.advanceTimersByTime(1);
+
+      await outcome;
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
