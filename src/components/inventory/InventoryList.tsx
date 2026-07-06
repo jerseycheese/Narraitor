@@ -25,6 +25,81 @@ interface InventoryListProps {
   className?: string;
 }
 
+interface InventoryItemImageProps {
+  item: InventoryItem;
+  isGenerating: boolean;
+  error?: string;
+}
+
+/**
+ * Renders the visual slot for an inventory item.
+ *
+ * Priority:
+ * - an in-flight generation shows a loading affordance;
+ * - a completed image with a renderable URL (AI-generated or placeholder)
+ *   renders as an <img>;
+ * - a recorded generation error surfaces the message from
+ *   inventoryStore.imageGenerationErrors;
+ * - an image object that resolved to no URL (GeneratedImage.url is
+ *   `string | null`) falls back to an "image unavailable" affordance rather
+ *   than an empty slot.
+ * Items with nothing to show (no image, not generating, no error) render no
+ * slot to keep manually-added items clean.
+ */
+const InventoryItemImage: React.FC<InventoryItemImageProps> = ({
+  item,
+  isGenerating,
+  error,
+}) => {
+  const imageUrl = item.image?.url ?? null;
+
+  if (isGenerating) {
+    return (
+      <div className="manuscript-inventory-item-image-wrapper">
+        <div
+          className="manuscript-inventory-item-image-placeholder manuscript-skeleton-pulse"
+          role="img"
+          aria-label={`Generating image for ${item.name}`}
+        />
+      </div>
+    );
+  }
+
+  if (imageUrl) {
+    return (
+      <div className="manuscript-inventory-item-image-wrapper">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imageUrl}
+          alt={item.name}
+          className="manuscript-inventory-item-image"
+          loading="lazy"
+        />
+      </div>
+    );
+  }
+
+  // Either a recorded error, or an image object that resolved to a null URL,
+  // yields an "image unavailable" affordance. The error variant carries the
+  // failure message as a tooltip; a null-URL image is a benign miss.
+  if (error || item.image) {
+    return (
+      <div className="manuscript-inventory-item-image-wrapper">
+        <div
+          className="manuscript-inventory-item-image-placeholder manuscript-inventory-item-image-placeholder-error"
+          role="img"
+          aria-label={`Image unavailable for ${item.name}`}
+          title={error}
+        >
+          No image
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 /**
  * Responsive inventory list component with categorized item display.
  * Displays items grouped by category with responsive grid layout.
@@ -44,6 +119,13 @@ export const InventoryList: React.FC<InventoryListProps> = ({
   const itemsObject = useInventoryStore((state) => state.items);
   const characterInventories = useInventoryStore(
     (state) => state.characterInventories
+  );
+  // Image generation lifecycle state, surfaced per item in the card image slot
+  const generatingImageFor = useInventoryStore(
+    (state) => state.generatingImageFor
+  );
+  const imageGenerationErrors = useInventoryStore(
+    (state) => state.imageGenerationErrors
   );
 
   const {
@@ -174,6 +256,12 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                     data-equipped={item.equipped ? 'true' : undefined}
                     role="listitem"
                   >
+                    <InventoryItemImage
+                      item={item}
+                      isGenerating={generatingImageFor.has(item.id)}
+                      error={imageGenerationErrors.get(item.id)}
+                    />
+
                     <div className="manuscript-inventory-item-header">
                       <h4 className="manuscript-inventory-item-name">{item.name}</h4>
                       {item.stackable && (

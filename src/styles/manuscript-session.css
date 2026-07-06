@@ -1742,6 +1742,42 @@ body.manuscript-overlay-open {
   border-color: var(--color-border-strong);
 }
 
+.manuscript-inventory-item-image-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-3);
+}
+
+.manuscript-inventory-item-image {
+  width: 6rem;
+  height: 6rem;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+}
+
+.manuscript-inventory-item-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.manuscript-inventory-item-image-placeholder-error {
+  border-style: dashed;
+  border-color: var(--color-border-strong);
+}
+
 /* Equipped items get a distinct accent border + tinted surface so the state
    reads instantly without relying on color alone (paired with the badge below). */
 .manuscript-inventory-item.is-equipped {

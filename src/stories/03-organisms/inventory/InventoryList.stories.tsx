@@ -119,6 +119,72 @@ export const Default: Story = {
   ],
 };
 
+export const WithImages: Story = {
+  args: {
+    characterId: 'char-story-images',
+  },
+  decorators: [
+    (StoryComponent) => {
+      const { addItem, clearCharacterInventory } = useInventoryStore();
+
+      React.useEffect(() => {
+        const characterId = 'char-story-images';
+        const timestamp = getTimestamp();
+
+        clearCharacterInventory(characterId);
+
+        // Inline SVG data URIs so the story renders the restored image slot
+        // without any network dependency.
+        const swatch = (fill: string) =>
+          `data:image/svg+xml;utf8,${encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="${fill}"/></svg>`
+          )}`;
+
+        addItem(characterId, {
+          name: 'Steel Sword',
+          description: 'Forged blade with a balanced edge',
+          stackable: false,
+          quantity: 1,
+          categorization: createCategorization('equipment', timestamp),
+          acquisition: createAcquisition(1, timestamp),
+          image: {
+            type: 'ai-generated',
+            url: swatch('#8a6d3b'),
+            generatedAt: timestamp,
+          },
+        });
+
+        addItem(characterId, {
+          name: 'Health Potion',
+          description: 'Ruby liquid that radiates a faint warmth',
+          stackable: true,
+          quantity: 4,
+          maxStack: 25,
+          categorization: createCategorization('consumables', timestamp),
+          acquisition: createAcquisition(4, timestamp),
+          image: {
+            type: 'ai-generated',
+            url: swatch('#a94442'),
+            generatedAt: timestamp,
+          },
+        });
+
+        // No image field: demonstrates that manually-added items render no slot.
+        addItem(characterId, {
+          name: 'Guild Charter',
+          description: 'Sealed parchment outlining membership rights',
+          stackable: false,
+          quantity: 1,
+          categorization: createCategorization('documents', timestamp),
+          acquisition: createAcquisition(1, timestamp),
+        });
+      }, [addItem, clearCharacterInventory]);
+
+      return <StoryComponent />;
+    },
+  ],
+};
+
 export const SingleCategory: Story = {
   args: {
     characterId: 'char-story-single',
