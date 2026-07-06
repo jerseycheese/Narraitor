@@ -27,11 +27,14 @@ function extractRecentNarrative(segments: NarrativeSegment[]): string[] {
 function extractJournalSummary(entries?: JournalEntry[]): string[] {
   if (!entries || entries.length === 0) return [];
 
-  // Rank critical above major so the story's defining moments survive the top-5 cut
-  const significanceRank: Record<JournalEntry['significance'], number> = {
-    critical: 0,
-    major: 1,
-    minor: 2
+  // Rank critical moments above the rest so the story's defining beats survive the
+  // top-5 cut. Achievements are peers of 'major' (as the original filter treated
+  // them), so a minor-significance achievement still ranks with majors rather than
+  // sinking below them.
+  const importanceRank = (entry: JournalEntry): number => {
+    if (entry.significance === 'critical') return 0;
+    if (entry.significance === 'major' || entry.type === 'achievement') return 1;
+    return 2;
   };
 
   const importantEntries = entries
@@ -40,7 +43,7 @@ function extractJournalSummary(entries?: JournalEntry[]): string[] {
       entry.significance === 'major' ||
       entry.type === 'achievement'
     )
-    .sort((a, b) => significanceRank[a.significance] - significanceRank[b.significance])
+    .sort((a, b) => importanceRank(a) - importanceRank(b))
     .slice(0, 5);
 
   return importantEntries.map(entry => entry.content);

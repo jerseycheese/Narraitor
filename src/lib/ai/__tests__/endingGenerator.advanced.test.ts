@@ -32,6 +32,7 @@ import {
   createMockNarrativeSegments,
   createMockJournalEntries,
   createMixedSignificanceJournalEntries,
+  createAchievementPeerJournalEntries,
   setupTestTimers,
   cleanupTestTimers
 } from './endingGenerator.testHelpers';
@@ -211,6 +212,42 @@ describe('EndingGenerator - Advanced Features', () => {
 
     // Minor non-achievement entries stay excluded
     expect(prompt).not.toContain('Restocked supplies at the village market');
+  });
+
+  it('should treat achievements as peers of major entries in the ending prompt', async () => {
+    const mockRequest: EndingGenerationRequest = {
+      sessionId: 'session-789',
+      characterId: 'char-456',
+      worldId: 'world-123',
+      endingType: 'story-complete'
+    };
+
+    const mockContext = {
+      world: mockWorld,
+      character: mockCharacter,
+      narrativeSegments: mockNarrativeSegments,
+      journalEntries: createAchievementPeerJournalEntries()
+    };
+
+    mockBuildEndingContext.mockResolvedValue(mockContext);
+    mockGeminiClient.generateContent.mockResolvedValue({ content: `{
+      "epilogue": "The journey ends...",
+      "characterLegacy": "A true hero...",
+      "worldImpact": "Forever changed...",
+      "tone": "triumphant",
+      "achievements": ["Victory"]
+    }` });
+
+    await generateEnding(mockRequest);
+
+    const prompt = mockGeminiClient.generateContent.mock.calls[0][0] as string;
+
+    // A minor-significance achievement ranks with majors, so it survives the
+    // top-5 cut instead of sinking below the major entries
+    expect(prompt).toContain('Minor achievement: recovered the lost locket');
+
+    // It displaces the last major entry rather than being dropped itself
+    expect(prompt).not.toContain('Major moment 3');
   });
 
   it('should generate appropriate endings for each ending type', async () => {
