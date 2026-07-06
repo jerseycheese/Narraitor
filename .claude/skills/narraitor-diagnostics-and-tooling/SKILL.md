@@ -29,10 +29,15 @@ curl -s -X POST localhost:3000/api/narrative/generate -H 'Content-Type: applicat
 curl -s -X POST localhost:3000/api/narrative/generate -H 'Content-Type: application/json' \
   -d '{"prompt":"One sentence of neutral test narration."}' -w '\nHTTP %{http_code}\n'
 
-# Provider key validity vs upstream outage discrimination:
-curl -s -X POST localhost:3000/api/ai/validate-provider -H 'Content-Type: application/json' -d '{}' -w '\nHTTP %{http_code}\n'
+# Provider key validity vs upstream outage discrimination.
+# This route reads the candidate key ONLY from the x-provider-api-key header (no env
+# fallback) and returns {"valid":false,"error":"NO_KEY"} immediately if it's absent —
+# so you MUST pass the header, or you learn nothing but "the route is wired".
+curl -s -X POST localhost:3000/api/ai/validate-provider \
+  -H 'Content-Type: application/json' -H 'x-provider-api-key: <candidate-key>' \
+  -d '{}' -w '\nHTTP %{http_code}\n'
 ```
-Interpretation: 400 on empty body = route up, handler wired. 200 with generated text = full path live. 5xx/timeout on a valid body = key, upstream, or timeout (generate/choices: 30s server-side via `makeGeminiRequest`, no retries; the 120s figure is the CLIENT-side aiFetch ceiling and doesn't apply to direct curls) — validate-provider splits key-vs-outage. NOTE: the `{prompt}` 400-contract applies to `narrative/generate` and `narrative/choices` only; other routes have their own body shapes — read the handler before smoking them.
+Interpretation: on `narrative/generate` — 400 on empty body = route up, handler wired; 200 with generated text = full path live; 5xx/timeout on a valid body = key, upstream, or timeout (generate/choices: 30s server-side via `makeGeminiRequest`, no retries; the 120s figure is the CLIENT-side aiFetch ceiling and doesn't apply to direct curls). On `validate-provider` WITH a key header, the JSON `error` field splits the causes: `INVALID_KEY` = bad/rejected key, `RATE_LIMITED` = quota, `NETWORK`/`VALIDATION_FAILED` = upstream/other, `valid:true` = key good. A keyless call returns `NO_KEY` and proves only that the route responds. NOTE: the `{prompt}` 400-contract applies to `narrative/generate` and `narrative/choices` only; other routes have their own body shapes — read the handler before smoking them.
 
 **Persisted store state (ground truth of app data):** Browser devtools → Application → IndexedDB → db `narraitor-state` → object store `narraitor-store` → the persist key (e.g. `narraitor-narrative-store`). This is what hydration will produce — when UI and expectation disagree, read this first. (Provider keys sit encrypted in db `narraitor-secure`; there is nothing useful to eyeball there.)
 

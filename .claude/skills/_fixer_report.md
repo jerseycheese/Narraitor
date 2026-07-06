@@ -2,6 +2,16 @@
 
 Date: 2026-07-04. Inputs: `_review_factual.md` (2 BLOCKING / 6 IMPORTANT / 7 MINOR), `_review_doctrine.md` (2/6/7), `_review_usability.md` (1/6/9). Policy: all BLOCKING and IMPORTANT findings fixed; MINOR fixes applied where one edit covered them, otherwise deferred and documented below. Every factual correction was re-verified first-hand (grep/read) before editing — not taken on the reviewer's word.
 
+## Post-publish review round — GPT on PR #1513 (2026-07-05)
+
+An external (GPT) review of the open PR raised three findings. All verified first-hand against the tree before acting:
+
+- **CONFIRMED — validate-provider diagnostic was wrong.** `narraitor-diagnostics-and-tooling` sent a keyless `curl` to `/api/ai/validate-provider` and claimed it "splits key-vs-outage". The route reads the candidate key ONLY from `x-provider-api-key` (verified in `src/app/api/ai/validate-provider/route.ts`) and returns `NO_KEY` immediately when absent — so the keyless call proves nothing. Fixed: the curl now passes the header, and the interpretation maps the JSON `error` field (`INVALID_KEY` / `RATE_LIMITED` / `NETWORK` / `valid:true`). Propagated the header caveat to campaign Phase 2.
+- **CONFIRMED — release campaign omitted the publish step.** `narraitor-hardest-problem-campaign` Phase 6 stopped at tag → fast-forward `main`. `public_docs/development/release-process.md` step 4 also requires `gh release create`. Fixed: Phase 6 now lists all four steps with the exact commands, and states an un-published tag is not a release.
+- **REFINED (not a defect, but imprecise) — AI mock-panel mechanism.** GPT reported only finding `AITestingPanel`; `AIMockingSection.tsx` does exist and DOES expose failure scenarios (`error-timeout`, `error-rate-limit`, custom errors via `MockScenarios`). The underlying point held, though: the panel forces CANNED success/error/slow/intermittent scenarios, not an arbitrary malformed-byte body, so it can't reproduce the parse-error class on its own. Fixed `narraitor-ai-quality-discipline` step 4 to split the failure drill by type — mock panel for slow/error/intermittent, unit fixture / network interception for a truly malformed response body, key omission for auth.
+
+All three verified against source this session; the AITestingPanel-doesn't-exist half of finding 3 was a reviewer miss, corrected in the record rather than propagated.
+
 ## BLOCKING — all fixed
 
 | Finding | Fix |
