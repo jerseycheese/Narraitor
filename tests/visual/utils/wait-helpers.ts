@@ -7,6 +7,20 @@
 
 import { Page, Locator } from '@playwright/test';
 
+const NEXT_DEV_OVERLAY_STYLE = `
+  nextjs-portal,
+  nextjs-toast,
+  [data-nextjs-toast],
+  [data-nextjs-dialog],
+  [data-nextjs-dialog-overlay],
+  [data-nextjs-build-indicator],
+  [data-nextjs-error-overlay] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+`;
+
 /**
  * Wait for content to be fully stable before taking screenshots.
  * Balanced approach - faster than original but reliable for data seeding.
@@ -83,12 +97,59 @@ export async function waitForNavigationHeading(
  */
 export async function waitForImagesLoaded(page: Page, timeout: number = 5000): Promise<void> {
   try {
+    // waitForFunction signature is (fn, arg, options) — the timeout must go in
+    // the third slot, or it's serialized as the (unused) page-function arg and
+    // the call silently falls back to the default action timeout.
     await page.waitForFunction(
       () => Array.from(document.images).every((img) => img.complete),
+      undefined,
       { timeout }
     );
   } catch (error) {
     console.log(`Image loading wait failed: ${(error as Error).message}`);
+  }
+}
+
+/**
+ * Wait until the images inside a container have finished loading.
+ *
+ * Scoped to a selector so an offscreen lazy image elsewhere on the page can't
+ * poison the wait (a global document.images check stays false forever and times
+ * out). Lazy (IntersectionObserver) images inside the container are forced to
+ * `eager` first, so a full-element screenshot doesn't capture them mid-load —
+ * those images otherwise only fetch when scrolled into view, after this wait.
+ *
+ * Use for locator screenshots of image-bearing surfaces (e.g. the worlds-list
+ * banners), where the global waitForImagesLoaded is unreliable on CI.
+ */
+export async function waitForImagesLoadedIn(
+  page: Page,
+  selector: string,
+  timeout: number = 30000
+): Promise<void> {
+  try {
+    await page.evaluate((sel) => {
+      const root = document.querySelector(sel);
+      root?.querySelectorAll('img').forEach((img) => {
+        if (img.loading === 'lazy') img.loading = 'eager';
+      });
+    }, selector);
+    // Require naturalWidth > 0, not just `complete`: a next/image banner served
+    // through on-demand optimization can be slow to first-paint on CI, and
+    // `complete` flips true for the empty box before the pixels arrive.
+    await page.waitForFunction(
+      (sel) => {
+        const root = document.querySelector(sel);
+        if (!root) return false;
+        return Array.from(root.querySelectorAll('img')).every(
+          (img) => img.complete && img.naturalWidth > 0
+        );
+      },
+      selector,
+      { timeout }
+    );
+  } catch (error) {
+    console.log(`Scoped image wait failed for ${selector}: ${(error as Error).message}`);
   }
 }
 
@@ -173,6 +234,9 @@ export async function hideDynamicContent(page: Page): Promise<void> {
         pointer-events: none !important;
       }
 
+      /* Hide Next.js dev overlay controls from screenshots */
+      ${NEXT_DEV_OVERLAY_STYLE}
+
       /* Disable animations for consistent screenshots */
       *, *::before, *::after {
         animation-duration: 0s !important;
@@ -182,6 +246,41 @@ export async function hideDynamicContent(page: Page): Promise<void> {
       }
     `
   });
+}
+
+/**
+ * Hide only the Next.js dev overlay while preserving app-level tutorial UI.
+ */
+export async function hideNextDevOverlay(page: Page): Promise<void> {
+  await page.addStyleTag({
+    content: NEXT_DEV_OVERLAY_STYLE
+  });
+}
+
+/**
+ * Pin the sticky app shell (workshop sidebar + page header) into normal flow.
+ * Without this, locator and fullPage screenshots of tall pages get the sticky
+ * header overlaid mid-content, since the header sticks at its viewport position
+ * relative to where the locator was scrolled. Mirrors the shell-pinning step in
+ * world-creation.spec.ts captureWizardStep.
+ */
+export async function pinAppShell(page: Page): Promise<void> {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.addStyleTag({
+    content: `
+      .workshop-sidebar {
+        position: static !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      header {
+        position: static !important;
+      }
+    `,
+  });
+  await page.waitForTimeout(50);
 }
 
 /**

@@ -98,31 +98,23 @@ export function CharacterTable({
   const columns: ColumnDef<Character>[] = React.useMemo(
     () => [
       {
-        id: 'portrait',
-        header: '',
-        cell: ({ row }) => (
-          <div
-            className="character-portrait-clickable"
-            onClick={() => handleViewCharacter(row.original.id)}
-          >
-            <CharacterPortrait
-              portrait={
-                row.original.portrait || { type: 'placeholder', url: null }
-              }
-              characterName={row.original.name}
-              size="large"
-            />
-          </div>
-        ),
-        enableSorting: false,
-        size: 64,
-      },
-      {
         accessorKey: 'name',
         header: 'Name',
         cell: ({ row }) => (
-          <div onClick={() => handleViewCharacter(row.original.id)}>
-            {row.getValue('name')}
+          <div
+            className="component-character-table-name"
+            onClick={() => handleViewCharacter(row.original.id)}
+          >
+            <span className="component-character-table-thumb" aria-hidden="true">
+              <CharacterPortrait
+                portrait={
+                  row.original.portrait || { type: 'placeholder', url: null }
+                }
+                characterName={row.original.name}
+                size="large"
+              />
+            </span>
+            <span>{row.getValue('name') as string}</span>
           </div>
         ),
         enableSorting: true,

@@ -1,8 +1,8 @@
 // Action template focused on immediate item usage beats
-import { NarrativeSegment } from '@/types/narrative.types';
 import { majorEventGuidelines } from './majorEventGuidelines';
+import type { NarrativeTemplateContext } from './context';
 
-export const actionTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+export const actionTemplate = (context: NarrativeTemplateContext) => {
   const {
     worldName,
     genre,
@@ -15,7 +15,7 @@ export const actionTemplate = (context: any) => { // eslint-disable-line @typesc
 
   const recentSegments = narrativeContext?.recentSegments || [];
   const recentContent = recentSegments
-    .map((segment: NarrativeSegment, index: number) => `[Scene ${index + 1}]: ${segment.content}`)
+    .map((segment, index) => `[Scene ${index + 1}]: ${segment.content}`)
     .join('\n\n');
 
   const currentLocation = narrativeContext?.currentLocation;

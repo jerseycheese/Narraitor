@@ -1,7 +1,183 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import React, { useEffect, useState } from 'react';
 import { ManuscriptSessionShell } from '@/components/GameSession/ManuscriptSessionShell';
 import { ManuscriptActionRail } from '@/components/GameSession/ManuscriptActionRail';
-import React from 'react';
+import { ManuscriptFloatingHud } from '@/components/GameSession/ManuscriptFloatingHud';
+import { SceneStatus } from '@/components/GameSession/SceneStatus';
+import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
+import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
+import { useNPCStore } from '@/state/npcStore';
+import type { NPC } from '@/types/npc.types';
+import type { Decision, NarrativeSegment } from '@/types/narrative.types';
+
+/**
+ * `ManuscriptSessionShell` is the immersive play surface. These stories render
+ * it with the REAL region components the app composes — `ManuscriptFloatingHud`,
+ * `SceneStatus`, `ManuscriptActionRail` + `ChoiceSelector`, and `NarrativeHistory`
+ * — fed deterministic demo data (no AI), the same shape the living style guide's
+ * SessionShowcase uses (issue #1276). Pick a theme from the toolbar to see the
+ * shell render per DS1/DS2/DS3.
+ */
+
+const ISO = '2026-01-01T12:00:00.000Z';
+const DATE = new Date(ISO);
+const WORLD_ID = 'sb-demo-world';
+
+const NPCS: Record<string, NPC> = {
+  'npc-marlowe-vance': {
+    id: 'npc-marlowe-vance',
+    name: 'Marlowe Vance',
+    description: 'A weary private investigator.',
+    worldId: WORLD_ID,
+    createdAt: ISO,
+    updatedAt: ISO,
+  },
+  'npc-sergeant-reyes': {
+    id: 'npc-sergeant-reyes',
+    name: 'Sergeant Reyes',
+    description: 'A cautious police sergeant.',
+    worldId: WORLD_ID,
+    createdAt: ISO,
+    updatedAt: ISO,
+  },
+};
+
+const SEGMENTS: NarrativeSegment[] = [
+  {
+    id: 'sb-seg-1',
+    worldId: WORLD_ID,
+    sessionId: 'sb-demo-session',
+    type: 'scene',
+    content:
+      'Rain hammered the sidewalk outside the Alibi Room. Through the smudged window, neon signs bled pink and blue across the wet asphalt. The club was closing, and the bartender was already stacking chairs.',
+    characterIds: ['npc-marlowe-vance'],
+    metadata: { tags: [], location: 'The Alibi Room', mood: 'mysterious', characterIds: ['npc-marlowe-vance'] },
+    timestamp: DATE,
+    createdAt: ISO,
+    updatedAt: ISO,
+  },
+  {
+    id: 'sb-seg-2',
+    worldId: WORLD_ID,
+    sessionId: 'sb-demo-session',
+    type: 'action',
+    content:
+      'The bartender\'s composure cracked. He slid a matchbook across the counter. "She got in a car. Black sedan. That\'s all I know."',
+    characterIds: ['npc-marlowe-vance', 'npc-sergeant-reyes'],
+    metadata: {
+      tags: [],
+      location: 'The Alibi Room',
+      mood: 'tense',
+      characterIds: ['npc-marlowe-vance', 'npc-sergeant-reyes'],
+      causedByDecisionId: 'sb-decision-prev',
+      causedByDecisionText:
+        'You pressed the bartender for information instead of searching the back office.',
+      decisionOutcome: 'critical-success',
+    },
+    timestamp: DATE,
+    createdAt: ISO,
+    updatedAt: ISO,
+  },
+];
+
+const DECISION: Decision = {
+  id: 'sb-decision',
+  prompt: 'What do you do?',
+  decisionWeight: 'major',
+  options: [
+    { id: 'sb-opt-1', text: 'Search the warehouse at the matchbook address', hint: 'Follows the new lead', alignment: 'neutral' },
+    { id: 'sb-opt-2', text: 'Tail the black sedan through the warehouse district', hint: 'Uses Shadowing', alignment: 'lawful' },
+    { id: 'sb-opt-3', text: 'Confront Deluca directly at his club', hint: 'Uses Interrogation', alignment: 'chaotic' },
+  ],
+};
+
+/** Demo snapshot using the real canon snapshot classes (no store seeding). */
+function DemoSnapshot() {
+  return (
+    <div className="manuscript-character-snapshot">
+      <h4 className="manuscript-hud-panel-title">CHARACTER SNAPSHOT</h4>
+      <div className="manuscript-character-snapshot-identity">
+        <div className="manuscript-character-snapshot-name">Marlowe Vance</div>
+      </div>
+      <div className="manuscript-character-snapshot-stats">
+        <div className="manuscript-character-snapshot-section">
+          <div className="manuscript-character-snapshot-list">
+            <div className="manuscript-character-snapshot-level-row">
+              <span className="manuscript-character-snapshot-item-label">Level</span>
+              <span className="manuscript-character-snapshot-item-value">4</span>
+            </div>
+          </div>
+        </div>
+        <div className="manuscript-character-snapshot-section">
+          <h5 className="manuscript-character-snapshot-subheading">Attributes</h5>
+          <div className="manuscript-character-snapshot-list">
+            {[['Instinct', '14'], ['Composure', '11'], ['Street Smarts', '16']].map(([label, value]) => (
+              <div key={label} className="manuscript-character-snapshot-item">
+                <span className="manuscript-character-snapshot-item-label">{label}</span>
+                <span className="manuscript-character-snapshot-item-value">{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Renders the shell with the real composed session. `mode` toggles the
+ * representative state the action rail / narrative reflect.
+ */
+function SessionShellHarness({ mode = 'active' }: { mode?: 'active' | 'streaming' | 'loading' }) {
+  const [isCharacterOpen, setIsCharacterOpen] = useState(false);
+
+  // Seed demo NPCs so the real SceneStatus resolves participant names.
+  useEffect(() => {
+    const npcs = useNPCStore.getState().npcs;
+    const missing = Object.entries(NPCS).filter(([id]) => !npcs[id]);
+    if (missing.length > 0) {
+      useNPCStore.setState({ npcs: { ...npcs, ...Object.fromEntries(missing) } });
+    }
+  }, []);
+
+  const isStreaming = mode === 'streaming';
+  const isLoading = mode === 'loading';
+
+  return (
+    <ManuscriptSessionShell
+      hud={
+        <ManuscriptFloatingHud
+          characterName="Marlowe Vance"
+          onToggleCharacterSummary={() => setIsCharacterOpen((prev) => !prev)}
+          isCharacterSummaryExpanded={isCharacterOpen}
+          onToggleToolsMenu={() => {}}
+          isToolsMenuOpen={false}
+          characterSummaryPanel={<DemoSnapshot />}
+        />
+      }
+      marginContent={<SceneStatus segment={SEGMENTS[SEGMENTS.length - 1]} />}
+      actionRail={
+        <ManuscriptActionRail isStreaming={isStreaming}>
+          <div className="manuscript-action-rail-stack">
+            <ChoiceSelector
+              decision={DECISION}
+              onSelect={() => {}}
+              enableCustomInput
+              onCustomSubmit={() => {}}
+              isDisabled={isStreaming || isLoading}
+            />
+          </div>
+        </ManuscriptActionRail>
+      }
+    >
+      <NarrativeHistory
+        segments={isLoading ? [] : SEGMENTS}
+        isLoading={isLoading}
+        disableInitialAutoScroll
+      />
+    </ManuscriptSessionShell>
+  );
+}
 
 const meta: Meta<typeof ManuscriptSessionShell> = {
   title: '03-Organisms/Game Session/ManuscriptSessionShell',
@@ -15,81 +191,13 @@ export default meta;
 type Story = StoryObj<typeof ManuscriptSessionShell>;
 
 export const Default: Story = {
-  args: {
-    hud: (
-      <div className="manuscript-overlay-header-left" style={{ padding: '1rem', pointerEvents: 'auto' }}>
-        <div style={{ height: 40, width: 160, background: 'var(--color-surface, hsl(0 0% 98%))', backdropFilter: 'blur(4px)', border: '1px solid var(--color-border, hsl(0 0% 90%))', borderRadius: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontFamily: 'var(--font-system)' }}>
-          HUD PLACEHOLDER
-        </div>
-      </div>
-    ),
-    children: (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="text-narrative">
-            <p>
-              Paragraph {i + 1}: The manuscript layout provides a stable reading surface.
-              Each line of text is carefully measured for optimal legibility.
-              As the AI generates more content, this column will grow, but the
-              overall stage remains fixed and steady.
-            </p>
-          </div>
-        ))}
-      </div>
-    ),
-    actionRail: (
-      <ManuscriptActionRail>
-        <div style={{ height: 80, background: 'var(--color-surface, hsl(0 0% 98%))', backdropFilter: 'blur(4px)', borderTop: '1px solid var(--color-border, hsl(0 0% 90%))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontFamily: 'var(--font-system)' }}>
-          ACTION RAIL PLACEHOLDER
-        </div>
-      </ManuscriptActionRail>
-    ),
-  },
-};
-
-export const WithMarginContent: Story = {
-  args: {
-    ...Default.args,
-    marginContent: (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <h4 style={{ fontSize: '0.75rem', fontFamily: 'var(--font-system)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Suggested</h4>
-        {[1, 2, 3].map(i => (
-          <button key={i} className="manuscript-suggested-action" style={{ width: '100%', textAlign: 'left', padding: '0.75rem', fontSize: '0.875rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
-            Choice {i}
-          </button>
-        ))}
-      </div>
-    ),
-  },
+  render: () => <SessionShellHarness mode="active" />,
 };
 
 export const Streaming: Story = {
-  args: {
-    ...WithMarginContent.args,
-    actionRail: (
-      <ManuscriptActionRail isStreaming={true}>
-        <div style={{ height: 80, background: 'var(--color-surface, hsl(0 0% 98%))', backdropFilter: 'blur(4px)', borderTop: '1px solid var(--color-border, hsl(0 0% 90%))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontFamily: 'var(--font-system)', color: 'var(--color-accent)' }}>
-          GENERATING CONTENT...
-        </div>
-      </ManuscriptActionRail>
-    ),
-  },
+  render: () => <SessionShellHarness mode="streaming" />,
 };
 
-export const WithCharactersRail: Story = {
-  args: {
-    ...Default.args,
-    marginContent: (
-      <div className="manuscript-characters-rail-section">
-        <p className="manuscript-characters-rail-label">Characters Present</p>
-        <div className="manuscript-characters-rail-list">
-          {['Elara the Wise', 'Thorne', 'Captain Vex'].map((name) => (
-            <span key={name} className="manuscript-character-badge">
-              <span className="manuscript-character-name">{name}</span>
-            </span>
-          ))}
-        </div>
-      </div>
-    ),
-  },
+export const LoadingNarrative: Story = {
+  render: () => <SessionShellHarness mode="loading" />,
 };

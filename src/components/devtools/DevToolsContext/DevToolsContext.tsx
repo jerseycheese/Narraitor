@@ -49,7 +49,7 @@ const defaultContext: DevToolsContextType = {
 /**
  * DevTools Context
  */
-export const DevToolsContext = createContext<DevToolsContextType>(defaultContext);
+const DevToolsContext = createContext<DevToolsContextType>(defaultContext);
 
 /**
  * DevTools Provider Props

@@ -111,7 +111,6 @@ describe('findPotentialDuplicates', () => {
       (d.fact1.value === 'Gandalf the Grey' && d.fact2.value === 'Gandolf the Gray') ||
       (d.fact2.value === 'Gandalf the Grey' && d.fact1.value === 'Gandolf the Gray')
     );
-    expect(gandalfMatch).toBeDefined();
     expect(gandalfMatch!.confidence).toBeGreaterThan(0.8);
   });
 
@@ -145,7 +144,9 @@ describe('findPotentialDuplicates', () => {
         worldId: locationsWorld,
         category: 'locations',
         key: 'location_inn',
-        value: 'Prancing Pony Inn',
+        // Drop-the-article duplicate of "The Prancing Pony" (~0.76 similarity, above
+        // the default 0.60 threshold) so the category-filter test has a real match.
+        value: 'Prancing Pony',
         aliases: [],
         source: 'narrative',
       visibility: 'world-shared',
@@ -168,7 +169,9 @@ describe('findPotentialDuplicates', () => {
 
     const locationDuplicates = findPotentialDuplicates(mixedFacts, locationsWorld, { category: 'locations' });
 
-    // Should only find location duplicates, not characters
+    // The two similar locations must be detected (guards against a vacuous pass on []).
+    expect(locationDuplicates.length).toBeGreaterThan(0);
+    // ...and only locations are returned, never the similarly-named character.
     locationDuplicates.forEach(dup => {
       expect(dup.fact1.category).toBe('locations');
       expect(dup.fact2.category).toBe('locations');
@@ -176,10 +179,16 @@ describe('findPotentialDuplicates', () => {
   });
 
   it('respects minimum confidence threshold', () => {
-    const duplicates = findPotentialDuplicates(testFacts, worldId, { minConfidence: 0.95 });
+    const strict = findPotentialDuplicates(testFacts, worldId, { minConfidence: 0.95 });
+    const lenient = findPotentialDuplicates(testFacts, worldId, { minConfidence: 0.8 });
 
-    // High threshold should filter out medium-confidence matches
-    duplicates.forEach(dup => {
+    // A higher threshold must actually filter out the medium-confidence Gandalf/Gandolf
+    // match (guards against a vacuous pass when the result is empty).
+    expect(lenient.length).toBeGreaterThan(0);
+    expect(strict.length).toBeLessThan(lenient.length);
+
+    // Anything that does pass must meet the threshold.
+    strict.forEach(dup => {
       expect(dup.confidence).toBeGreaterThanOrEqual(0.95);
     });
   });
@@ -219,7 +228,6 @@ describe('findPotentialDuplicates', () => {
       (d.fact2.value === 'Aragorn' && d.fact1.value === 'Strider')
     );
 
-    expect(aliasMatch).toBeDefined();
     expect(aliasMatch!.method).toBe('alias');
     expect(aliasMatch!.confidence).toBe(1.0);
   });

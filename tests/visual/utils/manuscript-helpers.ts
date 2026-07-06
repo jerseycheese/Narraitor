@@ -181,6 +181,60 @@ export const stabilizeForCapture = async (page: Page): Promise<void> => {
   await pause(100);
 };
 
+export interface SessionStageLayout {
+  /** Number of explicit grid tracks on `.manuscript-main-stage` (DS1 = 3, DS2/DS3 = 1). */
+  trackCount: number;
+  gridTemplateColumns: string;
+  railLeft: number;
+  railRight: number;
+  railTop: number;
+  railBottom: number;
+  mainLeft: number;
+  mainTop: number;
+  /** `background-image` of `.manuscript-viewport-shell` (DS3 paints a radial dot grid). */
+  shellBg: string;
+}
+
+/**
+ * Read the composed session-stage layout for layout-invariant assertions (#1325).
+ *
+ * Returns geometry/computed style the deterministic assertions need — grid track
+ * count, the scene-status rail vs narrative-column rects, and the shell
+ * background — so a composed-layout regression (e.g. the DS2/DS3 grid split
+ * fixed in PR #1324) trips a check regardless of any screenshot baseline.
+ *
+ * Returns null when the stage/rail/content nodes are absent (no-rail or skeleton
+ * state) so callers guard explicitly rather than asserting on a partial tree.
+ */
+export const readSessionStageLayout = (
+  page: Page,
+): Promise<SessionStageLayout | null> =>
+  page.evaluate(() => {
+    const stage = document.querySelector('.manuscript-main-stage');
+    const rail = document.querySelector('.manuscript-characters-rail');
+    const main = document.querySelector('.manuscript-main-content');
+    const shell = document.querySelector('.manuscript-viewport-shell');
+    if (!stage || !rail || !main || !shell) return null;
+
+    const railRect = rail.getBoundingClientRect();
+    const mainRect = main.getBoundingClientRect();
+    // Computed grid-template-columns resolves minmax()/fr to space-separated px
+    // values, so the token count is the explicit track count.
+    const cols = window.getComputedStyle(stage).gridTemplateColumns;
+
+    return {
+      trackCount: cols.split(/\s+/).filter(Boolean).length,
+      gridTemplateColumns: cols,
+      railLeft: Math.round(railRect.left),
+      railRight: Math.round(railRect.right),
+      railTop: Math.round(railRect.top),
+      railBottom: Math.round(railRect.bottom),
+      mainLeft: Math.round(mainRect.left),
+      mainTop: Math.round(mainRect.top),
+      shellBg: window.getComputedStyle(shell).backgroundImage,
+    };
+  });
+
 export interface ManuscriptMetricNode {
   selector: string;
   exists: boolean;

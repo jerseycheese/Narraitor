@@ -8,7 +8,7 @@ import { EntityID } from './common.types';
 /**
  * Character personality traits that influence narrative generation
  */
-export type PersonalityTrait =
+type PersonalityTrait =
   | 'brave'
   | 'cautious'
   | 'curious'
@@ -28,7 +28,7 @@ export type PersonalityTrait =
 /**
  * Types of relationships between characters
  */
-export type RelationshipType =
+type RelationshipType =
   | 'ally'
   | 'rival'
   | 'mentor'
@@ -42,7 +42,7 @@ export type RelationshipType =
 /**
  * Player narrative style preferences
  */
-export type NarrativeStylePreference =
+type NarrativeStylePreference =
   | 'action-focused'
   | 'character-driven'
   | 'exploration'

@@ -1,6 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { getTimestamp } from '@/lib/utils';
 
+/**
+ * World detail NPCs section — single-theme (default DS1).
+ *
+ * DS coverage (#1264): this spec verifies NPC *content* (portrait images when
+ * available, initials fallback when missing), not theme layout. The world detail
+ * surface is covered across DS1/DS2/DS3 by tests/visual/world-detail-themes.spec.ts.
+ */
+
 const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
 const WORLD_ID = 'world-npcs-playwright';
 const NPC_WITH_PORTRAIT = 'npc-elara';

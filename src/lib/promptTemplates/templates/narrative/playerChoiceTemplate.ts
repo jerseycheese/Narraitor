@@ -13,6 +13,10 @@ interface PlayerChoiceTemplateContext {
     name: string;
     description: string;
   }>;
+  worldNpcs?: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 /**
@@ -20,7 +24,7 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt and options based on the current narrative context
  */
 export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills, optionCount } = context;
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount } = context;
   const choiceCount =
     typeof optionCount === 'number' && Number.isFinite(optionCount)
       ? Math.max(1, Math.floor(optionCount))
@@ -56,12 +60,35 @@ AVAILABLE SKILLS IN THIS WORLD:
 ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
   }
 
+  // Build the known-character roster + consequence instructions. Only emitted
+  // when the world has NPCs, so the parser has names to resolve against.
+  const hasNpcs = !!worldNpcs && worldNpcs.length > 0;
+  const npcInfo = hasNpcs
+    ? `
+
+KNOWN CHARACTERS (use these exact names):
+${worldNpcs.map(npc => `- ${npc.name}`).join('\n')}`
+    : '';
+  const consequencesInstructions = hasNpcs
+    ? `
+
+CONSEQUENCES (REQUIRED WHEN A KNOWN CHARACTER IS AFFECTED):
+- When an option would plausibly change how a known character feels about the player, add a Consequences line for that option.
+- Format EXACTLY: Consequences: CharacterName trust +N  (or -N), comma-separated for multiple characters.
+- Use ONLY names from the KNOWN CHARACTERS list. Omit the line entirely when no known character is affected.
+- Scale N to the Decision Weight: MINOR 2-5, MAJOR 5-12, CRITICAL 10-20.`
+    : '';
+  const consequencesFormatLine = hasNpcs
+    ? `
+   Consequences: [Optional - CharacterName trust +/-N]`
+    : '';
+
   const baseContent = `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
 CURRENT CONTEXT (brief summary):
 ${shortContext}
-${location ? `Current location: ${location}` : ''}${skillsInfo}
+${location ? `Current location: ${location}` : ''}${skillsInfo}${npcInfo}
 
 INSTRUCTIONS:
 Based on the ENTIRE narrative context (both beginning and end if provided), create ${choiceCount} distinct action choices that:
@@ -80,7 +107,7 @@ NEGATIVE CONSTRAINTS (CRITICAL):
 ALIGNMENT VARIETY (when appropriate):
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response  
-- CHAOTIC: Unexpected, disruptive actions that change the situation dramatically
+- CHAOTIC: Unexpected, disruptive actions that change the situation dramatically. Vary the KIND of chaos and do not default to making noise (yelling, shouting, singing) - draw from physical risk, trickery/deception, sabotage/destruction, turning the tables, or abandoning the obvious goal
 
 PERSONALITY-INFORMED CHOICES (when character personality context is provided):
 - Create options that offer ways to express the character's traits
@@ -92,9 +119,11 @@ PERSONALITY-INFORMED CHOICES (when character personality context is provided):
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
 SKILL REQUIREMENTS (CRITICAL FOR MVP):
-Generate choices with skill requirements when the situation naturally calls for specialized abilities:
-- Analyze the current scene for opportunities where skills would logically apply
-- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Persuasion for social encounters, Stealth for avoiding detection, Athletics for physical challenges)
+Generate choices with skill requirements only when the situation naturally calls for specialized abilities AND the skill exists in the "AVAILABLE SKILLS" list:
+- ONLY use the exact skill names from the "AVAILABLE SKILLS" list provided above.
+- NEVER invent new skills or use generic skills (like "Stealth", "Persuasion", "Athletics", etc.) unless they are explicitly listed in the "AVAILABLE SKILLS" for this world.
+- If NO "AVAILABLE SKILLS" are listed for this world, do NOT include any "Requirements:" lines in your options.
+- Analyze the current scene for opportunities where the provided world skills would logically apply.
 - **IMPORTANT: Create a MIX of difficulty levels** - don't assume the character can handle everything:
   * Easy tasks: 3-4 skill level (most characters can do this)
   * Moderate tasks: 5-6 skill level (challenging but achievable)
@@ -105,7 +134,7 @@ Generate choices with skill requirements when the situation naturally calls for 
 - VARY skill requirements across choices - use different character abilities when possible
 - Balance: Include both skill-required and non-skill choices for player agency
 - Custom actions by players should trigger implicit skill checks when appropriate
-- Format skill requirements as: [SkillName X+] where X is the minimum level
+- Format skill requirements as: Requirements: SkillName X+
 
 CHOICE HINTS:
 Add helpful hint text when choices benefit from explanation:
@@ -119,7 +148,7 @@ Carefully evaluate the narrative situation and determine the significance of thi
 - MAJOR: Important choices that significantly impact the story direction (meeting key characters, choosing major paths, using powerful abilities, entering dangerous areas, making moral choices)
 - CRITICAL: Life-changing decisions with major consequences (combat with deadly enemies, final confrontations, destiny-altering choices, choosing between life and death)
 
-Consider the stakes, potential consequences, and story impact. Don't default to MINOR - use MAJOR for interesting story moments and CRITICAL for climactic situations.
+Consider the stakes, potential consequences, and story impact. MOST decisions are MINOR or MAJOR: MINOR for everyday beats, MAJOR for the interesting story moments. Reserve CRITICAL for the RARE, genuinely life-or-death turning points - deadly combat, final confrontations, or choices where failure would plausibly end the character's story. When unsure between MAJOR and CRITICAL, choose MAJOR.
 
 FORMAT:
 Decision Weight: [MINOR/MAJOR/CRITICAL]
@@ -129,7 +158,7 @@ Context Summary: [Brief 1-2 sentence summary of the current situation that led t
 Options:
 ${Array.from({ length: choiceCount }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
    Hint: [Optional explanation]
-   Requirements: [Optional - SkillName X+]`).join('\n\n')}
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}`).join('\n\n')}${consequencesInstructions}
 
 ALIGNMENT INSTRUCTIONS: 
 - Always include alignment tags [LAWFUL], [NEUTRAL], or [CHAOTIC] at the start of each choice
@@ -173,4 +202,3 @@ IMPORTANT: Never include emojis anywhere in your response. Use only plain text -
   return `${baseContent}${examplesSection}`;
 };
 
-export default playerChoiceTemplate;

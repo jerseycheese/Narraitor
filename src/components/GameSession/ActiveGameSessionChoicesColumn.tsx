@@ -6,6 +6,7 @@ import type { Decision } from '@/types/narrative.types';
 import type { WorldSkill } from '@/types/world.types';
 import type { InventoryItem } from '@/types/inventory.types';
 import type { CharacterSkill } from '@/state/characterStore';
+import type { NarrativeError } from '@/lib/narrative/narrativeErrors';
 
 interface ActiveGameSessionChoicesColumnProps {
   currentDecision: Decision | null;
@@ -13,6 +14,7 @@ interface ActiveGameSessionChoicesColumnProps {
   status: 'active' | 'paused' | 'ended';
   isGenerating: boolean;
   isGeneratingChoices: boolean;
+  isEvaluatingAction?: boolean;
   isSessionEnded: boolean;
   worldSkills: WorldSkill[];
   characterSkills: CharacterSkill[];
@@ -32,6 +34,10 @@ interface ActiveGameSessionChoicesColumnProps {
     onAccept: () => void;
     onDismiss: () => void;
   };
+  /** Classified narrative-generation failure for the current turn, if any. */
+  generationError?: NarrativeError | null;
+  /** Retry the failed turn (only meaningful for transient/retryable errors). */
+  onRetryGeneration?: () => void;
 }
 
 const ActiveGameSessionChoicesColumn: React.FC<
@@ -42,6 +48,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
   status,
   isGenerating,
   isGeneratingChoices,
+  isEvaluatingAction = false,
   isSessionEnded,
   worldSkills,
   characterSkills,
@@ -57,8 +64,19 @@ const ActiveGameSessionChoicesColumn: React.FC<
   dataTutorial = 'player-choices',
   className = '',
   endingSuggestion,
+  generationError = null,
+  onRetryGeneration,
 }) => {
   const [showSuggestedActions, setShowSuggestedActions] = React.useState(false);
+
+  // Show the failure surface only once the turn has settled into an error —
+  // never mid-generation — so a Retry that flips isGenerating back on hides it
+  // immediately instead of flashing under the spinner.
+  const showGenerationError =
+    !!generationError &&
+    !isGenerating &&
+    !isGeneratingChoices &&
+    !isEvaluatingAction;
   const renderEndStoryAction = React.useCallback(() => {
     if (!endStoryAction) {
       return null;
@@ -79,14 +97,51 @@ const ActiveGameSessionChoicesColumn: React.FC<
   );
 
   return (
-    <div className={className} aria-busy={isGeneratingChoices}>
-      {(isGenerating || isGeneratingChoices) && (
-        <div className="manuscript-streaming-indicator">
-          <span className="manuscript-streaming-dot" />
-          <span className="manuscript-streaming-label">Generating response...</span>
+    <div className={className} aria-busy={isGeneratingChoices || isEvaluatingAction}>
+      {isEvaluatingAction ? (
+        <div className="manuscript-evaluating-indicator" role="status">
+          <span className="manuscript-evaluating-die" aria-hidden="true" />
+          <span className="manuscript-evaluating-label">Evaluating action...</span>
         </div>
+      ) : (
+        (isGenerating || isGeneratingChoices) && (
+          <div className="manuscript-streaming-indicator">
+            <span className="manuscript-streaming-dot" />
+            <span className="manuscript-streaming-label">Continuing your story...</span>
+          </div>
+        )
       )}
       <div className="player-choices-container" data-tutorial={dataTutorial}>
+        {showGenerationError ? (
+          <div
+            className={`manuscript-generation-error${
+              generationError.retryable ? '' : ' manuscript-generation-error-terminal'
+            }`}
+            role="alert"
+          >
+            <p className="manuscript-generation-error-title">
+              {generationError.title}
+            </p>
+            <p className="manuscript-generation-error-message">
+              {generationError.message}
+            </p>
+            {generationError.suggestion && (
+              <p className="manuscript-generation-error-suggestion">
+                {generationError.suggestion}
+              </p>
+            )}
+            {generationError.retryable && onRetryGeneration && (
+              <button
+                type="button"
+                className="manuscript-generation-error-retry"
+                onClick={onRetryGeneration}
+              >
+                {generationError.retryLabel}
+              </button>
+            )}
+          </div>
+        ) : (
+        <>
         {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}
         {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && !hidePrompt && (
           <p className="manuscript-context-summary">
@@ -111,9 +166,13 @@ const ActiveGameSessionChoicesColumn: React.FC<
           </div>
         )}
 
-        {/* Render ChoiceSelector if we have a decision OR if this is a resumed session with existing segments */}
-        {currentDecision?.decisionWeight ||
-        (currentDecision && segmentCount > 0) ? (
+        {/* Render ChoiceSelector if we have a decision OR if this is a resumed
+            session with existing segments — but while the next turn's choices
+            are generating, fall through to the skeleton so stale choices don't
+            linger then flip (F48). */}
+        {(currentDecision?.decisionWeight ||
+          (currentDecision && segmentCount > 0)) &&
+        !isGeneratingChoices ? (
           !hideChoices && (
             <div className={isProgressiveDisclosureEnabled ? (showSuggestedActions ? 'show-mobile-actions' : 'hide-mobile-actions') : ''}>
               <ChoiceSelector
@@ -156,6 +215,8 @@ const ActiveGameSessionChoicesColumn: React.FC<
               </div>
             </div>
           )
+        )}
+        </>
         )}
       </div>
     </div>

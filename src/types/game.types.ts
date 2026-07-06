@@ -1,5 +1,4 @@
 import { EntityID } from './common.types';
-import type { WorldTemplate } from './world-template.types';
 import { SessionLifecycleMetadata, SessionLifecycleStatus } from './session.types';
 import { TutorialProgress, TutorialPhase } from './tutorial.types';
 
@@ -35,21 +34,11 @@ export interface SavedSessionInfo {
   narrativeCount: number;
 }
 
-/**
- * Template history entry
- */
-export interface TemplateHistoryEntry {
-  template: WorldTemplate;
-  generatedAt: string;
-  generationType: 'inspired-by' | 'genre-mix' | 'surprise-me';
-  userInput?: string;
-  genres?: string[];
-}
 
 /**
  * Auto-save status and metadata
  */
-export interface AutoSaveState {
+interface AutoSaveState {
   enabled: boolean;
   lastSaveTime: string | null;
   status: 'idle' | 'saving' | 'saved' | 'error';
@@ -71,7 +60,6 @@ export interface SessionStore {
   characterId: EntityID | null;
   savedSessions: Record<string, SavedSessionInfo>;
   sessionLifecycle: Record<string, SessionLifecycleMetadata>;
-  templateHistory: TemplateHistoryEntry[];
   autoSave: AutoSaveState;
   tutorialProgress: TutorialProgress;
   narrativeHeight: number; // Persisted height for narrative container
@@ -91,18 +79,14 @@ export interface SessionStore {
   setCharacterId: (characterId: EntityID) => void;
   getSavedSession: (worldId: string, characterId: string) => SavedSessionInfo | undefined;
   resumeSavedSession: (sessionId: string) => boolean;
+  refreshRecoveryMarker: () => void;
   deleteSavedSession: (sessionId: string) => void;
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => void;
-  fixExistingSessionNarrativeCounts: () => Promise<void>;
+  repairSavedSessionNarrativeCounts: (counts: Record<string, number>) => void;
   upsertSessionLifecycle: (metadata: SessionLifecycleMetadata) => void;
   setSessionLifecycleStatus: (sessionId: string, status: SessionLifecycleStatus) => void;
   getSessionLifecycle: (sessionId: string) => SessionLifecycleMetadata | undefined;
-  
-  // Template history actions
-  addTemplateToHistory: (entry: TemplateHistoryEntry) => void;
-  getTemplateHistory: () => TemplateHistoryEntry[];
-  clearTemplateHistory: () => void;
-  
+
   // Auto-save actions
   setAutoSaveEnabled: (enabled: boolean) => void;
   updateAutoSaveStatus: (status: AutoSaveState['status'], errorMessage?: string) => void;

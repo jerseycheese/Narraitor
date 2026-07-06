@@ -1,7 +1,8 @@
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
+import type { NarrativeTemplateContext } from './context';
 
-export const transitionTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+export const transitionTemplate = (context: NarrativeTemplateContext) => {
   const {
     worldName,
     genre,

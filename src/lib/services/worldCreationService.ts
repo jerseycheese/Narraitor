@@ -6,7 +6,7 @@ import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { World, WorldAttribute, WorldSkill } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
 import { worldApi, WorldImageParams } from '@/lib/api/worldApi';
-import { ToneSettingsGenerator, extractWorldAnalysisData } from '@/lib/ai/toneSettingsGenerator';
+import { generateToneSettings, extractWorldAnalysisData } from '@/lib/ai/toneSettingsGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { logger } from '@/lib/utils/logger';
 import { npcPortraitService } from './npcPortraitService';
@@ -126,10 +126,9 @@ Every NPC must fit this world snugly. IDs must be unique, lowercase, kebab-case 
 async function generateAIToneSettings(worldData: Partial<World>): Promise<ToneSettings> {
   try {
     const client = createDefaultGeminiClient();
-    const generator = new ToneSettingsGenerator(client);
     const analysisData = extractWorldAnalysisData(worldData);
 
-    const result = await generator.generateToneSettings(analysisData);
+    const result = await generateToneSettings(client, analysisData);
 
     logger.info('AI tone settings generated:', {
       contentRating: result.contentRating,
@@ -220,7 +219,7 @@ export const worldCreationService = {
         description: worldData.description,
         genre: worldData.genre,
       }).catch(error => {
-        console.error('Background world image generation failed:', error);
+        logger.error('Background world image generation failed:', error);
         // Don't fail the world creation if image generation fails
       });
     }
@@ -269,7 +268,7 @@ export const worldCreationService = {
         },
       });
     } catch (error) {
-      console.error('Failed to generate world image:', error);
+      logger.error('Failed to generate world image:', error);
       throw error;
     }
   },

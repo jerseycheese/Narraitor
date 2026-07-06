@@ -8,18 +8,7 @@ import React from 'react';
 import { DevToolsProvider, useDevTools } from '../DevToolsContext';
 
 describe('DevTools Section Visibility - MVP', () => {
-  test('provides section visibility functions', () => {
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <DevToolsProvider>{children}</DevToolsProvider>
-    );
-
-    const { result } = renderHook(() => useDevTools(), { wrapper });
-
-    expect(typeof result.current.isSectionVisible).toBe('function');
-    expect(typeof result.current.toggleSectionVisibility).toBe('function');
-  });
-
-  test('sections are by default', () => {
+  test('sections are visible by default', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <DevToolsProvider>{children}</DevToolsProvider>
     );

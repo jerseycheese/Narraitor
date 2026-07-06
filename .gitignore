@@ -23,6 +23,10 @@ index.html
 playwright-html-report/
 playwright-test-results/
 
+# Stryker (mutation testing) generated output
+/reports/mutation/
+.stryker-tmp/
+
 # Playwright trace files (generated during debugging)
 /trace/
 trace/
@@ -106,12 +110,20 @@ public_docs/architecture/*.dot
 public_docs/architecture/*.html
 dependency-violations.html
 
-# Claude Code
+# Claude Code (CLAUDE.md is committed canon; the rest stays local)
 .claude/*
 .claude-workflow/
 .clauderc
-CLAUDE.md
 CLAUDE.local.md
+
+# Claude Code cloud (web sessions): commit only these reviewed, shareable files.
+# Everything else under .claude/ (incl. .github_token, settings.local.json) stays ignored.
+!.claude/settings.json
+!/CLAUDE.md
+!.claude/skills/
+!.claude/agents/
+# never commit macOS cruft, even within the re-included dirs above
+.claude/**/.DS_Store
 
 # Codex
 .codex/
@@ -121,6 +133,9 @@ AGENTS.md
 # Gemini CLI
 .gemini/
 GEMINI.md
+
+# Shared agent skills (synced locally, not committed)
+.agents/
 
 # MCP local config (do not commit)
 .mcp.json
@@ -138,3 +153,9 @@ build-output.log
 
 \n# Local tool logs\n.bdg/
 characters-debug.png
+
+# impeccable (design tool): keep local state out of git, share only the live config
+.impeccable/*
+!.impeccable/live/
+.impeccable/live/*
+!.impeccable/live/config.json

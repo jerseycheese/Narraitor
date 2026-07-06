@@ -58,14 +58,6 @@ describe('Session Boundary Logging - Session Start', () => {
     setupMockStores();
   });
 
-  it('verifies session initialization API exists', () => {
-    const sessionStore = useSessionStore();
-
-    expect(typeof sessionStore.initializeSession).toBe('function');
-    expect(typeof sessionStore.endSession).toBe('function');
-    expect(sessionStore).toBeDefined();
-  });
-
   it('handles session start callback and journal entry creation workflow', () => {
     const sessionStartTime = new Date('2024-01-15T10:30:00Z');
     const mockDate = jest.spyOn(global, 'Date').mockImplementation(() => sessionStartTime);

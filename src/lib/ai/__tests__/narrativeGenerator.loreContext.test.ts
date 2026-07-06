@@ -6,7 +6,7 @@ import { NarrativeGenerator } from '../narrativeGenerator';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
-import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
 import {
   createMockWorldStore,
   createMockCharacterStore,
@@ -75,7 +75,7 @@ describe('NarrativeGenerator lore context integration', () => {
       })
     );
 
-    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+    (getNarrativeTemplate as jest.Mock).mockReturnValue(
       jest.fn().mockReturnValue('Base narrative template')
     );
   });

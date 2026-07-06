@@ -10,6 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import SkillPrerequisitesEditor from '@/components/forms/SkillPrerequisitesEditor';
+
+const MAX_NAME_LENGTH = 100;
+const MAX_DESCRIPTION_LENGTH = 500;
 
 export interface SkillEditorProps {
   worldId: EntityID;
@@ -67,6 +71,7 @@ export function SkillEditor({
     name: '',
     description: '',
     attributeIds: [],
+    attributePrerequisites: [],
     difficulty: DEFAULT_SKILL_DIFFICULTY,
     baseValue: 5,
     minValue: 1,
@@ -85,6 +90,7 @@ export function SkillEditor({
         setFormData({
           ...existingSkill,
           attributeIds: existingSkill.attributeIds || [],
+          attributePrerequisites: existingSkill.attributePrerequisites || [],
         });
       }
     }
@@ -122,12 +128,12 @@ export function SkillEditor({
     }
 
     // Length validation
-    if (trimmedName.length > 100) {
-      validationErrors.push('Skill name must be 100 characters or less');
+    if (trimmedName.length > MAX_NAME_LENGTH) {
+      validationErrors.push(`Skill name must be ${MAX_NAME_LENGTH} characters or less`);
     }
 
-    if (trimmedDescription.length > 500) {
-      validationErrors.push('Description must be 500 characters or less');
+    if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
+      validationErrors.push(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`);
     }
 
     // Duplicate name validation (only for create mode or different skill in edit mode)
@@ -168,6 +174,7 @@ export function SkillEditor({
       description: trimmedDescription,
       worldId,
       attributeIds: formData.attributeIds || [],
+      attributePrerequisites: formData.attributePrerequisites || [],
       difficulty: formData.difficulty || DEFAULT_SKILL_DIFFICULTY,
       baseValue: formData.baseValue || 5,
       minValue: formData.minValue || 1,
@@ -296,6 +303,16 @@ export function SkillEditor({
               </p>
             )}
           </div>
+
+          <SkillPrerequisitesEditor
+            attributes={existingAttributes}
+            prerequisites={formData.attributePrerequisites}
+            onChange={(attributePrerequisites) =>
+              setFormData((prev) => ({ ...prev, attributePrerequisites }))
+            }
+            idPrefix="skill-editor"
+            disabled={!canCreateSkill}
+          />
         </div>
 
         <div>

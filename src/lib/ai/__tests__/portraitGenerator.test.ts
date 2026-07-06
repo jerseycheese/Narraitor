@@ -1,6 +1,6 @@
 // src/lib/ai/__tests__/portraitGenerator.test.ts
 
-import { PortraitGenerator } from '../portraitGenerator';
+import { generatePortrait, buildPortraitPrompt } from '../portraitGenerator';
 import { Character } from '../../../types/character.types';
 import { AIClient } from '../types';
 import { getTimestamp } from '@/lib/utils/timestamp';
@@ -11,13 +11,11 @@ const mockAIClient: AIClient = {
   generateImage: jest.fn(),
 };
 
-describe('PortraitGenerator', () => {
-  let generator: PortraitGenerator;
+describe('portraitGenerator', () => {
   let mockCharacter: Character;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    generator = new PortraitGenerator(mockAIClient);
 
     // Mock detection and enhancement responses
     (mockAIClient.generateContent as jest.Mock).mockImplementation(
@@ -111,7 +109,7 @@ describe('PortraitGenerator', () => {
         prompt: 'portrait of Elara Moonshadow',
       });
 
-      const result = await generator.generatePortrait(mockCharacter);
+      const result = await generatePortrait(mockAIClient,mockCharacter);
 
       expect(result.type).toBe('ai-generated');
       expect(result.url).toBe(mockImageData);
@@ -125,7 +123,7 @@ describe('PortraitGenerator', () => {
         prompt: '',
       });
 
-      await generator.generatePortrait(mockCharacter);
+      await generatePortrait(mockAIClient,mockCharacter);
 
       const callArgs = (mockAIClient.generateImage as jest.Mock).mock
         .calls[0][0];
@@ -148,7 +146,7 @@ describe('PortraitGenerator', () => {
         new Error('Image generation failed')
       );
 
-      await expect(generator.generatePortrait(mockCharacter)).rejects.toThrow(
+      await expect(generatePortrait(mockAIClient,mockCharacter)).rejects.toThrow(
         'Failed to generate character portrait'
       );
     });
@@ -161,7 +159,7 @@ describe('PortraitGenerator', () => {
         prompt: '',
       });
 
-      await generator.generatePortrait(mockCharacter, {});
+      await generatePortrait(mockAIClient,mockCharacter, {});
 
       const callArgs = (mockAIClient.generateImage as jest.Mock).mock
         .calls[0][0];
@@ -172,7 +170,7 @@ describe('PortraitGenerator', () => {
 
   describe('buildPortraitPrompt', () => {
     it('should create detailed prompt from character data', async () => {
-      const prompt = await generator.buildPortraitPrompt(mockCharacter);
+      const prompt = await buildPortraitPrompt(mockAIClient,mockCharacter);
 
       expect(prompt).toContain('Elara Moonshadow');
       expect(prompt).toContain('expressing wise mysterious character');
@@ -195,7 +193,7 @@ describe('PortraitGenerator', () => {
         prompt: 'Photorealistic portrait of Nathan Fielder',
       });
 
-      await generator.generatePortrait(comedianCharacter);
+      await generatePortrait(mockAIClient,comedianCharacter);
 
       // Check that detection was called
       expect(mockAIClient.generateContent).toHaveBeenCalledWith(
@@ -223,14 +221,14 @@ describe('PortraitGenerator', () => {
         },
       };
 
-      const prompt = await generator.buildPortraitPrompt(longCharacter);
+      const prompt = await buildPortraitPrompt(mockAIClient,longCharacter);
 
       // Gemini has 480 token limit, roughly 1920 characters
       expect(prompt.length).toBeLessThan(1920);
     });
 
     it('should include style keywords for quality', async () => {
-      const prompt = await generator.buildPortraitPrompt(mockCharacter);
+      const prompt = await buildPortraitPrompt(mockAIClient,mockCharacter);
 
       expect(prompt).toMatch(/portrait|character art|fantasy art/i);
       expect(prompt).toMatch(/photorealistic|documentary photography/i);

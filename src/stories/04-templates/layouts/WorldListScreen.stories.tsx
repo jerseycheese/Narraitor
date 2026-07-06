@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
@@ -63,6 +64,11 @@ const meta: Meta<typeof WorldListScreen> = {
   parameters: {
     layout: 'padded',
   },
+  args: {
+    // Explicit spy so Storybook 8 doesn't treat this on* prop as an implicit
+    // action arg, which crashes the render (the component calls it on mount).
+    onViewToggleRender: fn(),
+  },
   tags: ['autodocs'],
   decorators: [
     (Story) => {
@@ -78,19 +84,6 @@ const meta: Meta<typeof WorldListScreen> = {
       return <Story />;
     },
   ],
-  args: {
-    _router: {
-      push: (url: string) => {
-        console.log(`[Storybook] Navigating to: ${url}`);
-        return Promise.resolve();
-      }
-    },
-    _storeActions: {
-      setCurrentWorld: (id: string) => {
-        console.log(`[Storybook] Setting current world: ${id}`);
-      }
-    }
-  }
 };
 
 export default meta;
@@ -140,7 +133,8 @@ export const WithError: Story = {
           title: 'Failed to load worlds',
           message: 'Failed to load worlds',
           retryable: false,
-          type: ErrorType.SERVICE
+          type: ErrorType.SERVICE,
+          severity: 'error'
         }
       });
       return <Story />;

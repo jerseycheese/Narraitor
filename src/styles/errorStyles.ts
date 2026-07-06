@@ -1,23 +1,20 @@
 /**
- * Standardized error styling patterns for consistent error display across the application
+ * Standardized error styling patterns for consistent error display across the
+ * application. Class definitions live in src/styles/error-block.css (imported
+ * via globals.css) — these were Tailwind utility strings until the audit found
+ * them rendering inert in a post-Tailwind codebase.
  */
 export const errorStyles = {
   // Block-level error containers
-  container: 'p-4 bg-destructive/10 border border-destructive rounded-lg',
+  container: 'error-block',
 
   // Individual error messages
-  message: 'text-destructive text-sm mt-1',
+  message: 'error-block-message',
 
   // Form input error states
   input: {
-    border: 'border-destructive',
-    focus: 'focus-visible:ring-destructive',
-    combined: 'border-destructive focus-visible:ring-destructive'
+    border: 'input-error',
+    focus: 'input-error',
+    combined: 'input-error',
   },
-
-  // Error list styling
-  list: {
-    container: 'space-y-1',
-    item: 'text-destructive text-sm'
-  }
 } as const;

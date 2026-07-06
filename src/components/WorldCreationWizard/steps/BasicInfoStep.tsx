@@ -81,8 +81,8 @@ export default function BasicInfoStep({
             error={combinedErrors.relationship}
             helpText="Pick how closely this world should track an existing setting. The choice controls whether your world invents new canon or leans on established material."
           >
-            <div>
-              <div>
+            <div className="wizard-radio-group">
+              <div className="wizard-radio-option">
                 <Input
                   type="radio"
                   id="relationship-none"
@@ -90,19 +90,16 @@ export default function BasicInfoStep({
                   value=""
                   checked={!worldData.relationship}
                   onChange={() => onUpdate({ ...worldData, relationship: undefined, reference: '' })}
-                  
                 />
-                <div>
-                  <Label htmlFor="relationship-none" >
-                    Original World
-                  </Label>
-                  <p>
+                <div className="wizard-radio-option-text">
+                  <Label htmlFor="relationship-none">Original World</Label>
+                  <p className="wizard-radio-option-desc">
                     Create a completely original world from your imagination
                   </p>
                 </div>
               </div>
-              
-              <div>
+
+              <div className="wizard-radio-option">
                 <Input
                   type="radio"
                   id="relationship-based-on"
@@ -110,20 +107,17 @@ export default function BasicInfoStep({
                   value="based_on"
                   checked={worldData.relationship === 'inspired_by'}
                   onChange={() => onUpdate({ ...worldData, relationship: 'inspired_by' })}
-                  
                   data-testid="relationship-based-on-radio"
                 />
-                <div>
-                  <Label htmlFor="relationship-based-on" >
-                    Inspired By
-                  </Label>
-                  <p>
+                <div className="wizard-radio-option-text">
+                  <Label htmlFor="relationship-based-on">Inspired By</Label>
+                  <p className="wizard-radio-option-desc">
                     Create an original world inspired by an existing fictional universe or real setting
                   </p>
                 </div>
               </div>
-              
-              <div>
+
+              <div className="wizard-radio-option">
                 <Input
                   type="radio"
                   id="relationship-set-in"
@@ -131,14 +125,11 @@ export default function BasicInfoStep({
                   value="set_in"
                   checked={worldData.relationship === 'set_within'}
                   onChange={() => onUpdate({ ...worldData, relationship: 'set_within' })}
-                  
                   data-testid="relationship-set-in-radio"
                 />
-                <div>
-                  <Label htmlFor="relationship-set-in" >
-                    Set Within
-                  </Label>
-                  <p>
+                <div className="wizard-radio-option-text">
+                  <Label htmlFor="relationship-set-in">Set Within</Label>
+                  <p className="wizard-radio-option-desc">
                     Place your world directly within an existing fictional universe or real setting
                   </p>
                 </div>

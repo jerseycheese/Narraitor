@@ -3,7 +3,8 @@
 import type { EntityID, TimestampedEntity } from './common.types';
 import type { World } from './world.types';
 import type { Character } from './character.types';
-import type { InventoryAcquisitionMethod } from './inventory.types';
+import type { InventoryAcquisitionMethod, StandardInventoryCategory } from './inventory.types';
+import type { ContinuitySegmentNote } from './continuity.types';
 
 /**
  * Represents a segment of narrative in the game
@@ -92,6 +93,8 @@ export interface DecisionOption {
   customText?: string;
   // Choice alignment for personality-based variety
   alignment?: ChoiceAlignment;
+  // Consequences applied when this specific option is chosen
+  consequences?: Consequence[];
 }
 
 /**
@@ -126,7 +129,7 @@ export interface SkillCheckRoll {
  * Represents a consequence of a decision
  */
 export interface Consequence {
-  type: 'attribute' | 'skill' | 'item' | 'relationship' | 'narrative';
+  type: 'attribute' | 'skill' | 'item' | 'relationship' | 'narrative' | 'alignment';
   action: 'add' | 'remove' | 'modify';
   targetId: EntityID;
   value: string | number | boolean | Record<string, unknown>;
@@ -141,6 +144,12 @@ export interface AcquiredItemMetadata {
   description?: string;
   quantity?: number;
   acquisitionMethod?: InventoryAcquisitionMethod;
+  /**
+   * Category the narrative AI inferred for this item from story context. When
+   * present and valid, it lets the acquisition pipeline skip the separate
+   * categorization AI call. Validated against StandardInventoryCategory before use.
+   */
+  categoryHint?: StandardInventoryCategory;
   /**
    * Indicates that this metadata refines the most recently acquired item
    * rather than representing a completely new pickup.
@@ -261,6 +270,8 @@ export interface NarrativeMetadata {
   causedByDecisionId?: EntityID;
   causedByDecisionText?: string;
   decisionOutcome?: DecisionOutcome;
+  // Continuity guardrail outcome (#409/#412)
+  continuity?: ContinuitySegmentNote;
   // Debug information (dev mode only)
   debugInfo?: PromptDebugInfo;
 }
@@ -314,6 +325,8 @@ export interface NarrativeContext {
 export interface GenerationParameters {
   desiredLength?: 'short' | 'medium' | 'long';
   tone?: string;
+  /** Token budget for in-prompt few-shot examples; templates fall back to a default when unset. */
+  exampleTokenBudget?: number;
   segmentType?: 'scene' | 'dialogue' | 'action' | 'transition';
   includedTopics?: string[];
   excludedTopics?: string[];
@@ -365,6 +378,8 @@ export interface NarrativeGenerationResult {
     itemsLost?: LostItemMetadata[];
     // Major event tracking
     majorEvent?: string;
+    // Continuity guardrail outcome (#409/#412)
+    continuity?: ContinuitySegmentNote;
     // Debug information (dev mode only)
     debugInfo?: PromptDebugInfo;
   };

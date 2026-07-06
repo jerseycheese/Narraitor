@@ -8,6 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getTimestamp } from '@/lib/utils';
 import { GENRES, normalizeGenre } from '@/lib/constants/genres';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('AITestingPanel');
 
 interface AITestingPanelProps {
   className?: string;
@@ -185,12 +188,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       const responseTime = Date.now() - startTime;
 
-      // Log for debugging
-      console.log(
-        '[AI Testing Panel] Response generated in',
-        responseTime,
-        'ms'
-      );
+      logger.debug('Response generated in', responseTime, 'ms');
 
       setResult(response);
     } catch (err) {

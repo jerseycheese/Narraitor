@@ -314,6 +314,47 @@ describe('AttributeReviewStep', () => {
     expect(screen.getByDisplayValue('Strength')).toBeInTheDocument();
   });
 
+  test('updates the starting value through the number input', () => {
+    const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
+      ...s,
+      accepted: i === 0,
+    }));
+
+    const worldDataWithSelection = {
+      ...defaultWorldData,
+      attributes: [{
+        id: 'attr-1',
+        worldId: '',
+        name: 'Strength',
+        description: 'Physical power and endurance',
+        baseValue: 5,
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+      }],
+    };
+
+    render(
+      <AttributeReviewStep
+        worldData={worldDataWithSelection}
+        suggestions={suggestionsWithSelection}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    const valueInput = screen.getByTestId('attribute-base-value-input-0');
+    fireEvent.change(valueInput, { target: { value: '8' } });
+
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        attributes: expect.arrayContaining([
+          expect.objectContaining({ name: 'Strength', baseValue: 8 }),
+        ]),
+      })
+    );
+  });
+
   test('displays errors when provided', () => {
     const errors = { attributes: 'Please select at least one attribute' };
 

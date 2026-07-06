@@ -23,7 +23,7 @@ export const STORY_CHARACTER_ID = 'char-storybook';
 
 // ── Mock World ───────────────────────────────────────────────────────
 
-export const mockWorld: World = {
+const mockWorld: World = {
   id: STORY_WORLD_ID,
   name: 'The Shattered Isles',
   description: 'A storm-ravaged archipelago where ancient magic stirs beneath volcanic rock.',
@@ -164,7 +164,7 @@ export const mockStoryEndingTragic: StoryEnding = {
 
 // ── Mock Narrative Segments ──────────────────────────────────────────
 
-export const mockNarrativeSegments: NarrativeSegment[] = [
+const mockNarrativeSegments: NarrativeSegment[] = [
   {
     id: 'seg-1',
     sessionId: STORY_SESSION_ID,
@@ -205,22 +205,6 @@ export const WithMockWorldStore = (Story: React.FC) => {
     });
     return () => {
       useWorldStore.setState({ worlds: {}, entities: {} });
-    };
-  }, []);
-  return React.createElement(Story);
-};
-
-/**
- * Populates character store for stories that need character data.
- */
-export const WithMockCharacterStore = (Story: React.FC) => {
-  useEffect(() => {
-    useCharacterStore.setState({
-      characters: { [STORY_CHARACTER_ID]: mockCharacter as never },
-      entities: { [STORY_CHARACTER_ID]: mockCharacter as never },
-    });
-    return () => {
-      useCharacterStore.setState({ characters: {}, entities: {} });
     };
   }, []);
   return React.createElement(Story);

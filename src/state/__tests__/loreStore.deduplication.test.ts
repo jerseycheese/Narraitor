@@ -273,6 +273,12 @@ describe('mergeFactsImpl', () => {
     expect(() => {
       mergeFactsImpl(primaryFact.id, secondaryFact.id, mockContext);
     }).not.toThrow();
+
+    // The merge should still proceed and update the primary despite missing metadata.
+    expect(mockContext.updateFact).toHaveBeenCalledWith(
+      primaryFact.id,
+      expect.any(Object)
+    );
   });
 
   it('determines primary based on importance when swapped', () => {

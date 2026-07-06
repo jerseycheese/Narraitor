@@ -1,0 +1,61 @@
+import { useCharacterStore } from '../characterStore';
+import type { Character } from '../characterStore.types';
+
+const makeCharacter = (id: string, alignment?: number): Character =>
+  ({
+    id,
+    name: 'Test Hero',
+    description: '',
+    worldId: 'world-1',
+    level: 1,
+    alignment,
+    attributes: [],
+    skills: [],
+    derivedStats: [],
+    background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+    isPlayer: true,
+    status: { health: 10, maxHealth: 10, conditions: [] },
+    inventory: { characterId: id, items: [], capacity: 10, categories: [], itemOrder: [] },
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  }) as Character;
+
+describe('characterStore.applyAlignmentShift', () => {
+  beforeEach(() => {
+    useCharacterStore.setState({ characters: {}, entities: {}, error: null });
+  });
+
+  it('shifts from undefined alignment as if neutral (0)', () => {
+    useCharacterStore.setState((state) => ({
+      characters: { ...state.characters, 'char-1': makeCharacter('char-1') },
+    }));
+
+    useCharacterStore.getState().applyAlignmentShift('char-1', -8);
+
+    expect(useCharacterStore.getState().characters['char-1'].alignment).toBe(-8);
+  });
+
+  it('accumulates across shifts and clamps at both ends', () => {
+    useCharacterStore.setState((state) => ({
+      characters: { ...state.characters, 'char-1': makeCharacter('char-1', 95) },
+    }));
+
+    useCharacterStore.getState().applyAlignmentShift('char-1', 12);
+    expect(useCharacterStore.getState().characters['char-1'].alignment).toBe(100);
+
+    useCharacterStore.getState().applyAlignmentShift('char-1', -250);
+    expect(useCharacterStore.getState().characters['char-1'].alignment).toBe(-100);
+  });
+
+  it('no-ops for unknown characters and non-finite or zero deltas', () => {
+    useCharacterStore.setState((state) => ({
+      characters: { ...state.characters, 'char-1': makeCharacter('char-1', 5) },
+    }));
+
+    useCharacterStore.getState().applyAlignmentShift('missing', 10);
+    useCharacterStore.getState().applyAlignmentShift('char-1', Number.NaN);
+    useCharacterStore.getState().applyAlignmentShift('char-1', 0);
+
+    expect(useCharacterStore.getState().characters['char-1'].alignment).toBe(5);
+  });
+});

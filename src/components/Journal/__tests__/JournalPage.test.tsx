@@ -180,6 +180,7 @@ describe('JournalPage', () => {
         message: 'Unable to load journal',
         retryable: false,
         type: ErrorType.UNKNOWN,
+        severity: 'error',
       },
     });
     mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));

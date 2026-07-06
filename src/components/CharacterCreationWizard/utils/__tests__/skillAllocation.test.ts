@@ -2,6 +2,9 @@ import { normalizeSkillBounds, calculateSkillPointPool } from '../skillAllocatio
 import type { WizardSkillData, WizardSkillInput } from '../skillAllocation';
 import type { World } from '@/types/world.types';
 import { createMockWorld, createMockWorldSkill } from '@/lib/test-utils';
+import { logger } from '@/lib/utils/logger';
+
+jest.mock('@/lib/utils/logger');
 
 const buildWorld = (overrides: Partial<World> = {}): World => createMockWorld({
   id: 'world-1',
@@ -39,7 +42,7 @@ describe('skillAllocation utilities', () => {
   };
 
   beforeEach(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
@@ -73,7 +76,7 @@ describe('skillAllocation utilities', () => {
       const skills = normalizeSkillBounds([missingSkill], undefined);
 
       expect(skills[0].level).toBe(1);
-      expect(console.warn).toHaveBeenCalledWith(
+      expect(logger.warn).toHaveBeenCalledWith(
         expect.stringContaining('No matching world skill found while normalizing wizard data.'),
         expect.objectContaining({ skillId: 'missing-skill' })
       );

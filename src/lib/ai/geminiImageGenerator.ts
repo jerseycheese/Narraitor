@@ -7,12 +7,11 @@
  */
 
 import Logger from '@/lib/utils/logger';
-import { saveBase64Image, type SaveImageOptions } from '@/lib/utils/fileStorage';
 import { getAIConfig } from './config';
 
 const logger = new Logger('GeminiImageGenerator');
 
-export interface GeminiImagePart {
+interface GeminiImagePart {
   inlineData?: {
     mimeType?: string;
     data?: string;
@@ -106,13 +105,15 @@ export function extractImageFromResponse(
 }
 
 /**
- * High-level function to generate an image using Gemini
- * Combines API call and image extraction into one operation
+ * High-level function to generate an image using Gemini.
+ * Combines API call and image extraction into one operation and returns a
+ * base64 data URL. The image is persisted by the caller (e.g. into a store /
+ * IndexedDB) rather than written to disk, so it survives serverless instance
+ * recycling. Used by the journal, portrait, ending, and world image routes.
  *
  * @param prompt - The text prompt for image generation
  * @param apiKey - The Gemini API key
  * @returns The generated image data, or null if generation failed
- * @deprecated Use generateAndSaveImageWithGemini instead for better performance
  */
 export async function generateImageWithGemini(
   prompt: string,
@@ -146,61 +147,6 @@ export async function generateImageWithGemini(
 
   } catch (error) {
     logger.error('generateImageWithGemini', 'Image generation failed:', error);
-    return null;
-  }
-}
-
-/**
- * Generate an image with Gemini and save it to the file system
- * Returns a file URL instead of a base64 data URI for better performance
- *
- * @param prompt - The text prompt for image generation
- * @param apiKey - The Gemini API key
- * @param entityId - Unique ID for the entity (e.g., world ID)
- * @param category - Image category (e.g., 'worlds', 'characters')
- * @returns Object with the public URL and file info, or null if generation failed
- */
-export async function generateAndSaveImageWithGemini(
-  prompt: string,
-  apiKey: string,
-  entityId: string,
-  category: SaveImageOptions['category']
-): Promise<{ url: string; fileSize: number } | null> {
-  try {
-    const response = await callGeminiImageAPI(prompt, apiKey);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      logger.error('generateAndSaveImageWithGemini', 'Gemini API Error:', errorText);
-      return null;
-    }
-
-    const data = await response.json();
-    const imageData = extractImageFromResponse(data);
-
-    if (!imageData) {
-      logger.error('generateAndSaveImageWithGemini', 'No image data in response');
-      return null;
-    }
-
-    // Save the image to the file system
-    logger.debug('generateAndSaveImageWithGemini', `Saving image for ${category}/${entityId}`);
-    const saveResult = await saveBase64Image({
-      category,
-      entityId,
-      mimeType: imageData.mimeType,
-      base64Data: imageData.base64Data,
-    });
-
-    logger.info('generateAndSaveImageWithGemini', `Image saved: ${saveResult.url} (${saveResult.fileSize} bytes)`);
-
-    return {
-      url: saveResult.url,
-      fileSize: saveResult.fileSize,
-    };
-
-  } catch (error) {
-    logger.error('generateAndSaveImageWithGemini', 'Image generation and save failed:', error);
     return null;
   }
 }

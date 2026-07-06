@@ -106,7 +106,7 @@ const WorldTypeExampleComponent = (args: React.ComponentProps<typeof RadioGroup>
         onValueChange={setValue}
         name="world-type-radio"
       >
-        <div>
+        <label>
           <RadioGroupItem value="original" />
           <div>
             <div>Original World</div>
@@ -114,8 +114,8 @@ const WorldTypeExampleComponent = (args: React.ComponentProps<typeof RadioGroup>
               Generate a completely original world with unique settings and themes
             </div>
           </div>
-        </div>
-        <div>
+        </label>
+        <label>
           <RadioGroupItem value="inspired_by" />
           <div>
             <div>Inspired By</div>
@@ -123,8 +123,8 @@ const WorldTypeExampleComponent = (args: React.ComponentProps<typeof RadioGroup>
               Generate an original world inspired by an existing fictional universe
             </div>
           </div>
-        </div>
-        <div>
+        </label>
+        <label>
           <RadioGroupItem value="set_within" />
           <div>
             <div>Set Within</div>
@@ -132,7 +132,7 @@ const WorldTypeExampleComponent = (args: React.ComponentProps<typeof RadioGroup>
               Generate a world directly within an existing fictional universe
             </div>
           </div>
-        </div>
+        </label>
       </RadioGroup>
     </div>
   );

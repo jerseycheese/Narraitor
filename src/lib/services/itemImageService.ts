@@ -6,6 +6,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import Logger from '@/lib/utils/logger';
 import { ImageRequestCoordinator } from './imageRequestCoordinator';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 const logger = new Logger('ItemImageService');
 
@@ -67,7 +68,7 @@ class ItemImageService {
     item: { name: string; description?: string; categoryId: string },
     genre?: string
   ): Promise<GeneratedImage> {
-    const response = await fetch('/api/generate-item-image', {
+    const response = await aiFetch('/api/generate-item-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ item, genre }),

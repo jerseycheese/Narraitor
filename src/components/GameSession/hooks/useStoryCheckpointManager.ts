@@ -6,7 +6,9 @@ import { WorldStateMajorEvent } from '@/types/world-state.types';
 import type { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
 import { StoryCheckpointDecisionPayload, StoryCheckpointResponseBody } from '@/types/story-checkpoint.types';
 import { generateUniqueId, safeTrim } from '@/lib/utils';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { buildStoryCheckpointPayload } from '@/lib/narrative/storyCheckpointPayload';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 interface UseStoryCheckpointManagerArgs {
   worldId: string;
@@ -199,6 +201,14 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
   }, [characters]);
 
   const createCheckpoint = React.useCallback(async () => {
+    // Skip checkpoint generation under Playwright (E2E/visual) — it POSTs to
+    // /api/narrative/story-checkpoint, which hangs with no AI key in CI and
+    // stalls the page load (the visual suite's page.goto timeouts). Seeded
+    // pages don't need a generated checkpoint. Mirrors EndingScreen (#1323).
+    if (isPlaywrightEnv()) {
+      return;
+    }
+
     if (!worldId || !sessionId) {
       setError('Missing world or session context.');
       setStatus('error');
@@ -243,7 +253,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
         toneSettings: world?.toneSettings,
       });
 
-      const response = await fetch('/api/narrative/story-checkpoint', {
+      const response = await aiFetch('/api/narrative/story-checkpoint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

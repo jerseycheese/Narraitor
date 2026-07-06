@@ -1,16 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
-import GameSession from '@/components/GameSession/GameSession';
 import { LoadingPulse } from '@/components/ui/LoadingState';
-import { SectionError } from '@/components/ui/ErrorDisplay';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { Button } from '@/components/ui/button';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('Play');
+
+// GameSession drags in the full narrative/AI chain; load it on demand and reuse
+// the page's existing loading state so first paint stays light (issue #1357).
+const GameSession = dynamic(() => import('@/components/GameSession/GameSession'), {
+  ssr: false,
+  loading: () => <LoadingPulse message="Preparing your adventure..." />,
+});
 
 type PersistApi = {
   persist?: {
@@ -30,8 +40,7 @@ export default function PlayPage() {
 
   const currentWorldId = useWorldStore(state => state.currentWorldId);
   const currentWorld = useWorldStore(state => state.worlds[currentWorldId || '']);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const currentCharacterId = useCharacterStore((state: any) => state.currentCharacterId);
+  const currentCharacterId = useCharacterStore((state) => state.currentCharacterId);
   const initializeSession = useSessionStore(state => state.initializeSession);
   const currentSessionId = useSessionStore(state => state.id);
 
@@ -92,7 +101,7 @@ export default function PlayPage() {
 
         setIsLoading(false);
       } catch (err) {
-        console.error('Failed to initialize game session:', err);
+        logger.error('Failed to initialize game session:', err);
         setError(err instanceof Error ? err.message : 'Failed to start game session');
         setIsLoading(false);
       }
@@ -113,7 +122,8 @@ export default function PlayPage() {
     return (
       <div className="play-page play-page-shell play-page-shell-error">
         <PageLayout title="Game Session Error">
-          <SectionError
+          <ErrorDisplay
+            variant="section"
             title="Failed to Start Game"
             message={error}
             severity="error"
@@ -141,7 +151,8 @@ export default function PlayPage() {
     return (
       <div className="play-page play-page-shell play-page-shell-warning">
         <PageLayout title="No Active Session">
-          <SectionError
+          <ErrorDisplay
+            variant="section"
             title="No Active Session"
             message="Unable to create or resume a game session."
             severity="warning"

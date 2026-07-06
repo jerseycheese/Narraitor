@@ -56,7 +56,7 @@ export interface DerivedStat {
 /**
  * Character background information
  */
-export interface CharacterBackground {
+interface CharacterBackground {
   history: string;
   personality: string;
   physicalDescription?: string; // Physical appearance description
@@ -75,7 +75,7 @@ export interface CharacterBackground {
 /**
  * Represents a relationship between characters
  */
-export interface CharacterRelationship {
+interface CharacterRelationship {
   characterId: EntityID;
   type: 'ally' | 'enemy' | 'neutral' | 'romantic' | 'family';
   strength: number; // -100 to 100
@@ -85,7 +85,7 @@ export interface CharacterRelationship {
 /**
  * Current status of a character
  */
-export interface CharacterStatus {
+interface CharacterStatus {
   health: number;
   maxHealth: number;
   conditions: string[];

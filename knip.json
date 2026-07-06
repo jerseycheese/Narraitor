@@ -1,0 +1,30 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/app/**/{page,layout,template,error,loading,not-found,route,default,global-error}.{ts,tsx}",
+    ".storybook/{main,preview}.{cjs,ts,tsx}",
+    "scripts/**/*.{js,cjs,mjs}"
+  ],
+  "project": ["src/**/*.{ts,tsx,js,jsx}", "scripts/**/*.{js,cjs,mjs}"],
+  "ignore": ["src/app/dev/**"],
+  "ignoreDependencies": [
+    "@storybook/addon-essentials",
+    "@storybook/addon-a11y",
+    "@chromatic-com/storybook",
+    "eslint-plugin-storybook",
+    "eslint-config-prettier",
+    "postcss-nested",
+    // Framework referenced as a string in .storybook/main.cjs; knip's plugin can't trace .cjs.
+    "@storybook/nextjs",
+    // ESLint stack reached via FlatCompat string extends in eslint.config.mjs
+    // ("next/core-web-vitals", "next/typescript"); eslint itself runs through `next lint`.
+    "eslint",
+    "eslint-config-next",
+    "@typescript-eslint/eslint-plugin",
+    "@typescript-eslint/parser",
+    // Loads postcss.config.js during the build pipeline; not imported directly in source.
+    "postcss-load-config"
+  ],
+  // pkill is a system binary used by the `kill` npm script.
+  "ignoreBinaries": ["dot", "pkill"]
+}

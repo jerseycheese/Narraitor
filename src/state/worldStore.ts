@@ -6,7 +6,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
 import { safeTrim, normalizeText, NORM_NAME, NORM_DESC, getTimestamp } from '@/lib/utils';
-import { CrudStore } from './createCrudStore';
+import { CrudStore } from './crudStore.types';
 import { createStoreError, ErrorType } from '@/lib/utils/errorUtils';
 import { WorldState, WorldStateUpdate, createEmptyWorldState } from '../types/world-state.types';
 import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/world';
@@ -56,10 +56,6 @@ export interface WorldStore extends CrudStore<World> {
 
   // Tone settings management
   updateToneSettings: (worldId: EntityID, toneSettings: Partial<ToneSettings>) => void;
-
-  // Character templates management
-  generateCharacterTemplates: (worldId: EntityID) => Promise<void>;
-  updateCharacterTemplates: (worldId: EntityID, templates: World['characterTemplates']) => void;
 
   // World state management
   worldStates: Record<EntityID, WorldState>;
@@ -180,11 +176,8 @@ export const useWorldStore = create<WorldStore>()(
           });
 
           set((state) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedWorld, ...remainingWorlds } = state.worlds;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedEntity, ...remainingEntities } = state.entities;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [id]: _removedState, ...remainingStates } = state.worldStates;
             const currentIsDeleted = state.currentEntityId === id || state.currentWorldId === id;
             return {
@@ -430,36 +423,6 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Generate character templates
-        generateCharacterTemplates: async (worldId) => {
-          const world = get().worlds[worldId];
-          if (!world) {
-            set({ error: createStoreError('World Not Found', 'Cannot generate templates for unknown world') });
-            return;
-          }
-
-          try {
-            const { generateWorldCharacterTemplates } = await import('@/lib/utils/worldTemplateGenerator');
-            const templates = await generateWorldCharacterTemplates(world);
-            get().update(worldId, { characterTemplates: templates });
-          } catch (error) {
-            const message = error instanceof Error ? error.message : 'Unknown error';
-            set({ error: createStoreError('Template Generation Failed', message) });
-            logger.error('Failed to generate character templates', { worldId, error });
-          }
-        },
-
-        // Update character templates
-        updateCharacterTemplates: (worldId, templates) => {
-          const world = get().worlds[worldId];
-          if (!world) {
-            set({ error: createStoreError('World Not Found', 'Cannot update templates for unknown world') });
-            return;
-          }
-
-          get().update(worldId, { characterTemplates: templates });
-        },
-
         initializeWorldState: (worldId) => {
           set(state => {
             if (state.worldStates[worldId]) {
@@ -527,9 +490,8 @@ export const useWorldStore = create<WorldStore>()(
           get().setLoading(true);
           get().clearError();
           try {
-            // In this architecture, worlds are automatically loaded from IndexedDB
-            // via Zustand persistence, so we just need to ensure the state is ready
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Worlds are hydrated from IndexedDB by Zustand persistence and stay in
+            // sync reactively, so there is nothing to fetch imperatively here.
             get().setLoading(false);
           } catch (error) {
             get().setLoading(false);
@@ -538,6 +500,7 @@ export const useWorldStore = create<WorldStore>()(
               message: error instanceof Error ? error.message : 'Failed to fetch worlds',
               retryable: true,
               type: ErrorType.SERVICE,
+              severity: 'error',
             });
           }
         },
@@ -549,7 +512,7 @@ export const useWorldStore = create<WorldStore>()(
       version: 5, // Incremented for segment-based checkpoint architecture
       onRehydrateStorage: () => (state, error) => {
         if (error) {
-          console.error('[WorldStore] Failed to rehydrate state', error);
+          logger.error('[WorldStore] Failed to rehydrate state', error);
           return;
         }
         state?.syncDerivedState?.();
@@ -602,6 +565,5 @@ export const useWorldStore = create<WorldStore>()(
 // Expose store globally in development to support test data seeding
 // and debugging via window.useWorldStore in dev tools.
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useWorldStore = useWorldStore;
+  window.useWorldStore = useWorldStore;
 }

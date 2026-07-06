@@ -43,6 +43,8 @@ export interface GenerationConfig {
   topP?: number;
   topK?: number;
   maxOutputTokens?: number;
+  /** Gemini 2.5 thinking control. thinkingBudget: 0 disables dynamic thinking. */
+  thinkingConfig?: { thinkingBudget?: number };
 }
 
 /**
@@ -77,6 +79,10 @@ export interface AIImageResponse {
  */
 export interface AIClient {
   generateContent(prompt: string): Promise<AIResponse>;
+  // Choice generation is a distinct endpoint on the browser path; callers that
+  // need it (choiceGenerator) prefer this over generateContent so routing is
+  // explicit rather than inferred from prompt content.
+  generateChoices?(prompt: string): Promise<AIResponse>;
   generateImage?(prompt: string): Promise<AIImageResponse>;
   generateStructuredContent?<T = unknown>(prompt: string, schema: unknown): Promise<T>;
   isAvailable?(): Promise<boolean>;

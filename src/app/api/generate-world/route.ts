@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '@/lib/utils/errorUtils';
 import { generateWorld } from '@/lib/generators/worldGenerator';
 import Logger from '@/lib/utils/logger';
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
       relationship: body.worldRelationship || 'inspired_by',
       existingNames: body.existingNames,
       suggestedName: body.suggestedName
-    });
+    }, resolveApiKey(request));
     
     // Validate generated world structure
     if (!generatedWorld.name || !generatedWorld.description || !generatedWorld.genre) {

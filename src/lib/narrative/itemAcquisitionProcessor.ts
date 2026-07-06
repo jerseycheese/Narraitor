@@ -1,7 +1,8 @@
 // src/lib/narrative/itemAcquisitionProcessor.ts
 
 import { useInventoryStore } from '@/state/inventoryStore';
-import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
+import { categorizeInventoryItemsClient } from '@/lib/inventory/categorizeInventoryItemClient';
+import { isValidCategory } from '@/lib/inventory/categories';
 import {
   getTimestamp,
   normalizeText,
@@ -13,6 +14,14 @@ import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import type { EntityID } from '@/types/common.types';
 import type { InventoryItem, InventoryItemCategorization } from '@/types/inventory.types';
 import { itemImageService } from '@/lib/services/itemImageService';
+import {
+  delayBetweenItems,
+  itemNamesMatch,
+  runQueued,
+} from './itemProcessorShared';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ItemAcquisitionProcessor');
 
 type PreparedItem = AcquiredItemMetadata & {
   normalizedName: string;
@@ -22,7 +31,6 @@ type PreparedItem = AcquiredItemMetadata & {
   quantity: number;
 };
 
-const RATE_LIMIT_DELAY_MS = 200;
 const processingQueue = new Map<EntityID, Promise<void>>();
 
 /**
@@ -47,19 +55,16 @@ export async function processAcquiredItems(
     return;
   }
 
-  const previous = processingQueue.get(characterId) ?? Promise.resolve();
-
-  const tracked = previous
-    .catch((err) => {
-      // Prevent a failed prior job from blocking the queue
-      console.error('Previous item acquisition run failed', err);
-    })
-    .then(async () => {
+  return runQueued(
+    processingQueue,
+    characterId,
+    async () => {
       const inventoryStore = useInventoryStore.getState();
       const now = getTimestamp();
 
-      const preparedItems = await Promise.all(
-        items.map((item) => prepareItem(item, now))
+      const categorizations = await categorizeItems(items, now);
+      const preparedItems = items.map((item, index) =>
+        prepareItem(item, categorizations[index])
       );
 
       const deduplicatedItems = await deduplicateBatch(preparedItems);
@@ -78,7 +83,7 @@ export async function processAcquiredItems(
               inventoryStore.updateItemQuantity(existingMatch.id, newQuantity);
 
               if (matchResult.matchedBySoft) {
-                console.warn(
+                logger.warn(
                   `Merged stackable item "${item.normalizedName}" despite category mismatch due to identical name/description.`
                 );
               }
@@ -86,14 +91,14 @@ export async function processAcquiredItems(
               continue;
             }
 
-            console.warn(
+            logger.warn(
               `Item "${item.normalizedName}" was categorized as stackable but matches existing equipment. Skipping duplicate addition.`
             );
             continue;
           }
 
           if (!item.stackable && existingMatch) {
-            console.warn(
+            logger.warn(
               `Item "${item.normalizedName}" already exists in inventory. Skipping duplicate addition.`
             );
             continue;
@@ -113,22 +118,13 @@ export async function processAcquiredItems(
           await delayBetweenItems(i, deduplicatedItems.length);
         } catch (err) {
           // Log error but continue processing remaining items
-          console.error(`Failed to add item "${item.name}" to inventory:`, err);
+          logger.error(`Failed to add item "${item.name}" to inventory:`, err);
         }
       }
-    })
-    .catch((err) => {
-      console.error('processAcquiredItems encountered an unexpected error', err);
-    })
-    .finally(() => {
-      if (processingQueue.get(characterId) === tracked) {
-        processingQueue.delete(characterId);
-      }
-    });
-
-  processingQueue.set(characterId, tracked);
-
-  return tracked;
+    },
+    (err) => logger.error('Previous item acquisition run failed', err),
+    (err) => logger.error('processAcquiredItems encountered an unexpected error', err)
+  );
 }
 
 /**
@@ -175,42 +171,11 @@ function buildNameKey(name: string): string {
   return normalizeText(name || '', NORM_NAME).toLowerCase();
 }
 
-/**
- * Checks if two item names are semantically similar using AI.
- * Handles complex variations like:
- * - "Lantern" vs "Rusty Kerosene Lantern"
- * - "Photo of Mom" vs "Photo of your mother"
- * - "Gold Coin" vs "Gold Coins"
- * - "Healing Potion" vs "Potion of Healing"
- */
-async function itemNamesMatch(name1: string, name2: string): Promise<boolean> {
-  const normalized1 = normalizeText(name1 || '', NORM_NAME).toLowerCase();
-  const normalized2 = normalizeText(name2 || '', NORM_NAME).toLowerCase();
-
-  // Quick exact match check (avoid AI call)
-  if (normalized1 === normalized2) return true;
-
-  // Use AI for semantic similarity
-  const { checkItemSimilarityClient } = await import('@/lib/inventory/checkItemSimilarityClient');
-
-  try {
-    const result = await checkItemSimilarityClient({
-      name1,
-      name2,
-    });
-
-    // Consider items similar if AI says so with reasonable confidence
-    return result.similar && result.confidence > 0.7;
-  } catch (error) {
-    // If AI check fails, fall back to simple substring matching
-    console.warn('AI similarity check failed, using fallback:', error);
-    return normalized1.includes(normalized2) || normalized2.includes(normalized1);
-  }
-}
-
-async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<PreparedItem> {
+function prepareItem(
+  item: AcquiredItemMetadata,
+  categorization: InventoryItemCategorization
+): PreparedItem {
   const normalizedName = normalizeItemName(item.name);
-  const categorization = await getItemCategorization(item, now);
   const stackable = isStackableCategory(categorization.categoryId);
   const quantity = item.quantity ?? 1;
 
@@ -224,28 +189,91 @@ async function prepareItem(item: AcquiredItemMetadata, now: string): Promise<Pre
   };
 }
 
-async function getItemCategorization(
+/**
+ * Resolves a categorization for every acquired item, preferring the narrative
+ * AI's category hint (zero extra API calls) and batching the remainder into a
+ * single categorization request instead of one call per item.
+ */
+async function categorizeItems(
+  items: AcquiredItemMetadata[],
+  now: string
+): Promise<InventoryItemCategorization[]> {
+  const results = new Array<InventoryItemCategorization>(items.length);
+  const needsAiIndices: number[] = [];
+
+  items.forEach((item, index) => {
+    const fromHint = hintCategorization(item, now);
+    if (fromHint) {
+      results[index] = fromHint;
+    } else {
+      needsAiIndices.push(index);
+    }
+  });
+
+  if (needsAiIndices.length === 0) {
+    return results;
+  }
+
+  const aiResults = await batchCategorize(
+    needsAiIndices.map((index) => items[index]),
+    now
+  );
+
+  needsAiIndices.forEach((index, position) => {
+    results[index] = aiResults[position];
+  });
+
+  return results;
+}
+
+/**
+ * Uses the narrative AI's category hint when it is present and valid, skipping
+ * the separate categorization API call entirely.
+ */
+function hintCategorization(
   item: AcquiredItemMetadata,
   now: string
-): Promise<InventoryItemCategorization> {
-  try {
-    const aiCategorization = await categorizeInventoryItemClient({
-      name: item.name,
-      description: item.description || '',
-    });
+): InventoryItemCategorization | null {
+  if (item.categoryHint && isValidCategory(item.categoryHint)) {
+    return {
+      categoryId: item.categoryHint,
+      source: 'narrative-context',
+      classifiedAt: now,
+      confidence: 0.95,
+      rationale: 'Category inferred from narrative context',
+    };
+  }
+  return null;
+}
 
-    return {
-      ...aiCategorization,
-      classifiedAt: now,
-    };
+const fallbackCategorization = (now: string): InventoryItemCategorization => ({
+  categoryId: 'miscellaneous',
+  source: 'fallback',
+  classifiedAt: now,
+  confidence: 0,
+  rationale: 'AI categorization unavailable',
+});
+
+async function batchCategorize(
+  items: AcquiredItemMetadata[],
+  now: string
+): Promise<InventoryItemCategorization[]> {
+  try {
+    const responses = await categorizeInventoryItemsClient(
+      items.map((item) => ({
+        name: item.name,
+        description: item.description || '',
+      }))
+    );
+
+    return items.map((_, index) => {
+      const response = responses[index];
+      return response
+        ? { ...response, classifiedAt: now }
+        : fallbackCategorization(now);
+    });
   } catch {
-    return {
-      categoryId: 'miscellaneous',
-      source: 'fallback',
-      classifiedAt: now,
-      confidence: 0,
-      rationale: 'AI categorization unavailable',
-    };
+    return items.map(() => fallbackCategorization(now));
   }
 }
 
@@ -296,7 +324,7 @@ async function deduplicateBatch(items: PreparedItem[]): Promise<PreparedItem[]> 
       }
 
       if (existing.acquisitionMethod && item.acquisitionMethod && existing.acquisitionMethod !== item.acquisitionMethod) {
-        console.warn(
+        logger.warn(
           `Stackable item "${item.normalizedName}" had differing acquisition methods within the same batch. Using "${existing.acquisitionMethod}".`
         );
       }
@@ -318,7 +346,7 @@ async function deduplicateBatch(items: PreparedItem[]): Promise<PreparedItem[]> 
       allItems[existingIndex].item = mergedItem;
     }
 
-    console.warn(
+    logger.warn(
       `Duplicate equipment item detected in batch: "${item.normalizedName}". Keeping one entry and merging details.`
     );
   }
@@ -386,17 +414,9 @@ async function addItemToInventory(
 
   if (itemId) {
     itemImageService.generateForItem(itemId, characterId).catch((error) => {
-      console.warn(`Background image generation failed for item: ${item.normalizedName}`, error);
+      logger.warn(`Background image generation failed for item: ${item.normalizedName}`, error);
     });
   }
-}
-
-function delayBetweenItems(index: number, total: number): Promise<void> {
-  if (index >= total - 1) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
 }
 
 function chooseBetterDescription(existing?: string, incoming?: string): string | undefined {

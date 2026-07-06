@@ -306,10 +306,11 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       const wordCount = response.content.split(/\s+/).length;
       const expectedTokens = Math.ceil(wordCount * 1.3); // Rough tokens-to-words ratio
       
-      if (response.promptTokens && response.completionTokens) {
-        expect(response.completionTokens).toBeGreaterThan(0);
-        expect(response.completionTokens).toBeLessThan(expectedTokens * 3); // Allow generous range
-      }
+      // success-detailed must report realistic token counts. Asserting directly (rather
+      // than inside an `if`) guards against a vacuous pass when tokens are missing.
+      expect(response.promptTokens).toBeGreaterThan(0);
+      expect(response.completionTokens).toBeGreaterThan(0);
+      expect(response.completionTokens).toBeLessThan(expectedTokens * 3); // generous range
     });
   });
 

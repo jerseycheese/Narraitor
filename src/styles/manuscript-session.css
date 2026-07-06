@@ -139,6 +139,26 @@ body.manuscript-overlay-open {
   min-height: 100vh;
 }
 
+/* Play-entry early-exit states (world-not-found, no-characters, session-not-started,
+   generation error). The manuscript surface is deliberately chrome-free for immersion,
+   so these states get their own centered treatment with an explicit way back to
+   navigation, rather than stranding the player on a bare top-left banner (#1479). */
+.manuscript-play-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 60vh;
+  padding: var(--space-8) var(--space-4);
+}
+
+.manuscript-play-entry-debug {
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
 /* ─── /play route wrapper ───
    `.play-page` wraps every render path of /src/app/play/page.tsx so per-theme
    typography lands on PageLayout's unstyled <header>/<h1>/<p>. DS3 = base;
@@ -278,6 +298,48 @@ body.manuscript-overlay-open {
   color: var(--color-accent);
 }
 
+/* DS3 — Mechanical Manuscript: italic interface heading, monospace bullet eyebrow */
+[data-theme="ds3"] .play-page-shell > div > div > header h1 {
+  font-family: var(--font-interface);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--color-text-primary);
+}
+
+[data-theme="ds3"] .play-page-shell > div > div > header p {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .play-page-shell > div > div > header p::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .play-page-active > div > div > header h1 {
+  font-family: var(--font-interface);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+[data-theme="ds3"] .play-page-active > div > div > header p {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+[data-theme="ds3"] .play-page-active > div > div > header p::before {
+  content: "• ";
+  color: var(--color-text-muted);
+}
+
 .manuscript-main-stage {
   display: grid;
   gap: var(--space-4);
@@ -380,24 +442,24 @@ body.manuscript-overlay-open {
 .hide-mobile-actions .manuscript-suggested-actions-section,
 .hide-mobile-actions .manuscript-choice-prompt,
 .hide-mobile-actions .manuscript-choice-selector-body > .manuscript-choice-prompt {
-  display: none !important;
+  display: none;
 }
 
 .show-mobile-actions .manuscript-suggested-actions-section,
 .show-mobile-actions .manuscript-choice-prompt {
-  display: block !important;
+  display: block;
 }
 
 @media (width >= 1024px) {
   .manuscript-mobile-rail-top-controls {
-    display: none !important;
+    display: none;
   }
 
   .hide-mobile-actions .manuscript-suggested-actions-section,
   .show-mobile-actions .manuscript-suggested-actions-section,
   .hide-mobile-actions .manuscript-choice-prompt,
   .show-mobile-actions .manuscript-choice-prompt {
-    display: block !important;
+    display: block;
   }
 }
 
@@ -457,7 +519,8 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-characters-rail {
-  display: none;
+  display: block;
+  box-sizing: border-box;
   background: var(--color-overlay-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -527,7 +590,7 @@ body.manuscript-overlay-open {
 .manuscript-suggested-action[aria-pressed="true"] {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
 }
 
 .manuscript-suggested-action.is-selected:hover,
@@ -544,6 +607,7 @@ body.manuscript-overlay-open {
 .manuscript-hud-panel {
   position: absolute;
   z-index: 40;
+  box-sizing: border-box;
   width: min(var(--manuscript-rail-width, 18rem), calc(100vw - 1.5rem));
   max-height: min(70vh, 32rem);
   overflow-y: auto;
@@ -673,7 +737,7 @@ body.manuscript-overlay-open {
 .manuscript-tools-menu-item-active {
   background: var(--color-accent);
   border: none;
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
 }
 
 .manuscript-tools-menu-item-active:hover {
@@ -825,7 +889,9 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-custom-input {
-  width: 100%;
+  flex: 1;
+  width: auto;
+  min-width: 12.5rem;
   height: 2.375rem;
   padding: 0 var(--space-2);
   border-radius: var(--radius-sm);
@@ -859,7 +925,7 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-4);
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   font-family: var(--font-interface), system-ui, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
@@ -973,7 +1039,7 @@ body.manuscript-overlay-open {
 
 .manuscript-journal-snapshot-badge-new {
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
@@ -1041,7 +1107,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-characters-rail-mobile-stack {
-  order: 2;
+  order: -1;
 }
 
 @media (width >= 1024px) {
@@ -1258,6 +1324,14 @@ body.manuscript-overlay-open {
 
 }
 
+/* F47: a skill the player hasn't met yet reads as a muted/locked gate rather
+   than the accent "you have this" treatment. Choice stays selectable. */
+.manuscript-skill-check-badge[data-met="false"] {
+  background: rgb(from var(--color-text-muted) r g b / 12%);
+  color: var(--color-text-muted);
+  border-color: rgb(from var(--color-text-muted) r g b / 25%);
+}
+
 .manuscript-suggested-action.is-selected .manuscript-skill-check-badge {
 
   background: rgb(from var(--color-text-inverse) r g b / 20%);
@@ -1347,7 +1421,9 @@ body.manuscript-overlay-open {
   z-index: 1;
   border-color: var(--color-border);
   background: var(--color-surface);
-  overflow-y: visible;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   padding: var(--space-4);
   pointer-events: auto;
   animation: manuscript-slide-in-right 220ms ease;
@@ -1424,7 +1500,9 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-drawer-content {
-  overflow: visible;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   display: block;
   padding: 0;
   color: var(--color-text-secondary);
@@ -1700,6 +1778,36 @@ body.manuscript-overlay-open {
   border-color: var(--color-border-strong);
 }
 
+/* Equipped items get a distinct accent border + tinted surface so the state
+   reads instantly without relying on color alone (paired with the badge below). */
+.manuscript-inventory-item.is-equipped {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.manuscript-inventory-item-equipped-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  margin-bottom: var(--space-2);
+  padding: var(--space-0_5) var(--space-2);
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+}
+
+.manuscript-inventory-item-equipped-badge svg {
+  width: 1em;
+  height: 1em;
+}
+
 .manuscript-inventory-item-header {
   display: flex;
   justify-content: space-between;
@@ -1731,23 +1839,17 @@ body.manuscript-overlay-open {
 
 .manuscript-inventory-item-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-top: auto;
   padding-top: var(--space-3);
   border-top: 1px dashed var(--color-border);
 }
 
-.manuscript-inventory-item-category {
-  font-family: var(--font-system);
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-}
-
 .manuscript-inventory-actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--space-2);
 }
 
@@ -1758,6 +1860,7 @@ body.manuscript-overlay-open {
   letter-spacing: 0.05em;
   height: 1.75rem;
   padding-inline: var(--space-3);
+  white-space: nowrap;
 }
 
 /* Manuscript Choice History Styling */
@@ -1984,6 +2087,7 @@ body.manuscript-overlay-open {
 
   .manuscript-input-row {
     align-items: stretch;
+    flex-wrap: wrap;
   }
 
 }
@@ -2114,6 +2218,52 @@ body.manuscript-overlay-open {
   object-fit: cover;
 }
 
+/* Size variants give the portrait an intrinsic square size for the size prop
+   (small/medium/large/xlarge). They only take effect where no wrapper sizes the
+   portrait — e.g. Storybook and the QuickPlay CTA. Every consumer that frames the
+   portrait in a sized context carries a higher-specificity
+   `.wrapper .component-character-portrait` rule, so those layouts are unchanged. */
+.component-character-portrait-small {
+  width: 3rem;
+  height: 3rem;
+}
+
+.component-character-portrait-medium {
+  width: 5rem;
+  height: 5rem;
+}
+
+.component-character-portrait-large {
+  width: 8rem;
+  height: 8rem;
+}
+
+.component-character-portrait-xlarge {
+  width: 12rem;
+  height: 12rem;
+}
+
+/* CharacterCard sizes its own wrapper and lets the portrait fill it. Keep that
+   fill so the size variant doesn't override the card's framing (the other
+   wrapper-sized consumers already carry an equivalent override). */
+.character-card-portrait .component-character-portrait {
+  width: 100%;
+  height: 100%;
+}
+
+/* The character editor's portrait preview (PortraitSection) shows a bounded
+   square avatar. Its section provides no height for `height: 100%` to resolve
+   against, so aspect-ratio supplies the height — otherwise the placeholder
+   collapses to the initials' line-height and a filled image collapses to zero
+   (#1495). Mirrors the wizard PortraitStep preview size. */
+.component-character-editor .component-character-portrait {
+  width: calc(var(--space-8) * 8);
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+}
+
 .manuscript-character-snapshot-portrait {
   position: relative;
   width: 80px;
@@ -2212,11 +2362,45 @@ body.manuscript-overlay-open {
   color: var(--color-text-primary);
 }
 
+/* Alignment row + lawful/chaotic meter. Hidden entirely until the
+   character's alignment has been shifted by a choice. */
+.manuscript-character-snapshot-alignment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.manuscript-character-snapshot-alignment-track {
+  position: relative;
+  height: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--color-border);
+}
+
+/* Center notch marking neutral on the -100..100 axis. */
+.manuscript-character-snapshot-alignment-track::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  bottom: -1px;
+  width: 1px;
+  background: var(--color-text-muted);
+}
+
+.manuscript-character-snapshot-alignment-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+}
+
 /* Choice Outcome Callout */
 .choice-outcome-callout {
   border-radius: var(--radius-sm);
   padding: var(--space-4);
-  border-left: 4px solid var(--color-accent);
+  border: 1px solid var(--color-accent);
   background: var(--color-accent-soft);
 }
 
@@ -2237,6 +2421,51 @@ body.manuscript-overlay-open {
   line-height: 1.5;
   color: var(--color-text-secondary);
   margin: 0;
+}
+
+/* Structured consequence chips under the callout text (trust deltas,
+   alignment shifts). Rendered only when the chosen option carried
+   consequences. */
+.choice-outcome-consequences {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1_5);
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+
+.choice-outcome-chip {
+  font-family: var(--font-system), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  padding: var(--space-0_5) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.choice-outcome-chip[data-kind="relationship"][data-direction="positive"] {
+  border-color: var(--color-success);
+  color: var(--color-success-text);
+}
+
+.choice-outcome-chip[data-kind="relationship"][data-direction="negative"] {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.choice-outcome-chip[data-kind="alignment"][data-direction="positive"] {
+  border-color: var(--color-alignment-lawful-border);
+  background: var(--color-alignment-lawful-bg);
+  color: var(--color-alignment-lawful-text);
+}
+
+.choice-outcome-chip[data-kind="alignment"][data-direction="negative"] {
+  border-color: var(--color-alignment-chaotic-border);
+  background: var(--color-alignment-chaotic-bg);
+  color: var(--color-alignment-chaotic-text);
 }
 
 /* ─── Game Session Skeleton ─── */
@@ -2334,25 +2563,21 @@ body.manuscript-overlay-open {
 
 .manuscript-skeleton-prompt {
   height: 1.5rem;
-  width: 33%;
+  width: 60%;
   border-radius: var(--radius-sm);
 }
 
+/* Match the real choices block: single column, space-2 gap (F46). */
 .manuscript-skeleton-choice-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
-@media (width >= 768px) {
-  .manuscript-skeleton-choice-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
+/* Match the real suggested-action footprint: min-height 4.125rem, sharp radius. */
 .manuscript-skeleton-choice {
-  height: 3rem;
-  border-radius: var(--radius-md);
+  height: 4.125rem;
+  border-radius: var(--radius-sm);
 }
 
 .manuscript-skeleton-input {
@@ -2591,7 +2816,7 @@ body.manuscript-overlay-open {
   top: calc(-1 * var(--space-2));
   right: var(--space-3);
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   padding: var(--space-2);
   border-radius: 1px;
   font-size: 0.5rem;
@@ -2740,15 +2965,119 @@ body.manuscript-overlay-open {
   letter-spacing: 0.04em;
 }
 
-/* DS1: always show expanded choices, hide mobile toggle
-   Base rules use !important for hide/show toggle — must match to override */
+/* Issue #1478: inline generation-failure surface in the choices column. A
+   hung or failed turn now drops the loading skeleton and shows this instead of
+   spinning "Continuing your story..." forever. Transient (retryable) errors
+   offer a Retry; terminal ones (bad key) get the danger accent and point the
+   player at Settings. Visible across all three design systems on purpose. */
+.manuscript-generation-error {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1_5);
+  padding: var(--space-3);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.manuscript-generation-error-terminal {
+  border-color: var(--color-danger);
+}
+
+.manuscript-generation-error-title {
+  font-family: var(--font-interface), system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.manuscript-generation-error-message {
+  color: var(--color-text);
+  font-size: 0.875rem;
+}
+
+.manuscript-generation-error-suggestion {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.manuscript-generation-error-retry {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-family: var(--font-interface), system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.manuscript-generation-error-retry:hover {
+  background: var(--color-accent-hover);
+}
+
+.manuscript-generation-error-retry:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Issue #918: evaluating-action state — a tumbling-die motif distinguishes a
+   skill-check evaluation phase from generic generation. Hidden by default,
+   themed per design system below. */
+.manuscript-evaluating-indicator {
+  display: none;
+}
+
+[data-theme="ds1"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2_5) var(--space-2_5) var(--space-1_5);
+}
+
+/* DS1 — an outlined ink die tumbling end over end. */
+[data-theme="ds1"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  animation: manuscript-die-tumble 1.1s ease-in-out infinite;
+}
+
+[data-theme="ds1"] .manuscript-evaluating-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Shared tumble — a die turning over as it is cast. Spinning while squashing
+   vertically to a thin edge twice per turn fakes a cube flipping over (the
+   manuscript stylelint allow-list permits rotate + scale, not 3D rotates). */
+@keyframes manuscript-die-tumble {
+  0% { transform: rotate(0deg) scale(1, 1); }
+  25% { transform: rotate(90deg) scale(1, 0.18); }
+  50% { transform: rotate(180deg) scale(1, 1); }
+  75% { transform: rotate(270deg) scale(1, 0.18); }
+  100% { transform: rotate(360deg) scale(1, 1); }
+}
+
+/* DS1: always show expanded choices, hide mobile toggle */
 [data-theme="ds1"] .manuscript-mobile-rail-top-controls {
   display: none;
 }
 
 [data-theme="ds1"] .hide-mobile-actions .manuscript-suggested-actions-section {
-  /* stylelint-disable-next-line declaration-no-important */
-  display: block !important;
+  display: block;
 }
 
 /* DS1: always show desktop End Story button, hide mobile variant */
@@ -2821,7 +3150,7 @@ body.manuscript-overlay-open {
 [data-theme="ds1"] .choice-outcome-callout[data-outcome="decision"] .choice-outcome-label::before {
   content: 'REC';
   background: var(--color-accent);
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
   padding: 1px var(--space-1_5);
   border-radius: 1px;
   font-weight: 600;
@@ -2925,22 +3254,22 @@ body.manuscript-overlay-open {
 .error-display-section {
   margin: var(--space-4) 0;
   padding: var(--space-3) var(--space-3_5);
-  background: hsl(var(--destructive) / 8%);
-  border: 1px solid hsl(var(--destructive) / 30%);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
   border-radius: var(--radius-md);
 }
 
 .error-display-title {
   font-size: 1rem;
   font-weight: 600;
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
   margin: 0 0 var(--space-1_5);
 }
 
 .error-display-message {
   font-size: 0.875rem;
   line-height: 1.5;
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
   margin: 0 0 var(--space-2_5);
 }
 
@@ -2953,8 +3282,8 @@ body.manuscript-overlay-open {
   padding: var(--space-1_5) var(--space-3);
   font-size: 0.875rem;
   font-weight: 500;
-  background: hsl(var(--destructive));
-  color: hsl(var(--destructive-foreground));
+  background: var(--color-danger);
+  color: var(--color-on-danger);
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -2962,7 +3291,7 @@ body.manuscript-overlay-open {
 }
 
 .error-display-actions .error-display-retry:hover {
-  background: hsl(var(--destructive) / 90%);
+  background: color-mix(in srgb, var(--color-danger) 90%, transparent);
 }
 
 .error-display-actions .error-display-dismiss {
@@ -2970,15 +3299,48 @@ body.manuscript-overlay-open {
   font-size: 0.875rem;
   font-weight: 500;
   background: var(--color-surface);
-  color: hsl(var(--destructive));
-  border: 1px solid hsl(var(--destructive) / 30%);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
   border-radius: var(--radius-sm);
   cursor: pointer;
   text-decoration: none;
 }
 
 .error-display-actions .error-display-dismiss:hover {
-  background: hsl(var(--destructive) / 6%);
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
+}
+
+/* Issue #302 — retry in-progress + fallback after persistent failures.
+   Token-driven so each theme's --destructive / surface tokens carry through. */
+.error-display-actions .error-display-retry:disabled,
+.error-display-actions .error-display-retry[aria-busy="true"] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Alternative path offered once retries are exhausted — secondary styling so it
+   reads as a different action from the destructive retry. */
+.error-display-fallback {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-2_5);
+}
+
+.error-display-actions .error-display-fallback-action {
+  padding: var(--space-1_5) var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.error-display-actions .error-display-fallback-action:hover {
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
 }
 
 /* Fix 56: DS1 error container */
@@ -3048,8 +3410,8 @@ body.manuscript-overlay-open {
 [data-theme="ds2"] .error-display-section {
   margin: var(--space-4) 0;
   padding: var(--space-4) var(--space-4);
-  background: hsl(var(--destructive) / 6%);
-  border: 1px solid hsl(var(--destructive) / 25%);
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
   border-radius: var(--radius-md);
 }
 
@@ -3057,7 +3419,7 @@ body.manuscript-overlay-open {
   font-family: var(--font-narrative);
   font-size: 1.125rem;
   font-weight: 600;
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
   margin: 0 0 var(--space-2);
   letter-spacing: 0;
   text-transform: none;
@@ -3067,7 +3429,7 @@ body.manuscript-overlay-open {
   font-family: var(--font-narrative);
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: hsl(var(--destructive));
+  color: var(--color-danger);
   margin: 0 0 var(--space-3);
 }
 
@@ -3081,8 +3443,8 @@ body.manuscript-overlay-open {
   padding: var(--space-1_5) var(--space-3);
   font-size: 0.875rem;
   font-weight: 500;
-  background: hsl(var(--destructive));
-  color: hsl(var(--destructive-foreground));
+  background: var(--color-danger);
+  color: var(--color-on-danger);
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -3092,7 +3454,7 @@ body.manuscript-overlay-open {
 }
 
 [data-theme="ds2"] .error-display-actions .error-display-retry:hover {
-  background: hsl(var(--destructive) / 90%);
+  background: color-mix(in srgb, var(--color-danger) 90%, transparent);
 }
 
 [data-theme="ds2"] .error-display-actions .error-display-dismiss {
@@ -3101,8 +3463,8 @@ body.manuscript-overlay-open {
   font-size: 0.875rem;
   font-weight: 500;
   background: transparent;
-  color: hsl(var(--destructive));
-  border: 1px solid hsl(var(--destructive) / 30%);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
   border-radius: var(--radius-md);
   cursor: pointer;
   letter-spacing: 0;
@@ -3111,7 +3473,115 @@ body.manuscript-overlay-open {
 }
 
 [data-theme="ds2"] .error-display-actions .error-display-dismiss:hover {
-  background: hsl(var(--destructive) / 6%);
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
+}
+
+/* ===========================================================================
+   Issue #222 — severity-aware error display.
+   Default ("error") rendering is intentionally left untouched above; the rules
+   below only re-color the WARNING / INFO severities and add prominence to
+   CRITICAL. Selector lists cover DS3 (base), DS1 and DS2 so the accent wins
+   over each theme's destructive-coloured section rule.
+   =========================================================================== */
+
+/* Suggested next step — secondary to the message, same in every variant. */
+.error-display-suggestion {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-2_5);
+}
+
+/* Inline errors previously had no colour; give them a severity accent. */
+.error-display-inline {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin: var(--space-1) 0 0;
+}
+
+.error-display-inline.error-display-error,
+.error-display-inline.error-display-critical {
+  color: var(--color-danger);
+}
+
+.error-display-inline.error-display-warning {
+  color: hsl(var(--warning));
+}
+
+.error-display-inline.error-display-info {
+  color: hsl(var(--info));
+}
+
+/* --- WARNING (amber): less alarming than an error --- */
+.error-display-warning.error-display-section,
+[data-theme="ds1"] .error-display-warning.error-display-section,
+[data-theme="ds2"] .error-display-warning.error-display-section {
+  background: hsl(var(--warning) / 8%);
+  border-color: hsl(var(--warning) / 30%);
+}
+
+.error-display-warning .error-display-title,
+.error-display-warning .error-display-message,
+[data-theme="ds1"] .error-display-warning .error-display-title,
+[data-theme="ds1"] .error-display-warning .error-display-message,
+[data-theme="ds2"] .error-display-warning .error-display-title,
+[data-theme="ds2"] .error-display-warning .error-display-message {
+  color: hsl(var(--warning));
+}
+
+.error-display-warning .error-display-actions .error-display-retry,
+[data-theme="ds1"] .error-display-warning .error-display-actions .error-display-retry,
+[data-theme="ds2"] .error-display-warning .error-display-actions .error-display-retry {
+  background: hsl(var(--warning));
+  color: hsl(var(--warning-foreground));
+}
+
+.error-display-warning .error-display-actions .error-display-dismiss,
+[data-theme="ds1"] .error-display-warning .error-display-actions .error-display-dismiss,
+[data-theme="ds2"] .error-display-warning .error-display-actions .error-display-dismiss {
+  color: hsl(var(--warning));
+  border-color: hsl(var(--warning) / 30%);
+}
+
+/* --- INFO (blue): least intrusive --- */
+.error-display-info.error-display-section,
+[data-theme="ds1"] .error-display-info.error-display-section,
+[data-theme="ds2"] .error-display-info.error-display-section {
+  background: hsl(var(--info) / 7%);
+  border-color: hsl(var(--info) / 20%);
+}
+
+.error-display-info .error-display-title,
+.error-display-info .error-display-message,
+[data-theme="ds1"] .error-display-info .error-display-title,
+[data-theme="ds1"] .error-display-info .error-display-message,
+[data-theme="ds2"] .error-display-info .error-display-title,
+[data-theme="ds2"] .error-display-info .error-display-message {
+  color: hsl(var(--info));
+}
+
+.error-display-info .error-display-actions .error-display-retry,
+[data-theme="ds1"] .error-display-info .error-display-actions .error-display-retry,
+[data-theme="ds2"] .error-display-info .error-display-actions .error-display-retry {
+  background: hsl(var(--info));
+  color: hsl(var(--info-foreground));
+}
+
+.error-display-info .error-display-actions .error-display-dismiss,
+[data-theme="ds1"] .error-display-info .error-display-actions .error-display-dismiss,
+[data-theme="ds2"] .error-display-info .error-display-actions .error-display-dismiss {
+  color: hsl(var(--info));
+  border-color: hsl(var(--info) / 20%);
+}
+
+/* --- CRITICAL: same danger colour as an error, but more prominent --- */
+.error-display-critical.error-display-section,
+[data-theme="ds1"] .error-display-critical.error-display-section,
+[data-theme="ds2"] .error-display-critical.error-display-section {
+  border-width: 1px;
+  border-left-width: var(--space-1);
+  border-left-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
 }
 
 /* Fix 69: DS1 tools menu items — compact, transparent background */
@@ -3119,6 +3589,19 @@ body.manuscript-overlay-open {
   padding: var(--space-2) var(--space-2_5);
   background: transparent;
   font-size: 0.75rem;
+}
+
+/* F40: the transparent override above ties on specificity with the base active
+   rule and wins on source order, leaving the active button transparent while
+   its text flips to inverse — invisible. Restore the active fill for DS1. */
+[data-theme="ds1"] .manuscript-tools-menu-item-active {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+[data-theme="ds1"] .manuscript-tools-menu-item-active:hover {
+  background: var(--color-accent-hover);
+  color: var(--color-text-inverse);
 }
 
 /* Fix 70: DS1 tools menu item spacing — tighter gap between items */
@@ -3233,9 +3716,21 @@ body.manuscript-overlay-open {
   grid-template-columns: 1fr;
 }
 
-[data-theme="ds2"] .manuscript-characters-rail,
 [data-theme="ds2"] .manuscript-rail-spacer {
   display: none;
+}
+
+/* Scene status reads as an ambient annotation above the narrative. */
+[data-theme="ds2"] .manuscript-characters-rail {
+  display: block;
+  max-width: 42.5rem;
+  margin: 0 auto var(--space-4);
+  padding: 0 0 var(--space-3);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  overflow: visible;
 }
 
 /* Tighter narrative column for journal feel */
@@ -3489,8 +3984,10 @@ body.manuscript-overlay-open {
     grid-template-columns: 1fr;
   }
 
-  [data-theme="ds2"] .manuscript-characters-rail {
-    display: none;
+  /* Keep the narrative in the single column — the desktop base places it in
+     grid-column 2, which otherwise splits the journal page (see DS3 note). */
+  [data-theme="ds2"] .manuscript-main-content {
+    grid-column: 1;
   }
 
   [data-theme="ds2"] .manuscript-rail-spacer {
@@ -3643,6 +4140,34 @@ body.manuscript-overlay-open {
   50% { opacity: 1; }
 }
 
+/* DS2 evaluating-action — a solid accent die, bolder to match the Bento accent
+   language; faster, springier tumble. */
+[data-theme="ds2"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+[data-theme="ds2"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent-hover);
+  animation: manuscript-die-tumble 0.85s ease-in-out infinite;
+}
+
+[data-theme="ds2"] .manuscript-evaluating-label {
+  font-family: var(--font-system);
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 /* DS2 skeleton shimmer — warm gradient */
 [data-theme="ds2"] .manuscript-skeleton-pulse {
   background: linear-gradient(
@@ -3683,9 +4208,9 @@ body.manuscript-overlay-open {
   display: none;
 }
 
-/* DS2 choices always visible — override base !important hide at <1024px */
+/* DS2 choices always visible — override base hide at <1024px */
 [data-theme="ds2"] .manuscript-suggested-actions-section {
-  display: block !important;
+  display: block;
 }
 
 /* DS2 choice prompt hidden — demo shows no heading above choices */
@@ -3874,9 +4399,14 @@ body.manuscript-overlay-open {
   grid-template-columns: 1fr;
 }
 
-[data-theme="ds3"] .manuscript-characters-rail,
 [data-theme="ds3"] .manuscript-rail-spacer {
   display: none;
+}
+
+/* Scene status as a compact console bar above the narrative. */
+[data-theme="ds3"] .manuscript-characters-rail {
+  display: block;
+  margin-bottom: var(--space-3);
 }
 
 [data-theme="ds3"] .manuscript-main-content {
@@ -3998,7 +4528,7 @@ body.manuscript-overlay-open {
 
 [data-theme="ds3"] .manuscript-suggested-action {
   position: relative;
-  padding: var(--space-4) 1.25rem var(--space-4) 1.4375rem;
+  padding: var(--space-4) 1.25rem var(--space-4) 2.5rem;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -4206,8 +4736,12 @@ body.manuscript-overlay-open {
     grid-template-columns: 1fr;
   }
 
-  [data-theme="ds3"] .manuscript-characters-rail {
-    display: none;
+  /* Keep the narrative in the single column. The desktop base places
+     .manuscript-main-content in grid-column 2; without this reset it lands in
+     an implicit second column and the scene-status rail inflates column 1,
+     splitting the stage instead of stacking the scene bar above the narrative. */
+  [data-theme="ds3"] .manuscript-main-content {
+    grid-column: 1;
   }
 
   [data-theme="ds3"] .manuscript-rail-spacer {
@@ -4239,12 +4773,15 @@ body.manuscript-overlay-open {
     height: 1rem;
   }
 
-  /* DS3 outcome callout — float-right marginalia on desktop */
+  /* DS3 outcome callout — compact margin note pulled to the column's right
+     edge on desktop. The parent (.narrative-segment) is a flex column, so float
+     is inert here; align-self does the cross-axis pull. True page-gutter
+     marginalia is blocked by the narrative scroll container's overflow-x clip
+     (.scroll-smooth) — tracked as a separate follow-up. */
   [data-theme="ds3"] .choice-outcome-callout {
-    float: right;
-    clear: right;
+    align-self: flex-end;
     width: 220px;
-    margin: 0 0 var(--space-3) var(--space-3);
+    margin: 0 0 var(--space-3);
     padding: var(--space-3);
     box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   }
@@ -4347,6 +4884,48 @@ body.manuscript-overlay-open {
   50% { opacity: 1; }
 }
 
+/* DS3 evaluating-action — an outlined cool die that ticks in mechanical
+   quarter-turns (console feel), plus a bracketed monospace label. */
+[data-theme="ds3"] .manuscript-evaluating-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds3"] .manuscript-evaluating-die {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  animation: manuscript-die-tick 1.4s ease-in-out infinite;
+}
+
+/* Quarter-turn ticks with brief holds — a clacking die, no steps() needed. */
+@keyframes manuscript-die-tick {
+  0%, 16% { transform: rotate(0deg); }
+  25%, 41% { transform: rotate(90deg); }
+  50%, 66% { transform: rotate(180deg); }
+  75%, 91% { transform: rotate(270deg); }
+  100% { transform: rotate(360deg); }
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label::before {
+  content: "[ ";
+}
+
+[data-theme="ds3"] .manuscript-evaluating-label::after {
+  content: " ]";
+}
+
 /* DS3 skeleton shimmer — cool-toned gradient */
 [data-theme="ds3"] .manuscript-skeleton-pulse {
   background: linear-gradient(
@@ -4407,9 +4986,9 @@ body.manuscript-overlay-open {
   display: none;
 }
 
-/* DS3 choices always visible — override base !important hide at <1024px */
+/* DS3 choices always visible — override base hide at <1024px */
 [data-theme="ds3"] .manuscript-suggested-actions-section {
-  display: block !important;
+  display: block;
 }
 
 /* DS3 choice prompt hidden — no heading above choices */
@@ -4728,3 +5307,175 @@ body.manuscript-overlay-open {
   }
 }
 
+/* =========================================================================
+   Scene Status surface (shared base)
+   Characters present + current location for the latest segment. Themed per
+   DS: DS1 keeps the left rail, DS2 reads it as an ambient line, DS3 condenses
+   it into a console bar (rail visibility handled in each DS block above).
+   ========================================================================= */
+.component-scene-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.scene-status-location {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/* F49: pin the location to the top of the DS1 scene-status rail so a crowded
+   scene's character list can't scroll it out of view. DS2/DS3 render the
+   location as an always-visible top bar, so the sticky is scoped to DS1 (the
+   only theme whose rail scrolls). */
+[data-theme="ds1"] .scene-status-location {
+  position: sticky;
+  top: 0;
+}
+
+.scene-status-location-label {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--color-text-muted);
+}
+
+.scene-status-location-value {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: var(--color-text-secondary);
+}
+
+.scene-status-participants {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* Let name + disposition wrap inside the narrow rail instead of clipping. */
+.scene-status-badge {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* Disposition label next to a participant's name; only rendered when
+   relationship state exists for that NPC. */
+.scene-status-disposition {
+  font-family: var(--font-system), ui-monospace, monospace;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+}
+
+.scene-status-disposition[data-disposition="hostile"] {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.scene-status-disposition[data-disposition="friendly"],
+.scene-status-disposition[data-disposition="trusted"] {
+  border-color: var(--color-success);
+  color: var(--color-success-text);
+}
+
+/* Mobile: collapse the surface into a compact horizontal bar above the story. */
+@media (width < 1024px) {
+  .manuscript-characters-rail {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .component-scene-status {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .scene-status-location {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-1_5);
+  }
+}
+
+/* DS2 — scene status as an ambient one-line annotation above the narrative. */
+[data-theme="ds2"] .component-scene-status,
+[data-theme="ds2"] .scene-status-participants {
+  flex-flow: row wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+}
+
+[data-theme="ds2"] .scene-status-location {
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds2"] .scene-status-location-value,
+[data-theme="ds2"] .scene-status-name {
+  font-family: var(--font-narrative);
+  font-style: italic;
+}
+
+[data-theme="ds2"] .scene-status-avatar {
+  display: none;
+}
+
+/* DS2's badges are borderless text, so the disposition rides inline as a
+   bare annotation instead of a bordered tag. */
+[data-theme="ds2"] .scene-status-disposition {
+  border: none;
+  padding: 0;
+  margin-left: var(--space-1);
+}
+
+[data-theme="ds2"] .scene-status-badge {
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+}
+
+[data-theme="ds2"] .scene-status-list {
+  gap: var(--space-1) var(--space-2);
+}
+
+[data-theme="ds2"] .scene-status-badge + .scene-status-badge::before {
+  content: "·";
+  margin-right: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+/* DS3 — scene status condensed into a mechanical console bar. */
+[data-theme="ds3"] .component-scene-status,
+[data-theme="ds3"] .scene-status-participants {
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+[data-theme="ds3"] .scene-status-location {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-1_5);
+}
+
+[data-theme="ds3"] .scene-status-location-value {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+[data-theme="ds3"] .scene-status-badge {
+  padding: var(--space-0_5) var(--space-2);
+  font-size: 0.6875rem;
+}

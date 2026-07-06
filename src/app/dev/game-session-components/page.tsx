@@ -6,6 +6,9 @@ import SessionControls from '@/components/GameSession/SessionControls';
 import GameSessionLoading from '@/components/GameSession/GameSessionLoading';
 import GameSessionError from '@/components/GameSession/GameSessionError';
 import { Decision } from '@/types/narrative.types';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('GameSessionComponentsDev');
 
 export default function GameSessionComponentsTestPage() {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
@@ -24,29 +27,29 @@ export default function GameSessionComponentsTestPage() {
 
   const handleChoiceSelected = (choiceId: string) => {
     setSelectedChoiceId(choiceId);
-    console.log('Choice selected:', choiceId);
+    logger.debug('Choice selected:', choiceId);
   };
 
   const handleEnd = () => {
-    console.log('Session ended');
+    logger.debug('Session ended');
   };
 
   const handleRestart = () => {
-    console.log('Session restarted');
+    logger.debug('Session restarted');
   };
 
   const handleEndStory = () => {
-    console.log('Story ended');
+    logger.debug('Story ended');
   };
 
   const handleRetry = () => {
     setShowError(false);
-    console.log('Retry clicked');
+    logger.debug('Retry clicked');
   };
 
   const handleDismiss = () => {
     setShowError(false);
-    console.log('Dismiss clicked');
+    logger.debug('Dismiss clicked');
   };
 
   return (

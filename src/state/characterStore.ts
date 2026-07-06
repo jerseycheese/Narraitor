@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
-import { InventoryItem, InventoryCategory } from '../types/inventory.types';
 import { DerivedStat } from '../types/character.types';
 import { DerivedStatFormula } from '../types/world.types';
 import { generateUniqueId } from '../lib/utils/generateId';
@@ -16,83 +15,18 @@ import {
   getTimestamp,
 } from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
-import { CrudStore } from './createCrudStore';
+import { CrudStore } from './crudStore.types';
 import { calculateDerivedStat } from '@/lib/utils/derivedStatCalculator';
 import { storeEvents, StoreEventTypes, type CharacterDeletedEvent, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 
-// Simplified character types for MVP implementation
-export interface CharacterAttribute {
-  id: EntityID;
-  characterId: EntityID;
-  worldAttributeId?: EntityID; // Reference to world attribute for safer matching
-  name: string;
-  baseValue: number;
-  modifiedValue: number;
-  category?: string;
-}
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('CharacterStore');
 
-export interface CharacterSkill {
-  id: EntityID;
-  characterId: EntityID;
-  worldSkillId?: EntityID; // Reference to world skill for safer matching
-  name: string;
-  level: number;
-  category?: string;
-}
-
-// Note: DerivedStat is imported from character.types.ts
-
-interface CharacterBackground {
-  history: string;
-  personality: string;
-  goals: string[];
-  fears: string[];
-  physicalDescription?: string;
-  relationships: unknown[];
-  isKnownFigure?: boolean;
-  knownFigureType?:
-    | 'historical'
-    | 'fictional'
-    | 'celebrity'
-    | 'mythological'
-    | 'other';
-}
-
-interface CharacterStatus {
-  health: number;
-  maxHealth: number;
-  conditions: string[];
-  location?: string;
-}
-
-export interface Character {
-  id: EntityID;
-  name: string;
-  description: string;
-  worldId: EntityID;
-  level: number;
-  attributes: CharacterAttribute[];
-  skills: CharacterSkill[];
-  derivedStats: DerivedStat[];
-  background: CharacterBackground;
-  isPlayer: boolean;
-  status: CharacterStatus;
-  inventory: {
-    characterId: EntityID;
-    items: InventoryItem[];
-    capacity: number;
-    categories: InventoryCategory[];
-    itemOrder: EntityID[];
-  };
-  portrait?: {
-    type: 'ai-generated' | 'placeholder';
-    url: string | null;
-    generatedAt?: string;
-    prompt?: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
+// Character shapes live in characterStore.types.ts so lib code can import
+// them without pulling in the store module. Re-exported here to keep the
+// existing import surface working.
+import type { Character, CharacterAttribute, CharacterSkill } from './characterStore.types';
+export type { Character, CharacterAttribute, CharacterSkill } from './characterStore.types';
 
 const addCharacterToRoster = (
   rosters: Record<EntityID, EntityID[]>,
@@ -126,7 +60,6 @@ const removeCharacterFromRoster = (
   }
 
   if (filteredRoster.length === 0) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [worldId]: _removedRoster, ...remainingRosters } = rosters;
     return remainingRosters;
   }
@@ -174,6 +107,8 @@ export interface CharacterStore extends CrudStore<Character> {
     character: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>
   ) => EntityID;
   updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
+  /** Shift the lawful/chaotic alignment axis by delta, clamped to -100..100. */
+  applyAlignmentShift: (characterId: EntityID, delta: number) => void;
   deleteCharacter: (id: EntityID) => Promise<void>;
   setCurrentCharacter: (id: EntityID) => void;
 
@@ -434,10 +369,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             });
 
             set((state) => {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { [id]: _removedCharacter, ...remainingCharacters } =
                 state.characters;
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { [id]: _removedEntity, ...remainingEntities } =
                 state.entities;
               const isCurrent =
@@ -550,6 +483,22 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
           // Domain-specific aliases
           createCharacter: (characterData) => get().create(characterData),
           updateCharacter: (id, updates) => get().update(id, updates),
+
+          applyAlignmentShift: (characterId, delta) => {
+            const character = get().characters[characterId];
+            if (!character) {
+              logger.warn('applyAlignmentShift: unknown character', characterId);
+              return;
+            }
+            if (!Number.isFinite(delta) || delta === 0) {
+              return;
+            }
+
+            const current = character.alignment ?? 0;
+            const next = Math.max(-100, Math.min(100, current + delta));
+            get().update(characterId, { alignment: next });
+          },
+
           deleteCharacter: async (id) => await get().delete(id),
           setCurrentCharacter: (id) => get().setCurrent(id),
 
@@ -862,7 +811,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
         version: 3, // Incremented to clear old migrated data
         onRehydrateStorage: () => (state, error) => {
           if (error) {
-            console.error('[CharacterStore] Failed to rehydrate state', error);
+            logger.error('[CharacterStore] Failed to rehydrate state', error);
             return;
           }
           state?.syncDerivedState?.();
@@ -874,8 +823,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
 
 // Expose store globally in development for testing and debugging
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useCharacterStore = useCharacterStore;
+  window.useCharacterStore = useCharacterStore;
 }
 
 // Subscribe to store events

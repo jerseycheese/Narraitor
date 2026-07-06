@@ -15,7 +15,7 @@ export function WorldSettingsDisplay({ settings }: WorldSettingsDisplayProps) {
       aria-labelledby="settings-heading"
     >
       <h2 id="settings-heading">Character creation rules for this world</h2>
-      <div>
+      <div className="world-detail-meta-grid">
         <DataField
           label="Max Attributes"
           value={settings?.maxAttributes || 'Not set'}

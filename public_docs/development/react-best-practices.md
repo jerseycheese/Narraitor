@@ -24,13 +24,13 @@ The KISS principle applies especially well to React components. Simple, predicta
 **Props Interfaces** - Keep them focused. Too many optional props usually means the component is doing too much:
 
 ```typescript
-// ✅ Clear, focused interface
+// Good: Clear, focused interface
 interface CharacterCardProps {
   character: Character;
   onEdit: (id: string) => void;
 }
 
-// ❌ Swiss army knife component: break this down
+// Avoid: Swiss army knife component: break this down
 interface CharacterCardProps {
   character: Character;
   onEdit?: (id: string) => void;
@@ -44,7 +44,7 @@ interface CharacterCardProps {
 **Single Responsibility** - Components should have one clear job:
 
 ```typescript
-// ✅ One purpose: display a character card
+// Good: One purpose: display a character card
 const CharacterCard = ({ character, onEdit }: CharacterCardProps) => (
   <div className="character-card">
     <h3>{character.name}</h3>
@@ -53,7 +53,7 @@ const CharacterCard = ({ character, onEdit }: CharacterCardProps) => (
   </div>
 );
 
-// ❌ Too many jobs: split this into smaller components
+// Avoid: Too many jobs: split this into smaller components
 const CharacterManager = ({ characters, onEdit, onDelete, onAdd }) => {
   // Handles display, editing, deletion, creation, filtering, sorting...
   // This is asking for bugs
@@ -65,12 +65,12 @@ const CharacterManager = ({ characters, onEdit, onDelete, onAdd }) => {
 **Keep state flat**. Nested state objects are harder to update and debug:
 
 ```typescript
-// ✅ Simple, predictable updates
+// Good: Simple, predictable updates
 const [character, setCharacter] = useState<Character | null>(null);
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState<string | null>(null);
 
-// ❌ Nested state: harder to update safely
+// Avoid: Nested state: harder to update safely
 const [state, setState] = useState({
   character: { data: null, meta: { loading: false, error: null } }
 });
@@ -79,13 +79,13 @@ const [state, setState] = useState({
 **Store integration** should be straightforward. Components grab what they need and render accordingly:
 
 ```typescript
-// ✅ Direct, clear store usage
+// Good: Direct, clear store usage
 const CharacterList = () => {
   const { characters, loading, error } = useCharacterStore();
-  
+
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage error={error} />;
-  
+
   return (
     <div>
       {characters.map(character => (
@@ -101,7 +101,7 @@ const CharacterList = () => {
 **One concern per effect**. This makes debugging so much easier when something breaks:
 
 ```typescript
-// ✅ Clear, focused effects
+// Good: Clear, focused effects
 useEffect(() => {
   if (characterId) {
     loadCharacter(characterId);
@@ -112,7 +112,7 @@ useEffect(() => {
   return () => cancelPendingRequests();
 }, []);
 
-// ❌ Kitchen sink effect: nightmare to debug
+// Avoid: Kitchen sink effect: nightmare to debug
 useEffect(() => {
   if (characterId) loadCharacter(characterId);
   if (worldId && !world) loadWorld(worldId);
@@ -127,7 +127,7 @@ When an effect has more than 2-3 dependencies, it's usually doing too much.
 
 ### Conditional Rendering
 ```typescript
-// ✅ Good: Early returns for clarity
+// Good: Good: Early returns for clarity
 const CharacterView = ({ character }: { character: Character | null }) => {
   if (!character) {
     return <div>No character selected</div>;
@@ -144,7 +144,7 @@ const CharacterView = ({ character }: { character: Character | null }) => {
 
 ### List Rendering
 ```typescript
-// ✅ Good: Simple mapping
+// Good: Good: Simple mapping
 const CharacterList = ({ characters }: { characters: Character[] }) => (
   <div>
     {characters.map(character => (
@@ -196,14 +196,14 @@ const CharacterForm = ({ character, onSave }: CharacterFormProps) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input 
-        value={name} 
-        onChange={(e) => setName(e.target.value)} 
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         placeholder="Character name"
       />
-      <textarea 
-        value={description} 
-        onChange={(e) => setDescription(e.target.value)} 
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
         placeholder="Description"
       />
       <button type="submit">Save</button>
@@ -216,21 +216,21 @@ const CharacterForm = ({ character, onSave }: CharacterFormProps) => {
 
 ### Over-Abstraction
 ```typescript
-// ❌ Unnecessary complexity
+// Avoid: Unnecessary complexity
 const useAdvancedCharacterState = (config: ComplexConfig) => {
   // 50 lines of complex logic
 };
 
-// ✅ Direct approach
+// Good: Direct approach
 const [character, setCharacter] = useState<Character | null>(null);
 ```
 
 ### Premature Optimization
 ```typescript
-// ❌ Don't optimize until needed
+// Avoid: Don't optimize until needed
 const MemoizedCard = React.memo(CharacterCard, deepEqualComparison);
 
-// ✅ Start simple
+// Good: Start simple
 const CharacterCard = ({ character }: CharacterCardProps) => {
   // Simple implementation
 };

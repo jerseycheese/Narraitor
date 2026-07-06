@@ -1,11 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { notFound, useParams, useSearchParams, useRouter } from 'next/navigation';
-import GameSession from '@/components/GameSession/GameSession';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
+import { ProviderGate } from '@/components/ai/ProviderGate';
+
+// GameSession pulls the heaviest chain in the app (ActiveGameSession ->
+// NarrativeController -> @google/genai + every drawer panel). The page already
+// shows this same placeholder before it renders, so loading it on demand keeps
+// the play route's first paint cheap without changing what the user sees.
+const GameSession = dynamic(() => import('@/components/GameSession/GameSession'), {
+  ssr: false,
+  loading: () => (
+    <div className="manuscript-play-page-loading">
+      <p>Creating your game...</p>
+    </div>
+  ),
+});
 
 /**
  * Play page component that initializes a game session with a worldId
@@ -17,6 +31,7 @@ export default function PlayPage() {
   const worldId = params?.id as string;
   const [isClient, setIsClient] = useState(false);
   const [showStartNewConfirmation, setShowStartNewConfirmation] = useState(false);
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
 
   // Check for test data to support visual regression tests (guarded for SSR)
   // Always call hooks and use persisted store data
@@ -26,7 +41,6 @@ export default function PlayPage() {
   // Check if this should be a fresh session (from "Start New Session" button)
   const disableAutoResume = searchParams?.get('fresh') === 'true';
 
-  // Get current session progress for confirmation dialog
   const currentProgress = currentSessionId ? getSessionSegments(currentSessionId).length : 0;
 
   // Set isClient to true once component mounts
@@ -49,6 +63,22 @@ export default function PlayPage() {
     setShowStartNewConfirmation(false);
     router.push(`/worlds/${worldId}/play?fresh=true`);
   };
+
+  // Exit prompts confirmation only when there's narrative progress to abandon.
+  // Auto-save means data isn't lost either way; the prompt just guards against
+  // accidental clicks mid-story (issue #268).
+  const handleBackClick = () => {
+    if (currentProgress > 0) {
+      setShowExitConfirmation(true);
+    } else {
+      router.push(`/worlds/${worldId}`);
+    }
+  };
+
+  const handleConfirmedExit = () => {
+    setShowExitConfirmation(false);
+    router.push(`/worlds/${worldId}`);
+  };
   
   // For server rendering, show a simple placeholder
   if (!isClient) {
@@ -66,11 +96,13 @@ export default function PlayPage() {
 
   return (
     <div className="manuscript-play-page">
-      <GameSession 
-        worldId={worldId} 
+      <ProviderGate />
+
+      <GameSession
+        worldId={worldId}
         disableAutoResume={disableAutoResume}
         onStartNew={handleStartNewClick}
-        onBack={() => router.push(`/worlds/${worldId}`)}
+        onBack={handleBackClick}
       />
 
       {/* Confirmation dialog for starting new session */}
@@ -79,6 +111,15 @@ export default function PlayPage() {
         onClose={() => setShowStartNewConfirmation(false)}
         onConfirm={handleConfirmedStartNew}
         type="start-new"
+        currentProgress={currentProgress}
+      />
+
+      {/* Confirmation dialog for exiting the session mid-story */}
+      <GameSessionConfirmationDialog
+        isOpen={showExitConfirmation}
+        onClose={() => setShowExitConfirmation(false)}
+        onConfirm={handleConfirmedExit}
+        type="exit"
         currentProgress={currentProgress}
       />
     </div>

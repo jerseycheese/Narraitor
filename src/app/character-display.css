@@ -59,8 +59,10 @@
   border-radius: var(--radius-md);
 }
 
+/* Skill cards differ from attribute cards by a faint accent-tinted surface
+ * rather than a side stripe, so the distinction reads without the AI-tell edge. */
 .character-skill-card {
-  border-left: 3px solid var(--color-accent);
+  background: var(--color-accent-soft);
 }
 
 /* ─── Card Contents ─── */

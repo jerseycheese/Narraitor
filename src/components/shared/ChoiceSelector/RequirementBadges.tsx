@@ -29,6 +29,8 @@ export const AlignmentBadge: React.FC<AlignmentBadgeProps> = ({
 
 interface SkillRequirement {
   skillName?: string;
+  met?: boolean;
+  dc?: number;
   requirement?: {
     targetId: string;
   };
@@ -81,18 +83,24 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   const badgeLabel = hasNamedSkill
     ? primaryRequirement.skillName!
     : 'Skill';
+  const { dc, met } = primaryRequirement;
+  const displayLabel =
+    typeof dc === 'number' ? `${badgeLabel} · DC ${dc}` : badgeLabel;
 
   return (
     <span
       className="manuscript-skill-check-badge"
       data-option-id={optionId}
+      data-met={met === undefined ? undefined : String(met)}
       aria-label={
-        hasNamedSkill
-          ? `Skill check required: ${badgeLabel}`
-          : 'Skill check required'
+        typeof dc === 'number'
+          ? `Skill check: ${badgeLabel}, difficulty class ${dc}`
+          : hasNamedSkill
+            ? `Skill check required: ${badgeLabel}`
+            : 'Skill check required'
       }
     >
-      {badgeLabel}
+      {displayLabel}
     </span>
   );
 };

@@ -25,12 +25,12 @@ jest.mock('@/state/worldStore', () => ({
   useWorldStore: jest.fn(),
 }));
 
-jest.mock('@/lib/ai', () => ({
+jest.mock('@/lib/ai/clientFactory', () => ({
   createAIClient: jest.fn(),
 }));
 
 jest.mock('@/lib/ai/worldImageGenerator', () => ({
-  WorldImageGenerator: jest.fn(),
+  generateWorldImage: jest.fn(),
 }));
 
 jest.mock('@/lib/ai/worldAnalyzerClient', () => ({
@@ -86,7 +86,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     it('should not show confirmation dialog when canceling with clean state', async () => {
       render(<WorldCreationWizard onCancel={mockOnCancel} />);
       
-      // Click cancel on template step (clean state)
+      // Click cancel on the first step (clean state)
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);
       
@@ -97,7 +97,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
 
     it('should show confirmation dialog when canceling with dirty state', async () => {
       // Start with simple initial data and interact with form to create dirty state
-      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
       
       // Enter data to make the wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
@@ -118,7 +118,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     });
 
     it('should proceed with cancellation when user confirms', async () => {
-      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
       
       // Enter data to make the wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
@@ -137,7 +137,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     });
 
     it('should continue editing when user rejects confirmation', async () => {
-      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
       
       // Enter data to make the wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
@@ -157,7 +157,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     });
 
     it('should use router.push when no onCancel prop is provided', async () => {
-      render(<WorldCreationWizard initialStep={1} />);
+      render(<WorldCreationWizard initialStep={0} />);
       
       // Enter data to make the wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
@@ -178,7 +178,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
 
   describe('Dirty State Detection', () => {
     it('should detect dirty state when name is changed', async () => {
-      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
       
       // Enter name to make wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
@@ -191,8 +191,8 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     });
 
     it('should detect dirty state when description is changed', async () => {
-      // Start on step 2 (DescriptionStep) where the full description field is located
-      render(<WorldCreationWizard initialStep={2} onCancel={mockOnCancel} />);
+      // Start on step 1 (DescriptionStep) where the full description field is located
+      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
 
       // Enter description to make wizard dirty
       const descriptionInput = screen.getByTestId('world-full-description');
@@ -205,7 +205,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     });
 
     it('should detect dirty state when genre is changed', async () => {
-      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
       
       // Change genre to make wizard dirty  
       const genreSelect = screen.getByTestId('world-genre-select');
@@ -227,7 +227,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
         })),
         genre: TEST_WORLD_DATA.genre
       };
-      render(<WorldCreationWizard initialData={initialData} initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialData={initialData} initialStep={0} onCancel={mockOnCancel} />);
       
       // Modify the name field to trigger dirty state
       const nameInput = screen.getByTestId('world-name-input');
@@ -253,7 +253,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
         })),
         genre: TEST_WORLD_DATA.genre
       };
-      render(<WorldCreationWizard initialData={initialData} initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialData={initialData} initialStep={0} onCancel={mockOnCancel} />);
       
       // Modify the name field to trigger dirty state
       const nameInput = screen.getByTestId('world-name-input');
@@ -266,7 +266,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     });
 
     it('should detect dirty state when AI suggestions are generated', async () => {
-      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
       
       // Enter name to make wizard dirty and simulate AI suggestions generated
       const nameInput = screen.getByTestId('world-name-input');
@@ -281,7 +281,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
 
   describe('Dialog Properties', () => {
     it('should use warning variant for the confirmation dialog', async () => {
-      render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
+      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
       
       // Enter name to make wizard dirty
       const nameInput = screen.getByTestId('world-name-input');

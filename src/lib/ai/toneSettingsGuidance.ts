@@ -48,7 +48,7 @@ LITERARY LANGUAGE COMPLEXITY:
 /**
  * Detailed AI guidance for narrative style
  */
-export const NARRATIVE_STYLE_GUIDANCE: Record<NarrativeStyle, string> = {
+const NARRATIVE_STYLE_GUIDANCE: Record<NarrativeStyle, string> = {
   serious: `
 SERIOUS NARRATIVE STYLE:
 - Maintain a mature, thoughtful tone with gravitas and weight
@@ -152,7 +152,7 @@ BALANCED NARRATIVE STYLE:
 /**
  * Detailed AI guidance for content rating compliance
  */
-export const CONTENT_RATING_GUIDANCE: Record<ContentRating, string> = {
+const CONTENT_RATING_GUIDANCE: Record<ContentRating, string> = {
   'G': `
 G-RATED CONTENT GUIDELINES:
 - NO violence, weapons, fighting, or physical harm

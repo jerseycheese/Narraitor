@@ -132,6 +132,23 @@ export function buildBreadcrumbSegments(
       });
     }
   }
-  
+
+  // Handle settings routes (Worlds stays the home crumb, as for every page)
+  if (pathname.startsWith('/settings')) {
+    segments.push({
+      label: 'Settings',
+      href: '/settings',
+      isCurrentPage: pathname === '/settings'
+    });
+
+    if (pathname.startsWith('/settings/providers')) {
+      segments.push({
+        label: 'Providers',
+        href: '/settings/providers',
+        isCurrentPage: pathname === '/settings/providers'
+      });
+    }
+  }
+
   return segments;
 }

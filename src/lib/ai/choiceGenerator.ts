@@ -1,5 +1,6 @@
 import { AIClient } from './types';
 import { useWorldStore } from '@/state/worldStore';
+import { useNPCStore } from '@/state/npcStore';
 import { Decision, NarrativeContext, DecisionRequirement } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
@@ -7,7 +8,7 @@ import { checkAndRecordLoreMentions } from './loreContextHelper';
 import { safeTrim } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
 import { buildChoicePrompt } from './choiceGenerator.prompt';
-import { parseChoiceResponse } from './choiceGenerator.parser';
+import { parseChoiceResponse, applyAlignmentConsequences, type KnownNpc } from './choiceGenerator.parser';
 import { generateFallbackChoices } from './choiceGenerator.fallback';
 
 /**
@@ -25,103 +26,118 @@ export interface ChoiceGenerationParams {
 }
 
 /**
- * ChoiceGenerator class handles generating meaningful player choices
- * based on the current narrative context, character attributes, and world settings.
+ * Generates meaningful player choices based on the current narrative context,
+ * character attributes, and world settings. Falls back to deterministic choices
+ * if the AI response is empty, short, or errors.
  */
-export class ChoiceGenerator {
-  constructor(private aiClient: AIClient) {}
-  
-  /**
-   * Generate player choices based on narrative context
-   */
-  async generateChoices(params: ChoiceGenerationParams): Promise<Decision> {
+export async function generateChoices(
+  aiClient: AIClient,
+  params: ChoiceGenerationParams
+): Promise<Decision> {
+  try {
+    const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 4, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
+
+    const world = getWorld(worldId);
+    const prompt = buildChoicePrompt({
+      world,
+      worldId,
+      narrativeContext,
+      characterIds,
+      sessionId,
+      useAlignedChoices,
+      includeDecisionHistory,
+      maxOptions,
+    });
+
+    // Prefer the explicit choices entry point when the client has one (the
+    // browser proxy routes it to /api/narrative/choices); server-side clients
+    // hit the SDK directly so generateContent is equivalent there.
+    const response = aiClient.generateChoices
+      ? await aiClient.generateChoices(prompt)
+      : await aiClient.generateContent(prompt);
+
+
+    if (!response?.content || safeTrim(response?.content ?? '') === '') {
+      const fallbackDecision = generateFallbackChoices(world, narrativeContext);
+      return applyAlignmentConsequences(ensureSkillChecksForAllOptions(fallbackDecision, world));
+    }
+
+    const decision = parseChoiceResponse(response.content, narrativeContext, world, getKnownNpcs(worldId));
 
     try {
-      const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 4, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
+      checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');
+    } catch (error) {
+      // Non-critical: lore mention tracking is dev-only, don't break choice generation
+      logger.warn('Failed to record lore mentions:', error);
+    }
 
-      const world = this.getWorld(worldId);
-      const prompt = buildChoicePrompt({
-        world,
-        worldId,
-        narrativeContext,
-        characterIds,
-        sessionId,
-        useAlignedChoices,
-        includeDecisionHistory,
-        maxOptions,
-      });
+    // Ensure we have the minimum number of options
+    if (decision.options.length < minOptions) {
+      const fallbackDecision = generateFallbackChoices(world, narrativeContext);
+      const neededOptions = minOptions - decision.options.length;
 
-      const response = await this.aiClient.generateContent(prompt);
-      
-      
-      if (!response?.content || safeTrim(response?.content ?? '') === '') {
-        const fallbackDecision = generateFallbackChoices(world, narrativeContext);
-        return ensureSkillChecksForAllOptions(fallbackDecision, world);
-      }
-      
-      const decision = parseChoiceResponse(response.content, narrativeContext, world);
-
-      try {
-        checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');
-      } catch (error) {
-        // Non-critical: lore mention tracking is dev-only, don't break choice generation
-        logger.warn('Failed to record lore mentions:', error);
-      }
-
-      // Ensure we have the minimum number of options
-      if (decision.options.length < minOptions) {
-        const fallbackDecision = generateFallbackChoices(world, narrativeContext);
-        const neededOptions = minOptions - decision.options.length;
-        
-        // Add additional options from fallback to meet minimum
-        for (let i = 0; i < neededOptions; i++) {
-          if (i < fallbackDecision.options.length) {
-            decision.options.push(fallbackDecision.options[i]);
-          }
+      // Add additional options from fallback to meet minimum
+      for (let i = 0; i < neededOptions; i++) {
+        if (i < fallbackDecision.options.length) {
+          decision.options.push(fallbackDecision.options[i]);
         }
       }
-      
-      // Limit options to maximum if needed
-      if (decision.options.length > maxOptions) {
-        decision.options = decision.options.slice(0, maxOptions);
-      }
-
-      return ensureSkillChecksForAllOptions(decision, world);
-    } catch (error) {
-      const errorDetails = {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-        worldId: params.worldId,
-        hasNarrativeContext: !!params.narrativeContext,
-        characterIds: params.characterIds,
-        maxOptions: params.maxOptions,
-        minOptions: params.minOptions
-      };
-      logger.error('❌ CHOICE GENERATOR ERROR:', errorDetails);
-      logger.error('Full error object:', error);
-      
-      const world = this.getWorld(params.worldId);
-      const fallbackDecision = generateFallbackChoices(world, params.narrativeContext);
-      return ensureSkillChecksForAllOptions(fallbackDecision, world);
     }
-  }
 
-  /**
-   * Get world data from the store
-   */
-  private getWorld(worldId: string): World {
-    const { worlds } = useWorldStore.getState();
-    const world = worlds[worldId];
-    
-    
-    if (!world) {
-      logger.error('World not found:', worldId);
-      throw new Error(`World not found: ${worldId}`);
+    // Limit options to maximum if needed
+    if (decision.options.length > maxOptions) {
+      decision.options = decision.options.slice(0, maxOptions);
     }
-    
-    return world;
+
+    return applyAlignmentConsequences(ensureSkillChecksForAllOptions(decision, world));
+  } catch (error) {
+    const errorDetails = {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      worldId: params.worldId,
+      hasNarrativeContext: !!params.narrativeContext,
+      characterIds: params.characterIds,
+      maxOptions: params.maxOptions,
+      minOptions: params.minOptions
+    };
+    logger.error('❌ CHOICE GENERATOR ERROR:', errorDetails);
+    logger.error('Full error object:', error);
+
+    const world = getWorld(params.worldId);
+    const fallbackDecision = generateFallbackChoices(world, params.narrativeContext);
+    return applyAlignmentConsequences(ensureSkillChecksForAllOptions(fallbackDecision, world));
   }
 }
+
+/**
+ * NPC roster for the world, used to resolve consequence targets by name.
+ * Mirrors getWorld's defensive store read.
+ */
+const getKnownNpcs = (worldId: string): KnownNpc[] => {
+  try {
+    return useNPCStore
+      .getState()
+      .getNPCsByWorld(worldId)
+      .map((npc) => ({ id: npc.id, name: npc.name }));
+  } catch {
+    return [];
+  }
+};
+
+/**
+ * Get world data from the store
+ */
+const getWorld = (worldId: string): World => {
+  const { worlds } = useWorldStore.getState();
+  const world = worlds[worldId];
+
+  if (!world) {
+    logger.error('World not found:', worldId);
+    throw new Error(`World not found: ${worldId}`);
+  }
+
+  return world;
+};
 
 const ensureSkillChecksForAllOptions = (
   decision: Decision,

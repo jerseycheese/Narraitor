@@ -2,13 +2,13 @@ import React from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { safeTrim } from '@/lib/utils';
 
-export interface NarrativeParticipant {
+interface NarrativeParticipant {
   id: string;
   name: string;
   avatarUrl?: string;
 }
 
-export const NAME_STOP_WORDS = ['the', 'and', 'but', 'for'];
+const NAME_STOP_WORDS = ['the', 'and', 'but', 'for'];
 
 export const deriveFallbackName = (id: string): string => {
   if (!id) {

@@ -1,9 +1,9 @@
 # Narraitor MVP Roadmap
 
 ## Where We Are
-**Major Milestone**: Core MVP is done. AI storytelling, world creation, character building, session persistence, and navigation all work.
+**Major Milestone**: The core MVP is basically complete. AI storytelling, world creation, character building, session persistence, and navigation all work, and a player can go end to end through the loop.
 
-**Current Status**: Advanced polish phase. ~35-40 MVP-blocking items remain across narrative consistency, UI polish, and error handling.
+**Current Status**: Polish toward a proper 1.0. Since this roadmap was first drafted, several big pieces have landed: the three-design-system migration (DS1/DS2/DS3, see [ADR-011](../architecture/ADR-011-three-design-systems.md)), Playwright visual-regression testing, the dashboard home page, the guided onboarding tutorial, table views for the list screens, and the lore entity-management work (fuzzy matching, aliases, deduplication, resolution). The remaining work is mostly UI polish, error-handling hardening, and getting things release-ready rather than net-new core systems.
 
 ## What the MVP Does
 Basically, it's a complete solo narrative RPG experience where you can:
@@ -33,8 +33,11 @@ Basically, it's a complete solo narrative RPG experience where you can:
 Making the experience smooth. Navigation done: mobile works, loading states are responsive, state persists.
 
 **Priority 1: Narrative Consistency & Lore**
-The lore/narrative consistency system partially works but has inconsistent behavior. This is the highest-priority work because without reliable AI memory, the game experience breaks down:
-- Lore storage and fact tracking (#182-185)
+The lore system has come a long way — storage, fact tracking, fuzzy matching, aliases,
+deduplication, and entity resolution have all landed (the `loreStore.*` family plus
+`src/lib/lore/`), and there's a DevTools consistency-validation panel for debugging how the AI
+processes lore. Reliable AI memory still matters most for the experience, so the remaining work
+is tightening consistency rather than building the foundation:
 - Narrative consistency checks (#188-191)
 - Decision consequence tracking (#210, #198, #196)
 - Long-term story impact systems
@@ -52,7 +55,7 @@ The lore/narrative consistency system partially works but has inconsistent behav
 ### Phase 2.5: Developer Infrastructure
 Building debugging and tooling for production support.
 
-**Priority 1: Error Handling (MVP Blocker)**
+**Priority 1: Error Handling (MVP Blocker)** — shipped (#902; see "Recently shipped" below)
 Cannot ship without graceful error handling:
 - Runtime error capture and display (#159, #158, #155)
 - AI service error viewing (#201-203)
@@ -85,47 +88,76 @@ This is about getting ready for broader use beyond just personal development.
 
 ## Current Priority Queue
 
-### Immediate: Core Quality & Reliability
-Cannot ship without these:
-- Error handling and retry resilience (#902)
-- Lore entity management (#446-449 - fuzzy matching, Unicode support, aliases, entity resolution)
-- Context window management for long games (#408)
-- Narrative checkpoint system (#411) - MVP implementation complete, see `../features/story-checkpoints.md`
+The next release to main is **v1.0**: *visual finish* + the *launch gate*, tracked in the `v1.0`
+GitHub milestone and meta-issue **#1320**. Core MVP systems are done. The earlier Immediate /
+High Priority / Medium Priority queues are kept below as a record of what actually shipped (and
+what didn't), followed by the active v1.0 work — the roadmap is a running log, not a snapshot.
 
-### High Priority: Player-Facing Features
-Core user experience:
-- Dashboard home page to guide world → character flow (#398)
-- Guided onboarding tutorial (#399)
-- Character creation templates (#393)
-- Character portraits (custom upload #404, avatar library #405)
-- Skill prerequisites (#392)
-- Table views for journal/character/world lists (#808, #809, #810)
+### Recently shipped (prior queues, kept for history)
+
+**Core quality & reliability**
+- [x] Error handling and retry resilience (#902)
+- [x] Lore entity management — fuzzy matching (#446), Unicode keys (#447), entity resolution (#448), aliases (#449)
+- [x] Context-window management for long-running games (#408)
+- [x] Narrative checkpoint system (#411) — see `../features/story-checkpoints.md`
+
+**Player-facing features**
+- [x] Dashboard home page (#398)
+- [x] Guided onboarding tutorial (#399)
+- [x] Character creation templates (#393)
+- [x] Character portraits foundation — custom upload (#404), avatar library (#405); the preset+upload UX is revisited in #1299, deferred to 1.1
+- [x] Skill prerequisites (#392)
+- [x] Table views — character lists (#808), world comparison (#810)
+- [ ] Journal table view (#809) — still open, not pulled into v1.0
+
+**Development & infrastructure**
+- [x] Fixed skipped localStorage tests (#646)
+- [x] AI service documentation pass (#334)
+- [x] AI error-handling integration tests (#332)
+- [x] Token usage tracking (#326) and token-estimation optimization (#319)
+- [ ] Visual diff tooling (#652), Docker cross-platform visual consistency (#653), snapshot governance (#655), visual performance metrics (#656) — still open, not blocking 1.0
+
+### v1.0 — active (next release to main)
+
+The dependency order lives in #1320; the phases:
+
+### Phase A: Visual blockers (Tailwind-removal fallout)
+The post-#1097 cleanup left several shared primitives shipping unstyled in the app while the
+showcase looked fine — the exact drift the canon work exists to kill. One pattern: style the
+primitive *in production*, not in the showcase.
+- Shared modals unstyled — no backdrop, unpositioned panel (#1316, PR #1315) — establishes the pattern
+- Remaining DS primitives unstyled: card/alert/tabs/table/checkbox/radio (#1317) — after #1316
+- Render data-table + CollapsibleSection in the style guide for canon coverage (#1319) — after #1317
+
+### Phase B: DS canon + structural differentiation
+- Showcase = canon: render real production components, Session phase remaining (#1276)
+- [EPIC] Structural DS differentiation across surfaces (#1165)
+- Finish character-side detail/edit content treatment + CharacterTable alignment (#1295)
+- About page real content + DS1/DS2/DS3 treatment (#1135)
+
+### Phase C: Launch gate
+- [EPIC] MVP Launch Preparation — landing page, docs, legal, analytics (#495)
+
+### Supporting: visual-test coverage & hygiene
+De-risks the visual work above; not headline.
+- Audit visual specs for DS1/DS2/DS3 coverage (#1264)
+- Audit crawler hygiene: DS theme captures + seeded load + bbox cropping (#1297)
+- Stabilize tour & world-detail visual specs (#1198)
+- Split tutorial visual tests into a dedicated CI job (#1014); restore deleted tutorial coverage (#1239)
+
+### Deferred to 1.1+ (player-facing polish, not blocking 1.0)
+- Preset avatars + custom portrait upload (#1299)
+- Full keyboard control with focus indicators (#276)
 - Session pacing and reading milestones (#805)
 
-### Medium Priority: Development & Infrastructure
-Important for quality and debugging:
-- Fix skipped localStorage tests (#646)
-- Visual diff review tooling (#652)
-- Docker containers for cross-platform visual consistency (#653)
-- Snapshot governance (#655)
-- Visual performance metrics (#656)
-- AI service documentation enhancements (#334)
-- AI error handling integration tests (#332)
-- Token usage tracking (#326)
-- Token estimation optimization (#319)
-
 ### Deferred: Multi-Provider AI (Epic #878)
-Valuable but can launch with Gemini-only:
-- Provider abstraction layer (#890)
-- Secure configuration storage (#891)
-- Provider configuration UI (#892)
-- Gemini refactor to provider pattern (#893)
-- Claude native SDK (#894)
-- Generic OpenAI-compatible provider (#895)
-- See "Post-MVP Features" section for full multi-provider roadmap
+Valuable but can launch Gemini-only — see "Post-MVP Features" below. Provider abstraction
+(#890), secure key storage (#891), provider config UI (#892), Gemini refactor (#893), Claude
+native SDK (#894), generic OpenAI-compatible provider (#895).
 
 ## Technical Debt & Infrastructure
-- Implement Playwright visual regression testing
+- Playwright visual regression testing — done (`tests/visual/`, runs in CI)
+- Dead-code and architecture tooling — done (knip, CSS audit, dependency-cruiser, mutation testing, skott circular-dep budget)
 - Optimize bundle size and performance
 - Enhance error boundaries and recovery
 - Improve TypeScript strictness
@@ -151,7 +183,6 @@ Features that are valuable but not required for initial launch:
 - Mobile app versions
 
 **Infrastructure**
-- Visual regression testing (Playwright)
 - Advanced CI/CD pipeline enhancements
 - Dependency updates (Next.js 16, Storybook 9.x, test stack)
 
@@ -172,4 +203,4 @@ Features that are valuable but not required for initial launch:
 - [ ] Marketing materials ready
 
 ---
-*Last Updated: 2025-11-20 - Updated priorities based on actual implementation status, ~35-40 MVP-blocking items identified*
+*Last Updated: 2026-05-29 - Scoped the next release to main as v1.0: visual finish (DS canon + primitives styled in production, structural differentiation) plus the launch gate. Created the `v1.0` milestone and tracking meta-issue #1320; reconciled the priority queue against open issues (the prior queue referenced closed work). Player-facing polish — portraits #1299, keyboard #276, pacing #805 — deferred to 1.1.*

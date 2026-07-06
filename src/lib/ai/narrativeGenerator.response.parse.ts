@@ -1,8 +1,10 @@
 import { safeTrim } from '@/lib/utils';
+import { isValidCategory } from '@/lib/inventory/categories';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import type { GeneratedCharacterMetadata, LostItemMetadata } from '@/types/narrative.types';
 import type { ParsedNarrativeResponse, NarrativeExtractedMetadata } from './narrativeGenerator.response.types';
 import { validateMood, validateLossReason } from './narrativeGenerator.response.helpers';
+import { stripMarkdownFences, extractJsonObject } from './parseJSON';
 
 export const parseNarrativeResponse = (
   response: { content?: string },
@@ -17,36 +19,28 @@ export const parseNarrativeResponse = (
     actualContent.includes('"content":')
   ) {
     try {
-      let jsonStr = safeTrim(actualContent);
+      const stripped = stripMarkdownFences(actualContent);
+      const jsonStr = extractJsonObject(stripped);
 
-      if (jsonStr.includes('```json')) {
-        jsonStr = jsonStr.replace(/```json\s*/, '').replace(/\s*```/, '');
-      } else if (jsonStr.includes('```')) {
-        jsonStr = jsonStr.replace(/```\s*/, '').replace(/\s*```/, '');
-      }
-
-      jsonStr = safeTrim(jsonStr);
-
-      const jsonStart = jsonStr.indexOf('{');
-      const jsonEnd = jsonStr.lastIndexOf('}');
-      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-        jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
-      } else if (jsonStart !== -1) {
-        const contentMatch = jsonStr.match(
-          /"content"\s*:\s*"([\s\S]*?)(?:",|\s*$)/
-        );
-        if (contentMatch && contentMatch[1]) {
-          actualContent = contentMatch[1]
-            .replace(/\\"/g, '"')
-            .replace(/\\n/g, '\n');
+      if (jsonStr === null) {
+        // No complete object. If an opening brace is present the response was
+        // truncated mid-object: recover the content field. Otherwise there's
+        // no JSON at all.
+        if (stripped.indexOf('{') !== -1) {
+          const contentMatch = stripped.match(
+            /"content"\s*:\s*"([\s\S]*?)(?:",|\s*$)/
+          );
+          if (contentMatch && contentMatch[1]) {
+            actualContent = contentMatch[1]
+              .replace(/\\"/g, '"')
+              .replace(/\\n/g, '\n');
+          } else {
+            throw new Error('Incomplete JSON without extractable content');
+          }
         } else {
-          throw new Error('Incomplete JSON without extractable content');
+          throw new Error('No JSON structure found');
         }
       } else {
-        throw new Error('No JSON structure found');
-      }
-
-      if (jsonEnd !== -1) {
         const parsed = JSON.parse(jsonStr);
         if (parsed.content) {
           actualContent = parsed.content;
@@ -80,6 +74,7 @@ export const parseNarrativeResponse = (
                     description?: string;
                     quantity?: number;
                     acquisitionMethod?: string;
+                    categoryHint?: string;
                   };
                   return {
                     name: rawItem.name,
@@ -87,6 +82,11 @@ export const parseNarrativeResponse = (
                     quantity: rawItem.quantity,
                     acquisitionMethod:
                       rawItem.acquisitionMethod as InventoryAcquisitionMethod,
+                    categoryHint:
+                      typeof rawItem.categoryHint === 'string' &&
+                      isValidCategory(rawItem.categoryHint)
+                        ? rawItem.categoryHint
+                        : undefined,
                   };
                 })
               : undefined,

@@ -3,14 +3,16 @@
 import { AIConfig, GenerationConfig, SafetySetting } from './types';
 
 /**
- * Gets AI configuration from environment variables
- * Following the pattern from Boot Hill project
+ * Gets AI configuration from environment variables.
+ * A missing key falls back to '' here rather than throwing, because config is
+ * also read in mock/test contexts; callers that make real requests validate it
+ * (see validateAPIKey in apiHelpers and the MOCK_API_KEY sentinel).
  * @returns Configuration object
  */
 export const getAIConfig = (): AIConfig => {
   return {
     geminiApiKey: process.env.GEMINI_API_KEY || '',
-    modelName: 'gemini-2.0-flash',
+    modelName: 'gemini-2.5-flash',
     imageModelName: 'gemini-2.5-flash-image',
     maxRetries: 3,
     timeout: 30000
@@ -26,7 +28,10 @@ export const getGenerationConfig = (): GenerationConfig => {
     temperature: 0.7,
     topP: 1.0,
     topK: 40,
-    maxOutputTokens: 2048
+    maxOutputTokens: 2048,
+    // gemini-2.5-flash does dynamic "thinking" by default, which burns latency
+    // and output-token budget on these interactive game requests. Disable it.
+    thinkingConfig: { thinkingBudget: 0 }
   };
 };
 
@@ -44,13 +49,16 @@ export const getSafetySettings = (): SafetySetting[] => {
 };
 
 /**
- * Gets default configuration for AI service
+ * Gets default configuration for AI service.
+ * @param apiKeyOverride - the player's bring-your-own key for this request; when
+ *   omitted, falls back to the server env key (today's behavior).
  * @returns Complete AI service configuration
  */
-export const getDefaultConfig = () => {
+export const getDefaultConfig = (apiKeyOverride?: string | null) => {
   const aiConfig = getAIConfig();
   return {
-    apiKey: aiConfig.geminiApiKey,
+    // The player's resolved key (passed by the route) -> server env key.
+    apiKey: apiKeyOverride ?? aiConfig.geminiApiKey,
     modelName: aiConfig.modelName,
     maxRetries: aiConfig.maxRetries,
     timeout: aiConfig.timeout,

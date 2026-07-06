@@ -4,12 +4,17 @@ import React, { useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 
+// Stacking order applied when the rail + panels are pinned (position: fixed)
+// during a fullPage capture. Mirrors the workshop rail z-index scale: the
+// character/tools panels sit above the rail.
+const PINNED_PANEL_Z_INDEX = '40';
+const PINNED_RAIL_Z_INDEX = '20';
+
 interface ManuscriptSessionShellProps {
   children: React.ReactNode;
   hud?: React.ReactNode;
   actionRail?: React.ReactNode;
   marginContent?: React.ReactNode;
-  mobileTopContent?: React.ReactNode;
   className?: string;
 }
 
@@ -18,7 +23,6 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
   hud,
   actionRail,
   marginContent,
-  mobileTopContent,
   className,
 }) => {
   const { theme } = useTheme();
@@ -142,7 +146,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           characterPanel.style.top = `${panelTop}px`;
           characterPanel.style.left = `${mainStageRect.left}px`;
           characterPanel.style.width = `${railWidth}px`;
-          characterPanel.style.zIndex = '40';
+          characterPanel.style.zIndex = PINNED_PANEL_Z_INDEX;
           characterPanel.style.removeProperty('height');
         }
         if (toolsPanel) {
@@ -151,7 +155,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           toolsPanel.style.top = `${panelTop}px`;
           toolsPanel.style.left = `${mainStageRect.left}px`;
           toolsPanel.style.width = `${railWidth}px`;
-          toolsPanel.style.zIndex = '40';
+          toolsPanel.style.zIndex = PINNED_PANEL_Z_INDEX;
           toolsPanel.style.removeProperty('height');
         }
 
@@ -161,7 +165,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
         rail.style.removeProperty('bottom');
         rail.style.left = `${mainStageRect.left}px`;
         rail.style.width = `${railWidth}px`;
-        rail.style.zIndex = '20';
+        rail.style.zIndex = PINNED_RAIL_Z_INDEX;
       });
     };
 
@@ -190,7 +194,9 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
     mutationObserver.observe(container, { childList: true, subtree: true });
 
     window.addEventListener('resize', syncPosition);
-    window.addEventListener('scroll', syncPosition);
+    // Passive: syncPosition never calls preventDefault, so let the browser
+    // scroll without waiting on this handler (issue #1358).
+    window.addEventListener('scroll', syncPosition, { passive: true });
 
     return () => {
       if (frameId !== null) {
@@ -220,13 +226,11 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
 
           {/* Main Narrative Stage */}
           <main className="manuscript-overlay-main">
-            {mobileTopContent}
-
             <div className={clsx("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
                 {marginContent && (
                   <aside
                     className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
-                    aria-label="Characters present"
+                    aria-label="Scene status"
                     ref={railRef}
                   >
                     {marginContent}

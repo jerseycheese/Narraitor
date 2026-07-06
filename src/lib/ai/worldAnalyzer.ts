@@ -3,6 +3,7 @@ import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/co
 import { AttributeSuggestion, SkillSuggestion } from '@/components/WorldCreationWizard/WorldCreationWizard';
 import { truncate } from '../utils';
 import { logger } from '../utils/logger';
+import { parseJsonFromLLM } from './parseJSON';
 
 export interface WorldAnalysisResult {
   attributes: AttributeSuggestion[];
@@ -30,18 +31,19 @@ interface AIAnalysisResponse {
   skills: AISkill[];
 }
 
-export async function analyzeWorldDescription(description: string): Promise<WorldAnalysisResult> {
+export async function analyzeWorldDescription(description: string, apiKey?: string | null): Promise<WorldAnalysisResult> {
   logger.debug('analyzeWorldDescription called with:', truncate(description, 100));
-  
+
   try {
     const config = getAIConfig();
-    logger.debug('Using AI config:', { 
-      modelName: config.modelName, 
+    const effectiveKey = apiKey ?? config.geminiApiKey;
+    logger.debug('Using AI config:', {
+      modelName: config.modelName,
       timeout: config.timeout,
-      hasApiKey: !!config.geminiApiKey 
+      hasApiKey: !!effectiveKey
     });
-    
-    if (!config.geminiApiKey) {
+
+    if (!effectiveKey) {
       logger.error('API key is not configured - check GEMINI_API_KEY environment variable');
       throw new Error('API key is not configured');
     }
@@ -96,16 +98,13 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     logger.debug('Calling AI service directly...');
     // Call the AI service directly with proper configuration
     const client = new GeminiClient({
-      apiKey: config.geminiApiKey,
+      apiKey: effectiveKey,
       modelName: config.modelName,
       maxRetries: config.maxRetries,
       timeout: config.timeout,
       generationConfig: getGenerationConfig(),
       safetySettings: getSafetySettings()
     });
-    
-    // Add a small delay to ensure loading overlay appears
-    await new Promise(resolve => setTimeout(resolve, 500));
     
     logger.debug('Making AI request...');
     const response = await client.generateContent(prompt);
@@ -119,25 +118,10 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       analysis = JSON.parse(response.content);
       logger.debug('Parsed analysis:', analysis);
     } catch {
-      logger.debug('Initial parse failed, attempting to extract JSON from markdown...');
-      
-      // Fallback to extract JSON from response if not pure JSON
-      // Look for JSON wrapped in markdown code blocks
-      const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (codeBlockMatch) {
-        analysis = JSON.parse(codeBlockMatch[1]);
-        logger.debug('Successfully parsed from code block');
-      } else {
-        // Look for JSON object anywhere in the content
-        // Use a more flexible regex that allows nested objects
-        const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          analysis = JSON.parse(jsonMatch[0]);
-          logger.debug('Successfully extracted JSON using regex');
-        } else {
-          throw new Error('Failed to parse AI response as JSON');
-        }
-      }
+      logger.debug('Initial parse failed, extracting JSON from fences/prose...');
+      // Strips ```json fences and recovers the embedded object in one step.
+      analysis = parseJsonFromLLM<AIAnalysisResponse>(response.content);
+      logger.debug('Successfully extracted JSON from response');
     }
     
     // Transform the response to match our interface

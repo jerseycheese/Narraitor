@@ -2,47 +2,102 @@
 title: Architecture Decisions
 tags: [architecture, decisions, adr]
 created: 2025-04-28
-updated: 2025-06-26
+updated: 2026-05-22
 ---
 
 # Architecture Decisions
 
-So these are the key architectural decisions we made for Narraitor - basically why we chose certain technologies and patterns over others.
+These are the key architectural decisions behind Narraitor — why certain technologies and
+patterns won out over the alternatives. The sections below are a narrative summary; the numbered
+**Architecture Decision Records (ADRs)** capture individual decisions in depth.
+
+## Decision Records (ADRs)
+
+ADRs 001–008 were backfilled to document the inception-era foundation (reconstructed from the
+codebase and git history); 009 onward were written as the decisions were made.
+
+- [ADR-001: Next.js App Router + TypeScript](ADR-001-nextjs-app-router-typescript.md) — framework and language foundation
+- [ADR-002: Client-side-only architecture](ADR-002-client-side-only-architecture.md) — no backend database; serverless AI proxy only
+- [ADR-003: Zustand domain stores](ADR-003-zustand-state-management.md) — state management
+- [ADR-004: IndexedDB persistence](ADR-004-indexeddb-persistence.md) — client-side storage over localStorage
+- [ADR-005: Domain-driven structure](ADR-005-domain-driven-structure.md) — organize by domain, not file type
+- [ADR-006: Gemini behind server-side API routes](ADR-006-gemini-server-side-api.md) — AI provider and key protection
+- [ADR-007: Tailwind + shadcn/ui styling](ADR-007-tailwind-shadcn-styling.md) — original styling foundation (**superseded by ADR-011**)
+- [ADR-008: Testing & verification strategy](ADR-008-testing-and-verification-strategy.md) — TDD, Storybook-first, Playwright visual
+- [ADR-009: Guided onboarding system](ADR-009-guided-onboarding-system.md)
+- [ADR-010: Decision relevance simplification](ADR-010-decision-relevance-simplification.md)
+- [ADR-011: Three design systems (DS1/DS2/DS3)](ADR-011-three-design-systems.md)
 
 ## Frontend Architecture
 
-**Next.js 15+ App Router**: We went with the modern React framework because server/client components and nested layouts give us way better performance and organization than the old pages router.
+**Next.js 15 App Router**: Server/client components and nested layouts give better performance
+and organization than the old Pages Router, and the routing is cleaner. Runs on React 19.
 
-**Domain-Driven Design**: Instead of organizing code by technical layers (components, hooks, utils), we organize by business domains (World, Character, Narrative, etc.). This keeps related functionality together and makes it easier to find things.
+**Domain-Driven Design**: Code is organized by business domain (World, Character, Narrative,
+and so on) rather than by technical layer (components, hooks, utils). Related functionality
+sits together, which makes things easier to find.
 
-**Zustand State Management**: We tried React Context first, but it got messy fast with all the re-renders. Zustand is lightweight and lets us have domain-specific stores that don't interfere with each other.
+**Zustand State Management**: React Context came first but got messy fast with all the
+re-renders. Zustand is lightweight and allows domain-specific stores that don't trip over each
+other.
 
-**TypeScript**: Full type safety with strict mode because catching errors at compile time is way better than debugging runtime crashes.
+**TypeScript**: Full type safety with strict mode, because catching errors at compile time
+beats debugging runtime crashes.
 
 ## Data & Styling
 
-**IndexedDB Persistence**: We need to store complex world and character data, plus support offline use. LocalStorage maxes out too quickly, and we wanted something that scales.
+**IndexedDB Persistence**: World and character data gets complex, and game sessions need to
+survive a browser restart. LocalStorage maxes out too quickly, so IndexedDB handles the
+structured, larger datasets.
 
-**Tailwind CSS v3**: Utility-first styling because it's faster to build with and the performance is great. Sticking with v3 for Storybook compatibility, which matters more than having the latest features. The theme support makes dark mode trivial.
+**Plain CSS with design tokens (no Tailwind)**: Styling runs on hand-written CSS driven by
+design-token custom properties (`var(--color-surface)`, `var(--space-4)`, `var(--radius-md)`
+and friends), with `clsx` composing semantic class names like `badge badge-success`. Tailwind
+was removed — there's no `tailwindcss` dependency, no `tailwind.config.ts`, and no `@tailwind`
+directives. The token approach is what lets the three design systems restyle the same markup by
+swapping CSS variables rather than rewriting utility classes. See the design-system docs for how
+tokens and themes are organized.
 
-**shadcn/ui Components**: These give us accessible, good-looking components without reinventing the wheel. Built on Radix UI so accessibility is handled properly.
+**shadcn/ui structure, de-Tailwinded**: The component library started from shadcn/ui (built on
+Radix UI primitives, so accessibility is handled properly), but the components were taken
+through a "clean slate" pass that stripped out `cva` and the Tailwind utility classes in favor
+of semantic CSS classes wired to the token system. The Radix accessibility foundation stays;
+the styling moved to CSS.
 
-**Three Design Systems (DS1/DS2/DS3)**: One look stopped being enough once worlds got more varied, but token-only theming kept reading as the same app in different paint. So we ended up with three structurally different design systems — Drafting Table, Warm Earth, Mechanical Manuscript — each with its own token file, switched via a `data-theme` attribute on `<html>`. See [ADR-011](ADR-011-three-design-systems.md) for the structural-differentiation principle and how the theme files, showcase pages, and provider fit together.
+**Three Design Systems (DS1/DS2/DS3)**: One look stopped being enough once worlds got more
+varied, and token-only theming kept reading as the same app in different paint. The answer was
+three structurally different design systems — Drafting Table, Warm Earth, Mechanical Manuscript
+— each with its own token file, switched via a `data-theme` attribute on `<html>`. See
+[ADR-011](ADR-011-three-design-systems.md) for the structural-differentiation principle and how
+the theme files, showcase pages, and provider fit together.
 
 ## Development Practices
 
-**Storybook-First Development**: Building components in isolation catches issues early and makes debugging way easier. Plus it forces you to think about all the different states a component needs to handle.
+**Storybook-First Development**: Building components in isolation catches issues early and forces
+thinking through all the states a component has to handle.
 
-**Test-Driven Development**: We use Jest and React Testing Library, but focus on testing what users actually experience rather than implementation details. No point testing CSS classes when you should be testing behavior.
+**Test-Driven Development**: Jest and React Testing Library, focused on what users actually
+experience rather than implementation details. There's no point testing CSS classes when the
+behavior is what matters. Stryker mutation testing backs this up on the state, storage, and
+narrative layers.
 
-**Three-Stage Verification**: Every feature goes through Storybook (component isolation) → Test Harness (integration) → System Integration (full app). This catches different types of problems at each level.
+**Verification canon**: A visual change is verified against the `/dev/design-system{,-2,-3}`
+showcase routes first, then Storybook, then the app — when they disagree, the showcase wins.
+Feature work flows from component isolation (Storybook) to integration (the `/dev/*` harnesses)
+to the full app.
 
 ## Product Decisions
 
-**Single Player Focus**: For the MVP, we're focusing on single-player to keep things simple and really nail the core narrative experience. Multiplayer adds a ton of complexity we don't need right now.
+**Single Player Focus**: The MVP is single-player to keep things simple and nail the core
+narrative experience. Multiplayer adds a pile of complexity that isn't needed yet.
 
-**300-Line File Limit**: This might seem arbitrary, but it forces you to break things down properly. If a file is getting too big, it's usually doing too much.
+**300-Line File Limit**: It looks arbitrary, but it forces breaking things down. A file that's
+getting too big is usually doing too much.
 
-**Google Gemini AI**: The integration is entirely server-side with rate limiting and validation. We tested a few different AI providers and Gemini gave us the best balance of quality and reliability.
+**Google Gemini AI**: The integration (via `@google/genai`) is entirely server-side, with rate
+limiting and validation. Gemini gave the best balance of quality and reliability among the
+providers that got tested.
 
-**Security-First API Design**: All API keys stay server-side, we sanitize requests, and nothing sensitive ever reaches the client. Learned this lesson from other projects where API keys ended up in the browser.
+**Security-First API Design**: API keys stay server-side, requests get sanitized, and nothing
+sensitive reaches the client — a lesson learned from projects where API keys ended up in the
+browser.

@@ -1,4 +1,4 @@
-import { ChoiceGenerator } from '../choiceGenerator';
+import { generateChoices } from '../choiceGenerator';
 import { AIClient } from '../types';
 import { EntityID } from '@/types/common.types';
 import { NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
@@ -37,14 +37,12 @@ jest.mock('@/state/inventoryStore', () => ({
 
 // Mock narrativeTemplateManager
 jest.mock('@/lib/promptTemplates/narrativeTemplateManager', () => ({
-  narrativeTemplateManager: {
-    getTemplate: jest.fn().mockImplementation((templateKey) => {
-      if (templateKey === 'narrative/playerChoice') {
-        return jest.fn().mockReturnValue('Generate player choices for this scenario');
-      }
-      return jest.fn();
-    })
-  }
+  getNarrativeTemplate: jest.fn().mockImplementation((templateKey) => {
+    if (templateKey === 'narrative/playerChoice') {
+      return jest.fn().mockReturnValue('Generate player choices for this scenario');
+    }
+    return jest.fn();
+  })
 }));
 
 // Generate simple mock narrative context
@@ -80,11 +78,8 @@ const createMockNarrativeContext = (): NarrativeContext => {
 };
 
 describe('ChoiceGenerator', () => {
-  let choiceGenerator: ChoiceGenerator;
-  
   beforeEach(() => {
     jest.clearAllMocks();
-    choiceGenerator = new ChoiceGenerator(mockAIClient);
   });
 
   describe('generateChoices', () => {
@@ -102,7 +97,7 @@ describe('ChoiceGenerator', () => {
       
       mockAIClient.generateContent.mockResolvedValueOnce(mockResponse);
       
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1']
@@ -120,7 +115,7 @@ describe('ChoiceGenerator', () => {
     it('should handle AI errors and generate fallback choices', async () => {
       mockAIClient.generateContent.mockRejectedValueOnce(new Error('AI Service unavailable'));
       
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1']
@@ -132,11 +127,27 @@ describe('ChoiceGenerator', () => {
       expect(result.prompt).toBeTruthy();
     });
     
+    it('prefers the explicit generateChoices entry point when the client has one', async () => {
+      const routingClient: jest.Mocked<AIClient> = {
+        generateContent: jest.fn(),
+        generateChoices: jest.fn().mockResolvedValueOnce({ content: '', finishReason: 'STOP' }),
+      };
+
+      await generateChoices(routingClient, {
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1']
+      });
+
+      expect(routingClient.generateChoices).toHaveBeenCalled();
+      expect(routingClient.generateContent).not.toHaveBeenCalled();
+    });
+
     it('should handle empty or malformed AI responses', async () => {
       // Mock an empty response
       mockAIClient.generateContent.mockResolvedValueOnce({ content: '', finishReason: 'STOP' });
       
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1']
@@ -201,7 +212,7 @@ Options:
         finishReason: 'STOP',
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1'],
@@ -247,7 +258,7 @@ Options:
         finishReason: 'STOP',
       });
 
-      const result = await choiceGenerator.generateChoices({
+      const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),
         characterIds: ['char-1'],
@@ -260,5 +271,81 @@ Options:
         expect(skillRequirements.length).toBeGreaterThan(0);
       });
     });
+  });
+});
+
+// NPC roster for consequence-target resolution (hoisted by jest)
+jest.mock('@/state/npcStore', () => ({
+  useNPCStore: {
+    getState: jest.fn().mockReturnValue({
+      getNPCsByWorld: () => [{ id: 'npc-1', name: 'Marta', worldId: 'world-1' }],
+    }),
+  },
+}));
+
+describe('generateChoices structured consequences', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('carries parsed trust deltas and composed alignment shifts on options', async () => {
+    mockAIClient.generateContent.mockResolvedValue({
+      content: `Decision Weight: [major]
+Decision: What do you do?
+
+1. [Lawful] Return the ledger to Marta
+   Consequences: Marta trust +10
+2. [Neutral] Ask around quietly
+3. [Chaotic] Torch the ledger in the square
+   Consequences: Marta trust -15`,
+      finishReason: 'stop',
+    });
+
+    const decision = await generateChoices(mockAIClient, {
+      worldId: 'world-1',
+      narrativeContext: createMockNarrativeContext(),
+      characterIds: ['char-1'],
+    });
+
+    const lawful = decision.options.find((o) => o.alignment === 'lawful');
+    expect(lawful?.consequences).toEqual(
+      expect.arrayContaining([
+        { type: 'relationship', action: 'modify', targetId: 'npc-1', value: { trustDelta: 10 } },
+        { type: 'alignment', action: 'add', targetId: 'player-alignment', value: 8 },
+      ])
+    );
+
+    const chaotic = decision.options.find((o) => o.alignment === 'chaotic');
+    expect(chaotic?.consequences).toEqual(
+      expect.arrayContaining([
+        { type: 'relationship', action: 'modify', targetId: 'npc-1', value: { trustDelta: -15 } },
+        { type: 'alignment', action: 'add', targetId: 'player-alignment', value: -8 },
+      ])
+    );
+
+    const neutral = decision.options.find((o) => o.alignment === 'neutral');
+    expect(neutral?.consequences ?? []).toHaveLength(0);
+  });
+
+  it('composes alignment consequences on the fallback path too', async () => {
+    mockAIClient.generateContent.mockRejectedValue(new Error('AI down'));
+
+    const decision = await generateChoices(mockAIClient, {
+      worldId: 'world-1',
+      narrativeContext: createMockNarrativeContext(),
+      characterIds: ['char-1'],
+    });
+
+    const aligned = decision.options.filter(
+      (o) => o.alignment === 'lawful' || o.alignment === 'chaotic'
+    );
+    expect(aligned.length).toBeGreaterThan(0);
+    for (const option of aligned) {
+      expect(option.consequences).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: 'alignment', targetId: 'player-alignment' }),
+        ])
+      );
+    }
   });
 });

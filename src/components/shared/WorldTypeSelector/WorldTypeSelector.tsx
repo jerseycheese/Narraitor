@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import './WorldTypeSelector.css';
 
 export interface WorldTypeSelectorProps {
   value: WorldTypeData;
@@ -92,7 +93,7 @@ export function WorldTypeSelector({
   };
 
   return (
-    <div className={`${className}`}>
+    <div className={`component-world-type-selector ${className}`}>
       {/* World Type Selection */}
       {showLabels && (
         <Label>
@@ -106,11 +107,11 @@ export function WorldTypeSelector({
         disabled={disabled}
       >
         {WORLD_TYPE_OPTIONS.map((option) => (
-          <label key={option.id}>
+          <label key={option.id} className="world-type-option">
             <RadioGroupItem value={option.id} />
-            <div>
-              <div>{option.label}</div>
-              <div>
+            <div className="world-type-option-text">
+              <div className="world-type-option-label">{option.label}</div>
+              <div className="world-type-option-description">
                 {option.description}
               </div>
             </div>
@@ -161,5 +162,4 @@ export function WorldTypeSelector({
   );
 }
 
-export { WORLD_TYPE_OPTIONS };
-export type { WorldTypeOption, WorldTypeData };
+export type { WorldTypeData };

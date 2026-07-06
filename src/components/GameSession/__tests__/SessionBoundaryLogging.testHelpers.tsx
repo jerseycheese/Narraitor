@@ -5,13 +5,13 @@
 import { useSessionStore } from '@/state/sessionStore';
 import { useJournalStore } from '@/state/journalStore';
 
-export const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
+const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
 export const mockUseJournalStore = useJournalStore as jest.MockedFunction<typeof useJournalStore>;
 
 /**
  * Default mock session store state
  */
-export const createMockSessionStore = (overrides = {}) => ({
+const createMockSessionStore = (overrides = {}) => ({
   id: null,
   status: 'initializing' as const,
   worldId: null,
@@ -20,7 +20,6 @@ export const createMockSessionStore = (overrides = {}) => ({
   playerChoices: [],
   error: null,
   savedSessions: {},
-  templateHistory: [],
   autoSave: { enabled: true, lastSaveTime: null, status: 'idle' as const, errorMessage: null, totalSaves: 0 },
   onboardingCompleted: false,
   initializeSession: jest.fn(),
@@ -39,9 +38,6 @@ export const createMockSessionStore = (overrides = {}) => ({
   resumeSavedSession: jest.fn(),
   deleteSavedSession: jest.fn(),
   updateSavedSessionNarrativeCount: jest.fn(),
-  addTemplateToHistory: jest.fn(),
-  getTemplateHistory: jest.fn(),
-  clearTemplateHistory: jest.fn(),
   setAutoSaveEnabled: jest.fn(),
   updateAutoSaveStatus: jest.fn(),
   recordAutoSave: jest.fn(),
@@ -54,7 +50,7 @@ export const createMockSessionStore = (overrides = {}) => ({
 /**
  * Default mock journal store state
  */
-export const createMockJournalStore = (overrides = {}) => ({
+const createMockJournalStore = (overrides = {}) => ({
   addEntry: jest.fn(),
   getSessionEntries: jest.fn().mockReturnValue([]),
   markAsRead: jest.fn(),
@@ -88,18 +84,6 @@ export const setupMockStores = (
 
   return { mockSessionStore, mockJournalStore };
 };
-
-/**
- * Create test session data
- */
-export const createTestSession = (overrides = {}) => ({
-  id: 'test-session-123',
-  startTime: Date.now(),
-  worldId: 'test-world',
-  characterId: 'test-character',
-  status: 'active' as const,
-  ...overrides
-});
 
 /**
  * Setup static getState and subscribe mocks for session store

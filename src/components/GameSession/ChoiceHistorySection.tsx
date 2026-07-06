@@ -70,7 +70,6 @@ const ChoiceHistoryContent: React.FC<ChoiceHistoryContentProps> = ({
   return (
     <section
       data-testid="choice-history-section"
-      data-tutorial="choice-history-section"
     >
       {resolvedEntries.length === 0 ? (
         <p className="manuscript-choice-history-empty">

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
@@ -24,6 +25,7 @@ import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
 import { ManuscriptSessionShell } from './ManuscriptSessionShell';
 import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
+import { HudCloseButton } from './HudCloseButton';
 import { ManuscriptActionRail } from './ManuscriptActionRail';
 import { ManuscriptDrawer } from './ManuscriptDrawer';
 import {
@@ -35,7 +37,7 @@ import {
   ToolsMenuPanelContent,
 } from './ManuscriptDrawerPanels';
 import { CharacterSnapshot } from './CharacterSnapshot';
-import { ManuscriptCharactersRail } from './ManuscriptCharactersRail';
+import { SceneStatus } from './SceneStatus';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 
@@ -47,7 +49,6 @@ interface ActiveGameSessionProps {
   world?: World;
   status?: 'active' | 'paused' | 'ended';
   onChoiceSelected: (choiceId: string) => void;
-  onEnd?: () => void;
   onStartNew?: () => void;
   onBack?: () => void;
   // Narrative specific props
@@ -67,7 +68,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   world,
   status = 'active',
   onChoiceSelected,
-  onEnd,
   onStartNew,
   onBack,
   /* existingSegments - not currently used */
@@ -79,10 +79,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
+  const [retryToken, setRetryToken] = React.useState(0);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+  const [isEvaluatingAction, setIsEvaluatingAction] = React.useState(false);
   const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
   const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
   const [lastOpenedDrawer, setLastOpenedDrawer] = React.useState<DrawerType | null>(null);
@@ -95,8 +97,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
+  // Authoring-only Tools-menu affordances (Simulate Next Turn, Toggle Streaming
+  // State, Show Ending Suggestion). NODE_ENV is statically replaced at build time,
+  // so these callbacks are stripped from a production bundle and the menu hides
+  // each button when its callback is absent (#1430 F58).
+  const showDevTools = process.env.NODE_ENV === 'development';
   const { theme } = useTheme();
-  const isDS1 = theme === 'ds1';
   const isDS3 = theme === 'ds3';
 
   // Check for test data to support visual regression tests (guarded for SSR)
@@ -124,30 +130,62 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   );
   const characterSkills = character?.skills ?? [];
   
-  // Get narrative store for ending functionality
-  const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
+  // Get narrative store for ending functionality. Scope to just the ending
+  // slice (via useShallow) so the game shell doesn't re-render on every
+  // narrative-store write — segments stream in continuously during play.
+  const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } =
+    useNarrativeStore(
+      useShallow((state) => ({
+        currentEnding: state.currentEnding,
+        isGeneratingEnding: state.isGeneratingEnding,
+        generateEnding: state.generateEnding,
+        isSessionEnded: state.isSessionEnded,
+      }))
+    );
+
+  // Live story-generation failure for the current turn (timeout, network,
+  // provider 429/5xx, bad key). Captured in the store by NarrativeController so
+  // the choices column can surface inline error + Retry — see issue #1478.
+  const generationError = useNarrativeStore((state) => state.generationError);
+
+  // A failure must drop the "Continuing your story..." spinner/skeleton —
+  // otherwise the turn hangs on the loading state forever (the original #1478
+  // bug). Clearing both generation flags lets the error surface take over.
+  React.useEffect(() => {
+    if (generationError) {
+      setIsGenerating(false);
+      setIsGeneratingChoices(false);
+    }
+  }, [generationError]);
+
+  // Retry the failed turn: show the spinner again and bump the token the
+  // NarrativeController watches to re-run the last generation.
+  const handleRetryGeneration = React.useCallback(() => {
+    setIsGenerating(true);
+    setRetryToken((token) => token + 1);
+  }, []);
 
   // Reactively track segment count using a stable snapshot to avoid infinite loops.
   // Selecting derived arrays from Zustand can cause non-cached snapshots.
   const segmentCount = useNarrativeStore((state) => (state.sessionSegments[sessionId]?.length ?? 0));
 
-  // Get the latest narrative segment for the characters rail
-  // We look for the most recent segment that actually has participants, matching prototype logic
-  const latestSegmentWithParticipants = useNarrativeStore((state) => {
+  // Scene status reflects the absolute latest segment so location and
+  // participants track the current scene, not the last segment that happened to
+  // list characters (which would leave a newer location/participant set stale).
+  const latestSegment = useNarrativeStore((state) => {
     const segmentIds = state.sessionSegments[sessionId] || [];
     if (segmentIds.length === 0) return null;
-    
-    // Search backwards for a segment with characters
-    for (let i = segmentIds.length - 1; i >= 0; i--) {
-      const segment = state.segments[segmentIds[i]];
-      if (segment && ((segment.characterIds?.length ?? 0) > 0 || (segment.metadata?.characterIds?.length ?? 0) > 0)) {
-        return segment;
-      }
-    }
-    
-    // Fallback to absolute latest segment
     return state.segments[segmentIds[segmentIds.length - 1]] || null;
   });
+
+  // Show the scene status surface whenever the latest segment has participants
+  // or a location to report; mirrors SceneStatus' own empty check so the shell
+  // can collapse the rail column when there's nothing to show.
+  const hasSceneStatus =
+    !!latestSegment &&
+    ((latestSegment.characterIds?.length ?? 0) > 0 ||
+      (latestSegment.metadata?.characterIds?.length ?? 0) > 0 ||
+      !!latestSegment.metadata?.location);
 
   const hasExistingNarrative = segmentCount > 0;
 
@@ -238,9 +276,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     initialized,
     isGenerating,
     segmentCount,
-    characterId: characterId || undefined,
-    onEnd,
-    onEndStoryClick: handleEndStoryClick,
     setIsGenerating,
     setInitialized,
     setCurrentDecision,
@@ -261,6 +296,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setIsGenerating,
     setShouldTriggerGeneration,
     setIsGeneratingChoices,
+    setIsEvaluatingAction,
     setLocalSelectedChoiceId,
     choiceGenerationTimeoutRef,
     scheduleChoiceFallback,
@@ -383,21 +419,21 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               onOpenCharacterPanel={() => {
                 setIsCharacterSummaryExpanded(true);
               }}
-              onSimulateTurn={() => {
+              onSimulateTurn={showDevTools ? () => {
                 const fallbackChoiceId = currentDecision?.options?.[0]?.id;
                 if (fallbackChoiceId) {
                   handleChoiceSelected(fallbackChoiceId);
                   return;
                 }
                 handleCustomSubmit('Simulate next turn');
-              }}
-              onToggleStreamingPreview={() => {
+              } : undefined}
+              onToggleStreamingPreview={showDevTools ? () => {
                 setIsStreamingPreview((prev) => !prev);
-              }}
+              } : undefined}
               isStreamingPreview={isStreamingPreview}
-              onToggleEndingSuggestionPreview={() => {
+              onToggleEndingSuggestionPreview={showDevTools ? () => {
                 setIsEndingSuggestionPreview((prev) => !prev);
-              }}
+              } : undefined}
               isEndingSuggestionPreview={isEndingSuggestionPreview}
             />
           )}
@@ -444,28 +480,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               >
                 Reset
               </button>
-              <button
-                type="button"
-                onClick={onBack}
-                title="Back to World"
-                className="manuscript-hud-text-button"
-              >
-                Close
-              </button>
+              <HudCloseButton variant="text" onBack={onBack} />
             </div>
           )}
         />
       }
-      marginContent={isDS1 && isProgressiveDisclosureEnabled && latestSegmentWithParticipants &&
-        ((latestSegmentWithParticipants.characterIds?.length ?? 0) > 0 ||
-         (latestSegmentWithParticipants.metadata?.characterIds?.length ?? 0) > 0) ? (
-        <ManuscriptCharactersRail segment={latestSegmentWithParticipants} />
+      marginContent={hasSceneStatus ? (
+        <SceneStatus segment={latestSegment} />
       ) : null}
-      mobileTopContent={
-        isDS1 && isProgressiveDisclosureEnabled ? (
-          <ManuscriptCharactersRail segment={latestSegmentWithParticipants} variant="mobile-bar" />
-        ) : null
-      }
       actionRail={
         <ManuscriptActionRail
           isStreaming={isGenerating || isGeneratingChoices || isStreamingPreview}
@@ -477,6 +499,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               status={status}
               isGenerating={isGenerating}
               isGeneratingChoices={isGeneratingChoices}
+              isEvaluatingAction={isEvaluatingAction}
               isSessionEnded={isSessionEnded(sessionId)}
               worldSkills={world?.skills || []}
               characterSkills={characterSkills}
@@ -487,6 +510,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               endStoryAction={endStoryAction}
               isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
               endingSuggestion={endingSuggestion}
+              generationError={generationError}
+              onRetryGeneration={handleRetryGeneration}
             />
           </div>
         </ManuscriptActionRail>
@@ -507,6 +532,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         onChoicesGenerated={handleChoicesGenerated}
         onEndingSuggested={handleEndingSuggested}
         segmentCount={segmentCount}
+        retryToken={retryToken}
       />
 
       <div className="manuscript-secondary-controls">

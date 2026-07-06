@@ -1,0 +1,130 @@
+/* Game session crash-recovery prompt (issue #221).
+   Self-contained modal built on the Radix dialog primitives — owns its own
+   scrim and surface so it presents as a centered overlay. Tokens only, so the
+   three design-system themes restyle it for free. */
+
+.game-session-recovery-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  overflow-y: auto;
+  background: var(--color-scrim);
+}
+
+.game-session-recovery-modal {
+  width: 100%;
+  max-width: 32rem;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+}
+
+.game-session-recovery-prompt {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  text-align: left;
+}
+
+.game-session-recovery-prompt-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  color: var(--color-info);
+  background: var(--info-muted);
+  border: 1px solid var(--info-border);
+  border-radius: var(--radius-full);
+}
+
+.game-session-recovery-prompt-icon svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.game-session-recovery-prompt-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.game-session-recovery-prompt-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+}
+
+.game-session-recovery-prompt-lead {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.game-session-recovery-prompt-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.game-session-recovery-prompt-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+  min-width: 0;
+}
+
+.game-session-recovery-prompt-detail dt {
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.game-session-recovery-prompt-detail dd {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-session-recovery-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-top: var(--space-1);
+}
+
+@media (width <= 480px) {
+  .game-session-recovery-prompt {
+    flex-direction: column;
+  }
+
+  .game-session-recovery-prompt-actions {
+    justify-content: stretch;
+  }
+}

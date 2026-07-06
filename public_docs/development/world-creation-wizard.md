@@ -68,6 +68,5 @@ Uses Gemini API to analyze world descriptions and suggest attributes/skills. Has
 2. Component refactoring to reduce size
 3. Confirmation dialog for cancel action
 4. Point pool system for attributes/skills
-5. Template worlds for quick setup
-6. Import/export functionality
-7. Visual genre editor
+5. Import/export functionality
+6. Visual genre editor

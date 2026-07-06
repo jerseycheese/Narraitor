@@ -8,11 +8,13 @@ import {
   GoalExtractionRequest,
   GoalExtractionResult,
 } from '../types/goal.types';
+import type { NarrativeSegment } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { goalExtractor } from '../lib/ai/goalExtractor';
-import { CrudStore } from './createCrudStore';
+import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
+import { extractGoalsFromNarrative } from '../lib/ai/goalExtractor';
+import { CrudStore } from './crudStore.types';
 
 interface ProcessSegmentResult {
   newGoalsCreated: number;
@@ -39,7 +41,8 @@ export interface GoalStore extends CrudStore<NarrativeGoal> {
   incrementMentionCount: (goalId: EntityID) => void;
   addProgressNote: (goalId: EntityID, note: string) => void;
   clearSessionGoals: (sessionId: EntityID) => void;
-  processSegmentForGoals: (segmentId: EntityID, characterId?: EntityID) => Promise<ProcessSegmentResult>;
+  clearWorldGoals: (worldId: EntityID) => void;
+  processSegmentForGoals: (segment: NarrativeSegment, sessionId: EntityID, characterId?: EntityID) => Promise<ProcessSegmentResult>;
 }
 
 const getInitialState = () => ({
@@ -180,9 +183,7 @@ export const useGoalStore = create<GoalStore>()(
         }
 
         set((state) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [goalId]: _removedGoal, ...remainingGoals } = state.goals;
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [goalId]: _removedEntity, ...remainingEntities } = state.entities;
 
           const sessionGoals = state.sessionGoals[existingGoal.sessionId] || [];
@@ -283,21 +284,21 @@ export const useGoalStore = create<GoalStore>()(
         goalIds.forEach((goalId) => get().delete(goalId));
       },
 
-      processSegmentForGoals: async (segmentId, characterId) => {
+      clearWorldGoals: (worldId) => {
+        // Goals without a worldId can't be attributed to the deleted world,
+        // so they're left alone.
+        Object.values(get().goals)
+          .filter((goal) => goal.worldId === worldId)
+          .forEach((goal) => get().delete(goal.id));
+      },
+
+      processSegmentForGoals: async (segment, sessionId, characterId) => {
         set({ loading: true, error: null });
         try {
-          const { useNarrativeStore } = await import('./narrativeStore');
-          const narrativeState = useNarrativeStore.getState();
-          const segment = narrativeState.segments[segmentId];
-
           if (!segment) {
             const error = createStoreError('Segment Not Found', 'Narrative segment not found for goal processing.', ErrorType.SERVICE, true);
             return { newGoalsCreated: 0, goalsUpdated: 0, goalsCompleted: 0, error };
           }
-
-          const sessionId = Object.keys(narrativeState.sessionSegments).find((session) =>
-            narrativeState.sessionSegments[session]?.includes(segmentId)
-          );
 
           if (!sessionId) {
             const error = createStoreError('Session Not Found', 'No session could be determined for the provided segment.', ErrorType.SERVICE, true);
@@ -312,14 +313,14 @@ export const useGoalStore = create<GoalStore>()(
           const extractionRequest: GoalExtractionRequest = {
             content: segment.content,
             sessionId,
-            segmentId,
+            segmentId: segment.id,
             characterId,
             worldId: segment.worldId,
             existingGoals,
           };
 
           const extractionResult: GoalExtractionResult =
-            await goalExtractor.extractGoalsFromNarrative(extractionRequest);
+            await extractGoalsFromNarrative(extractionRequest);
 
           let newGoalsCreated = 0;
           let goalsUpdated = 0;
@@ -343,7 +344,7 @@ export const useGoalStore = create<GoalStore>()(
           extractionResult.completedGoals.forEach((goalId) => {
             const goal = get().goals[goalId];
             if (goal) {
-              get().updateGoal(goalId, { status: 'completed', completionSegmentId: segmentId });
+              get().updateGoal(goalId, { status: 'completed', completionSegmentId: segment.id });
               goalsCompleted++;
             }
           });
@@ -374,4 +375,14 @@ export const useGoalStore = create<GoalStore>()(
       migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
     }
   )
+);
+
+// Cascade cleanup: deleting a world orphans its goals otherwise (mirrors
+// characterStore's WORLD_DELETED subscription). Plain subscribe — the handler
+// only clears data, so a double-fire is a no-op.
+storeEvents.subscribe<WorldDeletedEvent>(
+  StoreEventTypes.WORLD_DELETED,
+  ({ worldId }) => {
+    useGoalStore.getState().clearWorldGoals(worldId);
+  }
 );

@@ -198,8 +198,6 @@ if (!formResult.valid) {
 - `validateGeneratedImage`
 
 ### Other Domain Objects
-- `isNarrativeSegment`
-- `isJournalEntry`
 - `isPlayerDecision`
 
 ## Migration from Basic Type Checking

@@ -18,10 +18,10 @@ The core functionality is working and stable. All the main systems (world creati
 ## Technical Foundation
 
  Built on a solid foundation of modern tools:
-- **Framework**: Next.js 15.5.6 with App Router (updated 2025-10-27)
+- **Framework**: Next.js 15 (15.5.x) with App Router
 - **AI Integration**: Google Gemini (secure server-side)
 - **State Management**: Zustand stores with IndexedDB persistence
-- **UI**: Tailwind CSS v3 with shadcn/ui components (v3 for Storybook compatibility)
+- **UI**: Plain CSS driven by design tokens (no Tailwind); components are shadcn-derived (Radix primitives) but styled with semantic CSS classes
 - **Testing**: Jest, React Testing Library, Storybook
 - **Development**: TDD workflow with 300-line file limits
 
@@ -42,7 +42,7 @@ The core functionality is working and stable. All the main systems (world creati
 **Development Infrastructure**: DevTools for debugging, Storybook for component development, and automated workflow scripts for repetitive tasks.
 
 ## Security & Performance
-API keys stay server-side with rate limiting (50 requests/hour per IP) to prevent abuse. All input gets sanitized and validated before hitting the AI service.
+API keys stay server-side with rate limiting (50 requests/hour per IP in production) on the AI generation routes to prevent abuse. All input gets sanitized and validated before hitting the AI service.
 
 ## Who This Is For
 Built primarily for personal use: solo narrative RPG experiences when you want to explore stories in specific fictional universes without needing a group or game master.

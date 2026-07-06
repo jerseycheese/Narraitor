@@ -36,9 +36,8 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
       {/* Inventory Display - hidden when progressive disclosure is enabled */}
       {!isProgressiveDisclosureEnabled && characterId && (
         <div
-          className="manuscript-support-section"
+          className="manuscript-support-inventory"
           data-testid="inventory-collapsible"
-          data-tutorial="inventory-toggle"
         >
           <CollapsibleSection title="Inventory" initialCollapsed>
             <InventoryList characterId={characterId} />
@@ -71,7 +70,6 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
             onClick={onOpenJournal}
             variant="outline"
             className="manuscript-journal-button"
-            data-tutorial="journal-toggle"
           >
             <span className="manuscript-journal-button-label">
               Open Journal
@@ -105,13 +103,15 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
             </div>
             
             <div className="manuscript-end-story-footer">
-              <button 
+              <button
+                type="button"
                 className="manuscript-end-story-cancel"
                 onClick={onCloseEndStory}
               >
                 Cancel
               </button>
-              <button 
+              <button
+                type="button"
                 className="manuscript-end-story-confirm"
                 onClick={onConfirmEndStory}
               >

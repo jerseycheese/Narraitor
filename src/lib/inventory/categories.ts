@@ -95,26 +95,3 @@ export function getCategoryMetadata(
 ): CategoryMetadata | undefined {
   return CATEGORY_METADATA[category];
 }
-
-/**
- * Returns all categories with their metadata.
- * Useful for building UI category selection lists.
- *
- * @returns Array of categories with id, name, and description
- *
- * @example
- * ```typescript
- * const categories = getAllCategories();
- * categories.forEach(cat => {
- *   console.log(`${cat.name}: ${cat.description}`);
- * });
- * ```
- */
-export function getAllCategories(): Array<
-  CategoryMetadata & { id: StandardInventoryCategory }
-> {
-  return STANDARD_CATEGORIES.map((category) => ({
-    id: category,
-    ...CATEGORY_METADATA[category],
-  }));
-}

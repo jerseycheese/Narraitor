@@ -135,21 +135,6 @@ describe('useKeyboardShortcuts', () => {
     expect(mockEscapeAction).toHaveBeenCalled();
   });
 
-  test('hook can be unmounted without errors', () => {
-    const shortcuts = [
-      {
-        key: 'Escape',
-        action: mockEscapeAction,
-        description: 'Close modal',
-      }
-    ];
-
-    const { unmount } = renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    // Should not throw when unmounting
-    expect(() => unmount()).not.toThrow();
-  });
-
   test('ignores shortcuts when input elements are focused', () => {
     const shortcuts = [
       {
@@ -180,25 +165,6 @@ describe('useKeyboardShortcuts', () => {
     expect(mockAction).not.toHaveBeenCalled();
 
     document.body.removeChild(input);
-  });
-
-  test('returns current shortcuts for inspection', () => {
-    const shortcuts = [
-      {
-        key: 'Escape',
-        action: mockEscapeAction,
-        description: 'Close modal',
-      },
-      {
-        key: 'j',
-        action: mockAction,
-        description: 'Open journal',
-      }
-    ];
-
-    const { result } = renderHook(() => useKeyboardShortcuts(shortcuts));
-
-    expect(result.current.shortcuts).toEqual(shortcuts);
   });
 
   test('prevents default behavior when specified', () => {

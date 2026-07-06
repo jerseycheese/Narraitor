@@ -3,11 +3,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
 import { getAIConfig } from '../lib/ai/config';
+import { resolveApiKey } from '../lib/ai/resolveApiKey';
+import { createAPIErrorResponse } from '../lib/utils/errorUtils';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ApiHelpers');
 
 /**
  * Get client IP address from request headers
  */
-export function getClientIP(request: NextRequest): string {
+function getClientIP(request: NextRequest): string {
   // Check various headers that might contain the real IP
   return (
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -22,7 +27,7 @@ export function getClientIP(request: NextRequest): string {
  * Handle rate limiting for API requests
  * Returns both the rate limit result and a NextResponse if rate limit is exceeded
  */
-export function handleRateLimiting(request: NextRequest): {
+function handleRateLimiting(request: NextRequest): {
   response: NextResponse | null;
   result: RateLimitResult;
 } {
@@ -55,7 +60,7 @@ export function handleRateLimiting(request: NextRequest): {
 /**
  * Validate basic request structure for AI endpoints
  */
-export async function validateAIRequest(request: NextRequest): Promise<{
+async function validateAIRequest(request: NextRequest): Promise<{
   prompt: string;
   config?: {
     maxTokens?: number;
@@ -76,29 +81,39 @@ export async function validateAIRequest(request: NextRequest): Promise<{
 }
 
 /**
- * Get and validate API key
- */
-export function validateAPIKey(): string | null {
-  const apiKey = process.env.GEMINI_API_KEY;
-  
-  if (!apiKey || apiKey === 'MOCK_API_KEY') {
-    return null;
-  }
-  
-  return apiKey;
-}
-
-/**
  * Create rate limit headers for successful responses
  * Uses the existing rate limit result to avoid double-counting
  */
-export function createRateLimitHeaders(result: RateLimitResult): Record<string, string> {
+function createRateLimitHeaders(result: RateLimitResult): Record<string, string> {
   return {
     'X-RateLimit-Limit': '50',
     'X-RateLimit-Remaining': result.remaining.toString(),
     'X-RateLimit-Reset': Math.ceil(result.resetTime / 1000).toString()
   };
 }
+
+// Harm categories are always returned in this order; per-rating thresholds line up by index.
+const HARM_CATEGORIES = [
+  'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+  'HARM_CATEGORY_HATE_SPEECH',
+  'HARM_CATEGORY_HARASSMENT',
+  'HARM_CATEGORY_DANGEROUS_CONTENT',
+] as const;
+
+const MEDIUM = 'BLOCK_MEDIUM_AND_ABOVE';
+const HIGH = 'BLOCK_ONLY_HIGH';
+const NONE = 'BLOCK_NONE';
+
+// Thresholds per content rating, ordered [sexual, hate, harassment, dangerous].
+const RATING_THRESHOLDS: Record<string, readonly [string, string, string, string]> = {
+  g: [MEDIUM, MEDIUM, MEDIUM, MEDIUM],
+  pg: [HIGH, HIGH, HIGH, HIGH],
+  'pg-13': [HIGH, HIGH, HIGH, HIGH],
+  r: [NONE, HIGH, HIGH, HIGH],
+  'nc-17': [NONE, HIGH, NONE, HIGH],
+};
+
+const DEFAULT_THRESHOLDS: readonly [string, string, string, string] = [MEDIUM, MEDIUM, MEDIUM, MEDIUM];
 
 /**
  * Extract tone settings from prompt and return appropriate safety settings
@@ -111,56 +126,8 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
   const contentRatingMatch = prompt.match(/((?:PG-13|NC-17|[A-Z]+))-RATED CONTENT GUIDELINES/i);
   const contentRating = contentRatingMatch?.[1]?.toLowerCase() || '';
 
-  // Map content ratings to safety thresholds
-  switch (contentRating) {
-    case 'g':
-      // G-rated: Block medium and above content
-      const gSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
-      ];
-      return gSettings;
-    case 'pg':
-    case 'pg-13':
-      // PG/PG-13: Block only high content
-      const pgSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
-      ];
-      return pgSettings;
-    case 'r':
-      // R-rated: Permissive for sexual content.
-      const rSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
-      ];
-      return rSettings;
-    case 'nc-17':
-      // NC-17: Highly permissive, no blocking on sexual content or harassment.
-      const nc17Settings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
-      ];
-      return nc17Settings;
-    default:
-      // Default: Medium filtering for safety
-      const defaultSettings = [
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
-      ];
-
-      return defaultSettings;
-  }
+  const thresholds = RATING_THRESHOLDS[contentRating] ?? DEFAULT_THRESHOLDS;
+  return HARM_CATEGORIES.map((category, i) => ({ category, threshold: thresholds[i] }));
 }
 
 
@@ -210,7 +177,7 @@ export async function makeGeminiRequest(
 /**
  * Response structure for Gemini text generation
  */
-export interface GeminiTextResponse {
+interface GeminiTextResponse {
   content: string;
   finishReason?: string;
   promptTokens?: number;
@@ -243,9 +210,6 @@ export async function processGeminiTextRequest(
     errorContext = 'Generation'
   } = options;
 
-  // Lazy import to avoid circular dependency
-  const { createAPIErrorResponse } = await import('../lib/utils/errorUtils');
-
   try {
     // Rate limiting
     const { response: rateLimitResponse, result: rateLimitResult } = handleRateLimiting(request);
@@ -262,8 +226,8 @@ export async function processGeminiTextRequest(
       );
     }
 
-    // Validate API key
-    const apiKey = validateAPIKey();
+    // Resolve the effective key: the player's BYO key (header) -> env fallback.
+    const apiKey = resolveApiKey(request);
     if (!apiKey) {
       return createAPIErrorResponse(
         new Error('Service configuration error: API key not configured'),
@@ -283,7 +247,10 @@ export async function processGeminiTextRequest(
           temperature: requestData.config?.temperature || temperature,
           topP: 1.0,
           topK: 40,
-          maxOutputTokens: requestData.config?.maxTokens || maxTokens
+          maxOutputTokens: requestData.config?.maxTokens || maxTokens,
+          // Disable gemini-2.5-flash dynamic thinking: it adds latency and eats
+          // into the (small) maxOutputTokens budget meant for visible prose.
+          thinkingConfig: { thinkingBudget: 0 }
         },
         safetySettings: getSafetySettingsFromPrompt(requestData.prompt)
       }
@@ -291,7 +258,7 @@ export async function processGeminiTextRequest(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API Error:', {
+      logger.error('Gemini API Error:', {
         status: response.status,
         statusText: response.statusText,
         errorText: errorText
@@ -311,7 +278,7 @@ export async function processGeminiTextRequest(
 
     // Extract content from response
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
-      console.error('API Response structure issue:', {
+      logger.error('API Response structure issue:', {
         hasCandidates: !!data.candidates,
         candidatesLength: data.candidates?.length,
         hasFirstCandidate: !!data.candidates?.[0],
@@ -345,7 +312,7 @@ export async function processGeminiTextRequest(
     });
 
   } catch (error) {
-    console.error(`${errorContext} error:`, error);
+    logger.error(`${errorContext} error:`, error);
 
     return createAPIErrorResponse(
       error instanceof Error ? error : new Error('Unknown error occurred'),

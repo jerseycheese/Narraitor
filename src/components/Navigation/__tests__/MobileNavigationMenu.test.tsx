@@ -22,8 +22,12 @@ jest.mock('../TutorialMenu', () => ({
   TutorialMenu: () => <div data-testid="tutorial-menu">Tutorials</div>,
 }));
 
+jest.mock('../ThemeMenu', () => ({
+  ThemeMenu: () => <div data-testid="theme-menu">Appearance</div>,
+}));
+
 describe('MobileNavigationMenu', () => {
-  it('shows tutorial menu when mobile menu is open', () => {
+  it('shows appearance and tutorial menus when mobile menu is open', () => {
     render(
       <MobileNavigationMenu
         isOpen={true}
@@ -32,6 +36,7 @@ describe('MobileNavigationMenu', () => {
       />
     );
 
+    expect(screen.getByTestId('theme-menu')).toBeInTheDocument();
     expect(screen.getByTestId('tutorial-menu')).toBeInTheDocument();
   });
 });

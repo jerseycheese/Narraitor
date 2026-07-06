@@ -104,6 +104,122 @@ export async function seedBaseData(page: Page): Promise<void> {
 }
 
 /**
+ * Barely-started seeding: one world, no characters, no sessions.
+ *
+ * Renders DashboardHome in its returning-no-session state — the only
+ * state that puts the Getting Started step checklist (1/3 complete)
+ * and the section interiors on screen. The completed intro phase is
+ * what keeps DashboardHome from routing to GuidedFirstTimeExperience.
+ */
+export async function seedBarelyStartedData(page: Page): Promise<void> {
+  console.log('Seeding barely-started data (one world, no characters/sessions)...');
+
+  await page.addInitScript(
+    async ({ world }) => {
+      localStorage.clear();
+
+      const seedStore = async (key: string, value: Record<string, unknown>) => {
+        return new Promise((resolve) => {
+          const request = indexedDB.open('narraitor-state', 1);
+
+          request.onupgradeneeded = (event) => {
+            const db = (event.target as IDBOpenDBRequest).result;
+            if (!db.objectStoreNames.contains('narraitor-store')) {
+              db.createObjectStore('narraitor-store');
+            }
+          };
+
+          request.onsuccess = (event) => {
+            const db = (event.target as IDBOpenDBRequest).result;
+            const tx = db.transaction(['narraitor-store'], 'readwrite');
+            const store = tx.objectStore('narraitor-store');
+            const put = store.put({ id: key, value }, key);
+            put.onsuccess = () => resolve('✅');
+            put.onerror = () => resolve('❌');
+          };
+
+          request.onerror = () => resolve('❌');
+        });
+      };
+
+      const stores = {
+        world: {
+          state: {
+            worlds: { [world.id]: world },
+            currentWorldId: world.id,
+            error: null,
+            loading: false,
+          },
+          version: 1,
+        },
+        character: {
+          state: { characters: {}, currentCharacterId: null, error: null, loading: false },
+          version: 1,
+        },
+        session: {
+          state: {
+            savedSessions: {},
+            // intro complete -> isFirstTimeUser() is false -> DashboardHome
+            // renders the dashboard instead of GuidedFirstTimeExperience.
+            // Seeded at version 4 so the store skips its migrate() pass,
+            // which would otherwise reset intro.completed to false.
+            tutorialProgress: {
+              phases: {
+                intro: { completed: true, skipped: false },
+                worldCreation: { completed: true, skipped: false, lastStep: 999 },
+                worldGeneration: { completed: true, skipped: false, lastStep: 0 },
+                characterCreation: { completed: true, skipped: false, lastStep: 5 },
+                firstPlay: { completed: true, skipped: false },
+              },
+              dismissedHints: [],
+              lastActiveStep: null,
+            },
+            error: null,
+            loading: false,
+          },
+          version: 4,
+        },
+        narrative: {
+          state: {
+            segments: {},
+            sessionSegments: {},
+            decisions: {},
+            sessionDecisions: {},
+            endedSessions: {},
+            currentEnding: null,
+            isGeneratingEnding: false,
+            endingError: null,
+            error: null,
+            loading: false,
+          },
+          version: 1,
+        },
+        journal: {
+          state: { entries: {}, sessionEntries: {} },
+          version: 1,
+        },
+      };
+
+      await Promise.all([
+        seedStore('narraitor-world-store', stores.world),
+        seedStore('narraitor-character-store', stores.character),
+        seedStore('narraitor-session-store', stores.session),
+        seedStore('narraitor-narrative-store', stores.narrative),
+        seedStore('narraitor-journal-store', stores.journal),
+      ]);
+
+      Object.entries(stores).forEach(([name, data]) => {
+        localStorage.setItem(`narraitor-${name}-store`, JSON.stringify(data));
+      });
+
+      (window as any).__TEST_SEEDED__ = true;
+      console.log('✅ Barely-started data seeded');
+    },
+    { world: SAMPLE_WORLDS[0] }
+  );
+}
+
+/**
  * Full data seeding for populated state tests
  * Simplified approach with single seeding strategy
  */

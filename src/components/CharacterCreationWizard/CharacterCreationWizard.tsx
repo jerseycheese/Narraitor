@@ -14,7 +14,6 @@ import {
 } from '@/components/shared/wizard';
 import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
-import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { BasicInfoStep } from './steps/BasicInfoStep';
 import { AttributesStep } from './steps/AttributesStep';
 import { SkillsStep } from './steps/SkillsStep';
@@ -199,7 +198,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     for (let i = 0; i < steps.length; i++) {
       const validator = stepValidators[i];
       if (validator) {
-        const validation = validator.validate(wizard.state.data);
+        const validation = validator(wizard.state.data);
         if (!validation.valid) {
           wizard.goToStep(i);
           wizard.setValidation(i, validation);
@@ -253,35 +252,29 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     switch (wizard.state.currentStep) {
       case 0:
         return (
-          <div data-tutorial="template-selector">
-            <TemplateSelectionStep {...props} />
-          </div>
-        );
-      case 1:
-        return (
           <div data-tutorial="basic-info">
             <BasicInfoStep {...props} />
           </div>
         );
-      case 2:
+      case 1:
         return (
           <div data-tutorial="attribute-allocation">
             <AttributesStep {...props} />
           </div>
         );
-      case 3:
+      case 2:
         return (
           <div data-tutorial="skill-selection">
             <SkillsStep {...props} />
           </div>
         );
-      case 4:
+      case 3:
         return (
           <div data-tutorial="background-editor">
             <BackgroundStep {...props} />
           </div>
         );
-      case 5:
+      case 4:
         return (
           <div data-tutorial="portrait-generator">
             <PortraitStep {...props} />
@@ -298,7 +291,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   return (
     <>
-      <WizardContainer title={`Create Character in ${world.name}`} className="component-character-creation-wizard">
+      <WizardContainer title={`Create Character in ${world.name}`} titleElement="h2" className="component-character-creation-wizard">
         <div>
           {/* Auto-save status indicator */}
           <div>

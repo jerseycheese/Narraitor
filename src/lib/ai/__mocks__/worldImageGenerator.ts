@@ -13,13 +13,7 @@ const mockWorldImages: Record<string, string> = {
   default: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWQiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzg3Q0VGQSIvPgogICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZFNEQyIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0idXJsKCNncmFkKSIvPgogIDxjaXJjbGUgY3g9IjcwMCIgY3k9IjgwIiByPSI1MCIgZmlsbD0iI0ZGRkYwMCIgb3BhY2l0eT0iMC45Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSIyMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC4zIj5XT1JMRDwvdGV4dD4KPC9zdmc+'
 };
 
-export class WorldImageGenerator {
-  constructor() {}
-
-  /**
-   * Generate a prompt for a world environment image
-   */
-  private buildPrompt(world: World): string {
+function buildPrompt(world: World): string {
     const subject: string[] = [];
     const context: string[] = [];
     const style: string[] = [];
@@ -107,38 +101,31 @@ export class WorldImageGenerator {
     return promptParts.join(', ');
   }
 
-  /**
-   * Generate an image for a world (mocked version)
-   */
-  async generateWorldImage(world: World): Promise<GeneratedImage> {
-    // Simulate async delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Randomly fail sometimes to test error handling
-    if (Math.random() < 0.1) {
-      throw new Error('Mock world image generation failed');
-    }
+export async function generateWorldImage(world: World): Promise<GeneratedImage> {
+  await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const prompt = this.buildPrompt(world);
-    const genreLC = world.genre.toLowerCase();
-    
-    // Select appropriate mock image based on theme
-    let mockImage = mockWorldImages.default;
-    if (genreLC.includes('fantasy')) {
-      mockImage = mockWorldImages.fantasy;
-    } else if (genreLC.includes('cyberpunk')) {
-      mockImage = mockWorldImages.cyberpunk;
-    } else if (genreLC.includes('horror')) {
-      mockImage = mockWorldImages.horror;
-    } else if (genreLC.includes('western')) {
-      mockImage = mockWorldImages.western;
-    }
-    
-    return {
-      type: 'ai-generated',
-      url: mockImage,
-      generatedAt: getTimestamp(),
-      prompt: prompt
-    };
+  if (Math.random() < 0.1) {
+    throw new Error('Mock world image generation failed');
   }
+
+  const prompt = buildPrompt(world);
+  const genreLC = world.genre.toLowerCase();
+
+  let mockImage = mockWorldImages.default;
+  if (genreLC.includes('fantasy')) {
+    mockImage = mockWorldImages.fantasy;
+  } else if (genreLC.includes('cyberpunk')) {
+    mockImage = mockWorldImages.cyberpunk;
+  } else if (genreLC.includes('horror')) {
+    mockImage = mockWorldImages.horror;
+  } else if (genreLC.includes('western')) {
+    mockImage = mockWorldImages.western;
+  }
+
+  return {
+    type: 'ai-generated',
+    url: mockImage,
+    generatedAt: getTimestamp(),
+    prompt: prompt
+  };
 }

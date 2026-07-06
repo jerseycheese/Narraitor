@@ -1,6 +1,9 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGameSessionState } from './useGameSessionState';
 import { createMockWorld, createMockCharacter, createMockWorldStore, createMockCharacterStore, createMockSessionStore } from '@/lib/test-utils';
+import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
 
 // Create test fixtures
 const testWorld = createMockWorld({
@@ -70,6 +73,10 @@ jest.mock('@/state/characterStore', () => ({
 describe('useGameSessionState', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Re-establish default store state so a per-test override (below) can't leak.
+    (useWorldStore as unknown as jest.Mock).mockReturnValue(mockWorldStoreState);
+    (useSessionStore as unknown as jest.Mock).mockReturnValue(mockSessionStoreState);
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStoreState);
   });
 
   test('initializes with session store state', () => {
@@ -85,12 +92,7 @@ describe('useGameSessionState', () => {
   test('handles choice selection', () => {
     const { result } = renderHook(() => useGameSessionState({
       worldId: 'test-world',
-      isClient: true,
-      _stores: {
-        worldStore: mockWorldStoreState,
-        sessionStore: mockSessionStoreState,
-        characterStore: mockCharacterStoreState
-      }
+      isClient: true
     }));
 
     act(() => {
@@ -108,12 +110,7 @@ describe('useGameSessionState', () => {
       worldId: 'test-world',
       isClient: true,
       onSessionEnd,
-      router,
-      _stores: {
-        worldStore: mockWorldStoreState,
-        sessionStore: mockSessionStoreState,
-        characterStore: mockCharacterStoreState
-      }
+      router
     }));
 
     act(() => {
@@ -130,12 +127,7 @@ describe('useGameSessionState', () => {
     const { result } = renderHook(() => useGameSessionState({
       worldId: 'test-world',
       isClient: true,
-      onSessionStart,
-      _stores: {
-        worldStore: mockWorldStoreState,
-        sessionStore: mockSessionStoreState,
-        characterStore: mockCharacterStoreState
-      }
+      onSessionStart
     }));
 
     // Set error state
@@ -172,21 +164,16 @@ describe('useGameSessionState', () => {
 
   test('handles retry when no character is selected', () => {
     const onSessionStart = jest.fn();
-    const mockStoresWithoutCharacter = {
-      worldStore: mockWorldStoreState,
-      sessionStore: mockSessionStoreState,
-      characterStore: { 
-        ...mockCharacterStoreState, 
-        currentCharacterId: null,
-        characters: {} // No characters for this world
-      }
-    };
-    
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
+      ...mockCharacterStoreState,
+      currentCharacterId: null,
+      characters: {} // No characters for this world
+    });
+
     const { result } = renderHook(() => useGameSessionState({
       worldId: 'test-world',
       isClient: true,
-      onSessionStart,
-      _stores: mockStoresWithoutCharacter
+      onSessionStart
     }));
 
     // The hook should calculate that there are no characters available

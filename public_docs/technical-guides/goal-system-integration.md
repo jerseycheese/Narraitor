@@ -7,7 +7,7 @@ So the goal tracking system was built to solve the problem of AI narratives that
 The goal tracking system integrates with existing stores through well-defined interfaces, maintaining separation of concerns while enabling narrative consistency tracking. The idea is that each store handles what it's good at, but they work together to maintain story coherence.
 
 ### Store Integration Pattern
-The flow is: `narrativeStore (segments) → goalStore (extraction) → aiContextStore (context building)`
+The flow runs from `narrativeStore` (segments) to `goalStore` (extraction) to `aiContextStore` (context building).
 
 Basically, as new story segments are created, the goal store processes them to extract and update goals, then the AI context store includes those goals in future prompts.
 
@@ -113,10 +113,10 @@ When the AI needs to generate new content:
 ### Goal Lifecycle Flow
 A goal's journey through the system:
 
-1. Goal extracted from narrative → status: 'active'
-2. Goal mentioned in subsequent segments → mentionCount++
-3. Goal progress tracked → progressNotes added
-4. Goal completed/abandoned → status updated, completedAt set
+1. Goal extracted from narrative, set to status `active`
+2. Goal mentioned in subsequent segments, so `mentionCount` increments
+3. Goal progress tracked, so `progressNotes` get added
+4. Goal completed or abandoned, so `status` updates and `completedAt` is set
 
 ## Persistence Integration
 

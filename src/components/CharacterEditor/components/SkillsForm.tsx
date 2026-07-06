@@ -106,6 +106,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                 onChange={newValue => handleValueChange(skill.id, newValue)}
                 disabled={false}
                 showLabel={false}
+                ariaLabel={`${worldSkill?.name || `Skill ${index + 1}`} skill level`}
                 testId={`skill-${skill.id}`}
               />
               <div className="skills-form-meta">

@@ -80,7 +80,20 @@ export default function CharacterViewPage() {
   ];
 
   return (
-    <PageLayout>
+    <PageLayout
+      title={character.name}
+      description={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
+      actions={
+        <ActionButtonGroup 
+          actions={actionButtons.map(btn => ({
+            ...btn,
+            flex: btn.variant === 'primary' || btn.variant === 'success'
+          }))} 
+          layout="horizontal" 
+          gap="sm" 
+        />
+      }
+    >
       {/* Ultra-thin world hero */}
       {world.image?.url && (
         <div className="character-detail-hero">
@@ -91,7 +104,7 @@ export default function CharacterViewPage() {
               alt: `${world.name} world`,
             }}
             subtitle={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
-            titleElement="h1"
+            titleElement="h2"
           />
         </div>
       )}
@@ -102,8 +115,6 @@ export default function CharacterViewPage() {
           <BackNavigation href="/characters" label="Back to Characters" />
         </div>
       )}
-
-      <ActionButtonGroup actions={actionButtons} />
 
       <div className="character-detail-body">
         <CharacterHeader character={character} world={world} />

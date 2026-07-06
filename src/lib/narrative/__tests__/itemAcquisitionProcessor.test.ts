@@ -2,13 +2,16 @@
 
 import { processAcquiredItems } from '../itemAcquisitionProcessor';
 import { useInventoryStore } from '@/state/inventoryStore';
-import { categorizeInventoryItemClient } from '@/lib/inventory/categorizeInventoryItemClient';
+import { categorizeInventoryItemsClient } from '@/lib/inventory/categorizeInventoryItemClient';
 import { checkItemSimilarityClient } from '@/lib/inventory/checkItemSimilarityClient';
 import type { AcquiredItemMetadata } from '@/types/narrative.types';
 import { mockZustandStore, createMockInventoryStore } from '@/lib/test-utils';
 import type { InventoryItem } from '@/types/inventory.types';
+import type { InventoryCategorizationResponse } from '@/lib/inventory/categorizeInventoryItemClient';
+import { logger } from '@/lib/utils/logger';
 
 // Mock the dependencies
+jest.mock('@/lib/utils/logger');
 jest.mock('@/state/inventoryStore');
 jest.mock('@/lib/inventory/categorizeInventoryItemClient');
 jest.mock('@/lib/inventory/checkItemSimilarityClient');
@@ -22,19 +25,38 @@ describe('itemAcquisitionProcessor', () => {
   let mockAddItem: jest.Mock;
   let mockGetCharacterItems: jest.Mock;
   let mockUpdateItemQuantity: jest.Mock;
-  const mockCategorize = categorizeInventoryItemClient as jest.MockedFunction<
-    typeof categorizeInventoryItemClient
+  const mockCategorizeBatch = categorizeInventoryItemsClient as jest.MockedFunction<
+    typeof categorizeInventoryItemsClient
   >;
+  // Tests configure per-item categorization through mockCategorize; the batch
+  // client mock below fans each batched item out to it so existing single-item
+  // expectations (call args, counts, order, rejection) keep working unchanged.
+  const mockCategorize = jest.fn<
+    Promise<InventoryCategorizationResponse>,
+    [{ name: string; description?: string }]
+  >();
   const mockCheckSimilarity = checkItemSimilarityClient as jest.MockedFunction<
     typeof checkItemSimilarityClient
   >;
-  let warnSpy: jest.SpyInstance;
   let characterItems: InventoryItem[];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     characterItems = [] as InventoryItem[];
+
+    // Fan a batched categorization request out to the per-item mockCategorize,
+    // preserving order so mockResolvedValueOnce chains line up with inputs. If
+    // mockCategorize rejects, the whole batch rejects (matching the real client
+    // throwing on a failed request, which the processor then falls back from).
+    mockCategorizeBatch.mockImplementation(async (items) => {
+      const results: InventoryCategorizationResponse[] = [];
+      for (const item of items) {
+        results.push(
+          await mockCategorize({ name: item.name, description: item.description })
+        );
+      }
+      return results;
+    });
 
     // Mock AI similarity checker with smart matching logic
     mockCheckSimilarity.mockImplementation(async ({ name1, name2 }) => {
@@ -90,9 +112,6 @@ describe('itemAcquisitionProcessor', () => {
     );
   });
 
-  afterEach(() => {
-    warnSpy?.mockRestore();
-  });
 
   describe('processAcquiredItems', () => {
     it('adds item to inventory when AI returns item metadata', async () => {
@@ -140,6 +159,92 @@ describe('itemAcquisitionProcessor', () => {
           acquiredAt: expect.any(String),
         },
       });
+    });
+
+    it('uses a valid category hint without calling the categorization client', async () => {
+      const itemMetadata: AcquiredItemMetadata = {
+        name: 'Rusty Key',
+        description: 'Opens the ancient door',
+        quantity: 1,
+        acquisitionMethod: 'loot',
+        categoryHint: 'quest-items',
+      };
+
+      await processAcquiredItems([itemMetadata], 'character-123', 'session-456');
+
+      expect(mockCategorizeBatch).not.toHaveBeenCalled();
+      expect(mockCategorize).not.toHaveBeenCalled();
+      expect(mockAddItem).toHaveBeenCalledWith(
+        'character-123',
+        expect.objectContaining({
+          name: 'Rusty Key',
+          categorization: expect.objectContaining({
+            categoryId: 'quest-items',
+            source: 'narrative-context',
+          }),
+        })
+      );
+    });
+
+    it('falls back to AI categorization when the hint is invalid', async () => {
+      const itemMetadata = {
+        name: 'Mystery Box',
+        description: 'Unmarked crate',
+        quantity: 1,
+        acquisitionMethod: 'loot',
+        categoryHint: 'not-a-real-category',
+      } as unknown as AcquiredItemMetadata;
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'miscellaneous',
+        source: 'ai',
+        confidence: 0.6,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems([itemMetadata], 'character-123', 'session-456');
+
+      expect(mockCategorize).toHaveBeenCalledTimes(1);
+      expect(mockAddItem).toHaveBeenCalledWith(
+        'character-123',
+        expect.objectContaining({
+          categorization: expect.objectContaining({ source: 'ai' }),
+        })
+      );
+    });
+
+    it('only sends hint-less items to the batch categorization client', async () => {
+      const items: AcquiredItemMetadata[] = [
+        {
+          name: 'Iron Sword',
+          description: 'A sturdy blade',
+          quantity: 1,
+          acquisitionMethod: 'loot',
+          categoryHint: 'equipment',
+        },
+        {
+          name: 'Strange Trinket',
+          description: 'Hard to place',
+          quantity: 1,
+          acquisitionMethod: 'loot',
+        },
+      ];
+
+      mockCategorize.mockResolvedValue({
+        categoryId: 'miscellaneous',
+        source: 'ai',
+        confidence: 0.5,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      await processAcquiredItems(items, 'character-123', 'session-456');
+
+      // Batched once, carrying only the hint-less item.
+      expect(mockCategorizeBatch).toHaveBeenCalledTimes(1);
+      expect(mockCategorizeBatch).toHaveBeenCalledWith([
+        { name: 'Strange Trinket', description: 'Hard to place' },
+      ]);
+      expect(mockAddItem).toHaveBeenCalledTimes(2);
     });
 
     it('handles multiple items acquired at once', async () => {
@@ -396,7 +501,7 @@ describe('itemAcquisitionProcessor', () => {
         })
       );
       expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
-      expect(warnSpy).not.toHaveBeenCalled();
+      expect(logger.warn).not.toHaveBeenCalled();
     });
 
     it('deduplicates identical equipment in the same batch and keeps one', async () => {
@@ -415,7 +520,7 @@ describe('itemAcquisitionProcessor', () => {
       await processAcquiredItems(items, 'character-123', 'session-456');
 
       expect(mockAddItem).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
     });
 
     it('merges equipment with the same name even when descriptions differ', async () => {
@@ -434,7 +539,7 @@ describe('itemAcquisitionProcessor', () => {
       await processAcquiredItems(items, 'character-123', 'session-456');
 
       expect(mockAddItem).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
       const storedDescription = characterItems[0]?.description;
       expect(storedDescription === 'Sharp edge' || storedDescription === 'Rusty blade').toBe(true);
     });
@@ -479,7 +584,7 @@ describe('itemAcquisitionProcessor', () => {
 
       expect(mockAddItem).toHaveBeenCalledTimes(1);
       expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
-      expect(warnSpy).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
     });
 
     it('prevents duplicate equipment even if AI category changes across segments', async () => {
@@ -507,7 +612,7 @@ describe('itemAcquisitionProcessor', () => {
 
       expect(mockAddItem).toHaveBeenCalledTimes(1);
       expect(mockUpdateItemQuantity).not.toHaveBeenCalled();
-      expect(warnSpy).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
     });
 
     it('deduplicates equipment with semantically similar names (e.g., "Lantern" vs "Rusty Kerosene Lantern")', async () => {
@@ -534,7 +639,7 @@ describe('itemAcquisitionProcessor', () => {
 
       // Should only add once (first item)
       expect(mockAddItem).toHaveBeenCalledTimes(1);
-      expect(warnSpy).toHaveBeenCalledWith(
+      expect(logger.warn).toHaveBeenCalledWith(
         expect.stringContaining('Item "Lantern" already exists')
       );
     });
@@ -643,22 +748,6 @@ describe('itemAcquisitionProcessor', () => {
       expect(mockAddItem).toHaveBeenCalledWith('character-123', expect.objectContaining({
         quantity: 3, // All three merged correctly
       }));
-    });
-
-    it('documents that AI handles complex semantic matches', () => {
-      // This test documents the expected behavior for AI-based matching.
-      // In real usage with the actual AI API, it would handle cases like:
-      // - "Photo of Mom" vs "Photo of your mother" (synonyms + possessives)
-      // - "Dad's Watch" vs "Father's Timepiece" (synonyms + word order)
-      // - "Healing Draught" vs "Curative Elixir" (complete synonym replacement)
-      //
-      // The mock in beforeEach() simulates this by handling:
-      // - Exact matches
-      // - Substring matches (e.g., "Potion" in "Health Potion")
-      // - Singular/plural (e.g., "Coin" vs "Coins")
-      //
-      // Real AI would go beyond simple string matching to understand semantic meaning.
-      expect(mockCheckSimilarity).toBeDefined();
     });
   });
 });

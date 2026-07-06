@@ -1,5 +1,5 @@
-import { parseChoiceResponse } from '../choiceGenerator.parser';
-import type { NarrativeContext } from '@/types/narrative.types';
+import { parseChoiceResponse, applyAlignmentConsequences } from '../choiceGenerator.parser';
+import type { Decision, NarrativeContext } from '@/types/narrative.types';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 
 const narrativeContext: NarrativeContext = {
@@ -126,5 +126,134 @@ Requirements: [Stealth 5+]
       operator: 'gte',
       value: 5,
     });
+  });
+});
+
+describe('parseChoiceResponse consequences', () => {
+  const knownNpcs = [
+    { id: 'npc-1', name: 'Marta' },
+    { id: 'npc-2', name: 'Guild Master Hollis' },
+  ];
+
+  const buildContent = (consequencesLine: string) => `Decision Weight: [major]
+Decision: What do you do?
+
+1. [Lawful] Return the ledger to Marta
+${consequencesLine}
+2. [Neutral] Walk away`;
+
+  it('parses trust deltas against the known NPC roster', () => {
+    const world = createMockWorld({ id: 'world-1' });
+    const decision = parseChoiceResponse(
+      buildContent('Consequences: Marta trust +10, Guild Master Hollis trust -5'),
+      narrativeContext,
+      world,
+      knownNpcs
+    );
+
+    expect(decision.options[0].consequences).toEqual(
+      expect.arrayContaining([
+        { type: 'relationship', action: 'modify', targetId: 'npc-1', value: { trustDelta: 10 } },
+        { type: 'relationship', action: 'modify', targetId: 'npc-2', value: { trustDelta: -5 } },
+      ])
+    );
+  });
+
+  it('resolves NPC names case-insensitively and clamps deltas to +/-20', () => {
+    const world = createMockWorld({ id: 'world-1' });
+    const decision = parseChoiceResponse(
+      buildContent('Consequences: MARTA trust -75'),
+      narrativeContext,
+      world,
+      knownNpcs
+    );
+
+    const relationship = decision.options[0].consequences?.find(
+      (consequence) => consequence.type === 'relationship'
+    );
+    expect(relationship).toEqual({
+      type: 'relationship',
+      action: 'modify',
+      targetId: 'npc-1',
+      value: { trustDelta: -20 },
+    });
+  });
+
+  it('drops consequences naming unknown characters', () => {
+    const world = createMockWorld({ id: 'world-1' });
+    const decision = parseChoiceResponse(
+      buildContent('Consequences: Stranger trust +10'),
+      narrativeContext,
+      world,
+      knownNpcs
+    );
+
+    const relationships = decision.options[0].consequences?.filter(
+      (consequence) => consequence.type === 'relationship'
+    );
+    expect(relationships ?? []).toHaveLength(0);
+  });
+
+  it('leaves options without a Consequences line free of relationship consequences', () => {
+    const world = createMockWorld({ id: 'world-1' });
+    const decision = parseChoiceResponse(
+      buildContent('Hint: Just a hint'),
+      narrativeContext,
+      world,
+      knownNpcs
+    );
+
+    expect(
+      decision.options.flatMap((option) =>
+        (option.consequences ?? []).filter((c) => c.type === 'relationship')
+      )
+    ).toHaveLength(0);
+  });
+});
+
+describe('applyAlignmentConsequences', () => {
+  const makeDecision = (decisionWeight?: 'minor' | 'major' | 'critical'): Decision => ({
+    id: 'decision-1',
+    prompt: 'What do you do?',
+    decisionWeight,
+    options: [
+      { id: 'opt-1', text: 'Follow the law', alignment: 'lawful' },
+      { id: 'opt-2', text: 'Stay practical', alignment: 'neutral' },
+      { id: 'opt-3', text: 'Burn it down', alignment: 'chaotic' },
+    ],
+  });
+
+  it('adds signed alignment consequences scaled by decision weight', () => {
+    const decision = applyAlignmentConsequences(makeDecision('critical'));
+
+    expect(decision.options[0].consequences).toEqual([
+      { type: 'alignment', action: 'add', targetId: 'player-alignment', value: 12 },
+    ]);
+    expect(decision.options[2].consequences).toEqual([
+      { type: 'alignment', action: 'add', targetId: 'player-alignment', value: -12 },
+    ]);
+  });
+
+  it('defaults to the minor magnitude and skips neutral options', () => {
+    const decision = applyAlignmentConsequences(makeDecision());
+
+    expect(decision.options[0].consequences?.[0].value).toBe(4);
+    expect(decision.options[1].consequences).toBeUndefined();
+  });
+
+  it('does not duplicate an existing alignment consequence', () => {
+    const base = makeDecision('major');
+    base.options[0] = {
+      ...base.options[0],
+      consequences: [
+        { type: 'alignment', action: 'add', targetId: 'player-alignment', value: 8 },
+      ],
+    };
+
+    const decision = applyAlignmentConsequences(applyAlignmentConsequences(base));
+
+    expect(
+      decision.options[0].consequences?.filter((c) => c.type === 'alignment')
+    ).toHaveLength(1);
   });
 });

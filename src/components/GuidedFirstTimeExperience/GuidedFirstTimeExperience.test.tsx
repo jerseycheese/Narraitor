@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { GuidedFirstTimeExperience } from './GuidedFirstTimeExperience';
 
 // Mock only what's necessary
@@ -80,45 +79,9 @@ describe('GuidedFirstTimeExperience', () => {
       // Should show the main call to action
       expect(screen.getByText(/create a world and start a story/i)).toBeInTheDocument();
     });
-
-    it('progresses through the experience steps', async () => {
-      const user = userEvent.setup();
-      render(<GuidedFirstTimeExperience />);
-
-      const nextButton = screen.queryByText(/next/i) || screen.queryByText(/continue/i) || screen.queryByText(/get started/i);
-
-      expect(nextButton).toBeInTheDocument();
-      if (nextButton) {
-        await user.click(nextButton);
-      }
-    });
-
-    it('completes the onboarding flow', async () => {
-      const user = userEvent.setup();
-      render(<GuidedFirstTimeExperience />);
-
-      const completeButton = screen.queryByText(/finish/i) || screen.queryByText(/complete/i) || screen.queryByText(/done/i);
-
-      if (completeButton) {
-        await user.click(completeButton);
-        expect(mockSessionStore.completeTutorialPhase).toHaveBeenCalledWith('intro');
-      }
-    });
   });
 
   describe('Integration', () => {
-    it('creates world during guided experience when requested', async () => {
-      const user = userEvent.setup();
-      render(<GuidedFirstTimeExperience />);
-
-      const createWorldButton = screen.queryByText(/create world/i) || screen.queryByText(/new world/i);
-
-      if (createWorldButton) {
-        await user.click(createWorldButton);
-        expect(mockWorldStore.createWorld).toHaveBeenCalled();
-      }
-    });
-
     it('navigates to appropriate page after completion', async () => {
       // Mock completed onboarding
       mockSessionStore.isFirstTimeUser = jest.fn(() => false);

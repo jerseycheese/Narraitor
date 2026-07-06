@@ -29,6 +29,7 @@ export function createMockInventoryStore(
     getCharacterItems: jest.fn(() => []),
     clearCharacterInventory: jest.fn(),
     useItem: jest.fn(() => ({ success: true, message: 'Item used' })),
+    toggleEquipItem: jest.fn(() => ({ success: true, equipped: true })),
     ...overrides,
   } as InventoryStore;
 }

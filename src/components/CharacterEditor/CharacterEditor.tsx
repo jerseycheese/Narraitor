@@ -6,7 +6,7 @@ import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
-import { Button } from '@/components/ui/button';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { PortraitSection } from './components/PortraitSection';
 import { BasicInfoForm } from './components/BasicInfoForm';
@@ -14,6 +14,9 @@ import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
 import { generatePortrait } from '@/lib/api/generatePortrait';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('CharacterEditor');
 
 // Use the Character type from the store since it's different from the main types
 type Character = ReturnType<typeof useCharacterStore.getState>['characters'][string];
@@ -63,7 +66,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     } catch (err) {
       setLoadError('Failed to load character data');
       setLoading(false);
-      console.error('Error loading character:', err);
+      logger.error('Error loading character:', err);
     }
   }, [storeCharacter, characterId]);
 
@@ -100,12 +103,10 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       const { updateCharacter } = useCharacterStore.getState();
       updateCharacter(characterId, editingCharacter);
 
-      await new Promise(resolve => setTimeout(resolve, 500));
-
       router.push(`/characters/${characterId}`);
     } catch (err) {
       setLoadError('Failed to save character');
-      console.error('Error saving character:', err);
+      logger.error('Error saving character:', err);
     } finally {
       setSaving(false);
     }
@@ -124,7 +125,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     if (!editingCharacter || !world) return;
 
     setGeneratingPortrait(true);
-    setPortraitError(null);
+    setPortraitError(null); // Clear previous portrait errors
     try {
       const { portrait } = await generatePortrait({
         character: { ...editingCharacter, id: characterId },
@@ -132,12 +133,11 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         customDescription: customDescription,
       });
 
-      if (portrait) {
-        setEditingCharacter({ ...editingCharacter, portrait });
-        useCharacterStore.getState().updateCharacter(characterId, { portrait });
-      }
+      // Update both local editing state and store
+      setEditingCharacter({ ...editingCharacter, portrait });
+      useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
-      console.error('Failed to generate portrait:', error);
+      logger.error('Failed to generate portrait:', error);
       setPortraitError('Failed to generate portrait. Please try again.');
     } finally {
       setGeneratingPortrait(false);
@@ -231,17 +231,30 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       </CollapsibleSection>
       
       <div className="character-editor-actions">
-        <Button variant="destructive" onClick={() => setShowDeleteDialog(true)} disabled={saving}>
-          Delete Character
-        </Button>
-        <div className="character-editor-actions-primary">
-          <Button variant="outline" onClick={handleCancel} disabled={saving}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={saving || !isPoolValid}>
-            {saving ? 'Saving...' : 'Save Changes'}
-          </Button>
-        </div>
+        <ActionButtonGroup
+          layout="horizontal"
+          gap="md"
+          actions={[
+            {
+              label: 'Delete Character',
+              onClick: () => setShowDeleteDialog(true),
+              variant: 'danger',
+              disabled: saving,
+            },
+            {
+              label: 'Cancel',
+              onClick: handleCancel,
+              variant: 'secondary',
+              disabled: saving,
+            },
+            {
+              label: saving ? 'Saving...' : 'Save Changes',
+              onClick: handleSave,
+              variant: 'primary',
+              disabled: saving || !isPoolValid,
+            },
+          ]}
+        />
       </div>
 
       <DeleteConfirmationDialog

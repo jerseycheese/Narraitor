@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import Image from 'next/image';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
@@ -64,9 +65,23 @@ export function DashboardRecentWorlds({
               }
             }}
           >
-            <h3>{world.name}</h3>
-            <div>
-              <span>{getGenreLabel(world.genre)}</span>
+            <div className="dashboard-recent-world-content">
+              {world.image?.url && (
+                <span className="dashboard-recent-world-thumb">
+                  <Image
+                    src={world.image.url}
+                    alt=""
+                    fill
+                    sizes="64px"
+                  />
+                </span>
+              )}
+              <div>
+                <h3>{world.name}</h3>
+                <div>
+                  <span>{getGenreLabel(world.genre)}</span>
+                </div>
+              </div>
             </div>
           </div>
         ))}

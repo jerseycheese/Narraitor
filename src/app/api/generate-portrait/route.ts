@@ -6,6 +6,7 @@ import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { truncate, getTimestamp } from '@/lib/utils';
 import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 
 const logger = new Logger('API');
 
@@ -16,7 +17,8 @@ async function buildPortraitPrompt(
   characterName: string,
   physicalDescription: string,
   worldGenre: string,
-  isKnownFigure?: boolean
+  isKnownFigure?: boolean,
+  apiKey?: string | null
 ): Promise<string> {
   try {
     logger.debug(
@@ -25,15 +27,19 @@ async function buildPortraitPrompt(
       characterName
     );
 
-    // Use only the character detection part, not the full image generation
-    const { PortraitGenerator } = await import('@/lib/ai/portraitGenerator');
-    const { createDefaultGeminiClient } = await import(
-      '@/lib/ai/defaultGeminiClient'
-    );
+    // Use only the character detection part, not the full image generation.
+    // These two dynamic imports are independent, so load them in parallel
+    // rather than awaiting one after the other.
+    const [
+      { buildPortraitPrompt: buildPortraitPromptFn },
+      { createDefaultGeminiClient },
+    ] = await Promise.all([
+      import('@/lib/ai/portraitGenerator'),
+      import('@/lib/ai/defaultGeminiClient'),
+    ]);
 
     logger.debug('generate-portrait API', 'Creating AI client and generator');
-    const aiClient = createDefaultGeminiClient();
-    const generator = new PortraitGenerator(aiClient);
+    const aiClient = createDefaultGeminiClient(apiKey);
 
     // Create a minimal character object for detection
     const mockCharacter: Character = {
@@ -74,7 +80,7 @@ async function buildPortraitPrompt(
     );
 
     // Call buildPortraitPrompt directly to avoid the image generation requirement
-    const prompt = await generator.buildPortraitPrompt(mockCharacter, {
+    const prompt = await buildPortraitPromptFn(aiClient, mockCharacter, {
       worldGenre: worldGenre,
     });
 
@@ -114,6 +120,7 @@ export async function POST(request: NextRequest) {
     let prompt: string;
     let character: Character | undefined;
     let world: World | undefined;
+    const apiKey = resolveApiKey(request);
 
     if (typeof body === 'string') {
       prompt = body;
@@ -146,7 +153,8 @@ export async function POST(request: NextRequest) {
           characterName,
           physicalDesc,
           worldGenre,
-          isKnownFigure
+          isKnownFigure,
+          apiKey
         );
 
         return NextResponse.json({
@@ -167,7 +175,8 @@ export async function POST(request: NextRequest) {
           characterName,
           physicalDesc,
           worldGenre,
-          isKnownFigure
+          isKnownFigure,
+          apiKey
         );
       }
     } else {
@@ -190,9 +199,7 @@ export async function POST(request: NextRequest) {
       truncate(prompt, 100)
     );
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey || apiKey === 'MOCK_API_KEY') {
+    if (!apiKey) {
       // Return a mock portrait for development
       const mockPortrait = {
         type: 'ai-generated' as const,

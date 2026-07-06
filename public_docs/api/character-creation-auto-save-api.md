@@ -16,7 +16,6 @@ What you get back:
 interface UseCharacterCreationAutoSaveReturn {
   data: CharacterCreationState | undefined;
   setData: (newData: CharacterCreationState | undefined) => void;
-  handleFieldBlur: () => void; // @deprecated
   clearAutoSave: () => void;
   hasRecoveryData: boolean;
   recoveryPreview: RecoveryDataPreview | undefined;
@@ -31,7 +30,6 @@ interface UseCharacterCreationAutoSaveReturn {
 |----------|------|-------------|
 | `data` | `CharacterCreationState \| undefined` | Current character creation data with save metadata |
 | `setData` | `(newData: CharacterCreationState \| undefined) => void` | Function to update character data (triggers auto-save) |
-| `handleFieldBlur` | `() => void` | **@deprecated** Legacy field blur handler - auto-save is now automatic |
 | `clearAutoSave` | `() => void` | Function to clear all auto-save data and reset state |
 | `hasRecoveryData` | `boolean` | Whether recovery data was detected on mount |
 | `recoveryPreview` | `RecoveryDataPreview \| undefined` | Analyzed preview data for recovery dialog |

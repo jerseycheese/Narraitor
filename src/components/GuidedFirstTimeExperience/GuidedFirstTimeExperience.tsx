@@ -18,12 +18,14 @@ import {
   convertToGenerationParams,
   validateWorldTypeData,
 } from '@/components/shared/WorldTypeSelector';
-import { Globe, Users, Play } from 'lucide-react';
 import { worldCreationService } from '@/lib/services/worldCreationService';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('GuidedFirstTimeExperience');
 
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
@@ -130,7 +132,7 @@ export function GuidedFirstTimeExperience() {
         // Navigate to character creation to continue the flow
         router.push(`/characters/create?worldId=${worldId}`);
       } catch (error) {
-        console.error('Error completing onboarding:', error);
+        logger.error('Error completing onboarding:', error);
         throw error; // Re-throw to let wizard handle it
       }
     },
@@ -183,71 +185,52 @@ export function GuidedFirstTimeExperience() {
               className="component-guided-first-time-step-item"
               role="listitem"
             >
-              <Globe
-                className="component-guided-first-time-step-icon"
+              <div
+                className="component-guided-first-time-step-num"
                 aria-hidden="true"
-              />
-              <div className="component-guided-first-time-step-body">
-                <div
-                  className="component-guided-first-time-step-num"
-                  aria-hidden="true"
-                >
-                  1
-                </div>
-                <h4 className="component-guided-first-time-step-heading">
-                  Build Your World
-                </h4>
-                <p className="component-guided-first-time-step-copy">
-                  Create or generate unique worlds with custom rules and
-                  settings
-                </p>
+              >
+                1
               </div>
+              <h4 className="component-guided-first-time-step-heading">
+                Build a world
+              </h4>
+              <p className="component-guided-first-time-step-copy">
+                Describe a setting and its rules, or generate one to start from.
+              </p>
             </div>
             <div
               className="component-guided-first-time-step-item"
               role="listitem"
             >
-              <Users
-                className="component-guided-first-time-step-icon"
+              <div
+                className="component-guided-first-time-step-num"
                 aria-hidden="true"
-              />
-              <div className="component-guided-first-time-step-body">
-                <div
-                  className="component-guided-first-time-step-num"
-                  aria-hidden="true"
-                >
-                  2
-                </div>
-                <h4 className="component-guided-first-time-step-heading">
-                  Create Characters
-                </h4>
-                <p className="component-guided-first-time-step-copy">
-                  Design or generate playable characters that fit your world
-                </p>
+              >
+                2
               </div>
+              <h4 className="component-guided-first-time-step-heading">
+                Create a character
+              </h4>
+              <p className="component-guided-first-time-step-copy">
+                Shape who you play, with real skills the story leans on.
+              </p>
             </div>
             <div
               className="component-guided-first-time-step-item"
               role="listitem"
             >
-              <Play
-                className="component-guided-first-time-step-icon"
+              <div
+                className="component-guided-first-time-step-num"
                 aria-hidden="true"
-              />
-              <div className="component-guided-first-time-step-body">
-                <div
-                  className="component-guided-first-time-step-num"
-                  aria-hidden="true"
-                >
-                  3
-                </div>
-                <h4 className="component-guided-first-time-step-heading">
-                  Start Playing
-                </h4>
-                <p className="component-guided-first-time-step-copy">
-                  Make choices and shape your story
-                </p>
+              >
+                3
               </div>
+              <h4 className="component-guided-first-time-step-heading">
+                Play the story
+              </h4>
+              <p className="component-guided-first-time-step-copy">
+                Make choices and watch the story bend around them.
+              </p>
             </div>
           </div>
         </section>

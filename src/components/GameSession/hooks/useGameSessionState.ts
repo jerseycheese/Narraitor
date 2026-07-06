@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
@@ -48,11 +49,6 @@ interface UseGameSessionStateOptions {
   initialState?: Partial<GameSessionState>;
   disableAutoResume?: boolean;
   router?: { push: (url: string) => void };
-  _stores?: {
-    worldStore: Partial<ReturnType<typeof useWorldStore.getState>> | (() => Partial<ReturnType<typeof useWorldStore.getState>>);
-    sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
-    characterStore?: Partial<ReturnType<typeof useCharacterStore.getState>> | (() => Partial<ReturnType<typeof useCharacterStore.getState>>);
-  };
 }
 
 export const useGameSessionState = ({
@@ -63,7 +59,6 @@ export const useGameSessionState = ({
   initialState,
   disableAutoResume = false,
   router,
-  _stores,
 }: UseGameSessionStateOptions) => {
   const logger = useMemo(() => new Logger('GameSession'), []);
   
@@ -82,23 +77,37 @@ export const useGameSessionState = ({
   // Local state for error handling
   const [error, setError] = useState<Error | null>(null);
   
-  // Always call store hooks unconditionally
-  const worldStoreHook = useWorldStore();
-  const sessionStoreHook = useSessionStore();
-  const characterStoreHook = useCharacterStore();
-  
-  // Use provided stores or real stores for testing
-  const actualWorldState = _stores?.worldStore 
-    ? (typeof _stores.worldStore === 'function' ? _stores.worldStore() : _stores.worldStore) 
-    : worldStoreHook;
-  
-  const actualSessionState = _stores?.sessionStore
-    ? (typeof _stores.sessionStore === 'function' ? _stores.sessionStore() : _stores.sessionStore)
-    : sessionStoreHook;
-  
-  const actualCharacterState = _stores?.characterStore
-    ? (typeof _stores.characterStore === 'function' ? _stores.characterStore() : _stores.characterStore)
-    : characterStoreHook;
+  // Scope each store subscription to the slice this hook actually uses, so the
+  // game session doesn't re-render on every unrelated store write during play.
+  // Session state itself is consumed via the dedicated subscription below; here
+  // we only need its (stable) action methods (issue #1358).
+  const actualWorldState = useWorldStore(
+    useShallow((state) => ({ worlds: state.worlds }))
+  );
+  const actualSessionState = useSessionStore(
+    useShallow((state) => ({
+      // savedSessions is part of the slice (not just the actions) because the
+      // savedSession memo below derives from getSavedSession(savedSessions). If
+      // IndexedDB hydration populates saved sessions after the world/character
+      // ids are already stable, the resume prompt still needs to refresh — so we
+      // subscribe to it. It changes far less often than the streaming session
+      // fields (status/playerChoices/currentSceneId), which is where the
+      // mid-stream re-render churn we're avoiding actually comes from.
+      savedSessions: state.savedSessions,
+      initializeSession: state.initializeSession,
+      selectChoice: state.selectChoice,
+      endSession: state.endSession,
+      getSavedSession: state.getSavedSession,
+      resumeSavedSession: state.resumeSavedSession,
+    }))
+  );
+  const actualCharacterState = useCharacterStore(
+    useShallow((state) => ({
+      characters: state.characters,
+      currentCharacterId: state.currentCharacterId,
+      setCurrentCharacter: state.setCurrentCharacter,
+    }))
+  );
   
   // Check if world exists - only on client-side
   const worldExists = useMemo(() => {
@@ -234,11 +243,15 @@ export const useGameSessionState = ({
     // Get current store state to check for existing session
     const currentStoreState = useSessionStore.getState();
     
-    // If store already has an active session that matches our requirements, don't initialize
+    // If store already has an active session that matches our requirements, don't
+    // re-initialize — but re-arm the crash-recovery marker. A clean refresh clears
+    // it on pagehide, and this remount path skips initializeSession/resumeSavedSession,
+    // so without this a crash before the next save would leave no marker (issue #221).
     if (!disableAutoResume &&
         currentStoreState.status === 'active' &&
         currentStoreState.worldId === worldId &&
         currentStoreState.characterId === sessionCharacterId) {
+      currentStoreState.refreshRecoveryMarker?.();
       return;
     }
     

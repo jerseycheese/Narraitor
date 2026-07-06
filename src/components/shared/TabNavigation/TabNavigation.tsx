@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import './TabNavigation.css';
 
 export interface TabOption<T = string> {
   value: T;
@@ -32,9 +33,13 @@ export function TabNavigation<T = string>({
   size = 'md',
   mobileLayout = 'wrap'
 }: TabNavigationProps<T>) {
-  const containerClasses = mobileLayout === 'scroll' 
-    ? `component-tab-navigation${className}` 
-    : `component-tab-navigation${className}`;
+  const containerClasses = [
+    'component-tab-navigation',
+    mobileLayout === 'scroll' ? 'component-tab-navigation-scroll' : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={containerClasses} role="tablist">

@@ -22,7 +22,7 @@ jest.mock('../../../state/journalStore', () => ({
   }
 }));
 
-import { endingGenerator } from '../endingGenerator';
+import { generateEnding } from '../endingGenerator';
 import { buildEndingContext } from '../contextManager';
 import type { EndingGenerationRequest } from '../../../types/narrative.types';
 import {
@@ -125,7 +125,7 @@ describe('EndingGenerator - Basic Generation', () => {
     mockBuildEndingContext.mockResolvedValue(mockContext);
     mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
-    const result = await endingGenerator.generateEnding(mockRequest);
+    const result = await generateEnding(mockRequest);
 
     expect(result).toMatchObject({
       epilogue: expect.any(String),
@@ -166,7 +166,7 @@ describe('EndingGenerator - Basic Generation', () => {
     mockBuildEndingContext.mockResolvedValue(mockContext);
     mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
-    const result = await endingGenerator.generateEnding(mockRequest);
+    const result = await generateEnding(mockRequest);
 
     expect(result.tone).toBe('triumphant');
     expect(result.epilogue).toContain('cost');

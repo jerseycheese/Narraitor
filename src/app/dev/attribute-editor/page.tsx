@@ -166,7 +166,6 @@ export default function AttributeEditorTestPage() {
         isOpen={showCreateModal} 
         onClose={() => setShowCreateModal(false)}
                 title="Create Attribute"
-                size="xl"
               >
                 <div>
                   Create a new custom attribute for this test world.
@@ -186,7 +185,6 @@ export default function AttributeEditorTestPage() {
         isOpen={!!editingAttribute} 
         onClose={() => setEditingAttribute(null)}
                 title="Edit Attribute"
-                size="xl"
               >
                 <div>
                   Modify the details of this test attribute.

@@ -21,7 +21,6 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { selectSessionEntries } from '@/lib/journal/journalSelectors';
 import { JournalEntryDetail } from './JournalEntryDetail';
 import { JournalEntryList } from './JournalEntryList';
-import { JournalEmptyState } from './JournalEmptyState';
 
 interface JournalPageProps {
   worldId: string;
@@ -138,7 +137,6 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
         <EmptyState
           title="No active session"
           description="Start or resume a session to view its journal entries."
-          variant="centered"
         />
       );
     }
@@ -170,7 +168,12 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     return (
       <div className="journal-content">
         {entries.length === 0 ? (
-          <JournalEmptyState />
+          <div className="journal-empty-state">
+            <EmptyState
+              title="This journal awaits its first entry"
+              description="Updates will appear here as things unfold"
+            />
+          </div>
         ) : (
           <>
             <div

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { clsx } from 'clsx'
+import './tabs.css'
 
 interface TabsContextValue {
   value: string
@@ -48,7 +49,7 @@ const TabsList: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   ...props 
 }) => (
   <div
-    className={className}
+    className={clsx('tabs-list', className)}
     {...props}
   >
     {children}
@@ -69,10 +70,11 @@ const TabsTrigger: React.FC<TabsTriggerProps> = ({
   if (!context) throw new Error("TabsTrigger must be used within Tabs")
   
   const isActive = context.value === value
-  
+
   return (
     <button
-      className={className}
+      type="button"
+      className={clsx('tabs-trigger', isActive && 'tabs-trigger-active', className)}
       onClick={() => context.onValueChange(value)}
       {...props}
     >
@@ -95,10 +97,10 @@ const TabsContent: React.FC<TabsContentProps> = ({
   if (!context) throw new Error("TabsContent must be used within Tabs")
   
   if (context.value !== value) return null
-  
+
   return (
     <div
-      className={className}
+      className={clsx('tabs-content', className)}
       {...props}
     >
       {children}

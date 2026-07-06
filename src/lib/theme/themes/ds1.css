@@ -21,6 +21,16 @@
   --color-text-muted: rgb(113 113 122);
   --color-text-inverse: rgb(255 255 255);
 
+  /* Text on a filled accent surface. Light mode: accent is dark, so white.
+   * Dark mode (below): accent is light, so a dark ink keeps button labels AA. */
+  --color-on-accent: rgb(255 255 255);
+
+  /* Text on filled semantic surfaces (success/danger/warning). Same logic as
+   * --color-on-accent: white here, dark ink in dark mode (see dark block). #1379 */
+  --color-on-success: rgb(255 255 255);
+  --color-on-danger: rgb(255 255 255);
+  --color-on-warning: rgb(255 255 255);
+
   /* Mechanical Accent - Archival Ink Blue */
   --color-accent: rgb(49 46 129);
   --color-accent-hover: rgb(30 27 75);
@@ -43,15 +53,15 @@
   --muted-foreground: 240 3.8% 46.1%;
   --accent: 240 4.8% 95.9%;
   --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
   --border: 240 5.2% 90%;
   --input: 240 5.2% 90%;
   --ring: 221.2 83.2% 53.3%;
   --radius: 0.5rem;
 
   /* Extended semantic tokens */
-  --success: 142 71% 45%;
+
+  /* Darkened from 45% so the filled .button-success (Play) carries white text at WCAG AA: white on #16833E = 4.83:1. See #1387. Dark mode is left to #1379. */
+  --success: 142 71% 30%;
   --success-foreground: 210 40% 98%;
   --success-text: 154 86% 20%;
   --success-background: 142 69% 83%;
@@ -130,23 +140,9 @@
   --color-danger: rgb(185 28 28);
   --color-danger-hover: rgb(153 27 27);
 
-  /* Spacing scale (Tailwind-aligned) */
-  --space-0_5: 0.125rem;
-  --space-1:   0.25rem;
-  --space-1_5: 0.375rem;
-  --space-2:   0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3:   0.75rem;
-  --space-3_5: 0.875rem;
-  --space-4:   1rem;
-  --space-5:   1.25rem;
-  --space-6:   1.5rem;
-  --space-8:   2rem;
-
-  /* Radius tokens */
+  /* Radius tokens (per-theme; --radius-full lives in _shared-tokens.css) */
   --radius-sm: 2px;
   --radius-md: 4px;
-  --radius-full: 9999px;
 }
 
 /* DS1 Dark Mode */
@@ -160,9 +156,18 @@
   --color-text-secondary: rgb(212 212 216);
   --color-text-muted: rgb(129 129 138);
   --color-text-inverse: rgb(255 255 255);
+  --color-on-accent: rgb(9 9 11);
+
+  /* Dark ink on the light semantic fills so filled buttons clear AA in dark mode. #1379 */
+  --color-on-success: rgb(9 9 11);
+  --color-on-danger: rgb(9 9 11);
+  --color-on-warning: rgb(9 9 11);
 
   --color-accent: rgb(129 140 248);
-  --color-accent-hover: rgb(165 180 252);
+
+  /* Hover darkens (not lightens) so white button/CTA text stays legible in dark
+   * mode — white-on-hover ~6.3:1. Base-state contrast tracked separately (#1379). */
+  --color-accent-hover: rgb(79 70 229);
   --color-accent-soft: rgb(129 140 248 / 10%);
 
   --background: 240 10% 3.9%;
@@ -180,8 +185,6 @@
   --muted-foreground: 240 5% 64.9%;
   --accent: 240 3.7% 15.9%;
   --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
   --ring: 224.3 76.3% 94.1%;
@@ -259,24 +262,6 @@
   --shadow-drawer: -12px 0 24px rgb(0 0 0 / 40%);
   --color-danger: rgb(239 68 68);
   --color-danger-hover: rgb(220 38 38);
-
-  /* Spacing scale (Tailwind-aligned) */
-  --space-0_5: 0.125rem;
-  --space-1:   0.25rem;
-  --space-1_5: 0.375rem;
-  --space-2:   0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3:   0.75rem;
-  --space-3_5: 0.875rem;
-  --space-4:   1rem;
-  --space-5:   1.25rem;
-  --space-6:   1.5rem;
-  --space-8:   2rem;
-
-  /* Radius tokens */
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-full: 9999px;
 }
 
 /* DS1 Background Pattern - Mechanical drafting grid */

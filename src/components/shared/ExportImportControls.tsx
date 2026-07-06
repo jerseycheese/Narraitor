@@ -8,6 +8,15 @@ import { Button } from '@/components/ui/button';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { downloadGameState, importFromFile } from '@/lib/storage/exportService';
 
+// Bound how big an import file can be before we even try to parse it.
+// `downloadGameState()` enforces no matching cap and saves embed full
+// `characterState` (AI portraits as base64 `data:image/...`) plus accumulated
+// narrative history, so legitimate self-exported backups can easily run into
+// the tens of MB. This ceiling is set high enough to accept any plausible
+// self-export while still rejecting obviously-wrong files (a 4 GB video, a
+// disk image) before we read them into memory.
+const MAX_IMPORT_FILE_SIZE_BYTES = 250 * 1024 * 1024;
+
 interface ExportImportControlsProps {
   className?: string;
 }
@@ -48,11 +57,32 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
     const file = event.target.files?.[0];
     if (!file) return;
 
+    const clearInput = () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    };
+
+    // The accept=".json" attribute is a UI hint only; users can still pick
+    // anything via "All Files". Validate at the boundary before reading.
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      showMessage('Import failed. Please choose a .json file.', 'error');
+      clearInput();
+      return;
+    }
+
+    if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {
+      const limitMb = Math.round(MAX_IMPORT_FILE_SIZE_BYTES / (1024 * 1024));
+      showMessage(`Import failed. File exceeds ${limitMb} MB limit.`, 'error');
+      clearInput();
+      return;
+    }
+
     setIsImporting(true);
-    
+
     try {
       const result = await importFromFile(file);
-      
+
       if (result.success) {
         showMessage(result.message || 'Import successful', 'success');
       } else {
@@ -62,10 +92,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
       showMessage('Import failed. Please check the file format.', 'error');
     } finally {
       setIsImporting(false);
-      // Clear file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      clearInput();
     }
   };
 
@@ -84,9 +111,8 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
         </Button>
 
         <div className="settings-export-import-files">
-          <label htmlFor="import-file" >
-            Import Game Data
-          </label>
+          {/* Visually hidden: the styled Button below is the trigger (clicks this
+              via ref). Kept in the DOM with an aria-label for assistive tech. */}
           <input
             id="import-file"
             ref={fileInputRef}
@@ -94,7 +120,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
             accept=".json"
             onChange={handleFileChange}
             disabled={isLoading}
-
+            className="sr-only"
             aria-label="Import game data from file"
           />
           <Button

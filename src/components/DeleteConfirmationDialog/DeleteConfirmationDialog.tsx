@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
@@ -30,15 +30,19 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       onClose={onClose}
       onConfirm={onConfirm}
       title={title}
-      message={description}
       variant="destructive"
+      message={
+        <>
+          <p>{description}</p>
+          <p>{itemName}</p>
+        </>
+      }
       confirmText={confirmButtonText}
       cancelText={cancelButtonText}
       confirmAriaLabel={`${confirmButtonText} ${itemName}`}
       cancelAriaLabel={`${cancelButtonText} deletion`}
       isLoading={isDeleting}
       loadingText="Deleting..."
-      customBody={<p>{itemName}</p>}
     />
   );
 };

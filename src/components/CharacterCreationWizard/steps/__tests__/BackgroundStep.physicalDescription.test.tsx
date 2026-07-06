@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BackgroundStep } from '../BackgroundStep';
+
+type BackgroundStepData = ComponentProps<typeof BackgroundStep>['data'];
+type BackgroundStepWorld = ComponentProps<typeof BackgroundStep>['worldConfig'];
 
 describe('BackgroundStep - Physical Description', () => {
   const mockData = {
@@ -16,11 +19,11 @@ describe('BackgroundStep - Physical Description', () => {
     validation: {
       3: { valid: true, errors: [], touched: false }
     }
-  };
+  } as unknown as BackgroundStepData;
 
   const mockOnUpdate = jest.fn();
   const mockOnValidation = jest.fn();
-  const mockWorldConfig = {};
+  const mockWorldConfig = {} as unknown as BackgroundStepWorld;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -148,9 +151,9 @@ describe('BackgroundStep - Physical Description', () => {
     const motivationField = screen.getByLabelText('Motivation (optional)');
 
     // Check that physical description comes after personality in DOM order
-    expect(personalityField.compareDocumentPosition(physicalDescriptionField) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    
+    expect(personalityField.compareDocumentPosition(physicalDescriptionField) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+
     // Check that motivation comes after physical description in DOM order
-    expect(physicalDescriptionField.compareDocumentPosition(motivationField) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(physicalDescriptionField.compareDocumentPosition(motivationField) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 });

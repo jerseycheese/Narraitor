@@ -217,18 +217,16 @@ describe('goalStore', () => {
 
       const goalId = useGoalStore.getState().createGoal(goalData);
 
-      // Valid transition: active -> completed
-      expect(() => {
-        useGoalStore.getState().updateGoal(goalId, { status: 'completed' });
-      }).not.toThrow();
+      // Valid transition: active -> completed (assert it actually took effect).
+      useGoalStore.getState().updateGoal(goalId, { status: 'completed' });
+      expect(useGoalStore.getState().goals[goalId].status).toBe('completed');
 
-      // Reset for next test
+      // Reset, then transition active -> abandoned.
       useGoalStore.getState().updateGoal(goalId, { status: 'active' });
+      expect(useGoalStore.getState().goals[goalId].status).toBe('active');
 
-      // Valid transition: active -> abandoned
-      expect(() => {
-        useGoalStore.getState().updateGoal(goalId, { status: 'abandoned' });
-      }).not.toThrow();
+      useGoalStore.getState().updateGoal(goalId, { status: 'abandoned' });
+      expect(useGoalStore.getState().goals[goalId].status).toBe('abandoned');
     });
 
     test('should track goal progress with notes', () => {

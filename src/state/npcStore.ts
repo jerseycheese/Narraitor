@@ -6,7 +6,8 @@ import { NPC } from '../types/npc.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
-import { CrudStore } from './createCrudStore';
+import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
+import { CrudStore } from './crudStore.types';
 
 export interface NPCStore extends CrudStore<NPC> {
   npcs: Record<EntityID, NPC>;
@@ -160,9 +161,7 @@ export const useNPCStore = create<NPCStore>()(
         }
 
         set((state) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [npcId]: _removedNPC, ...remainingNpcs } = state.npcs;
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [npcId]: _removedEntity, ...remainingEntities } = state.entities;
 
           const worldNpcs = state.worldNpcs[existingNPC.worldId] || [];
@@ -241,6 +240,15 @@ export const useNPCStore = create<NPCStore>()(
 // Expose store globally in development to support test data seeding
 // and debugging via window.useNPCStore in dev tools.
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).useNPCStore = useNPCStore;
+  window.useNPCStore = useNPCStore;
 }
+
+// Cascade cleanup: deleting a world orphans its NPCs otherwise (mirrors
+// characterStore's WORLD_DELETED subscription). Plain subscribe — the handler
+// only clears data, so a double-fire is a no-op.
+storeEvents.subscribe<WorldDeletedEvent>(
+  StoreEventTypes.WORLD_DELETED,
+  ({ worldId }) => {
+    useNPCStore.getState().clearWorldNPCs(worldId);
+  }
+);

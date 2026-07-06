@@ -1,0 +1,46 @@
+/* Table — global semantic styles for src/components/ui/table.tsx (#1317)
+ *
+ * Token-based base styling in production so the app's tables (CharacterTable,
+ * WorldTable, DataTable, …) render like the living style guide. Scoped to the
+ * `table-wrapper` the Table primitive emits, then keyed off the rendered
+ * thead/tbody elements so the header/cell sub-components need no extra classes.
+ * Per-theme look comes from the design tokens under the active `data-theme`
+ * scope — no hardcoded colors.
+ */
+
+.table-wrapper {
+  /* Horizontal scroll (not hidden) so wide tables — WorldTable / CharacterTable
+   * via DataTable — keep their right-hand columns reachable on narrow viewports. */
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+}
+
+.table-wrapper thead th {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: var(--color-surface-hover);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table-wrapper tbody td {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}

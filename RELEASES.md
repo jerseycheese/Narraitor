@@ -17,7 +17,7 @@ This is where the multi-theme design system migration goes public. Phases 0-2 of
 - Non-game-session surfaces brought into the system: home, worlds list, world detail/edit, characters list, character detail/edit, journal, settings, dev tooling.
 - Cross-theme audit pass and follow-on cleanup — wizard layouts, form wrappers, collapsible toggles, journal panes, classless buttons all resolved across DS1/DS2/DS3.
 - [DESIGN.md](DESIGN.md) at the repo root as the canonical AI-readable summary of the system. Canon order pinned: showcase pages > Storybook > app code.
-- [ADR-011](public_docs/decisions/adr-011-three-design-systems.md) documenting the three-design-systems decision and the structural-differentiation roadmap.
+- [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) documenting the three-design-systems decision and the structural-differentiation roadmap.
 - Release model itself ([#1170](https://github.com/jerseycheese/narraitor/pull/1210)): `main` is release-only, `develop` is rolling, branch protection rebuilt accordingly.
 
 The headline integration PR is [#1081](https://github.com/jerseycheese/narraitor/pull/1081). The last two gate items — GuidedFirstTimeExperience wizard styling ([#1199](https://github.com/jerseycheese/narraitor/issues/1199)) and worlds journal DS treatment ([#1159](https://github.com/jerseycheese/narraitor/issues/1159)) — closed together via [#1200](https://github.com/jerseycheese/narraitor/pull/1200), which is what cleared the way for this release.

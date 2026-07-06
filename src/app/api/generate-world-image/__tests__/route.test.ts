@@ -6,7 +6,6 @@
 jest.mock('@/lib/ai/defaultGeminiClient');
 jest.mock('@/lib/ai/geminiImageGenerator', () => ({
   generateImageWithGemini: jest.fn(),
-  generateAndSaveImageWithGemini: jest.fn(),
 }));
 jest.mock('@/lib/utils/logger', () => {
   return jest.fn().mockImplementation(() => ({
@@ -28,13 +27,12 @@ jest.mock('@/lib/utils/genrePromptGuide', () => ({
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-import { generateImageWithGemini, generateAndSaveImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import type { World } from '@/types/world.types';
 
 // Create typed mocks
 const mockCreateDefaultGeminiClient = createDefaultGeminiClient as jest.MockedFunction<typeof createDefaultGeminiClient>;
 const mockGenerateImageWithGemini = generateImageWithGemini as jest.MockedFunction<typeof generateImageWithGemini>;
-const mockGenerateAndSaveImageWithGemini = generateAndSaveImageWithGemini as jest.MockedFunction<typeof generateAndSaveImageWithGemini>;
 
 describe('/api/generate-world-image', () => {
   const mockWorld: World = {
@@ -61,7 +59,7 @@ describe('/api/generate-world-image', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreateDefaultGeminiClient.mockReturnValue(mockGeminiClient as unknown as ReturnType<typeof createDefaultGeminiClient>);
-    
+
     // Mock environment variable
     process.env.GEMINI_API_KEY = 'test-api-key';
   });
@@ -103,12 +101,13 @@ describe('/api/generate-world-image', () => {
       const customPrompt = 'A dark and stormy castle on a hilltop';
 
       mockGeminiClient.generateContent.mockResolvedValue({
-        content: customPrompt // Use custom prompt directly when provided
+        content: customPrompt
       });
 
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue({
-        url: '/uploads/worlds/test-world.png',
-        fileSize: 102400
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,abc123',
+        mimeType: 'image/png',
+        base64Data: 'abc123',
       });
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
@@ -125,7 +124,7 @@ describe('/api/generate-world-image', () => {
       expect(response.status).toBe(200);
       expect(data.aiGenerated).toBe(true);
       expect(data.placeholder).toBe(false);
-      expect(data.imageUrl).toBe('/uploads/worlds/test-world.png');
+      expect(data.imageUrl).toBe('data:image/png;base64,abc123');
       expect(data.description).toBe(customPrompt);
     });
 
@@ -154,13 +153,90 @@ describe('/api/generate-world-image', () => {
     });
   });
 
+  describe('World Element Grounding', () => {
+    // The manual world wizard passes the full world (attributes + skills) but the
+    // /worlds Generate path passes only id/name/description/genre. Grounding the
+    // prompt in the world's structured elements when present enriches thin manual
+    // descriptions (#1437) without changing the /worlds-shape prompt.
+    it('includes world attribute and skill names in the AI elaboration prompt', async () => {
+      mockGeminiClient.generateContent.mockResolvedValue({
+        content: 'AI-generated detailed description',
+      });
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,abc123',
+        mimeType: 'image/png',
+        base64Data: 'abc123',
+      });
+
+      const worldWithElements: World = {
+        ...mockWorld,
+        attributes: [
+          {
+            id: 'attr-1',
+            worldId: 'test-world',
+            name: 'Arcane Resonance',
+            description: 'Attunement to ambient magic',
+            baseValue: 5,
+            minValue: 1,
+            maxValue: 10,
+          },
+        ],
+        skills: [
+          {
+            id: 'skill-1',
+            worldId: 'test-world',
+            name: 'Runeweaving',
+            description: 'Binding spells into objects',
+            difficulty: 'medium',
+            baseValue: 5,
+            minValue: 1,
+            maxValue: 10,
+          },
+        ],
+      };
+
+      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
+        method: 'POST',
+        body: JSON.stringify({ world: worldWithElements }),
+      });
+
+      await POST(request);
+
+      expect(mockGeminiClient.generateContent).toHaveBeenCalled();
+      const elaborationPrompt = mockGeminiClient.generateContent.mock.calls[0][0] as string;
+      expect(elaborationPrompt).toContain('Arcane Resonance');
+      expect(elaborationPrompt).toContain('Runeweaving');
+    });
+
+    it('omits the world-elements block when no attributes or skills are defined', async () => {
+      mockGeminiClient.generateContent.mockResolvedValue({
+        content: 'AI-generated detailed description',
+      });
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,abc123',
+        mimeType: 'image/png',
+        base64Data: 'abc123',
+      });
+
+      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
+        method: 'POST',
+        body: JSON.stringify({ world: mockWorld }),
+      });
+
+      await POST(request);
+
+      const elaborationPrompt = mockGeminiClient.generateContent.mock.calls[0][0] as string;
+      expect(elaborationPrompt).not.toContain('World elements');
+    });
+  });
+
   describe('Genre-Specific Image Generation', () => {
     it('should generate appropriate fallback for different genres', async () => {
       // Mock no API key to force fallback
       delete process.env.GEMINI_API_KEY;
 
       const testGenres = ['fantasy', 'sci-fi', 'cyberpunk'];
-      
+
       for (const genre of testGenres) {
         const worldWithGenre = { ...mockWorld, genre };
         const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
@@ -186,9 +262,10 @@ describe('/api/generate-world-image', () => {
         content: 'Generated image description'
       });
 
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue({
-        url: '/uploads/worlds/test-world.png',
-        fileSize: 102400
+      mockGenerateImageWithGemini.mockResolvedValue({
+        url: 'data:image/png;base64,abc123',
+        mimeType: 'image/png',
+        base64Data: 'abc123',
       });
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
@@ -202,9 +279,9 @@ describe('/api/generate-world-image', () => {
       expect(response.status).toBe(200);
       expect(data.aiGenerated).toBe(true);
       expect(data.placeholder).toBe(false);
-      expect(data.imageUrl).toBe('/uploads/worlds/test-world.png');
+      expect(data.imageUrl).toBe('data:image/png;base64,abc123');
       expect(data.service).toBe('gemini-image-generation');
-      expect(mockGenerateAndSaveImageWithGemini).toHaveBeenCalled();
+      expect(mockGenerateImageWithGemini).toHaveBeenCalled();
     });
 
     it('should fallback to placeholder when Gemini API fails', async () => {
@@ -212,7 +289,7 @@ describe('/api/generate-world-image', () => {
         content: 'Generated description'
       });
 
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue(null);
+      mockGenerateImageWithGemini.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
@@ -228,47 +305,6 @@ describe('/api/generate-world-image', () => {
       expect(data.imageUrl).toContain('picsum.photos');
     });
 
-    it('should fallback to placeholder when Gemini API response has no image', async () => {
-      mockGeminiClient.generateContent.mockResolvedValue({
-        content: 'Generated description'
-      });
-
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue(null);
-
-      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
-        method: 'POST',
-        body: JSON.stringify({ world: mockWorld }),
-      });
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data.aiGenerated).toBe(false);
-      expect(data.placeholder).toBe(true);
-      expect(data.imageUrl).toContain('picsum.photos');
-    });
-
-    it('should fallback to placeholder when network error occurs', async () => {
-      mockGeminiClient.generateContent.mockResolvedValue({
-        content: 'Generated description'
-      });
-
-      mockGenerateAndSaveImageWithGemini.mockResolvedValue(null);
-
-      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
-        method: 'POST',
-        body: JSON.stringify({ world: mockWorld }),
-      });
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(data.aiGenerated).toBe(false);
-      expect(data.placeholder).toBe(true);
-      expect(data.imageUrl).toContain('picsum.photos');
-    });
   });
 
   describe('Environment Configuration', () => {

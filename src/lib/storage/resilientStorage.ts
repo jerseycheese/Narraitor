@@ -7,6 +7,9 @@
 
 import { IndexedDBAdapter } from './indexedDBAdapter';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('ResilientStorage');
+
 /**
  * Storage health status
  */
@@ -59,7 +62,7 @@ export class ResilientStorageMiddleware {
 
       // Check if IndexedDB is actually available (not just that initialize didn't throw)
       if (!this.adapter.isInitialized) {
-        console.warn('[Storage] IndexedDB not available, using memory storage');
+        logger.warn('[Storage] IndexedDB not available, using memory storage');
         this.adapter = null;
         this.status = StorageStatus.UNAVAILABLE;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
@@ -73,7 +76,7 @@ export class ResilientStorageMiddleware {
 
       this.status = StorageStatus.HEALTHY;
     } catch (error) {
-      console.warn('[Storage] IndexedDB unavailable, using memory storage:', error);
+      logger.warn('[Storage] IndexedDB unavailable, using memory storage:', error);
       this.adapter = null;
       this.status = StorageStatus.UNAVAILABLE;
       this.onStatusChange(StorageStatus.UNAVAILABLE, {
@@ -94,7 +97,7 @@ export class ResilientStorageMiddleware {
       try {
         return await this.adapter.getItem(key);
       } catch (error) {
-        console.warn('[Storage] IndexedDB read failed, switching to memory:', error);
+        logger.warn('[Storage] IndexedDB read failed, switching to memory:', error);
         this.adapter = null;
         this.status = StorageStatus.UNAVAILABLE;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
@@ -122,7 +125,7 @@ export class ResilientStorageMiddleware {
         this.memoryStorage.set(key, value);
         return;
       } catch (error) {
-        console.warn('[Storage] IndexedDB write failed, switching to memory:', error);
+        logger.warn('[Storage] IndexedDB write failed, switching to memory:', error);
         this.adapter = null;
         this.status = StorageStatus.UNAVAILABLE;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {

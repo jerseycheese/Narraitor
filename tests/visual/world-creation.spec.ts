@@ -1,16 +1,64 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
 import { seedTestData } from './utils/seedTestData';
+import { mockApiEndpoints } from './utils/mockApi';
+
+/**
+ * World creation wizard — full sequential flow, single-theme (default DS1).
+ *
+ * DS coverage (#1264): all three design systems for the world wizard are covered
+ * by the "World creation wizard steps render <DS> structure" tests in
+ * tests/visual/wizard-themes.spec.ts. Tripling this full five-step flow would
+ * duplicate that coverage at much higher runtime/flake cost.
+ */
+
+/** Capture a stable, full-page wizard screenshot with the app shell intact. */
+const captureWizardStep = async (page: Page, name: string): Promise<void> => {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await waitForContentStable(page);
+  await page.evaluate(() => document.fonts.ready);
+  await hideDynamicContent(page);
+  // Chromium's full-page screenshot mis-places the app shell on pages taller than
+  // the viewport: the sticky header/progress rail and the 100vh, own-scrolling
+  // sidebar render at an offset, leaving the page title floating above a displaced
+  // shell. Pin them into normal flow for the capture — at scroll 0 the result is
+  // identical to the live layout, minus the artifact.
+  await page.addStyleTag({
+    content: `
+      .workshop-sidebar {
+        position: static !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      header,
+      .component-wizard-progress {
+        position: static !important;
+      }
+    `,
+  });
+  await page.waitForTimeout(50);
+  // Soft so a single run surfaces a diff at every step; a hard assertion
+  // aborts the sequence at the first diff and leaks the rest one run at a time.
+  await expect.soft(page).toHaveScreenshot(name, { fullPage: true });
+};
 
 /**
  * World Creation Wizard Visual Regression Test (Sequential)
  *
- * Single initialization that walks through Steps 1–6,
+ * Single initialization that walks through Steps 1–5,
  * taking screenshots at each stage to reduce flakiness and runtime.
  */
 
-test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => {
+test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
   test.setTimeout(45000); // Extended timeout for complex wizard
+  // Deterministic AI: Step 3 (description -> attributes) calls
+  // /api/ai/analyze-world, which has no key in CI and throws — leaving the
+  // attributes panel mid-render when the capture fires, so the full-page
+  // screenshot comes back short and the diff fails (a develop-wide flake).
+  // Mocking the AI routes makes the analysis resolve instantly and stably.
+  await mockApiEndpoints(page);
   await seedTestData(page);
   await page.goto('/worlds');
   await waitForContentStable(page);
@@ -49,28 +97,12 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
     await overlay.waitFor({ state: 'detached', timeout: 2000 }).catch(() => {});
   };
 
-  await test.step('Step 1: Template', async () => {
+  await test.step('Step 1: Basic Info', async () => {
     await dismissTutorialOverlay();
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step1-template.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step1-basic-info.png');
   });
 
-  await test.step('Step 2: Basic Info', async () => {
-    const westernTemplateCard = page.locator('[data-testid="template-card-western"]');
-    if (await westernTemplateCard.count() > 0) {
-      await westernTemplateCard.click();
-      await page.waitForTimeout(300);
-      const useTemplateButton = page.locator('button:has-text("Use Selected Template")');
-      if (await useTemplateButton.count() > 0) {
-        await useTemplateButton.click();
-        await page.waitForTimeout(600);
-      }
-    }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step2-basic-info.png', { fullPage: true });
-  });
-
-  await test.step('Step 3: Description', async () => {
+  await test.step('Step 2: Description', async () => {
     const nameInput = page.locator('input[placeholder*="world name"], input[name="name"], input[placeholder*="Enter name"]');
     if (await nameInput.count() > 0) {
       await nameInput.fill('Test World');
@@ -94,17 +126,16 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton.click();
       await page.waitForTimeout(700);
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step3-description.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step2-description.png');
   });
 
-  await test.step('Step 4: Attributes Review', async () => {
-    // Fill description and proceed
-    const descriptionInput = page.locator('textarea[placeholder*="description"], textarea[name="description"]');
-    if (await descriptionInput.count() > 0) {
-      await descriptionInput.fill('A test world created for visual regression testing.');
-      await page.waitForTimeout(150);
-    }
+  await test.step('Step 3: Attributes Review', async () => {
+    // Full Description requires at least 50 characters before Next is enabled.
+    const descriptionInput = page.locator('[data-testid="world-full-description"]');
+    await descriptionInput.fill(
+      'A dusty frontier town on the edge of the territory, where law is scarce and every stranger hides a past worth burying.'
+    );
+    await page.waitForTimeout(150);
     const nextButton2 = page
       .locator('.component-wizard-container')
       .getByRole('button', { name: 'Next' });
@@ -113,11 +144,10 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton2.click();
       await page.waitForTimeout(700);
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step4-attributes.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step3-attributes.png');
   });
 
-  await test.step('Step 5: Skills Review', async () => {
+  await test.step('Step 4: Skills Review', async () => {
     // Add a minimal custom attribute to satisfy requirement and advance
     const addCustomAttributeBtn = page.locator('[data-testid="add-custom-attribute-button"]');
     if (await addCustomAttributeBtn.count() > 0) {
@@ -142,11 +172,10 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
       await nextButton3.click();
       await page.waitForTimeout(700);
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step5-skills.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step4-skills.png');
   });
 
-  await test.step('Step 6: Finalize', async () => {
+  await test.step('Step 5: Finalize', async () => {
     // Add a minimal custom skill and advance
     const addCustomSkillBtn = page.locator('button:has-text("Add Custom Skill")');
     if (await addCustomSkillBtn.count() > 0) {
@@ -161,9 +190,15 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
           await descriptionInput.fill('A test skill for visual regression testing.');
           await page.waitForTimeout(150);
         }
-        const testAttributeCheckbox = page.locator('input[type="checkbox"]:near(:text("Test Attribute"))');
-        if (await testAttributeCheckbox.count() > 0) {
-          await testAttributeCheckbox.check();
+        // The SkillEditor lists one checkbox per world attribute (ids start
+        // with "attribute-"). With the AI suggestions mocked there are several,
+        // so the old ':near(Test Attribute)' match resolved to multiple
+        // elements and threw a strict-mode violation. Checking the first
+        // attribute satisfies the "at least one attribute" rule the editor
+        // requires before "Create Skill" enables.
+        const attributeCheckbox = page.locator('input[id^="attribute-"]').first();
+        if (await attributeCheckbox.count() > 0) {
+          await attributeCheckbox.check();
           await page.waitForTimeout(150);
         }
         const createSkillBtn = page.getByRole('button', { name: /create skill/i });
@@ -173,12 +208,14 @@ test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => 
         }
       }
     }
-    const nextButton4 = page.locator('button:has-text("Next")');
+    const nextButton4 = page
+      .locator('.component-wizard-container')
+      .getByRole('button', { name: 'Next' });
     if (await nextButton4.count() > 0) {
+      await dismissTutorialOverlay();
       await nextButton4.click();
       await page.waitForTimeout(700);
     }
-    await hideDynamicContent(page);
-    await expect(page).toHaveScreenshot('world-creation-step6-finalize.png', { fullPage: true });
+    await captureWizardStep(page, 'world-creation-step5-finalize.png');
   });
 });

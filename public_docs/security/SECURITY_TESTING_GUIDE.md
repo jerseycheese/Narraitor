@@ -20,11 +20,11 @@ Run the automated test script:
 ```
 
 This script will:
-- ✅ Verify API routes exist and respond correctly
-- ✅ Check that rate limiting is working (50 requests/hour per IP)
-- ✅ Ensure no API keys are visible in the build
-- ✅ Validate request handling and error responses
-- ✅ Confirm security headers are present
+- Verify API routes exist and respond correctly
+- Check that rate limiting is working (50 requests/hour per IP)
+- Ensure no API keys are visible in the build
+- Validate request handling and error responses
+- Confirm security headers are present
 
 ## Manual Browser Testing
 
@@ -37,7 +37,7 @@ npm run dev
 ### 2. Open Browser DevTools
 
 1. Open your browser to `http://localhost:3000` (or 3001)
-2. Open DevTools (F12 or right-click → Inspect)
+2. Open DevTools (F12 or right-click, then Inspect)
 3. Go to the **Network** tab
 
 ### 3. Test API Key Security
@@ -59,17 +59,17 @@ npm run dev
 2. **Trigger narrative generation** (start a game or make a choice)
 3. **Check Network tab** - you should see:
    ```
-   ✅ POST /api/narrative/generate
-   ✅ POST /api/narrative/choices
-   ✅ No requests to googleapis.com
-   ✅ No visible API keys in any request
+   POST /api/narrative/generate
+   POST /api/narrative/choices
+   No requests to googleapis.com
+   No visible API keys in any request
    ```
 
 4. **Check Response Headers** for rate limiting:
    ```
-   ✅ X-RateLimit-Limit: 50
-   ✅ X-RateLimit-Remaining: 49
-   ✅ X-RateLimit-Reset: [timestamp]
+   X-RateLimit-Limit: 50
+   X-RateLimit-Remaining: 49
+   X-RateLimit-Reset: [timestamp]
    ```
 
 ### 5. Test Rate Limiting
@@ -77,8 +77,8 @@ npm run dev
 1. **Make multiple requests quickly** (refresh game session page multiple times)
 2. **After 50 requests** you should see:
    ```
-   ❌ HTTP 429 Too Many Requests
-   ❌ Error: "Rate limit exceeded. Please try again in X minutes."
+   HTTP 429 Too Many Requests
+   Error: "Rate limit exceeded. Please try again in X minutes."
    ```
 
 ### 6. Check Build Security
@@ -88,8 +88,8 @@ npm run dev
 npm run build
 
 # Search for any exposed API keys (should find nothing)
-grep -r "AIzaSy" .next/ || echo "✅ No API keys found in build"
-grep -r "NEXT_PUBLIC_GEMINI" .next/ || echo "✅ No public env vars found"
+grep -r "AIzaSy" .next/ || echo "No API keys found in build"
+grep -r "NEXT_PUBLIC_GEMINI" .next/ || echo "No public env vars found"
 ```
 
 ## Production Deployment Testing
@@ -98,10 +98,10 @@ grep -r "NEXT_PUBLIC_GEMINI" .next/ || echo "✅ No public env vars found"
 
 **Secure Configuration:**
 ```env
-# ✅ Server-side only (secure)
+# Server-side only (secure)
 GEMINI_API_KEY=your-actual-api-key
 
-# ❌ Remove any public variables (insecure)
+# Remove any public variables (insecure)
 # NEXT_PUBLIC_GEMINI_API_KEY=your-api-key  # DELETE THIS
 ```
 
@@ -128,7 +128,7 @@ GEMINI_API_KEY=your-actual-api-key
 
 ## What to Expect
 
-### ✅ Secure Behavior (Current)
+### Secure Behavior (Current)
 
 - **Network Tab**: Only shows requests to your domain's API routes
 - **Environment**: API keys stored server-side only
@@ -136,7 +136,7 @@ GEMINI_API_KEY=your-actual-api-key
 - **Error Handling**: User-friendly messages for rate limits
 - **Cost Control**: 50 requests/hour prevents unexpected charges
 
-### ❌ Previous Insecure Behavior (Fixed)
+### Previous Insecure Behavior (Fixed)
 
 - API keys visible in browser developer tools
 - Direct requests to googleapis.com from browser

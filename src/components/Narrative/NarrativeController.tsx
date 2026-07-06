@@ -6,24 +6,28 @@ import React, {
   useCallback,
 } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
-import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
-import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { useNarrativeGenerator } from '@/hooks/useNarrativeGenerator';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useEndingDetection } from './useEndingDetection';
+import { usePlayerChoices } from './hooks/usePlayerChoices';
 import {
   Decision,
-  DecisionOutcome,
   DecisionWeight,
-  NarrativeContext,
   NarrativeSegment,
   SkillCheckRoll,
 } from '@/types/narrative.types';
-import { truncate } from '@/lib/utils';
+import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
+import { getNarrativeError } from '@/lib/narrative/narrativeErrors';
+import {
+  evaluateDecisionSkillChecks,
+  isFatalCriticalDecision,
+} from '@/lib/narrative/evaluateDecisionSkillChecks';
+import { logger } from '@/lib/utils/logger';
+import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
-import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
-import type { Character as UtilCharacter } from '@/types/character.types';
 import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
@@ -45,6 +49,12 @@ interface NarrativeControllerProps {
   className?: string;
   generateChoices?: boolean; // Whether to generate choices after narrative
   hideHistory?: boolean; // Whether to hide the narrative history UI
+  /**
+   * Bumping this counter re-runs the last failed generation. Lets an external
+   * surface (the choices column's Retry) drive recovery without exposing the
+   * controller's internal retry handler. Ignored at its initial value.
+   */
+  retryToken?: number;
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
@@ -60,10 +70,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   className,
   generateChoices = true,
   hideHistory = false,
+  retryToken = 0,
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGeneratingChoices, setIsGeneratingChoices] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
 
@@ -72,15 +82,15 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const getSessionSegments = useNarrativeStore(
     (state) => state.getSessionSegments
   );
-  const hasHydrated = useNarrativeStore((state) => state._hasHydrated);
-  const narrativeGenerator = useMemo(
-    () => new NarrativeGenerator(createDefaultGeminiClient()),
-    []
+  const setGenerationError = useNarrativeStore(
+    (state) => state.setGenerationError
   );
+  const clearGenerationError = useNarrativeStore(
+    (state) => state.clearGenerationError
+  );
+  const hasHydrated = useNarrativeStore((state) => state._hasHydrated);
+  const narrativeGenerator = useNarrativeGenerator();
 
-  // Access character and world stores for skill evaluation
-  const characters = useCharacterStore((state) => state.characters);
-  const worlds = useWorldStore((state) => state.worlds);
   const npcIds = useNPCStore(
     useCallback((state) => state.worldNpcs[worldId] ?? EMPTY_NPC_IDS, [worldId])
   );
@@ -103,21 +113,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     new Set()
   );
   const mountedRef = useRef(false);
-  const generateCount = useRef(0);
   const warnedMissingSessionIdRef = useRef(false);
 
   const warnMissingSessionId = useCallback((context: string) => {
     if (process.env.NODE_ENV === 'production') return;
     if (warnedMissingSessionIdRef.current) return;
     warnedMissingSessionIdRef.current = true;
-    console.warn(
+    logger.warn(
       `[NarrativeController] Missing sessionId; skipping ${context} generation.`
     );
   }, []);
   // Use a ref to track if we've initiated generation in this component instance
   const initialGenerationInitiated = useRef(false);
-  // Use a ref to prevent overlapping choice generation
-  const choiceGenerationInProgress = useRef(false);
   // Prevent duplicate initial-scene generation in dev StrictMode (effects can run twice across remounts)
   const initialGenerationLocksRef = useRef(new Set<string>());
 
@@ -129,9 +136,19 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     onEndingSuggested,
   });
 
+  const { isGeneratingChoices, generatePlayerChoices } = usePlayerChoices({
+    sessionId,
+    worldId,
+    characterId,
+    narrativeGenerator,
+    warnMissingSessionId,
+    mountedRef,
+    onChoicesGenerated,
+    onError: setError,
+  });
+
   // Initialize component state on mount
   useEffect(() => {
-    const generationLocks = initialGenerationLocksRef.current;
     // Create a unique session key to track this instance
     const instanceKey = `${sessionId}-${Date.now()}`;
     setSessionKey(instanceKey);
@@ -139,21 +156,20 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     // Reset state when session changes
     setProcessedChoices(new Set());
     setError(null);
-    generateCount.current = 0;
 
     // Set mounted flag
     mountedRef.current = true;
 
     // Reset generation flags
     initialGenerationInitiated.current = false;
-    choiceGenerationInProgress.current = false;
 
     return () => {
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
-      choiceGenerationInProgress.current = false; // Reset choice generation flag
-      // Clear generation locks for this session to prevent memory leaks
-      generationLocks.delete(sessionId);
+      // NOTE: We intentionally do NOT delete initialGenerationLocksRef here.
+      // The lock is owned by the in-flight generation (released in its finally
+      // block); releasing it on unmount allows a remounted instance to start a
+      // duplicate generation while the original is still in flight.
     };
   }, [sessionId, worldId, characterId]);
 
@@ -207,11 +223,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       return;
     }
 
-    const isPlaywrightRuntime =
-      typeof window !== 'undefined' &&
-      Boolean(
-        (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__
-      );
+    const isPlaywrightRuntime = isPlaywrightEnv();
 
     if (isPlaywrightRuntime && persistedSegments.length === 0) {
       // Visual regression tests seed data via persistence; wait for hydration
@@ -233,7 +245,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         setInitialGenerationCompleted(true);
         initialGenerationInitiated.current = true;
 
-        generateCount.current += 1;
         generateInitialNarrative();
       }
       // Choice-based generation (only if we haven't processed this choice already)
@@ -246,7 +257,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           return updated;
         });
 
-        generateCount.current += 1;
         generateNextSegment(choiceId);
       }
       // Log if we're skipping generation
@@ -261,238 +271,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     isLoading,
     sessionId,
     sessionKey,
-  ]);
-
-  /**
-   * Generate player choices based on current narrative context
-   */
-  const generatePlayerChoices = useCallback(async () => {
-    if (!mountedRef.current) {
-      return;
-    }
-    if (!sessionId) {
-      warnMissingSessionId('choice');
-      return;
-    }
-
-    // Prevent overlapping choice generation using ref (more reliable than state)
-    if (choiceGenerationInProgress.current) {
-      return;
-    }
-
-    choiceGenerationInProgress.current = true;
-
-    // Get fresh segments from the store instead of relying on component state
-    const currentSegments = useNarrativeStore
-      .getState()
-      .getSessionSegments(sessionId);
-
-    if (currentSegments.length === 0) {
-      choiceGenerationInProgress.current = false;
-      return;
-    }
-    setIsGeneratingChoices(true);
-
-    // Use recent segments for context - get from fresh data
-    const recentSegments = currentSegments.slice(-5);
-
-    // Create fallback choices upfront - we'll use these immediately if something fails
-    const fallbackId = `decision-fallback-${Date.now()}`;
-    const fallbackDecision: Decision = {
-      id: fallbackId,
-      prompt: 'What will you do?',
-      options: [
-        {
-          id: `option-${fallbackId}-1`,
-          text: 'Investigate further',
-          alignment: 'neutral',
-          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
-        },
-        {
-          id: `option-${fallbackId}-2`,
-          text: 'Talk to nearby characters',
-          alignment: 'lawful',
-          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
-        },
-        {
-          id: `option-${fallbackId}-3`,
-          text: 'Move to a new location',
-          alignment: 'neutral',
-          requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
-        },
-      ],
-      decisionWeight: 'minor',
-      contextSummary:
-        recentSegments.length > 0
-          ? `${recentSegments[recentSegments.length - 1]?.metadata?.location || 'Unknown location'}: ${truncate(recentSegments[recentSegments.length - 1]?.content || 'Making a decision', 100)}`
-          : 'Making a decision in an unknown location.',
-    };
-
-    try {
-      const choiceCharacterIds = characterId ? [characterId] : [];
-      // Create narrative context for choice generation
-      const narrativeContext: NarrativeContext = {
-        worldId,
-        currentSceneId: `scene-${Date.now()}`,
-        characterIds: choiceCharacterIds,
-        previousSegments: recentSegments,
-        currentTags:
-          recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
-        sessionId: sessionId || 'temp-session',
-        recentSegments,
-        currentLocation:
-          recentSegments[recentSegments.length - 1]?.metadata?.location ||
-          undefined,
-      };
-
-      // Generate choices with a 15-second timeout for real API calls
-      let decision;
-      try {
-        // Set up a race between the AI generation and a timeout
-        const timeoutPromise = new Promise<Decision>((_, reject) => {
-          setTimeout(
-            () =>
-              reject(
-                new Error('AI choice generation timed out after 15 seconds')
-              ),
-            15000
-          );
-        });
-
-        decision = await Promise.race([
-          narrativeGenerator.generatePlayerChoices(
-            worldId,
-            narrativeContext,
-            choiceCharacterIds
-          ),
-          timeoutPromise,
-        ]);
-      } catch {
-        // Choice generation failed, using fallback choices
-        decision = fallbackDecision;
-      }
-
-      // Skip if component unmounted during async operation
-      if (!mountedRef.current) {
-        return;
-      }
-
-      // Verify decision structure and use fallback if invalid
-      if (
-        !decision ||
-        !decision.options ||
-        (decision.options?.length || 0) === 0
-      ) {
-        decision = fallbackDecision;
-      }
-
-      // Add decision to store and get the actual stored ID
-      const storedDecisionId = useNarrativeStore
-        .getState()
-        .addDecision(sessionId, {
-          prompt: decision.prompt,
-          options: decision.options,
-          decisionWeight: decision.decisionWeight,
-          contextSummary: decision.contextSummary,
-        });
-
-      // Update the decision with the stored ID before passing to parent
-      decision.id = storedDecisionId;
-
-      // Only notify parent component if we have AI-generated choices (not fallback)
-      // Check if this is a fallback decision by comparing the ID pattern
-      const isFallbackDecision = decision.id.includes('decision-fallback-');
-
-      if (!isFallbackDecision) {
-        if (onChoicesGenerated) {
-          try {
-            // Create a deep copy of the decision to ensure React state updates
-            const decisionCopy = JSON.parse(JSON.stringify(decision));
-            onChoicesGenerated(decisionCopy);
-          } catch (error) {
-            console.error('Error calling onChoicesGenerated callback:', error);
-          }
-        }
-      }
-    } catch {
-      // Unhandled error in generatePlayerChoices
-      setError(
-        'Unable to generate choices. Please check your connection and try again.'
-      );
-
-      // Even if we get an unhandled error, try to provide fallback choices
-
-      try {
-        // Only try to create fallback choices if we haven't already added any for this session
-        const existingDecisions = useNarrativeStore
-          .getState()
-          .getSessionDecisions(sessionId);
-
-        if (existingDecisions.length === 0 && mountedRef.current) {
-          // Create and add fallback choices to the store
-          const fallbackId = `decision-fallback-error-${Date.now()}`;
-          const fallbackDecision: Decision = {
-            id: fallbackId,
-            prompt: 'What will you do now?',
-            options: [
-              {
-                id: `option-${fallbackId}-1`,
-                text: 'Investigate the situation',
-                alignment: 'neutral',
-                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
-              },
-              {
-                id: `option-${fallbackId}-2`,
-                text: 'Speak with someone nearby',
-                alignment: 'lawful',
-                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
-              },
-              {
-                id: `option-${fallbackId}-3`,
-                text: 'Move to a different area',
-                alignment: 'neutral',
-                requirements: [{ type: 'skill', targetId: 'generic-skill-check', operator: 'gte', value: 1 }],
-              },
-            ],
-            decisionWeight: 'minor',
-            contextSummary: 'Error occurred during choice generation.',
-          };
-
-          // Add to store and get the actual stored ID
-          const storedFallbackId = useNarrativeStore
-            .getState()
-            .addDecision(sessionId, {
-              prompt: fallbackDecision.prompt,
-              options: fallbackDecision.options,
-              decisionWeight: fallbackDecision.decisionWeight,
-              contextSummary: fallbackDecision.contextSummary,
-            });
-
-          // Update the fallback decision with the stored ID
-          fallbackDecision.id = storedFallbackId;
-
-          // Notify parent
-          if (onChoicesGenerated && mountedRef.current) {
-            const decisionCopy = JSON.parse(JSON.stringify(fallbackDecision));
-            onChoicesGenerated(decisionCopy);
-          }
-        }
-      } catch {
-        // Failed to provide fallback choices
-      }
-    } finally {
-      choiceGenerationInProgress.current = false;
-      if (mountedRef.current) {
-        setIsGeneratingChoices(false);
-      }
-    }
-  }, [
-    sessionId,
-    worldId,
-    characterId,
-    onChoicesGenerated,
-    narrativeGenerator,
-    warnMissingSessionId,
   ]);
 
   // Load segments after hydration is complete
@@ -595,7 +373,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       if (
         generateChoices &&
         existingSegments.length > 0 &&
-        existingDecisions.length === 0
+        existingDecisions.length === 0 &&
+        !isSessionEndingSegment(existingSegments[existingSegments.length - 1])
       ) {
         setTimeout(() => {
           if (mountedRef.current) {
@@ -603,8 +382,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           }
         }, 300);
       }
-    } catch {
-      // Non-critical; continue
+    } catch (error) {
+      logger.warn('Non-critical error in post-hydration choice trigger', error);
     }
   }, [
     hasHydrated,
@@ -647,17 +426,15 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setError(null);
 
       // Race AI generation with a timeout so we can fallback gracefully
-      // Allow more time for first-call cold-starts and slower generation
-      const timeoutMs = 15000;
       const timeoutPromise = new Promise<
         ReturnType<typeof narrativeGenerator.generateInitialScene>
       >((_, reject) => {
         setTimeout(
           () =>
             reject(
-              new Error(`Initial generation timed out after ${timeoutMs}ms`)
+              new Error(`Initial generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
             ),
-          timeoutMs
+          AI_GENERATION_TIMEOUT_MS
         );
       });
       const result = await Promise.race([
@@ -721,8 +498,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Check for ending indicators
       await checkForEndingIndicators(newSegment);
 
-      // Generate choices if enabled - always generate for initial narrative
-      if (generateChoices) {
+      // Generate choices if enabled - skip when this segment already ends the session
+      if (generateChoices && !isSessionEndingSegment(newSegment)) {
         // Start generating AI choices immediately without showing fallback choices first
         setTimeout(() => {
           generatePlayerChoices();
@@ -769,16 +546,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         }
 
         // Kick off choice generation (will provide AI or fallback choices)
-        if (generateChoices) {
+        if (generateChoices && !isSessionEndingSegment(fallbackSegment)) {
           setTimeout(() => {
             generatePlayerChoices();
           }, 500);
         }
-      } catch {
+      } catch (error) {
         // Surface the original error if fallback insert also fails
-        setError(
-          'Unable to generate narrative. Please check your connection and try again.'
-        );
+        setError(getNarrativeError(error as Error).message);
       }
     } finally {
       initialGenerationLocksRef.current.delete(lockKey);
@@ -800,6 +575,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
     setIsLoading(true);
     setError(null);
+    clearGenerationError();
 
     try {
       // Use recent segments for context (last 3 segments for efficiency)
@@ -833,179 +609,38 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         }
       }
 
-      // Evaluate skill requirements if present
-      const skillCheckTags: string[] = [];
-      const rollResults: SkillCheckRoll[] = [];
+      // Evaluate skill requirements (rolls, tags, outcome, per-roll toasts, and
+      // the parent onSkillCheckPerformed notification are handled in the helper)
+      // Read characters/worlds at call time via getState() rather than
+      // subscribing — they're only needed here inside this async handler, so a
+      // store subscription would re-render the controller on every character/
+      // world write for no benefit (issue #1358).
+      const character = characterId
+        ? useCharacterStore.getState().characters[characterId]
+        : undefined;
+      const world = useWorldStore.getState().worlds[worldId];
+      const { skillCheckTags, rollResults, decisionOutcome } =
+        evaluateDecisionSkillChecks({
+          selectedOption,
+          character,
+          world,
+          toast,
+          onSkillCheckPerformed,
+        });
 
-      if (selectedOption?.requirements && characterId) {
-        const character = characters[characterId];
-        const world = worlds[worldId];
+      // Fatal outcome check: a critical decision only ends the run on a true
+      // critical-failure roll (natural 1). An ordinary missed roll is a
+      // survivable setback the AI narrates (and can still escalate via the
+      // fatal-outcome tag below), so one unlucky-but-ordinary roll no longer
+      // ends the story (issue #1426).
+      const isFatalCriticalFailure = isFatalCriticalDecision(
+        decisionWeight,
+        rollResults
+      );
 
-        if (character && world) {
-          // Filter for skill requirements only
-          const skillRequirements = selectedOption.requirements.filter(
-            (req) => req.type === 'skill'
-          );
-
-          for (const requirement of skillRequirements) {
-            const requiredLevel =
-              typeof requirement.value === 'number'
-                ? requirement.value
-                : parseInt(requirement.value, 10);
-
-            // ChoiceGenerator has already converted skill names to IDs
-            // targetId now contains the skill ID directly
-            const skillCheck = {
-              skillId: requirement.targetId,
-              difficulty: requiredLevel,
-            };
-
-            // Adapt store character format to evaluator's expected format
-            const adaptedCharacter: UtilCharacter = {
-              id: character.id,
-              name: character.name,
-              description: character.description,
-              worldId: character.worldId,
-              skills: character.skills.map((skill) => ({
-                skillId: skill.worldSkillId || skill.id,
-                level: skill.level,
-                experience: 0,
-                isActive: true,
-              })),
-              attributes: character.attributes.map((attr) => ({
-                attributeId: attr.worldAttributeId || attr.id,
-                value: attr.modifiedValue || attr.baseValue,
-              })),
-              derivedStats: [],
-              background: {
-                history: character.background?.history || '',
-                personality: character.background?.personality || '',
-                goals: character.background?.goals || [],
-                fears: character.background?.fears || [],
-                relationships: [],
-              },
-              inventory: {
-                characterId: character.inventory.characterId,
-                items: [],
-                capacity: character.inventory.capacity,
-                categories: [],
-                itemOrder: [],
-              },
-              status: character.status,
-              createdAt: character.createdAt,
-              updatedAt: character.updatedAt,
-            };
-
-            try {
-              const rollResult = evaluateSkillCheck(
-                adaptedCharacter,
-                skillCheck,
-                world.skills || []
-              );
-              rollResults.push(rollResult);
-
-              // Build tags based on outcome
-              if (rollResult.isCriticalSuccess) {
-                skillCheckTags.push(
-                  `skill-critical-success:${requirement.targetId}`
-                );
-              } else if (rollResult.isCriticalFailure) {
-                skillCheckTags.push(
-                  `skill-critical-failure:${requirement.targetId}`
-                );
-              } else if (rollResult.success) {
-                skillCheckTags.push(`skill-success:${requirement.targetId}`);
-              } else {
-                skillCheckTags.push(`skill-failure:${requirement.targetId}`);
-              }
-
-              skillCheckTags.push(`skill-roll:${rollResult.diceRoll}`);
-            } catch (error) {
-              console.error('Skill check failed:', error);
-              skillCheckTags.push(`skill-error:${requirement.targetId}`);
-            }
-          }
-        }
-      }
-
-      // Pass results to parent component
-      onSkillCheckPerformed?.(rollResults);
-
-      // Show toast notifications for skill check results
-      // Use longer duration (8 seconds) so players have time to read the roll details
-      rollResults.forEach((result) => {
-        // Build detailed breakdown for description
-        const buildBreakdown = () => {
-          const parts = [`d20: ${result.diceRoll}`];
-          if (result.skillLevel > 0) parts.push(`skill: +${result.skillLevel}`);
-          if (result.attributeBonus > 0)
-            parts.push(`attribute: +${result.attributeBonus}`);
-
-          // If no bonuses, explicitly show that
-          const hasAnyBonus =
-            result.skillLevel > 0 || result.attributeBonus > 0;
-          const breakdown = hasAnyBonus
-            ? parts.join(', ')
-            : `${parts[0]} (no bonuses)`;
-
-          return `${breakdown} = ${result.total} (need ${result.dc})`;
-        };
-
-        if (result.isCriticalSuccess) {
-          toast.addToast({
-            title: `Critical Success! ${result.skillName}`,
-            description: `Natural 20! Automatic success regardless of modifiers.`,
-            variant: 'success',
-            duration: 8000,
-          });
-        } else if (result.isCriticalFailure) {
-          toast.addToast({
-            title: `Critical Failure! ${result.skillName}`,
-            description: `Natural 1! Automatic failure regardless of modifiers.`,
-            variant: 'error',
-            duration: 8000,
-          });
-        } else if (result.success) {
-          toast.addToast({
-            title: `${result.skillName} Check: Success`,
-            description: buildBreakdown(),
-            variant: 'success',
-            duration: 8000,
-          });
-        } else {
-          toast.addToast({
-            title: `${result.skillName} Check: Failed`,
-            description: buildBreakdown(),
-            variant: 'warning',
-            duration: 8000,
-          });
-        }
-      });
-
-      let decisionOutcome: DecisionOutcome | undefined;
-      if (rollResults.length > 0) {
-        const successCount = rollResults.filter((r) => r.success).length;
-        const failureCount = rollResults.length - successCount;
-        const hasCriticalSuccess = rollResults.some((r) => r.isCriticalSuccess);
-        const hasCriticalFailure = rollResults.some((r) => r.isCriticalFailure);
-
-        if (failureCount === 0) {
-          decisionOutcome = hasCriticalSuccess ? 'critical-success' : 'success';
-        } else if (successCount === 0) {
-          decisionOutcome = hasCriticalFailure ? 'critical-failure' : 'failure';
-        } else {
-          decisionOutcome = 'mixed';
-        }
-      }
-
-      // Fatal outcome check: Any failure on a critical decision ends the game
-      // This makes critical decisions truly life-or-death
-      const hasCriticalFailure =
-        decisionWeight === 'critical' && rollResults.some((r) => !r.success);
-
-      if (hasCriticalFailure) {
+      if (isFatalCriticalFailure) {
         suggestEnding(
-          'fatal: failure on a pivotal decision left the character unable to continue.',
+          'fatal: a catastrophic failure on a pivotal decision left the character unable to continue.',
           'story-complete'
         );
       }
@@ -1032,32 +667,48 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         skillCheckContext = ` [Skill checks: ${skillResultDescriptions.join(', ')}]`;
       }
 
-      const result = await narrativeGenerator.generateSegment({
-        worldId,
-        sessionId,
-        characterIds: characterId ? [characterId] : [],
-        narrativeContext: {
-          worldId,
-          currentSceneId: `scene-${Date.now()}`,
-          characterIds: characterId ? [characterId] : [],
-          previousSegments: recentSegments,
-          currentTags,
-          sessionId: sessionId || 'temp-session',
-          recentSegments,
-          currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
-        },
-        generationParameters: {
-          includedTopics: [choiceText],
-          desiredLength: 'short',
-          decisionWeight,
-          // Critical decisions with critical failures should have tragic tone
-          desiredTone:
-            decisionWeight === 'critical' &&
-            rollResults.some((r) => r.isCriticalFailure)
-              ? 'tragic'
-              : undefined,
-        },
+      const segmentTimeoutPromise = new Promise<
+        ReturnType<typeof narrativeGenerator.generateSegment>
+      >((_, reject) => {
+        setTimeout(
+          () =>
+            reject(
+              new Error(`Segment generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
+            ),
+          AI_GENERATION_TIMEOUT_MS
+        );
       });
+      const result = await Promise.race([
+        narrativeGenerator.generateSegment({
+          worldId,
+          sessionId,
+          characterIds: characterId ? [characterId] : [],
+          narrativeContext: {
+            worldId,
+            currentSceneId: `scene-${Date.now()}`,
+            characterIds: characterId ? [characterId] : [],
+            previousSegments: recentSegments,
+            currentTags,
+            sessionId,
+            recentSegments,
+            currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
+          },
+          generationParameters: {
+            includedTopics: [choiceText],
+            desiredLength: 'short',
+            decisionWeight,
+            // Critical decisions with critical failures should have tragic tone
+            desiredTone:
+              decisionWeight === 'critical' &&
+              rollResults.some((r) => r.isCriticalFailure)
+                ? 'tragic'
+                : undefined,
+          },
+        }),
+        segmentTimeoutPromise as unknown as ReturnType<
+          typeof narrativeGenerator.generateSegment
+        >,
+      ]);
 
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
@@ -1114,8 +765,20 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Check for ending indicators
       await checkForEndingIndicators(newSegment);
 
-      // Generate choices if enabled
-      if (generateChoices) {
+      // Generate choices if enabled - skip when the session is ending
+      // (fatal/ending segment or a fatal critical-decision failure).
+      // A fatal critical failure only ends the session when an ending handler
+      // is wired: suggestEnding() is a no-op without onEndingSuggested. Without
+      // a handler, keep generating choices so a standalone controller (harness,
+      // story, embedder) can still move forward instead of stalling with no
+      // ending and no choices.
+      const criticalFailureEndsSession =
+        isFatalCriticalFailure && Boolean(onEndingSuggested);
+      if (
+        generateChoices &&
+        !isSessionEndingSegment(newSegment) &&
+        !criticalFailureEndsSession
+      ) {
         if (isCustomInput) {
           // Generate choices after a longer delay to ensure custom input is fully processed
           setTimeout(() => {
@@ -1128,11 +791,15 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           }, 500); // Normal timeout for predefined choices
         }
       }
-    } catch {
-      // Error generating narrative
+    } catch (err) {
+      // Error generating narrative. Classify the failure (transient network/
+      // 429/5xx/timeout vs terminal bad-key) into shared store state so the
+      // play surface can surface inline error + Retry copy. Keep the local
+      // string error for the (hidden) NarrativeHistory path too.
       setError(
         'Unable to generate narrative. Please check your connection and try again.'
       );
+      setGenerationError(getNarrativeError(err as Error));
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
@@ -1142,6 +809,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   const handleRetry = () => {
     setError(null);
+    clearGenerationError();
 
     // If we have no segments, retry initial generation
     if (segments.length === 0) {
@@ -1159,6 +827,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setError(null);
     }
   };
+
+  // Re-run the failed generation when an external surface bumps retryToken
+  // (e.g. the choices column's Retry button). Skips the initial 0 value so a
+  // fresh mount never triggers a spurious regeneration.
+  useEffect(() => {
+    if (retryToken > 0) {
+      handleRetry();
+    }
+    // handleRetry closes over the latest choiceId/segments each render; depending
+    // only on retryToken keeps this a one-shot per bump.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retryToken]);
 
   return (
     <div className={`narrative-controller ${className || ''}`}>

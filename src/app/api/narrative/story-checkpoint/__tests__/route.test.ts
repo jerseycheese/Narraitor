@@ -76,7 +76,8 @@ describe('/api/narrative/story-checkpoint', () => {
     expect(response.status).toBe(200);
     expect(data.summary).toBe('Recap');
     expect(mockGenerateStoryCheckpointSummary).toHaveBeenCalledWith(
-      expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' })
+      expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' }),
+      null
     );
   });
 

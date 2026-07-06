@@ -11,6 +11,12 @@ export const mockWorldA = {
   name: 'The Enchanted Realm',
   description: 'A magical world filled with wonder',
   genre: 'fantasy' as const,
+  image: {
+    type: 'ai-generated' as const,
+    url: '/visual-assets/world-cyberpunk.png',
+    prompt: 'A sweeping fantasy landscape',
+    generatedAt: getTimestamp(),
+  },
   attributes: [],
   skills: [],
   settings: {
@@ -23,11 +29,13 @@ export const mockWorldA = {
   updatedAt: getTimestamp(),
 };
 
+// World B intentionally has no image — exercises the no-image fallback.
 export const mockWorldB = {
   ...mockWorldA,
   id: 'world-2',
   name: 'Neon Shore',
   genre: 'sci-fi' as const,
+  image: undefined,
 };
 
 export const mockCharacterA = {
@@ -55,7 +63,12 @@ export const mockCharacterA = {
     itemOrder: [],
   },
   status: { health: 100, maxHealth: 100, conditions: [] },
-  portrait: { type: 'placeholder' as const, url: null },
+  portrait: {
+    type: 'ai-generated' as const,
+    url: '/visual-assets/portrait-fantasy.png',
+    prompt: 'A courageous warrior',
+    generatedAt: getTimestamp(),
+  },
   createdAt: getTimestamp(),
   updatedAt: getTimestamp(),
 };
@@ -65,6 +78,12 @@ export const mockCharacterB = {
   id: 'char-2',
   worldId: 'world-2',
   name: 'Vex',
+  portrait: {
+    type: 'ai-generated' as const,
+    url: '/visual-assets/portrait-cyberpunk.png',
+    prompt: 'A wary street operative',
+    generatedAt: getTimestamp(),
+  },
 };
 
 export type DashboardScenario =
@@ -72,7 +91,7 @@ export type DashboardScenario =
   | 'returning-no-session'
   | 'barely-started';
 
-export const mockDashboardState = (scenario: DashboardScenario) => {
+const mockDashboardState = (scenario: DashboardScenario) => {
   // Always bypass first-time onboarding so we render the dashboard,
   // not the GuidedFirstTimeExperience.
   const sharedSession = {

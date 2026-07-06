@@ -2,24 +2,42 @@
 title: Technical Approach
 tags: [architecture, technology, stack]
 created: 2025-04-28
-updated: 2025-06-26
+updated: 2026-05-22
 ---
 
 # Technical Approach
 
-This the tech stack here prioritizes maintainability and developer experience over being cutting-edge. The goal was to choose technologies that would still make sense in a year, with good TypeScript support and clear upgrade paths.
+The tech stack prioritizes maintainability and developer experience over being cutting-edge.
+The aim was to pick technologies that would still make sense in a year — good TypeScript
+support, clear upgrade paths, nothing exotic.
 
 ## Technology Choices
 
-**Next.js 15.5.6 with App Router** - Went with the latest stable version for better performance with server components and built-in optimizations. The App Router makes routing much cleaner than the old Pages Router, and nested layouts eliminate a lot of layout duplication. (Updated 2025-10-27.)
+**Next.js 15 (15.5.x) with App Router** - The App Router makes routing cleaner than the old
+Pages Router, server components help performance, and nested layouts cut a lot of layout
+duplication. Running React 19 underneath.
 
-**TypeScript everywhere** - Static typing catches so many issues early, especially with complex state management and AI integrations. The IDE integration makes refactoring much safer, and types serve as documentation.
+**TypeScript everywhere** - Static typing catches a lot early, especially with complex state
+management and AI integrations. The IDE integration makes refactoring safer, and the types
+double as documentation.
 
-**Tailwind CSS v3 + shadcn/ui** - Utility-first CSS for rapid development, but shadcn/ui provides consistent component patterns. Sticking with v3 for now since Storybook compatibility matters more than having the latest Tailwind features. The combination gives you speed without sacrificing design consistency, and the theming approach works well for world-specific styling.
+**Plain CSS with design tokens (no Tailwind)** - Styling is hand-written CSS driven by
+design-token custom properties (`var(--color-surface)`, `var(--space-4)`, `var(--radius-md)`),
+with `clsx` composing semantic class names. Tailwind isn't a dependency anymore — the
+components started from shadcn/ui but were stripped of `cva` and Tailwind utilities in a "clean
+slate" pass, keeping the Radix accessibility foundation while moving styling onto the token
+system. That token approach is what lets the three design systems (DS1/DS2/DS3) restyle the same
+markup by swapping CSS variables.
 
-**Zustand for state management** - Replaced React Context early on because it was getting unwieldy. Zustand is lightweight, has excellent TypeScript support, and makes testing much easier since stores are just functions. The IndexedDB persistence integration works smoothly.
+**Zustand for state management** - Replaced React Context early on once it got unwieldy.
+Zustand is lightweight, has solid TypeScript support, and is easy to test since stores are just
+functions. It persists to IndexedDB through the `persist` middleware.
 
-**Testing stack** - Jest + React Testing Library for the core testing, with Storybook for component development. The TDD workflow really helps with component APIs, and React Testing Library keeps tests focused on user behavior rather than implementation details.
+**Testing stack** - Jest + React Testing Library for unit and integration tests, Playwright for
+visual-regression specs (`tests/visual/`), and Storybook for component development. Stryker
+mutation testing runs against the state, storage, and narrative layers to keep those tests
+honest. RTL keeps tests focused on user behavior rather than implementation details, which fits
+the TDD workflow.
 
 **Data persistence** - IndexedDB for client-side storage because game sessions need to persist across browser sessions. It handles structured data well and has good performance for the narrative data structures.
 - Transaction support for data integrity
@@ -29,7 +47,7 @@ This the tech stack here prioritizes maintainability and developer experience ov
 ### AI Integration: Google Gemini
 **Secure Implementation**:
 - Server-side API key protection
-- Rate limiting (50 requests/hour per IP)
+- Rate limiting (50 requests/hour per IP in production) on the narrative generation routes
 - Prompt template management
 - Context-aware generation
 - Error handling and fallbacks
@@ -68,19 +86,21 @@ This the tech stack here prioritizes maintainability and developer experience ov
 
 ```
 src/
-├── app/                     # Next.js App Router pages
-├── components/              # Shared UI components
-├── lib/                     # Shared utilities and services
+├── app/                     # Next.js App Router pages + API routes
+├── components/              # React components, grouped by domain
+├── lib/                     # Domain logic, integrations, utilities
 ├── state/                   # Zustand stores by domain
+├── services/                # Cross-cutting services
+├── hooks/                   # Shared React hooks
 ├── types/                   # TypeScript type definitions
+├── stories/                 # Storybook stories
+├── styles/                  # Global + theme CSS
 └── utils/                   # Helper functions
 ```
 
-**Key Benefits**:
-- Clear organization by function
-- Zustand stores grouped by domain
-- Shared components for reusability
-- Centralized utilities and types
+The [Repository Structure](repository-structure.md) doc has the full tree. The payoff of this
+layout is that related code sits together: stores grouped by domain, components grouped by the
+feature they serve, and types kept close to the domains they describe.
 
 ## Performance Optimizations
 

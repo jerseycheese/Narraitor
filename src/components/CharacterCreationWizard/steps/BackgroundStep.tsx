@@ -4,12 +4,20 @@ import { ErrorBlock } from '@/components/shared';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import type { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
+import type { WizardValidation } from '@/hooks/useWizardState';
+import type { World } from '@/types/world.types';
+
+interface BackgroundStepData {
+  characterData: CharacterCreationData;
+  validation: Record<number, WizardValidation>;
+}
 
 interface BackgroundStepProps {
-  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onUpdate: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  data: BackgroundStepData;
+  onUpdate: (updates: Partial<CharacterCreationData>) => void;
   onValidation: (valid: boolean, errors: string[]) => void;
-  worldConfig: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  worldConfig: World;
 }
 
 export const BackgroundStep: React.FC<BackgroundStepProps> = ({

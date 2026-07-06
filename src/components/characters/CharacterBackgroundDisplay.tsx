@@ -16,41 +16,37 @@ interface CharacterBackgroundDisplayProps {
 
 export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDisplayProps) {
   return (
-    <div>
+    <div className="character-detail-background">
       {/* History Section */}
-      <div>
-        <h3>
-          History
-        </h3>
-        <p>
-          {background.history}
-        </p>
+      <div className="character-detail-background-section">
+        <h3 className="character-detail-background-heading">History</h3>
+        <p className="character-detail-background-text">{background.history}</p>
       </div>
 
       {/* Personality Section */}
-      <div>
-        <h3>
-          Personality
-        </h3>
-        <p>
+      <div className="character-detail-background-section">
+        <h3 className="character-detail-background-heading">Personality</h3>
+        <p className="character-detail-background-text">
           {background.personality}
         </p>
       </div>
 
       {/* Goals Section */}
       {background.goals && background.goals.length > 0 && (
-        <div>
-          <h3>
+        <div className="character-detail-background-section">
+          <h3 className="character-detail-background-heading">
             Goals & Motivations
           </h3>
           {background.goals.length === 1 ? (
-            <p>
+            <p className="character-detail-background-text">
               {background.goals[0]}
             </p>
           ) : (
-            <ul>
+            <ul className="character-detail-background-list">
               {background.goals.map((goal, index) => (
-                <li key={index}>{goal}</li>
+                <li key={index} className="character-detail-background-list-item">
+                  {goal}
+                </li>
               ))}
             </ul>
           )}
@@ -59,13 +55,13 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
 
       {/* Fears Section */}
       {background.fears && background.fears.length > 0 && (
-        <div>
-          <h3>
-            Fears
-          </h3>
-          <ul>
+        <div className="character-detail-background-section">
+          <h3 className="character-detail-background-heading">Fears</h3>
+          <ul className="character-detail-background-list">
             {background.fears.map((fear, index) => (
-              <li key={index}>{fear}</li>
+              <li key={index} className="character-detail-background-list-item">
+                {fear}
+              </li>
             ))}
           </ul>
         </div>
@@ -73,11 +69,11 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
 
       {/* Physical Description Section (optional) */}
       {background.physicalDescription && (
-        <div>
-          <h3>
+        <div className="character-detail-background-section">
+          <h3 className="character-detail-background-heading">
             Physical Appearance
           </h3>
-          <p>
+          <p className="character-detail-background-text">
             {background.physicalDescription}
           </p>
         </div>

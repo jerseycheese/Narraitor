@@ -47,7 +47,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { getTimestamp } from '@/lib/utils';
 import { useJournalStore } from '@/state/journalStore';
-import { AutoSaveService, SaveTriggerReason, GameState } from '@/lib/services/autoSaveService';
+import { createAutoSave, AutoSave, SaveTriggerReason, GameState } from '@/lib/services/autoSaveService';
 import { useToast } from '@/components/ui/toast';
 
 /**
@@ -76,7 +76,7 @@ export const useAutoSave = () => {
   const sessionStatus = useSessionStore(state => state.status);
   const toast = useToast();
   
-  const autoSaveServiceRef = useRef<AutoSaveService | null>(null);
+  const autoSaveServiceRef = useRef<AutoSave | null>(null);
 
   // Create state provider function using direct store accessors to avoid re-subscribing
   const stateProvider = useCallback(async (): Promise<GameState> => {
@@ -106,7 +106,7 @@ export const useAutoSave = () => {
   // Initialize auto-save service
   useEffect(() => {
     if (!autoSaveServiceRef.current) {
-      autoSaveServiceRef.current = new AutoSaveService(stateProvider, {
+      autoSaveServiceRef.current = createAutoSave(stateProvider, {
         onSaveStart: (reason) => {
           // Manual saves set the status before calling triggerSave
           if (reason !== 'manual') {

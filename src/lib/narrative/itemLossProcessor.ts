@@ -10,6 +10,11 @@ import type { EntityID } from '@/types/common.types';
 import type { InventoryItem } from '@/types/inventory.types';
 import { createLossJournalEntry } from '@/lib/inventory/journalIntegration';
 import { logger } from '@/lib/utils/logger';
+import {
+  delayBetweenItems,
+  itemNamesMatch,
+  runQueued,
+} from './itemProcessorShared';
 
 type PreparedLossItem = LostItemMetadata & {
   normalizedName: string;
@@ -18,7 +23,6 @@ type PreparedLossItem = LostItemMetadata & {
   adjustedQuantity: boolean; // True if AI requested more than available
 };
 
-const RATE_LIMIT_DELAY_MS = 200;
 const processingQueue = new Map<EntityID, Promise<void>>();
 
 /**
@@ -45,14 +49,10 @@ export async function processLostItems(
 
   logger.info(`Processing ${items.length} lost items for character ${characterId}`);
 
-  const previous = processingQueue.get(characterId) ?? Promise.resolve();
-
-  const tracked = previous
-    .catch((err) => {
-      // Prevent a failed prior job from blocking the queue
-      logger.error('Previous item loss run failed', err);
-    })
-    .then(async () => {
+  return runQueued(
+    processingQueue,
+    characterId,
+    async () => {
       const inventoryStore = useInventoryStore.getState();
       const characterItems = inventoryStore.getCharacterItems(characterId);
 
@@ -78,15 +78,13 @@ export async function processLostItems(
 
         try {
           logger.info(`Removing ${item.quantityToRemove}x "${item.matchedInventoryItem.name}" from inventory`);
-          // Execute removal
           inventoryStore.removeItem(
             characterId,
             item.matchedInventoryItem.id,
             item.quantityToRemove
           );
 
-          // Create journal entry (non-blocking)
-          // We pass a modified metadata object with the actual quantity removed
+          // Create journal entry (non-blocking) with the actual quantity removed
           void createJournalEntryForLoss(
             item.matchedInventoryItem,
             { ...item, quantity: item.quantityToRemove },
@@ -100,26 +98,15 @@ export async function processLostItems(
             );
           }
 
-          // Rate limiting between items
           await delayBetweenItems(i, preparedItems.length);
         } catch (err) {
-          // Log error but continue processing remaining items
           logger.error(`Failed to remove item "${item.name}" from inventory:`, err);
         }
       }
-    })
-    .catch((err) => {
-      logger.error('processLostItems encountered an unexpected error', err);
-    })
-    .finally(() => {
-      if (processingQueue.get(characterId) === tracked) {
-        processingQueue.delete(characterId);
-      }
-    });
-
-  processingQueue.set(characterId, tracked);
-
-  return tracked;
+    },
+    (err) => logger.error('Previous item loss run failed', err),
+    (err) => logger.error('processLostItems encountered an unexpected error', err)
+  );
 }
 
 /**
@@ -171,31 +158,6 @@ async function prepareItemForLoss(
 }
 
 /**
- * Checks if two item names are semantically similar using AI.
- * Reuses the pattern from itemAcquisitionProcessor.
- */
-async function itemNamesMatch(name1: string, name2: string): Promise<boolean> {
-  const normalized1 = normalizeText(name1 || '', NORM_NAME).toLowerCase();
-  const normalized2 = normalizeText(name2 || '', NORM_NAME).toLowerCase();
-
-  // Quick exact match check
-  if (normalized1 === normalized2) return true;
-
-  try {
-    const { checkItemSimilarityClient } = await import('@/lib/inventory/checkItemSimilarityClient');
-    const result = await checkItemSimilarityClient({
-      name1,
-      name2,
-    });
-
-    return result.similar && result.confidence > 0.7;
-  } catch (error) {
-    console.warn('AI similarity check failed for item loss, using fallback:', error);
-    return normalized1.includes(normalized2) || normalized2.includes(normalized1);
-  }
-}
-
-/**
  * Creates a journal entry for item loss.
  */
 async function createJournalEntryForLoss(
@@ -231,10 +193,3 @@ async function createJournalEntryForLoss(
   }
 }
 
-function delayBetweenItems(index: number, total: number): Promise<void> {
-  if (index >= total - 1) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
-}

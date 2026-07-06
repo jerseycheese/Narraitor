@@ -2,9 +2,12 @@
 
 import { useCallback } from 'react';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
-import type { Decision, NarrativeSegment } from '@/types/narrative.types';
+import type { Decision, DecisionRequirement, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { inferCustomActionSkillChecks } from '@/lib/ai/customActionSkillInference';
 import { generateUniqueId } from '@/lib/utils';
 import type { UseAutoSaveReturn } from '@/hooks/useAutoSave';
 
@@ -16,6 +19,7 @@ interface UseActiveGameSessionActionsOptions {
   setIsGenerating: Dispatch<SetStateAction<boolean>>;
   setShouldTriggerGeneration: Dispatch<SetStateAction<boolean>>;
   setIsGeneratingChoices: Dispatch<SetStateAction<boolean>>;
+  setIsEvaluatingAction: Dispatch<SetStateAction<boolean>>;
   setLocalSelectedChoiceId: Dispatch<SetStateAction<string | undefined>>;
   choiceGenerationTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
   scheduleChoiceFallback: () => void;
@@ -37,6 +41,7 @@ export const useActiveGameSessionActions = ({
   setIsGenerating,
   setShouldTriggerGeneration,
   setIsGeneratingChoices,
+  setIsEvaluatingAction,
   setLocalSelectedChoiceId,
   choiceGenerationTimeoutRef,
   scheduleChoiceFallback,
@@ -103,9 +108,15 @@ export const useActiveGameSessionActions = ({
     void autoSave.triggerSave('player-choice');
   }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
-  const handleCustomSubmit = useCallback((customText: string) => {
+  const handleCustomSubmit = useCallback(async (customText: string) => {
     // Check if session has ended - if so, prevent further generation
     if (isSessionEnded(sessionId)) {
+      return;
+    }
+
+    // Can't register a custom action without an active decision; bail before touching
+    // generation state so we never fire onChoiceSelected with an id that backs no option.
+    if (!currentDecision) {
       return;
     }
 
@@ -117,6 +128,41 @@ export const useActiveGameSessionActions = ({
       createDecisionJournalEntry(currentDecision, customText, true);
     }
 
+    // Disable input immediately; the inference + roll happen before generation.
+    setIsGenerating(true);
+    setIsGeneratingChoices(true);
+    setLocalSelectedChoiceId(customChoiceId);
+
+    // Phase 1 (Issue #918): infer skill checks for the typed action so custom
+    // actions get the same d20 treatment as predefined choices. The resulting
+    // requirements are attached to the option below; NarrativeController then
+    // rolls them via its existing skill-check evaluation.
+    let inferredRequirements: DecisionRequirement[] = [];
+    if (currentDecision && characterId) {
+      const character = useCharacterStore.getState().characters[characterId];
+      const world = character
+        ? useWorldStore.getState().worlds[character.worldId]
+        : undefined;
+
+      if (character && world) {
+        setIsEvaluatingAction(true);
+        try {
+          const recentSegments = useNarrativeStore
+            .getState()
+            .getSessionSegments(sessionId)
+            .slice(-2);
+          inferredRequirements = await inferCustomActionSkillChecks({
+            actionText: customText,
+            character,
+            world,
+            recentSegments,
+          });
+        } finally {
+          setIsEvaluatingAction(false);
+        }
+      }
+    }
+
     // Create a custom decision option and add it to the current decision in the store
     if (currentDecision) {
       const customOption = {
@@ -124,6 +170,9 @@ export const useActiveGameSessionActions = ({
         text: customText,
         isCustomInput: true,
         customText: customText,
+        ...(inferredRequirements.length > 0
+          ? { requirements: inferredRequirements }
+          : {}),
       };
 
       // Update the decision in the store with the new custom option and select it
@@ -137,16 +186,13 @@ export const useActiveGameSessionActions = ({
     setCurrentDecision(null);
 
     // Trigger narrative generation with the custom choice
-    setIsGenerating(true);
-    setIsGeneratingChoices(true); // Start generating new choices
-    setLocalSelectedChoiceId(customChoiceId);
     setShouldTriggerGeneration(true);
 
     maybeCompleteFirstPlay();
     onChoiceSelected(customChoiceId);
 
     void autoSave.triggerSave('player-choice');
-  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
+  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsEvaluatingAction, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
   const handleChoicesGenerated = useCallback((decision: Decision) => {
     if (!decision || !decision.options || (decision.options?.length || 0) === 0) {

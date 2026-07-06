@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import Logger from '@/lib/utils/logger';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
@@ -15,6 +17,8 @@ import WorldImageForm from '@/components/forms/WorldImageForm';
 interface WorldEditorProps {
   worldId: string;
 }
+
+const logger = new Logger('WorldEditor');
 
 const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   const router = useRouter();
@@ -31,8 +35,10 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
 
   // Kick off store hydration on mount
   useEffect(() => {
-    fetchWorlds().catch(() => {
-      // Swallow errors; UI will show fallback error state
+    fetchWorlds().catch((err) => {
+      logger.error('Failed to load worlds:', err);
+      setError('Failed to load world');
+      setLoading(false);
     });
   }, [fetchWorlds]);
 
@@ -69,9 +75,6 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
     try {
       const { updateWorld } = useWorldStore.getState();
       updateWorld(worldId, world);
-
-      // Small delay to show save state
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
       router.push('/worlds'); // Navigate back to worlds list
     } catch {
@@ -157,17 +160,24 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       </CollapsibleSection>
 
       <div className="world-editor-actions">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleCancel}
-          disabled={saving}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={saving}>
-          {saving ? 'Saving...' : 'Save Changes'}
-        </Button>
+        <ActionButtonGroup
+          layout="horizontal"
+          gap="md"
+          actions={[
+            {
+              label: 'Cancel',
+              onClick: handleCancel,
+              variant: 'secondary',
+              disabled: saving,
+            },
+            {
+              label: saving ? 'Saving...' : 'Save Changes',
+              onClick: () => handleSave(), // Wrap in arrow to avoid event object issues
+              variant: 'primary',
+              disabled: saving,
+            },
+          ]}
+        />
       </div>
     </form>
   );

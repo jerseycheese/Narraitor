@@ -1,0 +1,43 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "npm",
+  "testRunner": "jest",
+  "jest": {
+    "configFile": "jest.stryker.config.cjs",
+    "enableFindRelatedTests": true
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 2,
+  "timeoutMS": 60000,
+  "timeoutFactor": 2,
+  "disableTypeChecks": "src/**/*.{js,ts,jsx,tsx}",
+  "ignorePatterns": [
+    ".claude",
+    "narraitor-worktrees",
+    "public_docs",
+    "public",
+    "storybook-static",
+    ".next",
+    "coverage",
+    "reports",
+    "stryker-tmp",
+    ".stryker-tmp",
+    "tests",
+    ".git"
+  ],
+  "warnings": { "preprocessorErrors": false },
+  "mutate": [
+    "src/state/**/*.ts",
+    "src/lib/storage/**/*.ts",
+    "src/lib/narrative/**/*.ts",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "!src/**/__mocks__/**",
+    "!src/**/*.stories.*"
+  ],
+  "reporters": ["html", "clear-text", "progress"],
+  "tempDirName": "stryker-tmp",
+  "htmlReporter": {
+    "fileName": "reports/mutation/wave2a.html"
+  }
+}

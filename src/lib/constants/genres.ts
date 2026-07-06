@@ -84,9 +84,3 @@ export function toGenreValue(value: string, fallback: GenreValue = 'other'): Gen
   const isValid = GENRES.some(genre => genre.value === normalized);
   return (isValid ? normalized : fallback) as GenreValue;
 }
-
-/**
- * Genres available for mixing in the Genre Mixer
- * Excludes 'other' since it requires specific definition to be useful for blending
- */
-export const MIXABLE_GENRES = GENRES.filter(genre => genre.value !== 'other');

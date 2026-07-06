@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '@/lib/utils/errorUtils';
-import { generateCharacter } from '@/lib/ai/characterGenerator';
+import { generateAICharacter } from '@/lib/generators/characterGenerator';
 import { World } from '@/types/world.types';
 import { validateWorld } from '@/lib/utils/typeGuards';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('GenerateCharacter');
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +14,7 @@ export async function POST(request: NextRequest) {
     const characterType = body?.characterType;
     const existingNames = body?.existingNames;
     const suggestedName = body?.suggestedName;
+    const concept = body?.concept;
     const worldData = body?.world;
     
     if (!worldData) {
@@ -32,16 +37,18 @@ export async function POST(request: NextRequest) {
     const world = worldData as World;
 
     // Generate character using the existing function
-    const generatedCharacter = await generateCharacter(
+    const generatedCharacter = await generateAICharacter(
       world,
       (Array.isArray(existingNames) ? existingNames : []) as string[],
       suggestedName as string | undefined,
-      (characterType as 'original' | 'known' | 'specific') || 'original'
+      (characterType as 'original' | 'known' | 'specific') || 'original',
+      typeof concept === 'string' ? concept : undefined,
+      resolveApiKey(request)
     );
 
     return NextResponse.json(generatedCharacter);
   } catch (error) {
-    console.error('Character generation error:', error);
+    logger.error('Character generation error:', error);
 
     return createAPIErrorResponse(
       error instanceof Error ? error : new Error('Character generation failed'),

@@ -2,6 +2,9 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { sanitizeForSerialization } from '@/lib/utils';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('JsonViewer');
 
 /**
  * JsonViewer props
@@ -106,7 +109,7 @@ function syntaxHighlight(json: string): string {
     );
   } catch (error) {
     // Fail gracefully if highlighting encounters an error
-    console.error('Error while highlighting JSON:', error);
+    logger.error('Error while highlighting JSON:', error);
     return json
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')

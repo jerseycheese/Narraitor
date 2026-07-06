@@ -3,6 +3,7 @@
 import React from 'react';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History } from 'lucide-react';
+import { HudCloseButton } from './HudCloseButton';
 
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
@@ -56,6 +57,7 @@ function DS1ChromeBar({
           <button
             ref={characterButtonRef}
             type="button"
+            data-tutorial="session-character"
             onClick={onToggleCharacterSummary}
             aria-expanded={isCharacterSummaryExpanded}
             className="manuscript-hud-text-button"
@@ -67,6 +69,7 @@ function DS1ChromeBar({
             <button
               ref={toolsButtonRef}
               type="button"
+              data-tutorial="session-tools"
               onClick={onToggleToolsMenu}
               aria-label="Toggle Tools menu"
               aria-expanded={isToolsMenuOpen}
@@ -122,6 +125,7 @@ function DS2RunningHead({
           <button
             ref={characterButtonRef}
             type="button"
+            data-tutorial="session-character"
             onClick={onToggleCharacterSummary}
             aria-expanded={isCharacterSummaryExpanded}
             className="manuscript-hud-character-link"
@@ -133,6 +137,7 @@ function DS2RunningHead({
             <button
               ref={toolsButtonRef}
               type="button"
+              data-tutorial="session-tools"
               onClick={onToggleToolsMenu}
               aria-label="Toggle Tools menu"
               aria-expanded={isToolsMenuOpen}
@@ -173,6 +178,7 @@ function DS3FloatingPill({
   characterName,
   onOpenDrawer,
   onStartNew,
+  onBack,
   onEndStory,
   saveIndicator,
   characterButtonRef,
@@ -188,6 +194,7 @@ function DS3FloatingPill({
           <button
             ref={characterButtonRef}
             type="button"
+            data-tutorial="session-character"
             onClick={onToggleCharacterSummary}
             aria-expanded={isCharacterSummaryExpanded}
             className="manuscript-hud-character-pill"
@@ -254,6 +261,7 @@ function DS3FloatingPill({
           >
             <RotateCcw size={16} aria-hidden="true" />
           </button>
+          <HudCloseButton variant="icon" onBack={onBack} />
           <button
             type="button"
             onClick={onEndStory}

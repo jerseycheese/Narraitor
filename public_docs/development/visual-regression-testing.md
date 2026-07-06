@@ -2,7 +2,7 @@
 title: Visual Regression Testing with Playwright
 tags: [testing, playwright, visual-testing, ci-cd]
 created: 2025-08-20
-updated: 2025-08-21
+updated: 2026-05-23
 ---
 
 # Getting visual regression testing working properly
@@ -11,11 +11,11 @@ This addresses the visual testing gap in the CI pipeline - turns out there were 
 
 ## Why this was needed
 
-Regular testing catches functional bugs but completely misses when your UI breaks visually. You might have a perfectly working login form that's shifted 200 pixels to the right, or buttons that changed color, or responsive layouts that collapsed unexpectedly. 
+Regular testing catches functional bugs but completely misses when your UI breaks visually. You might have a perfectly working login form that's shifted 200 pixels to the right, or buttons that changed color, or responsive layouts that collapsed unexpectedly.
 
 Visual tests solve this by taking screenshots and comparing them to baseline images. If anything changes beyond acceptable thresholds, the test fails. It's like having a designer review every UI change automatically.
 
-> **Multi-theme note**: Since the [DS migration](../architecture/ADR-011-three-design-systems.md), any visual change has to be checked against all three themes (DS1, DS2, DS3), not just the default. The current baselines and helpers cover all three; stabilization work for tour and world-detail specs across themes is tracked in [#1198](https://github.com/jerseycheese/Narraitor/issues/1198).
+> **Multi-theme note**: Since the [DS migration](../architecture/ADR-011-three-design-systems.md), visual coverage for user-facing surfaces must cover all three themes (DS1, DS2, DS3), not just the default. A visual spec that intentionally covers only one theme needs an inline comment explaining why that exception is valid. Auditing older specs against this rule is tracked in [#1264](https://github.com/jerseycheese/Narraitor/issues/1264).
 
 ## How It Works
 
@@ -63,10 +63,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Component Visual Tests', () => {
   test('homepage layout', async ({ page }) => {
     await page.goto('/');
-    
+
     // Wait for page to fully load
     await page.waitForLoadState('networkidle');
-    
+
     // Take screenshot and compare
     await expect(page).toHaveScreenshot('homepage.png');
   });
@@ -122,7 +122,7 @@ await expect(page).toHaveScreenshot('game-session-dynamic.png', {
 **Configuration**:
 ```typescript
 await expect(staticComponent).toHaveScreenshot('navigation-header.png', {
-  maxDiffPixels: 500,              // Low tolerance for static elements  
+  maxDiffPixels: 500,              // Low tolerance for static elements
   threshold: 0.2                   // 20% tolerance - catch real regressions
 });
 ```
@@ -171,6 +171,17 @@ The combination provides layered protection:
 
 ## Writing Good Visual Tests
 
+### Design System Coverage
+
+Every user-facing visual spec should make theme coverage explicit:
+
+1. **Default expectation**: capture DS1, DS2, and DS3 baselines for the same route, state, component, or workflow. This is the visual-test equivalent of exercising all Drupal theme variants, not only the default active theme.
+2. **Use focused specs when full-flow multiplication is too expensive**: keep long sequential flow specs if they provide useful regression coverage, but add a smaller theme-differentiation spec that screenshots the shared surface once per design system. See `tests/visual/dashboard-themes.spec.ts` and `tests/visual/wizard-themes.spec.ts`.
+3. **Name snapshots with the theme id**: include `ds1`, `ds2`, or `ds3` in the screenshot name, for example `wizard-world-ds2.png`.
+4. **Document exceptions in the spec**: if a visual spec covers only one design system, add a comment near the test explaining the reason, such as browser API coverage, dark-mode-only coverage, non-user-facing infrastructure, or an existing tracking issue.
+
+Do not rely on a separate manual theme-switcher screenshot as proof that a surface is covered. Theme-switcher tests prove the switcher works; surface-level tests prove the actual UI remains structurally correct in each design system.
+
 ### Test Structure
 
 Organize tests by interface area:
@@ -180,9 +191,9 @@ test.describe('Core Interface Visual Tests', () => {
   test('landing page layout', async ({ page }) => {
     // Test implementation
   });
-  
+
   test('navigation header', async ({ page }) => {
-    // Test implementation  
+    // Test implementation
   });
 });
 ```
@@ -195,13 +206,13 @@ Always wait for content to fully load before taking screenshots:
 async function waitForAppReady(page) {
   // Wait for network requests to finish
   await page.waitForLoadState('networkidle', { timeout: 30000 });
-  
+
   // Wait for main content
   await page.waitForSelector('main', { timeout: 15000 });
-  
+
   // Wait for fonts to load (critical for consistency)
   await page.waitForFunction(() => document.fonts.ready, { timeout: 10000 });
-  
+
   // Additional stabilization time
   await page.waitForTimeout(2000);
 }
@@ -209,7 +220,7 @@ async function waitForAppReady(page) {
 test('component test', async ({ page }) => {
   await page.goto('/component');
   await waitForAppReady(page);
-  
+
   await expect(page).toHaveScreenshot('component.png');
 });
 ```
@@ -222,7 +233,7 @@ Test specific components instead of full pages when appropriate:
 test('character card component', async ({ page }) => {
   await page.goto('/characters');
   await waitForAppReady(page);
-  
+
   // Screenshot just the character card
   const characterCard = page.locator('[data-testid="character-card-1"]');
   await expect(characterCard).toHaveScreenshot('character-card.png');
@@ -236,14 +247,14 @@ Capture various component states:
 ```typescript
 test('button states', async ({ page }) => {
   await page.goto('/components/button-demo');
-  
+
   // Default state
   await expect(page.locator('.demo-button')).toHaveScreenshot('button-default.png');
-  
+
   // Hover state
   await page.locator('.demo-button').hover();
   await expect(page.locator('.demo-button')).toHaveScreenshot('button-hover.png');
-  
+
   // Focused state
   await page.locator('.demo-button').focus();
   await expect(page.locator('.demo-button')).toHaveScreenshot('button-focused.png');
@@ -277,7 +288,7 @@ tests/visual/world-creation.spec.ts-snapshots/
 
 The naming convention includes:
 - Screenshot name you specified
-- Browser engine (`chromium`)  
+- Browser engine (`chromium`)
 - Operating system (`darwin`)
 
 ## Debugging Failed Tests
@@ -406,14 +417,14 @@ We use a **Darwin-only visual testing strategy**, meaning all baseline screensho
 ### Current Recommendation
 
 **Stay with Darwin-only** for now because:
-- Team is 100% macOS-based  
+- Team is 100% macOS-based
 - No reported production visual issues from platform differences
 - Maintenance overhead of cross-platform testing isn't justified yet
 - Docker migration is a better long-term solution than multi-platform baselines
 
 **Plan for Docker migration** when:
 - Team grows or diversifies platforms
-- Production issues emerge from platform differences  
+- Production issues emerge from platform differences
 - CI/CD pipeline needs more reliability across environments
 
 ## Accessibility Visual Testing
@@ -426,15 +437,15 @@ Visual regression tests also serve as accessibility validation by capturing how 
 test('collapsible section accessibility states', async ({ page }) => {
   await page.goto('/devtools');
   await waitForAppReady(page);
-  
+
   // Test default collapsed state
   const section = page.locator('[data-testid="performance-warnings-section"]');
   await expect(section).toHaveScreenshot('warnings-collapsed.png');
-  
+
   // Test focus state for keyboard navigation
   await section.locator('button').focus();
   await expect(section).toHaveScreenshot('warnings-focused.png');
-  
+
   // Test expanded state
   await section.locator('button').click();
   await expect(section).toHaveScreenshot('warnings-expanded.png');
@@ -449,10 +460,10 @@ Verify that warning components maintain proper contrast and visual accessibility
 test('warning alerts accessibility appearance', async ({ page }) => {
   await page.goto('/devtools');
   await waitForAppReady(page);
-  
+
   // Focus on warning content area
   const warningsContainer = page.locator('[role="alert"]');
-  
+
   // Test warning appearance with proper semantic styling
   await expect(warningsContainer).toHaveScreenshot('warning-alerts.png', {
     threshold: 0.2, // Low tolerance - accessibility styling should be stable
@@ -467,10 +478,10 @@ test('warning alerts accessibility appearance', async ({ page }) => {
 test('high contrast focus indicators', async ({ page }) => {
   // Enable high contrast simulation if available
   await page.emulateMedia({ forcedColors: 'active' });
-  
+
   await page.goto('/components');
   await waitForAppReady(page);
-  
+
   // Test focus indicators are visible in high contrast
   await page.locator('button').first().focus();
   await expect(page.locator('button').first()).toHaveScreenshot('button-focus-high-contrast.png');
@@ -528,7 +539,7 @@ test('high contrast focus indicators', async ({ page }) => {
 
 When reviewing PRs with visual changes:
 1. Check if baseline screenshots changed
-2. Verify changes align with design requirements  
+2. Verify changes align with design requirements
 3. Test locally if changes seem unexpected
 4. Approve baseline updates for intentional changes
 
@@ -544,7 +555,7 @@ When reviewing PRs with visual changes:
 **Cause**: Pixel-level differences invisible to human eye
 **Solution**: Check threshold settings, review difference images
 
-### "Dynamic content causes false failures"  
+### "Dynamic content causes false failures"
 
 **Cause**: Timestamps, random data, or changing content
 **Solution**: Mock dynamic elements or use element-specific screenshots
@@ -557,7 +568,7 @@ When reviewing PRs with visual changes:
 ## Related Documentation
 
 - [Testing Guide](./testing-guide.md) - General testing philosophy and patterns
-- [Playwright Visual Testing Workflow](./workflows/visual-testing-workflow.md) - Step-by-step process guide  
+- [Playwright Visual Testing Workflow](./workflows/visual-testing-workflow.md) - Step-by-step process guide
 - [Visual Test Examples](./visual-test-examples.md) - Practical implementation examples
 - [Playwright Visual API Reference](../api/playwright-visual-api.md) - Technical API details
 

@@ -145,4 +145,3 @@ Response Format:
 }`;
 };
 
-export default skillAcknowledgmentTemplate;

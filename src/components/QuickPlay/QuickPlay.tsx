@@ -13,7 +13,11 @@ import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
+import { fixExistingSessionNarrativeCounts } from '@/lib/session/fixSessionNarrativeCounts';
 import { Globe, Users, Play } from 'lucide-react';
+
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('QuickPlay');
 
 export function QuickPlay() {
   const router = useRouter();
@@ -28,19 +32,14 @@ export function QuickPlay() {
   const shouldShowOnboarding = useSessionStore(
     (state) => state.shouldShowOnboarding
   );
-  const fixExistingSessionNarrativeCounts = useSessionStore(
-    (state) => state.fixExistingSessionNarrativeCounts
-  );
   const actualWorlds = worlds;
   const actualCharacters = characters;
   const actualSavedSessions = savedSessions;
 
   // Fix existing session narrative counts on component mount
   useEffect(() => {
-    if (fixExistingSessionNarrativeCounts) {
-      fixExistingSessionNarrativeCounts();
-    }
-  }, [fixExistingSessionNarrativeCounts]);
+    fixExistingSessionNarrativeCounts();
+  }, []);
 
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -100,7 +99,7 @@ export function QuickPlay() {
     try {
       await cleanupSessionData(mostRecentSession.id);
     } catch (error) {
-      console.error('Failed to delete session:', error);
+      logger.error('Failed to delete session:', error);
     } finally {
       setIsDeleting(false);
       setIsDeleteDialogOpen(false);

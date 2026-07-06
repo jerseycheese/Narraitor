@@ -4,7 +4,7 @@ This document explains how to use dependency-cruiser to analyze and visualize Na
 
 ## Quick Start
 
-**⭐ Interactive exploration (recommended):**
+**Interactive exploration (recommended):**
 ```bash
 npm run deps:diagram:interactive
 open public_docs/architecture/dependency-graph-interactive.html
@@ -23,24 +23,26 @@ npm run deps:validate
 
 > **Note:** Dependency-cruiser v13+ auto-finds `.dependency-cruiser.cjs` - no `--config` flag needed!
 
+> **Looking for a live, click-through graph?** dependency-cruiser produces the static diagrams here; for interactive exploration ("what imports `characterStore`?", "how does this cycle actually loop?"), use [skott](using-skott.md). New circular dependencies are blocked at CI by the `skott:check` budget — `using-skott.md` covers what to do when that fails.
+
 ## Generated Diagrams
 
 Diagrams are generated at **multiple zoom levels** for optimal viewing:
 
-### 🎯 Interactive HTML (dependency-graph-interactive.html) *NEW!*
+### Interactive HTML (dependency-graph-interactive.html)
 **Best for:** Exploring and understanding the codebase
 - **Hover** over modules to highlight dependencies
 - **Click** to "pin" relationships (ESC to clear)
 - Self-contained offline file
 - Handles any codebase size
 
-### 📁 Folder-Level SVG (dependency-graph-folders.svg) *NEW!*
+### Folder-Level SVG (dependency-graph-folders.svg)
 **Best for:** High-level architecture overview
 - Shows directory-to-directory dependencies
 - Cleaner than module-level view
 - Great for identifying module boundaries
 
-### 🏛️ Architecture Diagram (high-level.svg) *NEW!*
+### Architecture Diagram (high-level.svg)
 **Best for:** Executive summary and onboarding
 - Ultra-high-level collapsed view
 - Shows major architectural layers
@@ -50,26 +52,26 @@ Diagrams are generated at **multiple zoom levels** for optimal viewing:
 ### 1. Domain-Level Overview (dependency-graph-domains.mmd)
 **Best for:** Understanding high-level architecture
 - Shows: state, components, lib, types, utils, etc.
-- ~54 lines, <100 edges
-- ✅ Works in VS Code
+- ~54 lines, under 100 edges
+- Works in VS Code
 
 ### 2. Component Relationships (component-dependencies.mmd)
 **Best for:** Understanding component structure
 - Shows: Major component folders and their dependencies
 - ~112 lines
-- ✅ Works in VS Code
+- Works in VS Code
 
 ### 3. Store Dependencies (stores-dependencies.mmd)
 **Best for:** Analyzing state management
 - Shows: All Zustand stores and their relationships
 - ~275 lines
-- ✅ Works in VS Code
+- Works in VS Code
 
 ### 4. Full Detail (dependency-graph-detailed.mmd)
 **Best for:** Deep investigation with Mermaid Live Editor
 - Shows: Every file and import
 - 5000+ lines, 1000+ edges
-- ❌ Too complex for VS Code - use https://mermaid.live
+- Too complex for VS Code, use https://mermaid.live instead
 
 These diagrams are regenerated automatically via npm scripts and can be viewed in any Mermaid-compatible viewer.
 
@@ -107,16 +109,15 @@ npm run deps:baseline         # Update after fixes (tracks progress)
 
 **Critical Issues: Circular Dependencies (59 warnings)**
 
-Store-to-store circles cause unpredictable initialization:
-- `sessionStore` ↔ `worldStore`
-- `sessionStore` ↔ `inventoryStore` ↔ `characterStore`
-- `narrativeStore` ↔ `sessionStore` ↔ `goalStore`
+Store-to-store circles cause unpredictable initialization. The known ones are between
+`sessionStore` and `worldStore`; across `sessionStore`, `inventoryStore`, and
+`characterStore`; and across `narrativeStore`, `sessionStore`, and `goalStore`.
 
 **Resolution Strategy:**
 1. Extract shared logic to `lib/` utilities
 2. Use dependency inversion (interfaces in types)
-3. Apply pub-sub patterns for cross-store communication
-4. Break apart monolithic stores
+3. Apply pub-sub patterns for cross-store communication — this is what `storeEvents` in `src/lib/state/storePubSub.ts` already does for cascade deletes
+4. Break apart monolithic stores (the `loreStore` split into its `loreStore.*` family is an example of this)
 
 **Type Violations (23 errors)**
 
@@ -214,14 +215,17 @@ Rules are defined in `.dependency-cruiser.cjs`. Key sections:
 
 ## Integration with CI
 
-Add to GitHub Actions:
+Dependency validation isn't wired into CI yet — the GitHub Actions pipeline currently runs
+type-check, lint (ESLint + Stylelint + layout usage), knip, tests, and build, but not
+`deps:validate`. Adding it would be a one-liner if the baseline is kept current:
 
 ```yaml
 - name: Validate Architecture
   run: npm run deps:validate
 ```
 
-This will fail the build if critical architecture boundaries are violated.
+That would fail the build on any NEW boundary violation while still tolerating the known ones
+in the baseline file.
 
 ## Viewing Diagrams
 

@@ -4,7 +4,7 @@
 
 This guide helps identify which GitHub issues are safe for fully autonomous YOLO mode implementation vs. those requiring manual verification.
 
-## Safe for YOLO Mode ✅
+## Safe for YOLO Mode
 
 Issues that can be safely implemented in YOLO mode typically have:
 - Clear, objective acceptance criteria
@@ -54,7 +54,7 @@ Issues that can be safely implemented in YOLO mode typically have:
 - Persistence layer updates
 - Cache implementation
 
-## NOT Safe for YOLO Mode ❌
+## NOT Safe for YOLO Mode
 
 Issues requiring human judgment, aesthetic evaluation, or complex user testing:
 
@@ -115,7 +115,7 @@ If all boxes can be checked, the issue is likely safe for YOLO mode.
 
 For issues to be worked on simultaneously, additional criteria apply:
 
-### ✅ Safe for Parallel Work:
+### Safe for Parallel Work:
 - **Different domains** (World vs Character vs Narrative vs Journal)
 - **Different UI components** with no shared dependencies
 - **Different state stores** (worldStore vs characterStore vs journalStore)
@@ -123,13 +123,13 @@ For issues to be worked on simultaneously, additional criteria apply:
 - **Independent test coverage** areas
 - **No shared configuration** files or dependencies
 
-### ⚠️ Requires Analysis for Parallel Work:
+### Requires Analysis for Parallel Work:
 - **Same domain, different components** - need dependency analysis
 - **Shared utility functions** - check for conflicts in shared code
 - **Similar file patterns** - analyze actual file overlap
 - **Cross-domain integration** - evaluate integration points
 
-### ❌ Unsafe for Parallel Work:
+### Anti-pattern: Unsafe for Parallel Work:
 - **Same files/components** being modified
 - **Shared state management** areas with writes
 - **Integration tests** affecting same workflows
@@ -140,7 +140,7 @@ Use `./scripts/github/check-related-issues.sh [issue-number]` to analyze depende
 
 ## Examples
 
-### ✅ YOLO Safe Example:
+### YOLO Safe Example:
 ```
 Issue #123: Add timestamp display to WorldCard component
 - Display created/updated dates in ISO format
@@ -153,7 +153,7 @@ This is YOLO safe because:
 - No aesthetic judgment needed
 ```
 
-### ❌ NOT YOLO Safe Example:
+### Anti-pattern: NOT YOLO Safe Example:
 ```
 Issue #456: Improve WorldCard visual hierarchy
 - Make important information stand out more

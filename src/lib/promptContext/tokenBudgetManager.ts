@@ -20,11 +20,43 @@ export interface BudgetAllocation {
 }
 
 /**
- * Configuration options for TokenBudgetManager
+ * Calibration snapshot comparing the heuristic token estimate against an actual
+ * token count from the AI provider. `accuracy` (actual / estimated) is only
+ * present once an actual has been recorded and the estimate is non-zero.
  */
-export interface TokenBudgetManagerOptions {
-  enabled?: boolean;
+export interface CalibrationData {
+  componentId?: string;
+  estimated: number;
+  actual?: number;
+  accuracy?: number;
 }
+
+/**
+ * Per-component usage figures for the observability snapshot. `allocation` is
+ * the resolved target budget (the bar denominator); `estimated` is the recorded
+ * heuristic token count for the most recent request.
+ */
+export interface ComponentBudgetUsage {
+  componentId: string;
+  priority: ComponentPriority;
+  allocation: number;
+  estimated: number;
+}
+
+/**
+ * A read-only snapshot of a request's budget state, consumed by the DevTools
+ * TokenBudgetPanel. `calibration` is the request-level estimate-vs-actual
+ * reconciliation (see `recordUsage('request-total', ...)`).
+ */
+export interface TokenBudgetSnapshot {
+  enabled: boolean;
+  totalBudget: number;
+  components: ComponentBudgetUsage[];
+  calibration: CalibrationData;
+}
+
+/** Reserved component id for the request-level whole-prompt calibration. */
+export const REQUEST_TOTAL_COMPONENT_ID = 'request-total';
 
 /**
  * Request budget instance for tracking allocations during a single request
@@ -32,7 +64,9 @@ export interface TokenBudgetManagerOptions {
 export class RequestBudget {
   private allocations: Map<string, BudgetAllocation> = new Map();
   private usage: Map<string, number> = new Map();
+  private actualUsage: Map<string, number> = new Map();
   private enabled: boolean;
+  private totalBudget: number;
 
   constructor(
     allocations: BudgetAllocation[],
@@ -40,6 +74,7 @@ export class RequestBudget {
     enabled: boolean = true
   ) {
     this.enabled = enabled;
+    this.totalBudget = totalBudget;
 
     if (!enabled) {
       // When disabled, store allocations but don't enforce limits
@@ -139,42 +174,104 @@ export class RequestBudget {
   }
 
   /**
-   * Record actual token usage for a component
+   * Record token usage for a component.
+   *
+   * `tokens` is the estimated (heuristic) count. Pass `options.actualTokens`
+   * when an actual count is known (e.g. from the AI provider's usage metadata)
+   * to enable calibration of the estimation heuristics.
    */
-  recordUsage(componentId: string, tokens: number): void {
+  recordUsage(
+    componentId: string,
+    tokens: number,
+    options?: { actualTokens?: number }
+  ): void {
     this.usage.set(componentId, tokens);
+    if (options?.actualTokens !== undefined) {
+      this.actualUsage.set(componentId, options.actualTokens);
+    }
+  }
+
+  /**
+   * Get calibration data comparing estimated vs actual token counts.
+   *
+   * With a `componentId`, returns that component's snapshot. Without one,
+   * returns the aggregate across every component that has recorded usage.
+   *
+   * The aggregate `estimated` covers all recorded components, but `actual` and
+   * `accuracy` are computed only over the subset that has provider counts — so
+   * accuracy stays an apples-to-apples ratio rather than dividing a full-set
+   * estimate by a partial-set actual.
+   */
+  getCalibrationData(componentId?: string): CalibrationData {
+    if (componentId !== undefined) {
+      return buildCalibration(
+        this.usage.get(componentId) ?? 0,
+        this.actualUsage.get(componentId),
+        componentId
+      );
+    }
+
+    let estimated = 0;
+    for (const value of this.usage.values()) {
+      estimated += value;
+    }
+
+    // Aggregate actual/accuracy only over components that have an actual count,
+    // pairing each with its own estimate so the ratio compares the same subset.
+    let actual: number | undefined;
+    let measuredEstimated = 0;
+    for (const [id, actualTokens] of this.actualUsage) {
+      actual = (actual ?? 0) + actualTokens;
+      measuredEstimated += this.usage.get(id) ?? 0;
+    }
+
+    const accuracy =
+      actual !== undefined && measuredEstimated > 0
+        ? actual / measuredEstimated
+        : undefined;
+
+    return { estimated, actual, accuracy };
+  }
+
+  /**
+   * Build a read-only snapshot of the current budget state for observability.
+   *
+   * Covers the configured components (the reserved `request-total` lives only in
+   * the usage map, so it is naturally excluded from the per-component list and
+   * surfaced separately as `calibration`).
+   */
+  getSnapshot(): TokenBudgetSnapshot {
+    const components: ComponentBudgetUsage[] = [];
+    for (const [componentId, allocation] of this.allocations) {
+      components.push({
+        componentId,
+        priority: allocation.priority,
+        allocation: allocation.target,
+        estimated: this.usage.get(componentId) ?? 0,
+      });
+    }
+
+    return {
+      enabled: this.enabled,
+      totalBudget: this.totalBudget,
+      components,
+      calibration: this.getCalibrationData(REQUEST_TOTAL_COMPONENT_ID),
+    };
   }
 }
 
 /**
- * Token Budget Manager
- *
- * Centralized manager for creating and tracking token budgets across
- * prompt generation. Supports feature flag for safe rollback.
+ * Build a calibration snapshot, computing accuracy only when an actual count is
+ * available and the estimate is non-zero (avoids divide-by-zero).
  */
-export class TokenBudgetManager {
-  private enabled: boolean;
-
-  constructor(options?: TokenBudgetManagerOptions) {
-    this.enabled = options?.enabled ?? true;
-  }
-
-  /**
-   * Create a new request budget with the given allocations
-   */
-  createBudget(
-    allocations: BudgetAllocation[],
-    totalBudget: number
-  ): RequestBudget {
-    return new RequestBudget(allocations, totalBudget, this.enabled);
-  }
-
-  /**
-   * Check if budget tracking is enabled
-   */
-  isEnabled(): boolean {
-    return this.enabled;
-  }
+function buildCalibration(
+  estimated: number,
+  actual: number | undefined,
+  componentId?: string
+): CalibrationData {
+  const accuracy =
+    actual !== undefined && estimated > 0 ? actual / estimated : undefined;
+  return { componentId, estimated, actual, accuracy };
 }
 
 /**

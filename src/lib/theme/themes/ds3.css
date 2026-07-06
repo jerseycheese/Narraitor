@@ -21,6 +21,14 @@
   --color-text-muted: rgb(125 113 99);
   --color-text-inverse: rgb(255 255 255);
 
+  /* Text on a filled accent surface — white in light, dark ink in dark (see dark block). */
+  --color-on-accent: rgb(255 255 255);
+
+  /* Text on filled semantic surfaces — white here, dark ink in dark mode. #1379 */
+  --color-on-success: rgb(255 255 255);
+  --color-on-danger: rgb(255 255 255);
+  --color-on-warning: rgb(255 255 255);
+
   /* Steel Blue accent */
   --color-accent: rgb(91 122 140);
   --color-accent-hover: rgb(74 105 120);
@@ -42,8 +50,6 @@
   --muted-foreground: 25 14% 46%;
   --accent: 30 16% 92%;
   --accent-foreground: 25 20% 14%;
-  --destructive: 0 59% 41%;
-  --destructive-foreground: 0 0% 100%;
   --border: 29 16% 85%;
   --input: 29 16% 85%;
   --ring: 200 21% 45%;
@@ -64,11 +70,13 @@
   --warning-border: 36 38% 70%;
   --warning-muted: 36 38% 88%;
 
-  /* Manuscript warning button colors */
-  --color-warning: rgb(140 109 63);
-  --color-warning-soft: rgb(140 109 63 / 14%);
-  --color-warning-border: rgb(140 109 63 / 50%);
-  --color-warning-muted: rgb(140 109 63 / 10%);
+  /* Manuscript warning button colors.
+   * Darkened from rgb(140 109 63): the soft warning button (colored text on the
+   * translucent fill) only read 3.68:1 in light mode; same bronze hue, deeper, now 4.97:1. */
+  --color-warning: rgb(113 88 51);
+  --color-warning-soft: rgb(113 88 51 / 14%);
+  --color-warning-border: rgb(113 88 51 / 50%);
+  --color-warning-muted: rgb(113 88 51 / 10%);
   --color-success: rgb(74 124 89);
   --color-success-bg: rgb(74 124 89 / 10%);
   --color-info: rgb(91 122 140);
@@ -129,24 +137,10 @@
   --color-danger: rgb(156 64 64);
   --color-danger-hover: rgb(130 50 50);
 
-  /* Spacing scale (Tailwind-aligned) */
-  --space-0_5: 0.125rem;
-  --space-1:   0.25rem;
-  --space-1_5: 0.375rem;
-  --space-2:   0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3:   0.75rem;
-  --space-3_5: 0.875rem;
-  --space-4:   1rem;
-  --space-5:   1.25rem;
-  --space-6:   1.5rem;
-  --space-8:   2rem;
-
-  /* Radius tokens */
+  /* Radius tokens (per-theme; --radius-full lives in _shared-tokens.css) */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
-  --radius-full: 9999px;
 }
 
 /* DS3 Dark Mode */
@@ -160,9 +154,20 @@
   --color-text-secondary: rgb(168 156 142);
   --color-text-muted: rgb(141 130 121);
   --color-text-inverse: rgb(255 255 255);
+  --color-on-accent: rgb(23 19 16);
+
+  /* Dark ink on the light semantic fills so filled buttons clear AA in dark mode. #1379 */
+  --color-on-success: rgb(23 19 16);
+
+  /* Slightly deeper than the canvas ink: ds3's muted-red danger fill needs it to clear 4.5:1 (4.72:1). */
+  --color-on-danger: rgb(15 12 10);
+  --color-on-warning: rgb(23 19 16);
 
   --color-accent: rgb(123 160 180);
-  --color-accent-hover: rgb(141 177 195);
+
+  /* Hover darkens (not lightens) so white button/CTA text stays legible in dark
+   * mode — white-on-hover ~5.4:1. Base-state contrast tracked separately (#1379). */
+  --color-accent-hover: rgb(80 110 128);
   --color-accent-soft: rgb(123 160 180 / 12%);
 
   --background: 20 18% 8%;
@@ -180,8 +185,6 @@
   --muted-foreground: 25 10% 52%;
   --accent: 20 12% 14%;
   --accent-foreground: 33 17% 90%;
-  --destructive: 0 50% 38%;
-  --destructive-foreground: 210 40% 98%;
   --border: 20 15% 16%;
   --input: 20 15% 16%;
   --ring: 200 19% 59%;
@@ -259,25 +262,6 @@
   --shadow-drawer: -12px 0 12px rgb(0 0 0 / 35%);
   --color-danger: rgb(192 96 96);
   --color-danger-hover: rgb(170 75 75);
-
-  /* Spacing scale (Tailwind-aligned) */
-  --space-0_5: 0.125rem;
-  --space-1:   0.25rem;
-  --space-1_5: 0.375rem;
-  --space-2:   0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3:   0.75rem;
-  --space-3_5: 0.875rem;
-  --space-4:   1rem;
-  --space-5:   1.25rem;
-  --space-6:   1.5rem;
-  --space-8:   2rem;
-
-  /* Radius tokens */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-full: 9999px;
 }
 
 /* DS3 Background Pattern - Dot grid */

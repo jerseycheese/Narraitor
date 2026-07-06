@@ -44,5 +44,3 @@ export { createMockNarrativeStore } from './mockStoreFactories/narrative';
 export { createMockInventoryStore } from './mockStoreFactories/inventory';
 export { createMockNPCStore } from './mockStoreFactories/npc';
 export { createMockWorldStore } from './mockStoreFactories/world';
-export { createMockGoalStore } from './mockStoreFactories/goal';
-export { createMockLoreStore } from './mockStoreFactories/lore';

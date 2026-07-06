@@ -9,7 +9,7 @@ import { Select } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { LoadingState as UILoadingState } from '@/components/ui/LoadingState/LoadingState';
 
-export interface WorldNameInputProps {
+interface WorldNameInputProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
@@ -19,7 +19,7 @@ export interface WorldNameInputProps {
   className?: string;
 }
 
-export function WorldNameInput({
+function WorldNameInput({
   value,
   onChange,
   error,
@@ -46,7 +46,7 @@ export function WorldNameInput({
   );
 }
 
-export interface GenreSelectProps {
+interface GenreSelectProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
@@ -56,7 +56,7 @@ export interface GenreSelectProps {
   className?: string;
 }
 
-export function GenreSelect({
+function GenreSelect({
   value,
   onChange,
   error,
@@ -86,7 +86,7 @@ export function GenreSelect({
   );
 }
 
-export interface DescriptionTextAreaProps {
+interface DescriptionTextAreaProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
@@ -99,7 +99,7 @@ export interface DescriptionTextAreaProps {
   className?: string;
 }
 
-export function DescriptionTextArea({
+function DescriptionTextArea({
   value,
   onChange,
   error,
@@ -144,14 +144,14 @@ export function DescriptionTextArea({
   );
 }
 
-export interface LoadingStateProps {
+interface LoadingStateProps {
   isLoading: boolean;
   message?: string;
   details?: string;
   className?: string;
 }
 
-export function LoadingState({
+function LoadingState({
   isLoading,
   message = 'Loading...',
   details,
@@ -171,14 +171,14 @@ export function LoadingState({
   );
 }
 
-export interface ErrorDisplayProps {
+interface ErrorDisplayProps {
   error: string | null;
   onRetry?: () => void;
   onDismiss?: () => void;
   className?: string;
 }
 
-export function ErrorDisplay({
+function ErrorDisplay({
   error,
   onRetry,
   onDismiss,

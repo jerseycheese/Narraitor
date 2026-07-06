@@ -2,28 +2,41 @@
 title: State Management Guide
 tags: [state, zustand, architecture, stores]
 created: 2025-06-26
-updated: 2025-06-26
+updated: 2026-05-22
 ---
 
 # State Management Guide
 
-This the state management here uses Zustand with domain-driven stores. The key insight was that each major area of the app (World, Character, Narrative, etc.) needed its own state management, but they should follow consistent patterns.
+State management uses Zustand with domain-driven stores. The idea is that each major area of
+the app (World, Character, Narrative, and so on) owns its own store, but they all follow the
+same patterns so they stay predictable. Every store lives in `src/state/` and is exported as a
+`useXStore` hook.
 
 ## How It's Organized
 
 ```mermaid
 graph TD
     A[Components] --> B[Zustand Stores]
-    B --> C[World Store]
-    B --> D[Character Store] 
-    B --> E[Narrative Store]
-    B --> F[Session Store]
-    B --> G[Journal Store]
-    B --> H[AI Context Store]
-    B --> I[Inventory Store]
+    B --> C[useWorldStore]
+    B --> D[useCharacterStore]
+    B --> E[useNarrativeStore]
+    B --> F[useSessionStore]
+    B --> G[useJournalStore]
+    B --> H[useAiContextStore]
+    B --> I[useInventoryStore]
+    B --> J[useNPCStore]
+    B --> K[useGoalStore]
+    B --> L[useNavigationStore]
+    B --> M[useLoreStore]
+    C -.cascade events.-> N[storeEvents pub/sub]
+    D -.cascade events.-> N
 ```
 
-Each store handles its own domain, but they can interact when needed. For example, the Character Store needs to know about available worlds from the World Store.
+Each store handles its own domain, but they interact when needed. The Character Store needs to
+know about available worlds from the World Store, for instance. For interactions that would
+otherwise force stores to import each other (cascade deletes, mostly), they go through the
+`storeEvents` pub/sub bus in `src/lib/state/storePubSub.ts` rather than direct imports — see
+[Cross-Store Operations](#cross-store-operations) below.
 
 ## Store Pattern
 
@@ -224,32 +237,42 @@ const WorldEditor = () => {
 ```
 
 ### Cross-Store Operations
+
+Reading across stores is fine — pull what you need from another store's state directly:
+
 ```typescript
 const GameSession = () => {
-  const worldStore = useWorldStore();
-  const characterStore = useCharacterStore();
-  const sessionStore = useSessionStore();
-  
-  const startNewGame = () => {
-    // Get current world
-    const world = worldStore.worlds[worldStore.currentWorldId];
-    if (!world) return;
-    
-    // Get selected characters
-    const characters = Object.values(characterStore.characters)
-      .filter(char => char.worldId === world.id);
-    
-    // Create session
-    const sessionId = sessionStore.createSession({
-      worldId: world.id,
-      characterIds: characters.map(c => c.id)
-    });
-    
-    sessionStore.setCurrentSession(sessionId);
+  const world = useWorldStore((s) => s.currentWorldId ? s.worlds[s.currentWorldId] : null);
+  const characters = useCharacterStore((s) =>
+    Object.values(s.characters).filter((c) => c.worldId === world?.id)
+  );
+  const initializeSession = useSessionStore((s) => s.initializeSession);
+
+  const startNewGame = async () => {
+    if (!world || characters.length === 0) return;
+    await initializeSession(world.id, characters[0].id);
   };
-  
+
   return <button onClick={startNewGame}>Start Game</button>;
 };
+```
+
+Writing across stores is where it gets tricky. A store shouldn't import another store to
+mutate it — that creates circular dependencies and tangles the domains. Cascade operations
+(deleting a world should clean up its characters, deleting a character should clean up what it
+owns) go through the `storeEvents` bus instead. The deleting store publishes an event; the
+stores that care subscribe and clean up their own slice:
+
+```typescript
+import { storeEvents, StoreEventTypes } from '@/lib/state/storePubSub';
+
+// In worldStore.deleteWorld, after removing the world:
+storeEvents.emit(StoreEventTypes.WORLD_DELETED, { worldId });
+
+// characterStore subscribes once and handles its own cleanup:
+storeEvents.on(StoreEventTypes.WORLD_DELETED, ({ worldId }) => {
+  // remove characters belonging to the deleted world
+});
 ```
 
 ### Error Handling
@@ -401,22 +424,33 @@ Use branded types for IDs when mixing them up would cause bugs. Make `WorldID` a
 
 ## Persistence
 
-Future persistence with IndexedDB:
+Persistence is in place and runs on IndexedDB, not localStorage — the saved-game data
+(worlds, characters, narrative, lore) gets big enough that localStorage's size limits would
+bite. Stores wrap their implementation in Zustand's `persist` middleware and point it at
+`createIndexedDBStorage()` from `src/state/persistence.ts`:
 
 ```typescript
-// Planned persistence integration
-const persistedWorldStore = create<WorldStore>()(
+import { persist } from 'zustand/middleware';
+import { createIndexedDBStorage } from './persistence';
+
+export const useCharacterStore = create<CharacterStore>()(
   persist(
     (set, get) => ({
-      // Store implementation
+      // store implementation
     }),
     {
-      name: 'world-storage',
-      storage: createJSONStorage(() => indexedDB)
+      name: 'narraitor-character-store',
+      storage: createIndexedDBStorage(),
+      migrate: (persistedState) => persistedState || getInitialState(),
     }
   )
 );
 ```
+
+Most stores follow this — character, narrative, journal, lore, inventory, npc, goal,
+navigation, and session all persist through the same adapter. The `name` namespaces each
+store's data, and `migrate` is where a store decides what to do with an older persisted shape
+on load.
 
 ## Related
 - `/src/state/` - Store implementations

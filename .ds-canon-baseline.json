@@ -1,0 +1,33 @@
+{
+  "comment": "Storybook canon guard (scripts/verify-ds-canon.cjs, npm run lint:ds-canon). Storybook is the single canonical, backend-free view of the frontend (#1484, ADR-012). One check: every in-scope component must appear in a story under src/stories/**. In-scope = componentScope below (nested ui/** + the whole shared/** presentational layer + an explicit domain allowlist of presentational cards/portraits/displays). Fails only on NEW uncovered components; existing gaps are grandfathered in storybookGaps with tracking. coverageExceptions documents non-visual wrappers that legitimately have no story. The living style guide and its skinning/guide-coverage checks were retired in #1488. Mirrors the .skott-baseline.json pattern.",
+  "componentScope": {
+    "globs": [
+      "src/components/ui/**/*.{tsx,jsx}",
+      "src/components/shared/**/*.tsx"
+    ],
+    "domainAllowlist": [
+      "src/components/CharacterCard/CharacterCard.tsx",
+      "src/components/WorldCard/WorldCard.tsx",
+      "src/components/CharacterPortrait/CharacterPortrait.tsx",
+      "src/components/characters/CharacterAttributeDisplay.tsx",
+      "src/components/characters/CharacterBackgroundDisplay.tsx",
+      "src/components/characters/CharacterDerivedStatsDisplay.tsx",
+      "src/components/characters/CharacterDetailsDisplay.tsx",
+      "src/components/characters/CharacterSkillDisplay.tsx",
+      "src/components/Dashboard/DashboardContinueCard.tsx",
+      "src/components/Dashboard/DashboardProgressCard.tsx",
+      "src/components/ai/ProviderCard.tsx",
+      "src/components/world/WorldDetailsDisplay.tsx",
+      "src/components/world/WorldSettingsDisplay.tsx",
+      "src/components/world/ToneSettingsDisplay.tsx",
+      "src/components/world/WorldImageDisplay.tsx"
+    ]
+  },
+  "coverageExceptions": {
+    "scroll-area": "Behavior/utility wrapper (adds scroll styling around arbitrary content) — no visual variants/states to canonize.",
+    "choiceStyling": "Styling helper — exports class-name maps for ChoiceSelector, not a rendered component.",
+    "SSRClientOnly": "Behavior wrapper — defers render to the client; no visual variants/states to canonize.",
+    "toaster": "Infra mount — renders the toast viewport/portal; exercised via the toast stories."
+  },
+  "storybookGaps": []
+}

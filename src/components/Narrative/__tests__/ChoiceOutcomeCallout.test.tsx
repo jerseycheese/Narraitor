@@ -2,6 +2,8 @@
 
 import { render, screen } from '@testing-library/react';
 import { ChoiceOutcomeCallout } from '../ChoiceOutcomeCallout';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useNPCStore } from '@/state/npcStore';
 
 describe('ChoiceOutcomeCallout', () => {
   const defaultProps = {
@@ -20,13 +22,6 @@ describe('ChoiceOutcomeCallout', () => {
 
     const badge = screen.getByText(/You choose to help the merchant/).closest('[data-decision-id]');
     expect(badge).toBeInTheDocument();
-  });
-
-  it('should use small size variant', () => {
-    const { container } = render(<ChoiceOutcomeCallout {...defaultProps} />);
-
-    const callout = container.querySelector('.choice-outcome-callout');
-    expect(callout).toBeInTheDocument();
   });
 
   it('should accept custom className', () => {
@@ -78,5 +73,92 @@ describe('ChoiceOutcomeCallout', () => {
     expect(
       screen.getByText(/You attempt to help the merchant/)
     ).toBeInTheDocument();
+  });
+});
+
+describe('ChoiceOutcomeCallout consequence chips', () => {
+  beforeEach(() => {
+    useNarrativeStore.setState({ decisions: {} });
+    useNPCStore.setState({
+      npcs: {
+        'npc-1': {
+          id: 'npc-1',
+          name: 'Marta',
+          description: '',
+          worldId: 'world-1',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-01T00:00:00.000Z',
+        },
+      },
+    });
+  });
+
+  it('renders no chips when the decision has no consequences', () => {
+    const { container } = render(
+      <ChoiceOutcomeCallout decisionId="decision-x" decisionText="You choose to wait" />
+    );
+
+    expect(container.querySelector('.choice-outcome-consequences')).toBeNull();
+  });
+
+  it('renders trust and alignment chips for the selected option', () => {
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-1': {
+          id: 'decision-1',
+          prompt: 'What now?',
+          selectedOptionId: 'opt-1',
+          options: [
+            {
+              id: 'opt-1',
+              text: 'Pocket the ledger',
+              alignment: 'chaotic',
+              consequences: [
+                { type: 'relationship', action: 'modify', targetId: 'npc-1', value: { trustDelta: -15 } },
+                { type: 'alignment', action: 'add', targetId: 'player-alignment', value: -8 },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    const { container } = render(
+      <ChoiceOutcomeCallout decisionId="decision-1" decisionText="You choose to pocket the ledger" />
+    );
+
+    expect(screen.getByText('Marta −15 trust')).toBeInTheDocument();
+    expect(screen.getByText('Chaos rises')).toBeInTheDocument();
+    expect(container.querySelectorAll('.choice-outcome-chip')).toHaveLength(2);
+  });
+
+  it('skips relationship chips whose NPC cannot be resolved', () => {
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-2': {
+          id: 'decision-2',
+          prompt: 'What now?',
+          selectedOptionId: 'opt-1',
+          options: [
+            {
+              id: 'opt-1',
+              text: 'Help the stranger',
+              alignment: 'lawful',
+              consequences: [
+                { type: 'relationship', action: 'modify', targetId: 'npc-unknown', value: { trustDelta: 10 } },
+                { type: 'alignment', action: 'add', targetId: 'player-alignment', value: 4 },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    const { container } = render(
+      <ChoiceOutcomeCallout decisionId="decision-2" decisionText="You choose to help" />
+    );
+
+    expect(container.querySelectorAll('.choice-outcome-chip')).toHaveLength(1);
+    expect(screen.getByText('Order rises')).toBeInTheDocument();
   });
 });

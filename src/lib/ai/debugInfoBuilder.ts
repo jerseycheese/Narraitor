@@ -10,6 +10,9 @@ import { EntityID } from '@/types/common.types';
 import { World } from '@/types/world.types';
 import { ToneSettings } from '@/types/tone-settings.types';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('DebugInfoBuilder');
+
 export interface DebugInfoContext {
   fullPrompt: string;
   templateName: string;
@@ -234,7 +237,7 @@ export function isDebugInfoEnabled(): boolean {
         }
       }
     } catch (error) {
-      console.warn('Failed to check DevTools settings:', error);
+      logger.warn('Failed to check DevTools settings:', error);
     }
   }
 

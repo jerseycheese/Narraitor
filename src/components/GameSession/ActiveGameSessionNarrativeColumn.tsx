@@ -21,6 +21,7 @@ interface ActiveGameSessionNarrativeColumnProps {
   onChoicesGenerated: (decision: Decision) => void;
   onEndingSuggested: (reason: string, endingType: EndingType) => void;
   segmentCount: number;
+  retryToken?: number;
 }
 
 const ActiveGameSessionNarrativeColumn: React.FC<
@@ -40,6 +41,7 @@ const ActiveGameSessionNarrativeColumn: React.FC<
   onChoicesGenerated,
   onEndingSuggested,
   segmentCount,
+  retryToken,
 }) => {
   return (
     <div
@@ -73,6 +75,7 @@ const ActiveGameSessionNarrativeColumn: React.FC<
           onEndingSuggested={onEndingSuggested}
           generateChoices={true}
           hideHistory={true}
+          retryToken={retryToken}
         />
       </div>
     </div>

@@ -66,20 +66,22 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
   };
 
   return (
-    <div className={`${className}`}>
+    <div
+      className={['component-point-pool-manager', className]
+        .filter(Boolean)
+        .join(' ')}
+    >
       {/* Point Pool Summary */}
-      <div className={wizardStyles.card.base}>
+      <div className={`${wizardStyles.card.base} point-pool-summary`}>
         <h3 className={wizardStyles.subheading}>
           {poolConfig.label || 'Point Pool'}
         </h3>
-        <div>
-          <div>
+        <div className="point-pool-summary-row">
+          <div className="point-pool-totals">
             <span>Total: {poolConfig.total}</span>
-            <span>
-              Remaining: {remaining}
-            </span>
+            <span>Remaining: {remaining}</span>
           </div>
-          <div>
+          <div className="point-pool-status">
             {remaining === 0 && (
               <span>
                 <CheckCircle aria-hidden="true" />
@@ -91,21 +93,32 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
       </div>
 
       {/* Allocations */}
-      <div>
+      <div className="point-pool-allocation-list">
         {allocations.map((allocation, index) => {
           const safeKey = allocation.id || allocation.name || String(index);
           return (
-            <div key={safeKey} className={wizardStyles.card.base}>
-              <div>
-                <span>{allocation.name}</span>
-                <span>{allocation.value}</span>
+            <div
+              key={safeKey}
+              className={`${wizardStyles.card.base} point-pool-allocation`}
+            >
+              <div className="point-pool-allocation-header">
+                <span className="point-pool-allocation-name">
+                  {allocation.name}
+                </span>
+                <span className="point-pool-allocation-value">
+                  {allocation.value}
+                </span>
               </div>
 
-              {allocation.description && <p>{allocation.description}</p>}
+              {allocation.description && (
+                <p className="point-pool-allocation-description">
+                  {allocation.description}
+                </p>
+              )}
 
-              <div>
+              <div className="point-pool-allocation-control">
                 {calculateMaxValue(allocation) < allocation.maxValue && (
-                  <div>
+                  <div className="point-pool-limit">
                     <span>Limited by available points</span>
                   </div>
                 )}
@@ -125,7 +138,7 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
                 {/* Visual indicator when at max due to points */}
                 {allocation.value === calculateMaxValue(allocation) &&
                   calculateMaxValue(allocation) < allocation.maxValue && (
-                    <div>
+                    <div className="point-pool-limit-note">
                       {/* Using a simple dot indicator via CSS */}
                       <span aria-hidden="true" />
                       <span>No points left. Reduce others to increase.</span>

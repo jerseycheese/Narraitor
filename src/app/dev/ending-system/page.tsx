@@ -188,9 +188,9 @@ The world had been saved, and all knew that heroes like this one would always ri
                 <p>Please wait while we create your story ending...</p>
                 <div>
                   <div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
+                    <div />
+                    <div />
+                    <div />
                   </div>
                 </div>
               </div>

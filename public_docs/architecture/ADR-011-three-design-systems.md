@@ -7,8 +7,10 @@ updated: 2026-05-10
 
 # ADR-011: Three structurally-differentiated design systems (DS1/DS2/DS3)
 
-**Status**: Accepted - Implemented
+**Status**: Accepted - Implemented (canon-surface ordering superseded by [ADR-012](ADR-012-storybook-single-canon-surface.md))
 **Date**: 2026-05-10
+
+> **Note (2026-06-28):** The "canon order: showcase pages > Storybook > app" decision below was reversed by [ADR-012](ADR-012-storybook-single-canon-surface.md) — Storybook is now the single canon surface and the `/dev/design-system*` showcase routes were retired. The three-design-system architecture (DS1/DS2/DS3, `data-theme` switching, structural differentiation) described here is unchanged.
 
 ## The Situation
 
@@ -83,7 +85,7 @@ The `data-theme` attribute approach won out because it's cheap, it's reversible,
 
 **Adding a per-theme variation to a component.** Don't branch in JSX. Add a CSS variable for whatever needs to vary, set the default in the theme files, and let the component consume the variable. If the variation is structural enough that CSS variables can't carry it (e.g., a different layout), it's worth questioning whether the component should be rethought rather than forked.
 
-**Adding a new component.** Build it once against tokens. Add a Storybook story alongside it. Verify in this order before merging: showcase pages (canon) → Storybook (DS1/DS2/DS3 × light/dark via toolbar) → a real production route. If a token doesn't exist for what you need, add it to all three theme files with values that fit each theme's voice — don't add it to one and let the others fall back to undefined.
+**Adding a new component.** Build it once against tokens. Add a Storybook story alongside it. Verify in this order before merging: showcase pages (canon) first, then Storybook (each of DS1/DS2/DS3 in light and dark via the toolbar), then a real production route. If a token doesn't exist for what you need, add it to all three theme files with values that fit each theme's voice — don't add it to one and let the others fall back to undefined.
 
 **Adding a fourth theme.** Add `dsN.css`, register it in [src/lib/theme/index.ts](../../src/lib/theme/index.ts) (the `THEMES` array and the `DesignSystem` type), and add a showcase page. ThemeProvider's `readStoredTheme` validation will need the new id added to the `if (stored === 'ds1' || ...)` check.
 

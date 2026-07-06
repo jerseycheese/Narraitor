@@ -68,7 +68,7 @@ interface DataTableProps {
 }
 
 const meta: Meta<DataTableProps> = {
-  title: '02-molecules/ui-components/DataTable',
+  title: '02-Molecules/ui-components/DataTable',
   component: DataTable,
   parameters: {
     layout: 'padded',

@@ -1,7 +1,9 @@
 import { createDefaultGeminiClient } from './defaultGeminiClient';
+import { getAIConfig } from './config';
 import { StoryCheckpointRequestBody, StoryCheckpointResponseBody } from '@/types/story-checkpoint.types';
 import { safeTrim } from '@/lib/utils';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
+import { stripMarkdownFences, extractJsonObject } from './parseJSON';
 
 const RESPONSE_SCHEMA = `{
   "segment": "2-3 sentences (50-75 words) summarizing ONLY the events provided in this checkpoint",
@@ -12,8 +14,7 @@ const RESPONSE_SCHEMA = `{
   "themes": ["Optional list of tonal throughlines"],
   "includedEvents": 3,
   "includedDecisions": 1,
-  "lastEventTimestamp": "2025-11-20T15:31:39Z",
-  "model": "gemini-1.5-pro"
+  "lastEventTimestamp": "2025-11-20T15:31:39Z"
 }`;
 
 const formatEvents = (events: StoryCheckpointRequestBody['events']): string => {
@@ -117,14 +118,10 @@ const sanitizeString = (value?: unknown, fallback = ''): string => {
 };
 
 const parseResponse = (content: string): StoryCheckpointResponseBody => {
-  let payload = content.trim();
-  if (payload.startsWith('```')) {
-    payload = payload.replace(/^```json?/i, '').replace(/```$/, '').trim();
-  }
-  const jsonStart = payload.indexOf('{');
-  const jsonEnd = payload.lastIndexOf('}');
-  if (jsonStart >= 0 && jsonEnd > jsonStart) {
-    payload = payload.slice(jsonStart, jsonEnd + 1);
+  let payload = stripMarkdownFences(content);
+  const extracted = extractJsonObject(payload);
+  if (extracted) {
+    payload = extracted;
   }
 
   const parsed = JSON.parse(payload);
@@ -143,14 +140,18 @@ const parseResponse = (content: string): StoryCheckpointResponseBody => {
     includedEvents: typeof parsed.includedEvents === 'number' ? parsed.includedEvents : 0,
     includedDecisions: typeof parsed.includedDecisions === 'number' ? parsed.includedDecisions : 0,
     lastEventTimestamp: sanitizeString(parsed.lastEventTimestamp),
-    model: sanitizeString(parsed.model),
+    // Record the model the default client actually runs on, not whatever the AI
+    // echoed back. The prompt used to carry a stale "gemini-1.5-pro" example and
+    // the model dutifully repeated it, mislabelling every checkpoint (#1430 F37).
+    model: getAIConfig().modelName,
   };
 };
 
 export const generateStoryCheckpointSummary = async (
   payload: StoryCheckpointRequestBody,
+  apiKey?: string | null,
 ): Promise<StoryCheckpointResponseBody> => {
-  const client = createDefaultGeminiClient();
+  const client = createDefaultGeminiClient(apiKey);
   const prompt = buildPrompt(payload);
 
   const response = await client.generateContent(prompt);

@@ -1,7 +1,8 @@
 import * as React from "react"
 import { clsx } from 'clsx'
+import './radio-group.css'
 
-export interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string
   onValueChange?: (value: string) => void
   name?: string
@@ -9,7 +10,7 @@ export interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: 'vertical' | 'horizontal'
 }
 
-export interface RadioGroupItemProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface RadioGroupItemProps extends React.InputHTMLAttributes<HTMLInputElement> {
   value: string
   id?: string
   children?: React.ReactNode
@@ -34,10 +35,8 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
     return (
       <RadioGroupContext.Provider value={contextValue}>
         <div
-          className={clsx(
-            orientation === 'horizontal' ? "grid-flow-col auto-cols-max" : "grid-flow-row",
-            className
-          )}
+          className={clsx("radio-group", className)}
+          data-orientation={orientation}
           role="radiogroup"
           ref={ref}
           {...props}
@@ -54,7 +53,7 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
     const itemId = id || `radio-${value}`
 
     return (
-      <div>
+      <div className="radio-option">
         <input
           type="radio"
           id={itemId}
@@ -63,14 +62,12 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
           checked={context.value === value}
           onChange={() => context.onValueChange?.(value)}
           disabled={context.disabled || props.disabled}
-          className={clsx(
-            className
-          )}
+          className={clsx("radio-item", className)}
           ref={ref}
           {...props}
         />
         {children && (
-          <label htmlFor={itemId} >
+          <label htmlFor={itemId} className="radio-label">
             {children}
           </label>
         )}

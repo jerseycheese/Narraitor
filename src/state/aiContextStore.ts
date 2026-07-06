@@ -1,34 +1,10 @@
 import { create } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { NarrativeGoal, GoalPriority } from '../types/goal.types';
-import { generateUniqueId } from '../lib/utils/generateId';
 import { getTimestamp } from '@/lib/utils';
 
 // Module cache for dynamic import to break circular dependencies
 let goalStoreModule: typeof import('./goalStore') | null = null;
-
-// Simplified AI context types
-interface AIPromptContext {
-  type: string;
-  content: string;
-  tokenCount?: number;
-}
-
-interface AIConstraint {
-  type: string;
-  value: string | number;
-}
-
-interface AIContext {
-  id: EntityID;
-  sessionId: EntityID;
-  recentContext: AIPromptContext[];
-  constraints: AIConstraint[];
-  metadata: {
-    tokenCount: number;
-    lastUpdated: string;
-  };
-}
 
 // Extended context with goal integration
 interface AISessionContext {
@@ -55,22 +31,11 @@ interface ContextBuildOptions {
  */
 interface AIContextStore {
   // State
-  contexts: Record<EntityID, AIContext>;
-  contextHistory: Record<EntityID, AISessionContext[]>;
-  activeContextId: EntityID | null;
   error: string | null;
   loading: boolean;
 
-  // Original Actions
-  createContext: (sessionId: EntityID) => EntityID;
-  updateContext: (contextId: EntityID, updates: Partial<AIContext>) => void;
-  addPromptContext: (contextId: EntityID, promptContext: AIPromptContext) => void;
-  clearContext: (contextId: EntityID) => void;
-
   // Goal Integration Actions
   buildContextForSession: (sessionId: EntityID, options?: ContextBuildOptions) => Promise<AISessionContext>;
-  saveContextToHistory: (sessionId: EntityID, context: AISessionContext) => void;
-  getContextHistory: (sessionId: EntityID) => AISessionContext[];
 
   // State management
   reset: () => void;
@@ -105,115 +70,13 @@ const sortGoalsByPriority = (goals: NarrativeGoal[]): NarrativeGoal[] => {
 
 // Initial state
 const initialState = {
-  contexts: {},
-  contextHistory: {},
-  activeContextId: null,
   error: null,
   loading: false,
 };
 
 // AI Context Store implementation
-export const aiContextStore = create<AIContextStore>()((set, get) => ({
+export const useAiContextStore = create<AIContextStore>()((set) => ({
   ...initialState,
-
-  createContext: (sessionId) => {
-    const contextId = generateUniqueId('context');
-
-    const newContext: AIContext = {
-      id: contextId,
-      sessionId,
-      recentContext: [],
-      constraints: [],
-      metadata: {
-        tokenCount: 0,
-        lastUpdated: getTimestamp(),
-      },
-    };
-
-    set((state) => ({
-      contexts: {
-        ...state.contexts,
-        [contextId]: newContext,
-      },
-      activeContextId: contextId,
-    }));
-
-    return contextId;
-  },
-
-  updateContext: (contextId, updates) =>
-    set((state) => {
-      if (!state.contexts[contextId]) {
-        return { error: 'Context not found' };
-      }
-
-      const updatedContext: AIContext = {
-        ...state.contexts[contextId],
-        ...updates,
-        metadata: {
-          ...state.contexts[contextId].metadata,
-          lastUpdated: getTimestamp(),
-        },
-      };
-
-      return {
-        contexts: {
-          ...state.contexts,
-          [contextId]: updatedContext,
-        },
-        error: null,
-      };
-    }),
-
-  addPromptContext: (contextId, promptContext) =>
-    set((state) => {
-      if (!state.contexts[contextId]) {
-        return { error: 'Context not found' };
-      }
-
-      const context = state.contexts[contextId];
-      const updatedContext: AIContext = {
-        ...context,
-        recentContext: [...context.recentContext, promptContext],
-        metadata: {
-          ...context.metadata,
-          tokenCount: context.metadata.tokenCount + (promptContext.tokenCount || 0),
-          lastUpdated: getTimestamp(),
-        },
-      };
-
-      return {
-        contexts: {
-          ...state.contexts,
-          [contextId]: updatedContext,
-        },
-        error: null,
-      };
-    }),
-
-  clearContext: (contextId) =>
-    set((state) => {
-      if (!state.contexts[contextId]) {
-        return { error: 'Context not found' };
-      }
-
-      const clearedContext: AIContext = {
-        ...state.contexts[contextId],
-        recentContext: [],
-        metadata: {
-          tokenCount: 0,
-          lastUpdated: getTimestamp(),
-        },
-      };
-
-      return {
-        contexts: {
-          ...state.contexts,
-          [contextId]: clearedContext,
-        },
-        error: null,
-      };
-    }),
 
   // Simplified goal context building
   buildContextForSession: async (sessionId, options = {}) => {
@@ -311,38 +174,9 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
     }
   },
 
-  saveContextToHistory: (sessionId, context) => {
-    set((state) => {
-      const sessionHistory = state.contextHistory[sessionId] || [];
-      const maxHistorySize = 10;
-
-      const updatedHistory = [...sessionHistory, context];
-
-      // Trim history if too long
-      if (updatedHistory.length > maxHistorySize) {
-        updatedHistory.splice(0, updatedHistory.length - maxHistorySize);
-      }
-
-      return {
-        contextHistory: {
-          ...state.contextHistory,
-          [sessionId]: updatedHistory,
-        },
-      };
-    });
-  },
-
-  getContextHistory: (sessionId) => {
-    const state = get();
-    return state.contextHistory[sessionId] || [];
-  },
-
   // State management actions
   reset: () => set(() => initialState),
   setError: (error) => set(() => ({ error })),
   clearError: () => set(() => ({ error: null })),
   setLoading: (loading) => set(() => ({ loading })),
 }));
-
-// Export as useAiContextStore for compatibility
-export const useAiContextStore = aiContextStore;

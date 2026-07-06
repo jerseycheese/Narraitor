@@ -1,11 +1,55 @@
 import { defineConfig, devices } from '@playwright/test';
+import { execSync } from 'node:child_process';
+
+/**
+ * Resolve the base URL for local runs.
+ *
+ * CI always serves on 3000 (see the webServer block below) so visual baselines
+ * stay stable. Locally, follow this checkout's dev-server port so running tests
+ * from a git worktree targets that worktree's server, not a stray 3000.
+ * An explicit PLAYWRIGHT_BASE_URL always wins.
+ */
+function resolveBaseURL(): string {
+  if (process.env.PLAYWRIGHT_BASE_URL) {
+    return process.env.PLAYWRIGHT_BASE_URL;
+  }
+  if (process.env.CI) {
+    return 'http://localhost:3000';
+  }
+  try {
+    const port = execSync('node scripts/worktree-port.js', { encoding: 'utf8' }).trim();
+    if (port) {
+      return `http://localhost:${port}`;
+    }
+  } catch {
+    // Fall back to the canonical port below.
+  }
+  return 'http://localhost:3000';
+}
 
 /**
  * Playwright Configuration for Visual Regression Testing
- * 
+ *
  * Configures Playwright for consistent visual screenshot comparison
  * across multiple browsers and viewports. Optimized for CI/CD environments.
  */
+
+// Shared Chromium settings for both the main visual project and the tutorial
+// project, so they render identically (viewport + font hinting).
+const chromiumUse = {
+  ...devices['Desktop Chrome'],
+  // Standard desktop viewport for consistent screenshots (height > 800px for test requirements)
+  viewport: { width: 1280, height: 1024 },
+  // Browser launch options for consistent font rendering
+  launchOptions: {
+    args: [
+      '--font-render-hinting=none',
+      '--disable-font-subpixel-positioning',
+      '--disable-lcd-text',
+    ],
+  },
+};
+
 export default defineConfig({
   // Test directory for visual regression tests
   testDir: './tests/visual',
@@ -49,7 +93,7 @@ export default defineConfig({
   // Global test setup
   use: {
     // Base URL for all tests
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    baseURL: resolveBaseURL(),
     
     // Reduced timeouts for faster execution
     actionTimeout: 10 * 1000,
@@ -72,20 +116,22 @@ export default defineConfig({
   // Configure projects for major browsers - optimized for CI speed
   projects: [
     {
+      // Main visual suite. Excludes the tutorial tours, which run in their own
+      // project (and dedicated CI job) to keep the main run lean — see #1014.
       name: 'chromium',
-      use: { 
-        ...devices['Desktop Chrome'],
-        // Standard desktop viewport for consistent screenshots (height > 800px for test requirements)
-        viewport: { width: 1280, height: 1024 },
-        // Browser launch options for consistent font rendering
-        launchOptions: {
-          args: [
-            '--font-render-hinting=none',
-            '--disable-font-subpixel-positioning',
-            '--disable-lcd-text',
-          ],
-        },
-      },
+      testIgnore: '**/tutorials/**',
+      use: { ...chromiumUse },
+    },
+    {
+      // Tutorial tours run as a separate project so they can be split into a
+      // dedicated CI job. snapshotPathTemplate pins the literal "-chromium"
+      // (instead of the default "{-projectName}") so the existing
+      // ...-chromium-darwin.png baselines stay valid — no regeneration.
+      name: 'tutorials',
+      testMatch: '**/tutorials/**/*.spec.ts',
+      snapshotPathTemplate:
+        '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-chromium{-snapshotSuffix}{ext}',
+      use: { ...chromiumUse },
     },
     // NOTE: Firefox and WebKit disabled for faster CI
     // Enable for comprehensive cross-browser testing when needed

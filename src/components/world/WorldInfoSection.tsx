@@ -16,7 +16,7 @@ export function WorldInfoSection({ world }: WorldInfoSectionProps) {
       aria-labelledby="world-details-heading"
     >
       <h2 id="world-details-heading">World details</h2>
-      <div>
+      <div className="world-detail-meta-grid">
         <DataField
           label="Created"
           value={formatDate(world.createdAt)}

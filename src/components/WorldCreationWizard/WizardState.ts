@@ -1,26 +1,5 @@
 // WizardState.ts
-import { World, WorldSkill } from '@/types/world.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
-import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
-
-export interface WizardState {
-  currentStep: number;
-  worldData: Partial<World>;
-  aiSuggestions?: {
-    attributes: AttributeSuggestion[];
-    skills: SkillSuggestion[];
-  };
-  aiSuggestionMeta?: {
-    source: AIGuidanceSource;
-    generatedAt?: string;
-    descriptionSnapshot?: string;
-  };
-  customSkills?: WorldSkill[]; // New: Track user-created skills separately
-  errors: Record<string, string>;
-  isProcessing: boolean;
-  selectedTemplateId?: string | null;
-  createOwnWorld?: boolean;
-}
 
 export interface AttributeSuggestion {
   name: string;
@@ -45,11 +24,9 @@ export interface SkillSuggestion {
 }
 
 export const WIZARD_STEPS = [
-  { id: 'template', label: 'Choose Template' },
   { id: 'basic-info', label: 'Basic Information' },
   { id: 'description', label: 'World Description' },
   { id: 'attributes', label: 'Review Attributes' },
   { id: 'skills', label: 'Review Skills' },
   { id: 'finalize', label: 'Finalize' },
-  { id: 'quick-start', label: 'Quick Start' },
 ];

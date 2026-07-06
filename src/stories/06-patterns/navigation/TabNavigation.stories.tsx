@@ -74,7 +74,7 @@ export const SmartTemplatesExample: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Real-world usage example from SmartTemplates component with longer labels'
+        story: 'Tab navigation with longer, sentence-style labels'
       }
     }
   }

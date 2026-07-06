@@ -78,6 +78,12 @@ describe('ActiveGameSession Manuscript Layout', () => {
       isGeneratingEnding: false,
       isSessionEnded: () => false,
       generateEnding: jest.fn(),
+      getSessionSegments: (sid: string) => {
+        const segments = mockNarrativeState.segments as Record<string, unknown>;
+        const ids = (mockNarrativeState.sessionSegments as Record<string, string[]>)[sid] ?? [];
+        return ids.map((id) => segments[id]).filter(Boolean);
+      },
+      getSessionDecisions: () => [],
     };
     (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) => 
       selector ? selector(mockNarrativeState) : mockNarrativeState
@@ -251,10 +257,21 @@ describe('ActiveGameSession Manuscript Layout', () => {
   });
 
   it('passes isStreaming to ManuscriptActionRail when generating', async () => {
-    // We'll mock isGenerating state via the narrative controller effect
-    // But since it's an internal state, we can just check the rail prop
     const ManuscriptActionRail = require('../ManuscriptActionRail').ManuscriptActionRail;
-    
+
+    // Segments exist (so the session shell renders) but choices are still
+    // generating - that is the streaming state the action rail reflects.
+    (useNarrativeStore as unknown as { subscribe: jest.Mock }).subscribe = jest.fn(
+      (cb: (state: unknown) => void) => {
+        cb({
+          sessionSegments: { [mockSessionId]: ['seg-1'] },
+          sessionDecisions: {},
+          decisions: {},
+        });
+        return jest.fn();
+      }
+    );
+
     render(
       <ActiveGameSession
         worldId={mockWorldId}
@@ -266,8 +283,6 @@ describe('ActiveGameSession Manuscript Layout', () => {
     // Wait for initialization
     await screen.findByTestId('manuscript-session-shell');
 
-    // Check last call to the mock
-    // Note: ActiveGameSession uses useState(true) for isGenerating initially
     const lastCall = (ManuscriptActionRail as jest.Mock).mock.calls.slice(-1)[0][0];
     expect(lastCall.isStreaming).toBe(true);
   });
@@ -307,6 +322,27 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.getByRole('button', { name: /toggle tools menu/i })).toBeInTheDocument();
     });
 
+    it('keeps dev-only authoring tools out of the Tools menu outside development', async () => {
+      // NODE_ENV is 'test' here, which the dev-tools gate treats like production,
+      // so the authoring affordances must not render for real players (#1430 F58).
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const toolsToggle = await screen.findByRole('button', { name: /toggle tools menu/i });
+      fireEvent.click(toolsToggle);
+
+      expect(screen.queryByRole('button', { name: /simulate next turn/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /toggle streaming state/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /ending suggestion/i })).not.toBeInTheDocument();
+    });
+
         it('opens character drawer from Tools menu when trigger is clicked (flag ON)', async () => {
 
           (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
@@ -334,28 +370,23 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.getByText('Character Sheet')).toBeInTheDocument();
     });
 
-        it('renders suggested actions in margin when flag is ON', async () => {
+    it('renders the scene status rail when the latest segment has participants', async () => {
+      // Override narrative state with a segment that has characterIds
+      const mockNarrativeStateWithChars = {
+        segments: {
+          'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: ['npc-1'] },
+        },
+        sessionSegments: { [mockSessionId]: ['seg-1'] },
+        currentEnding: null,
+        isGeneratingEnding: false,
+        isSessionEnded: () => false,
+        generateEnding: jest.fn(),
+      };
+      (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector ? selector(mockNarrativeStateWithChars) : mockNarrativeStateWithChars
+      );
 
-          (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
-
-          // Override narrative state with a segment that has characterIds
-          const mockNarrativeStateWithChars = {
-            segments: {
-              'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: ['npc-1'] },
-            },
-            sessionSegments: { [mockSessionId]: ['seg-1'] },
-            currentEnding: null,
-            isGeneratingEnding: false,
-            isSessionEnded: () => false,
-            generateEnding: jest.fn(),
-          };
-          (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) =>
-            selector ? selector(mockNarrativeStateWithChars) : mockNarrativeStateWithChars
-          );
-
-          render(
-
-
+      render(
         <ActiveGameSession
           worldId={mockWorldId}
           sessionId={mockSessionId}
@@ -363,10 +394,11 @@ describe('ActiveGameSession Manuscript Layout', () => {
         />
       );
 
-      // Margin content is inside an <aside>
-      const aside = await screen.findByRole('complementary', { name: /characters present/i });
+      // Scene status lives inside the <aside> rail and reflects the latest segment.
+      const aside = await screen.findByRole('complementary', { name: /scene status/i });
       expect(aside).toBeInTheDocument();
       expect(aside).toHaveClass('manuscript-characters-rail');
+      expect(screen.getByText('Characters Present')).toBeInTheDocument();
     });
 
         it('toggles Tools menu when Tools button is clicked', async () => {

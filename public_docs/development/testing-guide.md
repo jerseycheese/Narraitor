@@ -15,7 +15,7 @@ I've found that focusing on user behavior over implementation details makes test
 
 **Key principles**:
 - **TDD**: Write tests before implementation: forces you to think about the API first
-- **User-centric**: Test what users see, not how code works internally  
+- **User-centric**: Test what users see, not how code works internally
 - **Component isolation**: Test components independently before integration
 - **One thing per test**: Clear, focused assertions that are easy to debug
 
@@ -25,6 +25,12 @@ I've found that focusing on user behavior over implementation details makes test
 3. **Integration Tests**: Component + store interactions (slower, fewer needed)
 4. **Visual Tests**: Screenshot-based regression testing (medium speed, selective coverage)
 5. **E2E Tests**: Complete user flows (slowest, only for critical paths)
+
+On top of the pyramid, **mutation testing** (Stryker, `stryker.config.json`) runs locally
+against the state, storage, and narrative layers (`src/state/**`, `src/lib/storage/**`,
+`src/lib/narrative/**`). It deliberately breaks the code in small ways and checks whether a test
+fails — a good way to catch tests that pass without really asserting anything. It's not a CI
+gate; run it when you've touched those layers.
 
 ## Visual Regression Testing
 
@@ -55,13 +61,13 @@ Visual tests also verify accessibility implementation by capturing focus states,
 ```typescript
 test('accessible warning component', async ({ page }) => {
   await page.goto('/devtools');
-  
+
   // Test warning with proper semantic styling
   const warning = page.locator('[role="alert"]');
   await expect(warning).toHaveScreenshot('semantic-warning.png', {
     threshold: 0.2 // Strict threshold - accessibility styling should be stable
   });
-  
+
   // Test keyboard focus state
   await page.locator('button').first().focus();
   await expect(page.locator('button').first()).toHaveScreenshot('focused-button.png');
@@ -79,7 +85,7 @@ Visual tests complement other test types by focusing on the user experience:
 │ Unit Tests      │ Logic errors     │ N/A               │
 │ Component Tests │ Rendering issues │ Basic structure   │
 │ Integration     │ Data flow bugs   │ State changes     │
-│ Visual Tests    │ Layout breaks    │ ✅ PRIMARY        │
+│ Visual Tests    │ Layout breaks    │ PRIMARY           │
 │ E2E Tests       │ User workflows   │ Full journeys     │
 └─────────────────┴──────────────────┴───────────────────┘
 ```
@@ -113,10 +119,10 @@ async function waitForAppReady(page) {
 test('component visual test', async ({ page }) => {
   await page.goto('/component-page');
   await waitForAppReady(page);
-  
+
   // Full page screenshot
   await expect(page).toHaveScreenshot('component-page.png');
-  
+
   // Or component-specific screenshot
   const component = page.locator('[data-testid="my-component"]');
   await expect(component).toHaveScreenshot('my-component.png');
@@ -127,7 +133,7 @@ test('component visual test', async ({ page }) => {
 
 **Focus on user-critical interfaces:**
 - Landing pages and navigation
-- Form layouts and validation states  
+- Form layouts and validation states
 - Game session interfaces
 - Modal dialogs and overlays
 
@@ -146,9 +152,9 @@ tests/visual/
 ```
 
 **Handle visual failures appropriately:**
-1. **If it's a bug** → Fix the code, don't update baseline
-2. **If it's intentional** → Update baseline with `npm run test:visual:update`
-3. **If it's environmental** → Check CI artifacts, adjust thresholds
+1. **If it's a bug**: fix the code, don't update the baseline
+2. **If it's intentional**: update the baseline with `npm run test:visual:update`
+3. **If it's environmental**: check CI artifacts and adjust thresholds
 
 For complete visual testing guidance, see the [Visual Regression Testing Guide](./visual-regression-testing.md).
 
@@ -190,10 +196,10 @@ test('creates character and updates store', async () => {
   mockZustandStore(useCharacterStore, mockStore);
 
   render(<CharacterCreator />);
-  
+
   await user.type(screen.getByLabelText('Name'), 'New Character');
   await user.click(screen.getByText('Create'));
-  
+
   expect(screen.getByText('Character created')).toBeInTheDocument();
 });
 ```
@@ -203,12 +209,12 @@ test('creates character and updates store', async () => {
 **Descriptive test names** save so much debugging time. When a test fails, you should immediately know what broke:
 
 ```typescript
-// ✅ Clear: tells you exactly what failed
+// Good: Clear: tells you exactly what failed
 test('displays error message when character creation fails', () => {
   // Test implementation
 });
 
-// ❌ Vague: have to read the test to understand what it does
+// Avoid: Vague: have to read the test to understand what it does
 test('handles error', () => {
   // Test implementation
 });
@@ -217,13 +223,13 @@ test('handles error', () => {
 **Test user interactions, not implementation details**. Focus on what users actually do:
 
 ```typescript
-// ✅ Tests the user experience
+// Good: Tests the user experience
 test('navigates to character detail when clicked', async () => {
   const user = userEvent.setup();
   render(<CharacterCard character={mockCharacter} />);
-  
+
   await user.click(screen.getByText('View Details'));
-  
+
   expect(mockRouter.push).toHaveBeenCalledWith('/characters/1');
 });
 ```
@@ -231,13 +237,13 @@ test('navigates to character detail when clicked', async () => {
 **Mock sparingly**. Only mock external dependencies, not your own logic:
 
 ```typescript
-// ✅ Mock API calls and external services
+// Good: Mock API calls and external services
 const mockApiCall = jest.fn();
 jest.mock('@/lib/api', () => ({
   createCharacter: mockApiCall
 }));
 
-// ❌ Don't mock your own functions: test them instead
+// Avoid: Don't mock your own functions: test them instead
 const mockCalculateTotal = jest.fn();
 jest.mock('./utils', () => ({
   calculateTotal: mockCalculateTotal  // This defeats the purpose of testing
@@ -249,10 +255,10 @@ jest.mock('./utils', () => ({
 // Test error scenarios
 test('displays error when API call fails', async () => {
   mockApiCall.mockRejectedValue(new Error('Network error'));
-  
+
   render(<CharacterForm />);
   await user.click(screen.getByText('Submit'));
-  
+
   expect(screen.getByText(/error/i)).toBeInTheDocument();
 });
 ```
@@ -264,7 +270,7 @@ test('displays error when API call fails', async () => {
 test('updates display when data changes', () => {
   const { rerender } = render(<Component data="initial" />);
   expect(screen.getByText('initial')).toBeInTheDocument();
-  
+
   rerender(<Component data="updated" />);
   expect(screen.getByText('updated')).toBeInTheDocument();
 });
@@ -275,13 +281,13 @@ test('updates display when data changes', () => {
 test('submits form with correct data', async () => {
   const user = userEvent.setup();
   const onSubmit = jest.fn();
-  
+
   render(<CharacterForm onSubmit={onSubmit} />);
-  
+
   await user.type(screen.getByLabelText('Name'), 'Test Name');
   await user.selectOptions(screen.getByLabelText('Class'), 'warrior');
   await user.click(screen.getByText('Submit'));
-  
+
   expect(onSubmit).toHaveBeenCalledWith({
     name: 'Test Name',
     class: 'warrior'
@@ -292,15 +298,15 @@ test('submits form with correct data', async () => {
 ### Testing Loading States
 ```typescript
 test('shows loading spinner while saving', async () => {
-  const slowApiCall = jest.fn(() => new Promise(resolve => 
+  const slowApiCall = jest.fn(() => new Promise(resolve =>
     setTimeout(resolve, 100)
   ));
-  
+
   render(<Component onSave={slowApiCall} />);
-  
+
   user.click(screen.getByText('Save'));
   expect(screen.getByText(/saving/i)).toBeInTheDocument();
-  
+
   await waitFor(() => {
     expect(screen.queryByText(/saving/i)).not.toBeInTheDocument();
   });
@@ -320,12 +326,12 @@ beforeEach(() => {
 
 test('creates character in store', () => {
   const { createCharacter } = useCharacterStore.getState();
-  
+
   const characterId = createCharacter({
     name: 'Test Character',
     worldId: 'world-1'
   });
-  
+
   const characters = useCharacterStore.getState().characters;
   expect(characters[characterId]).toMatchObject({
     name: 'Test Character',
@@ -345,11 +351,11 @@ const TestProvider = ({ children }) => (
 
 test('component updates when store changes', () => {
   render(<CharacterList />, { wrapper: TestProvider });
-  
+
   act(() => {
     useCharacterStore.getState().createCharacter(mockCharacter);
   });
-  
+
   expect(screen.getByText(mockCharacter.name)).toBeInTheDocument();
 });
 ```
@@ -480,7 +486,7 @@ import { createMockCharacter, mockZustandStore } from '@/lib/test-utils';
 npm run test
 
 # Run tests in watch mode
-npm run test:watch
+npm run test -- --watch
 
 # Run tests with coverage
 npm run test:coverage
@@ -524,7 +530,7 @@ import { within, userEvent } from '@storybook/testing-library';
 export const InteractiveTest: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    
+
     await userEvent.click(canvas.getByRole('button'));
     await expect(canvas.getByText('Clicked')).toBeInTheDocument();
   }
@@ -545,9 +551,9 @@ test('handles API success', async () => {
     ok: true,
     json: async () => ({ id: '1', name: 'Character' })
   });
-  
+
   render(<ComponentWithAPI />);
-  
+
   await waitFor(() => {
     expect(screen.getByText('Character')).toBeInTheDocument();
   });

@@ -5,6 +5,7 @@ import { useAiContextStore } from '@/state/aiContextStore';
 import type { EntityID } from '@/types/common.types';
 import type { World } from '@/types/world.types';
 import type { CharacterGoal } from '@/types/personalization.types';
+import type { NarrativeGoal } from '@/types/goal.types';
 import { safeTrim } from '@/lib/utils';
 import {
   summarizeThreadHighlight,
@@ -13,7 +14,10 @@ import {
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
-import { PersonalizationEngine } from './personalizationEngine';
+import {
+  createPersonalizedContext,
+  generateNarrativeEnhancement,
+} from './personalizationEngine';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { applyBudget } from './narrativeGenerator.budget';
 const MAX_OTHER_CHARACTER_THREADS = 3;
@@ -23,7 +27,6 @@ export const enhancePromptWithPersonalization = async (
   prompt: string,
   worldId: EntityID,
   characterIds: string[],
-  personalizationEngine: PersonalizationEngine,
   sessionId?: EntityID,
   budget?: RequestBudget
 ): Promise<string> => {
@@ -74,11 +77,9 @@ export const enhancePromptWithPersonalization = async (
       ? await useAiContextStore.getState().buildContextForSession(sessionId)
       : null;
     const narrativeGoals = aiContext?.activeGoals || [];
-    const characterGoals = convertToCharacterGoals(
-      narrativeGoals as unknown as Array<Record<string, unknown>>
-    );
+    const characterGoals = convertToCharacterGoals(narrativeGoals);
 
-    const personalizedContext = personalizationEngine.createPersonalizedContext(
+    const personalizedContext = createPersonalizedContext(
       playerCharacter,
       world,
       relevantDecisions,
@@ -88,7 +89,7 @@ export const enhancePromptWithPersonalization = async (
     );
 
     const enhancementText =
-      personalizationEngine.generateNarrativeEnhancement(personalizedContext);
+      generateNarrativeEnhancement(personalizedContext);
     const cleanedEnhancementText = prompt.includes('CURRENT NARRATIVE GOALS:')
       ? enhancementText
           .split('\n\n')
@@ -116,7 +117,7 @@ export const enhancePromptWithPersonalization = async (
       return prompt;
     }
 
-    if (!budget || !budget.isEnabled()) {
+    if (!budget) {
       return `${prompt}${personalizationSection}`;
     }
 
@@ -187,14 +188,14 @@ export const convertToPersonalizationCharacter = (
 };
 
 const convertToCharacterGoals = (
-  narrativeGoals: Array<Record<string, unknown>>
+  narrativeGoals: NarrativeGoal[]
 ): CharacterGoal[] =>
   narrativeGoals.map((goal) => ({
-    id: goal.id as string,
-    description: (goal.description || goal.title) as string,
-    priority: mapGoalPriority(goal.priority as string),
+    id: goal.id,
+    description: goal.description || goal.title,
+    priority: mapGoalPriority(goal.priority),
     progress: calculateGoalProgress(goal),
-    establishedAt: goal.createdAt as string,
+    establishedAt: goal.createdAt,
     isActive: goal.status === 'active',
   }));
 
@@ -211,7 +212,7 @@ const mapGoalPriority = (priority: string): 'primary' | 'secondary' | 'minor' =>
   }
 };
 
-const calculateGoalProgress = (goal: Record<string, unknown>): number => {
+const calculateGoalProgress = (goal: NarrativeGoal): number => {
   if (goal.status === 'completed') return 100;
   if (goal.status === 'abandoned') return 0;
 

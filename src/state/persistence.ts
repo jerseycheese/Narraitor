@@ -26,7 +26,7 @@ const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
       const storage = new ResilientStorageMiddleware({
         onStatusChange: (status, error) => {
           if (error?.shouldNotify) {
-            console.warn('[Persistence] Storage status changed:', status, error);
+            logger.warn('[Persistence] Storage status changed:', status, error);
           }
         },
       });
@@ -41,23 +41,27 @@ const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
 /**
  * Create resilient IndexedDB storage for Zustand persistence
  * @returns Persistence storage implementation compatible with Zustand
+ *
+ * Generic over the persisted state shape so explicitly-typed PersistOptions
+ * (e.g. narrativeStore.persistence.ts) can use it; defaults to unknown for
+ * the inline-options stores.
  */
-export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
-  getItem: async (name: string): Promise<{ state: unknown; version?: number } | null> => {
+export const createIndexedDBStorage = <T = unknown>(): PersistStorage<T> => ({
+  getItem: async (name: string): Promise<{ state: T; version?: number } | null> => {
     try {
       const storage = await getResilientStorage();
       const result = await storage.getItem(name);
-      
+
       if (!result) return null;
       // Parse the JSON string into a StorageValue object
-      return JSON.parse(result) as { state: unknown; version?: number };
+      return JSON.parse(result) as { state: T; version?: number };
     } catch (error) {
       logger.error('Failed to get item', error);
       return null;
     }
   },
   
-  setItem: async (name: string, value: { state: unknown; version?: number }): Promise<void> => {
+  setItem: async (name: string, value: { state: T; version?: number }): Promise<void> => {
     try {
       const storage = await getResilientStorage();
       // Convert the StorageValue object to a JSON string

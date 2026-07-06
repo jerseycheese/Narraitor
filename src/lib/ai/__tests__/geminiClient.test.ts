@@ -61,6 +61,10 @@ describe('GeminiClient', () => {
         text: 'Generated test content',
         result: {
           finishReason: 'STOP'
+        },
+        usageMetadata: {
+          promptTokenCount: 12,
+          candidatesTokenCount: 34
         }
       };
       mockGenerateContent.mockResolvedValueOnce(mockSDKResponse);
@@ -79,9 +83,46 @@ describe('GeminiClient', () => {
       expect(result).toEqual({
         content: 'Generated test content',
         finishReason: 'STOP',
-        promptTokens: undefined,
-        completionTokens: undefined
+        promptTokens: 12,
+        completionTokens: 34
       });
+    });
+
+    test('should extract token usage from SDK usageMetadata', async () => {
+      const mockSDKResponse = {
+        text: 'Token tracked content',
+        result: {
+          finishReason: 'STOP'
+        },
+        usageMetadata: {
+          promptTokenCount: 150,
+          candidatesTokenCount: 275,
+          totalTokenCount: 425
+        }
+      };
+      mockGenerateContent.mockResolvedValueOnce(mockSDKResponse);
+
+      client = new GeminiClient(config);
+      const result = await client.generateContent('Test prompt');
+
+      expect(result.promptTokens).toBe(150);
+      expect(result.completionTokens).toBe(275);
+    });
+
+    test('should return undefined token counts when usageMetadata is absent', async () => {
+      const mockSDKResponse = {
+        text: 'No usage metadata',
+        result: {
+          finishReason: 'STOP'
+        }
+      };
+      mockGenerateContent.mockResolvedValueOnce(mockSDKResponse);
+
+      client = new GeminiClient(config);
+      const result = await client.generateContent('Test prompt');
+
+      expect(result.promptTokens).toBeUndefined();
+      expect(result.completionTokens).toBeUndefined();
     });
 
     test('should retry on transient errors', async () => {

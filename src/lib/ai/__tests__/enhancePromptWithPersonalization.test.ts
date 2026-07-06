@@ -1,6 +1,5 @@
 import { enhancePromptWithPersonalization } from '../narrativeGenerator.prompt.personalization';
 import { playerDecisionTracker } from '../playerDecisionTracker';
-import { PersonalizationEngine } from '../personalizationEngine';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
@@ -29,12 +28,9 @@ describe('enhancePromptWithPersonalization Integration', () => {
     updatedAt: '2023-01-01',
   };
 
-  let personalizationEngine: PersonalizationEngine;
-
   beforeEach(() => {
     jest.clearAllMocks();
     playerDecisionTracker.clearDecisions();
-    personalizationEngine = new PersonalizationEngine();
 
     (useWorldStore.getState as jest.Mock).mockReturnValue({
       worlds: { 'world-1': mockWorld },
@@ -71,7 +67,6 @@ describe('enhancePromptWithPersonalization Integration', () => {
       'Base prompt',
       'world-1',
       ['char-1'],
-      personalizationEngine,
       'session-1'
     );
 
@@ -95,7 +90,6 @@ describe('enhancePromptWithPersonalization Integration', () => {
       'Base prompt',
       'world-1',
       ['char-1'],
-      personalizationEngine,
       'session-1'
     );
 
@@ -119,7 +113,6 @@ describe('enhancePromptWithPersonalization Integration', () => {
       'Base prompt',
       'world-1',
       ['char-1'],
-      personalizationEngine,
       undefined
     );
 
@@ -148,7 +141,6 @@ describe('enhancePromptWithPersonalization Integration', () => {
       'Base prompt',
       'world-1',
       ['char-1'],
-      personalizationEngine,
       'session-1'
     );
 
@@ -170,7 +162,6 @@ describe('enhancePromptWithPersonalization Integration', () => {
       'Base prompt',
       'world-1',
       ['char-1'],
-      personalizationEngine,
       'session-1'
     );
 

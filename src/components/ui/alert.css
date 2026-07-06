@@ -1,0 +1,57 @@
+/* Alert — global semantic styles for src/components/ui/alert.tsx (#1317)
+ *
+ * The Alert primitive already emits `alert` / `alert-${variant}` classes; this
+ * gives them production token-based styling so the app renders them like the
+ * living style guide does. Per-theme look comes from the design tokens under the
+ * active `data-theme` scope — no hardcoded colors.
+ */
+
+.alert {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-family: var(--font-interface);
+}
+
+.alert-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.alert-description {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.alert-destructive {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+}
+
+.alert-destructive .alert-title {
+  color: var(--color-danger);
+}
+
+.alert-warning {
+  border-color: var(--color-warning-border);
+  background: var(--color-warning-soft);
+}
+
+.alert-warning .alert-title {
+  color: var(--color-warning);
+}
+
+.alert-info {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.alert-info .alert-title {
+  color: var(--color-accent);
+}

@@ -95,6 +95,86 @@ jobs:
         run: npm run lint:css
       - name: Enforce non-self-closing PageLayout usage
         run: npm run lint:layout-usage
+      - name: Enforce design-system canon (living style guide)
+        run: npm run lint:ds-canon
+      - name: Enforce dependency boundaries (no new cycles or dev-dep leaks)
+        run: npm run deps:validate
+
+  knip:
+    name: Knip (unused code)
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # Blocking: fails the check on any unused dependency, export, or type so
+      # dead code can't accumulate (#1231).
+      - name: Run Knip
+        run: npm run knip
+
+  skott-cycles:
+    name: Skott circular-dep budget
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # Blocking: fails when the count of circular dependencies reachable from
+      # the app entrypoint exceeds the baseline in `.skott-baseline.json`.
+      # Intentional new cycles bump the baseline; accidental new cycles get
+      # fixed (run `npm run skott:circular` locally to inspect which loop is new).
+      - name: Run skott:check
+        run: npm run skott:check
+
+  audit-css:
+    name: CSS audit (unused selectors)
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # The audit script exits 0 on findings (it only fails on a genuine error,
+      # e.g. a broken script or missing file), so findings surface in the logs
+      # without failing the check. No `|| true` -- that would also hide a broken
+      # audit. Review the output and prune manually (#1087).
+      - name: Run CSS audit
+        run: npm run audit:css
 
   test:
     name: Unit & Integration Tests
@@ -194,6 +274,16 @@ jobs:
     name: E2E Tests
     runs-on: macos-latest
     needs: [build]
+    # Shard across runners and force --workers=1 per shard. The visual suite's
+    # timeouts (#1344) come from worker concurrency against a single `next dev`
+    # server: two workers hitting two uncompiled routes at once stall the
+    # single-process dev server past the navigation timeout. One worker per shard
+    # removes that contention entirely; sharding keeps wall-clock reasonable.
+    # Stays on `next dev` so rendering (and committed baselines) is unchanged.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -228,19 +318,19 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
       - name: Run E2E tests (fail on visual diffs)
-        run: npm run test:e2e:critical
+        run: npm run test:e2e:critical -- --shard=${{ matrix.shard }}/2 --workers=1
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: e2e-test-failures
+          name: e2e-test-failures-shard${{ matrix.shard }}
           path: test-results/
           retention-days: 7
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-html-report
+          name: playwright-html-report-shard${{ matrix.shard }}
           path: |
             playwright-report/
             !playwright-report/**/*.zip
@@ -272,8 +362,8 @@ jobs:
       - name: Prepare security report directory
         run: mkdir -p ci-security
 
-      - name: Run npm audit (fails on high severity only)
-        run: npm audit --production --audit-level=high | tee ci-security/npm-audit.txt
+      - name: Run npm audit (fails on moderate severity or higher)
+        run: npm audit --production --audit-level=moderate | tee ci-security/npm-audit.txt
         continue-on-error: false
 
       - name: Generate npm audit JSON report

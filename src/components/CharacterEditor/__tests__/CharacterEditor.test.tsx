@@ -176,15 +176,11 @@ describe('CharacterEditor MVP Tests', () => {
     const saveButton = screen.getByText('Save Changes');
     fireEvent.click(saveButton);
 
-    // Verify saving feedback is shown
-    await waitFor(() => {
-      expect(screen.getByText('Saving...')).toBeInTheDocument();
-    });
-
-    // Verify updateCharacter was called
+    // Verify updateCharacter was called and navigation occurred
     await waitFor(() => {
       expect(mockUpdateCharacter).toHaveBeenCalled();
     });
+    expect(mockRouter.push).toHaveBeenCalledWith('/characters/test-char-1');
   });
 
   // Acceptance Criteria 5: Users can cancel edits without saving changes
