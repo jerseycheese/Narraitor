@@ -87,21 +87,6 @@ export interface InventoryItem extends NamedEntity, TimestampedEntity {
 }
 
 /**
- * Lightweight declaration of a starting inventory item, used by character
- * archetypes/templates to seed a freshly created character's inventory.
- * Timestamps, IDs, and acquisition metadata are filled in when the item is added.
- */
-export interface InventoryItemInput {
-  name: string;
-  description?: string;
-  categoryId: StandardInventoryCategory;
-  quantity?: number;
-  stackable?: boolean;
-  maxStack?: number;
-  equipped?: boolean;
-}
-
-/**
  * Result of attempting to equip or unequip an item.
  */
 export interface ItemEquipResult {

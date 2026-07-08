@@ -6,7 +6,6 @@
 // Mock storage helpers to prevent issues in test environment
 jest.mock('@/utils/storageHelpers', () => ({
   isStorageAvailable: jest.fn(() => true),
-  handleStorageError: jest.fn((error) => ({ shouldNotify: false, error })),
 }));
 
 // Mock logger

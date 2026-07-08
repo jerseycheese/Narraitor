@@ -29,9 +29,6 @@ type SessionStatusLookup = (sessionId: EntityID) => SessionLifecycleStatus | und
 
 // === Public API ===
 
-export const detectConflict = (currentVersion: number, incomingVersion: number): boolean =>
-  incomingVersion <= currentVersion;
-
 export const mergeState = (current: WorldState, incoming: WorldState): WorldState => {
   const version = Math.max(current.version, incoming.version);
   const lastModified =

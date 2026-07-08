@@ -44,20 +44,6 @@ export function validateFields<T>(rules: FieldValidationRules<T>): Validator<T> 
 }
 
 /**
- * Run multiple validators against the same data; concatenate their errors.
- */
-export function combineValidators<T>(...validators: Validator<T>[]): Validator<T> {
-  return (data: T): WizardValidation => {
-    const errors: string[] = [];
-    for (const v of validators) {
-      const result = v(data);
-      if (!result.valid) errors.push(...result.errors);
-    }
-    return { valid: errors.length === 0, errors, touched: true };
-  };
-}
-
-/**
  * A validator that always passes — useful for steps with no validation.
  */
 export const alwaysValid: Validator<unknown> = () => ({

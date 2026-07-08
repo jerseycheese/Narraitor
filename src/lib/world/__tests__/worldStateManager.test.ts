@@ -3,7 +3,6 @@ import {
   recordMajorEvent,
   recordStoryCheckpoint,
   getActiveWorldState,
-  detectConflict,
   mergeState,
   applyWorldStateUpdate,
 } from '../index';
@@ -94,12 +93,6 @@ describe('worldStateManager', () => {
     expect(relationship.trust).toBe(75);
     expect(relationship.sentiment).toBe(0);
     expect(state.version).toBe(1);
-  });
-
-  it('detects version conflicts when incoming version is stale', () => {
-    expect(detectConflict(3, 2)).toBe(true);
-    expect(detectConflict(3, 3)).toBe(true);
-    expect(detectConflict(3, 4)).toBe(false);
   });
 
   it('merges world states preferring most recent updates', () => {
