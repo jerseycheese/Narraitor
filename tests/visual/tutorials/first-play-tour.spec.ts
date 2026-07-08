@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
-import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
+import { gotoTutorialPage, waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
 // Smoke-level coverage of the in-play (firstPlay) tour, which now has 4 steps:
 // 0-1 (narrative-display, player-choices) and 2-3 (session-character, session-tools)
@@ -15,7 +15,7 @@ test('First play tour snapshots (steps 0-1)', async ({ page }) => {
   test.setTimeout(120000);
 
   await seedTestData(page);
-  await page.goto('/worlds/world-cyberpunk-2077/play');
+  await gotoTutorialPage(page, '/worlds/world-cyberpunk-2077/play');
   await waitForContentStable(page);
   await waitForStoreReady(page);
 

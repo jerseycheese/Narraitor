@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
-import { waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
+import { gotoTutorialPage, waitForStoreReady, setTutorialProgress, startTourAt, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
 const steps = [0, 1, 2, 3];
 
@@ -9,7 +9,7 @@ test('World generation tour snapshots (steps 0-3)', async ({ page }) => {
   test.setTimeout(60000);
 
   await seedTestData(page);
-  await page.goto('/worlds');
+  await gotoTutorialPage(page, '/worlds');
   await waitForContentStable(page);
   await waitForStoreReady(page);
 

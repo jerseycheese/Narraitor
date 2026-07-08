@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { hideNextDevOverlay, waitForContentStable } from '../utils/wait-helpers';
 import { seedBaseData } from '../utils/seedTestData';
-import { zeroPad } from '../utils/tutorial-helpers';
+import { gotoTutorialPage, zeroPad } from '../utils/tutorial-helpers';
 
 test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   test.setTimeout(60000);
 
   await seedBaseData(page);
-  await page.goto('/');
+  await gotoTutorialPage(page, '/');
   await hideNextDevOverlay(page);
   await waitForContentStable(page);
   await expect(page.getByRole('heading', { name: 'First time?' })).toBeVisible();

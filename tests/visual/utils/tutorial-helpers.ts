@@ -1,11 +1,40 @@
 import { Page, expect } from '@playwright/test';
 
+/**
+ * Navigate to a tutorial page without waiting for the `load` event.
+ *
+ * These specs run against `next dev`, which compiles client chunks on first
+ * request. `load` waits for those chunks — app/layout.js alone measured ~12s on
+ * a cold CI dev server — so a cold route can blow the 20s navigationTimeout even
+ * though the document itself comes back in 0.6-1.6s. That's what turned the
+ * Tutorial Visual Tests job into timeout roulette (#1519); #1344 is the same
+ * failure mode in the main visual job.
+ *
+ * Every caller follows this with waitForContentStable plus an explicit wait, so
+ * dropping to domcontentloaded leaves nothing unsettled.
+ */
+export const gotoTutorialPage = async (
+  page: Page,
+  url: string
+): Promise<void> => {
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+};
+
+// Hydration can't finish until `next dev` has compiled and served the client
+// chunks on first hit; app/layout.js alone has measured ~12s on a cold CI dev
+// server, so this budget covers compile + hydration, not hydration alone.
+const STORE_READY_TIMEOUT_MS = 30000;
+
 export const waitForStoreReady = async (page: Page): Promise<void> => {
+  // waitForFunction signature is (fn, arg, options) — the timeout must go in
+  // the third slot, or it's serialized as the (unused) page-function arg and
+  // the call silently falls back to the default action timeout.
   await page.waitForFunction(
     () =>
       (window as any).__TEST_STORES_SEEDED__ === true &&
       !!(window as any).useSessionStore?.setState,
-    { timeout: 15000 }
+    undefined,
+    { timeout: STORE_READY_TIMEOUT_MS }
   );
 };
 
@@ -42,6 +71,7 @@ export const setTutorialProgress = async (
 export const waitForTestStartTour = async (page: Page): Promise<void> => {
   await page.waitForFunction(
     () => typeof (window as any).__TEST_START_TOUR__ === 'function',
+    undefined,
     { timeout: 15000 }
   );
 };

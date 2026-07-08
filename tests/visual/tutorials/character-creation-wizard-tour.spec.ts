@@ -2,6 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
 import {
+  gotoTutorialPage,
   waitForStoreReady,
   setTutorialProgress,
   startTourAt,
@@ -42,7 +43,7 @@ test('Character creation wizard tour snapshots (steps 0-4)', async ({
   test.setTimeout(180000);
 
   await seedTestData(page);
-  await page.goto('/characters/create?worldId=world-cyberpunk-2077');
+  await gotoTutorialPage(page, '/characters/create?worldId=world-cyberpunk-2077');
   await waitForContentStable(page);
   await waitForStoreReady(page);
 
