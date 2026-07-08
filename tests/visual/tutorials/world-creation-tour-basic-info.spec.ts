@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
-import { waitForStoreReady, setTutorialProgress, startTourAt, stopTour, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
+import { gotoTutorialPage, waitForStoreReady, setTutorialProgress, startTourAt, stopTour, waitForTooltip, getVisibleTutorialClip, hideTourOverlay, zeroPad } from '../utils/tutorial-helpers';
 
 const steps = [0, 1, 2, 3, 4, 5, 6, 7];
 
@@ -34,7 +34,7 @@ test('World creation tour: Basic Information (tour steps 0-7)', async ({ page })
   test.setTimeout(90000);
 
   await seedTestData(page);
-  await page.goto('/worlds/create');
+  await gotoTutorialPage(page, '/worlds/create');
   await waitForContentStable(page);
   await waitForStoreReady(page);
 

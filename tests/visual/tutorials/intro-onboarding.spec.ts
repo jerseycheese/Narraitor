@@ -1,16 +1,23 @@
 import { test, expect } from '@playwright/test';
 import { hideNextDevOverlay, waitForContentStable } from '../utils/wait-helpers';
 import { seedBaseData } from '../utils/seedTestData';
-import { zeroPad } from '../utils/tutorial-helpers';
+import { gotoTutorialPage, zeroPad } from '../utils/tutorial-helpers';
 
 test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   test.setTimeout(60000);
 
   await seedBaseData(page);
-  await page.goto('/');
+  await gotoTutorialPage(page, '/');
   await hideNextDevOverlay(page);
   await waitForContentStable(page);
-  await expect(page.getByRole('heading', { name: 'First time?' })).toBeVisible();
+  // The onboarding UI mounts inside SSRClientOnly, so this heading can't exist
+  // until the client chunks land and hydrate. seedBaseData sets no store flag,
+  // so unlike its sibling specs this one has no waitForStoreReady to gate on —
+  // the assertion itself has to carry the cold-compile budget (#1519). The 5s
+  // default clears by ~120ms warm and fails outright once a chunk stalls.
+  await expect(page.getByRole('heading', { name: 'First time?' })).toBeVisible({
+    timeout: 30000,
+  });
   await expect
     .poll(async () =>
       page.evaluate(
