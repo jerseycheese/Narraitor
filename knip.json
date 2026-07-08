@@ -15,12 +15,18 @@
   // `project` negation instead would drop them as *consumers* too, and the default run
   // would then flag the types they import as unused.
   "ignore": [
-    // Dev harnesses match the production entry glob above; without this, everything
-    // they import would look reachable from production.
+    // Suppresses findings in the /dev harnesses. Known limitation: `ignore` does not
+    // remove files from the module graph, so these pages still anchor what they import.
+    // Dead code reachable only from a /dev route (QuickPlay, today) is therefore NOT
+    // reported by --production. Negating the routes in `entry`, in `project`, and in the
+    // `next` plugin config were all tried and none of them drop the edge — knip's Next.js
+    // plugin supplies src/app/**/{page,layout,...} as production entries itself. Tracked
+    // on #1514; for now the sweep catches this class by hand.
     "src/app/dev/**",
     // Test and Storybook support modules: imported by specs and stories, never by the
     // app. Jest's testMatch only covers `*.test.{ts,tsx}`, so `--production` can't
-    // negate these on its own.
+    // negate these on its own. Measured: moving them to `project` negations reports the
+    // same 41 exports and 16 types, so nothing is masked by ignoring them here.
     "**/*.testHelpers.{ts,tsx}",
     "**/*.stories.helpers.{ts,tsx}",
     "src/lib/test-utils/**",
