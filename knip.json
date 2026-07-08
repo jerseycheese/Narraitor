@@ -1,12 +1,31 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
+  // The `!` suffix marks a pattern as production. Without it `--production` filters
+  // every entry out (knip's hasProductionSuffix), the module graph collapses to the
+  // Next.js plugin's built-in entries, and `knip:production` reports the whole runtime
+  // dependency list as unused. Storybook and scripts stay unsuffixed — they're dev-only.
   "entry": [
-    "src/app/**/{page,layout,template,error,loading,not-found,route,default,global-error}.{ts,tsx}",
+    "src/app/**/{page,layout,template,error,loading,not-found,route,default,global-error}.{ts,tsx}!",
     ".storybook/{main,preview}.{cjs,ts,tsx}",
     "scripts/**/*.{js,cjs,mjs}"
   ],
-  "project": ["src/**/*.{ts,tsx,js,jsx}", "scripts/**/*.{js,cjs,mjs}"],
-  "ignore": ["src/app/dev/**"],
+  "project": ["src/**/*.{ts,tsx,js,jsx}!", "scripts/**/*.{js,cjs,mjs}"],
+  // These entries exist for `--production` and the default run reports them as
+  // redundant hints — that's expected, don't delete them. Excluding the same files via
+  // `project` negation instead would drop them as *consumers* too, and the default run
+  // would then flag the types they import as unused.
+  "ignore": [
+    // Dev harnesses match the production entry glob above; without this, everything
+    // they import would look reachable from production.
+    "src/app/dev/**",
+    // Test and Storybook support modules: imported by specs and stories, never by the
+    // app. Jest's testMatch only covers `*.test.{ts,tsx}`, so `--production` can't
+    // negate these on its own.
+    "**/*.testHelpers.{ts,tsx}",
+    "**/*.stories.helpers.{ts,tsx}",
+    "src/lib/test-utils/**",
+    "src/stories/**/*StoryData.ts"
+  ],
   "ignoreDependencies": [
     "@storybook/addon-essentials",
     "@storybook/addon-a11y",
@@ -16,12 +35,9 @@
     "postcss-nested",
     // Framework referenced as a string in .storybook/main.cjs; knip's plugin can't trace .cjs.
     "@storybook/nextjs",
-    // ESLint stack reached via FlatCompat string extends in eslint.config.mjs
-    // ("next/core-web-vitals", "next/typescript"); eslint itself runs through `next lint`.
-    "eslint",
+    // Reached via FlatCompat string extends in eslint.config.mjs ("next/core-web-vitals",
+    // "next/typescript"); the package itself runs through `next lint`.
     "eslint-config-next",
-    "@typescript-eslint/eslint-plugin",
-    "@typescript-eslint/parser",
     // Loads postcss.config.js during the build pipeline; not imported directly in source.
     "postcss-load-config"
   ],
