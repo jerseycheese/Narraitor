@@ -61,24 +61,6 @@ export const getUnmetPrerequisites = (
 };
 
 /**
- * True when the character satisfies every prerequisite for a skill.
- */
-export const arePrerequisitesMet = (
-  prerequisites: SkillAttributePrerequisite[] | undefined,
-  characterAttributes: CharacterAttributeValue[]
-): boolean => {
-  if (!prerequisites || prerequisites.length === 0) {
-    return true;
-  }
-
-  return prerequisites.every(
-    (prereq) =>
-      prereq.minValue <= 0 ||
-      lookupCurrentValue(prereq.attributeId, characterAttributes) >= prereq.minValue
-  );
-};
-
-/**
  * Human-readable summary of why a skill is locked, e.g.
  * "Requires Strength 5 (you have 3)".
  */

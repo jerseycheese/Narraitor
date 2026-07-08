@@ -1,8 +1,8 @@
 /*
  * Production base styling for the Radix dialog primitive (#1276 / #1316).
  *
- * Lives in production so every modal — SimpleModal, PreviewModal, the
- * confirmation dialogs, and the living style guide — renders the same thing.
+ * Lives in production so every modal — SimpleModal, the confirmation dialogs,
+ * and the living style guide — renders the same thing.
  * After the Tailwind removal (#1097) the dialog shipped unstyled (no backdrop,
  * unpositioned panel); this restores it on design tokens, per-theme via the
  * existing [data-theme] token cascade. The living style guide renders the real

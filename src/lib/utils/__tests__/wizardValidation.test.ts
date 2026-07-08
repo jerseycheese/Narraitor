@@ -1,6 +1,5 @@
 import {
   validateFields,
-  combineValidators,
   alwaysValid,
   createValidationRules,
 } from '../wizardValidation';
@@ -110,37 +109,6 @@ describe('validateFields', () => {
     });
 
     expect(validator({ name: '', email: '', age: 0, skills: [] }).valid).toBe(true);
-  });
-});
-
-describe('combineValidators', () => {
-  it('concatenates errors from multiple validators', () => {
-    const fieldValidator = validateFields<TestFormData>({
-      name: [createValidationRules.required('Name is required')],
-      email: [createValidationRules.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Invalid email')],
-      age: [createValidationRules.minValue(18, 'Must be 18 or older')],
-    });
-
-    const customValidator = (data: TestFormData) => ({
-      valid: data.skills.length > 0,
-      errors: data.skills.length === 0 ? ['At least one skill required'] : [],
-      touched: true,
-    });
-
-    const validator = combineValidators(fieldValidator, customValidator);
-
-    const result = validator({ name: '', email: 'invalid', age: 16, skills: [] });
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContain('Name is required');
-    expect(result.errors).toContain('Invalid email');
-    expect(result.errors).toContain('Must be 18 or older');
-    expect(result.errors).toContain('At least one skill required');
-
-    const validResult = validator({
-      name: 'John', email: 'john@example.com', age: 25, skills: ['programming'],
-    });
-    expect(validResult.valid).toBe(true);
-    expect(validResult.errors).toEqual([]);
   });
 });
 

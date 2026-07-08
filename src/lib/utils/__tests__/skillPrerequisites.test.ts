@@ -1,6 +1,5 @@
 import {
   getUnmetPrerequisites,
-  arePrerequisitesMet,
   formatUnmetPrerequisites,
 } from '@/lib/utils/skillPrerequisites';
 import { WorldAttribute } from '@/types/world.types';
@@ -27,34 +26,6 @@ const attributes: WorldAttribute[] = [
 ];
 
 describe('skillPrerequisites', () => {
-  describe('arePrerequisitesMet', () => {
-    it('returns true when there are no prerequisites', () => {
-      expect(arePrerequisitesMet(undefined, [])).toBe(true);
-      expect(arePrerequisitesMet([], [{ attributeId: 'attr-str', value: 1 }])).toBe(true);
-    });
-
-    it('returns true when every requirement is satisfied', () => {
-      expect(
-        arePrerequisitesMet([{ attributeId: 'attr-str', minValue: 3 }], [
-          { attributeId: 'attr-str', value: 4 },
-        ])
-      ).toBe(true);
-    });
-
-    it('returns false when a requirement is not met', () => {
-      expect(
-        arePrerequisitesMet([{ attributeId: 'attr-str', minValue: 5 }], [
-          { attributeId: 'attr-str', value: 3 },
-        ])
-      ).toBe(false);
-    });
-
-    it('treats a missing attribute as value 0', () => {
-      expect(
-        arePrerequisitesMet([{ attributeId: 'attr-str', minValue: 1 }], [])
-      ).toBe(false);
-    });
-  });
 
   describe('getUnmetPrerequisites', () => {
     it('returns only the failing prerequisites with names and values', () => {
