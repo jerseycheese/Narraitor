@@ -1,13 +1,26 @@
 // src/lib/ai/geminiClient.ts
 
-import { GoogleGenAI } from '@google/genai';
-import { AIResponse, AIServiceConfig, AIClient } from './types';
+import { GoogleGenAI, type SafetySetting as SdkSafetySetting } from '@google/genai';
+import { AIResponse, AIServiceConfig, AIClient, SafetySetting } from './types';
 import { isRetryableError } from '@/lib/utils/errorUtils';
 import { getGenerationConfig, getSafetySettings } from './config';
 import { timeoutSignal } from './abortTimeout';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('GeminiClient');
+
+/**
+ * Our config carries safety settings as plain strings, because the same values
+ * also go out on the raw REST path (see apiHelpers). The SDK types them as its
+ * own string enums whose runtime values are exactly these spellings, so this is
+ * a re-typing at the boundary, not a conversion.
+ */
+function toSdkSafetySettings(settings: SafetySetting[] = []): SdkSafetySetting[] {
+  return settings.map(({ category, threshold }) => ({
+    category: category as SdkSafetySetting['category'],
+    threshold: threshold as SdkSafetySetting['threshold']
+  }));
+}
 
 /**
  * Client for Google Gemini AI service
@@ -65,13 +78,23 @@ export class GeminiClient implements AIClient {
    * @returns Promise resolving to AI response
    */
   private async makeRequest(prompt: string): Promise<AIResponse> {
+    const { temperature, topP, topK, maxOutputTokens, thinkingConfig } =
+      this.config.generationConfig ?? {};
+
     try {
       const response = await this.genAI.models.generateContent({
         model: this.config.modelName,
         contents: prompt,
         config: {
-          generationConfig: this.config.generationConfig,
-          safetySettings: this.config.safetySettings,
+          // The SDK reads generation params straight off `config` and drops
+          // unknown keys without complaint. Nesting them under a
+          // `generationConfig` key (the REST wire shape) sends nothing.
+          temperature,
+          topP,
+          topK,
+          maxOutputTokens,
+          thinkingConfig,
+          safetySettings: toSdkSafetySettings(this.config.safetySettings),
           // config.timeout existed but was never enforced — a hung request
           // previously blocked forever (retries only fire on rejection).
           abortSignal: timeoutSignal(this.config.timeout)
@@ -80,7 +103,7 @@ export class GeminiClient implements AIClient {
 
       return {
         content: response.text || '',
-        finishReason: response.result?.finishReason || 'STOP',
+        finishReason: response.candidates?.[0]?.finishReason || 'STOP',
         promptTokens: response.usageMetadata?.promptTokenCount || undefined,
         completionTokens: response.usageMetadata?.candidatesTokenCount || undefined
       };

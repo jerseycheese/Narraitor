@@ -2,6 +2,7 @@
 
 import { GeminiClient } from '../geminiClient';
 import { AIServiceConfig } from '../types';
+import { getGenerationConfig } from '../config';
 
 const mockGenerateContent = jest.fn();
 
@@ -26,10 +27,10 @@ describe('GeminiClient', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGenerateContent.mockReset();
-    
+
     config = {
       apiKey: 'test-api-key',
-      modelName: 'gemini-2.0-flash', 
+      modelName: 'gemini-2.0-flash',
       maxRetries: 3,
       timeout: 30000,
       generationConfig: {
@@ -59,9 +60,7 @@ describe('GeminiClient', () => {
       // Mock successful response from SDK
       const mockSDKResponse = {
         text: 'Generated test content',
-        result: {
-          finishReason: 'STOP'
-        },
+        candidates: [{ finishReason: 'STOP' }],
         usageMetadata: {
           promptTokenCount: 12,
           candidatesTokenCount: 34
@@ -76,7 +75,10 @@ describe('GeminiClient', () => {
         model: 'gemini-2.0-flash',
         contents: 'Test prompt',
         config: {
-          generationConfig: config.generationConfig,
+          temperature: 0.7,
+          topP: 1.0,
+          topK: 40,
+          maxOutputTokens: 2048,
           safetySettings: config.safetySettings
         }
       });
@@ -91,9 +93,7 @@ describe('GeminiClient', () => {
     test('should extract token usage from SDK usageMetadata', async () => {
       const mockSDKResponse = {
         text: 'Token tracked content',
-        result: {
-          finishReason: 'STOP'
-        },
+        candidates: [{ finishReason: 'STOP' }],
         usageMetadata: {
           promptTokenCount: 150,
           candidatesTokenCount: 275,
@@ -112,9 +112,7 @@ describe('GeminiClient', () => {
     test('should return undefined token counts when usageMetadata is absent', async () => {
       const mockSDKResponse = {
         text: 'No usage metadata',
-        result: {
-          finishReason: 'STOP'
-        }
+        candidates: [{ finishReason: 'STOP' }]
       };
       mockGenerateContent.mockResolvedValueOnce(mockSDKResponse);
 
@@ -129,9 +127,7 @@ describe('GeminiClient', () => {
       // Simulate two failures followed by success - use network error message
       const mockSDKResponse = {
         text: 'Generated after retry',
-        result: {
-          finishReason: 'STOP'
-        }
+        candidates: [{ finishReason: 'STOP' }]
       };
 
       mockGenerateContent
@@ -172,21 +168,18 @@ describe('GeminiClient', () => {
       mockGenerateContent.mockRejectedValueOnce(authError);
 
       client = new GeminiClient(config);
-      
+
       await expect(client.generateContent('Test prompt'))
         .rejects
         .toThrow('Invalid API key');
-      
+
       expect(mockGenerateContent).toHaveBeenCalledTimes(1);
     });
 
-    test('should handle SDK response formats', async () => {
-      // Test various SDK response formats
+    test('should surface a truncated response via candidates[0].finishReason', async () => {
       const mockSDKResponse = {
         text: 'Test response',
-        result: {
-          finishReason: 'MAX_TOKENS'
-        }
+        candidates: [{ finishReason: 'MAX_TOKENS' }]
       };
       mockGenerateContent.mockResolvedValueOnce(mockSDKResponse);
 
@@ -201,14 +194,8 @@ describe('GeminiClient', () => {
       });
     });
 
-    test('should handle empty responses', async () => {
-      const mockSDKResponse = {
-        text: '',
-        result: {
-          finishReason: 'STOP'
-        }
-      };
-      mockGenerateContent.mockResolvedValueOnce(mockSDKResponse);
+    test('should fall back to STOP when the response carries no candidates', async () => {
+      mockGenerateContent.mockResolvedValueOnce({ text: '' });
 
       client = new GeminiClient(config);
       const result = await client.generateContent('Test prompt');
@@ -236,9 +223,7 @@ describe('GeminiClient', () => {
 
       const mockSDKResponse = {
         text: 'Test',
-        result: {
-          finishReason: 'STOP'
-        }
+        candidates: [{ finishReason: 'STOP' }]
       };
       mockGenerateContent.mockResolvedValueOnce(mockSDKResponse);
 
@@ -249,10 +234,39 @@ describe('GeminiClient', () => {
         model: 'gemini-2.0-flash',
         contents: 'Test prompt',
         config: {
-          generationConfig: customConfig.generationConfig,
+          temperature: 0.9,
+          topP: 0.8,
+          topK: 30,
+          maxOutputTokens: 1024,
           safetySettings: customConfig.safetySettings
         }
       });
+    });
+
+    // The SDK reads generation params off `config` and silently drops unknown
+    // keys, so nesting them under `generationConfig` sent nothing at all — most
+    // expensively thinkingBudget: 0, which is what stops gemini-2.5-flash
+    // burning output tokens on dynamic thinking.
+    test('should hand the SDK the default thinking, token and temperature settings', async () => {
+      mockGenerateContent.mockResolvedValueOnce({
+        text: 'Test',
+        candidates: [{ finishReason: 'STOP' }]
+      });
+
+      const defaults = getGenerationConfig();
+      client = new GeminiClient({
+        apiKey: 'test-api-key',
+        modelName: 'gemini-2.5-flash',
+        maxRetries: 3,
+        timeout: 30000
+      });
+      await client.generateContent('Test prompt');
+
+      const sentConfig = mockGenerateContent.mock.calls[0][0].config;
+      expect(sentConfig.thinkingConfig).toEqual({ thinkingBudget: 0 });
+      expect(sentConfig.maxOutputTokens).toBe(defaults.maxOutputTokens);
+      expect(sentConfig.temperature).toBe(defaults.temperature);
+      expect(sentConfig.generationConfig).toBeUndefined();
     });
   });
 });
