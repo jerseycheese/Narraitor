@@ -66,14 +66,17 @@ export async function validateEventSignificance(
       model,
       contents: prompt,
       config: {
-        generationConfig: {
-          temperature: 0.1, // Low temperature for consistent classification
-          maxOutputTokens: 200, // Short response needed
-        },
+        // These live directly on `config`; the SDK ignores anything it doesn't
+        // recognise, so a nested `generationConfig` reaches the model as nothing.
+        temperature: 0.1, // Low temperature for consistent classification
+        maxOutputTokens: 200, // Short response needed
+        // Thinking tokens count against maxOutputTokens, and 200 of them would
+        // be spent deliberating instead of answering. This is a yes/no call.
+        thinkingConfig: { thinkingBudget: 0 },
       },
     });
 
-    const responseText = result.text;
+    const responseText = result.text ?? '';
     logger.debug('EventSignificanceValidator', 'Raw validation response', {
       responseText,
     });
