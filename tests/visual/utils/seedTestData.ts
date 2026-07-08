@@ -706,28 +706,35 @@ export async function seedTestData(page: Page): Promise<void> {
         return true;
       };
 
+      // The poll starts at document-start and can only seed once hydration has
+      // attached every store to window. Against a cold `next dev` server that
+      // takes longer than the old 5s budget, and once the interval clears,
+      // __TEST_STORES_SEEDED__ never lands — so no waitForStoreReady timeout can
+      // recover. 30s covers a cold chunk compile plus hydration (#1519). The
+      // interval clears the moment seeding succeeds, so warm runs pay nothing.
+      const pollIntervalMs = 100;
+      const maxAttempts = 300;
+
       const didSeedStores = seedStoresFromFixtures();
       if (!didSeedStores) {
         let attempts = 0;
-        const maxAttempts = 50;
         const intervalId = window.setInterval(() => {
           attempts += 1;
           if (seedStoresFromFixtures() || attempts >= maxAttempts) {
             window.clearInterval(intervalId);
           }
-        }, 100);
+        }, pollIntervalMs);
       }
 
       const didSeedJournalStore = seedJournalStoreFromFixtures();
       if (!didSeedJournalStore) {
         let attempts = 0;
-        const maxAttempts = 50;
         const intervalId = window.setInterval(() => {
           attempts += 1;
           if (seedJournalStoreFromFixtures() || attempts >= maxAttempts) {
             window.clearInterval(intervalId);
           }
-        }, 100);
+        }, pollIntervalMs);
       }
 
       console.log('✅ Full test data seeded');

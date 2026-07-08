@@ -30,7 +30,7 @@
     "test:ci": "node --max-old-space-size=4096 node_modules/.bin/jest --config=jest.config.cjs --coverage",
     "test:e2e:critical": "playwright test --project=chromium",
     "test:visual": "playwright test --project=chromium",
-    "test:visual:tutorials": "WARM_TUTORIAL_ROUTES=1 playwright test --project=tutorials",
+    "test:visual:tutorials": "playwright test --project=tutorials",
     "test:visual:update": "playwright test --update-snapshots",
     "test:visual:prune": "node scripts/clean-visual-snapshots.cjs",
     "test:visual:headed": "playwright test --headed",

@@ -172,9 +172,7 @@ export default defineConfig({
   outputDir: 'test-results/',
   
   // Global test settings
-  // Compiles the tutorial routes before the workers start; no-ops off CI and
-  // for every project but `tutorials`. See the file for why (#1519).
-  globalSetup: './tests/visual/utils/warmTutorialRoutes.ts',
+  globalSetup: undefined,
   globalTeardown: undefined,
   
   // Test match patterns (exclude setup files from being run as tests)
