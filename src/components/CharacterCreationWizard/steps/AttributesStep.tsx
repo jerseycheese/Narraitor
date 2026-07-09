@@ -97,7 +97,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
       {remaining > 0 && (
         <div className={wizardStyles.card.base}>
           <p>
-            You have {remaining} unspent attribute points. Spending them will increase your character&apos;s level and overall capabilities. You can continue with the current allocation or spend more points.
+            You have {remaining} attribute points left to spend. Add them to strengthen your character, or continue as you are.
           </p>
         </div>
       )}

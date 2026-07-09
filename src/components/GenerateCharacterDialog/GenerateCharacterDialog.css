@@ -1,0 +1,56 @@
+/* GenerateCharacterDialog — option rows + status (#1434 / F36).
+ *
+ * Mirrors the WorldTypeSelector option pattern so the generate-character and
+ * generate-world modals read consistently. Each option is a <label> wrapping a
+ * RadioGroupItem (native accent-colored radio) and a text block (name +
+ * description). All values are design tokens, so it themes across DS1/DS2/DS3 +
+ * light/dark without per-theme overrides.
+ */
+
+.component-generate-character-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Field group — spaces a label above its control (e.g. the type prompt above
+   the radio group), so the label reads as a heading, not flush against it. */
+.generate-character-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.generate-character-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.generate-character-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0_5);
+}
+
+.generate-character-option-label {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.generate-character-option-description {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.generate-character-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}

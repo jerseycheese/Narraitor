@@ -381,8 +381,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         <div className={`${wizardStyles.card.base}`}>
           <p>
             {totalSkillPoints > totalCapacity
-              ? 'Your skill point pool exceeds the current skill caps. You can maximize existing skills or leave points unspent.'
-              : `You have ${remainingPoints} unspent skill points. Spending them will improve your character's capabilities. You can continue with the current allocation or invest more points.`}
+              ? 'You have more skill points than your skills can hold. Max out your skills or leave the extra unspent — both work.'
+              : `You have ${remainingPoints} skill points left to spend. Add them to sharpen your character's skills, or continue as you are.`}
           </p>
         </div>
       )}

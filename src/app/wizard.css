@@ -243,6 +243,47 @@
   font-weight: 600;
 }
 
+/* Character portrait placeholder — avatar thumbnail in Basic Info (#1434 / F55).
+   Empty state shows a person icon instead of a stray floating "?". Matches the
+   portrait preview's square + radius-md treatment for consistency. */
+.component-character-portrait-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--space-8) * 2);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  font-family: var(--font-interface);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.component-character-portrait-placeholder .portrait-placeholder-icon {
+  width: 55%;
+  height: 55%;
+}
+
+/* Basic Info step layout (#1434 / F34) — portrait preview centered above a
+   consistently spaced field stack. The step nests fields two levels below
+   .wizard-form-section, so they miss its gap; restore vertical rhythm here. */
+.component-basic-info-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.component-basic-info-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
 .component-portrait-step .component-character-portrait img {
   object-fit: cover;
 }
