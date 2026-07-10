@@ -431,9 +431,6 @@ test.describe('Wizard Theme Differentiation', () => {
       await page.locator('#character-personality').fill(
         'Clever, dry sense of humor, suspicious of authority but fiercely loyal to found family.'
       );
-      await page.locator('#character-physical-description').fill(
-        'Augmented cybernetic eye, worn leather jacket, intricate data tattoos.'
-      );
       await page.locator('#character-motivation').fill(
         'Keep the resistance supplied with intel and tech.'
       );
