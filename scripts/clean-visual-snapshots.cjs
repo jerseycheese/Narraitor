@@ -75,9 +75,62 @@ function extractScreenshotMatchers(source) {
   return Array.from(names).map(nameToMatcher);
 }
 
+// Remove a snapshot directory's PNGs (optionally all of them) and the dir if
+// it ends up empty. Returns the number of files deleted.
+function removePngs(snapshotDir, shouldDelete) {
+  let deleted = 0;
+  const entries = fs.readdirSync(snapshotDir, { withFileTypes: true });
+  for (const ent of entries) {
+    if (!ent.isFile()) continue;
+    const file = ent.name;
+    if (!file.toLowerCase().endsWith('.png')) continue;
+    if (!shouldDelete(file)) continue;
+    const full = path.join(snapshotDir, file);
+    try {
+      fs.unlinkSync(full);
+      deleted++;
+      // eslint-disable-next-line no-console
+      console.log(`Pruned orphan snapshot: ${path.relative(ROOT, full)}`);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(`Failed to delete ${full}: ${e.message}`);
+    }
+  }
+
+  // Remove directory if now empty
+  const remaining = fs.readdirSync(snapshotDir).filter((n) => n !== '.gitkeep');
+  if (remaining.length === 0) {
+    try {
+      fs.rmdirSync(snapshotDir);
+      // eslint-disable-next-line no-console
+      console.log(`Removed empty snapshot dir: ${path.relative(ROOT, snapshotDir)}`);
+    } catch {}
+  }
+  return deleted;
+}
+
+// Snapshot dirs whose sibling spec was deleted entirely. The per-spec loop
+// below never visits these (it iterates specs, not dirs), so a fully-removed
+// spec leaves its baselines stranded forever. Prune the whole dir.
+function pruneOrphanDirs() {
+  const snapshotDirs = glob.sync('**/*.spec.ts-snapshots', {
+    cwd: VISUAL_DIR,
+    absolute: true,
+  });
+  let deleted = 0;
+  for (const dir of snapshotDirs) {
+    const siblingSpec = dir.replace(/-snapshots$/, '');
+    if (fs.existsSync(siblingSpec)) continue;
+    // eslint-disable-next-line no-console
+    console.log(`Orphan snapshot dir (no sibling spec): ${path.relative(ROOT, dir)}`);
+    deleted += removePngs(dir, () => true);
+  }
+  return deleted;
+}
+
 function pruneSnapshots() {
   const specFiles = glob.sync('**/*.spec.ts', { cwd: VISUAL_DIR, absolute: true });
-  let deleted = 0;
+  let deleted = pruneOrphanDirs();
   let checked = 0;
 
   for (const specPath of specFiles) {
@@ -88,37 +141,15 @@ function pruneSnapshots() {
     const snapshotDir = `${specPath}-snapshots`;
     if (!fs.existsSync(snapshotDir)) continue;
 
-    const entries = fs.readdirSync(snapshotDir, { withFileTypes: true });
-    for (const ent of entries) {
-      if (!ent.isFile()) continue;
-      const file = ent.name;
-      if (!file.toLowerCase().endsWith('.png')) continue;
+    checked += fs
+      .readdirSync(snapshotDir)
+      .filter((n) => n.toLowerCase().endsWith('.png')).length;
 
-      const keep = expectedMatchers.some((re) => re.test(file));
-      checked++;
-      if (!keep) {
-        const full = path.join(snapshotDir, file);
-        try {
-          fs.unlinkSync(full);
-          deleted++;
-          // eslint-disable-next-line no-console
-          console.log(`Pruned orphan snapshot: ${path.relative(ROOT, full)}`);
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.warn(`Failed to delete ${full}: ${e.message}`);
-        }
-      }
-    }
-
-    // Remove directory if now empty
-    const remaining = fs.readdirSync(snapshotDir).filter((n) => n !== '.gitkeep');
-    if (remaining.length === 0) {
-      try {
-        fs.rmdirSync(snapshotDir);
-        // eslint-disable-next-line no-console
-        console.log(`Removed empty snapshot dir: ${path.relative(ROOT, snapshotDir)}`);
-      } catch {}
-    }
+    // Keep a PNG only if some expected matcher accepts its name.
+    deleted += removePngs(
+      snapshotDir,
+      (file) => !expectedMatchers.some((re) => re.test(file))
+    );
   }
 
   // eslint-disable-next-line no-console
