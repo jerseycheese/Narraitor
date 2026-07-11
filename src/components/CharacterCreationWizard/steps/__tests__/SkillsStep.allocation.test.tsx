@@ -101,6 +101,13 @@ describe('SkillsStep - skill point allocation', () => {
     ).toBeInTheDocument();
   });
 
+  // F9/F33: leftover-points guidance uses plain language, not the old "point pool / skill caps" jargon.
+  it('shows plain-language guidance for leftover skill points', () => {
+    renderSkillsStep();
+
+    expect(screen.getByText(/skill points left to spend/i)).toBeInTheDocument();
+  });
+
   it('clamps skill level changes to the available point pool', () => {
     renderSkillsStep();
 

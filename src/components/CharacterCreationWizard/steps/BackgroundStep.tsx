@@ -61,15 +61,6 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
     });
   };
 
-  const handlePhysicalDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onUpdate({
-      background: {
-        ...data.characterData.background,
-        physicalDescription: e.target.value,
-      },
-    });
-  };
-
   const validation = data.validation[4];
   const showErrors = validation?.touched && !validation?.valid;
 
@@ -81,7 +72,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
       >
       {/* Helpful tip */}
       <div>
-        <p>
+        <p className="form-help-text">
           A compelling backstory helps bring your character to life and
           provides context for their actions and decisions in the game.
         </p>
@@ -98,7 +89,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           rows={6}
           placeholder="Describe your character's background and history... (minimum 50 characters)"
         />
-        <p>
+        <p className="form-help-text">
           {data.characterData.background.history.length} / 50 characters minimum
         </p>
       </div>
@@ -114,24 +105,8 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           rows={4}
           placeholder="Describe your character's personality traits... (minimum 30 characters)"
         />
-        <p>
+        <p className="form-help-text">
           {data.characterData.background.personality.length} / 30 characters minimum
-        </p>
-      </div>
-
-      <div>
-        <Label htmlFor="character-physical-description">
-          Physical Appearance
-        </Label>
-        <Textarea
-          id="character-physical-description"
-          value={data.characterData.background.physicalDescription || ''}
-          onChange={handlePhysicalDescriptionChange}
-          rows={4}
-          placeholder="Describe your character's physical appearance... (optional)"
-        />
-        <p>
-          Optional field to describe how your character looks
         </p>
       </div>
 
@@ -146,7 +121,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           onChange={handleMotivationChange}
           placeholder="What drives your character?"
         />
-        <p>
+        <p className="form-help-text">
           Optional field to help define your character&apos;s driving force
         </p>
       </div>

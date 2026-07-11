@@ -65,20 +65,20 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       >
       {/* Helpful tip */}
       <div>
-        <p>
+        <p className="form-help-text">
           Choose a unique name for your character. The name should be between 3 and 50 characters
           and must be unique within this world.
         </p>
       </div>
 
-      <div>
+      <div className="component-basic-info-layout">
         {/* Portrait placeholder */}
         <div>
           <CharacterPortraitPlaceholder name={data.characterData.name} />
         </div>
 
         {/* Form fields */}
-        <div>
+        <div className="component-basic-info-fields">
           <div>
             <Label htmlFor="character-name">
               Character Name <span>*</span>
@@ -129,7 +129,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               rows={3}
               placeholder="Describe your character's appearance (e.g., tall and muscular, silver hair, blue eyes, wears leather armor)"
             />
-            <p>
+            <p className="form-help-text">
               This will be used to generate your character&apos;s portrait. Tip: Add &quot;looks like [actor name]&quot; to generate a portrait resembling a specific person.
             </p>
           </div>
