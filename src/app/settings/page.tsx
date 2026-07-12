@@ -59,10 +59,10 @@ export default function SettingsPage() {
           <h2>Appearance</h2>
           <Card className="settings-card">
             <CardHeader>
-              <CardTitle>Theme &amp; color</CardTitle>
+              <CardTitle>Color mode</CardTitle>
               <CardDescription>
-                Choose a visual style and light/dark mode. Your choice is saved
-                in this browser and applies across the app.
+                Choose light, dark, or system mode. Your choice is saved in this
+                browser and applies across the app.
               </CardDescription>
             </CardHeader>
             <CardContent>

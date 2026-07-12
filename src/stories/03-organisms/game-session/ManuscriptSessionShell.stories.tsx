@@ -15,8 +15,8 @@ import type { Decision, NarrativeSegment } from '@/types/narrative.types';
  * it with the REAL region components the app composes — `ManuscriptFloatingHud`,
  * `SceneStatus`, `ManuscriptActionRail` + `ChoiceSelector`, and `NarrativeHistory`
  * — fed deterministic demo data (no AI), the same shape the living style guide's
- * SessionShowcase uses (issue #1276). Pick a theme from the toolbar to see the
- * shell render per DS1/DS2/DS3.
+ * SessionShowcase uses (issue #1276). Pick light or dark from the toolbar to see
+ * the shell in each color mode.
  */
 
 const ISO = '2026-01-01T12:00:00.000Z';

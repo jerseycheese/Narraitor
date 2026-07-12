@@ -39,8 +39,8 @@ type Story = StoryObj<typeof meta>;
 // CSS Var Swatch Component
 //
 // Renders a swatch whose background is the live CSS custom property value
-// (via `var(...)`), so it automatically tracks whichever theme (DS1/DS2/DS3)
-// is active in the Storybook toolbar rather than a hardcoded, possibly-stale
+// (via `var(...)`), so it automatically tracks the light/dark color mode
+// active in the Storybook toolbar rather than a hardcoded, possibly-stale
 // hex value.
 //
 // Render the color as a div `background` rather than an SVG `<rect fill>`:
@@ -104,7 +104,7 @@ export const CompleteShowcase: Story = {
           <h3>Theme Tokens</h3>
           <p>
             Swatches render the live CSS custom property value, so they
-            automatically track the DS1/DS2/DS3 theme selected in the
+            automatically track the light/dark color mode selected in the
             toolbar above.
           </p>
 

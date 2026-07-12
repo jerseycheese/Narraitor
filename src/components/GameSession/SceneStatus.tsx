@@ -18,8 +18,8 @@ interface SceneStatusProps {
 
 /**
  * Dedicated scene status surface: characters present + current location for the
- * most recent narrative segment. One canon component, themed per DS via CSS
- * (DS1 left rail, DS2 ambient line, DS3 compact bar).
+ * most recent narrative segment. One canon component — a compact status bar,
+ * with light/dark handled via CSS.
  */
 export const SceneStatus: React.FC<SceneStatusProps> = ({ segment, className }) => {
   const getById = useNPCStore((state) => state.getById);

@@ -87,8 +87,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   const characterButtonRef = React.useRef<HTMLButtonElement>(null);
   const drawerTriggerRef = React.useRef<HTMLElement | null>(null);
-  const [isStreamingPreview, setIsStreamingPreview] = React.useState(false);
-  const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
 
@@ -352,16 +350,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         onAccept: handleAcceptEndingSuggestion,
         onDismiss: handleRejectEndingSuggestion,
       }
-    : isEndingSuggestionPreview
-      ? {
-          reason: 'Draft ending preview from Tools panel.',
-          onAccept: () => {
-            setIsEndingSuggestionPreview(false);
-            handleEndStoryClick();
-          },
-          onDismiss: () => setIsEndingSuggestionPreview(false),
-        }
-      : undefined;
+    : undefined;
 
   return (
     <ManuscriptSessionShell
@@ -402,7 +391,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       ) : null}
       actionRail={
         <ManuscriptActionRail
-          isStreaming={isGenerating || isGeneratingChoices || isStreamingPreview}
+          isStreaming={isGenerating || isGeneratingChoices}
         >
           <div className="manuscript-action-rail-stack">
             <ActiveGameSessionChoicesColumn

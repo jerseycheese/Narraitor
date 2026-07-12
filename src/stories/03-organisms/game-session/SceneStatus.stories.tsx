@@ -9,10 +9,9 @@ import { createEmptyWorldState } from '@/types/world-state.types';
 
 /**
  * `SceneStatus` is the canon scene-status surface — characters present + current
- * location for the latest narrative segment. One component, themed per DS via CSS
- * (DS1 left rail, DS2 ambient line, DS3 compact bar — pick a theme in the
- * toolbar). It reads participant names from the NPC store, so the stories seed a
- * couple of demo NPCs.
+ * location for the latest narrative segment. One component — a compact status
+ * bar, with light/dark handled via CSS. It reads participant names from the NPC
+ * store, so the stories seed a couple of demo NPCs.
  */
 
 const ISO = '2026-01-01T12:00:00.000Z';

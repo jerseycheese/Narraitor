@@ -10,7 +10,7 @@ const meta = {
       description: {
         component:
           'Loading skeleton shown while the first narrative segment generates. ' +
-          'Use the theme toolbar to verify skeleton appearance across DS1, DS2, and DS3.',
+          'Use the color-mode toolbar to verify the skeleton in light and dark.',
       },
     },
   },

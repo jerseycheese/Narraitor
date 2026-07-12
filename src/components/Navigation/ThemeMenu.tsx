@@ -51,7 +51,6 @@ export function ThemeMenu() {
         variant="ghost"
         size="icon"
         aria-label="Appearance"
-        aria-haspopup="menu"
         aria-expanded={open}
         className={headerDropdownTriggerClass}
         onClick={() => setOpen((prev) => !prev)}
@@ -60,7 +59,7 @@ export function ThemeMenu() {
       </Button>
 
       {open && (
-        <div className={headerDropdownMenuClass} role="menu">
+        <div className={headerDropdownMenuClass}>
           <DarkModeToggle />
         </div>
       )}

@@ -115,7 +115,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
           >
             <RotateCcw size={16} aria-hidden="true" />
           </button>
-          <HudCloseButton variant="icon" onBack={onBack} />
+          <HudCloseButton onBack={onBack} />
           <button
             type="button"
             onClick={onEndStory}
