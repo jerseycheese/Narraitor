@@ -70,7 +70,10 @@ Also deferred, on purpose, and separately from each other:
 
 - **A bolder DS3** — deeper ink-blue accent, a louder dot grid, drafting marks, a real type scale, a brand-vs-product surface split. A design pass, not a code cleanup, and it changes token values again, which is exactly why this PR doesn't try to update `DESIGN.md`'s numbers yet (see the note added there).
 - **The `DESIGN.md` rewrite** that follows the bolder-DS3 pass, once there are real DS3 numbers worth documenting as canon instead of DS1's leftover values.
-- **Removing the legacy shadcn HSL token layer** (`--primary`, `--background`, etc. in [ds3.css](../../src/lib/theme/themes/ds3.css)) — the tour and some dialogs still read those tokens, so it stays until that's untangled.
+
+Since resolved:
+
+- **Removing the legacy shadcn HSL token layer** (`--primary`, `--background`, etc. in [ds3.css](../../src/lib/theme/themes/ds3.css)) — done in #1474. The onboarding tour was the last consumer once the shadcn `ui/*` primitives were re-skinned onto `--color-*`; it now reads the `--color-*` family too, and the legacy block was removed from ds3.css.
 
 ## Related Decisions
 

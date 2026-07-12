@@ -350,7 +350,7 @@
   padding: var(--space-2) var(--space-3);
   text-align: left;
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
 }
 
 .workshop-sidebar-world-item[data-active="true"] {

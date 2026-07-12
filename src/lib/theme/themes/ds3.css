@@ -34,27 +34,6 @@
   --color-accent-hover: rgb(74 105 120);
   --color-accent-soft: rgb(91 122 140 / 10%);
 
-  /* shadcn/ui HSL tokens */
-  --background: 36 24% 95%;
-  --foreground: 25 20% 14%;
-  --card: 38 100% 98%;
-  --card-foreground: 25 20% 14%;
-  --popover: 38 100% 98%;
-  --popover-foreground: 25 20% 14%;
-
-  --primary: 200 21% 45%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 25 14% 40%;
-  --secondary-foreground: 0 0% 100%;
-  --muted: 30 16% 92%;
-  --muted-foreground: 25 14% 46%;
-  --accent: 30 16% 92%;
-  --accent-foreground: 25 20% 14%;
-  --border: 29 16% 85%;
-  --input: 29 16% 85%;
-  --ring: 200 21% 45%;
-  --radius: 0.375rem;
-
   /* Extended semantic tokens */
   --success: 138 25% 40%;
   --success-foreground: 210 40% 98%;
@@ -169,25 +148,6 @@
    * mode — white-on-hover ~5.4:1. Base-state contrast tracked separately (#1379). */
   --color-accent-hover: rgb(80 110 128);
   --color-accent-soft: rgb(123 160 180 / 12%);
-
-  --background: 20 18% 8%;
-  --foreground: 33 17% 90%;
-  --card: 20 15% 10%;
-  --card-foreground: 33 17% 90%;
-  --popover: 20 15% 10%;
-  --popover-foreground: 33 17% 90%;
-
-  --primary: 200 19% 59%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 20 10% 28%;
-  --secondary-foreground: 0 0% 100%;
-  --muted: 20 12% 14%;
-  --muted-foreground: 25 10% 52%;
-  --accent: 20 12% 14%;
-  --accent-foreground: 33 17% 90%;
-  --border: 20 15% 16%;
-  --input: 20 15% 16%;
-  --ring: 200 19% 59%;
 
   --success: 138 20% 48%;
   --success-foreground: 222 84% 5%;
