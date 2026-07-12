@@ -25,7 +25,6 @@ import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
 import { ManuscriptSessionShell } from './ManuscriptSessionShell';
 import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
-import { HudCloseButton } from './HudCloseButton';
 import { ManuscriptActionRail } from './ManuscriptActionRail';
 import { ManuscriptDrawer } from './ManuscriptDrawer';
 import {
@@ -39,7 +38,6 @@ import {
 import { CharacterSnapshot } from './CharacterSnapshot';
 import { SceneStatus } from './SceneStatus';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { useTheme } from '@/lib/theme/ThemeProvider';
 
 type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history' | 'journal';
 
@@ -102,8 +100,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // so these callbacks are stripped from a production bundle and the menu hides
   // each button when its callback is absent (#1430 F58).
   const showDevTools = process.env.NODE_ENV === 'development';
-  const { theme } = useTheme();
-  const isDS3 = theme === 'ds3';
 
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
@@ -460,29 +456,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               className="manuscript-save-indicator"
             />
           }
-          rightContent={isDS3 ? undefined : (
-            <div className="manuscript-hud-right-controls">
-              <SaveIndicator
-                status={autoSave.status}
-                lastSaveTime={autoSave.lastSaveTime}
-                errorMessage={autoSave.errorMessage}
-                totalSaves={autoSave.totalSaves}
-                onRetryError={autoSave.retry}
-                retryable
-                compact
-                className="manuscript-save-indicator"
-              />
-              <button
-                type="button"
-                onClick={onStartNew}
-                title="Start New Session"
-                className="manuscript-hud-text-button manuscript-hud-reset-button"
-              >
-                Reset
-              </button>
-              <HudCloseButton variant="text" onBack={onBack} />
-            </div>
-          )}
         />
       }
       marginContent={hasSceneStatus ? (

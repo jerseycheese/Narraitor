@@ -5,7 +5,6 @@ import type { DesignSystem, ColorScheme } from './index';
 import {
   DEFAULT_THEME,
   DEFAULT_COLOR_SCHEME,
-  STORAGE_KEY_THEME,
   STORAGE_KEY_COLOR_SCHEME,
 } from './index';
 
@@ -25,13 +24,6 @@ function getSystemPreference(): 'light' | 'dark' {
 }
 
 function readStoredTheme(): DesignSystem {
-  if (typeof window === 'undefined') return DEFAULT_THEME;
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY_THEME);
-    if (stored === 'ds1' || stored === 'ds2' || stored === 'ds3') return stored;
-  } catch {
-    // localStorage unavailable
-  }
   return DEFAULT_THEME;
 }
 
@@ -64,16 +56,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setColorSchemeState(readStoredColorScheme());
     setSystemPreference(getSystemPreference());
   }, []);
-
-  // Apply theme attribute to <html>
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    try {
-      localStorage.setItem(STORAGE_KEY_THEME, theme);
-    } catch {
-      // localStorage unavailable
-    }
-  }, [theme]);
 
   // Apply dark class to <html>
   useEffect(() => {

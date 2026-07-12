@@ -40,8 +40,9 @@ in player-facing copy.
 
 - Reading first — long-form narrative is the load-bearing surface; line length, rhythm, and
   legibility win over everything else.
-- Three systems, one soul — DS1/DS2/DS3 differ structurally (ADR-011), never just reskinned;
-  tokens carry the variation, components stay theme-blind.
+- One system, not a skin — DS3 (ADR-013, superseding the old three-system split in ADR-011)
+  is structurally deliberate, not just recolored; tokens carry the variation, components stay
+  theme-blind.
 - Storybook is canon — when production drifts from Storybook, production is wrong (ADR-012).
 - No seams showing — never surface the generation machinery in player-facing copy.
 - Earn density — show consequence / state / inventory affordances only when there's data
@@ -49,7 +50,7 @@ in player-facing copy.
 
 ## Accessibility & Inclusion
 
-WCAG 2.1 AA. 4.5:1 minimum text contrast, verified in light and dark across all three design
-systems (the open #1379 release gate is an AA contrast miss). Visible focus indicators in
+WCAG 2.1 AA. 4.5:1 minimum text contrast, verified in light and dark
+(the open #1379 release gate is an AA contrast miss). Visible focus indicators in
 every theme; no color-only signaling; full keyboard operation; text resizes to 200% without
 breaking; touch targets at least 44px (#1477); honor reduced-motion.

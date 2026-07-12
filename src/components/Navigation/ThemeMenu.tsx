@@ -1,14 +1,10 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Palette, Check } from 'lucide-react';
+import { Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/lib/theme';
-import { THEMES } from '@/lib/theme';
 import { DarkModeToggle } from './DarkModeToggle';
 import {
-  headerDropdownHeaderClass,
-  headerDropdownItemClass,
   headerDropdownMenuClass,
   headerDropdownTriggerClass,
 } from './navigationDropdownStyles';
@@ -16,14 +12,10 @@ import {
 /**
  * ThemeMenu - compact palette-icon "Appearance" menu.
  *
- * One coherent appearance control for the app chrome: visual theme (skin) by
- * human name, plus light/dark/system color mode, in a single dropdown. Replaces
- * the inline DS1/DS2/DS3 segmented control and the separate dark-mode toggle
- * that used to sit beside it. The same control is the canonical home in
- * Settings -> Appearance.
+ * Single control for the app chrome's color mode (light/dark/system). The
+ * same control is the canonical home in Settings -> Appearance.
  */
 export function ThemeMenu() {
-  const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -69,29 +61,7 @@ export function ThemeMenu() {
 
       {open && (
         <div className={headerDropdownMenuClass} role="menu">
-          <p className={headerDropdownHeaderClass}>Theme</p>
-          {THEMES.map((t) => (
-            <Button
-              key={t.id}
-              type="button"
-              role="menuitemradio"
-              aria-checked={theme === t.id}
-              variant="ghost"
-              className={headerDropdownItemClass}
-              onClick={() => setTheme(t.id)}
-            >
-              <div className="theme-menu-item-text">
-                <div>{t.name}</div>
-                <div>{t.description}</div>
-              </div>
-              {theme === t.id && <Check aria-hidden="true" />}
-            </Button>
-          ))}
-
-          <div className="theme-menu-mode">
-            <p className={headerDropdownHeaderClass}>Color mode</p>
-            <DarkModeToggle />
-          </div>
+          <DarkModeToggle />
         </div>
       )}
     </div>

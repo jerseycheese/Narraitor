@@ -2,20 +2,22 @@
 title: Design System
 tags: [design-system, theming, overview]
 created: 2026-05-10
-updated: 2026-05-10
+updated: 2026-07-11
 ---
 
 # Design System
 
-Three structurally-different design systems ship with the app — DS1, DS2, DS3. The user picks one in the theme switcher; it isn't tied to a world's genre. Each theme has its own CSS file, its own showcase page, and its own visual point of view. Switching is a one-attribute change on `<html>`. Components stay theme-blind.
+> **Note (2026-07-11):** This page still describes the old three-system architecture in places. As of [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md), Narraitor ships a single design system — **DS3** only. The comparison table below is kept as a historical record; treat DS1 and DS2 as gone everywhere they're mentioned.
 
-For the rationale, see [ADR-011](../architecture/ADR-011-three-design-systems.md). For an AI-readable summary of the design surface, see [DESIGN.md](../../DESIGN.md) at the repo root.
+Narraitor shipped three structurally-different design systems until [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md) collapsed them to one. **DS3** is the only design system today — it isn't user-selectable, and it isn't tied to a world's genre either. It has its own CSS file and its own visual point of view. Components stay theme-blind.
+
+For the original three-system rationale (superseded), see [ADR-011](../architecture/ADR-011-three-design-systems.md). For the collapse decision, see [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md). For an AI-readable summary of the design surface, see [DESIGN.md](../../DESIGN.md) at the repo root.
 
 ## Principles
 
 - **Structural differentiation over token swaps.** Themes vary in shape language, spacing rhythm, and density — not just color and font. Same shape with three palettes reads as one product wearing three hats.
 - **Tokens carry the variation; components stay blind.** No `theme === 'ds1'` branching in JSX. Components consume `var(--token-name)` and let the active theme decide the value.
-- **The showcase pages are canon.** [`/dev/design-system`](../../src/app/dev/design-system/page.tsx), [`-2`](../../src/app/dev/design-system-2/page.tsx), and [`-3`](../../src/app/dev/design-system-3/page.tsx) are the source of truth. If a production component drifts from the showcase, the production component is wrong.
+- **Storybook is canon** (ADR-012). The old `/dev/design-system{,-2,-3}` showcase pages this bullet used to point to are retired — `npm run storybook` is the source of truth now. If a production component drifts from Storybook, the production component is wrong.
 - **No inline styles.** Every visual value comes from a token. Hardcoded colors and pixel values are bugs.
 
 ## The Three Systems
@@ -26,17 +28,16 @@ For the rationale, see [ADR-011](../architecture/ADR-011-three-design-systems.md
 | **DS2** | Warm Earth | Organic, soft, breathing space | Crimson Pro | Sage Green | 12px |
 | **DS3** | Mechanical Manuscript | Aged paper, drafting ink, dot grid | Newsreader | Steel Blue | 6px |
 
-DS1 is the default. Light + dark mode are layered on top via a separate `dark` class on `<html>`.
+DS1 was the default until the collapse; DS3 is the only theme running now, hardcoded rather than defaulted. Light + dark mode are still layered on top via a separate `dark` class on `<html>` — unaffected by the collapse.
 
 ## Where things live
 
-- **Theme tokens**: [src/lib/theme/themes/ds1.css](../../src/lib/theme/themes/ds1.css), [ds2.css](../../src/lib/theme/themes/ds2.css), [ds3.css](../../src/lib/theme/themes/ds3.css)
+- **Theme tokens**: [src/lib/theme/themes/ds3.css](../../src/lib/theme/themes/ds3.css) — the only theme file now; `ds1.css` and `ds2.css` are deleted
 - **Theme registry & types**: [src/lib/theme/index.ts](../../src/lib/theme/index.ts)
-- **Theme provider** (sets `data-theme`, manages dark mode, persists choice): [src/lib/theme/ThemeProvider.tsx](../../src/lib/theme/ThemeProvider.tsx)
+- **Theme provider** (sets `data-theme`, manages dark mode, persists color-scheme choice): [src/lib/theme/ThemeProvider.tsx](../../src/lib/theme/ThemeProvider.tsx)
 - **Global element resets / utility CSS**: [src/app/globals.css](../../src/app/globals.css)
 - **Game-session-specific styles**: [src/styles/manuscript-session.css](../../src/styles/manuscript-session.css)
-- **Showcase pages**: [src/app/dev/design-system/page.tsx](../../src/app/dev/design-system/page.tsx) (DS1), `-2/page.tsx` (DS2), `-3/page.tsx` (DS3). Each has a `session/page.tsx` subroute that's canon for game-session UI.
-- **Storybook**: `npm run storybook` (port 6006). Foundation stories at [src/stories/00-foundation/](../../src/stories/00-foundation/) (`DesignSystemShowcase`, `DesignTokens`). The toolbar has a DS1/DS2/DS3 + light/dark switcher — verify components in all six combinations.
+- **Storybook**: `npm run storybook` (port 6006) — the canon frontend surface (ADR-012). Foundation stories at [src/stories/00-foundation/](../../src/stories/00-foundation/) (`DesignSystemShowcase`, `DesignTokens`). The toolbar has a light/dark switcher — verify components in both. The old showcase pages (`/dev/design-system{,-2,-3}`) are retired.
 
 ## Documentation in this directory
 
@@ -47,18 +48,17 @@ DS1 is the default. Light + dark mode are layered on top via a separate `dark` c
 
 ## Adding to the system
 
-- **New token?** Add it to all three theme files (`ds1.css`, `ds2.css`, `ds3.css`) — both light and dark blocks. Don't add to one and let the others fall back to undefined.
-- **New component?** Build against tokens, not raw values. Add a Storybook story alongside the component. Verify the showcase pages first (canon), then Storybook (DS1/DS2/DS3 × light/dark), then a real production route, before merging.
+- **New token?** Add it to `ds3.css` — both light and dark blocks. Don't add it to only one and let the other fall back to undefined.
+- **New component?** Build against tokens, not raw values. Add a Storybook story alongside the component. Verify in Storybook (light × dark), then a real production route, before merging.
 - **New per-theme variation on an existing component?** Don't branch in JSX. Add a CSS variable for the property that needs to vary; let each theme set its own value. If the variation is structural enough that a CSS variable can't carry it, rethink the component before forking it.
 - **Fourth theme?** Add `dsN.css`, register it in [src/lib/theme/index.ts](../../src/lib/theme/index.ts), add a showcase page, update `ThemeProvider`'s `readStoredTheme` validation, and add the new theme to the Storybook toolbar in [.storybook/preview.tsx](../../.storybook/preview.tsx).
 
 ## Verifying visual changes
 
-**Canon order: showcase pages > Storybook > app.** When the three disagree, the showcase pages win.
+**Canon order: Storybook > app** (ADR-012). The showcase pages this section used to lead with are retired; Storybook is the highest authority now.
 
 In order:
 
-1. **Showcase pages** — `/dev/design-system{,-2,-3}` and the `/session/` subroutes. The highest authority. If your change drifts from canon here, the change is wrong (not the canon).
-2. **Storybook** — `npm run storybook`. Component-level reference. Use the toolbar switcher to flip DS1/DS2/DS3 and light/dark. Should match the showcase; if it doesn't, fix Storybook to match canon.
-3. **Real production routes** — walk the actual user flow that exercises the change. Token-level fixes can pass showcase and Storybook but still break in real flows where data shape, async loading, or layout context shifts behavior.
-4. **Visual regression suite** — `npm run test:visual`. See [visual-regression-testing.md](../development/visual-regression-testing.md). Multi-theme baselines stabilization is tracked in [#1198](https://github.com/jerseycheese/Narraitor/issues/1198).
+1. **Storybook** — `npm run storybook`. Component-level reference. Use the toolbar switcher to flip light/dark. If production drifts from Storybook, fix production.
+2. **Real production routes** — walk the actual user flow that exercises the change. Token-level fixes can pass Storybook but still break in real flows where data shape, async loading, or layout context shifts behavior.
+3. **Visual regression suite** — `npm run test:visual`. See [visual-regression-testing.md](../development/visual-regression-testing.md).

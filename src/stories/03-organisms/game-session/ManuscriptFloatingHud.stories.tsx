@@ -29,14 +29,6 @@ export const Default: Story = {
     onToggleToolsMenu: () => {},
     isToolsMenuOpen: false,
     characterName: 'The Archivist',
-    rightContent: (
-      <div className="manuscript-hud-right-controls">
-        <div style={{ fontSize: '0.625rem', fontFamily: 'var(--font-system)', color: 'var(--color-text-muted)', marginRight: '0.5rem' }}>SAVED</div>
-        <button type="button" className="manuscript-hud-text-button">
-          Reset
-        </button>
-      </div>
-    ),
     drawerTriggers: true,
   },
 };
