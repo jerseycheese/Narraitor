@@ -15,7 +15,7 @@ Regular testing catches functional bugs but completely misses when your UI break
 
 Visual tests solve this by taking screenshots and comparing them to baseline images. If anything changes beyond acceptable thresholds, the test fails. It's like having a designer review every UI change automatically.
 
-> **Multi-theme note**: Since the [DS migration](../architecture/ADR-011-three-design-systems.md), visual coverage for user-facing surfaces must cover all three themes (DS1, DS2, DS3), not just the default. A visual spec that intentionally covers only one theme needs an inline comment explaining why that exception is valid. Auditing older specs against this rule is tracked in [#1264](https://github.com/jerseycheese/Narraitor/issues/1264).
+> **Color-mode note**: Since the [collapse to a single design system (DS3)](../architecture/ADR-013-collapse-to-single-design-system-ds3.md), there is one design system. The coverage axis that remains is light/dark color mode — capture both wherever a surface renders differently between them.
 
 ## How It Works
 
@@ -171,16 +171,13 @@ The combination provides layered protection:
 
 ## Writing Good Visual Tests
 
-### Design System Coverage
+### Color-Mode Coverage
 
-Every user-facing visual spec should make theme coverage explicit:
+There is a single design system (DS3). The coverage axis that remains is light/dark color mode.
 
-1. **Default expectation**: capture DS1, DS2, and DS3 baselines for the same route, state, component, or workflow. This is the visual-test equivalent of exercising all Drupal theme variants, not only the default active theme.
-2. **Use focused specs when full-flow multiplication is too expensive**: keep long sequential flow specs if they provide useful regression coverage, but add a smaller theme-differentiation spec that screenshots the shared surface once per design system. See `tests/visual/dashboard-themes.spec.ts` and `tests/visual/wizard-themes.spec.ts`.
-3. **Name snapshots with the theme id**: include `ds1`, `ds2`, or `ds3` in the screenshot name, for example `wizard-world-ds2.png`.
-4. **Document exceptions in the spec**: if a visual spec covers only one design system, add a comment near the test explaining the reason, such as browser API coverage, dark-mode-only coverage, non-user-facing infrastructure, or an existing tracking issue.
-
-Do not rely on a separate manual theme-switcher screenshot as proof that a surface is covered. Theme-switcher tests prove the switcher works; surface-level tests prove the actual UI remains structurally correct in each design system.
+1. **Capture both modes where they differ**: if a surface renders differently in light and dark, screenshot both. If it renders the same either way, one baseline is enough.
+2. **Name snapshots with the mode when both are covered**: include `light` or `dark` in the screenshot name, for example `wizard-world-dark.png`.
+3. **Document single-mode coverage**: if a spec covers only one mode, add a short comment explaining why — browser-API coverage, non-user-facing infrastructure, or an existing tracking issue.
 
 ### Test Structure
 

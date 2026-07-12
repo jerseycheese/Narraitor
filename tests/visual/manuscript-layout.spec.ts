@@ -51,7 +51,7 @@ test.describe('Manuscript Layout Specific Tests', () => {
     });
   });
 
-  test('Desktop should keep character rail on left and sync panel width', async ({ page }) => {
+  test('Desktop character panel opens as a floating overlay near expected width', async ({ page }) => {
     // Seed full test data including narrative segments
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -61,7 +61,7 @@ test.describe('Manuscript Layout Specific Tests', () => {
     // Wait for the main manuscript shell to load
     await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 10000 });
 
-    const hudToggle = page.getByRole('button', { name: /^character$/i });
+    const hudToggle = page.locator('.manuscript-hud-character-pill');
     await expect(hudToggle).toBeVisible();
     await hudToggle.click();
 
@@ -70,59 +70,45 @@ test.describe('Manuscript Layout Specific Tests', () => {
       timeout: 10000,
     });
 
-    // The character panel's width is matched to the rail by a deferred layout
-    // effect in ManuscriptSessionShell (a ResizeObserver + requestAnimationFrame
-    // that copies the measured rail width onto the panel). Measuring synchronously
-    // the instant the panel mounts races that sync, which is flaky across runners
-    // (issue #1497; previously skip-listed in #1185). Wait for the widths to
-    // settle before asserting instead of sampling mid-sync.
-    await expect
-      .poll(
-        () =>
-          page.evaluate(() => {
-            const rail = document.querySelector('.manuscript-characters-rail');
-            const panel = document.querySelector('.manuscript-hud-character-panel');
-            if (!rail || !panel) return Number.POSITIVE_INFINITY;
-            return Math.abs(
-              Math.round(
-                panel.getBoundingClientRect().width - rail.getBoundingClientRect().width,
-              ),
-            );
-          }),
-        { timeout: 5000 },
-      )
-      .toBeLessThanOrEqual(2);
-
+    // DS3's character panel is a floating dropdown anchored below the
+    // character pill (`.manuscript-hud-panel`: position: absolute; top: 100%;
+    // width: min(var(--manuscript-rail-width, 18rem), calc(100vw - 1.5rem))).
+    // The DS1-only rail-width-sync effect this test used to wait on (a
+    // ResizeObserver in ManuscriptSessionShell gated on `theme === 'ds1'`) was
+    // dead code for DS3 even before it was deleted this refactor, so there's
+    // no async sync to race here — the layout is settled as soon as the panel
+    // mounts.
     const desktopLayout = await page.evaluate(() => {
-      const rail = document.querySelector('.manuscript-characters-rail');
-      const mainContent = document.querySelector('.manuscript-main-content');
+      const header = document.querySelector('.manuscript-overlay-header');
       const panel = document.querySelector('.manuscript-hud-character-panel');
 
-      if (!rail || !mainContent || !panel) {
+      if (!header || !panel) {
         return null;
       }
 
-      const railRect = rail.getBoundingClientRect();
-      const mainRect = mainContent.getBoundingClientRect();
+      const headerRect = header.getBoundingClientRect();
       const panelRect = panel.getBoundingClientRect();
 
       return {
-        railDisplay: window.getComputedStyle(rail).display,
         panelWidth: Math.round(panelRect.width),
-        railWidth: Math.round(railRect.width),
-        panelRailDelta: Math.abs(Math.round(panelRect.width - railRect.width)),
-        railIsLeftOfMain: railRect.left < mainRect.left,
+        panelPosition: window.getComputedStyle(panel).position,
+        panelTopAtOrBelowHeader: panelRect.top >= headerRect.bottom - 1,
       };
     });
 
     expect(desktopLayout).not.toBeNull();
     if (!desktopLayout) {
-      throw new Error('Expected desktop manuscript layout elements to be present');
+      throw new Error('Expected desktop character panel and header to be present');
     }
 
-    expect(desktopLayout.railDisplay).not.toBe('none');
-    expect(desktopLayout.railIsLeftOfMain).toBe(true);
-    expect(desktopLayout.panelRailDelta).toBeLessThanOrEqual(2);
+    // Measured live against the DS3 app at 1280px wide: the panel resolves to
+    // its CSS fallback of 18rem (288px at the default 16px root font-size).
+    // Assert a generous range instead of the exact px value so the check
+    // isn't brittle against minor rendering differences across runners.
+    expect(desktopLayout.panelWidth).toBeGreaterThan(200);
+    expect(desktopLayout.panelWidth).toBeLessThanOrEqual(400);
+    expect(desktopLayout.panelPosition).toBe('absolute');
+    expect(desktopLayout.panelTopAtOrBelowHeader).toBe(true);
 
     await hideDynamicContent(page);
 
@@ -142,6 +128,10 @@ test.describe('Manuscript Layout Specific Tests', () => {
 
     await expect(page.getByRole('button', { name: /close/i })).toBeVisible();
 
+    // DS3 stacks the scene-status rail as a compact console bar above the
+    // narrative (`[data-theme="ds3"] .manuscript-characters-rail { display:
+    // block; margin-bottom: var(--space-3); }`), not beside it — the old
+    // DS1 three-column "rail to the left of main" layout doesn't apply here.
     const desktopLayout = await page.evaluate(() => {
       const rail = document.querySelector('.manuscript-characters-rail');
       const mainContent = document.querySelector('.manuscript-main-content');
@@ -151,7 +141,8 @@ test.describe('Manuscript Layout Specific Tests', () => {
       const mainRect = mainContent.getBoundingClientRect();
       return {
         railDisplay: window.getComputedStyle(rail).display,
-        railIsLeftOfMain: railRect.left < mainRect.left,
+        // Small tolerance for subpixel rounding; measured live this gap is ~28px.
+        railIsAboveMain: railRect.bottom <= mainRect.top + 2,
       };
     });
 
@@ -160,7 +151,7 @@ test.describe('Manuscript Layout Specific Tests', () => {
       throw new Error('Expected desktop manuscript rail and content to be present');
     }
     expect(desktopLayout.railDisplay).not.toBe('none');
-    expect(desktopLayout.railIsLeftOfMain).toBe(true);
+    expect(desktopLayout.railIsAboveMain).toBe(true);
 
     await hideDynamicContent(page);
 

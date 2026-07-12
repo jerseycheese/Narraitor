@@ -1,11 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
    About Surface
    Styles for the /about page and the <About /> component.
-   All values use design tokens for theme-awareness. Per-theme
-   structural treatments mirror dashboard.css:
-   DS1 = drafting-table (sharp, hairline rules, mono labels, grid)
-   DS2 = editorial (soft radius cards, airy, serif prose)
-   DS3 = mechanical manuscript (dot-grid, corner brackets, compact)
+   All values use design tokens for theme-awareness. Structural treatment
+   (dot-grid, corner brackets, compact) mirrors dashboard.css.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Base layout (token-driven, theme-agnostic) ─── */
@@ -249,142 +246,6 @@
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   DS1 — "The Drafting Table"
-   Archival / drafting: sharp radius, hairline rules between
-   sections, mono uppercase section labels, faint drafting grid.
-   ═══════════════════════════════════════════════════════════════ */
-
-[data-theme="ds1"] .component-about {
-  gap: 0;
-  background-color: var(--color-canvas);
-  background-image:
-    linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-border-strong) 40%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-border-strong) 40%, transparent) 1px,
-      transparent 1px
-    );
-  background-size: 24px 24px;
-  background-repeat: repeat;
-}
-
-[data-theme="ds1"] .component-about-hero,
-[data-theme="ds1"] .component-about-section,
-[data-theme="ds1"] .component-about-cta {
-  padding: var(--space-6) 0;
-  border-bottom: 1px solid var(--color-border-strong);
-  border-radius: 0;
-  background: transparent;
-}
-
-[data-theme="ds1"] .component-about-cta {
-  border-bottom: none;
-  align-items: flex-start;
-}
-
-[data-theme="ds1"] .component-about-title {
-  font-family: var(--font-interface);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-[data-theme="ds1"] .component-about-section-title {
-  font-family: var(--font-system);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .component-about-steps {
-  gap: var(--space-3);
-}
-
-[data-theme="ds1"] .component-about-step {
-  border-radius: var(--radius-sm);
-  padding: var(--space-4);
-  gap: var(--space-3);
-}
-
-[data-theme="ds1"] .component-about-step-number {
-  border-radius: var(--radius-sm);
-  background: transparent;
-  border: 1px solid var(--color-border-strong);
-}
-
-[data-theme="ds1"] .component-about-cta-link {
-  border-radius: var(--radius-sm);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   DS2 — "Warm Earth" editorial
-   Soft radius step cards, generous whitespace, serif prose, warm
-   surface fills, no background pattern.
-   ═══════════════════════════════════════════════════════════════ */
-
-[data-theme="ds2"] .component-about {
-  gap: clamp(var(--space-8), 6vw, 4rem);
-}
-
-[data-theme="ds2"] .component-about-title {
-  font-weight: 500;
-  letter-spacing: -0.015em;
-}
-
-[data-theme="ds2"] .component-about-lead {
-  font-family: var(--font-narrative);
-  font-size: 1.375rem;
-  line-height: 1.5;
-}
-
-[data-theme="ds2"] .component-about-section-title {
-  font-family: var(--font-narrative);
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-}
-
-[data-theme="ds2"] .component-about-prose p {
-  font-family: var(--font-narrative);
-  font-size: 1.1875rem;
-  line-height: 1.7;
-}
-
-[data-theme="ds2"] .component-about-steps {
-  gap: var(--space-6);
-}
-
-[data-theme="ds2"] .component-about-step {
-  padding: var(--space-6);
-  gap: var(--space-3);
-  border: none;
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-hover);
-}
-
-[data-theme="ds2"] .component-about-step-description {
-  font-family: var(--font-narrative);
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-[data-theme="ds2"] .component-about-cta {
-  padding: var(--space-8);
-  border: none;
-  border-radius: var(--radius-lg);
-}
-
-[data-theme="ds2"] .component-about-cta-link {
-  border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-6);
 }
 
 /* ═══════════════════════════════════════════════════════════════

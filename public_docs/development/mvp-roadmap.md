@@ -3,7 +3,7 @@
 ## Where We Are
 **Major Milestone**: The core MVP is basically complete. AI storytelling, world creation, character building, session persistence, and navigation all work, and a player can go end to end through the loop.
 
-**Current Status**: Polish toward a proper 1.0. Since this roadmap was first drafted, several big pieces have landed: the three-design-system migration (DS1/DS2/DS3, see [ADR-011](../architecture/ADR-011-three-design-systems.md)), Playwright visual-regression testing, the dashboard home page, the guided onboarding tutorial, table views for the list screens, and the lore entity-management work (fuzzy matching, aliases, deduplication, resolution). The remaining work is mostly UI polish, error-handling hardening, and getting things release-ready rather than net-new core systems.
+**Current Status**: Polish toward a proper 1.0. Since this roadmap was first drafted, several big pieces have landed: the three-design-system migration (DS1/DS2/DS3, see [ADR-011](../architecture/ADR-011-three-design-systems.md)) — later collapsed back to one design system, DS3, via [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md) — Playwright visual-regression testing, the dashboard home page, the guided onboarding tutorial, table views for the list screens, and the lore entity-management work (fuzzy matching, aliases, deduplication, resolution). The remaining work is mostly UI polish, error-handling hardening, and getting things release-ready rather than net-new core systems.
 
 ## What the MVP Does
 Basically, it's a complete solo narrative RPG experience where you can:
@@ -129,18 +129,11 @@ primitive *in production*, not in the showcase.
 - Remaining DS primitives unstyled: card/alert/tabs/table/checkbox/radio (#1317) — after #1316
 - Render data-table + CollapsibleSection in the style guide for canon coverage (#1319) — after #1317
 
-### Phase B: DS canon + structural differentiation
-- Showcase = canon: render real production components, Session phase remaining (#1276)
-- [EPIC] Structural DS differentiation across surfaces (#1165)
-- Finish character-side detail/edit content treatment + CharacterTable alignment (#1295)
-- About page real content + DS1/DS2/DS3 treatment (#1135)
-
 ### Phase C: Launch gate
 - [EPIC] MVP Launch Preparation — landing page, docs, legal, analytics (#495)
 
 ### Supporting: visual-test coverage & hygiene
 De-risks the visual work above; not headline.
-- Audit visual specs for DS1/DS2/DS3 coverage (#1264)
 - Audit crawler hygiene: DS theme captures + seeded load + bbox cropping (#1297)
 - Stabilize tour & world-detail visual specs (#1198)
 - Split tutorial visual tests into a dedicated CI job (#1014); restore deleted tutorial coverage (#1239)

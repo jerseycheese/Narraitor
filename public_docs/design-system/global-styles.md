@@ -9,15 +9,15 @@ updated: 2025-06-15
 
 # Narraitor Global Styles
 
-The global styling system provides a theme-aware foundation built on plain CSS and design-token custom properties. (There's no Tailwind — it was removed in the design-system migration, `#1097`.) Three design systems (DS1, DS2, DS3) with light and dark modes are fully supported — components consume tokens through `var()` and adapt automatically when the user switches themes.
+The global styling system provides a theme-aware foundation built on plain CSS and design-token custom properties. (There's no Tailwind — it was removed in the design-system migration, `#1097`.) One design system (DS3) with light and dark modes is fully supported — components consume tokens through `var()` and adapt automatically when the user switches color scheme.
 
-For the rationale behind having three design systems (and the structural-differentiation principle that shaped the per-theme CSS files referenced below), see [ADR-011](../architecture/ADR-011-three-design-systems.md).
+[ADR-011](../architecture/ADR-011-three-design-systems.md) explains the rationale for originally having three design systems (and the structural-differentiation principle that shaped the per-theme CSS files); [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md) explains why that later collapsed to DS3 alone.
 
 ## CSS Architecture
 
 The styling stack loads in this order:
 
-1. **Theme CSS files** (`src/lib/theme/themes/ds1.css`, `ds2.css`, `ds3.css`, plus `_shared-tokens.css`) — define all CSS custom properties under `[data-theme]` selectors
+1. **Theme CSS files** (`src/lib/theme/themes/ds3.css`, plus `_shared-tokens.css`) — define all CSS custom properties under `[data-theme="ds3"]` selectors
 2. **Global styles** (`src/app/globals.css`) — base element resets and defaults that consume `var(--token)` values
 3. **Component CSS** — co-located styles for specific components, keyed off semantic class names
 
@@ -115,8 +115,8 @@ After React hydrates, `ThemeProvider` takes over. It syncs React state from `loc
 ### 4. CSS Selectors Resolve
 
 The browser resolves `var(--token-name)` references based on the active selectors:
-- `[data-theme="ds2"]` selects DS2 light tokens
-- `[data-theme="ds2"].dark` lets DS2 dark tokens override
+- `[data-theme="ds3"]` selects DS3 light tokens
+- `[data-theme="ds3"].dark` lets DS3 dark tokens override
 
 Components never need to know which theme is active — they just reference `var(--color-surface)` and the cascade handles the rest.
 
@@ -131,7 +131,7 @@ import { ThemeProvider } from '@/lib/theme';
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-theme="ds1">
+    <html lang="en" data-theme="ds3">
       <body>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
@@ -150,7 +150,7 @@ import { useTheme } from '@/lib/theme';
 function MyComponent() {
   const { theme, colorScheme, resolvedColorScheme, setTheme, setColorScheme } = useTheme();
 
-  // theme: 'ds1' | 'ds2' | 'ds3'
+  // theme: 'ds3' (fixed — the design-system axis was collapsed to one, ADR-013)
   // colorScheme: 'light' | 'dark' | 'system'
   // resolvedColorScheme: 'light' | 'dark' (computed — resolves 'system' to actual)
   // setTheme: (theme) => void
@@ -164,10 +164,11 @@ Throws `Error('useTheme must be used within a ThemeProvider')` if called outside
 
 | Key | localStorage Key | Default | Purpose |
 |-----|-----------------|---------|---------|
-| Theme | `narraitor-theme` | `'ds1'` | Which design system is active |
 | Color scheme | `narraitor-color-scheme` | `'light'` | Light, dark, or system preference |
 
-Server-side renders default to DS1 + light. The FOUC script and ThemeProvider sync the actual preference after the page loads, preventing hydration mismatches.
+Theme is fixed to `'ds3'` and isn't persisted — there's only one design system, so there's nothing to remember.
+
+Server-side renders default to DS3 + light. The FOUC script and ThemeProvider sync the actual color-scheme preference after the page loads, preventing hydration mismatches.
 
 ### System Preference Detection
 

@@ -11,103 +11,111 @@ updated: 2025-06-15
 
 Design tokens manage colors, spacing, typography, and elevation across the app via CSS custom properties. Every visual value consumed by components comes from token variables scoped to the active design system and color scheme.
 
-For the design rationale behind having three structurally-different design systems instead of one — and how that shapes the token model below — see [ADR-011](../architecture/ADR-011-three-design-systems.md). For an AI-readable summary of the same surface (tokens, components, do's and don'ts), see [DESIGN.md](../../DESIGN.md) at the repo root.
+[ADR-011](../architecture/ADR-011-three-design-systems.md) explains the design rationale for originally having three structurally-different design systems instead of one; [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md) explains why the app later collapsed back to one, DS3. For an AI-readable summary of the same surface (tokens, components, do's and don'ts), see [DESIGN.md](../../DESIGN.md) at the repo root.
 
 ## Architecture Overview
 
-The token system uses a three-tier hierarchy of CSS custom properties, defined per-theme in dedicated CSS files:
+The token system uses a three-tier hierarchy of CSS custom properties:
 
 **Global Tokens** to **Semantic Tokens** to **Component Tokens**
 
-Each design system (DS1, DS2, DS3) defines all three tiers under a `[data-theme]` attribute selector, with separate blocks for light and dark mode. Changing the active theme swaps the entire token set at the root level — every component that consumes `var(--token-name)` updates automatically.
+DS3 defines all three tiers under the `[data-theme="ds3"]` attribute selector, with separate blocks for light and dark mode. Every component that consumes `var(--token-name)` picks up the active mode automatically.
 
 ### Tier 1: Global Tokens
 
-These establish the design system's identity — fonts, surface colors, spacing, and border radii. They live in `src/lib/theme/themes/ds1.css`, `ds2.css`, and `ds3.css`.
+These establish the design system's identity — fonts, surface colors, and border radii. They live in `src/lib/theme/themes/ds3.css`. (The spacing scale is shared across light/dark rather than per-theme, so it lives in `_shared-tokens.css` under `:root` instead — see below.)
 
 ```css
-/* From ds1.css — "The Drafting Table" */
-[data-theme="ds1"] {
+/* From ds3.css — "Mechanical Manuscript" */
+[data-theme="ds3"] {
   /* Typography: semantic names map to specific font families */
-  --font-narrative: var(--font-lora);
-  --font-system: var(--font-ibm-plex-mono);
-  --font-interface: var(--font-ibm-plex-sans);
+  --font-narrative: var(--font-newsreader);
+  --font-system: var(--font-fira-code);
+  --font-interface: var(--font-dm-sans);
 
   /* Surface colors */
-  --color-canvas: rgb(253 251 247);        /* Page background */
-  --color-surface: rgb(255 255 255);       /* Component backgrounds */
-  --color-surface-hover: rgb(244 244 245); /* Interactive hover state */
+  --color-canvas: rgb(247 243 237);            /* Page background */
+  --color-surface: rgb(255 252 246 / 80%);     /* Component backgrounds */
+  --color-surface-hover: rgb(239 233 224);     /* Interactive hover state */
 
   /* Border colors */
-  --color-border: rgb(228 228 231);        /* Default borders */
-  --color-border-strong: rgb(212 212 216); /* Emphasized borders */
+  --color-border: rgb(226 217 206);            /* Default borders */
+  --color-border-strong: rgb(212 201 186);     /* Emphasized borders */
 
   /* Text colors */
-  --color-text-primary: rgb(17 17 17);     /* Main body text */
-  --color-text-secondary: rgb(63 63 70);   /* Secondary text */
-  --color-text-muted: rgb(113 113 122);    /* Disabled/hint text */
-  --color-text-inverse: rgb(255 255 255);  /* Text on dark surfaces */
+  --color-text-primary: rgb(42 35 28);         /* Main body text */
+  --color-text-secondary: rgb(115 102 88);     /* Secondary text */
+  --color-text-muted: rgb(125 113 99);         /* Disabled/hint text */
+  --color-text-inverse: rgb(255 255 255);      /* Text on dark surfaces */
 
-  /* Accent */
-  --color-accent: rgb(49 46 129);          /* Primary accent */
-  --color-accent-hover: rgb(30 27 75);     /* Accent hover state */
-  --color-accent-soft: rgb(49 46 129 / 8%);
+  /* Accent (Steel Blue) */
+  --color-accent: rgb(91 122 140);
+  --color-accent-hover: rgb(74 105 120);
+  --color-accent-soft: rgb(91 122 140 / 10%);
 
-  /* Spacing scale (Tailwind-aligned) */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-
-  /* Radius */
-  --radius: 0.5rem;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-full: 9999px;
+  /* Radius (per-theme; --radius-full lives in _shared-tokens.css) */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 }
 ```
 
-Each design system provides these same tokens with different values — DS2 uses warmer tones and softer radii, DS3 uses cooler tones and tighter radii.
+```css
+/* From _shared-tokens.css — identical across light/dark, no per-theme variation */
+:root {
+  --space-0_5: 0.125rem;
+  --space-1:   0.25rem;
+  --space-1_5: 0.375rem;
+  --space-2:   0.5rem;
+  --space-2_5: 0.625rem;
+  --space-3:   0.75rem;
+  --space-3_5: 0.875rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+  --radius-full: 9999px;
+}
+```
 
 ### Tier 2: Semantic Tokens
 
 These map intent and context onto the global foundation. Status feedback, storytelling contexts, and elevation are all semantic tokens.
 
 ```css
-[data-theme="ds1"] {
+[data-theme="ds3"] {
   /* Status colors */
-  --color-warning: rgb(146 64 14);
-  --color-success: hsl(var(--success));
-  --color-info: hsl(var(--info));
-  --color-danger: rgb(185 28 28);
+  --color-warning: rgb(113 88 51);
+  --color-success: rgb(74 124 89);
+  --color-info: rgb(91 122 140);
+  --color-danger: rgb(156 64 64);
 
   /* Story ending tones (HSL values) */
-  --ending-triumphant: 43 96% 56%;
-  --ending-bittersweet: 221.2 83.2% 53.1%;
-  --ending-mysterious: 240 5.9% 10%;
-  --ending-tragic: 0 84% 60%;
-  --ending-hopeful: 142.1 76.2% 45.3%;
+  --ending-triumphant: 36 38% 50%;
+  --ending-bittersweet: 200 21% 50%;
+  --ending-mysterious: 25 20% 14%;
+  --ending-tragic: 0 59% 41%;
+  --ending-hopeful: 138 25% 40%;
 
   /* Lore category tags (background / border / text triplets) */
-  --lore-characters-bg: 214 92% 91%;
-  --lore-characters-border: 213 84% 73%;
-  --lore-characters-text: 224 76% 25%;
-  --lore-locations-bg: 142 69% 83%;
-  --lore-locations-border: 34 84% 44%;
-  --lore-locations-text: 154 86% 27%;
+  --lore-characters-bg: 200 30% 91%;
+  --lore-characters-border: 200 30% 68%;
+  --lore-characters-text: 200 30% 25%;
+  --lore-locations-bg: 138 25% 90%;
+  --lore-locations-border: 138 25% 55%;
+  --lore-locations-text: 138 30% 27%;
 
   /* Choice alignment colors */
-  --alignment-lawful-bg: 213 100% 96%;
-  --alignment-lawful-border: 221 91% 91%;
-  --alignment-lawful-text: 224 76% 48%;
-  --alignment-chaotic-bg: 33 100% 96%;
-  --alignment-chaotic-border: 32 98% 83%;
-  --alignment-chaotic-text: 20 91% 48%;
+  --alignment-lawful-bg: 200 40% 96%;
+  --alignment-lawful-border: 200 30% 87%;
+  --alignment-lawful-text: 200 30% 40%;
+  --alignment-chaotic-bg: 30 60% 96%;
+  --alignment-chaotic-border: 30 50% 82%;
+  --alignment-chaotic-text: 20 50% 42%;
 
   /* Elevation (shadows) */
-  --shadow-overlay: 0 6px 18px rgb(0 0 0 / 8%);
-  --shadow-drawer: -12px 0 18px rgb(0 0 0 / 8%);
+  --shadow-overlay: 0 4px 12px rgb(0 0 0 / 10%);
+  --shadow-drawer: -12px 0 12px rgb(0 0 0 / 10%);
 }
 ```
 
@@ -119,36 +127,40 @@ These predate the Tailwind removal, so despite the `bg-primary`-style naming the
 matching Tailwind utility classes — the values are reached through `var()` like every other token.
 
 ```css
-[data-theme="ds1"] {
-  --background: 0 0% 100%;
-  --foreground: 240 5.9% 10%;
-  --primary: 221.2 83.2% 44.3%;
+[data-theme="ds3"] {
+  --background: 36 24% 95%;
+  --foreground: 25 20% 14%;
+  --card: 38 100% 98%;
+  --card-foreground: 25 20% 14%;
+  --popover: 38 100% 98%;
+  --popover-foreground: 25 20% 14%;
+  --primary: 200 21% 45%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 240 3.8% 26.1%;
+  --secondary: 25 14% 40%;
   --secondary-foreground: 0 0% 100%;
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 240 5.2% 90%;
-  --input: 240 5.2% 90%;
-  --ring: 221.2 83.2% 53.3%;
-  --radius: 0.5rem;
+  --muted: 30 16% 92%;
+  --muted-foreground: 25 14% 46%;
+  --accent: 30 16% 92%;
+  --accent-foreground: 25 20% 14%;
+  --border: 29 16% 85%;
+  --input: 29 16% 85%;
+  --ring: 200 21% 45%;
+  --radius: 0.375rem;
 
   /* Extended status tokens with background/border/muted variants */
-  --success: 142 71% 45%;
-  --success-background: 142 69% 83%;
-  --success-border: 142 69% 83%;
-  --warning: 32 95% 44%;
-  --warning-background: 43 76% 83%;
-  --warning-border: 43 76% 83%;
-  --info: 217 91% 60%;
-  --info-background: 214 92% 91%;
-  --info-border: 214 92% 91%;
+  --success: 138 25% 40%;
+  --success-background: 138 25% 90%;
+  --success-border: 138 25% 75%;
+  --warning: 36 38% 40%;
+  --warning-background: 36 38% 88%;
+  --warning-border: 36 38% 70%;
+  --info: 200 21% 45%;
+  --info-background: 200 30% 91%;
+  --info-border: 200 30% 78%;
 }
 ```
+
+Note: there's no `--destructive` / `--destructive-foreground` pair — `--color-danger` (Tier 2, above) covers that semantic need instead.
 
 ## Using Design Tokens
 
@@ -202,16 +214,16 @@ const WarningAlert = () => (
 
 ### Font Utility Classes
 
-Three semantic font slots are available as utility classes that resolve per-theme:
+Three semantic font slots are available as utility classes:
 
 ```tsx
-// Narrative text (Lora in DS1, Crimson Pro in DS2, Newsreader in DS3)
+// Narrative text (Newsreader)
 <p className="font-narrative">Story content goes here...</p>
 
-// System/code text (IBM Plex Mono in DS1, JetBrains Mono in DS2, Fira Code in DS3)
+// System/code text (Fira Code)
 <code className="font-system">const x = 42;</code>
 
-// Interface text (IBM Plex Sans in DS1, Manrope in DS2, DM Sans in DS3)
+// Interface text (DM Sans)
 <span className="font-interface">Button Label</span>
 ```
 
@@ -219,19 +231,21 @@ Three semantic font slots are available as utility classes that resolve per-them
 
 For JavaScript contexts like chart libraries that need actual values, the legacy TypeScript tokens at `src/lib/design-tokens/` still exist. However, CSS custom properties are the canonical system — prefer reading computed styles when JS values are needed.
 
-## Theme-Specific Differences
+## DS3 at a Glance
 
-Each design system has a distinct visual personality:
+| Property | DS3 "Mechanical Manuscript" |
+|----------|---------------------------|
+| **Narrative Font** | Newsreader |
+| **System Font** | Fira Code |
+| **Interface Font** | DM Sans |
+| **Canvas** | `rgb(247 243 237)` |
+| **Accent** | Steel Blue `rgb(91 122 140)` |
+| **Radius** | `--radius-md: 6px` (tight) |
+| **Background** | Dot grid (24x24px) |
 
-| Property | DS1 "Drafting Table" | DS2 "Warm Earth" | DS3 "Mechanical Manuscript" |
-|----------|---------------------|-------------------|---------------------------|
-| **Narrative Font** | Lora | Crimson Pro | Newsreader |
-| **System Font** | IBM Plex Mono | JetBrains Mono | Fira Code |
-| **Interface Font** | IBM Plex Sans | Manrope | DM Sans |
-| **Canvas** | `rgb(253 251 247)` | `rgb(250 248 243)` | `rgb(247 243 237)` |
-| **Accent** | Archival Ink Blue `rgb(49 46 129)` | Sage Green `rgb(124 139 111)` | Steel Blue `rgb(91 122 140)` |
-| **Radius** | `0.5rem` (square) | `0.75rem` (soft) | `0.375rem` (tight) |
-| **Background** | Mechanical grid (72x72px) | Clean solid | Dot grid (24x24px) |
+This used to be a three-column comparison against DS1 "Drafting Table" and DS2 "Warm Earth" — see
+[ADR-011](../architecture/ADR-011-three-design-systems.md) if you want that history — but DS3 is
+the only design system now ([ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md)).
 
 ## Shadow Tokens
 
@@ -239,14 +253,14 @@ Two shadow tokens handle different elevation contexts:
 
 **`--shadow-overlay`** — Centered shadow for modals, popovers, and floating elements:
 ```css
-/* DS1 light */ --shadow-overlay: 0 6px 18px rgb(0 0 0 / 8%);
-/* DS1 dark  */ --shadow-overlay: 0 8px 24px rgb(0 0 0 / 40%);
+/* DS3 light */ --shadow-overlay: 0 4px 12px rgb(0 0 0 / 10%);
+/* DS3 dark  */ --shadow-overlay: 0 4px 12px rgb(0 0 0 / 35%);
 ```
 
 **`--shadow-drawer`** — Directional shadow with negative x-offset for side panels and drawers:
 ```css
-/* DS1 light */ --shadow-drawer: -12px 0 18px rgb(0 0 0 / 8%);
-/* DS1 dark  */ --shadow-drawer: -12px 0 24px rgb(0 0 0 / 40%);
+/* DS3 light */ --shadow-drawer: -12px 0 12px rgb(0 0 0 / 10%);
+/* DS3 dark  */ --shadow-drawer: -12px 0 12px rgb(0 0 0 / 35%);
 ```
 
 The pattern: dark mode increases shadow opacity (8% to 40%) because shadows need more contrast against dark backgrounds to remain visible. The `-12px` x-offset on drawer shadows keeps the shadow on the leading edge of a left-anchored panel.
@@ -294,19 +308,19 @@ Always pair design tokens with proper semantic markup and ARIA attributes for fu
 
 ## Dark Mode
 
-Dark mode is fully implemented. Each design system defines a complete set of dark-mode token overrides using the `.dark` class on `<html>`:
+Dark mode is fully implemented. DS3 defines a complete set of dark-mode token overrides using the `.dark` class on `<html>`:
 
 ```css
 /* Light mode tokens */
-[data-theme="ds1"] {
-  --color-canvas: rgb(253 251 247);
-  --color-text-primary: rgb(17 17 17);
+[data-theme="ds3"] {
+  --color-canvas: rgb(247 243 237);
+  --color-text-primary: rgb(42 35 28);
 }
 
 /* Dark mode overrides */
-[data-theme="ds1"].dark {
-  --color-canvas: rgb(9 9 11);
-  --color-text-primary: rgb(250 250 250);
+[data-theme="ds3"].dark {
+  --color-canvas: rgb(23 19 16);
+  --color-text-primary: rgb(237 232 224);
 }
 ```
 
@@ -319,9 +333,12 @@ See [global-styles.md](./global-styles.md) for the `ThemeProvider` API and resol
 
 ## Future Considerations
 
-The three-tier system makes it straightforward to:
-- Add new design systems (DS4+) by creating a new theme CSS file with the same token interface
-- Add new contextual token families for future game features
-- Support per-world theme overrides where story worlds customize token subsets
+The three-tier system still makes it *possible* to add another design system by creating a new
+theme CSS file with the same token interface — but [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md)
+collapsed DS1/DS2/DS3 down to one because maintaining three stopped paying for itself, so that's
+not a direction to reach for casually. More realistic near-term uses of the same three-tier
+structure:
+- New contextual token families for future game features
+- Per-world theme overrides where story worlds customize token subsets
 
 The key principle: components reference semantic or contextual tokens via `var()`, never raw color values. This keeps the system flexible as visual requirements evolve.

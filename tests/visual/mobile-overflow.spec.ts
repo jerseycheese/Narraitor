@@ -3,11 +3,8 @@ import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 
 /**
- * Mobile action-row overflow — already all-DS (#1264).
- *
- * This spec loops DS1/DS2/DS3 (see `themes` below) across two narrow viewports,
- * asserting no horizontal overflow per theme. Listed here so the #1264 audit
- * shows it as intentional all-theme coverage, not a single-theme gap.
+ * Mobile action-row overflow (#1264): asserts no horizontal overflow across
+ * two narrow viewports.
  */
 
 const expectNoHorizontalOverflow = async (
@@ -51,72 +48,55 @@ const expectNoHorizontalOverflow = async (
   };
 
 test.describe('Mobile Action Row Layout', () => {
-  const themes = ['ds1', 'ds2', 'ds3'] as const;
+  const theme = 'ds3';
   const mobileViewports = [
     { name: 'narrow-mobile', width: 320, height: 568 },
     { name: 'mobile', width: 375, height: 667 },
   ] as const;
 
-  for (const theme of themes) {
-    for (const viewport of mobileViewports) {
-      test(`Mobile action row should not have horizontal overflow in ${theme} at ${viewport.width}px`, async ({ page }) => {
-        // Seed test data and mock APIs
-        await seedTestData(page);
-        await mockApiEndpoints(page);
+  for (const viewport of mobileViewports) {
+    test(`Mobile action row should not have horizontal overflow at ${viewport.width}px`, async ({ page }) => {
+      // Seed test data and mock APIs
+      await seedTestData(page);
+      await mockApiEndpoints(page);
 
-        await page.setViewportSize({
-          width: viewport.width,
-          height: viewport.height,
-        });
-
-        // Go to play page
-        await page.goto('/worlds/world-cyberpunk-2077/play');
-
-        // Set theme
-        await page.evaluate((t) => {
-          localStorage.setItem('narraitor-theme', t);
-          document.documentElement.setAttribute('data-theme', t);
-        }, theme);
-
-        await page.reload();
-
-        // Wait for the main manuscript shell to load
-        await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 15000 });
-
-        // Check if suggested actions are present
-        await expect(page.locator('.manuscript-suggested-action').first()).toBeVisible();
-
-        // Check for horizontal overflow
-        await expectNoHorizontalOverflow(page, theme, viewport.width, '#manuscript-action-rail');
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
       });
 
-      test(`World detail action row should not have horizontal overflow in ${theme} at ${viewport.width}px`, async ({ page }) => {
-        await seedTestData(page);
+      // Go to play page
+      await page.goto('/worlds/world-cyberpunk-2077/play');
 
-        await page.setViewportSize({
-          width: viewport.width,
-          height: viewport.height,
-        });
+      // Wait for the main manuscript shell to load
+      await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 15000 });
 
-        await page.goto('/worlds/world-cyberpunk-2077');
+      // Check if suggested actions are present
+      await expect(page.locator('.manuscript-suggested-action').first()).toBeVisible();
 
-        await page.evaluate((t) => {
-          localStorage.setItem('narraitor-theme', t);
-          document.documentElement.setAttribute('data-theme', t);
-        }, theme);
+      // Check for horizontal overflow
+      await expectNoHorizontalOverflow(page, theme, viewport.width, '#manuscript-action-rail');
+    });
 
-        await page.reload();
+    test(`World detail action row should not have horizontal overflow at ${viewport.width}px`, async ({ page }) => {
+      await seedTestData(page);
 
-        await page.waitForFunction(
-          () => (window as typeof window & { __TEST_STORES_SEEDED__?: boolean }).__TEST_STORES_SEEDED__ === true,
-          { timeout: 15000 }
-        );
-
-        await expect(page.getByRole('button', { name: 'Play in World' })).toBeVisible();
-
-        await expectNoHorizontalOverflow(page, theme, viewport.width);
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
       });
-    }
+
+      await page.goto('/worlds/world-cyberpunk-2077');
+
+      await page.waitForFunction(
+        () => (window as typeof window & { __TEST_STORES_SEEDED__?: boolean }).__TEST_STORES_SEEDED__ === true,
+        { timeout: 15000 }
+      );
+
+      await expect(page.getByRole('button', { name: 'Play in World' })).toBeVisible();
+
+      await expectNoHorizontalOverflow(page, theme, viewport.width);
+    });
   }
 });
 

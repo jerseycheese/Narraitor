@@ -27,17 +27,17 @@ Here's what I've learned about writing visual tests that catch real issues witho
 
 ## Writing Effective Visual Tests
 
-### Cover All Design Systems by Default
+### Cover Both Color Modes by Default
 
-Narraitor ships three structurally different design systems, so user-facing visual coverage should normally test all three: DS1, DS2, and DS3. A one-theme screenshot can miss the same class of problem a Drupal site would miss if QA only reviewed the default theme and never checked the alternate theme implementation.
+Since the [collapse to a single design system (DS3)](../architecture/ADR-013-collapse-to-single-design-system-ds3.md), there is one design system. The coverage axis that remains is light/dark color mode, so user-facing visual coverage should normally capture both wherever a surface renders differently between them. A one-mode screenshot can miss the same class of problem a Drupal site would miss if QA only reviewed the default theme and never checked the alternate theme implementation.
 
 Use one of these patterns:
 
-- **Small surface**: loop over `['ds1', 'ds2', 'ds3']` and capture one baseline per theme.
-- **Long workflow**: keep the full sequential workflow in one theme, then add a focused theme-differentiation spec that captures the shared surface or representative state once in DS1, DS2, and DS3.
-- **Known exception**: leave an inline comment explaining why only one theme is covered and link to the tracking issue if the gap is temporary.
+- **Small surface**: loop over `['light', 'dark']` and capture one baseline per mode.
+- **Long workflow**: keep the full sequential workflow in one mode, then add a focused mode-differentiation spec that captures the shared surface or representative state once in light and once in dark.
+- **Known exception**: leave an inline comment explaining why only one mode is covered and link to the tracking issue if the gap is temporary.
 
-Snapshot names should include the design-system id, such as `dashboard-ds3.png` or `wizard-character-ds2.png`.
+Snapshot names should include the mode, such as `dashboard-dark.png` or `wizard-character-light.png`.
 
 ### Split Testing Strategy (2025 Best Practice)
 

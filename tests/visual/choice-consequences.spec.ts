@@ -147,7 +147,7 @@ const seedConsequenceState = async (page: Page, options: { selectOption: boolean
 };
 
 const openCharacterPanel = async (page: Page): Promise<void> => {
-  const hudToggle = page.getByRole('button', { name: /^character$/i });
+  const hudToggle = page.locator('.manuscript-hud-character-pill');
   await expect(hudToggle).toBeVisible();
   await hudToggle.click();
   await page.waitForSelector('.manuscript-hud-character-panel', { state: 'visible', timeout: 10000 });
@@ -174,8 +174,8 @@ test.describe('Choice consequences in the play surface (#468)', () => {
     await hideDynamicContent(page);
     await page.evaluate(() => document.fonts.ready);
 
-    await expect(chips).toHaveScreenshot('choice-outcome-consequences-ds1.png');
-    await expect(sceneStatus).toHaveScreenshot('scene-status-dispositions-ds1.png');
+    await expect(chips).toHaveScreenshot('choice-outcome-consequences-ds3.png');
+    await expect(sceneStatus).toHaveScreenshot('scene-status-dispositions-ds3.png');
 
     // CharacterSnapshot shows the alignment row + meter in the HUD panel.
     await openCharacterPanel(page);
@@ -183,7 +183,7 @@ test.describe('Choice consequences in the play surface (#468)', () => {
     await expect(alignmentRow).toBeVisible();
     await expect(alignmentRow).toContainText('Chaotic');
     await expect(page.locator('.manuscript-hud-character-panel')).toHaveScreenshot(
-      'character-snapshot-alignment-ds1.png',
+      'character-snapshot-alignment-ds3.png',
     );
   });
 

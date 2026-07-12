@@ -27,11 +27,10 @@ export const WIDE_VIEWPORT: AuditViewport = {
 };
 
 export type AppDrawerName =
-  | 'Character Details'
   | 'Inventory'
-  | 'Story So Far'
+  | 'Story Summary'
   | 'Choice History'
-  | 'Journal Snapshot';
+  | 'Journal';
 
 const APP_SESSION_URL = '/worlds/world-cyberpunk-2077/play';
 
@@ -65,49 +64,10 @@ export const setupAppManuscriptPage = async (
 };
 
 export const openAppCharacterPanel = async (page: Page): Promise<void> => {
-  const characterButton = page
-    .locator('.manuscript-overlay-header-left .manuscript-hud-text-button')
-    .filter({ hasText: /^Character$/i })
-    .first();
+  const characterButton = page.locator('.manuscript-hud-character-pill').first();
   await expect(characterButton).toBeVisible();
   await characterButton.click({ force: true });
   await expect(page.locator('.manuscript-hud-character-panel')).toBeVisible();
-};
-
-export const openAppToolsPanel = async (page: Page): Promise<void> => {
-  const toolsButton = page.locator('button[aria-label="Toggle Tools menu"]').first();
-  await expect(toolsButton).toBeVisible();
-
-  const clickToolsProgrammatically = async () => {
-    await page.evaluate(() => {
-      const button = document.querySelector(
-        'button[aria-label="Toggle Tools menu"]',
-      ) as HTMLButtonElement | null;
-      button?.click();
-    });
-  };
-
-  const isExpanded = async (): Promise<boolean> =>
-    (await toolsButton.getAttribute('aria-expanded')) === 'true';
-
-  if (!(await isExpanded())) {
-    await clickToolsProgrammatically();
-    await pause(120);
-  }
-
-  if (!(await isExpanded())) {
-    await toolsButton.click({ force: true });
-    await pause(120);
-  }
-
-  if (!(await isExpanded())) {
-    await clickToolsProgrammatically();
-  }
-
-  await expect.poll(isExpanded, { timeout: 5000 }).toBe(true);
-  await expect(
-    page.getByRole('button', { name: 'Character Details' }).first(),
-  ).toBeVisible();
 };
 
 export const openAppDrawer = async (
@@ -116,13 +76,12 @@ export const openAppDrawer = async (
 ): Promise<void> => {
   if (drawerLabel === 'Inventory') {
     await seedInventoryItemsForVisual(page);
-  } else if (drawerLabel === 'Story So Far') {
+  } else if (drawerLabel === 'Story Summary') {
     await seedStorySummaryForVisual(page);
-  } else if (drawerLabel === 'Journal Snapshot') {
+  } else if (drawerLabel === 'Journal') {
     await seedJournalEntriesForVisual(page);
   }
 
-  await openAppToolsPanel(page);
   await page.getByRole('button', { name: drawerLabel }).click();
   const drawer = page.locator('[data-testid="manuscript-drawer"]');
   await expect(drawer).toBeVisible();
@@ -131,14 +90,14 @@ export const openAppDrawer = async (
     await expect(drawer.getByText('Ghostlink Cyberdeck')).toBeVisible({
       timeout: 5000,
     });
-  } else if (drawerLabel === 'Story So Far') {
+  } else if (drawerLabel === 'Story Summary') {
     const paragraphLocator = drawer.locator(
       '[data-testid="story-summary-section"] .manuscript-story-summary-paragraph',
     );
     await expect
       .poll(async () => paragraphLocator.count(), { timeout: 5000 })
       .toBeGreaterThan(0);
-  } else if (drawerLabel === 'Journal Snapshot') {
+  } else if (drawerLabel === 'Journal') {
     await expect(
       drawer.locator('.manuscript-journal-snapshot-entry').first(),
     ).toBeVisible({ timeout: 5000 });

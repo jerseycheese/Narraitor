@@ -1,19 +1,13 @@
 import React, { useEffect } from 'react';
 import type { Preview } from '@storybook/react';
 import {
-  Lora,
-  IBM_Plex_Mono,
-  IBM_Plex_Sans,
-  Crimson_Pro,
-  JetBrains_Mono,
-  Manrope,
   Newsreader,
   Fira_Code,
   DM_Sans,
 } from 'next/font/google';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { ThemeProvider, useTheme } from '../src/lib/theme/ThemeProvider';
-import type { DesignSystem, ColorScheme } from '../src/lib/theme';
+import type { ColorScheme } from '../src/lib/theme';
 import { TutorialProvider } from '../src/components/TutorialProvider/TutorialProvider';
 import { handlers } from './msw/handlers';
 
@@ -23,27 +17,17 @@ import '../src/app/wizard.css';
 import '../src/app/dashboard.css';
 import '../src/app/badge.css';
 import '../src/lib/theme/themes/_shared-tokens.css';
-import '../src/lib/theme/themes/ds1.css';
-import '../src/lib/theme/themes/ds2.css';
 import '../src/lib/theme/themes/ds3.css';
 import './storybook.css';
 
 // Mirror the font declarations from src/app/layout.tsx so Storybook's
 // @storybook/nextjs framework loads them and injects the CSS variables
-// that theme CSS references (e.g. --font-narrative: var(--font-lora)).
-const lora = Lora({ subsets: ['latin'], variable: '--font-lora', display: 'swap' });
-const ibmPlexMono = IBM_Plex_Mono({ weight: ['400', '500', '600'], subsets: ['latin'], variable: '--font-ibm-plex-mono', display: 'swap' });
-const ibmPlexSans = IBM_Plex_Sans({ weight: ['400', '500', '600', '700'], subsets: ['latin'], variable: '--font-ibm-plex-sans', display: 'swap' });
-const crimsonPro = Crimson_Pro({ subsets: ['latin'], variable: '--font-crimson-pro', display: 'swap' });
-const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains-mono', display: 'swap' });
-const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' });
-const newsreader = Newsreader({ subsets: ['latin'], variable: '--font-newsreader', display: 'swap' });
-const firaCode = Fira_Code({ subsets: ['latin'], variable: '--font-fira-code', display: 'swap' });
-const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' });
+// that theme CSS references (e.g. --font-narrative: var(--font-newsreader)).
+const newsreader = Newsreader({ subsets: ['latin'], variable: '--font-newsreader', display: 'swap', preload: true });
+const firaCode = Fira_Code({ subsets: ['latin'], variable: '--font-fira-code', display: 'swap', preload: true });
+const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap', preload: true });
 
 const fontVariables = [
-  lora.variable, ibmPlexMono.variable, ibmPlexSans.variable,
-  crimsonPro.variable, jetbrainsMono.variable, manrope.variable,
   newsreader.variable, firaCode.variable, dmSans.variable,
 ].join(' ');
 
@@ -52,14 +36,15 @@ const fontVariables = [
 // intercept the app's AI/HTTP routes, so stories never hit the real network.
 initialize({ onUnhandledRequest: 'bypass' });
 
-// Syncs Storybook toolbar selections into ThemeProvider's React context
-// so components using useTheme() render the correct theme variant.
-const ThemeSyncer: React.FC<{ sbTheme: DesignSystem; sbColorScheme: ColorScheme }> = ({
-  sbTheme,
-  sbColorScheme,
-}) => {
-  const { setTheme, setColorScheme } = useTheme();
-  useEffect(() => { setTheme(sbTheme); }, [sbTheme, setTheme]);
+// Pins data-theme="ds3" on the preview root — layout.tsx sets this via SSR
+// for the real app, but Storybook's iframe never runs that layout — and
+// syncs the colorScheme toolbar global into ThemeProvider's React context
+// so useTheme() consumers render the right light/dark variant.
+const ThemeRootSync: React.FC<{ sbColorScheme: ColorScheme }> = ({ sbColorScheme }) => {
+  const { setColorScheme } = useTheme();
+  useEffect(() => {
+    document.documentElement.dataset.theme = 'ds3';
+  }, []);
   useEffect(() => { setColorScheme(sbColorScheme); }, [sbColorScheme, setColorScheme]);
   return null;
 };
@@ -73,13 +58,12 @@ const FontInjector: React.FC = () => {
 };
 
 const withTheme = (Story: React.FC, context: { globals: Record<string, string> }) => {
-  const theme = (context.globals.theme || 'ds1') as DesignSystem;
   const colorScheme = (context.globals.colorScheme || 'light') as ColorScheme;
 
   return (
     <ThemeProvider>
       <FontInjector />
-      <ThemeSyncer sbTheme={theme} sbColorScheme={colorScheme} />
+      <ThemeRootSync sbColorScheme={colorScheme} />
       <TutorialProvider>
         <Story />
       </TutorialProvider>
@@ -89,19 +73,6 @@ const withTheme = (Story: React.FC, context: { globals: Record<string, string> }
 
 const preview: Preview = {
   globalTypes: {
-    theme: {
-      name: 'Theme',
-      description: 'Design system theme',
-      toolbar: {
-        icon: 'paintbrush',
-        items: [
-          { value: 'ds1', title: 'DS1 - Drafting Table' },
-          { value: 'ds2', title: 'DS2 - Warm Earth' },
-          { value: 'ds3', title: 'DS3 - Mechanical Manuscript' },
-        ],
-        dynamicTitle: true,
-      },
-    },
     colorScheme: {
       name: 'Color Scheme',
       description: 'Light or dark mode',
@@ -116,7 +87,6 @@ const preview: Preview = {
     },
   },
   initialGlobals: {
-    theme: 'ds1',
     colorScheme: 'light',
   },
   decorators: [withTheme],

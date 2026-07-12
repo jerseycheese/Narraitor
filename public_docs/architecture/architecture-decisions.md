@@ -26,7 +26,8 @@ codebase and git history); 009 onward were written as the decisions were made.
 - [ADR-008: Testing & verification strategy](ADR-008-testing-and-verification-strategy.md) — TDD, Storybook-first, Playwright visual
 - [ADR-009: Guided onboarding system](ADR-009-guided-onboarding-system.md)
 - [ADR-010: Decision relevance simplification](ADR-010-decision-relevance-simplification.md)
-- [ADR-011: Three design systems (DS1/DS2/DS3)](ADR-011-three-design-systems.md)
+- [ADR-011: Three design systems (DS1/DS2/DS3)](ADR-011-three-design-systems.md) — structural differentiation across themes (**superseded by ADR-013**)
+- [ADR-013: Collapse to a single design system (DS3)](ADR-013-collapse-to-single-design-system-ds3.md) — greenfield collapse back to one system
 
 ## Frontend Architecture
 
@@ -54,9 +55,11 @@ structured, larger datasets.
 design-token custom properties (`var(--color-surface)`, `var(--space-4)`, `var(--radius-md)`
 and friends), with `clsx` composing semantic class names like `badge badge-success`. Tailwind
 was removed — there's no `tailwindcss` dependency, no `tailwind.config.ts`, and no `@tailwind`
-directives. The token approach is what lets the three design systems restyle the same markup by
-swapping CSS variables rather than rewriting utility classes. See the design-system docs for how
-tokens and themes are organized.
+directives. The token approach is what let three structurally-different design systems restyle
+the same markup by swapping CSS variables rather than rewriting utility classes — the app has
+since collapsed to one, DS3 (see [ADR-013](ADR-013-collapse-to-single-design-system-ds3.md)), but
+the token architecture still works the same way for light/dark mode. See the design-system docs
+for how tokens and themes are organized.
 
 **shadcn/ui structure, de-Tailwinded**: The component library started from shadcn/ui (built on
 Radix UI primitives, so accessibility is handled properly), but the components were taken
@@ -64,12 +67,15 @@ through a "clean slate" pass that stripped out `cva` and the Tailwind utility cl
 of semantic CSS classes wired to the token system. The Radix accessibility foundation stays;
 the styling moved to CSS.
 
-**Three Design Systems (DS1/DS2/DS3)**: One look stopped being enough once worlds got more
-varied, and token-only theming kept reading as the same app in different paint. The answer was
-three structurally different design systems — Drafting Table, Warm Earth, Mechanical Manuscript
-— each with its own token file, switched via a `data-theme` attribute on `<html>`. See
+**One Design System (DS3)**: One look stopped being enough once worlds got more varied, and
+token-only theming kept reading as the same app in different paint. The answer was three
+structurally different design systems — Drafting Table, Warm Earth, Mechanical Manuscript — each
+with its own token file, switched via a `data-theme` attribute on `<html>` (see
 [ADR-011](ADR-011-three-design-systems.md) for the structural-differentiation principle and how
-the theme files, showcase pages, and provider fit together.
+the theme files, showcase pages, and provider fit together). That stayed true for a while; the app
+later collapsed back to one system, Mechanical Manuscript (`data-theme="ds3"`), once the
+three-way surface area stopped paying for itself (see
+[ADR-013](ADR-013-collapse-to-single-design-system-ds3.md)).
 
 ## Development Practices
 

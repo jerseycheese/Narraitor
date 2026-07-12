@@ -8,10 +8,6 @@ import {
   DecisionRequirement,
   DecisionItemRequirements,
 } from '@/types/narrative.types';
-
-jest.mock('@/lib/theme/ThemeProvider', () => ({
-  useTheme: () => ({ theme: 'ds1', colorScheme: 'light', resolvedColorScheme: 'light', setTheme: jest.fn(), setColorScheme: jest.fn() }),
-}));
 import { StandardInventoryCategory } from '@/types/inventory.types';
 
 describe('ChoiceSelector - Inventory Requirements', () => {

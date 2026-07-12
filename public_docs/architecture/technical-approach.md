@@ -26,8 +26,10 @@ design-token custom properties (`var(--color-surface)`, `var(--space-4)`, `var(-
 with `clsx` composing semantic class names. Tailwind isn't a dependency anymore — the
 components started from shadcn/ui but were stripped of `cva` and Tailwind utilities in a "clean
 slate" pass, keeping the Radix accessibility foundation while moving styling onto the token
-system. That token approach is what lets the three design systems (DS1/DS2/DS3) restyle the same
-markup by swapping CSS variables.
+system. That token approach is what let three structurally-different design systems (DS1/DS2/DS3)
+restyle the same markup by swapping CSS variables; the app has since collapsed to one, DS3 (see
+[ADR-013](./ADR-013-collapse-to-single-design-system-ds3.md)), but the same swap-the-variables
+architecture is still how light/dark mode works today.
 
 **Zustand for state management** - Replaced React Context early on once it got unwieldy.
 Zustand is lightweight, has solid TypeScript support, and is easy to test since stores are just

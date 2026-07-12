@@ -11,9 +11,6 @@ import { useNPCStore } from '@/state/npcStore';
 
 jest.mock('@/lib/featureFlags');
 jest.mock('@/state/npcStore');
-jest.mock('@/lib/theme/ThemeProvider', () => ({
-  useTheme: () => ({ theme: 'ds1' }),
-}));
 
 // Mock ResizeObserver
 const mockObserve = jest.fn();

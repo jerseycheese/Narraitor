@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, act } from '@testing-library/react';
 import { ThemeProvider, useTheme } from '../ThemeProvider';
-import { STORAGE_KEY_THEME, STORAGE_KEY_COLOR_SCHEME } from '../index';
+import { STORAGE_KEY_COLOR_SCHEME } from '../index';
 
 // Test component that exposes context values
 function TestConsumer({ onRender }: { onRender: (ctx: ReturnType<typeof useTheme>) => void }) {
@@ -40,25 +40,14 @@ describe('ThemeProvider', () => {
     });
   });
 
-  it('defaults to ds1 and light mode', () => {
+  it('defaults to ds3 and light mode', () => {
     let ctx: ReturnType<typeof useTheme> | null = null;
     renderWithProvider((c) => { ctx = c; });
 
-    expect(ctx!.theme).toBe('ds1');
+    expect(ctx!.theme).toBe('ds3');
     expect(ctx!.colorScheme).toBe('light');
     expect(ctx!.resolvedColorScheme).toBe('light');
-    expect(document.documentElement.getAttribute('data-theme')).toBe('ds1');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
-  });
-
-  it('setTheme updates data-theme attribute', () => {
-    let ctx: ReturnType<typeof useTheme> | null = null;
-    renderWithProvider((c) => { ctx = c; });
-
-    act(() => { ctx!.setTheme('ds2'); });
-
-    expect(ctx!.theme).toBe('ds2');
-    expect(document.documentElement.getAttribute('data-theme')).toBe('ds2');
   });
 
   it('setColorScheme dark adds .dark class', () => {
@@ -72,15 +61,6 @@ describe('ThemeProvider', () => {
     expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 
-  it('persists theme to localStorage', () => {
-    let ctx: ReturnType<typeof useTheme> | null = null;
-    renderWithProvider((c) => { ctx = c; });
-
-    act(() => { ctx!.setTheme('ds3'); });
-
-    expect(localStorage.getItem(STORAGE_KEY_THEME)).toBe('ds3');
-  });
-
   it('persists color scheme to localStorage', () => {
     let ctx: ReturnType<typeof useTheme> | null = null;
     renderWithProvider((c) => { ctx = c; });
@@ -90,29 +70,23 @@ describe('ThemeProvider', () => {
     expect(localStorage.getItem(STORAGE_KEY_COLOR_SCHEME)).toBe('dark');
   });
 
-  it('reads stored values on mount', () => {
-    localStorage.setItem(STORAGE_KEY_THEME, 'ds2');
+  it('reads stored color scheme on mount; theme ignores storage', () => {
     localStorage.setItem(STORAGE_KEY_COLOR_SCHEME, 'dark');
 
     let ctx: ReturnType<typeof useTheme> | null = null;
     renderWithProvider((c) => { ctx = c; });
 
-    expect(ctx!.theme).toBe('ds2');
+    expect(ctx!.theme).toBe('ds3');
     expect(ctx!.colorScheme).toBe('dark');
   });
 
-  it('theme and color scheme are independent', () => {
+  it('theme stays ds3 regardless of color scheme changes', () => {
     let ctx: ReturnType<typeof useTheme> | null = null;
     renderWithProvider((c) => { ctx = c; });
 
-    act(() => { ctx!.setTheme('ds3'); });
     act(() => { ctx!.setColorScheme('dark'); });
 
     expect(ctx!.theme).toBe('ds3');
-    expect(ctx!.colorScheme).toBe('dark');
-
-    act(() => { ctx!.setTheme('ds1'); });
-    expect(ctx!.theme).toBe('ds1');
     expect(ctx!.colorScheme).toBe('dark');
   });
 

@@ -5,11 +5,6 @@ import ChoiceSelector from '../ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
 import { InventoryItem } from '@/types/inventory.types';
 
-jest.mock('@/lib/theme/ThemeProvider', () => ({
-  useTheme: () => ({ theme: 'ds1', colorScheme: 'light', resolvedColorScheme: 'light', setTheme: jest.fn(), setColorScheme: jest.fn() }),
-}));
-
-
 describe('ChoiceSelector', () => {
   const mockOnSelect = jest.fn();
   const mockOnCustomSubmit = jest.fn();
@@ -150,14 +145,14 @@ describe('ChoiceSelector', () => {
     it('shows custom input field when enabled', () => {
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
 
-      expect(screen.getByPlaceholderText('Or write your own action...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Describe your action...')).toBeInTheDocument();
     });
 
     it('submits custom input when entered', async () => {
       const user = userEvent.setup();
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
 
-      const input = screen.getByPlaceholderText('Or write your own action...');
+      const input = screen.getByPlaceholderText('Describe your action...');
       await user.type(input, 'Custom action');
       await user.keyboard('{Enter}');
 
@@ -317,7 +312,7 @@ describe('ChoiceSelector', () => {
   describe('Manuscript Styling Contract', () => {
     it('uses manuscript-input id for custom input', () => {
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
-      const input = screen.getByPlaceholderText('Or write your own action...');
+      const input = screen.getByPlaceholderText('Describe your action...');
       expect(input).toHaveAttribute('id', 'manuscript-input');
     });
 

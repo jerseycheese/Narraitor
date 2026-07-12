@@ -152,126 +152,6 @@
   }
 }
 
-/* ─── DS1: Drafting Table ───────────────────────────────────────
-   Architectural rhythm: tight padding, sharp accent rule under the
-   title, mono uppercase eyebrow caption above. Body grid carries
-   the surface; suppress the home-hero radial dots so the patterns
-   don't collide. */
-
-[data-theme="ds1"] .home-hero {
-  padding: 3rem var(--space-4) 2.5rem;
-}
-
-[data-theme="ds1"] .home-hero::before {
-  display: none;
-}
-
-[data-theme="ds1"] .home-hero::after {
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    color-mix(in srgb, var(--color-accent) 6%, transparent) 70%
-  );
-}
-
-[data-theme="ds1"] .home-hero-title {
-  letter-spacing: -0.02em;
-  font-weight: 400;
-  margin-bottom: var(--space-3);
-}
-
-[data-theme="ds1"] .home-hero-title::after {
-  content: "";
-  display: block;
-  width: 3rem;
-  height: 2px;
-  margin: var(--space-4) auto var(--space-2);
-  background: linear-gradient(to right, var(--color-accent), transparent);
-}
-
-[data-theme="ds1"] .home-hero-tagline {
-  max-width: 32rem;
-  letter-spacing: 0.005em;
-}
-
-[data-theme="ds1"] .home-dashboard {
-  border-top-color: var(--color-border-strong);
-  padding-top: var(--space-5);
-}
-
-@media (width >= 768px) {
-  [data-theme="ds1"] .home-hero {
-    padding: 4rem var(--space-4) 3rem;
-  }
-
-  [data-theme="ds1"] .home-hero-title::after {
-    height: 64px;
-  }
-}
-
-/* ─── DS2: Warm Earth ───────────────────────────────────────────
-   Generous breathing room, soft fade-up, no chrome between hero
-   and dashboard — the atmosphere does the work. Body has no grid,
-   so the home-hero dot pattern carries the texture by itself. */
-
-[data-theme="ds2"] .home-hero {
-  padding: clamp(4rem, 9vh, 6rem) var(--space-4) clamp(3rem, 7vh, 5rem);
-}
-
-[data-theme="ds2"] .home-hero::before {
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 8%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse 110% 100% at 50% 0%, hsl(0deg 0% 0%) 30%, transparent 90%);
-}
-
-[data-theme="ds2"] .home-hero::after {
-  background: radial-gradient(
-    ellipse 80% 70% at 50% 110%,
-    color-mix(in srgb, var(--color-accent) 14%, transparent),
-    transparent 70%
-  );
-}
-
-[data-theme="ds2"] .home-hero-logo {
-  margin-bottom: var(--space-6);
-  animation: home-fade-up 0.8s cubic-bezier(0.19, 1, 0.22, 1) both,
-             home-logo-float 8s ease-in-out 0.6s infinite;
-}
-
-[data-theme="ds2"] .home-hero-title {
-  font-weight: 400;
-  letter-spacing: -0.015em;
-  font-size: clamp(3.25rem, 9vw, 4.5rem);
-  margin-bottom: var(--space-5);
-  animation: home-fade-up 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.12s both;
-}
-
-[data-theme="ds2"] .home-hero-tagline {
-  font-size: 1.125rem;
-  line-height: 1.7;
-  max-width: 34rem;
-  animation: home-fade-up 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.24s both;
-}
-
-[data-theme="ds2"] .home-dashboard {
-  border-top: none;
-  padding-top: clamp(3rem, 7vh, 5rem);
-}
-
-@media (width >= 768px) {
-  [data-theme="ds2"] .home-hero {
-    padding: clamp(5rem, 11vh, 8rem) var(--space-4) clamp(4rem, 9vh, 6rem);
-  }
-
-  [data-theme="ds2"] .home-hero-tagline {
-    font-size: 1.1875rem;
-  }
-}
-
 /* ─── DS3: Mechanical Manuscript ────────────────────────────────
    Aged paper + dotted rhythm. Body carries the dot grid; hero
    gets a dotted rule under the title and a serif italic-feeling
@@ -347,14 +227,6 @@
 
   [data-theme="ds3"] .home-hero-tagline {
     font-size: 1.1875rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-theme="ds2"] .home-hero-logo,
-  [data-theme="ds2"] .home-hero-title,
-  [data-theme="ds2"] .home-hero-tagline {
-    animation: none;
   }
 }
 
@@ -536,166 +408,6 @@
 
 .workshop-sidebar-toolbar > * {
   flex-shrink: 0;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Workshop sidebar — per-theme structural differentiation (#1232)
-   Each theme gives the rail a distinct compositional tack, the same
-   way the dashboard became Drafting Table / Spread / Mechanical
-   Manuscript (#1222). The personalities match the rest of the app:
-   DS1 = a ruled architectural register, DS2 = airy floating modules,
-   DS3 = a dense dotted control rail.
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── DS1 — Drafting Table: the rail as a ruled index/register ───
-   Tight density, sharp corners, hairline rules dividing every row.
-   Primary nav and the world switcher both read as ruled catalogue
-   entries; the active row is marked by a sharp accent rule, not a
-   filled pill. Section labels become tracked eyebrow tags over a
-   strong hairline — the world switcher reads as a titled register. */
-
-[data-theme="ds1"] .workshop-sidebar {
-  border-right: 1px solid var(--color-border-strong);
-}
-
-[data-theme="ds1"] .workshop-sidebar-nav {
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-3) var(--space-2);
-}
-
-[data-theme="ds1"] .workshop-sidebar-brand-row {
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--color-border-strong);
-}
-
-[data-theme="ds1"] .workshop-sidebar-primary {
-  gap: 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-[data-theme="ds1"] .workshop-sidebar-primary-link {
-  padding: var(--space-2);
-  border-top: 1px solid var(--color-border);
-  font-size: 0.875rem;
-  letter-spacing: 0.02em;
-}
-
-[data-theme="ds1"]
-  .workshop-sidebar-primary
-  li:first-child
-  .workshop-sidebar-primary-link {
-  border-top: none;
-}
-
-[data-theme="ds1"] .workshop-sidebar-primary-link[data-active="true"] {
-  background: var(--color-surface);
-  border-left-color: var(--color-accent);
-  font-weight: 600;
-}
-
-[data-theme="ds1"] .workshop-sidebar-section-label {
-  padding-bottom: var(--space-1);
-  border-bottom: 1px solid var(--color-border-strong);
-  font-family: var(--font-interface);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-}
-
-[data-theme="ds1"] .workshop-sidebar-worlds-list {
-  gap: 0;
-}
-
-[data-theme="ds1"] .workshop-sidebar-world-item {
-  border: none;
-  border-top: 1px solid var(--color-border);
-  border-left: 2px solid transparent;
-  border-radius: 0;
-  padding: var(--space-2);
-}
-
-[data-theme="ds1"]
-  .workshop-sidebar-worlds-list
-  li:first-child
-  .workshop-sidebar-world-item {
-  border-top: none;
-}
-
-[data-theme="ds1"] .workshop-sidebar-world-item[data-active="true"] {
-  background: var(--color-surface);
-  border-left-color: var(--color-accent);
-}
-
-[data-theme="ds1"] .workshop-sidebar-world-name {
-  font-family: var(--font-interface);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-/* ─── DS2 — The Spread: airy rail with floating modules ───
-   Generous spacing, soft radii, narrative-serif section labels in
-   normal case. The nav links become roomy rounded pills and the
-   world switcher is lifted into its own rounded surface module that
-   floats on the rail — the unmistakable editorial-spread move. */
-
-[data-theme="ds2"] .workshop-sidebar-nav {
-  gap: var(--space-5);
-  padding: var(--space-6) var(--space-4) var(--space-4);
-}
-
-[data-theme="ds2"] .workshop-sidebar-brand-row {
-  padding-bottom: var(--space-4);
-  border-bottom: none;
-}
-
-[data-theme="ds2"] .workshop-sidebar-primary {
-  gap: var(--space-1);
-}
-
-[data-theme="ds2"] .workshop-sidebar-primary-link {
-  padding: var(--space-2) var(--space-3);
-  border-left: none;
-  border-radius: var(--radius-lg);
-  font-size: 1rem;
-}
-
-[data-theme="ds2"] .workshop-sidebar-primary-link[data-active="true"] {
-  background: var(--color-surface);
-}
-
-[data-theme="ds2"] .workshop-sidebar-worlds-section {
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-}
-
-[data-theme="ds2"] .workshop-sidebar-section-label {
-  font-family: var(--font-narrative);
-  font-size: 0.95rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--color-text-secondary);
-}
-
-[data-theme="ds2"] .workshop-sidebar-worlds-list {
-  gap: var(--space-2);
-}
-
-[data-theme="ds2"] .workshop-sidebar-world-item {
-  padding: var(--space-3);
-  border-color: transparent;
-  border-radius: var(--radius-md);
-}
-
-[data-theme="ds2"] .workshop-sidebar-world-item[data-active="true"] {
-  background: var(--color-surface-hover);
-  border-color: transparent;
-}
-
-[data-theme="ds2"] .workshop-sidebar-world-name {
-  font-size: 1rem;
 }
 
 /* ─── DS3 — Mechanical Manuscript: dense dotted control rail ───
@@ -1093,8 +805,8 @@
   color: var(--color-text-primary);
 }
 
-/* Wordmark in the per-theme narrative serif (Lora / Crimson Pro / Newsreader)
-   so the brand carries the app's literary identity instead of plain UI sans. */
+/* Wordmark in the narrative serif (Newsreader) so the brand carries the
+   app's literary identity instead of plain UI sans. */
 .app-wordmark {
   font-family: var(--font-narrative);
   font-size: 1.0625rem;
@@ -1859,50 +1571,6 @@
   }
 }
 
-/* DS1 — Drafting Table: tight, sharp, hairline eyebrow */
-
-[data-theme="ds1"] .world-detail-section {
-  border-radius: 2px;
-}
-
-[data-theme="ds1"] .world-detail-section h2 {
-  position: relative;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"] .world-detail-section h2::after {
-  content: "";
-  display: block;
-  width: 2rem;
-  height: 2px;
-  margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to right, var(--color-accent), transparent);
-}
-
-/* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
-
-[data-theme="ds2"] .world-detail-body {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .world-detail-sections {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .world-detail-section {
-  border-radius: 1rem;
-  padding: clamp(var(--space-5), 3vw, var(--space-6));
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"] .world-detail-section h2 {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  font-size: 1.375rem;
-  letter-spacing: -0.005em;
-}
-
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
 
 [data-theme="ds3"] .world-detail-section h2 {
@@ -1958,7 +1626,7 @@
  *
  * Styled on the component's own class — not scoped to a host page — so the
  * living style guide and every app surface render the same themed component.
- * Base look here; the DS1/DS2/DS3 differentiation lives in each theme block. */
+ * Base look here; light/dark overrides live in the theme block. */
 
 .component-collapsible-section {
   background: var(--color-surface);
@@ -2013,109 +1681,6 @@
     flex-direction: column;
     align-items: stretch;
   }
-}
-
-/* DS1 — Drafting Table: tight, sharp, hairline eyebrow, accent rule */
-
-[data-theme="ds1"] .component-world-editor {
-  gap: var(--space-4);
-}
-
-[data-theme="ds1"] .component-collapsible-section {
-  border-radius: 2px;
-}
-
-[data-theme="ds1"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  padding: var(--space-3) var(--space-5);
-  border-bottom: 1px solid var(--color-border);
-}
-
-[data-theme="ds1"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"][aria-expanded="false"] {
-  border-bottom-color: transparent;
-}
-
-[data-theme="ds1"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  position: relative;
-  padding-top: var(--space-3);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"]::before {
-  content: "Section";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"]::after {
-  content: "";
-  display: block;
-  width: 2rem;
-  height: 2px;
-  margin: var(--space-2) 0 0;
-  background: linear-gradient(to right, var(--color-accent), transparent);
-}
-
-[data-theme="ds1"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding: var(--space-4) var(--space-5) var(--space-5);
-}
-
-[data-theme="ds1"] .character-editor-actions,
-[data-theme="ds1"] .world-editor-actions {
-  border-radius: 2px;
-  padding: var(--space-3) var(--space-4);
-}
-
-/* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
-
-[data-theme="ds2"] .component-world-editor {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .component-collapsible-section {
-  border-radius: 1rem;
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-header"] {
-  padding: clamp(var(--space-4), 2vw, var(--space-5))
-    clamp(var(--space-5), 3vw, var(--space-6));
-}
-
-[data-theme="ds2"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"] {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  font-size: 1.375rem;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds2"]
-  .component-collapsible-section
-  [data-testid="collapsible-section-content"] {
-  padding: 0 clamp(var(--space-5), 3vw, var(--space-6))
-    clamp(var(--space-5), 3vw, var(--space-6));
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
@@ -2227,11 +1792,6 @@
   margin-bottom: 3.5rem;
 }
 
-[data-theme="ds2"] .page-layout-header {
-  /* Exception: Requires layout spacing larger than the maximum --space-8 token */
-  margin-bottom: clamp(3.5rem, 6vw, 6rem);
-}
-
 .page-layout-header-top {
   display: flex;
   flex-wrap: wrap;
@@ -2257,35 +1817,7 @@
   max-width: 48rem;
 }
 
-/* Per-theme list-header voice. The shared list surfaces (worlds, characters)
-   shouldn't read as one app in three palettes — so the title's typeface, scale,
-   and the header's vertical rhythm diverge per theme, mirroring how the
-   settings-section heading already expresses each design system.
-   DS1 = sharp compact sans · DS2 = warm serif display · DS3 = drafting serif. */
-[data-theme="ds1"] .page-layout-header {
-  /* Exception: tighter than --space-8 for DS1's compact drafting rhythm */
-  margin-bottom: 2.5rem;
-}
-
-[data-theme="ds1"] .page-layout-title {
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-[data-theme="ds2"] .page-layout-title {
-  font-family: var(--font-narrative);
-  font-size: 2.5rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-[data-theme="ds2"] .page-layout-description {
-  font-family: var(--font-narrative);
-  font-size: 1.0625rem;
-}
-
 [data-theme="ds3"] .page-layout-header {
-  /* Exception: medium rhythm between DS1's compact and DS2's airy headers */
   margin-bottom: 3rem;
 }
 
@@ -2393,112 +1925,6 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text-primary);
-}
-
-/* ─── DS1: Drafting Table ───────────────────────────────────────
-   Tight density, sharp 2px radii, hairline uppercase eyebrow over
-   the card title, vertical accent rule under the title. Toolbar
-   sits over a hairline base rule for the architectural feel. */
-
-[data-theme="ds1"] .characters-toolbar {
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--color-border-strong);
-}
-
-[data-theme="ds1"] .component-character-card h3 {
-  position: relative;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  padding-top: var(--space-3);
-}
-
-[data-theme="ds1"] .component-character-card h3::before {
-  content: "Character";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .component-character-card h3::after {
-  content: "";
-  display: block;
-  width: 2rem;
-  height: 2px;
-  margin: var(--space-2) 0 0;
-  background: linear-gradient(to right, var(--color-accent), transparent);
-}
-
-[data-theme="ds1"] .characters-empty {
-  padding: var(--space-6) var(--space-5);
-  border-radius: 2px;
-}
-
-[data-theme="ds1"] .characters-empty h2 {
-  position: relative;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-[data-theme="ds1"] .characters-empty h2::after {
-  content: "";
-  display: block;
-  width: 2.5rem;
-  height: 2px;
-  margin: var(--space-3) 0 0;
-  background: linear-gradient(to right, var(--color-accent), transparent);
-}
-
-/* ─── DS2: Warm Earth ───────────────────────────────────────────
-   Airy spacing, soft 1rem radii, no internal divider on the card
-   footer (extra padding instead), serif normal-case headers.
-   Empty state is centered with a quiet fade-up. */
-
-[data-theme="ds2"] .characters-toolbar {
-  margin-bottom: clamp(var(--space-4), 2vw, var(--space-6));
-}
-
-[data-theme="ds2"] .component-character-card {
-  border-radius: 1rem;
-}
-
-[data-theme="ds2"] .component-character-card h3 {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  letter-spacing: -0.005em;
-  font-size: 1.25rem;
-}
-
-[data-theme="ds2"] .component-character-card > div > div:first-child {
-  padding: var(--space-5);
-}
-
-[data-theme="ds2"] .component-character-card > div > div:first-child > p {
-  line-height: 1.7;
-}
-
-[data-theme="ds2"] .component-character-card footer {
-  padding: var(--space-4) var(--space-5);
-  border-top: none;
-}
-
-[data-theme="ds2"] .characters-empty {
-  align-items: center;
-  text-align: center;
-  padding: clamp(3rem, 7vh, 5rem) var(--space-5);
-  border-radius: 1rem;
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"] .characters-empty h2 {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  font-size: clamp(1.375rem, 3vw, 1.625rem);
 }
 
 @keyframes characters-fade-up {
@@ -2689,107 +2115,6 @@
   }
 }
 
-/* DS1 — Drafting Table: tight, sharp, hairline eyebrow */
-
-[data-theme="ds1"] .character-detail-header {
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--color-border-strong);
-}
-
-[data-theme="ds1"] .character-detail-header-info h2 {
-  position: relative;
-  padding-top: var(--space-3);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-[data-theme="ds1"] .character-detail-header-info h2::before {
-  content: "Character";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .character-detail-header-info h2::after {
-  content: "";
-  display: block;
-  width: 2rem;
-  height: 2px;
-  margin: var(--space-2) 0 0;
-  background: linear-gradient(to right, var(--color-accent), transparent);
-}
-
-[data-theme="ds1"] .character-detail-section {
-  border-radius: 2px;
-}
-
-[data-theme="ds1"] .character-detail-section h2 {
-  position: relative;
-  padding-top: var(--space-3);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"] .character-detail-section h2::before {
-  content: "Section";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .character-detail-section h2::after {
-  content: "";
-  display: block;
-  width: 2rem;
-  height: 2px;
-  margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to right, var(--color-accent), transparent);
-}
-
-/* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
-
-[data-theme="ds2"] .character-detail-body {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .character-detail-header {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .character-detail-header-info h2 {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  letter-spacing: -0.01em;
-}
-
-[data-theme="ds2"] .character-detail-sections {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .character-detail-section {
-  border-radius: 1rem;
-  padding: clamp(var(--space-5), 3vw, var(--space-6));
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"] .character-detail-section h2 {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  font-size: 1.375rem;
-  letter-spacing: -0.005em;
-}
-
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
 
 [data-theme="ds3"] .character-detail-header {
@@ -2910,66 +2235,6 @@
   }
 }
 
-/* DS1 — Drafting Table: tight, sharp, hairline eyebrow, accent rule */
-
-[data-theme="ds1"] .character-edit-body {
-  gap: var(--space-4);
-}
-
-[data-theme="ds1"] .component-character-editor {
-  gap: var(--space-4);
-}
-
-[data-theme="ds1"] .component-character-editor .attributes-form-row,
-[data-theme="ds1"] .component-character-editor .skills-form-row {
-  border-radius: 2px;
-}
-
-[data-theme="ds1"] .character-editor-actions {
-  border-radius: 2px;
-  padding: var(--space-3) var(--space-4);
-}
-
-/* DS2 — Warm Earth: airy, soft radii, serif headings, fade-up */
-
-[data-theme="ds2"] .character-edit-body {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .component-character-editor {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .component-character-editor .attributes-form-row,
-[data-theme="ds2"] .component-character-editor .skills-form-row {
-  border-radius: 0.75rem;
-  padding: var(--space-4);
-}
-
-[data-theme="ds2"]
-  .component-character-editor
-  .component-background-form
-  > h2,
-[data-theme="ds2"]
-  .component-character-editor
-  .attributes-form-header
-  > h2,
-[data-theme="ds2"]
-  .component-character-editor
-  .skills-form-header
-  > h2 {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-}
-
-[data-theme="ds2"] .character-editor-actions,
-[data-theme="ds2"] .world-editor-actions {
-  border-radius: 1rem;
-  padding: clamp(var(--space-4), 2vw, var(--space-5))
-    clamp(var(--space-5), 3vw, var(--space-6));
-  justify-content: center;
-}
-
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
 
 [data-theme="ds3"] .component-character-editor .attributes-form-list,
@@ -3062,7 +2327,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Settings Page — DS1/DS2/DS3 treatment for the data-management
+   Settings Page — structural treatment for the data-management
    section card and the export/import action surface. Mirrors the
    world-detail-section / character-detail-section vocabulary.
    ═══════════════════════════════════════════════════════════════ */
@@ -3156,78 +2421,6 @@
   }
 }
 
-/* DS1 — Drafting Table: tight, sharp, hairline eyebrow */
-
-[data-theme="ds1"] .settings-card {
-  border-radius: 2px;
-}
-
-[data-theme="ds1"] .settings-section h2 {
-  position: relative;
-  padding-top: var(--space-3);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"] .settings-section h2::before {
-  content: "Section";
-  display: block;
-  margin-bottom: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .settings-section h2::after {
-  content: "";
-  display: block;
-  width: 2rem;
-  height: 2px;
-  margin: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(to right, var(--color-accent), transparent);
-}
-
-[data-theme="ds1"] .settings-export-import-help {
-  font-family: var(--font-system);
-  font-size: 0.8125rem;
-}
-
-/* DS2 — Warm Earth: airy, soft radii, serif heading, fade-up */
-
-[data-theme="ds2"] .settings-page {
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .settings-section {
-  gap: clamp(var(--space-3), 2vw, var(--space-5));
-}
-
-[data-theme="ds2"] .settings-card {
-  border-radius: 1rem;
-  padding: clamp(var(--space-5), 3vw, var(--space-6));
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"] .settings-section h2 {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  font-size: 1.375rem;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds2"] .settings-export-import-actions {
-  gap: clamp(var(--space-3), 2vw, var(--space-5));
-}
-
-[data-theme="ds2"] .settings-export-import-help {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-size: 0.9375rem;
-}
-
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
 
 [data-theme="ds3"] .settings-card {
@@ -3293,19 +2486,6 @@
   background-size: 12px 4px;
   background-repeat: repeat-x;
   background-position: top left;
-}
-
-/* Reduced-motion override — placed after all DS2 fade-up rules so the
-   later same-specificity selectors don't win the cascade. */
-
-@media (prefers-reduced-motion: reduce) {
-  [data-theme="ds2"] .characters-empty,
-  [data-theme="ds2"] .character-detail-section,
-  [data-theme="ds2"] .world-detail-section,
-  [data-theme="ds2"] .settings-card,
-  [data-theme="ds2"] .component-collapsible-section {
-    animation: none;
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3596,79 +2776,6 @@
   font-size: 0.875rem;
 }
 
-/* DS1 — Drafting Table: sharp chrome, monospace eyebrow on the entry summary,
-   2px accent rule between list and detail panes. */
-
-[data-theme="ds1"] .journal-page .journal-list-pane {
-  border-right: 2px solid var(--color-border);
-  padding: var(--space-4);
-}
-
-[data-theme="ds1"] .journal-page .journal-list-header h2 {
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .journal-page .journal-nav {
-  border-top: 2px solid var(--color-border);
-  padding-top: var(--space-4);
-}
-
-[data-theme="ds1"] .journal-page .journal-nav span {
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .journal-page .journal-empty-state,
-[data-theme="ds1"] .journal-page .journal-detail-empty {
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-sm);
-}
-
-/* DS2 — Warm Earth: airy spacing, soft radii, narrative serif on the section
-   title, fade-up echo on the journal content surface. */
-
-[data-theme="ds2"] .journal-page .journal-content {
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"] .journal-page .journal-list-pane {
-  padding: clamp(var(--space-4), 2vw, var(--space-6));
-  border-radius: 1rem;
-  background: color-mix(in oklab, var(--color-surface) 70%, transparent);
-}
-
-[data-theme="ds2"] .journal-page .journal-list-header h2 {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-size: 1.25rem;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  text-transform: none;
-  color: var(--color-text-primary);
-}
-
-[data-theme="ds2"] .journal-page .journal-nav {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-size: 0.9375rem;
-  border-top: none;
-  padding-top: clamp(var(--space-3), 2vw, var(--space-4));
-}
-
-[data-theme="ds2"] .journal-page .journal-empty-state,
-[data-theme="ds2"] .journal-page .journal-detail-empty {
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px color-mix(in oklab, var(--color-accent) 10%, transparent);
-}
-
 /* DS3 — Mechanical Manuscript: dotted radial-gradient divider above the nav,
    monospace voice on the entry summary, dot-bullet on the section title. */
 
@@ -3704,12 +2811,6 @@
 [data-theme="ds3"] .journal-page .journal-detail-empty {
   border-radius: var(--radius-md);
   border: 1px dashed var(--color-border-strong);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-theme="ds2"] .journal-page .journal-content {
-    animation: none;
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3813,59 +2914,6 @@
   z-index: 2;
 }
 
-/* DS1 — Drafting Table: sharp 2px chrome, monospace uppercase subtitle as an
-   eyebrow, accent rule down the overlay's left edge. */
-
-[data-theme="ds1"] .component-hero {
-  border-radius: 2px;
-  border-width: 2px;
-}
-
-[data-theme="ds1"] .component-hero-overlay {
-  border-left: 2px solid var(--color-accent);
-  padding: var(--space-4) var(--space-5);
-}
-
-[data-theme="ds1"] .component-hero-title {
-  font-family: var(--font-interface);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"] .component-hero-subtitle {
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-/* DS2 — Warm Earth: soft 1rem radius, narrative serif title, italic subtitle,
-   fade-up entrance, no internal rules. */
-
-[data-theme="ds2"] .component-hero {
-  border-radius: 1rem;
-  animation: characters-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-[data-theme="ds2"] .component-hero-overlay {
-  padding: clamp(var(--space-4), 2vw, var(--space-6))
-    clamp(var(--space-5), 3vw, var(--space-6));
-}
-
-[data-theme="ds2"] .component-hero-title {
-  font-family: var(--font-narrative);
-  font-weight: 400;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds2"] .component-hero-subtitle {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-size: 1.0625rem;
-  color: var(--color-text-secondary);
-}
-
 /* DS3 — Mechanical Manuscript: rounded-square radii, italic narrative title
    with a dotted divider above it, monospace dot-bullet subtitle. */
 
@@ -3910,12 +2958,6 @@
   opacity: 0.6;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-theme="ds2"] .component-hero {
-    animation: none;
-  }
-}
-
 /* ═══════════════════════════════════════════════════════════════
    SectionWrapper (shared component)
    Bare divs since #1051 Tailwind cleanup — adds card chrome that
@@ -3949,33 +2991,6 @@
   line-height: 1.6;
 }
 
-[data-theme="ds1"] .component-section-wrapper {
-  border-radius: 2px;
-  border-width: 2px;
-}
-
-[data-theme="ds1"] .component-section-wrapper-title {
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds2"] .component-section-wrapper {
-  border-radius: 1rem;
-  padding: clamp(var(--space-4), 2vw, var(--space-6));
-}
-
-[data-theme="ds2"] .component-section-wrapper-title {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-weight: 500;
-  font-size: 1.25rem;
-  letter-spacing: -0.005em;
-}
-
 [data-theme="ds3"] .component-section-wrapper {
   border-color: var(--color-border-strong);
 }
@@ -3997,7 +3012,7 @@
    EndingScreen — story conclusion page.
    Same #1051 bare-divs damage as Hero/SectionWrapper before this
    commit; identifying classes added in EndingScreen.tsx so the page
-   reads as styled across DS1/DS2/DS3.
+   reads as styled instead of a bare-div dump.
    ═══════════════════════════════════════════════════════════════ */
 
 .component-ending-screen {
@@ -4150,45 +3165,6 @@
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds1"] .component-ending-screen-hero-frame {
-  border-radius: 2px;
-  border-width: 2px;
-}
-
-[data-theme="ds1"] .component-ending-screen-hero-title {
-  font-family: var(--font-interface);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-
-[data-theme="ds1"] .component-ending-screen-hero-meta {
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .component-ending-screen-achievement {
-  border-radius: 2px;
-  border-width: 2px;
-  border-color: var(--color-accent);
-}
-
-[data-theme="ds2"] .component-ending-screen-hero-frame {
-  border-radius: 1rem;
-}
-
-[data-theme="ds2"] .component-ending-screen-hero-meta {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-size: 1.0625rem;
-}
-
-[data-theme="ds2"] .component-ending-screen-achievement {
-  border-radius: 1rem;
-}
-
 [data-theme="ds3"] .component-ending-screen-hero-frame {
   border-color: var(--color-border-strong);
 }
@@ -4259,10 +3235,10 @@
 }
 
 /* ─── World detail — section body treatments ───────────────────
-   The page-shell (per-theme silhouette) lives further up in the
-   DS1/DS2/DS3 blocks; these rules style the content INSIDE each
-   .world-detail-section so the raw markup doesn't read as a debug
-   dump. Universal across themes; per-theme tweaks layer on top. */
+   The page-shell (silhouette) lives further up in the theme block;
+   these rules style the content INSIDE each .world-detail-section
+   so the raw markup doesn't read as a debug dump. Universal across
+   light/dark; mode-specific tweaks layer on top. */
 
 .world-detail-section > p {
   margin: 0 0 var(--space-3);
@@ -4474,20 +3450,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   line-height: 1.45;
 }
 
-/* DS1 manuscript overlay — sharper borders, no card background */
-
-[data-theme="ds1"] .world-detail-npc,
-[data-theme="ds1"] .world-detail-stat,
-[data-theme="ds1"] .world-detail-meta-grid .component-data-field {
-  border-radius: 2px;
-  background: transparent;
-}
-
-[data-theme="ds1"] .world-detail-stat-name {
-  font-family: var(--font-narrative);
-  font-weight: 500;
-}
-
 /* DS3 console — corner-bracket accent on stat/npc/data cards */
 
 [data-theme="ds3"] .world-detail-npc,
@@ -4662,22 +3624,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   color: var(--color-text-primary);
 }
 
-/* DS1 manuscript overlay — sharper borders, no card background.
-   Extends the existing attribute/skill cards for content-treatment parity. */
-
-[data-theme="ds1"] .character-detail-derived-stat,
-[data-theme="ds1"] .character-detail-background-section,
-[data-theme="ds1"] .character-attribute-card,
-[data-theme="ds1"] .character-skill-card {
-  border-radius: 2px;
-  background: transparent;
-}
-
-[data-theme="ds1"] .character-detail-derived-stat-name {
-  font-family: var(--font-narrative);
-  font-weight: 500;
-}
-
 /* DS3 console — corner-bracket accent on character content cards */
 
 [data-theme="ds3"] .character-detail-derived-stat,
@@ -4733,417 +3679,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Issue #1224 — Worlds + Characters: Structural DS Differentiation
-   DS1 Folio  · DS2 Bento · DS3 Console
-   Per-theme compositional tacks for list, detail, and edit surfaces.
-   Mirrors the dashboard.css pattern (#1222). Tokens-only, no Tailwind.
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── DS1 — Folio ────────────────────────────────────────────────
-   Lists: single-column typeset index with a left folio rail (date /
-   serial) and a right action set, ruled hairlines between rows.
-   Detail/edit: manuscript spread with a left margin rail and ruled
-   section separators.
-*/
-
-[data-theme="ds1"] .worlds-screen {
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-border-strong);
-}
-
-[data-theme="ds1"] .world-list-grid {
-  grid-template-columns: 1fr;
-  gap: 0;
-}
-
-[data-theme="ds1"] .component-world-card {
-  display: grid;
-  grid-template-columns: 11rem 1fr auto;
-  grid-template-rows: auto auto;
-  column-gap: var(--space-5);
-  align-items: start;
-  padding: var(--space-4) var(--space-2);
-  border: 0;
-  border-bottom: 1px solid var(--color-border);
-  border-radius: 0;
-  background: transparent;
-}
-
-[data-theme="ds1"] .component-world-card > div:first-child,
-[data-theme="ds1"] .component-world-card > div:first-child > a,
-[data-theme="ds1"] .component-world-card .component-hero,
-[data-theme="ds1"] .component-world-card .component-hero-overlay {
-  display: contents;
-}
-
-[data-theme="ds1"] .component-world-card .component-hero-image {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-  position: static;
-  width: 100%;
-  height: 5.5rem;
-  border-radius: 2px;
-  object-fit: cover;
-}
-
-[data-theme="ds1"] .component-world-card .component-hero-content {
-  grid-column: 2;
-  grid-row: 1;
-  background: transparent;
-  padding: 0;
-  margin: 0;
-}
-
-[data-theme="ds1"] .component-world-card .component-hero-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-}
-
-[data-theme="ds1"] .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
-  grid-column: 1 / -1;
-  margin-top: var(--space-3);
-}
-
-[data-theme="ds1"] .component-world-card .world-card-body {
-  display: contents;
-}
-
-[data-theme="ds1"] .component-world-card .world-card-content {
-  grid-column: 2;
-  grid-row: 1;
-  padding: 0;
-}
-
-[data-theme="ds1"] .component-world-card footer {
-  display: contents;
-}
-
-[data-theme="ds1"] .world-card-footer-meta {
-  grid-column: 1;
-  grid-row: 2;
-  padding: var(--space-2) 0 0;
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  border-top: 0;
-}
-
-[data-theme="ds1"] .world-card-footer-actions {
-  grid-column: 3;
-  grid-row: 1 / span 2;
-  align-self: center;
-}
-
-/* DS1 character list — folio rail with portrait thumb */
-
-[data-theme="ds1"] .characters-grid {
-  grid-template-columns: 1fr;
-  gap: 0;
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-border-strong);
-}
-
-[data-theme="ds1"] .component-character-card {
-  display: grid;
-  grid-template-columns: 7rem 1fr auto;
-  column-gap: var(--space-5);
-  align-items: center;
-  padding: var(--space-4) var(--space-2);
-  border: 0;
-  border-bottom: 1px solid var(--color-border);
-  border-radius: 0;
-  background: transparent;
-}
-
-[data-theme="ds1"] .component-character-card .character-card-body,
-[data-theme="ds1"] .component-character-card .character-card-inner {
-  display: contents;
-}
-
-[data-theme="ds1"] .component-character-card .active-state-indicator {
-  grid-column: 1 / -1;
-  margin-bottom: var(--space-2);
-}
-
-[data-theme="ds1"] .component-character-card .character-card-portrait {
-  grid-column: 1;
-  align-self: center;
-  padding: 0;
-  width: 5.5rem;
-  height: 5.5rem;
-  overflow: hidden;
-  border-radius: 2px;
-}
-
-[data-theme="ds1"] .component-character-card .character-card-name {
-  grid-column: 2;
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-narrative);
-  font-size: 1.125rem;
-  font-weight: 500;
-}
-
-[data-theme="ds1"] .component-character-card .character-card-meta {
-  grid-column: 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-[data-theme="ds1"] .component-character-card .character-card-description,
-[data-theme="ds1"] .component-character-card .character-card-connections,
-[data-theme="ds1"] .component-character-card .character-card-recent {
-  grid-column: 2;
-}
-
-[data-theme="ds1"] .component-character-card .character-card-description {
-  margin: var(--space-2) 0 0;
-  padding: 0;
-  font-family: var(--font-interface);
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-}
-
-[data-theme="ds1"] .component-character-card .character-card-footer {
-  grid-column: 3;
-  align-self: center;
-  padding: 0;
-  border-top: 0;
-}
-
-@media (width <= 640px) {
-  [data-theme="ds1"] .component-world-card,
-  [data-theme="ds1"] .component-character-card {
-    grid-template-columns: 5rem 1fr;
-  }
-  [data-theme="ds1"] .world-card-footer-actions,
-  [data-theme="ds1"] .component-character-card .character-card-footer {
-    grid-column: 1 / -1;
-    grid-row: auto;
-    justify-self: stretch;
-    padding-top: var(--space-3);
-  }
-  [data-theme="ds1"] .component-world-card .component-hero-image {
-    grid-row: 1;
-    height: 4rem;
-  }
-}
-
-/* DS1 detail — manuscript spread with margin rail */
-
-[data-theme="ds1"] .world-detail-body {
-  display: grid;
-  grid-template-columns: 7rem 1fr;
-  column-gap: var(--space-6);
-}
-
-[data-theme="ds1"] .character-detail-body {
-  display: grid;
-  grid-template-columns: 12rem 1fr;
-  column-gap: var(--space-6);
-}
-
-[data-theme="ds1"] .world-detail-body > *,
-[data-theme="ds1"] .character-detail-body > * {
-  grid-column: 2;
-}
-
-[data-theme="ds1"] .world-detail-body::before,
-[data-theme="ds1"] .character-detail-body::before {
-  content: "";
-  grid-column: 1;
-  grid-row: 1 / -1;
-  border-right: 1px solid var(--color-border);
-  align-self: stretch;
-}
-
-[data-theme="ds1"] .world-detail-sections,
-[data-theme="ds1"] .character-detail-sections {
-  position: relative;
-}
-
-[data-theme="ds1"] .world-detail-section,
-[data-theme="ds1"] .character-detail-section {
-  border: 0;
-  border-top: 1px solid var(--color-border);
-  border-radius: 0;
-  background: transparent;
-  padding: var(--space-5) 0;
-}
-
-[data-theme="ds1"] .world-detail-section:first-child,
-[data-theme="ds1"] .character-detail-section:first-child {
-  border-top: 0;
-  padding-top: 0;
-}
-
-@media (width <= 768px) {
-  [data-theme="ds1"] .world-detail-body,
-  [data-theme="ds1"] .character-detail-body {
-    grid-template-columns: 1fr;
-    column-gap: 0;
-  }
-  [data-theme="ds1"] .world-detail-body > *,
-  [data-theme="ds1"] .character-detail-body > * {
-    grid-column: 1;
-  }
-  [data-theme="ds1"] .world-detail-body::before,
-  [data-theme="ds1"] .character-detail-body::before {
-    display: none;
-  }
-}
-
-/* DS1 edit — same manuscript spread silhouette around the editor */
-
-[data-theme="ds1"] .component-world-editor,
-[data-theme="ds1"] .component-character-editor {
-  display: grid;
-  grid-template-columns: 12rem 1fr;
-  gap: var(--space-5) var(--space-6);
-}
-
-[data-theme="ds1"] .component-world-editor > *,
-[data-theme="ds1"] .component-character-editor > * {
-  grid-column: 2;
-}
-
-[data-theme="ds1"] .component-world-editor::before,
-[data-theme="ds1"] .component-character-editor::before {
-  content: "";
-  grid-column: 1;
-  grid-row: 1 / -1;
-  border-right: 1px solid var(--color-border);
-  align-self: stretch;
-}
-
-@media (width <= 768px) {
-  [data-theme="ds1"] .component-world-editor,
-  [data-theme="ds1"] .component-character-editor {
-    grid-template-columns: 1fr;
-    column-gap: 0;
-  }
-  [data-theme="ds1"] .component-world-editor > *,
-  [data-theme="ds1"] .component-character-editor > * {
-    grid-column: 1;
-  }
-  [data-theme="ds1"] .component-world-editor::before,
-  [data-theme="ds1"] .component-character-editor::before {
-    display: none;
-  }
-}
-
-/* ─── DS2 — Bento ────────────────────────────────────────────────
-   Lists: composed card grid with generous clamp() gaps. Detail /
-   edit: 2-col module grid; long-form sections span both columns.
-*/
-
-[data-theme="ds2"] .world-list-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-@media (width >= 1600px) {
-  [data-theme="ds2"] .world-list-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (width <= 768px) {
-  [data-theme="ds2"] .world-list-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-[data-theme="ds2"] .component-world-card {
-  border-radius: 1rem;
-  padding: var(--space-3);
-}
-
-/* DS2 Bento — cap the character pill strip so a world with many NPCs
-   doesn't pull its card to several times the height of its neighbors. */
-[data-theme="ds2"] .component-world-card .world-card-character-pills {
-  max-height: 5.5rem;
-  overflow: hidden;
-}
-
-[data-theme="ds2"] .characters-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-@media (width >= 1280px) {
-  [data-theme="ds2"] .characters-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (width <= 768px) {
-  [data-theme="ds2"] .characters-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* DS2 detail — 2-col module stack */
-
-[data-theme="ds2"] .world-detail-sections,
-[data-theme="ds2"] .character-detail-sections {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .world-detail-section:first-child,
-[data-theme="ds2"] .character-detail-section:first-child {
-  grid-column: 1 / -1;
-}
-
-/* F23 — balance the 2-col grid: a lone trailing section (even count, i.e. odd
-   number of cards after the full-width hero) spans the row instead of leaving
-   an empty half. */
-[data-theme="ds2"] .world-detail-section:last-child:nth-child(even) {
-  grid-column: 1 / -1;
-}
-
-@media (width <= 768px) {
-  [data-theme="ds2"] .world-detail-sections,
-  [data-theme="ds2"] .character-detail-sections {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* DS2 edit — 2-col collapsible-section grid */
-
-[data-theme="ds2"] .component-world-editor,
-[data-theme="ds2"] .component-character-editor {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(var(--space-5), 3vw, var(--space-8));
-}
-
-[data-theme="ds2"] .component-world-editor > .component-collapsible-section:first-child,
-[data-theme="ds2"] .component-character-editor > .component-collapsible-section:first-child,
-[data-theme="ds2"] .component-world-editor > .world-editor-actions,
-[data-theme="ds2"] .component-character-editor > .character-editor-actions {
-  grid-column: 1 / -1;
-}
-
-@media (width <= 768px) {
-  [data-theme="ds2"] .component-world-editor,
-  [data-theme="ds2"] .component-character-editor {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ─── DS3 — Console ──────────────────────────────────────────────

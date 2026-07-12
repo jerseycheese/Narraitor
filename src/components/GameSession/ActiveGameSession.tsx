@@ -25,7 +25,6 @@ import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
 import { ManuscriptSessionShell } from './ManuscriptSessionShell';
 import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
-import { HudCloseButton } from './HudCloseButton';
 import { ManuscriptActionRail } from './ManuscriptActionRail';
 import { ManuscriptDrawer } from './ManuscriptDrawer';
 import {
@@ -34,12 +33,10 @@ import {
   StorySummaryDrawerContent,
   ChoiceHistoryDrawerContent,
   JournalSnapshotDrawerContent,
-  ToolsMenuPanelContent,
 } from './ManuscriptDrawerPanels';
 import { CharacterSnapshot } from './CharacterSnapshot';
 import { SceneStatus } from './SceneStatus';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { useTheme } from '@/lib/theme/ThemeProvider';
 
 type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history' | 'journal';
 
@@ -87,23 +84,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isEvaluatingAction, setIsEvaluatingAction] = React.useState(false);
   const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
   const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
-  const [lastOpenedDrawer, setLastOpenedDrawer] = React.useState<DrawerType | null>(null);
-  const [isToolsMenuOpen, setIsToolsMenuOpen] = React.useState(false);
 
   const characterButtonRef = React.useRef<HTMLButtonElement>(null);
-  const toolsButtonRef = React.useRef<HTMLButtonElement>(null);
   const drawerTriggerRef = React.useRef<HTMLElement | null>(null);
-  const [isStreamingPreview, setIsStreamingPreview] = React.useState(false);
-  const [isEndingSuggestionPreview, setIsEndingSuggestionPreview] = React.useState(false);
 
   const isProgressiveDisclosureEnabled = isFeatureEnabled('PROGRESSIVE_DISCLOSURE');
-  // Authoring-only Tools-menu affordances (Simulate Next Turn, Toggle Streaming
-  // State, Show Ending Suggestion). NODE_ENV is statically replaced at build time,
-  // so these callbacks are stripped from a production bundle and the menu hides
-  // each button when its callback is absent (#1430 F58).
-  const showDevTools = process.env.NODE_ENV === 'development';
-  const { theme } = useTheme();
-  const isDS3 = theme === 'ds3';
 
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
@@ -206,7 +191,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('firstPlay'));
 
   React.useEffect(() => {
-    if (!isCharacterSummaryExpanded && !isToolsMenuOpen && activeDrawer === null) return;
+    if (!isCharacterSummaryExpanded && activeDrawer === null) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -214,11 +199,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           setActiveDrawer(null);
           drawerTriggerRef.current?.focus();
           drawerTriggerRef.current = null;
-          return;
-        }
-        if (isToolsMenuOpen) {
-          setIsToolsMenuOpen(false);
-          toolsButtonRef.current?.focus();
           return;
         }
         if (isCharacterSummaryExpanded) {
@@ -231,7 +211,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCharacterSummaryExpanded, isToolsMenuOpen, activeDrawer]);
+  }, [isCharacterSummaryExpanded, activeDrawer]);
 
   React.useEffect(() => {
     if (!isGameReady) return;
@@ -370,79 +350,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         onAccept: handleAcceptEndingSuggestion,
         onDismiss: handleRejectEndingSuggestion,
       }
-    : isEndingSuggestionPreview
-      ? {
-          reason: 'Draft ending preview from Tools panel.',
-          onAccept: () => {
-            setIsEndingSuggestionPreview(false);
-            handleEndStoryClick();
-          },
-          onDismiss: () => setIsEndingSuggestionPreview(false),
-        }
-      : undefined;
+    : undefined;
 
   return (
     <ManuscriptSessionShell
       hud={
         <ManuscriptFloatingHud
           characterButtonRef={characterButtonRef}
-          toolsButtonRef={toolsButtonRef}
           onToggleCharacterSummary={() => {
-            setIsCharacterSummaryExpanded((prev) => {
-              const next = !prev;
-              if (next) {
-                setIsToolsMenuOpen(false);
-              }
-              return next;
-            });
+            setIsCharacterSummaryExpanded((prev) => !prev);
           }}
           isCharacterSummaryExpanded={isCharacterSummaryExpanded}
-          onToggleToolsMenu={() => {
-            setIsToolsMenuOpen(!isToolsMenuOpen);
-            setIsCharacterSummaryExpanded(false);
-          }}
-          isToolsMenuOpen={isToolsMenuOpen}
           characterSummaryPanel={character && <CharacterSnapshot character={character} />}
-          toolsMenuPanel={isProgressiveDisclosureEnabled && (
-            <ToolsMenuPanelContent
-              activeDrawer={activeDrawer ?? lastOpenedDrawer}
-              onOpenDrawer={(drawerType) => {
-                drawerTriggerRef.current = document.activeElement as HTMLElement;
-                setActiveDrawer(drawerType);
-                setLastOpenedDrawer(drawerType);
-                setIsCharacterSummaryExpanded(false);
-              }}
-              onClosePanel={() => setIsToolsMenuOpen(false)}
-              onOpenJournalRoute={() =>
-                router.push(`/worlds/${worldId}/play/journal`)
-              }
-              onOpenCharacterPanel={() => {
-                setIsCharacterSummaryExpanded(true);
-              }}
-              onSimulateTurn={showDevTools ? () => {
-                const fallbackChoiceId = currentDecision?.options?.[0]?.id;
-                if (fallbackChoiceId) {
-                  handleChoiceSelected(fallbackChoiceId);
-                  return;
-                }
-                handleCustomSubmit('Simulate next turn');
-              } : undefined}
-              onToggleStreamingPreview={showDevTools ? () => {
-                setIsStreamingPreview((prev) => !prev);
-              } : undefined}
-              isStreamingPreview={isStreamingPreview}
-              onToggleEndingSuggestionPreview={showDevTools ? () => {
-                setIsEndingSuggestionPreview((prev) => !prev);
-              } : undefined}
-              isEndingSuggestionPreview={isEndingSuggestionPreview}
-            />
-          )}
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
           onOpenDrawer={(drawerType) => {
             drawerTriggerRef.current = document.activeElement as HTMLElement;
             setActiveDrawer(drawerType as DrawerType);
-            setLastOpenedDrawer(drawerType as DrawerType);
             setIsCharacterSummaryExpanded(false);
           }}
           onStartNew={onStartNew}
@@ -460,29 +384,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               className="manuscript-save-indicator"
             />
           }
-          rightContent={isDS3 ? undefined : (
-            <div className="manuscript-hud-right-controls">
-              <SaveIndicator
-                status={autoSave.status}
-                lastSaveTime={autoSave.lastSaveTime}
-                errorMessage={autoSave.errorMessage}
-                totalSaves={autoSave.totalSaves}
-                onRetryError={autoSave.retry}
-                retryable
-                compact
-                className="manuscript-save-indicator"
-              />
-              <button
-                type="button"
-                onClick={onStartNew}
-                title="Start New Session"
-                className="manuscript-hud-text-button manuscript-hud-reset-button"
-              >
-                Reset
-              </button>
-              <HudCloseButton variant="text" onBack={onBack} />
-            </div>
-          )}
         />
       }
       marginContent={hasSceneStatus ? (
@@ -490,7 +391,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       ) : null}
       actionRail={
         <ManuscriptActionRail
-          isStreaming={isGenerating || isGeneratingChoices || isStreamingPreview}
+          isStreaming={isGenerating || isGeneratingChoices}
         >
           <div className="manuscript-action-rail-stack">
             <ActiveGameSessionChoicesColumn

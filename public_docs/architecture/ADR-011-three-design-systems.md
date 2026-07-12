@@ -7,10 +7,12 @@ updated: 2026-05-10
 
 # ADR-011: Three structurally-differentiated design systems (DS1/DS2/DS3)
 
-**Status**: Accepted - Implemented (canon-surface ordering superseded by [ADR-012](ADR-012-storybook-single-canon-surface.md))
+**Status**: Accepted - Implemented (canon-surface ordering superseded by [ADR-012](ADR-012-storybook-single-canon-surface.md); design-system architecture superseded by [ADR-013](ADR-013-collapse-to-single-design-system-ds3.md))
 **Date**: 2026-05-10
 
 > **Note (2026-06-28):** The "canon order: showcase pages > Storybook > app" decision below was reversed by [ADR-012](ADR-012-storybook-single-canon-surface.md) — Storybook is now the single canon surface and the `/dev/design-system*` showcase routes were retired. The three-design-system architecture (DS1/DS2/DS3, `data-theme` switching, structural differentiation) described here is unchanged.
+
+> **Note (2026-07-11):** The three-design-system architecture itself — DS1/DS2/DS3, `data-theme` switching, structural differentiation — is superseded by [ADR-013](ADR-013-collapse-to-single-design-system-ds3.md). Nobody had ever asked for per-theme switching, and running three structurally-different themes across light/dark was a real maintenance and QA tax with no offsetting demand, so DS1 and DS2 were deleted and DS3 became the app's only design system. The rest of this document is a historical record of a decision that was correct at the time — it is not describing current app behavior.
 
 ## The Situation
 

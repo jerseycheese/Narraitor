@@ -512,7 +512,7 @@ When creating visual tests, ensure:
 - **Animations are stable** (disabled in config)
 - **Test data is consistent** (mock APIs if needed)
 - **Screenshots are focused** (component vs full page)
-- **DS1, DS2, and DS3 are covered** for user-facing surfaces, or the spec documents why it is intentionally single-theme
+- **Light and dark are covered** for user-facing surfaces where they render differently, or the spec documents why it is intentionally single-mode
 - **Filenames are descriptive** (`component-state.png`)
 - **Different states are tested** (default, hover, error, etc.)
 

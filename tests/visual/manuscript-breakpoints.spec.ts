@@ -6,7 +6,6 @@ import {
   collectManuscriptMetrics,
   openAppCharacterPanel,
   openAppDrawer,
-  openAppToolsPanel,
   setupAppManuscriptPage,
   stabilizeForCapture,
   type AppDrawerName,
@@ -32,11 +31,10 @@ interface BreakpointState {
 }
 
 const drawerStates: Array<{ id: string; appLabel: AppDrawerName }> = [
-  { id: 'drawer-character', appLabel: 'Character Details' },
   { id: 'drawer-inventory', appLabel: 'Inventory' },
-  { id: 'drawer-story-summary', appLabel: 'Story So Far' },
+  { id: 'drawer-story-summary', appLabel: 'Story Summary' },
   { id: 'drawer-choice-history', appLabel: 'Choice History' },
-  { id: 'drawer-journal', appLabel: 'Journal Snapshot' },
+  { id: 'drawer-journal', appLabel: 'Journal' },
 ];
 
 const BREAKPOINT_STATES: BreakpointState[] = [
@@ -55,10 +53,6 @@ const BREAKPOINT_STATES: BreakpointState[] = [
   {
     id: 'character-panel-open',
     applyAppState: openAppCharacterPanel,
-  },
-  {
-    id: 'tools-panel-open',
-    applyAppState: openAppToolsPanel,
   },
   ...drawerStates.map((drawerState) => ({
     id: drawerState.id,

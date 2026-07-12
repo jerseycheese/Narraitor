@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   Shared tokens — identical across all themes (DS1/DS2/DS3) and modes.
-   Per-theme overrides live in ds1.css, ds2.css, ds3.css.
+   Shared tokens — identical across light and dark mode.
+   Theme overrides live in ds3.css.
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
