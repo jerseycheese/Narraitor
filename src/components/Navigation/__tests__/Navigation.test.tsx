@@ -82,17 +82,10 @@ jest.mock('../MobileNavigationMenu', () => ({
 
 jest.mock('@/lib/theme', () => ({
   useTheme: () => ({
-    theme: 'ds1',
     colorScheme: 'light',
     resolvedColorScheme: 'light',
-    setTheme: jest.fn(),
     setColorScheme: jest.fn(),
   }),
-  THEMES: [
-    { id: 'ds1', name: 'Drafting Table', description: 'test' },
-    { id: 'ds2', name: 'Warm Earth', description: 'test' },
-    { id: 'ds3', name: 'Mechanical Manuscript', description: 'test' },
-  ],
 }));
 
 describe('HeaderNavigation', () => {

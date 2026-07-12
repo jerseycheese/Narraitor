@@ -150,8 +150,6 @@ function SessionShellHarness({ mode = 'active' }: { mode?: 'active' | 'streaming
           characterName="Marlowe Vance"
           onToggleCharacterSummary={() => setIsCharacterOpen((prev) => !prev)}
           isCharacterSummaryExpanded={isCharacterOpen}
-          onToggleToolsMenu={() => {}}
-          isToolsMenuOpen={false}
           characterSummaryPanel={<DemoSnapshot />}
         />
       }

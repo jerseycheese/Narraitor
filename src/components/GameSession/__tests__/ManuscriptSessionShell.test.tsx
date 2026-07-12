@@ -2,10 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ManuscriptSessionShell } from '../ManuscriptSessionShell';
 
-jest.mock('@/lib/theme/ThemeProvider', () => ({
-  useTheme: () => ({ theme: 'ds1', colorScheme: 'light', resolvedColorScheme: 'light', setTheme: jest.fn(), setColorScheme: jest.fn() }),
-}));
-
 describe('ManuscriptSessionShell', () => {
   it('renders children and hud', () => {
     render(

@@ -7,11 +7,8 @@ import { HudCloseButton } from './HudCloseButton';
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
   isCharacterSummaryExpanded: boolean;
-  onToggleToolsMenu: () => void;
-  isToolsMenuOpen: boolean;
   className?: string;
   characterSummaryPanel?: React.ReactNode;
-  toolsMenuPanel?: React.ReactNode;
   drawerTriggers?: boolean;
   characterName?: string;
   onOpenDrawer?: (drawerType: string) => void;
@@ -20,7 +17,6 @@ interface ManuscriptFloatingHudProps {
   onEndStory?: () => void;
   saveIndicator?: React.ReactNode;
   characterButtonRef?: React.RefObject<HTMLButtonElement | null>;
-  toolsButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 /* Floating character pill (top-left) + icon buttons (top-right) */
