@@ -29,6 +29,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
   isCharacterSummaryExpanded,
   characterSummaryPanel,
   characterName,
+  drawerTriggers,
   onOpenDrawer,
   onStartNew,
   onBack,
@@ -69,42 +70,46 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
       <div className="manuscript-overlay-header-right">
         <div className="manuscript-ds3-controls">
           {saveIndicator}
-          <button
-            type="button"
-            onClick={() => onOpenDrawer?.('journal')}
-            title="Journal"
-            aria-label="Journal"
-            className="manuscript-hud-icon-button"
-          >
-            <BookOpen size={16} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onOpenDrawer?.('inventory')}
-            title="Inventory"
-            aria-label="Inventory"
-            className="manuscript-hud-icon-button"
-          >
-            <Backpack size={16} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onOpenDrawer?.('story-summary')}
-            title="Story Summary"
-            aria-label="Story Summary"
-            className="manuscript-hud-icon-button"
-          >
-            <FileText size={16} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onOpenDrawer?.('choice-history')}
-            title="Choice History"
-            aria-label="Choice History"
-            className="manuscript-hud-icon-button"
-          >
-            <History size={16} aria-hidden="true" />
-          </button>
+          {drawerTriggers && (
+            <>
+              <button
+                type="button"
+                onClick={() => onOpenDrawer?.('journal')}
+                title="Journal"
+                aria-label="Journal"
+                className="manuscript-hud-icon-button"
+              >
+                <BookOpen size={16} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenDrawer?.('inventory')}
+                title="Inventory"
+                aria-label="Inventory"
+                className="manuscript-hud-icon-button"
+              >
+                <Backpack size={16} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenDrawer?.('story-summary')}
+                title="Story Summary"
+                aria-label="Story Summary"
+                className="manuscript-hud-icon-button"
+              >
+                <FileText size={16} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenDrawer?.('choice-history')}
+                title="Choice History"
+                aria-label="Choice History"
+                className="manuscript-hud-icon-button"
+              >
+                <History size={16} aria-hidden="true" />
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={onStartNew}
