@@ -2,18 +2,18 @@ import type { Placement } from '@popperjs/core';
 
 export const joyrideStyles = {
   options: {
-    primaryColor: 'hsl(var(--primary))',
-    backgroundColor: 'hsl(var(--background))',
-    textColor: 'hsl(var(--foreground))',
-    arrowColor: 'hsl(var(--card))',
+    primaryColor: 'var(--color-accent)',
+    backgroundColor: 'var(--color-canvas)',
+    textColor: 'var(--color-text-primary)',
+    arrowColor: 'var(--color-overlay-surface-strong)',
     // eslint-disable-next-line design-tokens/no-hardcoded-colors
     overlayColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 10000,
   },
   tooltip: {
-    backgroundColor: 'hsl(var(--card))',
-    borderRadius: 'var(--radius)',
-    color: 'hsl(var(--card-foreground))',
+    backgroundColor: 'var(--color-overlay-surface-strong)',
+    borderRadius: 'var(--radius-md)',
+    color: 'var(--color-text-primary)',
     textAlign: 'left' as const,
     pointerEvents: 'auto' as const,
   },
@@ -38,18 +38,17 @@ export const joyrideStyles = {
     // app's stacking context, so the tour never showed a backdrop (#1431).
     backgroundColor: 'transparent',
     mixBlendMode: 'normal' as const,
-    // eslint-disable-next-line design-tokens/no-hardcoded-colors
     boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.45)',
   },
   buttonNext: {
-    backgroundColor: 'hsl(var(--primary))',
-    color: 'hsl(var(--primary-foreground))',
+    backgroundColor: 'var(--color-accent)',
+    color: 'var(--color-on-accent)',
   },
   buttonBack: {
-    color: 'hsl(var(--muted-foreground))',
+    color: 'var(--color-text-muted)',
   },
   buttonSkip: {
-    color: 'hsl(var(--primary))',
+    color: 'var(--color-accent)',
     textDecoration: 'underline',
     backgroundColor: 'transparent',
     padding: 0,

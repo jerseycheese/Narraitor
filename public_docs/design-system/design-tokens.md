@@ -4,7 +4,7 @@ type: design-system
 category: tokens
 tags: [design-tokens, colors, architecture, theming, dark-mode]
 created: 2025-01-09
-updated: 2025-06-15
+updated: 2026-07-12
 ---
 
 # Design Token System
@@ -119,35 +119,16 @@ These map intent and context onto the global foundation. Status feedback, storyt
 }
 ```
 
-### Tier 3: Component Tokens (shadcn-derived)
+### Tier 3: Extended Status Tokens (HSL)
 
-HSL-based tokens carried over from the shadcn/ui component foundation. They're consumed via
-`var()` in component CSS (typically wrapped in `hsl()`, e.g. `background: hsl(var(--primary))`).
-These predate the Tailwind removal, so despite the `bg-primary`-style naming there are no
-matching Tailwind utility classes — the values are reached through `var()` like every other token.
+A few status tokens are still stored as raw HSL channels and consumed via `hsl(var())`
+(e.g. `background: hsl(var(--success-background))`), because they carry background/border
+variants that predate the `--color-*` family. Everything else reaches color through the
+`--color-*` tokens (Tiers 1–2).
 
 ```css
 [data-theme="ds3"] {
-  --background: 36 24% 95%;
-  --foreground: 25 20% 14%;
-  --card: 38 100% 98%;
-  --card-foreground: 25 20% 14%;
-  --popover: 38 100% 98%;
-  --popover-foreground: 25 20% 14%;
-  --primary: 200 21% 45%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 25 14% 40%;
-  --secondary-foreground: 0 0% 100%;
-  --muted: 30 16% 92%;
-  --muted-foreground: 25 14% 46%;
-  --accent: 30 16% 92%;
-  --accent-foreground: 25 20% 14%;
-  --border: 29 16% 85%;
-  --input: 29 16% 85%;
-  --ring: 200 21% 45%;
-  --radius: 0.375rem;
-
-  /* Extended status tokens with background/border/muted variants */
+  /* Status tokens with background/border variants (HSL channels) */
   --success: 138 25% 40%;
   --success-background: 138 25% 90%;
   --success-border: 138 25% 75%;
@@ -160,7 +141,7 @@ matching Tailwind utility classes — the values are reached through `var()` lik
 }
 ```
 
-Note: there's no `--destructive` / `--destructive-foreground` pair — `--color-danger` (Tier 2, above) covers that semantic need instead.
+Note: there's no `--destructive` / `--destructive-foreground` pair — `--color-danger` (Tier 2, above) covers that semantic need instead. The old shadcn base tokens (`--primary`, `--background`, `--card`, `--popover`, `--border`, `--input`, `--ring`, `--radius`, …) were removed once the app unified on the `--color-*` family — see [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md).
 
 ## Using Design Tokens
 
@@ -197,8 +178,8 @@ const WarningAlert = () => (
 
 ```css
 .btn-primary {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-md);
 }
