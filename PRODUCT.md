@@ -52,5 +52,5 @@ in player-facing copy.
 
 WCAG 2.1 AA. 4.5:1 minimum text contrast, verified in light and dark
 (the open #1379 release gate is an AA contrast miss). Visible focus indicators in
-every theme; no color-only signaling; full keyboard operation; text resizes to 200% without
+both light and dark; no color-only signaling; full keyboard operation; text resizes to 200% without
 breaking; touch targets at least 44px (#1477); honor reduced-motion.

@@ -84,7 +84,7 @@ components:
 
 # Narraitor Design
 
-> **Note (2026-07-11):** Narraitor now ships a single design system, DS3 ("The Mechanical Manuscript") — see [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md), which collapsed the three-system architecture described in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md). The frontmatter above and most of the prose below still describe **DS1's old values** (colors, fonts, radii) — that's a historical artifact, left in place pending a full rewrite to DS3's actual numbers in a later pass. Until then, [src/lib/theme/themes/ds3.css](src/lib/theme/themes/ds3.css) is the source of truth for what's actually running. Don't treat anything below as describing DS3's (or any theme's) current values unless it explicitly says so.
+> **Note (2026-07-11):** Narraitor now ships a single design system, DS3 ("The Mechanical Manuscript") — see [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md), which collapsed the three-system architecture described in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md). The frontmatter above and most of the prose below still describe **DS1's old values** (colors, fonts, radii, shadows) — that's a historical artifact, left in place pending a full rewrite to DS3's actual numbers in a later pass. Until then, [src/lib/theme/themes/ds3.css](src/lib/theme/themes/ds3.css) is the source of truth for what's actually running. Don't treat anything below as describing DS3's (or any theme's) current values unless it explicitly says so.
 
 ## Overview
 
@@ -98,7 +98,7 @@ The brand sits at the intersection of **archival** and **literary**: the visual 
 
 1. **Reading first.** Long-form narrative is the most-viewed surface. Line lengths, line heights, and paragraph rhythm get optimized before anything else.
 2. **Tokens carry variation; components stay theme-blind.** No `theme === 'ds1'` branching in JSX. Components consume `var(--token-name)` and let the active theme decide.
-3. **Structural differentiation.** A theme is a coherent point of view about how interfaces should feel — different shape language, spacing, density. Same shape with three palettes reads as one app wearing three hats.
+3. **Structural differentiation.** A theme is a coherent point of view about how interfaces should feel — different shape language, spacing, density, not just a palette swap. That standard came from a time when three design systems had to feel like genuinely different products (see [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md)); with one system now, it still applies as the bar for DS3 having a real point of view rather than reading as a generic, undifferentiated template.
 4. **Storybook is canon; app code is the lowest authority.** **Storybook** (`npm run storybook`) is the single source of truth for the frontend — `00-Foundation/Design System Showcase` and `00-Foundation/Design Tokens` foundation stories, per-component stories for variants, whole-page stories seeded with mock data, and a light/dark toolbar switcher (plus mobile/tablet/desktop viewports). Every in-scope component must have a story; the `lint:ds-canon` guard fails any that don't. When production drifts from Storybook, the production code is wrong, not the canon. The old `/dev/design-system*` living style guide was retired — see [ADR-012](public_docs/architecture/ADR-012-storybook-single-canon-surface.md).
 5. **No inline styles, no hardcoded values.** Every visual value comes from a token. Hex codes and pixel literals in component code are bugs.
 
@@ -138,12 +138,11 @@ DS1 is zinc-based with a single accent (Archival Ink Blue). The palette is inten
 - **Status colors are for status, not decoration.** Don't use `success` green to make something feel "fresh" or `danger` red to make something feel urgent if no error has occurred.
 - **Lore and ending-tone colors** (`--lore-*`, `--ending-*` tokens in the theme files) are for tagging story content, not general UI. Don't use them on buttons or controls.
 
-### Multi-theme color notes
+### DS3 color notes
 
-- DS2 accent is sage green `#7C8B6F`; DS3 accent is steel blue `#5B7A8C`. Same role, different value.
-- DS2 canvas is `#FAF8F3` (warmer); DS3 canvas is `#F7F3ED` (more aged-paper).
-- Each theme has a complete dark-mode override under `[data-theme="dsN"].dark` — toggle the `dark` class on `<html>`.
-- Full per-theme palette: [ds1.css](src/lib/theme/themes/ds1.css), [ds2.css](src/lib/theme/themes/ds2.css), [ds3.css](src/lib/theme/themes/ds3.css).
+- DS3's actual accent is steel blue `#5B7A8C`; canvas is `#F7F3ED` (aged-paper) — both different from the DS1 values used as illustrative examples above.
+- DS3 has a complete dark-mode override under `[data-theme="ds3"].dark` — toggle the `dark` class on `<html>`.
+- Full current palette: [ds3.css](src/lib/theme/themes/ds3.css) — the only theme file now.
 
 ## Typography
 
@@ -153,7 +152,7 @@ There are exactly three font slots, named by **purpose, not size**:
 - **system** (DS1: IBM Plex Mono) — code-adjacent surfaces, IDs, debug content, computed values. Monospace.
 - **interface** (DS1: IBM Plex Sans) — buttons, navigation, form labels, headings, metadata. Sans-serif.
 
-These names are stable across themes. Only the underlying font family changes (DS2 = Crimson Pro / JetBrains Mono / Manrope; DS3 = Newsreader / Fira Code / DM Sans).
+These names outlived the multi-theme system that motivated them: DS3's actual fonts are Newsreader (narrative), Fira Code (system), and DM Sans (interface) — different from the DS1 fonts named above, which are shown as illustrative examples, not current values.
 
 Use the utility classes when consuming in components:
 
@@ -190,13 +189,13 @@ Spacing is on a 4px base scale (the same increments Tailwind used, kept as `--sp
 - **lg** `24px` (`--space-6`) — between sections within a page
 - **xl** `32px` (`--space-8`) — between major page regions
 
-The full scale is `--space-0_5` through `--space-8` in [ds1.css:133-144](src/lib/theme/themes/ds1.css). Half-step values (`0_5`, `1_5`, `2_5`, `3_5`) exist for fine-tuning.
+The full scale is `--space-0_5` through `--space-8` in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) — shared across light/dark rather than per-theme. Half-step values (`0_5`, `1_5`, `2_5`, `3_5`) exist for fine-tuning.
 
 ### Layout rules
 
 - **Page max-width** is `1280px` for general content; narrative content tightens further to `56rem`.
 - **Game session viewport** is fixed-position, full-viewport, with internal layout governed by [src/styles/manuscript-session.css](src/styles/manuscript-session.css). Don't apply page-level spacing to game-session screens.
-- **Mobile breakpoints**: `640px` (sm), `768px` (md), `1024px` (lg), `1280px` (xl). Mobile-specific work for the DS migration is still open — see issues #1139, #1143, #1148, #1150.
+- **Mobile breakpoints**: `640px` (sm), `768px` (md), `1024px` (lg), `1280px` (xl). Mobile-specific layout bugs from the DS migration (#1139, #1143, #1148, #1150) are resolved.
 
 ## Elevation & Depth
 
@@ -209,22 +208,18 @@ Depth is conveyed primarily through **borders and tonal shifts**, not shadows. C
 
 ## Shapes
 
-Border radius varies per theme — that's part of how the themes feel structurally different:
-
-- **DS1**: `--radius-sm: 2px`, `--radius-md: 4px`, `--radius: 0.5rem`. Sharp, precise.
-- **DS2**: `--radius-sm: 6px`, `--radius-md: 12px`, `--radius: 0.75rem`. Soft, rounded.
-- **DS3**: `--radius-sm: 4px`, `--radius-md: 6px`, `--radius: 0.375rem`. Tight, drafted.
+DS3's radius scale — tight, drafted: `--radius-sm: 4px`, `--radius-md: 6px`, `--radius: 0.375rem`.
 
 ### Usage rules
 
-- **Buttons** use `var(--radius-md)`. (DS1: 4px, DS2: 12px, DS3: 6px.)
-- **Cards and inputs** use `var(--radius)` (the default). Don't pin a card to `4px` — it'll fight the theme on DS2.
+- **Buttons** use `var(--radius-md)` (`6px`).
+- **Cards and inputs** use `var(--radius)` (`0.375rem`, the default).
 - **Pills and badges** use `var(--radius-full)` (`9999px`).
-- **Pin tokens, not values.** Code that hardcodes `border-radius: 8px` will look right in one theme and wrong in two.
+- **Pin tokens, not values.** Code that hardcodes `border-radius: 8px` will look right today and wrong the moment the token changes.
 
 ## Components
 
-Component rules apply to all three themes. The token references resolve per-theme automatically.
+Component rules apply to DS3. The token references resolve automatically.
 
 ### Button
 

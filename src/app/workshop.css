@@ -805,8 +805,8 @@
   color: var(--color-text-primary);
 }
 
-/* Wordmark in the per-theme narrative serif (Lora / Crimson Pro / Newsreader)
-   so the brand carries the app's literary identity instead of plain UI sans. */
+/* Wordmark in the narrative serif (Newsreader) so the brand carries the
+   app's literary identity instead of plain UI sans. */
 .app-wordmark {
   font-family: var(--font-narrative);
   font-size: 1.0625rem;

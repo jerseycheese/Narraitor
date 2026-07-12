@@ -129,11 +129,6 @@ primitive *in production*, not in the showcase.
 - Remaining DS primitives unstyled: card/alert/tabs/table/checkbox/radio (#1317) — after #1316
 - Render data-table + CollapsibleSection in the style guide for canon coverage (#1319) — after #1317
 
-### Phase B: DS canon + structural differentiation
-- Showcase = canon: render real production components, Session phase remaining (#1276)
-- [EPIC] Structural DS differentiation across surfaces (#1165)
-- Finish character-side detail/edit content treatment + CharacterTable alignment (#1295)
-
 ### Phase C: Launch gate
 - [EPIC] MVP Launch Preparation — landing page, docs, legal, analytics (#495)
 
