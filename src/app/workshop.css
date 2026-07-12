@@ -1626,7 +1626,7 @@
  *
  * Styled on the component's own class — not scoped to a host page — so the
  * living style guide and every app surface render the same themed component.
- * Base look here; the DS1/DS2/DS3 differentiation lives in each theme block. */
+ * Base look here; light/dark overrides live in the theme block. */
 
 .component-collapsible-section {
   background: var(--color-surface);
@@ -1818,7 +1818,6 @@
 }
 
 [data-theme="ds3"] .page-layout-header {
-  /* Exception: medium rhythm between DS1's compact and DS2's airy headers */
   margin-bottom: 3rem;
 }
 
@@ -2328,7 +2327,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Settings Page — DS1/DS2/DS3 treatment for the data-management
+   Settings Page — structural treatment for the data-management
    section card and the export/import action surface. Mirrors the
    world-detail-section / character-detail-section vocabulary.
    ═══════════════════════════════════════════════════════════════ */
@@ -3013,7 +3012,7 @@
    EndingScreen — story conclusion page.
    Same #1051 bare-divs damage as Hero/SectionWrapper before this
    commit; identifying classes added in EndingScreen.tsx so the page
-   reads as styled across DS1/DS2/DS3.
+   reads as styled instead of a bare-div dump.
    ═══════════════════════════════════════════════════════════════ */
 
 .component-ending-screen {
@@ -3236,10 +3235,10 @@
 }
 
 /* ─── World detail — section body treatments ───────────────────
-   The page-shell (per-theme silhouette) lives further up in the
-   DS1/DS2/DS3 blocks; these rules style the content INSIDE each
-   .world-detail-section so the raw markup doesn't read as a debug
-   dump. Universal across themes; per-theme tweaks layer on top. */
+   The page-shell (silhouette) lives further up in the theme block;
+   these rules style the content INSIDE each .world-detail-section
+   so the raw markup doesn't read as a debug dump. Universal across
+   light/dark; mode-specific tweaks layer on top. */
 
 .world-detail-section > p {
   margin: 0 0 var(--space-3);

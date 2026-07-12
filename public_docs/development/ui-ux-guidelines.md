@@ -12,7 +12,7 @@ UI approach: create immersive experiences that adapt to different fictional worl
 
 ## Design Philosophy
 
-**Three Design Systems, User-Chosen** - Three structurally-different design systems ship with the app (DS1, DS2, DS3). The user picks one; it isn't tied to world genre. Each one carries a coherent visual point of view — different fonts, spacing, shape language, density. The underlying structure and usability patterns stay consistent across all three. See [ADR-011](../architecture/ADR-011-three-design-systems.md) for the why.
+**One Design System** - The app ships one design system, DS3 ("Mechanical Manuscript") — aged paper, drafting ink, dot-grid aesthetic. [ADR-011](../architecture/ADR-011-three-design-systems.md) explains why the app originally shipped three user-chosen systems (DS1/DS2/DS3); [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md) explains why that later collapsed back to one.
 
 **Responsive & Accessible** - Works on all screen sizes with keyboard navigation, screen reader support, and proper contrast. Mobile-first approach because touch interactions are often simpler to design for.
 
@@ -20,23 +20,9 @@ UI approach: create immersive experiences that adapt to different fictional worl
 
 **Intuitive Flow** - Users should understand what to do next without reading documentation. Good design guides behavior through visual hierarchy and familiar patterns.
 
-## Design Systems
+## Design System
 
-Three design systems ship with the app, each providing a complete set of CSS custom properties for light and dark mode. Users switch between them via the theme picker in the navigation bar.
-
-### DS1 — "The Drafting Table"
-Sharp lines, archival ink, graph paper grid. Technical and precise.
-- **Fonts**: Lora (narrative), IBM Plex Mono (system), IBM Plex Sans (interface)
-- **Accent**: Archival Ink Blue `rgb(49 46 129)`
-- **Radius**: `--radius-md: 4px` — square and deliberate (each theme picks its own radius scale on purpose; tighter corners read as more technical)
-- **Background**: Mechanical drafting grid (72x72px)
-
-### DS2 — "Warm Earth"
-Organic earth tones, soft forms, breathing space. Welcoming and grounded.
-- **Fonts**: Crimson Pro (narrative), JetBrains Mono (system), Manrope (interface)
-- **Accent**: Sage Green `rgb(124 139 111)`
-- **Radius**: `--radius-md: 12px` — soft and rounded
-- **Background**: Clean solid (no pattern)
+DS3 ("Mechanical Manuscript") is the app's single design system, providing a complete set of CSS custom properties for light and dark mode. There's no design-system picker anymore — users switch light/dark/system color mode via the Appearance control in the navigation bar (see [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md)).
 
 ### DS3 — "Mechanical Manuscript"
 Aged paper, drafting ink, dot grid aesthetic. Textured and literary.
@@ -46,12 +32,12 @@ Aged paper, drafting ink, dot grid aesthetic. Textured and literary.
 - **Background**: Dot grid (24x24px)
 
 ### Theme Implementation
-- `ThemeProvider` React context manages the active design system and color scheme
-- `data-theme` attribute on `<html>` selects which CSS token set is active
+- `ThemeProvider` React context manages color scheme; design system is fixed to DS3
+- `data-theme="ds3"` attribute on `<html>` selects the CSS token set
 - `.dark` class on `<html>` toggles dark mode overrides
 - Components consume tokens via `var(--token-name)` — no theme-specific logic in components
-- FOUC prevention script applies stored preferences before React hydrates
-- Preferences persist in `localStorage` (`narraitor-theme`, `narraitor-color-scheme`)
+- FOUC prevention script applies the stored color-scheme preference before React hydrates
+- Color-scheme preference persists in `localStorage` (`narraitor-color-scheme`)
 
 See [design-tokens.md](../design-system/design-tokens.md) for the full token reference and [global-styles.md](../design-system/global-styles.md) for the `useTheme()` API.
 

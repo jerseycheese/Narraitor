@@ -3,8 +3,8 @@
  * Mirrors the WorldTypeSelector option pattern so the generate-character and
  * generate-world modals read consistently. Each option is a <label> wrapping a
  * RadioGroupItem (native accent-colored radio) and a text block (name +
- * description). All values are design tokens, so it themes across DS1/DS2/DS3 +
- * light/dark without per-theme overrides.
+ * description). All values are design tokens, so it themes across light/dark
+ * without per-theme overrides.
  */
 
 .component-generate-character-dialog {

@@ -160,9 +160,8 @@ body.manuscript-overlay-open {
 }
 
 /* ─── /play route wrapper ───
-   `.play-page` wraps every render path of /src/app/play/page.tsx so per-theme
-   typography lands on PageLayout's unstyled <header>/<h1>/<p>. DS3 = base;
-   DS1 + DS2 add overrides below. */
+   `.play-page` wraps every render path of /src/app/play/page.tsx so themed
+   typography lands on PageLayout's unstyled <header>/<h1>/<p>. */
 
 .play-page {
   min-height: 100vh;
@@ -2471,7 +2470,7 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-sm);
 }
 
-/* Fix 24: Streaming indicator — hidden by default, visible in DS1 */
+/* Fix 24: Streaming indicator — hidden by default */
 .manuscript-streaming-indicator {
   display: none;
 }
@@ -2564,9 +2563,8 @@ body.manuscript-overlay-open {
   text-underline-offset: 2px;
 }
 
-/* Base SectionError styling — applies to DS3 (default) and any unthemed render.
-   DS1 overrides at line ~2748; DS2 overrides further below.
-   Token-driven so each theme's --destructive picks up automatically. */
+/* Base SectionError styling — applies to DS3 and any unthemed render.
+   Token-driven so the active theme's semantic colors pick up automatically. */
 .error-display-section {
   margin: var(--space-4) 0;
   padding: var(--space-3) var(--space-3_5);
@@ -2663,8 +2661,7 @@ body.manuscript-overlay-open {
    Issue #222 — severity-aware error display.
    Default ("error") rendering is intentionally left untouched above; the rules
    below only re-color the WARNING / INFO severities and add prominence to
-   CRITICAL. Selector lists cover DS3 (base), DS1 and DS2 so the accent wins
-   over each theme's destructive-coloured section rule.
+   CRITICAL, so the accent wins over the base destructive-coloured section rule.
    =========================================================================== */
 
 /* Suggested next step — secondary to the message, same in every variant. */
@@ -2745,12 +2742,12 @@ body.manuscript-overlay-open {
   background: color-mix(in srgb, var(--color-danger) 12%, transparent);
 }
 
-/* DS2/DS3 inventory category title hidden — demos show no category headers (Pass 10, fix 4) */
+/* Inventory category title hidden — demos show no category headers (Pass 10, fix 4) */
 [data-theme="ds3"] .manuscript-inventory-category-title {
   display: none;
 }
 
-/* DS2/DS3 inventory category group — remove margin when title hidden (Pass 10, fix 4) */
+/* Inventory category group — remove margin when title hidden (Pass 10, fix 4) */
 [data-theme="ds3"] .manuscript-inventory-category-group {
   margin-bottom: var(--space-4);
 }
@@ -3655,9 +3652,8 @@ body.manuscript-overlay-open {
 
 /* =========================================================================
    Scene Status surface (shared base)
-   Characters present + current location for the latest segment. Themed per
-   DS: DS1 keeps the left rail, DS2 reads it as an ambient line, DS3 condenses
-   it into a console bar (rail visibility handled in each DS block above).
+   Characters present + current location for the latest segment. Condensed
+   into a compact console bar.
    ========================================================================= */
 .component-scene-status {
   display: flex;

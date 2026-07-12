@@ -7,7 +7,6 @@
   background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   border: 1px solid var(--color-danger);
 
-  /* radius-md, not -lg: DS1 (the default theme) defines no --radius-lg. */
   border-radius: var(--radius-md);
 }
 

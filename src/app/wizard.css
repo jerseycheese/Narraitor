@@ -1287,8 +1287,6 @@
 /* ═══════════════════════════════════════════════════════════════
    Wizard structural differentiation (#1223)
 
-   DS1 — Manuscript Worksheet: numbered contents rail + ruled passages.
-   DS2 — Sectioned Module: centered card stack + distinct command tray.
    DS3 — Command Strip: compact top controls + dense field stacking.
    ═══════════════════════════════════════════════════════════════ */
 
@@ -1489,19 +1487,13 @@
    Step-internal widgets (#1265)
 
    The wizard shell + shared hooks (cards, badges, forms, empty
-   states) are already DS-aware. This section gives the step-INTERNAL
-   widgets — review cards, custom attribute/skill editors, point-pool
-   allocation, portrait controls, image review, slot meters and the
-   inline confirm alert — a structural DS1/DS2/DS3 treatment so they
-   read as part of each tack instead of one default widget recolored
-   three ways.
-
-   DS1 — Drafting Table: sharp 2px chrome, ruled passages, accent
-     side-rules, square slot cells, monospace eyebrows.
-   DS2 — Warm Earth: soft 1rem radii, inset surface cards, pill slot
-     dots, serif voice, no hard rules.
-   DS3 — Command Strip: dense 4px chrome, dotted radial-gradient
-     separators, compact square cells, monospace labels.
+   states) are already theme-aware. This section gives the
+   step-INTERNAL widgets — review cards, custom attribute/skill
+   editors, point-pool allocation, portrait controls, image review,
+   slot meters and the inline confirm alert — a structural treatment
+   so they read as part of the design rather than one default widget
+   recolored: dense 4px chrome, dotted radial-gradient separators,
+   compact square cells, monospace labels.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Shared layout (theme-neutral) ─── */

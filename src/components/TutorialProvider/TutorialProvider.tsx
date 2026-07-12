@@ -300,10 +300,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       // unrenderable step instead of freezing on it — the old early-return left
       // Joyride mounted on a step it couldn't draw (a dark overlay with no tooltip
       // and no way out). Reaching the end completes the phase so onboarding doesn't
-      // re-arm every session and isTourActive resolves. The default DS1 +
-      // progressive-disclosure layout has every anchor present and never hits this;
-      // it's the safety net for DS3 and the legacy flat layout, where the Tools
-      // anchor isn't rendered.
+      // re-arm every session and isTourActive resolves. With progressive disclosure
+      // on (the default), every anchor is present and this never fires; it's the
+      // safety net for when the flag is off, where the Tools anchor isn't rendered.
       if (!stepMapping) {
         const nextIndex = index + 1;
         if (Number.isInteger(nextIndex) && nextIndex < steps.length) {

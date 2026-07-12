@@ -125,7 +125,7 @@ body > * {
   z-index: 1;
 }
 
-/* Token definitions are in src/lib/theme/themes/ (ds1.css, ds2.css, ds3.css) */
+/* Token definitions are in src/lib/theme/themes/ (ds3.css, _shared-tokens.css) */
 
 /* Typography role classes */
 .text-technical {

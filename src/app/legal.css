@@ -1,14 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════
    Legal Surface
    Styles for /privacy and /terms and the <LegalPage /> component.
-   All values use design tokens for theme-awareness. Per-theme
-   structural treatments mirror about.css, but tuned for dense text:
-   readability comes first, so there are no full-page background
-   patterns — differentiation lives in the hero, section titles,
-   and rhythm.
-   DS1 = drafting-table (hairline section rules, mono uppercase labels)
-   DS2 = editorial (serif prose, airy rhythm)
-   DS3 = mechanical manuscript (mono labels with a dot bullet, compact)
+   All values use design tokens for theme-awareness. Structural treatment
+   (mono labels with a dot bullet, compact) mirrors about.css, but tuned
+   for dense text: readability comes first, so there are no full-page
+   background patterns — differentiation lives in the hero, section
+   titles, and rhythm.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Base layout (token-driven, theme-agnostic) ─── */

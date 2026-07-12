@@ -4,11 +4,8 @@
    front door. All values use design tokens for theme-awareness. The
    composition is intentionally bolder than the About surface (large
    display hero, a stepped grid, a distinct "how it's free" band) so it
-   reads as a front door, not a centered template. Per-theme structural
-   treatments mirror about.css:
-   DS1 = drafting-table (drafting grid, hairline rules, mono uppercase labels)
-   DS2 = editorial (large serif display, airy rhythm, soft surfaces)
-   DS3 = mechanical manuscript (dot-grid, corner-bracket cards, mono labels)
+   reads as a front door, not a centered template. Structural treatment
+   (dot-grid, corner-bracket cards, mono labels) mirrors about.css.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Base layout (token-driven, theme-agnostic) ─── */
