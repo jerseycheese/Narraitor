@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Narraitor
-description: AI-driven storytelling app. Ships a single design system (DS3) as of ADR-013 — see the note below. This frontmatter still documents DS1's old values as a historical artifact pending a full DS3 rewrite; see src/lib/theme/themes/ds3.css for DS3's actual current tokens.
+description: AI-driven storytelling app. Single design system now (DS3, ADR-013) — this frontmatter still carries stale DS1 values; ds3.css has the current tokens.
 colors:
   canvas: "#FDFBF7"
   surface: "#FFFFFF"
@@ -92,7 +92,7 @@ Narraitor is an AI-driven interactive storytelling app. Players create a fiction
 
 The brand sits at the intersection of **archival** and **literary**: the visual language borrows from drafting tables, manuscripts, and design notebooks — surfaces that imply care and craft. There's deliberately no "game UI" sheen, no neon, no glassmorphism. The app should feel like writing tools, not entertainment software.
 
-Narraitor shipped three structurally-different design systems — **DS1 "The Drafting Table"**, **DS2 "Warm Earth"**, and **DS3 "The Mechanical Manuscript"** — until [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md) collapsed them to one. **DS3** is the only design system running today; it isn't user-selectable. DS1 and DS2 are deleted — see [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) for why all three existed in the first place. The frontmatter and most of the prose below still describe DS1's old values, not DS3's; see the note above.
+**DS3** ("The Mechanical Manuscript") is Narraitor's design system — the sole one since [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md) collapsed the three-system architecture [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md) originally shipped.
 
 ### Principles
 

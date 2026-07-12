@@ -9,7 +9,7 @@ updated: 2026-07-11
 
 > **Note (2026-07-11):** This page still describes the old three-system architecture in places. As of [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md), Narraitor ships a single design system — **DS3** only. The comparison table below is kept as a historical record; treat DS1 and DS2 as gone everywhere they're mentioned.
 
-Narraitor shipped three structurally-different design systems until [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md) collapsed them to one. **DS3** is the only design system today — it isn't user-selectable, and it isn't tied to a world's genre either. It has its own CSS file and its own visual point of view. Components stay theme-blind.
+**DS3** isn't user-selectable, and it isn't tied to a world's genre either — it has its own CSS file and its own visual point of view. Components stay theme-blind.
 
 For the original three-system rationale (superseded), see [ADR-011](../architecture/ADR-011-three-design-systems.md). For the collapse decision, see [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md). For an AI-readable summary of the design surface, see [DESIGN.md](../../DESIGN.md) at the repo root.
 
