@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Settings } from 'lucide-react';
+import './DesignSystemShowcase.css';
 
 const meta: Meta = {
   title: '00-Foundation/Design System Showcase',
@@ -77,39 +78,39 @@ const CssVarSwatch = ({ token }: { token: string }) => (
 export const CompleteShowcase: Story = {
   name: 'Complete Design System',
   render: () => (
-    <div>
+    <div className="ds-showcase">
       {/* Typography */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Typography</h2>
-        <div>
+        <div className="ds-showcase-typography-samples">
           <h1>Heading 1 - Main Page Titles</h1>
           <h2>Heading 2 - Section Titles</h2>
           <h3>Heading 3 - Subsection Titles</h3>
           <h4>Heading 4 - Component Titles</h4>
-          <p>Large text - Prominent body copy</p>
-          <p>Body text - Default paragraph text</p>
-          <p>Small text - Secondary information</p>
-          <p>Extra small - Captions and metadata</p>
-          <p>Muted text - Less important information</p>
+          <p className="ds-showcase-text-large">Large text - Prominent body copy</p>
+          <p className="ds-showcase-text-body">Body text - Default paragraph text</p>
+          <p className="ds-showcase-text-small">Small text - Secondary information</p>
+          <p className="ds-showcase-text-xs">Extra small - Captions and metadata</p>
+          <p className="ds-showcase-text-muted">Muted text - Less important information</p>
           <code>Inline code</code>
         </div>
       </section>
 
       {/* Color System */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Color System</h2>
 
         {/* Theme Tokens */}
-        <div>
+        <div className="ds-showcase-subsection">
           <h3>Theme Tokens</h3>
-          <p>
+          <p className="ds-showcase-description">
             Swatches render the live CSS custom property value, so they
             automatically track the light/dark color mode selected in the
             toolbar above.
           </p>
 
           <h4>Core</h4>
-          <div>
+          <div className="ds-showcase-swatch-group">
             {[
               '--color-accent',
               '--color-accent-hover',
@@ -121,7 +122,7 @@ export const CompleteShowcase: Story = {
           </div>
 
           <h4>Text</h4>
-          <div>
+          <div className="ds-showcase-swatch-group">
             {[
               '--color-text-primary',
               '--color-text-secondary',
@@ -133,7 +134,7 @@ export const CompleteShowcase: Story = {
           </div>
 
           <h4>Surfaces</h4>
-          <div>
+          <div className="ds-showcase-swatch-group">
             {[
               '--color-canvas',
               '--color-surface',
@@ -146,7 +147,7 @@ export const CompleteShowcase: Story = {
           </div>
 
           <h4>Feedback</h4>
-          <div>
+          <div className="ds-showcase-swatch-group">
             {[
               '--color-danger',
               '--color-danger-hover',
@@ -164,14 +165,14 @@ export const CompleteShowcase: Story = {
       </section>
 
       {/* Buttons */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Buttons</h2>
 
-        {/* Button Variants */}
-        <div>
-          <div>
+        <div className="ds-showcase-subsection-group">
+          {/* Button Variants */}
+          <div className="ds-showcase-subsection">
             <h3>Variants</h3>
-            <div>
+            <div className="ds-showcase-button-row">
               <Button variant="default">Default</Button>
               <Button variant="secondary">Secondary</Button>
               <Button variant="outline">Outline</Button>
@@ -185,9 +186,9 @@ export const CompleteShowcase: Story = {
           </div>
 
           {/* Button Sizes */}
-          <div>
+          <div className="ds-showcase-subsection">
             <h3>Sizes</h3>
-            <div>
+            <div className="ds-showcase-button-row">
               <Button size="sm">Small</Button>
               <Button size="default">Default</Button>
               <Button size="lg">Large</Button>
@@ -198,18 +199,18 @@ export const CompleteShowcase: Story = {
           </div>
 
           {/* Button States */}
-          <div>
+          <div className="ds-showcase-subsection">
             <h3>States</h3>
-            <div>
+            <div className="ds-showcase-button-row">
               <Button>Normal</Button>
               <Button disabled>Disabled</Button>
             </div>
           </div>
 
           {/* Semantic Action Buttons */}
-          <div>
+          <div className="ds-showcase-subsection">
             <h3>Semantic Action Buttons</h3>
-            <div>
+            <div className="ds-showcase-button-row">
               <Button variant="success">Start Game</Button>
               <Button variant="success">Create Character</Button>
               <Button variant="success">Play World</Button>
@@ -217,7 +218,7 @@ export const CompleteShowcase: Story = {
               <Button>Edit</Button>
               <Button variant="destructive">Delete</Button>
             </div>
-            <p>
+            <p className="ds-showcase-description">
               Green buttons (success variant) are used for forward momentum
               actions like starting games or creating content. They provide
               4.6:1 contrast ratio for WCAG AA compliance.
@@ -227,23 +228,23 @@ export const CompleteShowcase: Story = {
       </section>
 
       {/* Form Elements */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Form Elements</h2>
-        <div>
+        <div className="ds-showcase-subsection-group">
           {/* Text Inputs */}
-          <div>
+          <div className="ds-showcase-subsection">
             <h3>Text Inputs</h3>
-            <div>
-              <div>
+            <div className="ds-showcase-form-grid">
+              <div className="ds-showcase-form-field">
                 <Label htmlFor="input-default">Default Input</Label>
                 <Input id="input-default" placeholder="Enter text..." />
               </div>
-              <div>
+              <div className="ds-showcase-form-field">
                 <Label htmlFor="input-error">Input with Error</Label>
                 <Input id="input-error" placeholder="Invalid input" />
-                <p>This field is required</p>
+                <p className="ds-showcase-field-error">This field is required</p>
               </div>
-              <div>
+              <div className="ds-showcase-form-field">
                 <Label htmlFor="textarea">Textarea</Label>
                 <Textarea
                   id="textarea"
@@ -255,10 +256,10 @@ export const CompleteShowcase: Story = {
           </div>
 
           {/* Selection Inputs */}
-          <div>
+          <div className="ds-showcase-subsection">
             <h3>Selection Inputs</h3>
-            <div>
-              <div>
+            <div className="ds-showcase-form-grid">
+              <div className="ds-showcase-form-field">
                 <Label htmlFor="select">Select Dropdown</Label>
                 <Select id="select">
                   <option value="">Choose an option</option>
@@ -268,28 +269,28 @@ export const CompleteShowcase: Story = {
                 </Select>
               </div>
 
-              <div>
+              <div className="ds-showcase-form-field">
                 <Label>Checkboxes</Label>
-                <div>
-                  <div>
+                <div className="ds-showcase-option-group">
+                  <div className="ds-showcase-option-row">
                     <Checkbox id="check1" />
                     <Label htmlFor="check1">Option 1</Label>
                   </div>
-                  <div>
+                  <div className="ds-showcase-option-row">
                     <Checkbox id="check2" />
                     <Label htmlFor="check2">Option 2</Label>
                   </div>
                 </div>
               </div>
 
-              <div>
+              <div className="ds-showcase-form-field">
                 <Label>Radio Group</Label>
                 <RadioGroup defaultValue="radio1">
-                  <div>
+                  <div className="ds-showcase-option-row">
                     <RadioGroupItem value="radio1" id="radio1" />
                     <Label htmlFor="radio1">Radio 1</Label>
                   </div>
-                  <div>
+                  <div className="ds-showcase-option-row">
                     <RadioGroupItem value="radio2" id="radio2" />
                     <Label htmlFor="radio2">Radio 2</Label>
                   </div>
@@ -301,9 +302,9 @@ export const CompleteShowcase: Story = {
       </section>
 
       {/* Badges */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Badges</h2>
-        <div>
+        <div className="ds-showcase-badge-row">
           <Badge variant="default">Default</Badge>
           <Badge variant="secondary">Secondary</Badge>
           <Badge variant="outline">Outline</Badge>
@@ -312,9 +313,9 @@ export const CompleteShowcase: Story = {
       </section>
 
       {/* Alerts */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Alerts</h2>
-        <div>
+        <div className="ds-showcase-stack">
           <Alert>
             <AlertTitle>Default Alert</AlertTitle>
             <AlertDescription>
@@ -332,9 +333,9 @@ export const CompleteShowcase: Story = {
       </section>
 
       {/* Cards */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Cards</h2>
-        <div>
+        <div className="ds-showcase-card-grid">
           <Card>
             <CardHeader>
               <CardTitle>Simple Card</CardTitle>
@@ -378,7 +379,7 @@ export const CompleteShowcase: Story = {
       </section>
 
       {/* Tabs */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Tabs</h2>
         <Tabs defaultValue="tab1">
           <TabsList>
@@ -431,39 +432,39 @@ export const CompleteShowcase: Story = {
       </section>
 
       {/* Layout Examples */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Layout Examples</h2>
 
-        {/* Grid Layout */}
-        <div>
-          <div>
+        <div className="ds-showcase-subsection-group">
+          {/* Grid Layout */}
+          <div className="ds-showcase-subsection">
             <h3>Grid Layout</h3>
-            <div>
+            <div className="ds-showcase-demo-grid">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i}>Grid Item {i}</div>
+                <div key={i} className="ds-showcase-demo-box">Grid Item {i}</div>
               ))}
             </div>
           </div>
 
           {/* Flex Layout */}
-          <div>
+          <div className="ds-showcase-subsection">
             <h3>Flex Layout</h3>
-            <div>
-              <div>Flex Item 1</div>
-              <div>Flex Item 2</div>
-              <div>Flex Item 3</div>
+            <div className="ds-showcase-demo-flex">
+              <div className="ds-showcase-demo-flex-item ds-showcase-demo-box">Flex Item 1</div>
+              <div className="ds-showcase-demo-flex-item ds-showcase-demo-box">Flex Item 2</div>
+              <div className="ds-showcase-demo-flex-item ds-showcase-demo-box">Flex Item 3</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Spacing Scale */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Spacing Scale</h2>
-        <div>
+        <div className="ds-showcase-spacing-list">
           {[1, 2, 3, 4, 6, 8, 12, 16, 20, 24].map((space) => (
-            <div key={space}>
-              <div>{space * 4}px</div>
+            <div key={space} className="ds-showcase-spacing-row">
+              <div className="ds-showcase-spacing-px">{space * 4}px</div>
               <div>
                 <svg
                   width={space * 4}
@@ -474,20 +475,20 @@ export const CompleteShowcase: Story = {
                   <rect x="0" y="0" width={space * 4} height={16} rx="4" />
                 </svg>
               </div>
-              <div>space-{space}</div>
+              <div className="ds-showcase-spacing-token">space-{space}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* Theme-Specific Colors */}
-      <section>
+      <section className="ds-showcase-section">
         <h2>Theme-Specific Colors</h2>
 
         {/* Ending Tones */}
-        <div>
+        <div className="ds-showcase-subsection">
           <h3>Ending Tones</h3>
-          <div>
+          <div className="ds-showcase-swatch-group">
             {[
               '--ending-triumphant',
               '--ending-hopeful',
@@ -501,9 +502,9 @@ export const CompleteShowcase: Story = {
         </div>
 
         {/* Lore Categories */}
-        <div>
+        <div className="ds-showcase-subsection">
           <h3>Lore Categories</h3>
-          <div>
+          <div className="ds-showcase-swatch-group">
             {[
               '--lore-characters-bg',
               '--lore-characters-border',
@@ -530,9 +531,9 @@ export const CompleteShowcase: Story = {
 export const ComponentMatrix: Story = {
   name: 'Component Interaction Matrix',
   render: () => (
-    <div>
+    <div className="ds-showcase-stack">
       <h2>Component Interaction Matrix</h2>
-      <p>
+      <p className="ds-showcase-description">
         This shows how different components work together in various
         combinations.
       </p>
@@ -546,25 +547,27 @@ export const ComponentMatrix: Story = {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div>
-            <Label htmlFor="username">Username</Label>
-            <Input id="username" placeholder="Enter username" />
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="Enter email" />
-          </div>
-          <div>
-            <Label htmlFor="role">Role</Label>
-            <Select id="role">
-              <option value="">Select role</option>
-              <option value="player">Player</option>
-              <option value="gamemaster">Game Master</option>
-            </Select>
-          </div>
-          <div>
-            <Checkbox id="terms" />
-            <Label htmlFor="terms">I agree to the terms and conditions</Label>
+          <div className="ds-showcase-form-grid">
+            <div className="ds-showcase-form-field">
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" placeholder="Enter username" />
+            </div>
+            <div className="ds-showcase-form-field">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" placeholder="Enter email" />
+            </div>
+            <div className="ds-showcase-form-field">
+              <Label htmlFor="role">Role</Label>
+              <Select id="role">
+                <option value="">Select role</option>
+                <option value="player">Player</option>
+                <option value="gamemaster">Game Master</option>
+              </Select>
+            </div>
+            <div className="ds-showcase-option-row">
+              <Checkbox id="terms" />
+              <Label htmlFor="terms">I agree to the terms and conditions</Label>
+            </div>
           </div>
         </CardContent>
         <CardFooter>
@@ -580,7 +583,7 @@ export const ComponentMatrix: Story = {
           Your game data is approaching the storage limit. Consider cleaning up
           old sessions.
         </AlertDescription>
-        <div>
+        <div className="ds-showcase-alert-actions">
           <Button size="sm" variant="outline">
             Manage Storage
           </Button>
@@ -591,7 +594,7 @@ export const ComponentMatrix: Story = {
       {/* Complex Card Layout */}
       <Card>
         <CardHeader>
-          <div>
+          <div className="ds-showcase-card-header-row">
             <div>
               <CardTitle>Fantasy Campaign</CardTitle>
               <CardDescription>Active gaming session</CardDescription>
@@ -607,27 +610,27 @@ export const ComponentMatrix: Story = {
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
             <TabsContent value="overview">
-              <div>
+              <div className="ds-showcase-subsection">
                 <p>Campaign started 3 days ago with 4 active players.</p>
-                <div>
+                <div className="ds-showcase-badge-row">
                   <Badge>Level 3</Badge>
                   <Badge variant="secondary">Fantasy</Badge>
                 </div>
               </div>
             </TabsContent>
             <TabsContent value="players">
-              <div>
+              <div className="ds-showcase-subsection">
                 <p>Active Players (4)</p>
                 <div>Player management interface would go here.</div>
               </div>
             </TabsContent>
             <TabsContent value="settings">
-              <div>
-                <div>
+              <div className="ds-showcase-option-group">
+                <div className="ds-showcase-option-row">
                   <Checkbox id="notifications" />
                   <Label htmlFor="notifications">Enable notifications</Label>
                 </div>
-                <div>
+                <div className="ds-showcase-option-row">
                   <Checkbox id="public" />
                   <Label htmlFor="public">Public campaign</Label>
                 </div>
