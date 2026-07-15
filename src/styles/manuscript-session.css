@@ -3491,8 +3491,15 @@ body.manuscript-overlay-open {
   margin-bottom: 0;
 }
 
+/* Row axis (not column) here, so trailing-edge alignment is margin-left, not
+   margin-top; the column layout's top divider has no row equivalent. Left
+   shrinkable (no flex-shrink:0) so narrow drawers fall through to
+   .manuscript-inventory-actions' flex-wrap instead of overflowing. */
 [data-theme="ds3"] .manuscript-inventory-item-footer {
-  display: none;
+  margin-top: 0;
+  margin-left: auto;
+  padding-top: 0;
+  border-top: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
