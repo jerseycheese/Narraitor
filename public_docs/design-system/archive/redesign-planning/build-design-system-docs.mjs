@@ -4,12 +4,15 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, '..');
 
-const baseDir = path.join(rootDir, 'public_docs', 'design-system', 'redesign-planning');
+// Archived 2026-07-15: this prototype predates DS3 and is no longer published.
+// Storybook's src/stories/00-foundation/DesignSystemShowcase.stories.tsx is the
+// live, canon design-system reference now (ADR-012). Kept here, inert, for
+// historical reference only — this script intentionally no longer writes to
+// public/, so running it can't silently republish a stale page.
+const baseDir = __dirname;
 const sourceDir = path.join(baseDir, 'src');
 const outputFile = path.join(baseDir, 'design-system.html');
-const publicOutputFile = path.join(rootDir, 'public', 'design-system', 'index.html');
 
 const staticSources = {
   '{{INLINE_CSS}}': path.join(sourceDir, 'styles.css'),
@@ -56,13 +59,9 @@ async function buildDesignSystemDoc() {
   output = output.replace('{{CONTENT_TOP}}', contentTop);
   output = output.replace('{{CONTENT_BOTTOM}}', contentBottom);
 
-  await fs.mkdir(path.dirname(publicOutputFile), { recursive: true });
   await fs.writeFile(outputFile, output, 'utf8');
-  await fs.writeFile(publicOutputFile, output, 'utf8');
   // eslint-disable-next-line no-console
   console.log(`Built ${outputFile}`);
-  // eslint-disable-next-line no-console
-  console.log(`Published ${publicOutputFile}`);
 }
 
 async function readCompositeContent(dirPath, fallbackFilePath) {

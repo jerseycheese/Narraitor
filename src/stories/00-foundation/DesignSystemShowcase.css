@@ -1,0 +1,198 @@
+.ds-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-4) 0;
+}
+
+.ds-showcase-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ds-showcase-section:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.ds-showcase-subsection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds-showcase-description {
+  max-width: 60ch;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+/* Typography samples */
+.ds-showcase-typography-samples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ds-showcase-text-large {
+  font-size: 1.125rem;
+  color: var(--color-text-primary);
+}
+
+.ds-showcase-text-body {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+}
+
+.ds-showcase-text-small {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.ds-showcase-text-xs {
+  font-size: 0.75rem;
+  color: var(--color-text-primary);
+}
+
+.ds-showcase-text-muted {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Token swatch groups */
+.ds-showcase-swatch-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Buttons */
+.ds-showcase-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Form elements */
+.ds-showcase-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 24rem;
+}
+
+.ds-showcase-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1_5);
+}
+
+.ds-showcase-field-error {
+  font-size: 0.8125rem;
+  color: var(--color-danger);
+}
+
+.ds-showcase-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ds-showcase-option-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Badges */
+.ds-showcase-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Alerts */
+.ds-showcase-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds-showcase-alert-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* Cards */
+.ds-showcase-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+
+.ds-showcase-card-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* Layout demo (illustrates literal grid/flex, not app layout) */
+.ds-showcase-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.ds-showcase-demo-flex {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.ds-showcase-demo-flex-item {
+  flex: 1;
+}
+
+.ds-showcase-demo-box {
+  padding: var(--space-4);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+/* Spacing scale */
+.ds-showcase-spacing-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ds-showcase-spacing-row {
+  display: grid;
+  grid-template-columns: 4rem 1fr 6rem;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ds-showcase-spacing-row svg rect {
+  fill: var(--color-accent);
+}
+
+.ds-showcase-spacing-px {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.ds-showcase-spacing-token {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}

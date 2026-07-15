@@ -251,35 +251,15 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     switch (wizard.state.currentStep) {
       case 0:
-        return (
-          <div data-tutorial="basic-info">
-            <BasicInfoStep {...props} />
-          </div>
-        );
+        return <BasicInfoStep {...props} />;
       case 1:
-        return (
-          <div data-tutorial="attribute-allocation">
-            <AttributesStep {...props} />
-          </div>
-        );
+        return <AttributesStep {...props} />;
       case 2:
-        return (
-          <div data-tutorial="skill-selection">
-            <SkillsStep {...props} />
-          </div>
-        );
+        return <SkillsStep {...props} />;
       case 3:
-        return (
-          <div data-tutorial="background-editor">
-            <BackgroundStep {...props} />
-          </div>
-        );
+        return <BackgroundStep {...props} />;
       case 4:
-        return (
-          <div data-tutorial="portrait-generator">
-            <PortraitStep {...props} />
-          </div>
-        );
+        return <PortraitStep {...props} />;
       default:
         return null;
     }

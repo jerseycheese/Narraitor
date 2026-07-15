@@ -261,6 +261,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       <WizardFormSection
         title="Allocate Skill Points"
         description={`Choose up to ${maxSelectable} starting skills and distribute ${totalSkillPoints} skill points across them.`}
+        dataTutorial="skill-selection"
       >
       <div className="wizard-skill-intro">
         <p>
