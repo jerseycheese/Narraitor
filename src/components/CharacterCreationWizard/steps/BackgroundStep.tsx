@@ -69,6 +69,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
       <WizardFormSection
         title="Character Background"
         description="Provide details about your character's history, personality, and motivations."
+        dataTutorial="background-editor"
       >
       {/* Helpful tip */}
       <div>
