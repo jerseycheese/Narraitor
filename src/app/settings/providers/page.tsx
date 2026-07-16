@@ -5,6 +5,7 @@ import { PageLayout } from '@/components/shared/PageLayout';
 import { Button } from '@/components/ui/button';
 import { ProviderCard } from '@/components/ai/ProviderCard';
 import { ProviderWizard } from '@/components/ai/ProviderWizard';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/DeleteConfirmationDialog';
 import { useProviderStore } from '@/state/providerStore';
 import '@/components/ai/provider-config.css';
 
@@ -23,6 +24,7 @@ export default function ProvidersSettingsPage() {
 
   const [showWizard, setShowWizard] = useState(false);
   const [validatingId, setValidatingId] = useState<string | null>(null);
+  const [providerToRemoveId, setProviderToRemoveId] = useState<string | null>(null);
 
   const list = Object.values(providers);
 
@@ -34,6 +36,26 @@ export default function ProvidersSettingsPage() {
       setValidatingId(null);
     }
   };
+
+  const handleCloseRemoveDialog = () => setProviderToRemoveId(null);
+
+  const handleConfirmRemove = async () => {
+    if (providerToRemoveId) {
+      await removeProvider(providerToRemoveId);
+    }
+    setProviderToRemoveId(null);
+  };
+
+  // Removal is destructive: the key is gone for good, and removing the last
+  // provider also clears the stored encryption key. Spell out the stakes.
+  const providerToRemove = providerToRemoveId ? providers[providerToRemoveId] : undefined;
+  const removeMessage = !providerToRemove
+    ? ''
+    : list.length === 1
+      ? "Removing your only provider also clears the encryption key stored in this browser. You'll need to set up a provider again before playing."
+      : providerToRemove.id === activeProviderId
+        ? 'This provider is currently in use. Another saved provider will take over.'
+        : 'Are you sure you want to remove this provider? Its saved key will be deleted from this browser.';
 
   return (
     <PageLayout
@@ -66,12 +88,22 @@ export default function ProvidersSettingsPage() {
                 validation={validationStatus[provider.id]}
                 onSetActive={setActiveProvider}
                 onValidate={handleValidate}
-                onDelete={removeProvider}
+                onDelete={setProviderToRemoveId}
                 isValidating={validatingId === provider.id}
               />
             ))}
           </div>
         )}
+
+        <DeleteConfirmationDialog
+          isOpen={providerToRemoveId !== null}
+          onClose={handleCloseRemoveDialog}
+          onConfirm={handleConfirmRemove}
+          title="Remove Provider"
+          description={removeMessage}
+          itemName={providerToRemove?.name || 'this provider'}
+          confirmButtonText="Remove"
+        />
       </div>
     </PageLayout>
   );
