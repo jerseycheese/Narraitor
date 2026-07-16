@@ -5,6 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
+// Associates a WizardFormGroup's visible label with the wizard control it
+// wraps (#1529). The group generates an id, points its Label at it, and the
+// wizard field components below pick the id up from context - so every
+// existing WizardFormGroup + WizardTextField/WizardSelect/WizardTextArea
+// pairing gets an accessible name without call-site changes.
+const WizardFieldIdContext = React.createContext<string | undefined>(undefined);
+
 interface WizardFormGroupProps {
   label: string;
   error?: string;
@@ -20,9 +27,11 @@ export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
   helpText,
   children,
 }) => {
+  const fieldId = React.useId();
+
   return (
     <div>
-      <Label>
+      <Label htmlFor={fieldId}>
         {label}
         {required && <span>*</span>}
       </Label>
@@ -34,7 +43,9 @@ export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
           {helpText}
         </p>
       )}
-      {children}
+      <WizardFieldIdContext.Provider value={fieldId}>
+        {children}
+      </WizardFieldIdContext.Provider>
       {error && <p className={errorStyles.message}>{error}</p>}
     </div>
   );
@@ -65,8 +76,11 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
   testId,
   dataTutorial,
 }) => {
+  const fieldId = React.useContext(WizardFieldIdContext);
+
   return (
     <Input
+      id={fieldId}
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -107,8 +121,11 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
   testId,
   dataTutorial,
 }) => {
+  const fieldId = React.useContext(WizardFieldIdContext);
+
   return (
     <Textarea
+      id={fieldId}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onBlur={onBlur}
@@ -146,8 +163,11 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
   testId,
   dataTutorial,
 }) => {
+  const fieldId = React.useContext(WizardFieldIdContext);
+
   return (
     <select
+      id={fieldId}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onBlur={onBlur}
