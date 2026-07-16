@@ -1,0 +1,37 @@
+/* NotFoundState — styles for src/components/shared/NotFoundState.tsx (#1535)
+ *
+ * The shared not-found treatment (unknown routes via src/app/not-found.tsx, plus
+ * the world/character detail fallbacks) lost its classes in the Tailwind removal
+ * (#1051) and rendered as bare top-left text. Mirrors the EmptyState treatment
+ * (#1479): centered, comfortable measure, token-driven so the active theme and
+ * surface CSS brand it. Heading size comes from the surface h1 rules, not here.
+ */
+
+.component-not-found-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+
+.not-found-state-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.not-found-state-content h1 {
+  margin: 0;
+}
+
+.not-found-state-content p {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
