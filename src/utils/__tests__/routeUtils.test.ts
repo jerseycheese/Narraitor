@@ -8,6 +8,10 @@ describe('buildBreadcrumbSegments', () => {
     expect(buildBreadcrumbSegments('/worlds', worlds, characters, null)).toEqual([]);
   });
 
+  it('returns no segments on the app home route (#1528)', () => {
+    expect(buildBreadcrumbSegments('/dashboard', worlds, characters, null)).toEqual([]);
+  });
+
   it('builds Worlds > <world name> for a world detail route', () => {
     const segs = buildBreadcrumbSegments('/worlds/world-1', worlds, characters, 'world-1');
     expect(segs.map((s) => s.label)).toEqual(['Worlds', 'Eldoria']);

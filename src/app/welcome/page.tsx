@@ -1,12 +1,10 @@
-import type { Metadata } from 'next';
-import { Landing } from '@/components/Landing';
+import { permanentRedirect } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Narraitor — a solo narrative RPG in any world you imagine',
-  description:
-    'Build a world, create a character, and play a story that adapts to your choices. Runs in your browser, your data stays on your device.',
-};
-
+/**
+ * Legacy alias for the public landing page (#1528). The Landing experience
+ * moved to the root route; keep /welcome redirecting so old links still land
+ * on the front door.
+ */
 export default function WelcomePage() {
-  return <Landing />;
+  permanentRedirect('/');
 }

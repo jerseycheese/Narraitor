@@ -118,7 +118,7 @@ describe('useGameSessionState', () => {
     });
 
     expect(mockSessionStoreState.endSession).toHaveBeenCalledTimes(1);
-    expect(router.push).toHaveBeenCalledWith('/');
+    expect(router.push).toHaveBeenCalledWith('/dashboard');
     expect(onSessionEnd).toHaveBeenCalledTimes(1);
   });
 

@@ -38,7 +38,8 @@ test.describe('Mobile layouts', () => {
   test('dashboard stacks at phone width', async ({ page }) => {
     await page.setViewportSize(MOBILE_VIEWPORT);
     await seedBarelyStartedData(page);
-    await page.goto('/');
+    // App home moved to /dashboard (#1528); / is the public landing page.
+    await page.goto('/dashboard');
     await waitForContentStable(page);
     await page.waitForSelector('.component-dashboard-getting-started', { timeout: 8000 });
     await settle(page);

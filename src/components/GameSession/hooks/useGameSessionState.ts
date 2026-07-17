@@ -179,7 +179,7 @@ export const useGameSessionState = ({
   const handleDismissError = () => {
     setError(null);
     setSessionState(prev => ({ ...prev, error: null }));
-    router?.push('/');
+    router?.push('/dashboard');
   };
   
   // Manual session initialization
@@ -230,7 +230,7 @@ export const useGameSessionState = ({
   const handleEndSession = () => {
     actualSessionState.endSession?.();
     setSessionState(prev => ({ ...prev, status: 'ended' }));
-    router?.push('/'); // Navigate back to home page
+    router?.push('/dashboard'); // Back to the app home, not the public landing page (#1528)
     if (onSessionEnd) {
       onSessionEnd();
     }

@@ -52,7 +52,12 @@ export function HeaderNavigation() {
   const [mounted, setMounted] = useState(false);
 
   const hasWorlds = mounted && hasWorldsStore;
-  const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
+  const shouldShowBreadcrumbs =
+    pathname !== '/' && pathname !== '/dashboard' && pathname !== '/worlds';
+  // Public context (no local worlds yet) brands to the landing page at /;
+  // once this browser has app state, the brand is a home link to /dashboard
+  // so app users aren't sent back to the marketing front door (#1528).
+  const brandHref = hasWorlds ? '/dashboard' : '/';
 
   useKeyboardShortcuts(
     [
@@ -155,7 +160,7 @@ export function HeaderNavigation() {
                   </Button>
                 </div>
 
-                <Link href="/" className="app-brand">
+                <Link href={brandHref} className="app-brand">
                   <LogoIcon size="small" className="logo-icon-inverted" />
                   <LogoText size="sm" className="app-wordmark" />
                 </Link>

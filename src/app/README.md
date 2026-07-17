@@ -5,7 +5,9 @@ This directory uses the Next.js App Router architecture, which replaced the prev
 ## How the Routes Work
 
 **Core app routes:**
-- `/` - Home/dashboard
+- `/` - public landing page (returning browsers with local app state are routed to `/dashboard`)
+- `/dashboard` - app home/dashboard (first-time onboarding lives here too)
+- `/welcome` - legacy alias, permanent redirect to `/`
 - `/worlds`, `/worlds/create`, `/worlds/[id]`, `/worlds/[id]/edit` - world list, creation, detail, edit
 - `/worlds/[id]/play`, `/worlds/[id]/play/journal` - active gameplay and the in-session journal
 - `/characters`, `/characters/create`, `/characters/[id]`, `/characters/[id]/edit` - character list, creation, detail, edit
