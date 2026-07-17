@@ -35,10 +35,12 @@ export function FunnelAnalytics() {
     }
   }, []);
 
-  // Route-based funnel steps.
+  // Route-based funnel steps. The landing page owns the root route (#1528),
+  // so the landing step fires on / — real first-touch traffic, not just
+  // visitors who knew the old /welcome URL.
   useEffect(() => {
     if (!pathname) return;
-    if (pathname === '/welcome') {
+    if (pathname === '/') {
       trackFunnelStep('landing');
     } else if (getSurfaceMode(pathname) === 'manuscript') {
       trackFunnelStep('session-started');

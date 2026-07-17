@@ -220,8 +220,10 @@ test.describe('Fresh GameSession skeleton → content', () => {
       },
       { getTimestampSource: GET_TIMESTAMP_SOURCE }
     );
-    // First navigate to the app root to seed stores via localStorage
-    await page.goto(`${baseURL}/`, { waitUntil: 'domcontentloaded' });
+    // First navigate to the app home to seed stores via localStorage.
+    // /dashboard (not /) since #1528: the root is the public landing page and
+    // routes browsers with seeded IndexedDB state to /dashboard anyway.
+    await page.goto(`${baseURL}/dashboard`, { waitUntil: 'domcontentloaded' });
 
     // Seed minimal world + character using dev-exposed stores (IndexedDB-backed)
     await page.evaluate(

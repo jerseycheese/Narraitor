@@ -26,39 +26,43 @@ import { waitForStoreReady } from './utils/tutorial-helpers';
  */
 
 test.describe('Main Pages Visual Tests', () => {
-  test('Home page should render consistently (empty state)', async ({ page }) => {
+  // The app home moved from / to /dashboard (#1528; / is now the public
+  // landing page, covered by landing-page.spec.ts). These two dashboard tests
+  // navigate to the canonical route directly; the CI-adopted baseline names
+  // (home-*.png) are kept because the rendered pixels are unchanged.
+  test('Dashboard should render consistently (empty state)', async ({ page }) => {
     // Use base seeding for empty state - much faster than clearing everything manually
     await seedBaseData(page);
-    
-    await page.goto('/');
+
+    await page.goto('/dashboard');
     await waitForContentStable(page);
     await hideDynamicContent(page);
-    
+
     // Verify page loaded with expected content
     await expect(page).toHaveTitle(/Narraitor/i);
-    
+
     // Take full page screenshot - empty QuickPlay form
     await expect(page).toHaveScreenshot('home-empty-state.png', { fullPage: true });
   });
 
-  test('Home page should render consistently', async ({ page }) => {
+  test('Dashboard should render consistently', async ({ page }) => {
     // Seed test data to show returning user with recent game session
     await seedTestData(page);
-    await page.goto('/');
+    await page.goto('/dashboard');
     // Wait for seeding to complete before stabilizing
     await page.waitForFunction(() => (window as any).__TEST_STORES_SEEDED__ === true, { timeout: 15000 });
-    
+
     // Reload to ensure localStorage is picked up cleanly
     await page.reload();
-    
+
     await waitForContentStable(page);
     await hideDynamicContent(page);
     // Ensure the Continue section appears (seeded session present)
     await page.waitForSelector('[aria-labelledby="continue-game-heading"]', { timeout: 8000 });
-    
+
     // Verify page loaded with expected content
     await expect(page).toHaveTitle(/Narraitor/i);
-    
+
     // Take full page screenshot - should show "Continue Last Game" with character and world info
     await expect(page).toHaveScreenshot('home-page.png', { fullPage: true });
   });

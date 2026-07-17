@@ -108,7 +108,8 @@ test.describe('Mobile Action Row Layout', () => {
  * desktop nav row — must own navigation, and the header itself must not overflow.
  *
  * Scope is the header on purpose: these assert the collapse and that `.header-nav`
- * doesn't overflow, on both a breadcrumb-free route (`/`) and a breadcrumb-bearing
+ * doesn't overflow, on both a breadcrumb-free route (`/dashboard` — the app home
+ * since #1528 moved the dashboard off `/`) and a breadcrumb-bearing
  * one (`/about`). They deliberately do NOT assert whole-document width — page
  * content can overflow for reasons unrelated to the header (e.g. the About-page
  * footer's box-sizing bug, tracked separately), and #1381 is header-only.
@@ -118,7 +119,7 @@ test.describe('App-Shell Header Mobile Collapse', () => {
     { name: 'narrow-mobile', width: 320, height: 568 },
     { name: 'mobile', width: 375, height: 667 },
   ] as const;
-  const routes = ['/', '/about'] as const;
+  const routes = ['/dashboard', '/about'] as const;
 
   const expectHeaderCollapsed = async (page: Page) => {
     // Hamburger owns navigation; the desktop nav row is hidden via CSS.

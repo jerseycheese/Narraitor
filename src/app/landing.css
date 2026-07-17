@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
    Landing Surface
-   Styles for /welcome and the <Landing /> component — the free public
+   Styles for the root route (/) and the <Landing /> component — the free public
    front door. All values use design tokens for theme-awareness. The
    composition is intentionally bolder than the About surface (large
    display hero, a stepped grid, a distinct "how it's free" band) so it

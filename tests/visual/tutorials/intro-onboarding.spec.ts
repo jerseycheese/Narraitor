@@ -7,7 +7,9 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   test.setTimeout(60000);
 
   await seedBaseData(page);
-  await gotoTutorialPage(page, '/');
+  // The guided first-time experience lives on the app home, which moved from
+  // / to /dashboard when the landing page took over the root route (#1528).
+  await gotoTutorialPage(page, '/dashboard');
   await hideNextDevOverlay(page);
   await waitForContentStable(page);
   // The onboarding UI mounts inside SSRClientOnly, so this heading can't exist

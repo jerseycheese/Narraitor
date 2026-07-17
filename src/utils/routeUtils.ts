@@ -35,8 +35,10 @@ export function buildBreadcrumbSegments(
 ): BreadcrumbSegment[] {
   const segments: BreadcrumbSegment[] = [];
   
-  // Only show breadcrumbs for non-root paths
-  const isRootPath = pathname === '/' || pathname === '/worlds';
+  // Only show breadcrumbs for non-root paths. /dashboard is the app home
+  // (moved off / by #1528), so it counts as a root like / and /worlds.
+  const isRootPath =
+    pathname === '/' || pathname === '/dashboard' || pathname === '/worlds';
   
   // Don't show breadcrumbs on the root/home page
   if (isRootPath) {

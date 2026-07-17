@@ -72,8 +72,10 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
       data-identifier="workshop-sidebar-nav"
     >
       <div className="workshop-sidebar-brand-row">
+        {/* Workshop is always app context, so the brand links to the app home
+            rather than the public landing page (#1528). */}
         <Link
-          href="/"
+          href="/dashboard"
           onClick={() => onNavigate?.()}
           className="workshop-sidebar-brand"
         >
