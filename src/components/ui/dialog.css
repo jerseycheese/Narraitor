@@ -21,6 +21,10 @@
 }
 
 .dialog-content {
+  /* No global border-box reset exists, so without this the width calc below
+     measures the content box and the 20px padding + 1px border land on top,
+     rendering the panel 10px wider than the viewport on mobile (#1531). */
+  box-sizing: border-box;
   position: fixed;
   left: 50%;
   top: 50%;
