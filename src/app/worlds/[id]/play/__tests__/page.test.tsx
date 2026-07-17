@@ -1,7 +1,11 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import PlayPage from '../page';
 import { notFound, useParams } from 'next/navigation';
+import { useWorldStore } from '@/state/worldStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import type { World } from '@/types/world.types';
+import type { StoryEnding } from '@/types/narrative.types';
 
 // Mock dependencies
 jest.mock('next/navigation', () => ({
@@ -104,5 +108,44 @@ describe('Play Page', () => {
 
     // Assert — GameSession is loaded via next/dynamic, so await its appearance
     expect(await screen.findByTestId('mock-game-session')).toHaveTextContent(`Game Session for ${testWorldId}`);
+  });
+
+  // The immersive play route is chrome-free (no PageLayout), so the page
+  // renders its own screen-reader-only h1 (#1532). No React.useState spy
+  // here: the real mount effect flips isClient under act(), and the spy
+  // breaks hook order once store updates re-render the page.
+  describe('page-level heading', () => {
+    afterEach(() => {
+      // Unmount before resetting stores so the real narrativeStore doesn't
+      // re-render a mounted page outside act().
+      cleanup();
+      useNarrativeStore.setState({ currentEnding: null });
+      (useWorldStore as unknown as { __resetMocks: () => void }).__resetMocks();
+    });
+
+    test('active play exposes exactly one sr-only h1 naming the world', () => {
+      // worldStore is globally mocked (jest.setup.ts); seed via its own API.
+      const worldId = useWorldStore
+        .getState()
+        .createWorld({ name: 'Neo-Tokyo' } as Omit<World, 'id' | 'createdAt' | 'updatedAt'>);
+      (useParams as jest.Mock).mockReturnValue({ id: worldId });
+
+      render(<PlayPage />);
+
+      const headings = screen.getAllByRole('heading', { level: 1 });
+      expect(headings).toHaveLength(1);
+      expect(headings[0]).toHaveTextContent('Playing in Neo-Tokyo');
+      expect(headings[0]).toHaveClass('sr-only');
+    });
+
+    test('h1 switches to Story Complete when an ending is active', () => {
+      useNarrativeStore.setState({
+        currentEnding: { id: 'ending-1' } as StoryEnding,
+      });
+
+      render(<PlayPage />);
+
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Story Complete');
+    });
   });
 });

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { notFound, useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { useWorldStore } from '@/state/worldStore';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import { ProviderGate } from '@/components/ai/ProviderGate';
 
@@ -37,6 +38,10 @@ export default function PlayPage() {
   // Always call hooks and use persisted store data
   const currentSessionId = useSessionStore((state) => state.id);
   const { getSessionSegments } = useNarrativeStore();
+  const worldName = useWorldStore((state) => state.worlds[worldId]?.name);
+  // ActiveGameSession swaps to the ending screen whenever currentEnding is
+  // set, so the page heading tracks the same store field to stay in sync.
+  const currentEnding = useNarrativeStore((state) => state.currentEnding);
 
   // Check if this should be a fresh session (from "Start New Session" button)
   const disableAutoResume = searchParams?.get('fresh') === 'true';
@@ -94,8 +99,18 @@ export default function PlayPage() {
     notFound();
   }
 
+  const pageHeading = currentEnding
+    ? 'Story Complete'
+    : worldName
+      ? `Playing in ${worldName}`
+      : 'Game Session';
+
   return (
     <div className="manuscript-play-page">
+      {/* The immersive play shell is deliberately chrome-free, so the
+          page-level heading is screen-reader-only (#1532). */}
+      <h1 className="sr-only manuscript-play-page-title">{pageHeading}</h1>
+
       <ProviderGate />
 
       <GameSession
