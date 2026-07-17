@@ -474,15 +474,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                                     : ''
                           }
                           subtitle={
+                            // Session-scoped drawers show the world name as
+                            // readable context — never the raw persistence ID,
+                            // which truncated to "Session session-" (#1534).
+                            // No world name means no subtitle at all.
                             activeDrawer === 'character'
                               ? character?.name
                               : activeDrawer === 'inventory'
                                 ? `Items for ${character?.name}`
                                 : activeDrawer === 'story-summary' || activeDrawer === 'choice-history' || activeDrawer === 'journal'
-                                  ? `Session ${sessionId.slice(0, 8)}`
+                                  ? world?.name
                                   : undefined
                           }
-                
         >
           {activeDrawer === 'character' && character && (
             <CharacterDrawerContent character={character} />
