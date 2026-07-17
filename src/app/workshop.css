@@ -1086,7 +1086,11 @@
   border-top: 1px solid var(--color-border);
 }
 
-@media (width >= 768px) {
+/* Hidden above 768px to match the header hamburger's `<= 768px` boundary
+   (useMobileNavigation.ts). A `>= 768px` gate here disagreed with that
+   boundary by one pixel, so opening the menu at exactly 768px rendered
+   nothing — same off-by-one class as the workshop shell fix in #1557. */
+@media (width > 768px) {
   .mobile-nav-menu {
     display: none;
   }
