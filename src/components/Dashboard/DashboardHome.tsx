@@ -128,6 +128,10 @@ export function DashboardHome() {
 
   return (
     <main className="component-dashboard-home">
+      {/* The returning dashboard has no visible page title by design (cards
+          carry their own h2s), so keep a screen-reader page heading (#1530). */}
+      <h1 className="sr-only">Dashboard</h1>
+
       {/* Continue Card - Only for active session users */}
       {dashboardState === 'active-session' && mostRecentSession && (
         <DashboardContinueCard

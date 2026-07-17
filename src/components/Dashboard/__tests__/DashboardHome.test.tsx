@@ -115,6 +115,14 @@ describe('DashboardHome', () => {
       expect(screen.getByRole('heading', { name: /your progress/i })).toBeInTheDocument();
     });
 
+    it('renders exactly one page-level h1 (#1530)', () => {
+      render(<DashboardHome />);
+
+      const h1s = screen.getAllByRole('heading', { level: 1 });
+      expect(h1s).toHaveLength(1);
+      expect(h1s[0]).toHaveTextContent('Dashboard');
+    });
+
     it('shows recent worlds section', () => {
       render(<DashboardHome />);
 
@@ -160,6 +168,14 @@ describe('DashboardHome', () => {
       render(<DashboardHome />);
 
       expect(screen.getAllByRole('button', { name: /continue/i }).length).toBeGreaterThan(0);
+    });
+
+    it('renders exactly one page-level h1 (#1530)', () => {
+      render(<DashboardHome />);
+
+      const h1s = screen.getAllByRole('heading', { level: 1 });
+      expect(h1s).toHaveLength(1);
+      expect(h1s[0]).toHaveTextContent('Dashboard');
     });
 
     it('shows progress card with session metrics', () => {
