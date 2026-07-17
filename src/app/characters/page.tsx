@@ -521,6 +521,10 @@ export default function CharactersPage() {
 
   return (
     <PageLayout title={headerTitle} description={headerDescription}>
+      {/* When the world hero replaces the visible page header, PageLayout
+          renders no h1, so keep a screen-reader page heading (#1530). */}
+      {!headerTitle && <h1 className="sr-only">My Characters</h1>}
+
       {mounted && currentWorld && (
         <Hero
           title={currentWorld.name}
