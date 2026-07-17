@@ -31,6 +31,27 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
   onOpenJournal,
   isProgressiveDisclosureEnabled = false,
 }) => {
+  const cancelButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  // Escape/focus parity with the shared ConfirmationDialog (#1536): Escape
+  // dismisses, and initial focus lands on Cancel because ending the story is
+  // irreversible - the same choice the shared dialog makes for destructive
+  // confirmations.
+  React.useEffect(() => {
+    if (!showEndConfirmation) return;
+
+    cancelButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onCloseEndStory();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showEndConfirmation, onCloseEndStory]);
+
   return (
     <div className="manuscript-support-sections">
       {/* Inventory Display - hidden when progressive disclosure is enabled */}
@@ -104,6 +125,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
             
             <div className="manuscript-end-story-footer">
               <button
+                ref={cancelButtonRef}
                 type="button"
                 className="manuscript-end-story-cancel"
                 onClick={onCloseEndStory}

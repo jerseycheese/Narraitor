@@ -287,6 +287,20 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     createJournalEntryFromSegment,
   });
 
+  // One modal decision at a time (#1536): the End Story confirmation renders
+  // without a focus trap, so the HUD Close/Reset controls stay reachable while
+  // it is open. Those controls hand off to page-level confirmation dialogs, so
+  // close the End Story confirmation first or both dialogs mount at once.
+  const handleHudBack = React.useCallback(() => {
+    handleCloseEndStory();
+    onBack?.();
+  }, [handleCloseEndStory, onBack]);
+
+  const handleHudStartNew = React.useCallback(() => {
+    handleCloseEndStory();
+    onStartNew?.();
+  }, [handleCloseEndStory, onStartNew]);
+
   // If we have an ending, show the ending screen instead
   if (currentEnding) {
     return <EndingScreen />;
@@ -369,8 +383,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             setActiveDrawer(drawerType as DrawerType);
             setIsCharacterSummaryExpanded(false);
           }}
-          onStartNew={onStartNew}
-          onBack={onBack}
+          onStartNew={handleHudStartNew}
+          onBack={handleHudBack}
           onEndStory={handleEndStoryClick}
           saveIndicator={
             <SaveIndicator
