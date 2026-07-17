@@ -29,6 +29,26 @@ describe('BasicInfoStep', () => {
     expect(screen.getByTestId('world-genre-select')).toBeInTheDocument();
   });
 
+  // #1529: the visible WizardFormGroup labels must be programmatically wired
+  // to the controls they describe, or screen readers announce them unlabeled.
+  test('associates visible labels with their form controls', () => {
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    expect(screen.getByLabelText('World Name (optional)')).toBe(
+      screen.getByTestId('world-name-input')
+    );
+    // The Genre label renders a trailing required marker, so match by prefix
+    expect(screen.getByLabelText(/^genre/i)).toBe(
+      screen.getByTestId('world-genre-select')
+    );
+  });
+
   test('displays error for world name when provided', () => {
     // Since BasicInfoStep no longer handles validation directly,
     // we test that errors passed in are displayed correctly
