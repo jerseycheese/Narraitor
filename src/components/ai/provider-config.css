@@ -159,6 +159,29 @@
   font-size: 0.875rem;
 }
 
+/* Mobile wizard fit (#1539): at phone widths the auto-fill preset grid
+   collapses to a single 12rem column, so seven stacked presets (six of them
+   "Coming soon") push the custom-endpoint toggle and the Cancel/Next row
+   ~270px past a 667px-tall first viewport. Two-up compact presets halve that
+   wall so the usable path fits the first screen, and the sticky action row
+   keeps Cancel/Next reachable however long the step content grows. */
+@media (width < 768px) {
+  .component-provider-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .provider-preset {
+    padding: var(--space-2);
+  }
+
+  .component-provider-wizard .wizard-nav-container {
+    position: sticky;
+    bottom: 0;
+    padding-bottom: var(--space-3);
+    background: var(--color-surface);
+  }
+}
+
 /* Verify step */
 .provider-verify {
   display: flex;
