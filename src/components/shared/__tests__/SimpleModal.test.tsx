@@ -62,6 +62,63 @@ describe('SimpleModal', () => {
     expect(document.querySelector('[data-scroll-container="overlay"]')).toBeNull();
   });
 
+  it('exposes description as the dialog accessible description', () => {
+    render(
+      <SimpleModal
+        isOpen={true}
+        onClose={jest.fn()}
+        title="Please wait"
+        description="Loading Test World..."
+      />,
+    );
+
+    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(
+      'Loading Test World...',
+    );
+  });
+
+  it('does not trigger the Radix missing-description warning when description is set', () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    render(
+      <SimpleModal
+        isOpen={true}
+        onClose={jest.fn()}
+        title="Please wait"
+        description="Loading Test World..."
+      />,
+    );
+
+    const missingDescriptionWarnings = warnSpy.mock.calls.filter((call) =>
+      String(call[0]).includes('Missing `Description`'),
+    );
+    expect(missingDescriptionWarnings).toHaveLength(0);
+    warnSpy.mockRestore();
+  });
+
+  it('lets ariaDescribedBy point the dialog at a caller-owned element', () => {
+    // Radix cannot see caller-owned aria-describedby wiring and still logs
+    // its missing-description heuristic warning for this path; silence it so
+    // test output stays clean. The accessible description itself resolves.
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    render(
+      <SimpleModal
+        isOpen={true}
+        onClose={jest.fn()}
+        title="Generate World"
+        ariaDescribedBy="caller-desc"
+      >
+        <p id="caller-desc">Caller supplied description.</p>
+      </SimpleModal>,
+    );
+
+    expect(screen.getByRole('dialog')).toHaveAccessibleDescription(
+      'Caller supplied description.',
+    );
+    warnSpy.mockRestore();
+  });
+
   it('supports overlay scrolling with a footer', () => {
     render(
       <SimpleModal

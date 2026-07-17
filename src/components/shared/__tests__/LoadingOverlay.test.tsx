@@ -21,13 +21,33 @@ describe('LoadingOverlay', () => {
 
     it('should display custom message when provided', () => {
       render(
-        <LoadingOverlay 
-          isVisible={true} 
-          message="Loading your world..." 
+        <LoadingOverlay
+          isVisible={true}
+          message="Loading your world..."
         />
       );
-      
+
       expect(screen.getByText('Loading your world...')).toBeInTheDocument();
+    });
+
+    it('exposes the message as the dialog accessible description without Radix warnings', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      render(
+        <LoadingOverlay
+          isVisible={true}
+          message="Loading Playwright Test World..."
+        />
+      );
+
+      expect(screen.getByRole('dialog')).toHaveAccessibleDescription(
+        'Loading Playwright Test World...',
+      );
+      const missingDescriptionWarnings = warnSpy.mock.calls.filter((call) =>
+        String(call[0]).includes('Missing `Description`'),
+      );
+      expect(missingDescriptionWarnings).toHaveLength(0);
+      warnSpy.mockRestore();
     });
   });
 
