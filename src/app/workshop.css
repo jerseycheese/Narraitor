@@ -610,7 +610,16 @@
   .default-surface-inner {
     padding: var(--space-3);
   }
+}
 
+/* Workshop drawer boundary is `<= 768px` (not `< 768px`) so exactly 768px —
+   iPad Mini portrait — gets the drawer shell, matching the header hamburger's
+   `<= 768px` boundary (#1381). With the old `< 768px` gate the desktop shell
+   survived at exactly 768px: the 18rem rail pinned next to a 479px workspace
+   and the breadcrumb trail wrapped the sticky header to 144px tall (#1540).
+   `.default-surface-inner` stays in the `< 768px` block above — its gutter is
+   synced with `.header-nav-inner`'s space-3 (<768) / space-4 (768-1024) map. */
+@media (width <= 768px) {
   .app-surface-workshop {
     display: block;
   }
