@@ -38,7 +38,7 @@ const mockEnding: StoryEnding = {
   updatedAt: '2025-11-24T10:00:00Z',
 };
 
-const setupStores = (checkpoints: StoryCheckpoint[] = []) => {
+const setupStores = (checkpoints: StoryCheckpoint[] = [], ending: StoryEnding = mockEnding) => {
   mockUseRouter.mockReturnValue({
     push: jest.fn(),
     back: jest.fn(),
@@ -49,7 +49,7 @@ const setupStores = (checkpoints: StoryCheckpoint[] = []) => {
   } as ReturnType<typeof useRouter>);
 
   mockUseNarrativeStore.mockReturnValue({
-    currentEnding: mockEnding,
+    currentEnding: ending,
     isGeneratingEnding: false,
     endingError: null,
     getSessionSegments: jest.fn(() => []),
@@ -272,5 +272,29 @@ describe('EndingScreen - Your Story Section', () => {
     // Expand and check updated ARIA attributes
     fireEvent.click(button);
     expect(button).toHaveAttribute('aria-expanded', 'true');
+  });
+});
+
+// The page-level h1 belongs to the play route, so the ending screen itself
+// must only contribute subordinate headings (#1532).
+describe('EndingScreen - Heading hierarchy', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders The End as an h2 with no h1 of its own (placeholder hero)', () => {
+    setupStores([]);
+    render(<EndingScreen />);
+
+    expect(screen.getByRole('heading', { level: 2, name: 'The End' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1 })).toBeNull();
+  });
+
+  it('keeps The End subordinate when the ending image renders', () => {
+    setupStores([], { ...mockEnding, imageUrl: 'data:image/png;base64,abc' });
+    render(<EndingScreen />);
+
+    expect(screen.getByRole('heading', { level: 2, name: 'The End' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1 })).toBeNull();
   });
 });

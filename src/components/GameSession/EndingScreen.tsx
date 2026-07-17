@@ -328,9 +328,12 @@ export function EndingScreen() {
               />
               <div className="component-ending-screen-hero-overlay">
                 <header className="component-ending-screen-hero-header">
-                  <h1 className="component-ending-screen-hero-title">
+                  {/* h2 in every hero branch: the page-level h1 belongs to the
+                      route (sr-only "Story Complete", #1532), and this was the
+                      only branch still rendering the hero title as an h1. */}
+                  <h2 className="component-ending-screen-hero-title">
                     The End
-                  </h1>
+                  </h2>
                   <p className="component-ending-screen-hero-meta">
                     {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
                   </p>
