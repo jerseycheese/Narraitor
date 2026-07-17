@@ -10,6 +10,8 @@ import { useTutorial } from '@/components/TutorialProvider';
 import { useRouter } from 'next/navigation';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { isFeatureEnabled } from '@/lib/featureFlags';
+import { useWorldStore } from '@/state/worldStore';
+import { createMockWorld } from '@/lib/test-utils';
 
 // Mock dependencies
 jest.mock('@/state/narrativeStore');
@@ -17,6 +19,12 @@ jest.mock('@/state/sessionStore');
 jest.mock('@/state/characterStore');
 jest.mock('@/state/inventoryStore');
 jest.mock('@/state/journalStore');
+jest.mock('@/state/worldStore');
+// StorySummaryDrawerContent mounts the checkpoint manager; its return value is
+// unused there, so a no-op keeps the drawer test focused on the header.
+jest.mock('../hooks/useStoryCheckpointManager', () => ({
+  useStoryCheckpointManager: jest.fn(),
+}));
 jest.mock('@/hooks/useAutoSave');
 jest.mock('@/components/TutorialProvider');
 jest.mock('@/lib/featureFlags');
@@ -74,6 +82,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
         'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: [] },
       },
       sessionSegments: { [mockSessionId]: ['seg-1'] },
+      sessionDecisions: {},
+      decisions: {},
       currentEnding: null,
       isGeneratingEnding: false,
       isSessionEnded: () => false,
@@ -114,6 +124,10 @@ describe('ActiveGameSession Manuscript Layout', () => {
       };
       return selector ? selector(state) : state;
     });
+
+    (useWorldStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector({ worlds: {}, worldStates: {} })
+    );
 
     (useTutorial as jest.Mock).mockReturnValue({
       startTour: jest.fn(),
@@ -319,5 +333,56 @@ describe('ActiveGameSession Manuscript Layout', () => {
     expect(aside).toBeInTheDocument();
     expect(aside).toHaveClass('manuscript-characters-rail');
     expect(screen.getByText('Characters Present')).toBeInTheDocument();
+  });
+
+  describe('drawer subtitles use readable labels (#1534)', () => {
+    // mockSessionId ('session-1') slices to 'session-', so the old
+    // `sessionId.slice(0, 8)` subtitle rendered exactly "Session session-".
+    const worldWithName = createMockWorld({ id: mockWorldId, name: 'Cyberpunk Neo-Tokyo' });
+
+    beforeEach(() => {
+      (isFeatureEnabled as jest.Mock).mockImplementation(
+        (flag) => flag === 'PROGRESSIVE_DISCLOSURE'
+      );
+    });
+
+    // The three session-scoped drawers share one subtitle branch.
+    it.each(['Journal', 'Story Summary', 'Choice History'])(
+      'shows the world name instead of a truncated session ID in the %s drawer',
+      async (triggerLabel) => {
+        render(
+          <ActiveGameSession
+            worldId={mockWorldId}
+            sessionId={mockSessionId}
+            world={worldWithName}
+            onChoiceSelected={jest.fn()}
+          />
+        );
+
+        fireEvent.click(await screen.findByRole('button', { name: triggerLabel }));
+
+        const drawer = await screen.findByTestId('manuscript-drawer');
+        expect(drawer.querySelector('.manuscript-drawer-subtitle')).toHaveTextContent(
+          'Cyberpunk Neo-Tokyo'
+        );
+        expect(within(drawer).queryByText(/Session session-/)).not.toBeInTheDocument();
+      }
+    );
+
+    it('omits the subtitle entirely when no world name is available', async () => {
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      fireEvent.click(await screen.findByRole('button', { name: 'Journal' }));
+
+      const drawer = await screen.findByTestId('manuscript-drawer');
+      expect(within(drawer).queryByText(/Session session-/)).not.toBeInTheDocument();
+      expect(drawer.querySelector('.manuscript-drawer-subtitle')).toBeNull();
+    });
   });
 });
