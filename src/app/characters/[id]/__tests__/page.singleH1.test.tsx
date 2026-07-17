@@ -63,4 +63,12 @@ describe('CharacterViewPage heading hierarchy', () => {
     expect(h1s).toHaveLength(1);
     expect(h1s[0]).toHaveTextContent('Aria');
   });
+
+  it('does not repeat the character name in lower-level headings (#1542)', () => {
+    render(<CharacterViewPage />);
+
+    // Exactly one heading carries the name: the page h1. The hero banner and
+    // the CharacterHeader block previously stacked two more h2s with it.
+    expect(screen.getAllByRole('heading', { name: 'Aria' })).toHaveLength(1);
+  });
 });

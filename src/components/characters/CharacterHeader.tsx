@@ -23,7 +23,8 @@ export function CharacterHeader({ character, world }: CharacterHeaderProps) {
         size="xlarge"
       />
       <div className="character-detail-header-info">
-        <h2>{character.name}</h2>
+        {/* No name heading here — the page-level h1 already announces the
+            character, and repeating it stacked duplicate headings (#1542) */}
         <p>Level {character.level}</p>
         {character.background.personality && (
           <p>

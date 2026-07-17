@@ -94,17 +94,15 @@ export default function CharacterViewPage() {
         />
       }
     >
-      {/* Ultra-thin world hero */}
+      {/* Decorative world-image banner; the page h1 above already carries the
+          character name, so the hero repeats neither it nor the level line (#1542) */}
       {world.image?.url && (
         <div className="character-detail-hero">
           <Hero
-            title={character.name}
             image={{
               url: world.image.url,
               alt: `${world.name} world`,
             }}
-            subtitle={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
-            titleElement="h2"
           />
         </div>
       )}

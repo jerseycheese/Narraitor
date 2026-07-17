@@ -94,8 +94,9 @@ describe('CharacterViewPage', () => {
   test('displays character information when character exists', () => {
     render(<CharacterViewPage />);
     
-    // Should display character name in the character details (since no world image, only h2)
-    expect(screen.getByRole('heading', { level: 2, name: 'Test Character' })).toBeInTheDocument();
+    // The page h1 carries the name once; no lower heading repeats it (#1542)
+    expect(screen.getByRole('heading', { level: 1, name: 'Test Character' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: 'Test Character' })).toHaveLength(1);
     expect(screen.getByText('Level 5')).toBeInTheDocument();
     
     // Should display character attributes 
