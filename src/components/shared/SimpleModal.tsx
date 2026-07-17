@@ -1,4 +1,4 @@
-import React, { useId } from 'react';
+import React from 'react';
 import { X } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
 
@@ -55,10 +56,15 @@ export function SimpleModal({
   scrollBehavior = 'overlay',
   stickyFooter,
 }: SimpleModalProps) {
-  const fallbackDescriptionId = useId();
-  const resolvedDescriptionId =
-    ariaDescribedBy ||
-    (description ? `${fallbackDescriptionId}-description` : undefined);
+  // Radix wires DialogContent's aria-describedby to the DialogDescription we
+  // render below. Only override that default to point at a caller-owned
+  // element (ariaDescribedBy), or to opt out explicitly when the dialog has
+  // no descriptive text at all -- a dangling aria-describedby makes Radix
+  // warn about a missing Description.
+  const describedByOverride =
+    description && !ariaDescribedBy
+      ? {}
+      : { 'aria-describedby': ariaDescribedBy };
   const hasHeaderContent = Boolean(title || showCloseButton || description);
 
   return (
@@ -67,7 +73,7 @@ export function SimpleModal({
       onOpenChange={(open) => (open ? undefined : onClose())}
     >
       <DialogContent
-        aria-describedby={resolvedDescriptionId}
+        {...describedByOverride}
         showCloseButton={false}
         overlayScroll={scrollBehavior === 'overlay'}
         overlayClassName={overlayClassName}
@@ -93,10 +99,13 @@ export function SimpleModal({
           <div>
             <div>
               {title && <DialogTitle>{title}</DialogTitle>}
+              {/* asChild keeps this a div: description accepts arbitrary
+                  nodes (some callers pass <p> blocks), which the default
+                  Radix <p> element could not legally contain. */}
               {description && (
-                <div id={ariaDescribedBy ? undefined : resolvedDescriptionId}>
-                  {description}
-                </div>
+                <DialogDescription asChild>
+                  <div className="dialog-description">{description}</div>
+                </DialogDescription>
               )}
             </div>
             {showCloseButton && (
