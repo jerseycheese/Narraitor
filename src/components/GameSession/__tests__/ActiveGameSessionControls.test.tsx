@@ -100,4 +100,36 @@ describe('ActiveGameSessionControls', () => {
     expect(cancelButton).toHaveClass('manuscript-end-story-cancel');
     expect(confirmButton).toHaveClass('manuscript-end-story-confirm');
   });
+
+  // Escape/focus parity with the shared ConfirmationDialog (#1536).
+  it('closes the end-story confirmation on Escape', () => {
+    const onCloseEndStory = jest.fn();
+
+    render(
+      <ActiveGameSessionControls
+        {...baseProps}
+        onCloseEndStory={onCloseEndStory}
+        showEndConfirmation={true}
+        character={undefined}
+        characterId={undefined}
+      />
+    );
+
+    fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
+
+    expect(onCloseEndStory).toHaveBeenCalledTimes(1);
+  });
+
+  it('moves focus to Cancel when the end-story confirmation opens', () => {
+    render(
+      <ActiveGameSessionControls
+        {...baseProps}
+        showEndConfirmation={true}
+        character={undefined}
+        characterId={undefined}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /cancel/i })).toHaveFocus();
+  });
 });
