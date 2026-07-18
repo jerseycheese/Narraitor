@@ -1308,6 +1308,10 @@
 :root .component-world-creation-wizard,
 :root .component-character-creation-wizard > :not(.wizard-header) {
   width: 100%;
+
+  /* No global border-box reset in this app, so width: 100% + the padding and
+     border below rendered 18px past the mobile content column (#1541). */
+  box-sizing: border-box;
   min-width: 0;
   display: grid;
   grid-template-columns: 1fr;
