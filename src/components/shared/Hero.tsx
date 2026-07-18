@@ -3,8 +3,10 @@ import Image from 'next/image';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 interface HeroProps {
-  /** The title to display over the image */
-  title: string;
+  /** The title to display over the image. Omit (with no subtitle/badge) to
+   * render a purely decorative banner — detail pages do this so the entity
+   * name isn't repeated below the page-level h1 (#1542). */
+  title?: string;
   /** The image to display (optional) */
   image?: {
     url: string;
@@ -20,8 +22,6 @@ interface HeroProps {
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   /** Optional actions to render anchored at bottom-right of the hero */
   actions?: React.ReactNode;
-  /** Theme/genre for styling (unused in clean slate) */
-  theme?: string;
 }
 
 /**
@@ -61,7 +61,6 @@ export const Hero: React.FC<HeroProps> = ({
   titleTestId,
   titleElement: TitleElement = 'h1',
   actions,
-  theme, // Destructure but ignore
 }) => {
   return (
     <div className="component-hero">
@@ -84,25 +83,30 @@ export const Hero: React.FC<HeroProps> = ({
         />
       )}
 
-      {/* Title overlay with gradient background */}
-      <div className="component-hero-overlay">
-        <div className="component-hero-content">
-          <TitleElement
-            className="component-hero-title"
-            data-testid={titleTestId}
-          >
-            {title}
-          </TitleElement>
+      {/* Title overlay with gradient background; skipped entirely when the
+          hero is decorative so no empty bar renders over the image */}
+      {(title || subtitle || badge) && (
+        <div className="component-hero-overlay">
+          <div className="component-hero-content">
+            {title && (
+              <TitleElement
+                className="component-hero-title"
+                data-testid={titleTestId}
+              >
+                {title}
+              </TitleElement>
+            )}
 
-          {subtitle && (
-            <p className="component-hero-subtitle">
-              {subtitle}
-            </p>
-          )}
+            {subtitle && (
+              <p className="component-hero-subtitle">
+                {subtitle}
+              </p>
+            )}
 
-          {badge && <div className="component-hero-badge">{badge}</div>}
+            {badge && <div className="component-hero-badge">{badge}</div>}
+          </div>
         </div>
-      </div>
+      )}
 
       {actions && (
         <div className="component-hero-actions">

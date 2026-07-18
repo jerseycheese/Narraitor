@@ -110,19 +110,18 @@ export default function WorldViewPage() {
         />
       }
     >
-      {/* Hero section with image or themed background */}
-      <div className="world-detail-hero">
-        <Hero
-          title={world.name}
-          titleElement="h2"
-          image={world.image?.url ? {
-            url: world.image.url,
-            alt: `${world.name} world`
-          } : undefined}
-          subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-          theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
-        />
-      </div>
+      {/* Decorative image banner; the page h1 above already carries the world
+          name, so the hero repeats neither title nor genre (#1542) */}
+      {world.image?.url && (
+        <div className="world-detail-hero">
+          <Hero
+            image={{
+              url: world.image.url,
+              alt: `${world.name} world`
+            }}
+          />
+        </div>
+      )}
 
       <section className="world-detail-body" aria-label="World details">
         <WorldDetailsDisplay world={world} />

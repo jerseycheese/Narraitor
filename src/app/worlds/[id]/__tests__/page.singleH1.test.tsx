@@ -49,9 +49,16 @@ describe('WorldViewPage heading hierarchy', () => {
     const h1s = screen.getAllByRole('heading', { level: 1 });
     expect(h1s).toHaveLength(1);
     expect(h1s[0]).toHaveTextContent('Fantasy Realm');
-    // The hero repeats the name, but as an h2 so the page keeps a single h1.
+  });
+
+  it('does not repeat the world name in lower-level headings (#1542)', () => {
+    render(<WorldViewPage />);
+
+    // The name appears exactly once in the heading outline (the page h1);
+    // the hero is a decorative image band and no longer repeats it.
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Fantasy Realm' })
-    ).toBeInTheDocument();
+      screen.getAllByRole('heading', { name: 'Fantasy Realm' })
+    ).toHaveLength(1);
+    expect(screen.getByAltText('Fantasy Realm world')).toBeInTheDocument();
   });
 });
