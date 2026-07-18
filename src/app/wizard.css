@@ -1028,20 +1028,20 @@
 
 /* ─── DS3 — Mechanical Manuscript ─── */
 
-[data-theme="ds3"] .wizard-page .wizard-title,
-[data-theme="ds3"] .wizard-page .wizard-page-title {
+:root .wizard-page .wizard-title,
+:root .wizard-page .wizard-page-title {
   font-family: var(--font-interface);
   font-style: italic;
   letter-spacing: -0.005em;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-progress-circle {
+:root .wizard-page .wizard-progress-circle {
   border-radius: 3px;
   font-family: var(--font-system);
   font-size: 0.8125rem;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-progress-connector {
+:root .wizard-page .wizard-progress-connector {
   height: 4px;
   background: transparent;
   background-image: radial-gradient(
@@ -1054,7 +1054,7 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-progress-connector-active {
+:root .wizard-page .wizard-progress-connector-active {
   background: transparent;
   background-image: radial-gradient(
     circle,
@@ -1066,18 +1066,18 @@
   opacity: 1;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-progress-label {
+:root .wizard-page .wizard-progress-label {
   font-family: var(--font-system);
   font-size: 0.6875rem;
   letter-spacing: 0.05em;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-progress-label::before {
+:root .wizard-page .wizard-progress-label::before {
   content: "• ";
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-step-title {
+:root .wizard-page .wizard-step-title {
   position: relative;
   padding-top: var(--space-3);
   font-family: var(--font-interface);
@@ -1085,7 +1085,7 @@
   font-weight: 500;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-step-title::before {
+:root .wizard-page .wizard-step-title::before {
   content: "• Step";
   display: block;
   margin-bottom: var(--space-1);
@@ -1098,16 +1098,16 @@
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-archetype-grid .wizard-step-title::before {
+:root .wizard-page .wizard-archetype-grid .wizard-step-title::before {
   content: none;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-form-section {
+:root .wizard-page .wizard-form-section {
   position: relative;
   padding-top: var(--space-4);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-form-section + .wizard-form-section::before {
+:root .wizard-page .wizard-form-section + .wizard-form-section::before {
   content: "";
   display: block;
   position: absolute;
@@ -1125,35 +1125,35 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-subheading {
+:root .wizard-page .wizard-subheading {
   font-family: var(--font-system);
   letter-spacing: 0.1em;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-subheading::before {
+:root .wizard-page .wizard-subheading::before {
   content: "• ";
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .wizard-page .form-input,
-[data-theme="ds3"] .wizard-page .form-textarea,
-[data-theme="ds3"] .wizard-page .form-select {
+:root .wizard-page .form-input,
+:root .wizard-page .form-textarea,
+:root .wizard-page .form-select {
   border-radius: 4px;
   font-family: var(--font-interface);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-card,
-[data-theme="ds3"] .wizard-page .wizard-panel {
+:root .wizard-page .wizard-card,
+:root .wizard-page .wizard-panel {
   border-radius: 4px;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-nav-container {
+:root .wizard-page .wizard-nav-container {
   position: relative;
   border-top: none;
   padding-top: var(--space-5);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-nav-container::before {
+:root .wizard-page .wizard-nav-container::before {
   content: "";
   display: block;
   position: absolute;
@@ -1171,28 +1171,28 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-nav-primary,
-[data-theme="ds3"] .wizard-page .wizard-nav-secondary {
+:root .wizard-page .wizard-nav-primary,
+:root .wizard-page .wizard-nav-secondary {
   border-radius: 4px;
 }
 
 /* DS3 step content — monospace card titles, dotted divider/action-row
    accents reusing the canon connector pattern, rounded-square chips. */
 
-[data-theme="ds3"] .wizard-page .wizard-card-title {
+:root .wizard-page .wizard-card-title {
   font-family: var(--font-system);
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0.05em;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-card-actions {
+:root .wizard-page .wizard-card-actions {
   position: relative;
   margin-top: var(--space-3);
   padding-top: var(--space-3);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-card-actions::before {
+:root .wizard-page .wizard-card-actions::before {
   content: "";
   position: absolute;
   top: 0;
@@ -1209,13 +1209,13 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-template-mode-divider {
+:root .wizard-page .wizard-template-mode-divider {
   font-family: var(--font-system);
   letter-spacing: 0.1em;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-template-mode-divider::before,
-[data-theme="ds3"] .wizard-page .wizard-template-mode-divider::after {
+:root .wizard-page .wizard-template-mode-divider::before,
+:root .wizard-page .wizard-template-mode-divider::after {
   width: 2.5rem;
   height: 4px;
   background: transparent;
@@ -1229,44 +1229,44 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-archetype-section-heading {
+:root .wizard-page .wizard-archetype-section-heading {
   font-family: var(--font-system);
   letter-spacing: 0.1em;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-archetype-section-heading::before {
+:root .wizard-page .wizard-archetype-section-heading::before {
   content: "• ";
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-badge {
+:root .wizard-page .wizard-badge {
   border-radius: 3px;
   font-family: var(--font-system);
   letter-spacing: 0.05em;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-toggle {
+:root .wizard-page .wizard-toggle {
   border-radius: 4px;
   font-family: var(--font-system);
   font-size: 0.75rem;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-info-banner {
+:root .wizard-page .wizard-info-banner {
   border-radius: 4px;
   border-style: dashed;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-empty-state {
+:root .wizard-page .wizard-empty-state {
   border-radius: 4px;
   font-family: var(--font-system);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-help-row {
+:root .wizard-page .wizard-help-row {
   position: relative;
   padding-top: var(--space-4);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-help-row::before {
+:root .wizard-page .wizard-help-row::before {
   content: "";
   display: block;
   position: absolute;
@@ -1292,21 +1292,21 @@
 
 /* ─── Shared wizard flow hooks ─── */
 
-[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > :first-child:not(.component-wizard-progress) {
+:root .component-character-creation-wizard > :not(.wizard-header) > :first-child:not(.component-wizard-progress) {
   grid-column: 1 / -1;
   justify-self: end;
 }
 
 /* ─── DS3 — Command Strip ─── */
 
-[data-theme="ds3"] .component-create-world-page > .wizard-container,
-[data-theme="ds3"] .component-create-character-page .component-character-creation-wizard {
+:root .component-create-world-page > .wizard-container,
+:root .component-create-character-page .component-character-creation-wizard {
   max-width: calc(var(--space-8) * 44);
   margin: 0 auto;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard,
-[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) {
+:root .component-world-creation-wizard,
+:root .component-character-creation-wizard > :not(.wizard-header) {
   width: 100%;
   min-width: 0;
   display: grid;
@@ -1328,43 +1328,43 @@
   background-repeat: repeat;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard > .component-wizard-progress,
-[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress,
-[data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container,
-[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container,
-[data-theme="ds3"] .component-world-creation-wizard > .wizard-step-content,
-[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
+:root .component-world-creation-wizard > .component-wizard-progress,
+:root .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress,
+:root .component-world-creation-wizard > .wizard-nav-container,
+:root .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container,
+:root .component-world-creation-wizard > .wizard-step-content,
+:root .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard > .component-wizard-progress,
-[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress {
+:root .component-world-creation-wizard > .component-wizard-progress,
+:root .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress {
   grid-area: progress;
   min-width: 0;
   padding: var(--space-2);
   overflow-x: auto;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container,
-[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
+:root .component-world-creation-wizard > .wizard-nav-container,
+:root .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
   grid-area: actions;
   margin-top: 0;
   padding: var(--space-2) var(--space-3);
   align-items: center;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard > .wizard-step-content,
-[data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
+:root .component-world-creation-wizard > .wizard-step-content,
+:root .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
   grid-area: content;
   gap: var(--space-3);
   min-width: 0;
   padding: var(--space-4);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-row,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-row {
+:root .component-world-creation-wizard .wizard-progress-row,
+:root .component-character-creation-wizard .wizard-progress-row {
   flex-flow: row nowrap;
   align-items: stretch;
   justify-content: flex-start;
@@ -1372,13 +1372,13 @@
   min-width: max-content;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-connector-wrapper,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-connector-wrapper {
+:root .component-world-creation-wizard .wizard-progress-connector-wrapper,
+:root .component-character-creation-wizard .wizard-progress-connector-wrapper {
   display: none;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-wrapper,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-wrapper {
+:root .component-world-creation-wizard .wizard-progress-step-wrapper,
+:root .component-character-creation-wizard .wizard-progress-step-wrapper {
   flex-direction: row;
   align-items: center;
   gap: var(--space-2);
@@ -1388,38 +1388,38 @@
   background: var(--color-canvas);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-active,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-active {
+:root .component-world-creation-wizard .wizard-progress-step-active,
+:root .component-character-creation-wizard .wizard-progress-step-active {
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-on-accent);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-label,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-active .wizard-progress-label {
+:root .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-label,
+:root .component-character-creation-wizard .wizard-progress-step-active .wizard-progress-label {
   color: var(--color-text-inverse);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-circle-active,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-step-active .wizard-progress-circle-active {
+:root .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-circle-active,
+:root .component-character-creation-wizard .wizard-progress-step-active .wizard-progress-circle-active {
   background: var(--color-text-inverse);
   color: var(--color-accent);
   border-color: var(--color-text-inverse);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-circle,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-circle {
+:root .component-world-creation-wizard .wizard-progress-circle,
+:root .component-character-creation-wizard .wizard-progress-circle {
   width: var(--space-5);
   height: var(--space-5);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-label,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-progress-label {
+:root .component-world-creation-wizard .wizard-progress-label,
+:root .component-character-creation-wizard .wizard-progress-label {
   white-space: nowrap;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-form-section,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-form-section {
+:root .component-world-creation-wizard .wizard-form-section,
+:root .component-character-creation-wizard .wizard-form-section {
   margin: 0;
   padding: var(--space-3);
   border: 1px solid var(--color-border);
@@ -1427,28 +1427,28 @@
   background: var(--color-surface);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-form-section + .wizard-form-section,
-[data-theme="ds3"] .component-character-creation-wizard .wizard-form-section + .wizard-form-section {
+:root .component-world-creation-wizard .wizard-form-section + .wizard-form-section,
+:root .component-character-creation-wizard .wizard-form-section + .wizard-form-section {
   margin-top: var(--space-3);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .form-group,
-[data-theme="ds3"] .component-character-creation-wizard .form-group {
+:root .component-world-creation-wizard .form-group,
+:root .component-character-creation-wizard .form-group {
   gap: var(--space-1);
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .form-input,
-[data-theme="ds3"] .component-world-creation-wizard .form-textarea,
-[data-theme="ds3"] .component-world-creation-wizard .form-select,
-[data-theme="ds3"] .component-character-creation-wizard .form-input,
-[data-theme="ds3"] .component-character-creation-wizard .form-textarea,
-[data-theme="ds3"] .component-character-creation-wizard .form-select {
+:root .component-world-creation-wizard .form-input,
+:root .component-world-creation-wizard .form-textarea,
+:root .component-world-creation-wizard .form-select,
+:root .component-character-creation-wizard .form-input,
+:root .component-character-creation-wizard .form-textarea,
+:root .component-character-creation-wizard .form-select {
   padding: var(--space-1_5) var(--space-2_5);
 }
 
 @media (width < 768px) {
-  [data-theme="ds3"] .component-world-creation-wizard,
-  [data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) {
+  :root .component-world-creation-wizard,
+  :root .component-character-creation-wizard > :not(.wizard-header) {
     padding: var(--space-2);
 
     /* Move the action bar below the form on narrow screens so Next/Back are
@@ -1459,19 +1459,19 @@
       "actions";
   }
 
-  [data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container,
-  [data-theme="ds3"] .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
+  :root .component-world-creation-wizard > .wizard-nav-container,
+  :root .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
     flex-direction: column;
     align-items: stretch;
   }
 
-  [data-theme="ds3"] .component-world-creation-wizard .wizard-nav-group,
-  [data-theme="ds3"] .component-character-creation-wizard .wizard-nav-group {
+  :root .component-world-creation-wizard .wizard-nav-group,
+  :root .component-character-creation-wizard .wizard-nav-group {
     justify-content: stretch;
   }
 
-  [data-theme="ds3"] .component-world-creation-wizard .wizard-nav-group > *,
-  [data-theme="ds3"] .component-character-creation-wizard .wizard-nav-group > * {
+  :root .component-world-creation-wizard .wizard-nav-group > *,
+  :root .component-character-creation-wizard .wizard-nav-group > * {
     flex: 1 1 auto;
   }
 }
@@ -1889,25 +1889,25 @@
 
 /* ════════════════════ DS3 — Command Strip ════════════════════ */
 
-[data-theme="ds3"] .wizard-page .wizard-review-list {
+:root .wizard-page .wizard-review-list {
   gap: var(--space-4);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-review-suggestions,
-[data-theme="ds3"] .wizard-page .wizard-review-custom-list,
-[data-theme="ds3"] .wizard-page .wizard-skill-allocation-list {
+:root .wizard-page .wizard-review-suggestions,
+:root .wizard-page .wizard-review-custom-list,
+:root .wizard-page .wizard-skill-allocation-list {
   gap: var(--space-2);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-review-card-detail,
-[data-theme="ds3"] .wizard-page .wizard-skill-level {
+:root .wizard-page .wizard-review-card-detail,
+:root .wizard-page .wizard-skill-level {
   position: relative;
   padding-top: var(--space-3);
   gap: var(--space-2);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-review-card-detail::before,
-[data-theme="ds3"] .wizard-page .wizard-skill-level::before {
+:root .wizard-page .wizard-review-card-detail::before,
+:root .wizard-page .wizard-skill-level::before {
   content: "";
   position: absolute;
   top: 0;
@@ -1924,77 +1924,77 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-skill-attr-option {
+:root .wizard-page .wizard-skill-attr-option {
   border-radius: 4px;
   padding: var(--space-1_5);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-custom-editor {
+:root .wizard-page .wizard-custom-editor {
   border-radius: 4px;
   padding: var(--space-3);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-custom-editor h2 {
+:root .wizard-page .wizard-custom-editor h2 {
   font-family: var(--font-system);
   font-size: 0.875rem;
   letter-spacing: 0.05em;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-custom-editor input,
-[data-theme="ds3"] .wizard-page .wizard-custom-editor textarea,
-[data-theme="ds3"] .wizard-page .wizard-custom-editor select {
+:root .wizard-page .wizard-custom-editor input,
+:root .wizard-page .wizard-custom-editor textarea,
+:root .wizard-page .wizard-custom-editor select {
   border-radius: 4px;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-slot-cell {
+:root .wizard-page .wizard-slot-cell {
   width: var(--space-2);
   height: var(--space-2);
   border-radius: 1px;
 }
 
-[data-theme="ds3"] .wizard-page .wizard-slot-summary-count,
-[data-theme="ds3"] .wizard-page .wizard-skill-level-row {
+:root .wizard-page .wizard-slot-summary-count,
+:root .wizard-page .wizard-skill-level-row {
   font-family: var(--font-system);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-dialog-panel {
+:root .wizard-page .wizard-dialog-panel {
   border-radius: 4px;
   border-style: dashed;
 }
 
-[data-theme="ds3"] .wizard-page .component-portrait-step {
+:root .wizard-page .component-portrait-step {
   gap: var(--space-3);
 }
 
-[data-theme="ds3"] .wizard-page .component-portrait-step .component-character-portrait {
+:root .wizard-page .component-portrait-step .component-character-portrait {
   border-radius: 4px;
 }
 
-[data-theme="ds3"] .wizard-page .component-portrait-step button {
+:root .wizard-page .component-portrait-step button {
   border-radius: 4px;
   padding: var(--space-1_5) var(--space-3);
 }
 
-[data-theme="ds3"] .wizard-page .portrait-step-success {
+:root .wizard-page .portrait-step-success {
   border-radius: 4px;
   border-style: dashed;
 }
 
-[data-theme="ds3"] .wizard-page .component-point-pool-manager {
+:root .wizard-page .component-point-pool-manager {
   gap: var(--space-2);
 }
 
-[data-theme="ds3"] .wizard-page .component-point-pool-manager .point-pool-allocation {
+:root .wizard-page .component-point-pool-manager .point-pool-allocation {
   border-radius: 4px;
   padding: var(--space-2_5);
 }
 
-[data-theme="ds3"] .wizard-page .point-pool-allocation-name,
-[data-theme="ds3"] .wizard-page .point-pool-allocation-value {
+:root .wizard-page .point-pool-allocation-name,
+:root .wizard-page .point-pool-allocation-value {
   font-family: var(--font-system);
 }
 
-[data-theme="ds3"] .wizard-page .wizard-error-container {
+:root .wizard-page .wizard-error-container {
   border-radius: 4px;
   border-style: dashed;
 }
@@ -2158,47 +2158,47 @@
    .wizard-progress-connector pattern at line 1147. Monospace voice on the
    skip link with a dot bullet to match wizard-progress-label at line 1178. */
 
-[data-theme="ds3"] .component-guided-first-time {
+:root .component-guided-first-time {
   border-radius: var(--radius-md);
   border-color: var(--color-border-strong);
 }
 
-[data-theme="ds3"] .component-guided-first-time .wizard-title {
+:root .component-guided-first-time .wizard-title {
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 500;
 }
 
-[data-theme="ds3"] .component-guided-first-time-step-item {
+:root .component-guided-first-time-step-item {
   border-radius: var(--radius-md);
   border-color: var(--color-border-strong);
 }
 
-[data-theme="ds3"] .component-guided-first-time-step-num {
+:root .component-guided-first-time-step-num {
   font-family: var(--font-system);
   font-size: 0.8125rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-[data-theme="ds3"] .component-guided-first-time-step-num::before {
+:root .component-guided-first-time-step-num::before {
   content: "• ";
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .component-guided-first-time-step-heading {
+:root .component-guided-first-time-step-heading {
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 500;
 }
 
-[data-theme="ds3"] .component-guided-first-time-step-title {
+:root .component-guided-first-time-step-title {
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 500;
 }
 
-[data-theme="ds3"] .component-guided-first-time-nav {
+:root .component-guided-first-time-nav {
   border-top: none;
   background-image: radial-gradient(
     circle,
@@ -2211,19 +2211,19 @@
   padding-top: var(--space-5);
 }
 
-[data-theme="ds3"] .component-guided-first-time-skip {
+:root .component-guided-first-time-skip {
   font-family: var(--font-system);
   font-size: 0.6875rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-[data-theme="ds3"] .component-guided-first-time-skip::before {
+:root .component-guided-first-time-skip::before {
   content: "• ";
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .component-guided-first-time-error {
+:root .component-guided-first-time-error {
   border-radius: var(--radius-md);
   border-color: var(--color-border-strong);
 }
@@ -2238,25 +2238,25 @@
 
 /* ─── F8 + F13 — DS3: vertical step-nav, Back/Next moved to the bottom ─── */
 
-[data-theme="ds3"] .component-world-creation-wizard {
+:root .component-world-creation-wizard {
   grid-template-areas:
     "progress"
     "content"
     "actions";
 }
 
-[data-theme="ds3"] .component-world-creation-wizard > .component-wizard-progress {
+:root .component-world-creation-wizard > .component-wizard-progress {
   overflow-x: visible;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard .wizard-progress-row {
+:root .component-world-creation-wizard .wizard-progress-row {
   flex-flow: column nowrap;
   align-items: stretch;
   gap: var(--space-1_5);
   min-width: 0;
 }
 
-[data-theme="ds3"] .component-world-creation-wizard > .wizard-nav-container {
+:root .component-world-creation-wizard > .wizard-nav-container {
   padding: var(--space-3);
 }
 

@@ -5,8 +5,8 @@ import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 /**
  * About — the marketing/explainer page for Narraitor. Token-driven, server
- * component. Per-theme structural treatment lives in src/app/about.css under
- * [data-theme="dsN"] .component-about* selectors (mirrors the dashboard pattern).
+ * component. Structural treatment lives in src/app/about.css under
+ * .component-about* selectors (mirrors the dashboard pattern).
  *
  * Copy leads with the wedge (a structured solo RPG with real skill checks and
  * tracked state), explains the provider key in plain terms, and stays

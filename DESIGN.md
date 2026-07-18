@@ -141,7 +141,7 @@ DS1 is zinc-based with a single accent (Archival Ink Blue). The palette is inten
 ### DS3 color notes
 
 - DS3's actual accent is steel blue `#5B7A8C`; canvas is `#F7F3ED` (aged-paper) — both different from the DS1 values used as illustrative examples above.
-- DS3 has a complete dark-mode override under `[data-theme="ds3"].dark` — toggle the `dark` class on `<html>`.
+- DS3 has a complete dark-mode override under `:root.dark` — toggle the `dark` class on `<html>`.
 - Full current palette: [ds3.css](src/lib/theme/themes/ds3.css) — the only theme file now.
 
 ## Typography
@@ -288,7 +288,7 @@ As of [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-syste
 - Color scheme (light | dark | system) is still fully user-controlled — via the Appearance menu (`ThemeMenu` + `DarkModeToggle`) or Settings — and layered separately via the `dark` class on `<html>`.
 - Both are managed by [`ThemeProvider`](src/lib/theme/ThemeProvider.tsx). Only color scheme persists to `localStorage`, under `narraitor-color-scheme`.
 - A FOUC-prevention script applies the stored color scheme before React hydrates, so users don't see a light/dark flash.
-- The `useTheme()` hook still exposes `theme`/`setTheme` alongside `colorScheme`/`resolvedColorScheme` and their setters, but `theme` is always `"ds3"` and nothing in the app calls `setTheme`. That surface is vestigial, left in place for this PR and slated for removal in the de-naming follow-up noted in ADR-013.
+- The `useTheme()` hook exposes `colorScheme`/`resolvedColorScheme`/`setColorScheme` only. The vestigial `theme`/`setTheme` surface (and the `DesignSystem` type behind it) was removed in the de-naming follow-up ADR-013 planned (#1546).
 
 ## References
 

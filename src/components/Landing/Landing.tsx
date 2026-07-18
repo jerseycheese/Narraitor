@@ -6,8 +6,8 @@ import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 /**
  * Landing — the free public front door for a first-time visitor (#1365).
  * Token-driven server component. Structural treatment (dot-grid, corner-bracket
- * cards, mono labels) lives in src/app/landing.css under [data-theme="ds3"]
- * .component-landing* selectors (mirrors the About/dashboard pattern).
+ * cards, mono labels) lives in src/app/landing.css under .component-landing*
+ * selectors (mirrors the About/dashboard pattern).
  *
  * Outcome-framed copy — it leads with the wedge (a structured solo RPG with
  * real skill checks and tracked state), not the machinery.

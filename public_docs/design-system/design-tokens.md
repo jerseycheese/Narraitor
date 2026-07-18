@@ -19,7 +19,7 @@ The token system uses a three-tier hierarchy of CSS custom properties:
 
 **Global Tokens** to **Semantic Tokens** to **Component Tokens**
 
-DS3 defines all three tiers under the `[data-theme="ds3"]` attribute selector, with separate blocks for light and dark mode. Every component that consumes `var(--token-name)` picks up the active mode automatically.
+DS3 defines all three tiers under the `:root` selector, with separate blocks for light and dark mode. Every component that consumes `var(--token-name)` picks up the active mode automatically.
 
 ### Tier 1: Global Tokens
 
@@ -27,7 +27,7 @@ These establish the design system's identity — fonts, surface colors, and bord
 
 ```css
 /* From ds3.css — "Mechanical Manuscript" */
-[data-theme="ds3"] {
+:root {
   /* Typography: semantic names map to specific font families */
   --font-narrative: var(--font-newsreader);
   --font-system: var(--font-fira-code);
@@ -83,7 +83,7 @@ These establish the design system's identity — fonts, surface colors, and bord
 These map intent and context onto the global foundation. Status feedback, storytelling contexts, and elevation are all semantic tokens.
 
 ```css
-[data-theme="ds3"] {
+:root {
   /* Status colors */
   --color-warning: rgb(113 88 51);
   --color-success: rgb(74 124 89);
@@ -127,7 +127,7 @@ variants that predate the `--color-*` family. Everything else reaches color thro
 `--color-*` tokens (Tiers 1–2).
 
 ```css
-[data-theme="ds3"] {
+:root {
   /* Status tokens with background/border variants (HSL channels) */
   --success: 138 25% 40%;
   --success-background: 138 25% 90%;
@@ -293,13 +293,13 @@ Dark mode is fully implemented. DS3 defines a complete set of dark-mode token ov
 
 ```css
 /* Light mode tokens */
-[data-theme="ds3"] {
+:root {
   --color-canvas: rgb(247 243 237);
   --color-text-primary: rgb(42 35 28);
 }
 
 /* Dark mode overrides */
-[data-theme="ds3"].dark {
+:root.dark {
   --color-canvas: rgb(23 19 16);
   --color-text-primary: rgb(237 232 224);
 }

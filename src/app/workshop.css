@@ -157,15 +157,15 @@
    gets a dotted rule under the title and a serif italic-feeling
    tagline. Suppress the home-hero dot pattern (body covers it). */
 
-[data-theme="ds3"] .home-hero {
+:root .home-hero {
   padding: 4rem var(--space-4) 3rem;
 }
 
-[data-theme="ds3"] .home-hero::before {
+:root .home-hero::before {
   display: none;
 }
 
-[data-theme="ds3"] .home-hero::after {
+:root .home-hero::after {
   background: radial-gradient(
     ellipse 75% 65% at 50% 115%,
     color-mix(in srgb, var(--color-accent) 10%, transparent),
@@ -173,14 +173,14 @@
   );
 }
 
-[data-theme="ds3"] .home-hero-title {
+:root .home-hero-title {
   font-style: normal;
   font-weight: 400;
   letter-spacing: -0.012em;
   margin-bottom: var(--space-3);
 }
 
-[data-theme="ds3"] .home-hero-title::after {
+:root .home-hero-title::after {
   content: "";
   display: block;
   width: 96px;
@@ -192,7 +192,7 @@
   opacity: 0.7;
 }
 
-[data-theme="ds3"] .home-hero-tagline {
+:root .home-hero-tagline {
   font-family: var(--font-narrative);
   font-style: italic;
   font-size: 1.125rem;
@@ -201,13 +201,13 @@
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds3"] .home-dashboard {
+:root .home-dashboard {
   border-top: none;
   padding-top: var(--space-6);
   position: relative;
 }
 
-[data-theme="ds3"] .home-dashboard::before {
+:root .home-dashboard::before {
   content: "";
   position: absolute;
   top: 0;
@@ -221,11 +221,11 @@
 }
 
 @media (width >= 768px) {
-  [data-theme="ds3"] .home-hero {
+  :root .home-hero {
     padding: 5rem var(--space-4) 4rem;
   }
 
-  [data-theme="ds3"] .home-hero-tagline {
+  :root .home-hero-tagline {
     font-size: 1.1875rem;
   }
 }
@@ -416,17 +416,17 @@
    nav state. The world switcher tightens into a compact status
    readout — dense rows with a dotted active frame. */
 
-[data-theme="ds3"] .workshop-sidebar-nav {
+:root .workshop-sidebar-nav {
   gap: var(--space-3);
 }
 
-[data-theme="ds3"] .workshop-sidebar-brand-row {
+:root .workshop-sidebar-brand-row {
   position: relative;
   padding-bottom: var(--space-2);
   border-bottom: none;
 }
 
-[data-theme="ds3"] .workshop-sidebar-brand-row::after {
+:root .workshop-sidebar-brand-row::after {
   content: "";
   position: absolute;
   left: var(--space-1);
@@ -443,7 +443,7 @@
   opacity: 0.7;
 }
 
-[data-theme="ds3"] .workshop-sidebar-primary-link {
+:root .workshop-sidebar-primary-link {
   padding: var(--space-1) var(--space-2);
   border-left: none;
   font-family: var(--font-system);
@@ -452,17 +452,17 @@
   text-transform: uppercase;
 }
 
-[data-theme="ds3"] .workshop-sidebar-primary-link[data-active="true"] {
+:root .workshop-sidebar-primary-link[data-active="true"] {
   background: var(--color-accent);
   color: var(--color-on-accent);
 }
 
-[data-theme="ds3"] .workshop-sidebar-section-label {
+:root .workshop-sidebar-section-label {
   position: relative;
   padding-bottom: var(--space-2);
 }
 
-[data-theme="ds3"] .workshop-sidebar-section-label::before {
+:root .workshop-sidebar-section-label::before {
   content: "";
   display: inline-block;
   width: 5px;
@@ -474,7 +474,7 @@
   vertical-align: middle;
 }
 
-[data-theme="ds3"] .workshop-sidebar-section-label::after {
+:root .workshop-sidebar-section-label::after {
   content: "";
   position: absolute;
   left: 0;
@@ -491,11 +491,11 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .workshop-sidebar-worlds-list {
+:root .workshop-sidebar-worlds-list {
   gap: 0;
 }
 
-[data-theme="ds3"] .workshop-sidebar-world-item {
+:root .workshop-sidebar-world-item {
   gap: 0 var(--space-2);
   padding: var(--space-1) var(--space-2);
   border-style: dotted;
@@ -503,17 +503,17 @@
   border-radius: 0;
 }
 
-[data-theme="ds3"] .workshop-sidebar-world-item[data-active="true"] {
+:root .workshop-sidebar-world-item[data-active="true"] {
   background: var(--color-accent-soft);
   border-style: dotted;
   border-color: var(--color-accent);
 }
 
-[data-theme="ds3"] .workshop-sidebar-world-name {
+:root .workshop-sidebar-world-name {
   font-size: 0.875rem;
 }
 
-[data-theme="ds3"] .workshop-sidebar-world-meta {
+:root .workshop-sidebar-world-meta {
   font-size: 0.65rem;
 }
 
@@ -1586,7 +1586,7 @@
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
 
-[data-theme="ds3"] .world-detail-section h2 {
+:root .world-detail-section h2 {
   position: relative;
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
@@ -1596,7 +1596,7 @@
   font-weight: 400;
 }
 
-[data-theme="ds3"] .world-detail-section h2::before {
+:root .world-detail-section h2::before {
   content: "• Section";
   display: block;
   margin-bottom: var(--space-1);
@@ -1609,7 +1609,7 @@
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .world-detail-section h2::after {
+:root .world-detail-section h2::after {
   content: "";
   display: block;
   position: absolute;
@@ -1698,14 +1698,12 @@
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
 
-[data-theme="ds3"]
-  .component-collapsible-section
+:root .component-collapsible-section
   [data-testid="collapsible-section-header"] {
   position: relative;
 }
 
-[data-theme="ds3"]
-  .component-collapsible-section
+:root .component-collapsible-section
   [data-testid="collapsible-section-header"][aria-expanded="true"]::after {
   content: "";
   display: block;
@@ -1724,15 +1722,13 @@
   opacity: 0.7;
 }
 
-[data-theme="ds3"]
-  .component-collapsible-section
+:root .component-collapsible-section
   [data-testid="collapsible-section-title"] {
   position: relative;
   padding-top: var(--space-3);
 }
 
-[data-theme="ds3"]
-  .component-collapsible-section
+:root .component-collapsible-section
   [data-testid="collapsible-section-title"]::before {
   content: "• Section";
   display: block;
@@ -1745,8 +1741,7 @@
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"]
-  .component-collapsible-section
+:root .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding-top: var(--space-4);
 }
@@ -1830,11 +1825,11 @@
   max-width: 48rem;
 }
 
-[data-theme="ds3"] .page-layout-header {
+:root .page-layout-header {
   margin-bottom: 3rem;
 }
 
-[data-theme="ds3"] .page-layout-title {
+:root .page-layout-title {
   font-family: var(--font-narrative);
   font-size: 2.125rem;
   font-weight: 500;
@@ -1957,12 +1952,12 @@
    serif fallback styling, dotted hairline above the card footer
    instead of the solid border. */
 
-[data-theme="ds3"] .characters-toolbar {
+:root .characters-toolbar {
   padding-bottom: var(--space-3);
   position: relative;
 }
 
-[data-theme="ds3"] .characters-toolbar::after {
+:root .characters-toolbar::after {
   content: "";
   display: block;
   position: absolute;
@@ -1980,12 +1975,12 @@
   opacity: 0.7;
 }
 
-[data-theme="ds3"] .component-character-card h3 {
+:root .component-character-card h3 {
   position: relative;
   padding-top: var(--space-3);
 }
 
-[data-theme="ds3"] .component-character-card h3::before {
+:root .component-character-card h3::before {
   content: "• Character";
   display: block;
   margin-bottom: var(--space-1);
@@ -1997,12 +1992,12 @@
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .component-character-card footer {
+:root .component-character-card footer {
   border-top: none;
   position: relative;
 }
 
-[data-theme="ds3"] .component-character-card footer::before {
+:root .component-character-card footer::before {
   content: "";
   position: absolute;
   top: 0;
@@ -2019,20 +2014,20 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .characters-empty {
+:root .characters-empty {
   align-items: center;
   text-align: center;
   padding: var(--space-8) var(--space-5);
 }
 
-[data-theme="ds3"] .characters-empty h2 {
+:root .characters-empty h2 {
   position: relative;
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 400;
 }
 
-[data-theme="ds3"] .characters-empty h2::after {
+:root .characters-empty h2::after {
   content: "";
   display: block;
   width: 96px;
@@ -2122,12 +2117,12 @@
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
 
-[data-theme="ds3"] .character-detail-header {
+:root .character-detail-header {
   position: relative;
   padding-bottom: var(--space-4);
 }
 
-[data-theme="ds3"] .character-detail-header::after {
+:root .character-detail-header::after {
   content: "";
   display: block;
   position: absolute;
@@ -2145,7 +2140,7 @@
   opacity: 0.7;
 }
 
-[data-theme="ds3"] .character-detail-section h2 {
+:root .character-detail-section h2 {
   position: relative;
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
@@ -2155,7 +2150,7 @@
   font-weight: 400;
 }
 
-[data-theme="ds3"] .character-detail-section h2::before {
+:root .character-detail-section h2::before {
   content: "• Section";
   display: block;
   margin-bottom: var(--space-1);
@@ -2168,7 +2163,7 @@
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .character-detail-section h2::after {
+:root .character-detail-section h2::after {
   content: "";
   display: block;
   position: absolute;
@@ -2225,13 +2220,13 @@
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
 
-[data-theme="ds3"] .component-character-editor .attributes-form-list,
-[data-theme="ds3"] .component-character-editor .skills-form-list {
+:root .component-character-editor .attributes-form-list,
+:root .component-character-editor .skills-form-list {
   gap: var(--space-2);
 }
 
-[data-theme="ds3"] .component-character-editor .attributes-form-row,
-[data-theme="ds3"] .component-character-editor .skills-form-row {
+:root .component-character-editor .attributes-form-row,
+:root .component-character-editor .skills-form-row {
   position: relative;
   background: transparent;
   border: 1px solid transparent;
@@ -2239,12 +2234,10 @@
   padding-top: var(--space-4);
 }
 
-[data-theme="ds3"]
-  .component-character-editor
+:root .component-character-editor
   .attributes-form-row
   + .attributes-form-row::before,
-[data-theme="ds3"]
-  .component-character-editor
+:root .component-character-editor
   .skills-form-row
   + .skills-form-row::before {
   content: "";
@@ -2264,21 +2257,18 @@
   opacity: 0.5;
 }
 
-[data-theme="ds3"] .component-character-editor .attributes-form-meta,
-[data-theme="ds3"] .component-character-editor .skills-form-meta {
+:root .component-character-editor .attributes-form-meta,
+:root .component-character-editor .skills-form-meta {
   font-family: var(--font-system);
 }
 
-[data-theme="ds3"]
-  .component-character-editor
+:root .component-character-editor
   .component-background-form
   > h2,
-[data-theme="ds3"]
-  .component-character-editor
+:root .component-character-editor
   .attributes-form-header
   > h2,
-[data-theme="ds3"]
-  .component-character-editor
+:root .component-character-editor
   .skills-form-header
   > h2 {
   font-family: var(--font-narrative);
@@ -2286,8 +2276,8 @@
   font-weight: 400;
 }
 
-[data-theme="ds3"] .character-editor-actions,
-[data-theme="ds3"] .world-editor-actions {
+:root .character-editor-actions,
+:root .world-editor-actions {
   position: relative;
   padding-top: var(--space-5);
   background: transparent;
@@ -2295,8 +2285,8 @@
   border-radius: 0;
 }
 
-[data-theme="ds3"] .character-editor-actions::before,
-[data-theme="ds3"] .world-editor-actions::before {
+:root .character-editor-actions::before,
+:root .world-editor-actions::before {
   content: "";
   display: block;
   position: absolute;
@@ -2411,11 +2401,11 @@
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
 
-[data-theme="ds3"] .settings-card {
+:root .settings-card {
   border-radius: 6px;
 }
 
-[data-theme="ds3"] .settings-section h2 {
+:root .settings-section h2 {
   position: relative;
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
@@ -2424,7 +2414,7 @@
   font-weight: 400;
 }
 
-[data-theme="ds3"] .settings-section h2::before {
+:root .settings-section h2::before {
   content: "• Section";
   display: block;
   margin-bottom: var(--space-1);
@@ -2437,7 +2427,7 @@
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .settings-section h2::after {
+:root .settings-section h2::after {
   content: "";
   display: block;
   position: absolute;
@@ -2455,16 +2445,16 @@
   opacity: 0.6;
 }
 
-[data-theme="ds3"] .settings-export-import {
+:root .settings-export-import {
   gap: var(--space-5);
 }
 
-[data-theme="ds3"] .settings-export-import-help {
+:root .settings-export-import-help {
   font-family: var(--font-system);
   font-size: 0.8125rem;
 }
 
-[data-theme="ds3"] .settings-export-import-help p + p {
+:root .settings-export-import-help p + p {
   padding-top: var(--space-2);
   background-image: radial-gradient(
     circle,
@@ -2767,7 +2757,7 @@
 /* DS3 — Mechanical Manuscript: dotted radial-gradient divider above the nav,
    monospace voice on the entry summary, dot-bullet on the section title. */
 
-[data-theme="ds3"] .journal-page .journal-list-header h2 {
+:root .journal-page .journal-list-header h2 {
   position: relative;
   font-family: var(--font-system);
   font-size: 0.8125rem;
@@ -2775,12 +2765,12 @@
   text-transform: uppercase;
 }
 
-[data-theme="ds3"] .journal-page .journal-list-header h2::before {
+:root .journal-page .journal-list-header h2::before {
   content: "• ";
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .journal-page .journal-nav {
+:root .journal-page .journal-nav {
   background-image: radial-gradient(
     circle,
     var(--color-border-strong) 1.5px,
@@ -2795,8 +2785,8 @@
   letter-spacing: 0.05em;
 }
 
-[data-theme="ds3"] .journal-page .journal-empty-state,
-[data-theme="ds3"] .journal-page .journal-detail-empty {
+:root .journal-page .journal-empty-state,
+:root .journal-page .journal-detail-empty {
   border-radius: var(--radius-md);
   border: 1px dashed var(--color-border-strong);
 }
@@ -2905,22 +2895,22 @@
 /* DS3 — Mechanical Manuscript: rounded-square radii, italic narrative title
    with a dotted divider above it, monospace dot-bullet subtitle. */
 
-[data-theme="ds3"] .component-hero {
+:root .component-hero {
   border-radius: var(--radius-md);
   border-color: var(--color-border-strong);
 }
 
-[data-theme="ds3"] .component-hero-overlay {
+:root .component-hero-overlay {
   padding: var(--space-4) var(--space-5);
 }
 
-[data-theme="ds3"] .component-hero-title {
+:root .component-hero-title {
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 500;
 }
 
-[data-theme="ds3"] .component-hero-subtitle {
+:root .component-hero-subtitle {
   position: relative;
   padding-top: var(--space-2);
   font-family: var(--font-system);
@@ -2929,7 +2919,7 @@
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .component-hero-subtitle::before {
+:root .component-hero-subtitle::before {
   content: "";
   position: absolute;
   top: 0;
@@ -2979,11 +2969,11 @@
   line-height: 1.6;
 }
 
-[data-theme="ds3"] .component-section-wrapper {
+:root .component-section-wrapper {
   border-color: var(--color-border-strong);
 }
 
-[data-theme="ds3"] .component-section-wrapper-title {
+:root .component-section-wrapper-title {
   position: relative;
   font-family: var(--font-system);
   font-size: 0.8125rem;
@@ -2991,7 +2981,7 @@
   text-transform: uppercase;
 }
 
-[data-theme="ds3"] .component-section-wrapper-title::before {
+:root .component-section-wrapper-title::before {
   content: "• ";
   color: var(--color-text-muted);
 }
@@ -3153,24 +3143,24 @@
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds3"] .component-ending-screen-hero-frame {
+:root .component-ending-screen-hero-frame {
   border-color: var(--color-border-strong);
 }
 
-[data-theme="ds3"] .component-ending-screen-hero-title {
+:root .component-ending-screen-hero-title {
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 500;
 }
 
-[data-theme="ds3"] .component-ending-screen-hero-meta {
+:root .component-ending-screen-hero-meta {
   font-family: var(--font-system);
   font-size: 0.8125rem;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .component-ending-screen-achievement {
+:root .component-ending-screen-achievement {
   border-color: var(--color-border-strong);
 }
 
@@ -3440,16 +3430,16 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 /* DS3 console — corner-bracket accent on stat/npc/data cards */
 
-[data-theme="ds3"] .world-detail-npc,
-[data-theme="ds3"] .world-detail-stat,
-[data-theme="ds3"] .world-detail-meta-grid .component-data-field {
+:root .world-detail-npc,
+:root .world-detail-stat,
+:root .world-detail-meta-grid .component-data-field {
   position: relative;
   border-radius: 0;
 }
 
-[data-theme="ds3"] .world-detail-npc::before,
-[data-theme="ds3"] .world-detail-stat::before,
-[data-theme="ds3"] .world-detail-meta-grid .component-data-field::before {
+:root .world-detail-npc::before,
+:root .world-detail-stat::before,
+:root .world-detail-meta-grid .component-data-field::before {
   content: "";
   position: absolute;
   top: 0;
@@ -3614,18 +3604,18 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 /* DS3 console — corner-bracket accent on character content cards */
 
-[data-theme="ds3"] .character-detail-derived-stat,
-[data-theme="ds3"] .character-detail-background-section,
-[data-theme="ds3"] .character-attribute-card,
-[data-theme="ds3"] .character-skill-card {
+:root .character-detail-derived-stat,
+:root .character-detail-background-section,
+:root .character-attribute-card,
+:root .character-skill-card {
   position: relative;
   border-radius: 0;
 }
 
-[data-theme="ds3"] .character-detail-derived-stat::before,
-[data-theme="ds3"] .character-detail-background-section::before,
-[data-theme="ds3"] .character-attribute-card::before,
-[data-theme="ds3"] .character-skill-card::before {
+:root .character-detail-derived-stat::before,
+:root .character-detail-background-section::before,
+:root .character-attribute-card::before,
+:root .character-skill-card::before {
   content: "";
   position: absolute;
   top: 0;
@@ -3675,16 +3665,16 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
    accents on each section.
 */
 
-[data-theme="ds3"] .worlds-screen {
+:root .worlds-screen {
   font-feature-settings: "tnum";
 }
 
-[data-theme="ds3"] .world-list-grid {
+:root .world-list-grid {
   grid-template-columns: 1fr;
   gap: var(--space-1);
 }
 
-[data-theme="ds3"] .component-world-card {
+:root .component-world-card {
   display: grid;
   grid-template-columns: 9rem 1fr auto;
   grid-template-rows: auto auto;
@@ -3696,7 +3686,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: relative;
 }
 
-[data-theme="ds3"] .component-world-card::before {
+:root .component-world-card::before {
   content: "";
   position: absolute;
   top: 0;
@@ -3707,7 +3697,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   border-left: 1px solid var(--color-accent);
 }
 
-[data-theme="ds3"] .component-world-card::after {
+:root .component-world-card::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -3718,14 +3708,14 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   border-right: 1px solid var(--color-accent);
 }
 
-[data-theme="ds3"] .component-world-card > div:first-child,
-[data-theme="ds3"] .component-world-card > div:first-child > a,
-[data-theme="ds3"] .component-world-card .component-hero,
-[data-theme="ds3"] .component-world-card .component-hero-overlay {
+:root .component-world-card > div:first-child,
+:root .component-world-card > div:first-child > a,
+:root .component-world-card .component-hero,
+:root .component-world-card .component-hero-overlay {
   display: contents;
 }
 
-[data-theme="ds3"] .component-world-card .component-hero-image {
+:root .component-world-card .component-hero-image {
   grid-column: 1;
   grid-row: 1 / span 2;
   position: static;
@@ -3734,7 +3724,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   object-fit: cover;
 }
 
-[data-theme="ds3"] .component-world-card .component-hero-content {
+:root .component-world-card .component-hero-content {
   grid-column: 2;
   grid-row: 1;
   background: transparent;
@@ -3742,7 +3732,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   margin: 0;
 }
 
-[data-theme="ds3"] .component-world-card .component-hero-title {
+:root .component-world-card .component-hero-title {
   font-size: 1rem;
   font-style: italic;
   font-family: var(--font-narrative);
@@ -3751,26 +3741,26 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   overflow-wrap: break-word;
 }
 
-[data-theme="ds3"] .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
+:root .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
   grid-column: 1 / -1;
   margin-top: var(--space-2);
 }
 
-[data-theme="ds3"] .component-world-card .world-card-body {
+:root .component-world-card .world-card-body {
   display: contents;
 }
 
-[data-theme="ds3"] .component-world-card .world-card-content {
+:root .component-world-card .world-card-content {
   grid-column: 2;
   grid-row: 1;
   padding: 0;
 }
 
-[data-theme="ds3"] .component-world-card footer {
+:root .component-world-card footer {
   display: contents;
 }
 
-[data-theme="ds3"] .world-card-footer-meta {
+:root .world-card-footer-meta {
   grid-column: 2;
   grid-row: 2;
   padding: 0;
@@ -3781,7 +3771,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   border-top: 0;
 }
 
-[data-theme="ds3"] .world-card-footer-actions {
+:root .world-card-footer-actions {
   grid-column: 3;
   grid-row: 1 / span 2;
   align-self: center;
@@ -3789,12 +3779,12 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 /* DS3 character list — dense row */
 
-[data-theme="ds3"] .characters-grid {
+:root .characters-grid {
   grid-template-columns: 1fr;
   gap: var(--space-1);
 }
 
-[data-theme="ds3"] .component-character-card {
+:root .component-character-card {
   display: grid;
   grid-template-columns: 5rem 1fr auto;
   column-gap: var(--space-4);
@@ -3805,7 +3795,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: relative;
 }
 
-[data-theme="ds3"] .component-character-card::before {
+:root .component-character-card::before {
   content: "";
   position: absolute;
   top: 0;
@@ -3816,7 +3806,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   border-left: 1px solid var(--color-accent);
 }
 
-[data-theme="ds3"] .component-character-card::after {
+:root .component-character-card::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -3827,17 +3817,17 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   border-right: 1px solid var(--color-accent);
 }
 
-[data-theme="ds3"] .component-character-card .character-card-body,
-[data-theme="ds3"] .component-character-card .character-card-inner {
+:root .component-character-card .character-card-body,
+:root .component-character-card .character-card-inner {
   display: contents;
 }
 
-[data-theme="ds3"] .component-character-card .active-state-indicator {
+:root .component-character-card .active-state-indicator {
   grid-column: 1 / -1;
   margin-bottom: var(--space-1);
 }
 
-[data-theme="ds3"] .component-character-card .character-card-portrait {
+:root .component-character-card .character-card-portrait {
   grid-column: 1;
   align-self: center;
   padding: 0;
@@ -3846,7 +3836,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   overflow: hidden;
 }
 
-[data-theme="ds3"] .component-character-card .character-card-name {
+:root .component-character-card .character-card-name {
   grid-column: 2;
   margin: 0;
   padding: 0;
@@ -3855,7 +3845,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   font-size: 1rem;
 }
 
-[data-theme="ds3"] .component-character-card .character-card-meta {
+:root .component-character-card .character-card-meta {
   grid-column: 2;
   display: flex;
   flex-wrap: wrap;
@@ -3867,7 +3857,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .component-character-card .character-card-description {
+:root .component-character-card .character-card-description {
   grid-column: 2;
   margin: var(--space-1) 0 0;
   padding: 0;
@@ -3880,12 +3870,12 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   overflow: hidden;
 }
 
-[data-theme="ds3"] .component-character-card .character-card-connections,
-[data-theme="ds3"] .component-character-card .character-card-recent {
+:root .component-character-card .character-card-connections,
+:root .component-character-card .character-card-recent {
   display: none;
 }
 
-[data-theme="ds3"] .component-character-card .character-card-footer {
+:root .component-character-card .character-card-footer {
   grid-column: 3;
   align-self: center;
   padding: 0;
@@ -3893,12 +3883,12 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 }
 
 @media (width <= 640px) {
-  [data-theme="ds3"] .component-world-card,
-  [data-theme="ds3"] .component-character-card {
+  :root .component-world-card,
+  :root .component-character-card {
     grid-template-columns: 4rem 1fr;
   }
-  [data-theme="ds3"] .world-card-footer-actions,
-  [data-theme="ds3"] .component-character-card .character-card-footer {
+  :root .world-card-footer-actions,
+  :root .component-character-card .character-card-footer {
     grid-column: 1 / -1;
     grid-row: auto;
     padding-top: var(--space-2);
@@ -3912,31 +3902,31 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
      so image and title split into their own cells — thumb in the 4rem
      media column, title in the 1fr text column. Desktop and tablet keep
      the established caption-under-thumb treatment. */
-  [data-theme="ds3"] .component-world-card > div:first-child > div:first-child,
-  [data-theme="ds3"] .component-world-card > div:first-child > div:first-child > a {
+  :root .component-world-card > div:first-child > div:first-child,
+  :root .component-world-card > div:first-child > div:first-child > a {
     display: contents;
   }
 
   /* The link's box is gone on phones (display: contents), so paint its
      keyboard focus on the title instead. */
-  [data-theme="ds3"] .component-world-card a:focus-visible .component-hero-title {
+  :root .component-world-card a:focus-visible .component-hero-title {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
   /* Thumb stays in row 1 beside the title; description and meta take the
      freed full-width rows below. */
-  [data-theme="ds3"] .component-world-card .component-hero-image {
+  :root .component-world-card .component-hero-image {
     grid-row: 1;
   }
 
-  [data-theme="ds3"] .component-world-card .world-card-content {
+  :root .component-world-card .world-card-content {
     grid-column: 1 / -1;
     grid-row: 2;
     padding-top: var(--space-2);
   }
 
-  [data-theme="ds3"] .world-card-footer-meta {
+  :root .world-card-footer-meta {
     grid-column: 1 / -1;
     grid-row: 3;
   }
@@ -3944,34 +3934,34 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 /* DS3 detail — 3-col readout with corner brackets */
 
-[data-theme="ds3"] .world-detail-sections,
-[data-theme="ds3"] .character-detail-sections {
+:root .world-detail-sections,
+:root .character-detail-sections {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-auto-flow: dense;
   gap: var(--space-4);
 }
 
-[data-theme="ds3"] .world-detail-section:first-child,
-[data-theme="ds3"] .character-detail-section:first-child {
+:root .world-detail-section:first-child,
+:root .character-detail-section:first-child {
   grid-column: 1 / -1;
 }
 
 /* F23 — balance the 3-col grid: a lone trailing section (one card left over
    after the full-width hero) spans the row instead of stranding a single card. */
-[data-theme="ds3"] .world-detail-section:last-child:nth-child(3n + 2) {
+:root .world-detail-section:last-child:nth-child(3n + 2) {
   grid-column: 1 / -1;
 }
 
-[data-theme="ds3"] .world-detail-section,
-[data-theme="ds3"] .character-detail-section {
+:root .world-detail-section,
+:root .character-detail-section {
   position: relative;
   padding: var(--space-4);
   border-radius: 0;
 }
 
-[data-theme="ds3"] .world-detail-section::before,
-[data-theme="ds3"] .character-detail-section::before {
+:root .world-detail-section::before,
+:root .character-detail-section::before {
   content: "";
   position: absolute;
   top: 0;
@@ -3983,15 +3973,15 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 }
 
 @media (width <= 1024px) {
-  [data-theme="ds3"] .world-detail-sections,
-  [data-theme="ds3"] .character-detail-sections {
+  :root .world-detail-sections,
+  :root .character-detail-sections {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (width <= 640px) {
-  [data-theme="ds3"] .world-detail-sections,
-  [data-theme="ds3"] .character-detail-sections {
+  :root .world-detail-sections,
+  :root .character-detail-sections {
     grid-template-columns: 1fr;
   }
 }
@@ -3999,23 +3989,23 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 /* DS3 edit — 2-col collapsible-section grid (3-col leaves orphans with the
    current section counts; 2-col tiles 5 sections cleanly as hero + 2×2) */
 
-[data-theme="ds3"] .component-world-editor,
-[data-theme="ds3"] .component-character-editor {
+:root .component-world-editor,
+:root .component-character-editor {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
 }
 
-[data-theme="ds3"] .component-world-editor > .component-collapsible-section:first-child,
-[data-theme="ds3"] .component-character-editor > .component-collapsible-section:first-child,
-[data-theme="ds3"] .component-world-editor > .world-editor-actions,
-[data-theme="ds3"] .component-character-editor > .character-editor-actions {
+:root .component-world-editor > .component-collapsible-section:first-child,
+:root .component-character-editor > .component-collapsible-section:first-child,
+:root .component-world-editor > .world-editor-actions,
+:root .component-character-editor > .character-editor-actions {
   grid-column: 1 / -1;
 }
 
 @media (width <= 640px) {
-  [data-theme="ds3"] .component-world-editor,
-  [data-theme="ds3"] .component-character-editor {
+  :root .component-world-editor,
+  :root .component-character-editor {
     grid-template-columns: 1fr;
   }
 }

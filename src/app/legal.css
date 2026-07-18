@@ -149,11 +149,11 @@
    prose, tighter rhythm.
    ═══════════════════════════════════════════════════════════════ */
 
-[data-theme="ds3"] .component-legal {
+:root .component-legal {
   gap: var(--space-6);
 }
 
-[data-theme="ds3"] .component-legal-section-title {
+:root .component-legal-section-title {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -165,7 +165,7 @@
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds3"] .component-legal-section-title::before {
+:root .component-legal-section-title::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -175,13 +175,13 @@
   flex-shrink: 0;
 }
 
-[data-theme="ds3"] .component-legal-lead {
+:root .component-legal-lead {
   font-family: var(--font-narrative);
   font-size: 1.125rem;
   line-height: 1.55;
 }
 
-[data-theme="ds3"] .component-legal-prose p {
+:root .component-legal-prose p {
   font-family: var(--font-system);
   font-size: 0.9375rem;
   line-height: 1.6;

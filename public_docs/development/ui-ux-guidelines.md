@@ -33,7 +33,7 @@ Aged paper, drafting ink, dot grid aesthetic. Textured and literary.
 
 ### Theme Implementation
 - `ThemeProvider` React context manages color scheme; design system is fixed to DS3
-- `data-theme="ds3"` attribute on `<html>` selects the CSS token set
+- CSS tokens are `:root`-scoped in `ds3.css` (the `data-theme="ds3"` attribute on `<html>` remains as a marker only, #1546)
 - `.dark` class on `<html>` toggles dark mode overrides
 - Components consume tokens via `var(--token-name)` — no theme-specific logic in components
 - FOUC prevention script applies the stored color-scheme preference before React hydrates
