@@ -25,6 +25,7 @@ export default function ProvidersSettingsPage() {
   const [showWizard, setShowWizard] = useState(false);
   const [validatingId, setValidatingId] = useState<string | null>(null);
   const [providerToRemoveId, setProviderToRemoveId] = useState<string | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   const list = Object.values(providers);
 
@@ -37,13 +38,22 @@ export default function ProvidersSettingsPage() {
     }
   };
 
-  const handleCloseRemoveDialog = () => setProviderToRemoveId(null);
+  // Once confirmed, removal runs to completion: cancel/escape are inert while
+  // the await is in flight, and the dialog closes when it settles.
+  const handleCloseRemoveDialog = () => {
+    if (isRemoving) return;
+    setProviderToRemoveId(null);
+  };
 
   const handleConfirmRemove = async () => {
-    if (providerToRemoveId) {
+    if (!providerToRemoveId || isRemoving) return;
+    setIsRemoving(true);
+    try {
       await removeProvider(providerToRemoveId);
+    } finally {
+      setIsRemoving(false);
+      setProviderToRemoveId(null);
     }
-    setProviderToRemoveId(null);
   };
 
   // Removal is destructive: the key is gone for good, and removing the last
@@ -103,6 +113,7 @@ export default function ProvidersSettingsPage() {
           description={removeMessage}
           itemName={providerToRemove?.name || 'this provider'}
           confirmButtonText="Remove"
+          isDeleting={isRemoving}
         />
       </div>
     </PageLayout>

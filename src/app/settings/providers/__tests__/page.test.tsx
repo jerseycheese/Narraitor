@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // The jest alias mapper resolves @/-form CSS imports before the CSS stub rule
@@ -46,6 +46,7 @@ jest.mock('@/components/DeleteConfirmationDialog/DeleteConfirmationDialog', () =
     description,
     itemName,
     confirmButtonText,
+    isDeleting,
   }: {
     isOpen: boolean;
     onClose: () => void;
@@ -54,14 +55,19 @@ jest.mock('@/components/DeleteConfirmationDialog/DeleteConfirmationDialog', () =
     description: string;
     itemName: string;
     confirmButtonText?: string;
+    isDeleting?: boolean;
   }) => {
     if (!isOpen) return null;
     return (
       <div role="dialog" aria-label={title}>
         <p>{description}</p>
         <p>{itemName}</p>
-        <button onClick={onClose}>Cancel</button>
-        <button onClick={onConfirm}>{confirmButtonText || 'Delete'}</button>
+        <button onClick={onClose} disabled={isDeleting}>
+          Cancel
+        </button>
+        <button onClick={onConfirm} disabled={isDeleting}>
+          {confirmButtonText || 'Delete'}
+        </button>
       </div>
     );
   },
@@ -163,5 +169,55 @@ describe('ProvidersSettingsPage — remove confirmation', () => {
     expect(useProviderStore.getState().providers['p1']).toBeUndefined();
     expect(useProviderStore.getState().activeProviderId).toBe('p2');
     expect(clearEncryptionKey).not.toHaveBeenCalled();
+  });
+
+  test('double-clicking confirm only starts one removal', async () => {
+    seedProviders([makeProvider('p1', 'Visual QA Gemini')], 'p1');
+    let resolveRemoval!: () => void;
+    removeSpy = jest.fn(
+      () => new Promise<void>((resolve) => { resolveRemoval = resolve; })
+    );
+    useProviderStore.setState({ removeProvider: removeSpy });
+    const user = userEvent.setup();
+    render(<ProvidersSettingsPage />);
+
+    await user.click(screen.getByRole('button', { name: /remove/i }));
+    const dialog = screen.getByRole('dialog', { name: /remove provider/i });
+    const confirmButton = within(dialog).getByRole('button', { name: /^remove$/i });
+
+    await user.click(confirmButton);
+    await user.click(confirmButton);
+
+    expect(confirmButton).toBeDisabled();
+    expect(removeSpy).toHaveBeenCalledTimes(1);
+
+    await act(async () => resolveRemoval());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  test('cancel is inert while removal is in flight, and removal still completes', async () => {
+    seedProviders([makeProvider('p1', 'Visual QA Gemini')], 'p1');
+    let resolveRemoval!: () => void;
+    removeSpy = jest.fn(
+      () => new Promise<void>((resolve) => { resolveRemoval = resolve; })
+    );
+    useProviderStore.setState({ removeProvider: removeSpy });
+    const user = userEvent.setup();
+    render(<ProvidersSettingsPage />);
+
+    await user.click(screen.getByRole('button', { name: /remove/i }));
+    const dialog = screen.getByRole('dialog', { name: /remove provider/i });
+    await user.click(within(dialog).getByRole('button', { name: /^remove$/i }));
+
+    // Once confirmed, removal runs to completion: cancel must neither close
+    // the dialog early nor stop the removal.
+    const cancelButton = within(dialog).getByRole('button', { name: /cancel/i });
+    expect(cancelButton).toBeDisabled();
+    await user.click(cancelButton);
+    expect(screen.getByRole('dialog', { name: /remove provider/i })).toBeInTheDocument();
+
+    await act(async () => resolveRemoval());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(removeSpy).toHaveBeenCalledTimes(1);
   });
 });
