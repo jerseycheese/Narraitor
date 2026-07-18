@@ -2,10 +2,6 @@ import React from 'react';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// The jest alias mapper resolves @/-form CSS imports before the CSS stub rule
-// can catch them, so stub the page's stylesheet import here.
-jest.mock('@/components/ai/provider-config.css', () => ({}));
-
 // crypto.subtle isn't available in jsdom — mock the encryption layer so the
 // store's removeProvider can run (it clears the key after the last removal).
 jest.mock('@/lib/storage/encryption', () => ({
