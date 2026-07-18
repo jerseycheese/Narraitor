@@ -5,8 +5,10 @@ const config = {
   maxWorkers: '50%',
   workerIdleMemoryLimit: '512MB',
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
+    // CSS stub must come first: mappers match in order, and the @/ alias would
+    // otherwise resolve @/-form stylesheet imports to real files.
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   testMatch: [
     '<rootDir>/src/**/*.test.{ts,tsx}',
