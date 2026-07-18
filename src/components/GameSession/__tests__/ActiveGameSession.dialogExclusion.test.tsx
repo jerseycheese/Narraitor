@@ -25,7 +25,7 @@ jest.mock('@/hooks/useAutoSave');
 jest.mock('@/components/TutorialProvider');
 jest.mock('@/lib/featureFlags');
 jest.mock('@/lib/theme/ThemeProvider', () => ({
-  useTheme: () => ({ theme: 'ds3', colorScheme: 'light', resolvedColorScheme: 'light', setTheme: jest.fn(), setColorScheme: jest.fn() }),
+  useTheme: () => ({ colorScheme: 'light', resolvedColorScheme: 'light', setColorScheme: jest.fn() }),
 }));
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),

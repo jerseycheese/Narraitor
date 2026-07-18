@@ -4,7 +4,7 @@
    Fonts: Newsreader, Fira Code, DM Sans
    ═══════════════════════════════════════════════════════════════ */
 
-[data-theme="ds3"] {
+:root {
   /* Typography mapping: semantic -> specific */
   --font-narrative: var(--font-newsreader);
   --font-system: var(--font-fira-code);
@@ -123,7 +123,7 @@
 }
 
 /* DS3 Dark Mode */
-[data-theme="ds3"].dark {
+:root.dark {
   --color-canvas: rgb(23 19 16);
   --color-surface: rgb(30 26 22 / 80%);
   --color-surface-hover: rgb(18 15 12);
@@ -225,7 +225,7 @@
 }
 
 /* DS3 Background Pattern - Dot grid */
-[data-theme="ds3"] body::before {
+:root body::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -236,7 +236,7 @@
   opacity: 0.3;
 }
 
-[data-theme="ds3"].dark body::before {
+:root.dark body::before {
   background-image: radial-gradient(circle, rgb(237 232 224 / 12%) 1px, transparent 1px);
   background-size: 24px 24px;
   opacity: 0.3;

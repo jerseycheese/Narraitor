@@ -1,18 +1,15 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { DesignSystem, ColorScheme } from './index';
+import type { ColorScheme } from './index';
 import {
-  DEFAULT_THEME,
   DEFAULT_COLOR_SCHEME,
   STORAGE_KEY_COLOR_SCHEME,
 } from './index';
 
 export interface ThemeContextValue {
-  theme: DesignSystem;
   colorScheme: ColorScheme;
   resolvedColorScheme: 'light' | 'dark';
-  setTheme: (theme: DesignSystem) => void;
   setColorScheme: (scheme: ColorScheme) => void;
 }
 
@@ -21,10 +18,6 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 function getSystemPreference(): 'light' | 'dark' {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
-function readStoredTheme(): DesignSystem {
-  return DEFAULT_THEME;
 }
 
 function readStoredColorScheme(): ColorScheme {
@@ -44,7 +37,6 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   // Initialize with defaults to match server render (FOUC script handles visual)
-  const [theme, setThemeState] = useState<DesignSystem>(DEFAULT_THEME);
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>(DEFAULT_COLOR_SCHEME);
   const [systemPreference, setSystemPreference] = useState<'light' | 'dark'>('light');
 
@@ -52,7 +44,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   // Sync React state from localStorage after hydration
   useEffect(() => {
-    setThemeState(readStoredTheme());
     setColorSchemeState(readStoredColorScheme());
     setSystemPreference(getSystemPreference());
   }, []);
@@ -81,14 +72,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  const setTheme = useCallback((t: DesignSystem) => setThemeState(t), []);
   const setColorScheme = useCallback((s: ColorScheme) => setColorSchemeState(s), []);
 
   const value: ThemeContextValue = {
-    theme,
     colorScheme,
     resolvedColorScheme,
-    setTheme,
     setColorScheme,
   };
 

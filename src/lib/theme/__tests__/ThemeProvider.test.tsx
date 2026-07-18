@@ -40,11 +40,10 @@ describe('ThemeProvider', () => {
     });
   });
 
-  it('defaults to ds3 and light mode', () => {
+  it('defaults to light mode', () => {
     let ctx: ReturnType<typeof useTheme> | null = null;
     renderWithProvider((c) => { ctx = c; });
 
-    expect(ctx!.theme).toBe('ds3');
     expect(ctx!.colorScheme).toBe('light');
     expect(ctx!.resolvedColorScheme).toBe('light');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
@@ -70,23 +69,12 @@ describe('ThemeProvider', () => {
     expect(localStorage.getItem(STORAGE_KEY_COLOR_SCHEME)).toBe('dark');
   });
 
-  it('reads stored color scheme on mount; theme ignores storage', () => {
+  it('reads stored color scheme on mount', () => {
     localStorage.setItem(STORAGE_KEY_COLOR_SCHEME, 'dark');
 
     let ctx: ReturnType<typeof useTheme> | null = null;
     renderWithProvider((c) => { ctx = c; });
 
-    expect(ctx!.theme).toBe('ds3');
-    expect(ctx!.colorScheme).toBe('dark');
-  });
-
-  it('theme stays ds3 regardless of color scheme changes', () => {
-    let ctx: ReturnType<typeof useTheme> | null = null;
-    renderWithProvider((c) => { ctx = c; });
-
-    act(() => { ctx!.setColorScheme('dark'); });
-
-    expect(ctx!.theme).toBe('ds3');
     expect(ctx!.colorScheme).toBe('dark');
   });
 

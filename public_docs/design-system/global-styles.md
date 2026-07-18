@@ -17,7 +17,7 @@ The global styling system provides a theme-aware foundation built on plain CSS a
 
 The styling stack loads in this order:
 
-1. **Theme CSS files** (`src/lib/theme/themes/ds3.css`, plus `_shared-tokens.css`) — define all CSS custom properties under `[data-theme="ds3"]` selectors
+1. **Theme CSS files** (`src/lib/theme/themes/ds3.css`, plus `_shared-tokens.css`) — define all CSS custom properties under `:root` selectors
 2. **Global styles** (`src/app/globals.css`) — base element resets and defaults that consume `var(--token)` values
 3. **Component CSS** — co-located styles for specific components, keyed off semantic class names
 
@@ -115,8 +115,8 @@ After React hydrates, `ThemeProvider` takes over. It syncs React state from `loc
 ### 4. CSS Selectors Resolve
 
 The browser resolves `var(--token-name)` references based on the active selectors:
-- `[data-theme="ds3"]` selects DS3 light tokens
-- `[data-theme="ds3"].dark` lets DS3 dark tokens override
+- `:root` selects DS3 light tokens
+- `:root.dark` lets DS3 dark tokens override
 
 Components never need to know which theme is active — they just reference `var(--color-surface)` and the cascade handles the rest.
 
@@ -148,12 +148,10 @@ Access theme state from any component:
 import { useTheme } from '@/lib/theme';
 
 function MyComponent() {
-  const { theme, colorScheme, resolvedColorScheme, setTheme, setColorScheme } = useTheme();
+  const { colorScheme, resolvedColorScheme, setColorScheme } = useTheme();
 
-  // theme: 'ds3' (fixed — the design-system axis was collapsed to one, ADR-013)
   // colorScheme: 'light' | 'dark' | 'system'
   // resolvedColorScheme: 'light' | 'dark' (computed — resolves 'system' to actual)
-  // setTheme: (theme) => void
   // setColorScheme: (scheme) => void
 }
 ```
@@ -166,7 +164,7 @@ Throws `Error('useTheme must be used within a ThemeProvider')` if called outside
 |-----|-----------------|---------|---------|
 | Color scheme | `narraitor-color-scheme` | `'light'` | Light, dark, or system preference |
 
-Theme is fixed to `'ds3'` and isn't persisted — there's only one design system, so there's nothing to remember.
+There's no theme key: the design-system axis was collapsed to one (ADR-013), and the vestigial `theme`/`setTheme` surface was removed from `useTheme()` along with the selector flatten (#1546).
 
 Server-side renders default to DS3 + light. The FOUC script and ThemeProvider sync the actual color-scheme preference after the page loads, preventing hydration mismatches.
 

@@ -254,7 +254,7 @@
    gaps, medium radius, mono section labels with a dot bullet.
    ═══════════════════════════════════════════════════════════════ */
 
-[data-theme="ds3"] .component-about {
+:root .component-about {
   gap: var(--space-6);
   background-image: radial-gradient(
     circle,
@@ -265,7 +265,7 @@
   background-repeat: repeat;
 }
 
-[data-theme="ds3"] .component-about-section-title {
+:root .component-about-section-title {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -277,7 +277,7 @@
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds3"] .component-about-section-title::before {
+:root .component-about-section-title::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -287,17 +287,17 @@
   flex-shrink: 0;
 }
 
-[data-theme="ds3"] .component-about-lead {
+:root .component-about-lead {
   font-family: var(--font-narrative);
   font-size: 1.1875rem;
   line-height: 1.55;
 }
 
-[data-theme="ds3"] .component-about-steps {
+:root .component-about-steps {
   gap: var(--space-3);
 }
 
-[data-theme="ds3"] .component-about-step {
+:root .component-about-step {
   position: relative;
   padding: var(--space-4);
   gap: var(--space-2);
@@ -307,7 +307,7 @@
 }
 
 /* Corner brackets — top-left + bottom-right L-marks in accent. */
-[data-theme="ds3"] .component-about-step::before {
+:root .component-about-step::before {
   content: "";
   position: absolute;
   top: 0;
@@ -319,7 +319,7 @@
   pointer-events: none;
 }
 
-[data-theme="ds3"] .component-about-step::after {
+:root .component-about-step::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -331,20 +331,20 @@
   pointer-events: none;
 }
 
-[data-theme="ds3"] .component-about-step-number {
+:root .component-about-step-number {
   border-radius: var(--radius-sm);
   font-family: var(--font-system);
 }
 
-[data-theme="ds3"] .component-about-step-description {
+:root .component-about-step-description {
   font-family: var(--font-system);
   font-size: 0.875rem;
 }
 
-[data-theme="ds3"] .component-about-cta {
+:root .component-about-cta {
   border-radius: var(--radius-md);
 }
 
-[data-theme="ds3"] .component-about-cta-link {
+:root .component-about-cta-link {
   border-radius: var(--radius-md);
 }

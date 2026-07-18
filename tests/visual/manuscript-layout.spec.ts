@@ -129,8 +129,8 @@ test.describe('Manuscript Layout Specific Tests', () => {
     await expect(page.getByRole('button', { name: /close/i })).toBeVisible();
 
     // DS3 stacks the scene-status rail as a compact console bar above the
-    // narrative (`[data-theme="ds3"] .manuscript-characters-rail { display:
-    // block; margin-bottom: var(--space-3); }`), not beside it — the old
+    // narrative (`.manuscript-characters-rail { display: block;
+    // margin-bottom: var(--space-3); }`), not beside it — the old
     // DS1 three-column "rail to the left of main" layout doesn't apply here.
     const desktopLayout = await page.evaluate(() => {
       const rail = document.querySelector('.manuscript-characters-rail');

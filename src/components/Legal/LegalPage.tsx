@@ -4,8 +4,8 @@ import Link from 'next/link';
 /**
  * LegalPage — shared layout for the lightweight privacy/terms surfaces (#1366).
  * Token-driven server component. Structural treatment (mono labels with a dot
- * bullet, compact) lives in src/app/legal.css under [data-theme="ds3"]
- * .component-legal* selectors (mirrors the About/dashboard pattern).
+ * bullet, compact) lives in src/app/legal.css under .component-legal*
+ * selectors (mirrors the About/dashboard pattern).
  */
 
 interface LegalPageProps {

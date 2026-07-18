@@ -284,7 +284,7 @@
    cards, compact rhythm, mono prose.
    ═══════════════════════════════════════════════════════════════ */
 
-[data-theme="ds3"] .component-landing {
+:root .component-landing {
   gap: clamp(var(--space-6), 5vw, 3.5rem);
   background-image: radial-gradient(
     circle,
@@ -295,17 +295,17 @@
   background-repeat: repeat;
 }
 
-[data-theme="ds3"] .component-landing-eyebrow {
+:root .component-landing-eyebrow {
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds3"] .component-landing-lead {
+:root .component-landing-lead {
   font-family: var(--font-narrative);
   font-size: 1.1875rem;
   line-height: 1.55;
 }
 
-[data-theme="ds3"] .component-landing-section-title {
+:root .component-landing-section-title {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -317,7 +317,7 @@
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds3"] .component-landing-section-title::before {
+:root .component-landing-section-title::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -327,14 +327,14 @@
   flex-shrink: 0;
 }
 
-[data-theme="ds3"] .component-landing-step {
+:root .component-landing-step {
   position: relative;
   border: none;
   background: var(--color-surface);
 }
 
 /* Corner brackets — top-left + bottom-right L-marks in accent. */
-[data-theme="ds3"] .component-landing-step::before {
+:root .component-landing-step::before {
   content: "";
   position: absolute;
   top: 0;
@@ -346,7 +346,7 @@
   pointer-events: none;
 }
 
-[data-theme="ds3"] .component-landing-step::after {
+:root .component-landing-step::after {
   content: "";
   position: absolute;
   right: 0;
@@ -358,12 +358,12 @@
   pointer-events: none;
 }
 
-[data-theme="ds3"] .component-landing-step-number {
+:root .component-landing-step-number {
   border-radius: var(--radius-sm);
 }
 
-[data-theme="ds3"] .component-landing-step-description,
-[data-theme="ds3"] .component-landing-note-description {
+:root .component-landing-step-description,
+:root .component-landing-note-description {
   font-family: var(--font-system);
   font-size: 0.875rem;
 }

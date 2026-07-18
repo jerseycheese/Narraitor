@@ -241,7 +241,7 @@ body.manuscript-overlay-open {
 }
 
 /* DS3 — Mechanical Manuscript: italic interface heading, monospace bullet eyebrow */
-[data-theme="ds3"] .play-page-shell > div > div > header h1 {
+:root .play-page-shell > div > div > header h1 {
   font-family: var(--font-interface);
   font-style: italic;
   font-weight: 500;
@@ -249,7 +249,7 @@ body.manuscript-overlay-open {
   color: var(--color-text-primary);
 }
 
-[data-theme="ds3"] .play-page-shell > div > div > header p {
+:root .play-page-shell > div > div > header p {
   font-family: var(--font-system);
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
@@ -257,19 +257,19 @@ body.manuscript-overlay-open {
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .play-page-shell > div > div > header p::before {
+:root .play-page-shell > div > div > header p::before {
   content: "• ";
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .play-page-active > div > div > header h1 {
+:root .play-page-active > div > div > header h1 {
   font-family: var(--font-interface);
   font-style: italic;
   font-weight: 500;
   letter-spacing: -0.005em;
 }
 
-[data-theme="ds3"] .play-page-active > div > div > header p {
+:root .play-page-active > div > div > header p {
   font-family: var(--font-system);
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
@@ -277,7 +277,7 @@ body.manuscript-overlay-open {
   color: var(--color-text-muted);
 }
 
-[data-theme="ds3"] .play-page-active > div > div > header p::before {
+:root .play-page-active > div > div > header p::before {
   content: "• ";
   color: var(--color-text-muted);
 }
@@ -2743,12 +2743,12 @@ body.manuscript-overlay-open {
 }
 
 /* Inventory category title hidden — demos show no category headers (Pass 10, fix 4) */
-[data-theme="ds3"] .manuscript-inventory-category-title {
+:root .manuscript-inventory-category-title {
   display: none;
 }
 
 /* Inventory category group — remove margin when title hidden (Pass 10, fix 4) */
-[data-theme="ds3"] .manuscript-inventory-category-group {
+:root .manuscript-inventory-category-group {
   margin-bottom: var(--space-4);
 }
 
@@ -2758,45 +2758,45 @@ body.manuscript-overlay-open {
    ═══════════════════════════════════════════════════════════════ */
 
 /* Grid: collapse to single column (floating pill replaces rail) */
-[data-theme="ds3"] .manuscript-main-stage {
+:root .manuscript-main-stage {
   grid-template-columns: 1fr;
 }
 
-[data-theme="ds3"] .manuscript-rail-spacer {
+:root .manuscript-rail-spacer {
   display: none;
 }
 
 /* Scene status as a compact console bar above the narrative. */
-[data-theme="ds3"] .manuscript-characters-rail {
+:root .manuscript-characters-rail {
   display: block;
   margin-bottom: var(--space-3);
 }
 
-[data-theme="ds3"] .manuscript-main-content {
+:root .manuscript-main-content {
   padding: 5rem 1.5rem 7.5rem;
 }
 
 /* Dot grid background overlay */
-[data-theme="ds3"] .manuscript-viewport-shell {
+:root .manuscript-viewport-shell {
   background:
     radial-gradient(circle, rgb(42 35 28 / 18%) 1px, transparent 1px) 0 0 / 24px 24px,
     linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
 }
 
-[data-theme="ds3"].dark .manuscript-viewport-shell {
+:root.dark .manuscript-viewport-shell {
   background:
     radial-gradient(circle, rgb(237 232 224 / 12%) 1px, transparent 1px) 0 0 / 24px 24px,
     linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
 }
 
 /* HUD: remove baseline border — floating elements only */
-[data-theme="ds3"] .manuscript-overlay-header {
+:root .manuscript-overlay-header {
   border-bottom: none;
   padding-bottom: 0;
 }
 
 /* Character pill — full rounded shape for DS3 */
-[data-theme="ds3"] .manuscript-hud-character-pill {
+:root .manuscript-hud-character-pill {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -2814,18 +2814,18 @@ body.manuscript-overlay-open {
   transition: all 120ms ease;
 }
 
-[data-theme="ds3"] .manuscript-hud-character-pill:focus-visible {
+:root .manuscript-hud-character-pill:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-[data-theme="ds3"] .manuscript-hud-character-pill:hover {
+:root .manuscript-hud-character-pill:hover {
   background: var(--color-overlay-surface-strong);
   border-color: var(--color-accent);
   color: var(--color-text-primary);
 }
 
-[data-theme="ds3"] .manuscript-hud-character-pill-avatar {
+:root .manuscript-hud-character-pill-avatar {
   width: 1.25rem;
   height: 1.25rem;
   border-radius: var(--radius-full);
@@ -2834,14 +2834,14 @@ body.manuscript-overlay-open {
   flex-shrink: 0;
 }
 
-[data-theme="ds3"] .manuscript-hud-character-pill-avatar img {
+:root .manuscript-hud-character-pill-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 /* Icon-only buttons for DS3 HUD right side */
-[data-theme="ds3"] .manuscript-hud-icon-button {
+:root .manuscript-hud-icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2858,29 +2858,29 @@ body.manuscript-overlay-open {
   -webkit-backdrop-filter: blur(12px);
 }
 
-[data-theme="ds3"] .manuscript-hud-icon-button:hover {
+:root .manuscript-hud-icon-button:hover {
   background: var(--color-overlay-surface-strong);
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
 }
 
-[data-theme="ds3"] .manuscript-hud-icon-button:focus-visible {
+:root .manuscript-hud-icon-button:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-[data-theme="ds3"] .manuscript-hud-icon-button svg {
+:root .manuscript-hud-icon-button svg {
   width: 0.875rem;
   height: 0.875rem;
 }
 
 /* Choices: vertical stack with accent left bar, tighter gap */
-[data-theme="ds3"] .manuscript-suggested-actions-grid {
+:root .manuscript-suggested-actions-grid {
   grid-template-columns: 1fr;
   gap: var(--space-2_5);
 }
 
-[data-theme="ds3"] .manuscript-suggested-action {
+:root .manuscript-suggested-action {
   position: relative;
   padding: var(--space-4) 1.25rem var(--space-4) 2.5rem;
   border-radius: var(--radius-lg);
@@ -2888,7 +2888,7 @@ body.manuscript-overlay-open {
   -webkit-backdrop-filter: blur(12px);
 }
 
-[data-theme="ds3"] .manuscript-suggested-action::before {
+:root .manuscript-suggested-action::before {
   content: '';
   position: absolute;
   left: 0;
@@ -2900,38 +2900,38 @@ body.manuscript-overlay-open {
   transition: background 150ms ease;
 }
 
-[data-theme="ds3"] .manuscript-suggested-action:hover {
+:root .manuscript-suggested-action:hover {
   border-color: var(--color-accent);
   box-shadow: var(--shadow-float);
 }
 
-[data-theme="ds3"] .manuscript-suggested-action:hover::before {
+:root .manuscript-suggested-action:hover::before {
   background: var(--color-accent);
 }
 
-[data-theme="ds3"] .manuscript-suggested-action.is-selected,
-[data-theme="ds3"] .manuscript-suggested-action[aria-pressed="true"] {
+:root .manuscript-suggested-action.is-selected,
+:root .manuscript-suggested-action[aria-pressed="true"] {
   background: var(--color-accent-fill);
   border-color: var(--color-accent);
 }
 
-[data-theme="ds3"] .manuscript-suggested-action-label {
+:root .manuscript-suggested-action-label {
   font-size: 0.9375rem;
   line-height: 1.5;
   margin-bottom: 0.25rem;
 }
 
 /* Rotate accent bar colors across choices — hover only */
-[data-theme="ds3"] .manuscript-suggested-action:nth-child(3n+2):hover::before {
+:root .manuscript-suggested-action:nth-child(3n+2):hover::before {
   background: var(--color-info);
 }
 
-[data-theme="ds3"] .manuscript-suggested-action:nth-child(3n+3):hover::before {
+:root .manuscript-suggested-action:nth-child(3n+3):hover::before {
   background: var(--color-warning);
 }
 
 /* DS3 keyboard badge — keycap with depth shadow */
-[data-theme="ds3"] .manuscript-choice-kbd {
+:root .manuscript-choice-kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2953,7 +2953,7 @@ body.manuscript-overlay-open {
 }
 
 /* DS3 input counter (Pass 10, fix 3: color text-muted, drop letter-spacing per demo) */
-[data-theme="ds3"] .manuscript-input-counter {
+:root .manuscript-input-counter {
   font-family: var(--font-system);
   font-size: 0.6875rem;
   color: var(--color-text-muted);
@@ -2961,7 +2961,7 @@ body.manuscript-overlay-open {
 }
 
 /* Input: transparent with warm border */
-[data-theme="ds3"] .manuscript-custom-input {
+:root .manuscript-custom-input {
   background: transparent;
   border: 1px solid var(--color-text-muted);
   border-radius: var(--radius-md);
@@ -2969,18 +2969,18 @@ body.manuscript-overlay-open {
   height: auto;
 }
 
-[data-theme="ds3"] .manuscript-custom-input:focus-visible {
+:root .manuscript-custom-input:focus-visible {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px var(--color-accent-soft);
   outline: none;
 }
 
-[data-theme="ds3"] .manuscript-custom-input::placeholder {
+:root .manuscript-custom-input::placeholder {
   font-style: italic;
 }
 
 /* DS3 circular send button — dark primary, not accent */
-[data-theme="ds3"] .manuscript-send-button {
+:root .manuscript-send-button {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
@@ -2989,12 +2989,12 @@ body.manuscript-overlay-open {
   color: var(--color-canvas);
 }
 
-[data-theme="ds3"] .manuscript-send-button:hover {
+:root .manuscript-send-button:hover {
   opacity: 0.85;
 }
 
 /* DS3 outcome callout — bordered card with decorative dashed-stripe top (Pass 7: padding+margin) */
-[data-theme="ds3"] .choice-outcome-callout {
+:root .choice-outcome-callout {
   border: 1px solid var(--color-border);
   border-top: none;
   background: var(--color-surface);
@@ -3008,7 +3008,7 @@ body.manuscript-overlay-open {
   margin-bottom: var(--space-5);
 }
 
-[data-theme="ds3"] .choice-outcome-callout::before {
+:root .choice-outcome-callout::before {
   content: '';
   position: absolute;
   top: -1px;
@@ -3026,8 +3026,8 @@ body.manuscript-overlay-open {
 }
 
 /* Success-colored dashed top pattern */
-[data-theme="ds3"] .choice-outcome-callout[data-outcome="success"]::before,
-[data-theme="ds3"] .choice-outcome-callout[data-outcome="critical-success"]::before {
+:root .choice-outcome-callout[data-outcome="success"]::before,
+:root .choice-outcome-callout[data-outcome="critical-success"]::before {
   background: repeating-linear-gradient(
     90deg,
     var(--color-success) 0,
@@ -3037,7 +3037,7 @@ body.manuscript-overlay-open {
   );
 }
 
-[data-theme="ds3"] .choice-outcome-label {
+:root .choice-outcome-label {
   font-family: var(--font-system);
   font-size: 0.625rem;
   font-weight: 600;
@@ -3047,15 +3047,15 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-sm);
 }
 
-[data-theme="ds3"] .choice-outcome-callout[data-outcome="success"] .choice-outcome-label,
-[data-theme="ds3"] .choice-outcome-callout[data-outcome="critical-success"] .choice-outcome-label {
+:root .choice-outcome-callout[data-outcome="success"] .choice-outcome-label,
+:root .choice-outcome-callout[data-outcome="critical-success"] .choice-outcome-label {
   color: var(--color-success);
   background: var(--color-success-bg);
 }
 
 /* Failure/danger-colored dashed top pattern */
-[data-theme="ds3"] .choice-outcome-callout[data-outcome="failure"]::before,
-[data-theme="ds3"] .choice-outcome-callout[data-outcome="critical-failure"]::before {
+:root .choice-outcome-callout[data-outcome="failure"]::before,
+:root .choice-outcome-callout[data-outcome="critical-failure"]::before {
   background: repeating-linear-gradient(
     90deg,
     var(--color-danger) 0,
@@ -3065,19 +3065,19 @@ body.manuscript-overlay-open {
   );
 }
 
-[data-theme="ds3"] .choice-outcome-callout[data-outcome="failure"] .choice-outcome-label,
-[data-theme="ds3"] .choice-outcome-callout[data-outcome="critical-failure"] .choice-outcome-label {
+:root .choice-outcome-callout[data-outcome="failure"] .choice-outcome-label,
+:root .choice-outcome-callout[data-outcome="critical-failure"] .choice-outcome-label {
   color: var(--color-danger);
   background: rgb(from var(--color-danger) r g b / 10%);
 }
 
-[data-theme="ds3"] .choice-outcome-text {
+:root .choice-outcome-text {
   font-size: 0.9375rem;
   line-height: 1.6;
 }
 
 /* HUD panels: tighter radius, strong blur, demo-matched padding (Pass 7) */
-[data-theme="ds3"] .manuscript-hud-panel {
+:root .manuscript-hud-panel {
   border-radius: var(--radius-lg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -3086,7 +3086,7 @@ body.manuscript-overlay-open {
 
 /* Desktop override: keep single column */
 @media (width >= 1024px) {
-  [data-theme="ds3"] .manuscript-main-stage {
+  :root .manuscript-main-stage {
     grid-template-columns: 1fr;
   }
 
@@ -3094,35 +3094,35 @@ body.manuscript-overlay-open {
      .manuscript-main-content in grid-column 2; without this reset it lands in
      an implicit second column and the scene-status rail inflates column 1,
      splitting the stage instead of stacking the scene bar above the narrative. */
-  [data-theme="ds3"] .manuscript-main-content {
+  :root .manuscript-main-content {
     grid-column: 1;
   }
 
-  [data-theme="ds3"] .manuscript-rail-spacer {
+  :root .manuscript-rail-spacer {
     display: none;
   }
 
-  [data-theme="ds3"] .manuscript-suggested-actions-grid {
+  :root .manuscript-suggested-actions-grid {
     grid-template-columns: 1fr;
   }
 
   /* Scale up pill and icon for desktop */
-  [data-theme="ds3"] .manuscript-hud-character-pill {
+  :root .manuscript-hud-character-pill {
     font-size: 0.8125rem;
     padding: var(--space-2) var(--space-4);
   }
 
-  [data-theme="ds3"] .manuscript-hud-character-pill-avatar {
+  :root .manuscript-hud-character-pill-avatar {
     width: 1.5rem;
     height: 1.5rem;
   }
 
-  [data-theme="ds3"] .manuscript-ds3-controls .manuscript-hud-icon-button {
+  :root .manuscript-ds3-controls .manuscript-hud-icon-button {
     width: 2.25rem;
     height: 2.25rem;
   }
 
-  [data-theme="ds3"] .manuscript-ds3-controls .manuscript-hud-icon-button svg {
+  :root .manuscript-ds3-controls .manuscript-hud-icon-button svg {
     width: 1rem;
     height: 1rem;
   }
@@ -3132,7 +3132,7 @@ body.manuscript-overlay-open {
      is inert here; align-self does the cross-axis pull. True page-gutter
      marginalia is blocked by the narrative scroll container's overflow-x clip
      (.scroll-smooth) — tracked as a separate follow-up. */
-  [data-theme="ds3"] .choice-outcome-callout {
+  :root .choice-outcome-callout {
     align-self: flex-end;
     width: 220px;
     margin: 0 0 var(--space-3);
@@ -3140,18 +3140,18 @@ body.manuscript-overlay-open {
     box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   }
 
-  [data-theme="ds3"] .choice-outcome-callout .choice-outcome-text {
+  :root .choice-outcome-callout .choice-outcome-text {
     font-size: 0.8125rem;
     line-height: 1.5;
   }
 
-  [data-theme="ds3"] .choice-outcome-label {
+  :root .choice-outcome-label {
     font-size: 0.5625rem;
   }
 }
 
 /* DS3 icon controls grouped toolbar (top-right) — surface (80% alpha) for grid show-through (Pass 8, fix 7) */
-[data-theme="ds3"] .manuscript-ds3-controls {
+:root .manuscript-ds3-controls {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -3163,7 +3163,7 @@ body.manuscript-overlay-open {
   padding: 4px;
 }
 
-[data-theme="ds3"] .manuscript-ds3-controls .manuscript-hud-icon-button {
+:root .manuscript-ds3-controls .manuscript-hud-icon-button {
   border: none;
   background: transparent;
   backdrop-filter: none;
@@ -3171,13 +3171,13 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-md);
 }
 
-[data-theme="ds3"] .manuscript-ds3-controls .manuscript-hud-icon-button:hover {
+:root .manuscript-ds3-controls .manuscript-hud-icon-button:hover {
   background: var(--color-accent-soft);
   color: var(--color-accent);
 }
 
 /* DS3 narrative segment divider — centered rule */
-[data-theme="ds3"] .manuscript-narrative-divider {
+:root .manuscript-narrative-divider {
   border: none;
   width: 120px;
   height: 1px;
@@ -3187,17 +3187,17 @@ body.manuscript-overlay-open {
 }
 
 /* DS3 save indicator — compact status dot */
-[data-theme="ds3"] .manuscript-save-indicator {
+:root .manuscript-save-indicator {
   border: none;
   background: transparent;
   padding: var(--space-1);
 }
 
-[data-theme="ds3"] .manuscript-save-indicator .save-indicator-copy {
+:root .manuscript-save-indicator .save-indicator-copy {
   display: none;
 }
 
-[data-theme="ds3"] .manuscript-save-indicator .save-indicator-status::after {
+:root .manuscript-save-indicator .save-indicator-status::after {
   content: '';
   display: block;
   width: 6px;
@@ -3206,18 +3206,18 @@ body.manuscript-overlay-open {
   background: var(--color-success);
 }
 
-[data-theme="ds3"] .manuscript-save-indicator .save-indicator-button {
+:root .manuscript-save-indicator .save-indicator-button {
   display: none;
 }
 
 /* DS3 streaming indicator — pulsing muted dot */
-[data-theme="ds3"] .manuscript-streaming-indicator {
+:root .manuscript-streaming-indicator {
   display: flex;
   align-items: center;
   gap: var(--space-1_5);
 }
 
-[data-theme="ds3"] .manuscript-streaming-dot {
+:root .manuscript-streaming-dot {
   display: inline-block;
   width: 6px;
   height: 6px;
@@ -3226,7 +3226,7 @@ body.manuscript-overlay-open {
   animation: ds3-streaming-pulse 1.2s ease-in-out infinite;
 }
 
-[data-theme="ds3"] .manuscript-streaming-label {
+:root .manuscript-streaming-label {
   font-family: var(--font-system);
   font-size: 0.6875rem;
   color: var(--color-text-muted);
@@ -3240,13 +3240,13 @@ body.manuscript-overlay-open {
 
 /* DS3 evaluating-action — an outlined cool die that ticks in mechanical
    quarter-turns (console feel), plus a bracketed monospace label. */
-[data-theme="ds3"] .manuscript-evaluating-indicator {
+:root .manuscript-evaluating-indicator {
   display: flex;
   align-items: center;
   gap: var(--space-1_5);
 }
 
-[data-theme="ds3"] .manuscript-evaluating-die {
+:root .manuscript-evaluating-die {
   display: inline-block;
   width: 10px;
   height: 10px;
@@ -3265,23 +3265,23 @@ body.manuscript-overlay-open {
   100% { transform: rotate(360deg); }
 }
 
-[data-theme="ds3"] .manuscript-evaluating-label {
+:root .manuscript-evaluating-label {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   color: var(--color-text-muted);
   letter-spacing: 0.04em;
 }
 
-[data-theme="ds3"] .manuscript-evaluating-label::before {
+:root .manuscript-evaluating-label::before {
   content: "[ ";
 }
 
-[data-theme="ds3"] .manuscript-evaluating-label::after {
+:root .manuscript-evaluating-label::after {
   content: " ]";
 }
 
 /* DS3 skeleton shimmer — cool-toned gradient */
-[data-theme="ds3"] .manuscript-skeleton-pulse {
+:root .manuscript-skeleton-pulse {
   background: linear-gradient(
     90deg,
     var(--color-border) 25%,
@@ -3299,23 +3299,23 @@ body.manuscript-overlay-open {
 }
 
 /* DS3 "Suggested Actions" heading — hidden (DS3 uses kbd badge style) */
-[data-theme="ds3"] .manuscript-suggested-actions-heading {
+:root .manuscript-suggested-actions-heading {
   display: none;
 }
 
 /* DS3 narrative text — 18px with generous line-height */
-[data-theme="ds3"] .text-narrative {
+:root .text-narrative {
   font-size: 1.125rem;
   line-height: 1.75;
 }
 
-[data-theme="ds3"] .text-narrative p,
-[data-theme="ds3"] .text-narrative.scene-spacing p {
+:root .text-narrative p,
+:root .text-narrative.scene-spacing p {
   margin-bottom: var(--space-2);
 }
 
 /* DS3 dialogue segments — italic with left border accent (Pass 8, fix 6) */
-[data-theme="ds3"] .dialogue-segment {
+:root .dialogue-segment {
   font-style: italic;
   border-left: 2px solid var(--color-border-strong);
   padding-left: var(--space-4);
@@ -3323,40 +3323,40 @@ body.manuscript-overlay-open {
 }
 
 /* DS3 main content inner — narrower journal column */
-[data-theme="ds3"] .manuscript-main-content-inner {
+:root .manuscript-main-content-inner {
   max-width: 42.5rem;
 }
 
 /* DS3 choice cards — neutral colors, not alignment-tinted */
-[data-theme="ds3"] .manuscript-suggested-action.manuscript-suggested-action-lawful,
-[data-theme="ds3"] .manuscript-suggested-action.manuscript-suggested-action-chaotic {
+:root .manuscript-suggested-action.manuscript-suggested-action-lawful,
+:root .manuscript-suggested-action.manuscript-suggested-action-chaotic {
   background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-primary);
 }
 
 /* DS3 mobile toggle hidden — choices always visible */
-[data-theme="ds3"] .manuscript-mobile-suggested-actions-toggle {
+:root .manuscript-mobile-suggested-actions-toggle {
   display: none;
 }
 
 /* DS3 choices always visible — override base hide at <1024px */
-[data-theme="ds3"] .manuscript-suggested-actions-section {
+:root .manuscript-suggested-actions-section {
   display: block;
 }
 
 /* DS3 choice prompt hidden — no heading above choices */
-[data-theme="ds3"] .manuscript-choice-prompt {
+:root .manuscript-choice-prompt {
   display: none;
 }
 
 /* DS3 input label hidden — uses placeholder text only */
-[data-theme="ds3"] .manuscript-input-label {
+:root .manuscript-input-label {
   display: none;
 }
 
 /* DS3 action rail — border-top only, no radius, tighter padding (Pass 8, fix 5) */
-[data-theme="ds3"] #manuscript-action-rail {
+:root #manuscript-action-rail {
   background: var(--color-overlay-surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -3368,66 +3368,66 @@ body.manuscript-overlay-open {
 }
 
 /* DS3 mobile bar hidden (no rail concept) */
-[data-theme="ds3"] .manuscript-characters-mobile-bar {
+:root .manuscript-characters-mobile-bar {
   display: none;
 }
 
 /* DS3 end story button hidden — exit action is in HUD icon toolbar */
-[data-theme="ds3"] .manuscript-end-story-desktop,
-[data-theme="ds3"] .manuscript-end-story-mobile {
+:root .manuscript-end-story-desktop,
+:root .manuscript-end-story-mobile {
   display: none;
 }
 
 /* Drawer: lighter overlay, tighter panel, header border (Pass 7, fixes 1-6) */
-[data-theme="ds3"] .manuscript-overlay-backdrop.manuscript-drawer-backdrop {
+:root .manuscript-overlay-backdrop.manuscript-drawer-backdrop {
   background: rgb(0 0 0 / 15%);
 }
 
-[data-theme="ds3"] .manuscript-drawer-panel {
+:root .manuscript-drawer-panel {
   width: min(100%, 23.75rem);
 }
 
-[data-theme="ds3"] .manuscript-drawer-header {
+:root .manuscript-drawer-header {
   border-bottom: 1px solid var(--color-border);
   padding-bottom: var(--space-4);
 }
 
-[data-theme="ds3"] .manuscript-drawer-title {
+:root .manuscript-drawer-title {
   font-size: 1rem;
 }
 
-[data-theme="ds3"] .manuscript-drawer-content {
+:root .manuscript-drawer-content {
   color: var(--color-text-primary);
 }
 
 /* Character name: bolder in DS3 HUD panel (Pass 7, fix 10) */
-[data-theme="ds3"] .manuscript-character-snapshot-name {
+:root .manuscript-character-snapshot-name {
   font-weight: 600;
 }
 
 /* DS3 character snapshot stat values — larger, bolder, system font (Pass 8, fix 1) */
-[data-theme="ds3"] .manuscript-character-snapshot-item-value {
+:root .manuscript-character-snapshot-item-value {
   font-family: var(--font-system);
   font-size: 1rem;
   font-weight: 600;
 }
 
 /* DS3 character snapshot stat labels — system font to match values (Pass 10, fix 1) */
-[data-theme="ds3"] .manuscript-character-snapshot-item-label {
+:root .manuscript-character-snapshot-item-label {
   font-family: var(--font-system);
 }
 
 /* DS3 character snapshot stat row padding (Pass 8, fix 2) */
-[data-theme="ds3"] .manuscript-character-snapshot-item {
+:root .manuscript-character-snapshot-item {
   padding: 3px 0;
 }
 
 /* DS3 drawer content — journal snapshot (Pass 9, fix 1) */
-[data-theme="ds3"] .manuscript-journal-snapshot-list {
+:root .manuscript-journal-snapshot-list {
   gap: 0;
 }
 
-[data-theme="ds3"] .manuscript-journal-snapshot-entry {
+:root .manuscript-journal-snapshot-entry {
   background: transparent;
   border: none;
   border-radius: 0;
@@ -3435,11 +3435,11 @@ body.manuscript-overlay-open {
   border-bottom: 1px solid var(--color-border);
 }
 
-[data-theme="ds3"] .manuscript-journal-snapshot-entry:last-child {
+:root .manuscript-journal-snapshot-entry:last-child {
   border-bottom: none;
 }
 
-[data-theme="ds3"] .manuscript-journal-snapshot-content {
+:root .manuscript-journal-snapshot-content {
   font-family: var(--font-interface);
   font-size: 0.875rem;
   line-height: 1.55;
@@ -3449,19 +3449,19 @@ body.manuscript-overlay-open {
   overflow: visible;
 }
 
-[data-theme="ds3"] .manuscript-journal-snapshot-meta {
+:root .manuscript-journal-snapshot-meta {
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 /* DS3 drawer content — inventory items (Pass 9, fix 2) */
-[data-theme="ds3"] .manuscript-inventory-grid {
+:root .manuscript-inventory-grid {
   grid-template-columns: 1fr;
   gap: 0;
 }
 
-[data-theme="ds3"] .manuscript-inventory-item {
+:root .manuscript-inventory-item {
   flex-direction: row;
   align-items: center;
   gap: var(--space-3);
@@ -3472,20 +3472,20 @@ body.manuscript-overlay-open {
   border-radius: 0;
 }
 
-[data-theme="ds3"] .manuscript-inventory-item:last-child {
+:root .manuscript-inventory-item:last-child {
   border-bottom: none;
 }
 
-[data-theme="ds3"] .manuscript-inventory-item-header {
+:root .manuscript-inventory-item-header {
   margin-bottom: 0;
 }
 
-[data-theme="ds3"] .manuscript-inventory-item-name {
+:root .manuscript-inventory-item-name {
   font-size: 0.875rem;
   font-weight: 500;
 }
 
-[data-theme="ds3"] .manuscript-inventory-item-description {
+:root .manuscript-inventory-item-description {
   font-family: var(--font-interface);
   font-size: 0.8125rem;
   margin-bottom: 0;
@@ -3495,7 +3495,7 @@ body.manuscript-overlay-open {
    margin-top; the column layout's top divider has no row equivalent. Left
    shrinkable (no flex-shrink:0) so narrow drawers fall through to
    .manuscript-inventory-actions' flex-wrap instead of overflowing. */
-[data-theme="ds3"] .manuscript-inventory-item-footer {
+:root .manuscript-inventory-item-footer {
   margin-top: 0;
   margin-left: auto;
   padding-top: 0;
@@ -3652,7 +3652,7 @@ body.manuscript-overlay-open {
 
 /* DS3 theme: subtle shadow on desktop float */
 @media (width >= 1024px) {
-  [data-theme="ds3"] .manuscript-marginalia-definition {
+  :root .manuscript-marginalia-definition {
     box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   }
 }
@@ -3748,25 +3748,25 @@ body.manuscript-overlay-open {
 }
 
 /* DS3 — scene status condensed into a mechanical console bar. */
-[data-theme="ds3"] .component-scene-status,
-[data-theme="ds3"] .scene-status-participants {
+:root .component-scene-status,
+:root .scene-status-participants {
   flex-flow: row wrap;
   align-items: center;
   gap: var(--space-2) var(--space-3);
 }
 
-[data-theme="ds3"] .scene-status-location {
+:root .scene-status-location {
   flex-direction: row;
   align-items: center;
   gap: var(--space-1_5);
 }
 
-[data-theme="ds3"] .scene-status-location-value {
+:root .scene-status-location-value {
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
-[data-theme="ds3"] .scene-status-badge {
+:root .scene-status-badge {
   padding: var(--space-0_5) var(--space-2);
   font-size: 0.6875rem;
 }

@@ -462,7 +462,7 @@
    brackets as a drafting-ink mechanical mark. The compact stat strip
    sits on top of the 3-col row of Recent + Getting Started. */
 
-[data-theme="ds3"] .component-dashboard-home {
+:root .component-dashboard-home {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
@@ -476,26 +476,26 @@
 }
 
 @media (width < 768px) {
-  [data-theme="ds3"] .component-dashboard-home {
+  :root .component-dashboard-home {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
   }
 }
 
-[data-theme="ds3"] .component-dashboard-continue-card,
-[data-theme="ds3"] .component-dashboard-progress-card {
+:root .component-dashboard-continue-card,
+:root .component-dashboard-progress-card {
   grid-column: 1 / -1;
 }
 
 /* Featherweight panels on the canvas — small canonical radius, no
    border (corner brackets do the framing), subtle surface lift over
    the dot grid. */
-[data-theme="ds3"] .component-dashboard-progress-card,
-[data-theme="ds3"] .component-dashboard-continue-card,
-[data-theme="ds3"] .component-dashboard-recent-worlds,
-[data-theme="ds3"] .component-dashboard-recent-characters,
-[data-theme="ds3"] .component-dashboard-getting-started {
+:root .component-dashboard-progress-card,
+:root .component-dashboard-continue-card,
+:root .component-dashboard-recent-worlds,
+:root .component-dashboard-recent-characters,
+:root .component-dashboard-getting-started {
   position: relative;
   padding: var(--space-4) var(--space-5);
   border-radius: var(--radius-md);
@@ -506,11 +506,11 @@
 }
 
 /* Corner brackets — top-left + bottom-right L-marks in accent. */
-[data-theme="ds3"] .component-dashboard-progress-card::before,
-[data-theme="ds3"] .component-dashboard-continue-card::before,
-[data-theme="ds3"] .component-dashboard-recent-worlds::before,
-[data-theme="ds3"] .component-dashboard-recent-characters::before,
-[data-theme="ds3"] .component-dashboard-getting-started::before {
+:root .component-dashboard-progress-card::before,
+:root .component-dashboard-continue-card::before,
+:root .component-dashboard-recent-worlds::before,
+:root .component-dashboard-recent-characters::before,
+:root .component-dashboard-getting-started::before {
   content: "";
   position: absolute;
   top: 0;
@@ -522,11 +522,11 @@
   pointer-events: none;
 }
 
-[data-theme="ds3"] .component-dashboard-progress-card::after,
-[data-theme="ds3"] .component-dashboard-continue-card::after,
-[data-theme="ds3"] .component-dashboard-recent-worlds::after,
-[data-theme="ds3"] .component-dashboard-recent-characters::after,
-[data-theme="ds3"] .component-dashboard-getting-started::after {
+:root .component-dashboard-progress-card::after,
+:root .component-dashboard-continue-card::after,
+:root .component-dashboard-recent-worlds::after,
+:root .component-dashboard-recent-characters::after,
+:root .component-dashboard-getting-started::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -541,20 +541,20 @@
 /* Continue card stays on the aged-paper canvas — the visual emphasis
    comes from a heavier accent-soft fill and a marginalia annotation,
    not a dark inversion (which would break the manuscript stance). */
-[data-theme="ds3"] .component-dashboard-continue-card {
+:root .component-dashboard-continue-card {
   background: var(--color-accent-soft);
 }
 
 /* Progress as a compact stat strip — stats inline along one row
    rather than 2D-stacked tiles. Numbers are the lead reading element. */
-[data-theme="ds3"] .dashboard-progress-stats {
+:root .dashboard-progress-stats {
   display: flex;
   flex-wrap: wrap;
   grid-template-columns: none;
   gap: var(--space-3) var(--space-6);
 }
 
-[data-theme="ds3"] .dashboard-progress-stat {
+:root .dashboard-progress-stat {
   flex: 0 1 auto;
   flex-direction: row;
   align-items: baseline;
@@ -564,11 +564,11 @@
   background: transparent;
 }
 
-[data-theme="ds3"] .component-dashboard-progress-card h2,
-[data-theme="ds3"] .component-dashboard-continue-card h2,
-[data-theme="ds3"] .component-dashboard-recent-worlds h2,
-[data-theme="ds3"] .component-dashboard-recent-characters h2,
-[data-theme="ds3"] .component-dashboard-getting-started h2 {
+:root .component-dashboard-progress-card h2,
+:root .component-dashboard-continue-card h2,
+:root .component-dashboard-recent-worlds h2,
+:root .component-dashboard-recent-characters h2,
+:root .component-dashboard-getting-started h2 {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -581,11 +581,11 @@
 }
 
 /* Canonical DS3 dot bullet — rhymes with the dot-grid background. */
-[data-theme="ds3"] .component-dashboard-progress-card h2::before,
-[data-theme="ds3"] .component-dashboard-continue-card h2::before,
-[data-theme="ds3"] .component-dashboard-recent-worlds h2::before,
-[data-theme="ds3"] .component-dashboard-recent-characters h2::before,
-[data-theme="ds3"] .component-dashboard-getting-started h2::before {
+:root .component-dashboard-progress-card h2::before,
+:root .component-dashboard-continue-card h2::before,
+:root .component-dashboard-recent-worlds h2::before,
+:root .component-dashboard-recent-characters h2::before,
+:root .component-dashboard-getting-started h2::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -596,11 +596,11 @@
 }
 
 /* Recent rows: tight monospace, no radius, hairline rules between. */
-[data-theme="ds3"] .dashboard-recent-list {
+:root .dashboard-recent-list {
   gap: 0;
 }
 
-[data-theme="ds3"] .dashboard-recent-item {
+:root .dashboard-recent-item {
   border-radius: 0;
   border: none;
   border-bottom: 1px dotted var(--color-border);
@@ -608,34 +608,34 @@
   padding: var(--space-2) var(--space-3);
 }
 
-[data-theme="ds3"] .dashboard-recent-item:last-child {
+:root .dashboard-recent-item:last-child {
   border-bottom: none;
 }
 
-[data-theme="ds3"] .dashboard-recent-item:hover {
+:root .dashboard-recent-item:hover {
   background: var(--color-surface);
   border-bottom-color: var(--color-accent);
 }
 
-[data-theme="ds3"] .dashboard-recent-item h3 {
+:root .dashboard-recent-item h3 {
   font-family: var(--font-system);
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0;
 }
 
-[data-theme="ds3"] .dashboard-recent-empty-state,
-[data-theme="ds3"] .dashboard-recent-empty-slot {
+:root .dashboard-recent-empty-state,
+:root .dashboard-recent-empty-slot {
   border-radius: 0;
 }
 
-[data-theme="ds3"] .dashboard-progress-stat-label,
-[data-theme="ds3"] .dashboard-recent-item span,
-[data-theme="ds3"] .dashboard-recent-item p {
+:root .dashboard-progress-stat-label,
+:root .dashboard-recent-item span,
+:root .dashboard-recent-item p {
   font-family: var(--font-system);
 }
 
-[data-theme="ds3"] .dashboard-progress-stat-value span {
+:root .dashboard-progress-stat-value span {
   font-family: var(--font-narrative);
   font-size: 2rem;
   line-height: 1;
@@ -644,80 +644,80 @@
 
 /* ─── DS3 interior ─── */
 
-[data-theme="ds3"] .dashboard-continue-card-row {
+:root .dashboard-continue-card-row {
   gap: var(--space-3);
 }
 
-[data-theme="ds3"] .dashboard-continue-card-fields,
-[data-theme="ds3"] .dashboard-continue-card-meta {
+:root .dashboard-continue-card-fields,
+:root .dashboard-continue-card-meta {
   gap: var(--space-2) var(--space-4);
 }
 
-[data-theme="ds3"] .dashboard-continue-card-meta time {
+:root .dashboard-continue-card-meta time {
   font-family: var(--font-system);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-size: 0.6875rem;
 }
 
-[data-theme="ds3"] .dashboard-getting-started-steps {
+:root .dashboard-getting-started-steps {
   gap: 0;
 }
 
-[data-theme="ds3"] .dashboard-getting-started-step {
+:root .dashboard-getting-started-step {
   padding: var(--space-2) var(--space-3);
   border-bottom: 1px dotted var(--color-border);
 }
 
-[data-theme="ds3"] .dashboard-getting-started-step:last-child {
+:root .dashboard-getting-started-step:last-child {
   border-bottom: none;
 }
 
-[data-theme="ds3"] .dashboard-getting-started-step-label {
+:root .dashboard-getting-started-step-label {
   font-family: var(--font-system);
   font-size: 0.875rem;
   line-height: 1.4;
 }
 
-[data-theme="ds3"] .dashboard-recent-character-content {
+:root .dashboard-recent-character-content {
   gap: var(--space-2);
 }
 
 /* ─── DS3 ─── */
 
-[data-theme="ds3"] .world-list-grid {
+:root .world-list-grid {
   gap: var(--space-4);
 }
 
-[data-theme="ds3"] .component-world-card {
+:root .component-world-card {
   border-radius: var(--radius-md);
   background: var(--color-surface);
   backdrop-filter: blur(6px);
 }
 
-[data-theme="ds3"] .world-card-content {
+:root .world-card-content {
   padding: var(--space-5);
   gap: var(--space-3);
 }
 
-[data-theme="ds3"] .component-world-card footer {
+:root .component-world-card footer {
   padding: var(--space-3) var(--space-5);
   border-top: 1px dotted var(--color-border);
 }
 
-[data-theme="ds3"] .world-card-description-block p {
+:root .world-card-description-block p {
   font-family: var(--font-system);
   font-size: 0.9375rem;
 }
 
-[data-theme="ds3"] .world-card-footer-meta time {
+:root .world-card-footer-meta time {
   font-family: var(--font-system);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   font-size: 0.6875rem;
 }
 
-[data-theme="ds3"] .world-list-empty {
+:root .world-list-empty {
   border-radius: var(--radius-md);
   padding: var(--space-6) var(--space-5);
   gap: var(--space-3);
@@ -725,7 +725,7 @@
   backdrop-filter: blur(6px);
 }
 
-[data-theme="ds3"] .world-list-empty-icon {
+:root .world-list-empty-icon {
   border-radius: var(--radius-md);
   width: 4rem;
   height: 4rem;
@@ -733,7 +733,7 @@
   border: 1px dotted var(--color-border);
 }
 
-[data-theme="ds3"] .world-list-empty-title {
+:root .world-list-empty-title {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -745,7 +745,7 @@
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds3"] .world-list-empty-title::before {
+:root .world-list-empty-title::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -755,19 +755,19 @@
   flex-shrink: 0;
 }
 
-[data-theme="ds3"] .world-list-empty-lede {
+:root .world-list-empty-lede {
   font-family: var(--font-narrative);
   font-size: 1.25rem;
   color: var(--color-text-primary);
 }
 
-[data-theme="ds3"] .world-list-empty-guide {
+:root .world-list-empty-guide {
   border-radius: var(--radius-sm);
   border: 1px dotted var(--color-border);
   padding: var(--space-4) var(--space-5);
 }
 
-[data-theme="ds3"] .world-list-empty-guide-heading {
+:root .world-list-empty-guide-heading {
   font-family: var(--font-system);
   font-size: 0.75rem;
   font-weight: 500;
@@ -776,12 +776,12 @@
   color: var(--color-text-secondary);
 }
 
-[data-theme="ds3"] .world-list-empty-guide-steps {
+:root .world-list-empty-guide-steps {
   font-family: var(--font-system);
   font-size: 0.875rem;
 }
 
-[data-theme="ds3"] .world-list-empty-tip {
+:root .world-list-empty-tip {
   border-radius: var(--radius-sm);
   border-left: none;
   border: 1px dotted var(--color-border);
