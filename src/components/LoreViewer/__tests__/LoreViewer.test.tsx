@@ -5,7 +5,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { LoreViewer } from '../LoreViewer';
-import type { LoreFact } from '../../../types';
+import type { LoreFact } from '../../../types/lore.types';
 
 // Mock the lore store
 const mockGetFacts = jest.fn();

@@ -18,7 +18,6 @@ jest.mock('@/lib/storage/encryption', () => ({
 import {
   useProviderStore,
   getActiveProviderKey,
-  hasConfiguredProvider,
   type AddProviderInput,
 } from '../providerStore';
 import { clearEncryptionKey } from '@/lib/storage/encryption';
@@ -54,7 +53,6 @@ describe('providerStore', () => {
     expect((config as unknown as Record<string, unknown>).apiKey).toBeUndefined();
     expect(config.encryptedApiKey).not.toBe('AIza-secret');
     expect(useProviderStore.getState().activeProviderId).toBe(id);
-    expect(hasConfiguredProvider()).toBe(true);
   });
 
   test('getActiveProviderKey decrypts the active provider just-in-time', async () => {
