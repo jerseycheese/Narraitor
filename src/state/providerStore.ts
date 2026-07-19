@@ -240,8 +240,3 @@ export async function getActiveProviderKey(): Promise<string | null> {
 
   return decryptKey(config.encryptedApiKey);
 }
-
-/** Whether any provider is configured (used to gate AI-dependent UI). */
-export function hasConfiguredProvider(): boolean {
-  return Object.keys(useProviderStore.getState().providers).length > 0;
-}

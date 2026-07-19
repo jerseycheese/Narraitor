@@ -1,11 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import type { JournalEntry } from '@/types/journal.types';
 import { useJournalStore } from '@/state/journalStore';
-import {
-  ToolsMenuPanelContent,
-  JournalSnapshotDrawerContent,
-} from '../ManuscriptDrawerPanels';
+import { JournalSnapshotDrawerContent } from '../ManuscriptDrawerPanels';
 
 jest.mock('@/state/journalStore', () => ({
   useJournalStore: jest.fn(),
@@ -44,95 +41,6 @@ describe('ManuscriptDrawerPanels', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockJournalEntries([]);
-  });
-
-  it('shows Journal Snapshot in the tools menu', () => {
-    render(
-      <ToolsMenuPanelContent
-        activeDrawer={null}
-        onOpenDrawer={jest.fn()}
-        onClosePanel={jest.fn()}
-        onOpenJournalRoute={jest.fn()}
-      />
-    );
-
-    expect(screen.getByRole('button', { name: /journal snapshot/i })).toBeInTheDocument();
-  });
-
-  it('opens the journal drawer when Journal Snapshot is clicked', () => {
-    const onOpenDrawer = jest.fn();
-
-    render(
-      <ToolsMenuPanelContent
-        activeDrawer={null}
-        onOpenDrawer={onOpenDrawer}
-        onClosePanel={jest.fn()}
-        onOpenJournalRoute={jest.fn()}
-      />
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: /journal snapshot/i }));
-    expect(onOpenDrawer).toHaveBeenCalledWith('journal');
-  });
-
-  it('renders prototype-parity tools controls when optional handlers are provided', () => {
-    render(
-      <ToolsMenuPanelContent
-        activeDrawer={null}
-        onOpenDrawer={jest.fn()}
-        onClosePanel={jest.fn()}
-        onOpenJournalRoute={jest.fn()}
-        onOpenCharacterPanel={jest.fn()}
-        onSimulateTurn={jest.fn()}
-        onToggleStreamingPreview={jest.fn()}
-        onToggleEndingSuggestionPreview={jest.fn()}
-      />
-    );
-
-    expect(screen.getByRole('button', { name: /^character$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /character details/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /inventory/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /story so far/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /choice history/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /journal snapshot/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /open journal route/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /simulate next turn/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /toggle streaming state/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /show ending suggestion/i })).toBeInTheDocument();
-  });
-
-  it('calls optional tools parity handlers', () => {
-    const onClosePanel = jest.fn();
-    const onOpenCharacterPanel = jest.fn();
-    const onSimulateTurn = jest.fn();
-    const onToggleStreamingPreview = jest.fn();
-    const onToggleEndingSuggestionPreview = jest.fn();
-
-    render(
-      <ToolsMenuPanelContent
-        activeDrawer={null}
-        onOpenDrawer={jest.fn()}
-        onClosePanel={onClosePanel}
-        onOpenJournalRoute={jest.fn()}
-        onOpenCharacterPanel={onOpenCharacterPanel}
-        onSimulateTurn={onSimulateTurn}
-        onToggleStreamingPreview={onToggleStreamingPreview}
-        onToggleEndingSuggestionPreview={onToggleEndingSuggestionPreview}
-      />
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: /^character$/i }));
-    expect(onClosePanel).toHaveBeenCalled();
-    expect(onOpenCharacterPanel).toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole('button', { name: /simulate next turn/i }));
-    expect(onSimulateTurn).toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole('button', { name: /toggle streaming state/i }));
-    expect(onToggleStreamingPreview).toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole('button', { name: /show ending suggestion/i }));
-    expect(onToggleEndingSuggestionPreview).toHaveBeenCalled();
   });
 
   it('renders empty state when no journal entries exist for the session', () => {

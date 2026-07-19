@@ -5,15 +5,11 @@
  * Provides consistent test data with sensible defaults that can be overridden.
  */
 
-import type {
-  World,
-  WorldAttribute,
-  WorldSkill,
-  NarrativeSegment,
-  JournalEntry,
-  JournalEntryType,
-  InventoryItem,
-} from '@/types';
+import type { World } from '@/types';
+import type { WorldAttribute, WorldSkill } from '@/types/world.types';
+import type { NarrativeSegment } from '@/types/narrative.types';
+import type { JournalEntry, JournalEntryType } from '@/types/journal.types';
+import type { InventoryItem } from '@/types/inventory.types';
 import type { Character } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils';
 

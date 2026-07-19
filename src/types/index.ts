@@ -9,11 +9,8 @@
 
 export type { EntityID } from './common.types';
 export type { GenreValue } from './genre.types';
-export type { World, WorldAttribute, WorldSkill } from './world.types';
+export type { World } from './world.types';
 export type { Character } from './character.types';
-export type { InventoryItem } from './inventory.types';
-export type { NarrativeSegment } from './narrative.types';
-export type { JournalEntry, JournalEntryType } from './journal.types';
-export type { LoreFact, LoreCategory, LoreUsageSource } from './lore.types';
+export type { LoreCategory, LoreUsageSource } from './lore.types';
 export type { NarrativeContext } from './session.types';
 export type { AITestConfig, AIResponse } from './ai-testing.types';
