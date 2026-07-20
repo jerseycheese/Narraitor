@@ -142,9 +142,8 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           />
         )}
 
-      {/* Rendered before the prose so the desktop float-right note sits in the
-          margin beside the text — a float only wraps content that follows it in
-          source order. Mobile renders it as a bottom sheet via CSS (F41). */}
+      {/* Render before prose so block-flow float contexts keep the note beside
+          following text; DS3's flex segment pulls it right with CSS. */}
       {activeTerm && (
         <TermDefinition
           term={activeTerm}

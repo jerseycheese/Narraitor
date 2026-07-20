@@ -1,6 +1,72 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
+
+const seedMarginaliaLoreFact = async (page: Page) => {
+  await page.addInitScript(async () => {
+    const now = '2024-01-01T00:00:00.000Z';
+    const fact = {
+      id: 'fact-visual-arasaka',
+      key: 'world-cyberpunk-2077:location_arasaka',
+      value: 'Arasaka',
+      aliases: [],
+      category: 'locations',
+      source: 'manual',
+      worldId: 'world-cyberpunk-2077',
+      visibility: 'world-shared',
+      metadata: {
+        description:
+          'A corporate tower whose security systems anchor the test scene.',
+        type: 'megacorp',
+        importance: 'high',
+      },
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const loreStore = {
+      state: {
+        facts: { [fact.id]: fact },
+        entities: { [fact.id]: fact },
+        factHistory: {},
+        mergeAuditLog: [],
+        loreUsage: {},
+        loreUsageEvents: [],
+        currentEntityId: null,
+        error: null,
+        loading: false,
+      },
+      version: 3,
+    };
+
+    await new Promise((resolve) => {
+      const request = indexedDB.open('narraitor-state', 1);
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains('narraitor-store')) {
+          db.createObjectStore('narraitor-store');
+        }
+      };
+
+      request.onsuccess = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        const tx = db.transaction(['narraitor-store'], 'readwrite');
+        const store = tx.objectStore('narraitor-store');
+        const put = store.put(
+          { id: 'lore-store', value: loreStore },
+          'lore-store'
+        );
+        put.onsuccess = () => resolve('seeded');
+        put.onerror = () => resolve('failed');
+      };
+
+      request.onerror = () => resolve('failed');
+    });
+
+    localStorage.setItem('lore-store', JSON.stringify(loreStore));
+  });
+};
 
 test.describe('Manuscript regression assertions', () => {
   test('Play surface keeps location visible and scrolls new segments into view', async ({ page }) => {
@@ -136,5 +202,53 @@ test.describe('Manuscript regression assertions', () => {
     );
     expect(geometry.newestTop).toBeGreaterThanOrEqual(geometry.scrollerTop);
     expect(geometry.newestBottom).toBeLessThanOrEqual(geometry.scrollerBottom);
+  });
+
+  test('Desktop marginalia definition sits to the right of the prose column', async ({ page }) => {
+    await seedTestData(page);
+    await seedMarginaliaLoreFact(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.narrative-segment', { timeout: 10000 });
+
+    await page.getByRole('button', { name: 'Arasaka' }).first().click();
+    await expect(
+      page.getByRole('complementary', { name: 'Definition: Arasaka' })
+    ).toBeVisible();
+
+    const geometry = await page.evaluate(() => {
+      const definition = document.querySelector(
+        '.manuscript-marginalia-definition'
+      );
+      const segment = definition?.closest('.narrative-segment');
+      const prose = segment?.querySelector(
+        '[data-testid="narrative-content-container"]'
+      );
+
+      if (!definition || !prose) {
+        return null;
+      }
+
+      const definitionRect = definition.getBoundingClientRect();
+      const proseRect = prose.getBoundingClientRect();
+
+      return {
+        definitionLeft: Math.round(definitionRect.left),
+        proseLeft: Math.round(proseRect.left),
+        leftOffset: Math.round(definitionRect.left - proseRect.left),
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected marginalia geometry to be measurable');
+    }
+
+    expect(geometry.definitionLeft).toBeGreaterThan(geometry.proseLeft);
+    expect(geometry.leftOffset).toBeGreaterThan(24);
   });
 });

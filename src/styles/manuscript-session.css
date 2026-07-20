@@ -3620,12 +3620,13 @@ body.manuscript-overlay-open {
   margin: 0;
 }
 
-/* Desktop: float-right margin note (matches DS3 choice-outcome-callout pattern) */
+/* Desktop: right-aligned margin note inside the flex narrative segment. */
 @media (width >= 1024px) {
   .manuscript-marginalia-definition {
     position: relative;
     float: right;
     clear: right;
+    align-self: flex-end;
     width: 200px;
     max-width: 200px;
     margin: 0 0 var(--space-3) var(--space-3);
