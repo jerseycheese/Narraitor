@@ -204,7 +204,7 @@ test.describe('Manuscript regression assertions', () => {
     expect(geometry.newestBottom).toBeLessThanOrEqual(geometry.scrollerBottom);
   });
 
-  test('Desktop marginalia definition sits to the right of the prose column', async ({ page }) => {
+  test('Desktop marginalia definition sits in the right margin outside the prose column', async ({ page }) => {
     await seedTestData(page);
     await seedMarginaliaLoreFact(page);
     await mockApiEndpoints(page);
@@ -235,11 +235,17 @@ test.describe('Manuscript regression assertions', () => {
 
       const definitionRect = definition.getBoundingClientRect();
       const proseRect = prose.getBoundingClientRect();
+      const scrollViewport = document.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      ) as HTMLElement | null;
 
       return {
         definitionLeft: Math.round(definitionRect.left),
-        proseLeft: Math.round(proseRect.left),
-        leftOffset: Math.round(definitionRect.left - proseRect.left),
+        definitionRight: Math.round(definitionRect.right),
+        proseRight: Math.round(proseRect.right),
+        rightGutter: Math.round(definitionRect.left - proseRect.right),
+        scrollViewportScrollLeft: scrollViewport?.scrollLeft ?? 0,
+        viewportWidth: Math.round(window.innerWidth),
       };
     });
 
@@ -248,7 +254,13 @@ test.describe('Manuscript regression assertions', () => {
       throw new Error('Expected marginalia geometry to be measurable');
     }
 
-    expect(geometry.definitionLeft).toBeGreaterThan(geometry.proseLeft);
-    expect(geometry.leftOffset).toBeGreaterThan(24);
+    expect(geometry.definitionLeft).toBeGreaterThanOrEqual(
+      geometry.proseRight + 16
+    );
+    expect(geometry.rightGutter).toBeGreaterThanOrEqual(16);
+    expect(geometry.definitionRight).toBeLessThanOrEqual(
+      geometry.viewportWidth - 16
+    );
+    expect(geometry.scrollViewportScrollLeft).toBe(0);
   });
 });

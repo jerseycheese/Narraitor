@@ -18,7 +18,7 @@ export const TermDefinition: React.FC<TermDefinitionProps> = ({
 
   // Auto-focus the panel on mount so screen readers announce it
   useEffect(() => {
-    ref.current?.focus();
+    ref.current?.focus({ preventScroll: true });
   }, []);
 
   useEffect(() => {

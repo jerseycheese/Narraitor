@@ -3620,16 +3620,35 @@ body.manuscript-overlay-open {
   margin: 0;
 }
 
-/* Desktop: right-aligned margin note inside the flex narrative segment. */
+/* Desktop: extend only annotated history into the right page gutter. */
 @media (width >= 1024px) {
-  .manuscript-marginalia-definition {
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) {
+    /* 21.25rem is half the DS3 manuscript column; the note lane must fit in the visible gutter. */
+    --manuscript-marginalia-width: min(12.5rem, calc(50vw - 21.25rem - var(--space-8)));
+
+    width: calc(100% + var(--space-4) + var(--manuscript-marginalia-width));
+  }
+
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) .narrative-history-segments {
+    width: calc(100% - var(--space-4) - var(--manuscript-marginalia-width));
+  }
+
+  :root .narrative-segment:has(.manuscript-marginalia-definition) {
     position: relative;
-    float: right;
-    clear: right;
-    align-self: flex-end;
-    width: 200px;
-    max-width: 200px;
-    margin: 0 0 var(--space-3) var(--space-3);
+
+    /* Reserve the measured note height so absolute marginalia does not overlap the following segment. */
+    min-height: 13rem;
+  }
+
+  .manuscript-marginalia-definition {
+    position: absolute;
+    top: 0;
+    left: calc(100% + var(--space-4));
+    align-self: auto;
+    box-sizing: border-box;
+    width: var(--manuscript-marginalia-width);
+    max-width: none;
+    margin: 0;
     z-index: auto;
     box-shadow: none;
     border-radius: var(--radius-md);

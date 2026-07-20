@@ -142,8 +142,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           />
         )}
 
-      {/* Render before prose so block-flow float contexts keep the note beside
-          following text; DS3's flex segment pulls it right with CSS. */}
+      {/* Render before prose so desktop CSS can place the note in the margin. */}
       {activeTerm && (
         <TermDefinition
           term={activeTerm}
