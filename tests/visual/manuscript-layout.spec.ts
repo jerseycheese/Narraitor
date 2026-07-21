@@ -1,7 +1,15 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 import { hideDynamicContent } from './utils/wait-helpers';
+
+const resetPlaySurfaceScroll = async (page: Page) => {
+  await page.evaluate(() => {
+    const scroller = document.querySelector('.manuscript-overlay-main') as HTMLElement | null;
+    scroller?.scrollTo({ top: 0, behavior: 'auto' });
+  });
+  await page.waitForTimeout(50);
+};
 
 /**
  * Manuscript Layout Specific Visual Tests
@@ -60,6 +68,8 @@ test.describe('Manuscript Layout Specific Tests', () => {
 
     // Wait for the main manuscript shell to load
     await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 10000 });
+    await page.waitForTimeout(150);
+    await resetPlaySurfaceScroll(page);
 
     const hudToggle = page.locator('.manuscript-hud-character-pill');
     await expect(hudToggle).toBeVisible();
@@ -122,6 +132,8 @@ test.describe('Manuscript Layout Specific Tests', () => {
     await page.goto('/worlds/world-cyberpunk-2077/play');
 
     await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 10000 });
+    await page.waitForTimeout(150);
+    await resetPlaySurfaceScroll(page);
 
     await expect(page.locator('[data-testid="manuscript-session-shell"]')).toBeVisible();
     await expect(page.locator('[data-testid="manuscript-action-rail"]')).toBeVisible();

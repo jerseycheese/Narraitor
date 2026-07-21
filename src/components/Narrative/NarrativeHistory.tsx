@@ -22,7 +22,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   disableInitialAutoScroll = false
 }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const scrollViewportRef = useRef<HTMLDivElement>(null);
+  const scrollViewportRef = useRef<HTMLElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
   const prevSegmentCountRef = useRef(segments.length);
   const hasUserScrollInteractionRef = useRef(false);
@@ -249,16 +249,22 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     );
   };
 
-  // Get the ScrollArea's viewport element for scroll control + ResizeObserver anchoring
+  // Get the active scroll target for scroll control + ResizeObserver anchoring.
   useEffect(() => {
     if (scrollAreaRef.current) {
-      // Find the ScrollArea viewport within our specific component
-      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
-      if (viewport) {
-        scrollViewportRef.current = viewport;
+      const playSurfaceViewport = scrollAreaRef.current.closest(
+        '.manuscript-overlay-main'
+      ) as HTMLElement | null;
+      const radixViewport = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      ) as HTMLElement | null;
+      const scrollTarget = playSurfaceViewport ?? radixViewport;
+
+      if (scrollTarget) {
+        scrollViewportRef.current = scrollTarget;
         // Passive: handleScroll only reads scroll position (no preventDefault),
         // so mark it passive to avoid blocking scroll (issue #1358).
-        viewport.addEventListener('scroll', handleScroll, { passive: true });
+        scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
 
         // ResizeObserver: anchor scroll to bottom during content growth
         const contentEl = scrollContentRef.current;
@@ -276,7 +282,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         }
 
         return () => {
-          viewport.removeEventListener('scroll', handleScroll);
+          scrollTarget.removeEventListener('scroll', handleScroll);
           resizeObserver?.disconnect();
         };
       }
