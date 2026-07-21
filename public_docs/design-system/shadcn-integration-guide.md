@@ -24,8 +24,8 @@ Alert, and so on, several built on `@radix-ui/*`). What changed is how they're s
   ```
 
 - **Styling lives in CSS, keyed off those class names**, and resolves design tokens via
-  `var(--token-name)`. The token values are defined per theme under `[data-theme="ds1"]`,
-  `[data-theme="ds2"]`, and `[data-theme="ds3"]` selectors in `src/lib/theme/themes/`.
+  `var(--token-name)`. The current token values live in `src/lib/theme/themes/ds3.css`
+  under `:root` and `:root.dark`; `_shared-tokens.css` holds shared primitives.
 - **Variants are plain string props**, not `cva` configs. A Badge takes `variant`/`size`
   props and turns them into `badge-${variant}`/`badge-${size}` classes; the CSS does the rest.
 

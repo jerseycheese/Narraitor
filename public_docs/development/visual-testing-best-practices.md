@@ -2,7 +2,7 @@
 title: Visual Testing Best Practices
 tags: [testing, best-practices, visual-testing, playwright, guidelines]
 created: 2025-08-20
-updated: 2026-05-23
+updated: 2026-07-21
 ---
 
 # What actually works for visual testing
@@ -297,19 +297,13 @@ test('responsive navigation component', async ({ page }) => {
 3. **Test locally first** before pushing to CI
 4. **Review visual diffs** in test results when CI fails
 
-**CI-adopted baselines (important exception)**:
-Visual regression runs on `macos-latest`. Most baselines (wizard, tour flows) match a
-local Mac within tolerance, so regenerating them locally is fine. But some content-heavy
-pages — `dashboard-themes`, `main-pages` (home, home-empty-state, world-edit,
-character-edit), and `theme-switcher` (theme-ds*-home) — do **not** match local renders
-and have their baselines **adopted from CI output**. For these:
-- Do **not** regenerate locally (it will pass locally but fail in CI).
-- After an intentional change, let the `E2E Tests` check fail, then download the failed
-  shard artifacts — `gh run download <run-id> --pattern 'e2e-test-failures-shard*'` (the E2E
-  job is sharded, so artifacts are named `e2e-test-failures-shard1` / `-shard2`; only failed
-  shards upload). Or just run `./scripts/download-playwright-report.sh <pr>`, which handles
-  this. Verify each `*-actual.png` is a correct render (not a seeding/empty flake), and copy
-  the verified actuals over the corresponding `*-chromium-darwin.png` baselines.
+**CI baseline adoption**:
+Visual regression runs on `macos-latest`. If a visual change passes locally but fails in CI,
+download the failed shard artifacts with `./scripts/download-playwright-report.sh <pr>` or
+`gh run download <run-id> --pattern 'e2e-test-failures-shard*'`. Verify each `*-actual.png`
+is a correct render, not a seeding or empty-state failure, before copying it over the matching
+`*-chromium-darwin.png` baseline. The old `dashboard-themes` and `theme-switcher` specs no
+longer exist; do not preserve exception lists for deleted visual suites.
 
 **Parallel-load flakiness**: worker concurrency against the single `next dev` server can time
 out navigations / `waitForStoreReady` (store hydration). CI runs the E2E job sharded with

@@ -204,7 +204,7 @@ const handleClick = () => {
 - [ ] Test on slow network connections
 
 ## Related Documentation
-- [LoadingOverlay Component](/src/components/shared/LoadingOverlay.tsx)
-- [useNavigationLoading Hook](/src/hooks/useNavigationLoading.ts)
-- [NavigationLoadingProvider](/src/components/shared/NavigationLoadingProvider.tsx)
+- [LoadingOverlay Component](../../src/components/shared/LoadingOverlay.tsx)
+- [useNavigationLoading Hook](../../src/hooks/useNavigationLoading.ts)
+- [NavigationLoadingProvider](../../src/components/shared/NavigationLoadingProvider.tsx)
 - [UI/UX Guidelines](../development/ui-ux-guidelines.md)

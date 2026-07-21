@@ -2,7 +2,7 @@
 title: GitHub Integration Guide
 tags: [github, sync, automation, workflow]
 created: 2025-06-26
-updated: 2025-06-26
+updated: 2026-07-21
 ---
 
 # GitHub Integration Guide
@@ -201,7 +201,7 @@ gh auth token
 - Monitor for sync failures in automation (they happen)
 
 ## Related
-- `/scripts/user-stories/` - CSV files
-- `/scripts/update-user-stories.js` - Main sync script
+- `scripts/user-stories/` - CSV files
+- `scripts/update-user-stories.js` - Main sync script
 - `.github/ISSUE_TEMPLATE/` - Issue templates
 - GitHub Project Boards
