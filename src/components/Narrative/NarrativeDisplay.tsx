@@ -68,7 +68,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     ? (speakerRecord?.name ?? deriveFallbackName(speakerId))
     : null;
 
-  const { participants, highlightTerms } = useNarrativeParticipants({
+  const { highlightTerms } = useNarrativeParticipants({
     segment: resolvedSegment,
     speakerId,
     speakerName,
@@ -83,22 +83,34 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   );
 
   const [activeTerm, setActiveTerm] = React.useState<TermDefinitionData | null>(null);
+  const [activeTermTopOffset, setActiveTermTopOffset] = React.useState<number | undefined>(undefined);
   const triggerRef = useRef<HTMLElement | null>(null);
 
   const handleTermClick = React.useCallback(
     (termText: string, anchorElement: HTMLElement) => {
       const definition = getDefinition(termText);
       if (definition) {
+        const segment = anchorElement.closest('.narrative-segment');
+        const segmentRect = segment?.getBoundingClientRect();
+        const anchorRect = anchorElement.getBoundingClientRect();
+        const topOffset = segmentRect
+          ? Math.max(0, Math.round(anchorRect.top - segmentRect.top))
+          : undefined;
+
         triggerRef.current = anchorElement;
+        setActiveTermTopOffset(topOffset);
         setActiveTerm(definition);
       }
     },
     [getDefinition]
   );
 
-  const handleTermDismiss = React.useCallback(() => {
-    triggerRef.current?.focus();
+  const handleTermDismiss = React.useCallback((shouldRestoreFocus = true) => {
+    if (shouldRestoreFocus) {
+      triggerRef.current?.focus({ preventScroll: true });
+    }
     triggerRef.current = null;
+    setActiveTermTopOffset(undefined);
     setActiveTerm(null);
   }, []);
 
@@ -142,13 +154,12 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           />
         )}
 
-      {/* Rendered before the prose so the desktop float-right note sits in the
-          margin beside the text — a float only wraps content that follows it in
-          source order. Mobile renders it as a bottom sheet via CSS (F41). */}
+      {/* Render before prose so desktop CSS can place the note in the margin. */}
       {activeTerm && (
         <TermDefinition
           term={activeTerm}
           onDismiss={handleTermDismiss}
+          topOffsetPx={activeTermTopOffset}
         />
       )}
 

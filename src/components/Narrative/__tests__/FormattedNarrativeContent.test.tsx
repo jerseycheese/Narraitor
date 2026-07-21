@@ -124,6 +124,42 @@ Multiple newlines should create separate paragraphs.`;
       expect(onTermClick).toHaveBeenCalledWith('sword of power', button);
     });
 
+    it('passes the canonical term when a possessive term button is clicked', () => {
+      const onTermClick = jest.fn();
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="The Fragment's signal faded."
+          definitionTerms={['Fragment']}
+          onTermClick={onTermClick}
+        />
+      );
+
+      const button = container.querySelector(
+        'button.manuscript-marginalia-term'
+      ) as HTMLElement;
+      expect(button).toHaveTextContent("Fragment's");
+
+      button.click();
+
+      expect(onTermClick).toHaveBeenCalledWith('Fragment', button);
+    });
+
+    it('does not wrap definition terms inside longer words', () => {
+      const { container } = render(
+        <FormattedNarrativeContent
+          content="The real tear in reality mattered."
+          definitionTerms={['real']}
+        />
+      );
+
+      const buttons = container.querySelectorAll(
+        'button.manuscript-marginalia-term'
+      );
+      expect(buttons).toHaveLength(1);
+      expect(buttons[0]).toHaveTextContent('real');
+      expect(container).toHaveTextContent('reality');
+    });
+
     it('renders both highlight spans and definition buttons when both props are provided', () => {
       const { container } = render(
         <FormattedNarrativeContent

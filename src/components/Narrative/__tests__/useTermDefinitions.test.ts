@@ -85,6 +85,15 @@ describe('useTermDefinitions', () => {
     expect(def?.description).toBe('A powerful mage from the Northern Tower.');
   });
 
+  it('looks up definition when clicked text includes a possessive suffix', () => {
+    mockGetFacts.mockReturnValue([baseFact]);
+    const { result } = renderHook(() => useTermDefinitions('world-1'));
+
+    const def = result.current.getDefinition("Aria's");
+    expect(def).not.toBeNull();
+    expect(def?.name).toBe('Aria');
+  });
+
   it('looks up definition by alias (case-insensitive)', () => {
     mockGetFacts.mockReturnValue([baseFact]);
     const { result } = renderHook(() => useTermDefinitions('world-1'));

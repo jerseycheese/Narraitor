@@ -13,6 +13,8 @@ interface FormattedNarrativeContentProps {
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+const isWordCharacter = (value: string) => /[0-9A-Za-z]/.test(value);
+
 export const FormattedNarrativeContent: React.FC<
   FormattedNarrativeContentProps
 > = ({ content, className, highlightTerms, highlightClassName, definitionTerms, onTermClick }) => {
@@ -153,7 +155,7 @@ export const FormattedNarrativeContent: React.FC<
             let end = start + rawMatch.length;
 
             const precedingChar = start > 0 ? node[start - 1] : '';
-            if (precedingChar && /[0-9A-Za-z]/.test(precedingChar)) {
+            if (precedingChar && isWordCharacter(precedingChar)) {
               const fragment = node.slice(start, end);
               if (fragment) {
                 nextNodes.push(
@@ -171,6 +173,22 @@ export const FormattedNarrativeContent: React.FC<
             const suffix = node.slice(end, end + 2);
             if (suffix === "'s" || suffix === '’s') {
               end += 2;
+            } else {
+              const followingChar = node[end] ?? '';
+              if (followingChar && isWordCharacter(followingChar)) {
+                const fragment = node.slice(start, end);
+                if (fragment) {
+                  nextNodes.push(
+                    <React.Fragment
+                      key={`${keyBase}-partial-end-${start}-${key}`}
+                    >
+                      {fragment}
+                    </React.Fragment>
+                  );
+                }
+                lastIndex = end;
+                continue;
+              }
             }
 
             const matchedText = node.slice(start, end);
@@ -290,7 +308,7 @@ export const FormattedNarrativeContent: React.FC<
                     start > 0 ? text[start - 1] : '';
                   if (
                     precedingChar &&
-                    /[0-9A-Za-z]/.test(precedingChar)
+                    isWordCharacter(precedingChar)
                   ) {
                     const fragment = text.slice(start, end);
                     if (fragment) {
@@ -306,9 +324,26 @@ export const FormattedNarrativeContent: React.FC<
                     continue;
                   }
 
+                  const lookupText = rawMatch;
                   const suffix = text.slice(end, end + 2);
                   if (suffix === "'s" || suffix === '\u2019s') {
                     end += 2;
+                  } else {
+                    const followingChar = text[end] ?? '';
+                    if (followingChar && isWordCharacter(followingChar)) {
+                      const fragment = text.slice(start, end);
+                      if (fragment) {
+                        innerNodes.push(
+                          <React.Fragment
+                            key={`${fragmentKey}-partial-end-${start}-${key}`}
+                          >
+                            {fragment}
+                          </React.Fragment>
+                        );
+                      }
+                      lastIndex = end;
+                      continue;
+                    }
                   }
 
                   const matchedText = text.slice(start, end);
@@ -321,7 +356,7 @@ export const FormattedNarrativeContent: React.FC<
                       className="manuscript-marginalia-term"
                       aria-haspopup="dialog"
                       onClick={(e) =>
-                        onTermClick?.(trimmed, e.currentTarget)
+                        onTermClick?.(lookupText, e.currentTarget)
                       }
                       key={`${fragmentKey}-defterm-${key}-${start}`}
                     >

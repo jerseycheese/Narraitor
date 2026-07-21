@@ -77,6 +77,7 @@ describe('TermDefinition', () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(onDismiss).toHaveBeenCalledWith(true);
   });
 
   it('calls onDismiss on click outside', () => {
@@ -91,6 +92,7 @@ describe('TermDefinition', () => {
 
     fireEvent.mouseDown(document.body);
     expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(onDismiss).toHaveBeenCalledWith(false);
   });
 
   it('does NOT dismiss on click inside', () => {

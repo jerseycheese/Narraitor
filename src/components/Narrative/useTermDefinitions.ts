@@ -12,6 +12,10 @@ export interface TermDefinitionData {
 }
 
 const DEFINABLE_CATEGORIES: LoreCategory[] = ['characters', 'locations', 'events'];
+const POSSESSIVE_SUFFIX_PATTERN = /(?:'s|\u2019s)$/i;
+
+const getLookupKey = (term: string) =>
+  term.trim().replace(/\s+/g, ' ').replace(POSSESSIVE_SUFFIX_PATTERN, '').toLowerCase();
 
 /**
  * Builds a term lookup map from lore facts for the current world/session.
@@ -48,7 +52,7 @@ export function useTermDefinitions(
       };
 
       // Register canonical name
-      const canonKey = fact.value.toLowerCase();
+      const canonKey = getLookupKey(fact.value);
       if (!map.has(canonKey)) {
         map.set(canonKey, data);
         names.push(fact.value);
@@ -56,7 +60,7 @@ export function useTermDefinitions(
 
       // Register aliases
       for (const alias of fact.aliases || []) {
-        const aliasKey = alias.toLowerCase();
+        const aliasKey = getLookupKey(alias);
         if (!map.has(aliasKey)) {
           map.set(aliasKey, data);
           names.push(alias);
@@ -69,7 +73,7 @@ export function useTermDefinitions(
 
   const getDefinition = useMemo(() => {
     return (matchedText: string): TermDefinitionData | null => {
-      return lookupMap.get(matchedText.toLowerCase()) ?? null;
+      return lookupMap.get(getLookupKey(matchedText)) ?? null;
     };
   }, [lookupMap]);
 

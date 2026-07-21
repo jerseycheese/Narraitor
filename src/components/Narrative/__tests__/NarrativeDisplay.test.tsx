@@ -229,6 +229,27 @@ describe('NarrativeDisplay', () => {
       expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
     });
 
+    it('shows term definition when the clicked prose is possessive', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-marginalia-possessive',
+        content: "Aria's staff caught the moonlight.",
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      fireEvent.click(screen.getByRole('button', { name: "Aria's" }));
+
+      const definition = screen.getByRole('complementary');
+      expect(definition).toHaveAttribute('aria-label', 'Definition: Aria');
+      expect(screen.getByText('A powerful mage from the Northern Tower.')).toBeInTheDocument();
+    });
+
     it('focuses definition panel when opened', () => {
       mockGetFacts.mockReturnValue(loreFacts);
 
@@ -275,6 +296,30 @@ describe('NarrativeDisplay', () => {
 
       // Focus should return to the trigger button
       expect(document.activeElement).toBe(termButton);
+    });
+
+    it('does not return focus to the old trigger after pointer dismissal', () => {
+      mockGetFacts.mockReturnValue(loreFacts);
+
+      const segment = createMockNarrativeSegment({
+        id: 'seg-pointer-dismiss',
+        content: 'Aria walked forward.',
+        type: 'scene',
+        worldId: 'world-test-1',
+        sessionId: 'session-test-1',
+        metadata: { characterIds: [], mood: 'neutral', tags: [] },
+      });
+
+      render(<NarrativeDisplay segment={segment} />);
+
+      const termButton = screen.getAllByRole('button', { name: /Aria/i })[0];
+      fireEvent.click(termButton);
+      expect(screen.getByRole('complementary')).toBeInTheDocument();
+
+      fireEvent.mouseDown(document.body);
+
+      expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+      expect(document.activeElement).not.toBe(termButton);
     });
   });
 });
