@@ -12,6 +12,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+"scripts/sync-local-env.sh"
+
 port="$(node scripts/worktree-port.js)"
 
 bash scripts/kill-port.sh "$port"
