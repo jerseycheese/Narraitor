@@ -4,7 +4,7 @@ type: design-system
 category: styling
 tags: [global-styles, css, design-system, theming, dark-mode]
 created: 2025-05-17
-updated: 2025-06-15
+updated: 2026-07-21
 ---
 
 # Narraitor Global Styles
@@ -87,11 +87,11 @@ The theme system resolves through four stages from CSS definition to rendered ou
 
 ### 1. CSS Files Define Tokens
 
-Three theme CSS files (`ds1.css`, `ds2.css`, `ds3.css`) define the complete token set under attribute selectors. Each file has two blocks:
+The active token files are `_shared-tokens.css` and `ds3.css`. Shared tokens cover app-wide primitives, and DS3 defines the current design-system tokens under `:root` plus dark-mode overrides:
 
 ```css
-[data-theme="ds1"]      { /* light mode tokens */ }
-[data-theme="ds1"].dark { /* dark mode overrides */ }
+:root      { /* DS3 light mode tokens */ }
+:root.dark { /* DS3 dark mode overrides */ }
 ```
 
 These files are imported in `src/app/layout.tsx` so all tokens are available globally.
@@ -101,7 +101,6 @@ These files are imported in `src/app/layout.tsx` so all tokens are available glo
 An inline `<script>` in `layout.tsx` runs before React hydrates, reading stored preferences from `localStorage` and applying them immediately to avoid a flash of unstyled content:
 
 ```javascript
-// Reads narraitor-theme, sets the data-theme attribute
 // Reads narraitor-color-scheme, adds the .dark class if needed
 // Runs synchronously before first paint
 ```

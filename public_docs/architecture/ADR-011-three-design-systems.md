@@ -2,7 +2,7 @@
 title: "ADR-011: Three structurally-differentiated design systems (DS1/DS2/DS3)"
 tags: [architecture, decision, adr, design-system, theming]
 created: 2026-05-10
-updated: 2026-05-10
+updated: 2026-07-21
 ---
 
 # ADR-011: Three structurally-differentiated design systems (DS1/DS2/DS3)
@@ -10,7 +10,7 @@ updated: 2026-05-10
 **Status**: Accepted - Implemented (canon-surface ordering superseded by [ADR-012](ADR-012-storybook-single-canon-surface.md); design-system architecture superseded by [ADR-013](ADR-013-collapse-to-single-design-system-ds3.md))
 **Date**: 2026-05-10
 
-> **Note (2026-06-28):** The "canon order: showcase pages > Storybook > app" decision below was reversed by [ADR-012](ADR-012-storybook-single-canon-surface.md) — Storybook is now the single canon surface and the `/dev/design-system*` showcase routes were retired. The three-design-system architecture (DS1/DS2/DS3, `data-theme` switching, structural differentiation) described here is unchanged.
+> **Note (2026-06-28):** The "canon order: showcase pages > Storybook > app" decision below was reversed by [ADR-012](ADR-012-storybook-single-canon-surface.md). Storybook became the single canon surface and the `/dev/design-system*` showcase routes were retired. The three-design-system architecture was still current at that point, but was later superseded by ADR-013.
 
 > **Note (2026-07-11):** The three-design-system architecture itself — DS1/DS2/DS3, `data-theme` switching, structural differentiation — is superseded by [ADR-013](ADR-013-collapse-to-single-design-system-ds3.md). Nobody had ever asked for per-theme switching, and running three structurally-different themes across light/dark was a real maintenance and QA tax with no offsetting demand, so DS1 and DS2 were deleted and DS3 became the app's only design system. The rest of this document is a historical record of a decision that was correct at the time — it is not describing current app behavior.
 
@@ -32,23 +32,23 @@ Three design systems, each with its own token file, switched at the root via a `
 - **DS2 — "Warm Earth"**: organic earth tones, soft forms, breathing space. Crimson Pro / JetBrains Mono / Manrope. `--radius-md: 12px`.
 - **DS3 — "The Mechanical Manuscript"**: aged paper, drafting ink, dot grid aesthetic. Newsreader / Fira Code / DM Sans. `--radius-md: 6px`.
 
-Each theme lives in its own file:
+At the time, each theme lived in its own file:
 
-- [src/lib/theme/themes/ds1.css](../../src/lib/theme/themes/ds1.css)
-- [src/lib/theme/themes/ds2.css](../../src/lib/theme/themes/ds2.css)
+- `src/lib/theme/themes/ds1.css` (deleted by ADR-013)
+- `src/lib/theme/themes/ds2.css` (deleted by ADR-013)
 - [src/lib/theme/themes/ds3.css](../../src/lib/theme/themes/ds3.css)
 
 The switching mechanism is in [src/lib/theme/ThemeProvider.tsx](../../src/lib/theme/ThemeProvider.tsx) — a small React context that writes `data-theme="ds1"` (or 2 or 3) to the `<html>` element and persists the choice in `localStorage` under `narraitor-theme`. Light/dark is layered on top via a separate `dark` class on the same element, and resolves system preference when set to `"system"`.
 
 The tokens themselves are scoped via `[data-theme="ds1"] { ... }` selectors. There's no per-component `theme === 'ds1'` branching in JSX. The components stay theme-blind; the variation lives in CSS variables that resolve differently depending on which theme is active.
 
-The visual canon for each theme is the matching showcase page:
+At the time, the visual canon for each theme was the matching showcase page:
 
-- [src/app/dev/design-system/page.tsx](../../src/app/dev/design-system/page.tsx) (DS1)
-- [src/app/dev/design-system-2/page.tsx](../../src/app/dev/design-system-2/page.tsx) (DS2)
-- [src/app/dev/design-system-3/page.tsx](../../src/app/dev/design-system-3/page.tsx) (DS3)
+- `src/app/dev/design-system/page.tsx` (deleted; superseded by Storybook via ADR-012)
+- `src/app/dev/design-system-2/page.tsx` (deleted; superseded by Storybook via ADR-012)
+- `src/app/dev/design-system-3/page.tsx` (deleted; superseded by Storybook via ADR-012)
 
-Each also has a `/session/` subroute that's the canon for game-session UI specifically. **Storybook** sits one level below the showcase as a component-level reference — `00-Foundation/Design System Showcase` and `00-Foundation/Design Tokens` are the foundation stories, and the toolbar switcher in [.storybook/preview.tsx](../../.storybook/preview.tsx) lets you verify any story in DS1/DS2/DS3 and light/dark. Storybook should match the showcase; if they disagree, the showcase is right.
+Each also had a session subroute that acted as the canon for game-session UI specifically. **Storybook** sat one level below the showcase as a component-level reference - `00-Foundation/Design System Showcase` and `00-Foundation/Design Tokens` were the foundation stories, and the toolbar switcher in [.storybook/preview.tsx](../../.storybook/preview.tsx) let you verify any story in DS1/DS2/DS3 and light/dark. Storybook was expected to match the showcase; if they disagreed, the showcase was right.
 
 The canon order is **showcase pages > Storybook > app**. These aren't documentation — they're the source of truth. If a production component drifts from them, the production component is wrong.
 

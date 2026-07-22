@@ -2,7 +2,7 @@
 title: Storybook Development Workflow
 tags: [storybook, components, development, isolation]
 created: 2025-06-26
-updated: 2025-12-28
+updated: 2026-07-21
 ---
 
 # Storybook Development Workflow
@@ -217,7 +217,7 @@ npm run build-storybook
 
 ### Workflow Integration
 - Develop components in Storybook first
-- Move to test harness (`/dev/component-name`) for limited integration
+- Move to a matching `/dev/[component-name]` harness when one exists for limited integration
 - Finally integrate into main application
 
 ## Best Practices

@@ -2,7 +2,7 @@
 title: "ADR-008: Testing and verification strategy"
 tags: [architecture, decision, adr, testing, tdd, storybook, playwright]
 created: 2025-04-28
-updated: 2026-05-22
+updated: 2026-07-21
 ---
 
 # ADR-008: Testing and verification strategy
@@ -32,7 +32,8 @@ A layered strategy, set up from the start and extended over time:
 - **Storybook-first component development** — build components in isolation, with stories that
   exercise their states, before wiring them into the app.
 - **Playwright** for end-to-end and, later, **visual-regression** tests (`tests/visual/`,
-  self-seeding specs) that screenshot routes across the three design systems and light/dark.
+  self-seeding specs) that screenshot routes across the current design surface. Since ADR-013,
+  that means DS3 across the relevant light/dark color modes, not a DS1/DS2/DS3 matrix.
 - **A three-stage verification habit**: Storybook (component isolation), then the `/dev/*` test
   harnesses (integration with real data), then the full app.
 - Later additions: **mutation testing** (Stryker) on the state/storage/narrative layers, and
@@ -70,8 +71,8 @@ bug earlier is cheaper.
 
 ### Downsides
 
-- Visual baselines are maintenance: intentional UI changes mean regenerating snapshots, and the
-  three-DS-by-light/dark matrix is a lot of images.
+- Visual baselines are maintenance: intentional UI changes mean regenerating snapshots, and
+  DS3 still needs the relevant light/dark and viewport coverage.
 - Storybook-first and three-stage verification add up-front effort per component — accepted as
   worth it for the regression protection.
 

@@ -2,7 +2,7 @@
 title: Game Mechanics
 tags: [mechanics, choices, attributes, alignment, decisions]
 created: 2025-06-26
-updated: 2025-06-26
+updated: 2026-07-21
 ---
 
 # Game Mechanics
@@ -248,7 +248,7 @@ The UI shows decision weight through border styling and shadows - heavier border
 
 ## Testing & Development
 
-There are a few dev routes set up for testing these mechanics. `/dev/game-session` lets you test everything in context, `/dev/choice-selector` focuses on individual choice components, and `/dev/world-creation-wizard` handles attribute configuration.
+There are a few dev routes set up for testing these mechanics. `/dev/game-session` lets you test everything in context, `/dev/choice-alignment` focuses on alignment and decision-weight behavior, and `/dev/world-creation-wizard` handles attribute configuration.
 
 When testing, try out different decision weights (minor, major, critical), all three alignment types in various situations, different attribute configurations, and how these systems work together.
 
