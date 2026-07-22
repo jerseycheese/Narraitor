@@ -83,22 +83,13 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   );
 
   const [activeTerm, setActiveTerm] = React.useState<TermDefinitionData | null>(null);
-  const [activeTermTopOffset, setActiveTermTopOffset] = React.useState<number | undefined>(undefined);
   const triggerRef = useRef<HTMLElement | null>(null);
 
   const handleTermClick = React.useCallback(
     (termText: string, anchorElement: HTMLElement) => {
       const definition = getDefinition(termText);
       if (definition) {
-        const segment = anchorElement.closest('.narrative-segment');
-        const segmentRect = segment?.getBoundingClientRect();
-        const anchorRect = anchorElement.getBoundingClientRect();
-        const topOffset = segmentRect
-          ? Math.max(0, Math.round(anchorRect.top - segmentRect.top))
-          : undefined;
-
         triggerRef.current = anchorElement;
-        setActiveTermTopOffset(topOffset);
         setActiveTerm(definition);
       }
     },
@@ -110,7 +101,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
       triggerRef.current?.focus({ preventScroll: true });
     }
     triggerRef.current = null;
-    setActiveTermTopOffset(undefined);
     setActiveTerm(null);
   }, []);
 
@@ -154,12 +144,13 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           />
         )}
 
-      {/* Render before prose so desktop CSS can place the note in the margin. */}
+      {/* Rendered before the prose so the desktop margin note (align-self:
+          flex-end) sits above it, matching the choice outcome callout.
+          Mobile renders it as a bottom sheet via CSS (F41). */}
       {activeTerm && (
         <TermDefinition
           term={activeTerm}
           onDismiss={handleTermDismiss}
-          topOffsetPx={activeTermTopOffset}
         />
       )}
 
