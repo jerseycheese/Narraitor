@@ -4,12 +4,12 @@ type: security
 category: testing
 tags: [security, testing, api-keys, guide]
 created: 2025-06-01
-updated: 2025-06-08
+updated: 2026-07-21
 ---
 
 # Security Testing Guide - API Keys Protection
 
-This guide shows you how to verify that the API keys are now secure and not exposed to the browser.
+This guide verifies the current provider-key model: player keys are encrypted before browser persistence, forwarded to Narraitor's own API routes per request, and never sent directly from the browser to Google. The server-side `GEMINI_API_KEY` is still supported as a local/dev fallback.
 
 ## Automated Testing
 
@@ -21,8 +21,8 @@ Run the automated test script:
 
 This script will:
 - Verify API routes exist and respond correctly
-- Check that rate limiting is working (50 requests/hour per IP)
-- Ensure no API keys are visible in the build
+- Check that rate limiting is working (50 requests/hour per IP in production mode)
+- Ensure no `NEXT_PUBLIC_` provider keys are visible in the build
 - Validate request handling and error responses
 - Confirm security headers are present
 
@@ -48,10 +48,10 @@ npm run dev
 - Direct calls to Google API with visible keys
 
 **AFTER (Secure: current implementation):**
-- All requests go to `/api/narrative/*` endpoints
-- No Google API URLs visible in Network tab
-- No API keys visible anywhere in requests
-- Server-side proxy handles all AI communication
+- All AI requests go to same-origin `/api/*` endpoints
+- No browser requests go directly to `googleapis.com`
+- A configured player key may appear on the same-origin request as `x-provider-api-key`; it must not appear in logs, response bodies, JavaScript bundles, or third-party browser requests
+- Server-side API routes handle the provider communication
 
 ### 4. Verify Secure Implementation
 
@@ -61,8 +61,8 @@ npm run dev
    ```
    POST /api/narrative/generate
    POST /api/narrative/choices
-   No requests to googleapis.com
-   No visible API keys in any request
+   No browser requests to googleapis.com
+   No provider keys in response payloads or third-party requests
    ```
 
 4. **Check Response Headers** for rate limiting:
@@ -87,7 +87,7 @@ npm run dev
 # Build the application
 npm run build
 
-# Search for any exposed API keys (should find nothing)
+# Search for exposed public provider keys (should find nothing)
 grep -r "AIzaSy" .next/ || echo "No API keys found in build"
 grep -r "NEXT_PUBLIC_GEMINI" .next/ || echo "No public env vars found"
 ```
@@ -98,7 +98,7 @@ grep -r "NEXT_PUBLIC_GEMINI" .next/ || echo "No public env vars found"
 
 **Secure Configuration:**
 ```env
-# Server-side only (secure)
+# Optional server-side fallback
 GEMINI_API_KEY=your-actual-api-key
 
 # Remove any public variables (insecure)
@@ -107,22 +107,22 @@ GEMINI_API_KEY=your-actual-api-key
 
 ### Vercel Deployment
 
-1. **Set environment variables in Vercel dashboard:**
-   - `GEMINI_API_KEY` = your API key
-   - Do NOT set any `NEXT_PUBLIC_*` variables
+1. **Set environment variables in Vercel dashboard only if you want a server fallback:**
+   - `GEMINI_API_KEY` = fallback API key
+   - Do NOT set any `NEXT_PUBLIC_*` provider-key variables
 
 2. **Deploy and verify:**
-   - No API keys visible in browser
+   - No provider keys visible in bundles, logs, or third-party browser requests
    - All AI features work through API routes
    - Rate limiting active
 
 ### Security Checklist
 
-- [ ] No API keys visible in browser DevTools
+- [ ] Player keys are encrypted in the provider store before persistence
 - [ ] No requests to external AI APIs from browser
 - [ ] All AI requests go through `/api/*` routes
 - [ ] Rate limiting prevents abuse (50 req/hour)
-- [ ] Environment variables are server-side only
+- [ ] Server fallback environment variables are server-side only
 - [ ] Build contains no sensitive data
 - [ ] Production deployment uses secure configuration
 
@@ -130,8 +130,8 @@ GEMINI_API_KEY=your-actual-api-key
 
 ### Secure Behavior (Current)
 
-- **Network Tab**: Only shows requests to your domain's API routes
-- **Environment**: API keys stored server-side only
+- **Network Tab**: Shows requests to your domain's API routes; configured player keys travel only in the same-origin `x-provider-api-key` header
+- **Environment**: Server fallback keys stay server-side; player keys are encrypted before browser persistence
 - **Rate Limiting**: Automatic protection against abuse
 - **Error Handling**: User-friendly messages for rate limits
 - **Cost Control**: 50 requests/hour prevents unexpected charges
@@ -148,7 +148,7 @@ GEMINI_API_KEY=your-actual-api-key
 
 ### "API key not configured" Error
 
-- Check that `GEMINI_API_KEY` is set in your environment
+- Add a provider under `/settings/providers`, or set `GEMINI_API_KEY` as the server fallback
 - Ensure no `NEXT_PUBLIC_` prefix is used
 - Restart development server after changing env vars
 
@@ -168,10 +168,10 @@ GEMINI_API_KEY=your-actual-api-key
 
 This keeps API keys secure:
 
-1. **API Key Protection**: Keys never leave the server
+1. **API Key Protection**: Player keys are encrypted at rest in browser storage and only forwarded to same-origin API routes for active provider calls
 2. **Cost Control**: Rate limiting prevents abuse
 3. **User Privacy**: No sensitive data in client code
 4. **Scalability**: Server-side proxy handles all AI communication
 5. **Monitoring**: Request logging for usage tracking
 
-The security vulnerability where API keys were exposed to users has been completely resolved.
+The original vulnerability where the app called Google directly from the browser is resolved. The current risk to watch is accidental logging or third-party forwarding of `x-provider-api-key`.

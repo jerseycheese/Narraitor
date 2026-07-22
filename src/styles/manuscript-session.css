@@ -85,7 +85,7 @@ body.manuscript-overlay-open {
 
 .manuscript-overlay-main {
   min-height: 0;
-  overflow: hidden auto;
+  overflow-y: auto;
   position: relative;
   z-index: 1;
   overscroll-behavior-y: contain;
@@ -114,16 +114,6 @@ body.manuscript-overlay-open {
 
 .scroll-smooth {
   scroll-padding-block: 2rem;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.scroll-smooth::-webkit-scrollbar {
-  display: none;
-}
-
-.narrative-history-container .mobile-scroll > [data-orientation] {
-  display: none;
 }
 
 /* Fix 25d: CharacterSummary cursor via class-based targeting */
@@ -2295,7 +2285,6 @@ body.manuscript-overlay-open {
 
 /* Choice Outcome Callout */
 .choice-outcome-callout {
-  box-sizing: border-box;
   border-radius: var(--radius-sm);
   padding: var(--space-4);
   border: 1px solid var(--color-accent);
@@ -3141,11 +3130,14 @@ body.manuscript-overlay-open {
     height: 1rem;
   }
 
-  /* DS3 outcome callout — narrative metadata, so it stays in the prose flow
-     while lore marginalia owns the page gutter. */
+  /* DS3 outcome callout — compact margin note pulled to the column's right
+     edge on desktop. The parent (.narrative-segment) is a flex column, so float
+     is inert here; align-self does the cross-axis pull. True page-gutter
+     marginalia is blocked by the narrative scroll container's overflow-x clip
+     (.scroll-smooth) — tracked as a separate follow-up. */
   :root .choice-outcome-callout {
-    align-self: stretch;
-    width: 100%;
+    align-self: flex-end;
+    width: 220px;
     margin: 0 0 var(--space-3);
     padding: var(--space-3);
     box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
@@ -3632,53 +3624,16 @@ body.manuscript-overlay-open {
   overflow-wrap: anywhere;
 }
 
-/* Wide viewports: extend only annotated history into the right page gutter. */
-@media (width >= 960px) {
-  :root .narrative-history-container:has(.manuscript-marginalia-term) {
-    --manuscript-marginalia-gap: var(--space-4);
-    --manuscript-marginalia-outer-inset: var(--space-4);
-
-    /* 21.25rem is half the DS3 manuscript column; the note lane plus inset must fit in the visible gutter. */
-    --manuscript-marginalia-width: min(
-      12.5rem,
-      calc(
-        50vw
-        - 21.25rem
-        - var(--space-8)
-        - var(--manuscript-marginalia-outer-inset)
-        - var(--space-1)
-      )
-    );
-
-    width: calc(
-      100%
-      + var(--manuscript-marginalia-gap)
-      + var(--manuscript-marginalia-width)
-      + var(--manuscript-marginalia-outer-inset)
-    );
-  }
-
-  :root .narrative-history-container:has(.manuscript-marginalia-term) .narrative-history-segments {
-    width: calc(
-      100%
-      - var(--manuscript-marginalia-gap)
-      - var(--manuscript-marginalia-width)
-      - var(--manuscript-marginalia-outer-inset)
-    );
-  }
-
-  :root .narrative-segment:has(.manuscript-marginalia-definition) {
+/* Desktop: margin note pulled to the column's right edge (matches DS3
+   choice-outcome-callout pattern). The parent (.narrative-segment) is a flex
+   column, so float is inert here; align-self does the cross-axis pull. */
+@media (width >= 1024px) {
+  .manuscript-marginalia-definition {
     position: relative;
-  }
-
-  :root .manuscript-marginalia-definition {
-    position: absolute;
-    inset: var(--manuscript-marginalia-top, 0) auto auto calc(100% + var(--manuscript-marginalia-gap));
-    align-self: auto;
-    box-sizing: border-box;
-    width: var(--manuscript-marginalia-width);
-    max-width: none;
-    margin: 0;
+    align-self: flex-end;
+    width: 200px;
+    max-width: 200px;
+    margin: 0 0 var(--space-3);
     z-index: auto;
     box-shadow: none;
     border-radius: var(--radius-md);

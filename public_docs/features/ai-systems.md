@@ -2,7 +2,7 @@
 title: AI Systems
 tags: [ai, narrative, world-creation, choices, inventory]
 created: 2025-06-26
-updated: 2025-10-11
+updated: 2026-07-21
 ---
 
 # AI Systems
@@ -25,10 +25,11 @@ The AI integration is pretty central to the whole experience. Generic AI story g
 
 ## Security & Performance
 
-The AI requests all go through secure server-side routes to keep API keys protected:
+The AI requests all go through server-side routes, with player-owned provider keys handled per request:
 
 - **Rate limiting**: 50 requests/hour per IP in production (500 in dev) on the narrative generation routes, via `src/utils/rateLimiter.ts`; over the limit returns 429 with `X-RateLimit-*` headers
-- **Server-side keys**: `GEMINI_API_KEY` never reaches the browser
+- **Player provider keys**: saved through `/settings/providers`, encrypted in `useProviderStore`, decrypted just in time, and sent to Narraitor's same-origin API routes as `x-provider-api-key`
+- **Server fallback**: `GEMINI_API_KEY` never reaches the browser and is used only when a request has no player provider key
 - **Proxy pattern**: Client-side code calls Next.js API routes, which handle the actual AI communication
 
 ## AI Service Integration
@@ -43,12 +44,11 @@ const response = await client.generateContent('Generate a story about a cowboy')
 
 ### Server-side Usage (API Routes Only)
 ```typescript
-import { GeminiClient } from '@/lib/ai/geminiClient';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 
-const client = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
-  modelName: 'gemini-2.0-flash'
-});
+const apiKey = resolveApiKey(request);
+const client = createDefaultGeminiClient(apiKey);
 ```
 
 ## Narrative Generation
@@ -77,14 +77,12 @@ currentTags: ['skill-failure:stealth']
 
 ### Quick Start
 ```tsx
-import { GameSessionActiveWithNarrative } from '@/components/GameSession';
+import ActiveGameSession from '@/components/GameSession/ActiveGameSession';
 
-<GameSessionActiveWithNarrative
+<ActiveGameSession
   worldId="world-id"
   sessionId="session-id"
-  onChoiceSelected={(choiceId) => {
-    // Choice automatically processed with skill evaluation
-  }}
+  characterId="character-id"
 />
 ```
 
@@ -135,13 +133,12 @@ For example, describe a fantasy world as "A mystical realm where ancient magic f
 
 ### Integration
 ```tsx
-import { WorldCreationWizard } from '@/components/World';
+import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
 
 <WorldCreationWizard
-  onWorldCreated={(world) => {
-    // World created with AI suggestions
+  onComplete={(worldId) => {
+    // World created with reviewed suggestions
   }}
-  enableAISuggestions={true}
 />
 ```
 
@@ -257,7 +254,8 @@ There are several dev routes set up for testing different AI features:
 
 - `/dev/world-creation-wizard` - Test AI world suggestions
 - `/dev/game-session` - Test narrative and choice generation
-- `/dev/devtools-test` - Test AI mocking functionality
+- `/dev/narrative-system` - Test narrative generation and continuity scenarios
+- `/dev/test-world-generation` - Test generated world data
 
 ### Test Scenarios
 The testing harnesses let you try out different scenarios without having to set up complete game sessions. You can test narrative generation with various world themes, try different choice generation situations, experiment with genre combinations for world suggestions, and compare conclusive vs ongoing stories for ending detection. The AI mocking section is particularly useful for testing error scenarios and edge cases that are hard to reproduce with the real API.
@@ -270,7 +268,7 @@ For network issues, there's a 15-second timeout on AI requests, clear error mess
 
 ## Configuration
 
-Environment variables are straightforward: `GEMINI_API_KEY` is required and server-side only (never use NEXT_PUBLIC_ prefix), `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging, and `NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true` is an opt-in switch for token-budget-based prompt truncation.
+Environment variables are straightforward: `GEMINI_API_KEY` is an optional server-side fallback (never use a `NEXT_PUBLIC_` provider key), `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging, and `NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true` is an opt-in switch for token-budget-based prompt truncation.
 
 The model configuration uses gemini-2.0-flash as the primary model, temperature of 0.7 for creative content, and max tokens vary by use case (200 for choices, 500 for narrative).
 

@@ -46,7 +46,7 @@ Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 ## Getting It Running
 
-You'll need Node.js (v18+), npm, and a Google Gemini API key. For local development the key lives in a server-side env file (`GEMINI_API_KEY`, below). In normal use, players bring their own key — see [AI Integration Details](#ai-integration-details).
+You'll need Node.js (v18+), npm, and a Google Gemini API key. For local development you can either add the key through Settings, then Providers in the app, or use a server-side `.env.local` fallback (`GEMINI_API_KEY`, below). In normal use, players bring their own key through the provider settings screen - see [AI Integration Details](#ai-integration-details).
 
 ```bash
 # Clone and set up
@@ -61,10 +61,9 @@ cp .env.example .env.local
 # (keeps long-running sessions from ballooning prompt size)
 # NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true
 
-# Feature flags (default off)
+# Feature flags
 # NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING=false
-# NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE=false
-# NEXT_PUBLIC_FEATURE_VIRTUALIZATION=false
+# NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE=true
 
 # Fire it up
 npm run dev
@@ -84,7 +83,6 @@ npm run storybook
 
 # Testing
 npm run test
-npm run test:prompt-templates  # AI prompt validation
 
 # Interactive testing
 npm run dev
@@ -245,8 +243,7 @@ GEMINI_API_KEY=your-api-key
 
 # Feature flags
 # NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING=false
-# NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE=false
-# NEXT_PUBLIC_FEATURE_VIRTUALIZATION=false
+# NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE=true
 ```
 
 **Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.

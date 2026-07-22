@@ -4,7 +4,7 @@ type: architecture
 category: world
 tags: [world, wizard, creation, ai]
 created: 2025-05-15
-updated: 2025-06-08
+updated: 2026-07-21
 ---
 
 # World Creation Wizard Documentation
@@ -188,6 +188,6 @@ Test coverage:
 ## Related Documentation
 
 - [World Management](../features/world-management.md)
-- [World Types](/src/types/world.types.ts)
-- [AI World Analyzer](/src/lib/ai/worldAnalyzer.ts)
-- [World Store](/src/state/worldStore.ts)
+- [World Types](../../src/types/world.types.ts)
+- [AI World Analyzer](../../src/lib/ai/worldAnalyzer.ts)
+- [World Store](../../src/state/worldStore.ts)

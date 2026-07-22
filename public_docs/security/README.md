@@ -2,20 +2,21 @@
 title: Security Overview
 tags: [security, api, protection]
 created: 2025-06-01
-updated: 2026-05-22
+updated: 2026-07-21
 ---
 
 # Security Overview
 
-Secure AI integration that keeps the Gemini API key off the client, routes everything through
-server-side API routes, and rate-limits the AI endpoints per IP.
+Narraitor keeps provider calls behind its own server-side API routes. A player can save a provider key in the browser, where it is encrypted before persistence, and the app decrypts it just in time to send it to Narraitor's API route for a single request. The server-side `GEMINI_API_KEY` remains available as a local/dev fallback.
 
 ## Core Security Features
 
-**Server-Side Only**: The `GEMINI_API_KEY` lives on the server and never reaches the browser
-**Secure Proxy**: Client requests go through Next.js API routes (`src/app/api/`), which make the actual AI calls
-**Rate Limiting**: 50 requests/hour per IP in production (500 in dev), enforced by an in-memory limiter (`src/utils/rateLimiter.ts`) on the narrative generation routes via `src/utils/apiHelpers.ts`. Over the limit returns HTTP 429 with `X-RateLimit-*` headers.
-**Input Validation**: API inputs are validated and sanitized before use
+**Provider key storage**: User-entered keys are encrypted by `src/state/providerStore.ts` before they are persisted in browser storage.
+**Per-request key forwarding**: `src/lib/ai/aiFetch.ts` attaches the decrypted key as `x-provider-api-key` only for the current same-origin API request.
+**Server fallback**: `GEMINI_API_KEY` lives on the server and is used only when a request does not include a player provider key.
+**Secure proxy**: Client requests go through Next.js API routes (`src/app/api/`), which make the actual provider calls.
+**Rate limiting**: 50 requests/hour per IP in production (500 in dev), enforced by an in-memory limiter (`src/utils/rateLimiter.ts`) on the narrative generation routes via `src/utils/apiHelpers.ts`. Over the limit returns HTTP 429 with `X-RateLimit-*` headers.
+**Input validation**: API inputs are validated and sanitized before use.
 
 Separately, outbound AI calls are throttled with fixed delays for item processing and image requests (`src/lib/narrative/itemProcessorShared.ts`, `src/lib/services/imageRequestCoordinator.ts`) to stay under provider limits.
 
@@ -29,9 +30,9 @@ cd public_docs/security
 
 ## Best Practices
 
-**Development**: Use `GEMINI_API_KEY` in `.env.local` (never `NEXT_PUBLIC_`)
-**Production**: Configure environment variables in the deployment platform
-**Code Review**: Check for exposed secrets and confirm AI calls stay server-side
+**Development**: Use the in-app provider settings, or use `GEMINI_API_KEY` in `.env.local` as a fallback. Never use a `NEXT_PUBLIC_` provider key.
+**Production**: Prefer player-owned provider keys. Configure `GEMINI_API_KEY` only if the deployment intentionally offers a server fallback.
+**Code Review**: Check for exposed secrets, confirm provider calls stay behind API routes, and never log `x-provider-api-key` or resolved provider keys.
 
 ## CI Security Scanning
 

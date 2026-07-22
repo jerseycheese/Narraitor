@@ -2,7 +2,7 @@
 title: Portrait Generation Guide
 tags: [portrait, character, ai, integration]
 created: 2025-06-26
-updated: 2025-06-26
+updated: 2026-07-21
 ---
 
 # Portrait Generation Guide
@@ -325,7 +325,7 @@ interface PortraitConfig {
 ```
 
 ## Related
-- `/components/CharacterPortrait/`
-- `/api/generate-portrait`
-- `/types/character.types`
+- [CharacterPortrait component](../../src/components/CharacterPortrait/CharacterPortrait.tsx)
+- [Generate portrait route](../../src/app/api/generate-portrait/route.ts)
+- [Character types](../../src/types/character.types.ts)
 - Character Creation Wizard integration
