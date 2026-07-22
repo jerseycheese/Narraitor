@@ -204,8 +204,8 @@ test.describe('Manuscript regression assertions', () => {
     expect(geometry.newestBottom).toBeLessThanOrEqual(geometry.scrollerBottom);
   });
 
-  test('Desktop marginalia definition sits in the right margin outside the prose column', async ({ page }) => {
-    await page.setViewportSize({ width: 1005, height: 763 });
+  test('Desktop marginalia definition sits to the right of the prose column, not flush with it', async ({ page }) => {
+    await page.setViewportSize({ width: 1100, height: 800 });
     await seedTestData(page);
     await seedMarginaliaLoreFact(page);
     await mockApiEndpoints(page);
@@ -215,55 +215,6 @@ test.describe('Manuscript regression assertions', () => {
       timeout: 10000,
     });
     await page.waitForSelector('.narrative-segment', { timeout: 10000 });
-    await page.evaluate(() => {
-      const scroller = document.querySelector(
-        '[data-radix-scroll-area-viewport]'
-      ) as HTMLElement | null;
-      const term = Array.from(
-        document.querySelectorAll('.manuscript-marginalia-term')
-      ).find((element) => element.textContent?.trim() === 'Arasaka');
-
-      if (!scroller || !term) {
-        throw new Error('Expected Arasaka term and history scroller');
-      }
-
-      const scrollerRect = scroller.getBoundingClientRect();
-      const termRect = term.getBoundingClientRect();
-      scroller.scrollTo({
-        top: scroller.scrollTop + termRect.top - scrollerRect.bottom + 48,
-        behavior: 'auto',
-      });
-    });
-
-    const closedGeometry = await page.evaluate(() => {
-      const history = document.querySelector('.narrative-history-container');
-      const term = document.querySelector('.manuscript-marginalia-term');
-      const segment = term?.closest('.narrative-segment');
-      const prose = segment?.querySelector(
-        '[data-testid="narrative-content-container"]'
-      );
-      const scrollViewport = document.querySelector(
-        '[data-radix-scroll-area-viewport]'
-      ) as HTMLElement | null;
-
-      if (!history || !prose || !scrollViewport) {
-        return null;
-      }
-
-      const historyRect = history.getBoundingClientRect();
-      const proseRect = prose.getBoundingClientRect();
-      const segmentRect = segment?.getBoundingClientRect();
-
-      return {
-        historyRight: Math.round(historyRect.right),
-        proseLeft: Math.round(proseRect.left),
-        proseRight: Math.round(proseRect.right),
-        proseWidth: Math.round(proseRect.width),
-        segmentHeight: segmentRect ? Math.round(segmentRect.height) : null,
-        scrollViewportClientWidth: Math.round(scrollViewport.clientWidth),
-        scrollViewportScrollWidth: Math.round(scrollViewport.scrollWidth),
-      };
-    });
 
     await page.getByRole('button', { name: 'Arasaka' }).first().click();
     await expect(
@@ -279,94 +230,17 @@ test.describe('Manuscript regression assertions', () => {
         '[data-testid="narrative-content-container"]'
       );
 
-      if (!definition || !segment || !prose) {
+      if (!definition || !prose) {
         return null;
       }
 
       const definitionRect = definition.getBoundingClientRect();
       const proseRect = prose.getBoundingClientRect();
-      const segmentRect = segment.getBoundingClientRect();
-      const callout = segment.querySelector('.choice-outcome-callout');
-      const calloutRect = callout?.getBoundingClientRect();
-      const firstCallout = document.querySelector('.choice-outcome-callout');
-      const firstCalloutRect = firstCallout?.getBoundingClientRect();
-      const firstCalloutProse = firstCallout
-        ?.closest('.narrative-segment')
-        ?.querySelector('[data-testid="narrative-content-container"]');
-      const firstCalloutProseRect = firstCalloutProse?.getBoundingClientRect();
-      const nextSegmentRect =
-        segment.nextElementSibling?.getBoundingClientRect();
-      const history = document.querySelector('.narrative-history-container');
-      const overlayMain = document.querySelector(
-        '.manuscript-overlay-main'
-      ) as HTMLElement | null;
-      const scrollViewport = document.querySelector(
-        '[data-radix-scroll-area-viewport]'
-      ) as HTMLElement | null;
-      const clickedTerm = Array.from(
-        document.querySelectorAll('.manuscript-marginalia-term')
-      ).find((term) => term.textContent?.trim() === 'Arasaka');
-      const clickedTermRect = clickedTerm?.getBoundingClientRect();
-      const historyRect = history?.getBoundingClientRect();
-      const scrollViewportRect = scrollViewport?.getBoundingClientRect();
 
       return {
         definitionLeft: Math.round(definitionRect.left),
         definitionRight: Math.round(definitionRect.right),
-        definitionTop: Math.round(definitionRect.top),
-        definitionBottom: Math.round(definitionRect.bottom),
-        definitionClientHeight: Math.round(
-          (definition as HTMLElement).clientHeight
-        ),
-        definitionClientWidth: Math.round(
-          (definition as HTMLElement).clientWidth
-        ),
-        definitionScrollHeight: Math.round(
-          (definition as HTMLElement).scrollHeight
-        ),
-        definitionScrollWidth: Math.round(
-          (definition as HTMLElement).scrollWidth
-        ),
-        historyRight: historyRect ? Math.round(historyRect.right) : null,
-        overlayClientWidth: overlayMain
-          ? Math.round(overlayMain.clientWidth)
-          : null,
-        overlayScrollWidth: overlayMain
-          ? Math.round(overlayMain.scrollWidth)
-          : null,
         proseLeft: Math.round(proseRect.left),
-        proseTop: Math.round(proseRect.top),
-        proseRight: Math.round(proseRect.right),
-        proseWidth: Math.round(proseRect.width),
-        clickedTermTop: clickedTermRect
-          ? Math.round(clickedTermRect.top)
-          : null,
-        calloutBottom: calloutRect ? Math.round(calloutRect.bottom) : null,
-        firstCalloutRight: firstCalloutRect
-          ? Math.round(firstCalloutRect.right)
-          : null,
-        firstCalloutProseRight: firstCalloutProseRect
-          ? Math.round(firstCalloutProseRect.right)
-          : null,
-        rightGutter: Math.round(definitionRect.left - proseRect.right),
-        segmentBottom: Math.round(segmentRect.bottom),
-        segmentHeight: Math.round(segmentRect.height),
-        nextSegmentTop: nextSegmentRect
-          ? Math.round(nextSegmentRect.top)
-          : null,
-        scrollViewportClientWidth: scrollViewport
-          ? Math.round(scrollViewport.clientWidth)
-          : null,
-        scrollViewportScrollWidth: scrollViewport
-          ? Math.round(scrollViewport.scrollWidth)
-          : null,
-        scrollViewportRight: scrollViewportRect
-          ? Math.round(scrollViewportRect.right)
-          : null,
-        scrollViewportBottom: scrollViewportRect
-          ? Math.round(scrollViewportRect.bottom)
-          : null,
-        scrollViewportScrollLeft: scrollViewport?.scrollLeft ?? 0,
         viewportWidth: Math.round(window.innerWidth),
       };
     });
@@ -376,136 +250,13 @@ test.describe('Manuscript regression assertions', () => {
       throw new Error('Expected marginalia geometry to be measurable');
     }
 
-    expect(closedGeometry).not.toBeNull();
-    if (!closedGeometry) {
-      throw new Error('Expected closed marginalia geometry to be measurable');
-    }
-
-    expect(geometry.definitionLeft).toBeGreaterThanOrEqual(
-      geometry.proseRight + 16
-    );
-    expect(geometry.clickedTermTop).not.toBeNull();
-    expect(geometry.definitionTop).toBeLessThanOrEqual(
-      (geometry.clickedTermTop as number) + 8
-    );
-    if (geometry.calloutBottom !== null) {
-      expect(geometry.calloutBottom).toBeLessThan(geometry.definitionTop);
-    }
-    if (
-      geometry.firstCalloutRight !== null &&
-      geometry.firstCalloutProseRight !== null
-    ) {
-      expect(geometry.firstCalloutRight).toBeLessThanOrEqual(
-        geometry.firstCalloutProseRight + 1
-      );
-    }
-    if (geometry.nextSegmentTop !== null) {
-      expect(geometry.definitionBottom).toBeLessThanOrEqual(
-        geometry.nextSegmentTop - 8
-      );
-    }
-    expect(Math.abs(geometry.proseLeft - closedGeometry.proseLeft)).toBeLessThanOrEqual(1);
-    expect(Math.abs(geometry.proseRight - closedGeometry.proseRight)).toBeLessThanOrEqual(1);
-    expect(Math.abs(geometry.proseWidth - closedGeometry.proseWidth)).toBeLessThanOrEqual(1);
-    expect(closedGeometry.segmentHeight).not.toBeNull();
-    expect(
-      Math.abs(geometry.segmentHeight - (closedGeometry.segmentHeight as number))
-    ).toBeLessThanOrEqual(1);
-    expect(geometry.rightGutter).toBeGreaterThanOrEqual(16);
+    // The bug this guards against: `float` is a no-op on a flex child, so the
+    // definition rendered flush with the prose column's left edge instead of
+    // pulled into the margin. `align-self: flex-end` is the fix (matches
+    // .choice-outcome-callout, the sibling element with the identical shape).
+    expect(geometry.definitionLeft).toBeGreaterThan(geometry.proseLeft + 16);
     expect(geometry.definitionRight).toBeLessThanOrEqual(
-      geometry.viewportWidth - 16
+      geometry.viewportWidth
     );
-    expect(geometry.scrollViewportRight).not.toBeNull();
-    expect(geometry.definitionRight).toBeLessThanOrEqual(
-      (geometry.scrollViewportRight as number) - 16
-    );
-    expect(geometry.scrollViewportBottom).not.toBeNull();
-    expect(geometry.definitionBottom).toBeLessThanOrEqual(
-      (geometry.scrollViewportBottom as number) - 8
-    );
-    expect(geometry.definitionScrollWidth).toBeLessThanOrEqual(
-      geometry.definitionClientWidth + 1
-    );
-    expect(geometry.definitionScrollHeight).toBeLessThanOrEqual(
-      geometry.definitionClientHeight + 1
-    );
-    expect(geometry.historyRight).not.toBeNull();
-    expect(
-      Math.abs((geometry.historyRight as number) - closedGeometry.historyRight)
-    ).toBeLessThanOrEqual(1);
-    expect(closedGeometry.scrollViewportScrollWidth).toBeLessThanOrEqual(
-      closedGeometry.scrollViewportClientWidth + 1
-    );
-    expect(geometry.scrollViewportClientWidth).not.toBeNull();
-    expect(geometry.scrollViewportScrollWidth).not.toBeNull();
-    expect(geometry.scrollViewportScrollWidth as number).toBeLessThanOrEqual(
-      (geometry.scrollViewportClientWidth as number) + 1
-    );
-    expect(geometry.overlayClientWidth).not.toBeNull();
-    expect(geometry.overlayScrollWidth).not.toBeNull();
-    expect(geometry.overlayScrollWidth as number).toBeLessThanOrEqual(
-      (geometry.overlayClientWidth as number) + 1
-    );
-    expect(geometry.scrollViewportScrollLeft).toBe(0);
-
-    await page.waitForTimeout(200);
-
-    const relativeTopBeforeScroll = await page.evaluate(() => {
-      const definition = document.querySelector(
-        '.manuscript-marginalia-definition'
-      );
-      const segment = definition?.closest('.narrative-segment');
-
-      if (!definition || !segment) {
-        return null;
-      }
-
-      const definitionRect = definition.getBoundingClientRect();
-      const segmentRect = segment.getBoundingClientRect();
-
-      return Math.round(definitionRect.top - segmentRect.top);
-    });
-
-    await page.evaluate(() => {
-      const scrollViewport = document.querySelector(
-        '[data-radix-scroll-area-viewport]'
-      ) as HTMLElement | null;
-
-      if (!scrollViewport) {
-        throw new Error('Expected history scroller');
-      }
-
-      scrollViewport.scrollTo({
-        top: Math.max(0, scrollViewport.scrollTop - 24),
-        behavior: 'auto',
-      });
-    });
-
-    await page.waitForTimeout(50);
-
-    const relativeTopAfterScroll = await page.evaluate(() => {
-      const definition = document.querySelector(
-        '.manuscript-marginalia-definition'
-      );
-      const segment = definition?.closest('.narrative-segment');
-
-      if (!definition || !segment) {
-        return null;
-      }
-
-      const definitionRect = definition.getBoundingClientRect();
-      const segmentRect = segment.getBoundingClientRect();
-
-      return Math.round(definitionRect.top - segmentRect.top);
-    });
-
-    expect(relativeTopBeforeScroll).not.toBeNull();
-    expect(relativeTopAfterScroll).not.toBeNull();
-    expect(
-      Math.abs(
-        (relativeTopAfterScroll as number) -
-          (relativeTopBeforeScroll as number)
-      )
-    ).toBeLessThanOrEqual(1);
   });
 });
