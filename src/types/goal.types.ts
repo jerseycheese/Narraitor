@@ -78,14 +78,3 @@ export interface GoalExtractionResult {
   completedGoals: EntityID[];
   confidence: number; // 0-1 confidence score
 }
-
-/**
- * Context data for including goals in AI prompts
- */
-export interface GoalContext {
-  activeGoals: NarrativeGoal[];
-  recentGoals: NarrativeGoal[];
-  criticalGoals: NarrativeGoal[];
-  contextText: string;
-  tokenCount: number;
-}

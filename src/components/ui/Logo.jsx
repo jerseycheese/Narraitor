@@ -1,36 +1,5 @@
 import Image from 'next/image';
 
-export function Logo({ size = 'medium', showText = true, textSize = 'auto', className = '' }) {
-  const logoSizes = {
-    small: { width: 32, height: 32 },
-    medium: { width: 64, height: 64 },
-    large: { width: 96, height: 96 },
-    xl: { width: 128, height: 128 }
-  };
-
-  // Text sizes removed as they were Tailwind classes
-  
-  const logoConfig = logoSizes[size];
-
-  return (
-    <div className={className}>
-      <Image 
-        src="/narraitor-logo.svg" 
-        alt="Narraitor Logo" 
-        width={logoConfig.width}
-        height={logoConfig.height}
-      />
-      {showText && (
-        <div>
-          <span>Narr</span>
-          <span>ai</span>
-          <span>tor</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function LogoText({ size = 'lg', className = '' }) {
   return (
     <div className={className}>

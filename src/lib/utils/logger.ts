@@ -38,7 +38,7 @@ const LOG_COLORS: LogColors = {
 /**
  * Parse log level from environment variable
  */
-function parseLogLevel(level?: string): LogLevel {
+function parseLogLevel(level?: string, fallback: LogLevel = LogLevel.WARN): LogLevel {
   const upperLevel = level?.toUpperCase();
   switch (upperLevel) {
     case 'DEBUG': return LogLevel.DEBUG;
@@ -46,7 +46,7 @@ function parseLogLevel(level?: string): LogLevel {
     case 'WARN': return LogLevel.WARN;
     case 'ERROR': return LogLevel.ERROR;
     case 'NONE': return LogLevel.NONE;
-    default: return LogLevel.WARN; // Default to WARN for less noise
+    default: return fallback;
   }
 }
 
@@ -62,7 +62,7 @@ class Logger {
     if (process.env.NODE_ENV === 'production') {
       // Production: only errors unless explicitly configured
       this.isEnabled = true;
-      this.minLevel = parseLogLevel(process.env.NEXT_PUBLIC_LOG_LEVEL) || LogLevel.ERROR;
+      this.minLevel = parseLogLevel(process.env.NEXT_PUBLIC_LOG_LEVEL, LogLevel.ERROR);
     } else {
       // Development: check legacy flag first, then use log level
       if (process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'false') {

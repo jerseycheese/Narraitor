@@ -10,6 +10,10 @@
     "scripts/**/*.{js,cjs,mjs}"
   ],
   "project": ["src/**/*.{ts,tsx,js,jsx}!", "scripts/**/*.{js,cjs,mjs}"],
+  "ignoreExportsUsedInFile": true,
+  "ignoreIssues": {
+    "src/lib/ai/types.ts": ["types"]
+  },
   // These entries exist for `--production` and the default run reports them as
   // redundant hints — that's expected, don't delete them. Excluding the same files via
   // `project` negation instead would drop them as *consumers* too, and the default run

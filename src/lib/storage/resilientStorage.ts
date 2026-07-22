@@ -11,23 +11,19 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('ResilientStorage');
 
 /**
- * Storage health status
+ * Storage health status. Only reported when falling back — there is no
+ * "healthy" signal, since `onStatusChange` is never called on the happy path.
  */
 export enum StorageStatus {
-  /** Storage is working (IndexedDB available) */
-  HEALTHY = 'healthy',
   /** Using memory-only fallback */
   UNAVAILABLE = 'unavailable',
 }
 
 /**
- * Storage error information
+ * Storage fallback information
  */
-export interface StorageError {
-  userMessage: string;
-  technicalMessage: string;
-  isRecoverable: boolean;
-  shouldNotify: boolean;
+export interface StorageFallbackNotice {
+  message: string;
 }
 
 /**
@@ -35,7 +31,7 @@ export interface StorageError {
  */
 export interface ResilientStorageConfig {
   /** Callback invoked when storage status changes */
-  onStatusChange?: (status: StorageStatus, error?: StorageError | null) => void;
+  onStatusChange?: (status: StorageStatus, notice?: StorageFallbackNotice | null) => void;
 }
 
 /**
@@ -44,8 +40,7 @@ export interface ResilientStorageConfig {
 export class ResilientStorageMiddleware {
   private adapter: IndexedDBAdapter | null = null;
   private memoryStorage: Map<string, string> = new Map();
-  private status: StorageStatus = StorageStatus.HEALTHY;
-  private readonly onStatusChange: (status: StorageStatus, error?: StorageError | null) => void;
+  private readonly onStatusChange: (status: StorageStatus, notice?: StorageFallbackNotice | null) => void;
 
   constructor(config: ResilientStorageConfig = {}) {
     this.onStatusChange = config.onStatusChange ?? (() => {});
@@ -64,26 +59,16 @@ export class ResilientStorageMiddleware {
       if (!this.adapter.isInitialized) {
         logger.warn('[Storage] IndexedDB not available, using memory storage');
         this.adapter = null;
-        this.status = StorageStatus.UNAVAILABLE;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
-          userMessage: 'Game progress will not persist between sessions',
-          technicalMessage: 'IndexedDB not available in this environment',
-          isRecoverable: false,
-          shouldNotify: true
+          message: 'IndexedDB not available in this environment',
         });
         return;
       }
-
-      this.status = StorageStatus.HEALTHY;
     } catch (error) {
       logger.warn('[Storage] IndexedDB unavailable, using memory storage:', error);
       this.adapter = null;
-      this.status = StorageStatus.UNAVAILABLE;
       this.onStatusChange(StorageStatus.UNAVAILABLE, {
-        userMessage: 'Game progress will not persist between sessions',
-        technicalMessage: `IndexedDB initialization failed: ${error}`,
-        isRecoverable: false,
-        shouldNotify: true
+        message: `IndexedDB initialization failed: ${error}`,
       });
     }
   }
@@ -99,12 +84,8 @@ export class ResilientStorageMiddleware {
       } catch (error) {
         logger.warn('[Storage] IndexedDB read failed, switching to memory:', error);
         this.adapter = null;
-        this.status = StorageStatus.UNAVAILABLE;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
-          userMessage: 'Storage issues detected, using temporary session storage',
-          technicalMessage: `IndexedDB read failed: ${error}`,
-          isRecoverable: false,
-          shouldNotify: true
+          message: `IndexedDB read failed: ${error}`,
         });
       }
     }
@@ -127,12 +108,8 @@ export class ResilientStorageMiddleware {
       } catch (error) {
         logger.warn('[Storage] IndexedDB write failed, switching to memory:', error);
         this.adapter = null;
-        this.status = StorageStatus.UNAVAILABLE;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
-          userMessage: 'Storage issues detected, using temporary session storage',
-          technicalMessage: `IndexedDB write failed: ${error}`,
-          isRecoverable: false,
-          shouldNotify: true
+          message: `IndexedDB write failed: ${error}`,
         });
       }
     }
@@ -153,12 +130,5 @@ export class ResilientStorageMiddleware {
       }
     }
     this.memoryStorage.delete(key);
-  }
-
-  /**
-   * Get current storage status
-   */
-  getStorageStatus(): StorageStatus {
-    return this.status;
   }
 }

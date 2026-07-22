@@ -14,7 +14,6 @@ We're using a Container/Presenter pattern where the main GameSession component o
 - **GameSessionError** (`GameSessionError.tsx`): Error state component
 - **GameSessionLoading** (`GameSessionLoading.tsx`): Loading state component
 - **PlayerChoices** (`PlayerChoices.tsx`): Renders and handles player choices
-- **SessionControls** (`SessionControls.tsx`): Pause/Resume/End session controls
 - **JournalPage** (`src/components/Journal/JournalPage.tsx`): Dedicated journal page for reading session entries
 
 ### Custom Hook
@@ -36,12 +35,6 @@ Handles player interaction by:
 - Managing choice selection
 - Supporting disabled states
 - Maintaining proper accessibility attributes
-
-### SessionControls
-Provides session management with:
-- Pause/resume/end buttons
-- Session state transitions
-- Visual feedback for current state
 
 ### State Components
 - **GameSessionLoading**: Shows loading spinner with customizable message

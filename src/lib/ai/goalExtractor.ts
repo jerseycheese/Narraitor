@@ -7,13 +7,11 @@ import {
   NarrativeGoal,
   GoalExtractionRequest,
   GoalExtractionResult,
-  GoalContext,
   GoalType,
   GoalPriority,
   GoalStatus,
 } from '../../types/goal.types';
-import { capitalize, safeTrim, formatDateTime } from '@/lib/utils';
-import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
+import { capitalize, formatDateTime } from '@/lib/utils';
 
 // Created on first use, not at import time — the class singleton used to
 // construct a client as a module side effect.
@@ -62,104 +60,6 @@ export async function extractGoalsFromNarrative(
       confidence: 0,
     };
   }
-}
-
-/**
- * Detect if a goal has been completed based on narrative content
- */
-export async function detectGoalCompletion(
-  goal: NarrativeGoal,
-  narrativeContent: string
-): Promise<boolean> {
-  try {
-    // Validate inputs
-    if (!goal?.title || !narrativeContent?.trim()) {
-      return false;
-    }
-
-    const prompt = buildCompletionDetectionPrompt(
-      goal,
-      narrativeContent
-    );
-    const response = await getClient().generateContent(prompt);
-
-    if (!response.content) {
-      return false;
-    }
-
-    // Parse completion response
-    return parseCompletionResponse(response.content);
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Build goal context for AI prompts with token management
- */
-export function buildGoalContext(goals: NarrativeGoal[], maxTokens: number): GoalContext {
-  if (!goals || goals.length === 0) {
-    return {
-      activeGoals: [],
-      recentGoals: [],
-      criticalGoals: [],
-      contextText: '',
-      tokenCount: 0,
-    };
-  }
-
-  // Filter and sort goals by priority and recency
-  const activeGoals = goals.filter((g) => g.status === 'active');
-  const criticalGoals = activeGoals.filter((g) => g.priority === 'critical');
-  const recentGoals = activeGoals
-    .filter((g) => g.lastMentionedAt)
-    .sort((a, b) => {
-      const aTime = new Date(a.lastMentionedAt!).getTime();
-      const bTime = new Date(b.lastMentionedAt!).getTime();
-      return bTime - aTime;
-    })
-    .slice(0, 5);
-
-  // Build context text prioritizing critical goals
-  let contextText = '';
-  let tokenCount = 0;
-  const prioritizedGoals = [...criticalGoals];
-
-  // Add high priority goals not already included
-  const highPriorityGoals = activeGoals.filter(
-    (g) =>
-      g.priority === 'high' && !criticalGoals.some((cg) => cg.id === g.id)
-  );
-  prioritizedGoals.push(...highPriorityGoals);
-
-  // Add medium priority goals if we have token budget
-  const mediumPriorityGoals = activeGoals.filter(
-    (g) =>
-      g.priority === 'medium' &&
-      !prioritizedGoals.some((pg) => pg.id === g.id)
-  );
-  prioritizedGoals.push(...mediumPriorityGoals);
-
-  // Build context text within token limits
-  for (const goal of prioritizedGoals) {
-    const goalText = formatGoalForContext(goal);
-    const goalTokens = estimateTokenCount(goalText);
-
-    if (tokenCount + goalTokens <= maxTokens) {
-      contextText += goalText;
-      tokenCount += goalTokens;
-    } else {
-      break;
-    }
-  }
-
-  return {
-    activeGoals,
-    recentGoals,
-    criticalGoals,
-    contextText,
-    tokenCount,
-  };
 }
 
 /**
@@ -221,31 +121,6 @@ Respond with JSON in this exact format:
 }
 
 /**
- * Build prompt for completion detection
- */
-function buildCompletionDetectionPrompt(
-  goal: NarrativeGoal,
-  narrativeContent: string
-): string {
-  return `Analyze if this goal has been completed based on the narrative content.
-
-GOAL: ${goal.title}
-DESCRIPTION: ${goal.description}
-TYPE: ${goal.type}
-KEYWORDS: ${goal.keywords?.join(', ') || 'none'}
-
-NARRATIVE CONTENT:
-${narrativeContent}
-
-Has this goal been completed? Consider:
-- Explicit completion (goal clearly achieved)
-- Implicit completion (goal no longer relevant/possible)
-- Abandonment (goal given up or circumstances changed)
-
-Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
-}
-
-/**
  * Parse goal extraction response from AI
  */
 function parseGoalExtractionResponse(
@@ -299,17 +174,6 @@ function parseGoalExtractionResponse(
   } catch {
     return createFallbackExtractionResult(request);
   }
-}
-
-/**
- * Parse completion detection response
- */
-function parseCompletionResponse(content: string): boolean {
-  const cleanContent = safeTrim(content).toLowerCase();
-  return (
-    cleanContent.includes('completed') &&
-    !cleanContent.includes('not_completed')
-  );
 }
 
 /**
@@ -490,17 +354,4 @@ function validateGoalUpdates(
   }
 
   return validUpdates;
-}
-
-/**
- * Format goal for context string
- */
-function formatGoalForContext(goal: NarrativeGoal): string {
-  const priority =
-    goal.priority === 'critical'
-      ? '[CRITICAL] '
-      : goal.priority === 'high'
-        ? '[HIGH] '
-        : '';
-  return `${priority}${goal.title}: ${goal.contextSummary || goal.description}\n`;
 }

@@ -18,7 +18,7 @@ Scripts for managing GitHub labels across the repository. Setting up consistent 
 
 Scripts focused on working with GitHub issues programmatically. When you're dealing with dozens of issues, manual processing gets old fast:
 
-- **`github-issue-utils.js`** - Common GitHub issue operations (utilities for other scripts)
+- **`github/github-issue-utils.js`** - Common GitHub issue operations (utilities for other scripts)
 - **`process-issues.js`** - Processes GitHub issues in bulk, extracting or updating information
 - **`utils/`** - General utility modules used by various scripts
 

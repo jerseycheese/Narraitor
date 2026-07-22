@@ -63,13 +63,13 @@ export async function verifyLabels() {
 
     if (missingLabels.length > 0) {
       console.warn(`Warning: Missing complexity labels: ${missingLabels.join(', ')}`);
-      console.warn('Run "node scripts/github/setup-github-labels.js" to create all required labels before proceeding.');
+      console.warn('Run "node scripts/setup-github-labels.js" to create all required labels before proceeding.');
     } else {
       console.log('All complexity labels exist.');
     }
   } catch (err) {
     console.warn(`Warning: Could not verify labels: ${err.message}`);
-    console.warn('Run "node scripts/github/setup-github-labels.js" to ensure all required labels exist.');
+    console.warn('Run "node scripts/setup-github-labels.js" to ensure all required labels exist.');
   }
 }
 

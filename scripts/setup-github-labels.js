@@ -45,12 +45,22 @@ const labelDefinitions = [
   { name: 'domain:journal-system', color: '5319e7', description: 'Related to the Journal System' },
   { name: 'domain:state-management', color: '5319e7', description: 'Related to the State Management system' },
   { name: 'domain:infrastructure', color: '5319e7', description: 'Related to project infrastructure, build, or deployment' },
+  { name: 'domain:ai-service', color: '5319e7', description: 'Related to AI service integration' },
+  { name: 'domain:world-interface', color: '5319e7', description: 'Related to world configuration UI/UX' },
+  { name: 'domain:character-interface', color: '5319e7', description: 'Related to character system UI/UX' },
+  { name: 'domain:journal-interface', color: '5319e7', description: 'Related to journal system UI/UX' },
+  { name: 'domain:utilities-and-helpers', color: '5319e7', description: 'Related to utility functions and helper methods' },
   
   // Priority Labels
   { name: 'priority:high', color: 'f9d0c4', description: 'High priority items for MVP' },
   { name: 'priority:medium', color: 'f9d0c4', description: 'Medium priority items' },
   { name: 'priority:low', color: 'f9d0c4', description: 'Low priority items' },
   { name: 'priority:post-mvp', color: 'f9d0c4', description: 'Items intentionally planned for after MVP' },
+
+  // Complexity Labels
+  { name: 'complexity:small', color: 'bfd4f2', description: 'Small complexity (1-2 days of effort)' },
+  { name: 'complexity:medium', color: 'bfd4f2', description: 'Medium complexity (3-5 days of effort)' },
+  { name: 'complexity:large', color: 'bfd4f2', description: 'Large complexity (1+ week of effort)' },
   
   // Status Labels
   { name: 'status:backlog', color: 'c2e0c6', description: 'In the backlog, not yet scheduled' },

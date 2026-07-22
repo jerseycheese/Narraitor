@@ -1,9 +1,9 @@
 import React from 'react';
-import { Logo, LogoText, LogoIcon } from '@/components/ui/Logo';
+import { LogoText, LogoIcon } from '@/components/ui/Logo';
 
 const meta = {
   title: '01-Atoms/display/Logo',
-  component: Logo,
+  component: LogoIcon,
   parameters: {
     layout: 'centered',
     docs: {
@@ -18,35 +18,7 @@ const meta = {
 export default meta;
 
 export const Default = {
-  render: () => <Logo />,
-};
-
-export const Sizes = {
-  render: () => (
-    <div>
-      <div>
-        <h3>Logo with Text</h3>
-        <div>
-          <div>
-            <p>Small</p>
-            <Logo size="small" />
-          </div>
-          <div>
-            <p>Medium (Default)</p>
-            <Logo size="medium" />
-          </div>
-          <div>
-            <p>Large</p>
-            <Logo size="large" />
-          </div>
-          <div>
-            <p>Extra Large</p>
-            <Logo size="xl" />
-          </div>
-        </div>
-      </div>
-    </div>
-  ),
+  render: () => <LogoIcon />,
 };
 
 export const IconOnly = {
@@ -119,7 +91,8 @@ export const Usage = {
           <div>
             <p>Navigation Header</p>
             <div>
-              <Logo size="small" />
+              <LogoIcon size="small" />
+              <LogoText size="sm" />
               <div>
                 <a href="#">Worlds</a>
                 <a href="#">Characters</a>
@@ -131,7 +104,8 @@ export const Usage = {
           <div>
             <p>Hero Section</p>
             <div>
-              <Logo size="xl" />
+              <LogoIcon size="xl" />
+              <LogoText size="xl" />
               <p>Create immersive narrative experiences</p>
             </div>
           </div>
@@ -139,7 +113,8 @@ export const Usage = {
           <div>
             <p>Footer</p>
             <div>
-              <Logo size="small" />
+              <LogoIcon size="small" />
+              <LogoText size="sm" />
               <p>© 2024 Narraitor. All rights reserved.</p>
             </div>
           </div>
@@ -156,8 +131,8 @@ export const OnDarkBackground = {
         <h3>Dark Background Usage</h3>
         <div>
           <div>
-            <Logo size="medium" />
-            <Logo size="small" />
+            <LogoIcon size="medium" />
+            <LogoIcon size="small" />
             <LogoText />
           </div>
         </div>

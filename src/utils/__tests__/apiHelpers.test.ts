@@ -58,7 +58,7 @@ describe('getSafetySettingsFromPrompt', () => {
 
   it('returns BLOCK_ONLY_HIGH for PG-13 content', () => {
     const prompt = `
-      PG-13-RATED CONTENT GUIDELINES:
+      PG-13 CONTENT GUIDELINES:
       - Moderate fantasy violence with some detail
       - Themes of loss and sacrifice
     `;
@@ -105,7 +105,7 @@ describe('getSafetySettingsFromPrompt', () => {
 
   it('returns BLOCK_NONE for sexually explicit content for NC-17', () => {
     const prompt = `
-      NC-17-RATED CONTENT GUIDELINES:
+      NC-17 CONTENT GUIDELINES:
       - Intense, realistic scenarios with serious consequences
       - Strong language and complex mature themes
     `;

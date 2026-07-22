@@ -1,7 +1,7 @@
 /**
  * Budget integration tests for NarrativeGenerator
  *
- * These tests verify that when ENABLE_TOKEN_BUDGET_MANAGER is enabled, large
+ * These tests verify that when NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER is enabled, large
  * prompt components are truncated to stay within their component budgets.
  */
 
@@ -72,7 +72,7 @@ const mockWorld = {
 describe('NarrativeGenerator budget integration', () => {
   let narrativeGenerator: NarrativeGenerator;
   let mockAIClient: { generateContent: jest.Mock };
-  const originalEnv = process.env.ENABLE_TOKEN_BUDGET_MANAGER;
+  const originalEnv = process.env.NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER;
   type TemplateContext = {
     narrativeContext?: {
       recentSegments?: Array<{ content: string }>;
@@ -81,7 +81,7 @@ describe('NarrativeGenerator budget integration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.ENABLE_TOKEN_BUDGET_MANAGER = 'true';
+    process.env.NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER = 'true';
 
     mockAIClient = {
       generateContent: jest.fn().mockResolvedValue({
@@ -121,9 +121,9 @@ describe('NarrativeGenerator budget integration', () => {
 
   afterEach(() => {
     if (originalEnv === undefined) {
-      delete process.env.ENABLE_TOKEN_BUDGET_MANAGER;
+      delete process.env.NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER;
     } else {
-      process.env.ENABLE_TOKEN_BUDGET_MANAGER = originalEnv;
+      process.env.NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER = originalEnv;
     }
   });
 
@@ -149,8 +149,8 @@ describe('NarrativeGenerator budget integration', () => {
     expect(capturedPrompt).not.toContain('END_MARKER');
   });
 
-  it('bypasses truncation when ENABLE_TOKEN_BUDGET_MANAGER=false', async () => {
-    process.env.ENABLE_TOKEN_BUDGET_MANAGER = 'false';
+  it('bypasses truncation when NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=false', async () => {
+    process.env.NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER = 'false';
     const loreContext = `\nEstablished World Facts:\n${new Array(2000).fill('word').join(' ')}\nEND_MARKER`;
     (getLoreContextForPrompt as jest.Mock).mockReturnValue(loreContext);
 

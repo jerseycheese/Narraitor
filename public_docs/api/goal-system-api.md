@@ -84,12 +84,6 @@ The AI service that reads narrative content and figures out what goals the chara
 ```typescript
 // Extract goals from narrative content
 extractGoalsFromNarrative(request: GoalExtractionRequest): Promise<GoalExtractionResult>
-
-// Detect if specific goal has been completed
-detectGoalCompletion(goal: NarrativeGoal, narrativeContent: string): Promise<boolean>
-
-// Build context for AI prompts with token management
-buildGoalContext(goals: NarrativeGoal[], maxTokens: number): GoalContext
 ```
 
 #### Configuration
@@ -97,7 +91,6 @@ The extractor is built to be resilient because AI can be unpredictable:
 
 - Supports fallback pattern matching when AI fails
 - Validates and cleans AI responses
-- Handles token budget constraints
 - Provides confidence scoring
 
 ### aiContextStore.ts Goal Integration

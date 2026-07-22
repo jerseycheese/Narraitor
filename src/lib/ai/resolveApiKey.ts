@@ -3,8 +3,6 @@
 import type { NextRequest } from 'next/server';
 import { PROVIDER_API_KEY_HEADER } from './providerKeyHeader';
 
-export { PROVIDER_API_KEY_HEADER };
-
 /**
  * Resolve the effective Gemini key for a request.
  *

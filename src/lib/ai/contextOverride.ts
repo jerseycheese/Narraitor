@@ -1,30 +1,12 @@
 import type { World, Character, NarrativeContext, AITestConfig } from '../../types';
 
-/**
- * Deep clone utility that works in both browser and Node.js environments
- */
-function deepClone<T>(obj: T): T {
-  if (obj === null || typeof obj !== 'object') {
-    return obj;
+const cloneContextValue = <T>(value: T): T => {
+  if (typeof globalThis.structuredClone === 'function') {
+    return globalThis.structuredClone(value);
   }
-  
-  if (obj instanceof Date) {
-    return new Date(obj.getTime()) as T;
-  }
-  
-  if (Array.isArray(obj)) {
-    return obj.map(item => deepClone(item)) as T;
-  }
-  
-  const cloned = {} as T;
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      cloned[key] = deepClone(obj[key]);
-    }
-  }
-  
-  return cloned;
-}
+
+  return JSON.parse(JSON.stringify(value)) as T;
+};
 
 /**
  * Creates a test context by merging base game components with test overrides
@@ -39,12 +21,7 @@ export function createTestContext(
   character: Character;
   narrativeContext: NarrativeContext;
 } {
-  const result = mergeTestOverrides(baseWorld, baseCharacter, baseNarrativeContext, testConfig);
-  
-  // Apply custom variables to narrative context if provided
-  // Note: Custom variables would be stored in a different way in the actual implementation
-  
-  return result;
+  return mergeTestOverrides(baseWorld, baseCharacter, baseNarrativeContext, testConfig);
 }
 
 /**
@@ -60,19 +37,18 @@ export function mergeTestOverrides(
   character: Character;
   narrativeContext: NarrativeContext;
 } {
-  // Deep clone base objects to avoid mutations
   const world: World = Object.assign(
-    deepClone(baseWorld),
+    cloneContextValue(baseWorld),
     testConfig.worldOverride || {}
   );
   
   const character: Character = Object.assign(
-    deepClone(baseCharacter),
+    cloneContextValue(baseCharacter),
     testConfig.characterOverride || {}
   );
   
   const narrativeContext: NarrativeContext = Object.assign(
-    deepClone(baseNarrativeContext),
+    cloneContextValue(baseNarrativeContext),
     testConfig.narrativeContext || {}
   );
   

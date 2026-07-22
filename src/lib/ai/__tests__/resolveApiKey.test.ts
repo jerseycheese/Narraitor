@@ -2,7 +2,8 @@
  * @jest-environment node
  */
 import { NextRequest } from 'next/server';
-import { resolveApiKey, PROVIDER_API_KEY_HEADER } from '../resolveApiKey';
+import { PROVIDER_API_KEY_HEADER } from '../providerKeyHeader';
+import { resolveApiKey } from '../resolveApiKey';
 
 const ORIGINAL = process.env.GEMINI_API_KEY;
 
