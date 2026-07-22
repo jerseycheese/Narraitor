@@ -8,16 +8,16 @@ gluing strings together themselves.
 
 ## How it works
 
-A template is a plain object — an `id`, a `PromptType`, a `variables` list that documents
-what the template expects, and a `generate(context)` function that actually builds the
-prompt. The `generate` function is real code, not `{{placeholder}}` substitution, which
-means a template can branch on context (skip an empty inventory, format recent events,
-acknowledge a skill check) and stay type-checked against the context shape it declares.
+A narrative template is a plain object with an `id` and a `generate(context)` function
+that actually builds the prompt. The `generate` function is real code, not
+`{{placeholder}}` substitution, which means a template can branch on context (skip an
+empty inventory, format recent events, acknowledge a skill check) and stay type-checked
+against the context shape it declares.
 
 Templates live under `templates/`. The narrative ones are defined per-file in
 `templates/narrative/` (base, action, scene, transition, player choice, and so on) and
 collected in `templates/narrative/index.ts`; endings live in `templates/endingTemplates.ts`.
-The shared types — `PromptType` and the `PromptTemplate` interface — are in `types.ts`.
+The shared static prompt type is in `types.ts`.
 
 ## Looking up a template
 

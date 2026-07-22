@@ -1,8 +1,9 @@
 // process-issues.js (refactored < 300 lines)
 // Processes GitHub issues to update from CSV data
 
-import { updateIssue } from './github-issue-utils.js';
+import { updateIssue } from './github/github-issue-utils.js';
 import { extractDomainFromIssue } from './story-validation-utils.js';
+import { OWNER, REPO } from './user-stories/modules/config.js';
 import {
   updateUserStory,
   updatePlainLanguageSummary,
@@ -170,7 +171,19 @@ export async function processIssues(issues, loadedCsvData, issueTemplateContent,
       // Process updates
       if (hasChanges) {
         if (!dryRun) {
-          await updateIssue(issue, body, complexityLabel, priorityLabel, titleToUpdate, domainLabel);
+          const currentLabels = issue.labels.map(l => typeof l === 'object' ? l.name : l);
+          const filteredLabels = currentLabels.filter(label =>
+            !label.toLowerCase().startsWith('complexity:') &&
+            !label.toLowerCase().startsWith('priority:') &&
+            !label.toLowerCase().startsWith('domain:')
+          );
+          const labels = [...filteredLabels, complexityLabel, priorityLabel, domainLabel].filter(Boolean);
+          const updatePayload = { body, labels };
+          if (titleToUpdate) {
+            updatePayload.title = titleToUpdate;
+          }
+
+          await updateIssue(OWNER, REPO, issue.number, updatePayload);
           // console.log(`✅ Updated issue #${issue.number}`);
         } else {
           // console.log(`Would update issue #${issue.number} (dry run)`);

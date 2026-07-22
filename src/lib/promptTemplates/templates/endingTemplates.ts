@@ -1,7 +1,6 @@
 // src/lib/promptTemplates/templates/endingTemplates.ts
 
 import type { PromptTemplate } from '../types';
-import { PromptType } from '../types';
 import type { EndingType } from '../../../types/narrative.types';
 
 const endingTypeDescriptions: Record<EndingType, string> = {
@@ -13,9 +12,6 @@ const endingTypeDescriptions: Record<EndingType, string> = {
 
 export const endingTemplate: PromptTemplate = {
   id: 'ending',
-  name: 'Story Ending Generator',
-  type: PromptType.NARRATIVE,
-  
   content: `You are a master storyteller creating a satisfying ending for an interactive narrative game session.
 
 CONTEXT:
@@ -115,23 +111,7 @@ DO NOT (especially for tragic/fatal endings):
 - Use hopeful language about future possibilities when the character is dead
 - Leave open the possibility of continuation
 
-For tragic endings, be clear: the story has ended. The character is gone. Honor their sacrifice.`,
-
-  variables: [
-    { name: 'worldName', type: 'string', description: 'Name of the world' },
-    { name: 'worldDescription', type: 'string', description: 'Description of the world' },
-    { name: 'characterName', type: 'string', description: 'Name of the character' },
-    { name: 'characterClass', type: 'string', description: 'Class of the character' },
-    { name: 'characterLevel', type: 'number', description: 'Level of the character' },
-    { name: 'characterBackground', type: 'string', description: 'Background of the character' },
-    { name: 'characterPersonality', type: 'string', description: 'Personality of the character' },
-    { name: 'characterGoals', type: 'string', description: 'Goals of the character' },
-    { name: 'endingType', type: 'string', description: 'Type of ending' },
-    { name: 'endingTypeDescription', type: 'string', description: 'Description of ending type' },
-    { name: 'recentNarrative', type: 'string', description: 'Recent narrative content' },
-    { name: 'journalEntries', type: 'string', description: 'Journal entries' },
-    { name: 'customPrompt', type: 'string', description: 'Custom prompt from user' }
-  ]
+For tragic endings, be clear: the story has ended. The character is gone. Honor their sacrifice.`
 };
 
 // Helper function to prepare ending template variables

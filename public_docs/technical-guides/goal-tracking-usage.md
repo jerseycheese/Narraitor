@@ -99,19 +99,8 @@ console.log(context.goalContext);
 
 ### Goal Completion Detection
 ```typescript
-// Check if goal was completed in narrative
-const isCompleted = await goalExtractor.detectGoalCompletion(
-  goal,
-  'I finally found the Crystal of Power hidden beneath the altar!'
-);
-
-if (isCompleted) {
-  goalStore.updateGoal(goal.id, {
-    status: 'completed',
-    completedAt: new Date(),
-    completionMethod: 'achieved'
-  });
-}
+// Goal completion is handled by processSegmentForGoals() as part of segment processing.
+await goalStore.processSegmentForGoals(segment, sessionId, characterId);
 ```
 
 ## Integration with Narrative Generation

@@ -363,11 +363,13 @@ jobs:
         run: mkdir -p ci-security
 
       - name: Run npm audit (fails on moderate severity or higher)
-        run: npm audit --production --audit-level=moderate | tee ci-security/npm-audit.txt
+        run: |
+          set -o pipefail
+          npm audit --omit=dev --audit-level=moderate | tee ci-security/npm-audit.txt
         continue-on-error: false
 
       - name: Generate npm audit JSON report
-        run: npm audit --production --json > ci-security/npm-audit.json
+        run: npm audit --omit=dev --json > ci-security/npm-audit.json
         continue-on-error: true
 
       - name: Capture dependency update suggestions

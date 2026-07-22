@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
-import SessionControls from '@/components/GameSession/SessionControls';
 import GameSessionLoading from '@/components/GameSession/GameSessionLoading';
 import GameSessionError from '@/components/GameSession/GameSessionError';
 import { Decision } from '@/types/narrative.types';
@@ -30,18 +29,6 @@ export default function GameSessionComponentsTestPage() {
     logger.debug('Choice selected:', choiceId);
   };
 
-  const handleEnd = () => {
-    logger.debug('Session ended');
-  };
-
-  const handleRestart = () => {
-    logger.debug('Session restarted');
-  };
-
-  const handleEndStory = () => {
-    logger.debug('Story ended');
-  };
-
   const handleRetry = () => {
     setShowError(false);
     logger.debug('Retry clicked');
@@ -67,25 +54,6 @@ export default function GameSessionComponentsTestPage() {
           <p>
             Selected: {selectedChoiceId || 'None'}
           </p>
-        </section>
-
-        {/* SessionControls Component */}
-        <section>
-          <h2>SessionControls Component</h2>
-          <div>
-            <div>
-              <h3>Basic Controls (End Only)</h3>
-              <SessionControls onEnd={handleEnd} />
-            </div>
-            <div>
-              <h3>All Controls</h3>
-              <SessionControls 
-                onEnd={handleEnd}
-                onRestart={handleRestart}
-                onEndStory={handleEndStory}
-              />
-            </div>
-          </div>
         </section>
 
         {/* GameSessionLoading Component */}

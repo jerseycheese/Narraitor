@@ -83,7 +83,7 @@ function parseLabelsFromMarkdown(filePath) {
         const nameMatch = line.match(/^- ([^:]+):/);
         if (nameMatch && currentSection.includes('domain')) {
           labelName = `domain:${nameMatch[1].toLowerCase().replace(/\s+/g, '-')}`;
-          description = `Related to the ${nameMatch[1]} system`;
+          description = `Related to ${nameMatch[1]} system`;
         } else if (nameMatch && currentSection.includes('priority')) {
           labelName = `priority:${nameMatch[1].toLowerCase()}`;
           description = `${nameMatch[1]} priority item`;
@@ -169,7 +169,8 @@ function parseLabelsFromMarkdown(filePath) {
   const domains = [
     'world-configuration', 'character-system', 'decision-tracking', 
     'decision-relevance', 'narrative-engine', 'journal-system', 
-    'state-management', 'infrastructure'
+    'state-management', 'infrastructure', 'ai-service', 'world-interface',
+    'character-interface', 'journal-interface', 'utilities-and-helpers'
   ];
   
   domains.forEach(domain => {
@@ -178,7 +179,7 @@ function parseLabelsFromMarkdown(filePath) {
       labels.push({
         name: labelName,
         color: defaultColors.domain,
-        description: `Related to the ${domain.replace(/-/g, ' ')} system`
+        description: `Related to ${domain.replace(/-/g, ' ')} system`
       });
     }
   });

@@ -2,6 +2,8 @@ import { buildChoicePrompt } from '../choiceGenerator.prompt';
 import type { NarrativeContext } from '@/types/narrative.types';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { playerDecisionTracker } from '../playerDecisionTracker';
+import { getLoreContextForPrompt } from '../loreContextHelper';
+import { RequestBudget, ComponentPriority } from '@/lib/promptContext/tokenBudgetManager';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   getNarrativeTemplate: jest.fn().mockReturnValue((context: { worldName: string }) =>
@@ -121,5 +123,30 @@ describe('buildChoicePrompt', () => {
       10,
       expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' })
     );
+  });
+
+  it('truncates lore context to the budget when a budget is supplied', () => {
+    const bigLoreContext = `\n\nEstablished World Facts:\n${new Array(2000).fill('word').join(' ')}\nEND_MARKER`;
+    (getLoreContextForPrompt as jest.Mock).mockReturnValueOnce(bigLoreContext);
+
+    const world = createMockWorld({ id: 'world-1' });
+    const budget = new RequestBudget(
+      [{ componentId: 'lore-context', priority: ComponentPriority.MEDIUM, min: 0, target: 20, max: 20 }],
+      20,
+      true
+    );
+
+    const prompt = buildChoicePrompt({
+      world,
+      worldId: 'world-1',
+      narrativeContext,
+      characterIds: ['char-1'],
+      sessionId: 'session-1',
+      includeDecisionHistory: false,
+      budget,
+    });
+
+    expect(prompt).toContain('Established World Facts:');
+    expect(prompt).not.toContain('END_MARKER');
   });
 });

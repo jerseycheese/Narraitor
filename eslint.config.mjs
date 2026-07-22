@@ -53,13 +53,17 @@ const eslintConfig = [
       "src/components/devtools/**/*.{js,jsx,ts,tsx}",
       "src/lib/devtools/**/*.{js,jsx,ts,tsx}",
       "src/lib/design-tokens/**/*.{js,jsx,ts,tsx}",
-      "src/stories/**/*.{js,jsx,ts,tsx}"
+      "src/stories/**/*.{js,jsx,ts,tsx}",
+      "tests/**/*.{js,jsx,ts,tsx}",
+      "scripts/**/*.{js,cjs,mjs}",
+      "eslint-rules/**/*.js"
     ],
     rules: {
       "@typescript-eslint/no-require-imports": "off", // Allow require() in test files for Jest mocking
-      "design-tokens/no-hardcoded-colors": "off", // Allow hardcoded colors in tests, dev tools, design tokens, and stories
-      "no-console": "off", // Dev tooling, tests, and stories legitimately use console
+      "design-tokens/no-hardcoded-colors": "off", // Allow hardcoded colors in tests, dev tools, design tokens, stories, and scripts
+      "no-console": "off", // Dev tooling, tests, stories, and scripts legitimately use console
       "@typescript-eslint/no-explicit-any": "warn", // Allow `any` in dev tools and tests, but flag it
+      "react-hooks/rules-of-hooks": "off", // Playwright fixture helpers are not React hooks
     },
   },
   {

@@ -59,7 +59,7 @@ cp .env.example .env.local
 # Edit .env.local and add: GEMINI_API_KEY=your-key-here
 # Optional: enable token-budget-based prompt truncation
 # (keeps long-running sessions from ballooning prompt size)
-# ENABLE_TOKEN_BUDGET_MANAGER=true
+# NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true
 
 # Feature flags (default off)
 # NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING=false
@@ -241,7 +241,7 @@ The AI system routes everything through Next.js API endpoints (`/api/narrative/g
 # .env.local
 GEMINI_API_KEY=your-api-key
 # Optional: enable token-budget-based prompt truncation
-# ENABLE_TOKEN_BUDGET_MANAGER=true
+# NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true
 
 # Feature flags
 # NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING=false

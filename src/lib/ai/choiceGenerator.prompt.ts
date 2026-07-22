@@ -7,11 +7,13 @@ import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
+import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
 import { formatSkillsForNarrative } from './attributeSkillFormatter';
 import { formatPersonalityForChoices } from './choiceGenerator.personality';
+import { applyBudget, limitNarrativeContextToBudget } from './narrativeGenerator.budget';
 import type { NarrativeContext } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
@@ -25,6 +27,7 @@ interface ChoicePromptInput {
   useAlignedChoices?: boolean;
   includeDecisionHistory?: boolean;
   maxOptions?: number;
+  budget?: RequestBudget;
 }
 export const buildChoicePrompt = ({
   world,
@@ -35,42 +38,51 @@ export const buildChoicePrompt = ({
   useAlignedChoices = false,
   includeDecisionHistory = true,
   maxOptions,
+  budget,
 }: ChoicePromptInput): string => {
   const resolvedCharacterIds = resolveCharacterIds(characterIds, worldId);
   const template = getTemplate(
     useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice'
   );
+  const budgetedNarrativeContext = budget
+    ? limitNarrativeContextToBudget(narrativeContext, budget) ?? narrativeContext
+    : narrativeContext;
   const context = buildContext(
     world,
-    narrativeContext,
+    budgetedNarrativeContext,
     resolvedCharacterIds,
     maxOptions
   );
-  const basePrompt = template(context);
+  const basePrompt = applyBudget(template(context), 'base-template', budget);
   const inventoryAwarePrompt = enhancePromptWithInventory(
     basePrompt,
-    resolvedCharacterIds
+    resolvedCharacterIds,
+    budget
   );
   const skillAwarePrompt = enhancePromptWithCharacterSkills(
     inventoryAwarePrompt,
-    resolvedCharacterIds
+    resolvedCharacterIds,
+    budget
   );
   const personalityAwarePrompt = enhancePromptWithPersonality(
     skillAwarePrompt,
     resolvedCharacterIds,
-    useAlignedChoices
+    useAlignedChoices,
+    budget
   );
   const loreEnhancedPrompt = enhancePromptWithLore(
     personalityAwarePrompt,
     worldId,
-    sessionId
+    sessionId,
+    budget
   );
   const toneEnhancedPrompt = enhancePromptWithToneSettings(
     loreEnhancedPrompt,
-    world
+    world,
+    budget
   );
   return includeDecisionHistory && sessionId
-    ? enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId)
+    ? enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId, budget)
     : toneEnhancedPrompt;
 };
 const resolveCharacterIds = (
@@ -137,15 +149,20 @@ const getWorldNpcs = (worldId: string): Array<{ id: string; name: string }> => {
 const enhancePromptWithLore = (
   prompt: string,
   worldId: string,
-  sessionId?: EntityID
+  sessionId?: EntityID,
+  budget?: RequestBudget
 ): string => {
   const loreContext = getLoreContextForPrompt(worldId, sessionId, {
     recordUsage: true,
     source: 'choices',
   });
-  return prompt + loreContext;
+  return prompt + applyBudget(loreContext, 'lore-context', budget);
 };
-const enhancePromptWithToneSettings = (prompt: string, world: World): string => {
+const enhancePromptWithToneSettings = (
+  prompt: string,
+  world: World,
+  budget?: RequestBudget
+): string => {
   const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
   const detailedInstructions = getDetailedToneInstructions(
     toneSettings.contentRating,
@@ -162,11 +179,16 @@ CHOICE GENERATION FOCUS:
 - Ensure choices are appropriate and align with the tone settings
 - Present options that respect the content boundaries while maintaining agency`;
 
-  return prompt + detailedInstructions + choiceSpecificGuidance;
+  return prompt + applyBudget(
+    detailedInstructions + choiceSpecificGuidance,
+    'tone-settings',
+    budget
+  );
 };
 const enhancePromptWithInventory = (
   prompt: string,
-  characterIds: string[]
+  characterIds: string[],
+  budget?: RequestBudget
 ): string => {
   try {
     if (!characterIds || characterIds.length === 0) return prompt;
@@ -174,7 +196,16 @@ const enhancePromptWithInventory = (
     const { getCharacterItems } = useInventoryStore.getState();
     const items = getCharacterItems(characterId);
     if (!items || items.length === 0) return prompt;
-    const { context: inventorySection } = buildInventoryContext(items);
+    const equippedItemIds = getEquippedItemIds(characterIds);
+    const tokenLimit =
+      budget && budget.isEnabled() ? budget.getAllocation('inventory') : undefined;
+    const { context: inventorySection, tokenCount } = buildInventoryContext(items, {
+      equippedItemIds,
+      tokenLimit:
+        typeof tokenLimit === 'number' && Number.isFinite(tokenLimit)
+          ? tokenLimit
+          : undefined,
+    });
     if (!inventorySection) return prompt;
     const guidance = `
 
@@ -186,6 +217,10 @@ CHOICE DESIGN RULES:
 - Do NOT create options that suggest picking up or rediscovering these items.
 - You may reference these items as tools or resources, but focus choices on new actions that move the narrative forward.`;
 
+    if (budget) {
+      budget.recordUsage('inventory', tokenCount);
+    }
+
     return `${prompt}${guidance}`;
   } catch {
     return prompt;
@@ -193,7 +228,8 @@ CHOICE DESIGN RULES:
 };
 const enhancePromptWithCharacterSkills = (
   prompt: string,
-  characterIds: string[]
+  characterIds: string[],
+  budget?: RequestBudget
 ): string => {
   try {
     if (!characterIds || characterIds.length === 0) return prompt;
@@ -217,7 +253,7 @@ SKILL-BASED CHOICE GUIDANCE:
 - Lower-level skills (Trained, Novice) can still provide options but with appropriate risk
 - Don't force skill-based choices if they don't fit the narrative context`;
 
-    return `${prompt}${guidance}`;
+    return `${prompt}${applyBudget(guidance, 'character-context', budget)}`;
   } catch {
     return prompt;
   }
@@ -226,7 +262,8 @@ SKILL-BASED CHOICE GUIDANCE:
 const enhancePromptWithPersonality = (
   prompt: string,
   characterIds: string[],
-  useAlignedChoices: boolean
+  useAlignedChoices: boolean,
+  budget?: RequestBudget
 ): string => {
   try {
     if (!characterIds || characterIds.length === 0) return prompt;
@@ -248,7 +285,7 @@ const enhancePromptWithPersonality = (
       !useAlignedChoices
     );
     if (!personalitySection) return prompt;
-    return `${prompt}${personalitySection}`;
+    return `${prompt}${applyBudget(personalitySection, 'personalization', budget)}`;
   } catch {
     return prompt;
   }
@@ -257,7 +294,8 @@ const enhancePromptWithPersonality = (
 const enhancePromptWithDecisionHistory = (
   prompt: string,
   worldId: EntityID,
-  sessionId: EntityID
+  sessionId: EntityID,
+  budget?: RequestBudget
 ): string => {
   try {
     const currentContext: SimpleNarrativeContext = { worldId, sessionId };
@@ -294,9 +332,24 @@ CHOICE GENERATION INSTRUCTIONS:
 - Acknowledge consequences of previous choices where relevant
 - Ensure choices feel consistent with the player's history`;
 
-    return `${prompt}${decisionGuidance}`;
+    return `${prompt}${applyBudget(decisionGuidance, 'personalization', budget)}`;
   } catch (error) {
     logger.error('Error enhancing prompt with decision history:', error);
     return prompt;
+  }
+};
+
+const getEquippedItemIds = (characterIds: string[] | undefined): string[] => {
+  if (!characterIds || characterIds.length === 0) {
+    return [];
+  }
+
+  try {
+    const { getCharacterItems } = useInventoryStore.getState();
+    return getCharacterItems(characterIds[0])
+      .filter((item) => item.equipped)
+      .map((item) => item.id);
+  } catch {
+    return [];
   }
 };

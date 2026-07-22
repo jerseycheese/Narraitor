@@ -270,7 +270,7 @@ For network issues, there's a 15-second timeout on AI requests, clear error mess
 
 ## Configuration
 
-Environment variables are straightforward: `GEMINI_API_KEY` is required and server-side only (never use NEXT_PUBLIC_ prefix), `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging, and `ENABLE_TOKEN_BUDGET_MANAGER=true` is an opt-in switch for token-budget-based prompt truncation.
+Environment variables are straightforward: `GEMINI_API_KEY` is required and server-side only (never use NEXT_PUBLIC_ prefix), `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging, and `NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true` is an opt-in switch for token-budget-based prompt truncation.
 
 The model configuration uses gemini-2.0-flash as the primary model, temperature of 0.7 for creative content, and max tokens vary by use case (200 for choices, 500 for narrative).
 

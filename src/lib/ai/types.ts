@@ -15,7 +15,7 @@ export interface AIServiceConfig {
 }
 
 /**
- * Standard error object for AI service
+ * Standard error object for AI service mocks
  */
 export interface AIServiceError {
   code: string;

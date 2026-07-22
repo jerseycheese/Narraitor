@@ -37,33 +37,30 @@ describe('ResilientStorageMiddleware', () => {
     it('should start in HEALTHY status when IndexedDB is available', async () => {
       mockAdapter.initialize.mockResolvedValue(undefined);
 
-      const storage = new ResilientStorageMiddleware({
+      new ResilientStorageMiddleware({
         onStatusChange: mockNotificationCallback,
       });
 
       // Wait for initialization
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      expect(storage.getStorageStatus()).toBe(StorageStatus.HEALTHY);
       expect(mockNotificationCallback).not.toHaveBeenCalled();
     });
 
     it('should switch to UNAVAILABLE when IndexedDB initialization fails', async () => {
       mockAdapter.initialize.mockRejectedValue(new Error('IndexedDB unavailable'));
 
-      const storage = new ResilientStorageMiddleware({
+      new ResilientStorageMiddleware({
         onStatusChange: mockNotificationCallback,
       });
 
       // Wait for initialization to fail
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
       expect(mockNotificationCallback).toHaveBeenCalledWith(
         StorageStatus.UNAVAILABLE,
         expect.objectContaining({
-          shouldNotify: true,
-          userMessage: expect.stringContaining('will not persist'),
+          message: expect.stringContaining('IndexedDB initialization failed'),
         })
       );
     });
@@ -76,20 +73,17 @@ describe('ResilientStorageMiddleware', () => {
       } as unknown as jest.Mocked<IndexedDBAdapter>;
       mockIndexedDBAdapter.mockImplementationOnce(() => uninitializedAdapter);
 
-      const storage = new ResilientStorageMiddleware({
+      new ResilientStorageMiddleware({
         onStatusChange: mockNotificationCallback,
       });
 
       // Wait for initialization
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
       expect(mockNotificationCallback).toHaveBeenCalledWith(
         StorageStatus.UNAVAILABLE,
         expect.objectContaining({
-          shouldNotify: true,
-          userMessage: expect.stringContaining('will not persist'),
-          technicalMessage: 'IndexedDB not available in this environment',
+          message: 'IndexedDB not available in this environment',
         })
       );
     });
@@ -116,13 +110,19 @@ describe('ResilientStorageMiddleware', () => {
       mockAdapter.initialize.mockResolvedValue(undefined);
       mockAdapter.setItem.mockRejectedValue(new Error('Quota exceeded'));
 
-      const storage = new ResilientStorageMiddleware();
+      const storage = new ResilientStorageMiddleware({
+        onStatusChange: mockNotificationCallback,
+      });
       await new Promise(resolve => setTimeout(resolve, 10));
 
       await storage.setItem('test-key', 'test-value');
 
-      // Should have switched to memory fallback
-      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
+      expect(mockNotificationCallback).toHaveBeenCalledWith(
+        StorageStatus.UNAVAILABLE,
+        expect.objectContaining({
+          message: expect.stringContaining('IndexedDB write failed'),
+        })
+      );
 
       // Should still be able to retrieve from memory
       const result = await storage.getItem('test-key');
@@ -133,13 +133,20 @@ describe('ResilientStorageMiddleware', () => {
       mockAdapter.initialize.mockResolvedValue(undefined);
       mockAdapter.getItem.mockRejectedValue(new Error('Read failed'));
 
-      const storage = new ResilientStorageMiddleware();
+      const storage = new ResilientStorageMiddleware({
+        onStatusChange: mockNotificationCallback,
+      });
       await new Promise(resolve => setTimeout(resolve, 10));
 
       // First operation fails and switches to memory
       const result = await storage.getItem('test-key');
       expect(result).toBeNull();
-      expect(storage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
+      expect(mockNotificationCallback).toHaveBeenCalledWith(
+        StorageStatus.UNAVAILABLE,
+        expect.objectContaining({
+          message: expect.stringContaining('IndexedDB read failed'),
+        })
+      );
 
       // Now store in memory
       await storage.setItem('test-key', 'memory-value');

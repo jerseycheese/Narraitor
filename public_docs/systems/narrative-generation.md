@@ -95,9 +95,9 @@ Different moments in the story need different approaches, so we have specialized
 
 ### Token Budgeting (Context Window Management)
 
-Long-running sessions tend to accumulate a lot of context, and prompts can quietly balloon if nothing pushes back. The narrative generator now supports a token budget manager that caps the largest prompt sections (recent narrative, lore, goals, tone settings, inventory, personalization, and item acquisition instructions).
+Long-running sessions tend to accumulate a lot of context, and prompts can quietly balloon if nothing pushes back. The narrative and choice generators share a token budget manager that caps the largest prompt sections (recent narrative, lore, goals, tone settings, inventory, personalization, and item acquisition instructions).
 
-It’s opt-in via `ENABLE_TOKEN_BUDGET_MANAGER=true`, which makes it easy to turn on gradually and adjust allocations without risking a breaking change to prompt composition.
+It’s opt-in via `NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true`, which makes it easy to turn on gradually and adjust allocations without risking a breaking change to prompt composition.
 
 ### Tone Settings System
 

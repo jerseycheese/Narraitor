@@ -123,8 +123,7 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
   category: string;
   threshold: string;
 }> {
-  // Look for tone settings in the prompt - handle both simple ratings (G, PG, R) and compound ratings (PG-13, NC-17)
-  const contentRatingMatch = prompt.match(/((?:PG-13|NC-17|[A-Z]+))-RATED CONTENT GUIDELINES/i);
+  const contentRatingMatch = prompt.match(/((?:PG-13|NC-17|[A-Z]+))(?:-RATED)? CONTENT GUIDELINES/i);
   const contentRating = contentRatingMatch?.[1]?.toLowerCase() || '';
 
   const thresholds = RATING_THRESHOLDS[contentRating] ?? DEFAULT_THRESHOLDS;
