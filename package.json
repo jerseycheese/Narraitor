@@ -67,7 +67,7 @@
     "clsx": "^2.1.1",
     "fastest-levenshtein": "^1.0.16",
     "lucide-react": "^0.548.0",
-    "next": "^15.5.7",
+    "next": "^15.5.21",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-joyride": "3.0.0-7",
