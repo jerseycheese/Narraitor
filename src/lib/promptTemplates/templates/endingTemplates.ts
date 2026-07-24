@@ -45,8 +45,10 @@ Generate a complete story ending with the following components:
    - HOPEFUL: Use when results are mixed, there's potential for future success, or the outcome
      is bittersweet but optimistic. Not complete victory, but progress was made.
 
-   - MYSTERIOUS: Use when there are unresolved questions, ambiguous outcomes, enigmatic events,
-     or the story leaves mysteries unsolved. The ending raises new questions.
+   - MYSTERIOUS: Use when enigmatic events color the outcome, even though the character's
+     immediate situation still resolves. The plot concludes — what happened is clear — but
+     deeper questions about meaning, truth, or consequence linger unanswered. Only the larger
+     "why" may stay open; the character's immediate fate must not.
 
    - TRAGIC: Use when the character DIED, was INCAPACITATED, or suffered catastrophic failure.
      The character's story has ENDED—they cannot continue. Use past tense. Focus on their
@@ -61,6 +63,10 @@ Generate a complete story ending with the following components:
    - Reference specific events from their journey
    - Match the chosen tone throughout
    - Provide narrative closure while respecting the ending type
+   - REQUIRED FOR EVERY TONE: the immediate story arc must resolve by the end of the epilogue —
+     this session's central conflict or situation is answered. A cliffhanger that leaves the
+     character's present circumstances unresolved is not acceptable for any tone, including
+     MYSTERIOUS — ambiguity belongs to meaning or theme, never to what just happened.
 
    For TRAGIC endings where the character died:
    * Describe their final moments with weight and dignity
@@ -101,7 +107,7 @@ Remember to:
 - Make the ending feel earned and satisfying
 - Reference specific story events, not generic fantasy tropes
 - Match your chosen tone throughout all sections
-- Provide closure while leaving room for imagination
+- Resolve the immediate story arc fully — closure is required, not optional, regardless of tone
 - Keep the language evocative and engaging
 
 DO NOT (especially for tragic/fatal endings):
