@@ -861,32 +861,6 @@
   display: inline-flex;
 }
 
-/* Bound the appearance dropdown so it fits the narrow workshop rail (which
-   clips overflow) and let the skin descriptions wrap instead of forcing the
-   menu wider than its container. */
-.theme-menu .header-dropdown-menu {
-  width: 15rem;
-}
-
-.theme-menu-item-text {
-  min-width: 0;
-}
-
-.theme-menu-item-text > div {
-  white-space: normal;
-}
-
-/* Color-mode section inside the appearance dropdown, below the theme list. */
-.theme-menu-mode {
-  margin-top: var(--space-1);
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--color-border);
-}
-
-.theme-menu-mode .dark-mode-toggle {
-  margin-top: var(--space-1);
-}
-
 /* In the workshop rail the trigger sits at the bottom-left, so the default
    top-right dropdown placement clips off the bottom and left edges. Flip it to
    open upward and align to the trigger's left edge. */
@@ -1403,6 +1377,10 @@
   font-size: 0.9375rem;
   line-height: 1.5;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .world-card-type-badge {
@@ -1597,7 +1575,7 @@
 }
 
 :root .world-detail-section h2::before {
-  content: "• Section";
+  content: "• ";
   display: block;
   margin-bottom: var(--space-1);
   font-family: var(--font-system);
@@ -1730,7 +1708,7 @@
 
 :root .component-collapsible-section
   [data-testid="collapsible-section-title"]::before {
-  content: "• Section";
+  content: "• ";
   display: block;
   margin-bottom: var(--space-1);
   font-family: var(--font-system);
@@ -2045,6 +2023,10 @@
 
 /* ─── Character Detail Page ─── */
 
+.character-detail-hero {
+  margin-bottom: var(--space-3);
+}
+
 .character-detail-body {
   display: flex;
   flex-direction: column;
@@ -2151,7 +2133,7 @@
 }
 
 :root .character-detail-section h2::before {
-  content: "• Section";
+  content: "• ";
   display: block;
   margin-bottom: var(--space-1);
   font-family: var(--font-system);
@@ -2415,7 +2397,7 @@
 }
 
 :root .settings-section h2::before {
-  content: "• Section";
+  content: "• ";
   display: block;
   margin-bottom: var(--space-1);
   font-family: var(--font-system);

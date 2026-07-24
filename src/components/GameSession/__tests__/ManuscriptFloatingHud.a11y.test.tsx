@@ -62,4 +62,24 @@ describe('ManuscriptFloatingHud accessibility', () => {
     );
     expect(button).toHaveAttribute('aria-expanded', 'true');
   });
+
+  it('renders the active character portrait in the avatar pill when one exists (#1581)', () => {
+    render(
+      <ManuscriptFloatingHud
+        {...baseProps}
+        characterName="Finn"
+        characterPortrait={{ type: 'ai-generated', url: 'data:image/png;base64,abc' }}
+      />
+    );
+
+    const avatar = document.querySelector('.manuscript-hud-character-pill-avatar');
+    expect(avatar?.querySelector('img')).not.toBeNull();
+  });
+
+  it('leaves the avatar pill empty when the character has no portrait', () => {
+    render(<ManuscriptFloatingHud {...baseProps} characterName="Finn" />);
+
+    const avatar = document.querySelector('.manuscript-hud-character-pill-avatar');
+    expect(avatar?.querySelector('img')).toBeNull();
+  });
 });

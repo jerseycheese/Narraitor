@@ -309,7 +309,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // If generating ending, show loading state
   if (isGeneratingEnding) {
     return (
-      <div>
+      <div className="manuscript-loading-shell">
         <LoadingState
           message={isFatalEnding ? "Game Over" : "Writing your story's ending..."}
         />
@@ -378,6 +378,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           characterSummaryPanel={character && <CharacterSnapshot character={character} />}
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
+          characterPortrait={character?.portrait}
           onOpenDrawer={(drawerType) => {
             drawerTriggerRef.current = document.activeElement as HTMLElement;
             setActiveDrawer(drawerType as DrawerType);

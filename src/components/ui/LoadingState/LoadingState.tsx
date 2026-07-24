@@ -1,4 +1,5 @@
 import React from 'react';
+import './LoadingState.css';
 
 export type LoadingVariant = 'spinner' | 'pulse' | 'dots' | 'skeleton';
 type LoadingSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -72,28 +73,29 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 
       case 'pulse':
         return (
-          <div role="status" aria-label="Loading">
+          <div role="status" aria-label="Loading" className="component-loading-pulse">
             {showAvatar && (
-              <div>
-                <div />
-                <div>
-                  <div />
-                  <div />
+              <div className="component-loading-pulse-avatar-row">
+                <div className="component-loading-pulse-avatar-circle" />
+                <div className="component-loading-pulse-avatar-lines">
+                  <div className="component-loading-pulse-avatar-line" />
+                  <div className="component-loading-pulse-avatar-line" />
                 </div>
               </div>
             )}
             {Array.from({ length: skeletonLines }).map((_, i) => (
-              <div key={i} />
+              <div key={i} className="component-loading-pulse-line" />
             ))}
           </div>
         );
 
       case 'dots':
         return (
-          <div role="status" aria-label="Loading">
+          <div role="status" aria-label="Loading" className="component-loading-dots">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
+                className="component-loading-dot"
                 style={{ animationDelay: `${i * 150}ms` }}
               />
             ))}
@@ -103,10 +105,10 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 
       case 'skeleton':
         return (
-          <div role="status" aria-label="Loading">
-            <div>
+          <div role="status" aria-label="Loading" className="component-loading-skeleton">
+            <div className="component-loading-skeleton-lines">
               {Array.from({ length: skeletonLines }).map((_, i) => (
-                <div key={i} />
+                <div key={i} className="component-loading-skeleton-line" />
               ))}
             </div>
           </div>
