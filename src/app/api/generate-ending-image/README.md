@@ -64,7 +64,7 @@ Comprehensive testing through:
    - JSON parsing robustness validated
 
 3. **Coverage:**
-   - All ending tones tested (triumphant, bittersweet, mysterious, tragic, hopeful)
+   - All ending tones tested (triumphant, mysterious, tragic, hopeful)
    - Both AI success and fallback scenarios verified
    - Error conditions thoroughly exercised
 
