@@ -37,7 +37,7 @@
   height: 3rem;
   border-radius: var(--radius-full);
   background: var(--color-surface-hover);
-  animation: component-loading-pulse-fade 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: component-loading-pulse-fade 2s ease-in-out infinite;
 }
 
 .component-loading-pulse-avatar-lines {
@@ -52,7 +52,7 @@
   height: 1rem;
   border-radius: var(--radius-sm);
   background: var(--color-surface-hover);
-  animation: component-loading-pulse-fade 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: component-loading-pulse-fade 2s ease-in-out infinite;
 }
 
 /* Dots variant */
@@ -85,7 +85,7 @@
   height: 1rem;
   border-radius: var(--radius-sm);
   background: var(--color-surface-hover);
-  animation: component-loading-pulse-fade 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: component-loading-pulse-fade 2s ease-in-out infinite;
 }
 
 .component-loading-skeleton-line:last-child {
