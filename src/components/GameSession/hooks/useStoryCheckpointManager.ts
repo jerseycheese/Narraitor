@@ -285,19 +285,30 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
     }
   }, [characterId, characterNameLookup, pendingEvents, sessionId, worldId, worldState?.storyCheckpoints, world?.toneSettings]);
 
-  // Auto-trigger checkpoint creation when there's at least 1 pending event
+  // Auto-trigger checkpoint creation when there's at least 1 pending event.
+  // Gated on the actual event-id set (not just status) so a failed attempt
+  // doesn't re-arm the timer every render — it only retries once genuinely
+  // new events arrive, instead of retrying the same failed batch forever.
+  const lastAttemptedEventIdsRef = React.useRef<string | null>(null);
+
   React.useEffect(() => {
     if (pendingEvents.length === 0 || status === 'loading') {
       return;
     }
 
+    const currentEventIds = pendingEvents.map((event) => event.id).join(',');
+    if (currentEventIds === lastAttemptedEventIdsRef.current) {
+      return;
+    }
+
     // Debounce: wait 3 seconds after the last event before creating checkpoint
     const timeoutId = setTimeout(() => {
+      lastAttemptedEventIdsRef.current = currentEventIds;
       createCheckpoint();
     }, 3000);
 
     return () => clearTimeout(timeoutId);
-  }, [pendingEvents.length, status, createCheckpoint]);
+  }, [pendingEvents, status, createCheckpoint]);
 
   // Listen for session end event to capture final checkpoint
   React.useEffect(() => {

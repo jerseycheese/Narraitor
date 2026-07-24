@@ -52,6 +52,15 @@ describe('StorySummarySection', () => {
     expect(screen.getByText(/Your story will appear here once major events occur/i)).toBeInTheDocument();
   });
 
+  it('shows a distinct failure message instead of the empty placeholder when the checkpoint request errored', () => {
+    setupHook({ status: 'error', error: 'Checkpoint API is down' });
+    setupWorldStore([]);
+    render(<StorySummarySection worldId="world-1" sessionId="session-1" />);
+
+    expect(screen.getByText('Checkpoint API is down')).toBeInTheDocument();
+    expect(screen.queryByText(/Your story will appear here once major events occur/i)).not.toBeInTheDocument();
+  });
+
   it('renders checkpoint segment from a single checkpoint', () => {
     const checkpoint: StoryCheckpoint = {
       id: 'checkpoint-1',
