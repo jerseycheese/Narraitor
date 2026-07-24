@@ -409,10 +409,6 @@ body > * {
   background-color: hsl(var(--ending-triumphant));
 }
 
-.ending-bittersweet {
-  background-color: hsl(var(--ending-bittersweet));
-}
-
 .ending-mysterious {
   background-color: hsl(var(--ending-mysterious));
 }
