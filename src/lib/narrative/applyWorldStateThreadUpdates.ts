@@ -224,6 +224,10 @@ export async function applyWorldStateThreadUpdates({
     }
 
     worldStore.updateWorldState(effectiveWorldId, updatePayload, sessionId);
-  } catch {
+  } catch (error) {
+    logger.error('[NarrativeStore]', 'Failed to apply world state thread updates', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      sessionId,
+    });
   }
 }

@@ -16,7 +16,7 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
   sessionId,
   characterId,
 }) => {
-  useStoryCheckpointManager({ worldId, sessionId, characterId });
+  const { status, error } = useStoryCheckpointManager({ worldId, sessionId, characterId });
   const worldState = useWorldStore((state) =>
     worldId ? state.worldStates[worldId] : undefined
   );
@@ -44,6 +44,8 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
         .filter(Boolean)
     : [];
 
+  const showFailedState = summaryParagraphs.length === 0 && status === 'error';
+
   return (
     <section
       data-testid="story-summary-section"
@@ -55,6 +57,10 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
             <p key={`${paragraph.slice(0, 32)}-${index}`} className="manuscript-story-summary-paragraph">{paragraph}</p>
           ))}
         </div>
+      ) : showFailedState ? (
+        <p className="manuscript-story-summary-error">
+          {error ?? 'Story summary failed to generate.'}
+        </p>
       ) : (
         <p className="manuscript-story-summary-empty">
           Your story will appear here once major events occur.
