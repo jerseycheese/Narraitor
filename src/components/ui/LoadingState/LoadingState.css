@@ -1,0 +1,93 @@
+/* LoadingState — global semantic styles for src/components/ui/LoadingState/LoadingState.tsx (#1576)
+ *
+ * The `pulse`, `dots`, and `skeleton` variants rendered bare unclassed <div> elements
+ * with no CSS backing anywhere in the repo — a Tailwind-removal regression (#1051) that
+ * stripped `animate-pulse` and friends — so every screen using them showed only floating
+ * text on a blank page. `spinner` was repaired in #1467; this finishes the other three.
+ * Token-based per the active `data-theme` scope; no hardcoded colors.
+ */
+
+@keyframes component-loading-pulse-fade {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes component-loading-dot-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Pulse variant */
+.component-loading-pulse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.component-loading-pulse-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.component-loading-pulse-avatar-circle {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover);
+  animation: component-loading-pulse-fade 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.component-loading-pulse-avatar-lines {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-loading-pulse-avatar-line,
+.component-loading-pulse-line {
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+  animation: component-loading-pulse-fade 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Dots variant */
+.component-loading-dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.component-loading-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: var(--radius-full);
+  background: var(--color-text-secondary);
+  animation: component-loading-dot-fade 1.4s ease-in-out infinite;
+}
+
+/* Skeleton variant */
+.component-loading-skeleton {
+  width: 100%;
+}
+
+.component-loading-skeleton-lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-loading-skeleton-line {
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+  animation: component-loading-pulse-fade 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.component-loading-skeleton-line:last-child {
+  width: 80%;
+}

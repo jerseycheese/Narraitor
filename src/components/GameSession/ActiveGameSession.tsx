@@ -309,7 +309,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // If generating ending, show loading state
   if (isGeneratingEnding) {
     return (
-      <div>
+      <div className="manuscript-loading-shell">
         <LoadingState
           message={isFatalEnding ? "Game Over" : "Writing your story's ending..."}
         />
