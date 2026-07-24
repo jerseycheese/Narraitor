@@ -13,10 +13,12 @@ This API endpoint generates AI-powered story endings for completed game sessions
   "characterId": "string (required)", 
   "worldId": "string (required)",
   "endingType": "player-choice | story-complete | session-limit | character-retirement (required)",
-  "desiredTone": "triumphant | bittersweet | mysterious | tragic | hopeful (optional)",
+  "desiredTone": "triumphant | mysterious | tragic | hopeful (optional)",
   "customPrompt": "string (optional)"
 }
 ```
+
+`desiredTone` is advisory except for `tragic`, which forces explicit fatal-outcome framing (character death, past tense, no continuation language). For the other three values, the model chooses whichever tone actually fits the narrative content — the prompt text doesn't change based on what's requested, so the response's own `tone` field may differ from what was sent.
 
 **Response (200):**
 ```json
