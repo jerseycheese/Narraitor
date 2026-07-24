@@ -1007,6 +1007,14 @@ body.manuscript-overlay-open {
   letter-spacing: 0.05em;
 }
 
+.manuscript-story-summary-error {
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Mobile Stack Layouts */
 .manuscript-main-stage-mobile-stack {
   display: grid;

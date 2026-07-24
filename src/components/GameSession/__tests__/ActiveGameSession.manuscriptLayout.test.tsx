@@ -20,10 +20,10 @@ jest.mock('@/state/characterStore');
 jest.mock('@/state/inventoryStore');
 jest.mock('@/state/journalStore');
 jest.mock('@/state/worldStore');
-// StorySummaryDrawerContent mounts the checkpoint manager; its return value is
-// unused there, so a no-op keeps the drawer test focused on the header.
+// StorySummaryDrawerContent mounts the checkpoint manager; this test only
+// exercises the drawer header, so a default idle/no-error shape is enough.
 jest.mock('../hooks/useStoryCheckpointManager', () => ({
-  useStoryCheckpointManager: jest.fn(),
+  useStoryCheckpointManager: jest.fn(() => ({ status: 'idle', error: null })),
 }));
 jest.mock('@/hooks/useAutoSave');
 jest.mock('@/components/TutorialProvider');
