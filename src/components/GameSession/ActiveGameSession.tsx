@@ -378,6 +378,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           characterSummaryPanel={character && <CharacterSnapshot character={character} />}
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
+          characterPortrait={character?.portrait}
           onOpenDrawer={(drawerType) => {
             drawerTriggerRef.current = document.activeElement as HTMLElement;
             setActiveDrawer(drawerType as DrawerType);

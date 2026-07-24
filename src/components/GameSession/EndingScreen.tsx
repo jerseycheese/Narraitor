@@ -30,6 +30,7 @@ import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelper
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
 import { generateEndingImage as requestEndingImage } from '@/lib/api/endingImageApi';
+import { capitalize } from '@/lib/utils/formatters';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('EndingScreen');
@@ -290,11 +291,6 @@ export function EndingScreen() {
 
   return (
     <>
-      {/* Screen reader announcement */}
-      <div role="status" aria-live="polite" aria-label="story complete">
-        Story Complete: {currentEnding.tone} ending
-      </div>
-
       <div className="component-ending-screen" data-testid="ending-screen">
         {/* Hero Section: Combined Header with Image */}
         <section
@@ -321,7 +317,7 @@ export function EndingScreen() {
               <Image
                 className="component-ending-screen-hero-image"
                 src={endingImage}
-                alt={`${currentEnding.tone} ending for ${character?.name || 'the hero'}'s story`}
+                alt={`${capitalize(currentEnding.tone)} ending for ${character?.name || 'the hero'}'s story`}
                 width={1280}
                 height={720}
                 priority
@@ -397,60 +393,58 @@ export function EndingScreen() {
             </SectionWrapper>
           </section>
 
-          <div>
-            {/* Character Legacy */}
-            <section>
-              <SectionWrapper title="Character Legacy">
-                <div className="manuscript-ending-prose">
-                  {currentEnding.characterLegacy}
-                </div>
-              </SectionWrapper>
-            </section>
+          {/* Character Legacy */}
+          <section>
+            <SectionWrapper title="Character Legacy">
+              <div className="manuscript-ending-prose">
+                {currentEnding.characterLegacy}
+              </div>
+            </SectionWrapper>
+          </section>
 
-            {/* Achievements */}
-            {currentEnding.achievements &&
-              currentEnding.achievements.length > 0 && (
-                <section aria-label="Story achievements">
-                  <SectionWrapper title="Achievements">
-                    <ul
-                      className="component-ending-screen-achievements"
-                      role="list"
-                    >
-                      {currentEnding.achievements.map((achievement, index) => {
-                        // Split achievement into title and description
-                        const colonIndex = achievement.indexOf(':');
-                        const title =
-                          colonIndex > 0
-                            ? achievement.substring(0, colonIndex)
-                            : achievement;
-                        const description =
-                          colonIndex > 0
-                            ? achievement.substring(colonIndex + 1).trim()
-                            : '';
+          {/* Achievements */}
+          {currentEnding.achievements &&
+            currentEnding.achievements.length > 0 && (
+              <section aria-label="Story achievements">
+                <SectionWrapper title="Achievements">
+                  <ul
+                    className="component-ending-screen-achievements"
+                    role="list"
+                  >
+                    {currentEnding.achievements.map((achievement, index) => {
+                      // Split achievement into title and description
+                      const colonIndex = achievement.indexOf(':');
+                      const title =
+                        colonIndex > 0
+                          ? achievement.substring(0, colonIndex)
+                          : achievement;
+                      const description =
+                        colonIndex > 0
+                          ? achievement.substring(colonIndex + 1).trim()
+                          : '';
 
-                        return (
-                          <li
-                            key={index}
-                            className="component-ending-screen-achievement"
-                          >
-                            <div className="component-ending-screen-achievement-body">
-                              <span className="component-ending-screen-achievement-title">
-                                {title}
+                      return (
+                        <li
+                          key={index}
+                          className="component-ending-screen-achievement"
+                        >
+                          <div className="component-ending-screen-achievement-body">
+                            <span className="component-ending-screen-achievement-title">
+                              {title}
+                            </span>
+                            {description && (
+                              <span className="component-ending-screen-achievement-description">
+                                {description}
                               </span>
-                              {description && (
-                                <span className="component-ending-screen-achievement-description">
-                                  {description}
-                                </span>
-                              )}
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </SectionWrapper>
-                </section>
-              )}
-          </div>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </SectionWrapper>
+              </section>
+            )}
 
           {/* World Impact */}
           <section>

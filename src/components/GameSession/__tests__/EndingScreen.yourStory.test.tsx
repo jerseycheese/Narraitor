@@ -297,4 +297,39 @@ describe('EndingScreen - Heading hierarchy', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'The End' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 1 })).toBeNull();
   });
+
+  it('does not render a redundant visible "Story Complete" announcement (#1577)', () => {
+    setupStores([]);
+    render(<EndingScreen />);
+
+    expect(screen.queryByText(/Story Complete/i)).not.toBeInTheDocument();
+  });
+});
+
+// The unclassed wrapper div previously grouping Character Legacy and
+// Achievements broke the parent flex `gap` between them (#1577) — the fix
+// is structural (no wrapper), so the regression guard is structural too.
+describe('EndingScreen - Legacy/Achievements layout', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders Character Legacy and Achievements as direct siblings under the flex content container', () => {
+    setupStores([]);
+    render(<EndingScreen />);
+
+    // SectionWrapper renders its own inner <section class="component-section-wrapper">;
+    // EndingScreen wraps each in a second, outer <section> with no class of its own.
+    // The bug was an extra <div> around that outer pair, so what matters here is
+    // that pair's shared parent, not the inner SectionWrapper markup.
+    const legacyOuterSection = screen.getByText('Character Legacy').closest('section')
+      ?.parentElement;
+    const achievementsOuterSection = screen.getByText('Achievements').closest('section')
+      ?.parentElement;
+
+    expect(legacyOuterSection?.tagName).toBe('SECTION');
+    expect(achievementsOuterSection?.tagName).toBe('SECTION');
+    expect(legacyOuterSection?.parentElement).toBe(achievementsOuterSection?.parentElement);
+    expect(legacyOuterSection?.parentElement).toHaveClass('component-ending-screen-content');
+  });
 });

@@ -3,6 +3,8 @@
 import React from 'react';
 import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History } from 'lucide-react';
 import { HudCloseButton } from './HudCloseButton';
+import { CharacterPortrait } from '@/components/CharacterPortrait';
+import type { GeneratedImage } from '@/types/common.types';
 
 interface ManuscriptFloatingHudProps {
   onToggleCharacterSummary: () => void;
@@ -11,6 +13,7 @@ interface ManuscriptFloatingHudProps {
   characterSummaryPanel?: React.ReactNode;
   drawerTriggers?: boolean;
   characterName?: string;
+  characterPortrait?: GeneratedImage;
   onOpenDrawer?: (drawerType: string) => void;
   onStartNew?: () => void;
   onBack?: () => void;
@@ -25,6 +28,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
   isCharacterSummaryExpanded,
   characterSummaryPanel,
   characterName,
+  characterPortrait,
   drawerTriggers,
   onOpenDrawer,
   onStartNew,
@@ -50,7 +54,13 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
             className="manuscript-hud-character-pill"
           >
             <span className="manuscript-hud-character-pill-avatar" aria-hidden="true">
-              {/* Avatar placeholder — CSS handles sizing */}
+              {characterPortrait && (
+                <CharacterPortrait
+                  portrait={characterPortrait}
+                  characterName={characterName || 'Character'}
+                  size="small"
+                />
+              )}
             </span>
             <span>{characterName || 'Character'}</span>
           </button>

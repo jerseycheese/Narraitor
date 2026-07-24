@@ -2843,6 +2843,15 @@ body.manuscript-overlay-open {
   object-fit: cover;
 }
 
+/* CharacterPortrait's own size variant sets an intrinsic square size that
+   would overflow this 20-24px pill; force it to fill the wrapper instead,
+   matching the equivalent override for every other sized consumer. */
+:root .manuscript-hud-character-pill-avatar .component-character-portrait {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 /* Icon-only buttons for DS3 HUD right side */
 :root .manuscript-hud-icon-button {
   display: inline-flex;
