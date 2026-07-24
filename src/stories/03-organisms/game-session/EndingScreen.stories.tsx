@@ -27,11 +27,11 @@ export const Tragic: Story = {
   decorators: [withEndingScreenStores(mockStoryEndingTragic)],
 };
 
-export const Bittersweet: Story = {
+export const Mysterious: Story = {
   decorators: [
     withEndingScreenStores({
       ...mockStoryEndingTriumphant,
-      id: 'ending-bittersweet',
+      id: 'ending-mysterious',
       tone: 'mysterious',
       epilogue:
         'The truth, when it finally came, was smaller than expected. Not a revelation but a quiet acknowledgement that some questions were never meant to be answered.',

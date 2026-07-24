@@ -492,7 +492,6 @@ export const CompleteShowcase: Story = {
             {[
               '--ending-triumphant',
               '--ending-hopeful',
-              '--ending-bittersweet',
               '--ending-mysterious',
               '--ending-tragic',
             ].map((token) => (

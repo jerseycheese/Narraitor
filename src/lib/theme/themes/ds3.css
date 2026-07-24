@@ -69,7 +69,6 @@
 
   /* Contextual colors for storytelling features */
   --ending-triumphant: 36 38% 50%;
-  --ending-bittersweet: 200 21% 50%;
   --ending-mysterious: 25 20% 14%;
   --ending-tragic: 0 59% 41%;
   --ending-hopeful: 138 25% 40%;
@@ -179,7 +178,6 @@
   --info-muted: 200 35% 12%;
 
   --ending-triumphant: 36 38% 55%;
-  --ending-bittersweet: 200 25% 55%;
   --ending-mysterious: 20 12% 12%;
   --ending-tragic: 0 50% 45%;
   --ending-hopeful: 138 20% 48%;
