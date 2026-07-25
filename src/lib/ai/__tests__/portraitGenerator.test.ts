@@ -168,6 +168,78 @@ describe('portraitGenerator', () => {
     });
   });
 
+  describe('enhanceKnownCharacter (invoked internally by generatePortrait for known figures)', () => {
+    const knownFigureCharacter = (background: {
+      physicalDescription?: string;
+      personality?: string;
+      history?: string;
+    }): Character => ({
+      ...mockCharacter,
+      name: 'Nathan Fielder',
+      background: {
+        ...mockCharacter.background,
+        physicalDescription: '',
+        personality: '',
+        history: '',
+        ...background,
+      },
+    });
+
+    const enhancementPromptMarkers = [
+      'Provide an accurate physical description',
+      'Enhance this physical description',
+      'personality in 15 words',
+      'Enhance this personality description',
+      'Provide a one-sentence background',
+      'Enhance this background',
+    ];
+
+    beforeEach(() => {
+      (mockAIClient.generateImage as jest.Mock).mockResolvedValue({
+        image: 'data:image/png;base64,abc123',
+        prompt: 'portrait',
+      });
+    });
+
+    it('does not enhance background fields that are already populated (#1588)', async () => {
+      // history is left blank so enhancement still runs, but physicalDescription
+      // and personality are already set and must not fire their own AI calls
+      const character = knownFigureCharacter({
+        physicalDescription: 'Tall with a beard and glasses',
+        personality: 'Deadpan and awkward',
+      });
+
+      await generatePortrait(mockAIClient, character);
+
+      const prompts = (mockAIClient.generateContent as jest.Mock).mock.calls.map(
+        (call) => call[0]
+      );
+
+      expect(prompts.some((p) => p.includes('Enhance this physical description'))).toBe(false);
+      expect(prompts.some((p) => p.includes('Enhance this personality description'))).toBe(false);
+    });
+
+    it('fires zero enhancement calls when all three background fields are already populated', async () => {
+      const character = knownFigureCharacter({
+        physicalDescription: 'Tall with a beard and glasses',
+        personality: 'Deadpan and awkward',
+        history: 'Star of Nathan For You',
+      });
+
+      await generatePortrait(mockAIClient, character);
+
+      const prompts = (mockAIClient.generateContent as jest.Mock).mock.calls.map(
+        (call) => call[0]
+      );
+
+      const firedEnhancementCall = prompts.some((p) =>
+        enhancementPromptMarkers.some((marker) => p.includes(marker))
+      );
+
+      expect(firedEnhancementCall).toBe(false);
+    });
+  });
+
   describe('buildPortraitPrompt', () => {
     it('should create detailed prompt from character data', async () => {
       const prompt = await buildPortraitPrompt(mockAIClient,mockCharacter);

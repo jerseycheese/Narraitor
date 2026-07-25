@@ -206,27 +206,12 @@ async function enhanceKnownCharacter(
       description = capitalize(description);
 
       enhancements.physicalDescription = description.replace(/\.+$/, '.');
-    } else {
-      const prompt = `Enhance this physical description of ${character.name} (the ${contextHint}) with accurate details: "${character?.background?.physicalDescription}"
-        ${detection.figureType === 'fictional' && detection.actorName ? `As portrayed by ${detection.actorName} in the film/show.` : ''}
-        Keep the user's description but add missing details like specific hair length/style/color, facial features, or typical clothing if not specified.
-        Maximum 40 words. Answer with just the enhanced description, no extra text.`;
-
-      const response = await aiClient.generateContent(prompt);
-      enhancements.physicalDescription = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
     }
 
     if (!character?.background?.personality || safeTrim(character?.background?.personality ?? '').length === 0) {
       const prompt = `Describe ${character.name}'s (the ${contextHint}) personality in 15 words or less.
         Focus on their key character traits.
         Answer with just the description, no extra text.`;
-
-      const response = await aiClient.generateContent(prompt);
-      enhancements.personality = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
-    } else {
-      const prompt = `Enhance this personality description of ${character.name} (the ${contextHint}): "${character?.background?.personality}"
-        Keep the user's description but add accurate character traits if missing or expand on provided traits.
-        Maximum 20 words. Answer with just the enhanced description, no extra text.`;
 
       const response = await aiClient.generateContent(prompt);
       enhancements.personality = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
@@ -237,14 +222,6 @@ async function enhanceKnownCharacter(
         ${detection.figureType === 'videogame' ? 'MUST include the specific video game title they are from (e.g., "from Red Dead Redemption 2", "from The Legend of Zelda", etc.).' : ''}
         ${detection.figureType === 'fictional' ? 'MUST include the specific movie or TV show title they are from.' : ''}
         Answer with just one sentence, no extra text.`;
-
-      const response = await aiClient.generateContent(prompt);
-      enhancements.history = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
-    } else {
-      const prompt = `Enhance this background for ${character.name} (the ${contextHint}): "${character?.background?.history}"
-        ${detection.figureType === 'videogame' ? 'Add the specific video game title if missing.' : ''}
-        ${detection.figureType === 'fictional' ? 'Add the specific movie or TV show title if missing.' : ''}
-        Keep the user's content but add missing context or details. One sentence maximum. Answer with just the enhanced background, no extra text.`;
 
       const response = await aiClient.generateContent(prompt);
       enhancements.history = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
