@@ -7,7 +7,6 @@ import type {
   StructuredLoreExtraction,
   LoreMergeAuditEntry,
   EntityMatch,
-  DuplicateMatch,
   LoreUsageEvent,
   LoreUsageSource,
   LoreUsageStats,
@@ -35,9 +34,7 @@ import {
   type ReferenceUpdateContext,
 } from './loreStore.resolution';
 import {
-  scanForDuplicatesImpl,
   mergeFactsImpl,
-  checkDuplicateBeforeCreateImpl,
   type DeduplicationContext,
 } from './loreStore.deduplication';
 import {
@@ -438,18 +435,6 @@ export const createLoreFactActions = (set: SetState, get: GetState) => ({
   },
 
   // ─── Deduplication ────────────────────────────────────────────────────────
-  scanForDuplicates: async (worldId: EntityID, category?: LoreCategory) => {
-    const context: DeduplicationContext = {
-      getFact: get().getById,
-      getFacts: get().getFacts,
-      updateFact: get().update,
-      deleteFact: get().delete,
-      setAliases: get().setAliases,
-      setError: get().setError,
-    };
-    return await scanForDuplicatesImpl(worldId, category ?? null, context);
-  },
-
   mergeFacts: (primaryId: EntityID, secondaryId: EntityID) => {
     const dedupeContext: DeduplicationContext = {
       getFact: get().getById,
@@ -491,27 +476,6 @@ export const createLoreFactActions = (set: SetState, get: GetState) => ({
     set((state) => ({
       mergeAuditLog: [auditEntry, ...state.mergeAuditLog],
     }));
-  },
-
-  checkDuplicateBeforeCreate: async (
-    value: string,
-    category: LoreCategory,
-    worldId: EntityID
-  ): Promise<DuplicateMatch[]> => {
-    const context: DeduplicationContext = {
-      getFact: get().getById,
-      getFacts: get().getFacts,
-      updateFact: get().update,
-      deleteFact: get().delete,
-      setAliases: get().setAliases,
-      setError: get().setError,
-    };
-    return await checkDuplicateBeforeCreateImpl(
-      value,
-      category,
-      worldId,
-      context
-    );
   },
 
   findPotentialEntityMatches: (
