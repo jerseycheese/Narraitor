@@ -43,6 +43,29 @@ This file documents the labels used in the Narraitor repository. You can use a t
 - `complexity:medium` - Medium complexity (3-5 days of effort)
 - `complexity:large` - Large complexity (1+ week of effort)
 
+## Model Power Labels
+
+Model Power measures a **different axis than Complexity**. Complexity estimates
+*time/scope* (how many days, how many files). Model Power estimates *reasoning
+difficulty* — how much ambiguity, judgment, and tradeoff-weighing the work
+requires, independent of how long it takes or how many files it touches.
+
+The two are orthogonal: a `complexity:large` issue can be `model-power:light`
+if it's mechanical repetition across many files (a bulk rename, a
+well-specified dependency bump touching 30 files). A `complexity:small` issue
+can be `model-power:frontier` if it's one file but requires genuine
+architectural or creative judgment with no clear right answer. Assess them
+independently — don't infer one from the other.
+
+These tiers describe reasoning capability in the abstract, not any specific AI
+provider or model name. `model-power:frontier` means "needs the most capable
+model available," not "must use model X."
+
+- `model-power:light` - Mechanical, narrow, unambiguous (rename, copy tweak, dependency bump per changelog)
+- `model-power:standard` - Typical well-scoped fix/feature, follows an existing pattern (default tier)
+- `model-power:advanced` - Cross-cutting or judgment-heavy; several viable approaches, real tradeoffs
+- `model-power:frontier` - High-ambiguity, architecture-level or creative-judgment work, high blast radius
+
 ## Status Labels
 
 - `status:backlog` - In the backlog, not yet scheduled
@@ -63,4 +86,5 @@ For consistent visual styling, use these hex colors for labels:
 - Domain labels: `#5319e7` (purple)
 - Priority labels: `#f9d0c4` (salmon)
 - Complexity labels: `#bfd4f2` (light blue)
+- Model Power labels: `#fbca04` (gold)
 - Status labels: `#c2e0c6` (light green)

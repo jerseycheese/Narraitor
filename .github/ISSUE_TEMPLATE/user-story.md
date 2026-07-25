@@ -32,6 +32,13 @@ As a [type of user], I want [goal/need] so that [benefit/value].
 - [ ] Medium (3-5 days)
 - [ ] Large (1+ week)
 
+## Estimated Model Power
+<!-- Select the reasoning/judgment level this work requires — a different axis from Estimated Complexity (time/scope). See .github/labels.md. -->
+- [ ] Light (mechanical, narrow, unambiguous — rename, copy tweak, dependency bump)
+- [ ] Standard (typical well-scoped work, follows an existing pattern — default tier)
+- [ ] Advanced (cross-cutting or judgment-heavy — several viable approaches, real tradeoffs)
+- [ ] Frontier (high-ambiguity, architecture-level or creative-judgment work)
+
 ## Priority
 <!-- Select the priority level -->
 - [ ] High (MVP)
