@@ -32,11 +32,6 @@ const meta: Meta<typeof WorldTypeSelector> = {
       control: 'radio',
       options: ['vertical', 'horizontal'],
     },
-    size: {
-      description: 'Size variant',
-      control: 'radio',
-      options: ['small', 'medium', 'large'],
-    },
     disabled: {
       description: 'Whether the component is disabled',
       control: 'boolean',
@@ -75,24 +70,7 @@ export const Default: Story = {
   args: {
     showLabels: true,
     layout: 'vertical',
-    size: 'medium',
     disabled: false,
-  },
-};
-
-export const Small: Story = {
-  render: (args) => <InteractiveWorldTypeSelector {...args} />,
-  args: {
-    ...Default.args,
-    size: 'small',
-  },
-};
-
-export const Large: Story = {
-  render: (args) => <InteractiveWorldTypeSelector {...args} />,
-  args: {
-    ...Default.args,
-    size: 'large',
   },
 };
 
@@ -133,9 +111,8 @@ const InspiredByExampleComponent = () => {
       <WorldTypeSelector
         value={data}
         onChange={setData}
-        size="medium"
       />
-      
+
       <div>
         <h3>Current Data:</h3>
         <pre>
@@ -169,9 +146,8 @@ const SetWithinExampleComponent = () => {
       <WorldTypeSelector
         value={data}
         onChange={setData}
-        size="medium"
       />
-      
+
       <div>
         <h3>Current Data:</h3>
         <pre>

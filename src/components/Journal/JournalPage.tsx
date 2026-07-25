@@ -146,7 +146,6 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
         <div>
           <LoadingState
             variant="skeleton"
-            size="md"
             message="Loading journal entries..."
             skeletonLines={6}
           />

@@ -164,8 +164,6 @@ function LoadingState({
       <UILoadingState
         message={details ? `${message} - ${details}` : message}
         size="md"
-        theme="light"
-        centered={true}
       />
     </div>
   );

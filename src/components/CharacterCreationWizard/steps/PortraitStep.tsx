@@ -150,7 +150,7 @@ export function PortraitStep({
       <div className="portrait-step-body">
         {isGenerating ? (
           <div className="portrait-step-loading">
-            <LoadingState variant="spinner" size="md" centered={false} />
+            <LoadingState variant="spinner" size="md" />
           </div>
         ) : (
           <CharacterPortrait

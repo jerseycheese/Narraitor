@@ -213,7 +213,6 @@ export function useWizardState<T>(config: WizardConfig<T>) {
 
     setState(prev => {
       // Clear previous submit error before starting new attempt
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { submit: _, ...otherErrors } = prev.errors;
       return { 
         ...prev, 
@@ -255,7 +254,6 @@ export function useWizardState<T>(config: WizardConfig<T>) {
 
   const clearError = useCallback((field: string) => {
     setState(prev => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [field]: _, ...rest } = prev.errors;
       return { ...prev, errors: rest };
     });

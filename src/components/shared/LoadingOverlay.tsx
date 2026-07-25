@@ -66,8 +66,6 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
         <LoadingState
           variant={variant}
           size="lg"
-          theme="light"
-          centered={false}
         />
       </div>
     </SimpleModal>

@@ -28,17 +28,11 @@ export const GameSessionSkeleton: React.FC<GameSessionSkeletonProps> = ({
           <div className="manuscript-skeleton-paragraph">
             <LoadingSkeleton
               skeletonLines={6}
-              size="md"
-              theme="light"
-              centered={false}
             />
           </div>
           <div className="manuscript-skeleton-paragraph">
             <LoadingSkeleton
               skeletonLines={4}
-              size="md"
-              theme="light"
-              centered={false}
             />
           </div>
         </div>

@@ -79,26 +79,6 @@ export function validateText(text: string, options?: {
 }
 
 /**
- * Validates that points are distributed correctly
- */
-export function validatePointDistribution(
-  values: number[],
-  totalPoints: number
-): ValidationResult {
-  const errors: string[] = [];
-  const pointsSpent = values.reduce((sum, value) => sum + value, 0);
-
-  if (pointsSpent !== totalPoints) {
-    errors.push(`Must spend exactly ${totalPoints} points (${pointsSpent} spent)`);
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors
-  };
-}
-
-/**
  * Validates that a selection count is within acceptable range
  */
 export function validateSelectionCount(

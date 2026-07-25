@@ -11,12 +11,10 @@ const GameSessionLoading: React.FC<GameSessionLoadingProps> = ({
   loadingMessage = 'Loading your game...',
 }) => {
   return (
-    <div data-testid="game-session-loading" >
+    <div data-testid="game-session-loading" className="component-loading-center">
       <LoadingState
         message={loadingMessage}
         size="md"
-        theme="light"
-        centered={true}
       />
     </div>
   );
