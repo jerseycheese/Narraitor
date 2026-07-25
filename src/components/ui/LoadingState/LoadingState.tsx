@@ -3,7 +3,6 @@ import './LoadingState.css';
 
 export type LoadingVariant = 'spinner' | 'pulse' | 'dots' | 'skeleton';
 type LoadingSize = 'sm' | 'md' | 'lg' | 'xl';
-type LoadingTheme = 'light' | 'dark';
 
 /** Bounded spinner dimensions per size — the SVG has no intrinsic size, so without
  * this it expands to fill its container and reads as a giant ring (#1432 F5/F35). */
@@ -17,18 +16,12 @@ const SPINNER_DIMENSIONS: Record<LoadingSize, string> = {
 interface LoadingStateProps {
   /** The variant of loading indicator to display */
   variant?: LoadingVariant;
-  /** Size of the loading indicator */
+  /** Size of the loading indicator. Only applies to the `spinner` variant — inert for pulse/dots/skeleton. */
   size?: LoadingSize;
-  /** Color theme */
-  theme?: LoadingTheme;
   /** Optional message to display below the loading indicator */
   message?: string;
   /** Additional CSS classes */
   className?: string;
-  /** Whether to center the loading state in its container */
-  centered?: boolean;
-  /** Whether to show the loading state inline */
-  inline?: boolean;
   /** For skeleton variant: number of skeleton lines to show */
   skeletonLines?: number;
   /** For skeleton variant: whether to show avatar placeholder */
@@ -38,11 +31,8 @@ interface LoadingStateProps {
 export const LoadingState: React.FC<LoadingStateProps> = ({
   variant = 'spinner',
   size = 'md',
-  theme = 'light',
   message,
   className,
-  centered = true,
-  inline = false,
   skeletonLines = 3,
   showAvatar = false,
 }) => {

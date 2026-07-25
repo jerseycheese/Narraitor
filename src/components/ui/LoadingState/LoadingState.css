@@ -17,6 +17,15 @@
   50% { opacity: 1; }
 }
 
+/* Full-screen loading boundary — centers the indicator in the viewport */
+.component-loading-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
 /* Pulse variant */
 .component-loading-pulse {
   display: flex;

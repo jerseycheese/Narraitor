@@ -9,7 +9,6 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
-import { getTimestamp } from '@/lib/utils';
 import { readString, writeString } from '@/lib/utils/browserStorage';
 import { CharacterCard } from '@/components/CharacterCard';
 import {
@@ -18,7 +17,6 @@ import {
 } from '@/components/character/CharacterViewToggle';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
-import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import { Button } from '@/components/ui/button';

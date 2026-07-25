@@ -145,7 +145,7 @@ export const GenerateCharacterDialog: React.FC<
 
         {isGenerating && (
           <div className="generate-character-status">
-            <LoadingState variant="spinner" size="sm" centered={false} />
+            <LoadingState variant="spinner" size="sm" />
             <span>{generatingStatus}</span>
           </div>
         )}

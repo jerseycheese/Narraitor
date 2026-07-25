@@ -162,7 +162,7 @@ export function HeaderNavigation() {
 
                 <Link href={brandHref} className="app-brand">
                   <LogoIcon size="small" className="logo-icon-inverted" />
-                  <LogoText size="sm" className="app-wordmark" />
+                  <LogoText className="app-wordmark" />
                 </Link>
 
                 <div

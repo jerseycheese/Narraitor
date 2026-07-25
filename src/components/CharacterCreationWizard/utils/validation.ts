@@ -1,11 +1,10 @@
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
-import { 
-  validateName, 
-  validateText, 
-  validatePointDistribution, 
+import {
+  validateName,
+  validateText,
   validateSelectionCount,
-  ValidationResult 
+  ValidationResult
 } from '@/lib/utils/validationUtils';
 
 export const validateCharacterName = (name: string, worldId: EntityID): ValidationResult => {

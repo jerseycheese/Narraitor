@@ -80,7 +80,7 @@ export function SidebarNavigation({ onNavigate }: SidebarNavigationProps) {
           className="workshop-sidebar-brand"
         >
           <LogoIcon size="small" className="logo-icon-inverted" />
-          <LogoText size="sm" className="app-wordmark" />
+          <LogoText className="app-wordmark" />
         </Link>
       </div>
 

@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import { CheckCircle } from 'lucide-react';
 import { SaveTriggerReason } from '@/lib/services/autoSaveService';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -67,8 +66,6 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
         <LoadingState
           variant="spinner"
           message={compact ? undefined : 'Saving...'}
-          inline={true}
-          centered={false}
         />
         {onManualSave && (
           <button className="save-indicator-button" disabled={true} type="button">

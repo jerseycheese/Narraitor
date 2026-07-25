@@ -121,7 +121,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
       <div className="mobile-nav-header">
         <div className="mobile-nav-brand">
           <LogoIcon size="small" className="logo-icon-inverted" />
-          <LogoText size="sm" className="app-wordmark" />
+          <LogoText className="app-wordmark" />
         </div>
         <div className="mobile-nav-header-actions">
           {/* Appearance + tutorial menus for mobile parity with the desktop header */}

@@ -13,7 +13,6 @@ export interface WorldTypeSelectorProps {
   onChange: (data: WorldTypeData) => void;
   showLabels?: boolean;
   layout?: 'vertical' | 'horizontal';
-  size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   className?: string;
 }
@@ -56,7 +55,6 @@ export function WorldTypeSelector({
   value,
   onChange,
   showLabels = true,
-  size = 'medium',
   disabled = false,
   className = '',
 }: WorldTypeSelectorProps) {

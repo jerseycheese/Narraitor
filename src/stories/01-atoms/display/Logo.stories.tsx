@@ -56,24 +56,8 @@ export const TextOnly = {
         <h3>Text Logo Variations</h3>
         <div>
           <div>
-            <p>Small</p>
-            <LogoText size="sm" />
-          </div>
-          <div>
-            <p>Medium</p>
-            <LogoText size="md" />
-          </div>
-          <div>
-            <p>Large (Default)</p>
-            <LogoText size="lg" />
-          </div>
-          <div>
-            <p>Extra Large</p>
-            <LogoText size="xl" />
-          </div>
-          <div>
-            <p>2X Large</p>
-            <LogoText size="2xl" />
+            <p>Wordmark</p>
+            <LogoText />
           </div>
         </div>
       </div>
@@ -92,7 +76,7 @@ export const Usage = {
             <p>Navigation Header</p>
             <div>
               <LogoIcon size="small" />
-              <LogoText size="sm" />
+              <LogoText />
               <div>
                 <a href="#">Worlds</a>
                 <a href="#">Characters</a>
@@ -105,7 +89,7 @@ export const Usage = {
             <p>Hero Section</p>
             <div>
               <LogoIcon size="xl" />
-              <LogoText size="xl" />
+              <LogoText />
               <p>Create immersive narrative experiences</p>
             </div>
           </div>
@@ -114,7 +98,7 @@ export const Usage = {
             <p>Footer</p>
             <div>
               <LogoIcon size="small" />
-              <LogoText size="sm" />
+              <LogoText />
               <p>© 2024 Narraitor. All rights reserved.</p>
             </div>
           </div>

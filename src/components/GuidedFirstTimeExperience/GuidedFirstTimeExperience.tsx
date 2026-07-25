@@ -271,7 +271,6 @@ export function GuidedFirstTimeExperience() {
               });
             }
           }}
-          size="medium"
         />
 
         {/* Validation Errors */}

@@ -124,7 +124,6 @@ describe('worldStore persistence', () => {
       // Create persisted store
       const persistedStore = create<WorldStore>()(
         persist(
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           (_set, _get, _api) => useWorldStore.getState(),
           {
             name: 'narraitor-world-store',

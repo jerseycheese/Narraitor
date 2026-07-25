@@ -223,7 +223,6 @@ export default function WorldsPage() {
             disabled={isGenerating}
             showLabels={true}
             layout="vertical"
-            size="medium"
           />
           {error && <ErrorDisplay variant="inline" message={error} />}
 
