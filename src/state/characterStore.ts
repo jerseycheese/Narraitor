@@ -137,14 +137,6 @@ export interface CharacterStore extends CrudStore<Character> {
   // Derived stats management
   recalculateDerivedStats: (characterId: EntityID) => Promise<void>;
 
-  // Path Count Optimization
-  cleanupCharacterHistory: (
-    worldId?: EntityID,
-    keepRecentCount?: number
-  ) => void;
-  compactCharacterData: () => void;
-  getCharactersCount: (worldId?: EntityID) => number;
-
   // Cascading delete helper
   deleteCharactersInWorld: (worldId: EntityID) => Promise<void>;
 
@@ -673,95 +665,6 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             );
 
             get().update(characterId, { derivedStats: updatedDerivedStats });
-          },
-
-          cleanupCharacterHistory: (worldId, keepRecentCount = 10) => {
-            set((state) => {
-              let charactersToProcess = Object.values(state.characters);
-
-              if (worldId) {
-                charactersToProcess = charactersToProcess.filter(
-                  (char) => char.worldId === worldId
-                );
-              }
-
-              if (charactersToProcess.length <= keepRecentCount) {
-                return state;
-              }
-
-              const sortedCharacters = charactersToProcess.sort(
-                (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime()
-              );
-
-              const removedCharacters = sortedCharacters.slice(keepRecentCount);
-              const idsToRemove = new Set(
-                removedCharacters.map((char) => char.id)
-              );
-
-              const newCharacters = Object.fromEntries(
-                Object.entries(state.characters).filter(
-                  ([id]) => !idsToRemove.has(id)
-                )
-              );
-
-              return {
-                characters: newCharacters,
-                entities: newCharacters,
-                worldCharacterIds: buildWorldCharacterIds(
-                  newCharacters as Record<EntityID, Character>
-                ),
-                currentCharacterId:
-                  state.currentCharacterId &&
-                  idsToRemove.has(state.currentCharacterId)
-                    ? null
-                    : state.currentCharacterId,
-                currentEntityId:
-                  state.currentEntityId &&
-                  idsToRemove.has(state.currentEntityId)
-                    ? null
-                    : state.currentEntityId,
-              };
-            });
-          },
-
-          compactCharacterData: () => {
-            set((state) => {
-              const compactedCharacters: Record<EntityID, Character> = {};
-
-              Object.entries(state.characters).forEach(([id, character]) => {
-                compactedCharacters[id] = {
-                  ...character,
-                  attributes: character.attributes?.slice(0, 6) || [],
-                  skills: character.skills?.slice(0, 5) || [],
-                  background: {
-                    ...character.background,
-                    goals: character.background.goals?.slice(0, 3) || [],
-                    fears: character.background.fears?.slice(0, 3) || [],
-                    relationships: [],
-                  },
-                };
-              });
-
-              return {
-                characters: compactedCharacters,
-                entities: compactedCharacters,
-                worldCharacterIds: buildWorldCharacterIds(
-                  compactedCharacters as Record<EntityID, Character>
-                ),
-              };
-            });
-          },
-
-          getCharactersCount: (worldId) => {
-            const { characters } = useCharacterStore.getState();
-            if (worldId) {
-              return Object.values(characters).filter(
-                (char) => char.worldId === worldId
-              ).length;
-            }
-            return Object.keys(characters).length;
           },
 
           deleteCharactersInWorld: async (worldId) => {

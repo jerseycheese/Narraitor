@@ -7,7 +7,6 @@ import type {
   StructuredLoreExtraction,
   LoreMergeAuditEntry,
   EntityMatch,
-  DuplicateMatch,
   LoreUsageEvent,
   LoreUsageSource,
   LoreUsageStats,
@@ -65,9 +64,7 @@ export interface LoreStore extends CrudStore<LoreFact> {
   removeAlias: (id: EntityID, alias: string) => void;
   setAliases: (id: EntityID, aliases: string[]) => void;
   findEntityByAnyName: (name: string, worldId: EntityID) => LoreFact | null;
-  scanForDuplicates: (worldId: EntityID, category?: LoreCategory) => Promise<DuplicateMatch[]>;
   mergeFacts: (primaryId: EntityID, secondaryId: EntityID) => void;
-  checkDuplicateBeforeCreate: (value: string, category: LoreCategory, worldId: EntityID) => Promise<DuplicateMatch[]>;
   findPotentialEntityMatches: (worldId: EntityID, options?: { minConfidence?: number; category?: LoreCategory }) => EntityMatch[];
   getMergeAuditLog: () => LoreMergeAuditEntry[];
   recordLoreUsage: (input: {

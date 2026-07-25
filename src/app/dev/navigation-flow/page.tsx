@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { QuickPlay } from '@/components/QuickPlay';
 import { GameStartWizard } from '@/components/GameStartWizard';
 import { Breadcrumbs } from '@/components/Navigation/Breadcrumbs';
 import { useWorldStore } from '@/state/worldStore';
@@ -14,7 +13,7 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('NavigationFlowDev');
 
 export default function NavigationFlowTestPage() {
-  const [activeTest, setActiveTest] = useState<'quickplay' | 'wizard' | 'breadcrumbs' | 'flow'>('quickplay');
+  const [activeTest, setActiveTest] = useState<'wizard' | 'breadcrumbs' | 'flow'>('wizard');
   const [wizardWorldId, setWizardWorldId] = useState<string>('');
   const [wizardCharacterId, setWizardCharacterId] = useState<string>('');
   
@@ -41,16 +40,6 @@ export default function NavigationFlowTestPage() {
         <div>
           <h2>Test Components</h2>
           <div>
-            <button
-              onClick={() => setActiveTest('quickplay')}
-              className={`${
-                activeTest === 'quickplay'
-                  ? ''
-                  : ''
-              }`}
-            >
-              Quick Play
-            </button>
             <button
               onClick={() => setActiveTest('wizard')}
               className={`${
@@ -135,15 +124,6 @@ export default function NavigationFlowTestPage() {
 
         {/* Test Component Display */}
         <div>
-          {activeTest === 'quickplay' && (
-            <div>
-              <h2>Quick Play Component</h2>
-              <div>
-                <QuickPlay />
-              </div>
-            </div>
-          )}
-
           {activeTest === 'wizard' && (
             <div>
               <h2>Game Start Wizard</h2>
