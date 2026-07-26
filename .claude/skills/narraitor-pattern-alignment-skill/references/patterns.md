@@ -6,7 +6,7 @@ Use this checklist during reviews to keep Narraitor changes consistent with exis
 - Use PascalCase filenames for components.
 - Keep components focused; suggest splitting if files drift past ~300 lines.
 - Use primitives from `src/components/ui/` for form controls and common UI.
-- Prefer `cssClasses` from `src/lib/utils/classNames.ts` for class merging.
+- Use `clsx` directly for conditional class merging (the repo's established pattern — 37+ components import it directly; `cssClasses` in `src/lib/utils/classNames.ts` is a thin wrapper only `ErrorDisplay` uses).
 
 ## Design tokens
 - No hardcoded colors in TS/TSX or CSS.

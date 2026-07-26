@@ -10,7 +10,7 @@ Before adding new helpers, scan these areas for existing utilities:
 - `src/lib/utils/errorUtils.ts` — ErrorType, user-friendly errors, retryability, store errors
 - `src/lib/utils/formatters.ts` — date/time/string formatting helpers
 - `src/lib/utils/validationUtils.ts` — input and rules validation
-- `src/lib/utils/classNames.ts` — `cssClasses`, a `clsx`-based class merger
+- `src/lib/utils/classNames.ts` — `cssClasses`, a thin `clsx` wrapper (rarely used; prefer importing `clsx` directly, per repo convention)
 - `src/lib/utils/generateId.ts` — `generateUniqueId`
 - `src/lib/utils/logger.ts` — Logger utility
 - `src/lib/utils/timestamp.ts` — timestamp helpers
