@@ -5,12 +5,12 @@ Use this checklist during reviews to keep Narraitor changes consistent with exis
 ## Component structure
 - Use PascalCase filenames for components.
 - Keep components focused; suggest splitting if files drift past ~300 lines.
-- Use shadcn/ui primitives from `src/components/ui/` for form controls and common UI.
-- Prefer `cn` from `src/lib/utils/classNames.ts` for class merging.
+- Use primitives from `src/components/ui/` for form controls and common UI.
+- Prefer `cssClasses` from `src/lib/utils/classNames.ts` for class merging.
 
 ## Design tokens
 - No hardcoded colors in TS/TSX or CSS.
-- Use Tailwind color tokens or `hsl(var(--...))` variables.
+- Use `var(--color-*)` design tokens directly — complete colors, don't wrap in `hsl()`. Status/domain tokens (`--success`, `--warning`, `--ending-*`, `--alignment-*`, etc.) are raw HSL channels and must be wrapped: `hsl(var(--success))`. Full split in `public_docs/design-system/design-tokens.md`.
 - For JS-accessible tokens, use `src/lib/design-tokens`.
 
 ## Error handling
