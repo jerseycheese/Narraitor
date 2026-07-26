@@ -13,6 +13,7 @@ import { applyWorldStateUpdate, getActiveWorldState, mergeState } from '@/lib/wo
 import Logger from '@/lib/utils/logger';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { useSessionStore } from './sessionStore';
+import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 
 const logger = new Logger('WorldStore');
 
@@ -255,7 +256,11 @@ export const useWorldStore = create<WorldStore>()(
         },
 
         // Domain-specific method aliases
-        createWorld: (worldData) => get().create(worldData),
+        createWorld: (worldData) => {
+          const worldId = get().create(worldData);
+          trackFunnelStep('world-created');
+          return worldId;
+        },
         updateWorld: (id, updates) => get().update(id, updates),
         deleteWorld: (id) => get().delete(id),
         setCurrentWorld: (id) => get().setCurrent(id),
