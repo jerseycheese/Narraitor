@@ -54,7 +54,8 @@
     "skott:circular": "skott --showCircularDependencies --displayMode=file-tree --tsconfig=./tsconfig.json --ignorePattern=**/*.test.* --ignorePattern=**/*.stories.* --ignorePattern=**/__tests__/** --exitCodeOnCircularDependencies=0 src/app/layout.tsx",
     "skott:graph": "skott --displayMode=graph --tsconfig=./tsconfig.json --ignorePattern=**/*.test.* --ignorePattern=**/*.stories.* --ignorePattern=**/__tests__/** --exitCodeOnCircularDependencies=0 src/app/layout.tsx",
     "skott:watch": "skott --displayMode=webapp --watch --tsconfig=./tsconfig.json --ignorePattern=**/*.test.* --ignorePattern=**/*.stories.* --ignorePattern=**/__tests__/** --exitCodeOnCircularDependencies=0 src/app/layout.tsx",
-    "skott:check": "node scripts/check-circular-count.mjs"
+    "skott:check": "node scripts/check-circular-count.mjs",
+    "explore": "skott --visualization"
   },
   "dependencies": {
     "@google/genai": "^0.13.0",
