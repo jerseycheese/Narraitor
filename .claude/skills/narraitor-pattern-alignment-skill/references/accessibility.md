@@ -13,7 +13,7 @@ Use this when reviewing UI components.
 - Do not rely on placeholder-only labels.
 
 ## Dialogs and modals
-- Use shadcn/ui Dialog for focus trapping and escape handling.
+- Use the `Dialog` primitive from `src/components/ui/` for focus trapping and escape handling.
 - Ensure title/description are present.
 
 ## Keyboard support

@@ -5,7 +5,7 @@ Follow existing component organization and keep UI code easy to discover.
 ## Organization
 - Domain/feature components live under `src/components/` (e.g., `world/`, `character/`, `narrative/`, `journal/`, `inventory/`).
 - Cross-domain components go in `src/components/shared/`.
-- UI primitives (shadcn/ui) live in `src/components/ui/` and use lowercase filenames.
+- UI primitives (Button, Input, Dialog, Card, etc.) live in `src/components/ui/` and use lowercase filenames.
 
 ## Naming
 - Use PascalCase for component files.
@@ -17,8 +17,8 @@ Follow existing component organization and keep UI code easy to discover.
 - Keep data-loading logic in server components or route handlers when possible.
 
 ## Form controls
-- Prefer shadcn/ui components over raw HTML form elements.
-- Use Tailwind design tokens or `hsl(var(--...))` CSS variables for styling.
+- Prefer existing `src/components/ui` primitives over raw HTML form elements.
+- Use `var(--color-*)`, `var(--space-*)`, etc. design tokens for styling — plain CSS, no Tailwind.
 
 ## Storybook
 - Place stories in `src/stories/` following existing folder patterns.
