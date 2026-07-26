@@ -36,6 +36,14 @@ test.describe('Main Pages Visual Tests', () => {
 
     await page.goto('/dashboard');
     await waitForContentStable(page);
+    // Empty state routes to GuidedFirstTimeExperience, whose "First time?"
+    // title renders in the italic Newsreader webfont (--font-narrative,
+    // next/font with display: 'swap'). Without waiting for the swap, an
+    // occasional slow font fetch leaves fallback-font glyphs painted at
+    // screenshot time, producing a few thousand pixels of diff right at
+    // maxDiffPixels — the same wait other specs already do (e.g.
+    // world-creation.spec.ts, landing-page.spec.ts).
+    await page.evaluate(() => document.fonts.ready);
     await hideDynamicContent(page);
 
     // Verify page loaded with expected content
