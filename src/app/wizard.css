@@ -26,6 +26,7 @@
   line-height: 1.2;
   color: var(--color-text-primary);
   margin: 0;
+  margin-top: var(--space-4);
 }
 
 /* The wizard title renders as <h1> or <h2> depending on whether the page already
