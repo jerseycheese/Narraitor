@@ -25,8 +25,8 @@ Do NOT invoke for: documentation-only edits, config changes, or trivial one-line
 - Report issues first (ordered by severity) with file:line and concrete fixes.
 
 ## Core alignment areas
-- Components and structure (naming, file size, shadcn/ui usage)
-- Design tokens and color usage (no hardcoded colors)
+- Components and structure (naming, file size, DOM clarity)
+- Design tokens and color usage (no hardcoded colors; use `hsl(var(--color-*))` and design-token CSS)
 - Error handling and user-friendly errors
 - State management and persistence patterns
 - Type safety and domain types

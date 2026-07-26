@@ -10,7 +10,7 @@ Port inline styles from a reference source (demo component, Figma spec, screensh
 ## Hard Rules
 
 - **No `!important`** -- fix specificity at the selector level.
-- **No raw pixel values** when a design token exists (`--space-*`, `--radius-*`, `--font-*`). Token definitions live in `src/lib/theme/design-tokens.css`.
+- **No raw pixel values** when a design token exists (`--space-*`, `--radius-*`, `--font-*`). Token definitions live in `src/lib/theme/themes/_shared-tokens.css`.
 - **No demo-only UI** -- do not port components that only exist in the reference scaffold (state switchers, mock data chrome, debug panels).
 - **No dark-mode changes** -- theme overrides target `[data-theme="dsN"]` only. Do not touch `.dark` variants unless the plan explicitly calls for it.
 - **No new inline styles** -- the point is moving styles into CSS. Never add `style={{}}` to fix a gap.
