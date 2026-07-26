@@ -36,4 +36,11 @@ describe('trackFunnelStep (#1367)', () => {
 
     expect(mockTrack).not.toHaveBeenCalled();
   });
+
+  it('tracks world-created step', () => {
+    trackFunnelStep('world-created');
+
+    expect(mockTrack).toHaveBeenCalledTimes(1);
+    expect(mockTrack).toHaveBeenCalledWith('world-created');
+  });
 });

@@ -33,6 +33,7 @@ import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { ensureWorldNpcRoster } from '@/lib/services/worldCreationService';
 import { useTutorial } from '@/components/TutorialProvider';
 import { tourStepToWizardStep } from '@/lib/tutorial/worldCreationTour';
+import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('WorldCreationWizard');
@@ -341,7 +342,10 @@ export default function WorldCreationWizard({
         reference: data.reference, // Include reference for character generation
         relationship: data.relationship, // Include relationship for character generation
       });
-      
+
+      // Track the world creation in the funnel
+      trackFunnelStep('world-created');
+
       // Set the newly created world as the active world
       const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(worldId);

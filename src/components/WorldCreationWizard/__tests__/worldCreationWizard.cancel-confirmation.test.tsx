@@ -45,6 +45,14 @@ jest.mock('@/components/TutorialProvider', () => ({
   })),
 }));
 
+jest.mock('@vercel/analytics', () => ({
+  track: jest.fn(),
+}));
+
+jest.mock('@/lib/utils/isPlaywrightEnv', () => ({
+  isPlaywrightEnv: jest.fn(() => false),
+}));
+
 // Test data constants
 const TEST_WORLD_DATA = {
   name: 'Test World Name',
