@@ -27,6 +27,13 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
       )
     )
     .toBe(true);
+  // The "First time?" title renders in the italic Newsreader webfont
+  // (--font-narrative, next/font with display: 'swap'). Without waiting for
+  // the swap, an occasional slow font fetch (cold CI dev-server compile)
+  // leaves the fallback-font glyphs painted at screenshot time, producing a
+  // few thousand pixels of diff right at maxDiffPixels — the same wait other
+  // specs already do (e.g. world-creation.spec.ts, landing-page.spec.ts).
+  await page.evaluate(() => document.fonts.ready);
 
   // Step 0: Welcome
   await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(0)}.png`, {
@@ -39,6 +46,7 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await nextButton.click();
   await page.waitForTimeout(500);
   await waitForContentStable(page);
+  await page.evaluate(() => document.fonts.ready);
   await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(1)}.png`, {
     fullPage: false,
   });
@@ -47,6 +55,7 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await nextButton.click();
   await page.waitForTimeout(500);
   await waitForContentStable(page);
+  await page.evaluate(() => document.fonts.ready);
   await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(2)}.png`, {
     fullPage: false,
   });
