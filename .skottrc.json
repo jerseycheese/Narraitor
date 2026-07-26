@@ -1,0 +1,15 @@
+{
+  "entrypoint": "src",
+  "incremental": true,
+  "trackTypeOnlyDependencies": true,
+  "tsconfig": "./tsconfig.json",
+  "fileExtensions": [".ts", ".tsx"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.stories.tsx",
+    "**/dist/**",
+    "**/.next/**"
+  ]
+}
