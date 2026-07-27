@@ -4,10 +4,8 @@
  */
 
 import type { EntityID } from '../types/common.types';
-import type { LoreFact, LoreCategory, DuplicateMatch } from '../types/lore.types';
-import { findPotentialDuplicates, checkFactSimilarity } from '../lib/lore/fuzzyMatcher';
+import type { LoreFact, LoreCategory } from '../types/lore.types';
 import { logger } from '@/lib/utils/logger';
-import { getTimestamp } from '@/lib/utils';
 import type { UserFriendlyError } from '@/lib/utils/errorUtils';
 import { ErrorType } from '@/lib/utils/errorUtils';
 
@@ -35,40 +33,6 @@ export interface MergeResult {
   secondaryCategory: LoreCategory;
   aliasesAdded: string[];
   crossCategory: boolean;
-}
-
-/**
- * Scan for potential duplicates in a world
- */
-export async function scanForDuplicatesImpl(
-  worldId: EntityID,
-  category: LoreCategory | null,
-  context: DeduplicationContext
-): Promise<DuplicateMatch[]> {
-  try {
-    const facts = context.getFacts({ worldId });
-    const options = category ? { category } : undefined;
-
-    const duplicates = findPotentialDuplicates(facts, worldId, options);
-
-    logger.info('[LoreStore] Duplicate scan complete', {
-      worldId,
-      category,
-      duplicatesFound: duplicates.length,
-    });
-
-    return duplicates;
-  } catch (error) {
-    logger.error('[LoreStore] Error scanning for duplicates', error);
-    context.setError({
-      title: 'Duplicate Scan Failed',
-      message: 'Failed to scan for duplicates',
-      retryable: true,
-      type: ErrorType.SERVICE,
-      severity: 'error',
-    });
-    return [];
-  }
 }
 
 /**
@@ -198,64 +162,5 @@ export function mergeFactsImpl(
       severity: 'error',
     });
     throw error;
-  }
-}
-
-/**
- * Check for duplicates before creating a new fact
- */
-export async function checkDuplicateBeforeCreateImpl(
-  value: string,
-  category: LoreCategory,
-  worldId: EntityID,
-  context: DeduplicationContext
-): Promise<DuplicateMatch[]> {
-  try {
-    const existingFacts = context.getFacts({ worldId })
-      .filter(f => f.category === category);
-
-    if (existingFacts.length === 0) {
-      return [];
-    }
-
-    // Create a temporary fact for comparison
-    const now = getTimestamp();
-    const tempFact: LoreFact = {
-      id: 'temp' as EntityID,
-      worldId,
-      category,
-      key: 'temp_key',
-      value,
-      aliases: [],
-      source: 'manual',
-      visibility: 'world-shared',
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    const matches: DuplicateMatch[] = [];
-
-    // Check against each existing fact
-    for (const existingFact of existingFacts) {
-      const result = await checkFactSimilarity(tempFact, existingFact);
-
-      // Only include matches above minimum threshold
-      if (result.isDuplicate || result.confidence >= 0.6) {
-        matches.push({
-          fact1: existingFact,
-          fact2: tempFact,
-          confidence: result.confidence,
-          method: result.method,
-          rationale: result.rationale,
-        });
-      }
-    }
-
-    // Sort by confidence (highest first)
-    return matches.sort((a, b) => b.confidence - a.confidence);
-
-  } catch (error) {
-    logger.error('[LoreStore] Error checking for duplicates', error);
-    return [];
   }
 }

@@ -12,6 +12,7 @@ import { logger } from '@/lib/utils/logger';
 import { npcPortraitService } from './npcPortraitService';
 import { toGenreValue } from '@/lib/constants/genres';
 import type { GenreValue } from '@/types/genre.types';
+import { extractJsonObject } from '@/lib/ai/parseJSON';
 
 export interface CreateWorldFromGenerationParams {
   generatedData: GeneratedWorldData;
@@ -93,12 +94,12 @@ Every NPC must fit this world snugly. IDs must be unique, lowercase, kebab-case 
   try {
     const response = await client.generateContent(prompt);
     const raw = response.content ?? '';
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const json = extractJsonObject(raw);
+    if (json === null) {
       throw new Error('No JSON block found in NPC response');
     }
 
-    const parsed = JSON.parse(jsonMatch[0]) as { npcs?: GeneratedNPCResult[] };
+    const parsed = JSON.parse(json) as { npcs?: GeneratedNPCResult[] };
     const roster = Array.isArray(parsed?.npcs) ? parsed.npcs : [];
 
     if (roster.length === 0) {

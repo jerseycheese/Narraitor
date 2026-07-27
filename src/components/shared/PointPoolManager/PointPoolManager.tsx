@@ -24,8 +24,6 @@ export interface PointPoolManagerProps {
   poolConfig: PointPoolConfig;
   onChange: (id: string, newValue: number) => void;
   className?: string;
-  showLabels?: boolean;
-  disabled?: boolean;
 }
 
 export const PointPoolManager: React.FC<PointPoolManagerProps> = ({

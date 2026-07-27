@@ -290,8 +290,7 @@ export function EndingScreen() {
   ];
 
   return (
-    <>
-      <div className="component-ending-screen" data-testid="ending-screen">
+    <div className="component-ending-screen" data-testid="ending-screen">
         {/* Hero Section: Combined Header with Image */}
         <section
           className="component-ending-screen-hero"
@@ -483,7 +482,6 @@ export function EndingScreen() {
             </SectionWrapper>
           </section>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

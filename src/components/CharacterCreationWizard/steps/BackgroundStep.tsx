@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import type { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 import type { WizardValidation } from '@/hooks/useWizardState';
 import type { World } from '@/types/world.types';
+import { validateBackground } from '../utils/validation';
 
 interface BackgroundStepData {
   characterData: CharacterCreationData;
@@ -23,45 +24,44 @@ interface BackgroundStepProps {
 export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   data,
   onUpdate,
+  onValidation,
 }) => {
+  const updateBackground = (background: CharacterCreationData['background']) => {
+    onUpdate({ background });
+    const result = validateBackground(background);
+    onValidation(result.valid, result.errors);
+  };
+
   const handleHistoryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onUpdate({
-      background: {
-        ...data.characterData.background,
-        history: e.target.value,
-      },
+    updateBackground({
+      ...data.characterData.background,
+      history: e.target.value,
     });
   };
 
   const handlePersonalityChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onUpdate({
-      background: {
-        ...data.characterData.background,
-        personality: e.target.value,
-      },
+    updateBackground({
+      ...data.characterData.background,
+      personality: e.target.value,
     });
   };
 
   const handleMotivationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({
-      background: {
-        ...data.characterData.background,
-        motivation: e.target.value,
-      },
+    updateBackground({
+      ...data.characterData.background,
+      motivation: e.target.value,
     });
   };
 
   const handleGoalsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const goals = e.target.value.split('\n').filter(goal => goal.trim());
-    onUpdate({
-      background: {
-        ...data.characterData.background,
-        goals,
-      },
+    updateBackground({
+      ...data.characterData.background,
+      goals,
     });
   };
 
-  const validation = data.validation[4];
+  const validation = data.validation[3];
   const showErrors = validation?.touched && !validation?.valid;
 
   return (

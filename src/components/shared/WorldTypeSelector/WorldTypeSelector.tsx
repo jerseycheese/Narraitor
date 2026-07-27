@@ -12,7 +12,6 @@ export interface WorldTypeSelectorProps {
   value: WorldTypeData;
   onChange: (data: WorldTypeData) => void;
   showLabels?: boolean;
-  layout?: 'vertical' | 'horizontal';
   disabled?: boolean;
   className?: string;
 }

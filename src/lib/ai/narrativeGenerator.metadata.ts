@@ -2,6 +2,7 @@ import type { AIClient } from './types';
 import type { GeneratedCharacterMetadata } from '@/types/narrative.types';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import { safeTrim } from '@/lib/utils';
+import { extractJsonObject } from './parseJSON';
 
 export const analyzeSegmentMetadata = async (
   content: string,
@@ -84,12 +85,12 @@ ${content}
   try {
     const response = await geminiClient.generateContent(prompt);
     const raw = response.content ?? '';
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const json = extractJsonObject(raw);
+    if (json === null) {
       return { presentCharacterIds: candidateIds, items: [] };
     }
 
-    const parsed = JSON.parse(jsonMatch[0]) as {
+    const parsed = JSON.parse(json) as {
       presentCharacterIds?: string[];
       items?: Array<{
         name?: string;

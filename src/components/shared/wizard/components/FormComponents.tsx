@@ -89,7 +89,7 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
       disabled={disabled}
       autoFocus={autoFocus}
       maxLength={maxLength}
-      className={error ? errorStyles.input.combined : ''}
+      className={error ? errorStyles.input : ''}
       data-testid={testId}
       data-tutorial={dataTutorial}
     />
@@ -133,7 +133,7 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
       disabled={disabled}
       rows={rows}
       maxLength={maxLength}
-      className={error ? errorStyles.input.combined : ''}
+      className={error ? errorStyles.input : ''}
       data-testid={testId}
       data-tutorial={dataTutorial}
     />

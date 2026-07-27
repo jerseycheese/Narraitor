@@ -85,23 +85,6 @@ const nextConfig: NextConfig = {
   // Hide development indicators for clean screenshots
   devIndicators: false,
 
-  // Redirects for old dev paths
-  async redirects() {
-    return [
-      // Redirect old dev paths to new ones
-      {
-        source: '/app/dev',
-        destination: '/dev',
-        permanent: true,
-      },
-      {
-        source: '/app/dev/:path*',
-        destination: '/dev/:path*',
-        permanent: true,
-      },
-    ];
-  },
-
   // Configure external image domains
   images: {
     remotePatterns: [

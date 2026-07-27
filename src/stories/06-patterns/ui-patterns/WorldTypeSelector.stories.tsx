@@ -27,11 +27,6 @@ const meta: Meta<typeof WorldTypeSelector> = {
       description: 'Whether to show the "World Type" label',
       control: 'boolean',
     },
-    layout: {
-      description: 'Layout direction for radio buttons',
-      control: 'radio',
-      options: ['vertical', 'horizontal'],
-    },
     disabled: {
       description: 'Whether the component is disabled',
       control: 'boolean',
@@ -69,16 +64,7 @@ export const Default: Story = {
   render: (args) => <InteractiveWorldTypeSelector {...args} />,
   args: {
     showLabels: true,
-    layout: 'vertical',
     disabled: false,
-  },
-};
-
-export const HorizontalLayout: Story = {
-  render: (args) => <InteractiveWorldTypeSelector {...args} />,
-  args: {
-    ...Default.args,
-    layout: 'horizontal',
   },
 };
 

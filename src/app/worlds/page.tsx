@@ -222,7 +222,6 @@ export default function WorldsPage() {
             onChange={setWorldTypeData}
             disabled={isGenerating}
             showLabels={true}
-            layout="vertical"
           />
           {error && <ErrorDisplay variant="inline" message={error} />}
 

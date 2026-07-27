@@ -11,10 +11,6 @@ export const errorStyles = {
   // Individual error messages
   message: 'error-block-message',
 
-  // Form input error states
-  input: {
-    border: 'input-error',
-    focus: 'input-error',
-    combined: 'input-error',
-  },
+  // Form input error state
+  input: 'input-error',
 } as const;

@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { World } from '@/types/world.types';
 import { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
+import { validateCharacterName } from '../utils/validation';
 
 interface CharacterWizardData {
   characterData: CharacterCreationData;
@@ -30,6 +31,7 @@ interface BasicInfoStepProps {
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   data,
   onUpdate,
+  onValidation,
   worldConfig,
 }) => {
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,10 +53,14 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
 
   const handleBlur = () => {
-    // Validation will be triggered by parent component
+    const result = validateCharacterName(
+      data.characterData.name,
+      data.characterData.worldId
+    );
+    onValidation(result.valid, result.errors);
   };
 
-  const validation = data.validation[1];
+  const validation = data.validation[0];
   const showErrors = validation?.touched && !validation?.valid;
 
   return (

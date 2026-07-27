@@ -176,16 +176,6 @@ export interface DuplicateMatch {
 }
 
 /**
- * Result of similarity check between two facts
- */
-export interface SimilarityResult {
-  isDuplicate: boolean;
-  confidence: number; // 0.0 to 1.0
-  method: 'exact' | 'levenshtein' | 'ai' | 'alias';
-  rationale: string;
-}
-
-/**
  * Match record for entity resolution review
  */
 export interface EntityMatch {

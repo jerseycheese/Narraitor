@@ -9,6 +9,7 @@ type BasicInfoStepData = ComponentProps<typeof BasicInfoStep>['data'];
 describe('BasicInfoStep - Physical Description', () => {
   const mockData = {
     characterData: {
+      worldId: 'world-1',
       name: 'Jamie Holt',
       description: 'A returning camp counselor',
       background: {

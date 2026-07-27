@@ -95,11 +95,6 @@ export const validateSkills = (
     const { minLevel } = getBounds(skill);
     return sum + Math.max(0, (skill.level ?? minLevel) - minLevel);
   }, 0);
-  const totalCapacity = selectedSkills.reduce((sum, skill) => {
-    const { minLevel, maxLevel } = getBounds(skill);
-    return sum + Math.max(0, maxLevel - minLevel);
-  }, 0);
-
   selectedSkills.forEach(skill => {
     const { minLevel, maxLevel } = getBounds(skill);
     const skillLabel = skill.name || skill.skillId;

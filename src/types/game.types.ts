@@ -82,7 +82,6 @@ export interface SessionStore {
   refreshRecoveryMarker: () => void;
   deleteSavedSession: (sessionId: string) => void;
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => void;
-  repairSavedSessionNarrativeCounts: (counts: Record<string, number>) => void;
   upsertSessionLifecycle: (metadata: SessionLifecycleMetadata) => void;
   setSessionLifecycleStatus: (sessionId: string, status: SessionLifecycleStatus) => void;
   getSessionLifecycle: (sessionId: string) => SessionLifecycleMetadata | undefined;

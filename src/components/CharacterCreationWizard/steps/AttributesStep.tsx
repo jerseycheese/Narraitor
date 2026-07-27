@@ -5,6 +5,7 @@ import {
 } from '@/components/shared/wizard';
 import { PointPoolManager, PointAllocation } from '@/components/shared/PointPoolManager';
 import { World } from '@/types/world.types';
+import { validateAttributes } from '../utils/validation';
 
 interface CharacterWizardAttribute {
   attributeId: string;
@@ -43,6 +44,7 @@ interface AttributesStepProps {
 export const AttributesStep: React.FC<AttributesStepProps> = ({
   data,
   onUpdate,
+  onValidation,
 }) => {
   // Convert attributes to PointAllocation format
   const allocations: PointAllocation[] = data.characterData.attributes.map((attr) => ({
@@ -59,9 +61,14 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
       attr.attributeId === attributeId ? { ...attr, value } : attr
     );
     onUpdate({ attributes: updatedAttributes });
+    const result = validateAttributes(
+      updatedAttributes,
+      data.pointPools.attributes.total
+    );
+    onValidation(result.valid, result.errors);
   };
 
-  const validation = data.validation[2];
+  const validation = data.validation[1];
   const showErrors = validation?.touched && !validation?.valid;
 
   // Calculate if all points are allocated
