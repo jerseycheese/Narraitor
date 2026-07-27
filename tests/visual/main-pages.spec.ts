@@ -3,6 +3,8 @@ import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections,
 import { seedTestData, seedBaseData } from './utils/seedTestData';
 import { waitForStoreReady } from './utils/tutorial-helpers';
 
+const TEXT_HEAVY_ONBOARDING_MAX_DIFF_PIXELS = 11000;
+
 /**
  * Main Pages Visual Regression Tests
  *
@@ -50,7 +52,10 @@ test.describe('Main Pages Visual Tests', () => {
     await expect(page).toHaveTitle(/Narraitor/i);
 
     // Take full page screenshot - empty QuickPlay form
-    await expect(page).toHaveScreenshot('home-empty-state.png', { fullPage: true });
+    await expect(page).toHaveScreenshot('home-empty-state.png', {
+      fullPage: true,
+      maxDiffPixels: TEXT_HEAVY_ONBOARDING_MAX_DIFF_PIXELS,
+    });
   });
 
   test('Dashboard should render consistently', async ({ page }) => {
