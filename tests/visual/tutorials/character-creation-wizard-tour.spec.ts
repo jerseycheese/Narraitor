@@ -69,9 +69,9 @@ test('Character creation wizard tour snapshots (steps 0-4)', async ({
   await expect(basicInfoName).toBeVisible({ timeout: 15000 });
   await waitForContentStable(page);
 
-  const wizardNext = page.locator(
-    'button:not([data-test-id]):has-text("Next")'
-  );
+  const wizardNext = page
+    .locator('.component-wizard-container')
+    .getByRole('button', { name: 'Next' });
 
   for (const stepIndex of steps) {
     // Stop tour before moving wizard to avoid overlay interception
@@ -149,6 +149,7 @@ test('Character creation wizard tour snapshots (steps 0-4)', async ({
         togglesClicked += 1;
         await waitForContentStable(page);
       }
+      await expect(page.getByText('Selected: 2')).toBeVisible();
 
       // Increase each selected skill to its maximum level to satisfy the pool
       const skillSliders = page.locator(
