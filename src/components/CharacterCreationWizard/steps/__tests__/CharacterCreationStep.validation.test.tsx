@@ -1,10 +1,11 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { BasicInfoStep } from '../BasicInfoStep';
 import { AttributesStep } from '../AttributesStep';
 import { SkillsStep } from '../SkillsStep';
 import { BackgroundStep } from '../BackgroundStep';
 import type { World } from '@/types/world.types';
+import type { WizardValidation } from '@/hooks/useWizardState';
 
 const worldConfig: World = {
   id: 'world-1',
@@ -48,6 +49,11 @@ const worldConfig: World = {
 
 const onUpdate = jest.fn();
 const onValidation = jest.fn();
+const validateStep = jest.fn<WizardValidation, []>(() => ({
+  valid: true,
+  errors: [],
+  touched: true,
+}));
 
 describe('CharacterCreationWizard step validation display', () => {
   beforeEach(() => {
@@ -82,10 +88,51 @@ describe('CharacterCreationWizard step validation display', () => {
         }}
         onUpdate={onUpdate}
         onValidation={onValidation}
+        validateStep={validateStep}
       />
     );
 
     expect(screen.getByText('Character name is required')).toBeInTheDocument();
+  });
+
+  it('validates basic-info blur through the injected step validator', () => {
+    validateStep.mockReturnValueOnce({
+      valid: false,
+      touched: true,
+      errors: ['Character name must be at least 2 characters'],
+    });
+
+    render(
+      <BasicInfoStep
+        data={{
+          characterData: {
+            worldId: 'world-1',
+            name: 'A',
+            description: '',
+            portraitPlaceholder: '',
+            attributes: [],
+            skills: [],
+            background: {
+              history: '',
+              personality: '',
+              goals: [],
+              motivation: '',
+            },
+          },
+          validation: {},
+        }}
+        onUpdate={onUpdate}
+        onValidation={onValidation}
+        validateStep={validateStep}
+      />
+    );
+
+    fireEvent.blur(screen.getByLabelText(/Character Name/));
+
+    expect(validateStep).toHaveBeenCalledTimes(1);
+    expect(onValidation).toHaveBeenCalledWith(false, [
+      'Character name must be at least 2 characters',
+    ]);
   });
 
   it('shows attribute errors from step 1', () => {
@@ -197,6 +244,7 @@ describe('CharacterCreationWizard step validation display', () => {
         }}
         onUpdate={onUpdate}
         onValidation={onValidation}
+        validateStep={validateStep}
         worldConfig={worldConfig}
       />
     );
@@ -204,5 +252,60 @@ describe('CharacterCreationWizard step validation display', () => {
     expect(
       screen.getByText('Character history must be at least 50 characters')
     ).toBeInTheDocument();
+  });
+
+  it('validates background on blur, not on every change', () => {
+    validateStep.mockReturnValueOnce({
+      valid: false,
+      touched: true,
+      errors: ['Character history must be at least 50 characters'],
+    });
+
+    render(
+      <BackgroundStep
+        data={{
+          characterData: {
+            worldId: 'world-1',
+            name: 'Jamie Holt',
+            description: '',
+            portraitPlaceholder: '',
+            attributes: [],
+            skills: [],
+            background: {
+              history: '',
+              personality: '',
+              goals: [],
+              motivation: '',
+            },
+          },
+          validation: {},
+        }}
+        onUpdate={onUpdate}
+        onValidation={onValidation}
+        validateStep={validateStep}
+        worldConfig={worldConfig}
+      />
+    );
+
+    const history = screen.getByLabelText(/Character History/);
+    fireEvent.change(history, { target: { value: 'Short' } });
+
+    expect(onUpdate).toHaveBeenCalledWith({
+      background: {
+        history: 'Short',
+        personality: '',
+        goals: [],
+        motivation: '',
+      },
+    });
+    expect(validateStep).not.toHaveBeenCalled();
+    expect(onValidation).not.toHaveBeenCalled();
+
+    fireEvent.blur(history);
+
+    expect(validateStep).toHaveBeenCalledTimes(1);
+    expect(onValidation).toHaveBeenCalledWith(false, [
+      'Character history must be at least 50 characters',
+    ]);
   });
 });

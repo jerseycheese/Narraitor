@@ -64,7 +64,6 @@ export const handlers = [
   ),
   http.post('/api/inventory/categorize', () => textResponse('general')),
   http.post('/api/inventory/check-similarity', () => textResponse('false')),
-  http.post('/api/lore/check-similarity', () => textResponse('false')),
 
   // --- Structured generation routes (return the entity directly) ---
   http.post('/api/generate-world', () =>

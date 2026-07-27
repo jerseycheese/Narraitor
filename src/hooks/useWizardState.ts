@@ -25,6 +25,7 @@ export interface UseWizardStateOptions<TData> {
   initialStep?: number;
   steps: WizardStep[];
   onStepValidation?: (stepIndex: number, data: TData) => WizardValidation;
+  validateOnUpdate?: boolean;
   onDataChange?: (data: TData) => void;
 }
 
@@ -54,6 +55,7 @@ export function useWizardState<TData = unknown>({
   initialStep = 0,
   steps,
   onStepValidation,
+  validateOnUpdate = true,
   onDataChange,
 }: UseWizardStateOptions<TData>): UseWizardStateReturn<TData> {
   const [state, setState] = useState<WizardState<TData>>({
@@ -89,7 +91,7 @@ export function useWizardState<TData = unknown>({
       
       // Trigger validation if handler provided
       let newValidation = prev.validation;
-      if (onStepValidation) {
+      if (onStepValidation && validateOnUpdate) {
         const validation = onStepValidation(prev.currentStep, newData);
         newValidation = {
           ...prev.validation,
@@ -110,20 +112,29 @@ export function useWizardState<TData = unknown>({
 
       return newState;
     });
-  }, [onStepValidation, onDataChange]);
+  }, [onStepValidation, validateOnUpdate, onDataChange]);
 
   const goNext = useCallback(() => {
     setState(prev => {
       // Re-validate current step with current data before navigating
       let currentStepValid = true;
+      let validation: WizardValidation | undefined;
       if (onStepValidation) {
-        const validation = onStepValidation(prev.currentStep, prev.data);
+        validation = onStepValidation(prev.currentStep, prev.data);
         currentStepValid = validation.valid;
       }
       
       // Only proceed if current step is valid and not processing
       if (!currentStepValid || prev.isProcessing) {
-        return prev;
+        return validation
+          ? {
+              ...prev,
+              validation: {
+                ...prev.validation,
+                [prev.currentStep]: validation,
+              },
+            }
+          : prev;
       }
       
       const nextStep = Math.min(prev.currentStep + 1, steps.length - 1);

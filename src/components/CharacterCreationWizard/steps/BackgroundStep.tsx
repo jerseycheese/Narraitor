@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import type { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 import type { WizardValidation } from '@/hooks/useWizardState';
 import type { World } from '@/types/world.types';
-import { validateBackground } from '../utils/validation';
 
 interface BackgroundStepData {
   characterData: CharacterCreationData;
@@ -18,6 +17,7 @@ interface BackgroundStepProps {
   data: BackgroundStepData;
   onUpdate: (updates: Partial<CharacterCreationData>) => void;
   onValidation: (valid: boolean, errors: string[]) => void;
+  validateStep: () => WizardValidation;
   worldConfig: World;
 }
 
@@ -25,10 +25,14 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   data,
   onUpdate,
   onValidation,
+  validateStep,
 }) => {
   const updateBackground = (background: CharacterCreationData['background']) => {
     onUpdate({ background });
-    const result = validateBackground(background);
+  };
+
+  const handleBlur = () => {
+    const result = validateStep();
     onValidation(result.valid, result.errors);
   };
 
@@ -87,6 +91,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           id="character-history"
           value={data.characterData.background.history}
           onChange={handleHistoryChange}
+          onBlur={handleBlur}
           rows={6}
           placeholder="Describe your character's background and history... (minimum 50 characters)"
         />
@@ -103,6 +108,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           id="character-personality"
           value={data.characterData.background.personality}
           onChange={handlePersonalityChange}
+          onBlur={handleBlur}
           rows={4}
           placeholder="Describe your character's personality traits... (minimum 30 characters)"
         />
@@ -120,6 +126,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           type="text"
           value={data.characterData.background.motivation}
           onChange={handleMotivationChange}
+          onBlur={handleBlur}
           placeholder="What drives your character?"
         />
         <p className="form-help-text">
@@ -135,6 +142,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           id="character-goals"
           value={data.characterData.background.goals.join('\n')}
           onChange={handleGoalsChange}
+          onBlur={handleBlur}
           rows={3}
           placeholder="Enter your character's goals, one per line"
         />

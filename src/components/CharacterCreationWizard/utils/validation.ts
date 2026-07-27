@@ -1,31 +1,17 @@
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
 import {
-  validateName,
   validateText,
   validateSelectionCount,
   ValidationResult
 } from '@/lib/utils/validationUtils';
 
-export const validateCharacterName = (name: string, worldId: EntityID): ValidationResult => {
-  // Use shared validation for basic name rules
-  const basicValidation = validateName(name);
-  if (!basicValidation.valid) {
-    return basicValidation;
-  }
-  
+export const isCharacterNameUnique = (name: string, worldId: EntityID): boolean => {
   // Check uniqueness within world
   const state = useCharacterStore.getState();
   const characters = state.characters || {};
   const existingCharacters = (Object.values(characters) as Character[]).filter(c => c.worldId === worldId);
-  if (existingCharacters.some(c => c.name === name)) {
-    return {
-      valid: false,
-      errors: ['A character with this name already exists in this world']
-    };
-  }
-  
-  return { valid: true, errors: [] };
+  return !existingCharacters.some(c => c.name === name);
 };
 
 export const validateAttributes = (

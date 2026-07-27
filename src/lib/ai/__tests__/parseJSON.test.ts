@@ -1,4 +1,4 @@
-import { stripMarkdownFences, extractJsonObject } from '../parseJSON';
+import { stripMarkdownFences, extractJsonObject, extractFencedJson } from '../parseJSON';
 
 describe('stripMarkdownFences', () => {
   it('returns clean JSON unchanged (trimmed)', () => {
@@ -37,5 +37,23 @@ describe('extractJsonObject', () => {
 
   it('returns null when only an opening brace is present', () => {
     expect(extractJsonObject('{ incomplete')).toBeNull();
+  });
+});
+
+describe('extractFencedJson', () => {
+  it('extracts json-tagged fenced content', () => {
+    expect(extractFencedJson('```json\n{"a":1}\n```')).toBe('{"a":1}');
+  });
+
+  it('extracts plain fenced content', () => {
+    expect(extractFencedJson('```\n{"a":1}\n```')).toBe('{"a":1}');
+  });
+
+  it('ignores non-JSON fenced content', () => {
+    expect(extractFencedJson('```ts\nconst value = 1;\n```')).toBeNull();
+  });
+
+  it('returns null when no fenced block is present', () => {
+    expect(extractFencedJson('{"a":1}')).toBeNull();
   });
 });

@@ -26,11 +26,12 @@ export function extractJsonObject(raw: string): string | null {
 }
 
 /**
- * Returns the contents of the first ```json fenced block, or null when none is
- * present. Used by parsers whose contract is "fenced JSON or fall back".
+ * Returns the contents of the first ```json or plain ``` fenced block, or null
+ * when none is present. Used by parsers whose contract is "fenced JSON or fall
+ * back".
  */
 export function extractFencedJson(raw: string): string | null {
-  const match = raw.match(/```json\s*([\s\S]*?)\s*```/);
+  const match = raw.match(/```(?:json)?(?=\s)[ \t]*\r?\n?([\s\S]*?)\s*```/);
   return match ? match[1] : null;
 }
 

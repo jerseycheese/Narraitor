@@ -1,4 +1,4 @@
-import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from '../validation';
+import { isCharacterNameUnique, validateAttributes, validateSkills, validateBackground } from '../validation';
 import { useCharacterStore } from '@/state/characterStore';
 import { mockZustandStore, createMockCharacterStore } from '@/lib/test-utils';
 
@@ -6,7 +6,7 @@ import { mockZustandStore, createMockCharacterStore } from '@/lib/test-utils';
 jest.mock('@/state/characterStore');
 
 describe('Character Creation Validation', () => {
-  describe('validateCharacterName', () => {
+  describe('isCharacterNameUnique', () => {
     beforeEach(() => {
       mockZustandStore(useCharacterStore as jest.MockedFunction<typeof useCharacterStore>, createMockCharacterStore({
         characters: {
@@ -18,41 +18,16 @@ describe('Character Creation Validation', () => {
       }));
     });
 
-    it('returns error when name is empty', () => {
-      const result = validateCharacterName('', 'world-1');
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Name is required');
-    });
-
-    it('returns error when name is too short', () => {
-      const result = validateCharacterName('AB', 'world-1');
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Name must be at least 3 characters');
-    });
-
-    it('returns error when name is too long', () => {
-      const longName = 'A'.repeat(51);
-      const result = validateCharacterName(longName, 'world-1');
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Name must be less than 50 characters');
-    });
-
-    it('returns error when name already exists in same world', () => {
-      const result = validateCharacterName('Existing Hero', 'world-1');
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain('A character with this name already exists in this world');
+    it('returns false when name already exists in same world', () => {
+      expect(isCharacterNameUnique('Existing Hero', 'world-1')).toBe(false);
     });
 
     it('allows same name in different world', () => {
-      const result = validateCharacterName('Existing Hero', 'world-3');
-      expect(result.valid).toBe(true);
-      expect(result.errors).toHaveLength(0);
+      expect(isCharacterNameUnique('Existing Hero', 'world-3')).toBe(true);
     });
 
-    it('validates successfully for valid unique name', () => {
-      const result = validateCharacterName('New Hero', 'world-1');
-      expect(result.valid).toBe(true);
-      expect(result.errors).toHaveLength(0);
+    it('allows a unique name', () => {
+      expect(isCharacterNameUnique('New Hero', 'world-1')).toBe(true);
     });
   });
 

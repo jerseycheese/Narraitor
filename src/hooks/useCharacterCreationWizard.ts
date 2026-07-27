@@ -8,7 +8,7 @@ import {
 } from '@/lib/utils/wizardValidation';
 import { EntityID } from '@/types/common.types';
 import { World } from '@/types/world.types';
-import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from '@/components/CharacterCreationWizard/utils/validation';
+import { isCharacterNameUnique, validateAttributes, validateSkills, validateBackground } from '@/components/CharacterCreationWizard/utils/validation';
 
 /**
  * Complete character data structure for creation wizard
@@ -86,7 +86,7 @@ export function useCharacterCreationWizard({
           createValidationRules.required('Character name is required'),
           createValidationRules.minLength(2, 'Character name must be at least 2 characters'),
           createValidationRules.custom<string>(
-            (name) => validateCharacterName(name, worldId).valid,
+            (name) => isCharacterNameUnique(name, worldId),
             'A character with this name already exists in this world'
           ),
         ],
@@ -120,6 +120,7 @@ export function useCharacterCreationWizard({
     initialData,
     initialStep,
     steps,
+    validateOnUpdate: false,
     onStepValidation: (stepIndex, data) => {
       const validator = stepValidators[stepIndex];
       return validator ? validator(data) : { valid: true, errors: [], touched: true };

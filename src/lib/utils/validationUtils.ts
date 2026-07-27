@@ -9,40 +9,6 @@ export interface ValidationResult {
 }
 
 /**
- * Validates that a name meets basic requirements
- */
-export function validateName(name: string, options?: {
-  minLength?: number;
-  maxLength?: number;
-  required?: boolean;
-}): ValidationResult {
-  const {
-    minLength = 3,
-    maxLength = 50,
-    required = true
-  } = options || {};
-
-  const errors: string[] = [];
-  const trimmedName = name?.trim() || '';
-
-  if (required && !trimmedName) {
-    errors.push('Name is required');
-  } else if (trimmedName) {
-    if (trimmedName.length < minLength) {
-      errors.push(`Name must be at least ${minLength} characters`);
-    }
-    if (trimmedName.length > maxLength) {
-      errors.push(`Name must be less than ${maxLength} characters`);
-    }
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors
-  };
-}
-
-/**
  * Validates that a text field meets minimum requirements
  */
 export function validateText(text: string, options?: {
