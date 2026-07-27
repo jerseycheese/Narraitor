@@ -1,5 +1,7 @@
 // src/lib/utils/aiResponseParser.ts
 
+import { extractFencedJson, extractJsonObject } from '@/lib/ai/parseJSON';
+
 /**
  * Utility functions for parsing AI responses across different features
  */
@@ -57,18 +59,13 @@ export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: strin
     return JSON.parse(response.content);
   } catch {
     try {
-      // Fallback to extract JSON from response if not pure JSON
-      // Look for JSON wrapped in markdown code blocks
-      const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (codeBlockMatch) {
-        return JSON.parse(codeBlockMatch[1]);
+      const fencedJson = extractFencedJson(response.content);
+      if (fencedJson) {
+        return JSON.parse(fencedJson);
       } else {
-        // Look for JSON object anywhere in the content
-        // Use a more flexible regex that allows nested objects
-        const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          // Try to parse the JSON, but if it fails due to truncation, attempt to fix it
-          let jsonStr = jsonMatch[0];
+        const json = extractJsonObject(response.content);
+        if (json) {
+          let jsonStr = json;
           try {
             return JSON.parse(jsonStr);
           } catch {

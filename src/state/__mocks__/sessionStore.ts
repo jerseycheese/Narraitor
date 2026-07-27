@@ -16,7 +16,6 @@ export const useSessionStore = jest.fn((selector) => {
       lastActiveStep: null,
     },
     completeTutorialPhase: jest.fn(),
-    repairSavedSessionNarrativeCounts: jest.fn(),
   };
   
   // If selector is provided, call it with the mock state
@@ -46,7 +45,6 @@ const mockSessionStore = {
       lastActiveStep: null,
     },
     completeTutorialPhase: jest.fn(),
-    repairSavedSessionNarrativeCounts: jest.fn(),
   })),
   setState: jest.fn(),
   subscribe: jest.fn(),

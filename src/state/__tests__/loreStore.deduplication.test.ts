@@ -1,114 +1,14 @@
 /**
- * Tests for lore store deduplication functionality
- * Tests focus on behavior: scanning, merging, and duplicate detection
+ * Tests for lore store fact merging behavior
  */
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import type { LoreFact } from '@/types/lore.types';
 import type { EntityID } from '@/types/common.types';
-import { getTimestamp } from '@/lib/utils';
 import {
-  scanForDuplicatesImpl,
   mergeFactsImpl,
-  checkDuplicateBeforeCreateImpl,
   type DeduplicationContext,
 } from '../loreStore.deduplication';
-
-// Mock the fuzzy matcher module
-jest.mock('@/lib/lore/fuzzyMatcher', () => ({
-  findPotentialDuplicates: jest.fn(),
-  checkFactSimilarity: jest.fn(),
-}));
-
-import { findPotentialDuplicates, checkFactSimilarity } from '@/lib/lore/fuzzyMatcher';
-
-const mockFindPotentialDuplicates = findPotentialDuplicates as jest.MockedFunction<typeof findPotentialDuplicates>;
-const mockCheckFactSimilarity = checkFactSimilarity as jest.MockedFunction<typeof checkFactSimilarity>;
-
-describe('scanForDuplicatesImpl', () => {
-  const worldId: EntityID = 'world-123' as EntityID;
-  let mockContext: DeduplicationContext;
-  let testFacts: LoreFact[];
-
-  beforeEach(() => {
-    testFacts = [
-      {
-        id: 'fact-1' as EntityID,
-        worldId,
-        category: 'characters',
-        key: 'character_gandalf',
-        value: 'Gandalf the Grey',
-        aliases: [],
-        source: 'narrative',
-      visibility: 'world-shared',
-        createdAt: '2024-01-01T00:00:00.000Z',
-        updatedAt: '2024-01-01T00:00:00.000Z',
-      },
-      {
-        id: 'fact-2' as EntityID,
-        worldId,
-        category: 'characters',
-        key: 'character_gandolf',
-        value: 'Gandolf',
-        aliases: [],
-        source: 'narrative',
-      visibility: 'world-shared',
-        createdAt: '2024-01-02T00:00:00.000Z',
-        updatedAt: '2024-01-02T00:00:00.000Z',
-      },
-    ];
-
-    mockContext = {
-      getFact: jest.fn((id) => testFacts.find(f => f.id === id)),
-      getFacts: jest.fn((options) => {
-        if (options?.worldId) {
-          return testFacts.filter(f => f.worldId === options.worldId);
-        }
-        return testFacts;
-      }),
-      updateFact: jest.fn(),
-      deleteFact: jest.fn(),
-      setAliases: jest.fn(),
-      setError: jest.fn(),
-    };
-
-    mockFindPotentialDuplicates.mockReturnValue([
-      {
-        fact1: testFacts[0],
-        fact2: testFacts[1],
-        confidence: 0.87,
-        method: 'levenshtein',
-        rationale: 'Names are very similar',
-      },
-    ]);
-  });
-
-  it('finds duplicates in specified world', async () => {
-    const duplicates = await scanForDuplicatesImpl(worldId, null, mockContext);
-
-    expect(mockContext.getFacts).toHaveBeenCalledWith({ worldId });
-    expect(duplicates.length).toBeGreaterThan(0);
-    expect(duplicates[0].confidence).toBe(0.87);
-  });
-
-  it('filters by category when specified', async () => {
-    await scanForDuplicatesImpl(worldId, 'characters', mockContext);
-
-    expect(mockFindPotentialDuplicates).toHaveBeenCalledWith(
-      expect.anything(),
-      worldId,
-      expect.objectContaining({ category: 'characters' })
-    );
-  });
-
-  it('returns empty array when no duplicates found', async () => {
-    mockFindPotentialDuplicates.mockReturnValue([]);
-
-    const duplicates = await scanForDuplicatesImpl(worldId, null, mockContext);
-
-    expect(duplicates).toEqual([]);
-  });
-});
 
 describe('mergeFactsImpl', () => {
   let mockContext: DeduplicationContext;
@@ -310,84 +210,5 @@ describe('mergeFactsImpl', () => {
 
     // The low importance fact should be deleted
     expect(mockContext.deleteFact).toHaveBeenCalledWith(lowImportanceFact.id);
-  });
-});
-
-describe('checkDuplicateBeforeCreateImpl', () => {
-  const worldId: EntityID = 'world-123' as EntityID;
-  let mockContext: DeduplicationContext;
-
-  beforeEach(() => {
-    const testFacts: LoreFact[] = [
-      {
-        id: 'fact-1' as EntityID,
-        worldId,
-        category: 'characters',
-        key: 'character_gandalf',
-        value: 'Gandalf',
-        aliases: [],
-        source: 'narrative',
-      visibility: 'world-shared',
-        createdAt: getTimestamp(),
-        updatedAt: getTimestamp(),
-      },
-    ];
-
-    mockContext = {
-      getFact: jest.fn((id) => testFacts.find(f => f.id === id)),
-      getFacts: jest.fn(() => testFacts),
-      updateFact: jest.fn(),
-      deleteFact: jest.fn(),
-      setAliases: jest.fn(),
-      setError: jest.fn(),
-    };
-
-    mockCheckFactSimilarity.mockResolvedValue({
-      isDuplicate: false,
-      confidence: 0.3,
-      method: 'levenshtein',
-      rationale: 'Different names',
-    });
-  });
-
-  it('finds high confidence matches before creation', async () => {
-    mockCheckFactSimilarity.mockResolvedValue({
-      isDuplicate: true,
-      confidence: 0.92,
-      method: 'levenshtein',
-      rationale: 'Very similar names',
-    });
-
-    const matches = await checkDuplicateBeforeCreateImpl(
-      'Gandolf',
-      'characters',
-      worldId,
-      mockContext
-    );
-
-    expect(matches.length).toBeGreaterThan(0);
-    expect(matches[0].confidence).toBeGreaterThan(0.9);
-  });
-
-  it('returns empty array when no similar facts exist', async () => {
-    const matches = await checkDuplicateBeforeCreateImpl(
-      'Frodo Baggins',
-      'characters',
-      worldId,
-      mockContext
-    );
-
-    expect(matches).toEqual([]);
-  });
-
-  it('only checks facts in the same world and category', async () => {
-    await checkDuplicateBeforeCreateImpl(
-      'Gandolf',
-      'characters',
-      worldId,
-      mockContext
-    );
-
-    expect(mockContext.getFacts).toHaveBeenCalledWith({ worldId });
   });
 });

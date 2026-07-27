@@ -58,6 +58,45 @@ describe('useWizardState', () => {
     });
   });
 
+  it('can defer validation until navigation', () => {
+    const onStepValidation = jest.fn((stepIndex, data: TestData) => {
+      if (stepIndex === 0) {
+        return {
+          valid: data.name.length > 0,
+          errors: data.name.length === 0 ? ['Name is required'] : [],
+          touched: true,
+        };
+      }
+      return { valid: true, errors: [], touched: true };
+    });
+
+    const { result } = renderHook(() =>
+      useWizardState({
+        initialData,
+        steps: testSteps,
+        onStepValidation,
+        validateOnUpdate: false,
+      })
+    );
+
+    act(() => {
+      result.current.updateData({ age: 42 });
+    });
+
+    expect(result.current.state.validation[0]).toBeUndefined();
+
+    act(() => {
+      result.current.goNext();
+    });
+
+    expect(result.current.state.currentStep).toBe(0);
+    expect(result.current.state.validation[0]).toEqual({
+      valid: false,
+      errors: ['Name is required'],
+      touched: true,
+    });
+  });
+
   it('should handle validation edge cases correctly', () => {
     const { result } = renderHook(() =>
       useWizardState({

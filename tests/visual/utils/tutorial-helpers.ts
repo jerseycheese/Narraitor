@@ -94,6 +94,9 @@ export const stopTour = async (page: Page): Promise<void> => {
       (window as any).__TEST_STOP_TOUR__();
     }
   });
+  await expect(page.locator('.react-joyride__tooltip')).toBeHidden({
+    timeout: 5000,
+  });
 };
 
 export const waitForTooltip = async (page: Page): Promise<void> => {

@@ -290,200 +290,192 @@ export function EndingScreen() {
   ];
 
   return (
-    <>
-      <div className="component-ending-screen" data-testid="ending-screen">
-        {/* Hero Section: Combined Header with Image */}
-        <section
-          className="component-ending-screen-hero"
-          aria-label="Story ending"
-        >
-          {isGeneratingImage ? (
-            <div
-              className="component-ending-screen-hero-loading"
-              role="img"
-              aria-live="polite"
-              aria-label="Loading ending image"
-            >
-              <div className="component-ending-screen-hero-loading-body">
-                <LoadingState message="Loading ending image..." />
-                <p>
-                  Preparing a visual representation of your story&apos;s
-                  conclusion...
-                </p>
-              </div>
+    <div className="component-ending-screen" data-testid="ending-screen">
+      {/* Hero Section: Combined Header with Image */}
+      <section
+        className="component-ending-screen-hero"
+        aria-label="Story ending"
+      >
+        {isGeneratingImage ? (
+          <div
+            className="component-ending-screen-hero-loading"
+            role="img"
+            aria-live="polite"
+            aria-label="Loading ending image"
+          >
+            <div className="component-ending-screen-hero-loading-body">
+              <LoadingState message="Loading ending image..." />
+              <p>
+                Preparing a visual representation of your story&apos;s
+                conclusion...
+              </p>
             </div>
-          ) : endingImage ? (
-            <div className="component-ending-screen-hero-frame">
-              <Image
-                className="component-ending-screen-hero-image"
-                src={endingImage}
-                alt={`${capitalize(currentEnding.tone)} ending for ${character?.name || 'the hero'}'s story`}
-                width={1280}
-                height={720}
-                priority
-              />
-              <div className="component-ending-screen-hero-overlay">
-                <header className="component-ending-screen-hero-header">
-                  {/* h2 in every hero branch: the page-level h1 belongs to the
+          </div>
+        ) : endingImage ? (
+          <div className="component-ending-screen-hero-frame">
+            <Image
+              className="component-ending-screen-hero-image"
+              src={endingImage}
+              alt={`${capitalize(currentEnding.tone)} ending for ${character?.name || 'the hero'}'s story`}
+              width={1280}
+              height={720}
+              priority
+            />
+            <div className="component-ending-screen-hero-overlay">
+              <header className="component-ending-screen-hero-header">
+                {/* h2 in every hero branch: the page-level h1 belongs to the
                       route (sr-only "Story Complete", #1532), and this was the
                       only branch still rendering the hero title as an h1. */}
-                  <h2 className="component-ending-screen-hero-title">
-                    The End
-                  </h2>
-                  <p className="component-ending-screen-hero-meta">
-                    {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
-                  </p>
-                </header>
-              </div>
+                <h2 className="component-ending-screen-hero-title">The End</h2>
+                <p className="component-ending-screen-hero-meta">
+                  {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
+                </p>
+              </header>
             </div>
-          ) : imageError ? (
-            <div
-              className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
-            >
-              <div className="component-ending-screen-hero-error">
-                <p>Unable to load ending image</p>
-                <Button
-                  onClick={generateEndingImage}
-                  variant="link"
-                  size="sm"
-                  aria-label="Retry loading ending image"
-                >
-                  Try Again
-                </Button>
-              </div>
-              <div className="component-ending-screen-hero-overlay">
-                <header className="component-ending-screen-hero-header">
-                  <h2 className="component-ending-screen-hero-title">
-                    The End
-                  </h2>
-                  <p className="component-ending-screen-hero-meta">
-                    {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
-                  </p>
-                </header>
-              </div>
+          </div>
+        ) : imageError ? (
+          <div
+            className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
+          >
+            <div className="component-ending-screen-hero-error">
+              <p>Unable to load ending image</p>
+              <Button
+                onClick={generateEndingImage}
+                variant="link"
+                size="sm"
+                aria-label="Retry loading ending image"
+              >
+                Try Again
+              </Button>
             </div>
-          ) : (
-            <div
-              className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
-            >
-              <div className="component-ending-screen-hero-placeholder">
-                <p>Ending image</p>
-              </div>
-              <div className="component-ending-screen-hero-overlay">
-                <header className="component-ending-screen-hero-header">
-                  <h2 className="component-ending-screen-hero-title">
-                    The End
-                  </h2>
-                  <p className="component-ending-screen-hero-meta">
-                    {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
-                  </p>
-                </header>
-              </div>
+            <div className="component-ending-screen-hero-overlay">
+              <header className="component-ending-screen-hero-header">
+                <h2 className="component-ending-screen-hero-title">The End</h2>
+                <p className="component-ending-screen-hero-meta">
+                  {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
+                </p>
+              </header>
             </div>
-          )}
+          </div>
+        ) : (
+          <div
+            className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
+          >
+            <div className="component-ending-screen-hero-placeholder">
+              <p>Ending image</p>
+            </div>
+            <div className="component-ending-screen-hero-overlay">
+              <header className="component-ending-screen-hero-header">
+                <h2 className="component-ending-screen-hero-title">The End</h2>
+                <p className="component-ending-screen-hero-meta">
+                  {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
+                </p>
+              </header>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <div className="component-ending-screen-content">
+        {/* Epilogue */}
+        <section>
+          <SectionWrapper title="Epilogue">
+            <div className="manuscript-ending-prose">
+              {currentEnding.epilogue}
+            </div>
+          </SectionWrapper>
         </section>
 
-        <div className="component-ending-screen-content">
-          {/* Epilogue */}
-          <section>
-            <SectionWrapper title="Epilogue">
-              <div className="manuscript-ending-prose">
-                {currentEnding.epilogue}
-              </div>
-            </SectionWrapper>
-          </section>
+        {/* Character Legacy */}
+        <section>
+          <SectionWrapper title="Character Legacy">
+            <div className="manuscript-ending-prose">
+              {currentEnding.characterLegacy}
+            </div>
+          </SectionWrapper>
+        </section>
 
-          {/* Character Legacy */}
-          <section>
-            <SectionWrapper title="Character Legacy">
-              <div className="manuscript-ending-prose">
-                {currentEnding.characterLegacy}
-              </div>
-            </SectionWrapper>
-          </section>
+        {/* Achievements */}
+        {currentEnding.achievements &&
+          currentEnding.achievements.length > 0 && (
+            <section aria-label="Story achievements">
+              <SectionWrapper title="Achievements">
+                <ul
+                  className="component-ending-screen-achievements"
+                  role="list"
+                >
+                  {currentEnding.achievements.map((achievement, index) => {
+                    // Split achievement into title and description
+                    const colonIndex = achievement.indexOf(':');
+                    const title =
+                      colonIndex > 0
+                        ? achievement.substring(0, colonIndex)
+                        : achievement;
+                    const description =
+                      colonIndex > 0
+                        ? achievement.substring(colonIndex + 1).trim()
+                        : '';
 
-          {/* Achievements */}
-          {currentEnding.achievements &&
-            currentEnding.achievements.length > 0 && (
-              <section aria-label="Story achievements">
-                <SectionWrapper title="Achievements">
-                  <ul
-                    className="component-ending-screen-achievements"
-                    role="list"
-                  >
-                    {currentEnding.achievements.map((achievement, index) => {
-                      // Split achievement into title and description
-                      const colonIndex = achievement.indexOf(':');
-                      const title =
-                        colonIndex > 0
-                          ? achievement.substring(0, colonIndex)
-                          : achievement;
-                      const description =
-                        colonIndex > 0
-                          ? achievement.substring(colonIndex + 1).trim()
-                          : '';
-
-                      return (
-                        <li
-                          key={index}
-                          className="component-ending-screen-achievement"
-                        >
-                          <div className="component-ending-screen-achievement-body">
-                            <span className="component-ending-screen-achievement-title">
-                              {title}
+                    return (
+                      <li
+                        key={index}
+                        className="component-ending-screen-achievement"
+                      >
+                        <div className="component-ending-screen-achievement-body">
+                          <span className="component-ending-screen-achievement-title">
+                            {title}
+                          </span>
+                          {description && (
+                            <span className="component-ending-screen-achievement-description">
+                              {description}
                             </span>
-                            {description && (
-                              <span className="component-ending-screen-achievement-description">
-                                {description}
-                              </span>
-                            )}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </SectionWrapper>
-              </section>
-            )}
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </SectionWrapper>
+            </section>
+          )}
 
-          {/* World Impact */}
-          <section>
-            <SectionWrapper title="Impact on the World">
-              <div className="manuscript-ending-prose">
-                {currentEnding.worldImpact}
-              </div>
-            </SectionWrapper>
-          </section>
+        {/* World Impact */}
+        <section>
+          <SectionWrapper title="Impact on the World">
+            <div className="manuscript-ending-prose">
+              {currentEnding.worldImpact}
+            </div>
+          </SectionWrapper>
+        </section>
 
-          {/* Your Story - Collapsible Section */}
-          <section>
-            <CollapsibleSection title="Your Story" initialCollapsed={true}>
-              <div>
-                {fullStory ? (
-                  <div className="manuscript-ending-prose">
-                    {fullStory.split(/\n{2,}/).map((paragraph, index) => (
-                      <p key={`story-paragraph-${index}`}>{paragraph.trim()}</p>
-                    ))}
-                  </div>
-                ) : (
-                  <p>No story checkpoints available for this session.</p>
-                )}
-              </div>
-            </CollapsibleSection>
-          </section>
+        {/* Your Story - Collapsible Section */}
+        <section>
+          <CollapsibleSection title="Your Story" initialCollapsed={true}>
+            <div>
+              {fullStory ? (
+                <div className="manuscript-ending-prose">
+                  {fullStory.split(/\n{2,}/).map((paragraph, index) => (
+                    <p key={`story-paragraph-${index}`}>{paragraph.trim()}</p>
+                  ))}
+                </div>
+              ) : (
+                <p>No story checkpoints available for this session.</p>
+              )}
+            </div>
+          </CollapsibleSection>
+        </section>
 
-          {/* Next Steps */}
-          <section>
-            <SectionWrapper title="What's Next?">
-              <CardActionGroup
-                primaryActions={navigationActions}
-                layout="horizontal"
-                gap="lg"
-              />
-            </SectionWrapper>
-          </section>
-        </div>
+        {/* Next Steps */}
+        <section>
+          <SectionWrapper title="What's Next?">
+            <CardActionGroup
+              primaryActions={navigationActions}
+              layout="horizontal"
+              gap="lg"
+            />
+          </SectionWrapper>
+        </section>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
 import { validateWorld } from '@/lib/utils/typeGuards';
+import { extractJsonObject } from '@/lib/ai/parseJSON';
 
 // Character level range for generated characters
 const CHARACTER_LEVEL_RANGE = { min: 1, max: 5 };
@@ -138,14 +139,14 @@ CRITICAL INSTRUCTIONS:
     };
     
     // Extract JSON from response
-    const jsonMatch = apiResponse.content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const json = extractJsonObject(apiResponse.content);
+    if (json === null) {
       logger.error('CharacterGenerator', 'No JSON found in response:', apiResponse.content);
       throw new Error('No valid JSON found in response');
     }
     
     // Clean the JSON string before parsing
-    let jsonString = jsonMatch[0];
+    let jsonString = json;
     
     // Remove any comments that might have been included
     jsonString = jsonString.replace(/\/\/.*$/gm, ''); // Remove single-line comments

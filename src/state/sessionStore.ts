@@ -672,29 +672,6 @@ export const useSessionStore = create<SessionStore>()(
     return !state.tutorialProgress.phases.intro.completed && !state.tutorialProgress.phases.intro.skipped;
   },
   
-  // Patch saved sessions' narrativeCount values. The counts are computed by
-  // the caller from narrativeStore (src/lib/session/fixSessionNarrativeCounts.ts)
-  // so this store doesn't import it back. Deliberately leaves lastPlayed alone.
-  repairSavedSessionNarrativeCounts: (counts) => {
-    set(state => {
-      const updatedSessions = { ...state.savedSessions };
-      let hasUpdates = false;
-
-      for (const [sessionId, actualCount] of Object.entries(counts)) {
-        const saved = updatedSessions[sessionId];
-        if (saved && saved.narrativeCount !== actualCount) {
-          updatedSessions[sessionId] = {
-            ...saved,
-            narrativeCount: actualCount,
-          };
-          hasUpdates = true;
-        }
-      }
-
-      return hasUpdates ? { savedSessions: updatedSessions } : {};
-    });
-  },
-
   shouldShowOnboarding: () => {
     // Show onboarding if intro phase is not complete/skipped
     return get().isFirstTimeUser();

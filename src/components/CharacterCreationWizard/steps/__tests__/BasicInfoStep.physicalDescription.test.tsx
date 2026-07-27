@@ -9,6 +9,7 @@ type BasicInfoStepData = ComponentProps<typeof BasicInfoStep>['data'];
 describe('BasicInfoStep - Physical Description', () => {
   const mockData = {
     characterData: {
+      worldId: 'world-1',
       name: 'Jamie Holt',
       description: 'A returning camp counselor',
       background: {
@@ -26,6 +27,7 @@ describe('BasicInfoStep - Physical Description', () => {
 
   const mockOnUpdate = jest.fn();
   const mockOnValidation = jest.fn();
+  const validateStep = jest.fn(() => ({ valid: true, errors: [], touched: true }));
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -33,7 +35,12 @@ describe('BasicInfoStep - Physical Description', () => {
 
   it('renders the physical description field', () => {
     render(
-      <BasicInfoStep data={mockData} onUpdate={mockOnUpdate} onValidation={mockOnValidation} />
+      <BasicInfoStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        onValidation={mockOnValidation}
+        validateStep={validateStep}
+      />
     );
 
     const field = screen.getByLabelText('Physical Description (optional)');
@@ -54,7 +61,12 @@ describe('BasicInfoStep - Physical Description', () => {
     } as unknown as BasicInfoStepData;
 
     render(
-      <BasicInfoStep data={dataWithDescription} onUpdate={mockOnUpdate} onValidation={mockOnValidation} />
+      <BasicInfoStep
+        data={dataWithDescription}
+        onUpdate={mockOnUpdate}
+        onValidation={mockOnValidation}
+        validateStep={validateStep}
+      />
     );
 
     expect(screen.getByLabelText('Physical Description (optional)')).toHaveValue(
@@ -64,7 +76,12 @@ describe('BasicInfoStep - Physical Description', () => {
 
   it('round-trips changes to background.physicalDescription', () => {
     render(
-      <BasicInfoStep data={mockData} onUpdate={mockOnUpdate} onValidation={mockOnValidation} />
+      <BasicInfoStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        onValidation={mockOnValidation}
+        validateStep={validateStep}
+      />
     );
 
     fireEvent.change(screen.getByLabelText('Physical Description (optional)'), {

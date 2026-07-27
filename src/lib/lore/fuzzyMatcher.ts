@@ -5,12 +5,10 @@
 
 import { distance } from 'fastest-levenshtein';
 import { normalizeText, NORM_NAME } from '../utils/textNormalization';
-import { checkLoreSimilarityClient } from './checkLoreSimilarityClient';
-import type { LoreFact, LoreCategory, DuplicateMatch, SimilarityResult } from '@/types/lore.types';
+import type { LoreFact, LoreCategory, DuplicateMatch } from '@/types/lore.types';
 import type { EntityID } from '@/types/common.types';
 
 // Confidence thresholds
-const HIGH_CONFIDENCE_THRESHOLD = 0.85;
 const MEDIUM_CONFIDENCE_THRESHOLD = 0.60;
 
 /**
@@ -123,84 +121,5 @@ export function findPotentialDuplicates(
   return duplicates.sort((a, b) => b.confidence - a.confidence);
 }
 
-/**
- * Check similarity between two specific facts
- * Uses hybrid approach: exact match -> alias match -> Levenshtein -> AI (if needed)
- */
-export async function checkFactSimilarity(
-  fact1: LoreFact,
-  fact2: LoreFact
-): Promise<SimilarityResult> {
-  // 1. Check exact normalized match
-  const normalized1 = normalizeText(fact1.value, NORM_NAME).toLowerCase();
-  const normalized2 = normalizeText(fact2.value, NORM_NAME).toLowerCase();
-
-  if (normalized1 === normalized2) {
-    return {
-      isDuplicate: true,
-      confidence: 1.0,
-      method: 'exact',
-      rationale: 'Exact match after normalization',
-    };
-  }
-
-  // 2. Check alias matches
-  if (matchesAlias(fact2.value, fact1.aliases || []) || matchesAlias(fact1.value, fact2.aliases || [])) {
-    return {
-      isDuplicate: true,
-      confidence: 1.0,
-      method: 'alias',
-      rationale: 'Value matches known alias',
-    };
-  }
-
-  // 3. Calculate Levenshtein similarity
-  const similarity = calculateStringSimilarity(fact1.value, fact2.value);
-
-  // High confidence match - no need for AI
-  if (similarity >= HIGH_CONFIDENCE_THRESHOLD) {
-    return {
-      isDuplicate: true,
-      confidence: similarity,
-      method: 'levenshtein',
-      rationale: `Names are ${Math.round(similarity * 100)}% similar`,
-    };
-  }
-
-  // Low confidence - clearly not duplicates
-  if (similarity < MEDIUM_CONFIDENCE_THRESHOLD) {
-    return {
-      isDuplicate: false,
-      confidence: similarity,
-      method: 'levenshtein',
-      rationale: `Names are only ${Math.round(similarity * 100)}% similar`,
-    };
-  }
-
-  // Medium confidence (0.60-0.85) - use AI for semantic check
-  try {
-    const aiResult = await checkLoreSimilarityClient({
-      name1: fact1.value,
-      name2: fact2.value,
-      category: fact1.category,
-    });
-
-    return {
-      isDuplicate: aiResult.similar,
-      confidence: aiResult.confidence,
-      method: 'ai',
-      rationale: aiResult.rationale || 'AI semantic analysis',
-    };
-  } catch {
-    // AI check failed - fall back to Levenshtein result
-    return {
-      isDuplicate: similarity >= 0.7, // Use slightly higher threshold as fallback
-      confidence: similarity,
-      method: 'levenshtein',
-      rationale: `Levenshtein similarity: ${Math.round(similarity * 100)}% (AI check unavailable)`,
-    };
-  }
-}
-
 // Export types
-export type { DuplicateMatch, SimilarityResult };
+export type { DuplicateMatch };

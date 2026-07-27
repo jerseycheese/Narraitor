@@ -193,6 +193,13 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     wizard.setValidation(wizard.state.currentStep, { valid, errors, touched: true });
   };
 
+  const validateCurrentStep = () => {
+    const validator = stepValidators[wizard.state.currentStep];
+    return validator
+      ? validator(wizard.state.data)
+      : { valid: true, errors: [], touched: true };
+  };
+
   const handleCreate = () => {
     // Validate all steps
     for (let i = 0; i < steps.length; i++) {
@@ -246,6 +253,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       data: legacyData,
       onUpdate: handleUpdate,
       onValidation: handleValidation,
+      validateStep: validateCurrentStep,
       worldConfig: world,
     };
 
@@ -294,12 +302,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizard.canGoBack ? handleBack : undefined}
-            onNext={wizard.canGoNext ? handleNext : undefined}
+            onNext={!wizard.isLastStep ? handleNext : undefined}
             onComplete={wizard.isLastStep ? handleCreate : undefined}
             currentStep={wizard.state.currentStep}
             totalSteps={steps.length}
             completeLabel="Create Character"
-            disabled={hasErrors}
+            disabled={wizard.state.isProcessing}
           />
         </div>
       </WizardContainer>

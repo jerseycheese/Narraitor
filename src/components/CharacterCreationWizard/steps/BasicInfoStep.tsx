@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { World } from '@/types/world.types';
 import { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
+import type { WizardValidation } from '@/hooks/useWizardState';
 
 interface CharacterWizardData {
   characterData: CharacterCreationData;
@@ -24,12 +25,15 @@ interface BasicInfoStepProps {
   data: CharacterWizardData;
   onUpdate: (updates: Partial<CharacterCreationData>) => void;
   onValidation: (valid: boolean, errors: string[]) => void;
+  validateStep: () => WizardValidation;
   worldConfig?: World;
 }
 
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   data,
   onUpdate,
+  onValidation,
+  validateStep,
   worldConfig,
 }) => {
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,10 +55,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
 
   const handleBlur = () => {
-    // Validation will be triggered by parent component
+    const result = validateStep();
+    onValidation(result.valid, result.errors);
   };
 
-  const validation = data.validation[1];
+  const validation = data.validation[0];
   const showErrors = validation?.touched && !validation?.valid;
 
   return (
@@ -67,7 +72,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       {/* Helpful tip */}
       <div>
         <p className="form-help-text">
-          Choose a unique name for your character. The name should be between 3 and 50 characters
+          Choose a unique name for your character. The name should be between 2 and 50 characters
           and must be unique within this world.
         </p>
       </div>
