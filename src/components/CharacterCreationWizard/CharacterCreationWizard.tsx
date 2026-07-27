@@ -302,12 +302,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizard.canGoBack ? handleBack : undefined}
-            onNext={wizard.canGoNext ? handleNext : undefined}
+            onNext={!wizard.isLastStep ? handleNext : undefined}
             onComplete={wizard.isLastStep ? handleCreate : undefined}
             currentStep={wizard.state.currentStep}
             totalSteps={steps.length}
             completeLabel="Create Character"
-            disabled={hasErrors}
+            disabled={wizard.state.isProcessing}
           />
         </div>
       </WizardContainer>
