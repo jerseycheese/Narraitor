@@ -127,7 +127,7 @@ describe('CharacterCreationWizard step validation display', () => {
     expect(screen.getByText('Too many attribute points')).toBeInTheDocument();
   });
 
-  it('shows skill errors from step 2', () => {
+  it('does not duplicate skill errors inside step 2', () => {
     render(
       <SkillsStep
         data={{
@@ -166,7 +166,7 @@ describe('CharacterCreationWizard step validation display', () => {
       />
     );
 
-    expect(screen.getByText('Select at least one skill')).toBeInTheDocument();
+    expect(screen.queryByText('Select at least one skill')).not.toBeInTheDocument();
   });
 
   it('shows background errors from step 3', () => {

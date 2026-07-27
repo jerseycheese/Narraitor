@@ -203,8 +203,6 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
   ]);
 
   const hasUnallocatedPoints = remainingPoints > 0;
-  const validation = data.validation[2];
-  const showErrors = validation?.touched && !validation?.valid;
   const selectedSkills = data.characterData.skills.filter(skill => skill.isSelected);
   const maxSelectable = Math.min(worldConfig?.settings?.maxSkills ?? MAX_SKILL_SELECTION_LIMIT, MAX_SKILL_SELECTION_LIMIT);
   const handleSkillToggle = (skillId: string) => {
@@ -393,16 +391,6 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           <p className={wizardStyles.form.error}>
             You have allocated more skill points than available. Reduce one or more skill levels.
           </p>
-        </div>
-      )}
-
-      {showErrors && (
-        <div className={wizardStyles.errorContainer}>
-          {validation.errors.map((error, index) => (
-            <p key={index} className={wizardStyles.form.error}>
-              {error}
-            </p>
-          ))}
         </div>
       )}
       </WizardFormSection>
