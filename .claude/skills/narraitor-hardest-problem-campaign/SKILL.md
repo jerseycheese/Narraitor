@@ -55,7 +55,7 @@ Cell C = (World 1, established character): drive one session to an ENDING; verif
 Cell D = (World 2, fresh character): short run (3-5 turns) to complete the off-diagonal -
         catches world-2 assumptions baked into onboarding defaults.
 Each cell: hard-refresh mid-session (persistence proof), check continuity vs loreStore facts,
-verify all three themes once (narraitor-theme switch), dark mode once.
+verify light and dark once each (Appearance menu / `narraitor-color-scheme`).
 Failure drills (mechanism: DevTools AI mocking panel + network kill - see ai-quality-discipline
 step 4): kill network mid-generation (error + retry path, #1478 machinery);
         invalid key (clear error, no hang); double-submit a choice.

@@ -3,7 +3,7 @@
  * Follows the badge.css / dialog.css precedent: token-based base styling lives
  * in production so the app and the living style guide render the same component.
  * Per-theme look comes from the design tokens resolving under the active
- * `data-theme` scope (src/lib/theme/themes/ds{1,2,3}.css) — no hardcoded colors.
+ * `data-theme` scope (src/lib/theme/themes/ds3.css) — no hardcoded colors.
  */
 
 .card {

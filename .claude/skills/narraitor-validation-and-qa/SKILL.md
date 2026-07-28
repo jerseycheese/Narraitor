@@ -35,7 +35,7 @@ The change class (per change-control) and the diff.
 **Adding tests (MVP-level, never rigged):**
 - New logic → co-located Jest test pinning the acceptance criteria (not implementation details).
 - New in-scope component → story (CI requires it) + promotion evidence per parity ladder.
-- New stable visual state worth pinning → visual spec: prefer locator screenshots over fullPage (sticky-shell artifacts, cascade blast radius); seed stores post-hydration; seed `narraitor-theme` for DS variants; regenerate affected baselines together, on macOS only; `npm run test:visual:prune` for orphans.
+- New stable visual state worth pinning → visual spec: prefer locator screenshots over fullPage (sticky-shell artifacts, cascade blast radius); seed stores post-hydration; seed `narraitor-color-scheme` for light/dark variants (the `narraitor-theme` key died with the DS picker in ADR-013); regenerate affected baselines together, on macOS only; `npm run test:visual:prune` for orphans.
 - Trivial one-line CSS/copy fixes: verify live instead of pinning a spec (test debt costs more than it protects).
 
 **Reading failures:** assertion vs timeout vs pixel-diff triage lives in `narraitor-debugging-playbook`; the flake protocol (re-run twice, show output) applies before any "flake" verdict. Failing CI outside your diff → check whether develop already has an in-flight fix before "fixing" it yourself.

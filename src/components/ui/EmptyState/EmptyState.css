@@ -5,7 +5,7 @@
  * each empty state rendered as bare top-left text. This gives the shared component one
  * token-based treatment — centered, comfortable measure, clear hierarchy — so every
  * empty state reads as finished. Per-theme look comes from the design tokens under the
- * active `data-theme` scope (ds{1,2,3}.css); no hardcoded colors.
+ * active `data-theme` scope (ds3.css); no hardcoded colors.
  */
 
 .component-empty-state {

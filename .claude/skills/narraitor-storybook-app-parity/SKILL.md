@@ -37,7 +37,7 @@ S3 QA-verified                 (exercised in a real flow incl. failure paths; ev
 5. **Network parity** — MSW canned responses (`.storybook/msw/handlers.ts`) are happy-path only. The real route can return errors, malformed payloads, or take seconds (timeout ceiling 120s). Exercise loading/error/empty in the APP, not only as story variants.
 6. **Runtime semantics** — hydration (component renders pre-hydration in the app; Storybook seeds synchronously so it never sees that window), App Router navigation (Storybook mocks the router as a logger), and multi-second AI latency.
 7. **Perf parity** — no re-render storm in the app that Storybook's isolated tree hides (React DevTools profiler on the real route when the component subscribes to hot stores like narrativeStore).
-8. **Cross-context** — all three themes (ds1/ds2/ds3 toolbar AND `narraitor-theme` in the app) + dark mode + mobile viewport; for data components, >= 2 worlds/characters.
+8. **Cross-context** — light and dark (`colorScheme` toolbar in Storybook, `narraitor-color-scheme` in the app) + mobile viewport; for data components, >= 2 worlds/characters. There's one design system since ADR-013, so light/dark is the whole matrix.
 
 **Diagnosis rule:** when tiers disagree, the divergence is in DATA or ENVIRONMENT, not in the component's paint logic. Find the input diff first (compare story seed to the real hydrated blob), then touch code.
 

@@ -32,10 +32,10 @@ None. Repo checkout on `develop` (run `git fetch && git status` first — never 
 | Cross-store cascades | `src/lib/state/storePubSub.ts` + `src/state/storeEventWiring.ts` |
 | AI generation | `src/lib/ai/` — model strings in `src/lib/ai/config.ts`; client fetch seam `src/lib/ai/aiFetch.ts`; server key resolution `src/lib/ai/resolveApiKey.ts` |
 | Prompt templates | `src/lib/promptTemplates/` (registry: `narrativeTemplateManager.ts`); context/token budget in `src/lib/promptContext/` |
-| Server endpoints | `src/app/api/**/route.ts` (20 routes: narrative/*, generate-*, ai/*, inventory/*, lore/*) |
+| Server endpoints | `src/app/api/**/route.ts` (19 routes: narrative/*, generate-*, ai/*, inventory/*) |
 | Client→API seam | `src/lib/api/` — components call these services, never raw fetch (dependency-cruiser enforces) |
 | UI components | `src/components/<Domain>/` with co-located `.css`; stories centralized in `src/stories/` |
-| Theming / tokens | `src/lib/theme/themes/{_shared-tokens,ds1,ds2,ds3}.css`; `ThemeProvider.tsx`; localStorage `narraitor-theme`, `narraitor-color-scheme` |
+| Theming / tokens | `src/lib/theme/themes/{_shared-tokens,ds3}.css`; `ThemeProvider.tsx`; localStorage `narraitor-color-scheme` (light/dark only — ADR-013 deleted DS1/DS2 and the `narraitor-theme` key with them) |
 | Pages | `src/app/` (App Router); dev harnesses under `src/app/dev/*` (knip-exempt, not production canon) |
 | Unit tests | co-located `src/**/__tests__` + `src/**/*.test.*`; config `jest.config.cjs` |
 | Visual/e2e tests | `tests/visual/**/*.spec.ts`; baselines `*-chromium-darwin.png`; config `playwright.config.ts` |

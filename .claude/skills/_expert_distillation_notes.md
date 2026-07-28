@@ -35,8 +35,8 @@ Phrases that must trigger a specific check before acceptance:
 | "just a copy tweak" | Copy lives in templates, components, and sometimes baselines. Does it shift visual snapshots? Is it in the project voice? No "AI" mentions in user-facing strings. |
 | "fixed" | Was the original failing command re-run and shown green? |
 | "small change" | Small diffs to stores, shared CSS, or templates have large blast radii. Enumerate the radius, then call it small. |
-| "same component" | Same component in a different design system context (DS1/DS2/DS3) renders differently by design. Check all three. |
-| "reads fine" / "looks done" | One playthrough? One world? One theme? One viewport? Name the coverage. |
+| "same component" | Same component renders differently in light vs dark, and `.app-surface-*` styles headings by tag. Check both schemes. |
+| "reads fine" / "looks done" | One playthrough? One world? One color scheme? One viewport? Name the coverage. |
 | "just a prompt change" | Prompt changes are behavior changes. They go through the template registry and multi-world evaluation, not inline string edits. |
 | "works on my world" | Worlds differ in tone, attributes, skills. Test on a contrasting world + a fresh character before generalizing. |
 | "transient flake" | Re-run the exact check twice, show output. Auth failure vs upstream outage vs real regression need different fixes. |

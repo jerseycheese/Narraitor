@@ -36,7 +36,7 @@ The intended diff (files + shape changes), and the output of `npm run deps:valid
 
 **I8. No wrapper-service layer.** Components use stores + lib services directly (ExportService was removed on purpose). Don't reintroduce pass-through service classes.
 
-**I9. Styling through tokens.** Plain CSS + `var(--token)` + `clsx`. Three design systems (ds1/ds2/ds3) differ structurally by design (ADR-011); Storybook is the canon surface (ADR-012).
+**I9. Styling through tokens.** Plain CSS + `var(--token)` + `clsx`. One design system, ds3 — not switchable (ADR-013 superseded ADR-011); only light/dark varies. Storybook is the canon surface (ADR-012).
 
 **May not be bypassed, ever:** stylelint color rules, `deps:validate`, `knip`, `skott:check`, `lint:ds-canon`, the persist `migrate` requirement, and the change-control evidence bar. Re-baselining any of these is an owner-visible decision with a written justification, not a fix.
 

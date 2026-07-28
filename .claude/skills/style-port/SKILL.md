@@ -12,10 +12,10 @@ Port inline styles from a reference source (demo component, Figma spec, screensh
 - **No `!important`** -- fix specificity at the selector level.
 - **No raw pixel values** when a design token exists (`--space-*`, `--radius-*`, `--font-*`). Token definitions live in `src/lib/theme/themes/`: spacing and `--radius-full` in `_shared-tokens.css`, `--font-*` and `--radius-sm/md/lg` in `ds3.css`.
 - **No demo-only UI** -- do not port components that only exist in the reference scaffold (state switchers, mock data chrome, debug panels).
-- **No dark-mode changes** -- theme overrides target `[data-theme="dsN"]` only. Do not touch `.dark` variants unless the plan explicitly calls for it.
+- **No dark-mode changes** -- stay in the base (light) rules. Do not touch `:root.dark` variants unless the plan explicitly calls for it.
 - **No new inline styles** -- the point is moving styles into CSS. Never add `style={{}}` to fix a gap.
 - **One canon location per surface** -- game-session styles go in `src/styles/manuscript-session.css`. Other surfaces use their own canonical stylesheet. No component-level CSS modules for layout/theme styles.
-- **Theme-scoped overrides** -- DS-specific rules use `[data-theme="ds1"]`, `[data-theme="ds2"]`, or `[data-theme="ds3"]` selectors.
+- **No DS-scoped overrides** -- there's one design system since ADR-013. `data-theme="ds3"` is a constant on `<html>`, not a switch, so don't write per-DS selector blocks; style the base rules directly.
 - **Merge, don't duplicate** -- if a selector already exists, add properties to the existing block rather than creating a new one. Reference the fix number when extending existing blocks.
 
 ## Phase 1: Inventory
@@ -54,7 +54,7 @@ Output a numbered fix list with CSS.
 ## Phase 4: Port
 
 Apply CSS changes to the production stylesheet:
-- Add new rules in the correct section (base, then DS1, DS2, DS3 override blocks).
+- Add new rules in the correct section (base rules, then any `:root.dark` overrides).
 - Merge into existing rule blocks when the selector already exists.
 - Keyframes go near other `@keyframes` definitions.
 - Maintain section order within the file.
@@ -91,6 +91,6 @@ This step catches the class of bugs where CSS inheritance produces different ren
 
 ## Workflow
 
-- Run per-theme when porting theme-specific styles (DS1 first, then DS2, then DS3).
+- Run once against ds3, then re-check in dark mode if the port touched color.
 - Each invocation produces a discrete set of numbered fixes.
 - Deferred items (error states, fundamentally different UX patterns, demo-only chrome) are called out but not ported.

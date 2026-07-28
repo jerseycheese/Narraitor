@@ -43,6 +43,6 @@ Utility: `delete-image`, `debug` (GET, dev).
 - `src/lib/ai/config.ts` — `gemini-2.5-flash`, `gemini-2.5-flash-image`, temperature 0.7, maxOutputTokens 2048, thinkingBudget 0.
 - `src/lib/api/*` — component-facing services (worldApi, characterApi, image APIs) — the only sanctioned `/api` callers.
 - `src/lib/utils/isPlaywrightEnv.ts` — automation gate (UA contains "Playwright" or `window.__PLAYWRIGHT__`).
-- `src/lib/theme/` — ThemeProvider, `themeInitScript.ts` (FOUC prevention), themes/{_shared-tokens,ds1,ds2,ds3}.css; localStorage `narraitor-theme`, `narraitor-color-scheme`; sessionStorage `generated-world-data` (wizard handoff).
+- `src/lib/theme/` — ThemeProvider, `themeInitScript.ts` (FOUC prevention), themes/{_shared-tokens,ds3}.css (ADR-013 deleted ds1/ds2); localStorage `narraitor-color-scheme` only; sessionStorage `generated-world-data` (wizard handoff).
 - IndexedDB: app state db `narraitor-state` / store `narraitor-store`; crypto keys db `narraitor-secure` / store `keys`.
 - Feature flags: `src/lib/featureFlags.ts` — `BUFFERED_STREAMING` (env `NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING`), `PROGRESSIVE_DISCLOSURE` (default true).

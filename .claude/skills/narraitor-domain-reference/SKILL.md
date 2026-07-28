@@ -1,6 +1,6 @@
 ---
 name: narraitor-domain-reference
-description: Applied domain knowledge a mid-level engineer lacks for Narraitor - the world/character/narrative/session data model, Zustand store and persistence conventions, Next.js 15 App Router pitfalls, streaming/latency realities of Gemini, and the three-design-system theming model. Use when reasoning about how domains relate, what a store field means, why hydration/persistence behaves oddly, or how AI-provider quirks shape the code.
+description: Applied domain knowledge a mid-level engineer lacks for Narraitor - the world/character/narrative/session data model, Zustand store and persistence conventions, Next.js 15 App Router pitfalls, streaming/latency realities of Gemini, and the single-design-system (ds3) theming model. Use when reasoning about how domains relate, what a store field means, why hydration/persistence behaves oddly, or how AI-provider quirks shape the code.
 ---
 
 # Narraitor domain reference
@@ -35,7 +35,7 @@ None; pair with the specific source files for anything you'll assert.
 - Tone settings flow into both prompts and per-request safety settings (`getSafetySettingsFromPrompt`); content rating is a player-facing feature, not boilerplate.
 - Token budget is managed (`src/lib/promptContext/tokenBudgetManager.ts`) — context is a spend, measured per turn.
 
-**Theming model.** Three deliberately DIFFERENT design systems (ADR-011): ds1 "drafting table", ds2 "warm earth", ds3 "mechanical manuscript" — they differ structurally (layout/spacing/shape/density), not just palette. `data-theme` attribute + CSS files under `src/lib/theme/themes/`; light/dark per theme; `.app-surface-*` rules style headings BY TAG, so changing an h2→h3 shifts sizes and visual baselines. A component is not theme-done until seen in all three, both modes.
+**Theming model.** ONE design system: ds3 "mechanical manuscript" (ADR-013 superseded ADR-011 and deleted ds1 "drafting table" and ds2 "warm earth"). It is not switchable — `data-theme="ds3"` is hardcoded on `<html>` in `src/app/layout.tsx`, and tokens live in `src/lib/theme/themes/{ds3,_shared-tokens}.css`. The only remaining axis is light/dark, selected by `:root.dark`. `.app-surface-*` rules style headings BY TAG, so changing an h2→h3 shifts sizes and visual baselines. A component is not theme-done until seen in both color schemes.
 
 **Tutorial system.** react-joyride, pinned prerelease (see failure-archaeology E4); tours anchor to real DOM — renames/moves of anchor elements silently break tours; the tutorials Playwright project exists to catch that.
 
@@ -49,7 +49,7 @@ Correct reasoning; when explaining to others, cite the source paths not this ski
 - Bad behavior this prevents: treating sessions as server entities and designing a "load my save from the cloud" fix — there is no server persistence; saves live in the player's browser, full stop (clearing site data IS losing the save).
 - Assuming store persist keys from the store's filename.
 - Writing `JSON.parse(response.text)` on Gemini output.
-- Judging theme work in ds1 only.
+- Judging theme work in one color scheme only (check light AND dark).
 
 ## 9. Related skills
 `narraitor-architecture-contract` (invariants) · `narraitor-repo-orientation` (map) · `narraitor-ai-quality-discipline` (behavior evaluation) · `narraitor-failure-archaeology` (why the quirks exist).
