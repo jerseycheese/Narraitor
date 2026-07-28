@@ -259,7 +259,7 @@ These values live in `globals.css` or component-level CSS, not in theme files.
 
 ## Storybook Documentation
 
-All design tokens are documented in Storybook with interactive swatches. Navigate to "Foundation, then Design Tokens" to explore the complete system visually.
+Tokens are shown in Storybook under "00-Foundation, then Design System Showcase". There is no separate Design Tokens story — the token reference is this document plus `src/lib/theme/themes/{_shared-tokens,ds3}.css`.
 
 ## Accessibility & Contrast
 

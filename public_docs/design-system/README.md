@@ -37,7 +37,7 @@ DS1 was the default until the collapse; DS3 is the only theme running now, hardc
 - **Theme provider** (sets `data-theme`, manages dark mode, persists color-scheme choice): [src/lib/theme/ThemeProvider.tsx](../../src/lib/theme/ThemeProvider.tsx)
 - **Global element resets / utility CSS**: [src/app/globals.css](../../src/app/globals.css)
 - **Game-session-specific styles**: [src/styles/manuscript-session.css](../../src/styles/manuscript-session.css)
-- **Storybook**: `npm run storybook` (port 6006) — the canon frontend surface (ADR-012). Foundation stories at [src/stories/00-foundation/](../../src/stories/00-foundation/) (`DesignSystemShowcase`, `DesignTokens`). The toolbar has a light/dark switcher — verify components in both. The old showcase pages (`/dev/design-system{,-2,-3}`) are retired.
+- **Storybook**: `npm run storybook` (port 6006) — the canon frontend surface (ADR-012). The foundation story is [src/stories/00-foundation/](../../src/stories/00-foundation/) `DesignSystemShowcase`. The toolbar has a light/dark switcher — verify components in both. The old showcase pages (`/dev/design-system{,-2,-3}`) are retired.
 
 ## Documentation in this directory
 
