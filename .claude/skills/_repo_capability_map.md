@@ -70,7 +70,7 @@ All `stale-risk`, verified by discovery grep this session:
 2. ~~`public_docs/features/ai-systems.md` names `gemini-2.0-flash`~~ — FIXED in the doc-rot sweep; it now points at `src/lib/ai/config.ts` rather than naming a model inline.
 3. `public_docs/architecture/ADR-007-tailwind-shadcn-styling.md` + `design-system/shadcn-integration-guide.md` describe Tailwind/cva/cn() — correctly marked historical; do not treat as current guidance.
 4. Project memory (out-of-repo) claim that `streamResilience.ts` exists but is unwired — file deleted; stale.
-5. `docs/plans/*` are point-in-time implementation plans; several describe completed/superseded work (e.g. #1038 clean-slate) — never treat as current state.
+5. `docs/plans/archive/*` are point-in-time implementation plans, all now archived; several describe completed/superseded work (e.g. #1038 clean-slate) — never treat as current state. Note `docs/` is gitignored entirely (committed docs go in `public_docs/`), so these are local scratch, not repo history.
 
 ## 8. Known failure modes
 
