@@ -43,7 +43,7 @@ npm run lint:css           # Stylelint over **/*.css — run after ANY .css edit
 - `app/` — Next.js routes (App Router).
 - `components/` — React components, organized by domain.
 - `state/` — Zustand stores (the source of truth for app data): world, character, narrative, lore, inventory, npc, journal, goal, navigation, session, plus `persistence.ts` (IndexedDB).
-- `lib/` — non-UI logic: `ai/`, `api/`, `design-tokens/`, `generators/`, `devtools/`, feature flags.
+- `lib/` — non-UI logic: `ai/`, `api/`, `theme/` (design tokens), `generators/`, `devtools/`, feature flags.
 - `services/`, `hooks/`, `utils/`, `types/`, `styles/`, `stories/` (Storybook).
 
 ## Conventions

@@ -72,4 +72,4 @@ See these implementations:
 
 ## Documentation
 
-Full documentation: [/docs/components/shared-wizard-system.md](/docs/components/shared-wizard-system.md)
+Full documentation: [shared-wizard-system.md](../../../../public_docs/technical-guides/components/shared-wizard-system.md)

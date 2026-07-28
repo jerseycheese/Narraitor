@@ -11,7 +11,7 @@ Use this checklist during reviews to keep Narraitor changes consistent with exis
 ## Design tokens
 - No hardcoded colors in TS/TSX or CSS.
 - Use `var(--color-*)` design tokens directly — complete colors, don't wrap in `hsl()`. Status/domain tokens (`--success`, `--warning`, `--ending-*`, `--alignment-*`, etc.) are raw HSL channels and must be wrapped: `hsl(var(--success))`. Full split in `public_docs/design-system/design-tokens.md`.
-- For JS-accessible tokens, use `src/lib/design-tokens`.
+- There is no JS token module — read computed styles when JavaScript needs a token value. (`src/lib/design-tokens/` was deleted in #1509.)
 
 ## Error handling
 - Use helpers in `src/lib/utils/errorUtils.ts` for user-facing errors.
@@ -20,7 +20,7 @@ Use this checklist during reviews to keep Narraitor changes consistent with exis
 
 ## State management
 - Keep state in domain stores under `src/state/`.
-- Use `CrudStore` patterns when appropriate (`src/state/createCrudStore.ts`).
+- Use `CrudStore` patterns when appropriate (`src/state/crudStore.types.ts`).
 - Use `persist` + `createIndexedDBStorage` when state should survive reloads.
 - Avoid direct store-to-store imports; use `storeEvents` (`src/lib/state/storePubSub.ts`) or parent orchestration.
 

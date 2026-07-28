@@ -81,7 +81,7 @@ node update-user-stories.js --dry-run
 node update-user-stories.js --issue=123
 ```
 
-For more comprehensive documentation on working with user stories and GitHub issues, see the [GitHub Sync Guide](/docs/requirements/github-sync-guide.md).
+For more comprehensive documentation on working with user stories and GitHub issues, see the [GitHub Sync Guide](../../public_docs/development/github-sync-guide.md).
 
 ## Processing Issues
 
@@ -98,4 +98,4 @@ node scripts/user-stories/process-issues.js --skip 100 --limit 50
 node scripts/user-stories/process-issues.js --help
 ```
 
-For more comprehensive documentation on working with user stories and GitHub issues, see the [GitHub Sync Guide](/docs/requirements/github-sync-guide.md).
+For more comprehensive documentation on working with user stories and GitHub issues, see the [GitHub Sync Guide](../../public_docs/development/github-sync-guide.md).
