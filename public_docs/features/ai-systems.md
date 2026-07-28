@@ -264,13 +264,15 @@ The testing harnesses let you try out different scenarios without having to set 
 
 When AI service fails, the app continues without AI features. There's automatic retry logic with exponential backoff, and fallback content provides default options when AI is unavailable.
 
-For network issues, there's a 15-second timeout on AI requests, clear error messages when rate limits are exceeded, and user-friendly error states for connection problems.
+For network issues, AI requests run against explicit timeout budgets (see `src/lib/constants/aiTimeouts.ts`), with clear error messages when rate limits are exceeded and user-friendly error states for connection problems.
 
 ## Configuration
 
 Environment variables are straightforward: `GEMINI_API_KEY` is an optional server-side fallback (never use a `NEXT_PUBLIC_` provider key), `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging, and `NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true` is an opt-in switch for token-budget-based prompt truncation.
 
-The model configuration uses gemini-2.0-flash as the primary model, temperature of 0.7 for creative content, and max tokens vary by use case (200 for choices, 500 for narrative).
+The model configuration (`src/lib/ai/config.ts`) uses gemini-2.5-flash as the primary model and gemini-2.5-flash-image for image generation, temperature of 0.7 for creative content, and a 2048-token default output budget that individual callers can tighten (the significance validator caps at 200, for instance). Gemini's dynamic "thinking" is disabled by default — it burns latency and output-token budget on interactive game requests.
+
+Timeout budgets live in `src/lib/constants/aiTimeouts.ts`, deliberately derived from each other so client and server can't drift: 30s for a single server-side Gemini attempt, 45s as the browser ceiling for single-attempt text routes, and 120s for routes that run the retry loop server-side or generate images.
 
 ## Best Practices
 

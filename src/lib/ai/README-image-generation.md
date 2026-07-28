@@ -62,8 +62,11 @@ face close-up digital painting, high quality, detailed"
 ## API Details
 
 ### Endpoint
+
+The model is read from config rather than hardcoded — see `imageModelName` in `src/lib/ai/config.ts` (currently `gemini-2.5-flash-image`), used by `geminiImageGenerator.ts`:
+
 ```
-https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent
+https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().imageModelName}:generateContent
 ```
 
 ### Request Format
