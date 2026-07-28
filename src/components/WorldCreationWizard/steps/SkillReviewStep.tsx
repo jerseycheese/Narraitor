@@ -53,6 +53,17 @@ interface SkillReviewStepProps {
   onClearSuggestions?: () => void;
 }
 
+/** Maps a skill difficulty to its badge class names. */
+const difficultyBadgeClass = (difficulty: string): string => {
+  const variant =
+    difficulty === 'easy'
+      ? wizardStyles.badge.success
+      : difficulty === 'medium'
+        ? wizardStyles.badge.warning
+        : wizardStyles.badge.danger;
+  return `${wizardStyles.badge.base} ${variant}`;
+};
+
 /**
  * SkillReviewStep - World Creation Wizard step for reviewing and customizing skills
  *
@@ -72,16 +83,6 @@ interface SkillReviewStepProps {
  * @param props - Component props
  * @returns JSX element for the skill review step
  */
-const difficultyBadgeClass = (difficulty: string): string => {
-  const variant =
-    difficulty === 'easy'
-      ? wizardStyles.badge.success
-      : difficulty === 'medium'
-        ? wizardStyles.badge.warning
-        : wizardStyles.badge.danger;
-  return `${wizardStyles.badge.base} ${variant}`;
-};
-
 export default function SkillReviewStep({
   worldData,
   suggestions,
