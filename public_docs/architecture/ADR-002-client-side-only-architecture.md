@@ -33,7 +33,7 @@ generation** (`src/app/api/**`). There's no application database, no user accoun
 session backend.
 
 Every API route under `src/app/api/` is an AI/generation or AI-adjacent data-processing proxy
-(`narrative/generate`, `generate-character`, `inventory/categorize`, `lore/check-similarity`,
+(`narrative/generate`, `generate-character`, `inventory/categorize`, `inventory/check-similarity`,
 and so on). None of them read or write a server-side store.
 
 ## Why This Made Sense

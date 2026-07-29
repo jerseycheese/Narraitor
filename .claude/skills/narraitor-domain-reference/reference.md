@@ -28,7 +28,7 @@ Event bus: `src/lib/state/storePubSub.ts` — `storeEvents.subscribe/subscribeOn
 Narrative routes — request bodies DIFFER per route (read the handler before curling): `narrative/generate` (1024 tok) and `narrative/choices` (2048 tok) take `{prompt: string}` via `processGeminiTextRequest`; `narrative/ending` takes session/character/world ids + optional desiredTone/customPrompt; `narrative/summarize` takes `{content, ...}`; `story-checkpoint` and `validate-event-significance` have their own shapes.
 Generation: `generate-world`, `generate-character`, `generate-portrait`, `generate-world-image`, `generate-item-image`, `generate-journal-image`, `generate-ending-image`.
 AI meta: `ai/analyze-world`, `ai/validate-provider`.
-Data assists: `inventory/categorize`, `inventory/check-similarity`, `lore/check-similarity`.
+Data assists: `inventory/categorize`, `inventory/check-similarity`. (There is no `lore/check-similarity` route — it was deleted in #1634.)
 Utility: `delete-image`, `debug` (GET, dev).
 
 ## User-facing routes (observed)

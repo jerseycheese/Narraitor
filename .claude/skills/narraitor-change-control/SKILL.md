@@ -29,7 +29,7 @@ The diff (or planned diff), its classification (below), and the artifacts you al
 | Component / user-facing UI | Code gate PLUS parity ladder >= S2 per `narraitor-storybook-app-parity` (S3 for user-facing features) — unit-green + story alone NEVER earns "done" for UI |
 | Test-only | The test fails without the fix / passes with it — shown, not asserted |
 | AI-route / AI-behavior | Code gate PLUS multi-world evidence per `narraitor-ai-quality-discipline`; prompt changes per `narraitor-prompt-template-governance` |
-| Design-system / CSS | Code gate PLUS `lint:css`, all three DS themes + dark mode checked, visual baselines regenerated together if shared chrome moved |
+| Design-system / CSS | Code gate PLUS `lint:css`, both color schemes (light + dark) checked — one design system since ADR-013 — visual baselines regenerated together if shared chrome moved |
 | Store-shape | Code gate PLUS the blast-radius checklist in `narraitor-architecture-contract` (persist migrate!) |
 | Content/copy | Project voice, no "AI" in user-facing strings, baseline impact checked |
 

@@ -34,7 +34,7 @@ Also note any CSS classes in the reference that don't exist in the production st
 For each inventoried style, find the production equivalent:
 - Which CSS class targets the same element?
 - Which properties are already declared?
-- Are there theme-scoped `[data-theme="dsN"]` overrides that partially cover it?
+- Are there `:root.dark` overrides that partially cover it?
 
 Output a mapping table:
 
@@ -45,8 +45,8 @@ Output a mapping table:
 
 For each gap, determine the exact CSS declaration:
 - Convert px to the nearest design token or rem.
-- DS-specific rules go under `[data-theme="dsN"]`.
-- Base/shared rules go unscoped.
+- Dark-only rules go under `:root.dark`.
+- Everything else goes unscoped — there's one design system, so base rules are the default.
 - If an existing block partially covers the fix, merge into it.
 
 Output a numbered fix list with CSS.
@@ -71,7 +71,7 @@ Remove inline styles from production React components:
 - [ ] `npx stylelint` on the modified stylesheet -- clean
 - [ ] `npx tsc --noEmit` -- clean (no type errors from removed style props)
 - [ ] Relevant Jest tests pass
-- [ ] Other themes unaffected (all new DS-specific rules are `[data-theme]` scoped)
+- [ ] Dark mode unaffected (any dark-only rule is scoped to `:root.dark`; no stray `[data-theme]` blocks)
 - [ ] No `!important` introduced
 - [ ] No raw pixel values where tokens exist
 - [ ] No remaining inline `style=` props for ported properties
@@ -82,7 +82,7 @@ Remove inline styles from production React components:
 Code-level diffs catch explicit property gaps but miss inherited-style artifacts (e.g., a wrapper div inheriting a larger line-height, inflating badge height). After porting, use the `dev-browser` skill to:
 
 0. **Float the browser window** -- AeroSpace tiles Chromium by default, constraining the viewport and breaking media query tests. After the dev-browser server starts, run: `aerospace layout floating` (targets the focused window). Verify with `window.innerWidth` in a script before relying on breakpoint-dependent CSS.
-1. **Inject both demo and production markup** into the same page under the target `[data-theme]`.
+1. **Inject both demo and production markup** into the same page, in the color scheme you're porting for.
 2. **Screenshot side-by-side** for visual comparison.
 3. **Extract computed styles** from matching elements and diff key metrics: height, padding, margin, font-size, line-height, color.
 4. **Fix discrepancies** found only through computed-style comparison (not visible in source code).

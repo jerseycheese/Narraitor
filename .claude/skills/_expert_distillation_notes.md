@@ -53,7 +53,7 @@ Phrases that must trigger a specific check before acceptance:
 4. Boundaries: does it respect domain boundaries and store contracts? (npm run deps:validate must stay green.)
 5. Styling: design tokens only? (npm run lint:css must stay green — no hex/named/rgb colors outside theme files.)
 6. Persistence: does state survive reload? (IndexedDB rehydration — test with a hard refresh, not just SPA nav.)
-7. Themes: correct in all three design systems and both light/dark where applicable?
+7. Themes: correct in both light and dark? (One design system, ds3, since ADR-013.)
 8. Voice: copy in project voice, no "AI" in user-facing strings?
 9. Proof: is there a test, screenshot, or command output — not just a claim?
 10. Status: is the claimed status backed by artifacts (issue scope met, PR, CI green, QA log entry)?
@@ -109,7 +109,7 @@ Any "no" → the change is not done; the item names the next action.
 - **streamResilience built, never wired, then deleted.** A resilience middleware shipped (#903) with no caller and was ultimately removed as dead code. Doctrine: infrastructure without a caller is dead on arrival — wire it or don't build it; also, memory/docs about it are now stale. Encoded in: failure-archaeology, change-control.
 - **Visual-baseline cascade pain.** Shared-chrome CSS changes repeatedly diffed a dozen baselines across specs; chasing them one at a time wasted sessions. Doctrine: regenerate all affected baselines at once; prefer locator screenshots over fullPage; single-spec height diff = stale base. Encoded in: validation-and-qa, debugging-playbook.
 - **Ambient Gemini types shadow the SDK.** `src/types/@google/genai.d.ts` REPLACES the real SDK types (known — file exists). New SDK fields must be added there or tsc fails in confusing ways. Encoded in: domain-reference, debugging-playbook.
-- **gemini-2.0-flash retirement.** The model string went stale in code while docs still referenced it; the current model is gemini-2.5-flash (known — `src/lib/ai/config.ts`; `public_docs/features/ai-systems.md` still says 2.0 — stale-risk). Doctrine: model names are volatile config; verify with grep, smoke live via curl. Encoded in: build-test-env, diagnostics-and-tooling.
+- **gemini-2.0-flash retirement.** The model string went stale in code while docs still referenced it; the current model is gemini-2.5-flash (known — `src/lib/ai/config.ts`). `public_docs/features/ai-systems.md` was the stale consumer and is now corrected — it points at `config.ts` instead of naming a model inline. Doctrine: model names are volatile config; don't restate them in prose, verify with grep, smoke live via curl. Encoded in: build-test-env, diagnostics-and-tooling.
 - **The hallucinated revert (meta-lesson from this pass).** A discovery agent reported a "personalizationEngine rollback at #1195"; the factual review proved #1195 is a merged DS wizard PR and no such revert exists. Doctrine: agent-mined history is `observed` at best; superlative claims ("the single X") get direct `git log`/`gh` verification before encoding. Encoded in: failure-archaeology E8.
 - **`scripts/validate-prompt-templates.js` is a standalone demo, not a gate.** It defines its own toy `PromptTemplateManager` and never imports the real registry (known — read this session). Doctrine: don't cite it as prompt-template validation; the real registry is `src/lib/promptTemplates/narrativeTemplateManager.ts` and the real gate is its `__tests__` + the eval discipline. Encoded in: prompt-template-governance.
 
