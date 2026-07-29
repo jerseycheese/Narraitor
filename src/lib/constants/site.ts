@@ -36,6 +36,16 @@ export function getSiteUrl(): string {
   const deploymentHost = process.env.VERCEL_URL?.trim();
   if (deploymentHost) return toHttpsOrigin(deploymentHost);
 
+  // robots.txt, the sitemap, and every canonical are generated at build time,
+  // so a localhost origin here would be published permanently. On Vercel one of
+  // the hosts above is always set; anywhere else, refuse rather than ship a
+  // dead URL to crawlers.
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'NEXT_PUBLIC_SITE_URL must be set for a production build — without it, robots.txt, the sitemap, and every canonical link would publish a localhost URL.',
+    );
+  }
+
   // Worktrees each run the dev server on their own port, so read it rather
   // than assume 3000 — otherwise local sitemap and canonical output is a lie.
   return `http://localhost:${process.env.PORT?.trim() || DEFAULT_LOCAL_PORT}`;

@@ -7,8 +7,13 @@
  */
 import { getSiteUrl } from '../site';
 
+// NODE_ENV is typed read-only, so it can only be swapped via defineProperty.
+const setNodeEnv = (value: string) =>
+  Object.defineProperty(process.env, 'NODE_ENV', { value, configurable: true });
+
 describe('getSiteUrl', () => {
   const originalEnv = process.env;
+  const originalNodeEnv = process.env.NODE_ENV;
 
   beforeEach(() => {
     process.env = { ...originalEnv };
@@ -20,6 +25,7 @@ describe('getSiteUrl', () => {
 
   afterEach(() => {
     process.env = originalEnv;
+    setNodeEnv(originalNodeEnv ?? 'test');
   });
 
   it('prefers NEXT_PUBLIC_SITE_URL over the Vercel hosts', () => {
@@ -56,5 +62,18 @@ describe('getSiteUrl', () => {
     process.env.PORT = '3684';
 
     expect(getSiteUrl()).toBe('http://localhost:3684');
+  });
+
+  it('refuses to publish a localhost origin from a production build', () => {
+    setNodeEnv('production');
+
+    expect(() => getSiteUrl()).toThrow(/NEXT_PUBLIC_SITE_URL must be set/);
+  });
+
+  it('still resolves in production once an origin is configured', () => {
+    setNodeEnv('production');
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = 'project.vercel.app';
+
+    expect(getSiteUrl()).toBe('https://project.vercel.app');
   });
 });

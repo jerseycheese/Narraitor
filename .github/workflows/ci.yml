@@ -236,7 +236,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-
 
+      # getSiteUrl() refuses to fall back to localhost in a production build, so
+      # the origin has to be declared. This artifact is only ever compiled and
+      # thrown away, never served, so the value itself doesn't matter — the real
+      # deployment gets NEXT_PUBLIC_SITE_URL from its platform config.
       - name: Build application
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
         run: npm run build
 
   storybook:
