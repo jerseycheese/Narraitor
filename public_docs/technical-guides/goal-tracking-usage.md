@@ -56,10 +56,10 @@ goalStore.addProgressNote(goalId, 'Discovered secret passage');
 ### Automatic Goal Extraction
 The real magic happens when the AI reads narrative content and automatically detects goals:
 ```typescript
-import { goalExtractor } from '@/lib/ai/goalExtractor';
+import { extractGoalsFromNarrative } from '@/lib/ai/goalExtractor';
 
 // Extract goals from narrative content
-const extractionResult = await goalExtractor.extractGoalsFromNarrative({
+const extractionResult = await extractGoalsFromNarrative({
   content: 'The wizard told me I must find the Crystal of Power before the moon sets.',
   sessionId: 'session-123',
   segmentId: 'segment-456',
@@ -80,12 +80,12 @@ for (const update of extractionResult.updatedGoals) {
 ### Context Building for AI
 When generating new narrative content, the AI needs to know what goals are active:
 ```typescript
-import { aiContextStore } from '@/state/aiContextStore';
+import { useAiContextStore } from '@/state/aiContextStore';
 
-// Build goal context for AI prompt
-const context = aiContextStore.buildContextForSession(sessionId, {
+// Build goal context for AI prompt. buildContextForSession is async.
+const context = await useAiContextStore.getState().buildContextForSession(sessionId, {
   includeGoals: true,
-  maxTokens: 500,
+  maxChars: 500,
   prioritizeRecent: true
 });
 
