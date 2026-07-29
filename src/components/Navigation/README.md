@@ -145,8 +145,8 @@ npm run storybook
 
 
 ## Related Components
-- [NavigationLoadingProvider](../shared/NavigationLoadingProvider.md)
-- [LoadingOverlay](../shared/LoadingOverlay.md)
+- [NavigationLoadingProvider](../shared/NavigationLoadingProvider.tsx)
+- [LoadingOverlay](../shared/LoadingOverlay.tsx)
 - [Breadcrumbs](./Breadcrumbs.tsx)
 
 ## Migration Notes

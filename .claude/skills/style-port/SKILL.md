@@ -12,10 +12,10 @@ Port inline styles from a reference source (demo component, Figma spec, screensh
 - **No `!important`** -- fix specificity at the selector level.
 - **No raw pixel values** when a design token exists (`--space-*`, `--radius-*`, `--font-*`). Token definitions live in `src/lib/theme/themes/`: spacing and `--radius-full` in `_shared-tokens.css`, `--font-*` and `--radius-sm/md/lg` in `ds3.css`.
 - **No demo-only UI** -- do not port components that only exist in the reference scaffold (state switchers, mock data chrome, debug panels).
-- **No dark-mode changes** -- theme overrides target `[data-theme="dsN"]` only. Do not touch `.dark` variants unless the plan explicitly calls for it.
+- **No dark-mode changes** -- stay in the base (light) rules. Do not touch `:root.dark` variants unless the plan explicitly calls for it.
 - **No new inline styles** -- the point is moving styles into CSS. Never add `style={{}}` to fix a gap.
 - **One canon location per surface** -- game-session styles go in `src/styles/manuscript-session.css`. Other surfaces use their own canonical stylesheet. No component-level CSS modules for layout/theme styles.
-- **Theme-scoped overrides** -- DS-specific rules use `[data-theme="ds1"]`, `[data-theme="ds2"]`, or `[data-theme="ds3"]` selectors.
+- **No DS-scoped overrides** -- there's one design system since ADR-013. `data-theme="ds3"` is a constant on `<html>`, not a switch, so don't write per-DS selector blocks; style the base rules directly.
 - **Merge, don't duplicate** -- if a selector already exists, add properties to the existing block rather than creating a new one. Reference the fix number when extending existing blocks.
 
 ## Phase 1: Inventory
@@ -34,7 +34,7 @@ Also note any CSS classes in the reference that don't exist in the production st
 For each inventoried style, find the production equivalent:
 - Which CSS class targets the same element?
 - Which properties are already declared?
-- Are there theme-scoped `[data-theme="dsN"]` overrides that partially cover it?
+- Are there `:root.dark` overrides that partially cover it?
 
 Output a mapping table:
 
@@ -45,8 +45,8 @@ Output a mapping table:
 
 For each gap, determine the exact CSS declaration:
 - Convert px to the nearest design token or rem.
-- DS-specific rules go under `[data-theme="dsN"]`.
-- Base/shared rules go unscoped.
+- Dark-only rules go under `:root.dark`.
+- Everything else goes unscoped — there's one design system, so base rules are the default.
 - If an existing block partially covers the fix, merge into it.
 
 Output a numbered fix list with CSS.
@@ -54,7 +54,7 @@ Output a numbered fix list with CSS.
 ## Phase 4: Port
 
 Apply CSS changes to the production stylesheet:
-- Add new rules in the correct section (base, then DS1, DS2, DS3 override blocks).
+- Add new rules in the correct section (base rules, then any `:root.dark` overrides).
 - Merge into existing rule blocks when the selector already exists.
 - Keyframes go near other `@keyframes` definitions.
 - Maintain section order within the file.
@@ -71,7 +71,7 @@ Remove inline styles from production React components:
 - [ ] `npx stylelint` on the modified stylesheet -- clean
 - [ ] `npx tsc --noEmit` -- clean (no type errors from removed style props)
 - [ ] Relevant Jest tests pass
-- [ ] Other themes unaffected (all new DS-specific rules are `[data-theme]` scoped)
+- [ ] Dark mode unaffected (any dark-only rule is scoped to `:root.dark`; no stray `[data-theme]` blocks)
 - [ ] No `!important` introduced
 - [ ] No raw pixel values where tokens exist
 - [ ] No remaining inline `style=` props for ported properties
@@ -82,7 +82,7 @@ Remove inline styles from production React components:
 Code-level diffs catch explicit property gaps but miss inherited-style artifacts (e.g., a wrapper div inheriting a larger line-height, inflating badge height). After porting, use the `dev-browser` skill to:
 
 0. **Float the browser window** -- AeroSpace tiles Chromium by default, constraining the viewport and breaking media query tests. After the dev-browser server starts, run: `aerospace layout floating` (targets the focused window). Verify with `window.innerWidth` in a script before relying on breakpoint-dependent CSS.
-1. **Inject both demo and production markup** into the same page under the target `[data-theme]`.
+1. **Inject both demo and production markup** into the same page, in the color scheme you're porting for.
 2. **Screenshot side-by-side** for visual comparison.
 3. **Extract computed styles** from matching elements and diff key metrics: height, padding, margin, font-size, line-height, color.
 4. **Fix discrepancies** found only through computed-style comparison (not visible in source code).
@@ -91,6 +91,6 @@ This step catches the class of bugs where CSS inheritance produces different ren
 
 ## Workflow
 
-- Run per-theme when porting theme-specific styles (DS1 first, then DS2, then DS3).
+- Run once against ds3, then re-check in dark mode if the port touched color.
 - Each invocation produces a discrete set of numbered fixes.
 - Deferred items (error states, fundamentally different UX patterns, demo-only chrome) are called out but not ported.

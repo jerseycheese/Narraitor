@@ -16,9 +16,9 @@ Honest inventory of what this pass did NOT verify, suspects is stale, or needs t
 ## Docs suspected stale (flagged, not fixed — deliberate: this pass writes only inside .claude/skills/)
 
 - `DESIGN.md` + `public_docs/design-system/README.md`: residual `/dev/design-system*` references (pages retired per ADR-012; DESIGN.md largely names Storybook canon already — the staleness is residual lines). Candidate follow-up: a docs-only PR.
-- `public_docs/features/ai-systems.md`: names `gemini-2.0-flash`; code says `gemini-2.5-flash`.
+- ~~`public_docs/features/ai-systems.md`: names `gemini-2.0-flash`~~ — FIXED in the doc-rot sweep (model, timeout, and token-budget claims all corrected against `src/lib/ai/config.ts` and `src/lib/constants/aiTimeouts.ts`).
 - `public_docs/development/mvp-roadmap.md`: Phase A/B/C items may lag actual completion (memory says Phase C shipped); the campaign skill re-derives gate state from issues instead.
-- PRE-EXISTING skills carry stale content this pass deliberately did not edit (they're the owner's files): `style-port` cites a nonexistent token path (actual: `src/lib/theme/themes/_shared-tokens.css`); `narraitor-architecture`/`narraitor-pattern-alignment-skill` retain shadcn-era mentions; `review` mandates emoji in review output, conflicting with the owner's no-emoji rule. Candidate follow-up: a small sibling-cleanup PR (flagged in `_review_doctrine.md` I4).
+- PRE-EXISTING skills carried stale content this pass deliberately did not edit. Largely resolved since: `style-port`'s dead token path is fixed (now `src/lib/theme/themes/`), and the `review` emoji mandate is gone. The doc-rot sweep additionally purged pre-ADR-013 DS1/DS2 content from nine skills. Still open: `narraitor-architecture`/`narraitor-pattern-alignment-skill` retain shadcn-era mentions — accurate as provenance for `src/components/ui/`, but they should not read as license to add `cva`/`cn()` (see `_review_doctrine.md` I4).
 - Out-of-repo project memory: streamResilience claim confirmed stale this session (file deleted); other memory entries were spot-checked (joyride ✓, genai.d.ts ✓, model string ✓) but not exhaustively.
 
 ## Repo areas not inspected in depth

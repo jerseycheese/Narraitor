@@ -84,13 +84,13 @@ thinking through all the states a component has to handle.
 
 **Test-Driven Development**: Jest and React Testing Library, focused on what users actually
 experience rather than implementation details. There's no point testing CSS classes when the
-behavior is what matters. Stryker mutation testing backs this up on the state, storage, and
-narrative layers.
+behavior is what matters.
 
-**Verification canon**: A visual change is verified against the `/dev/design-system{,-2,-3}`
-showcase routes first, then Storybook, then the app — when they disagree, the showcase wins.
-Feature work flows from component isolation (Storybook) to integration (the `/dev/*` harnesses)
-to the full app.
+**Verification canon**: Storybook is the single canon frontend surface ([ADR-012](ADR-012-storybook-single-canon-surface.md))
+— when production drifts from Storybook, production is wrong. The `/dev/design-system{,-2,-3}`
+showcase routes that used to hold this role were deleted along with the living style guide.
+Feature work still flows from component isolation (Storybook) to integration (the remaining
+`/dev/*` harnesses) to the full app.
 
 ## Product Decisions
 

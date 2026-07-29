@@ -208,9 +208,9 @@ Three semantic font slots are available as utility classes:
 <span className="font-interface">Button Label</span>
 ```
 
-### Direct Import (Rare)
+### Reading Token Values From JavaScript
 
-For JavaScript contexts like chart libraries that need actual values, the legacy TypeScript tokens at `src/lib/design-tokens/` still exist. However, CSS custom properties are the canonical system — prefer reading computed styles when JS values are needed.
+There is no TypeScript token module. The parallel hardcoded-hex tokens at `src/lib/design-tokens/` were deleted in [#1509](https://github.com/jerseycheese/Narraitor/pull/1509) because they were a pre-ADR-011, single-theme copy that drifted from the CSS. CSS custom properties are the only token system — when a JavaScript context like a chart library needs an actual value, read the computed style.
 
 ## DS3 at a Glance
 
@@ -259,7 +259,7 @@ These values live in `globals.css` or component-level CSS, not in theme files.
 
 ## Storybook Documentation
 
-All design tokens are documented in Storybook with interactive swatches. Navigate to "Foundation, then Design Tokens" to explore the complete system visually.
+Tokens are shown in Storybook under "00-Foundation, then Design System Showcase". There is no separate Design Tokens story — the token reference is this document plus `src/lib/theme/themes/{_shared-tokens,ds3}.css`.
 
 ## Accessibility & Contrast
 

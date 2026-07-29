@@ -42,7 +42,7 @@ npm run lint
 npm run lint:css      # run after ANY .css edit
 ```
 Verify exit codes directly — never pipe through `tail`/`grep` in a way that swallows `$?`.
-For CSS/visual changes the gate is not only lint: verify the change live in ALL THREE design systems (ds1/ds2/ds3 via the theme switcher or Storybook toolbar) AND dark mode before commit — the three systems differ structurally by design (ADR-011), and a change that looks right in ds1 can break ds3. (Class gates: `narraitor-change-control` Step 1.)
+For CSS/visual changes the gate is not only lint: verify the change live in BOTH color schemes (light and dark, via the Storybook toolbar or the app's Appearance menu) before commit. There is one design system — ds3 — since ADR-013; light/dark is the only axis left. (Class gates: `narraitor-change-control` Step 1.)
 
 **Heavier gates** (CI-blocking; run when your change touches their domain):
 | Command | Gate | Fails when |

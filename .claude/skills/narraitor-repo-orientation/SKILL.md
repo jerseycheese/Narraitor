@@ -32,10 +32,10 @@ None. Repo checkout on `develop` (run `git fetch && git status` first — never 
 | Cross-store cascades | `src/lib/state/storePubSub.ts` + `src/state/storeEventWiring.ts` |
 | AI generation | `src/lib/ai/` — model strings in `src/lib/ai/config.ts`; client fetch seam `src/lib/ai/aiFetch.ts`; server key resolution `src/lib/ai/resolveApiKey.ts` |
 | Prompt templates | `src/lib/promptTemplates/` (registry: `narrativeTemplateManager.ts`); context/token budget in `src/lib/promptContext/` |
-| Server endpoints | `src/app/api/**/route.ts` (20 routes: narrative/*, generate-*, ai/*, inventory/*, lore/*) |
+| Server endpoints | `src/app/api/**/route.ts` (19 routes: narrative/*, generate-*, ai/*, inventory/*) |
 | Client→API seam | `src/lib/api/` — components call these services, never raw fetch (dependency-cruiser enforces) |
 | UI components | `src/components/<Domain>/` with co-located `.css`; stories centralized in `src/stories/` |
-| Theming / tokens | `src/lib/theme/themes/{_shared-tokens,ds1,ds2,ds3}.css`; `ThemeProvider.tsx`; localStorage `narraitor-theme`, `narraitor-color-scheme` |
+| Theming / tokens | `src/lib/theme/themes/{_shared-tokens,ds3}.css`; `ThemeProvider.tsx`; localStorage `narraitor-color-scheme` (light/dark only — ADR-013 deleted DS1/DS2 and the `narraitor-theme` key with them) |
 | Pages | `src/app/` (App Router); dev harnesses under `src/app/dev/*` (knip-exempt, not production canon) |
 | Unit tests | co-located `src/**/__tests__` + `src/**/*.test.*`; config `jest.config.cjs` |
 | Visual/e2e tests | `tests/visual/**/*.spec.ts`; baselines `*-chromium-darwin.png`; config `playwright.config.ts` |
@@ -54,7 +54,8 @@ Before repeating any structural claim (path, script, route, store field): confir
 An oriented session. If asked to summarize, produce a short "where I'll look and why" note with verified paths — not a re-dump of this map.
 
 ## 8. Common traps
-- **Do NOT trust blindly:** `docs/` (gitignored planning vault — point-in-time plans, several completed/superseded); residual `/dev/design-system*` references in `DESIGN.md` and `public_docs/design-system/README.md` (those pages are retired — Storybook is canon per ADR-012; DESIGN.md largely reflects this now, but residual lines linger); `public_docs/features/ai-systems.md` model name `gemini-2.0-flash` (actual: `gemini-2.5-flash`); ADR-007 Tailwind content (historical — Tailwind/cva/cn() removed in #1097); and parts of the PRE-EXISTING skills: `narraitor-architecture`/`narraitor-pattern-alignment-skill` still carry shadcn-era mentions and `style-port` cites a token path that no longer exists (tokens live in `src/lib/theme/themes/_shared-tokens.css`) — where they conflict with `narraitor-architecture-contract`, the contract wins.
+- **Do NOT trust blindly:** `docs/` (gitignored planning vault; all point-in-time plans now under `docs/plans/archive/`, several completed/superseded); `DESIGN.md`'s type-scale numbers, which are still DS1-era — the doc flags them inline and #1543 tracks the rewrite; ADR-007 and ADR-011 (historical by design — both correctly marked superseded, read them as history not guidance); and `narraitor-architecture`/`narraitor-pattern-alignment-skill`, which still carry shadcn-era mentions. Those describe the *origin* of the `src/components/ui/` primitives, never a license to add `cva`/`cn()`/Tailwind — where they conflict with `narraitor-architecture-contract`, the contract wins.
+  - Cleared by the 2026-07-28 doc-rot sweep, don't re-flag: `ai-systems.md`'s `gemini-2.0-flash` (now points at `config.ts`), `style-port`'s dead `design-tokens.css` path (now `themes/`), and the `/dev/design-system*` references in `DESIGN.md` / `public_docs/design-system/README.md` (present but correctly marked retired).
 - Bad behavior this prevents: a session reads `DESIGN.md`, navigates to `/dev/design-system`, finds nothing, and "helpfully" rebuilds a living style guide that was deliberately deleted.
 - Port 3000 may be held by an orphan `next dev` or another project — `lsof -nP -iTCP:3000 -sTCP:LISTEN` before blaming code.
 - `src/app/dev/*` harnesses are development sandboxes: patterns there are NOT production conventions.

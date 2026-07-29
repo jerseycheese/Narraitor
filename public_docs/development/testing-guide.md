@@ -163,11 +163,22 @@ For complete visual testing guidance, see the [Visual Regression Testing Guide](
 **Unit Tests** - Test individual functions and hooks. These are fast and catch logic errors early:
 
 ```typescript
-import { calculateAttributeTotal } from '@/lib/character';
+import { calculateDerivedStat } from '@/lib/utils/derivedStatCalculator';
 
-test('calculates attribute total correctly', () => {
-  const attributes = { strength: 8, dexterity: 6 };
-  expect(calculateAttributeTotal(attributes)).toBe(14);
+test('calculates a simple multiplier formula', () => {
+  const formula = {
+    id: 'vitality-pool',
+    name: 'Vitality Pool',
+    worldId: 'world-1',
+    description: 'Health pool',
+    attributeMultipliers: { constitution: 10 },
+  };
+  const attributes = [
+    { id: 'attr-1', characterId: 'char-1', worldAttributeId: 'constitution',
+      name: 'constitution', baseValue: 15, modifiedValue: 15, category: 'test' },
+  ];
+
+  expect(calculateDerivedStat(formula, attributes)).toBe(150);
 });
 ```
 

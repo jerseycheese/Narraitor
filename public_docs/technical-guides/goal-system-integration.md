@@ -40,26 +40,23 @@ Goals are automatically included in AI prompts through the context building syst
 
 ```typescript
 // In narrative generation or AI calls
-import { aiContextStore } from '@/state/aiContextStore';
+import { useAiContextStore } from '@/state/aiContextStore';
 
 const generateNarrativeWithGoalContext = async (sessionId: string) => {
-  // Build context including goals
-  const context = aiContextStore.buildContextForSession(sessionId, {
+  // Build context including goals. buildContextForSession is async.
+  const context = await useAiContextStore.getState().buildContextForSession(sessionId, {
     includeGoals: true,
-    maxTokens: 800,
+    maxChars: 800,
     prioritizeRecent: true
   });
-  
+
   // Use in AI prompt
   const prompt = `
 ${context.goalContext}
 
 Based on these active goals, continue the story...
 `;
-  
-  // Save context for tracking
-  aiContextStore.saveContextToHistory(sessionId, context);
-  
+
   return await generateContent(prompt);
 };
 ```

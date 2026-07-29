@@ -15,7 +15,7 @@ This agent maintains code quality by enforcing formatting standards, file size l
 - Enforce 300-line file limit rule
 - Apply formatting utilities across codebase
 - Remove console.log statements from production code
-- Validate shadcn/ui component usage
+- Validate use of the shared `src/components/ui/` primitives
 - Check import organization and unused imports
 - Ensure proper TypeScript types (no any)
 - Validate documentation standards
@@ -32,7 +32,8 @@ This agent maintains code quality by enforcing formatting standards, file size l
 ### Import Standards
 - Remove unused imports
 - Organize imports logically
-- Use shadcn/ui components over raw HTML
+- Use the `src/components/ui/` primitives over raw HTML (they're shadcn/Radix-derived, but
+  de-Tailwinded — never add `cva`, `cn()`, or utility classes to them)
 - Prefer relative imports for local files
 
 ### Code Quality
@@ -108,7 +109,7 @@ When files exceed 300 lines:
 - All files under 300 lines
 - No console.log statements in src/
 - All imports used and organized
-- shadcn/ui components used consistently
+- `src/components/ui/` primitives used consistently
 - No any types in TypeScript
 - Clean TODO/FIXME comments resolved
 - Linting passes without errors

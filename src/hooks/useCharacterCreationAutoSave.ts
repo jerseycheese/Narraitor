@@ -36,50 +36,6 @@ interface RecoveryDataPreview {
 }
 
 /**
- * Character Creation Auto-Save Hook
- * 
- * Provides automatic saving and recovery functionality for character creation workflows.
- * Uses localStorage for persistence with debounced saves to prevent excessive writes.
- * Includes recovery detection and user choice dialog integration.
- * 
- * Key Features:
- * - Automatic debounced saving (300ms delay)
- * - Recovery data detection on mount
- * - Visual save status feedback
- * - Manual save clearing on completion
- *
- * @param worldId - The ID of the world for which the character is being created
- * @returns Object containing save state, data handlers, and recovery status
- * 
- * @example
- * ```tsx
- * const {
- *   data,
- *   setData,
- *   clearAutoSave,
- *   hasRecoveryData,
- *   saveStatus
- * } = useCharacterCreationAutoSave(worldId);
- * 
- * // Check for recovery data
- * if (hasRecoveryData) {
- *   // Show recovery dialog
- * }
- * 
- * // Update character data (auto-saves after 300ms)
- * setData({
- *   currentStep: 1,
- *   worldId,
- *   characterData: updatedCharacter,
- *   validation: stepValidation,
- *   pointPools: poolState
- * });
- * 
- * // Clear save data when character creation completes
- * clearAutoSave();
- * ```
- */
-/**
  * Analyzes character data to generate preview information
  */
 function analyzeRecoveryData(data: CharacterCreationState): RecoveryDataPreview {
@@ -162,6 +118,50 @@ function hasCurrentFormData(data: CharacterCreationState | undefined): boolean {
   );
 }
 
+/**
+ * Character Creation Auto-Save Hook
+ *
+ * Provides automatic saving and recovery functionality for character creation workflows.
+ * Uses localStorage for persistence with debounced saves to prevent excessive writes.
+ * Includes recovery detection and user choice dialog integration.
+ *
+ * Key Features:
+ * - Automatic debounced saving (300ms delay)
+ * - Recovery data detection on mount
+ * - Visual save status feedback
+ * - Manual save clearing on completion
+ *
+ * @param worldId - The ID of the world for which the character is being created
+ * @returns Object containing save state, data handlers, and recovery status
+ *
+ * @example
+ * ```tsx
+ * const {
+ *   data,
+ *   setData,
+ *   clearAutoSave,
+ *   hasRecoveryData,
+ *   saveStatus
+ * } = useCharacterCreationAutoSave(worldId);
+ *
+ * // Check for recovery data
+ * if (hasRecoveryData) {
+ *   // Show recovery dialog
+ * }
+ *
+ * // Update character data (auto-saves after 300ms)
+ * setData({
+ *   currentStep: 1,
+ *   worldId,
+ *   characterData: updatedCharacter,
+ *   validation: stepValidation,
+ *   pointPools: poolState
+ * });
+ *
+ * // Clear save data when character creation completes
+ * clearAutoSave();
+ * ```
+ */
 export const useCharacterCreationAutoSave = (worldId: EntityID) => {
   /** Internal state for character creation data */
   const [data, setDataInternal] = useState<CharacterCreationState | undefined>();

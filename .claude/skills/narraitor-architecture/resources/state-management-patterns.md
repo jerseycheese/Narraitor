@@ -3,7 +3,7 @@
 Use Zustand stores in `src/state/` and follow existing store conventions.
 
 ## Standard store shape
-Use `CrudStore<T>` from `src/state/createCrudStore.ts` for CRUD-focused domains. The type is composed from separate state and action interfaces:
+Use `CrudStore<T>` from `src/state/crudStore.types.ts` for CRUD-focused domains. The type is composed from separate state and action interfaces:
 
 ```ts
 export interface CrudStoreState<T extends BaseEntity> {
@@ -29,7 +29,7 @@ export interface CrudStoreActions<T extends BaseEntity> {
 export type CrudStore<T extends BaseEntity> = CrudStoreState<T> & CrudStoreActions<T>;
 ```
 
-Note: `createCrudStore.ts` exports types only; the factory function was removed as unused. Stores that use these types implement the shape directly.
+Note: `crudStore.types.ts` is types only — there's no store factory. Stores that use these types implement the shape directly.
 
 ## Persistence pattern
 Use `persist` with IndexedDB storage when the domain should survive reloads.

@@ -44,21 +44,45 @@ generators rely on to reject a malformed response instead of persisting half a w
 
 ## Handling the whole request
 
-`handleAIRequest<T>` wraps the call-plus-parse cycle with retry logic:
+There's no wrapper that owns the call-plus-parse-plus-retry cycle. A `handleAIRequest<T>` helper
+used to live here, but it went out with the world-templates system in
+[#1454](https://github.com/jerseycheese/Narraitor/pull/1454). Callers now run their own retry loop
+and use the parser and validators directly.
+
+`worldGenerator` (`src/lib/generators/worldGenerator.ts`) is the reference shape:
 
 ```typescript
-import { handleAIRequest, parseAIJsonResponse } from '@/lib/utils/aiResponseParser';
+import { parseAIJsonResponse, validateRequiredFields, validateArrayFields } from '@/lib/utils/aiResponseParser';
 
-const world = await handleAIRequest(
-  () => aiClient.generate(prompt),
-  (response) => parseAIJsonResponse<GeneratedWorld>(response, 'Failed to parse world'),
-  2 // maxRetries
-);
+const MAX_RETRIES = 3;
+let lastError: Error | null = null;
+
+for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+  try {
+    // On a retry, tell the model why the last attempt failed
+    const retryPrompt = attempt > 1
+      ? `${prompt}\n\nIMPORTANT: This is retry attempt ${attempt}/${MAX_RETRIES}. The previous attempt failed due to malformed JSON...`
+      : prompt;
+
+    const response = await client.generateContent(retryPrompt);
+    const parsed = parseAIJsonResponse<Record<string, unknown>>({ content: response.content }, 'Failed to generate world configuration');
+
+    validateRequiredFields(parsed, ['name', 'genre', 'description', 'attributes', 'skills'], 'world generation response');
+    validateArrayFields(parsed, ['attributes', 'skills'], 'world generation response');
+
+    lastError = null;
+    // ...build the world from `parsed`
+  } catch (error) {
+    lastError = error as Error;
+    if (attempt < MAX_RETRIES) continue;
+  }
+}
 ```
 
-It retries on network/AI errors with exponential backoff, but deliberately does *not* retry on
-parse or validation errors — if the model returned something unparseable, asking again rarely
-helps, so it fails fast instead of burning quota.
+Note the retry policy is the opposite of what a generic wrapper would do: malformed JSON is
+exactly what it retries on, and the retry prompt names that failure so the model can correct
+itself. Since the parse and the validators both throw, they land in the same `catch` and get
+another attempt.
 
 ## Where it's used
 

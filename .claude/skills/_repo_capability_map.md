@@ -12,10 +12,10 @@ AI-driven narrative RPG framework (known — README, CLAUDE.md). Build a world (
 - **State** (`src/state/`): one Zustand store per domain — world, character, narrative (split across `narrativeStore.*.ts`), inventory, journal, lore (split across `loreStore.*.ts`), npc, goal, session, navigation, provider, aiContext, calibration, continuity. All persist through `src/state/persistence.ts` (IndexedDB). Cross-store cascades via the event bus `src/lib/state/storePubSub.ts` + `src/state/storeEventWiring.ts` (events: `WORLD_DELETED`, `CHARACTER_DELETED`, `SESSION_FRESH_START`, `SESSION_STARTED`, `SESSION_ENDED`) (observed).
 - **AI layer** (`src/lib/ai/`): Gemini client (`geminiClient.ts`, model `gemini-2.5-flash` + `gemini-2.5-flash-image` in `config.ts` — known), generators (narrative, choice, ending, images, goals, lore extraction), `aiFetch.ts` (client fetch + BYO key header + 120s timeout), `resolveApiKey.ts` (server key resolution), `abortTimeout.ts` (per-request abort signals, PR #1506) (observed).
 - **Prompt templates** (`src/lib/promptTemplates/`): registry `narrativeTemplateManager.ts` → `getNarrativeTemplate(id)`; template generators under `templates/narrative/` + `templates/endingTemplates.ts`; context assembly + token budgeting in `src/lib/promptContext/` (known — read this session).
-- **API routes** (`src/app/api/`): 20 route.ts files (known — full list verified): narrative (generate/choices/ending/summarize/story-checkpoint/validate-event-significance), generation (world/character/portrait/world-image/item-image/journal-image/ending-image), ai (analyze-world/validate-provider), inventory + lore similarity, delete-image, debug.
+- **API routes** (`src/app/api/`): 19 route.ts files (known — full list verified): narrative (generate/choices/ending/summarize/story-checkpoint/validate-event-significance), generation (world/character/portrait/world-image/item-image/journal-image/ending-image), ai (analyze-world/validate-provider), inventory (categorize/check-similarity), delete-image, debug. No lore route — `lore/check-similarity` was deleted in #1634.
 - **Client API seam** (`src/lib/api/`): components call these services, not fetch directly — enforced by dependency-cruiser since PR #1508 (known — dir listing; observed — rule).
-- **Components** (`src/components/`): domain-organized (GameSession, Narrative, WorldCreationWizard, CharacterCreationWizard, Journal, inventory, ui primitives, shared, devtools…). CSS co-located per component; stories live centrally under `src/stories/` (144 files, known) (observed).
-- **Theming** (`src/lib/theme/`): three design systems ds1/ds2/ds3 as CSS files under `src/lib/theme/themes/` + `_shared-tokens.css`; `ThemeProvider.tsx`; localStorage keys `narraitor-theme`, `narraitor-color-scheme`; FOUC-prevention init script (observed).
+- **Components** (`src/components/`): domain-organized (GameSession, Narrative, WorldCreationWizard, CharacterCreationWizard, Journal, inventory, ui primitives, shared, devtools…). CSS co-located per component; stories live centrally under `src/stories/` (140 files, known) (observed).
+- **Theming** (`src/lib/theme/`): ONE design system, ds3, as `themes/ds3.css` + `_shared-tokens.css` (ADR-013 deleted ds1/ds2); `ThemeProvider.tsx`; localStorage key `narraitor-color-scheme` for light/dark (the `narraitor-theme` key went with the DS picker); FOUC-prevention init script (observed).
 - **App routes** (`src/app/`): worlds/characters CRUD + wizards, `/worlds/[id]/play` session, `/settings/providers`, legal/landing, plus ~20 `/dev/*` harness routes (knip-exempt) (observed).
 
 ## 3. Build/test/run commands verified
@@ -44,10 +44,10 @@ Environment: node v24.16.0, npm 11.13.0 (known). Port 3000 free at session time 
 
 ## 5. Storybook + integration workflows verified
 
-- Storybook 8 + `@storybook/nextjs`; stories glob `src/stories/**/*.stories.*` (144 story files, known — counted this session); addons: essentials + a11y (observed).
+- Storybook 8 + `@storybook/nextjs`; stories glob `src/stories/**/*.stories.*` (140 story files, known — counted this session); addons: essentials + a11y (observed).
 - `withStores` decorator (`.storybook/decorators/withStores.tsx`): synchronous real-store `setState()` seeding; stores NOT auto-reset between stories (observed).
 - MSW (`.storybook/msw/handlers.ts`): mocks `/api/*` with canned responses, `onUnhandledRequest: 'bypass'` (observed).
-- Theme toolbar: ds1/ds2/ds3 + light/dark + 3 viewports (observed).
+- Toolbar: light/dark `colorScheme` global + viewports — no design-system picker (ADR-013 collapsed to ds3) (observed).
 - Storybook is the canon design surface (ADR-012, `public_docs/architecture/ADR-012-storybook-single-canon-surface.md`); `verify-ds-canon.cjs` (via `npm run lint:ds-canon`, CI-blocking) fails on NEW in-scope components without stories, grandfathered via `.ds-canon-baseline.json` (observed).
 - Production build copies `storybook-static` into `public/` (known — package.json build script).
 - Integration tier: real app hydrates from IndexedDB; e2e seeds stores post-hydration (`tests/visual/global.setup.ts`, seedTestData dual-seeding IndexedDB + localStorage; AI calls gated by `isPlaywrightEnv()` from `src/lib/utils/isPlaywrightEnv.ts`) (observed).
@@ -67,10 +67,10 @@ Environment: node v24.16.0, npm 11.13.0 (known). Port 3000 free at session time 
 All `stale-risk`, verified by discovery grep this session:
 
 1. `DESIGN.md` and `public_docs/design-system/README.md` carry residual `/dev/design-system*` showcase-page references — those pages were retired per ADR-012 (#1484/#1488). DESIGN.md largely names Storybook as canon already; the staleness is residual lines, not the whole doc.
-2. `public_docs/features/ai-systems.md` names `gemini-2.0-flash`; actual model is `gemini-2.5-flash` (`src/lib/ai/config.ts`).
+2. ~~`public_docs/features/ai-systems.md` names `gemini-2.0-flash`~~ — FIXED in the doc-rot sweep; it now points at `src/lib/ai/config.ts` rather than naming a model inline.
 3. `public_docs/architecture/ADR-007-tailwind-shadcn-styling.md` + `design-system/shadcn-integration-guide.md` describe Tailwind/cva/cn() — correctly marked historical; do not treat as current guidance.
 4. Project memory (out-of-repo) claim that `streamResilience.ts` exists but is unwired — file deleted; stale.
-5. `docs/plans/*` are point-in-time implementation plans; several describe completed/superseded work (e.g. #1038 clean-slate) — never treat as current state.
+5. `docs/plans/archive/*` are point-in-time implementation plans, all now archived; several describe completed/superseded work (e.g. #1038 clean-slate) — never treat as current state. Note `docs/` is gitignored entirely (committed docs go in `public_docs/`), so these are local scratch, not repo history.
 
 ## 8. Known failure modes
 

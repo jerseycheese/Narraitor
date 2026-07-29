@@ -19,7 +19,6 @@ Before adding new helpers, scan these areas for existing utilities:
 
 ## Domain utilities
 - `src/lib/world/` — world-specific logic (state formats, templates)
-- `src/lib/character/` — character helpers (if needed, check before adding)
 - `src/lib/inventory/` — inventory logic and integrations
 - `src/lib/narrative/` — narrative parsing and prompt helpers
 - `src/lib/lore/` — lore extraction/dedup/resolution utilities

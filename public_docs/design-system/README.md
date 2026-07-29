@@ -20,15 +20,15 @@ For the original three-system rationale (superseded), see [ADR-011](../architect
 - **Storybook is canon** (ADR-012). The old `/dev/design-system{,-2,-3}` showcase pages this bullet used to point to are retired — `npm run storybook` is the source of truth now. If a production component drifts from Storybook, the production component is wrong.
 - **No inline styles.** Every visual value comes from a token. Hardcoded colors and pixel values are bugs.
 
-## The Three Systems
+## The Design System
 
 | | Name | Feel | Narrative font | Accent | Radius (md) |
 |---|---|---|---|---|---|
-| **DS1** | The Drafting Table | Sharp lines, archival ink, graph-paper grid | Lora | Archival Ink Blue | 4px |
-| **DS2** | Warm Earth | Organic, soft, breathing space | Crimson Pro | Sage Green | 12px |
 | **DS3** | Mechanical Manuscript | Aged paper, drafting ink, dot grid | Newsreader | Steel Blue | 6px |
 
-DS1 was the default until the collapse; DS3 is the only theme running now, hardcoded rather than defaulted. Light + dark mode are still layered on top via a separate `dark` class on `<html>` — unaffected by the collapse.
+DS3 is the only design system, hardcoded as `data-theme="ds3"` on `<html>` rather than defaulted — it isn't switchable. Light + dark are layered on top via a `dark` class on `<html>`, and that's the whole matrix.
+
+Two others existed until [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md) deleted them: **DS1 "The Drafting Table"** (Lora, Archival Ink Blue, 4px radius — the old default) and **DS2 "Warm Earth"** (Crimson Pro, Sage Green, 12px). Their CSS files are gone; they're recorded here only so older PRs and issues referencing them still make sense.
 
 ## Where things live
 
@@ -37,7 +37,7 @@ DS1 was the default until the collapse; DS3 is the only theme running now, hardc
 - **Theme provider** (sets `data-theme`, manages dark mode, persists color-scheme choice): [src/lib/theme/ThemeProvider.tsx](../../src/lib/theme/ThemeProvider.tsx)
 - **Global element resets / utility CSS**: [src/app/globals.css](../../src/app/globals.css)
 - **Game-session-specific styles**: [src/styles/manuscript-session.css](../../src/styles/manuscript-session.css)
-- **Storybook**: `npm run storybook` (port 6006) — the canon frontend surface (ADR-012). Foundation stories at [src/stories/00-foundation/](../../src/stories/00-foundation/) (`DesignSystemShowcase`, `DesignTokens`). The toolbar has a light/dark switcher — verify components in both. The old showcase pages (`/dev/design-system{,-2,-3}`) are retired.
+- **Storybook**: `npm run storybook` (port 6006) — the canon frontend surface (ADR-012). The foundation story is [src/stories/00-foundation/](../../src/stories/00-foundation/) `DesignSystemShowcase`. The toolbar has a light/dark switcher — verify components in both. The old showcase pages (`/dev/design-system{,-2,-3}`) are retired.
 
 ## Documentation in this directory
 
