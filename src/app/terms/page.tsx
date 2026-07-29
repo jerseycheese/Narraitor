@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { LegalPage, LegalSection } from '@/components/Legal';
 
 export const metadata: Metadata = {
-  title: 'Terms — Narraitor',
+  title: 'Terms',
   description:
     'Plain-language terms for Narraitor: a free, creative-fiction tool provided as-is, with no warranty. Your stories are yours.',
 };

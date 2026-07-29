@@ -24,6 +24,7 @@ import { SkipLinks } from '@/components/shared/SkipLinks';
 import { ToastProvider, Toaster } from '@/components/ui/toast';
 import { TutorialProvider } from '@/components/TutorialProvider';
 import { ThemeProvider } from '@/lib/theme';
+import { getSiteUrl, SITE_NAME } from '@/lib/constants/site';
 import { THEME_INIT_SCRIPT } from '@/lib/theme/themeInitScript';
 import { Analytics } from '@vercel/analytics/next';
 import { FunnelAnalytics } from '@/components/analytics/FunnelAnalytics';
@@ -55,9 +56,31 @@ const fontVariables = [
   dmSans.variable,
 ].join(' ');
 
+const SITE_TITLE = 'Narraitor — play a story in any world you can imagine';
+const SITE_DESCRIPTION =
+  'Build a world, create a character, and make the choices that steer the story. A solo role-playing game that runs in your browser.';
+
 export const metadata: Metadata = {
-  title: 'Narraitor',
-  description: 'A narrative-driven RPG framework using AI',
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: SITE_TITLE,
+    template: '%s — Narraitor',
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  // './' self-canonicalises each route. A literal '/' would point every page at
+  // the site root, which is worse than having no canonical at all.
+  alternates: { canonical: './' },
+  // og:title and og:description are deliberately absent: Next fills them from
+  // each route's own resolved title/description. Do NOT add an `openGraph`
+  // block to a child route — Next replaces this object wholesale rather than
+  // merging, which would drop opengraph-image.tsx from that route's card.
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    locale: 'en_US',
+  },
+  twitter: { card: 'summary_large_image' },
 };
 
 export const viewport: Viewport = {

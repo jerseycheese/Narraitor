@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { LegalPage, LegalSection } from '@/components/Legal';
 
 export const metadata: Metadata = {
-  title: 'Privacy — Narraitor',
+  title: 'Privacy',
   description:
     'How Narraitor handles your data: your worlds and characters stay in your browser, prompts go to the provider that generates the story, and usage measurement is anonymous and cookieless.',
 };
