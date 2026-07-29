@@ -1,7 +1,8 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { JournalPage } from '@/components/Journal';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Journal',
 };
 

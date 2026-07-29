@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { NotFoundState } from '@/components/shared/NotFoundState';
 
 export const metadata: Metadata = {
-  title: 'Page Not Found | Narraitor',
+  title: 'Page Not Found',
+  description:
+    'This path does not lead anywhere. Head back to your worlds and pick up the story.',
 };
 
 /**

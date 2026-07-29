@@ -33,7 +33,7 @@ export function WorldImageDisplay({ image }: WorldImageDisplayProps) {
       <div className="world-detail-meta-grid">
         <DataField
           label="Image Type"
-          value={image.type === 'ai-generated' ? 'AI Generated' : 'Custom'}
+          value={image.type === 'ai-generated' ? 'Generated' : 'Custom'}
           variant="outline"
         />
 

@@ -169,7 +169,7 @@ export const generateStoryCheckpointSummary = async (
       .join('. ');
 
     return {
-      segment: eventText || 'Recent events logged but AI summary unavailable.',
+      segment: eventText || 'Recent events logged, but no summary was generated.',
       highlights: sanitizeArray(payload.events.map((event) => event.description).slice(0, 3)),
       majorEvents: sanitizeArray(payload.events.map((event) => event.description)),
       characterDevelopment: [],

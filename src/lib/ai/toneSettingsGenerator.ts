@@ -103,7 +103,7 @@ function validateParsedResponse(parsed: unknown): void {
 function parseResponse(content: string): ToneAnalysisResult {
   try {
     if (!content || content.trim() === '') {
-      throw new Error('AI service returned empty response');
+      throw new Error('The model provider returned an empty response');
     }
 
     const jsonStr = extractJsonObject(content);
@@ -130,7 +130,7 @@ function parseResponse(content: string): ToneAnalysisResult {
     }
 
     logger.error('Failed to parse AI tone settings response:', error);
-    throw new Error('Unable to parse AI response. Please try again.');
+    throw new Error('That response came back unreadable. Please try again.');
   }
 }
 
@@ -142,7 +142,7 @@ export async function generateToneSettings(
     const response = await client.generateContent(buildAnalysisPrompt(worldData));
 
     if (!response.content) {
-      throw new Error('AI service returned empty response');
+      throw new Error('The model provider returned an empty response');
     }
 
     return parseResponse(response.content);
@@ -154,11 +154,12 @@ export async function generateToneSettings(
       });
 
       if (error.message.includes('rate limit') || error.message.includes('429')) {
-        throw new Error('AI service is currently busy. Please try again in a moment.');
+        throw new Error('The model provider is busy. Please try again in a moment.');
       } else if (error.message.includes('network') || error.message.includes('timeout')) {
         throw new Error('Network error occurred. Please check your connection and try again.');
-      } else if (error.message.includes('No JSON found') || error.message.includes('Unable to parse')) {
-        throw new Error('AI response was invalid. Please try generating again.');
+        // Matches what parseResponse() throws above — keep the two in step.
+      } else if (error.message.includes('No JSON found') || error.message.includes('came back unreadable')) {
+        throw new Error('That response came back unreadable. Please try generating again.');
       } else if (error.message.startsWith('Invalid ') || error.message.startsWith('Missing ') || error.message.includes('empty response')) {
         throw error;
       } else {

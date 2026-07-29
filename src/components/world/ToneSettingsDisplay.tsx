@@ -45,8 +45,7 @@ export function ToneSettingsDisplay({
     >
       <h2 id="tone-settings-heading">Narrative tone settings</h2>
       <p>
-        These settings guide how AI-generated content will be written for this
-        world.
+        These settings guide how the narrative is written for this world.
       </p>
 
       <div className="world-detail-meta-grid">

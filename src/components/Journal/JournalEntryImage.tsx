@@ -97,7 +97,7 @@ export const JournalEntryImage: React.FC<JournalEntryImageProps> = ({ entry }) =
       className="journal-entry-image"
       headingLevel="h4"
       title="Entry Image"
-      description="AI-generated illustration capturing this moment from your story."
+      description="An illustration generated for this moment in your story."
       currentImageUrl={image?.url}
       currentImageType={image?.type}
       generatedAt={image?.generatedAt}
