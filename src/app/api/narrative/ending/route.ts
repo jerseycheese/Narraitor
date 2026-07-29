@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       
       if (error.message.includes('API') || error.message.includes('generation')) {
         return NextResponse.json(
-          { error: 'AI service unavailable', details: 'Please try again later' },
+          { error: 'Model provider unavailable', details: 'Please try again later' },
           { status: 503 }
         );
       }

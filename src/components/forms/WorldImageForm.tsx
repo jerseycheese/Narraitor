@@ -41,7 +41,7 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
   return (
     <ImageGenerationSection
       title="World Image"
-      description="AI-generated environmental image that represents your world. This will be displayed on world cards and as a hero image on the world details page."
+      description="A generated environmental image for your world. It appears on world cards and as the hero image on the world details page."
       currentImageUrl={world.image?.url}
       currentImageType={world.image?.type}
       generatedAt={world.image?.generatedAt}

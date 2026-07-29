@@ -11,7 +11,7 @@ describe('userFriendlyErrors (AI-specific)', () => {
       const error = new Error('network connection failed');
       const result = getUserFriendlyError(error);
 
-      expect(result.message).toContain('AI service');
+      expect(result.message).toContain('model provider');
       expect(result.message).toContain('network connection failed');
       expect(result.type).toBe(ErrorType.NETWORK);
       expect(result.retryable).toBe(true);
@@ -21,7 +21,7 @@ describe('userFriendlyErrors (AI-specific)', () => {
       const error = new Error('request timeout');
       const result = getUserFriendlyError(error);
 
-      expect(result.message).toContain('AI service');
+      expect(result.message).toContain('model provider');
       expect(result.message).toContain('timed out');
       expect(result.message).toContain('request timeout');
       expect(result.type).toBe(ErrorType.NETWORK);
@@ -42,7 +42,7 @@ describe('userFriendlyErrors (AI-specific)', () => {
       const error = new Error('401 unauthorized');
       const result = getUserFriendlyError(error);
 
-      expect(result.message).toContain('authentication');
+      expect(result.message).toContain('rejected your key');
       expect(result.message).toContain('401 unauthorized');
       expect(result.type).toBe(ErrorType.AUTH);
       expect(result.retryable).toBe(false);
@@ -100,7 +100,7 @@ describe('userFriendlyErrors (AI-specific)', () => {
       const message = userFriendlyError(error);
 
       expect(typeof message).toBe('string');
-      expect(message).toContain('AI service');
+      expect(message).toContain('model provider');
       expect(message).toContain('network failure');
     });
 
@@ -127,7 +127,7 @@ describe('userFriendlyErrors (AI-specific)', () => {
       const message = userFriendlyError(error);
 
       expect(typeof message).toBe('string');
-      expect(message).toContain('authentication');
+      expect(message).toContain('rejected your key');
       expect(message).toContain('401 unauthorized');
     });
 

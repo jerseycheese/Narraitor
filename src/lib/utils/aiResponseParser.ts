@@ -49,9 +49,9 @@ function attemptJsonRepair(jsonStr: string): string {
 /**
  * Parse JSON from AI response with proper error handling and markdown code block support
  */
-export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: string = 'Failed to parse AI response'): T {
+export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: string = 'Unable to read the response'): T {
   if (!response.content) {
-    throw new Error('No content received from AI service');
+    throw new Error('The model provider returned no content');
   }
 
   try {

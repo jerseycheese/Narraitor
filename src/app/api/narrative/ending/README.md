@@ -34,7 +34,7 @@ This API endpoint generates AI-powered story endings for completed game sessions
 
 **Error Responses:**
 - `400` - Missing required fields or invalid values
-- `503` - AI service unavailable 
+- `503` - Model provider unavailable 
 - `500` - Internal server error
 
 ### Method: GET

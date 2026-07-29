@@ -51,28 +51,28 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   if (message.includes('network')) {
     return {
       ...baseError,
-      message: `Unable to connect to AI service: ${sanitizedDetail}`
+      message: `Unable to reach the model provider: ${sanitizedDetail}`
     };
   }
 
   if (message.includes('timeout')) {
     return {
       ...baseError,
-      message: `AI service timed out: ${sanitizedDetail}`
+      message: `The model provider timed out: ${sanitizedDetail}`
     };
   }
 
   if (message.includes('429') || message.includes('rate limit')) {
     return {
       ...baseError,
-      message: `AI service rate limit exceeded: ${sanitizedDetail}`
+      message: `The model provider's rate limit was exceeded: ${sanitizedDetail}`
     };
   }
 
   if (message.includes('401') || message.includes('unauthorized')) {
     return {
       ...baseError,
-      message: `AI service authentication failed: ${sanitizedDetail}`
+      message: `The model provider rejected your key: ${sanitizedDetail}`
     };
   }
 

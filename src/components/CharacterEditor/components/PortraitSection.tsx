@@ -29,7 +29,7 @@ export const PortraitSection: React.FC<PortraitSectionProps> = ({
   return (
     <ImageGenerationSection
       title="Character Portrait"
-      description="AI-generated portrait based on character details."
+      description="A portrait generated from this character's details."
       currentImageUrl={portrait?.url}
       currentImageType={portrait?.type}
       generatedAt={portrait?.generatedAt}
