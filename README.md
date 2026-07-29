@@ -1,255 +1,130 @@
 # Narraitor
 
-AI-powered storytelling app that basically lets you play through narrative RPG experiences in any world you can imagine, fictional or non-fictional. Maybe you want to explore Middle Earth? Storm the beach at Normandy? Design something completely original? Narraitor adapts the AI storytelling to match your world's themes and tone.
+Play a story in any world you can imagine. Build a setting, create a character, and make the choices that steer what happens. Your decisions get tested against your character's skills, so what happens next is earned.
 
-> **A quick note on the UI**: I know it's pretty basic right now. I'm focused on building the foundational systems first - the storytelling engine, world mechanics, character progression. Right now it's all about getting the framework solid.
+**[Play it at narraitor-six.vercel.app](https://narraitor-six.vercel.app/)**. No account, runs in your browser, on a Google Gemini key you bring.
 
-## What This Actually Does
+## What this actually does
 
-The core idea came from wanting tabletop RPG experiences that could happen anytime, without coordinating schedules or finding a game master. Narraitor uses Google's Gemini AI to generate dynamic stories that respond to your choices, but here's the key part: it's not just generic fantasy. You define your world's rules, attributes, and tone, and the AI storytelling adapts to match exactly what you're going for.
+The core idea came from wanting tabletop RPG experiences that could happen anytime, without coordinating schedules or finding a game master. You define a world's rules, attributes, and tone; create characters that fit it; then play through a generated story that responds to your choices.
 
-## Branches
+The storytelling adapts to the world you described, so a noir detective setting reads completely differently from a space opera. Middle Earth, the beaches of Normandy, something you invented last week: all fair game.
 
-The repo has two branches that matter. `main` is the latest tagged release and the default clone target — pin here if you want something stable. `develop` is the rolling integration line where in-flight work lands, so it may include partial features at any given moment. Contributor PRs should target `develop`.
+## What to know before you start
 
-Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
+**You bring your own key.** Generation runs on a [Google Gemini](https://aistudio.google.com/apikey) key you provide once under Settings, then Providers. It's encrypted in your browser and sent per request, so the stories you generate run on your own account.
 
-## Key Features
+**It runs on your device.** Worlds, characters, and saves live in your browser's storage (IndexedDB). There's no backend database and no server-side copy of your games. Settings has export/import if you want a backup or you're moving between browsers, and clearing site data really does delete everything.
 
-**World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
+**No accounts.** Nothing to sign up for, no profile, no email.
 
-**Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
+## What you can do
 
-**Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
+**Build a world.** Describe a setting and the creation wizard suggests attributes and skills that fit it ("Force Sensitivity" for Star Wars, "Sanity" for Lovecraft), all of which you can edit, replace, or write yourself.
 
-**Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
+**Create characters.** Multi-step creation that works off your world's rules: allocate attribute points, pick skills that make sense for the setting, write a background. Portraits get generated to match.
 
-**Session Persistence**: Your games save automatically using IndexedDB, so you can pick up where you left off. No more lost progress when you close the browser.
+**Play the story.** Pick from suggested choices or type your own action. Decisions get weighted Minor, Major, or Critical so you can see what's actually at stake, and alignment tracking (Lawful, Neutral, Chaotic) keeps a read on how your character has been playing.
 
-## Additional Features
+**Keep track of it.** A journal drawer holds story history and past decisions, inventory tracks what you're carrying, and "Story So Far" summaries capture where things stand, which also keeps long campaigns coherent.
 
-**Template Worlds**: Don't want to build from scratch? Start with pre-configured worlds like Western, Sitcom, or high Fantasy, then customize from there.
+**Finish it.** When a story's reaching its natural end, you get an ending suggestion and a generated conclusion, so a campaign gets a real ending.
 
-**AI Character Portraits**: Generate visual representations of your characters that match their descriptions and world settings.
+**Take it with you.** Settings exports everything (worlds, characters, sessions, journal, narrative, inventory, and lore) as a JSON file you can re-import later.
 
-**Custom Player Actions**: Type any action you want to try instead of being limited to AI-suggested choices.
+---
 
-**In-Session Journal**: Review story history and past decisions through a floating journal button during gameplay.
+The rest of this is for running Narraitor locally or working on it.
 
-**Story Endings**: AI-suggested narrative conclusions help you wrap up campaigns when you're ready to finish.
+## Running it locally
 
-**Export/Import**: Save and share your worlds, characters, or sessions as JSON files for backup or collaboration.
-
-**Developer Tools**: Built-in debugging panel for inspecting application state and testing features.
-
-**Story Checkpoints**: Capture "story so far" summaries at pivotal moments to keep long campaigns coherent.
-
-## Getting It Running
-
-You'll need Node.js (v18+), npm, and a Google Gemini API key. For local development you can either add the key through Settings, then Providers in the app, or use a server-side `.env.local` fallback (`GEMINI_API_KEY`, below). In normal use, players bring their own key through the provider settings screen - see [AI Integration Details](#ai-integration-details).
+You'll need Node 20 (see [.nvmrc](.nvmrc)), npm, and a Google Gemini key. Nothing generates without the key, but you don't need it to install; add it through Settings, then Providers once the app is running, the same way players do.
 
 ```bash
-# Clone and set up
 git clone https://github.com/jerseycheese/narraitor.git
 cd narraitor
 npm install
-
-# Add your API key
-cp .env.example .env.local
-# Edit .env.local and add: GEMINI_API_KEY=your-key-here
-# Optional: enable token-budget-based prompt truncation
-# (keeps long-running sessions from ballooning prompt size)
-# NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true
-
-# Feature flags
-# NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING=false
-# NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE=true
-
-# Fire it up
 npm run dev
 ```
 
-The app runs on `localhost:3000`. You'll see the world creation wizard first: either pick a template or build your own universe.
+That's it. The app comes up on `localhost:3000` at the landing page, and **Start your story** takes you into world creation.
+
+If you'd rather use a server-side key than go through the provider settings screen (handy locally so you're not re-entering it), copy `.env.example` to `.env.local` and set `GEMINI_API_KEY`. That's a fallback for local work only; in normal use the player's own key wins.
 
 > Running from a git worktree? `npm run dev` picks a stable per-worktree port automatically (the main checkout keeps 3000), so multiple worktrees can run side by side without fighting over the port. The chosen URL is printed on startup; set `PORT` to override.
 
-## Development Setup
+## Development
 
-I've been using a component-first approach with Storybook and TDD. Basically, build components in isolation first, then integrate them. It keeps things manageable.
+The approach here is component-first with Storybook and TDD: build components in isolation, then integrate them. It keeps things manageable.
 
 ```bash
-# Component development
-npm run storybook
-
-# Testing
-npm run test
-
-# Interactive testing
-npm run dev
-# Then visit /dev routes for component testing
+npm run storybook      # component catalog on :6006
+npm run test           # Jest
+npm run type-check     # tsc --noEmit
+npm run lint           # ESLint
+npm run lint:css       # Stylelint
 ```
 
-There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/game-session`, etc. These let you test components with real data without going through the full app flow. For the design-system catalog (every component, themed, with mock data), use Storybook (`npm run storybook`).
+Run the last four before committing; CI runs them separately and the production build enforces lint and types anyway.
 
-### Feature Flags
+Worth knowing about `npm run build`: it builds the app *and* Storybook, then copies the static Storybook output into `public/`. If you just want to check the app compiles, `npm run build:app` is the faster one.
 
-We use feature flags to safely roll out major changes. Configure them in `.env.local` and use the helper:
+There are also `/dev` routes for exercising components against real data without walking the whole app flow: `/dev/world-creation-wizard`, `/dev/game-session`, and seventeen more. For the full themed component catalog, Storybook is the place.
 
-```typescript
-import { isFeatureEnabled } from '@/lib/featureFlags';
+Contributor PRs should target `develop` (see [Branches and releases](#branches-and-releases) below).
 
-if (isFeatureEnabled('BUFFERED_STREAMING')) {
-  // new path
-} else {
-  // current path
-}
-```
+## How it's organized
 
-## How It's Organized
-
-Using Next.js 15 with App Router. The structure follows domain-driven design, so related functionality stays together:
+Next.js 15 with the App Router. The structure follows domain-driven design, so related functionality stays together:
 
 ```
 src/
-├── app/                    # Next.js pages and API routes
-├── components/             # UI components (organized by domain)
-├── state/                  # Zustand stores for each domain
-├── lib/                    # AI services and utilities  
-├── types/                  # TypeScript definitions
-└── utils/                  # Helper functions
+├── app/           # Next.js pages and API routes
+├── components/    # UI components (organized by domain)
+├── state/         # Zustand stores for each domain
+├── lib/           # AI services, theme tokens, generators, utilities
+├── services/      # cross-domain service logic
+├── hooks/         # shared React hooks
+├── stories/       # Storybook stories
+├── styles/        # global and shared CSS
+├── types/         # TypeScript definitions
+└── utils/         # helper functions
 ```
 
-The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/SkillEditor/` instead of `components/editors/SkillEditor/`. Makes it easier to find related functionality.
+Components are grouped by domain (World, Character, Narrative, and so on) rather than by type, so you'll find `components/world/SkillEditor/` instead of `components/editors/SkillEditor/`.
+
+## Under the hood
+
+**World and character creation.** Multi-step wizards that adapt to each other: the world defines the attributes and skills, and character creation allocates against them. AI suggestions seed both, and everything stays editable.
+
+**Narrative engine.** Gemini handles generation through Next.js API routes (`/api/narrative/generate`, `/api/narrative/choices`, and others). The interesting part is context management: prompts carry your world's rules, character details, and recent story history so what gets generated stays consistent with the setting.
+
+**State and persistence.** Zustand stores backed by IndexedDB, one store per domain. Sessions survive a browser restart, and if IndexedDB is unavailable the storage layer falls back to memory-only so the app still runs. It just won't persist, and it says so.
+
+**Provider keys.** A player's key travels from the browser to the API routes in a per-request header (`x-provider-api-key`), gets used server-side for that single call, and is never logged or persisted. At rest in the browser it's encrypted. The `GEMINI_API_KEY` env var is a local/dev fallback that stays server-side.
+
+**Rate limiting.** The two narrative generation routes (`/api/narrative/generate` and `/api/narrative/choices`) are rate limited at 50 requests per hour per IP in production, looser in development. It's an in-memory limiter, so on serverless it's per-instance, not a global cap. Validation on those routes is thin: they check the body parses and carries a prompt, then pass it through. There's no sanitization step.
+
+**Design system.** Narraitor ships a single design system, DS3 ([ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md)). Plain CSS with design tokens, no Tailwind. [DESIGN.md](DESIGN.md) is the AI-readable surface for tokens and components, and [public_docs/design-system/](public_docs/design-system/) has the full reference. Storybook (`npm run storybook`) is the single canon surface: every component, themed, with mock data and no backend, plus a light/dark switcher in the toolbar. See [ADR-012](public_docs/architecture/ADR-012-storybook-single-canon-surface.md).
+
+**Images.** Beyond character portraits there's generation for world, journal, item, and ending images. [public_docs/features/portrait-generation-guide.md](public_docs/features/portrait-generation-guide.md) covers how the portrait side works.
+
+## Branches and releases
+
+Two branches matter. `main` is the latest tagged release and the default clone target, so pin here if you want something stable. `develop` is the rolling integration line where in-flight work lands, which means it may include partial features at any given moment. Contributor PRs should target `develop`.
+
+Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 ## Roadmap
 
-The core MVP functionality is basically complete - you can create worlds, build characters, play through AI-generated stories, and everything persists properly. The focus now has shifted to polish and getting things ready for a proper 1.0 release.
+1.0 is a public, single-player release: bring your own key, everything local, no accounts. The core systems all shipped a while back (world and character creation, the narrative engine, journal and inventory, persistence, the design-system migration, visual regression testing), and what's left is the launch gate, tracked in [#1320](https://github.com/jerseycheese/Narraitor/issues/1320) with the tag-and-cut in [#1635](https://github.com/jerseycheese/Narraitor/issues/1635).
 
-### What's Already Working
+Worth being explicit about what 1.0 deliberately leaves out: no accounts, no server-side sync. That's not an oversight. Monetization needs auth and backend persistence that don't exist yet, so it's been decoupled into its own track ([#495](https://github.com/jerseycheese/Narraitor/issues/495)) instead of bolted onto a launch checklist.
 
-The foundation is solid:
-- **World Creation System** with AI assistance and template worlds
-- **Character Building** with point allocation and progression
-- **AI Narrative Engine** with story generation and choice systems
-- **Session Persistence** using IndexedDB with graceful fallbacks
-- **Visual Regression Testing** with Playwright ([#384](https://github.com/jerseycheese/Narraitor/issues/384))
-- **Toast Notification System** for user feedback
-- **Navigation & State Management** with automatic saves
-- **Decision Weight System** (Minor/Major/Critical choices)
-- **Character Alignment Tracking** (Lawful/Neutral/Chaotic)
+After 1.0, player-facing polish lives on the [v1.1 milestone](https://github.com/jerseycheese/Narraitor/milestone/2): a bolder pass on the design system, portrait improvements, keyboard accessibility, session pacing. Multi-provider AI support ([#878](https://github.com/jerseycheese/Narraitor/issues/878)) is post-1.0 too; only the bring-your-own-key slice of it landed for launch, so Gemini is the one provider for now.
 
-### Current Focus: Polish & Cleanup
-
-Making what exists work really well:
-
-**Journal System Completeness** 
-- Entry viewing with proper formatting
-- Choice and outcome tracking
-- Session boundary logging
-
-**Character System Improvements**
-- Better attribute point distribution
-- In-game character reference access
-- Post-creation character modifications
-
-**World Configuration Polish**
-- Custom attribute definition capabilities
-- Improved AI suggestion workflows
-
-### Developer Infrastructure
-
-Because debugging production issues without proper tools is a nightmare:
-
-**Error Reporting & Monitoring**
-- Runtime error capture and display
-- Comprehensive error reporting system
-- AI service error monitoring
-
-**Debugging Tools**
-- Application state modification interfaces
-- Component visibility debugging
-- Console access for debugging functions
-
-**AI Service Improvements**
-- Request/response monitoring and logging
-- Decision relevance scoring ([#666](https://github.com/jerseycheese/Narraitor/issues/666))
-- Performance measurement tools
-
-### Testing & Quality
-
-Making sure things don't break when I change stuff:
-
-**Visual Testing Enhancements**
-- [Cross-platform Docker consistency](https://github.com/jerseycheese/Narraitor/issues/653)
-- [Advanced flakiness mitigation](https://github.com/jerseycheese/Narraitor/issues/654)
-- [Visual diff review workflow](https://github.com/jerseycheese/Narraitor/issues/652)
-- [Performance monitoring](https://github.com/jerseycheese/Narraitor/issues/656)
-- [Component library generation](https://github.com/jerseycheese/Narraitor/issues/657)
-
-**Technical Debt**
-- [Fix skipped localStorage tests](https://github.com/jerseycheese/Narraitor/issues/646)
-- Performance optimization
-- Bundle size improvements
-
-### Working Toward 1.0
-
-What constitutes "done enough" for a 1.0:
-- All user-facing polish complete
-- Developer tools operational for maintainability
-- Comprehensive testing coverage
-- Performance benchmarks met
-- Documentation that actually makes sense
-
-### Future Ideas (Post-1.0)
-
-Things that would be cool to explore:
-- **Enhanced Notifications** across all user interactions ([#607](https://github.com/jerseycheese/Narraitor/issues/607))
-- **Multiplayer Capabilities** (shared worlds and storytelling)
-- **Voice Narration** for enhanced immersion
-- **Mobile App Versions** for on-the-go storytelling
-- **Advanced AI Personalization** based on play patterns
-- **Content Moderation Tools** for public sharing
-- **Economy Systems** for more complex world building
-
-**Note**: Multi-model AI support (GPT-4, Claude, Ollama, etc.) is being explored for earlier implementation - see Epic [#878](https://github.com/jerseycheese/Narraitor/issues/878) for provider-agnostic AI integration plans.
-
-The nice thing about having the foundation solid is that these features can be added incrementally without breaking existing functionality.
-
-## Technical Architecture
-
-The app separates concerns into clear domains:
-
-**World Management**: Multi-step wizard for creating fictional universes. The AI suggests attributes and skills based on your world's theme, but you can customize everything. Template worlds give you starting points.
-
-**Character Creation**: Point-allocation system that adapts to your world's attributes and skills. Background generation helps flesh out character stories.
-
-**AI Narrative Engine**: Google Gemini integration handles story generation. The key innovation here is context management: the AI maintains awareness of your world's rules, character details, and story history to generate consistent narratives.
-
-**State Persistence**: Zustand stores with IndexedDB backing. Game sessions persist across browser sessions, and there's graceful fallback to memory-only if IndexedDB fails.
-
-**Security**: All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse. Players bring their own Gemini key, sent per request and used server-side for that one call — never persisted or logged. A server-side `GEMINI_API_KEY` env var acts as a local/dev fallback.
-
-**Design System**: Narraitor ships a single design system, **DS3**, as of [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md) (superseding the original three-system architecture in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md)). See [DESIGN.md](DESIGN.md) for the AI-readable design surface (tokens, components, do's and don'ts) and [public_docs/design-system/](public_docs/design-system/) for the full reference. **Storybook (`npm run storybook`) is the single canon surface** — every component, themed, with mock data and no backend; its toolbar has a light/dark switcher for verifying components in both. See [ADR-012](public_docs/architecture/ADR-012-storybook-single-canon-surface.md).
-
-## AI Integration Details
-
-The AI system routes everything through Next.js API endpoints (`/api/narrative/generate`, `/api/narrative/choices`). A player's own Gemini key travels from the browser to those routes in a per-request header (`x-provider-api-key`), gets used server-side for that single call, and is never logged or persisted. The `GEMINI_API_KEY` env var below is a local/dev fallback that stays server-side.
-
-```bash
-# .env.local
-GEMINI_API_KEY=your-api-key
-# Optional: enable token-budget-based prompt truncation
-# NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true
-
-# Feature flags
-# NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING=false
-# NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE=true
-```
-
-**Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
-
-**Portrait Generation**: There's also an AI portrait system for character images. Check `public_docs/features/portrait-generation-guide.md` for details on how that works.
+Further out, the ideas worth exploring are shared worlds, voice narration, and mobile builds. Having the foundation solid means those can land incrementally without breaking what's there.
 
 ## License
 
-This project is licensed under the MIT License; see the LICENSE file for details.
+MIT. See the [LICENSE](LICENSE) file for details.
