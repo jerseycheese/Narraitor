@@ -104,6 +104,7 @@
 }
 
 .component-landing-cta:hover {
+  color: var(--color-on-accent);
   background: var(--color-accent-hover);
 }
 

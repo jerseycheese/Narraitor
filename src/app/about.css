@@ -197,6 +197,7 @@
 }
 
 .component-about-cta-link:hover {
+  color: var(--color-on-accent);
   background: var(--color-accent-hover);
 }
 
