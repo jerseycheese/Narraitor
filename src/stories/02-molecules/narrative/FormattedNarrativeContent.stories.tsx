@@ -42,12 +42,6 @@ export const EmptyContent: Story = {
   },
 };
 
-export const WithCustomStyling: Story = {
-  args: {
-    content: `This paragraph has custom styling applied through the className prop. The text should maintain proper spacing while inheriting the custom styles.`,
-  },
-};
-
 export const LongText: Story = {
   args: {
     content: `In the heart of the cyberpunk metropolis, neon lights flickered against the rain-slick streets. The air was thick with the scent of street food and ozone from overloaded power lines. Chrome-plated figures moved through the crowd, their augmented eyes scanning for opportunities. *The shadows held secrets.* Secrets that could make or break a person in this dystopian world. **Freedom was a commodity, and information was the currency.** A figure emerged from an alleyway, their coat flapping in the mechanical wind. The encounter would change everything. Will they choose to follow the mysterious stranger, or will they retreat back into the safety of the crowd? Only time would tell. The city never slept. The neon never faded. And the game was always afoot. *This paragraph demonstrates how long-form narrative text flows with proper paragraph spacing.*`,

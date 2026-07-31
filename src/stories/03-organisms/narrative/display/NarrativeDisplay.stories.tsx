@@ -325,19 +325,6 @@ export const DialogueWithSpeakerNoAvatar: Story = {
   },
 };
 
-// Dialogue without speaker info (anonymous)
-export const DialogueWithoutSpeaker: Story = {
-  args: {
-    segment: createMockSegment(
-      'A mysterious voice echoes from the shadows, its source unknown...',
-      'dialogue',
-      {
-        tags: ['dialogue', 'mysterious'],
-      }
-    ),
-  },
-};
-
 // Component wrapper for multiple NPCs
 const MultipleNPCs = () => {
   const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);

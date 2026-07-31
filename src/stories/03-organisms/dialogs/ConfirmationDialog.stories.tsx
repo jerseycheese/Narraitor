@@ -46,17 +46,6 @@ export const DeleteCharacter: Story = {
   },
 };
 
-export const DeleteWorld: Story = {
-  args: {
-    isOpen: true,
-    title: '03-Organisms/dialogs/ConfirmationDialog',
-    message: 'Are you sure you want to delete this world? This will permanently remove the world and all associated characters and stories.',
-    variant: 'destructive',
-    confirmText: 'Delete',
-    cancelText: 'Cancel',
-  },
-};
-
 export const EndSession: Story = {
   args: {
     isOpen: true,
