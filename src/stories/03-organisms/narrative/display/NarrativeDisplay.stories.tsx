@@ -92,52 +92,6 @@ export const Scene: Story = {
   },
 };
 
-// Scene with dialogue - shows automatic quotation mark formatting in real scene segments
-const SceneWithDialogueStory: React.FC = () => {
-  const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
-
-  useEffect(() => {
-    ensureStorybookNPC('guardian-lysara', 'Guardian Lysara');
-    ensureStorybookNPC('captain-ryn-solis', 'Captain Ryn Solis');
-
-    setSegment(
-      createMockSegment(
-        'Guardian Lysara stepped forward from the shadows. Guardian Lysara said, Welcome to the Mystical Forest. Captain Ryn Solis replied, Thank you for your guidance.',
-        'scene',
-        {
-          characterIds: ['guardian-lysara', 'captain-ryn-solis'],
-          mood: 'mysterious',
-          tags: ['conversation', 'introduction'],
-          location: 'Forest Entrance',
-          characters: [
-            {
-              id: 'guardian-lysara',
-              name: 'Guardian Lysara',
-            },
-            {
-              id: 'captain-ryn-solis',
-              name: 'Captain Ryn Solis',
-            },
-          ],
-        }
-      )
-    );
-  }, []);
-
-  if (!segment) {
-    return null;
-  }
-
-  return <NarrativeDisplay segment={segment} />;
-};
-
-export const SceneWithDialogue: Story = {
-  args: {
-    segment: null,
-  },
-  render: () => <SceneWithDialogueStory />,
-};
-
 
 
 

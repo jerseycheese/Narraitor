@@ -53,19 +53,6 @@ export const OriginalWorld: Story = {
   },
 };
 
-export const SimilarToExisting: Story = {
-  args: {
-    world: {
-      ...baseWorld,
-      name: 'New Terra',
-      description: 'A sci-fi colony world',
-      genre: 'fantasy',
-      relationship: 'inspired_by',
-      reference: 'Star Wars',
-    },
-  },
-};
-
 export const LongReference: Story = {
   args: {
     world: {

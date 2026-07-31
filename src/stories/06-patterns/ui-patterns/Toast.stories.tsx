@@ -98,15 +98,6 @@ export const WithoutDescription: Story = {
   },
 };
 
-export const PersistentToast: Story = {
-  args: {
-    title: 'Persistent notification',
-    description: 'This toast will not auto-dismiss',
-    variant: 'warning',
-    duration: Infinity,
-  },
-};
-
 export const LongContent: Story = {
   args: {
     title: 'Very long notification title that demonstrates wrapping',

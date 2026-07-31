@@ -2867,13 +2867,6 @@
   margin-top: var(--space-2);
 }
 
-.component-hero-actions {
-  position: absolute;
-  right: var(--space-4);
-  bottom: var(--space-4);
-  z-index: 2;
-}
-
 /* DS3 — Mechanical Manuscript: rounded-square radii, italic narrative title
    with a dotted divider above it, monospace dot-bullet subtitle. */
 

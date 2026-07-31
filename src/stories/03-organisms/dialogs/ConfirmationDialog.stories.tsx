@@ -38,7 +38,7 @@ type Story = StoryObj<typeof meta>;
 export const DeleteCharacter: Story = {
   args: {
     isOpen: true,
-    title: '03-Organisms/dialogs/ConfirmationDialog',
+    title: 'Delete character',
     message: 'Are you sure you want to delete this character? This action will permanently remove all character data and cannot be undone.',
     variant: 'destructive',
     confirmText: 'Delete',
@@ -49,7 +49,7 @@ export const DeleteCharacter: Story = {
 export const EndSession: Story = {
   args: {
     isOpen: true,
-    title: '03-Organisms/dialogs/ConfirmationDialog',
+    title: 'End session',
     message: 'Are you sure you want to end this narrative session? Your progress will be saved automatically.',
     variant: 'warning',
     confirmText: 'End Session',
