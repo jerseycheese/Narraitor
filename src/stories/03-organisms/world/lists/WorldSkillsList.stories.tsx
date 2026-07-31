@@ -179,6 +179,28 @@ export const WithoutLinkedAttributes: Story = {
   },
 };
 
+// The skill's attributeIds points at an id absent from `attributes` — covers
+// the "Linked to: Unknown" fallback in WorldSkillsList.tsx.
+export const UnresolvedAttributeReference: Story = {
+  args: {
+    skills: [
+      {
+        id: 'piloting',
+        worldId: 'world-test',
+        name: 'Spacecraft Piloting',
+        description: 'Operating various types of spacecraft and vehicles',
+        attributeIds: ['reflex'],
+        difficulty: 'hard',
+        category: 'Technical',
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
+      },
+    ],
+    attributes: mockAttributes,
+  },
+};
+
 export const VariedDifficulties: Story = {
   args: {
     skills: [
