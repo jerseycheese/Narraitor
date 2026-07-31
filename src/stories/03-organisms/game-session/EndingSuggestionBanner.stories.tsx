@@ -43,23 +43,3 @@ export const ShortReason: Story = {
   },
 };
 
-export const LongReason: Story = {
-  args: {
-    reason:
-      "The hero has transformed, overcome their fears, and resolved the crisis. The emotional arc feels complete.",
-  },
-};
-
-export const TragicEnding: Story = {
-  args: {
-    reason:
-      "The sacrifice has been made. The conflict is resolved, though at great cost.",
-  },
-};
-
-export const TriumphantEnding: Story = {
-  args: {
-    reason:
-      "Victory is yours. The threat is vanquished, and a new era begins.",
-  },
-};

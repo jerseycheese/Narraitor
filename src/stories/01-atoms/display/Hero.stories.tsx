@@ -60,46 +60,11 @@ export const WithImageAndBadge: Story = {
   },
 };
 
-// Size variants
-export const TallHero: Story = {
-  args: {
-    title: 'Middle-earth',
-    subtitle: 'Epic Fantasy',
-    image: sampleImage,
-    badge: (
-      <span>
-        Set in Tolkien Universe
-      </span>
-    ),
-  },
-};
-
-export const ShortHero: Story = {
-  args: {
-    title: 'Quick Adventure',
-    image: sampleImage,
-  },
-};
-
-// Border radius variants (for card integration)
-export const CardTopOnly: Story = {
-  args: {
-    title: 'World Card Hero',
-    subtitle: 'Integrated with card layout',
-  },
-};
-
-export const NoBorderRadius: Story = {
-  args: {
-    title: 'Full Width Hero',
-    subtitle: 'No radius applied',
-  },
-};
-
-export const AllBorderRadius: Story = {
+// No image — falls back to the themed gradient background
+export const WithoutImage: Story = {
   args: {
     title: 'Standalone Hero',
-    subtitle: 'Full radius',
+    subtitle: 'Themed gradient background',
   },
 };
 

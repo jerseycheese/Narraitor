@@ -58,6 +58,13 @@ export const Success: Story = {
     description: 'Your changes have been saved successfully',
     variant: 'success',
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Every variant renders with role="alert", aria-live="polite", and aria-atomic="true".',
+      },
+    },
+  },
 };
 
 export const Error: Story = {
@@ -88,15 +95,6 @@ export const WithoutDescription: Story = {
   args: {
     title: 'Simple notification',
     variant: 'success',
-  },
-};
-
-export const PersistentToast: Story = {
-  args: {
-    title: 'Persistent notification',
-    description: 'This toast will not auto-dismiss',
-    variant: 'warning',
-    duration: Infinity,
   },
 };
 
@@ -212,22 +210,6 @@ export const MobileResponsive: Story = {
   parameters: {
     viewport: {
       defaultViewport: 'mobile1',
-    },
-  },
-};
-
-// Accessibility demonstration
-export const AccessibilityDemo: Story = {
-  args: {
-    title: 'Accessible notification',
-    description: 'This toast includes proper ARIA attributes for screen readers',
-    variant: 'success',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'This toast includes proper accessibility attributes: role="alert", aria-live="polite", and aria-atomic="true"',
-      },
     },
   },
 };

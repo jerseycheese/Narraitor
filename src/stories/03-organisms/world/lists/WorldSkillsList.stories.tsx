@@ -117,38 +117,6 @@ export const Default: Story = {
   },
 };
 
-export const MinimalSkills: Story = {
-  args: {
-    skills: [
-      {
-        id: 'combat',
-        worldId: 'world-test',
-        name: 'Combat',
-        description: 'Fighting ability',
-        attributeIds: ['str'],
-        difficulty: 'medium',
-        category: 'Combat',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'magic',
-        worldId: 'world-test',
-        name: 'Magic',
-        description: 'Spellcasting ability',
-        attributeIds: ['int'],
-        difficulty: 'hard',
-        category: 'Mystical',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-    ],
-    attributes: mockAttributes,
-  },
-};
-
 export const WithoutDescriptions: Story = {
   args: {
     skills: [
@@ -211,87 +179,9 @@ export const WithoutLinkedAttributes: Story = {
   },
 };
 
-export const Fantasy: Story = {
-  args: {
-    skills: [
-      {
-        id: 'swordsmanship',
-        worldId: 'world-test',
-        name: 'Swordsmanship',
-        description: 'Mastery of blade combat and weapon techniques',
-        attributeIds: ['str'],
-        difficulty: 'medium',
-        category: 'Combat',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'archery',
-        worldId: 'world-test',
-        name: 'Archery',
-        description: 'Precision shooting with bow and arrow',
-        attributeIds: ['dex'],
-        difficulty: 'medium',
-        category: 'Combat',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'magic',
-        worldId: 'world-test',
-        name: 'Arcane Magic',
-        description: 'Manipulation of mystical forces and spellcasting',
-        attributeIds: ['int'],
-        difficulty: 'hard',
-        category: 'Mystical',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'divine_magic',
-        worldId: 'world-test',
-        name: 'Divine Magic',
-        description: 'Channeling divine power for healing and protection',
-        attributeIds: ['wis'],
-        difficulty: 'hard',
-        category: 'Mystical',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'stealth',
-        worldId: 'world-test',
-        name: 'Stealth',
-        description: 'Moving silently and remaining',
-        attributeIds: ['dex'],
-        difficulty: 'hard',
-        category: 'Utility',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'lore',
-        worldId: 'world-test',
-        name: 'Ancient Lore',
-        description: 'Knowledge of history, legends, and forgotten secrets',
-        attributeIds: ['int'],
-        difficulty: 'medium',
-        category: 'Knowledge',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-    ],
-    attributes: mockAttributes,
-  },
-};
-
-export const SciFi: Story = {
+// The skill's attributeIds points at an id absent from `attributes` — covers
+// the "Linked to: Unknown" fallback in WorldSkillsList.tsx.
+export const UnresolvedAttributeReference: Story = {
   args: {
     skills: [
       {
@@ -299,82 +189,15 @@ export const SciFi: Story = {
         worldId: 'world-test',
         name: 'Spacecraft Piloting',
         description: 'Operating various types of spacecraft and vehicles',
-        attributeIds: ['dex'],
+        attributeIds: ['reflex'],
         difficulty: 'hard',
-        category: 'Technical',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'hacking',
-        worldId: 'world-test',
-        name: 'System Hacking',
-        description: 'Breaking into computer systems and networks',
-        attributeIds: ['int'],
-        difficulty: 'hard',
-        category: 'Technical',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'cybercombat',
-        worldId: 'world-test',
-        name: 'Cyber Combat',
-        description: 'Fighting in virtual and augmented reality',
-        attributeIds: ['int'],
-        difficulty: 'hard',
-        category: 'Combat',
-        minValue: 1,
-        maxValue: 20,
-        baseValue: 5,
-      },
-      {
-        id: 'engineering',
-        worldId: 'world-test',
-        name: 'Engineering',
-        description: 'Design and maintenance of advanced technology',
-        attributeIds: ['int'],
-        difficulty: 'medium',
         category: 'Technical',
         minValue: 1,
         maxValue: 20,
         baseValue: 5,
       },
     ],
-    attributes: [
-      {
-        id: 'body',
-        worldId: 'world-test',
-        name: 'Body',
-        description: 'Physical conditioning',
-        minValue: 1,
-        maxValue: 10,
-        baseValue: 5,
-        category: 'Physical',
-      },
-      {
-        id: 'mind',
-        worldId: 'world-test',
-        name: 'Mind',
-        description: 'Neural processing',
-        minValue: 1,
-        maxValue: 10,
-        baseValue: 5,
-        category: 'Mental',
-      },
-      {
-        id: 'tech',
-        worldId: 'world-test',
-        name: 'Tech',
-        description: 'Technology integration',
-        minValue: 1,
-        maxValue: 10,
-        baseValue: 5,
-        category: 'Technical',
-      },
-    ],
+    attributes: mockAttributes,
   },
 };
 

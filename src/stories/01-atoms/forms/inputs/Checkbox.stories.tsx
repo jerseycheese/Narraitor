@@ -41,20 +41,6 @@ export const Checked: Story = {
   },
 };
 
-export const WithLabel: Story = {
-  args: {
-    checked: false,
-    label: 'Accept terms and conditions',
-  },
-};
-
-export const CheckedWithLabel: Story = {
-  args: {
-    checked: true,
-    label: 'Subscribe to newsletter',
-  },
-};
-
 export const Disabled: Story = {
   args: {
     checked: false,

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { WorldInfoSection } from '@/components/world/WorldInfoSection';
 import { World } from '@/types/world.types';
-import { getTimestamp } from '@/lib/utils';
 
 const meta = {
   title: '03-Organisms/world/display/WorldInfoSection',
@@ -54,54 +53,6 @@ export const OriginalWorld: Story = {
   },
 };
 
-export const SimilarToExisting: Story = {
-  args: {
-    world: {
-      ...baseWorld,
-      name: 'New Terra',
-      description: 'A sci-fi colony world',
-      genre: 'fantasy',
-      relationship: 'inspired_by',
-      reference: 'Star Wars',
-    },
-  },
-};
-
-export const WithoutReference: Story = {
-  args: {
-    world: {
-      ...baseWorld,
-      name: 'Mysterious Realm',
-      relationship: undefined,
-    },
-  },
-};
-
-export const RecentlyCreated: Story = {
-  args: {
-    world: {
-      ...baseWorld,
-      name: 'Brand New World',
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
-      relationship: undefined,
-    },
-  },
-};
-
-export const OldWorld: Story = {
-  args: {
-    world: {
-      ...baseWorld,
-      name: 'Ancient Realm',
-      createdAt: '2020-01-15T08:30:00Z',
-      updatedAt: '2024-11-20T15:45:00Z',
-      relationship: 'set_within',
-      reference: 'Dungeons & Dragons',
-    },
-  },
-};
-
 export const LongReference: Story = {
   args: {
     world: {
@@ -109,51 +60,6 @@ export const LongReference: Story = {
       name: 'Extended Universe',
       relationship: 'inspired_by',
       reference: 'The Chronicles of Narnia, Lord of the Rings, and Harry Potter combined universe',
-    },
-  },
-};
-
-export const SciFiWorld: Story = {
-  args: {
-    world: {
-      ...baseWorld,
-      name: 'Cyberpunk City',
-      description: 'A futuristic dystopian metropolis',
-      genre: 'fantasy',
-      relationship: 'set_within',
-      reference: 'Blade Runner',
-      createdAt: '2024-12-01T12:00:00Z',
-      updatedAt: '2024-12-02T18:30:00Z',
-    },
-  },
-};
-
-export const HorrorWorld: Story = {
-  args: {
-    world: {
-      ...baseWorld,
-      name: 'Shadows of Arkham',
-      description: 'A town plagued by cosmic horrors',
-      genre: 'fantasy',
-      relationship: 'inspired_by',
-      reference: 'H.P. Lovecraft\'s Cthulhu Mythos',
-      createdAt: '2024-10-31T23:59:00Z',
-      updatedAt: '2024-11-01T00:15:00Z',
-    },
-  },
-};
-
-export const ModernWorld: Story = {
-  args: {
-    world: {
-      ...baseWorld,
-      name: 'Contemporary Earth',
-      description: 'Modern day Earth with supernatural elements',
-      genre: 'fantasy',
-      relationship: 'set_within',
-      reference: 'World of Darkness',
-      createdAt: '2024-12-03T09:00:00Z',
-      updatedAt: '2024-12-03T10:00:00Z',
     },
   },
 };

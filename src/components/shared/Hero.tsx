@@ -20,8 +20,6 @@ interface HeroProps {
   titleTestId?: string;
   /** Optional title element type (h1, h2, etc.) */
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  /** Optional actions to render anchored at bottom-right of the hero */
-  actions?: React.ReactNode;
 }
 
 /**
@@ -60,7 +58,6 @@ export const Hero: React.FC<HeroProps> = ({
   badge,
   titleTestId,
   titleElement: TitleElement = 'h1',
-  actions,
 }) => {
   return (
     <div className="component-hero">
@@ -105,12 +102,6 @@ export const Hero: React.FC<HeroProps> = ({
 
             {badge && <div className="component-hero-badge">{badge}</div>}
           </div>
-        </div>
-      )}
-
-      {actions && (
-        <div className="component-hero-actions">
-          {actions}
         </div>
       )}
     </div>
