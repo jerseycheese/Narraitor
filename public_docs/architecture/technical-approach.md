@@ -48,7 +48,10 @@ the TDD workflow.
 
 ### AI Integration: Google Gemini
 **Secure Implementation**:
-- Server-side API key protection
+- Bring-your-own-key: the player supplies their own Gemini key, it's encrypted in the browser
+  (`providerStore`), and `aiFetch` attaches it per request as the `x-provider-api-key` header
+- Every AI call still goes through a server-side route, so the key never reaches
+  `googleapis.com` from the browser; `GEMINI_API_KEY` remains as a dev and local-testing fallback
 - Rate limiting (50 requests/hour per IP in production) on the narrative generation routes
 - Prompt template management
 - Context-aware generation
@@ -129,7 +132,7 @@ feature they serve, and types kept close to the domains they describe.
 - No sensitive data in client-side storage
 
 **Server-Side Security**:
-- API keys protected on server
+- Keys resolved server-side per request (`resolveApiKey`), never embedded in the client bundle and never logged
 - Rate limiting per IP address
 - Request validation and error handling
 

@@ -19,7 +19,7 @@ The core functionality is working and stable. All the main systems (world creati
 
  Built on a solid foundation of modern tools:
 - **Framework**: Next.js 15 (15.5.x) with App Router
-- **AI Integration**: Google Gemini (secure server-side)
+- **AI Integration**: Google Gemini, with the player supplying their own key (encrypted in the browser, proxied through server-side routes)
 - **State Management**: Zustand stores with IndexedDB persistence
 - **UI**: Plain CSS driven by design tokens (no Tailwind); components are shadcn-derived (Radix primitives) but styled with semantic CSS classes
 - **Testing**: Jest, React Testing Library, Storybook
@@ -42,7 +42,7 @@ The core functionality is working and stable. All the main systems (world creati
 **Development Infrastructure**: DevTools for debugging, Storybook for component development, and automated workflow scripts for repetitive tasks.
 
 ## Security & Performance
-API keys stay server-side with rate limiting (50 requests/hour per IP in production) on the AI generation routes to prevent abuse. All input gets sanitized and validated before hitting the AI service.
+The player's key is encrypted in the browser and sent per request to same-origin routes, so it never lands in the client bundle and the browser never talks to Google directly. Rate limiting (50 requests/hour per IP in production) guards the AI generation routes against abuse, and all input gets sanitized and validated before hitting the AI service.
 
 ## Who This Is For
 Built primarily for personal use: solo narrative RPG experiences when you want to explore stories in specific fictional universes without needing a group or game master.

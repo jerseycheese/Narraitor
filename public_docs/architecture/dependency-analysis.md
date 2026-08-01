@@ -92,10 +92,10 @@ npm run analyze
 
 ### Violation Management
 
-The project uses **ignore-known violations** to manage 82 existing violations while preventing new ones:
+The project uses **ignore-known violations** to manage the existing violations while preventing new ones:
 
-- **Baseline File:** `.dependency-cruiser-known-violations.json` (3340 lines, tracked in git)
-- **Known Violations:** 82 total (23 type imports, 59 circular dependencies)
+- **Baseline File:** `.dependency-cruiser-known-violations.json` (630 lines, tracked in git)
+- **Known Violations:** 51 total, as of 2026-08-01: 22 dev-dependency imports, 8 circular dependencies, 7 type-to-implementation imports, 7 orphans, 7 components importing lib directly
 - **Strategy:** Fix incrementally while preventing new violations
 
 **Daily Workflow:**
@@ -107,11 +107,13 @@ npm run deps:baseline         # Update after fixes (tracks progress)
 
 ### Violation Categories
 
-**Critical Issues: Circular Dependencies (59 warnings)**
+**Circular Dependencies (8 in the baseline)**
 
-Store-to-store circles cause unpredictable initialization. The known ones are between
-`sessionStore` and `worldStore`; across `sessionStore`, `inventoryStore`, and
-`characterStore`; and across `narrativeStore`, `sessionStore`, and `goalStore`.
+The store-to-store circles this section used to describe are gone. What's left is mostly
+barrel-file self-reference (`src/lib/utils/index.ts` re-exporting modules that import it back,
+same shape in `src/types/index.ts` and `src/lib/theme/index.ts`) plus a couple of
+component-to-module loops in the world-creation wizard and the tutorial provider. Run
+`npm run deps:validate:strict` for the current list rather than trusting this paragraph.
 
 **Resolution Strategy:**
 1. Extract shared logic to `lib/` utilities
@@ -137,7 +139,7 @@ Storybook/test files import dev dependencies - these are safe as they never reac
 Monitor baseline file size over time:
 ```bash
 wc -l .dependency-cruiser-known-violations.json
-# Current: 3340 lines (82 violations)
+# Current: 630 lines (51 violations)
 # Target: < 1000 lines (reduce by 60%)
 ```
 
@@ -215,14 +217,16 @@ Rules are defined in `.dependency-cruiser.cjs`. Key sections:
 
 ## Integration with CI
 
-Dependency validation isn't wired into CI yet — the GitHub Actions pipeline currently runs
-type-check, lint (ESLint + Stylelint + layout usage), knip, tests, and build, but not
-`deps:validate`. Adding it would be a one-liner if the baseline is kept current:
+Dependency validation runs in CI, as the last step of the Lint Check job in
+`.github/workflows/ci.yml`:
 
 ```yaml
-- name: Validate Architecture
+- name: Enforce dependency boundaries (no new cycles or dev-dep leaks)
   run: npm run deps:validate
 ```
+
+Which means a new violation fails the build. Fix the boundary, or re-baseline deliberately with
+`npm run deps:baseline` if the violation is one you're choosing to accept.
 
 That would fail the build on any NEW boundary violation while still tolerating the known ones
 in the baseline file.

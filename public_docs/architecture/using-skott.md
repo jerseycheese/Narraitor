@@ -12,7 +12,7 @@ CI runs `npm run skott:check` (the `Skott circular-dep budget` job in `ci.yml`).
 When CI fails:
 
 1. Run `npm run skott:circular` locally — you get the file-tree view of every cycle, top-down.
-2. Diff against what was there before to find the new one. The list is small enough (currently 17) to eyeball.
+2. Diff against what was there before to find the new one. The list is small enough to eyeball; the budget in `.skott-baseline.json` is currently 6.
 3. Either fix the cycle, or — if it's deliberate, like the `StoreEventBus` pattern — bump the integer in `.skott-baseline.json` and note the reason in the commit message.
 
 If a refactor *removes* cycles, `skott:check` prints a "consider lowering the baseline" notice but still passes. Tightening is on the next refactor.

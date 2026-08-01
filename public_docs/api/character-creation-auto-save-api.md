@@ -316,14 +316,10 @@ try {
 - **JSON.parse/stringify**: IE8+, all modern browsers  
 - **React Hooks**: React 16.8+
 
-## Migration from sessionStorage
+## Storage
 
-The hook automatically handles migration:
-
-1. Checks for existing localStorage data first
-2. Falls back to sessionStorage if localStorage is empty
-3. Migrates sessionStorage data to localStorage if found
-4. Cleans up old sessionStorage entries after migration
+localStorage only. `useCharacterCreationAutoSave` reads and writes a single per-world key and
+never touches sessionStorage, so there's no migration path to worry about.
 
 ## Testing Considerations
 
