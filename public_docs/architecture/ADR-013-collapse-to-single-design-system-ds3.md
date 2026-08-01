@@ -2,7 +2,7 @@
 title: "ADR-013: Collapse to a single design system (DS3)"
 tags: [architecture, decision, adr, design-system, theming]
 created: 2026-07-11
-updated: 2026-07-11
+updated: 2026-08-01
 ---
 
 # ADR-013: Collapse to a single design system (DS3)
@@ -64,6 +64,15 @@ DS3 as shipped is still somewhat timid about its own concept. The dot grid is su
 
 ## Implementation Notes
 
+> **Note (2026-08-01):** The flatten described in the next paragraph as "a deliberate follow-up PR"
+> has since landed (#1546). [src/lib/theme/index.ts](../../src/lib/theme/index.ts) now exports only
+> `ColorScheme`, `DEFAULT_COLOR_SCHEME`, `STORAGE_KEY_COLOR_SCHEME`, `ThemeProvider`, and
+> `useTheme`, with no `DesignSystem` type, no `THEMES` array, and no `theme`/`setTheme` on the
+> context. `ds3.css` has no `[data-theme="ds3"]` selectors left. The attribute itself survives as a
+> hardcoded string on `<html>` in [src/app/layout.tsx](../../src/app/layout.tsx), so it's a static
+> label now rather than something a provider writes. The paragraph below is kept as the record of
+> why the flatten was split out, not as a description of current state.
+
 This PR keeps the `ds3` name everywhere on purpose: the `data-theme="ds3"` attribute, the `ds3.css` filename, and the `DesignSystem`/`THEMES` identifiers in [src/lib/theme/index.ts](../../src/lib/theme/index.ts) all still say "ds3" even though there's nothing left to disambiguate it from. Flattening those to `:root`/bare selectors and deleting the now-vestigial `DesignSystem` type, `THEMES` array, and the `theme`/`setTheme` surface on `useTheme()` is a deliberate follow-up PR, not this one. The flatten shifts selector specificity (`[data-theme="ds3"] .foo` at `(0,1,1)` collapsing to `.foo` at `(0,1,0)`) across roughly 518 selectors, which can move real pixels — that risk deserves its own isolated baseline regen rather than getting folded into this collapse's diff, where it would make an already-large baseline regen harder to attribute.
 
 Also deferred, on purpose, and separately from each other:
@@ -73,6 +82,8 @@ Also deferred, on purpose, and separately from each other:
 
 Since resolved:
 
+- **Flattening the `[data-theme="ds3"]` selectors and deleting the dead `DesignSystem`/`THEMES`/
+  `theme`/`setTheme` surface** - done in #1546, with its own baseline regen as planned.
 - **Removing the legacy shadcn HSL token layer** (`--primary`, `--background`, etc. in [ds3.css](../../src/lib/theme/themes/ds3.css)) — done in #1474. The onboarding tour was the last consumer once the shadcn `ui/*` primitives were re-skinned onto `--color-*`; it now reads the `--color-*` family too, and the legacy block was removed from ds3.css.
 
 ## Related Decisions

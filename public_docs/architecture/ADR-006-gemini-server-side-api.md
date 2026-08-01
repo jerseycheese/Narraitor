@@ -2,16 +2,30 @@
 title: "ADR-006: Google Gemini behind server-side API routes"
 tags: [architecture, decision, adr, ai, gemini, security]
 created: 2025-04-28
-updated: 2026-05-22
+updated: 2026-08-01
 ---
 
 # ADR-006: Google Gemini behind server-side API routes
 
-**Status**: Accepted
+**Status**: Accepted (key sourcing superseded by the bring-your-own-key model, #891/#892/#893)
 **Date**: 2025-04-28
 
 > Backfilled 2026-05-22. Retroactive record of an inception-era decision (the AI provider and the
 > server-side proxy pattern). Reconstructed from the codebase and git history.
+
+> **Note (2026-08-01):** The server-side proxy decision below still holds, and every AI call still
+> goes through a route under `src/app/api/`. What changed is where the key comes from. Since the
+> bring-your-own-key work (#891/#892/#893), the player supplies their own Gemini key, it's
+> encrypted in the browser (`src/state/providerStore.ts`), and `src/lib/ai/aiFetch.ts` attaches it
+> per request as the `x-provider-api-key` header. Server-side, `src/lib/ai/resolveApiKey.ts` takes
+> that header key first and only falls back to `GEMINI_API_KEY` when there isn't one, which makes
+> the env key a dev and local-testing convenience rather than the architecture.
+>
+> The reasoning didn't change so much as the bill did. A server-held key means one key paying for
+> every player's generations, which doesn't work for a free public release. Handing the cost to
+> whoever's playing solved that without giving up the proxy hop, since the key still never sits in
+> client JavaScript or reaches `googleapis.com` from the browser. Read the "What We Decided"
+> section below as the proxy decision, not as a description of key handling.
 
 ## The Situation
 

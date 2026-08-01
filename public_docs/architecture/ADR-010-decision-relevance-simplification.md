@@ -4,12 +4,13 @@ type: architecture
 category: refactoring
 tags: [simplification, ai, decision-tracking, kiss]
 created: 2025-11-14
+updated: 2026-08-01
 ---
 
 # ADR-010: Decision Relevance System Simplification
 
-## Status
-Accepted - Implemented
+**Status**: Accepted - Implemented
+**Date**: 2025-11-14
 
 ## Context
 

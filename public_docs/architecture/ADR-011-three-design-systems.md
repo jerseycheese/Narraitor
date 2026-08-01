@@ -2,7 +2,7 @@
 title: "ADR-011: Three structurally-differentiated design systems (DS1/DS2/DS3)"
 tags: [architecture, decision, adr, design-system, theming]
 created: 2026-05-10
-updated: 2026-07-21
+updated: 2026-08-01
 ---
 
 # ADR-011: Three structurally-differentiated design systems (DS1/DS2/DS3)
@@ -13,6 +13,14 @@ updated: 2026-07-21
 > **Note (2026-06-28):** The "canon order: showcase pages > Storybook > app" decision below was reversed by [ADR-012](ADR-012-storybook-single-canon-surface.md). Storybook became the single canon surface and the `/dev/design-system*` showcase routes were retired. The three-design-system architecture was still current at that point, but was later superseded by ADR-013.
 
 > **Note (2026-07-11):** The three-design-system architecture itself — DS1/DS2/DS3, `data-theme` switching, structural differentiation — is superseded by [ADR-013](ADR-013-collapse-to-single-design-system-ds3.md). Nobody had ever asked for per-theme switching, and running three structurally-different themes across light/dark was a real maintenance and QA tax with no offsetting demand, so DS1 and DS2 were deleted and DS3 became the app's only design system. The rest of this document is a historical record of a decision that was correct at the time — it is not describing current app behavior.
+
+> **Note (2026-08-01):** The theme API this document gives instructions against no longer exists, so
+> the "Adding a fourth theme" steps below can't be followed even as a curiosity. #1546 deleted the
+> `THEMES` array, the `DesignSystem` type, `readStoredTheme`, and the `theme`/`setTheme` pair on
+> `useTheme()`. [src/lib/theme/index.ts](../../src/lib/theme/index.ts) is down to `ColorScheme`,
+> `DEFAULT_COLOR_SCHEME`, `STORAGE_KEY_COLOR_SCHEME`, `ThemeProvider`, and `useTheme`, and the
+> `data-theme="ds3"` attribute is a hardcoded string in
+> [src/app/layout.tsx](../../src/app/layout.tsx) rather than something the provider writes.
 
 ## The Situation
 
