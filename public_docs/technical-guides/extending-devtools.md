@@ -209,27 +209,33 @@ import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 - Analyze importance ranking algorithm performance
 - Inspect structured lore context output
 
-### Decision Relevance Debugger
-When the AI keeps surfacing a decision that feels out of place, the relevance debugger shows exactly what the scoring engine saw. Here's what you get:
+### Decision Flow Section
+There's no relevance-scoring debugger, because there's no relevance scoring left to debug -
+[ADR-010](../architecture/ADR-010-decision-relevance-simplification.md) replaced the weighted
+five-factor calculator with plain recency filtering (`src/lib/ai/simpleDecisionRelevance.ts`).
 
-- **Factor table**: Overall, recency, context, impact, tag, and character scores side-by-side for the top decisions, sorted descending. Makes it easy to spot why one decision is ranking higher than another.
-- **Scoped filters**: Flip between active session, world, or all decisions without reloading the page. Super handy when you're testing specific scenarios.
-- **Context snapshot**: Displays the current narrative context alongside the raw decision metadata so you can confirm the inputs feeding the calculator.
-- **Detail panel**: Click any row to reveal matched tags, impact category, and the structured context payload that informs relevance scoring.
-- **Quick refresh loop**: Pull the latest decisions straight from `PlayerDecisionTracker` while you rerun scenarios or scripted flows.
+What exists instead is `DecisionFlowSection`, a read-only trace of how each decision was created,
+presented, selected, and recorded:
+
+- **Per-decision trace**: origin segment, the AI-generated options with their alignment and any
+  custom input, what the player picked, the `playerDecisionTracker` record, and the outcome segment.
+- **Session picker**: switch between sessions that have recorded decisions.
+- **Prompt debug**: segment-level prompt info shows up when "Show Prompts" capture was on. Choice
+  generation prompts aren't retained by the pipeline, so the trace covers what state actually stores.
+- **Snapshot on demand**: it reads state and never mutates it.
+
+`DecisionConsoleSection` is the sibling tool for driving decisions rather than inspecting them.
 
 ## DevToolsSection Component
 
 Use `DevToolsSection` for consistent styling across all DevTools components:
 
-```typescript
+```tsx
 import { DevToolsSection } from '../shared/DevToolsSection';
 
-// Replaces this pattern:
-<div className="bg-slate-700 p-2 rounded border border-slate-600">
-  <h4 className="text-xs font-medium mb-2 text-slate-200">Title</h4>
+<DevToolsSection title="Lore Statistics">
   {content}
-</div>
+</DevToolsSection>
 
 // With this:
 <DevToolsSection title="Title">

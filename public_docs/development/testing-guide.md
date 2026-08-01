@@ -394,13 +394,12 @@ const item = createMockInventoryItem({
 });
 ```
 
-Available factories:
+Available factories (`src/lib/test-utils/testDataFactory.ts`):
 - `createMockWorld`, `createMockWorldAttribute`, `createMockWorldSkill`
 - `createMockCharacter`
 - `createMockInventoryItem`
-- `createMockSession`, `createMockNarrativeSegment`, `createMockDecision`
+- `createMockNarrativeSegment`
 - `createMockJournalEntry`
-- `createMockPlayerChoice`
 
 **When to use:**
 - Creating domain objects for tests
@@ -431,10 +430,12 @@ beforeEach(() => {
 });
 ```
 
-Available factories:
+Available factories (`src/lib/test-utils/mockStoreFactories/`):
 - `createMockCharacterStore`, `createMockWorldStore`, `createMockSessionStore`
 - `createMockInventoryStore`, `createMockJournalStore`, `createMockNarrativeStore`
-- `createMockNPCStore`, `createMockGoalStore`, `createMockLoreStore`
+- `createMockNPCStore`
+
+There's no factory for the goal or lore stores; mock those by hand.
 
 Each factory provides:
 - Empty collections for state
@@ -515,7 +516,7 @@ The CI pipeline enforces a few quality gates before code can merge. These aren't
 
 **All tests must pass** - Obvious, but worth stating. If tests fail in CI, something's wrong. Don't bypass this by skipping tests.
 
-**80%+ code coverage** - Not about hitting a number, but ensuring critical paths are tested. If coverage drops, you probably added code without tests.
+**Coverage is a habit, not a gate** - `jest.config.cjs` sets no `coverageThreshold` and nothing in CI fails on coverage, so treat `npm run test:coverage` as a way to spot untested critical paths rather than a number to clear. A visible drop usually means code landed without tests.
 
 **No console errors or warnings** - Clean console output matters. Warnings about deprecated APIs or prop type mismatches often indicate real issues.
 
@@ -535,8 +536,7 @@ The process I've found that works well:
 ### Story Testing
 ```typescript
 // Component.stories.tsx
-import { expect } from '@storybook/jest';
-import { within, userEvent } from '@storybook/testing-library';
+import { expect, within, userEvent } from '@storybook/test';
 
 export const InteractiveTest: Story = {
   play: async ({ canvasElement }) => {

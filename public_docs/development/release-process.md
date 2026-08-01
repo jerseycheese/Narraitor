@@ -10,7 +10,7 @@ Rule of thumb: if there's a clean story to tell about what's in this slice of wo
 
 ## Version naming
 
-Tags follow `vMAJOR.MINOR.PATCH[-suffix]`. Pre-1.0 the version numbers are loose — they signal scope, not a stability promise. The optional suffix is for tags that benefit from a one-word label, like `v0.4.0-pre-design-system` or `v0.6.0-theme-differentiation`. Skip the suffix when the version is self-explanatory.
+Tags follow `vMAJOR.MINOR.PATCH[-suffix]`. Pre-1.0 the version numbers are loose — they signal scope, not a stability promise. The optional suffix is for tags that benefit from a one-word label, like `v0.4.0-pre-design-system` or `v0.5.0-design-system` (the two tags that exist so far). Skip the suffix when the version is self-explanatory, which `v1.0.0` is.
 
 ## Cutting the release
 

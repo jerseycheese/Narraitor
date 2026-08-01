@@ -33,7 +33,7 @@ Alert, and so on, several built on `@radix-ui/*`). What changed is how they're s
 
 - [Design tokens](./design-tokens.md) — the primitives/semantic/contextual token model
 - [Global styles](./global-styles.md) — global CSS and theme wiring
-- [ADR-011: Three design systems](../architecture/ADR-011-three-design-systems.md) — why the theme system is structured this way
+- [ADR-013: Collapse to a single design system (DS3)](../architecture/ADR-013-collapse-to-single-design-system-ds3.md) — why there's one design system now (supersedes ADR-011)
 - [DESIGN.md](../../DESIGN.md) — the AI-readable token/component reference at the repo root
 
 The components themselves under `src/components/ui/` are the source of truth for their props and

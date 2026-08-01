@@ -267,21 +267,28 @@ test('responsive navigation component', async ({ page }) => {
 
 ## Development Environment Considerations
 
-### DevTools Positioning
+### DevTools and visual tests
 
-**Visual tests include development tools**:
-- DevTools panel is positioned at **top of page** (not bottom)
-- Main content has automatic top padding (`pt-12`) in development mode
-- All visual test baselines include the devtools header
-- This ensures consistent positioning across all screenshots
+Visual tests **exclude** the DevTools panel. It used to leak into fullPage baselines, so
+`ClientOnlyDevTools` now refuses to render under automation:
 
-**Environment-specific settings**:
-```typescript
-// Layout automatically adjusts for development environment
-<main className={`min-h-screen pb-12 md:pb-14 ${
-  process.env.NODE_ENV === 'development' ? 'pt-12' : ''
-}`}>
+```tsx
+// src/components/ClientOnlyDevTools.tsx
+setIsAutomated(isPlaywrightEnv() || navigator.webdriver === true);
+
+if (!isClient || process.env.NODE_ENV !== 'development' || isAutomated) {
+  return null;
+}
 ```
+
+The `navigator.webdriver` fallback is there on purpose. Some visual specs reuse a seeded
+`storageState` that doesn't carry the `__PLAYWRIGHT__` flag, so `isPlaywrightEnv()` alone missed
+them and the panel showed up in their baselines. Note that the two checks are deliberately kept
+separate: `isPlaywrightEnv()` gates render-path behavior like AI generation, and broadening it to
+cover the panel would change what those specs actually exercise.
+
+Baselines therefore have no DevTools header and no development-only top padding, so a local
+capture matches a CI one on this axis regardless of `NODE_ENV`.
 
 ### CI/Local Environment Differences
 

@@ -88,8 +88,8 @@ export default defineConfig({
   testDir: './tests/visual',
   expect: {
     toHaveScreenshot: {
-      maxDiffPixels: 2000,    // Global default for most tests
-      threshold: 0.3,         // 30% tolerance for general cases
+      maxDiffPixels: 10000,   // Global default for most tests
+      threshold: 0.2,         // Slightly tighter for better accuracy
       animations: 'disabled', // Disable animations for consistency
     },
   },
@@ -326,22 +326,24 @@ npm run test:visual:debug
 
 ### GitHub Actions Workflow
 
-Visual tests run automatically in CI:
+There's no `playwright.yml`. Visual tests run from three places:
+
+- **`ci.yml`, the `e2e` job** - runs on every push and PR to `main`/`develop`, sharded two ways at
+  one worker per shard. This is the one that gates most work.
+- **`playwright-tutorials.yml`** - the tutorial visual specs, split into their own job because
+  they're slower and flakier than the rest. Same push/PR triggers, but a separate check.
+- **`playwright-focused.yml`** - `workflow_dispatch` only, so it never fires on its own. Trigger it
+  by hand when you want a visual run without pushing.
+
+All three sit on `macos-latest`, which isn't optional: the committed baselines are macOS-rendered
+and a Linux runner fails them on font rasterization alone.
 
 ```yaml
-# .github/workflows/playwright.yml
-- name: Install Playwright Browsers
+# .github/workflows/ci.yml, e2e job
+- name: Install Playwright browsers
   run: npx playwright install --with-deps
-
-- name: Run Playwright tests
-  run: npx playwright test
-
-- name: Upload test artifacts
-  if: failure()
-  uses: actions/upload-artifact@v4
-  with:
-    name: playwright-report
-    path: playwright-report/
+- name: Run E2E tests (fail on visual diffs)
+  run: npm run test:e2e:critical -- --shard=${{ matrix.shard }}/2 --workers=1
 ```
 
 ### Handling CI Failures
