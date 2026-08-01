@@ -64,9 +64,8 @@ The response mirrors what the UI displays:
 ```
 
 The browser calls this endpoint directly, through `aiFetch` rather than a bare `fetch` (see
-`useStoryCheckpointManager`). That's how the key stays private: `aiFetch` attaches the player's
-own key as a request header and the route resolves it server-side, so the key never ends up in
-client JavaScript and the browser never talks to `googleapis.com`.
+`useStoryCheckpointManager`). `aiFetch` attaches the player's key as a request header and the
+route resolves it server-side.
 
 ## Troubleshooting
 

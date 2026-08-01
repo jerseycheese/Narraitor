@@ -210,11 +210,11 @@ import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 - Inspect structured lore context output
 
 ### Decision Flow Section
-There's no relevance-scoring debugger, because there's no relevance scoring left to debug -
-[ADR-010](../architecture/ADR-010-decision-relevance-simplification.md) replaced the weighted
-five-factor calculator with plain recency filtering (`src/lib/ai/simpleDecisionRelevance.ts`).
+There's no relevance-scoring debugger. Relevance is plain recency filtering
+(`src/lib/ai/simpleDecisionRelevance.ts`, see
+[ADR-010](../architecture/ADR-010-decision-relevance-simplification.md)).
 
-What exists instead is `DecisionFlowSection`, a read-only trace of how each decision was created,
+What exists is `DecisionFlowSection`, a read-only trace of how each decision was created,
 presented, selected, and recorded:
 
 - **Per-decision trace**: origin segment, the AI-generated options with their alignment and any

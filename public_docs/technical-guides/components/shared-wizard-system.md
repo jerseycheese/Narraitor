@@ -56,8 +56,8 @@ interface WizardNavigationProps {
 Handles Previous/Next/Cancel buttons with validation states and loading indicators.
 
 ### WizardStep
-Individual step container. Note the name collision: this component is unrelated to the
-`WizardStep` *type* (`{ id, label, isOptional? }`) that the state hooks take as their `steps` array.
+Individual step container. Unrelated to the `WizardStep` *type* (`{ id, label, isOptional? }`) the
+state hooks take as their `steps` array, despite the shared name.
 
 ```typescript
 interface WizardStepProps {
@@ -67,8 +67,7 @@ interface WizardStepProps {
 }
 ```
 
-It's a content wrapper with error display. It doesn't render a header, so put your own heading in
-`children` if you want one.
+A content wrapper with error display. No header, so put your own heading in `children`.
 
 ## Form Components
 
@@ -90,10 +89,9 @@ interface ToggleButtonProps {
 ## Hooks & Utilities
 
 ### useWizardState
-There are two of these, and neither is re-exported from `@/components/shared/wizard`. Import from
-the specific path.
+There are two, neither re-exported from `@/components/shared/wizard`. Import from the specific path.
 
-**`@/hooks/useWizardState`** is the one most wizards use (world creation, character creation):
+**`@/hooks/useWizardState`** — used by world creation and character creation:
 
 ```typescript
 interface UseWizardStateOptions<TData> {
@@ -113,8 +111,8 @@ interface UseWizardStateOptions<TData> {
 Note `state.data` rather than a top-level `data`, and `goNext`/`goBack` rather than
 `nextStep`/`previousStep`.
 
-**`@/components/shared/wizard/hooks/useWizardState`** is the router-aware variant, currently used
-by `ProviderWizard`. It adds localStorage persistence and a completion callback:
+**`@/components/shared/wizard/hooks/useWizardState`** — router-aware, used by `ProviderWizard`.
+Adds localStorage persistence and a completion callback:
 
 ```typescript
 interface WizardConfig<T> {
@@ -134,8 +132,7 @@ interface WizardConfig<T> {
 Its actions live under `handlers` (`handleNext`, `handleBack`, `handleCancel`, `handleComplete`,
 `updateData`, `setError`, `clearError`) rather than at the top level.
 
-Two hooks with one name is a wart worth collapsing at some point; until then, check which one a
-component imports before copying its usage.
+Check which one a component imports before copying its usage.
 
 ### Validation helpers
 Located in `utils/validation.ts`:

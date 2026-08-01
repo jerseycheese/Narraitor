@@ -109,11 +109,10 @@ npm run deps:baseline         # Update after fixes (tracks progress)
 
 **Circular Dependencies (8 in the baseline)**
 
-The store-to-store circles this section used to describe are gone. What's left is mostly
-barrel-file self-reference (`src/lib/utils/index.ts` re-exporting modules that import it back,
-same shape in `src/types/index.ts` and `src/lib/theme/index.ts`) plus a couple of
+Mostly barrel-file self-reference: `src/lib/utils/index.ts` re-exporting modules that import it
+back, same shape in `src/types/index.ts` and `src/lib/theme/index.ts`. Plus a couple of
 component-to-module loops in the world-creation wizard and the tutorial provider. Run
-`npm run deps:validate:strict` for the current list rather than trusting this paragraph.
+`npm run deps:validate:strict` for the current list.
 
 **Resolution Strategy:**
 1. Extract shared logic to `lib/` utilities
@@ -217,16 +216,15 @@ Rules are defined in `.dependency-cruiser.cjs`. Key sections:
 
 ## Integration with CI
 
-Dependency validation runs in CI, as the last step of the Lint Check job in
-`.github/workflows/ci.yml`:
+Dependency validation runs in CI as the last step of the Lint Check job in
+`.github/workflows/ci.yml`, so a new violation fails the build:
 
 ```yaml
 - name: Enforce dependency boundaries (no new cycles or dev-dep leaks)
   run: npm run deps:validate
 ```
 
-Which means a new violation fails the build. Fix the boundary, or re-baseline deliberately with
-`npm run deps:baseline` if the violation is one you're choosing to accept.
+Fix the boundary, or re-baseline deliberately with `npm run deps:baseline`.
 
 That would fail the build on any NEW boundary violation while still tolerating the known ones
 in the baseline file.

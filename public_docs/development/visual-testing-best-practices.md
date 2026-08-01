@@ -269,8 +269,8 @@ test('responsive navigation component', async ({ page }) => {
 
 ### DevTools and visual tests
 
-Visual tests **exclude** the DevTools panel. It used to leak into fullPage baselines, so
-`ClientOnlyDevTools` now refuses to render under automation:
+Visual tests **exclude** the DevTools panel. `ClientOnlyDevTools` refuses to render under
+automation:
 
 ```tsx
 // src/components/ClientOnlyDevTools.tsx
@@ -281,14 +281,11 @@ if (!isClient || process.env.NODE_ENV !== 'development' || isAutomated) {
 }
 ```
 
-The `navigator.webdriver` fallback is there on purpose. Some visual specs reuse a seeded
-`storageState` that doesn't carry the `__PLAYWRIGHT__` flag, so `isPlaywrightEnv()` alone missed
-them and the panel showed up in their baselines. Note that the two checks are deliberately kept
-separate: `isPlaywrightEnv()` gates render-path behavior like AI generation, and broadening it to
-cover the panel would change what those specs actually exercise.
+Keep the two checks separate: `isPlaywrightEnv()` gates render-path behavior like AI generation,
+and broadening it to cover the panel would change what those specs exercise.
 
-Baselines therefore have no DevTools header and no development-only top padding, so a local
-capture matches a CI one on this axis regardless of `NODE_ENV`.
+Baselines have no DevTools header and no development-only top padding, so a local capture matches
+a CI one on this axis regardless of `NODE_ENV`.
 
 ### CI/Local Environment Differences
 

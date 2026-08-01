@@ -330,13 +330,13 @@ There's no `playwright.yml`. Visual tests run from three places:
 
 - **`ci.yml`, the `e2e` job** - runs on every push and PR to `main`/`develop`, sharded two ways at
   one worker per shard. This is the one that gates most work.
-- **`playwright-tutorials.yml`** - the tutorial visual specs, split into their own job because
-  they're slower and flakier than the rest. Same push/PR triggers, but a separate check.
+- **`playwright-tutorials.yml`** - the tutorial visual specs, in their own job. Same push/PR
+  triggers, separate check.
 - **`playwright-focused.yml`** - `workflow_dispatch` only, so it never fires on its own. Trigger it
   by hand when you want a visual run without pushing.
 
-All three sit on `macos-latest`, which isn't optional: the committed baselines are macOS-rendered
-and a Linux runner fails them on font rasterization alone.
+All three sit on `macos-latest`. The committed baselines are macOS-rendered, so a Linux runner
+fails them on font rasterization alone.
 
 ```yaml
 # .github/workflows/ci.yml, e2e job

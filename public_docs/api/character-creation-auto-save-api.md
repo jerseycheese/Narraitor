@@ -319,7 +319,7 @@ try {
 ## Storage
 
 localStorage only. `useCharacterCreationAutoSave` reads and writes a single per-world key and
-never touches sessionStorage, so there's no migration path to worry about.
+never touches sessionStorage.
 
 ## Testing Considerations
 

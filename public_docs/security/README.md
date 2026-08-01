@@ -38,11 +38,9 @@ cd public_docs/security
 
 The CI pipeline runs security checks on every PR to catch vulnerabilities before they hit production. This has caught real issues with outdated dependencies and known CVEs.
 
-**Security Scan job** runs `npm audit --omit=dev --audit-level=moderate` on every push and PR to `main` and `develop`, and it's a hard gate: that step sets `continue-on-error: false`, so a moderate-or-worse advisory in a runtime dependency fails the build. The follow-up steps that generate the JSON report and capture `npm outdated` are best-effort (`continue-on-error: true`) since they're diagnostics, not gates. Results get saved as artifacts (check `ci-security/summary.md`, `npm-audit.json`, and `npm-outdated.json` in the workflow run).
+**Security Scan job** runs `npm audit --omit=dev --audit-level=moderate` on every push and PR to `main` and `develop`. It's a hard gate: that step sets `continue-on-error: false`, so a moderate-or-worse advisory in a runtime dependency fails the build. The follow-up steps that generate the JSON report and capture `npm outdated` are diagnostics, not gates (`continue-on-error: true`). Results get saved as artifacts (check `ci-security/summary.md`, `npm-audit.json`, and `npm-outdated.json` in the workflow run).
 
-**CodeQL analysis** runs on pushes, pull requests, and Monday mornings at 09:00 UTC. It sets no `fail-on` threshold, so new security alerts land in the GitHub Security tab without blocking deploys. That leaves room to triage without emergency hotfixes.
-
-When a CVE has no fixed release yet, the pattern is a self-referencing `overrides` block in `package.json` (that's how sharp/libvips and postcss got pinned) rather than loosening the audit level.
+**CodeQL analysis** runs on pushes, pull requests, and Monday mornings at 09:00 UTC. It sets no `fail-on` threshold, so new security alerts land in the GitHub Security tab without blocking deploys.
 
 ### Reviewing `npm-outdated.json`
 

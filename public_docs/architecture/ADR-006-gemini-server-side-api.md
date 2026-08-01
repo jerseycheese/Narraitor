@@ -19,13 +19,8 @@ updated: 2026-08-01
 > encrypted in the browser (`src/state/providerStore.ts`), and `src/lib/ai/aiFetch.ts` attaches it
 > per request as the `x-provider-api-key` header. Server-side, `src/lib/ai/resolveApiKey.ts` takes
 > that header key first and only falls back to `GEMINI_API_KEY` when there isn't one, which makes
-> the env key a dev and local-testing convenience rather than the architecture.
->
-> The reasoning didn't change so much as the bill did. A server-held key means one key paying for
-> every player's generations, which doesn't work for a free public release. Handing the cost to
-> whoever's playing solved that without giving up the proxy hop, since the key still never sits in
-> client JavaScript or reaches `googleapis.com` from the browser. Read the "What We Decided"
-> section below as the proxy decision, not as a description of key handling.
+> the env key a dev and local-testing convenience rather than the architecture. Read the "What We
+> Decided" section below as the proxy decision, not as a description of key handling.
 
 ## The Situation
 

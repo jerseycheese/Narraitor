@@ -167,10 +167,8 @@ The system enforces some sensible limits to keep things manageable:
 - **Required Fields**: Name and description are mandatory because worlds need context
 
 ### Export/Import
-There isn't any. Worlds live in the browser's IndexedDB and there's no way to get one out as a
-file or bring one back in, so a world doesn't travel between browsers or devices. That's a known
-gap rather than a design position, and it's the kind of thing that gets easier to fix once there's
-an account system to hang it on.
+There isn't any. Worlds live in the browser's IndexedDB with no way to get one out as a file or
+bring one back in, so a world doesn't travel between browsers or devices.
 
 ## Testing & Development
 

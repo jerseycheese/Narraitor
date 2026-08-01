@@ -186,8 +186,8 @@ interface NarrativeContext {
 ## Session Types
 
 There's no `GameSession` interface and no `SessionState` type. Live session state lives in
-`sessionStore` rather than in a single entity type; what `src/types/session.types.ts` defines is
-lifecycle metadata plus the narrative context shape:
+`sessionStore`. `src/types/session.types.ts` defines lifecycle metadata and the narrative context
+shape:
 
 ```typescript
 type SessionLifecycleStatus = 'active' | 'ended' | 'abandoned';
@@ -277,8 +277,7 @@ interface InventoryItem extends NamedEntity, TimestampedEntity {
 
 ## AI Context Types
 
-There's no `AIContext` or `AIMessage` type, and no stored conversation history - each generation
-builds its prompt from current state rather than replaying a message log. The real context type is
+There's no `AIContext` or `AIMessage` type and no stored conversation history. The context type is
 `AISessionContext`, returned by `useAiContextStore.getState().buildContextForSession()`:
 
 ```typescript
@@ -295,7 +294,7 @@ interface AISessionContext {
   timestamp: string;
 }
 
-// src/lib/promptTemplates/types.ts - simpler than it used to be
+// src/lib/promptTemplates/types.ts
 interface PromptTemplate {
   id: string;
   content: string;
@@ -305,10 +304,9 @@ interface PromptTemplate {
 ## State Management Types
 
 Stores aren't built from a generic base. There's a shared `CrudStore<T>` contract in
-`src/state/crudStore.types.ts`, but only `goalStore` and `loreStore` reference it (the factory that
-went with it was deleted as unused). Every other store declares its own actions directly, named
-for its domain: `createWorld`/`updateWorld`/`deleteWorld` on `worldStore`, not `create`/`update`/
-`delete`.
+`src/state/crudStore.types.ts`, referenced only by `goalStore` and `loreStore`. Every other store
+declares its own actions, named for its domain: `createWorld`/`updateWorld`/`deleteWorld` on
+`worldStore`, not `create`/`update`/`delete`.
 
 ```typescript
 // src/state/crudStore.types.ts - the shared contract, used by goalStore and loreStore
@@ -331,16 +329,14 @@ type CrudStore<T extends BaseEntity> = {
 };
 ```
 
-For any other store, read its own type file. `narrativeStore` in particular doesn't generate
-narrative (that's `src/lib/ai/narrativeGenerator.ts`) and has no `generateNarrative`,
-`selectChoice`, or `submitCustomInput` - it holds `segments` and `decisions` and exposes
-`addSegment`, `selectDecisionOption`, and `generateEnding`. See
-`src/state/narrativeStore.types.ts`.
+For any other store, read its own type file. `narrativeStore` has no `generateNarrative`,
+`selectChoice`, or `submitCustomInput` - generation lives in `src/lib/ai/narrativeGenerator.ts`.
+The store holds `segments` and `decisions` and exposes `addSegment`, `selectDecisionOption`, and
+`generateEnding`. See `src/state/narrativeStore.types.ts`.
 
 ## Form Types
 
-None of these are exported anywhere; they're the shape store methods take inline. Written out for
-reference:
+None of these are exported; they're the shape store methods take inline:
 
 ```typescript
 // What createWorld / createCharacter accept
@@ -392,9 +388,9 @@ Types are split by domain:
 - `/src/types/lore.types.ts` - Lore facts and categories
 - `/src/types/inventory.types.ts` - Inventory and items
 
-Plus a longer tail this page doesn't cover: `goal`, `npc`, `provider`, `personalization`,
-`tone-settings`, `story-checkpoint`, `continuity`, `tutorial`, `dashboard`, and others. `ls
-src/types/` is the authoritative list.
+This page doesn't cover the rest: `goal`, `npc`, `provider`, `personalization`, `tone-settings`,
+`story-checkpoint`, `continuity`, `tutorial`, `dashboard`, and others. `ls src/types/` is the
+authoritative list.
 
 ## Usage Examples
 

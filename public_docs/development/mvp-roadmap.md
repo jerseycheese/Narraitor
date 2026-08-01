@@ -3,24 +3,19 @@
 ## Where We Are
 **Major Milestone**: The core MVP is basically complete. AI storytelling, world creation, character building, session persistence, and navigation all work, and a player can go end to end through the loop.
 
-**Current Status**: the 1.0 endgame. The visual-finish work that made up most of this roadmap's
-active queue is done, and so is the QA walkthrough. What's left in the `v1.0` milestone is four
-items plus the cut itself: the release QA tracking issue (#1417), the archive/retire sweep
-(#1639), this docs sweep (#1638), and tagging the release (#1635), all hanging off the tracking
-issue #1320.
+**Current Status**: the 1.0 endgame. The visual-finish work and the QA walkthrough are done.
+What's left in the `v1.0` milestone is the release QA tracking issue (#1417), the archive/retire
+sweep (#1639), this docs sweep (#1638), and tagging the release (#1635), all under #1320.
 
-The big pieces that landed along the way: the three-design-system migration (DS1/DS2/DS3, see
-[ADR-011](../architecture/ADR-011-three-design-systems.md)), later collapsed back to a single
-design system via [ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md);
-bring-your-own-key provider config (#891/#892/#893), which is what makes a free public release
-possible; Playwright visual-regression testing; the dashboard home page; the guided onboarding
-tutorial; table views for the list screens; and the lore entity-management work (fuzzy matching,
-aliases, deduplication, resolution).
+Landed along the way: the three-design-system migration
+([ADR-011](../architecture/ADR-011-three-design-systems.md)), later collapsed to a single design
+system ([ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md));
+bring-your-own-key provider config (#891/#892/#893); Playwright visual-regression testing; the
+dashboard home page; the guided onboarding tutorial; table views for the list screens; and the
+lore entity-management work (fuzzy matching, aliases, deduplication, resolution).
 
-1.0 ships single-player, browser-local, with the player supplying their own Gemini key. No
-accounts and no server-side sync, which is a scoping decision rather than an oversight -
-monetization needs auth and backend persistence that don't exist yet, so it lives on its own
-track (#495) instead of blocking the launch.
+1.0 ships single-player and browser-local, with the player supplying their own Gemini key. No
+accounts, no server-side sync; monetization is a separate track (#495).
 
 ## What the MVP Does
 Basically, it's a complete solo narrative RPG experience where you can:
@@ -106,10 +101,9 @@ This is about getting ready for broader use beyond just personal development.
 ## Current Priority Queue
 
 The next release to main is **v1.0**, tracked in the `v1.0` GitHub milestone and meta-issue
-**#1320**. Core MVP systems are done and the visual-finish work is done; what's left is release
-hygiene and the cut. The earlier Immediate / High Priority / Medium Priority queues are kept below
-as a record of what actually shipped (and what didn't), followed by the active v1.0 work. This
-roadmap is a running log, not a snapshot.
+**#1320**. The earlier Immediate / High Priority / Medium Priority queues are kept below as a
+record of what shipped and what didn't, followed by the active v1.0 work. This roadmap is a
+running log, not a snapshot.
 
 ### Recently shipped (prior queues, kept for history)
 
@@ -122,7 +116,7 @@ roadmap is a running log, not a snapshot.
 **Player-facing features**
 - [x] Dashboard home page (#398)
 - [x] Guided onboarding tutorial (#399)
-- [x] Character creation templates (#393) - since removed. The templates system was ripped out for 1.0 as too much complexity for the value (#1455, with world templates going the same way in #1454).
+- [x] Character creation templates (#393) - since removed in #1455 (world templates in #1454)
 - [x] Character portraits foundation — custom upload (#404), avatar library (#405); the preset+upload UX is revisited in #1299, deferred to 1.1
 - [x] Skill prerequisites (#392)
 - [x] Table views — character lists (#808), world comparison (#810)
@@ -149,10 +143,9 @@ lives in #1320.
 ### Shipped for v1.0
 
 **Visual blockers (Tailwind-removal fallout)**
-The post-#1097 cleanup left several shared primitives shipping unstyled in the app while the
-showcase looked fine, the exact drift the canon work exists to kill. The pattern that came out of
-it: style the primitive *in production*, not in the showcase.
-- [x] Shared modals unstyled, no backdrop, unpositioned panel (#1316, PR #1315) — set the pattern
+The post-#1097 cleanup left several shared primitives shipping unstyled in the app. The rule that
+came out of it: style the primitive *in production*, not in the showcase.
+- [x] Shared modals unstyled, no backdrop, unpositioned panel (#1316, PR #1315)
 - [x] Remaining DS primitives unstyled: card/alert/tabs/table/checkbox/radio (#1317)
 - [x] Render data-table + CollapsibleSection in the style guide for canon coverage (#1319)
 
@@ -162,10 +155,8 @@ it: style the primitive *in production*, not in the showcase.
 - [x] Split tutorial visual tests into a dedicated CI job (#1014); restore deleted tutorial coverage (#1239)
 
 ### Commercialization (#495) — post-1.0, not a launch gate
-This used to sit in the v1.0 queue as "MVP Launch Preparation." It's since been rescoped to
-commercialization (a paid product launch) and moved out of the 1.0 gate entirely, because
-charging for anything needs accounts and server-side persistence that 1.0 deliberately doesn't
-have.
+Formerly "MVP Launch Preparation" in the v1.0 queue. Now scoped to a paid product launch and out
+of the 1.0 gate.
 
 ### Deferred to 1.1+ (player-facing polish, not blocking 1.0)
 - Preset avatars + custom portrait upload (#1299)
@@ -173,10 +164,9 @@ have.
 - Session pacing and reading milestones (#805)
 
 ### Partly shipped: Multi-Provider AI (Epic #878)
-The bring-your-own-key slice landed for 1.0 and the rest is still deferred, so the app launches
-Gemini-only. Shipped: secure key storage (#891), provider config UI (#892), Gemini refactor to the
-provider pattern (#893). Still open: provider abstraction (#890), Claude native SDK (#894),
-generic OpenAI-compatible provider (#895).
+Gemini-only at launch. Shipped: secure key storage (#891), provider config UI (#892), Gemini
+refactor to the provider pattern (#893). Still open: provider abstraction (#890), Claude native
+SDK (#894), generic OpenAI-compatible provider (#895).
 
 ## Technical Debt & Infrastructure
 - Playwright visual regression testing — done (`tests/visual/`, runs in CI)
@@ -192,7 +182,6 @@ Features that are valuable but not required for initial launch:
 **Multi-Provider AI Support (Epic #878), minus what already shipped**
 - OpenAI-compatible provider abstraction (#890)
 - Support for OpenAI, Claude, Deepseek, Mistral, and so on (#894, #895)
-- Note: secure key storage and the provider config UI are done; 1.0 launches Gemini-only
 
 **Advanced Features**
 - Multiplayer/shared world support
@@ -224,4 +213,4 @@ Features that are valuable but not required for initial launch:
 - [ ] Marketing materials ready
 
 ---
-*Last Updated: 2026-08-01 - Correctness pass as part of #1638. The Phase A visual blockers (#1316, #1317, #1319) and the supporting visual-test items (#1297, #1198, #1014, #1239) had all merged but were still listed as active work, so they moved to "Shipped for v1.0" and the active queue now matches what's actually open in the milestone. #495 was retitled to commercialization and is no longer a 1.0 gate. Noted that the character-templates system (#393) was later removed in #1455, and that #891/#892/#893 shipped out of the multi-provider epic.*
+*Last Updated: 2026-08-01 - Correctness pass (#1638). Moved the merged Phase A and visual-test items to "Shipped for v1.0"; the active queue now matches the open milestone. #495 is no longer a 1.0 gate.*

@@ -220,13 +220,13 @@ Good HTML structure helps with accessibility and SEO, plus it makes the CSS easi
 
 ## Custom Components
 
-Buttons are the main thing `globals.css` styles directly. There's no `.btn` family and no
-`.card`; the base class is `.button`, with variants `.button-default`, `.button-secondary`,
+Buttons are the main thing `globals.css` styles directly. There's no `.btn` family and no `.card`.
+The base class is `.button`, with variants `.button-default`, `.button-secondary`,
 `.button-outline`, `.button-ghost`, `.button-link`, `.button-destructive`, `.button-success`,
 `.button-info`, `.button-warning`, plus sizes `.button-size-default`, `.button-size-sm`,
 `.button-size-lg`, `.button-size-icon`.
 
-In practice you don't write those class names yourself. Use the `Button` component from
+Don't write those class names yourself. Use the `Button` component from
 `src/components/ui/button.tsx`, which composes them from `variant` and `size` props:
 
 ```tsx
@@ -242,10 +242,9 @@ helpers `.font-narrative` / `.font-system` / `.font-interface`, and `.data-table
 
 ## Utility Classes
 
-There's one, and it's the standard name rather than the invented ones this section used to list:
-`.sr-only` hides content visually while leaving it available to screen readers. No
-`.text-balanced`, no `.visually-hidden`, no `.focus-visible` utility (focus styling is baked into
-the component classes via `:focus-visible` selectors).
+There's one: `.sr-only`, which hides content visually while leaving it available to screen
+readers. No `.text-balanced`, no `.visually-hidden`, no `.focus-visible` utility - focus styling
+lives in the component classes via `:focus-visible` selectors.
 
 ```tsx
 const AccessibleComponent = () => {

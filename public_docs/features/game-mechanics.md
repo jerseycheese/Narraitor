@@ -20,11 +20,10 @@ how it looks:
 
 **Critical Decisions** - Life-changing moments that determine major story outcomes. "The kingdom's fate hangs in the balance. What is your final choice?"
 
-The weight feeds the summarization prompt, so a critical decision gets summarized with more
-gravity than a passing one, and it's the axis a fatal ending can hang off. On screen it's quieter
-than that description implies: the journal's choice history prints the weight as a text label
-(`major WEIGHT`), and `getDecisionWeightStyling()` in `choiceStyling.tsx` returns empty strings, so
-weight adds no borders, shadows, or color to the choices themselves.
+The weight feeds the summarization prompt and can gate a fatal ending. Visually it does nothing:
+the journal's choice history prints it as a text label (`major WEIGHT`), and
+`getDecisionWeightStyling()` in `choiceStyling.tsx` returns empty strings, so weight adds no
+borders, shadows, or color to the choices themselves.
 
 **Smart Context** - Instead of just repeating the story, the AI generates context that explains why the decision matters:
 - "Tension builds as you must choose how to respond to the merchant's accusation"

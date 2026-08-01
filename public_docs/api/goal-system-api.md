@@ -126,8 +126,8 @@ interface AISessionContext {
 ```
 
 #### Context Management
-Context isn't snapshotted or replayed - `buildContextForSession` recomputes from current state
-every call. The store's other actions are just lifecycle plumbing:
+`buildContextForSession` recomputes from current state on every call; nothing is snapshotted or
+replayed. The store's other actions:
 
 ```typescript
 reset(): void
