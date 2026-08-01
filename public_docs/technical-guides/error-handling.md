@@ -30,9 +30,11 @@ const handleAction = async () => {
 };
 
 // Error display
-<ErrorMessage 
-  error={error}
+<ErrorDisplay
+  message={error.message}
+  showRetry
   onRetry={handleAction}
+  showDismiss
   onDismiss={() => setError(null)}
 />
 ```

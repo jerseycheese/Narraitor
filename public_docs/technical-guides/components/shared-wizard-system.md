@@ -56,17 +56,19 @@ interface WizardNavigationProps {
 Handles Previous/Next/Cancel buttons with validation states and loading indicators.
 
 ### WizardStep
-Individual step container.
+Individual step container. Note the name collision: this component is unrelated to the
+`WizardStep` *type* (`{ id, label, isOptional? }`) that the state hooks take as their `steps` array.
 
 ```typescript
 interface WizardStepProps {
   children: React.ReactNode;
-  title?: string;
-  description?: string;
+  error?: string | null;
+  className?: string;
 }
 ```
 
-Provides consistent step header and content area styling.
+It's a content wrapper with error display. It doesn't render a header, so put your own heading in
+`children` if you want one.
 
 ## Form Components
 
@@ -88,23 +90,52 @@ interface ToggleButtonProps {
 ## Hooks & Utilities
 
 ### useWizardState
-Primary state management hook.
+There are two of these, and neither is re-exported from `@/components/shared/wizard`. Import from
+the specific path.
+
+**`@/hooks/useWizardState`** is the one most wizards use (world creation, character creation):
 
 ```typescript
-interface UseWizardStateOptions<T> {
-  initialData: T;
-  totalSteps: number;
-  persistKey?: string;
-  onComplete?: (data: T) => void | Promise<void>;
-  validation?: ValidationRules<T>;
+interface UseWizardStateOptions<TData> {
+  initialData: TData;
+  initialStep?: number;
+  steps: WizardStep[];                       // an array of step configs, not a count
+  onStepValidation?: (stepIndex: number, data: TData) => WizardValidation;
+  validateOnUpdate?: boolean;
+  onDataChange?: (data: TData) => void;
 }
+
+// returns
+{ state, currentStepConfig, canGoNext, canGoBack, isFirstStep, isLastStep,
+  goNext, goBack, goToStep, updateData, setValidation, setProcessing, setError }
 ```
 
-**Features:**
-- Step navigation with bounds checking
-- Data persistence to localStorage
-- Optional per-step validation via `validation` config
-- Async completion handling
+Note `state.data` rather than a top-level `data`, and `goNext`/`goBack` rather than
+`nextStep`/`previousStep`.
+
+**`@/components/shared/wizard/hooks/useWizardState`** is the router-aware variant, currently used
+by `ProviderWizard`. It adds localStorage persistence and a completion callback:
+
+```typescript
+interface WizardConfig<T> {
+  steps: WizardStep[];
+  initialData: T;
+  onComplete: (data: T) => void | Promise<void>;
+  onCancel?: () => void;
+  validateStep?: (step: number, data: T) => ValidationState;
+  persistKey?: string;
+  debug?: boolean;
+}
+
+// returns
+{ state, handlers, currentStep, isFirstStep, isLastStep, stepValidation, currentError }
+```
+
+Its actions live under `handlers` (`handleNext`, `handleBack`, `handleCancel`, `handleComplete`,
+`updateData`, `setError`, `clearError`) rather than at the top level.
+
+Two hooks with one name is a wart worth collapsing at some point; until then, check which one a
+component imports before copying its usage.
 
 ### Validation helpers
 Located in `utils/validation.ts`:
@@ -139,43 +170,46 @@ import {
   WizardProgress,
   WizardNavigation,
   WizardStep,
-  useWizardState,
 } from '@/components/shared/wizard';
+import { useWizardState } from '@/hooks/useWizardState';
+
+const STEPS = [
+  { id: 'basics', label: 'Basics' },
+  { id: 'details', label: 'Details' },
+  { id: 'review', label: 'Review' },
+];
 
 function MyWizard() {
   const {
-    data,
-    currentStep,
+    state,
+    currentStepConfig,
+    canGoNext,
+    canGoBack,
+    goNext,
+    goBack,
     updateData,
-    nextStep,
-    previousStep,
-    canProceed,
-    isSubmitting,
   } = useWizardState({
     initialData: { name: '', email: '' },
-    totalSteps: 3,
-    persistKey: 'my-wizard',
-    onComplete: async (data) => {
-      // Save data
-    },
+    steps: STEPS,
   });
+  const currentStep = state.currentStep;
 
   return (
     <WizardContainer>
-      <WizardProgress currentStep={currentStep} totalSteps={3} />
-      
-      <WizardStep title="Step Title">
+      <WizardProgress steps={STEPS} currentStep={currentStep} />
+
+      <WizardStep>
+        <h2>{currentStepConfig.label}</h2>
         {/* Step content */}
       </WizardStep>
 
       <WizardNavigation
         currentStep={currentStep}
-        totalSteps={3}
-        onNext={nextStep}
-        onPrevious={previousStep}
+        totalSteps={STEPS.length}
+        onNext={goNext}
+        onBack={canGoBack ? goBack : undefined}
         onCancel={() => router.push('/')}
-        canProceed={canProceed}
-        isSubmitting={isSubmitting}
+        disabled={!canGoNext}
       />
     </WizardContainer>
   );
@@ -185,8 +219,8 @@ function MyWizard() {
 ## Best Practices
 
 ### State Management
-- Use `useWizardState` for all wizard state
-- Enable persistence for better UX
+- Use `useWizardState` for wizard state, but check which of the two you want first
+- Enable persistence (the `shared/wizard` variant's `persistKey`) when losing progress would hurt
 - Implement proper validation rules per step
 
 ### Styling

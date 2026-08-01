@@ -66,8 +66,13 @@ clearSessionGoals(sessionId: EntityID): void
 This is where the magic happens - automatically detecting goals from narrative content:
 
 ```typescript
-// Process narrative segment for goal extraction
-processSegmentForGoals(segmentId: EntityID, characterId?: EntityID): Promise<ProcessSegmentResult>
+// Process narrative segment for goal extraction. Takes the segment object, not its ID,
+// and sessionId is required.
+processSegmentForGoals(
+  segment: NarrativeSegment,
+  sessionId: EntityID,
+  characterId?: EntityID
+): Promise<ProcessSegmentResult>
 
 interface ProcessSegmentResult {
   newGoalsCreated: number;
@@ -121,12 +126,14 @@ interface AISessionContext {
 ```
 
 #### Context Management
-```typescript
-// Save context snapshot to history
-saveContextToHistory(sessionId: EntityID, context: AISessionContext): void
+Context isn't snapshotted or replayed - `buildContextForSession` recomputes from current state
+every call. The store's other actions are just lifecycle plumbing:
 
-// Retrieve context history for session
-getContextHistory(sessionId: EntityID): AISessionContext[]
+```typescript
+reset(): void
+setError(error: string | null): void
+clearError(): void
+setLoading(loading: boolean): void
 ```
 
 ## Type Definitions

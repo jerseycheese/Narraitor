@@ -13,7 +13,7 @@ So file naming was getting inconsistent across the project, which makes it harde
 
 **React Components** get PascalCase because that's what React expects: `DevToolsPanel.tsx`, `WorldCard.tsx`. These are your main UI building blocks.
 
-**Utility modules** use kebab-case like `csv-utils.js` or `parser-utils.js`. Basically anything that's a helper function or shared logic that isn't a React component.
+**Utility modules** use camelCase like `errorUtils.ts`, `sessionUtils.ts`, or `timestamp.ts`. Basically anything that's a helper function or shared logic that isn't a React component. There are no kebab-case module filenames anywhere under `src/lib/` or `src/utils/`.
 
 **Store files** are camelCase: `worldStore.ts`, `characterStore.ts`. This keeps them distinct from components but still readable.
 

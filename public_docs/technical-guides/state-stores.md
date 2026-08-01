@@ -36,7 +36,7 @@ There are fourteen domain stores today:
 
 Two more files in `src/state/` support the stores rather than being stores themselves:
 
-- **`createCrudStore.ts`** is a shared type contract, not a factory. It exports `CrudStore<T>`
+- **`crudStore.types.ts`** is a shared type contract, not a factory. It exports `CrudStore<T>`
   (the standard CRUD state + actions shape) that `goalStore` and `loreStore` build against. The
   factory function that used to live here was removed as dead code — only the types remain.
 - **`persistence.ts`** exports `createIndexedDBStorage`, the IndexedDB-backed storage adapter the
