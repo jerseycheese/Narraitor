@@ -97,7 +97,7 @@ import GameSession from '@/components/GameSession/GameSession';
 />
 ```
 
-The testing-only props (`_stores`, `_router`, `initialState`, `disableAutoResume`) exist for the `/dev/game-session` harness and the hook test suite. Production callers should never need them.
+The testing-only props (`initialState`, `disableAutoResume`) exist for the `/dev/game-session` harness and the hook test suite. Production callers should never need them.
 
 ## Related
 
