@@ -66,7 +66,7 @@ const handleCustomSubmit = (customText: string) => {
 ### Basic Implementation
 ```tsx
 <ChoiceSelector
-  choices={predefinedChoices}
+  decision={currentDecision}
   onSelect={handleChoiceSelect}
   enableCustomInput={true}
   onCustomSubmit={handleCustomInput}

@@ -27,7 +27,7 @@ The core functionality is working and stable. All the main systems (world creati
 
 ## Core Features
 
-**World Creation**: The multi-step wizard lets you define any fictional universe. You can start from scratch or use templates (Western, Fantasy, Sci-Fi, etc.). The AI suggests appropriate attributes and skills based on your world's theme, but everything's customizable. Want "Force Sensitivity" as an attribute? No problem.
+**World Creation**: The multi-step wizard lets you define any fictional universe. Describe what you have in mind and you get suggested attributes and skills tuned to that theme, all of them editable. Want "Force Sensitivity" as an attribute? No problem.
 
 **Character Building**: Point-allocation system that adapts to your world's rules. Create characters with backgrounds that make sense for your setting. The wizard guides you through attribute allocation, skill selection, and story background.
 

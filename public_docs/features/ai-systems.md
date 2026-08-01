@@ -82,7 +82,7 @@ import ActiveGameSession from '@/components/GameSession/ActiveGameSession';
 <ActiveGameSession
   worldId="world-id"
   sessionId="session-id"
-  characterId="character-id"
+  onChoiceSelected={handleChoiceSelected}
 />
 ```
 
@@ -117,7 +117,7 @@ Players can type their own actions instead of picking from AI suggestions. These
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 
 <ChoiceSelector
-  choices={aiGeneratedChoices}
+  decision={currentDecision}
   onSelect={handleChoiceSelect}
   enableCustomInput={true}
   onCustomSubmit={handleCustomInput}
@@ -164,7 +164,7 @@ import { useAiContextStore } from '@/state/aiContextStore';
 
 const context = await useAiContextStore.getState().buildContextForSession(sessionId, {
   includeGoals: true,
-  maxTokens: 500,
+  maxChars: 500,
   prioritizeRecent: true
 });
 
