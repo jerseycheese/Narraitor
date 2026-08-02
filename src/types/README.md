@@ -188,29 +188,27 @@ This pattern makes it easy to look up entities by ID and ensures the store metho
 
 ## Type Guards
 
-When you're dealing with data from external sources - localStorage, API responses, user uploads - you can use validation functions to validate the shape:
+When you're dealing with data from external sources - localStorage, a persisted store, an AI
+response - you can use validation functions to check the shape:
 
 ```typescript
-import { validateWorld, isNarrativeSegment, isJournalEntry } from '@/lib/utils/typeGuards';
+import { validateWorld, isPlayerDecisionArray } from '@/lib/utils/typeGuards';
 
-const handleFileUpload = async (file: File) => {
-  const data = JSON.parse(await file.text());
-
-  const worldValidation = validateWorld(data);
-  if (worldValidation.valid) {
-    // Safe to use as World
-    importWorld(data as World);
-  } else if (isNarrativeSegment(data)) {
-    // Safe to use as NarrativeSegment
-    importNarrative(data);
-  } else if (isJournalEntry(data)) {
-    // Safe to use as JournalEntry
-    importJournalEntry(data);
-  } else {
-    throw new Error('Unknown file format');
+const hydrateWorld = (raw: unknown) => {
+  const result = validateWorld(raw);
+  if (!result.valid) {
+    throw new Error(`Invalid world: ${result.errors.join(', ')}`);
   }
+  return raw as World;
 };
 ```
+
+`src/lib/utils/typeGuards.ts` exports exactly six things: `validateWorld`,
+`validateWorldAttribute`, `validateWorldSettings`, `validateWorldSkill`,
+`isPlayerDecisionArray`, and `sanitizeString`. The `validate*` family returns
+`ValidationResult` (`{ valid: boolean; errors: string[] }`), not a boolean. There are no guards
+for narrative segments or journal entries, and there's no world import path - worlds aren't
+importable from a file (see `public_docs/features/world-management.md`).
 
 ## Extending the Type System
 

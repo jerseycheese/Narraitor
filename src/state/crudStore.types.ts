@@ -1,9 +1,12 @@
 /**
  * CRUD Store Types
  *
- * Type definitions for stores with standard CRUD operations.
- * Note: The factory function was removed as unused code, but types are retained
- * for stores that still reference them (goalStore, loreStore).
+ * Type definitions for stores with standard CRUD operations. The factory function that went with
+ * them was removed as unused; the types stayed.
+ *
+ * Extended by worldStore, characterStore, inventoryStore, npcStore, goalStore, and loreStore.
+ * Those expose the generic create/update/delete alongside domain-named aliases (updateWorld
+ * delegates to update). Grep for `extends CrudStore<` rather than trusting this list.
  */
 
 import { UserFriendlyError } from '@/lib/utils/errorUtils';
