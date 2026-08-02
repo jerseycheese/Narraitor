@@ -152,21 +152,6 @@ const { deleteWorld } = useWorldStore();
 - **Multiple Cancellation Options**: Easy to abort deletion
 - **Immediate UI Update**: No confusion about deletion status
 
-## World Templates - Skip the Setup
-
-Sometimes you just want to start playing without spending an hour configuring attributes and skills. Templates give you ready-made worlds that you can use immediately or modify to fit your vision.
-
-### What's Available
-- **Genre Templates**: Classic setups for Fantasy, Western, Sci-Fi, Modern, and Historical settings with all the expected attributes and skills
-- **Custom Templates**: Save your own world configurations to reuse later or share with friends
-- **AI-Generated**: The AI can create templates based on your description - just tell it "cyberpunk with magic" and it'll build something appropriate
-
-### What You Get
-- **Complete Configuration**: All attributes, skills, and settings already done
-- **Genre-Appropriate Settings**: Tone and content ratings that make sense for the setting
-- **Thematic Consistency**: Descriptions and naming that fit the world type
-- **Ready to Play**: Create a character and jump straight into the story
-
 ## Behind the Scenes Data Handling
 
 ### How Your Worlds Get Saved
@@ -182,30 +167,8 @@ The system enforces some sensible limits to keep things manageable:
 - **Required Fields**: Name and description are mandatory because worlds need context
 
 ### Export/Import
-```typescript
-import { getTimestamp } from '@/lib/utils';
-
-// Export world configuration
-const exportWorld = (worldId: string) => {
-  const world = worlds[worldId];
-  const exportData = {
-    ...world,
-    exportedAt: getTimestamp(),
-    version: '1.0'
-  };
-  downloadJSON(exportData, `${world.name}.json`);
-};
-
-// Import world configuration
-const importWorld = (worldData: WorldExport) => {
-  const worldId = createWorld({
-    ...worldData,
-    id: generateUniqueId('world'),
-    createdAt: getTimestamp()
-  });
-  return worldId;
-};
-```
+There isn't any. Worlds live in the browser's IndexedDB with no way to get one out as a file or
+bring one back in, so a world doesn't travel between browsers or devices.
 
 ## Testing & Development
 

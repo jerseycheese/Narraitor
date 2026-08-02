@@ -38,11 +38,9 @@ cd public_docs/security
 
 The CI pipeline runs security checks on every PR to catch vulnerabilities before they hit production. This has caught real issues with outdated dependencies and known CVEs.
 
-**Security Scan job** runs `npm audit --production --audit-level=high` on every pull request. It also captures `npm outdated` metadata so you can see which dependencies are falling behind. The results get saved as artifacts (check `ci-security/summary.md`, `npm-audit.json`, and `npm-outdated.json` in the workflow run).
+**Security Scan job** runs `npm audit --omit=dev --audit-level=moderate` on every push and PR to `main` and `develop`. It's a hard gate: that step sets `continue-on-error: false`, so a moderate-or-worse advisory in a runtime dependency fails the build. The follow-up steps that generate the JSON report and capture `npm outdated` are diagnostics, not gates (`continue-on-error: true`). Results get saved as artifacts (check `ci-security/summary.md`, `npm-audit.json`, and `npm-outdated.json` in the workflow run).
 
-**CodeQL analysis** runs on pushes, pull requests, and Monday mornings at 09:00 UTC. It's set to `fail-on: none` so new security alerts show up in the GitHub Security tab without blocking deploys. This gives you time to triage and fix issues without emergency hotfixes.
-
-**Next step**: Once you've triaged the backlog of vulnerabilities, tighten the thresholds by removing `continue-on-error`. That way CI will actually fail if critical issues persist, instead of just logging warnings nobody reads.
+**CodeQL analysis** runs on pushes, pull requests, and Monday mornings at 09:00 UTC. It sets no `fail-on` threshold, so new security alerts land in the GitHub Security tab without blocking deploys.
 
 ### Reviewing `npm-outdated.json`
 

@@ -220,47 +220,40 @@ Good HTML structure helps with accessibility and SEO, plus it makes the CSS easi
 
 ## Custom Components
 
-A minimal set of component classes is included:
+Buttons are the main thing `globals.css` styles directly. There's no `.btn` family and no `.card`.
+The base class is `.button`, with variants `.button-default`, `.button-secondary`,
+`.button-outline`, `.button-ghost`, `.button-link`, `.button-destructive`, `.button-success`,
+`.button-info`, `.button-warning`, plus sizes `.button-size-default`, `.button-size-sm`,
+`.button-size-lg`, `.button-size-icon`.
 
-- `.card`: Card container with border and shadow
-- `.form-group`: Form field container
-- `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-accent`: Button variants
-
-Example usage:
+Don't write those class names yourself. Use the `Button` component from
+`src/components/ui/button.tsx`, which composes them from `variant` and `size` props:
 
 ```tsx
-const CardExample = () => {
-  return (
-    <div className="card">
-      <h2>Card Title</h2>
-      <p>Card content goes here.</p>
-      <button className="btn btn-primary">Primary Action</button>
-      <button className="btn btn-secondary">Secondary Action</button>
-    </div>
-  );
-};
+import { Button } from '@/components/ui/button';
+
+<Button variant="secondary" size="sm">Secondary Action</Button>
 ```
+
+`.form-group` does exist, but it's route-scoped in `src/app/wizard.css` rather than global.
+
+Also global: the typography classes `.text-narrative`, `.text-technical`, `.text-ui`, the font
+helpers `.font-narrative` / `.font-system` / `.font-interface`, and `.data-table`.
 
 ## Utility Classes
 
-Essential utility classes for common needs:
-
-- `.text-balanced`: Balanced text wrapping
-- `.visually-hidden`: Hide content visually but keep it accessible to screen readers
-- `.focus-visible`: Enhanced focus styling for accessibility
+There's one: `.sr-only`, which hides content visually while leaving it available to screen
+readers. No `.text-balanced`, no `.visually-hidden`, no `.focus-visible` utility - focus styling
+lives in the component classes via `:focus-visible` selectors.
 
 ```tsx
 const AccessibleComponent = () => {
   return (
-    <div>
-      <span className="visually-hidden">This text is only visible to screen readers</span>
-      <p className="text-balanced">This text will have balanced wrapping for better readability</p>
-      <button className="focus-visible">This button has enhanced focus styling</button>
-    </div>
+    <span className="sr-only">This text is only visible to screen readers</span>
   );
 };
 ```
 
 ## Testing and Development
 
-The global styles can be viewed and tested through the `GlobalStylesDemo` component in Storybook, which demonstrates all styled elements across all theme and color scheme combinations.
+The global styles can be viewed and tested through the `00-Foundation/Design System Showcase` story in Storybook (`src/stories/00-foundation/DesignSystemShowcase.stories.tsx`), which renders the styled elements in light and dark.

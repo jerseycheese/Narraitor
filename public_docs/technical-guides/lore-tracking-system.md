@@ -20,15 +20,23 @@ So this system solves a major problem with AI storytelling: the AI forgetting im
 ## Architecture
 
 ```typescript
-interface LoreFact {
-  id: string;
-  key: string;
-  value: string;
-  category: 'characters' | 'locations' | 'events' | 'rules';
-  source: 'narrative' | 'manual' | 'ai_extraction';
-  worldId: EntityID;
+interface LoreFact extends TimestampedEntity {
+  id: EntityID;
+  category: LoreCategory;   // 'characters' | 'locations' | 'events' | 'rules'
+  key: string;              // human-readable key, e.g. "world-123:character_lady_seraphina"
+  value: string;            // the canonical name
+  aliases: string[];        // other names this entity gets called
+  source: LoreSource;       // 'narrative' | 'manual'
   sessionId?: EntityID;
-  timestamp: string;
+  worldId: EntityID;
+  visibility: 'session-private' | 'world-shared';
+  metadata?: {
+    description?: string;
+    importance?: 'low' | 'medium' | 'high';
+    type?: string;
+    tags?: string[];
+    relatedEntities?: string[];
+  };
 }
 ```
 
@@ -84,8 +92,10 @@ The lore tracking system complements the goal tracking system in a way that make
 
 ```typescript
 // Combined context includes both lore facts and active goals
-const loreContext = getLoreContext(worldId, sessionId);
-const goalContext = aiContextStore.buildContextForSession(sessionId);
+// getLoreContextForPrompt returns the prompt-ready string. (useLoreStore also has a
+// getLoreContext, but that returns a fact-count/id object, not text.)
+const loreContext = getLoreContextForPrompt(worldId, sessionId);
+const goalContext = await useAiContextStore.getState().buildContextForSession(sessionId);
 
 const fullContext = `
 ${loreContext}

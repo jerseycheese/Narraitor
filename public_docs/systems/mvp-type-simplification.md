@@ -44,7 +44,8 @@ We cut out all the fancy RPG mechanics that would take months to implement prope
 
 ### 4. Simplified WorldSettings
 **Removed:**
-- `tone` - Advanced tone customization (Post-MVP)
+- `tone` - dropped from `WorldSettings`, not cut. Tone customization ships as a top-level
+  `World.toneSettings` field (`src/types/world.types.ts`) and feeds the narrative generator.
 
 **Kept:**
 - Core character creation constraints

@@ -47,7 +47,7 @@ const narrative = "The wizard warned me that the dragon will attack at dawn. I m
 ### AI Context Building
 ```typescript
 // Goals are automatically included in AI prompts
-const context = aiContextStore.buildContextForSession(sessionId);
+const context = await useAiContextStore.getState().buildContextForSession(sessionId);
 
 // Output format:
 // ACTIVE GOALS:
@@ -74,8 +74,8 @@ goalStore.updateGoal(goalId, {
 ### Token Budget Management
 Control how much context space goals consume:
 ```typescript
-const context = aiContextStore.buildContextForSession(sessionId, {
-  maxTokens: 500,        // Limit total goal context
+const context = await useAiContextStore.getState().buildContextForSession(sessionId, {
+  maxChars: 500,         // Cap the goal context by character count
   includeGoals: true,    // Enable/disable goal inclusion
   prioritizeRecent: true // Focus on recently mentioned goals
 });
@@ -103,7 +103,7 @@ const config = {
 Goals are automatically included in AI prompts to maintain story consistency:
 ```typescript
 // Before generating new content
-const context = aiContextStore.buildContextForSession(sessionId);
+const context = await useAiContextStore.getState().buildContextForSession(sessionId);
 const prompt = `
 ${context.goalContext}
 
@@ -154,12 +154,12 @@ Goals persist across browser sessions using IndexedDB:
 Track goal system performance:
 ```typescript
 // Check extraction results
-const result = await goalStore.processSegmentForGoals(segmentId);
+const result = await goalStore.processSegmentForGoals(segment, sessionId);
 console.log(`Created: ${result.newGoalsCreated}, Updated: ${result.goalsUpdated}`);
 
 // Monitor context usage
-const context = aiContextStore.buildContextForSession(sessionId);
-console.log(`Token usage: ${context.tokenCount}/${maxTokens}`);
+const context = await useAiContextStore.getState().buildContextForSession(sessionId);
+console.log(`Estimated tokens: ${context.tokenCount}`);
 ```
 
 ### Error Tracking
@@ -179,9 +179,11 @@ if (context.error) {
 ### Goal Lifecycle Analysis
 Track goal completion patterns:
 ```typescript
-// Analyze goal completion rates
-const completedGoals = goalStore.getGoalsByStatus('completed');
-const activeGoals = goalStore.getGoalsByStatus('active');
+// Analyze goal completion rates. There's no getGoalsByStatus - filter getAll() instead,
+// or use getActiveGoalsBySession when you only care about one session.
+const allGoals = goalStore.getAll();
+const completedGoals = allGoals.filter((goal) => goal.status === 'completed');
+const activeGoals = allGoals.filter((goal) => goal.status === 'active');
 const completionRate = completedGoals.length / (completedGoals.length + activeGoals.length);
 ```
 

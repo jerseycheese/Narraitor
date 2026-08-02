@@ -11,13 +11,19 @@ This the gameplay here focuses on meaningful choices rather than complex mechani
 
 ## Decision Weight System
 
-The AI analyzes each choice and assigns a visual weight so you can see what's actually important:
+The AI tags each decision with a weight, which mostly shapes how the story treats it rather than
+how it looks:
 
-**Minor Decisions** - Routine stuff that doesn't dramatically affect the story. Subtle styling, no borders. Things like "What will you have for breakfast?" or casual conversation options.
+**Minor Decisions** - Routine stuff that doesn't dramatically affect the story. Things like "What will you have for breakfast?" or casual conversation options.
 
-**Major Decisions** - Important story moments with amber borders and shadows. These affect character relationships, story direction, or significant plot points. Like "The dragon offers you a deal. How do you respond?"
+**Major Decisions** - Important story moments that affect character relationships, story direction, or significant plot points. Like "The dragon offers you a deal. How do you respond?"
 
-**Critical Decisions** - Life-changing moments with prominent red borders. These are climactic choices that determine major story outcomes. "The kingdom's fate hangs in the balance. What is your final choice?"
+**Critical Decisions** - Life-changing moments that determine major story outcomes. "The kingdom's fate hangs in the balance. What is your final choice?"
+
+The weight feeds the summarization prompt and can gate a fatal ending. Visually it does nothing:
+the journal's choice history prints it as a text label (`major WEIGHT`), and
+`getDecisionWeightStyling()` in `choiceStyling.tsx` returns empty strings, so weight adds no
+borders, shadows, or color to the choices themselves.
 
 **Smart Context** - Instead of just repeating the story, the AI generates context that explains why the decision matters:
 - "Tension builds as you must choose how to respond to the merchant's accusation"
@@ -79,12 +85,14 @@ Options:
 
 ### Visual Styling
 
+Alignment is the one axis that does show up visually. `getAlignmentClasses()` in
+`src/components/shared/ChoiceSelector/choiceStyling.tsx` maps it to a semantic class name, and the
+CSS decides what that looks like:
+
 ```typescript
-const alignmentStyles = {
-  lawful: 'border-l-4 border-blue-500 bg-blue-50/30',
-  neutral: 'border-l-4 border-gray-400 bg-gray-50/30', 
-  chaotic: 'border-l-4 border-red-500 bg-red-50/30'
-};
+// lawful  -> 'manuscript-suggested-action-lawful'
+// chaotic -> 'manuscript-suggested-action-chaotic'
+// neutral -> '' (no extra class)
 ```
 
 ## Skill Check System

@@ -92,7 +92,6 @@ These map intent and context onto the global foundation. Status feedback, storyt
 
   /* Story ending tones (HSL values) */
   --ending-triumphant: 36 38% 50%;
-  --ending-bittersweet: 200 21% 50%;
   --ending-mysterious: 25 20% 14%;
   --ending-tragic: 0 59% 41%;
   --ending-hopeful: 138 25% 40%;

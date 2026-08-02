@@ -185,8 +185,7 @@ Stories serve as:
 ### Interaction Testing
 ```typescript
 // Use Storybook's interaction testing
-import { userEvent, within } from '@storybook/testing-library';
-import { expect } from '@storybook/jest';
+import { userEvent, within, expect } from '@storybook/test';
 
 export const InteractionTest: Story = {
   args: {

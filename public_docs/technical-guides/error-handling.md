@@ -29,12 +29,16 @@ const handleAction = async () => {
   }
 };
 
-// Error display
-<ErrorMessage 
-  error={error}
-  onRetry={handleAction}
-  onDismiss={() => setError(null)}
-/>
+// Error display. `error` starts null and is reset to null on every retry, so guard it.
+{error && (
+  <ErrorDisplay
+    message={error.message}
+    showRetry
+    onRetry={handleAction}
+    showDismiss
+    onDismiss={() => setError(null)}
+  />
+)}
 ```
 
 ## Error Categories

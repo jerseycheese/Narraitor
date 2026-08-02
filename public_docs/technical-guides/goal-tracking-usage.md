@@ -107,8 +107,9 @@ await goalStore.processSegmentForGoals(segment, sessionId, characterId);
 
 ### Processing Narrative Segments
 ```typescript
-// Automatically process new narrative content for goals
-const result = await goalStore.processSegmentForGoals(segmentId, characterId);
+// Automatically process new narrative content for goals. Takes the segment
+// object and a required sessionId, not a segment ID.
+const result = await goalStore.processSegmentForGoals(segment, sessionId, characterId);
 
 console.log(`Created ${result.newGoalsCreated} new goals`);
 console.log(`Updated ${result.goalsUpdated} existing goals`);
@@ -127,7 +128,7 @@ useEffect(() => {
   const unsubscribe = narrativeStore.subscribe((state) => {
     const latestSegment = state.segments[state.currentSegmentId];
     if (latestSegment) {
-      goalStore.processSegmentForGoals(latestSegment.id, characterId);
+      goalStore.processSegmentForGoals(latestSegment, sessionId, characterId);
     }
   });
 
@@ -182,14 +183,14 @@ goalStore.updateGoal(goalId, {
 AI tokens cost money, so manage them carefully:
 ```typescript
 // Build context with strict token limits
-const lightweightContext = aiContextStore.buildContextForSession(sessionId, {
-  maxTokens: 200, // Conservative limit
+const lightweightContext = await useAiContextStore.getState().buildContextForSession(sessionId, {
+  maxChars: 200, // Conservative limit
   includeGoals: true
 });
 
 // Prioritize critical goals only
-const criticalOnlyContext = aiContextStore.buildContextForSession(sessionId, {
-  maxTokens: 100,
+const criticalOnlyContext = await useAiContextStore.getState().buildContextForSession(sessionId, {
+  maxChars: 100,
   prioritizeRecent: false // Focus on priority over recency
 });
 ```
@@ -222,7 +223,7 @@ try {
 ### Graceful Degradation
 ```typescript
 // Always provide fallback context
-const context = aiContextStore.buildContextForSession(sessionId);
+const context = await useAiContextStore.getState().buildContextForSession(sessionId);
 const safeGoalContext = context.error ? '' : context.goalContext;
 
 // Use in AI prompt with fallback

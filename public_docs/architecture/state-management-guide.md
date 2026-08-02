@@ -120,24 +120,31 @@ const charId = createCharacter({
 import { useNarrativeStore } from '@/state/narrativeStore';
 
 const {
-  narrativeEntries,
-  currentChoices,
-  isGenerating,
-  generateNarrative,
-  selectChoice,
-  submitCustomInput
+  segments,
+  decisions,
+  loading,
+  addSegment,
+  selectDecisionOption,
+  getSessionSegments,
 } = useNarrativeStore();
 
-// Generate narrative
-await generateNarrative({
-  worldId: 'world-1',
-  sessionId: 'session-1',
-  context: 'Player enters saloon...'
+// The store holds narrative state; it doesn't call the AI. Generation lives in
+// src/lib/ai/narrativeGenerator.ts, and the result gets written back here.
+const segmentId = addSegment('session-1', {
+  content: 'The saloon doors swing shut behind you.',
+  type: 'scene',
 });
 
-// Handle choice selection
-selectChoice('choice-1');
+// Record the player's pick against a decision the generator produced
+selectDecisionOption('decision-1', 'option-1', 'character-1');
+
+// Read a session's segments in order
+const sessionSegments = getSessionSegments('session-1');
 ```
+
+Endings are the one generation path the store does own, via `generateEnding(endingType, params)`,
+with `isGeneratingEnding` / `endingError` / `currentEnding` alongside it. Live story-loop failures
+land in `generationError` (a classified `NarrativeError`) rather than the plain `error` field.
 
 ### Session Store
 ```typescript

@@ -19,15 +19,17 @@ The simplest way to add portrait generation to any component:
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 <CharacterPortrait
-  character={character}
-  world={world}
-  onPortraitGenerated={(portrait) => {
-    console.log('Portrait generated:', portrait);
-  }}
+  portrait={character.portrait}
+  characterName={character.name}
+  size="large"
+  isGenerating={isGenerating}
+  error={error}
 />
 ```
 
-This component handles all the complexity - loading states, error handling, fallbacks, the works. You just pass in a character and world, and it figures out the rest.
+`CharacterPortrait` is a display component, not a generator. It handles loading state, the error
+case, and the placeholder fallback, but generating the image is a separate call - see
+`generatePortrait` below, or the `usePortraitGeneration` hook, which wires the two together.
 
 ## How the AI Magic Happens
 
@@ -35,31 +37,26 @@ This component handles all the complexity - loading states, error handling, fall
 The API call is straightforward, but there's a lot happening behind the scenes:
 
 ```typescript
-// Everything goes through the secure server-side API
-const generatePortrait = async (character: Character, world: World) => {
-  const response = await fetch('/api/generate-portrait', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ character, world })
-  });
+import { generatePortrait } from '@/lib/api/generatePortrait';
 
-  if (!response.ok) {
-    throw new Error('Portrait generation failed');
-  }
-
-  return response.json();
-};
+// Goes through a server-side route. aiFetch attaches the player's own key as a
+// request header, so the browser never calls Google directly.
+const { portrait } = await generatePortrait({ character, world });
 ```
 
 The system takes your character description and world context, feeds it to the AI image generation service, and returns a portrait that actually fits your character. No generic fantasy warrior #47 - this is your specific character.
 
 ### Portrait Types
+Portraits use the shared `GeneratedImage` type from `src/types/common.types.ts`. There's no
+separate `Portrait` interface, no style field, and no custom-upload type - a portrait is either
+generated or a placeholder.
+
 ```typescript
-interface Portrait {
-  type: 'ai-generated' | 'placeholder' | 'custom';
-  url?: string;
-  description?: string;
-  style?: 'realistic' | 'artistic' | 'cartoon';
+interface GeneratedImage {
+  type: 'ai-generated' | 'placeholder';
+  url: string | null;
+  generatedAt?: string;
+  prompt?: string;
 }
 ```
 
@@ -313,16 +310,22 @@ test('shows fallback when portrait fails to load', async () => {
 
 ## Configuration
 
-### Portrait Generation Settings
+There isn't a portrait config object. What the route takes is the request payload in
+`src/lib/api/generatePortrait.ts`:
+
 ```typescript
-interface PortraitConfig {
-  style: 'realistic' | 'artistic' | 'cartoon';
-  size: 'small' | 'medium' | 'large';
-  quality: 'low' | 'medium' | 'high';
-  enableCaching: boolean;
-  maxRetries: number;
+interface PortraitRequest {
+  character?: unknown;
+  world?: unknown;
+  customDescription?: string;
+  prompt?: string;
+  promptOnly?: boolean;
 }
 ```
+
+Style, size, and quality aren't parameters - the prompt builder derives the look from the
+character's physical description and the world's genre. `size` on `CharacterPortrait` is a
+display-only prop and doesn't affect what gets generated.
 
 ## Related
 - [CharacterPortrait component](../../src/components/CharacterPortrait/CharacterPortrait.tsx)

@@ -185,14 +185,27 @@ interface NarrativeContext {
 
 ## Session Types
 
+There's no `GameSession` interface and no `SessionState` type. Live session state lives in
+`sessionStore`. `src/types/session.types.ts` defines lifecycle metadata and the narrative context
+shape:
+
 ```typescript
-interface GameSession extends TimestampedEntity {
+type SessionLifecycleStatus = 'active' | 'ended' | 'abandoned';
+
+interface SessionLifecycleMetadata {
   id: EntityID;
   worldId: EntityID;
   characterId: EntityID;
-  state: SessionState;
-  narrativeHistory: EntityID[]; // NarrativeSegment IDs
-  currentContext: NarrativeContext;
+  status: SessionLifecycleStatus;
+  lastActivity: ISODateString;
+}
+
+interface NarrativeContext {
+  recentSegments: EntityID[]; // Last 5-10 segments
+  activeCharacters: EntityID[];
+  currentLocation?: string;
+  activeQuests?: string[];
+  mood?: string;
 }
 ```
 
@@ -214,13 +227,9 @@ interface JournalEntry extends TimestampedEntity {
   metadata: JournalMetadata;
 }
 
-type JournalFilter = {
-  type?: JournalEntryType;
-  significance?: 'minor' | 'major' | 'critical';
-  isRead?: boolean;
-  dateRange?: [ISODateString, ISODateString];
-};
 ```
+
+There's no `JournalFilter` type; journal filtering is done inline against the entry fields above.
 
 ## Inventory Types
 
@@ -268,141 +277,107 @@ interface InventoryItem extends NamedEntity, TimestampedEntity {
 
 ## AI Context Types
 
+There's no `AIContext` or `AIMessage` type and no stored conversation history. The context type is
+`AISessionContext`, returned by `useAiContextStore.getState().buildContextForSession()`:
+
 ```typescript
-interface AIContext {
-  worldId: EntityID;
-  characterIds: EntityID[];
-  conversationHistory: AIMessage[];
-  activePrompts: PromptTemplate[];
+// src/state/aiContextStore.ts
+interface AISessionContext {
+  sessionId: EntityID;
+  goalContext: string;
+  contextText: string;
+  activeGoals: NarrativeGoal[];
+  criticalGoals: NarrativeGoal[];
+  recentGoals: NarrativeGoal[];
+  tokenCount: number;
+  error: string | null;
+  timestamp: string;
 }
 
-interface AIMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-  timestamp: ISODateString;
-}
-
+// src/lib/promptTemplates/types.ts
 interface PromptTemplate {
-  id: EntityID;
-  name: string;
-  template: string;
-  variables: string[];
-  category: 'narrative' | 'choice' | 'character' | 'world';
+  id: string;
+  content: string;
 }
 ```
 
 ## State Management Types
 
+Six stores extend the shared `CrudStore<T>` contract in `src/state/crudStore.types.ts`:
+`worldStore`, `characterStore`, `inventoryStore`, `npcStore`, `goalStore`, and `loreStore`. Those
+expose the generic `create`/`update`/`delete` alongside domain-named aliases, so `updateWorld`
+delegates to `update`. `narrativeStore`, `sessionStore`, `journalStore`, `aiContextStore`, and the
+rest declare their own actions with no shared base.
+
+(The file's own header comment says only goalStore and loreStore reference these types. That
+comment is stale — don't trust it over the `extends CrudStore<...>` declarations.)
+
 ```typescript
-// Generic store interface
-interface BaseStore<T> {
-  entities: Record<EntityID, T>;
-  currentEntityId: EntityID | null;
-  loading: boolean;
+// src/state/crudStore.types.ts - the shared contract, used by goalStore and loreStore
+type CrudStore<T extends BaseEntity> = {
+  entities: Record<string, T>;
+  currentEntityId: string | null;
   error: UserFriendlyError | null;
+  loading: boolean;
 
-  create: (data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
-  update: (id: EntityID, updates: Partial<T>) => void;
-  delete: (id: EntityID) => void;
-  setCurrent: (id: EntityID) => void;
-
-  setLoading: (loading: boolean) => void;
-  setError: (error: UserFriendlyError | null) => void;
+  create: (data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  update: (id: string, updates: Partial<Omit<T, 'id' | 'createdAt' | 'updatedAt'>>) => void;
+  delete: (id: string) => void;
+  setCurrent: (id: string | null) => void;
+  getById: (id: string) => T | undefined;
+  getAll: () => T[];
   reset: () => void;
-}
-
-// Store types
-type WorldStore = BaseStore<World> & {
-  getWorldCharacters: (worldId: EntityID) => Character[];
-};
-
-type CharacterStore = BaseStore<Character> & {
-  getByWorldId: (worldId: EntityID) => Character[];
-  levelUp: (characterId: EntityID) => void;
-};
-
-type NarrativeStore = BaseStore<NarrativeSegment> & {
-  currentChoices: Decision | null;
-  isGenerating: boolean;
-
-  generateNarrative: (context: NarrativeContext) => Promise<void>;
-  selectChoice: (choiceId: EntityID) => void;
-  submitCustomInput: (input: string) => void;
+  setError: (error: UserFriendlyError | null) => void;
+  clearError: () => void;
+  setLoading: (loading: boolean) => void;
 };
 ```
+
+For any other store, read its own type file. `narrativeStore` has no `generateNarrative`,
+`selectChoice`, or `submitCustomInput` - generation lives in `src/lib/ai/narrativeGenerator.ts`.
+The store holds `segments` and `decisions` and exposes `addSegment`, `selectDecisionOption`, and
+`generateEnding`. See `src/state/narrativeStore.types.ts`.
 
 ## Form Types
 
-```typescript
-// Form data types (without IDs and timestamps)
-type CreateWorldData = Omit<World, 'id' | 'createdAt' | 'updatedAt'>;
-type CreateCharacterData = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
-type CreateSessionData = Omit<GameSession, 'id' | 'createdAt' | 'updatedAt'>;
-
-// Update types (all fields optional)
-type UpdateWorldData = Partial<Omit<World, 'id' | 'createdAt'>>;
-type UpdateCharacterData = Partial<Omit<Character, 'id' | 'createdAt'>>;
-```
-
-## Utility Types
+None of these are exported; they're the shape store methods take inline:
 
 ```typescript
-// API response types
-interface APIResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  timestamp: ISODateString;
-}
+// What createWorld / createCharacter accept
+Omit<World, 'id' | 'createdAt' | 'updatedAt'>
+Omit<Character, 'id' | 'createdAt' | 'updatedAt'>
 
-// Pagination types
-interface PaginatedResult<T> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
-}
-
-// Search types
-interface SearchQuery {
-  query: string;
-  filters?: Record<string, any>;
-  sort?: {
-    field: string;
-    direction: 'asc' | 'desc';
-  };
-  pagination?: {
-    page: number;
-    pageSize: number;
-  };
-}
+// The two update signatures differ; they are not symmetrical.
+updateWorld: (id: EntityID, updates: Partial<Omit<World, 'id' | 'createdAt' | 'updatedAt'>>) => void
+updateCharacter: (id: EntityID, updates: Partial<Character>) => void
 ```
+
+There's no session equivalent, since there's no `GameSession` entity type (see Session Types above).
 
 ## Validation Types
 
 ```typescript
-// Form validation
-interface ValidationError {
-  field: string;
-  message: string;
-  code: string;
-}
-
+// src/lib/utils/validationUtils.ts - errors are plain strings, and the flag is `valid`, not `isValid`
 interface ValidationResult {
-  isValid: boolean;
-  errors: ValidationError[];
+  valid: boolean;
+  errors: string[];
 }
-
-// Type guards for runtime validation
-const isNarrativeSegment = (obj: any): obj is NarrativeSegment => {
-  return obj && typeof obj.id === 'string' && typeof obj.content === 'string';
-};
-
-const isJournalEntry = (obj: any): obj is JournalEntry => {
-  return obj && typeof obj.id === 'string' && typeof obj.type === 'string';
-};
 ```
+
+There's no structured `ValidationError` type with field/message/code. The validators in
+`src/lib/utils/typeGuards/` all return `ValidationResult`:
+
+```typescript
+import { validateWorld, validateWorldAttribute } from '@/lib/utils/typeGuards';
+
+const result = validateWorld(data);
+if (!result.valid) {
+  console.error(result.errors); // string[]
+}
+```
+
+The only other guards exported from there are `isPlayerDecisionArray` and `sanitizeString`. There's
+no `isNarrativeSegment` or `isJournalEntry`.
 
 ## File Locations
 
@@ -412,9 +387,14 @@ Types are split by domain:
 - `/src/types/world.types.ts` - World-related types
 - `/src/types/character.types.ts` - Character-related types
 - `/src/types/narrative.types.ts` - Narrative and AI types
-- `/src/types/session.types.ts` - Game session types
-- `/src/types/journal.types.ts` - Journal and lore types
+- `/src/types/session.types.ts` - Session lifecycle metadata and narrative context
+- `/src/types/journal.types.ts` - Journal entries
+- `/src/types/lore.types.ts` - Lore facts and categories
 - `/src/types/inventory.types.ts` - Inventory and items
+
+This page doesn't cover the rest: `goal`, `npc`, `provider`, `personalization`, `tone-settings`,
+`story-checkpoint`, `continuity`, `tutorial`, `dashboard`, and others. `ls src/types/` is the
+authoritative list.
 
 ## Usage Examples
 

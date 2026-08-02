@@ -73,32 +73,43 @@ navigateWithLoading('/worlds/123', 'Loading world details...');
 ```
 
 ### Form Submissions
+There's no `startLoading`/`stopLoading` pair. Set the state, then clear it:
+
 ```tsx
+const { setLoadingState, clearLoading, navigateWithLoading } = useNavigationLoadingContext();
+
 const handleSubmit = async (data) => {
-  startLoading('Saving changes...');
+  setLoadingState({ isLoading: true, loadingType: 'data', message: 'Saving changes...' });
   try {
     await submitForm(data);
-    await navigateWithLoading('/success', 'Redirecting...');
-  } finally {
-    stopLoading();
+    // Hands off to the redirect overlay. Don't clear here - navigateWithLoading calls
+    // router.push and returns immediately, so a clearLoading() in a finally would kill
+    // the overlay before the pathname changes. The hook's pathname effect clears it.
+    navigateWithLoading('/success', 'Redirecting...');
+  } catch (err) {
+    clearLoading();
+    throw err;
   }
 };
 ```
 
 ### Long Operations
 ```tsx
-const { startLoading, stopLoading } = useNavigationLoadingContext();
+const { setLoadingState, clearLoading } = useNavigationLoadingContext();
 
 const handleGenerate = async () => {
-  startLoading('Generating content...');
+  setLoadingState({ isLoading: true, loadingType: 'data', message: 'Generating content...' });
   try {
     const result = await generateContent();
     // Process result...
   } finally {
-    stopLoading();
+    clearLoading();
   }
 };
 ```
+
+The full surface is `isLoading`, `loadingState`, `setLoadingMessage`, `setLoadingState`,
+`clearLoading`, and `navigateWithLoading`. Nothing else.
 
 ## Configuration
 
@@ -108,8 +119,8 @@ const handleGenerate = async () => {
 export const NAV_SAFETY_TIMEOUT_MS = 30000; // 30 seconds
 
 // useNavigationLoading.ts
-const MIN_LOADING_DURATION = 150; // Minimum display time
-const LOADING_DEBOUNCE = 100; // Delay before showing
+const DEBOUNCE_DELAY = 150; // ms - wait this long before showing, to avoid a flash on fast connections
+const MIN_DISPLAY_DURATION = 800; // ms - once shown, keep it up at least this long
 ```
 
 ### Customization
@@ -136,9 +147,11 @@ const LOADING_DEBOUNCE = 100; // Delay before showing
 jest.mock('@/hooks/useNavigationLoading', () => ({
   useNavigationLoading: () => ({
     isLoading: false,
+    loadingState: { isLoading: false, loadingType: 'page' },
+    setLoadingMessage: jest.fn(),
+    setLoadingState: jest.fn(),
+    clearLoading: jest.fn(),
     navigateWithLoading: jest.fn(),
-    cancelLoading: jest.fn(),
-    loadingMessage: ''
   })
 }));
 ```
@@ -158,7 +171,7 @@ jest.mock('@/hooks/useNavigationLoading', () => ({
 ## Troubleshooting
 
 ### Common Issues
-**Stuck Loading** usually means you have unmatched startLoading/stopLoading calls - every start needs a stop.
+**Stuck Loading** usually means a `setLoadingState` with `isLoading: true` and no matching `clearLoading()` - every set needs a clear, ideally in a `finally`.
 
 **No Loading Display** typically means the NavigationLoadingProvider isn't at the app root, so the context isn't available to child components.
 

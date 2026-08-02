@@ -21,7 +21,7 @@ The baseline file `.dependency-cruiser-known-violations.json` captures all curre
 ```bash
 # Normal validation (ignores known violations)
 npm run deps:validate
-# Pass: no new violations; the ~82 known violations are ignored
+# Pass: no new violations; the baselined violations are ignored
 
 # Strict validation (shows everything)
 npm run deps:validate:strict

@@ -59,11 +59,13 @@ The response mirrors what the UI displays:
   "includedEvents": 1,
   "includedDecisions": 1,
   "lastEventTimestamp": "2025-11-20T18:00:00Z",
-  "model": "gemini-1.5-pro"
+  "model": "gemini-2.5-flash"
 }
 ```
 
-Clients should only call this endpoint from server routes (never directly from the browser) so the Gemini key stays private.
+The browser calls this endpoint directly, through `aiFetch` rather than a bare `fetch` (see
+`useStoryCheckpointManager`). `aiFetch` attaches the player's key as a request header and the
+route resolves it server-side.
 
 ## Troubleshooting
 

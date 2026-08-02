@@ -2,7 +2,7 @@
 title: Architecture Decisions
 tags: [architecture, decisions, adr]
 created: 2025-04-28
-updated: 2026-05-22
+updated: 2026-08-01
 ---
 
 # Architecture Decisions
@@ -21,12 +21,13 @@ codebase and git history); 009 onward were written as the decisions were made.
 - [ADR-003: Zustand domain stores](ADR-003-zustand-state-management.md) — state management
 - [ADR-004: IndexedDB persistence](ADR-004-indexeddb-persistence.md) — client-side storage over localStorage
 - [ADR-005: Domain-driven structure](ADR-005-domain-driven-structure.md) — organize by domain, not file type
-- [ADR-006: Gemini behind server-side API routes](ADR-006-gemini-server-side-api.md) — AI provider and key protection
+- [ADR-006: Gemini behind server-side API routes](ADR-006-gemini-server-side-api.md) — AI provider and key protection (key sourcing since moved to bring-your-own-key)
 - [ADR-007: Tailwind + shadcn/ui styling](ADR-007-tailwind-shadcn-styling.md) — original styling foundation (**superseded by ADR-011**)
 - [ADR-008: Testing & verification strategy](ADR-008-testing-and-verification-strategy.md) — TDD, Storybook-first, Playwright visual
 - [ADR-009: Guided onboarding system](ADR-009-guided-onboarding-system.md)
 - [ADR-010: Decision relevance simplification](ADR-010-decision-relevance-simplification.md)
 - [ADR-011: Three design systems (DS1/DS2/DS3)](ADR-011-three-design-systems.md) — structural differentiation across themes (**superseded by ADR-013**)
+- [ADR-012: Storybook as the single canon surface](ADR-012-storybook-single-canon-surface.md) — retires the `/dev/design-system*` showcase routes
 - [ADR-013: Collapse to a single design system (DS3)](ADR-013-collapse-to-single-design-system-ds3.md) — greenfield collapse back to one system
 
 ## Frontend Architecture
@@ -100,10 +101,15 @@ narrative experience. Multiplayer adds a pile of complexity that isn't needed ye
 **300-Line File Limit**: It looks arbitrary, but it forces breaking things down. A file that's
 getting too big is usually doing too much.
 
-**Google Gemini AI**: The integration (via `@google/genai`) is entirely server-side, with rate
-limiting and validation. Gemini gave the best balance of quality and reliability among the
-providers that got tested.
+**Google Gemini AI**: Every Gemini call (via `@google/genai`) goes through a server-side API route,
+with rate limiting and validation. Gemini gave the best balance of quality and reliability among
+the providers that got tested. Since the bring-your-own-key work (#891/#892/#893) the key itself
+comes from the player rather than the server: it's encrypted in the browser and attached per
+request as the `x-provider-api-key` header, with `GEMINI_API_KEY` left as a dev and local-testing
+fallback. See [ADR-006](ADR-006-gemini-server-side-api.md).
 
-**Security-First API Design**: API keys stay server-side, requests get sanitized, and nothing
-sensitive reaches the client — a lesson learned from projects where API keys ended up in the
-browser.
+**Security-First API Design**: no key is baked into the client bundle and the browser never
+reaches `googleapis.com` directly, requests get sanitized, and nothing sensitive is logged. The
+player's own key is a deliberate exception to "nothing sensitive in the browser": it's encrypted
+at rest and decrypted just-in-time per request, which keeps it out of the bundle and out of
+storage in plaintext, but it is client-side by design under BYO-key.

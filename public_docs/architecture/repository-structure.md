@@ -43,7 +43,7 @@ narraitor/
 │   │   ├── lore/  inventory/  journal/  world/  generators/
 │   │   ├── storage/             # IndexedDB persistence helpers
 │   │   ├── state/               # storePubSub cross-store event bus
-│   │   ├── design-tokens/  theme/             # Design tokens + per-theme CSS
+│   │   ├── theme/               # ThemeProvider + design-token CSS (ds3.css, _shared-tokens.css)
 │   │   ├── tutorial/  routing/  services/  devtools/  api/
 │   │   └── utils/  hooks/  constants/  test-utils/
 │   ├── state/                    # Zustand stores (see note below)
@@ -91,11 +91,12 @@ casing is mixed — feature components live in PascalCase directories (`GameSess
 
 ## State
 
-State lives in `src/state/` as Zustand stores, one per domain — eleven of them today
+State lives in `src/state/` as Zustand stores, one per domain — fourteen of them today
 (`useWorldStore`, `useCharacterStore`, `useNarrativeStore`, `useJournalStore`,
 `useSessionStore`, `useAiContextStore`, `useNPCStore`, `useInventoryStore`, `useGoalStore`,
-`useNavigationStore`, `useLoreStore`). Alongside them, `persistence.ts` holds the IndexedDB
-storage adapter and `createCrudStore.ts` holds the shared `CrudStore<T>` type contract.
+`useNavigationStore`, `useLoreStore`, `useProviderStore`, `useCalibrationStore`,
+`useContinuityStore`). Alongside them, `persistence.ts` holds the IndexedDB
+storage adapter and `crudStore.types.ts` holds the shared `CrudStore<T>` type contract.
 Cross-store cascades go through the event bus in `src/lib/state/storePubSub.ts`. The
 [State Management Guide](state-management-guide.md) covers the patterns in detail.
 
@@ -103,7 +104,7 @@ Cross-store cascades go through the event bus in `src/lib/state/storePubSub.ts`.
 
 The `/dev/*` routes are component test harnesses — they render components in isolation with
 real seeded data, which makes debugging complex interactions (and reviewing the design system)
-much easier. All AI requests go through server-side routes under `src/app/api/`, so the Gemini
-API key never reaches the browser. Stores persist to IndexedDB automatically, so game sessions
+much easier. All AI requests go through server-side routes under `src/app/api/`, so the browser never calls
+Gemini directly. Stores persist to IndexedDB automatically, so game sessions
 survive a browser restart. And TypeScript runs strict throughout, with domain-specific type
 definitions in `src/types/` that make refactoring safer.

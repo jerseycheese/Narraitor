@@ -24,7 +24,8 @@ const processNewSegment = async (segment: NarrativeSegment) => {
   // Process segment content for goals
   const goalStore = useGoalStore.getState();
   const result = await goalStore.processSegmentForGoals(
-    segment.id,
+    segment,
+    segment.sessionId,
     segment.characterId
   );
   
@@ -101,7 +102,7 @@ Here's what happens when new content is generated:
 When the AI needs to generate new content:
 
 1. AI generation requested for session
-2. `aiContextStore.buildContextForSession()` called
+2. `useAiContextStore.getState().buildContextForSession()` called (async)
 3. Goals fetched from goalStore
 4. Goals prioritized and formatted within token budget
 5. Context returned for AI prompt
@@ -172,7 +173,7 @@ const generateWithFailsafes = async (sessionId: string) => {
   let goalContext = '';
   
   try {
-    const context = aiContextStore.buildContextForSession(sessionId);
+    const context = await useAiContextStore.getState().buildContextForSession(sessionId);
     goalContext = context.error ? '' : context.goalContext;
   } catch (error) {
     console.warn('Goal context building failed, continuing without goals:', error);
@@ -191,9 +192,9 @@ Errors are captured and reported without breaking the user experience. The goal 
 
 ```typescript
 // Goal extraction with error handling
-const processSegmentSafely = async (segmentId: string) => {
+const processSegmentSafely = async (segment: NarrativeSegment, sessionId: string) => {
   try {
-    const result = await goalStore.processSegmentForGoals(segmentId);
+    const result = await goalStore.processSegmentForGoals(segment, sessionId);
     
     if (result.error) {
       // Log error but don't throw
@@ -234,10 +235,10 @@ Context building respects token limits to prevent API cost overruns. The system 
 ```typescript
 // Adaptive token budgeting
 const getContextForAI = (sessionId: string, complexityLevel: 'simple' | 'complex') => {
-  const maxTokens = complexityLevel === 'simple' ? 200 : 800;
+  const maxChars = complexityLevel === 'simple' ? 200 : 800;
   
-  return aiContextStore.buildContextForSession(sessionId, {
-    maxTokens,
+  return useAiContextStore.getState().buildContextForSession(sessionId, {
+    maxChars,
     includeGoals: true,
     prioritizeRecent: complexityLevel === 'complex'
   });
@@ -307,12 +308,13 @@ it('extracts goals from narrative segments', async () => {
   
   // Process for goals
   const goalStore = useGoalStore.getState();
-  const result = await goalStore.processSegmentForGoals(segmentId);
-  
+  const segment = useNarrativeStore.getState().segments[segmentId];
+  const result = await goalStore.processSegmentForGoals(segment, sessionId);
+
   expect(result.newGoalsCreated).toBeGreaterThan(0);
   
   // Verify context building includes goals
-  const context = aiContextStore.buildContextForSession(sessionId);
+  const context = await useAiContextStore.getState().buildContextForSession(sessionId);
   expect(context.activeGoals.length).toBeGreaterThan(0);
 });
 ```

@@ -2,16 +2,25 @@
 title: "ADR-006: Google Gemini behind server-side API routes"
 tags: [architecture, decision, adr, ai, gemini, security]
 created: 2025-04-28
-updated: 2026-05-22
+updated: 2026-08-01
 ---
 
 # ADR-006: Google Gemini behind server-side API routes
 
-**Status**: Accepted
+**Status**: Accepted (key sourcing superseded by the bring-your-own-key model, #891/#892/#893)
 **Date**: 2025-04-28
 
 > Backfilled 2026-05-22. Retroactive record of an inception-era decision (the AI provider and the
 > server-side proxy pattern). Reconstructed from the codebase and git history.
+
+> **Note (2026-08-01):** The server-side proxy decision below still holds, and every AI call still
+> goes through a route under `src/app/api/`. What changed is where the key comes from. Since the
+> bring-your-own-key work (#891/#892/#893), the player supplies their own Gemini key, it's
+> encrypted in the browser (`src/state/providerStore.ts`), and `src/lib/ai/aiFetch.ts` attaches it
+> per request as the `x-provider-api-key` header. Server-side, `src/lib/ai/resolveApiKey.ts` takes
+> that header key first and only falls back to `GEMINI_API_KEY` when there isn't one, which makes
+> the env key a dev and local-testing convenience rather than the architecture. Read the "What We
+> Decided" section below as the proxy decision, not as a description of key handling.
 
 ## The Situation
 
@@ -61,7 +70,9 @@ where latency is felt directly.
 
 ### Upsides
 
-- The API key never reaches the client; all AI traffic is same-origin and server-mediated.
+- All AI traffic is same-origin and server-mediated; the browser never calls `googleapis.com`.
+- The server env key never reaches the client at all. (Under BYO-key the player's own key does
+  live in the browser — see the 2026-08-01 note above and the Downsides below.)
 - The API routes are a single choke point for validation, rate limiting, and error handling.
 - `gemini-2.5-flash` keeps interactive generation fast and inexpensive.
 
@@ -71,6 +82,11 @@ where latency is felt directly.
   layer that #878 defers — prompt formats and response parsing assume Gemini today.
 - The rate limiter is in-memory per instance, so it's best-effort under horizontal scaling
   rather than a globally accurate quota.
+- BYO-key moves part of the threat model into the browser. The player's key is encrypted at rest
+  (`src/lib/storage/encryption.ts`), decrypted just-in-time, and held in a closure for the
+  duration of one request, but it is plaintext in client JavaScript at that moment. It's out of
+  the static bundle and never sent to Google from the browser; it is not out of reach of script
+  running in the page.
 
 ## Implementation Notes
 

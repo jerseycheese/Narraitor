@@ -1,7 +1,14 @@
+---
+title: "ADR-009: Guided First-Time Experience System"
+tags: [architecture, decision, adr, onboarding]
+created: 2025-06-20
+updated: 2026-08-01
+---
+
 # ADR-009: Guided First-Time Experience System
 
-## Status
-Accepted - Implemented
+**Status**: Accepted - Implemented (#559)
+**Date**: 2025-06-20
 
 ## Context
 So we had a problem with new users hitting Narraitor and just bouncing. The world creation process was asking too much of them upfront - they needed to understand attributes, skills, and settings before they could even get started. There wasn't a clear path for first-time users, and the cognitive load was just too high. People were dropping off before they got to experience what the app actually does.
@@ -107,10 +114,6 @@ Built a guided onboarding system for new users:
 - Error rates and support requests from new users
 
 ## Related ADRs
-- ADR-003: Wizard Framework Architecture
-- ADR-007: AI Integration Patterns
-- ADR-008: Mobile-First Responsive Design
-
----
-*Created: 2025-06-20*
-*Status: Implemented in Issue #559*
+- [ADR-005: Domain-driven structure](ADR-005-domain-driven-structure.md) — where the onboarding components live
+- [ADR-006: Gemini behind server-side API routes](ADR-006-gemini-server-side-api.md) — the AI path this flow uses to fill in defaults
+- [ADR-008: Testing & verification strategy](ADR-008-testing-and-verification-strategy.md) — how the flow is verified

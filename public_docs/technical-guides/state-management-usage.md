@@ -201,7 +201,8 @@ const useWorldStats = (worldId: string) => {
     
     return {
       characterCount: worldCharacters.length,
-      totalLevels: worldCharacters.reduce((sum, char) => sum + char.level, 0)
+      // Character has no level field; derive from something that exists.
+      namedCharacters: worldCharacters.map((char) => char.name)
     };
   });
 };

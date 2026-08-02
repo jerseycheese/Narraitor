@@ -195,10 +195,10 @@ if (!formResult.valid) {
 - `validateWorldAttribute`
 - `validateWorldSkill`
 - `validateWorldSettings`
-- `validateGeneratedImage`
 
 ### Other Domain Objects
-- `isPlayerDecision`
+- `isPlayerDecisionArray` - validates a whole array, not a single decision
+- `sanitizeString`
 
 ## Migration from Basic Type Checking
 

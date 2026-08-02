@@ -138,27 +138,27 @@ The component intelligently displays preview information based on available reco
 ```typescript
 // Character name display
 {recoveryData?.name && (
-  <div>Character name: <span className="font-medium">{recoveryData.name}</span></div>
+  <div>Character name: <span>{recoveryData.name}</span></div>
 )}
 
 // Progress indication with step names
 {recoveryData?.currentStep !== undefined && (
-  <div>Progress: <span className="font-medium">{getStepDescription(recoveryData.currentStep)}</span></div>
+  <div>Progress: <span>{getStepDescription(recoveryData.currentStep)}</span></div>
 )}
 
 // Attribute allocation summary
 {recoveryData?.hasAttributes && recoveryData?.totalAttributePoints !== undefined && (
-  <div>Attribute points allocated: <span className="font-medium">{recoveryData.totalAttributePoints}</span></div>
+  <div>Attribute points allocated: <span>{recoveryData.totalAttributePoints}</span></div>
 )}
 
 // Skills selection count
 {recoveryData?.hasSkills && recoveryData?.selectedSkillCount !== undefined && (
-  <div>Skills selected: <span className="font-medium">{recoveryData.selectedSkillCount}</span></div>
+  <div>Skills selected: <span>{recoveryData.selectedSkillCount}</span></div>
 )}
 
 // Background completion status
 {recoveryData?.hasBackground && (
-  <div>Background: <span className="font-medium">Completed</span></div>
+  <div>Background: <span>Completed</span></div>
 )}
 ```
 
@@ -186,9 +186,7 @@ const validDate = formattedDate && formattedDate !== 'Invalid date' ? formattedD
 
 // Only show timestamp if valid
 {validDate && (
-  <p className="text-xs text-gray-500 mb-3">
-    Last saved: {validDate}
-  </p>
+  <p>Last saved: {validDate}</p>
 )}
 ```
 
@@ -222,11 +220,7 @@ useEffect(() => {
 }, [isVisible]);
 
 return (
-  <Button
-    ref={recoverButtonRef}
-    onClick={onRecover}
-    className="flex-1"
-  >
+  <Button ref={recoverButtonRef} onClick={onRecover}>
     Recover Progress
   </Button>
 );
@@ -269,7 +263,7 @@ return (
 
 ### Responsive Design
 
-- Mobile-friendly layout with `flex-col sm:flex-row` for buttons
+- Mobile-friendly button layout, handled by the modal's own CSS rather than utility classes
 - Maximum width constraint with proper padding
 - Responsive text sizing and spacing
 

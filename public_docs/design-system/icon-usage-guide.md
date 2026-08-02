@@ -60,20 +60,17 @@ For buttons, status indicators, and general interface elements:
 For larger interface elements and section headers:
 
 ```tsx
-<button className="flex items-center gap-2">
+<Button variant="ghost">
   <Globe size={20} />
   World Settings
-</button>
+</Button>
 ```
 
-#### **Dialog Icons: `w-8 h-8` (32px)**
-For achievement dialogs and prominent modal content:
+#### **Dialog Icons: 32px**
+For prominent modal content:
 
 ```tsx
-<AchievementDialog
-  icon={<Trophy size={32} />}
-  title="Achievement Unlocked!"
-/>
+<Trophy size={32} />
 ```
 
 ## Semantic Usage Guidelines
@@ -198,10 +195,13 @@ Icons should be properly labeled for assistive technologies:
 
 Ensure icons in interactive elements have proper focus states:
 
+Focus styling comes from the component classes rather than utilities, so reach for `Button` with
+`size="icon"` instead of hand-rolling a focus ring:
+
 ```tsx
-<button className="p-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+<Button variant="ghost" size="icon" aria-label="Settings">
   <Settings size={16} />
-</button>
+</Button>
 ```
 
 ### Color Accessibility
@@ -209,14 +209,14 @@ Ensure icons in interactive elements have proper focus states:
 Ensure sufficient contrast and don't rely solely on color:
 
 ```tsx
-// Good: Color + icon shape convey meaning
-<div className="flex items-center gap-2">
-  <CheckCircle size={16} />
-  <span>Success</span>
-</div>
+// Good: icon shape plus text convey meaning, color is reinforcement
+<span>
+  <CheckCircle size={16} color="var(--color-success)" />
+  Success
+</span>
 
-// Avoid: Color alone conveys meaning
-<div className="text-green-600">Success</div>
+// Avoid: color alone conveys meaning
+<span style={{ color: 'var(--color-success)' }}>Success</span>
 ```
 
 ## Implementation Examples
@@ -286,18 +286,17 @@ Displaying system and component status:
 ```tsx
 import { CheckCircle, AlertTriangle, XCircle, RotateCcw } from 'lucide-react'
 
+// Illustrative, not a component that exists in src/. Colors come from tokens, not utilities.
 const StorageStatusIcon = ({ status }) => {
-  const iconClass = "w-4 h-4"
-
   switch (status) {
     case 'healthy':
-      return <CheckCircle className={`${iconClass} text-green-600`} />
+      return <CheckCircle size={16} color="var(--color-success)" />
     case 'degraded':
-      return <AlertTriangle className={`${iconClass} text-yellow-600`} />
+      return <AlertTriangle size={16} color="var(--color-warning)" />
     case 'unavailable':
-      return <XCircle className={`${iconClass} text-red-600`} />
+      return <XCircle size={16} color="var(--color-danger)" />
     case 'recovering':
-      return <RotateCcw className={`${iconClass} text-blue-600 animate-spin`} />
+      return <RotateCcw size={16} color="var(--color-info)" />
     default:
       return <HelpCircle className={`${iconClass} text-gray-600`} />
   }
@@ -394,13 +393,7 @@ The Badge component is designed to work seamlessly with lucide-react icons:
 Most components should accept icons as React nodes:
 
 ```tsx
-// Achievement dialogs
-<AchievementDialog
-  icon={<Trophy size={32} />}
-  // other props...
-/>
-
-// Custom components should follow this pattern
+// Components should follow this pattern
 interface MyComponentProps {
   icon?: React.ReactNode
   children: React.ReactNode
@@ -431,4 +424,4 @@ Icons automatically inherit theme colors through CSS variables. Future theme exp
 
 ---
 
-*This guide reflects the current established patterns in the Narraitor codebase. All examples are taken from working components and represent tested, production-ready implementations.*
+*This guide reflects the established icon patterns in the Narraitor codebase. Some snippets are illustrative rather than lifted from a real component, so check `src/components/` before assuming a named component exists.*

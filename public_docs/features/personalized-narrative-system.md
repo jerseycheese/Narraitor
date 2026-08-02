@@ -8,8 +8,9 @@ This system watches how players actually play and adapts the storytelling to mat
 
 ## The Two Main Pieces
 
-### PersonalizationEngine - The Data Formatter
-This component takes player choices and formats them for the LLM to analyze.
+### personalizationEngine - The Data Formatter
+`src/lib/ai/personalizationEngine.ts` takes player choices and formats them for the LLM to
+analyze. It's a set of plain exported functions, not a class - there's nothing to instantiate.
 
 The key things it does:
 - **Aggregates basic choice data** (what types of choices are most common)
@@ -53,7 +54,7 @@ Instead of manually calculating complex heuristics, the system sends your raw de
 - **Stays flexible**: Adding new decision types or genres doesn't require rewriting detection logic
 
 ### What Gets Sent to the LLM
-The PersonalizationEngine formats your recent decisions into a simple structure:
+The personalization engine formats your recent decisions into a simple structure:
 
 - **Decision text**: What you actually chose
 - **Decision type**: Category (diplomatic, aggressive, stealthy, etc.)
@@ -100,11 +101,14 @@ const sanitizeString = (str: string) => {
 
 ### Basic Usage
 ```typescript
-const engine = new PersonalizationEngine();
-const tracker = new PlayerDecisionTracker();
+import { playerDecisionTracker } from '@/lib/ai/playerDecisionTracker';
+import {
+  createPersonalizedContext,
+  generateNarrativeEnhancement,
+} from '@/lib/ai/personalizationEngine';
 
 // Record player decisions
-tracker.recordDecision(
+playerDecisionTracker.recordDecision(
   'What do you do?',
   'Help the stranger',
   'helpful',
@@ -112,33 +116,31 @@ tracker.recordDecision(
   'world-1'
 );
 
-// Get personalized context
-const decisions = tracker.getRelevantDecisions(
+// Get personalized context. The first argument is the current narrative context
+// ({ worldId, sessionId? }); world/session filtering is the optional third argument.
+const decisions = playerDecisionTracker.getRelevantDecisions(
   { worldId: 'world-1' },
   10
 );
-const context = engine.createPersonalizedContext(
-  character,
-  world,
-  decisions
-);
+const context = createPersonalizedContext(character, world, decisions);
 
 // Generate narrative enhancement (formatted for LLM)
-const enhancement = engine.generateNarrativeEnhancement(context);
+const enhancement = generateNarrativeEnhancement(context);
 // Returns formatted string with recent decisions for Gemini to analyze
 ```
 
 ### Simple Pattern Tracking
 ```typescript
-const tracker = new PlayerDecisionTracker();
+import { playerDecisionTracker } from '@/lib/ai/playerDecisionTracker';
+import { analyzePlayerBehavior } from '@/lib/ai/personalizationEngine';
 
 // Basic choice pattern aggregation
-const patterns = tracker.analyzeChoicePatterns();
+const patterns = playerDecisionTracker.analyzeChoicePatterns();
 console.log(patterns.dominantChoiceTypes); // ['diplomatic', 'helpful']
 console.log(patterns.patternStrength); // 75
 
 // Lightweight behavior analysis (for UI display)
-const analysis = engine.analyzePlayerBehavior(character, decisions);
+const analysis = analyzePlayerBehavior(character, decisions);
 console.log(analysis.detectedTraits); // ['diplomatic', 'empathetic', 'logical']
 console.log(analysis.preferences.preferredChoiceTypes); // ['diplomatic', 'helpful']
 ```
@@ -150,9 +152,8 @@ The system integrates with `NarrativeGenerator` to enhance story generation:
 
 ```typescript
 // In narrativeGenerator.ts
-const personalizationEngine = new PersonalizationEngine();
-const context = personalizationEngine.createPersonalizedContext(/* ... */);
-const enhancement = personalizationEngine.generateNarrativeEnhancement(context);
+const context = createPersonalizedContext(/* ... */);
+const enhancement = generateNarrativeEnhancement(context);
 
 // Enhancement is used to inform AI narrative generation
 const prompt = `${basePrompt}\n\nPersonalization:\n${enhancement}`;
@@ -182,7 +183,7 @@ The choice generator grabs your recent decision history (up to 10 decisions) and
 1. Player makes choices during gameplay
 2. `PlayerDecisionTracker` records and validates decisions
 3. During narrative generation:
-   - `PersonalizationEngine` analyzes patterns and creates context
+   - `personalizationEngine` analyzes patterns and creates context
    - Enhanced context informs AI narrative generation
 4. During choice generation:
    - `simpleDecisionRelevance` filters decisions by recency and context
@@ -265,7 +266,9 @@ Currently uses client-side storage; planned abstractions for:
 
 ## API Reference
 
-### PersonalizationEngine Methods
+### personalizationEngine functions
+
+These are module-level exports from `src/lib/ai/personalizationEngine.ts`. Import them by name.
 
 #### `analyzePlayerBehavior(character, decisions, relationships?, goals?): PersonalizationAnalysis`
 Performs basic aggregation of player decisions and detects top 3 personality traits.
@@ -276,7 +279,10 @@ Creates structured context object containing recent decisions and basic preferen
 #### `generateNarrativeEnhancement(context): string`
 Formats decision history into LLM-ready text with instructions for pattern inference.
 
-### PlayerDecisionTracker Methods
+### PlayerDecisionTracker methods
+
+`PlayerDecisionTracker` is a class, but you almost always want the shared `playerDecisionTracker`
+singleton exported from the same module rather than a fresh instance.
 
 #### `recordDecision(prompt, choiceText, choiceType, sessionId, worldId, context?): PlayerDecision`
 Records a player decision with full validation and sanitization.
