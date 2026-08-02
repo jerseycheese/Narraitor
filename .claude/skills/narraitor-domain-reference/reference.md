@@ -33,7 +33,7 @@ Utility: `delete-image`, `debug` (GET, dev).
 
 ## User-facing routes (observed)
 
-`/` landing · `/welcome` · `/worlds` (+ `/worlds/create`, `/worlds/[id]`, `/worlds/[id]/edit`, `/worlds/[id]/play`, `/worlds/[id]/play/journal`) · `/characters` (+ create/[id]/edit) · `/play` · `/settings`, `/settings/providers` · `/about`, `/privacy`, `/terms` · `/dev/*` harnesses (~20, knip-exempt, non-canon).
+`/` landing · `/welcome` · `/worlds` (+ `/worlds/create`, `/worlds/[id]`, `/worlds/[id]/edit`, `/worlds/[id]/play`, `/worlds/[id]/play/journal`) · `/characters` (+ create/[id]/edit) · `/play` · `/settings`, `/settings/providers` · `/about`, `/privacy`, `/terms` · `/dev/*` harnesses (~10, non-canon — live AI, real stores, or real routing; Storybook covers the rest).
 
 ## Key seams (known)
 

@@ -18,9 +18,9 @@ This directory uses the Next.js App Router architecture, which replaced the prev
 (`narrative/generate`, `generate-character`, `inventory/categorize`, and so on). These exist so
 the Gemini API key stays server-side — see [ADR-006](../../public_docs/architecture/ADR-006-gemini-server-side-api.md).
 
-**Development routes** (`/dev/*`): component test harnesses, one per component or feature
-being worked on (e.g. `/dev/game-session`, `/dev/world-creation-wizard`). They render
-components in isolation with seeded data. The visual canon for the design system is
+**Development routes** (`/dev/*`): test harnesses for the surfaces Storybook can't cover —
+live AI calls, real stores, real routing (e.g. `/dev/game-session`, `/dev/world-generation`).
+The visual canon for the design system is
 Storybook (`npm run storybook`) — see [ADR-012](../../public_docs/architecture/ADR-012-storybook-single-canon-surface.md).
 
 ## World Creation Wizard

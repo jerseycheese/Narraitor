@@ -165,7 +165,7 @@ Recovery strategies include retrying failed requests with exponential backoff an
 
 ### Manual Testing
 
-The system includes a test harness at `/dev/narrative-system` for manual testing. You can generate initial narrative for different world themes to see how genre adaptation works, make player choices to verify narrative continuity, create new sessions to test initialization, and deliberately create edge case scenarios to test error handling. It's useful for catching issues that automated tests miss, particularly around the AI's actual output quality.
+The system includes a test harness at `/dev/game-session` for manual testing. You can generate initial narrative for different world themes to see how genre adaptation works, make player choices to verify narrative continuity, create new sessions to test initialization, and deliberately create edge case scenarios to test error handling. It's useful for catching issues that automated tests miss, particularly around the AI's actual output quality.
 
 ### Automated Testing
 

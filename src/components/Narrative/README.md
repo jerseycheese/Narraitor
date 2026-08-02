@@ -187,7 +187,7 @@ The AI choice generation is primarily used through `GameSessionActiveWithNarrati
 
 To manually test the narrative generation system:
 
-1. Navigate to `/dev/narrative-system` in development mode
+1. Navigate to `/dev/game-session` in development mode
 2. Use the controls to generate initial narrative and see how it adapts to the world theme
 3. Make choices to see how the narrative continues and maintains context
 4. **Test AI Choice Generation**: Enable choice generation to see contextual choices appear

@@ -173,9 +173,8 @@ bring one back in, so a world doesn't travel between browsers or devices.
 ## Testing & Development
 
 ### Manual Testing
-- `/dev/world-creation-wizard` - Test world creation flow
+- `/dev/world-generation` - Test AI world generation end to end
 - `/worlds/[id]/edit` - Test the production editing route with seeded or real local data
-- `/dev/world-list-screen` - Test world list and management surfaces
 
 ### Storybook Stories
 - `WorldBasicInfoForm` - Form component testing

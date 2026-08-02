@@ -67,7 +67,7 @@ Each component has comprehensive testing:
 
 ## Test Harness
 
-A test harness is available at `/dev/game-session-components` for interactive testing of all components.
+`ChoiceSelector.stories.tsx`, `GameSessionLoading.stories.tsx`, and `GameSessionError.stories.tsx` cover interactive testing of these components. The full session is still exercised live at `/dev/game-session`.
 
 ## Accessibility Features
 

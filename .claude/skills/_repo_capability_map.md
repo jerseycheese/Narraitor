@@ -16,7 +16,7 @@ AI-driven narrative RPG framework (known — README, CLAUDE.md). Build a world (
 - **Client API seam** (`src/lib/api/`): components call these services, not fetch directly — enforced by dependency-cruiser since PR #1508 (known — dir listing; observed — rule).
 - **Components** (`src/components/`): domain-organized (GameSession, Narrative, WorldCreationWizard, CharacterCreationWizard, Journal, inventory, ui primitives, shared, devtools…). CSS co-located per component; stories live centrally under `src/stories/` (140 files, known) (observed).
 - **Theming** (`src/lib/theme/`): ONE design system, ds3, as `themes/ds3.css` + `_shared-tokens.css` (ADR-013 deleted ds1/ds2); `ThemeProvider.tsx`; localStorage key `narraitor-color-scheme` for light/dark (the `narraitor-theme` key went with the DS picker); FOUC-prevention init script (observed).
-- **App routes** (`src/app/`): worlds/characters CRUD + wizards, `/worlds/[id]/play` session, `/settings/providers`, legal/landing, plus ~20 `/dev/*` harness routes (knip-exempt) (observed).
+- **App routes** (`src/app/`): worlds/characters CRUD + wizards, `/worlds/[id]/play` session, `/settings/providers`, legal/landing, plus ~10 `/dev/*` harness routes (observed).
 
 ## 3. Build/test/run commands verified
 

@@ -45,9 +45,8 @@ Returns `405 Method Not Allowed` with guidance to use POST.
 
 The API endpoints are thoroughly tested through:
 
-1. **Dev Test Harnesses:**
-   - `/dev/ending-system` - Interactive ending generation testing
-   - `/dev/ending-screen` - UI component testing
+1. **Dev Test Harness:**
+   - `/dev/ending-system` - Interactive ending generation testing (UI-only variants live in `EndingScreen.stories.tsx`)
 
 2. **Unit Tests:**
    - Core business logic tested in `endingGenerator.test.ts`
