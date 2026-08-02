@@ -256,7 +256,7 @@ The UI shows decision weight through border styling and shadows - heavier border
 
 ## Testing & Development
 
-There are a few dev routes set up for testing these mechanics. `/dev/game-session` lets you test everything in context, `/dev/choice-alignment` focuses on alignment and decision-weight behavior, and `/dev/world-creation-wizard` handles attribute configuration.
+There are a few dev routes set up for testing these mechanics. `/dev/game-session` lets you test everything in context, and `/dev/choice-alignment` focuses on alignment and decision-weight behavior.
 
 When testing, try out different decision weights (minor, major, critical), all three alignment types in various situations, different attribute configurations, and how these systems work together.
 

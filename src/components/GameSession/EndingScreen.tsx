@@ -162,12 +162,9 @@ export function EndingScreen() {
 
   // Load ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
-    // Skip image generation in Storybook, test environment, or dev harness
+    // Skip image generation in Storybook or test environment
     const isStorybook = isStorybookEnv();
     const isTest = process.env.NODE_ENV === 'test';
-    const isDevHarness =
-      typeof window !== 'undefined' &&
-      window.location.pathname.includes('/dev/ending-screen');
     const isPlaywright = isPlaywrightEnv();
 
     if (
@@ -176,7 +173,6 @@ export function EndingScreen() {
       !isGeneratingImage &&
       !isStorybook &&
       !isTest &&
-      !isDevHarness &&
       !isPlaywright &&
       generatedForEndingRef.current !== currentEnding.id
     ) {

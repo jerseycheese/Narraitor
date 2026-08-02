@@ -18,7 +18,7 @@
     "audit:css": "node scripts/audit-css.mjs",
     "validate:routes": "node scripts/validate-routes.js",
     "type-check": "tsc --noEmit",
-    "knip": "knip",
+    "knip": "knip --no-config-hints",
     "knip:fix": "knip --fix --allow-remove-files",
     "knip:production": "knip --production",
     "storybook": "storybook dev -p 6006",

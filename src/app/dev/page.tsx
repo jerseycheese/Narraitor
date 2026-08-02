@@ -6,19 +6,15 @@ export default function DevPage() {
   const testHarnesses = {
     'Core Systems': [
       { href: '/dev/game-session', label: 'Game Session', color: 'blue' },
-      { href: '/dev/ending-screen', label: 'Ending Screen', color: 'blue' },
-      { href: '/dev/narrative-system', label: 'Narrative System', color: 'blue' },
+      { href: '/dev/ending-system', label: 'Ending System (AI)', color: 'blue' },
       { href: '/dev/choice-alignment', label: 'Choice Alignment Test', color: 'blue' },
       { href: '/dev/lore-viewer', label: 'Lore Viewer', color: 'indigo' },
     ],
     'World Management': [
-      { href: '/dev/world-creation-wizard', label: 'World Creation Wizard', color: 'green' },
-      { href: '/dev/world-list-screen', label: 'World List Screen', color: 'green' },
       { href: '/dev/world-generation', label: 'World Generation (AI)', color: 'orange' },
-      { href: '/dev/attribute-editor', label: 'Attribute Editor', color: 'yellow' },
+      { href: '/dev/test-world-generation', label: 'Test World Generation (AI)', color: 'orange' },
     ],
     'Character Management': [
-      { href: '/dev/character-creation', label: 'Character Creation Wizard', color: 'purple' },
       { href: '/dev/character-generation', label: 'Character Generation (AI)', color: 'orange' },
     ],
     'Journal System': [
@@ -26,6 +22,7 @@ export default function DevPage() {
     ],
     'Navigation & UI': [
       { href: '/dev/navigation-flow', label: 'Navigation Flow', color: 'teal' },
+      { href: '/dev/guided-first-time-experience', label: 'Guided First-Time Experience', color: 'teal' },
     ],
   };
 

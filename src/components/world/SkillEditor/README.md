@@ -107,4 +107,4 @@ npm run storybook
 
 ## Test Harness
 
-Manual testing available at `/dev/skill-editor` route for interactive testing with realistic data.
+No dedicated dev harness — `SkillEditor.stories.tsx` covers interactive testing with realistic data (the `/dev/skill-editor` route was retired in favor of it, see #1639).

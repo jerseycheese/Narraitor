@@ -53,9 +53,8 @@ This API endpoint generates AI-powered image prompts for story ending visualizat
 
 Comprehensive testing through:
 
-1. **Dev Test Harnesses:**
-   - `/dev/ending-system` - Full ending generation with image prompts
-   - `/dev/ending-screen` - Image prompt integration testing
+1. **Dev Test Harness:**
+   - `/dev/ending-system` - Full ending generation with image prompts (UI-only variants live in `EndingScreen.stories.tsx`)
 
 2. **Manual Verification:**
    - AI generation success paths tested

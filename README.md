@@ -69,7 +69,7 @@ Run the last four before committing; CI runs them separately and the production 
 
 Worth knowing about `npm run build`: it builds the app *and* Storybook, then copies the static Storybook output into `public/`. If you just want to check the app compiles, `npm run build:app` is the faster one.
 
-There are also `/dev` routes for exercising components against real data without walking the whole app flow: `/dev/world-creation-wizard`, `/dev/game-session`, and seventeen more. For the full themed component catalog, Storybook is the place.
+There are also `/dev` routes for exercising components against real data without walking the whole app flow: `/dev/game-session`, `/dev/world-generation`, and eight more. For the full themed component catalog, Storybook is the place.
 
 Contributor PRs should target `develop` (see [Branches and releases](#branches-and-releases) below).
 
