@@ -108,6 +108,8 @@ comes from the player rather than the server: it's encrypted in the browser and 
 request as the `x-provider-api-key` header, with `GEMINI_API_KEY` left as a dev and local-testing
 fallback. See [ADR-006](ADR-006-gemini-server-side-api.md).
 
-**Security-First API Design**: the key is never embedded in client JavaScript and never reaches
-`googleapis.com` from the browser, requests get sanitized, and nothing sensitive is logged - a
-lesson learned from projects where API keys ended up in the browser.
+**Security-First API Design**: no key is baked into the client bundle and the browser never
+reaches `googleapis.com` directly, requests get sanitized, and nothing sensitive is logged. The
+player's own key is a deliberate exception to "nothing sensitive in the browser": it's encrypted
+at rest and decrypted just-in-time per request, which keeps it out of the bundle and out of
+storage in plaintext, but it is client-side by design under BYO-key.

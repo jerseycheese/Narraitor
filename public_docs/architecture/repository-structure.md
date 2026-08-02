@@ -104,7 +104,7 @@ Cross-store cascades go through the event bus in `src/lib/state/storePubSub.ts`.
 
 The `/dev/*` routes are component test harnesses — they render components in isolation with
 real seeded data, which makes debugging complex interactions (and reviewing the design system)
-much easier. All AI requests go through server-side routes under `src/app/api/`, so the Gemini
-API key never reaches the browser. Stores persist to IndexedDB automatically, so game sessions
+much easier. All AI requests go through server-side routes under `src/app/api/`, so the browser never calls
+Gemini directly. Stores persist to IndexedDB automatically, so game sessions
 survive a browser restart. And TypeScript runs strict throughout, with domain-specific type
 definitions in `src/types/` that make refactoring safer.

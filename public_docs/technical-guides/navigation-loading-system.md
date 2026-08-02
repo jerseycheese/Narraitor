@@ -82,9 +82,13 @@ const handleSubmit = async (data) => {
   setLoadingState({ isLoading: true, loadingType: 'data', message: 'Saving changes...' });
   try {
     await submitForm(data);
+    // Hands off to the redirect overlay. Don't clear here - navigateWithLoading calls
+    // router.push and returns immediately, so a clearLoading() in a finally would kill
+    // the overlay before the pathname changes. The hook's pathname effect clears it.
     navigateWithLoading('/success', 'Redirecting...');
-  } finally {
+  } catch (err) {
     clearLoading();
+    throw err;
   }
 };
 ```

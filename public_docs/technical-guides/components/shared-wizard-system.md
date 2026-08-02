@@ -91,7 +91,11 @@ interface ToggleButtonProps {
 ### useWizardState
 There are two, neither re-exported from `@/components/shared/wizard`. Import from the specific path.
 
-**`@/hooks/useWizardState`** — used by world creation and character creation:
+**`@/hooks/useWizardState`** — used by world creation and character creation. Note that
+`canGoNext` is defined as `!isLastStep && isCurrentStepValid && !isProcessing`, so it's always
+false on the final step. Wiring it to a blanket `disabled` dead-ends the wizard at review, because
+`WizardNavigation` renders `onComplete` instead of `onNext` on that step and applies `disabled` to
+both. Supply an `onComplete`, and branch `disabled` on `isLastStep`.
 
 ```typescript
 interface UseWizardStateOptions<TData> {
@@ -182,6 +186,7 @@ function MyWizard() {
     currentStepConfig,
     canGoNext,
     canGoBack,
+    isLastStep,
     goNext,
     goBack,
     updateData,
@@ -190,6 +195,12 @@ function MyWizard() {
     steps: STEPS,
   });
   const currentStep = state.currentStep;
+
+  // This hook has no onComplete option - handle submission yourself.
+  const handleComplete = async () => {
+    await saveWizardData(state.data);
+    router.push('/done');
+  };
 
   return (
     <WizardContainer>
@@ -205,8 +216,9 @@ function MyWizard() {
         totalSteps={STEPS.length}
         onNext={goNext}
         onBack={canGoBack ? goBack : undefined}
+        onComplete={handleComplete}
         onCancel={() => router.push('/')}
-        disabled={!canGoNext}
+        disabled={isLastStep ? state.isProcessing : !canGoNext}
       />
     </WizardContainer>
   );

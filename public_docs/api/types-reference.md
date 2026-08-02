@@ -303,10 +303,14 @@ interface PromptTemplate {
 
 ## State Management Types
 
-Stores aren't built from a generic base. There's a shared `CrudStore<T>` contract in
-`src/state/crudStore.types.ts`, referenced only by `goalStore` and `loreStore`. Every other store
-declares its own actions, named for its domain: `createWorld`/`updateWorld`/`deleteWorld` on
-`worldStore`, not `create`/`update`/`delete`.
+Six stores extend the shared `CrudStore<T>` contract in `src/state/crudStore.types.ts`:
+`worldStore`, `characterStore`, `inventoryStore`, `npcStore`, `goalStore`, and `loreStore`. Those
+expose the generic `create`/`update`/`delete` alongside domain-named aliases, so `updateWorld`
+delegates to `update`. `narrativeStore`, `sessionStore`, `journalStore`, `aiContextStore`, and the
+rest declare their own actions with no shared base.
+
+(The file's own header comment says only goalStore and loreStore reference these types. That
+comment is stale — don't trust it over the `extends CrudStore<...>` declarations.)
 
 ```typescript
 // src/state/crudStore.types.ts - the shared contract, used by goalStore and loreStore
@@ -343,9 +347,9 @@ None of these are exported; they're the shape store methods take inline:
 Omit<World, 'id' | 'createdAt' | 'updatedAt'>
 Omit<Character, 'id' | 'createdAt' | 'updatedAt'>
 
-// What updateWorld / updateCharacter accept
-Partial<Omit<World, 'id' | 'createdAt'>>
-Partial<Omit<Character, 'id' | 'createdAt'>>
+// The two update signatures differ; they are not symmetrical.
+updateWorld: (id: EntityID, updates: Partial<Omit<World, 'id' | 'createdAt' | 'updatedAt'>>) => void
+updateCharacter: (id: EntityID, updates: Partial<Character>) => void
 ```
 
 There's no session equivalent, since there's no `GameSession` entity type (see Session Types above).

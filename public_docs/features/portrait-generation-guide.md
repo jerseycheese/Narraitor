@@ -40,7 +40,7 @@ The API call is straightforward, but there's a lot happening behind the scenes:
 import { generatePortrait } from '@/lib/api/generatePortrait';
 
 // Goes through a server-side route. aiFetch attaches the player's own key as a
-// request header, so the key never lands in client JavaScript.
+// request header, so the browser never calls Google directly.
 const { portrait } = await generatePortrait({ character, world });
 ```
 

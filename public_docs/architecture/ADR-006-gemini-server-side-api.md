@@ -70,7 +70,9 @@ where latency is felt directly.
 
 ### Upsides
 
-- The API key never reaches the client; all AI traffic is same-origin and server-mediated.
+- All AI traffic is same-origin and server-mediated; the browser never calls `googleapis.com`.
+- The server env key never reaches the client at all. (Under BYO-key the player's own key does
+  live in the browser — see the 2026-08-01 note above and the Downsides below.)
 - The API routes are a single choke point for validation, rate limiting, and error handling.
 - `gemini-2.5-flash` keeps interactive generation fast and inexpensive.
 
@@ -80,6 +82,11 @@ where latency is felt directly.
   layer that #878 defers — prompt formats and response parsing assume Gemini today.
 - The rate limiter is in-memory per instance, so it's best-effort under horizontal scaling
   rather than a globally accurate quota.
+- BYO-key moves part of the threat model into the browser. The player's key is encrypted at rest
+  (`src/lib/storage/encryption.ts`), decrypted just-in-time, and held in a closure for the
+  duration of one request, but it is plaintext in client JavaScript at that moment. It's out of
+  the static bundle and never sent to Google from the browser; it is not out of reach of script
+  running in the page.
 
 ## Implementation Notes
 
