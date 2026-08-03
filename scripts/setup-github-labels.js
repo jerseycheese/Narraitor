@@ -32,6 +32,7 @@ const labelDefinitions = [
   { name: 'user-story', color: '0075ca', description: 'New feature described from a user\'s perspective' },
   { name: 'epic', color: '6f42c1', description: 'Large feature that contains multiple user stories' },
   { name: 'documentation', color: '0075ca', description: 'Improvements or additions to documentation' },
+  { name: 'technical-debt', color: 'a2eeef', description: 'Dead code, overengineering, or another code-health finding' },
   { name: 'question', color: 'd876e3', description: 'Further information is requested' },
   { name: 'help-wanted', color: '008672', description: 'Extra attention is needed' },
   { name: 'good-first-issue', color: '7057ff', description: 'Good for newcomers' },
