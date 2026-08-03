@@ -4,16 +4,21 @@ import { HeaderNavigation } from '../HeaderNavigation';
 
 // Mock next/navigation
 const mockPush = jest.fn();
+let mockPathname = '/worlds';
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
-    pathname: '/worlds',
+    pathname: mockPathname,
   }),
-  usePathname: () => '/worlds',
+  usePathname: () => mockPathname,
 }));
 
 // Mock stores - will be modified in tests
-const mockWorldStore = {
+const mockWorldStore: {
+  worlds: Record<string, { id: string; name: string; genre?: string }>;
+  currentWorldId: string | null;
+  setCurrentWorld: jest.Mock;
+} = {
   worlds: {},
   currentWorldId: null,
   setCurrentWorld: jest.fn(),
@@ -90,6 +95,9 @@ jest.mock('@/lib/theme', () => ({
 describe('HeaderNavigation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPathname = '/worlds';
+    mockWorldStore.worlds = {};
+    mockWorldStore.currentWorldId = null;
     // Reset viewport to desktop
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -171,6 +179,55 @@ describe('HeaderNavigation', () => {
       expect(
         screen.getByRole('button', { name: 'Appearance' })
       ).toBeInTheDocument();
+    });
+  });
+
+  describe('Contextual CTA (#1655)', () => {
+    const seedActiveWorld = () => {
+      mockWorldStore.worlds = {
+        'world-1': { id: 'world-1', name: 'Test World', genre: 'fantasy' },
+      };
+      mockWorldStore.currentWorldId = 'world-1';
+    };
+
+    it('renders Play in the success variant so it matches every other Play control', () => {
+      mockPathname = '/dashboard';
+      seedActiveWorld();
+
+      render(<HeaderNavigation />);
+
+      expect(screen.getByRole('button', { name: /^Play$/ })).toHaveClass(
+        'button-success'
+      );
+    });
+
+    it('suppresses the CTA on routes that own the action inline', () => {
+      mockPathname = '/worlds/world-1';
+      seedActiveWorld();
+
+      render(<HeaderNavigation />);
+
+      expect(
+        screen.queryByRole('button', { name: /^Play$/ })
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Breadcrumb suppression (#1655)', () => {
+    it('hides breadcrumbs on top-level destinations', () => {
+      mockPathname = '/characters';
+
+      render(<HeaderNavigation />);
+
+      expect(screen.queryByTestId('breadcrumbs')).not.toBeInTheDocument();
+    });
+
+    it('keeps breadcrumbs on nested routes', () => {
+      mockPathname = '/settings/providers';
+
+      render(<HeaderNavigation />);
+
+      expect(screen.getAllByTestId('breadcrumbs').length).toBeGreaterThan(0);
     });
   });
 });
