@@ -134,7 +134,7 @@ test.describe('Main Pages Visual Tests', () => {
     await page.goto('/worlds/world-cyberpunk-2077');
     // Block on the seed flushing and the world actually rendering before
     // capture — without this the IndexedDB seed loses the race in CI and the
-    // page paints empty (sidebar only). See #1198.
+    // page paints empty (chrome only). See #1198.
     await waitForStoreReady(page);
     await expect(page.getByText('Cyberpunk Neo-Tokyo').first()).toBeVisible({ timeout: 15000 });
     await waitForContentStable(page);

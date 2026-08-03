@@ -19,19 +19,12 @@ const captureWizardStep = async (page: Page, name: string): Promise<void> => {
   await page.evaluate(() => document.fonts.ready);
   await hideDynamicContent(page);
   // Chromium's full-page screenshot mis-places the app shell on pages taller than
-  // the viewport: the sticky header/progress rail and the 100vh, own-scrolling
-  // sidebar render at an offset, leaving the page title floating above a displaced
-  // shell. Pin them into normal flow for the capture — at scroll 0 the result is
-  // identical to the live layout, minus the artifact.
+  // the viewport: the sticky header and progress rail render at an offset, leaving
+  // the page title floating above a displaced shell. Pin them into normal flow for
+  // the capture — at scroll 0 the result is identical to the live layout, minus
+  // the artifact.
   await page.addStyleTag({
     content: `
-      .workshop-sidebar {
-        position: static !important;
-        height: auto !important;
-        min-height: 100vh !important;
-        max-height: none !important;
-        overflow: visible !important;
-      }
       header,
       .component-wizard-progress {
         position: static !important;
