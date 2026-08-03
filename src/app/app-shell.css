@@ -487,6 +487,10 @@
 }
 
 .breadcrumbs-inner {
+  /* Without border-box the gutter lands outside the max-width and the band
+     measures 1248px against the other two bands' 1200px, staggering the left
+     edge by one gutter on every viewport past the cap. */
+  box-sizing: border-box;
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-2) var(--space-4);
@@ -792,15 +796,19 @@
   color: var(--color-text-inverse);
 }
 
+/* Canonical success tokens, not the legacy `hsl(var(--success))` channel: that
+   one resolves 3 units off `--color-success`, so the card's Play and the
+   header's Play rendered two different greens side by side on /characters. */
 .card-action-group button.card-action-variant-success {
-  background: hsl(var(--success));
-  color: hsl(var(--success-foreground));
-  border-color: hsl(var(--success));
+  background: var(--color-success);
+  color: var(--color-on-success);
+  border-color: var(--color-success);
 }
 
 .card-action-group button.card-action-variant-success:hover {
-  opacity: 0.9;
-  color: hsl(var(--success-foreground));
+  background: var(--color-success-hover);
+  border-color: var(--color-success-hover);
+  color: var(--color-on-success);
 }
 
 .card-action-group button.card-action-variant-danger {

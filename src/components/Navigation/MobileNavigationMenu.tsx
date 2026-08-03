@@ -204,7 +204,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
                       <div>{world.name}</div>
                       <div>
                         {getGenreLabel(world.genre)} • {worldCharacters}{' '}
-                        characters
+                        {worldCharacters === 1 ? 'character' : 'characters'}
                       </div>
                     </div>
                     {world.id === currentWorldId && (
