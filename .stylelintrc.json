@@ -160,7 +160,7 @@
     },
     {
       "files": [
-        "src/app/workshop.css",
+        "src/app/app-shell.css",
         "src/app/dashboard.css",
         "src/app/wizard.css",
         "src/app/about.css",

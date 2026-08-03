@@ -128,7 +128,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
           {(() => {
             // When a world has no image, render no <img> at all and let Hero
             // fall back to its tokenized themed background (see .component-hero
-            // in workshop.css). A previous white 1x1 placeholder rendered as a
+            // in app-shell.css). A previous white 1x1 placeholder rendered as a
             // bright rectangle in dark mode (#1113). The themed empty-state is
             // deterministic CSS, so it stays stable under visual tests too.
             const heroImage = world.image?.url

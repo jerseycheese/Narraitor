@@ -44,7 +44,7 @@ const CSS_FILES = [
   'src/app/character-display.css',
   'src/app/dashboard.css',
   'src/app/wizard.css',
-  'src/app/workshop.css',
+  'src/app/app-shell.css',
   'src/styles/manuscript-session.css',
 ].map(abs);
 
@@ -67,7 +67,6 @@ const SAFELIST = {
   ],
   standard: [
     'dark', // documentElement.classList.add('dark')
-    'workshop-sidebar-open',
     'theme-switcher-option-active',
     'theme-switcher-option-compact',
     'dark-mode-toggle-option-active',

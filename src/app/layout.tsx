@@ -5,7 +5,7 @@ import {
   DM_Sans,
 } from 'next/font/google';
 import './globals.css';
-import './workshop.css';
+import './app-shell.css';
 import './wizard.css';
 import './dashboard.css';
 import './about.css';

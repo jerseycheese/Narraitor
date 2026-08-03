@@ -1,18 +1,8 @@
-/* Surface roots mount/unmount when the route crosses surface modes (default ↔
- * workshop ↔ manuscript) in AppSurfaceShell, so a fade on mount smooths the
- * otherwise-jarring top-nav→sidebar snap (#1432 F7) without firing on
- * same-surface navigation. Disabled under reduced-motion. */
-@keyframes surface-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.app-surface-default {
+.app-surface-app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background: var(--color-canvas);
-  animation: surface-fade-in 180ms ease;
 }
 
 .app-surface-manuscript {
@@ -22,12 +12,12 @@
   background: var(--color-canvas);
 }
 
-.default-surface-main {
+.app-surface-main {
   flex: 1;
   min-height: 0;
 }
 
-.default-surface-inner {
+.app-surface-inner {
   box-sizing: border-box;
   width: 100%;
   max-width: var(--content-max-width);
@@ -230,469 +220,40 @@
   }
 }
 
-.app-surface-workshop {
-  display: flex;
-  min-height: 100vh;
-  background: var(--color-canvas);
-  position: relative;
-  animation: surface-fade-in 180ms ease;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-surface-default,
-  .app-surface-workshop {
-    animation: none;
-  }
-}
-
-.workshop-sidebar {
-  width: 18rem;
-  min-width: 18rem;
-  height: 100vh;
-  overflow-y: auto;
-  position: sticky;
-  top: 0;
-  background: var(--color-surface-hover);
-  border-right: 1px solid var(--color-border);
-  z-index: 30;
-}
-
-.workshop-sidebar-nav {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-4) var(--space-3);
-}
-
-.workshop-sidebar-brand-row {
-  padding: 0 var(--space-1) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.workshop-sidebar-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  text-decoration: none;
-  color: var(--color-text-primary);
-}
-
-.workshop-sidebar-primary {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.workshop-sidebar-primary-link {
-  display: block;
-  padding: var(--space-2) var(--space-3);
-  font-family: var(--font-interface);
-  font-size: 0.95rem;
-  letter-spacing: 0.01em;
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  border-left: 2px solid transparent;
-  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
-}
-
-.workshop-sidebar-primary-link:hover {
-  color: var(--color-text-primary);
-}
-
-.workshop-sidebar-primary-link:focus-visible {
-  color: var(--color-text-primary);
-  outline: 2px solid var(--color-accent);
-  outline-offset: -2px;
-}
-
-.workshop-sidebar-primary-link[data-active="true"] {
-  color: var(--color-text-primary);
-  border-left-color: var(--color-accent);
-  background: var(--color-accent-soft);
-}
-
-.workshop-sidebar-worlds-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.workshop-sidebar-section-label {
-  margin: 0;
-  padding: 0 var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.workshop-sidebar-worlds-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.workshop-sidebar-world-item {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: var(--space-2) var(--space-2);
-  width: 100%;
-  min-height: auto;
-  padding: var(--space-2) var(--space-3);
-  text-align: left;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-}
-
-.workshop-sidebar-world-item[data-active="true"] {
-  background: var(--color-surface);
-  border-color: var(--color-border);
-}
-
-.workshop-sidebar-world-name {
-  grid-column: 1;
-  font-family: var(--font-narrative);
-  font-size: 0.95rem;
-  line-height: 1.2;
-  color: var(--color-text-primary);
-
-  /* grid items need min-width: 0 to allow text-overflow: ellipsis to work */
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.workshop-sidebar-world-meta {
-  grid-column: 1;
-  font-family: var(--font-system);
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  color: var(--color-text-muted);
-}
-
-.workshop-sidebar-world-item svg {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: center;
-  color: var(--color-accent);
-}
-
-.workshop-sidebar-spacer {
-  flex: 1 1 auto;
-  min-height: var(--space-2);
-}
-
-.workshop-sidebar-toolbar {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-1);
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface-hover);
-
-  /* Pin the toolbar to the bottom of the rail when the world list overflows the viewport. */
-  position: sticky;
-  bottom: 0;
-}
-
-.workshop-sidebar-toolbar > * {
-  flex-shrink: 0;
-}
-
-/* ─── DS3 — Mechanical Manuscript: dense dotted control rail ───
-   Condensed entries, monospace eyebrow labels with a bullet, dotted
-   rules in place of solid borders, and a high-contrast filled active
-   nav state. The world switcher tightens into a compact status
-   readout — dense rows with a dotted active frame. */
-
-:root .workshop-sidebar-nav {
-  gap: var(--space-3);
-}
-
-:root .workshop-sidebar-brand-row {
-  position: relative;
-  padding-bottom: var(--space-2);
-  border-bottom: none;
-}
-
-:root .workshop-sidebar-brand-row::after {
-  content: "";
-  position: absolute;
-  left: var(--space-1);
-  right: var(--space-1);
-  bottom: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-border-strong) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.7;
-}
-
-:root .workshop-sidebar-primary-link {
-  padding: var(--space-1) var(--space-2);
-  border-left: none;
-  font-family: var(--font-system);
-  font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-:root .workshop-sidebar-primary-link[data-active="true"] {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-}
-
-:root .workshop-sidebar-section-label {
-  position: relative;
-  padding-bottom: var(--space-2);
-}
-
-:root .workshop-sidebar-section-label::before {
-  content: "";
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
-  margin-right: var(--space-1);
-  flex-shrink: 0;
-  vertical-align: middle;
-}
-
-:root .workshop-sidebar-section-label::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-border-strong) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
-}
-
-:root .workshop-sidebar-worlds-list {
-  gap: 0;
-}
-
-:root .workshop-sidebar-world-item {
-  gap: 0 var(--space-2);
-  padding: var(--space-1) var(--space-2);
-  border-style: dotted;
-  border-color: transparent;
-  border-radius: 0;
-}
-
-:root .workshop-sidebar-world-item[data-active="true"] {
-  background: var(--color-accent-soft);
-  border-style: dotted;
-  border-color: var(--color-accent);
-}
-
-:root .workshop-sidebar-world-name {
-  font-size: 0.875rem;
-}
-
-:root .workshop-sidebar-world-meta {
-  font-size: 0.65rem;
-}
-
-.workshop-workspace {
-  flex: 1;
-  min-width: 0;
-  background: var(--color-surface);
-  display: flex;
-  flex-direction: column;
-}
-
-.workshop-context-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  padding: var(--space-3) var(--space-5);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.workshop-context-header-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-width: 0;
-}
-
-.workshop-context-header-right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.workshop-context-header-mobile-trigger {
-  display: none;
-}
-
-.workshop-context-header-mobile-title {
-  display: none;
-  margin: 0;
-  font-family: var(--font-system);
-  font-size: 0.875rem;
-  letter-spacing: 0.04em;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-}
-
-.workshop-workspace-main {
-  /* Fill the remaining workspace height after the sticky context header rather
-   * than forcing a fresh 100vh — stacking 100vh on top of the header overflowed
-   * the viewport and left a tall empty surface panel on short pages (#1432 F57). */
-  flex: 1;
-  min-height: 0;
-}
-
-.workshop-workspace-inner {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 1024px;
-  margin: 0 auto;
-  padding: var(--space-4);
-}
-
-.app-surface-workshop h1,
-.app-surface-default h1 {
+.app-surface-app h1 {
   font-family: var(--font-interface);
   font-size: 2rem;
   line-height: 1.2;
 }
 
-.app-surface-workshop h2,
-.app-surface-default h2 {
+.app-surface-app h2 {
   font-family: var(--font-interface);
   font-size: 1.5rem;
   line-height: 1.25;
 }
 
-.app-surface-workshop h3,
-.app-surface-default h3 {
+.app-surface-app h3 {
   font-family: var(--font-interface);
   font-size: 1.125rem;
   line-height: 1.35;
 }
 
-.workshop-sidebar-backdrop {
-  display: none;
-}
-
+/* The content gutter steps with the viewport and is mirrored by
+   `.header-nav-inner` and `.breadcrumbs-inner` so every band shares a left edge. */
 @media (width < 768px) {
-  .default-surface-inner {
+  .app-surface-inner {
     padding: var(--space-3);
   }
 }
 
-/* Workshop drawer boundary is `<= 768px` (not `< 768px`) so exactly 768px —
-   iPad Mini portrait — gets the drawer shell, matching the header hamburger's
-   `<= 768px` boundary (#1381). With the old `< 768px` gate the desktop shell
-   survived at exactly 768px: the 18rem rail pinned next to a 479px workspace
-   and the breadcrumb trail wrapped the sticky header to 144px tall (#1540).
-   `.default-surface-inner` stays in the `< 768px` block above — its gutter is
-   synced with `.header-nav-inner`'s space-3 (<768) / space-4 (768-1024) map. */
-@media (width <= 768px) {
-  .app-surface-workshop {
-    display: block;
-  }
-
-  .workshop-sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-    width: 85vw;
-    max-width: 20rem;
-    min-width: 0;
-    transform: translateX(-100%);
-    transition: transform 150ms ease;
-    z-index: 40;
-  }
-
-  .workshop-sidebar.workshop-sidebar-open {
-    transform: translateX(0);
-  }
-
-  .workshop-sidebar-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    background: var(--color-scrim);
-    z-index: 35;
-  }
-
-  .workshop-context-header {
-    padding: var(--space-3) var(--space-4);
-  }
-
-  .workshop-context-header-mobile-trigger,
-  .workshop-context-header-mobile-title {
-    display: inline-flex;
-  }
-
-  .workshop-context-header-mobile-title {
-    display: block;
-  }
-
-  /* Descendant selector needed for specificity: a generic .breadcrumbs-nav { display: flex } rule defined later in this file would otherwise win. */
-  .workshop-context-header .workshop-context-header-breadcrumbs,
-  .workshop-context-header .workshop-context-header-recent {
-    display: none;
-  }
-
-  /* Drop the secondary help icon on mobile too (alongside breadcrumbs + recent)
-     so the "Workshop" title and the primary CTA no longer collide under
-     space-between at narrow widths (<= ~415px). */
-  .workshop-context-header .tutorial-menu {
-    display: none;
-  }
-
-  .workshop-workspace-main {
-    min-height: calc(100vh - 3.5rem);
-  }
-
-  .workshop-workspace-inner {
-    width: 100%;
-  }
-}
-
 @media (width >= 1024px) {
-  .default-surface-inner {
+  .app-surface-inner {
     padding: var(--space-6);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Header Navigation (non-workshop routes)
+   Header Navigation (the app surface's only chrome)
    ═══════════════════════════════════════════════════════════════ */
 
 .header-nav {
@@ -716,7 +277,7 @@
 }
 
 /* Match the page-content gutter at each breakpoint so the logo lines up with
-   the page's left edge and the CTA with its right edge. default-surface-inner
+   the page's left edge and the CTA with its right edge. app-surface-inner
    uses space-3 (<768), space-4 (768-1024), space-6 (>=1024). */
 @media (width < 768px) {
   .header-nav-inner {
@@ -861,15 +422,6 @@
   display: inline-flex;
 }
 
-/* In the workshop rail the trigger sits at the bottom-left, so the default
-   top-right dropdown placement clips off the bottom and left edges. Flip it to
-   open upward and align to the trigger's left edge. */
-.workshop-sidebar-toolbar .theme-menu .header-dropdown-menu {
-  inset: auto auto 100% 0;
-  margin-top: 0;
-  margin-bottom: var(--space-1);
-}
-
 .header-dropdown-trigger {
   display: inline-flex;
   align-items: center;
@@ -938,6 +490,20 @@
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-2) var(--space-4);
+}
+
+/* Match the header's and content column's gutter map so all three bands share a
+   left edge. Matters more now that breadcrumbs reach every detail route (#1655). */
+@media (width < 768px) {
+  .breadcrumbs-inner {
+    padding-inline: var(--space-3);
+  }
+}
+
+@media (width >= 1024px) {
+  .breadcrumbs-inner {
+    padding-inline: var(--space-6);
+  }
 }
 
 .breadcrumbs-nav {
@@ -1644,15 +1210,12 @@
   color: var(--color-text-primary);
 }
 
-/* The section title became an <h2> for correct heading order (#1473). On the
-   default/workshop surfaces the .app-surface-* rules set line-height per tag
-   (h2 1.25 vs h3 1.35), so without this the section would shift vertically.
-   Scope the pin to those surfaces only — the manuscript surface (play/ending)
-   has no per-tag rules, so pinning there would over-apply and shift it instead. */
-.app-surface-default
-  .component-collapsible-section
-  [data-testid="collapsible-section-title"],
-.app-surface-workshop
+/* The section title became an <h2> for correct heading order (#1473). On the app
+   surface the .app-surface-app rules set line-height per tag (h2 1.25 vs h3
+   1.35), so without this the section would shift vertically. Scope the pin to
+   that surface only — the manuscript surface (play/ending) has no per-tag rules,
+   so pinning there would over-apply and shift it instead. */
+.app-surface-app
   .component-collapsible-section
   [data-testid="collapsible-section-title"] {
   line-height: 1.35;
@@ -1800,7 +1363,10 @@
   font-family: var(--font-interface);
   font-size: 1rem;
   color: var(--color-text-secondary);
-  max-width: 48rem;
+
+  /* Prose keeps its measure while the tables and grids beside it use the full
+     column, which widened when the workshop rail went away (#1655). */
+  max-width: 70ch;
 }
 
 :root .page-layout-header {
