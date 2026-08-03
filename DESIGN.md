@@ -193,9 +193,26 @@ The full scale is `--space-0_5` through `--space-8` in [_shared-tokens.css](src/
 
 ### Layout rules
 
-- **Page max-width** is `1280px` for general content; narrative content tightens further to `56rem`.
+- **Page max-width** is `--content-max-width` (`1200px`) for general content; narrative content tightens further to `56rem`.
 - **Game session viewport** is fixed-position, full-viewport, with internal layout governed by [src/styles/manuscript-session.css](src/styles/manuscript-session.css). Don't apply page-level spacing to game-session screens.
 - **Mobile breakpoints**: `640px` (sm), `768px` (md), `1024px` (lg), `1280px` (xl). Mobile-specific layout bugs from the DS migration (#1139, #1143, #1148, #1150) are resolved.
+
+## Surfaces
+
+There are two, and only two. `getSurfaceMode()` in [src/lib/routing/surfaceMode.ts](src/lib/routing/surfaceMode.ts) is the single source of truth for which one a route lands on.
+
+**App** — everything you do *about* a story: browsing and building worlds, making characters, changing settings, the dashboard, and the public pages. It carries one sticky header (brand, the three nav links, appearance/help/recent, the world switcher, and at most one contextual CTA), a breadcrumb band on nested routes, and a centered `1200px` content column. Below `768px` the header's controls collapse into a single modal drawer.
+
+**Manuscript** — reading and playing a story. `/play*` and `/worlds/{id}/play*`. No chrome at all. The prose is the interface.
+
+Rules that hold across both:
+
+- **Prose caps at `70ch`.** Tables, grids, and cards use the full column; paragraphs don't stretch with them.
+- **One contextual CTA, suppressed where the page owns the action.** A screen that already has a Play button doesn't get a second one in the header.
+- **Breadcrumbs are for nested routes.** `/`, `/dashboard`, `/worlds`, `/characters`, and `/settings` are top-level destinations and suppress them.
+- Canon is the `04-Templates/layouts/AppShell` story, which shows the four header states side by side.
+
+This collapsed a three-surface split (#1655). The retired third surface — a 288px "workshop" rail on `/worlds*`, `/characters*`, and `/settings*` — existed so three design systems could feel like three products; ADR-013 deleted two of them. It reverses [#1432](https://github.com/jerseycheese/Narraitor/issues/1432) F7, which kept the rail on differentiation grounds that no longer apply, and supersedes the archived Workshop layout pattern in `public_docs/design-system/archive/redesign-planning/design-system.html`.
 
 ## Elevation & Depth
 
@@ -270,6 +287,7 @@ The don'ts here come from real failures during the design-system migration. They
 - **Don't add per-world theming.** DS3 is fixed, not genre-driven, and was never meant to flex per world. Adding a `world.theme` field is scope creep with no demand.
 - **Don't write new color tokens for one-off shades.** If a shade is needed once, it doesn't deserve a token. If it's needed twice, the existing token is probably the right answer.
 - **Don't use drop shadows for general elevation.** Borders and tonal contrast first; shadows only for modals, drawers, and dropdowns.
+- **Don't introduce a third chrome.** A new page picks app or manuscript. The last time a surface was added to differentiate one part of the product, the two shells drifted until the same three links looked like two different apps (#1655).
 
 ### Do's
 
