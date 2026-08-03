@@ -564,7 +564,14 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: var(--color-surface);
+
+  /* --color-surface is 80% alpha (paper over canvas). Everywhere else there's an
+     opaque canvas behind it; a full-viewport drawer has the page instead, so it
+     read as see-through. Stack the two layers to keep the intended tone opaque.
+     Mattered less when this drawer served 6 routes; it serves all of them
+     now (#1655). */
+  background: linear-gradient(var(--color-surface), var(--color-surface)),
+    var(--color-canvas);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
