@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { HeaderNavigation } from '../HeaderNavigation';
-import { SidebarNavigation } from '../SidebarNavigation';
 
 // Mock next/navigation
 const mockPush = jest.fn();
@@ -172,38 +171,6 @@ describe('HeaderNavigation', () => {
       expect(
         screen.getByRole('button', { name: 'Appearance' })
       ).toBeInTheDocument();
-    });
-  });
-
-  describe('SidebarNavigation', () => {
-    it('renders core workshop navigation affordances', () => {
-      render(<SidebarNavigation />);
-
-      expect(
-        screen.getByRole('navigation', { name: 'Workshop navigation' })
-      ).toBeInTheDocument();
-      expect(screen.getByText('Worlds')).toBeInTheDocument();
-      expect(screen.getByText('Characters')).toBeInTheDocument();
-      expect(screen.getByText('Settings')).toBeInTheDocument();
-    });
-
-    it('renders the appearance menu in the sidebar bottom toolbar', () => {
-      render(<SidebarNavigation />);
-
-      const appearance = screen.getByRole('button', { name: 'Appearance' });
-      expect(appearance).toBeInTheDocument();
-      expect(appearance.closest('.workshop-sidebar-toolbar')).not.toBeNull();
-    });
-
-    it('does not render the contextual CTA inside the rail (it lives in the workspace header on desktop)', () => {
-      render(<SidebarNavigation />);
-
-      // Without seeded worlds the CTA on default surface would be "Create Your First World".
-      // The drafting-rail design moves all contextual CTAs into the workspace header,
-      // not the rail itself. Sidebar must not render any of these labels.
-      expect(screen.queryByText('Create Your First World')).not.toBeInTheDocument();
-      expect(screen.queryByText('Browse Worlds')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /^Play$/i })).not.toBeInTheDocument();
     });
   });
 });

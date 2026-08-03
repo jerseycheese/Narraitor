@@ -1,13 +1,13 @@
-export type SurfaceMode = 'default' | 'workshop' | 'manuscript';
+export type SurfaceMode = 'app' | 'manuscript';
 
 /**
  * Returns the top-level surface mode for a route path.
- * This is used to select between default, workshop, and manuscript shells.
+ * Two surfaces (#1655): the chrome-free manuscript for play, and app chrome
+ * everywhere else. See DESIGN.md "Surfaces".
  */
 export function getSurfaceMode(pathname: string): SurfaceMode {
   const normalizedPath = normalizePath(pathname);
 
-  // Manuscript routes
   if (
     normalizedPath === '/play' ||
     normalizedPath.startsWith('/play/') ||
@@ -16,16 +16,7 @@ export function getSurfaceMode(pathname: string): SurfaceMode {
     return 'manuscript';
   }
 
-  // Workshop routes
-  if (
-    /^\/worlds(?:\/.*)?$/.test(normalizedPath) ||
-    /^\/characters(?:\/.*)?$/.test(normalizedPath) ||
-    /^\/settings(?:\/.*)?$/.test(normalizedPath)
-  ) {
-    return 'workshop';
-  }
-
-  return 'default';
+  return 'app';
 }
 
 function normalizePath(pathname: string): string {

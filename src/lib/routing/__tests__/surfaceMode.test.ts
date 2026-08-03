@@ -12,8 +12,13 @@ describe('getSurfaceMode', () => {
     });
   });
 
-  describe('workshop routes', () => {
+  describe('app routes', () => {
     test.each([
+      '/',
+      '/about',
+      '/dashboard',
+      '/dev',
+      '/dev/game-session',
       '/worlds',
       '/worlds/create',
       '/worlds/world-123',
@@ -23,38 +28,29 @@ describe('getSurfaceMode', () => {
       '/characters/char-123',
       '/characters/char-123/edit',
       '/settings',
-    ])('returns workshop for %s', (path) => {
-      expect(getSurfaceMode(path)).toBe('workshop');
+    ])('returns app for %s', (path) => {
+      expect(getSurfaceMode(path)).toBe('app');
     });
   });
 
-  describe('default routes', () => {
-    test.each(['/', '/about', '/dev', '/dev/game-session'])(
-      'returns default for %s',
-      (path) => {
-        expect(getSurfaceMode(path)).toBe('default');
-      }
-    );
-  });
-
   test('normalizes missing leading slash and trailing slash', () => {
-    expect(getSurfaceMode('worlds')).toBe('workshop');
-    expect(getSurfaceMode('/worlds/')).toBe('workshop');
+    expect(getSurfaceMode('worlds')).toBe('app');
+    expect(getSurfaceMode('/worlds/')).toBe('app');
   });
 
   test.each([
-    ['/worlds?view=grid', 'workshop'],
-    ['/settings#theme', 'workshop'],
-    ['/characters/create?from=home#step-2', 'workshop'],
+    ['/worlds?view=grid', 'app'],
+    ['/settings#theme', 'app'],
+    ['/characters/create?from=home#step-2', 'app'],
     ['/play?resume=true', 'manuscript'],
   ])('ignores query params and hash fragments for %s', (path, expected) => {
     expect(getSurfaceMode(path)).toBe(expected);
   });
 
   test.each(['', '?view=grid', '#theme'])(
-    'treats empty or fragment-only input as default route for %s',
+    'treats empty or fragment-only input as an app route for %s',
     (path) => {
-      expect(getSurfaceMode(path)).toBe('default');
+      expect(getSurfaceMode(path)).toBe('app');
     }
   );
 });
