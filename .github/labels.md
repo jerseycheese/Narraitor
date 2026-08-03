@@ -9,6 +9,7 @@ This file documents the labels used in the Narraitor repository. You can use a t
 - `user-story` - New feature described from a user's perspective
 - `epic` - Large feature that contains multiple user stories
 - `documentation` - Improvements or additions to documentation
+- `technical-debt` - Dead code, overengineering, or another code-health finding
 
 ## Domain Labels
 
@@ -83,6 +84,7 @@ For consistent visual styling, use these hex colors for labels:
 - User Story: `#0075ca` (blue)
 - Epic: `#6f42c1` (purple)
 - Documentation: `#0075ca` (blue)
+- Technical Debt: `#a2eeef` (cyan)
 - Domain labels: `#5319e7` (purple)
 - Priority labels: `#f9d0c4` (salmon)
 - Complexity labels: `#bfd4f2` (light blue)
