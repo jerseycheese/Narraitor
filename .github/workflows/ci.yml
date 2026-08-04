@@ -176,6 +176,39 @@ jobs:
       - name: Run CSS audit
         run: npm run audit:css
 
+  docs-check:
+    name: Docs Check
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # Blocking: a relative link or anchor either resolves or it doesn't --
+      # no judgment call, so unlike the symbol check below it's safe to gate
+      # (#1651, follow-up to the #1638 docs correctness sweep).
+      - name: Check internal doc links
+        run: npm run docs:check-links
+
+      # Advisory prototype, not a gate: whether a backticked span is a code
+      # reference or plain English is a judgment call, so this exits 0 on
+      # findings (same failure ergonomics as `audit-css` above) and prints a
+      # worklist instead. Review the output and expand the tolerance list in
+      # scripts/check-docs-symbols.mjs as false positives show up.
+      - name: Check doc symbol references (advisory)
+        run: npm run docs:check-symbols
+
   test:
     name: Unit & Integration Tests
     runs-on: ubuntu-latest
