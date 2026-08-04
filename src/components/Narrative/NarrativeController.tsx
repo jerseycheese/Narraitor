@@ -496,8 +496,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onNarrativeGenerated(newSegment);
       }
 
-      // Check for ending indicators
-      await checkForEndingIndicators(newSegment);
+      // Check for ending indicators. Deferred off the per-turn path: it's
+      // an extra Gemini round-trip that only feeds onEndingSuggested, which
+      // choice generation below doesn't wait on.
+      void checkForEndingIndicators(newSegment);
 
       // Generate choices if enabled - skip when this segment already ends the session
       if (generateChoices && !isSessionEndingSegment(newSegment)) {
@@ -767,8 +769,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         );
       }
 
-      // Check for ending indicators
-      await checkForEndingIndicators(newSegment);
+      // Check for ending indicators. Deferred off the per-turn path: it's
+      // an extra Gemini round-trip that only feeds onEndingSuggested, which
+      // choice generation below doesn't wait on.
+      void checkForEndingIndicators(newSegment);
 
       // Generate choices if enabled - skip when the session is ending
       // (fatal/ending segment or a fatal critical-decision failure).
