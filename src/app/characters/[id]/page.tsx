@@ -59,7 +59,7 @@ export default function CharacterViewPage() {
     {
       label: 'Edit Character',
       onClick: () => router.push(`/characters/${characterId}/edit`),
-      variant: 'primary' as const,
+      variant: 'secondary' as const,
       icon: <Pencil aria-hidden="true" />,
     },
     {
@@ -74,7 +74,7 @@ export default function CharacterViewPage() {
     {
       label: 'Delete Character',
       onClick: () => setShowDeleteDialog(true),
-      variant: 'danger' as const,
+      variant: 'danger-outline' as const,
       icon: <Trash aria-hidden="true" />,
     },
   ];
@@ -87,8 +87,8 @@ export default function CharacterViewPage() {
         <ActionButtonGroup 
           actions={actionButtons.map(btn => ({
             ...btn,
-            flex: btn.variant === 'primary' || btn.variant === 'success'
-          }))} 
+            flex: btn.variant === 'success'
+          }))}
           layout="horizontal" 
           gap="sm" 
         />

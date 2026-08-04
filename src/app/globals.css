@@ -256,6 +256,20 @@ body > * {
   color: var(--color-text-inverse);
 }
 
+/* Variant: destructive-outline (demoted danger action — color carries the
+ * warning, fill stays reserved for the confirmation dialog's confirm button) */
+.button-destructive-outline {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+
+.button-destructive-outline:hover {
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  border-color: var(--color-danger-hover);
+  color: var(--color-danger-hover);
+}
+
 /* Variant: success */
 .button-success {
   background: var(--color-success);
