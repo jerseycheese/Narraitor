@@ -204,7 +204,7 @@ test.describe('Character roster context', () => {
     await expect(cards).toHaveCount(2);
 
     // DS3's roster card deliberately hides the recent-event/connections blurb
-    // (workshop.css: `.character-card-recent`/`.character-card-connections`
+    // (app-shell.css: `.character-card-recent`/`.character-card-connections`
     // { display: none }, pre-existing, not a DS3-specific bug) to keep the
     // compact list dense. This test's job is the content pipeline -- that the
     // seeded major event and cross-character reference actually reach the

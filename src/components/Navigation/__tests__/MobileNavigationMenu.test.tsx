@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MobileNavigationMenu } from '../MobileNavigationMenu';
 
 jest.mock('next/navigation', () => ({
@@ -38,5 +38,42 @@ describe('MobileNavigationMenu', () => {
 
     expect(screen.getByTestId('theme-menu')).toBeInTheDocument();
     expect(screen.getByTestId('tutorial-menu')).toBeInTheDocument();
+  });
+
+  it('is a modal dialog so assistive tech knows the page behind it is inert (#1655)', () => {
+    render(
+      <MobileNavigationMenu
+        isOpen={true}
+        onClose={jest.fn()}
+        onNavigate={jest.fn()}
+      />
+    );
+
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
+    expect(
+      screen.getByRole('navigation', { name: 'Mobile navigation' })
+    ).toBeInTheDocument();
+  });
+
+  it('traps Tab inside the drawer', () => {
+    render(
+      <MobileNavigationMenu
+        isOpen={true}
+        onClose={jest.fn()}
+        onNavigate={jest.fn()}
+      />
+    );
+
+    const dialog = screen.getByRole('dialog');
+    const focusable = Array.from(dialog.querySelectorAll('button'));
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    last.focus();
+    fireEvent.keyDown(dialog, { key: 'Tab' });
+    expect(document.activeElement).toBe(first);
+
+    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(last);
   });
 });

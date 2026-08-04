@@ -12,7 +12,7 @@ import { TutorialProvider } from '../src/components/TutorialProvider/TutorialPro
 import { handlers } from './msw/handlers';
 
 import '../src/app/globals.css';
-import '../src/app/workshop.css';
+import '../src/app/app-shell.css';
 import '../src/app/wizard.css';
 import '../src/app/dashboard.css';
 import '../src/app/badge.css';

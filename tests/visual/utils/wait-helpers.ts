@@ -258,35 +258,18 @@ export async function hideNextDevOverlay(page: Page): Promise<void> {
 }
 
 /**
- * Pin the sticky app shell (workshop sidebar + page header) into normal flow.
- * Without this, locator and fullPage screenshots of tall pages get the sticky
- * header overlaid mid-content, since the header sticks at its viewport position
- * relative to where the locator was scrolled. Mirrors the shell-pinning step in
- * world-creation.spec.ts captureWizardStep.
+ * Pin the sticky page header into normal flow. Without this, locator and
+ * fullPage screenshots of tall pages get the sticky header overlaid mid-content,
+ * since it sticks at its viewport position relative to where the locator was
+ * scrolled. Mirrors the shell-pinning step in world-creation.spec.ts
+ * captureWizardStep.
  *
- * At mobile width the workshop sidebar is a fixed off-canvas drawer rather than
- * the sticky side column it is on desktop. Pinning that drawer into flow drops a
- * full-viewport-tall blank block above the page content, so hide it for the
- * capture — a closed drawer isn't part of the visible mobile layout. Desktop
- * keeps the column pinned so a tall page's header doesn't overlay mid-content.
+ * The mobile drawer needs no handling: it unmounts when closed (#1655).
  */
 export async function pinAppShell(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    window.scrollTo(0, 0);
-    const sidebar = document.querySelector('.workshop-sidebar') as HTMLElement | null;
-    if (sidebar && getComputedStyle(sidebar).position === 'fixed') {
-      sidebar.style.setProperty('display', 'none', 'important');
-    }
-  });
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.addStyleTag({
     content: `
-      .workshop-sidebar {
-        position: static !important;
-        height: auto !important;
-        min-height: 100vh !important;
-        max-height: none !important;
-        overflow: visible !important;
-      }
       header {
         position: static !important;
       }

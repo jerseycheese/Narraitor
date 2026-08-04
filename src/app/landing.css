@@ -60,9 +60,9 @@
   color: var(--color-accent);
 }
 
-/* Scoped (.component-landing prefix) to outrank the default-surface h1
-   baseline in workshop.css (.app-surface-default h1) — the hero title is
-   deliberately a large display heading, not the 2rem surface default. */
+/* Scoped (.component-landing prefix) to outrank the app-surface h1 baseline in
+   app-shell.css (.app-surface-app h1) — the hero title is deliberately a large
+   display heading, not the 2rem surface default. */
 .component-landing .component-landing-title {
   margin: 0;
   font-family: var(--font-narrative);

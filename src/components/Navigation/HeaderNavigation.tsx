@@ -31,8 +31,34 @@ const RecentPagesDropdown = dynamic(
   { ssr: false }
 );
 
+// Routes that own the play/create action inline, where a header CTA would just
+// duplicate it. Extends the suppression the retired workshop header applied to
+// /worlds alone; this is the double-Play fix (#1655).
+// Routes that own the play or create action inline. Their own control is the
+// better one — the roster's Play sets the character before routing, where the
+// header's only sets the world — and both land on the same play URL.
+const CTA_SUPPRESSED_ROUTES: readonly RegExp[] = [
+  /^\/worlds$/,
+  /^\/worlds\/create$/,
+  /^\/worlds\/[^/]+$/,
+  /^\/worlds\/[^/]+\/edit$/,
+  /^\/characters$/,
+  /^\/characters\/create$/,
+  /^\/characters\/[^/]+$/,
+];
+
+// Top-level destinations orient on their own. Exact match, not a prefix, or
+// /settings/providers and the detail routes lose the breadcrumbs they need.
+const BREADCRUMB_SUPPRESSED_ROUTES = new Set([
+  '/',
+  '/dashboard',
+  '/worlds',
+  '/characters',
+  '/settings',
+]);
+
 /**
- * HeaderNavigation - Default top navigation for non-workshop routes.
+ * HeaderNavigation - the app surface's only chrome (#1655).
  */
 export function HeaderNavigation() {
   const {
@@ -52,8 +78,7 @@ export function HeaderNavigation() {
   const [mounted, setMounted] = useState(false);
 
   const hasWorlds = mounted && hasWorldsStore;
-  const shouldShowBreadcrumbs =
-    pathname !== '/' && pathname !== '/dashboard' && pathname !== '/worlds';
+  const shouldShowBreadcrumbs = !BREADCRUMB_SUPPRESSED_ROUTES.has(pathname);
   // Public context (no local worlds yet) brands to the landing page at /;
   // once this browser has app state, the brand is a home link to /dashboard
   // so app users aren't sent back to the marketing front door (#1528).
@@ -105,7 +130,11 @@ export function HeaderNavigation() {
     navigateWithLoading(`/worlds/${worldId}`, `Loading ${worldName}...`);
   };
 
-  const cta = currentWorld ? (
+  const suppressCta = CTA_SUPPRESSED_ROUTES.some((route) =>
+    route.test(pathname)
+  );
+
+  const cta = suppressCta ? null : currentWorld ? (
     <Button
       type="button"
       onClick={() =>
@@ -114,7 +143,7 @@ export function HeaderNavigation() {
           `Starting ${currentWorld.name}...`
         )
       }
-      variant="default"
+      variant="success"
     >
       <Play aria-hidden="true" />
       Play
@@ -126,6 +155,7 @@ export function HeaderNavigation() {
         navigateWithLoading('/worlds/create', 'Setting up world creation...')
       }
     >
+      <Plus aria-hidden="true" />
       Create Your First World
     </Button>
   ) : null;
@@ -204,7 +234,7 @@ export function HeaderNavigation() {
                         className={`${headerDropdownTriggerClass} header-world-trigger${currentWorld ? ' header-world-trigger-active' : ''}`}
                       >
                         <Globe aria-hidden="true" />
-                        <span>
+                        <span className="header-world-name">
                           {currentWorld ? currentWorld.name : 'Select World'}
                         </span>
                         {currentWorld && worldCharacterCount > 0 && (
@@ -246,7 +276,7 @@ export function HeaderNavigation() {
 
                           <div className={headerDropdownDividerClass}>
                             <Link
-                              href="/worlds"
+                              href="/worlds/create"
                               className={headerDropdownItemClass}
                               onClick={() => setShowWorldSwitcher(false)}
                             >

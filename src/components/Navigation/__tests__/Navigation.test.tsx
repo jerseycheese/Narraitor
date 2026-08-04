@@ -1,20 +1,24 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { HeaderNavigation } from '../HeaderNavigation';
-import { SidebarNavigation } from '../SidebarNavigation';
 
 // Mock next/navigation
 const mockPush = jest.fn();
+let mockPathname = '/worlds';
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
-    pathname: '/worlds',
+    pathname: mockPathname,
   }),
-  usePathname: () => '/worlds',
+  usePathname: () => mockPathname,
 }));
 
 // Mock stores - will be modified in tests
-const mockWorldStore = {
+const mockWorldStore: {
+  worlds: Record<string, { id: string; name: string; genre?: string }>;
+  currentWorldId: string | null;
+  setCurrentWorld: jest.Mock;
+} = {
   worlds: {},
   currentWorldId: null,
   setCurrentWorld: jest.fn(),
@@ -91,6 +95,9 @@ jest.mock('@/lib/theme', () => ({
 describe('HeaderNavigation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPathname = '/worlds';
+    mockWorldStore.worlds = {};
+    mockWorldStore.currentWorldId = null;
     // Reset viewport to desktop
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -175,35 +182,63 @@ describe('HeaderNavigation', () => {
     });
   });
 
-  describe('SidebarNavigation', () => {
-    it('renders core workshop navigation affordances', () => {
-      render(<SidebarNavigation />);
+  describe('Contextual CTA (#1655)', () => {
+    const seedActiveWorld = () => {
+      mockWorldStore.worlds = {
+        'world-1': { id: 'world-1', name: 'Test World', genre: 'fantasy' },
+      };
+      mockWorldStore.currentWorldId = 'world-1';
+    };
 
-      expect(
-        screen.getByRole('navigation', { name: 'Workshop navigation' })
-      ).toBeInTheDocument();
-      expect(screen.getByText('Worlds')).toBeInTheDocument();
-      expect(screen.getByText('Characters')).toBeInTheDocument();
-      expect(screen.getByText('Settings')).toBeInTheDocument();
+    it('renders Play in the success variant so it matches every other Play control', () => {
+      mockPathname = '/dashboard';
+      seedActiveWorld();
+
+      render(<HeaderNavigation />);
+
+      expect(screen.getByRole('button', { name: /^Play$/ })).toHaveClass(
+        'button-success'
+      );
     });
 
-    it('renders the appearance menu in the sidebar bottom toolbar', () => {
-      render(<SidebarNavigation />);
+    // Every route that renders its own play control: /worlds/[id] ("Play in
+    // World"), /characters (per-card Play), /characters/[id] ("Play with
+    // Character"). All three land on the same play URL as the header's Play.
+    it.each([
+      '/worlds',
+      '/worlds/world-1',
+      '/characters',
+      '/characters/char-1',
+    ])(
+      'suppresses the CTA on %s, which owns the action inline',
+      (pathname) => {
+        mockPathname = pathname;
+        seedActiveWorld();
 
-      const appearance = screen.getByRole('button', { name: 'Appearance' });
-      expect(appearance).toBeInTheDocument();
-      expect(appearance.closest('.workshop-sidebar-toolbar')).not.toBeNull();
+        render(<HeaderNavigation />);
+
+        expect(
+          screen.queryByRole('button', { name: /^Play$/ })
+        ).not.toBeInTheDocument();
+      }
+    );
+  });
+
+  describe('Breadcrumb suppression (#1655)', () => {
+    it('hides breadcrumbs on top-level destinations', () => {
+      mockPathname = '/characters';
+
+      render(<HeaderNavigation />);
+
+      expect(screen.queryByTestId('breadcrumbs')).not.toBeInTheDocument();
     });
 
-    it('does not render the contextual CTA inside the rail (it lives in the workspace header on desktop)', () => {
-      render(<SidebarNavigation />);
+    it('keeps breadcrumbs on nested routes', () => {
+      mockPathname = '/settings/providers';
 
-      // Without seeded worlds the CTA on default surface would be "Create Your First World".
-      // The drafting-rail design moves all contextual CTAs into the workspace header,
-      // not the rail itself. Sidebar must not render any of these labels.
-      expect(screen.queryByText('Create Your First World')).not.toBeInTheDocument();
-      expect(screen.queryByText('Browse Worlds')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /^Play$/i })).not.toBeInTheDocument();
+      render(<HeaderNavigation />);
+
+      expect(screen.getAllByTestId('breadcrumbs').length).toBeGreaterThan(0);
     });
   });
 });

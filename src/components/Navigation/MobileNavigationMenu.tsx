@@ -12,6 +12,11 @@ import { X, Globe, User, Settings, Check, Play, Plus } from 'lucide-react';
 
 const SWIPE_THRESHOLD = 100;
 
+// Deliberately simple: jsdom reports offsetParent as null for everything, so a
+// visibility filter would make the trap silently no-op in tests.
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
 interface MobileNavigationMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -45,17 +50,36 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
 
   const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
 
-  // Focus management - focus first element when opened
+  // Focus the first control on open, hand focus back to the opener on close.
   useEffect(() => {
-    if (isOpen && menuRef.current) {
-      const firstButton = menuRef.current.querySelector(
-        'button'
-      ) as HTMLButtonElement;
-      if (firstButton) {
-        firstButton.focus();
-      }
-    }
+    if (!isOpen) return;
+
+    const opener = document.activeElement as HTMLElement | null;
+    menuRef.current?.querySelector('button')?.focus();
+
+    return () => opener?.focus?.();
   }, [isOpen]);
+
+  // The drawer covers the page, so Tab must not escape into the content behind it.
+  const handleTabKey = useCallback((e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab' || !menuRef.current) return;
+
+    const focusable = Array.from(
+      menuRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+    );
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }, []);
 
   // Touch gesture handling for swipe to close (memoized)
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -110,9 +134,11 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
   return (
     <div
       className="mobile-nav-menu"
-      role="navigation"
-      aria-label="Mobile navigation"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Navigation menu"
       ref={menuRef}
+      onKeyDown={handleTabKey}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -138,8 +164,9 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
         </div>
       </div>
 
-      {/* Main navigation items */}
-      <div className="mobile-nav-links">
+      {/* Main navigation items. Kept as a landmark of its own: the wrapper is a
+          dialog now, so the nav role would otherwise be lost. */}
+      <nav className="mobile-nav-links" aria-label="Mobile navigation">
         <Button onClick={() => handleNavigation('/worlds')} variant="ghost">
           <Globe aria-hidden="true" />
           Worlds
@@ -177,7 +204,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
                       <div>{world.name}</div>
                       <div>
                         {getGenreLabel(world.genre)} • {worldCharacters}{' '}
-                        characters
+                        {worldCharacters === 1 ? 'character' : 'characters'}
                       </div>
                     </div>
                     {world.id === currentWorldId && (
@@ -214,7 +241,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
             </Button>
           )}
         </div>
-      </div>
+      </nav>
     </div>
   );
 });

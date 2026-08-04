@@ -57,6 +57,11 @@
   --color-warning-border: rgb(113 88 51 / 50%);
   --color-warning-muted: rgb(113 88 51 / 10%);
   --color-success: rgb(74 124 89);
+
+  /* Hover darkens here and lightens in dark mode: unlike accent, success flips
+   * its on-color between schemes, so each mode moves away from its own text.
+   * White on this: 6.58:1, up from 4.86:1 at rest. */
+  --color-success-hover: rgb(60 102 73);
   --color-success-bg: rgb(74 124 89 / 10%);
   --color-info: rgb(91 122 140);
 
@@ -167,6 +172,10 @@
   --color-warning-border: rgb(176 142 92 / 50%);
   --color-warning-muted: rgb(176 142 92 / 10%);
   --color-success: rgb(107 158 122);
+
+  /* Lightens rather than darkens: success carries near-black text in dark mode,
+   * so darkening would close the gap. Ink on this: 7.94:1, up from 6.07:1. */
+  --color-success-hover: rgb(130 180 145);
   --color-success-bg: rgb(107 158 122 / 12%);
   --color-info: rgb(123 160 180);
 
