@@ -265,9 +265,11 @@ body > * {
 }
 
 .button-destructive-outline:hover {
-  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
-  border-color: var(--color-danger-hover);
-  color: var(--color-danger-hover);
+  /* Neutral surface tint, not a danger-hover text/border swap — darkening
+   * the danger text on hover dropped dark-mode contrast to ~3:1 against the
+   * tinted background, below the 4.5:1 target. Keeping color/border pinned
+   * to --color-danger preserves the resting-state contrast on hover too. */
+  background: var(--color-surface-hover);
 }
 
 /* Variant: success */
