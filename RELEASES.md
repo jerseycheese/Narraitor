@@ -24,9 +24,9 @@ The last four issues ahead of the tag were about docs rather than code: a README
 
 The bolder DS3 redesign is deferred to v1.1. What ships here is DS3 as it landed during the collapse, which is coherent but deliberately restrained. Epic [#1543](https://github.com/jerseycheese/narraitor/issues/1543) and its children cover the real accent treatment, the dot grid, a proper type scale, drafting marks, and the brand-versus-product surface split. DESIGN.md still carries type-scale numbers from the old DS1, which [#1626](https://github.com/jerseycheese/narraitor/issues/1626) fixes once that work lands.
 
-Two accessibility gaps are known and named rather than discovered. Full keyboard control with visible focus indicators is [#276](https://github.com/jerseycheese/narraitor/issues/276), and touch targets under the 44px WCAG 2.5.5 threshold are [#1477](https://github.com/jerseycheese/narraitor/issues/1477). Both are open, both are real, and both are deferred to v1.1.
+Two accessibility gaps are worth naming up front. Full keyboard control with visible focus indicators is [#276](https://github.com/jerseycheese/narraitor/issues/276), and touch targets under the 44px WCAG 2.5.5 threshold are [#1477](https://github.com/jerseycheese/narraitor/issues/1477). Both are open, both are real, and both are deferred to v1.1.
 
-There's no client-side error reporting, so a production failure in someone else's browser is invisible from here ([#1641](https://github.com/jerseycheese/narraitor/issues/1641)). Vercel Analytics is wired up for the launch funnel only and doesn't capture errors. That's a deliberate call for 1.0 rather than something that got missed.
+There's no client-side error reporting, so a production failure in someone else's browser is invisible from here ([#1641](https://github.com/jerseycheese/narraitor/issues/1641)). Vercel Analytics is wired up for the launch funnel only and doesn't capture errors. That was a deliberate call for 1.0, not an oversight.
 
 **What's next**
 
