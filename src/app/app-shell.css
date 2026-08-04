@@ -406,6 +406,35 @@
   background: var(--color-accent-soft);
 }
 
+/* A world name is user-authored and unbounded, so left alone it pushes the
+   header past the viewport just above the drawer breakpoint, where the links
+   and the whole action cluster are already inline. Rather than hold the drawer
+   through tablet widths, make the name the one thing in the header that gives:
+   it caps at 12rem and ellipsizes below that only when the row runs out of
+   room. Flex items default to min-width:auto (won't shrink under their text),
+   so every ancestor down to the span needs min-width:0, and the controls that
+   must stay legible opt out of shrinking. (#1655) */
+.header-nav-left,
+.header-nav-actions,
+.header-nav-actions-group,
+.header-world-trigger {
+  min-width: 0;
+}
+
+.header-nav-links,
+.header-nav-actions-group > *:not(.header-world-trigger),
+.header-world-trigger > :not(.header-world-name) {
+  flex-shrink: 0;
+}
+
+.header-world-name {
+  min-width: 0;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .header-nav-divider {
   width: 1px;
   height: 1.375rem;

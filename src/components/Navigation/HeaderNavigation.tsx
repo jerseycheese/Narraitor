@@ -234,7 +234,7 @@ export function HeaderNavigation() {
                         className={`${headerDropdownTriggerClass} header-world-trigger${currentWorld ? ' header-world-trigger-active' : ''}`}
                       >
                         <Globe aria-hidden="true" />
-                        <span>
+                        <span className="header-world-name">
                           {currentWorld ? currentWorld.name : 'Select World'}
                         </span>
                         {currentWorld && worldCharacterCount > 0 && (
