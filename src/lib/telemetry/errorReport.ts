@@ -16,10 +16,21 @@ import { getUserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
  * resulting ErrorType enum leaves.
  */
 
-/** Where the failure happened. Closed union — no free-form values. */
-export type ErrorSource = 'client' | 'route' | 'global-error';
+/**
+ * Where the failure happened. Closed union — no free-form values.
+ *
+ * `error-boundary` and `global-error` are kept apart because they mean
+ * different things when triaging: a segment render crash still has the app
+ * shell around it, a root-layout crash doesn't.
+ */
+export type ErrorSource = 'client' | 'route' | 'error-boundary' | 'global-error';
 
-export const ERROR_SOURCES: readonly ErrorSource[] = ['client', 'route', 'global-error'];
+export const ERROR_SOURCES: readonly ErrorSource[] = [
+  'client',
+  'route',
+  'error-boundary',
+  'global-error',
+];
 
 export interface ErrorReport {
   /** Where it happened. Closed union — no free-form values. */
