@@ -298,28 +298,28 @@ body > * {
 /* Size: default — applied via .button-size-default */
 .button-size-default {
   padding: var(--space-2) var(--space-4);
-  min-height: 2.25rem;
+  min-height: var(--control-height-touch);
 }
 
 /* Size: sm */
 .button-size-sm {
   padding: var(--space-1) var(--space-3);
   font-size: 0.75rem;
-  min-height: 1.75rem;
+  min-height: var(--control-height-touch);
 }
 
 /* Size: lg */
 .button-size-lg {
   padding: var(--space-3) var(--space-6);
   font-size: 1rem;
-  min-height: 2.75rem;
+  min-height: var(--control-height-touch);
 }
 
 /* Size: icon */
 .button-size-icon {
   padding: var(--space-2);
-  min-height: 2.25rem;
-  min-width: 2.25rem;
+  min-height: var(--control-height-touch);
+  min-width: var(--control-height-touch);
 }
 
 .button-size-icon svg {
