@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EndingScreen } from '../EndingScreen';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -8,12 +8,16 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useRouter } from 'next/navigation';
 import { StoryCheckpoint } from '@/types/world-state.types';
 import { StoryEnding } from '@/types/narrative.types';
+import { generateEndingImage as requestEndingImage } from '@/lib/api/endingImageApi';
 
 jest.mock('next/navigation');
 jest.mock('@/state/narrativeStore');
 jest.mock('@/state/characterStore');
 jest.mock('@/state/worldStore');
 jest.mock('@/state/sessionStore');
+jest.mock('@/lib/api/endingImageApi');
+
+const mockRequestEndingImage = requestEndingImage as jest.MockedFunction<typeof requestEndingImage>;
 
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockUseNarrativeStore = useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>;
@@ -272,6 +276,31 @@ describe('EndingScreen - Your Story Section', () => {
     // Expand and check updated ARIA attributes
     fireEvent.click(button);
     expect(button).toHaveAttribute('aria-expanded', 'true');
+  });
+});
+
+// The ending image is decorative and should never auto-fire an AI call on
+// mount — only a player clicking a manual trigger requests it.
+describe('EndingScreen - Ending image is manually triggered', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockRequestEndingImage.mockResolvedValue({ imageUrl: 'https://example.com/ending.png' });
+  });
+
+  it('does not request an ending image on mount', () => {
+    setupStores([]);
+    render(<EndingScreen />);
+
+    expect(mockRequestEndingImage).not.toHaveBeenCalled();
+  });
+
+  it('requests an ending image when the placeholder button is clicked', async () => {
+    setupStores([]);
+    render(<EndingScreen />);
+
+    fireEvent.click(screen.getByRole('button', { name: /generate ending image/i }));
+
+    await waitFor(() => expect(mockRequestEndingImage).toHaveBeenCalledTimes(1));
   });
 });
 

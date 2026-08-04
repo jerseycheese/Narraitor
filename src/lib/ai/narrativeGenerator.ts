@@ -179,47 +179,46 @@ export class NarrativeGenerator {
       throwIfAborted(options?.signal);
 
       // Lore extraction runs on the final (possibly corrected) prose so a
-      // contradicted draft never pollutes the lore store.
+      // contradicted draft never pollutes the lore store. Deferred off the
+      // per-turn path — it's a full extra Gemini round-trip that only
+      // enriches later prompts, nothing in this turn's UI reads it.
       if (result.content) {
-        try {
-          if (process.env.NODE_ENV !== 'production') {
-            logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
-              worldId: request.worldId,
-              sessionId: request.sessionId,
-              contentLength: result.content.length,
-            });
-          }
-
-          const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
-            recordUsage: false,
+        if (process.env.NODE_ENV !== 'production') {
+          logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
+            worldId: request.worldId,
+            sessionId: request.sessionId,
+            contentLength: result.content.length,
           });
-          const structuredLore = await extractStructuredLore(
-            result.content,
-            existingLoreContext
-          );
-
-          const { useLoreStore } = await import('@/state/loreStore');
-          const { addStructuredLore } = useLoreStore.getState();
-          addStructuredLore(structuredLore, request.worldId, request.sessionId);
-
-          if (process.env.NODE_ENV !== 'production') {
-            logger.info('[NarrativeGenerator] Extracted and stored lore:', {
-              worldId: request.worldId,
-              sessionId: request.sessionId,
-              factCount:
-                structuredLore.characters.length +
-                structuredLore.locations.length +
-                structuredLore.events.length +
-                structuredLore.rules.length,
-              characters: structuredLore.characters.map((c) => c.name),
-              locations: structuredLore.locations.map((l) => l.name),
-              events: structuredLore.events.length,
-              rules: structuredLore.rules.length,
-            });
-          }
-        } catch (error) {
-          logger.error('[NarrativeGenerator] Failed to extract lore:', error);
         }
+
+        const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
+          recordUsage: false,
+        });
+        void extractStructuredLore(result.content, existingLoreContext)
+          .then(async (structuredLore) => {
+            const { useLoreStore } = await import('@/state/loreStore');
+            const { addStructuredLore } = useLoreStore.getState();
+            addStructuredLore(structuredLore, request.worldId, request.sessionId);
+
+            if (process.env.NODE_ENV !== 'production') {
+              logger.info('[NarrativeGenerator] Extracted and stored lore:', {
+                worldId: request.worldId,
+                sessionId: request.sessionId,
+                factCount:
+                  structuredLore.characters.length +
+                  structuredLore.locations.length +
+                  structuredLore.events.length +
+                  structuredLore.rules.length,
+                characters: structuredLore.characters.map((c) => c.name),
+                locations: structuredLore.locations.map((l) => l.name),
+                events: structuredLore.events.length,
+                rules: structuredLore.rules.length,
+              });
+            }
+          })
+          .catch((error) => {
+            logger.error('[NarrativeGenerator] Failed to extract lore:', error);
+          });
       }
 
       if (
@@ -404,52 +403,50 @@ export class NarrativeGenerator {
       throwIfAborted(options?.signal);
       recordRequestCalibration(budget, fullyEnhancedPrompt, response);
 
+      // Deferred off the per-turn path, same as generateSegment above.
       if (response.content) {
-        try {
-          if (process.env.NODE_ENV !== 'production') {
-            logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
-              worldId,
-              sessionId,
-              contentLength: response.content.length,
-            });
-          }
-
-          const existingLoreContext = getLoreContextForPrompt(worldId, sessionId, {
-            recordUsage: false,
+        if (process.env.NODE_ENV !== 'production') {
+          logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
+            worldId,
+            sessionId,
+            contentLength: response.content.length,
           });
-          const structuredLore = await extractStructuredLore(
-            response.content,
-            existingLoreContext
-          );
-
-          const { useLoreStore } = await import('@/state/loreStore');
-          const { addStructuredLore } = useLoreStore.getState();
-          addStructuredLore(structuredLore, worldId, sessionId);
-
-          if (process.env.NODE_ENV !== 'production') {
-            logger.info(
-              '[NarrativeGenerator] Extracted and stored lore from initial scene:',
-              {
-                worldId,
-                sessionId,
-                factCount:
-                  structuredLore.characters.length +
-                  structuredLore.locations.length +
-                  structuredLore.events.length +
-                  structuredLore.rules.length,
-                characters: structuredLore.characters.map((c) => c.name),
-                locations: structuredLore.locations.map((l) => l.name),
-                events: structuredLore.events.length,
-                rules: structuredLore.rules.length,
-              }
-            );
-          }
-        } catch (error) {
-          logger.error(
-            '[NarrativeGenerator] Failed to extract lore from initial scene:',
-            error
-          );
         }
+
+        const existingLoreContext = getLoreContextForPrompt(worldId, sessionId, {
+          recordUsage: false,
+        });
+        void extractStructuredLore(response.content, existingLoreContext)
+          .then(async (structuredLore) => {
+            const { useLoreStore } = await import('@/state/loreStore');
+            const { addStructuredLore } = useLoreStore.getState();
+            addStructuredLore(structuredLore, worldId, sessionId);
+
+            if (process.env.NODE_ENV !== 'production') {
+              logger.info(
+                '[NarrativeGenerator] Extracted and stored lore from initial scene:',
+                {
+                  worldId,
+                  sessionId,
+                  factCount:
+                    structuredLore.characters.length +
+                    structuredLore.locations.length +
+                    structuredLore.events.length +
+                    structuredLore.rules.length,
+                  characters: structuredLore.characters.map((c) => c.name),
+                  locations: structuredLore.locations.map((l) => l.name),
+                  events: structuredLore.events.length,
+                  rules: structuredLore.rules.length,
+                }
+              );
+            }
+          })
+          .catch((error) => {
+            logger.error(
+              '[NarrativeGenerator] Failed to extract lore from initial scene:',
+              error
+            );
+          });
       }
 
       let result = await formatNarrativeResponse(
