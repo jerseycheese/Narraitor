@@ -10,7 +10,9 @@ Rule of thumb: if there's a clean story to tell about what's in this slice of wo
 
 ## Version naming
 
-Tags follow `vMAJOR.MINOR.PATCH[-suffix]`. Pre-1.0 the version numbers are loose — they signal scope, not a stability promise. The optional suffix is for tags that benefit from a one-word label, like `v0.4.0-pre-design-system` or `v0.5.0-design-system` (the two tags that exist so far). Skip the suffix when the version is self-explanatory, which `v1.0.0` is.
+Tags follow `vMAJOR.MINOR.PATCH[-suffix]`. The two pre-1.0 tags used loose numbers that signalled scope rather than a stability promise. The optional suffix is for tags that benefit from a one-word label, like `v0.4.0-pre-design-system` or `v0.5.0-design-system`. Skip the suffix when the version is self-explanatory, which `v1.0.0` was.
+
+`package.json` tracks the tag from 1.0.0 onward. Bump it with `npm version X.Y.Z --no-git-tag-version` in the same commit as the `RELEASES.md` entry, so the lockfile stays in sync and no stray tag gets created.
 
 ## Cutting the release
 
@@ -28,6 +30,12 @@ The process has three moving parts: write the release notes, tag the commit, and
    git pull --ff-only
    git merge --ff-only vX.Y.Z
    git push origin main
+   ```
+   The `Protected branches` ruleset covers `main` with a pull-request requirement, so this push only works because the Repository admin role is a bypass actor on that ruleset. Deletion and non-fast-forward stay blocked for everyone. If the push gets rejected, check that the bypass is still there before reaching for anything else.
+
+   From a worktree, `git checkout main` will collide with whichever checkout already has it. Push the ref directly instead:
+   ```
+   git push origin vX.Y.Z^{commit}:refs/heads/main
    ```
 4. **Publish the GitHub release.** Either paste the matching section from `RELEASES.md` or pipe it in:
    ```
