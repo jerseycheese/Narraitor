@@ -20,6 +20,11 @@
   /* Universal radius token */
   --radius-full: 9999px;
 
+  /* Minimum touch target for interactive controls (WCAG 2.5.5 Target Size).
+   * Applied to buttons and other tappable controls app-wide, including
+   * desktop — one floor, not a touch-only breakpoint. */
+  --control-height-touch: 2.75rem;
+
   /* Standard reading width for primary content surfaces (dashboard, default
    * pages, top nav). Workshop creation pages stay narrower next to their rail. */
   --content-max-width: 1200px;
