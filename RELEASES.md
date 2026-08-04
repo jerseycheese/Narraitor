@@ -1,6 +1,36 @@
 # Releases
 
-Narraitor is pre-1.0, so releases get tagged manually from `develop` and fast-forwarded to `main`. Each entry below covers what's in the tag, what's known to still be in flight, and what's lined up next. The full release process lives in [release-process.md](public_docs/development/release-process.md).
+Releases get tagged manually from `develop` and fast-forwarded to `main`. Each entry below covers what's in the tag, what's known to still be in flight, and what's lined up next. The full release process lives in [release-process.md](public_docs/development/release-process.md).
+
+---
+
+## v1.0.0 - 2026-08-04
+
+This is 1.0, and what makes it 1.0 is that the whole loop holds together now: describe a world, create a character who fits it, play a story that responds to what you choose, and reach an ending that reads like an ending. Narraitor started from wanting tabletop RPG sessions without coordinating four schedules, and this is the first tag where a stranger can open the app and get that without a walkthrough. The v1.0 milestone closed 60 issues across 554 commits since [v0.5.0](https://github.com/jerseycheese/narraitor/releases/tag/v0.5.0-design-system), most of them about making pieces that already existed work together in someone else's browser.
+
+**What's in this release**
+
+- Bring your own key. Generation runs on a Google Gemini key entered once under Settings, then Providers. It's encrypted in the browser and sent per request, so there's no server-held key, no account, and no sign-up ([#891](https://github.com/jerseycheese/narraitor/issues/891), [#892](https://github.com/jerseycheese/narraitor/issues/892), [#893](https://github.com/jerseycheese/narraitor/issues/893)).
+- A public front door: a landing page ([#1365](https://github.com/jerseycheese/narraitor/issues/1365)), an About page with copy that says what this actually is rather than describing a generic storyteller chatbot ([#1421](https://github.com/jerseycheese/narraitor/issues/1421)), a privacy note and terms ([#1366](https://github.com/jerseycheese/narraitor/issues/1366)), cookieless funnel analytics ([#1367](https://github.com/jerseycheese/narraitor/issues/1367)), and share metadata so a pasted link previews properly ([#1636](https://github.com/jerseycheese/narraitor/issues/1636)).
+- One design system. DS1, DS2, and DS3 collapsed down to DS3 alone under [ADR-013](https://github.com/jerseycheese/narraitor/pull/1526), which supersedes ADR-011. Light and dark is the only switch left. The legacy shadcn token layer went with it ([#1527](https://github.com/jerseycheese/narraitor/pull/1527)), theme selectors got flattened ([#1546](https://github.com/jerseycheese/narraitor/issues/1546)), and the app shell collapsed to a single chrome ([#1655](https://github.com/jerseycheese/narraitor/issues/1655)).
+- Storybook is the single canon surface ([#1488](https://github.com/jerseycheese/narraitor/issues/1488), [ADR-012](https://github.com/jerseycheese/narraitor/issues/1484)). The old `/dev/design-system` living style guide is retired, and the stories run backend-free on MSW plus store decorators.
+- The play loop got the attention it needed: inventory with generated item images, lore dedup that catches role aliases, decisions weighted Minor / Major / Critical with alignment and trust tracking, story summaries that stop retrying forever ([#1575](https://github.com/jerseycheese/narraitor/issues/1575)), epilogues that close a story instead of teasing another one ([#1578](https://github.com/jerseycheese/narraitor/issues/1578), [#1605](https://github.com/jerseycheese/narraitor/pull/1605)), lethality rebalanced so one bad roll doesn't end a run ([#1426](https://github.com/jerseycheese/narraitor/issues/1426)), and generation failures that surface instead of hanging the session ([#1429](https://github.com/jerseycheese/narraitor/issues/1429), [#1478](https://github.com/jerseycheese/narraitor/issues/1478)).
+- Less surface to maintain. The world and character template systems came out entirely ([#1454](https://github.com/jerseycheese/narraitor/issues/1454), [#1455](https://github.com/jerseycheese/narraitor/issues/1455)), archetype generation went with them, and knip, skott, and a CSS audit now run in CI so dead code doesn't pile up quietly.
+- Two QA passes fed the punch lists in [#1423](https://github.com/jerseycheese/narraitor/issues/1423)-[#1438](https://github.com/jerseycheese/narraitor/issues/1438) and [#1574](https://github.com/jerseycheese/narraitor/issues/1574)-[#1590](https://github.com/jerseycheese/narraitor/issues/1590), every one of which closed before this tag.
+
+The last four issues ahead of the tag were about docs rather than code: a README rewrite that had been advertising a template system which no longer exists ([#1637](https://github.com/jerseycheese/narraitor/issues/1637)), a correctness sweep across `public_docs` ([#1638](https://github.com/jerseycheese/narraitor/issues/1638)), an archive pass over stale branches and dead config ([#1639](https://github.com/jerseycheese/narraitor/issues/1639)), and the share metadata above. The release tracking issues are [#1320](https://github.com/jerseycheese/narraitor/issues/1320) and [#1417](https://github.com/jerseycheese/narraitor/issues/1417).
+
+**Known incomplete**
+
+The bolder DS3 redesign is deferred to v1.1. What ships here is DS3 as it landed during the collapse, which is coherent but deliberately restrained. Epic [#1543](https://github.com/jerseycheese/narraitor/issues/1543) and its children cover the real accent treatment, the dot grid, a proper type scale, drafting marks, and the brand-versus-product surface split. DESIGN.md still carries type-scale numbers from the old DS1, which [#1626](https://github.com/jerseycheese/narraitor/issues/1626) fixes once that work lands.
+
+Two accessibility gaps are known and named rather than discovered. Full keyboard control with visible focus indicators is [#276](https://github.com/jerseycheese/narraitor/issues/276), and touch targets under the 44px WCAG 2.5.5 threshold are [#1477](https://github.com/jerseycheese/narraitor/issues/1477). Both are open, both are real, and both are deferred to v1.1.
+
+There's no client-side error reporting, so a production failure in someone else's browser is invisible from here ([#1641](https://github.com/jerseycheese/narraitor/issues/1641)). Vercel Analytics is wired up for the launch funnel only and doesn't capture errors. That's a deliberate call for 1.0 rather than something that got missed.
+
+**What's next**
+
+- `v1.1` - the bolder DS3 work from [#1543](https://github.com/jerseycheese/narraitor/issues/1543), plus the two deferred accessibility items ([#276](https://github.com/jerseycheese/narraitor/issues/276), [#1477](https://github.com/jerseycheese/narraitor/issues/1477)) and error reporting ([#1641](https://github.com/jerseycheese/narraitor/issues/1641)).
 
 ---
 
