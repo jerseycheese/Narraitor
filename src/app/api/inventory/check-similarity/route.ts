@@ -13,6 +13,7 @@ const logger = new Logger('CheckSimilarityAPI');
 export async function POST(request: NextRequest) {
   return handleSimilarityCheck(request, {
     logger,
+    route: '/api/inventory/check-similarity',
     errorLogMessage: 'Error checking item similarity:',
     failureMessage: 'Failed to check item similarity',
     buildPrompt: ({ name1, name2 }) => `Are these two item names referring to the same item? You must respond with ONLY a JSON object in this exact format:

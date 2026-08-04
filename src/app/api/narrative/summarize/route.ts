@@ -3,6 +3,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 
 import Logger from '@/lib/utils/logger';
+import { reportServerError } from '@/lib/telemetry/reportServerError';
 const logger = new Logger('Summarize');
 
 export async function POST(request: NextRequest) {
@@ -206,6 +207,7 @@ Do not include any explanatory text, code fences, markdown, or additional prose.
 
   } catch (error) {
     logger.error('Error generating journal summary:', error);
+    reportServerError(error, { source: 'route', route: '/api/narrative/summarize' });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

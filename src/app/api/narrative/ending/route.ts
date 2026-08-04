@@ -5,6 +5,7 @@ import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { generateEnding } from '../../../../lib/ai/endingGenerator';
 import { logger } from '../../../../lib/utils/logger';
 import type { EndingGenerationRequest, EndingType, EndingTone } from '../../../../types/narrative.types';
+import { reportServerError } from '@/lib/telemetry/reportServerError';
 
 export async function POST(request: NextRequest) {
   try {
@@ -79,9 +80,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('Failed to generate story ending', { 
+    logger.error('Failed to generate story ending', {
       error: error instanceof Error ? error.message : 'Unknown error'
     });
+    reportServerError(error, { source: 'route', route: '/api/narrative/ending' });
 
     if (error instanceof Error) {
       if (error.message.includes('not found')) {

@@ -11,8 +11,8 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy"
-      lead="The short, honest version: your stories live in your browser, and the only thing that leaves it is the prompt sent off to generate the next part of the story."
-      updated="June 2026"
+      lead="The short, honest version: your stories live in your browser. What leaves it is the prompt sent off to generate the next part of the story, plus anonymous counts of how the app gets used and what breaks."
+      updated="August 2026"
     >
       <LegalSection id="privacy-data" heading="Where your data lives">
         <p>
@@ -63,6 +63,22 @@ export default function PrivacyPage() {
           No personal data, and nothing derived from your content — world names,
           character names, prompts, story text — is ever sent to it. It exists to
           answer one question: does the first-play flow actually work for someone new.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="privacy-errors" heading="When something breaks">
+        <p>
+          If the app crashes or a request fails, it sends a short report so the
+          break is visible instead of silent. A report holds five things: which
+          part failed, the error&apos;s class name, a category like
+          &ldquo;network&rdquo; or &ldquo;timeout&rdquo;, the page you were on with
+          any ids swapped out, and the stack trace.
+        </p>
+        <p>
+          What it deliberately leaves out: the error message itself, anything from
+          your worlds, characters, or story, whatever you typed, and your provider
+          key. The message is read on your device to pick the category, and then
+          it&apos;s dropped — only the category travels.
         </p>
       </LegalSection>
 
