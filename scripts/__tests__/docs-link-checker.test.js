@@ -34,6 +34,11 @@ describe('extractHeadingSlugs', () => {
       new Set(['real-heading'])
     );
   });
+
+  it('suffixes repeated headings the way GitHub does (-1, -2, ...)', () => {
+    const content = '## Usage\n\ntext\n\n## Usage\n\nmore text\n\n## Usage\n';
+    expect(extractHeadingSlugs(content)).toEqual(new Set(['usage', 'usage-1', 'usage-2']));
+  });
 });
 
 describe('findBrokenLinks', () => {
@@ -94,5 +99,25 @@ describe('findBrokenLinks', () => {
     const content = '![alt text](missing.png)';
     const broken = findBrokenLinks(content, fakeFs(), '/docs/self.md');
     expect(broken).toEqual([{ target: 'missing.png', reason: 'target does not exist' }]);
+  });
+
+  it('resolves a link with a title, ignoring the title text', () => {
+    const content = '[see this](exists.md "read more")';
+    expect(findBrokenLinks(content, fakeFs(), '/docs/self.md')).toEqual([]);
+  });
+
+  it('flags a broken link even when it carries a title', () => {
+    const content = "[broken](missing.md 'read more')";
+    const broken = findBrokenLinks(content, fakeFs(), '/docs/self.md');
+    expect(broken).toEqual([{ target: "missing.md 'read more'", reason: 'target does not exist' }]);
+  });
+
+  it('resolves an anchor into the second occurrence of a repeated heading', () => {
+    const broken = findBrokenLinks(
+      '[jump](target.md#usage-1)',
+      fakeFs({ headings: new Set(['usage', 'usage-1']) }),
+      '/docs/self.md'
+    );
+    expect(broken).toEqual([]);
   });
 });

@@ -29,14 +29,37 @@ export function slugify(heading) {
     .replace(/\s+/g, '-');
 }
 
-/** Extract the set of heading-derived anchor slugs from markdown content. */
+/**
+ * Extract the set of heading-derived anchor slugs from markdown content.
+ *
+ * GitHub suffixes repeated headings with `-1`, `-2`, ... (first occurrence
+ * keeps the bare slug), so duplicate headings must be counted, not just
+ * collected into a Set of unique slugs.
+ */
 export function extractHeadingSlugs(content) {
+  const counts = new Map();
   const slugs = new Set();
   for (const line of content.split('\n')) {
     const match = /^#{1,6}\s+(.+)$/.exec(line);
-    if (match) slugs.add(slugify(match[1]));
+    if (!match) continue;
+    const base = slugify(match[1]);
+    const count = counts.get(base) ?? 0;
+    counts.set(base, count + 1);
+    slugs.add(count === 0 ? base : `${base}-${count}`);
   }
   return slugs;
+}
+
+/**
+ * Split a markdown link target into its href and an optional title, e.g.
+ * `target.md "read more"` -> `{ href: 'target.md', title: 'read more' }`.
+ * GitHub (and the spec) treats the quoted suffix as a title, not part of the
+ * path -- checking the raw string as a path would look for a file literally
+ * named "target.md \"read more\"".
+ */
+function splitLinkTitle(target) {
+  const match = /^(\S+)\s+(?:"[^"]*"|'[^']*'|\([^)]*\))$/.exec(target);
+  return match ? match[1] : target;
 }
 
 /**
@@ -60,7 +83,8 @@ export function findBrokenLinks(content, fs, selfPath) {
     const target = match[1].trim();
     if (!target || SCHEME_RE.test(target) || target.startsWith('mailto:')) continue;
 
-    const [rawPath, anchor] = target.split('#');
+    const href = splitLinkTitle(target);
+    const [rawPath, anchor] = href.split('#');
     const targetPath = rawPath ? fs.resolve(selfPath, rawPath) : selfPath;
 
     if (rawPath && !fs.exists(targetPath)) {
