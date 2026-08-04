@@ -35,6 +35,18 @@ describe('Privacy page (#1366)', () => {
       screen.getByText(/nothing derived from your content/i)
     ).toBeInTheDocument();
   });
+
+  it('states what a crash report holds and what it leaves out (#1641)', () => {
+    render(<PrivacyPage />);
+
+    expect(
+      screen.getByRole('heading', { name: /when something breaks/i })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/the error's class name/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/deliberately leaves out.*the error message itself/i)
+    ).toBeInTheDocument();
+  });
 });
 
 describe('Terms page (#1366)', () => {

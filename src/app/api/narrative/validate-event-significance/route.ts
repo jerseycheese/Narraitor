@@ -3,6 +3,7 @@ import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { validateEventSignificance, ValidationContext } from '@/lib/ai/eventSignificanceValidator';
 
 import Logger from '@/lib/utils/logger';
+import { reportServerError } from '@/lib/telemetry/reportServerError';
 const logger = new Logger('ValidateEventSignificance');
 
 /**
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     logger.error('Event significance validation error:', error);
+    reportServerError(error, { source: 'route', route: '/api/narrative/validate-event-significance' });
     return NextResponse.json(
       {
         error: 'Failed to validate event significance',

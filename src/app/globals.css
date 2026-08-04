@@ -477,3 +477,61 @@ body > * {
   max-width: 6rem;
 }
 
+/* Root-layout crash screen (app/global-error.tsx). It renders outside the app
+   shell with none of the layout's chrome, so it carries its own centering and
+   surface rather than inheriting one. */
+
+.app-global-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 100vh;
+  padding: var(--space-8) var(--space-4);
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.app-global-error-title {
+  font-family: var(--font-narrative);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.app-global-error-message {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  max-width: 32rem;
+  margin: 0;
+}
+
+.app-global-error-suggestion {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  max-width: 32rem;
+  margin: 0;
+}
+
+.app-global-error-action {
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  padding: var(--space-2) var(--space-5);
+  margin-top: var(--space-2);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  cursor: pointer;
+}
+
+.app-global-error-action:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
