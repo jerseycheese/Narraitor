@@ -3,7 +3,7 @@ import { clsx } from 'clsx'
 
 interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'success' | 'info' | 'warning'
+  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'destructive-outline' | 'success' | 'info' | 'warning'
   size?: 'default' | 'sm' | 'lg' | 'icon'
 }
 
