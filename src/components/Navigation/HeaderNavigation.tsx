@@ -34,12 +34,17 @@ const RecentPagesDropdown = dynamic(
 // Routes that own the play/create action inline, where a header CTA would just
 // duplicate it. Extends the suppression the retired workshop header applied to
 // /worlds alone; this is the double-Play fix (#1655).
+// Routes that own the play or create action inline. Their own control is the
+// better one — the roster's Play sets the character before routing, where the
+// header's only sets the world — and both land on the same play URL.
 const CTA_SUPPRESSED_ROUTES: readonly RegExp[] = [
   /^\/worlds$/,
   /^\/worlds\/create$/,
   /^\/worlds\/[^/]+$/,
   /^\/worlds\/[^/]+\/edit$/,
+  /^\/characters$/,
   /^\/characters\/create$/,
+  /^\/characters\/[^/]+$/,
 ];
 
 // Top-level destinations orient on their own. Exact match, not a prefix, or

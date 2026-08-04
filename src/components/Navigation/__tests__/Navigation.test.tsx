@@ -201,16 +201,27 @@ describe('HeaderNavigation', () => {
       );
     });
 
-    it('suppresses the CTA on routes that own the action inline', () => {
-      mockPathname = '/worlds/world-1';
-      seedActiveWorld();
+    // Every route that renders its own play control: /worlds/[id] ("Play in
+    // World"), /characters (per-card Play), /characters/[id] ("Play with
+    // Character"). All three land on the same play URL as the header's Play.
+    it.each([
+      '/worlds',
+      '/worlds/world-1',
+      '/characters',
+      '/characters/char-1',
+    ])(
+      'suppresses the CTA on %s, which owns the action inline',
+      (pathname) => {
+        mockPathname = pathname;
+        seedActiveWorld();
 
-      render(<HeaderNavigation />);
+        render(<HeaderNavigation />);
 
-      expect(
-        screen.queryByRole('button', { name: /^Play$/ })
-      ).not.toBeInTheDocument();
-    });
+        expect(
+          screen.queryByRole('button', { name: /^Play$/ })
+        ).not.toBeInTheDocument();
+      }
+    );
   });
 
   describe('Breadcrumb suppression (#1655)', () => {
