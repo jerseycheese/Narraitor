@@ -46,12 +46,37 @@ const tokenize = (content: string): string[] =>
   (content.match(/[a-zA-Z']+/g) || []).map((word) => word.toLowerCase());
 
 /**
+ * Builds a lowercase token set from known entity names (world name, player
+ * character, NPCs, other important entities) so those names — and their
+ * individual name parts, e.g. "Chen" from "Mara Chen" — never get flagged
+ * as overused prose. The scene prompt separately instructs the model to use
+ * NPC names naturally (sceneTemplate.ts); flagging a name here would work
+ * against that and risk the model paraphrasing or dropping it for
+ * "variety", breaking continuity instead of improving prose (#1681 review).
+ */
+export const buildKnownNameTokens = (
+  names: Array<string | null | undefined>
+): Set<string> => {
+  const tokens = new Set<string>();
+  for (const name of names) {
+    if (!name) continue;
+    for (const word of tokenize(name)) {
+      tokens.add(word);
+    }
+  }
+  return tokens;
+};
+
+/**
  * Pure extraction: counts word frequency across the given segments and
  * returns the words that reappear (not just the ones that occur once),
- * sorted by frequency then alphabetically for a deterministic list.
+ * sorted by frequency then alphabetically for a deterministic list. Words
+ * belonging to a known entity name are always excluded, regardless of how
+ * often they repeat.
  */
 export const extractRepeatedPhrases = (
-  segments: NarrativeSegment[] | undefined
+  segments: NarrativeSegment[] | undefined,
+  knownNameTokens?: Set<string>
 ): string[] => {
   if (!segments || segments.length === 0) {
     return [];
@@ -62,6 +87,7 @@ export const extractRepeatedPhrases = (
     if (!seg?.content) continue;
     for (const word of tokenize(seg.content)) {
       if (word.length < MIN_WORD_LENGTH || COMMON_WORDS.has(word)) continue;
+      if (knownNameTokens?.has(word)) continue;
       counts.set(word, (counts.get(word) || 0) + 1);
     }
   }
@@ -82,9 +108,10 @@ export const extractRepeatedPhrases = (
 export const enhancePromptWithPhraseVariety = (
   prompt: string,
   recentSegments: NarrativeSegment[] | undefined,
+  knownNameTokens?: Set<string>,
   budget?: RequestBudget
 ): string => {
-  const repeated = extractRepeatedPhrases(recentSegments);
+  const repeated = extractRepeatedPhrases(recentSegments, knownNameTokens);
   if (repeated.length === 0) {
     return prompt;
   }

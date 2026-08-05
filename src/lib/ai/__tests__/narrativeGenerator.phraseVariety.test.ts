@@ -1,9 +1,11 @@
 import {
   extractRepeatedPhrases,
   enhancePromptWithPhraseVariety,
+  buildKnownNameTokens,
 } from '../narrativeGenerator.phraseVariety';
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { useWorldStore } from '@/state/worldStore';
+import { useNPCStore } from '@/state/npcStore';
 import { MockAIClient } from '../../__mocks__/mockAiClient';
 import type { NarrativeSegment } from '@/types/narrative.types';
 
@@ -57,6 +59,32 @@ describe('extractRepeatedPhrases', () => {
 
     expect(result.length).toBeLessThanOrEqual(8);
   });
+
+  it('never flags a repeated word that belongs to a known entity name', () => {
+    const segments = [
+      segment('Mara Chen pushes through the dense woods, rifle ready.'),
+      segment('Mara Chen finds cold metal debris near the dense woods.'),
+    ];
+    const knownNameTokens = buildKnownNameTokens(['Mara Chen']);
+
+    const result = extractRepeatedPhrases(segments, knownNameTokens);
+
+    expect(result).not.toContain('mara');
+    expect(result).not.toContain('chen');
+    // Non-name repeats are still flagged.
+    expect(result).toContain('woods');
+  });
+});
+
+describe('buildKnownNameTokens', () => {
+  it('lowercases and splits multi-word names into individual tokens', () => {
+    const tokens = buildKnownNameTokens(['Mara Chen', 'Rustwater Camp', null, undefined]);
+
+    expect(tokens.has('mara')).toBe(true);
+    expect(tokens.has('chen')).toBe(true);
+    expect(tokens.has('rustwater')).toBe(true);
+    expect(tokens.has('camp')).toBe(true);
+  });
 });
 
 describe('enhancePromptWithPhraseVariety', () => {
@@ -81,6 +109,20 @@ describe('enhancePromptWithPhraseVariety', () => {
   it('returns the prompt unchanged when recentSegments is undefined', () => {
     const result = enhancePromptWithPhraseVariety('BASE PROMPT', undefined);
     expect(result).toBe('BASE PROMPT');
+  });
+
+  it('excludes known entity names from the flagged list', () => {
+    const segments = [
+      segment('Mara Chen pushes through the dense woods, rifle ready.'),
+      segment('Mara Chen finds cold metal debris near the dense woods.'),
+    ];
+    const knownNameTokens = buildKnownNameTokens(['Mara Chen']);
+
+    const result = enhancePromptWithPhraseVariety('BASE PROMPT', segments, knownNameTokens);
+
+    expect(result).not.toContain('mara');
+    expect(result).not.toContain('chen');
+    expect(result).toContain('woods');
   });
 });
 
@@ -147,5 +189,40 @@ describe('NarrativeGenerator phrase-variety integration', () => {
 
     const prompt = mockAiClient.getPrompts()[0];
     expect(prompt).not.toContain('RECENTLY OVERUSED WORDS');
+  });
+
+  it('does not flag an NPC name mentioned twice in recent segments', async () => {
+    useNPCStore.getState().createNPC({
+      worldId,
+      name: 'Mara',
+      description: 'A fellow survivor',
+    });
+    mockAiClient.setMockResponse({ content: 'Generated narrative content' });
+
+    await generator.generateSegment({
+      worldId,
+      sessionId: 'test-session',
+      characterIds: ['test-character'],
+      narrativeContext: {
+        worldId,
+        currentSceneId: 'scene-1',
+        characterIds: ['test-character'],
+        sessionId: 'test-session',
+        previousSegments: [],
+        currentTags: [],
+        recentSegments: [
+          segment('Mara leads you through the dense woods, rifle ready.'),
+          segment('Mara finds cold metal debris near the dense woods.'),
+        ],
+      },
+    });
+
+    const prompt = mockAiClient.getPrompts()[0];
+    // Other repeated words still get flagged — only the NPC's name is excluded.
+    expect(prompt).toContain('RECENTLY OVERUSED WORDS');
+    const [, flaggedWordsLine] =
+      prompt.match(/RECENTLY OVERUSED WORDS[^\n]*\n([^\n]*)/i) ?? [];
+    expect(flaggedWordsLine).toBeDefined();
+    expect(flaggedWordsLine?.toLowerCase()).not.toContain('mara');
   });
 });

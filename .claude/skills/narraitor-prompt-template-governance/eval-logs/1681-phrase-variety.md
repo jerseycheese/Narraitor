@@ -29,6 +29,9 @@ No prior eval log exists for this prompt surface to regress against. `sceneTempl
 ## Cost/latency
 - Added at most ~8 short words plus a fixed instruction sentence (~40-60 tokens) per turn, gated behind a new `phrase-variety` budget component (`target: 100, max: 200` tokens — smallest tier alongside `item-instructions`/`examples`) in `DEFAULT_ALLOCATIONS` (`src/lib/promptContext/tokenBudgetManager.ts`). No extra AI round trip. Negligible relative to the ~80k total request budget.
 
+## Review follow-up (Codex, PR #1684)
+Codex flagged that the original version counted NPC/location names like any other repeated word, so a name mentioned twice (e.g. "Mara") could land in the `RECENTLY OVERUSED WORDS` list and conflict with the scene prompt's instruction to use NPC names naturally (`sceneTemplate.ts` NPC METADATA RULES). Fixed by excluding known entity names (world name, player character, NPC roster, other important entities - all already available on the `buildNarrativeContext` output used earlier in the same request) before counting repeats. Added `buildKnownNameTokens` plus unit/integration coverage asserting an NPC name mentioned twice is never flagged while unrelated repeated words still are.
+
 ## Verdict
 - Mechanism verified via deterministic tests; behavioral "reads better" claim is NOT made — no live matrix was run. Per narraitor-ai-quality-discipline, this stays a "single-sample impression" pending a manual QA pass with a real provider key.
 - Ship decision: shipping the mechanism (small, reversible, fail-open — no-ops when there's nothing to flag) with the live-quality check flagged as a follow-up manual QA item, not a blocking gate for this small-complexity issue. Recorded at: PR for issue #1681.

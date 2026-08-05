@@ -53,7 +53,10 @@ import {
   buildContinuityContractFromStores,
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
-import { enhancePromptWithPhraseVariety } from './narrativeGenerator.phraseVariety';
+import {
+  buildKnownNameTokens,
+  enhancePromptWithPhraseVariety,
+} from './narrativeGenerator.phraseVariety';
 
 /**
  * Stop an abandoned generation before its side effects run. Callers that race
@@ -148,9 +151,18 @@ export class NarrativeGenerator {
         characterInventory
       );
 
+      // Never flag names the model is instructed to use naturally (sceneTemplate.ts) —
+      // the world/player/NPC/important-entity names already in context.
+      const knownNameTokens = buildKnownNameTokens([
+        context.worldName,
+        context.playerCharacterName,
+        ...context.npcRoster.map((npc) => npc.name),
+        ...(context.narrativeContext?.importantEntities?.map((entity) => entity.name) ?? []),
+      ]);
       const phraseVarietyPrompt = enhancePromptWithPhraseVariety(
         fullyEnhancedPrompt,
         requestForTemplate.narrativeContext?.recentSegments,
+        knownNameTokens,
         budget
       );
 
