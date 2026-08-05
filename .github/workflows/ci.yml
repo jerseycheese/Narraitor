@@ -99,6 +99,10 @@ jobs:
         run: npm run lint:ds-canon
       - name: Enforce dependency boundaries (no new cycles or dev-dep leaks)
         run: npm run deps:validate
+      # Blocking, and the other half of the ratchet: `deps:validate` stops new
+      # violations landing, this stops fixed ones lingering as dead suppressions.
+      - name: Enforce a shrinking dependency baseline
+        run: npm run deps:check
 
   knip:
     name: Knip (unused code)
