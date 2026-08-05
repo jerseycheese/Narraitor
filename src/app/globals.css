@@ -38,6 +38,38 @@ a[href="#main-content"]:focus {
   outline-offset: 2px;
 }
 
+/* Honor OS-level "reduce motion" (#1678). A blanket reset covers the vast
+   majority of the app's 65 transitions and 14 animations in one place instead
+   of needing every future keyframe to remember to check the media query.
+   `!important` is deliberate here — this has to win over every animation's own
+   specificity, including ones written after this rule. Near-zero duration
+   (rather than `none`) keeps animation/transitionend listeners firing. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Walk back the handful of cases where the blanket reset reads as broken
+     rather than calm. Rotation and positional movement (the die tick, the
+     drawer slide-in) are exactly what triggers vestibular symptoms, so those
+     stay fully stopped. But an in-progress indicator that freezes solid reads
+     as a stalled screen, not "still working" -- these are opacity-only, so
+     they don't carry the same risk. Give them back a slow, steady loop. */
+  :root .manuscript-streaming-dot,
+  .component-loading-pulse-avatar-circle,
+  .component-loading-pulse-line,
+  .component-loading-skeleton-line,
+  .component-loading-dot {
+    animation-duration: 2s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
 /* react-joyride appends its portal as the last child of <body>, where it picks
    up position: relative in normal flow and lands below all page content. That
    pushed the tour overlay + spotlight roughly a viewport down, so the dim

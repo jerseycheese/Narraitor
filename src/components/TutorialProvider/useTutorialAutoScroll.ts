@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { Step } from 'react-joyride';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export function useTutorialAutoScroll(
   run: boolean,
@@ -8,6 +9,10 @@ export function useTutorialAutoScroll(
 ) {
   const prevStepIndexRef = useRef<number | null>(null);
   const lastStepIndexRef = useRef<number | null>(null);
+  // Programmatic scrollIntoView isn't reachable by the CSS
+  // prefers-reduced-motion media query (#1678) -- jump instead of animating.
+  const prefersReducedMotion = useReducedMotion();
+  const scrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
 
   // Track previous step index
   useEffect(() => {
@@ -58,19 +63,19 @@ export function useTutorialAutoScroll(
 
     if (stepData.autoScroll === 'down') {
       if (!isForward) return;
-      element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      element.scrollIntoView({ block: 'center', behavior: scrollBehavior });
       return;
     }
 
     if (stepData.autoScroll === 'up') {
       if (!isBackward) return;
-      element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      element.scrollIntoView({ block: 'center', behavior: scrollBehavior });
       return;
     }
 
     if (isForward && !isBelow) return;
     if (isBackward && !isAbove) return;
-    
-    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }, [run, steps, stepIndex]);
+
+    element.scrollIntoView({ block: 'center', behavior: scrollBehavior });
+  }, [run, steps, stepIndex, scrollBehavior]);
 }
