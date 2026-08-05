@@ -455,24 +455,17 @@
 }
 
 /* ─── DS3 — "The Mechanical Manuscript" ───
-   Aged paper + drafting ink + dot grid, per ADR-011 and the DS3
-   showcase canon. A radial-gradient dot grid sits beneath everything
-   (2px dot every 24px — the canonical DS3 grid). Panels are
-   featherweight cards on the canvas, framed by thin accent corner
-   brackets as a drafting-ink mechanical mark. The compact stat strip
-   sits on top of the 3-col row of Recent + Getting Started. */
+   Aged paper + drafting ink, per ADR-011 and the DS3 showcase canon.
+   Panels are featherweight cards on the canvas, framed by thin accent
+   corner brackets as a drafting-ink mechanical mark. The compact stat
+   strip sits on top of the 3-col row of Recent + Getting Started.
+   Dot-grid field comes from the app-surface root (app-shell.css), not
+   defined per-page — see ds3.css --pattern-dot-grid-image. */
 
 :root .component-dashboard-home {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 18%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 24px 24px;
-  background-repeat: repeat;
 }
 
 @media (width < 768px) {

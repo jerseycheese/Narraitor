@@ -1,15 +1,20 @@
+/* Dot grid is composited here, not on a fixed body pseudo-element: this is
+ * the actual opaque surface root (globals.css's `body > *` stacks every real
+ * surface above body, so a separate fixed background layer behind it would
+ * never show). Single canonical pattern — see ds3.css
+ * --pattern-dot-grid-image. */
 .app-surface-app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--color-canvas);
+  background: var(--pattern-dot-grid-image) 0 0 / 24px 24px, var(--color-canvas);
 }
 
 .app-surface-manuscript {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--color-canvas);
+  background: var(--pattern-dot-grid-image) 0 0 / 24px 24px, var(--color-canvas);
 }
 
 .app-surface-main {
