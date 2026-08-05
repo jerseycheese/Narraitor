@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
+import { seedJournalEntriesForVisual } from './utils/game-session-page-seeder';
 
 const seedMarginaliaLoreFact = async (page: Page) => {
   await page.addInitScript(async () => {
@@ -287,6 +288,31 @@ test.describe('Manuscript regression assertions', () => {
     for (const fontSize of badgeFontSizes) {
       expect(fontSize).toBeGreaterThanOrEqual(12);
     }
+  });
+
+  test('Journal snapshot meta row stays above the 12px legibility floor', async ({ page }) => {
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+
+    // A DS3-only override on `:root .manuscript-journal-snapshot-meta` clobbered
+    // the base rule's font-size bump (missed in the initial #1683 pass), so this
+    // opens the real drawer rather than only checking the base-rule selector.
+    await seedJournalEntriesForVisual(page);
+    await page.getByRole('button', { name: 'Journal' }).click();
+    await page.waitForSelector('.manuscript-journal-snapshot-meta', { timeout: 10000 });
+
+    const metaFontSize = await page.evaluate(() => {
+      const meta = document.querySelector('.manuscript-journal-snapshot-meta');
+      return meta ? parseFloat(getComputedStyle(meta).fontSize) : null;
+    });
+
+    expect(metaFontSize).not.toBeNull();
+    expect(metaFontSize as number).toBeGreaterThanOrEqual(12);
   });
 
   test('Short narrative content does not leave a conspicuous dead band above the choices rail', async ({ page }) => {
