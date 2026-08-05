@@ -273,6 +273,94 @@ describe('ActiveGameSession Manuscript Layout', () => {
     expect(hudToggle).toHaveAttribute('aria-expanded', 'false');
   });
 
+  describe('keyboard shortcuts (#276)', () => {
+    it('opens the shortcuts dialog via the HUD button', async () => {
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const trigger = await screen.findByRole('button', { name: /keyboard shortcuts/i });
+      fireEvent.click(trigger);
+
+      expect(await screen.findByRole('dialog', { name: /keyboard shortcuts/i })).toBeInTheDocument();
+    });
+
+    it('opens the shortcuts dialog when "?" is pressed', async () => {
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+      fireEvent.keyDown(document, { key: '?' });
+
+      expect(await screen.findByRole('dialog', { name: /keyboard shortcuts/i })).toBeInTheDocument();
+    });
+
+    it('toggles the character summary when "c" is pressed', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const hudToggle = await screen.findByRole('button', { name: /hero/i });
+      expect(hudToggle).toHaveAttribute('aria-expanded', 'false');
+
+      fireEvent.keyDown(document, { key: 'c' });
+
+      expect(hudToggle).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('opens the journal drawer when "j" is pressed under progressive disclosure', async () => {
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+      fireEvent.keyDown(document, { key: 'j' });
+
+      const drawer = await screen.findByTestId('manuscript-drawer');
+      expect(drawer).toBeInTheDocument();
+    });
+
+    it('routes to the journal page when "j" is pressed without progressive disclosure', async () => {
+      const pushMock = jest.fn();
+      (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+      fireEvent.keyDown(document, { key: 'j' });
+
+      expect(pushMock).toHaveBeenCalledWith(`/worlds/${mockWorldId}/play/journal`);
+    });
+  });
+
   it('passes isStreaming to ManuscriptActionRail when generating', async () => {
     const ManuscriptActionRail = require('../ManuscriptActionRail').ManuscriptActionRail;
 

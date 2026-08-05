@@ -36,6 +36,8 @@ import {
 } from './ManuscriptDrawerPanels';
 import { CharacterSnapshot } from './CharacterSnapshot';
 import { SceneStatus } from './SceneStatus';
+import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 
 type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history' | 'journal';
@@ -84,6 +86,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isEvaluatingAction, setIsEvaluatingAction] = React.useState(false);
   const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
   const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
+  const [isShortcutsHelpOpen, setIsShortcutsHelpOpen] = React.useState(false);
 
   const characterButtonRef = React.useRef<HTMLButtonElement>(null);
   const drawerTriggerRef = React.useRef<HTMLElement | null>(null);
@@ -223,6 +226,49 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
     return () => clearTimeout(timer);
   }, [isGameReady, shouldShowTour, isTourActive, startTour]);
+
+  // Journal opens as a drawer under progressive disclosure, otherwise it's a
+  // route (matches the two "Open Journal" entry points already in the HUD /
+  // ActiveGameSessionControls).
+  const handleOpenJournalShortcut = React.useCallback(() => {
+    if (isProgressiveDisclosureEnabled) {
+      setActiveDrawer('journal');
+    } else {
+      router.push(`/worlds/${worldId}/play/journal`);
+    }
+  }, [isProgressiveDisclosureEnabled, router, worldId]);
+
+  const handleToggleCharacterShortcut = React.useCallback(() => {
+    setIsCharacterSummaryExpanded((prev) => !prev);
+  }, []);
+
+  // Game-session keyboard shortcuts (#276): number keys for choices live in
+  // ChoiceSelector itself since that's where the option list is. These cover
+  // the remaining common actions the issue calls out - journal, character
+  // sheet, and a discoverable reference for all of it. Only active once the
+  // session has rendered its real HUD (isGameReady), same gate the Escape
+  // handling above effectively relies on.
+  const gameSessionShortcuts = React.useMemo(
+    () => [
+      {
+        key: '?',
+        description: 'Show keyboard shortcuts',
+        action: () => setIsShortcutsHelpOpen(true),
+      },
+      {
+        key: 'j',
+        description: 'Open journal',
+        action: handleOpenJournalShortcut,
+      },
+      {
+        key: 'c',
+        description: 'Toggle character sheet',
+        action: handleToggleCharacterShortcut,
+      },
+    ],
+    [handleOpenJournalShortcut, handleToggleCharacterShortcut]
+  );
+  useKeyboardShortcuts(gameSessionShortcuts, isGameReady);
 
   const { createDecisionJournalEntry, createJournalEntryFromSegment } = useActiveGameSessionJournal({
     sessionId,
@@ -387,6 +433,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           onStartNew={handleHudStartNew}
           onBack={handleHudBack}
           onEndStory={handleEndStoryClick}
+          onShowShortcuts={() => setIsShortcutsHelpOpen(true)}
           saveIndicator={
             <SaveIndicator
               status={autoSave.status}
@@ -523,6 +570,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           )}
         </ManuscriptDrawer>
       )}
+
+      <KeyboardShortcutsDialog
+        open={isShortcutsHelpOpen}
+        onOpenChange={setIsShortcutsHelpOpen}
+      />
     </ManuscriptSessionShell>
   );
 };

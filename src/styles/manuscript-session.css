@@ -3803,3 +3803,49 @@ body.manuscript-overlay-open {
   padding: var(--space-0_5) var(--space-2);
   font-size: 0.6875rem;
 }
+
+/* Keyboard shortcuts help dialog (#276) — reference list of every binding
+   wired up in the game session. Uses the shared .dialog-content shell. */
+:root .keyboard-shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root .keyboard-shortcuts-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+:root .keyboard-shortcuts-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  min-width: 5rem;
+}
+
+:root .keyboard-shortcuts-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 var(--space-1_5);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-hover);
+  font-family: var(--font-system);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+:root .keyboard-shortcuts-description {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
