@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url';
 import { test, expect } from '@playwright/test';
 import { waitForContentStable } from '../utils/wait-helpers';
 import { seedTestData } from '../utils/seedTestData';
@@ -91,11 +92,18 @@ test('World creation tour: Finalize (tour steps 19-23)', async ({ page }) => {
   await page.locator('.component-wizard-container').getByRole('button', { name: 'Next' }).click();
   await waitForContentStable(page);
 
+  // The world image's "Generated: <date>" line renders today's date, so a
+  // baseline captured on one day drifts against every later run.
+  const stylePath = fileURLToPath(new URL('../utils/hide-volatile-content.css', import.meta.url));
+
   for (const stepIndex of steps) {
     await startTourAt(page, 'worldCreation', stepIndex);
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-finalize-${zeroPad(stepIndex)}.png`, { clip });
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-finalize-${zeroPad(stepIndex)}.png`, {
+      clip,
+      stylePath,
+    });
   }
 });

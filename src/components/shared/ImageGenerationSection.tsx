@@ -167,7 +167,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
           )}
 
           {generatedAt && (
-            <p>
+            <p className="image-generation-generated-at">
               Generated: {formatDate(generatedAt)}
             </p>
           )}

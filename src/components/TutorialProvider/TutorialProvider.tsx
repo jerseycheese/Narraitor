@@ -10,6 +10,7 @@ import Logger from '@/lib/utils/logger';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { useTutorialAutoScroll } from './useTutorialAutoScroll';
 import { useTourTargetRetry } from './useTourTargetRetry';
+import { useTutorialTooltipReposition } from './useTutorialTooltipReposition';
 
 // The full react-joyride module, loaded on demand (see ensureJoyrideRuntime).
 type JoyrideModule = typeof import('react-joyride');
@@ -88,6 +89,16 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [joyrideRuntime, setJoyrideRuntime] = useState<JoyrideModule | null>(null);
 
   useTutorialAutoScroll(run, steps, stepIndex);
+
+  const activeTarget = steps[stepIndex]?.target;
+  const remeasureStep = useCallback(() => {
+    setTargetResizeTick((tick) => tick + 1);
+  }, []);
+  const capturePopper = useTutorialTooltipReposition(
+    run && !isPaused,
+    typeof activeTarget === 'string' ? activeTarget : null,
+    remeasureStep
+  );
 
   // Force Joyride to re-measure the spotlight when the active step's target resizes
   // (e.g. a CollapsibleSection expanding). Without this, the spotlight stays at the
@@ -471,7 +482,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
             showProgress={tourOptions.showProgress}
             showSkipButton={tourOptions.showSkipButton}
             disableScrolling={tourOptions.disableScrolling}
-            floaterProps={tourOptions.floaterProps}
+            floaterProps={{ ...tourOptions.floaterProps, getPopper: capturePopper }}
             styles={joyrideStyles}
             callback={handleJoyrideCallback}
             disableOverlayClose={true}
