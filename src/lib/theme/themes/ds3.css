@@ -34,6 +34,12 @@
   --color-accent-hover: rgb(74 105 120);
   --color-accent-soft: rgb(91 122 140 / 10%);
 
+  /* Accent as body-sized text on --color-accent-soft: plain accent only
+     clears ~3.9:1 there, below the 4.5:1 AA minimum. This is the darker
+     step that restores contrast in light mode (accent-hover works here,
+     but not in dark mode — see the dark block below). */
+  --color-accent-strong: rgb(74 105 120);
+
   /* Extended semantic tokens */
   --success: 138 25% 40%;
   --success-foreground: 210 40% 98%;
@@ -152,6 +158,11 @@
    * mode — white-on-hover ~5.4:1. Base-state contrast tracked separately (#1379). */
   --color-accent-hover: rgb(80 110 128);
   --color-accent-soft: rgb(123 160 180 / 12%);
+
+  /* Accent as body-sized text on --color-accent-soft needs the LIGHTER step in
+     dark mode (opposite direction from light mode) — plain accent already
+     clears 5.25:1 here, so reuse it rather than accent-hover's darkened value. */
+  --color-accent-strong: rgb(123 160 180);
 
   --success: 138 20% 48%;
   --success-foreground: 222 84% 5%;

@@ -179,7 +179,10 @@
   font-family: var(--font-system);
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-accent);
+
+  /* accent-strong, not accent: plain accent on accent-soft only hits 3.9:1,
+     below the 4.5:1 AA minimum for this text size. */
+  color: var(--color-accent-strong);
   background: var(--color-accent-soft);
   border-radius: var(--radius-full);
 }
