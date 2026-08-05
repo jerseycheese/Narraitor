@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ManuscriptDrawer } from '../ManuscriptDrawer';
 
 describe('ManuscriptDrawer', () => {
@@ -88,5 +88,40 @@ describe('ManuscriptDrawer', () => {
 
     unmount();
     expect(document.body).not.toHaveClass('manuscript-overlay-open');
+  });
+
+  // Closing a drawer used to leave focus on <body>, which drops a keyboard
+  // player back at the very top of the tab order after every peek at the
+  // journal or inventory.
+  it('returns focus to the control that opened it', async () => {
+    const trigger = document.createElement('button');
+    trigger.textContent = 'Journal';
+    document.body.appendChild(trigger);
+    const triggerRef = { current: trigger };
+
+    const { rerender } = render(
+      <ManuscriptDrawer
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        title="Test Drawer"
+        restoreFocusRef={triggerRef}
+      >
+        <div>Content</div>
+      </ManuscriptDrawer>
+    );
+
+    rerender(
+      <ManuscriptDrawer
+        open={false}
+        onOpenChange={mockOnOpenChange}
+        title="Test Drawer"
+        restoreFocusRef={triggerRef}
+      >
+        <div>Content</div>
+      </ManuscriptDrawer>
+    );
+
+    await waitFor(() => expect(trigger).toHaveFocus());
+    trigger.remove();
   });
 });

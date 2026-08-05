@@ -4,6 +4,7 @@ import React from 'react';
 import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History, Keyboard } from 'lucide-react';
 import { HudCloseButton } from './HudCloseButton';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
+import { useRovingToolbar } from '@/hooks/useRovingToolbar';
 import type { GeneratedImage } from '@/types/common.types';
 
 interface ManuscriptFloatingHudProps {
@@ -43,6 +44,8 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
     node?.focus();
   }, []);
 
+  const { toolbarRef, onKeyDown, onFocus } = useRovingToolbar<HTMLDivElement>();
+
   return (
     <>
       <div className="manuscript-overlay-header-left">
@@ -76,7 +79,14 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
       </div>
 
       <div className="manuscript-overlay-header-right">
-        <div className="manuscript-ds3-controls">
+        <div
+          ref={toolbarRef}
+          onKeyDown={onKeyDown}
+          onFocus={onFocus}
+          role="toolbar"
+          aria-label="Session tools"
+          className="manuscript-ds3-controls"
+        >
           {saveIndicator}
           {drawerTriggers && (
             <>

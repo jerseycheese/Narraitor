@@ -193,28 +193,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const { startTour, isTourActive } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('firstPlay'));
 
+  // Escape for the drawer belongs to Radix, which closes it through
+  // onOpenChange and restores focus via the drawer's restoreFocusRef. The
+  // character panel is a plain popover with no dialog behaviour of its own,
+  // so it still needs its own Escape and focus return.
   React.useEffect(() => {
-    if (!isCharacterSummaryExpanded && activeDrawer === null) return;
+    if (!isCharacterSummaryExpanded) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (activeDrawer !== null) {
-          setActiveDrawer(null);
-          drawerTriggerRef.current?.focus();
-          drawerTriggerRef.current = null;
-          return;
-        }
-        if (isCharacterSummaryExpanded) {
-          setIsCharacterSummaryExpanded(false);
-          characterButtonRef.current?.focus();
-          return;
-        }
+        setIsCharacterSummaryExpanded(false);
+        characterButtonRef.current?.focus();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCharacterSummaryExpanded, activeDrawer]);
+  }, [isCharacterSummaryExpanded]);
 
   React.useEffect(() => {
     if (!isGameReady) return;
@@ -526,11 +521,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {isProgressiveDisclosureEnabled && (
         <ManuscriptDrawer
           open={activeDrawer !== null}
+          restoreFocusRef={drawerTriggerRef}
           onOpenChange={(open) => {
             if (!open) {
               setActiveDrawer(null);
-              drawerTriggerRef.current?.focus();
-              drawerTriggerRef.current = null;
             }
           }}
           title={

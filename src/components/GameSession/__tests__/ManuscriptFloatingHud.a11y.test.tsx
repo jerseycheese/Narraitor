@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ManuscriptFloatingHud } from '../ManuscriptFloatingHud';
 
 describe('ManuscriptFloatingHud accessibility', () => {
@@ -94,5 +94,64 @@ describe('ManuscriptFloatingHud accessibility', () => {
 
     const button = screen.getByRole('button', { name: /keyboard shortcuts/i });
     expect(button).toHaveClass('manuscript-hud-shortcuts-button');
+  });
+
+  // The icon row is a toolbar, not eight separate destinations. Left as
+  // eight tab stops it sits between the top of the page and the choices, so
+  // reaching an action costs eight extra presses on every single turn.
+  describe('session tools toolbar', () => {
+    const getTools = () =>
+      Array.from(
+        document.querySelectorAll<HTMLButtonElement>('.manuscript-hud-icon-button')
+      );
+
+    it('exposes the icon row as one named toolbar', () => {
+      render(<ManuscriptFloatingHud {...baseProps} onShowShortcuts={jest.fn()} />);
+
+      expect(
+        screen.getByRole('toolbar', { name: 'Session tools' })
+      ).toHaveClass('manuscript-ds3-controls');
+    });
+
+    it('keeps exactly one tool in the tab cycle', () => {
+      render(<ManuscriptFloatingHud {...baseProps} onShowShortcuts={jest.fn()} />);
+
+      const tools = getTools();
+      expect(tools.length).toBeGreaterThan(1);
+      expect(tools.filter((tool) => tool.tabIndex === 0)).toHaveLength(1);
+      expect(tools[0].tabIndex).toBe(0);
+    });
+
+    it('moves between tools with arrow keys, wrapping at both ends', () => {
+      render(<ManuscriptFloatingHud {...baseProps} onShowShortcuts={jest.fn()} />);
+
+      const toolbar = screen.getByRole('toolbar', { name: 'Session tools' });
+      const tools = getTools();
+      const last = tools[tools.length - 1];
+
+      tools[0].focus();
+      fireEvent.keyDown(toolbar, { key: 'ArrowRight' });
+      expect(tools[1]).toHaveFocus();
+
+      fireEvent.keyDown(toolbar, { key: 'ArrowLeft' });
+      fireEvent.keyDown(toolbar, { key: 'ArrowLeft' });
+      expect(last).toHaveFocus();
+
+      fireEvent.keyDown(toolbar, { key: 'Home' });
+      expect(tools[0]).toHaveFocus();
+
+      fireEvent.keyDown(toolbar, { key: 'End' });
+      expect(last).toHaveFocus();
+    });
+
+    it('leaves the last used tool as the tab stop', () => {
+      render(<ManuscriptFloatingHud {...baseProps} onShowShortcuts={jest.fn()} />);
+
+      const tools = getTools();
+      fireEvent.focus(tools[2], { target: tools[2] });
+
+      expect(tools[2].tabIndex).toBe(0);
+      expect(tools[0].tabIndex).toBe(-1);
+    });
   });
 });
