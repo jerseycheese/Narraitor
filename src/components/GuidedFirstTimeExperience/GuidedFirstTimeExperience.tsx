@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
-import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
+import { useWizardFlow } from '@/components/shared/wizard/hooks/useWizardFlow';
 import {
   validators,
   validateField,
@@ -146,7 +146,7 @@ export function GuidedFirstTimeExperience() {
   }, [updateTutorialProgress, router]);
 
   // Initialize wizard state
-  const wizard = useWizardState({
+  const wizard = useWizardFlow({
     steps: GUIDED_STEPS,
     initialData: {
       name: '',
