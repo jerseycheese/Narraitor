@@ -21,13 +21,21 @@ export function useRovingToolbar<T extends HTMLElement>(): {
   const toolbarRef = useRef<T>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Rendered-but-hidden buttons have to stay out of the set: the HUD drops its
+  // shortcuts trigger to display:none on phones, and arrowing onto one would
+  // silently lose focus, since focus() is a no-op on a box that isn't laid out.
+  // Computed style rather than getClientRects, which reports nothing at all
+  // under jsdom and would make the whole hook inert in tests.
   const getButtons = useCallback(
     () =>
       Array.from(
         toolbarRef.current?.querySelectorAll<HTMLButtonElement>(
           'button:not([disabled])'
         ) ?? []
-      ),
+      ).filter((button) => {
+        const style = window.getComputedStyle(button);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      }),
     []
   );
 

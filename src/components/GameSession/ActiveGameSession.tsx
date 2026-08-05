@@ -222,16 +222,25 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     return () => clearTimeout(timer);
   }, [isGameReady, shouldShowTour, isTourActive, startTour]);
 
+  // Every path into a drawer records what had focus, so closing it returns the
+  // player where they were. Routing the keyboard shortcut through here too
+  // keeps a stale HUD icon from stealing focus back after a `j` open.
+  const openDrawer = React.useCallback((drawerType: DrawerType) => {
+    drawerTriggerRef.current = document.activeElement as HTMLElement | null;
+    setActiveDrawer(drawerType);
+    setIsCharacterSummaryExpanded(false);
+  }, []);
+
   // Journal opens as a drawer under progressive disclosure, otherwise it's a
   // route (matches the two "Open Journal" entry points already in the HUD /
   // ActiveGameSessionControls).
   const handleOpenJournalShortcut = React.useCallback(() => {
     if (isProgressiveDisclosureEnabled) {
-      setActiveDrawer('journal');
+      openDrawer('journal');
     } else {
       router.push(`/worlds/${worldId}/play/journal`);
     }
-  }, [isProgressiveDisclosureEnabled, router, worldId]);
+  }, [isProgressiveDisclosureEnabled, openDrawer, router, worldId]);
 
   const handleToggleCharacterShortcut = React.useCallback(() => {
     setIsCharacterSummaryExpanded((prev) => !prev);
@@ -430,11 +439,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
           characterPortrait={character?.portrait}
-          onOpenDrawer={(drawerType) => {
-            drawerTriggerRef.current = document.activeElement as HTMLElement;
-            setActiveDrawer(drawerType as DrawerType);
-            setIsCharacterSummaryExpanded(false);
-          }}
+          onOpenDrawer={(drawerType) => openDrawer(drawerType as DrawerType)}
           onStartNew={handleHudStartNew}
           onBack={handleHudBack}
           onEndStory={handleEndStoryClick}

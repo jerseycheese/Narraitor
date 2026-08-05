@@ -144,6 +144,29 @@ describe('ManuscriptFloatingHud accessibility', () => {
       expect(last).toHaveFocus();
     });
 
+    // The shortcuts trigger is display:none on phones. Arrowing onto a box
+    // that isn't laid out silently drops focus, so it can't be in the set.
+    it('skips tools hidden by CSS', () => {
+      render(<ManuscriptFloatingHud {...baseProps} onShowShortcuts={jest.fn()} />);
+
+      const toolbar = screen.getByRole('toolbar', { name: 'Session tools' });
+      const shortcuts = screen.getByRole('button', {
+        name: /keyboard shortcuts/i,
+      });
+      const choiceHistory = screen.getByRole('button', {
+        name: /choice history/i,
+      });
+      const resetSession = screen.getByRole('button', {
+        name: /reset session/i,
+      });
+      shortcuts.style.display = 'none';
+
+      choiceHistory.focus();
+      fireEvent.keyDown(toolbar, { key: 'ArrowRight' });
+
+      expect(resetSession).toHaveFocus();
+    });
+
     it('leaves the last used tool as the tab stop', () => {
       render(<ManuscriptFloatingHud {...baseProps} onShowShortcuts={jest.fn()} />);
 

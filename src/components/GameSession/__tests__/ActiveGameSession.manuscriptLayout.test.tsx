@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import ActiveGameSession from '../ActiveGameSession';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -371,6 +371,45 @@ describe('ActiveGameSession Manuscript Layout', () => {
 
       const drawer = await screen.findByTestId('manuscript-drawer');
       expect(drawer).toBeInTheDocument();
+    });
+
+    // The restore target is captured per open. Without that, opening from a
+    // HUD icon once leaves the ref pinned to that icon, and a later "j" open
+    // yanks focus to the icon instead of back where the player was.
+    it('returns focus where the player was when the drawer opened via "j"', async () => {
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+
+      const hudTools = within(
+        screen.getByRole('toolbar', { name: 'Session tools' })
+      );
+
+      // Open and close once from the HUD icon so the ref is populated.
+      const journalIcon = hudTools.getByRole('button', { name: 'Journal' });
+      fireEvent.click(journalIcon);
+      await screen.findByTestId('manuscript-drawer');
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+      await waitFor(() =>
+        expect(screen.queryByTestId('manuscript-drawer')).not.toBeInTheDocument()
+      );
+
+      // Now open from somewhere else entirely via the shortcut.
+      const elsewhere = hudTools.getByRole('button', { name: 'End Story' });
+      elsewhere.focus();
+      fireEvent.keyDown(document, { key: 'j' });
+      await screen.findByTestId('manuscript-drawer');
+
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+      await waitFor(() => expect(elsewhere).toHaveFocus());
     });
 
     it('routes to the journal page when "j" is pressed without progressive disclosure', async () => {
