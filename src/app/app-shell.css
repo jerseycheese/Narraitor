@@ -1324,19 +1324,6 @@
 }
 
 :root .component-collapsible-section
-  [data-testid="collapsible-section-title"]::before {
-  content: "• ";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-:root .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding-top: var(--space-4);
 }
@@ -2014,19 +2001,6 @@
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 400;
-}
-
-:root .settings-section h2::before {
-  content: "• ";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  font-style: normal;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
 }
 
 :root .settings-section h2::after {
