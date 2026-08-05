@@ -123,7 +123,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
             onClick={onShowShortcuts}
             title="Keyboard Shortcuts"
             aria-label="Keyboard Shortcuts"
-            className="manuscript-hud-icon-button"
+            className="manuscript-hud-icon-button manuscript-hud-shortcuts-button"
           >
             <Keyboard size={16} aria-hidden="true" />
           </button>

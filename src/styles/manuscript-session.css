@@ -2038,6 +2038,22 @@ body.manuscript-overlay-open {
   .manuscript-header-controls {
     gap: var(--space-1);
   }
+
+  /* The HUD icon row's auto-sized grid track overlaps the character pill's
+     clickable area on narrow viewports once it grows past ~7 icons (#276
+     review follow-up - confirmed by measuring the two boxes overlapping at
+     375px). Dropping the shortcuts trigger here is also the right call on
+     its own merits: it opens a reference for keyboard-only bindings, which
+     aren't actionable on a touch-only device anyway. The "?" binding itself
+     still works if an external keyboard is attached.
+     Specificity note: needs to beat the unconditional `:root
+     .manuscript-hud-icon-button { display: inline-flex }` base rule below,
+     which shares this element's other class - a plain `.manuscript-hud-
+     shortcuts-button` selector loses that cascade fight regardless of media
+     query, so this chains both classes under :root to outrank it. */
+  :root .manuscript-hud-icon-button.manuscript-hud-shortcuts-button {
+    display: none;
+  }
 }
 
 @media (width >= 1024px) {
