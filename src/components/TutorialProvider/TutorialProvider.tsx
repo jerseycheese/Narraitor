@@ -89,7 +89,16 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const [joyrideRuntime, setJoyrideRuntime] = useState<JoyrideModule | null>(null);
 
   useTutorialAutoScroll(run, steps, stepIndex);
-  const capturePopper = useTutorialTooltipReposition(run && !isPaused);
+
+  const activeTarget = steps[stepIndex]?.target;
+  const remeasureStep = useCallback(() => {
+    setTargetResizeTick((tick) => tick + 1);
+  }, []);
+  const capturePopper = useTutorialTooltipReposition(
+    run && !isPaused,
+    typeof activeTarget === 'string' ? activeTarget : null,
+    remeasureStep
+  );
 
   // Force Joyride to re-measure the spotlight when the active step's target resizes
   // (e.g. a CollapsibleSection expanding). Without this, the spotlight stays at the
