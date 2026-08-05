@@ -12,7 +12,10 @@ import {
  */
 describe('errorReport privacy contract (#1641)', () => {
   it('keeps the message out of the payload, key-shaped strings and story text included', () => {
-    const secret = 'AIzaSyD-1234567890abcdefghijklmnopqrstu';
+    // Deliberately too short to match GitHub's Google-API-key secret scan
+    // (AIza + 35 chars) — still key-shaped enough to prove the message field
+    // gets dropped wholesale rather than selectively redacted.
+    const secret = 'AIzaSy-FAKE-TEST-KEY-DO-NOT-USE';
     const error = new Error(
       `Request failed with key ${secret} while generating for Thornwick the Bold in the Ashen Reach`
     );
