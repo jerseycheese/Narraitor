@@ -1,5 +1,6 @@
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
+import { describeNarrativeLength } from './narrativeLength';
 import type { NarrativeTemplateContext } from './context';
 
 export const sceneTemplate = (context: NarrativeTemplateContext) => {
@@ -16,6 +17,7 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
   } = context;
 
   const segmentType = generationParameters?.segmentType || 'scene';
+  const lengthDescription = describeNarrativeLength(generationParameters);
   const recentSegments = narrativeContext?.recentSegments || [];
   const recentContent = recentSegments.map((seg, i: number) =>
     `[Scene ${recentSegments.length - i}]: ${seg.content}`
@@ -104,7 +106,7 @@ Generate a ${segmentType} that:
 3. Does NOT repeat or revisit events that already happened
 4. Advances the story forward in time (never backward)
 5. Maintains the ${tone} tone
-6. Is approximately 3-5 sentences long (1 focused paragraph)
+6. Is approximately ${lengthDescription} in length
 
 ${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
 

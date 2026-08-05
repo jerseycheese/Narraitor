@@ -702,7 +702,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
             },
             generationParameters: {
               includedTopics: [choiceText],
-              desiredLength: 'short',
+              // No desiredLength: the template scales the beat off decisionWeight
+              // so weighty moments get more room than routine ones.
               decisionWeight,
               // Critical decisions with critical failures should have tragic tone
               desiredTone:
