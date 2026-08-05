@@ -1,5 +1,6 @@
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
+import { describeNarrativeLength } from './narrativeLength';
 import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 import type { NarrativeTemplateContext } from './context';
 
@@ -19,13 +20,7 @@ export const baseNarrativeTemplate = (context: NarrativeTemplateContext) => {
   // Tone settings are handled by the AI system prompt enhancement
   void toneSettings;
 
-  const length = generationParameters?.desiredLength || 'short';
-  const lengthGuide: Record<string, string> = {
-    short: '3-5 sentences (1 focused paragraph)',
-    medium: '1-2 paragraphs',
-    long: '3-4 paragraphs'
-  };
-  const lengthDescription = lengthGuide[length] || lengthGuide.medium;
+  const lengthDescription = describeNarrativeLength(generationParameters);
 
   const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
     ? `

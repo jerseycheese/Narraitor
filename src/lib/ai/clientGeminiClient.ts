@@ -78,7 +78,7 @@ export class ClientGeminiClient implements AIClient {
   async generateContent(prompt: string, options?: AIGenerateOptions): Promise<AIResponse> {
     const data = await this.postJson<{ content: string; finishReason?: string; promptTokens?: number; completionTokens?: number }>(
       '/api/narrative/generate',
-      { prompt, config: { temperature: 0.7, maxTokens: 1024 } },
+      { prompt, config: { temperature: 0.7, maxTokens: 2048 } },
       'generation',
       // The route makes a single 30s Gemini attempt (makeGeminiRequest), so
       // the wait ceiling is that budget + headroom, not the retry worst case.
