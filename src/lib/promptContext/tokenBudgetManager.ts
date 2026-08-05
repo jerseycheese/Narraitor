@@ -289,6 +289,7 @@ export const DEFAULT_ALLOCATIONS: BudgetAllocation[] = [
   { componentId: 'personalization', priority: ComponentPriority.MEDIUM, min: 200, target: 800, max: 1500 },
   { componentId: 'item-instructions', priority: ComponentPriority.LOW, min: 0, target: 200, max: 400 },
   { componentId: 'examples', priority: ComponentPriority.LOW, min: 0, target: 200, max: 400 },
+  { componentId: 'phrase-variety', priority: ComponentPriority.LOW, min: 0, target: 100, max: 200 },
 ];
 
 /**
