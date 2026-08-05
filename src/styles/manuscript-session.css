@@ -346,6 +346,14 @@ body.manuscript-overlay-open {
   box-shadow: var(--shadow-overlay);
   border-radius: var(--radius-sm);
   padding: var(--space-3);
+
+  /* DS3 always stacks suggested actions in a single column (never a grid),
+     so a full set of choices can grow tall enough to squeeze the narrative
+     row in `.manuscript-viewport-inner`'s auto/1fr/auto grid down to a few
+     px on short viewports. Cap the rail and let it scroll internally instead
+     of starving the story text of space. */
+  max-height: min(50dvh, 26rem);
+  overflow-y: auto;
 }
 
 .manuscript-mobile-rail-top-controls {
