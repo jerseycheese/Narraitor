@@ -53,6 +53,7 @@ import {
   buildContinuityContractFromStores,
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
+import { enhancePromptWithPhraseVariety } from './narrativeGenerator.phraseVariety';
 
 /**
  * Stop an abandoned generation before its side effects run. Callers that race
@@ -147,9 +148,15 @@ export class NarrativeGenerator {
         characterInventory
       );
 
+      const phraseVarietyPrompt = enhancePromptWithPhraseVariety(
+        fullyEnhancedPrompt,
+        requestForTemplate.narrativeContext?.recentSegments,
+        budget
+      );
+
       const continuityContract = buildContinuityContractFromStores(request);
       const finalPrompt = enhancePromptWithContinuityExpectations(
-        fullyEnhancedPrompt,
+        phraseVarietyPrompt,
         continuityContract
       );
 
