@@ -37,6 +37,7 @@ async function globalSetup(config: FullConfig) {
         const instantiateGetTimestamp = (source: string) =>
           new Function(`return (${source});`)() as () => string;
         const getTimestamp = instantiateGetTimestamp(getTimestampSource);
+        const SEEDED_IMAGE_GENERATED_AT = '2024-01-01T00:00:00.000Z';
         const {
           SAMPLE_WORLDS,
           SAMPLE_CHARACTERS,
@@ -133,7 +134,10 @@ async function globalSetup(config: FullConfig) {
             url:
               world.image?.url ??
               generateBitmapPlaceholder(world.id || world.name || 'world'),
-            generatedAt: now,
+            // Rendered verbatim as "Generated: <date>", so it has to be fixed.
+            // A live timestamp bakes the capture date into every baseline and
+            // breaks them the next day. Matches the other seeded fixtures.
+            generatedAt: SEEDED_IMAGE_GENERATED_AT,
           };
 
           return {
