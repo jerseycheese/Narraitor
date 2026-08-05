@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { createElement } from 'react';
-import { useWizardState } from '../useWizardState';
+import { useWizardFlow } from '../useWizardFlow';
 
 // Mock localStorage
 const localStorageMock = {
@@ -24,7 +24,7 @@ interface TestData {
   };
 }
 
-describe('useWizardState - localStorage migration', () => {
+describe('useWizardFlow - localStorage migration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -56,7 +56,7 @@ describe('useWizardState - localStorage migration', () => {
     };
 
     const { result } = renderHook(() =>
-      useWizardState({
+      useWizardFlow({
         steps: [{ id: 'test', label: 'Test' }],
         initialData,
         onComplete: () => {},
@@ -91,7 +91,7 @@ describe('useWizardState - localStorage migration', () => {
     };
 
     const { result } = renderHook(() =>
-      useWizardState({
+      useWizardFlow({
         steps: [{ id: 'test', label: 'Test' }],
         initialData,
         onComplete: () => {},
@@ -117,7 +117,7 @@ describe('useWizardState - localStorage migration', () => {
     };
 
     const { result } = renderHook(() =>
-      useWizardState({
+      useWizardFlow({
         steps: [{ id: 'test', label: 'Test' }],
         initialData,
         onComplete: () => {},
@@ -149,7 +149,7 @@ describe('useWizardState - localStorage migration', () => {
     };
 
     const { result } = renderHook(() =>
-      useWizardState({
+      useWizardFlow({
         steps: [{ id: 'test', label: 'Test' }],
         initialData,
         onComplete: () => {},
@@ -192,7 +192,7 @@ describe('useWizardState - localStorage migration', () => {
     };
 
     const { result } = renderHook(() =>
-      useWizardState({
+      useWizardFlow({
         steps: [{ id: 'test', label: 'Test' }],
         initialData,
         onComplete: () => {},
@@ -227,7 +227,7 @@ describe('useWizardState - localStorage migration', () => {
     }));
 
     const WizardTest = () => {
-      const wizard = useWizardState({
+      const wizard = useWizardFlow({
         steps: [{ id: 'test', label: 'Test' }],
         initialData,
         onComplete: () => {},

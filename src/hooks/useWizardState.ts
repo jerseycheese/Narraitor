@@ -1,5 +1,9 @@
 import { useState, useCallback, useMemo } from 'react';
 
+// In-memory step/data/validation state only. If you also want localStorage
+// persistence, a submit lifecycle, and cancel-routing, use `useWizardFlow`
+// in @/components/shared/wizard/hooks instead.
+
 export interface WizardStep {
   id: string;
   label: string;

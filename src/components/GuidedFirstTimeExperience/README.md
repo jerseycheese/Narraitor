@@ -45,7 +45,7 @@ export function QuickPlay() {
 
 ## How It's Built
 
-**Reuses existing wizard infrastructure** - Built on the same `useWizardState` hook that powers the full world creation wizard, so it handles step navigation, validation, and persistence automatically.
+**Reuses existing wizard infrastructure** - Built on the shared `useWizardFlow` hook, so it handles step navigation, validation, and persistence automatically.
 
 **Smart user detection** - Hooks into the session store to detect first-time users and track when they've completed onboarding.
 

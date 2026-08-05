@@ -12,11 +12,11 @@ import {
   WizardProgress,
   WizardNavigation,
   WizardStep,
-  useWizardState
 } from '@/components/shared/wizard';
+import { useWizardFlow } from '@/components/shared/wizard/hooks/useWizardFlow';
 
 function MyWizard() {
-  const wizard = useWizardState({
+  const wizard = useWizardFlow({
     initialData: { /* your data */ },
     totalSteps: 3,
     persistKey: 'my-wizard-session', // automatically saves progress
@@ -52,7 +52,7 @@ function MyWizard() {
 - **ToggleButton** - Styled toggle switches that actually look good
 
 - ### Hooks & Utilities
-- **useWizardState** - Complete state management (saves you from prop drilling hell)
+- **useWizardFlow** - Complete state management with persistence, submit, and cancel (saves you from prop drilling hell). For step state without any of that, there's `useWizardState` in `@/hooks`.
 - **Validation helpers** - `createWizardValidator`, `validateFields`, and friends for building per-step rules
 
 ## Why Use This Instead of Rolling Your Own
