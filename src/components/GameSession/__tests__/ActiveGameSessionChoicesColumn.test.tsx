@@ -51,6 +51,16 @@ describe('ActiveGameSessionChoicesColumn', () => {
     expect(selectorProps.isDisabled).toBe(false);
   });
 
+  it('forwards shortcutsSuspended to ChoiceSelector so its number-key hotkeys stay off behind a modal (#276)', () => {
+    render(<ActiveGameSessionChoicesColumn {...baseProps} shortcutsSuspended />);
+
+    const selectorProps = (ChoiceSelector as jest.Mock).mock.calls[0][0] as {
+      shortcutsSuspended?: boolean;
+    };
+
+    expect(selectorProps.shortcutsSuspended).toBe(true);
+  });
+
   it('does not render ChoiceSelector when no decision is available', () => {
     render(
       <ActiveGameSessionChoicesColumn

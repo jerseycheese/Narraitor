@@ -187,6 +187,14 @@ describe('ChoiceSelector', () => {
 
       expect(mockOnSelect).not.toHaveBeenCalled();
     });
+
+    it('does not respond to number keys while shortcutsSuspended (a modal is open)', () => {
+      renderChoiceSelector({ decision, onSelect: mockOnSelect, shortcutsSuspended: true });
+
+      fireEvent.keyDown(document, { key: '1' });
+
+      expect(mockOnSelect).not.toHaveBeenCalled();
+    });
   });
 
   describe('Custom Input', () => {

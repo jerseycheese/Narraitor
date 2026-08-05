@@ -43,12 +43,12 @@ jest.mock('../ActiveGameSessionNarrativeColumn', () => ({
 
 jest.mock('../ActiveGameSessionChoicesColumn', () => ({
   __esModule: true,
-  default: ({ inputActions, endStoryAction }: { inputActions?: React.ReactNode; endStoryAction?: React.ReactNode }) => (
+  default: jest.fn(({ inputActions, endStoryAction }: { inputActions?: React.ReactNode; endStoryAction?: React.ReactNode }) => (
     <div data-testid="choices-column">
       {inputActions}
       {endStoryAction}
     </div>
-  ),
+  )),
 }));
 
 jest.mock('../ActiveGameSessionControls', () => ({
@@ -302,6 +302,38 @@ describe('ActiveGameSession Manuscript Layout', () => {
       fireEvent.keyDown(document, { key: '?' });
 
       expect(await screen.findByRole('dialog', { name: /keyboard shortcuts/i })).toBeInTheDocument();
+    });
+
+    it('suspends ChoiceSelector\'s number-key hotkeys while the shortcuts dialog is open (review follow-up)', async () => {
+      const ActiveGameSessionChoicesColumn = require('../ActiveGameSessionChoicesColumn').default;
+      // Progressive disclosure ON so "j" would open the journal drawer if it
+      // weren't suspended - proves the gate actually blocks something,
+      // rather than "j" being a no-op for an unrelated reason.
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+
+      const propsBeforeOpen = (ActiveGameSessionChoicesColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      expect(propsBeforeOpen.shortcutsSuspended).toBe(false);
+
+      fireEvent.keyDown(document, { key: '?' });
+      await screen.findByRole('dialog', { name: /keyboard shortcuts/i });
+
+      const propsWhileOpen = (ActiveGameSessionChoicesColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      expect(propsWhileOpen.shortcutsSuspended).toBe(true);
+
+      // "j" is also suspended once a modal is up, so it must not stack a
+      // second overlay (the journal drawer) behind the shortcuts dialog.
+      fireEvent.keyDown(document, { key: 'j' });
+      expect(screen.queryByTestId('manuscript-drawer')).not.toBeInTheDocument();
     });
 
     it('toggles the character summary when "c" is pressed', async () => {
