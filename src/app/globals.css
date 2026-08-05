@@ -550,5 +550,9 @@ body > * {
 .app-global-error-action:hover {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
+
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
 }
 

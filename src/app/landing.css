@@ -104,7 +104,9 @@
 }
 
 .component-landing-cta:hover {
-  color: var(--color-on-accent);
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
   background: var(--color-accent-hover);
 }
 
@@ -284,19 +286,14 @@
 
 /* ═══════════════════════════════════════════════════════════════
    DS3 — "Mechanical Manuscript"
-   Dot-grid field, mono labels with a dot bullet, corner-bracket step
-   cards, compact rhythm, mono prose.
+   Mono labels with a dot bullet, corner-bracket step cards, compact
+   rhythm, mono prose. Dot-grid field comes from the app-surface root
+   (app-shell.css), not defined per-page — see ds3.css
+   --pattern-dot-grid-image.
    ═══════════════════════════════════════════════════════════════ */
 
 :root .component-landing {
   gap: clamp(var(--space-6), 5vw, 3.5rem);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 14%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 24px 24px;
-  background-repeat: repeat;
 }
 
 :root .component-landing-eyebrow {

@@ -649,6 +649,10 @@ body.manuscript-overlay-open {
 .manuscript-tools-menu-item-active:hover {
   background: var(--color-accent-hover);
   border: none;
+
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
 }
 
 .manuscript-tools-menu-item-secondary {
@@ -843,6 +847,10 @@ body.manuscript-overlay-open {
 
 .manuscript-send-button:hover:not(:disabled) {
   background: var(--color-accent-hover);
+
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
 }
 
 .manuscript-send-button:disabled {
@@ -2541,6 +2549,10 @@ body.manuscript-overlay-open {
 
 .manuscript-generation-error-retry:hover {
   background: var(--color-accent-hover);
+
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
 }
 
 .manuscript-generation-error-retry:focus-visible {
@@ -2787,16 +2799,12 @@ body.manuscript-overlay-open {
   padding: 5rem 1.5rem 7.5rem;
 }
 
-/* Dot grid background overlay */
+/* Dot grid background overlay — same canonical pattern as the app surface
+ * (ds3.css --pattern-dot-grid-image), layered under this surface's own
+ * dark scrim gradient rather than the plain canvas color. */
 :root .manuscript-viewport-shell {
   background:
-    radial-gradient(circle, rgb(42 35 28 / 18%) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
-}
-
-:root.dark .manuscript-viewport-shell {
-  background:
-    radial-gradient(circle, rgb(237 232 224 / 12%) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--pattern-dot-grid-image) 0 0 / 24px 24px,
     linear-gradient(180deg, var(--color-manuscript-gradient-start), var(--color-manuscript-gradient-end));
 }
 

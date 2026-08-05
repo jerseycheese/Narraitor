@@ -200,7 +200,9 @@
 }
 
 .component-about-cta-link:hover {
-  color: var(--color-on-accent);
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
   background: var(--color-accent-hover);
 }
 
@@ -254,19 +256,14 @@
 
 /* ═══════════════════════════════════════════════════════════════
    DS3 — "Mechanical Manuscript"
-   Compact: dot-grid background, corner-bracket step cards, tighter
-   gaps, medium radius, mono section labels with a dot bullet.
+   Compact: corner-bracket step cards, tighter gaps, medium radius, mono
+   section labels with a dot bullet. Dot-grid field comes from the
+   app-surface root (app-shell.css), not defined per-page — see ds3.css
+   --pattern-dot-grid-image.
    ═══════════════════════════════════════════════════════════════ */
 
 :root .component-about {
   gap: var(--space-6);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 16%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 24px 24px;
-  background-repeat: repeat;
 }
 
 :root .component-about-section-title {
