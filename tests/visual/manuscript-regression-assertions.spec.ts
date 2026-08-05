@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
+import { seedJournalEntriesForVisual } from './utils/game-session-page-seeder';
 
 const seedMarginaliaLoreFact = async (page: Page) => {
   await page.addInitScript(async () => {
@@ -258,5 +259,126 @@ test.describe('Manuscript regression assertions', () => {
     expect(geometry.definitionRight).toBeLessThanOrEqual(
       geometry.viewportWidth
     );
+  });
+
+  test('Choice badges stay above the 12px legibility floor', async ({ page }) => {
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.manuscript-alignment-badge, .manuscript-skill-check-badge', {
+      timeout: 10000,
+    });
+
+    // #1683: these badges sat at 0.625rem (10px), below anything a player is
+    // meant to read at a glance while scanning choices.
+    const badgeFontSizes = await page.evaluate(() => {
+      const badges = Array.from(
+        document.querySelectorAll(
+          '.manuscript-alignment-badge, .manuscript-skill-check-badge'
+        )
+      );
+      return badges.map((badge) => parseFloat(getComputedStyle(badge).fontSize));
+    });
+
+    expect(badgeFontSizes.length).toBeGreaterThan(0);
+    for (const fontSize of badgeFontSizes) {
+      expect(fontSize).toBeGreaterThanOrEqual(12);
+    }
+  });
+
+  test('Journal snapshot meta row stays above the 12px legibility floor', async ({ page }) => {
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+
+    // A DS3-only override on `:root .manuscript-journal-snapshot-meta` clobbered
+    // the base rule's font-size bump (missed in the initial #1683 pass), so this
+    // opens the real drawer rather than only checking the base-rule selector.
+    await seedJournalEntriesForVisual(page);
+    await page.getByRole('button', { name: 'Journal' }).click();
+    await page.waitForSelector('.manuscript-journal-snapshot-meta', { timeout: 10000 });
+
+    const metaFontSize = await page.evaluate(() => {
+      const meta = document.querySelector('.manuscript-journal-snapshot-meta');
+      return meta ? parseFloat(getComputedStyle(meta).fontSize) : null;
+    });
+
+    expect(metaFontSize).not.toBeNull();
+    expect(metaFontSize as number).toBeGreaterThanOrEqual(12);
+  });
+
+  test('Short narrative content does not leave a conspicuous dead band above the choices rail', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1024 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.narrative-segment', { timeout: 10000 });
+
+    // Trim to a single short segment so the narrative column is well short of
+    // the available height — the scenario #1683 measured ~193px (~19% of a
+    // 1024px-tall viewport) of dead space in.
+    await page.evaluate(() => {
+      const store = (window as any).useNarrativeStore?.getState?.();
+      if (!store?.clearSessionSegments || !store?.addSegment) {
+        throw new Error('Expected narrative store to be available');
+      }
+
+      const sessionId = 'session-cyberpunk-ghost';
+      store.clearSessionSegments(sessionId);
+      store.addSegment(sessionId, {
+        worldId: 'world-cyberpunk-2077',
+        content: 'A single short beat of narration.',
+        type: 'scene',
+        characterIds: ['char-cyberpunk-hacker'],
+        metadata: { tags: ['dead-band-regression'], location: 'Test Location' },
+        timestamp: new Date(),
+      });
+    });
+
+    await page.waitForFunction(
+      () => document.querySelectorAll('.narrative-segment').length === 1,
+      { timeout: 10000 }
+    );
+
+    const geometry = await page.evaluate(() => {
+      const narrativeContainer = document.querySelector(
+        '.manuscript-narrative-container'
+      );
+      const actionRail = document.querySelector('#manuscript-action-rail');
+
+      if (!narrativeContainer || !actionRail) {
+        return null;
+      }
+
+      return {
+        narrativeBottom: narrativeContainer.getBoundingClientRect().bottom,
+        actionRailTop: actionRail.getBoundingClientRect().top,
+        viewportHeight: window.innerHeight,
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected play surface geometry to be measurable');
+    }
+
+    const gap = geometry.actionRailTop - geometry.narrativeBottom;
+
+    // Guards the regression: for this single-line segment, the gap measured
+    // ~184px (~18% of viewport height) before the main-content padding trim,
+    // and ~163px (~16%) after.
+    expect(gap).toBeLessThan(geometry.viewportHeight * 0.17);
   });
 });

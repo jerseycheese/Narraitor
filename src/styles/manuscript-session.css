@@ -940,7 +940,7 @@ body.manuscript-overlay-open {
 
 .manuscript-journal-snapshot-badge {
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -973,7 +973,7 @@ body.manuscript-overlay-open {
   display: flex;
   justify-content: space-between;
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
 }
 
@@ -1197,7 +1197,7 @@ body.manuscript-overlay-open {
   align-items: center;
   border-radius: var(--radius-full);
   padding: var(--space-0_5) var(--space-1_5);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-family: var(--font-system);
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -1226,7 +1226,7 @@ body.manuscript-overlay-open {
 
   padding: var(--space-0_5) var(--space-1_5);
 
-  font-size: 0.625rem;
+  font-size: 0.75rem;
 
   font-family: var(--font-system);
 
@@ -1402,7 +1402,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface-hover);
   color: var(--color-text-secondary);
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1689,7 +1689,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface-hover);
   border: 1px solid var(--color-border);
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
@@ -2811,8 +2811,11 @@ body.manuscript-overlay-open {
   margin-bottom: var(--space-3);
 }
 
+/* Top/bottom padding trimmed from 5rem/7.5rem — the original values left a
+   ~193px empty band between short narrative content and the docked choices
+   rail on tall viewports. */
 :root .manuscript-main-content {
-  padding: 5rem 1.5rem 7.5rem;
+  padding: 3rem 1.5rem 4rem;
 }
 
 /* Dot grid background overlay — same canonical pattern as the app surface
@@ -3494,7 +3497,7 @@ body.manuscript-overlay-open {
 }
 
 :root .manuscript-journal-snapshot-meta {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
