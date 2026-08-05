@@ -193,28 +193,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const { startTour, isTourActive } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('firstPlay'));
 
+  // Escape for the drawer belongs to Radix, which closes it through
+  // onOpenChange and restores focus via the drawer's restoreFocusRef. The
+  // character panel is a plain popover with no dialog behaviour of its own,
+  // so it still needs its own Escape and focus return.
   React.useEffect(() => {
-    if (!isCharacterSummaryExpanded && activeDrawer === null) return;
+    if (!isCharacterSummaryExpanded) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (activeDrawer !== null) {
-          setActiveDrawer(null);
-          drawerTriggerRef.current?.focus();
-          drawerTriggerRef.current = null;
-          return;
-        }
-        if (isCharacterSummaryExpanded) {
-          setIsCharacterSummaryExpanded(false);
-          characterButtonRef.current?.focus();
-          return;
-        }
+        setIsCharacterSummaryExpanded(false);
+        characterButtonRef.current?.focus();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCharacterSummaryExpanded, activeDrawer]);
+  }, [isCharacterSummaryExpanded]);
 
   React.useEffect(() => {
     if (!isGameReady) return;
@@ -227,16 +222,25 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     return () => clearTimeout(timer);
   }, [isGameReady, shouldShowTour, isTourActive, startTour]);
 
+  // Every path into a drawer records what had focus, so closing it returns the
+  // player where they were. Routing the keyboard shortcut through here too
+  // keeps a stale HUD icon from stealing focus back after a `j` open.
+  const openDrawer = React.useCallback((drawerType: DrawerType) => {
+    drawerTriggerRef.current = document.activeElement as HTMLElement | null;
+    setActiveDrawer(drawerType);
+    setIsCharacterSummaryExpanded(false);
+  }, []);
+
   // Journal opens as a drawer under progressive disclosure, otherwise it's a
   // route (matches the two "Open Journal" entry points already in the HUD /
   // ActiveGameSessionControls).
   const handleOpenJournalShortcut = React.useCallback(() => {
     if (isProgressiveDisclosureEnabled) {
-      setActiveDrawer('journal');
+      openDrawer('journal');
     } else {
       router.push(`/worlds/${worldId}/play/journal`);
     }
-  }, [isProgressiveDisclosureEnabled, router, worldId]);
+  }, [isProgressiveDisclosureEnabled, openDrawer, router, worldId]);
 
   const handleToggleCharacterShortcut = React.useCallback(() => {
     setIsCharacterSummaryExpanded((prev) => !prev);
@@ -435,11 +439,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
           characterPortrait={character?.portrait}
-          onOpenDrawer={(drawerType) => {
-            drawerTriggerRef.current = document.activeElement as HTMLElement;
-            setActiveDrawer(drawerType as DrawerType);
-            setIsCharacterSummaryExpanded(false);
-          }}
+          onOpenDrawer={(drawerType) => openDrawer(drawerType as DrawerType)}
           onStartNew={handleHudStartNew}
           onBack={handleHudBack}
           onEndStory={handleEndStoryClick}
@@ -526,11 +526,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {isProgressiveDisclosureEnabled && (
         <ManuscriptDrawer
           open={activeDrawer !== null}
+          restoreFocusRef={drawerTriggerRef}
           onOpenChange={(open) => {
             if (!open) {
               setActiveDrawer(null);
-              drawerTriggerRef.current?.focus();
-              drawerTriggerRef.current = null;
             }
           }}
           title={
