@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History } from 'lucide-react';
+import { BookOpen, Backpack, FileText, RotateCcw, LogOut, History, Keyboard } from 'lucide-react';
 import { HudCloseButton } from './HudCloseButton';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import type { GeneratedImage } from '@/types/common.types';
@@ -18,6 +18,7 @@ interface ManuscriptFloatingHudProps {
   onStartNew?: () => void;
   onBack?: () => void;
   onEndStory?: () => void;
+  onShowShortcuts?: () => void;
   saveIndicator?: React.ReactNode;
   characterButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
@@ -34,6 +35,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
   onStartNew,
   onBack,
   onEndStory,
+  onShowShortcuts,
   saveIndicator,
   characterButtonRef,
 }) => {
@@ -116,6 +118,15 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
               </button>
             </>
           )}
+          <button
+            type="button"
+            onClick={onShowShortcuts}
+            title="Keyboard Shortcuts"
+            aria-label="Keyboard Shortcuts"
+            className="manuscript-hud-icon-button manuscript-hud-shortcuts-button"
+          >
+            <Keyboard size={16} aria-hidden="true" />
+          </button>
           <button
             type="button"
             onClick={onStartNew}

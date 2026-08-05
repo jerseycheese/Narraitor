@@ -82,4 +82,17 @@ describe('ManuscriptFloatingHud accessibility', () => {
     const avatar = document.querySelector('.manuscript-hud-character-pill-avatar');
     expect(avatar?.querySelector('img')).toBeNull();
   });
+
+  // At 8 icons wide, the HUD's auto-sized icon row overlaps the character
+  // pill's clickable area on mobile viewports and steals its clicks (#276
+  // review follow-up - a real layout bug, not a modal-gating one). The fix is
+  // a mobile-only `display: none` keyed off this class; jsdom can't compute
+  // real layout to catch the overlap itself, so this locks in the CSS hook
+  // the fix depends on.
+  it('marks the keyboard shortcuts trigger so it can be hidden on mobile (#276)', () => {
+    render(<ManuscriptFloatingHud {...baseProps} onShowShortcuts={jest.fn()} />);
+
+    const button = screen.getByRole('button', { name: /keyboard shortcuts/i });
+    expect(button).toHaveClass('manuscript-hud-shortcuts-button');
+  });
 });

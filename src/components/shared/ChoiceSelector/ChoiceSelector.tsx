@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Decision } from '@/types/narrative.types';
 import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
@@ -10,6 +10,7 @@ import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestio
 import { ArrowUp } from 'lucide-react';
 import { clsx } from 'clsx';
 import { safeTrim } from '@/lib/utils';
+import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 import { normalizeDecisionOptions } from './optionNormalizer';
 import type { NormalizedOption } from './optionNormalizer';
 import {
@@ -60,6 +61,12 @@ interface ChoiceSelectorProps {
     onAccept: () => void;
     onDismiss: () => void;
   };
+
+  // True while a modal/dialog (shortcuts help, a drawer, End Story
+  // confirmation, ...) is open over the session. Suppresses the number-key
+  // shortcuts below so a player interacting with that overlay can't also
+  // silently select a choice behind it (#276 review follow-up).
+  shortcutsSuspended?: boolean;
 }
 
 /**
@@ -82,6 +89,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   characterSkills = [],
   inventoryItems = [],
   endingSuggestion,
+  shortcutsSuspended = false,
 }) => {
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
@@ -131,6 +139,22 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     },
     [onSelect]
   );
+
+  // Number-key shortcuts (1-9) mirror the kbd hints rendered on each option
+  // (#276) so choices are selectable without a mouse. Disabled whenever the
+  // selector itself is disabled (turn in progress, session ended, etc.); the
+  // shared hook already ignores keystrokes while typing in an input.
+  const choiceShortcuts: KeyboardShortcut[] = useMemo(
+    () =>
+      allOptions.slice(0, 9).map((option, index) => ({
+        key: String(index + 1),
+        description: `Select "${option.text}"`,
+        action: () =>
+          handleOptionSelect(option.id, option.isDisabledByRequirements ?? false),
+      })),
+    [allOptions, handleOptionSelect]
+  );
+  useKeyboardShortcuts(choiceShortcuts, !isDisabled && !shortcutsSuspended);
 
   // Handle custom input submission
   const handleCustomSubmit = useCallback(() => {
