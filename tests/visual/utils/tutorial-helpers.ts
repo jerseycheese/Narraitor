@@ -13,10 +13,24 @@ import { Page, expect } from '@playwright/test';
  * Every caller follows this with waitForContentStable plus an explicit wait, so
  * dropping to domcontentloaded leaves nothing unsettled.
  */
+/**
+ * Frozen wall clock for the tour specs.
+ *
+ * The tours drive the real wizard, so anything the app stamps with
+ * `getTimestamp()` mid-tour lands in the screenshot — the world image's
+ * "Generated: <date>" line is the one that bites. Left live, every baseline
+ * bakes in the day it was recorded and disagrees with every run after it.
+ *
+ * setFixedTime pins Date/Date.now without touching timers, so the wizard's
+ * 500ms auto-start timer and Joyride's transitions still run normally.
+ */
+const FROZEN_CLOCK = new Date('2024-01-01T00:00:00.000Z');
+
 export const gotoTutorialPage = async (
   page: Page,
   url: string
 ): Promise<void> => {
+  await page.clock.setFixedTime(FROZEN_CLOCK);
   await page.goto(url, { waitUntil: 'domcontentloaded' });
 };
 
