@@ -1,188 +1,71 @@
 [
   {
     "type": "dependency",
+    "from": "src/components/ai/ProviderPresets.tsx",
+    "to": "src/lib/ai/presets.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/ai/ProviderWizard.tsx",
+    "to": "src/lib/ai/presets.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/ai/ProviderWizard.tsx",
+    "to": "src/lib/ai/validateProviderClient.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/forms/WorldImageForm.tsx",
+    "to": "src/lib/ai/worldImageGenerator.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/WorldCreationWizard/steps/FinalizeStep.tsx",
+    "to": "src/lib/ai/worldImageGenerator.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
+    "to": "src/lib/ai/worldAnalyzerClient.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
+    "to": "src/lib/ai/worldImageGenerator.ts",
+    "rule": {
+      "severity": "error",
+      "name": "components-no-direct-lib-imports"
+    }
+  },
+  {
+    "type": "dependency",
     "from": "src/state/__tests__/loreStore.testHelpers.ts",
     "to": "node_modules/@testing-library/react/dist/@testing-library/react.esm.js",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/01-atoms/feedback/ErrorDisplay.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/01-atoms/feedback/SaveIndicator.stories.tsx",
-    "to": "node_modules/@storybook/addon-actions/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/01-atoms/forms/controls/RangeSlider.stories.tsx",
-    "to": "node_modules/@storybook/react/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/02-molecules/forms/editors/SkillRangeEditor.stories.tsx",
-    "to": "node_modules/@storybook/react/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/02-molecules/forms/managers/ToneSettingsForm.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/02-molecules/narrative/FormattedNarrativeContent.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/02-molecules/ui-components/layout/CollapsibleSection.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/02-molecules/ui-components/layout/LoadingOverlay.stories.tsx",
-    "to": "node_modules/@storybook/addon-actions/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/editor-components/AttributeEditor.stories.tsx",
-    "to": "node_modules/@storybook/addon-actions/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/editor-components/SkillEditor.stories.tsx",
-    "to": "node_modules/@storybook/addon-actions/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/game-session/ActiveGameSessionChoicesColumn.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/game-session/ActiveGameSessionControls.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/game-session/EndingSuggestionBanner.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/game-session/GameSessionConfirmationDialog.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/game-session/GameSessionError.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/game-session/GameSessionResume.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/game-session/ManuscriptDrawerPanels.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/03-organisms/world/editor/WorldEditor.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/04-templates/layouts/WorldListScreen.stories.tsx",
-    "to": "node_modules/@storybook/test/dist/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/stories/04-templates/wizards/character/SkillsStep.stories.tsx",
-    "to": "node_modules/@storybook/addon-actions/dist/index.d.ts",
     "rule": {
       "severity": "error",
       "name": "not-to-dev-dep"
@@ -195,69 +78,6 @@
     "rule": {
       "severity": "error",
       "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/types/global.d.ts",
-    "to": "src/state/characterStore.ts",
-    "rule": {
-      "severity": "error",
-      "name": "types-no-implementation-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/types/global.d.ts",
-    "to": "src/state/inventoryStore.ts",
-    "rule": {
-      "severity": "error",
-      "name": "types-no-implementation-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/types/global.d.ts",
-    "to": "src/state/journalStore.ts",
-    "rule": {
-      "severity": "error",
-      "name": "types-no-implementation-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/types/global.d.ts",
-    "to": "src/state/narrativeStore.ts",
-    "rule": {
-      "severity": "error",
-      "name": "types-no-implementation-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/types/global.d.ts",
-    "to": "src/state/npcStore.ts",
-    "rule": {
-      "severity": "error",
-      "name": "types-no-implementation-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/types/global.d.ts",
-    "to": "src/state/sessionStore.ts",
-    "rule": {
-      "severity": "error",
-      "name": "types-no-implementation-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/types/global.d.ts",
-    "to": "src/state/worldStore.ts",
-    "rule": {
-      "severity": "error",
-      "name": "types-no-implementation-imports"
     }
   },
   {
@@ -500,131 +320,5 @@
         ]
       }
     ]
-  },
-  {
-    "type": "module",
-    "from": "src/lib/ai/__mocks__/config.ts",
-    "to": "src/lib/ai/__mocks__/config.ts",
-    "rule": {
-      "severity": "warn",
-      "name": "no-orphans"
-    }
-  },
-  {
-    "type": "module",
-    "from": "src/lib/ai/__mocks__/geminiClient.ts",
-    "to": "src/lib/ai/__mocks__/geminiClient.ts",
-    "rule": {
-      "severity": "warn",
-      "name": "no-orphans"
-    }
-  },
-  {
-    "type": "module",
-    "from": "src/lib/storage/__mocks__/indexedDBAdapter.js",
-    "to": "src/lib/storage/__mocks__/indexedDBAdapter.js",
-    "rule": {
-      "severity": "warn",
-      "name": "no-orphans"
-    }
-  },
-  {
-    "type": "module",
-    "from": "src/lib/utils/__mocks__/logger.ts",
-    "to": "src/lib/utils/__mocks__/logger.ts",
-    "rule": {
-      "severity": "warn",
-      "name": "no-orphans"
-    }
-  },
-  {
-    "type": "module",
-    "from": "src/state/__mocks__/characterStore.ts",
-    "to": "src/state/__mocks__/characterStore.ts",
-    "rule": {
-      "severity": "warn",
-      "name": "no-orphans"
-    }
-  },
-  {
-    "type": "module",
-    "from": "src/state/__mocks__/narrativeStore.ts",
-    "to": "src/state/__mocks__/narrativeStore.ts",
-    "rule": {
-      "severity": "warn",
-      "name": "no-orphans"
-    }
-  },
-  {
-    "type": "module",
-    "from": "src/state/__mocks__/sessionStore.ts",
-    "to": "src/state/__mocks__/sessionStore.ts",
-    "rule": {
-      "severity": "warn",
-      "name": "no-orphans"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
-    "to": "src/lib/ai/worldImageGenerator.ts",
-    "rule": {
-      "severity": "error",
-      "name": "components-no-direct-lib-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
-    "to": "src/lib/ai/worldAnalyzerClient.ts",
-    "rule": {
-      "severity": "error",
-      "name": "components-no-direct-lib-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/components/WorldCreationWizard/steps/FinalizeStep.tsx",
-    "to": "src/lib/ai/worldImageGenerator.ts",
-    "rule": {
-      "severity": "error",
-      "name": "components-no-direct-lib-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/components/forms/WorldImageForm.tsx",
-    "to": "src/lib/ai/worldImageGenerator.ts",
-    "rule": {
-      "severity": "error",
-      "name": "components-no-direct-lib-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/components/ai/ProviderWizard.tsx",
-    "to": "src/lib/ai/validateProviderClient.ts",
-    "rule": {
-      "severity": "error",
-      "name": "components-no-direct-lib-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/components/ai/ProviderWizard.tsx",
-    "to": "src/lib/ai/presets.ts",
-    "rule": {
-      "severity": "error",
-      "name": "components-no-direct-lib-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/components/ai/ProviderPresets.tsx",
-    "to": "src/lib/ai/presets.ts",
-    "rule": {
-      "severity": "error",
-      "name": "components-no-direct-lib-imports"
-    }
   }
 ]

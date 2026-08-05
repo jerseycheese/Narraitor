@@ -41,6 +41,7 @@
     "deps:validate": "depcruise src --config --ignore-known .dependency-cruiser-known-violations.json",
     "deps:validate:strict": "depcruise src --config",
     "deps:baseline": "depcruise src --output-type baseline --output-to .dependency-cruiser-known-violations.json",
+    "deps:check": "node scripts/check-deps-baseline.mjs",
     "deps:diagram": "depcruise src --include-only '^src' --output-type mermaid --collapse '^src/[^/]+' > public_docs/architecture/dependency-graph-domains.mmd",
     "deps:diagram:archi": "command -v dot >/dev/null 2>&1 && depcruise src --config --output-type archi | dot -T svg -Grankdir=TD > public_docs/architecture/high-level.svg || echo 'Skipping archi diagram (requires: brew install graphviz)'",
     "deps:diagram:detailed": "depcruise src --include-only '^src' --output-type mermaid > public_docs/architecture/dependency-graph-detailed.mmd",

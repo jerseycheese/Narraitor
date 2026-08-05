@@ -27,7 +27,11 @@ module.exports = {
           '(^|/)[.][^/]+[.](?:js|cjs|mjs|ts|cts|mts|json)$',                  // dot files
           '[.]d[.]ts$',                                                       // TypeScript declaration files
           '(^|/)tsconfig[.]json$',                                            // TypeScript config
-          '(^|/)(?:babel|webpack)[.]config[.](?:js|cjs|mjs|ts|cts|mts|json)$' // other configs
+          '(^|/)(?:babel|webpack)[.]config[.](?:js|cjs|mjs|ts|cts|mts|json)$', // other configs
+          // Jest manual mocks are reached through bare `jest.mock('path')` calls,
+          // which aren't import statements, so dependency-cruiser can't see the
+          // edge and reports every one of them as an orphan.
+          '(^|/)__mocks__/'
         ]
       },
       to: {},
@@ -186,13 +190,16 @@ module.exports = {
       severity: 'error',
       comment:
         'Type definition files should not import implementation code. ' +
-        'Types should be pure TypeScript interfaces and types only.',
+        'Types should be pure TypeScript interfaces and types only. ' +
+        'Type-only positions (`typeof import()`, `import type`) are fine: ' +
+        'they erase at compile time and pull in no implementation.',
       from: {
         path: '^src/types/.*\\.ts$'
       },
       to: {
         path: '^src/(?:state|components|lib)/',
-        pathNot: '^src/types/'
+        pathNot: '^src/types/',
+        dependencyTypesNot: ['type-only', 'type-import']
       }
     },
 
