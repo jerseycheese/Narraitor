@@ -3250,7 +3250,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .component-world-card {
   display: grid;
-  grid-template-columns: 9rem 1fr auto;
+  grid-template-columns: 16rem 1fr auto;
   grid-template-rows: auto auto;
   column-gap: var(--space-4);
   align-items: center;
@@ -3282,32 +3282,78 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   border-right: 1px solid var(--color-accent);
 }
 
+/* Flatten only as far as the hero link, which becomes the media cell itself —
+   it keeps a real box so keyboard focus still has something to ring. The hero
+   inside it holds the generated art at row scale (a 144x72 corner thumbnail
+   made the image nearly invisible on the surface players browse most) and
+   keeps its themed gradient, so a world with no image isn't a hole. */
 :root .component-world-card > div:first-child,
-:root .component-world-card > div:first-child > a,
-:root .component-world-card .component-hero,
-:root .component-world-card .component-hero-overlay {
+:root .component-world-card > div:first-child > div:first-child {
   display: contents;
 }
 
-:root .component-world-card .component-hero-image {
+:root .component-world-card > div:first-child > div:first-child > a {
   grid-column: 1;
-  grid-row: 1 / span 2;
-  position: static;
+  grid-row: 1 / -1;
+  display: block;
+  align-self: stretch;
+  min-height: 9rem;
+}
+
+:root .component-world-card .component-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+  height: 100%;
+  overflow: hidden;
+}
+
+:root .component-world-card .component-hero-image {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 4.5rem;
+  height: 100%;
   object-fit: cover;
 }
 
+/* At row scale the hero's own themed wash is too faint to read as a panel and
+   an imageless world looks like a rendering failure. Deepen it only where
+   there's no art to sit under. */
+:root .component-world-card .component-hero:not(:has(.component-hero-image)) {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-accent) 22%, var(--color-surface)) 0%,
+    var(--color-surface) 100%
+  );
+}
+
+/* Title rides the art on the hero's own solid bar, so contrast holds whatever
+   the generator produced. */
+:root .component-world-card .component-hero-overlay {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--color-surface);
+}
+
 :root .component-world-card .component-hero-content {
-  grid-column: 2;
-  grid-row: 1;
   background: transparent;
   padding: 0;
   margin: 0;
 }
 
+:root .component-world-card > div:first-child > div:first-child > a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
 :root .component-world-card .component-hero-title {
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-style: italic;
   font-family: var(--font-narrative);
 
@@ -3360,7 +3406,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .component-character-card {
   display: grid;
-  grid-template-columns: 5rem 1fr auto;
+  grid-template-columns: 8rem 1fr auto;
   column-gap: var(--space-4);
   align-items: center;
   padding: var(--space-3);
@@ -3401,12 +3447,14 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   margin-bottom: var(--space-1);
 }
 
+/* Same reasoning as the world card's hero panel: a 4rem thumbnail made the
+   generated portrait nearly invisible on the roster players browse most. */
 :root .component-character-card .character-card-portrait {
   grid-column: 1;
   align-self: center;
   padding: 0;
-  width: 4rem;
-  height: 4rem;
+  width: 7rem;
+  height: 7rem;
   overflow: hidden;
 }
 
@@ -3457,7 +3505,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 }
 
 @media (width <= 640px) {
-  :root .component-world-card,
   :root .component-character-card {
     grid-template-columns: 4rem 1fr;
   }
@@ -3468,30 +3515,17 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
     padding-top: var(--space-2);
   }
 
-  /* #1538 — ActiveStateCard's hasImage wrapper inserts a div between
-     div:first-child and the hero link, so the `> div:first-child > a`
-     contents chain above never matches. The whole hero (thumb + title +
-     genre) collapses into ONE auto-placed grid item in the media column:
-     a 64px strip at phone widths. Collapse the two skipped wrappers here
-     so image and title split into their own cells — thumb in the 4rem
-     media column, title in the 1fr text column. Desktop and tablet keep
-     the established caption-under-thumb treatment. */
-  :root .component-world-card > div:first-child > div:first-child,
+  /* A side-by-side image panel and text column don't both fit on a phone, so
+     the hero takes the full width as a band and everything else stacks under
+     it. Keeps the art large rather than shrinking it back to a strip. */
+  :root .component-world-card {
+    grid-template-columns: 1fr;
+  }
+
   :root .component-world-card > div:first-child > div:first-child > a {
-    display: contents;
-  }
-
-  /* The link's box is gone on phones (display: contents), so paint its
-     keyboard focus on the title instead. */
-  :root .component-world-card a:focus-visible .component-hero-title {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-  }
-
-  /* Thumb stays in row 1 beside the title; description and meta take the
-     freed full-width rows below. */
-  :root .component-world-card .component-hero-image {
+    grid-column: 1 / -1;
     grid-row: 1;
+    min-height: 8rem;
   }
 
   :root .component-world-card .world-card-content {
@@ -3503,6 +3537,12 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   :root .world-card-footer-meta {
     grid-column: 1 / -1;
     grid-row: 3;
+  }
+
+  /* A 7rem portrait would swallow a phone row. */
+  :root .component-character-card .character-card-portrait {
+    width: 4rem;
+    height: 4rem;
   }
 }
 
