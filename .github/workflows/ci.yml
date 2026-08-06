@@ -180,6 +180,29 @@ jobs:
       - name: Run CSS audit
         run: npm run audit:css
 
+  visual-baseline-check:
+    name: Visual Baseline Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Advisory, like audit-css below: no node_modules needed, the script
+      # only uses git and Node builtins. Flags a PR that changes src/** and a
+      # visual-test snapshot together, and any changed snapshot the PR body
+      # never mentions -- never fails the build, just surfaces it.
+      - name: Check visual baseline changes are documented
+        env:
+          BASE_REF: origin/${{ github.event.pull_request.base.ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node scripts/check-visual-baseline.mjs
+
   docs-check:
     name: Docs Check
     runs-on: ubuntu-latest

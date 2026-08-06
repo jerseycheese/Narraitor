@@ -39,6 +39,12 @@ Closes #
 ## Screenshots
 <!-- For UI changes, include before/after screenshots if applicable -->
 
+## Visual Baseline Changes
+<!-- List every visual-test snapshot this PR changes and what produced it, e.g.
+"character-detail-chromium-darwin.png - fixed hero/portrait spacing". A changed
+baseline with no entry here is the thing this section exists to catch.
+Write "None" if this PR doesn't touch tests/visual/**-snapshots/**. -->
+
 ## Code Review Summary (if applicable)
 <!-- For automated implementations, include code review analysis -->
 
