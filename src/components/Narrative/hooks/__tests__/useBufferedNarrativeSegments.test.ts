@@ -103,6 +103,36 @@ describe('useBufferedNarrativeSegments', () => {
     expect(result.current.isBuffering).toBe(false);
   });
 
+  it('renders stored segments immediately once hydration finishes, even though the parent mounted with an empty array', () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+
+    // Mirrors NarrativeHistoryManager: it mounts with an empty segments array
+    // while it loads and dedupes persisted history, then supplies the real
+    // stored segments only after its stabilization timer fires.
+    const { result, rerender } = renderHook(
+      ({ segs, isHydrating }) => useBufferedNarrativeSegments(segs, { isHydrating }),
+      { initialProps: { segs: [] as typeof segments, isHydrating: true } }
+    );
+
+    expect(result.current.renderedSegments).toEqual([]);
+
+    const storedSegments = [
+      createMockNarrativeSegment({ id: 'seg-1', content: 'First segment.' }),
+      createMockNarrativeSegment({ id: 'seg-2', content: 'Second segment.' }),
+    ];
+
+    act(() => {
+      rerender({ segs: storedSegments, isHydrating: false });
+    });
+
+    // Already-stored, already-read segments should render in full immediately —
+    // no reveal animation should kick in just because this is the first time
+    // the hook has seen them.
+    expect(result.current.renderedSegments[0].content).toBe('First segment.');
+    expect(result.current.renderedSegments[1].content).toBe('Second segment.');
+    expect(result.current.isBuffering).toBe(false);
+  });
+
   it('does not re-buffer already-revealed segments', () => {
     mockIsFeatureEnabled.mockReturnValue(true);
 

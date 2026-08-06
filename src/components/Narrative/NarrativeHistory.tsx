@@ -11,6 +11,13 @@ interface NarrativeHistoryProps {
   className?: string;
   onRetry?: () => void;
   disableInitialAutoScroll?: boolean;
+  /**
+   * True while the caller is still loading/deduping persisted history and
+   * hasn't supplied the real segments yet. Prevents the buffered-reveal hook
+   * from mistaking the first batch of stored segments for a freshly
+   * generated one once it does arrive.
+   */
+  isHydrating?: boolean;
 }
 
 export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
@@ -19,7 +26,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   error,
   className = '',
   onRetry,
-  disableInitialAutoScroll = false
+  disableInitialAutoScroll = false,
+  isHydrating = false
 }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const scrollViewportRef = useRef<HTMLElement>(null);
@@ -28,7 +36,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   const hasUserScrollInteractionRef = useRef(false);
   const isNearBottomRef = useRef(true);
 
-  const { renderedSegments } = useBufferedNarrativeSegments(segments);
+  const { renderedSegments } = useBufferedNarrativeSegments(segments, { isHydrating });
 
   // Check if the viewport is near the bottom
   const getIsNearBottom = useCallback(() => {

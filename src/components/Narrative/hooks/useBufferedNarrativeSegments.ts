@@ -10,6 +10,13 @@ import {
 interface UseBufferedNarrativeSegmentsOptions {
   intervalMs?: number;
   chunkSize?: number;
+  /**
+   * True while the caller is still loading/deduping persisted segments (e.g.
+   * NarrativeHistoryManager mounts with an empty array before its
+   * stabilization timer supplies the real stored segments). While true, any
+   * segments passed in are treated as historical, not newly generated.
+   */
+  isHydrating?: boolean;
 }
 
 /**
@@ -23,7 +30,7 @@ export function useBufferedNarrativeSegments(
   // A typical narrative beat runs roughly 1000-2000 characters. At the
   // minimum clamp interval (50ms), a chunk size of 15 tokens clears that in
   // about 1-2 seconds — fast enough to read as a reveal, not a second wait.
-  const { intervalMs = 50, chunkSize = 15 } = options;
+  const { intervalMs = 50, chunkSize = 15, isHydrating = false } = options;
   const enabled = isFeatureEnabled('BUFFERED_STREAMING');
 
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
@@ -31,6 +38,22 @@ export function useBufferedNarrativeSegments(
   const [isBuffering, setIsBuffering] = useState(false);
 
   const revealedSegmentIds = useRef<Set<string>>(new Set(segments.map((s) => s.id)));
+  const wasHydratingRef = useRef(isHydrating);
+
+  // A caller may mount with an empty segments array while it loads and dedupes
+  // persisted history, only supplying the real stored segments once hydration
+  // finishes. Without this, the "detect a new segment" effect below would see
+  // the most recent STORED segment for the first time and mistake it for one
+  // that was just generated, replaying the reveal animation on content the
+  // player already read. This effect runs before that one (declared first),
+  // so it marks the just-hydrated batch as already revealed before the check
+  // happens.
+  useEffect(() => {
+    if (wasHydratingRef.current && !isHydrating) {
+      segments.forEach((segment) => revealedSegmentIds.current.add(segment.id));
+    }
+    wasHydratingRef.current = isHydrating;
+  }, [isHydrating, segments]);
 
   const latestSegment = segments.length > 0 ? segments[segments.length - 1] : null;
 
