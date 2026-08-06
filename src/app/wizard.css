@@ -21,7 +21,7 @@
 
 .wizard-title {
   font-family: var(--font-interface);
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 600;
   line-height: 1.2;
   color: var(--color-text-primary);
@@ -44,7 +44,7 @@
 
 .wizard-step-title {
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-1);
@@ -52,7 +52,7 @@
 
 .wizard-step-description {
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: 1.5;
   margin: 0;
@@ -74,7 +74,7 @@
 
 .form-label {
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-text-primary);
 }
@@ -87,7 +87,7 @@
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   transition: border-color 120ms ease, box-shadow 120ms ease;
   box-sizing: border-box;
@@ -121,7 +121,7 @@
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   resize: vertical;
   transition: border-color 120ms ease, box-shadow 120ms ease;
@@ -146,7 +146,7 @@
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   cursor: pointer;
   transition: border-color 120ms ease, box-shadow 120ms ease;
@@ -161,14 +161,14 @@
 
 .form-error {
   font-family: var(--font-interface);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-danger);
   margin: 0;
 }
 
 .form-help-text {
   font-family: var(--font-interface);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   margin: 0;
 }
@@ -193,7 +193,7 @@
   display: block;
   margin-bottom: var(--space-1);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-text-primary);
 }
@@ -207,7 +207,7 @@
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   box-sizing: border-box;
 }
@@ -240,7 +240,7 @@
   background: var(--color-surface-hover);
   color: var(--color-text-muted);
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 600;
 }
 
@@ -259,7 +259,7 @@
   background: var(--color-surface-hover);
   color: var(--color-text-muted);
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
 }
 
@@ -300,7 +300,7 @@
   background: var(--color-accent);
   color: var(--color-on-accent);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
   transition: background-color 120ms ease;
@@ -345,7 +345,7 @@
   background: var(--color-accent);
   color: var(--color-on-accent);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
   transition: background-color 120ms ease;
@@ -379,7 +379,7 @@
   background: var(--color-surface);
   color: var(--color-text-secondary);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
@@ -411,7 +411,7 @@
   background: transparent;
   color: var(--color-text-muted);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   cursor: pointer;
   transition: color 120ms ease;
 }
@@ -467,7 +467,7 @@
   height: 2rem;
   border-radius: var(--radius-full);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   transition: all 120ms ease;
 }
@@ -492,7 +492,7 @@
 
 .wizard-progress-label {
   font-family: var(--font-interface);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   text-align: center;
 }
@@ -553,7 +553,7 @@
   padding: var(--space-0_5) var(--space-2);
   border-radius: var(--radius-full);
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -596,7 +596,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-family: var(--font-interface);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
@@ -656,7 +656,7 @@
 
 .wizard-subheading {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -671,7 +671,7 @@
   background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   color: var(--color-danger);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .wizard-error-container p {
@@ -706,7 +706,7 @@
 
 .wizard-page-title {
   font-family: var(--font-interface);
-  font-size: 1.875rem;
+  font-size: var(--font-size-2xl);
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-text-primary);
@@ -715,7 +715,7 @@
 
 .wizard-page-subtitle {
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
   margin: 0;
 }
@@ -841,7 +841,7 @@
 
 .wizard-info-banner p {
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
   margin: 0;
   line-height: 1.5;
@@ -860,7 +860,7 @@
   border-radius: var(--radius-md);
   background: var(--color-surface);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   text-align: center;
 }
@@ -959,7 +959,7 @@
 .range-slider-scale-label {
   top: 0;
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   line-height: 1;
   color: var(--color-text-muted);
 }
@@ -1194,7 +1194,7 @@
 
 :root .wizard-page .wizard-card-title {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   letter-spacing: 0.05em;
 }
@@ -1261,7 +1261,7 @@
 :root .wizard-page .wizard-toggle {
   border-radius: 4px;
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 }
 
 :root .wizard-page .wizard-info-banner {
@@ -1567,13 +1567,13 @@
   flex-direction: column;
   gap: var(--space-3);
   min-width: 0;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
 .wizard-review-card-range {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -1645,7 +1645,7 @@
 .wizard-custom-editor h2 {
   margin: 0 0 var(--space-3);
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -1698,7 +1698,7 @@
 }
 
 .wizard-slot-summary-note {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -1747,7 +1747,7 @@
 
 .wizard-dialog-panel p {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
@@ -1872,7 +1872,7 @@
 
 .wizard-skill-card-linked {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -1882,7 +1882,7 @@
 
 .wizard-skill-card-requirement {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-danger);
   margin-top: var(--space-1);
 }
@@ -1900,7 +1900,7 @@
   justify-content: space-between;
   gap: var(--space-2);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
 }
 
@@ -1953,7 +1953,7 @@
 
 :root .wizard-page .wizard-custom-editor h2 {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   letter-spacing: 0.05em;
 }
 
@@ -2089,7 +2089,7 @@
 
 .component-guided-first-time-step-num {
   font-family: var(--font-system);
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   line-height: 1;
   color: var(--color-accent);
@@ -2098,7 +2098,7 @@
 .component-guided-first-time-step-heading {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -2106,7 +2106,7 @@
 .component-guided-first-time-step-copy {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--color-text-secondary);
 }
@@ -2122,7 +2122,7 @@
 .component-guided-first-time-step-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -2158,7 +2158,7 @@
   display: flex;
   justify-content: center;
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
@@ -2356,7 +2356,7 @@
 .component-world-creation-wizard .wizard-suggestion-preview-heading {
   margin: 0 0 var(--space-2);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-text-primary);
 }

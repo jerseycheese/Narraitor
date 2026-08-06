@@ -12,7 +12,7 @@
 
 .error-block-message {
   margin-top: var(--space-1);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-danger);
 }
 

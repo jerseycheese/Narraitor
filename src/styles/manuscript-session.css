@@ -199,7 +199,7 @@ body.manuscript-overlay-open {
 
 .play-page-shell > div > div > header h1 {
   font-family: var(--font-interface);
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   line-height: 1.25;
   color: var(--color-text-primary);
@@ -224,7 +224,7 @@ body.manuscript-overlay-open {
 
 .play-page-active > div > div > header h1 {
   font-family: var(--font-narrative);
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 600;
   line-height: 1.25;
   color: var(--color-text-primary);
@@ -366,7 +366,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-interface);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
@@ -618,7 +618,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   line-height: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -701,7 +701,7 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-sm);
   background: var(--color-surface-hover);
   border: 1px solid var(--color-border);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   font-family: var(--font-interface), system-ui, sans-serif;
 }
@@ -745,7 +745,7 @@ body.manuscript-overlay-open {
   border: 1px solid var(--color-warning-border);
   color: var(--color-warning);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
@@ -781,7 +781,7 @@ body.manuscript-overlay-open {
 
 .manuscript-context-summary {
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.4;
   font-weight: 500;
   margin-bottom: var(--space-1_5);
@@ -792,7 +792,7 @@ body.manuscript-overlay-open {
 .manuscript-choice-prompt {
   margin: 0;
   font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
   max-width: 48rem;
@@ -809,7 +809,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   transition: all 120ms ease;
 }
 
@@ -823,7 +823,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-input-count {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
 }
 
@@ -837,7 +837,7 @@ body.manuscript-overlay-open {
   background: var(--color-accent);
   color: var(--color-on-accent);
   font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
@@ -926,7 +926,7 @@ body.manuscript-overlay-open {
 .manuscript-journal-snapshot-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-text-primary);
   line-height: 1.2;
@@ -940,7 +940,7 @@ body.manuscript-overlay-open {
 
 .manuscript-journal-snapshot-badge {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -973,14 +973,14 @@ body.manuscript-overlay-open {
   display: flex;
   justify-content: space-between;
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
 .manuscript-journal-snapshot-empty {
   font-family: var(--font-narrative);
   font-style: italic;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   text-align: center;
   padding: var(--space-8) var(--space-4);
@@ -1001,7 +1001,7 @@ body.manuscript-overlay-open {
 
 .manuscript-story-summary-paragraph {
   font-family: var(--font-narrative);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   line-height: 1.75;
   color: var(--color-text-primary);
   margin: 0;
@@ -1009,7 +1009,7 @@ body.manuscript-overlay-open {
 
 .manuscript-story-summary-empty {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1017,7 +1017,7 @@ body.manuscript-overlay-open {
 
 .manuscript-story-summary-error {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-danger);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1070,7 +1070,7 @@ body.manuscript-overlay-open {
 .manuscript-end-story-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -1082,7 +1082,7 @@ body.manuscript-overlay-open {
 .manuscript-end-story-message {
   margin: 0;
   font-family: var(--font-narrative);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
@@ -1102,7 +1102,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface);
   color: var(--color-text-secondary);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1122,7 +1122,7 @@ body.manuscript-overlay-open {
   background: var(--color-danger);
   color: var(--color-text-inverse);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1170,7 +1170,7 @@ body.manuscript-overlay-open {
 
   display: block;
 
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 
   font-family: var(--font-interface), system-ui, sans-serif;
 
@@ -1197,7 +1197,7 @@ body.manuscript-overlay-open {
   align-items: center;
   border-radius: var(--radius-full);
   padding: var(--space-0_5) var(--space-1_5);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-family: var(--font-system);
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -1226,7 +1226,7 @@ body.manuscript-overlay-open {
 
   padding: var(--space-0_5) var(--space-1_5);
 
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 
   font-family: var(--font-system);
 
@@ -1319,7 +1319,7 @@ body.manuscript-overlay-open {
   align-items: center;
   gap: var(--space-1);
   font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .manuscript-drawer-backdrop {
@@ -1381,14 +1381,14 @@ body.manuscript-overlay-open {
 .manuscript-drawer-title {
   margin: 0;
   font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .manuscript-drawer-subtitle {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -1402,7 +1402,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface-hover);
   color: var(--color-text-secondary);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1509,7 +1509,7 @@ body.manuscript-overlay-open {
 
 .manuscript-character-summary-name {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-family: var(--font-interface), system-ui, sans-serif;
   font-weight: 600;
 }
@@ -1525,7 +1525,7 @@ body.manuscript-overlay-open {
 
 .manuscript-character-summary-level {
   margin: var(--space-0_5) 0 0;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
 }
 
@@ -1536,7 +1536,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   transition: all 120ms ease;
 }
 
@@ -1552,7 +1552,7 @@ body.manuscript-overlay-open {
 .manuscript-character-summary-history {
   margin: 0 0 var(--space-3);
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.45;
 }
 
@@ -1594,19 +1594,19 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-character-summary-item-label {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
 }
 
 .manuscript-character-summary-item-value {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-family: var(--font-system), ui-monospace, monospace;
   font-weight: 500;
   color: var(--color-text-secondary);
 }
 
 .manuscript-character-summary-links {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -1628,7 +1628,7 @@ body.manuscript-overlay-open {
 
 .manuscript-inventory-category-title {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -1689,7 +1689,7 @@ body.manuscript-overlay-open {
   background: var(--color-surface-hover);
   border: 1px solid var(--color-border);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
@@ -1715,7 +1715,7 @@ body.manuscript-overlay-open {
   margin-bottom: var(--space-2);
   padding: var(--space-0_5) var(--space-2);
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1746,7 +1746,7 @@ body.manuscript-overlay-open {
 
 .manuscript-inventory-item-quantity {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -1777,7 +1777,7 @@ body.manuscript-overlay-open {
 
 .manuscript-inventory-action-button {
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   height: 1.75rem;
@@ -1816,7 +1816,7 @@ body.manuscript-overlay-open {
 
 .manuscript-choice-history-meta-item {
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
@@ -1837,7 +1837,7 @@ body.manuscript-overlay-open {
 
 .manuscript-choice-history-details {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   line-height: 1.4;
   color: var(--color-text-muted);
   background: var(--color-surface-hover);
@@ -1849,7 +1849,7 @@ body.manuscript-overlay-open {
 
 .manuscript-choice-history-empty {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
@@ -1863,7 +1863,7 @@ body.manuscript-overlay-open {
 
 .manuscript-choice-history-details-button {
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   height: 1.25rem;
@@ -1876,7 +1876,7 @@ body.manuscript-overlay-open {
 
 .manuscript-ending-prose {
   font-family: var(--font-narrative);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   line-height: 1.75;
   color: var(--color-text-primary);
 }
@@ -1956,7 +1956,7 @@ body.manuscript-overlay-open {
 }
 
 .save-indicator-text {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-primary);
   line-height: 1.1;
 }
@@ -1971,7 +1971,7 @@ body.manuscript-overlay-open {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: var(--space-1) var(--space-2);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-family: var(--font-interface), system-ui, sans-serif;
   background: var(--color-surface);
   color: var(--color-text-primary);
@@ -2000,7 +2000,7 @@ body.manuscript-overlay-open {
   .manuscript-warning-action-button {
     padding: var(--space-2) var(--space-3);
     height: 2rem;
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
   }
 
   .manuscript-input-row {
@@ -2022,7 +2022,7 @@ body.manuscript-overlay-open {
   .manuscript-warning-action-button {
     padding: var(--space-2) var(--space-3);
     height: 2rem;
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
   }
 }
 
@@ -2224,7 +2224,7 @@ body.manuscript-overlay-open {
 
 .manuscript-character-snapshot-name {
   font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 400;
   color: var(--color-text-primary);
 }
@@ -2251,7 +2251,7 @@ body.manuscript-overlay-open {
 .manuscript-character-snapshot-subheading {
   margin: 0;
   font-family: var(--font-system), ui-monospace, monospace;
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
@@ -2325,7 +2325,7 @@ body.manuscript-overlay-open {
 
 .choice-outcome-label {
   font-family: var(--font-system), ui-monospace, monospace;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   margin-bottom: var(--space-1);
   color: var(--color-accent);
   text-transform: uppercase;
@@ -2336,7 +2336,7 @@ body.manuscript-overlay-open {
 .choice-outcome-text {
   font-family: var(--font-narrative);
   font-style: italic;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--color-text-secondary);
   margin: 0;
@@ -2537,7 +2537,7 @@ body.manuscript-overlay-open {
 
 .manuscript-generation-error-message {
   color: var(--color-text);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .manuscript-generation-error-suggestion {
@@ -2557,7 +2557,7 @@ body.manuscript-overlay-open {
   background: var(--color-accent);
   color: var(--color-on-accent);
   font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
@@ -2596,7 +2596,7 @@ body.manuscript-overlay-open {
 
 /* Base error dismiss button (replaces Tailwind utilities) */
 .error-display-dismiss {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -2613,14 +2613,14 @@ body.manuscript-overlay-open {
 }
 
 .error-display-title {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-danger);
   margin: 0 0 var(--space-1_5);
 }
 
 .error-display-message {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--color-danger);
   margin: 0 0 var(--space-2_5);
@@ -2633,7 +2633,7 @@ body.manuscript-overlay-open {
 
 .error-display-actions .error-display-retry {
   padding: var(--space-1_5) var(--space-3);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   background: var(--color-danger);
   color: var(--color-on-danger);
@@ -2649,7 +2649,7 @@ body.manuscript-overlay-open {
 
 .error-display-actions .error-display-dismiss {
   padding: var(--space-1_5) var(--space-3);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   background: var(--color-surface);
   color: var(--color-danger);
@@ -2682,7 +2682,7 @@ body.manuscript-overlay-open {
 
 .error-display-actions .error-display-fallback-action {
   padding: var(--space-1_5) var(--space-3);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   background: var(--color-surface);
   color: var(--color-danger);
@@ -2713,7 +2713,7 @@ body.manuscript-overlay-open {
 
 /* Inline errors previously had no colour; give them a severity accent. */
 .error-display-inline {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.4;
   margin: var(--space-1) 0 0;
 }
@@ -3086,7 +3086,7 @@ body.manuscript-overlay-open {
 
 :root .choice-outcome-label {
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   font-weight: 600;
   letter-spacing: 0.1em;
   padding: 2px 8px;
@@ -3352,7 +3352,7 @@ body.manuscript-overlay-open {
 
 /* DS3 narrative text — 18px with generous line-height */
 :root .text-narrative {
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   line-height: 1.75;
 }
 
@@ -3440,7 +3440,7 @@ body.manuscript-overlay-open {
 }
 
 :root .manuscript-drawer-title {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
 }
 
 :root .manuscript-drawer-content {
@@ -3455,7 +3455,7 @@ body.manuscript-overlay-open {
 /* DS3 character snapshot stat values — larger, bolder, system font (Pass 8, fix 1) */
 :root .manuscript-character-snapshot-item-value {
   font-family: var(--font-system);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
 }
 
@@ -3488,7 +3488,7 @@ body.manuscript-overlay-open {
 
 :root .manuscript-journal-snapshot-content {
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.55;
   opacity: 0.85;
   color: var(--color-text-primary);
@@ -3497,7 +3497,7 @@ body.manuscript-overlay-open {
 }
 
 :root .manuscript-journal-snapshot-meta {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -3528,7 +3528,7 @@ body.manuscript-overlay-open {
 }
 
 :root .manuscript-inventory-item-name {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
 }
 
@@ -3624,7 +3624,7 @@ body.manuscript-overlay-open {
 .manuscript-marginalia-category {
   display: inline-block;
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -3760,7 +3760,7 @@ body.manuscript-overlay-open {
    relationship state exists for that NPC. */
 .scene-status-disposition {
   font-family: var(--font-system), ui-monospace, monospace;
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 0 var(--space-1);
@@ -3859,12 +3859,12 @@ body.manuscript-overlay-open {
   border: 1px solid var(--color-border);
   background: var(--color-surface-hover);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   color: var(--color-text-secondary);
 }
 
 :root .keyboard-shortcuts-description {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
 }

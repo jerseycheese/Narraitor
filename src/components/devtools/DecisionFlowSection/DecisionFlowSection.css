@@ -132,7 +132,7 @@
   background: var(--color-surface);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 }
 
 .devtools-decision-flow-empty {

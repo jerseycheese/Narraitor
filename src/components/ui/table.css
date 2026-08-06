@@ -20,13 +20,13 @@
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .table-wrapper thead th {
   padding: var(--space-2) var(--space-3);
   text-align: left;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
