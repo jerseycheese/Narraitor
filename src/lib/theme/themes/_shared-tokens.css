@@ -17,6 +17,28 @@
   --space-6:   1.5rem;
   --space-8:   2rem;
 
+  /* Type scale (#1622). Named steps rather than a single fixed ratio: each
+   * value is calibrated to a real anchor already in use rather than forced
+   * onto one strict progression, so adjacent steps land in a 1.11-1.25
+   * range (a Major Second to Major Third spread) instead of drifting off
+   * into sizes nothing in the app actually needs.
+   *   xs/sm/base/md/lg/xl match DESIGN.md's documented in-use values
+   *     (badges & metadata, interface text, body, section headings, page
+   *     titles).
+   *   3xl matches the page-layout hero title (app-shell.css
+   *     .page-layout-title), the largest real anchor in the app.
+   * 2xs and 2xl fill the floor (dense data, below the badge threshold) and
+   * a step between page titles and the hero size. */
+  --font-size-2xs:  0.625rem;
+  --font-size-xs:   0.75rem;
+  --font-size-sm:   0.875rem;
+  --font-size-base: 1rem;
+  --font-size-md:   1.125rem;
+  --font-size-lg:   1.25rem;
+  --font-size-xl:   1.5rem;
+  --font-size-2xl:  1.875rem;
+  --font-size-3xl:  2.125rem;
+
   /* Universal radius token */
   --radius-full: 9999px;
 

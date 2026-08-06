@@ -25,7 +25,7 @@
 .card-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -37,7 +37,7 @@
 .card-description {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--color-text-secondary);
 }

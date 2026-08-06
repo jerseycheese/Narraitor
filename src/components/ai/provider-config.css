@@ -54,7 +54,7 @@
 }
 
 .provider-card-meta {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
 
@@ -65,7 +65,7 @@
 }
 
 .provider-badge {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-full);
   border: 1px solid var(--color-border);
@@ -134,7 +134,7 @@
 }
 
 .provider-preset-note {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -156,7 +156,7 @@
   cursor: pointer;
   color: var(--color-accent);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 /* Mobile wizard fit (#1539): at phone widths the auto-fill preset grid
@@ -193,7 +193,7 @@
   padding: var(--space-3);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 

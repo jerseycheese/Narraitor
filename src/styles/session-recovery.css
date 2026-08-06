@@ -60,7 +60,7 @@
 .game-session-recovery-prompt-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--color-text-primary);

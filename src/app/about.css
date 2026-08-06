@@ -44,7 +44,7 @@
 .component-about-lead {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
@@ -75,7 +75,7 @@
 .component-about-section-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--color-text-primary);
@@ -90,7 +90,7 @@
 .component-about-prose p {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   line-height: 1.65;
   color: var(--color-text-secondary);
 }
@@ -146,7 +146,7 @@
   width: 2rem;
   height: 2rem;
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
 
   /* accent-strong, not accent: plain accent on accent-soft only hits 3.9:1,
@@ -190,7 +190,7 @@
   align-items: center;
   padding: var(--space-3) var(--space-5);
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-on-accent);
   background: var(--color-accent);
@@ -339,7 +339,7 @@
 
 :root .component-about-step-description {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 :root .component-about-cta {
