@@ -126,9 +126,18 @@ function DemoSnapshot() {
 
 /**
  * Renders the shell with the real composed session. `mode` toggles the
- * representative state the action rail / narrative reflect.
+ * representative state the action rail / narrative reflect. `withRail`
+ * mirrors ActiveGameSession's own `hasSceneStatus` gate — the app omits
+ * `marginContent` entirely (not just an empty SceneStatus) whenever the
+ * latest segment has no participants or location to report.
  */
-function SessionShellHarness({ mode = 'active' }: { mode?: 'active' | 'streaming' | 'loading' }) {
+function SessionShellHarness({
+  mode = 'active',
+  withRail = true,
+}: {
+  mode?: 'active' | 'streaming' | 'loading';
+  withRail?: boolean;
+}) {
   const [isCharacterOpen, setIsCharacterOpen] = useState(false);
 
   // Seed demo NPCs so the real SceneStatus resolves participant names.
@@ -153,7 +162,7 @@ function SessionShellHarness({ mode = 'active' }: { mode?: 'active' | 'streaming
           characterSummaryPanel={<DemoSnapshot />}
         />
       }
-      marginContent={<SceneStatus segment={SEGMENTS[SEGMENTS.length - 1]} />}
+      marginContent={withRail ? <SceneStatus segment={SEGMENTS[SEGMENTS.length - 1]} /> : null}
       actionRail={
         <ManuscriptActionRail isStreaming={isStreaming}>
           <div className="manuscript-action-rail-stack">
@@ -198,4 +207,8 @@ export const Streaming: Story = {
 
 export const LoadingNarrative: Story = {
   render: () => <SessionShellHarness mode="loading" />,
+};
+
+export const WithoutRail: Story = {
+  render: () => <SessionShellHarness mode="active" withRail={false} />,
 };
