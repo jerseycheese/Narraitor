@@ -111,4 +111,15 @@ describe('findUndocumentedSnapshots', () => {
       'Baseline changes:\n- world-form-chromium-darwin.png - spacing fix';
     expect(findUndocumentedSnapshots(changed, body)).toEqual([]);
   });
+
+  it('fully strips nested/malformed comment markers, leaving no dangling delimiter', () => {
+    const changed = ['tests/visual/world-creation.spec.ts-snapshots/world-form-chromium-darwin.png'];
+    // Nested "<!--" inside a comment, plus a stray trailing "-->" with no
+    // opener of its own -- the strip should consume the real comment and
+    // leave only inert dangling text, never a filename mention that reads
+    // as "outside a comment" by accident.
+    const body =
+      '<!--<!-- world-form-chromium-darwin.png -->--> world-form-chromium-darwin.png - spacing fix';
+    expect(findUndocumentedSnapshots(changed, body)).toEqual([]);
+  });
 });

@@ -37,9 +37,22 @@ const HTML_COMMENT_RE = /<!--[\s\S]*?-->/g;
  * Strips HTML comments so template boilerplate (e.g. the PR template's own
  * example filename inside a `<!-- -->` block) can't count as documentation
  * that the author never actually wrote.
+ *
+ * Loops to a fixed point rather than trusting a single pass: a bare
+ * `replace(re, '')` on a multi-character delimiter is the general shape of
+ * an incomplete-sanitization bug (nested/malformed markup can in principle
+ * leave a delimiter fragment that only becomes a full match once an earlier
+ * removal closes the gap around it). Re-running until nothing changes closes
+ * that class of gap regardless of whether this exact regex is susceptible.
  */
 function stripHtmlComments(text) {
-  return text.replace(HTML_COMMENT_RE, '');
+  let result = text;
+  let previous;
+  do {
+    previous = result;
+    result = result.replace(HTML_COMMENT_RE, '');
+  } while (result !== previous);
+  return result;
 }
 
 /**
