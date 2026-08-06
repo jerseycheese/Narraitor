@@ -16,40 +16,40 @@ describe('featureFlags', () => {
     return require('@/lib/featureFlags') as typeof import('@/lib/featureFlags');
   };
 
-  it('defaults all flags to false when env vars are missing, except PROGRESSIVE_DISCLOSURE which defaults to true', () => {
+  it('defaults BUFFERED_STREAMING and PROGRESSIVE_DISCLOSURE to true when env vars are missing', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: undefined,
       NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE: undefined,
     });
 
-    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(false);
+    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(true);
     expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
   });
 
-  it('enables BUFFERED_STREAMING only when env var is true', () => {
+  it('disables BUFFERED_STREAMING only when env var is exactly "false"', () => {
     const { isFeatureEnabled } = load({
-      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'true',
+      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'false',
     });
 
-    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(true);
+    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(false);
   });
 
-  it('treats non-true values as disabled', () => {
+  it('treats non-false values as enabled for default-on flags', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE: 'TRUE',
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: '1',
     });
 
     expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
-    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(false);
+    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(true);
   });
 
   it('supports downstream gating decisions for BUFFERED_STREAMING', () => {
     const { isFeatureEnabled } = load({
-      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'true',
+      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'false',
     });
 
     const mode = isFeatureEnabled('BUFFERED_STREAMING') ? 'buffered' : 'legacy';
-    expect(mode).toBe('buffered');
+    expect(mode).toBe('legacy');
   });
 });

@@ -20,7 +20,10 @@ export function useBufferedNarrativeSegments(
   segments: NarrativeSegment[],
   options: UseBufferedNarrativeSegmentsOptions = {}
 ) {
-  const { intervalMs = 75, chunkSize = 2 } = options;
+  // A typical narrative beat runs roughly 1000-2000 characters. At the
+  // minimum clamp interval (50ms), a chunk size of 15 tokens clears that in
+  // about 1-2 seconds — fast enough to read as a reveal, not a second wait.
+  const { intervalMs = 50, chunkSize = 15 } = options;
   const enabled = isFeatureEnabled('BUFFERED_STREAMING');
 
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);

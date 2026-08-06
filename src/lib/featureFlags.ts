@@ -9,7 +9,7 @@
  * in the browser.
  */
 const FEATURE_FLAG_DEFAULTS = {
-  BUFFERED_STREAMING: false,
+  BUFFERED_STREAMING: true,
   PROGRESSIVE_DISCLOSURE: true,
 } as const;
 

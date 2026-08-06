@@ -68,6 +68,41 @@ describe('useBufferedNarrativeSegments', () => {
     expect(result.current.isBuffering).toBe(false);
   });
 
+  it('reveals a realistic-length segment within the same fast timer budget as a short one', () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    const initialSegments = [segments[0]];
+    // ~1600 chars, in line with a typical 3-4 paragraph narrative beat.
+    const longContent = 'The old stone bridge creaked underfoot as you crossed into the market square. '.repeat(20);
+
+    const { result, rerender } = renderHook(
+      ({ segs }) => useBufferedNarrativeSegments(segs),
+      { initialProps: { segs: initialSegments } }
+    );
+
+    const newSegments = [
+      ...initialSegments,
+      createMockNarrativeSegment({ id: 'seg-2', content: longContent }),
+    ];
+
+    act(() => {
+      rerender({ segs: newSegments });
+    });
+
+    expect(result.current.renderedSegments[1].content).toBe('');
+
+    // 40 ticks is comfortably enough for production pacing to finish this
+    // content, but nowhere near the ~290 ticks the old CLS-testing pacing
+    // (chunkSize 2, 75ms interval) would have needed for the same length.
+    for (let i = 0; i < 40; i++) {
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+    }
+
+    expect(result.current.renderedSegments[1].content).toBe(longContent);
+    expect(result.current.isBuffering).toBe(false);
+  });
+
   it('does not re-buffer already-revealed segments', () => {
     mockIsFeatureEnabled.mockReturnValue(true);
 
