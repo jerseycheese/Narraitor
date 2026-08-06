@@ -214,6 +214,19 @@ describe('ChoiceSelector', () => {
 
       expect(mockOnCustomSubmit).toHaveBeenCalledWith('Custom action');
     });
+
+    it('autofocuses the input without scrolling its container (mobile choices-rail regression)', () => {
+      // #manuscript-action-rail scrolls internally on mobile (see
+      // manuscript-session.css); autofocus without preventScroll drags that
+      // rail down to reveal the input, hiding the suggested actions above it.
+      const focusSpy = jest.spyOn(HTMLInputElement.prototype, 'focus');
+
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
+
+      expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+
+      focusSpy.mockRestore();
+    });
   });
 
   describe('Skill Requirements', () => {
