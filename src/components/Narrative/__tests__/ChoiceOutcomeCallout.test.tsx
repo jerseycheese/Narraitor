@@ -128,7 +128,7 @@ describe('ChoiceOutcomeCallout consequence chips', () => {
     );
 
     expect(screen.getByText('Marta −15 trust')).toBeInTheDocument();
-    expect(screen.getByText('Chaos rises')).toBeInTheDocument();
+    expect(screen.getByText('Chaos +8')).toBeInTheDocument();
     expect(container.querySelectorAll('.choice-outcome-chip')).toHaveLength(2);
   });
 
@@ -159,6 +159,36 @@ describe('ChoiceOutcomeCallout consequence chips', () => {
     );
 
     expect(container.querySelectorAll('.choice-outcome-chip')).toHaveLength(1);
-    expect(screen.getByText('Order rises')).toBeInTheDocument();
+    expect(screen.getByText('Order +4')).toBeInTheDocument();
+  });
+
+  it('surfaces the actual shift size rather than a fixed label', () => {
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-3': {
+          id: 'decision-3',
+          prompt: 'What now?',
+          selectedOptionId: 'opt-1',
+          options: [
+            {
+              id: 'opt-1',
+              text: 'Swear the oath twice over',
+              alignment: 'lawful',
+              consequences: [
+                { type: 'alignment', action: 'add', targetId: 'player-alignment', value: 4 },
+                { type: 'alignment', action: 'add', targetId: 'player-alignment', value: 12 },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    render(
+      <ChoiceOutcomeCallout decisionId="decision-3" decisionText="You choose to swear the oath" />
+    );
+
+    expect(screen.getByText('Order +4')).toBeInTheDocument();
+    expect(screen.getByText('Order +12')).toBeInTheDocument();
   });
 });
