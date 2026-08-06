@@ -96,4 +96,19 @@ describe('findUndocumentedSnapshots', () => {
     const changed = ['tests/visual/world-creation.spec.ts-snapshots/world-form-chromium-darwin.png'];
     expect(findUndocumentedSnapshots(changed, undefined)).toEqual(changed);
   });
+
+  it('does not count a filename that only appears inside an HTML comment', () => {
+    const changed = ['tests/visual/world-creation.spec.ts-snapshots/world-form-chromium-darwin.png'];
+    const body =
+      '## Visual Baseline Changes\n<!-- e.g. "world-form-chromium-darwin.png - spacing fix" -->\n';
+    expect(findUndocumentedSnapshots(changed, body)).toEqual(changed);
+  });
+
+  it('still flags a filename named outside the comment even if it also appears inside one', () => {
+    const changed = ['tests/visual/world-creation.spec.ts-snapshots/world-form-chromium-darwin.png'];
+    const body =
+      '<!-- e.g. "world-form-chromium-darwin.png - spacing fix" -->\n' +
+      'Baseline changes:\n- world-form-chromium-darwin.png - spacing fix';
+    expect(findUndocumentedSnapshots(changed, body)).toEqual([]);
+  });
 });

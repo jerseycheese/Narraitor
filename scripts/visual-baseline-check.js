@@ -31,13 +31,25 @@ export function hasMixedChange(changedFiles) {
   return changedFiles.some(isSourceChange) && changedFiles.some(isSnapshotChange);
 }
 
+const HTML_COMMENT_RE = /<!--[\s\S]*?-->/g;
+
+/**
+ * Strips HTML comments so template boilerplate (e.g. the PR template's own
+ * example filename inside a `<!-- -->` block) can't count as documentation
+ * that the author never actually wrote.
+ */
+function stripHtmlComments(text) {
+  return text.replace(HTML_COMMENT_RE, '');
+}
+
 /**
  * A changed snapshot counts as documented if its filename appears anywhere
- * in the PR body -- deliberately loose (no required section format) since
- * the goal is catching a baseline with zero mention, not grading prose.
+ * in the PR body outside an HTML comment -- deliberately loose (no required
+ * section format) since the goal is catching a baseline with zero mention,
+ * not grading prose.
  */
 export function findUndocumentedSnapshots(changedSnapshots, prBody) {
-  const body = prBody ?? '';
+  const body = stripHtmlComments(prBody ?? '');
   return changedSnapshots.filter((snapshotPath) => {
     const filename = snapshotPath.split('/').pop();
     return !body.includes(filename);
