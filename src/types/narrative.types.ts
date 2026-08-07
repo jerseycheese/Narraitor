@@ -307,6 +307,8 @@ export interface NarrativeContext {
   sessionId: EntityID;
   /** Most recent segments (typically last 3-5) for immediate context. Subset of previousSegments */
   recentSegments?: NarrativeSegment[];
+  /** Consecutive segments since the last complication — see computeTurnsSinceComplication */
+  turnsSinceComplication?: number;
   currentLocation?: string;
   currentSituation?: string;
   importantEntities?: Array<{

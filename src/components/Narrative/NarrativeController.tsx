@@ -22,6 +22,7 @@ import {
   evaluateDecisionSkillChecks,
   isFatalCriticalDecision,
 } from '@/lib/narrative/evaluateDecisionSkillChecks';
+import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplication';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
@@ -585,6 +586,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     try {
       // Use recent segments for context (last 3 segments for efficiency)
       const recentSegments = segments.slice(-3);
+      // Streak tracked over the whole session, not just the trimmed context
+      // window above — a quiet stretch spans more than 3 segments.
+      const turnsSinceComplication = computeTurnsSinceComplication(segments);
 
       // Get the actual choice text from the narrative store
       const decisions = useNarrativeStore
@@ -698,6 +702,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
               currentTags,
               sessionId,
               recentSegments,
+              turnsSinceComplication,
               currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
             },
             generationParameters: {
