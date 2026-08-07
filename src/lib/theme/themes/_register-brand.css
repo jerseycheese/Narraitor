@@ -52,6 +52,33 @@
      than the app's fine engineering grid. Hard edge at a single radius,
      matching the base token's idiom. */
   --pattern-dot-grid-image: radial-gradient(circle, rgb(42 35 28 / 26%) 1.5px, transparent 1.5px);
+
+  /* ── Hero: text laid over photography ──────────────────────────────
+     These are the one group in this file with NO :root.dark variant, and
+     that is deliberate rather than an oversight. What sits behind them is a
+     photograph, not --color-canvas, so following the theme would break the
+     contrast contract instead of preserving it. The homepage hero swaps
+     between four fixed images; the same ink over the same scrim has to hold
+     in both themes because the backdrop never changes with the theme.
+
+     The floor is derived, not measured off the art, so it survives someone
+     swapping an image later. --brand-hero-ink has a relative luminance of
+     0.900, so 4.5:1 needs a backdrop at or below 0.161, which for a neutral
+     is about 112/255. sRGB alpha compositing of this scrim colour over a
+     pure WHITE pixel lands at 255 - 240a, so any effective alpha at or above
+     0.60 clears AA against literally any image. landing.css stacks the two
+     values below to 1 - (1 - 0.45)(1 - 0.50) = 0.725 across the text zone,
+     which measures 7.1:1 for the ink and 6.0:1 for the softer lead over
+     white, and more than that over the real low-key art.
+
+     tests/visual/landing-contrast.spec.ts screenshots the composite and
+     checks the worst pixel behind the text, per image and per theme, so a
+     lightened scrim fails loudly rather than silently. */
+  --brand-hero-ink: rgb(247 243 237);
+  --brand-hero-ink-soft: rgb(231 224 213);
+  --brand-hero-scrim-base: rgb(18 15 12 / 45%);
+  --brand-hero-scrim-text: rgb(18 15 12 / 50%);
+  --brand-hero-scrim-clear: rgb(18 15 12 / 0%);
 }
 
 @media (width >= 1024px) {

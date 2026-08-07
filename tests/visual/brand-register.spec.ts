@@ -99,4 +99,25 @@ test.describe('Brand register', () => {
     expect(dark).not.toBe('');
     expect(dark).not.toBe(light);
   });
+
+  // The hero tokens are the inverse case: they must NOT follow the theme, since
+  // what sits behind them is a photograph. A typo in one of these names fails
+  // silently into an inherited near-black on a dark image, and a screenshot
+  // baseline generated from that state would lock the bug in.
+  test('resolves theme-independent hero tokens on the homepage', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const light = await readRegisterToken(page, '--brand-hero-ink');
+
+    await page.addInitScript(() =>
+      localStorage.setItem('narraitor-color-scheme', 'dark')
+    );
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    const dark = await readRegisterToken(page, '--brand-hero-ink');
+
+    expect(light).not.toBe('');
+    expect(dark).toBe(light);
+  });
 });
