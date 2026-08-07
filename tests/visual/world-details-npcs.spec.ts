@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { getTimestamp } from '@/lib/utils';
 
 /**
  * World detail NPCs section — single-theme (default DS1).
@@ -9,7 +8,21 @@ import { getTimestamp } from '@/lib/utils';
  * surface is covered across DS1/DS2/DS3 by tests/visual/world-detail-themes.spec.ts.
  */
 
-const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
+/**
+ * Frozen seed timestamp. This used to be getTimestamp() (i.e. "now"), which the
+ * page prints back through WorldInfoSection's Created/Updated fields — so the
+ * baseline baked in whatever day it was captured and drifted from every later
+ * run. The DataFields are fixed-width, so the diff never reflowed the page and
+ * stayed under maxDiffPixels; it was burning diff budget silently rather than
+ * failing loudly.
+ *
+ * The value is the capture date of the committed baseline (last adopted in
+ * #1660, from a CI run on 2026-08-04 UTC), so the frozen render still prints
+ * "Aug 4, 2026" and matches it — no re-baseline needed. Noon UTC keeps the
+ * formatted date a full 12 hours from a day boundary, so it can't roll over
+ * even if a run somehow escapes the UTC pin in playwright.config.ts.
+ */
+const SEEDED_AT = '2026-08-04T12:00:00.000Z';
 const WORLD_ID = 'world-npcs-playwright';
 const NPC_WITH_PORTRAIT = 'npc-elara';
 const NPC_NO_PORTRAIT = 'npc-thorgrim';
@@ -45,11 +58,7 @@ test.describe('World details NPC portraits', () => {
     baseURL,
   }) => {
     await page.addInitScript(
-      async ({ getTimestampSource, seed }) => {
-        const instantiateGetTimestamp = (source: string) =>
-          new Function(`return (${source});`)() as () => string;
-        const getTs = instantiateGetTimestamp(getTimestampSource);
-        const now = getTs();
+      async ({ now, seed }) => {
         const dbName = 'narraitor-state';
         const storeName = 'narraitor-store';
 
@@ -160,7 +169,7 @@ test.describe('World details NPC portraits', () => {
           put('narraitor-npc-store', npcPersist),
         ]);
       },
-      { getTimestampSource: GET_TIMESTAMP_SOURCE, seed: SEED_PAYLOAD }
+      { now: SEEDED_AT, seed: SEED_PAYLOAD }
     );
 
     await page.goto(`${baseURL}/worlds/${WORLD_ID}`, {
