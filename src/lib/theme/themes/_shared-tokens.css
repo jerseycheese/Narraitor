@@ -50,4 +50,22 @@
   /* Standard reading width for primary content surfaces (dashboard, default
    * pages, top nav). Workshop creation pages stay narrower next to their rail. */
   --content-max-width: 1200px;
+
+  /* Layout grid. Named page widths, the same idiom as the --space-*
+   * and --font-size-* scales above: name the values already in use instead
+   * of letting pages pick their own. --content-max-width (1200px) remains
+   * the general app-shell width; these fill the tier below it.
+   *   --page-width-narrow: full-bleed content bands that read best short of
+   *     the full shell (hero copy, ending screen, landing's page container).
+   *   --page-width-prose: long-form reading measure (legal text, about's
+   *     lead copy and hero visual) -- narrower than narrow, wide enough that
+   *     lines don't feel clipped.
+   *   --page-gutter: the shared horizontal inset from viewport edge to
+   *     content, matching the padding the marketing pages already use.
+   * Breakpoints stay literal in media queries -- custom properties aren't
+   * readable inside @media conditions without a build step -- but should
+   * match the scale DESIGN.md documents: 640px / 768px / 1024px. */
+  --page-width-narrow: 64rem;
+  --page-width-prose: 48rem;
+  --page-gutter: var(--space-4);
 }
