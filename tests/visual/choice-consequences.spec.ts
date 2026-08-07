@@ -163,7 +163,7 @@ test.describe('Choice consequences in the play surface (#468)', () => {
     const chips = page.locator('.choice-outcome-consequences').first();
     await expect(chips).toBeVisible({ timeout: 10000 });
     await expect(chips.locator('.choice-outcome-chip[data-kind="relationship"]')).toHaveText('Kira Tanaka −15 trust');
-    await expect(chips.locator('.choice-outcome-chip[data-kind="alignment"]')).toHaveText('Order rises');
+    await expect(chips.locator('.choice-outcome-chip[data-kind="alignment"]')).toHaveText('Order +12');
 
     // SceneStatus participants carry trust-derived disposition tags.
     const sceneStatus = page.locator('.component-scene-status').first();
