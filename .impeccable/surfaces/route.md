@@ -64,13 +64,32 @@ carries "free" in three comments (lines 3, 6, 208); internal today, but it leaks
 
 ## 3. Selected direction
 
-**STRUCTURE AGREED 2026-08-07. VISUAL TREATMENT STILL OPEN.** Reference mockup:
-`.impeccable/mocks/fix-d.webp`, which shows the structure in one possible treatment only.
-Earlier sketch: `.impeccable/sketches/combined.webp`.
+**AGREED 2026-08-07: structure and treatment.** Approved mockup:
+`.impeccable/mocks/treat-cinema.webp`. Earlier sketch: `.impeccable/sketches/combined.webp`.
 
-What is settled is the arrangement and the interaction. How it looks, specifically how far the
-imagery dominates and whether the selector sits on paper or in its own band, is not settled
-and is being decided separately.
+**Treatment: the selected world fills the top of the page.** The chosen world's image runs
+full bleed across the top third with the headline, subhead, start button and secondary link
+laid over it in off-white. The four plates shrink to a thumbnail strip directly beneath the
+hero, and everything below that returns to paper. Picking a world changes the hero image, not
+just the section underneath it, so the whole page visibly becomes that world.
+
+Three constraints this treatment makes binding, all from its own stated risk:
+
+1. **Text over photography is the hardest contrast case there is, and here it has to hold four
+   times over, in both themes.** Every hero image needs a consistent darkening treatment
+   baked in or applied as an overlay, and the 4.5:1 floor has to be verified per image rather
+   than assumed from one. This is the single most likely thing to fail review.
+2. **It must not collapse into a generic hero.** A big photo with a headline over it is the
+   most conventional pattern on the web, and the whole exercise set out to avoid exactly that.
+   What earns it here is that the image is the selected world and changes when you pick a
+   different one. If that connection is not obvious, the treatment has failed.
+3. **The image becomes the largest thing on a page whose product is writing.** The hero is
+   capped at roughly the top third for that reason. It should not grow.
+
+Rejected treatments, kept for the record: `treat-paper.webp` (plates on the paper background;
+quietest, and the plate row risks reading as decoration rather than controls) and
+`treat-band.webp` (plates in a full-width dark band; solves the decoration problem without
+needing the imagery to dominate).
 
 **Four selectable world plates drive the whole page.** A row of four atmospheric world images
 sits under the hero, each captioned with its world. The first is selected by default and shown
