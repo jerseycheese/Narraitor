@@ -17,6 +17,8 @@ interface NarrativeTemplateNarrativeContext {
   currentLocation?: string;
   currentSituation?: string;
   currentTags?: string[];
+  /** Consecutive segments since the last complication — see computeTurnsSinceComplication */
+  turnsSinceComplication?: number;
   importantEntities?: Array<{
     id?: string;
     type?: string;
