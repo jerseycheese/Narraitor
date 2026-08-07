@@ -82,6 +82,7 @@ PACING GUIDANCE — RISING TENSION:
 - This segment MUST introduce a complication: an interruption, a new threat, an unexpected cost, or a setback tied to the current situation.
 - The complication does not need a skill check behind it — it can simply happen (an NPC arrives, a resource runs out, the trail leads somewhere worse than expected, time runs short).
 - Do not extend the current chain with another same-shape discovery (another clue, another trace) with nothing else changing.
+- Whatever complication you introduce here counts as a major event: record it in metadata.majorEvent (see the rules below) so this guidance doesn't fire again next turn for a problem you already resolved.
 ` : ''}
 
 ${generationParameters?.decisionWeight === 'critical' && narrativeContext?.currentTags?.some((tag: string) => tag.startsWith('skill-failure:') || tag.startsWith('skill-critical-failure:')) ? `
