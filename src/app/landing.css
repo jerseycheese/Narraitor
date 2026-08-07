@@ -16,7 +16,7 @@
   flex-direction: column;
   gap: clamp(var(--space-8), 6vw, 5rem);
   width: 100%;
-  max-width: var(--page-width-narrow);
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-8) var(--page-gutter);
 }

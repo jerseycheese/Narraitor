@@ -13,7 +13,7 @@
   flex-direction: column;
   gap: var(--space-8);
   width: 100%;
-  max-width: var(--page-width-prose);
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-6) var(--page-gutter);
 }
@@ -30,6 +30,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  max-width: var(--page-width-prose);
 }
 
 .component-about-title {
@@ -51,7 +52,6 @@
 
 .component-about-hero-visual {
   margin-top: var(--space-2);
-  max-width: var(--page-width-prose);
   overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -85,6 +85,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  max-width: var(--page-width-prose);
 }
 
 .component-about-prose p {
@@ -225,7 +226,7 @@
   flex-wrap: wrap;
   gap: var(--space-5);
   width: 100%;
-  max-width: var(--page-width-prose);
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-5) var(--page-gutter);
   border-top: 1px solid var(--color-border);
