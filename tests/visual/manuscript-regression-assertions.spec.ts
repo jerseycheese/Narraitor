@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
+import { seedJournalEntriesForVisual } from './utils/game-session-page-seeder';
 
 const seedMarginaliaLoreFact = async (page: Page) => {
   await page.addInitScript(async () => {
@@ -257,6 +258,213 @@ test.describe('Manuscript regression assertions', () => {
     expect(geometry.definitionLeft).toBeGreaterThan(geometry.proseLeft + 16);
     expect(geometry.definitionRight).toBeLessThanOrEqual(
       geometry.viewportWidth
+    );
+  });
+
+  test('Choice badges stay above the 12px legibility floor', async ({ page }) => {
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.manuscript-alignment-badge, .manuscript-skill-check-badge', {
+      timeout: 10000,
+    });
+
+    // #1683: these badges sat at 0.625rem (10px), below anything a player is
+    // meant to read at a glance while scanning choices.
+    const badgeFontSizes = await page.evaluate(() => {
+      const badges = Array.from(
+        document.querySelectorAll(
+          '.manuscript-alignment-badge, .manuscript-skill-check-badge'
+        )
+      );
+      return badges.map((badge) => parseFloat(getComputedStyle(badge).fontSize));
+    });
+
+    expect(badgeFontSizes.length).toBeGreaterThan(0);
+    for (const fontSize of badgeFontSizes) {
+      expect(fontSize).toBeGreaterThanOrEqual(12);
+    }
+  });
+
+  test('Journal snapshot meta row stays above the 12px legibility floor', async ({ page }) => {
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+
+    // A DS3-only override on `:root .manuscript-journal-snapshot-meta` clobbered
+    // the base rule's font-size bump (missed in the initial #1683 pass), so this
+    // opens the real drawer rather than only checking the base-rule selector.
+    await seedJournalEntriesForVisual(page);
+    await page.getByRole('button', { name: 'Journal' }).click();
+    await page.waitForSelector('.manuscript-journal-snapshot-meta', { timeout: 10000 });
+
+    const metaFontSize = await page.evaluate(() => {
+      const meta = document.querySelector('.manuscript-journal-snapshot-meta');
+      return meta ? parseFloat(getComputedStyle(meta).fontSize) : null;
+    });
+
+    expect(metaFontSize).not.toBeNull();
+    expect(metaFontSize as number).toBeGreaterThanOrEqual(12);
+  });
+
+  test('Short narrative content does not leave a conspicuous dead band above the choices rail', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 1024 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.narrative-segment', { timeout: 10000 });
+
+    // Trim to a single short segment so the narrative column is well short of
+    // the available height — the scenario #1683 measured ~193px (~19% of a
+    // 1024px-tall viewport) of dead space in.
+    //
+    // addSegment auto-links the session's most recent decision onto any new
+    // segment (see narrativeStore.segments.ts), so this segment renders a
+    // ChoiceOutcomeCallout from seedTestData's sample decision even though
+    // nothing here sets causedByDecisionId directly.
+    await page.evaluate(() => {
+      const store = (window as any).useNarrativeStore?.getState?.();
+      if (!store?.clearSessionSegments || !store?.addSegment) {
+        throw new Error('Expected narrative store to be available');
+      }
+
+      const sessionId = 'session-cyberpunk-ghost';
+      store.clearSessionSegments(sessionId);
+      store.addSegment(sessionId, {
+        worldId: 'world-cyberpunk-2077',
+        content: 'A single short beat of narration.',
+        type: 'scene',
+        characterIds: ['char-cyberpunk-hacker'],
+        metadata: { tags: ['dead-band-regression'], location: 'Test Location' },
+        timestamp: new Date(),
+      });
+    });
+
+    await page.waitForFunction(
+      () => document.querySelectorAll('.narrative-segment').length === 1,
+      { timeout: 10000 }
+    );
+
+    // Wait for the segment's rendered height to stop changing before
+    // measuring geometry, rather than trusting the first paint of the text —
+    // the same stable-for-a-beat pattern waitForStableScrollHeight uses
+    // elsewhere in this file's utils. This also covers the general case
+    // where a segment carries a decision-outcome callout: the callout mounts
+    // in the same render as the segment's text, so waiting for the whole
+    // segment box to settle waits for both together.
+    await page.waitForFunction(
+      () => {
+        const segment = document.querySelector('.narrative-segment');
+        if (!segment) return false;
+
+        const height = segment.getBoundingClientRect().height;
+        const tracker = window as unknown as {
+          __deadBandLastHeight?: number;
+          __deadBandStableSince?: number;
+        };
+
+        if (tracker.__deadBandLastHeight !== height) {
+          tracker.__deadBandLastHeight = height;
+          tracker.__deadBandStableSince = Date.now();
+          return false;
+        }
+
+        return Date.now() - (tracker.__deadBandStableSince ?? Date.now()) >= 200;
+      },
+      { timeout: 10000 }
+    );
+
+    const geometry = await page.evaluate(() => {
+      const narrativeContainer = document.querySelector(
+        '.manuscript-narrative-container'
+      );
+      const actionRail = document.querySelector('#manuscript-action-rail');
+
+      if (!narrativeContainer || !actionRail) {
+        return null;
+      }
+
+      return {
+        narrativeBottom: narrativeContainer.getBoundingClientRect().bottom,
+        actionRailTop: actionRail.getBoundingClientRect().top,
+        viewportHeight: window.innerHeight,
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected play surface geometry to be measurable');
+    }
+
+    const gap = geometry.actionRailTop - geometry.narrativeBottom;
+
+    // Guards the regression: for this single-line segment (plus the
+    // decision-outcome callout it inherits), the gap settles deterministically
+    // around 281px (~27% of a 1024px-tall viewport) once the segment has fully
+    // rendered — confirmed identical across repeated runs and across wait
+    // durations from 200ms to 1500ms. The ~163-184px (~16-18%) this test
+    // previously guarded against was itself a measurement taken before the
+    // segment had finished rendering, not a real ceiling; 35% leaves headroom
+    // above the settled value while still catching a dead band anywhere near
+    // the much larger one this test was originally written against.
+    expect(gap).toBeLessThan(geometry.viewportHeight * 0.35);
+  });
+
+  test('Docked choices rail does not squeeze the narrative row off-screen on mobile', async ({ page }) => {
+    // DS3 always stacks suggested actions in a single column (never a grid,
+    // see :root .manuscript-suggested-actions-grid), so a full set of choices
+    // on a narrow/short viewport used to demand more height than the
+    // `.manuscript-viewport-inner` auto/1fr/auto grid had available, squeezing
+    // the narrative row (`.manuscript-overlay-main`) down to ~16px — the story
+    // text effectively vanished. Reproduces on unmodified `develop` HEAD.
+    await page.setViewportSize({ width: 375, height: 667 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('#manuscript-action-rail', { timeout: 10000 });
+
+    const geometry = await page.evaluate(() => {
+      const main = document.querySelector('.manuscript-overlay-main');
+      const rail = document.querySelector('#manuscript-action-rail');
+      if (!main || !rail) return null;
+
+      const mainRect = main.getBoundingClientRect();
+      return {
+        mainHeight: mainRect.height,
+        railScrollHeight: rail.scrollHeight,
+        railClientHeight: rail.clientHeight,
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected play surface geometry to be measurable');
+    }
+
+    // Floor the narrative row so it stays legible instead of collapsing to a
+    // sliver — before the fix this measured ~16px on a 667px-tall viewport.
+    expect(geometry.mainHeight).toBeGreaterThan(120);
+
+    // The docked rail itself should absorb overflow via its own scrollbar
+    // rather than growing unbounded and starving the narrative row.
+    expect(geometry.railScrollHeight).toBeGreaterThanOrEqual(
+      geometry.railClientHeight
     );
   });
 });

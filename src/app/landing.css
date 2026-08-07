@@ -16,14 +16,14 @@
   flex-direction: column;
   gap: clamp(var(--space-8), 6vw, 5rem);
   width: 100%;
-  max-width: 1040px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-8) var(--page-gutter);
 }
 
 @media (width >= 1024px) {
   .component-landing {
-    padding: var(--space-8) var(--space-6);
+    padding: var(--space-8) var(--page-gutter);
   }
 }
 
@@ -33,7 +33,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  max-width: 760px;
+  max-width: var(--page-width-prose);
 }
 
 .component-landing-visual {
@@ -76,7 +76,7 @@
 .component-landing-lead {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
@@ -104,7 +104,9 @@
 }
 
 .component-landing-cta:hover {
-  color: var(--color-on-accent);
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
   background: var(--color-accent-hover);
 }
 
@@ -179,7 +181,10 @@
   font-family: var(--font-system);
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-accent);
+
+  /* accent-strong, not accent: plain accent on accent-soft only hits 3.9:1,
+     below the 4.5:1 AA minimum for this text size. */
+  color: var(--color-accent-strong);
   background: var(--color-accent-soft);
   border-radius: var(--radius-full);
 }
@@ -187,7 +192,7 @@
 .component-landing-step-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -281,19 +286,14 @@
 
 /* ═══════════════════════════════════════════════════════════════
    DS3 — "Mechanical Manuscript"
-   Dot-grid field, mono labels with a dot bullet, corner-bracket step
-   cards, compact rhythm, mono prose.
+   Mono labels with a dot bullet, corner-bracket step cards, compact
+   rhythm, mono prose. Dot-grid field comes from the app-surface root
+   (app-shell.css), not defined per-page — see ds3.css
+   --pattern-dot-grid-image.
    ═══════════════════════════════════════════════════════════════ */
 
 :root .component-landing {
   gap: clamp(var(--space-6), 5vw, 3.5rem);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 14%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 24px 24px;
-  background-repeat: repeat;
 }
 
 :root .component-landing-eyebrow {
@@ -366,5 +366,5 @@
 :root .component-landing-step-description,
 :root .component-landing-note-description {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }

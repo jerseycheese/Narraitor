@@ -27,8 +27,6 @@ import {
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
-import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
-import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
 import { generateEndingImage as requestEndingImage } from '@/lib/api/endingImageApi';
 import { capitalize } from '@/lib/utils/formatters';
 
@@ -160,25 +158,10 @@ export function EndingScreen() {
     updateCurrentEnding,
   ]);
 
-  // Load ending image when ending is available (but not in Storybook or test environment)
-  useEffect(() => {
-    // Skip image generation in Storybook or test environment
-    const isStorybook = isStorybookEnv();
-    const isTest = process.env.NODE_ENV === 'test';
-    const isPlaywright = isPlaywrightEnv();
-
-    if (
-      currentEnding &&
-      !endingImage &&
-      !isGeneratingImage &&
-      !isStorybook &&
-      !isTest &&
-      !isPlaywright &&
-      generatedForEndingRef.current !== currentEnding.id
-    ) {
-      generateEndingImage();
-    }
-  }, [currentEnding, endingImage, isGeneratingImage, generateEndingImage]); // Include all dependencies
+  // Ending image generation is purely decorative and manually triggered
+  // (placeholder "Generate Image" button / error-state "Try Again") rather
+  // than auto-firing on mount — it's an extra Gemini round-trip the player
+  // hasn't asked for.
 
   // Note: Removed automatic cleanup to prevent clearing ending during development re-renders
   // The ending should be cleared manually when navigating away
@@ -359,6 +342,14 @@ export function EndingScreen() {
           >
             <div className="component-ending-screen-hero-placeholder">
               <p>Ending image</p>
+              <Button
+                onClick={generateEndingImage}
+                variant="link"
+                size="sm"
+                aria-label="Generate ending image"
+              >
+                Generate Image
+              </Button>
             </div>
             <div className="component-ending-screen-hero-overlay">
               <header className="component-ending-screen-hero-header">

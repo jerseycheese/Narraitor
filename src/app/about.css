@@ -13,14 +13,14 @@
   flex-direction: column;
   gap: var(--space-8);
   width: 100%;
-  max-width: 860px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-6) var(--page-gutter);
 }
 
 @media (width >= 1024px) {
   .component-about {
-    padding: var(--space-8) var(--space-6);
+    padding: var(--space-8) var(--page-gutter);
   }
 }
 
@@ -30,6 +30,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  max-width: var(--page-width-prose);
 }
 
 .component-about-title {
@@ -44,14 +45,13 @@
 .component-about-lead {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
 
 .component-about-hero-visual {
   margin-top: var(--space-2);
-  max-width: 760px;
   overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -75,7 +75,7 @@
 .component-about-section-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--color-text-primary);
@@ -85,12 +85,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  max-width: var(--page-width-prose);
 }
 
 .component-about-prose p {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   line-height: 1.65;
   color: var(--color-text-secondary);
 }
@@ -146,9 +147,12 @@
   width: 2rem;
   height: 2rem;
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--color-accent);
+
+  /* accent-strong, not accent: plain accent on accent-soft only hits 3.9:1,
+     below the 4.5:1 AA minimum for this text size. */
+  color: var(--color-accent-strong);
   background: var(--color-accent-soft);
   border-radius: var(--radius-full);
 }
@@ -187,7 +191,7 @@
   align-items: center;
   padding: var(--space-3) var(--space-5);
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-on-accent);
   background: var(--color-accent);
@@ -197,7 +201,9 @@
 }
 
 .component-about-cta-link:hover {
-  color: var(--color-on-accent);
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
   background: var(--color-accent-hover);
 }
 
@@ -220,15 +226,15 @@
   flex-wrap: wrap;
   gap: var(--space-5);
   width: 100%;
-  max-width: 860px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: var(--space-5) var(--space-4);
+  padding: var(--space-5) var(--page-gutter);
   border-top: 1px solid var(--color-border);
 }
 
 @media (width >= 1024px) {
   .component-about-footer {
-    padding: var(--space-5) var(--space-6);
+    padding: var(--space-5) var(--page-gutter);
   }
 }
 
@@ -251,19 +257,14 @@
 
 /* ═══════════════════════════════════════════════════════════════
    DS3 — "Mechanical Manuscript"
-   Compact: dot-grid background, corner-bracket step cards, tighter
-   gaps, medium radius, mono section labels with a dot bullet.
+   Compact: corner-bracket step cards, tighter gaps, medium radius, mono
+   section labels with a dot bullet. Dot-grid field comes from the
+   app-surface root (app-shell.css), not defined per-page — see ds3.css
+   --pattern-dot-grid-image.
    ═══════════════════════════════════════════════════════════════ */
 
 :root .component-about {
   gap: var(--space-6);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 16%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 24px 24px;
-  background-repeat: repeat;
 }
 
 :root .component-about-section-title {
@@ -339,7 +340,7 @@
 
 :root .component-about-step-description {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 :root .component-about-cta {

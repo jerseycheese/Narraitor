@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
 import { getAIConfig } from '../lib/ai/config';
 import { resolveApiKey } from '../lib/ai/resolveApiKey';
-import { createAPIErrorResponse } from '../lib/utils/errorUtils';
+import { createAPIErrorResponse } from '../lib/utils/createAPIErrorResponse';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../lib/constants/aiTimeouts';
 
 import Logger from '@/lib/utils/logger';

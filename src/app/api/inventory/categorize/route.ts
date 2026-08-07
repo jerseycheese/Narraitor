@@ -4,6 +4,7 @@ import { categorizeInventoryItems } from '@/lib/ai/inventoryCategorizer';
 import type { InventoryCategorizationResult } from '@/lib/ai/inventoryCategorizer';
 import Logger from '@/lib/utils/logger';
 import { getTimestamp } from '@/lib/utils';
+import { reportServerError } from '@/lib/telemetry/reportServerError';
 
 const logger = new Logger('InventoryCategorizeAPI');
 
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ results });
   } catch (error) {
     logger.error('Failed to categorize inventory items', error);
+    reportServerError(error, { source: 'route', route: '/api/inventory/categorize' });
     return NextResponse.json(
       {
         error: 'Failed to categorize inventory items',

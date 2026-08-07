@@ -38,6 +38,8 @@ interface ActiveGameSessionChoicesColumnProps {
   generationError?: NarrativeError | null;
   /** Retry the failed turn (only meaningful for transient/retryable errors). */
   onRetryGeneration?: () => void;
+  /** Suppress ChoiceSelector's number-key shortcuts while a modal/dialog is open over the session (#276). */
+  shortcutsSuspended?: boolean;
 }
 
 const ActiveGameSessionChoicesColumn: React.FC<
@@ -66,6 +68,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
   endingSuggestion,
   generationError = null,
   onRetryGeneration,
+  shortcutsSuspended = false,
 }) => {
   const [showSuggestedActions, setShowSuggestedActions] = React.useState(false);
 
@@ -188,6 +191,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
                 inventoryItems={inventoryItems}
                 endingSuggestion={endingSuggestion}
                 inputActions={resolvedInputActions}
+                shortcutsSuspended={shortcutsSuspended}
               />
             </div>
           )

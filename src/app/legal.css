@@ -16,14 +16,14 @@
   flex-direction: column;
   gap: var(--space-6);
   width: 100%;
-  max-width: 720px;
+  max-width: var(--page-width-prose);
   margin: 0 auto;
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-6) var(--page-gutter);
 }
 
 @media (width >= 1024px) {
   .component-legal {
-    padding: var(--space-8) var(--space-6);
+    padding: var(--space-8) var(--page-gutter);
   }
 }
 
@@ -38,7 +38,7 @@
 .component-legal-eyebrow {
   margin: 0;
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -57,7 +57,7 @@
 .component-legal-lead {
   margin: 0;
   font-family: var(--font-narrative);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   line-height: 1.55;
   color: var(--color-text-secondary);
 }
@@ -79,8 +79,9 @@
 
 /* Scoped (.component-legal prefix) to outrank the app-surface h2 baseline in
    app-shell.css (.app-surface-app h2) — the section label is deliberately a
-   small mono uppercase eyebrow with a dot bullet, not the 1.5rem surface
-   default. A bare single class loses to `.app-surface-app h2` on specificity. */
+   small mono uppercase eyebrow with a dot bullet, not the --font-size-xl
+   surface default. A bare single class loses to `.app-surface-app h2` on
+   specificity. */
 .component-legal .component-legal-section-title {
   display: flex;
   align-items: center;

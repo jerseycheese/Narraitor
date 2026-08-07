@@ -71,7 +71,7 @@ export default function WorldViewPage() {
     {
       label: 'View Characters',
       onClick: () => router.push(`/characters?worldId=${worldId}`),
-      variant: 'primary' as const,
+      variant: 'secondary' as const,
       icon: (
         <Users aria-hidden="true" />
       )
@@ -103,7 +103,7 @@ export default function WorldViewPage() {
         <ActionButtonGroup
           actions={actionButtons.map(btn => ({
             ...btn,
-            flex: btn.variant === 'primary' || btn.variant === 'success'
+            flex: btn.variant === 'success'
           }))}
           layout="horizontal"
           gap="sm"

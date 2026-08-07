@@ -129,4 +129,62 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
     expect(typeof calledPrompt).toBe('string');
     expect(calledPrompt.length).toBeGreaterThan(0);
   });
+
+  // Lore extraction is a full extra Gemini round-trip that only enriches
+  // later prompts — generateSegment must not block on it.
+  test('resolves before lore extraction settles, then stores lore once it does', async () => {
+    const mockResponse = {
+      content: 'You press onward through the fog.',
+      finishReason: 'stop' as const,
+      promptTokens: 50,
+      completionTokens: 50
+    };
+    mockAIClient.generateContent.mockResolvedValue(mockResponse);
+
+    let resolveLoreExtraction: (value: {
+      characters: never[];
+      locations: never[];
+      events: never[];
+      rules: never[];
+    }) => void = () => {};
+    (extractStructuredLore as jest.Mock).mockReturnValue(
+      new Promise((resolve) => {
+        resolveLoreExtraction = resolve;
+      })
+    );
+
+    const addStructuredLore = jest.fn();
+    (useLoreStore.getState as jest.Mock).mockReturnValue({
+      getLoreContext: jest.fn().mockReturnValue({ factIds: [] }),
+      recordLoreMentions: jest.fn(),
+      recordLoreUsage: jest.fn(),
+      addStructuredLore
+    });
+
+    await narrativeGenerator.generateSegment({
+      worldId: 'skill-world',
+      sessionId: 'session-1',
+      characterIds: ['char-1'],
+      narrativeContext: {
+        worldId: 'skill-world',
+        currentSceneId: 'scene-4',
+        characterIds: ['char-1'],
+        sessionId: 'session-1',
+        previousSegments: [],
+        currentTags: []
+      }
+    });
+
+    // The segment resolved even though lore extraction is still pending.
+    expect(addStructuredLore).not.toHaveBeenCalled();
+
+    resolveLoreExtraction({ characters: [], locations: [], events: [], rules: [] });
+    // Flush the microtask queue so the deferred .then() chain (which
+    // includes an `await import(...)`) has a chance to run.
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(addStructuredLore).toHaveBeenCalled();
+  });
 });

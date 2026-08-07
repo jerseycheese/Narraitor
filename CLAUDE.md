@@ -32,7 +32,7 @@ npm run lint:css           # Stylelint over **/*.css — run after ANY .css edit
 ```
 
 - `npm run build` — production build (includes a Storybook build step).
-- Structural changes (imports crossing domains): `npm run deps:validate` — dependency-cruiser against the known-violations baseline (`deps:validate:strict` shows everything; re-baseline only deliberately with `deps:baseline`).
+- Structural changes (imports crossing domains): `npm run deps:validate`, dependency-cruiser against the known-violations baseline (`deps:validate:strict` shows everything; re-baseline only deliberately with `deps:baseline`). `npm run deps:check` is the other half of the ratchet: it fails when a baseline entry no longer reproduces, so fixing a violation means re-baselining.
 - Visual work: `npm run test:visual` (Playwright, chromium). Update snapshots deliberately with `test:visual:update`; prune orphans with `test:visual:prune`.
 - If local jest runs out of memory, `npm run test:ci` exists for that (4GB Node heap).
 
@@ -90,6 +90,7 @@ For truly automatic execution, select "Yes, and don't ask again this session" on
 - Port 3000 taken → an orphan `next dev` or rcv-simulator-va's main checkout.
 - Stylelint color failures → a raw color landed outside a theme file; route it through tokens.
 - deps:validate failures → fix the boundary violation, or (rarely, deliberately) re-baseline.
+- deps:check failures → a violation got fixed but its baseline entry is still there; run `deps:baseline` and commit the smaller file.
 
 ## Pointers
 

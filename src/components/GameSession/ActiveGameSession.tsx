@@ -36,6 +36,8 @@ import {
 } from './ManuscriptDrawerPanels';
 import { CharacterSnapshot } from './CharacterSnapshot';
 import { SceneStatus } from './SceneStatus';
+import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 
 type DrawerType = 'character' | 'inventory' | 'story-summary' | 'choice-history' | 'journal';
@@ -84,6 +86,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [isEvaluatingAction, setIsEvaluatingAction] = React.useState(false);
   const [isCharacterSummaryExpanded, setIsCharacterSummaryExpanded] = React.useState(false);
   const [activeDrawer, setActiveDrawer] = React.useState<DrawerType | null>(null);
+  const [isShortcutsHelpOpen, setIsShortcutsHelpOpen] = React.useState(false);
 
   const characterButtonRef = React.useRef<HTMLButtonElement>(null);
   const drawerTriggerRef = React.useRef<HTMLElement | null>(null);
@@ -190,28 +193,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const { startTour, isTourActive } = useTutorial();
   const shouldShowTour = useSessionStore(state => state.shouldShowTutorialPhase('firstPlay'));
 
+  // Escape for the drawer belongs to Radix, which closes it through
+  // onOpenChange and restores focus via the drawer's restoreFocusRef. The
+  // character panel is a plain popover with no dialog behaviour of its own,
+  // so it still needs its own Escape and focus return.
   React.useEffect(() => {
-    if (!isCharacterSummaryExpanded && activeDrawer === null) return;
+    if (!isCharacterSummaryExpanded) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (activeDrawer !== null) {
-          setActiveDrawer(null);
-          drawerTriggerRef.current?.focus();
-          drawerTriggerRef.current = null;
-          return;
-        }
-        if (isCharacterSummaryExpanded) {
-          setIsCharacterSummaryExpanded(false);
-          characterButtonRef.current?.focus();
-          return;
-        }
+        setIsCharacterSummaryExpanded(false);
+        characterButtonRef.current?.focus();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCharacterSummaryExpanded, activeDrawer]);
+  }, [isCharacterSummaryExpanded]);
 
   React.useEffect(() => {
     if (!isGameReady) return;
@@ -223,6 +221,30 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
     return () => clearTimeout(timer);
   }, [isGameReady, shouldShowTour, isTourActive, startTour]);
+
+  // Every path into a drawer records what had focus, so closing it returns the
+  // player where they were. Routing the keyboard shortcut through here too
+  // keeps a stale HUD icon from stealing focus back after a `j` open.
+  const openDrawer = React.useCallback((drawerType: DrawerType) => {
+    drawerTriggerRef.current = document.activeElement as HTMLElement | null;
+    setActiveDrawer(drawerType);
+    setIsCharacterSummaryExpanded(false);
+  }, []);
+
+  // Journal opens as a drawer under progressive disclosure, otherwise it's a
+  // route (matches the two "Open Journal" entry points already in the HUD /
+  // ActiveGameSessionControls).
+  const handleOpenJournalShortcut = React.useCallback(() => {
+    if (isProgressiveDisclosureEnabled) {
+      openDrawer('journal');
+    } else {
+      router.push(`/worlds/${worldId}/play/journal`);
+    }
+  }, [isProgressiveDisclosureEnabled, openDrawer, router, worldId]);
+
+  const handleToggleCharacterShortcut = React.useCallback(() => {
+    setIsCharacterSummaryExpanded((prev) => !prev);
+  }, []);
 
   const { createDecisionJournalEntry, createJournalEntryFromSegment } = useActiveGameSessionJournal({
     sessionId,
@@ -248,6 +270,44 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     character,
     generateEnding,
   });
+
+  // True while any modal/dialog is up over the session (shortcuts help, a
+  // progressive-disclosure drawer, or the End Story confirmation). Global
+  // hotkeys - both the j/c/? bindings below and ChoiceSelector's number keys
+  // - must not fire while one of these is open: the underlying content stays
+  // mounted behind the overlay, so without this gate a player reading the
+  // shortcuts dialog could press "1" and silently advance the turn behind it
+  // (#276 review follow-up). The character summary panel is deliberately
+  // excluded - it's non-modal and doesn't trap focus.
+  const isModalOpen = isShortcutsHelpOpen || activeDrawer !== null || showEndConfirmation;
+
+  // Game-session keyboard shortcuts (#276): number keys for choices live in
+  // ChoiceSelector itself since that's where the option list is. These cover
+  // the remaining common actions the issue calls out - journal, character
+  // sheet, and a discoverable reference for all of it. Only active once the
+  // session has rendered its real HUD (isGameReady) and no modal is already
+  // covering it.
+  const gameSessionShortcuts = React.useMemo(
+    () => [
+      {
+        key: '?',
+        description: 'Show keyboard shortcuts',
+        action: () => setIsShortcutsHelpOpen(true),
+      },
+      {
+        key: 'j',
+        description: 'Open journal',
+        action: handleOpenJournalShortcut,
+      },
+      {
+        key: 'c',
+        description: 'Toggle character sheet',
+        action: handleToggleCharacterShortcut,
+      },
+    ],
+    [handleOpenJournalShortcut, handleToggleCharacterShortcut]
+  );
+  useKeyboardShortcuts(gameSessionShortcuts, isGameReady && !isModalOpen);
 
   const { scheduleChoiceFallback } = useActiveGameSessionEffects({
     sessionId,
@@ -379,14 +439,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           drawerTriggers={isProgressiveDisclosureEnabled}
           characterName={character?.name}
           characterPortrait={character?.portrait}
-          onOpenDrawer={(drawerType) => {
-            drawerTriggerRef.current = document.activeElement as HTMLElement;
-            setActiveDrawer(drawerType as DrawerType);
-            setIsCharacterSummaryExpanded(false);
-          }}
+          onOpenDrawer={(drawerType) => openDrawer(drawerType as DrawerType)}
           onStartNew={handleHudStartNew}
           onBack={handleHudBack}
           onEndStory={handleEndStoryClick}
+          onShowShortcuts={() => setIsShortcutsHelpOpen(true)}
           saveIndicator={
             <SaveIndicator
               status={autoSave.status}
@@ -428,6 +485,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               endingSuggestion={endingSuggestion}
               generationError={generationError}
               onRetryGeneration={handleRetryGeneration}
+              shortcutsSuspended={isModalOpen}
             />
           </div>
         </ManuscriptActionRail>
@@ -468,11 +526,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {isProgressiveDisclosureEnabled && (
         <ManuscriptDrawer
           open={activeDrawer !== null}
+          restoreFocusRef={drawerTriggerRef}
           onOpenChange={(open) => {
             if (!open) {
               setActiveDrawer(null);
-              drawerTriggerRef.current?.focus();
-              drawerTriggerRef.current = null;
             }
           }}
           title={
@@ -523,6 +580,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           )}
         </ManuscriptDrawer>
       )}
+
+      <KeyboardShortcutsDialog
+        open={isShortcutsHelpOpen}
+        onOpenChange={setIsShortcutsHelpOpen}
+      />
     </ManuscriptSessionShell>
   );
 };

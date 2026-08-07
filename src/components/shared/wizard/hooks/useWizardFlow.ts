@@ -2,12 +2,16 @@ import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { safeJsonParse } from '@/lib/safeJsonParse';
 
+// Wizard state plus the surrounding flow: optional localStorage persistence,
+// a submit lifecycle, and cancel-routing. For step state with none of that,
+// use `useWizardState` in @/hooks instead.
+
 interface WizardStep {
   id: string;
   label: string;
 }
 
-export interface WizardState<T> {
+export interface WizardFlowState<T> {
   currentStep: number;
   data: T;
   errors: Record<string, string>;
@@ -21,7 +25,7 @@ interface ValidationState {
   touched: boolean;
 }
 
-export interface WizardConfig<T> {
+export interface WizardFlowConfig<T> {
   steps: WizardStep[];
   initialData: T;
   onComplete: (data: T) => void | Promise<void>;
@@ -31,7 +35,7 @@ export interface WizardConfig<T> {
   debug?: boolean;
 }
 
-export interface WizardHandlers<T> {
+export interface WizardFlowHandlers<T> {
   handleNext: () => void;
   handleBack: () => void;
   handleCancel: () => void;
@@ -41,7 +45,7 @@ export interface WizardHandlers<T> {
   clearError: (field: string) => void;
 }
 
-export function useWizardState<T>(config: WizardConfig<T>) {
+export function useWizardFlow<T>(config: WizardFlowConfig<T>) {
   const router = useRouter();
   const { 
     steps, 
@@ -54,7 +58,7 @@ export function useWizardState<T>(config: WizardConfig<T>) {
   } = config;
 
   // Initialize state from localStorage if persist key provided
-  const [state, setState] = useState<WizardState<T>>(() => {
+  const [state, setState] = useState<WizardFlowState<T>>(() => {
     if (persistKey && typeof window !== 'undefined') {
       const parsed = safeJsonParse<unknown>(
         localStorage.getItem(persistKey),
@@ -63,17 +67,17 @@ export function useWizardState<T>(config: WizardConfig<T>) {
 
       // Only restore if the persisted value is actually a wizard state.
       // localStorage under a persistKey is untrusted input — it can hold
-      // a value that isn't a WizardState (foreign writer, manual edit,
+      // a value that isn't a WizardFlowState (foreign writer, manual edit,
       // corruption). Spreading that produced a state missing required
       // fields like `errors`, which crashed downstream consumers.
-      const isWizardState =
+      const isWizardFlowState =
         parsed !== null &&
         typeof parsed === 'object' &&
         typeof (parsed as { currentStep?: unknown }).currentStep === 'number' &&
         typeof (parsed as { data?: unknown }).data === 'object';
 
-      if (isWizardState) {
-        const persisted = parsed as Partial<WizardState<T>> & {
+      if (isWizardFlowState) {
+        const persisted = parsed as Partial<WizardFlowState<T>> & {
           currentStep: number;
           data: Partial<T>;
         };
@@ -81,7 +85,7 @@ export function useWizardState<T>(config: WizardConfig<T>) {
         // This ensures new fields in initialData are present even if not
         // in the saved state. Each top-level field is rebuilt explicitly
         // so a partial persisted state can never yield an undefined field.
-        const initialState: WizardState<T> = {
+        const initialState: WizardFlowState<T> = {
           currentStep: persisted.currentStep,
           data: { ...initialData, ...persisted.data },
           errors: persisted.errors ?? {},
@@ -259,7 +263,7 @@ export function useWizardState<T>(config: WizardConfig<T>) {
     });
   }, []);
 
-  const handlers: WizardHandlers<T> = {
+  const handlers: WizardFlowHandlers<T> = {
     handleNext,
     handleBack,
     handleCancel,

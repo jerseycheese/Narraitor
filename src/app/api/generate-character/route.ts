@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
-import { createAPIErrorResponse } from '@/lib/utils/errorUtils';
+import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 import { generateAICharacter } from '@/lib/generators/characterGenerator';
 import { World } from '@/types/world.types';
 import { validateWorld } from '@/lib/utils/typeGuards';

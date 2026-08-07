@@ -6,23 +6,16 @@
 
 /* ─── Page Container ─── */
 
+/* No box/max-width/padding of its own: this renders inside
+   `.home-dashboard`, which is itself a plain pass-through inside
+   `.app-surface-inner` (app-shell.css) — that ancestor already caps
+   width at --content-max-width and owns the responsive gutter. Adding
+   another cap + padding here compounded on top of it and inset the
+   dashboard ~24px past the header logo's left edge. */
 .component-dashboard-home {
-  /* border-box so width:100% + padding stays within the viewport
-     (no global box-sizing reset in this project). */
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  width: 100%;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: var(--space-4);
-}
-
-@media (width >= 1024px) {
-  .component-dashboard-home {
-    padding: var(--space-6);
-  }
 }
 
 /* ─── Shared Section Card Surface ───
@@ -50,7 +43,7 @@
 .component-dashboard-getting-started h2 {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--color-text-primary);
@@ -178,7 +171,7 @@
 .dashboard-continue-card-meta {
   margin: 0;
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -253,7 +246,7 @@
 
 .dashboard-recent-item h3 {
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
@@ -343,7 +336,7 @@
   background: transparent;
   color: var(--color-text-muted);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   text-align: left;
   transition: border-color 120ms ease, background-color 120ms ease, color 120ms ease;
@@ -449,30 +442,23 @@
 .dashboard-getting-started-complete-body p {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: 1.5;
 }
 
 /* ─── DS3 — "The Mechanical Manuscript" ───
-   Aged paper + drafting ink + dot grid, per ADR-011 and the DS3
-   showcase canon. A radial-gradient dot grid sits beneath everything
-   (2px dot every 24px — the canonical DS3 grid). Panels are
-   featherweight cards on the canvas, framed by thin accent corner
-   brackets as a drafting-ink mechanical mark. The compact stat strip
-   sits on top of the 3-col row of Recent + Getting Started. */
+   Aged paper + drafting ink, per ADR-011 and the DS3 showcase canon.
+   Panels are featherweight cards on the canvas, framed by thin accent
+   corner brackets as a drafting-ink mechanical mark. The compact stat
+   strip sits on top of the 3-col row of Recent + Getting Started.
+   Dot-grid field comes from the app-surface root (app-shell.css), not
+   defined per-page — see ds3.css --pattern-dot-grid-image. */
 
 :root .component-dashboard-home {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 18%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 24px 24px;
-  background-repeat: repeat;
 }
 
 @media (width < 768px) {
@@ -573,7 +559,7 @@
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -619,7 +605,7 @@
 
 :root .dashboard-recent-item h3 {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -675,7 +661,7 @@
 
 :root .dashboard-getting-started-step-label {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.4;
 }
 
@@ -757,7 +743,7 @@
 
 :root .world-list-empty-lede {
   font-family: var(--font-narrative);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   color: var(--color-text-primary);
 }
 
@@ -769,7 +755,7 @@
 
 :root .world-list-empty-guide-heading {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -778,7 +764,7 @@
 
 :root .world-list-empty-guide-steps {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 :root .world-list-empty-tip {

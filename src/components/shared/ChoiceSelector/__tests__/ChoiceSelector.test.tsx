@@ -141,6 +141,62 @@ describe('ChoiceSelector', () => {
     });
   });
 
+  describe('Keyboard shortcuts (#276)', () => {
+    it('selects a choice when its number key is pressed', () => {
+      renderChoiceSelector({ decision, onSelect: mockOnSelect });
+
+      fireEvent.keyDown(document, { key: '2' });
+
+      expect(mockOnSelect).toHaveBeenCalledWith('opt-2');
+    });
+
+    it('does not select a disabled-by-requirements choice via its number key', () => {
+      // combinedRequirementDecision's first option (key "1") is item-gated
+      // and no lockpick is supplied here, so it renders disabled.
+      renderChoiceSelector({
+        decision: combinedRequirementDecision,
+        onSelect: mockOnSelect,
+        worldSkills: mockWorldSkills,
+        characterSkills: [],
+        inventoryItems: [],
+      });
+
+      fireEvent.keyDown(document, { key: '1' });
+
+      expect(mockOnSelect).not.toHaveBeenCalled();
+    });
+
+    it('ignores number keys while typing in the custom input', () => {
+      renderChoiceSelector({
+        decision,
+        onSelect: mockOnSelect,
+        enableCustomInput: true,
+        onCustomSubmit: mockOnCustomSubmit,
+      });
+
+      const input = screen.getByPlaceholderText('Describe your action...');
+      fireEvent.keyDown(input, { key: '1' });
+
+      expect(mockOnSelect).not.toHaveBeenCalled();
+    });
+
+    it('does not respond to number keys once the selector is disabled', () => {
+      renderChoiceSelector({ decision, onSelect: mockOnSelect, isDisabled: true });
+
+      fireEvent.keyDown(document, { key: '1' });
+
+      expect(mockOnSelect).not.toHaveBeenCalled();
+    });
+
+    it('does not respond to number keys while shortcutsSuspended (a modal is open)', () => {
+      renderChoiceSelector({ decision, onSelect: mockOnSelect, shortcutsSuspended: true });
+
+      fireEvent.keyDown(document, { key: '1' });
+
+      expect(mockOnSelect).not.toHaveBeenCalled();
+    });
+  });
+
   describe('Custom Input', () => {
     it('shows custom input field when enabled', () => {
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
@@ -157,6 +213,19 @@ describe('ChoiceSelector', () => {
       await user.keyboard('{Enter}');
 
       expect(mockOnCustomSubmit).toHaveBeenCalledWith('Custom action');
+    });
+
+    it('autofocuses the input without scrolling its container (mobile choices-rail regression)', () => {
+      // #manuscript-action-rail scrolls internally on mobile (see
+      // manuscript-session.css); autofocus without preventScroll drags that
+      // rail down to reveal the input, hiding the suggested actions above it.
+      const focusSpy = jest.spyOn(HTMLInputElement.prototype, 'focus');
+
+      renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
+
+      expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+
+      focusSpy.mockRestore();
     });
   });
 

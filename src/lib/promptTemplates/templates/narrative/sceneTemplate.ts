@@ -1,6 +1,14 @@
 import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
+import { describeNarrativeLength } from './narrativeLength';
 import type { NarrativeTemplateContext } from './context';
+
+/**
+ * Number of consecutive uneventful segments before the prompt starts pushing
+ * the model to break the calm. Below this, a quiet stretch just reads as
+ * normal pacing; at or above it, cautious play stops being a free pass.
+ */
+const STALE_PACING_THRESHOLD = 3;
 
 export const sceneTemplate = (context: NarrativeTemplateContext) => {
   const {
@@ -16,6 +24,7 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
   } = context;
 
   const segmentType = generationParameters?.segmentType || 'scene';
+  const lengthDescription = describeNarrativeLength(generationParameters);
   const recentSegments = narrativeContext?.recentSegments || [];
   const recentContent = recentSegments.map((seg, i: number) =>
     `[Scene ${recentSegments.length - i}]: ${seg.content}`
@@ -37,6 +46,8 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
       : hasSuccess
         ? 'success'
         : null;
+  const turnsSinceComplication = narrativeContext?.turnsSinceComplication ?? 0;
+  const isStale = turnsSinceComplication >= STALE_PACING_THRESHOLD;
 
   const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
     ? `
@@ -63,6 +74,15 @@ ${skillResult === 'critical-failure' ? '- CRITICAL FAILURE: consequences may be 
 - DO NOT explicitly mention skill names, skill levels, or game mechanics
 - Show the outcome through what actually happens in the story
 - Success = things work out, failure = things go wrong or backfire
+` : ''}
+
+${isStale ? `
+PACING GUIDANCE — RISING TENSION:
+- It has been ${turnsSinceComplication} turns in a row with no real complication for the player.
+- This segment MUST introduce a complication: an interruption, a new threat, an unexpected cost, or a setback tied to the current situation.
+- The complication does not need a skill check behind it — it can simply happen (an NPC arrives, a resource runs out, the trail leads somewhere worse than expected, time runs short).
+- Do not extend the current chain with another same-shape discovery (another clue, another trace) with nothing else changing.
+- Whatever complication you introduce here counts as a major event: record it in metadata.majorEvent (see the rules below) so this guidance doesn't fire again next turn for a problem you already resolved.
 ` : ''}
 
 ${generationParameters?.decisionWeight === 'critical' && narrativeContext?.currentTags?.some((tag: string) => tag.startsWith('skill-failure:') || tag.startsWith('skill-critical-failure:')) ? `
@@ -104,7 +124,7 @@ Generate a ${segmentType} that:
 3. Does NOT repeat or revisit events that already happened
 4. Advances the story forward in time (never backward)
 5. Maintains the ${tone} tone
-6. Is approximately 3-5 sentences long (1 focused paragraph)
+6. Is approximately ${lengthDescription} in length
 
 ${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
 

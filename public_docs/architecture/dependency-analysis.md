@@ -94,15 +94,16 @@ npm run analyze
 
 The project uses **ignore-known violations** to manage the existing violations while preventing new ones:
 
-- **Baseline File:** `.dependency-cruiser-known-violations.json` (630 lines, tracked in git)
-- **Known Violations:** 51 total, as of 2026-08-01: 22 dev-dependency imports, 8 circular dependencies, 7 type-to-implementation imports, 7 orphans, 7 components importing lib directly
-- **Strategy:** Fix incrementally while preventing new violations
+- **Baseline File:** `.dependency-cruiser-known-violations.json`, tracked in git
+- **Known Violations:** 17 total, as of 2026-08-04: 8 circular dependencies, 7 components importing lib/ai directly, 2 dev-dependency imports
+- **Strategy:** a two-way ratchet. `deps:validate` stops new violations landing; `deps:check` stops fixed ones lingering as dead suppressions, so the number can only go down.
 
 **Daily Workflow:**
 ```bash
 npm run deps:validate         # Pass/fail on NEW violations only
 npm run deps:validate:strict  # Show all violations (for reference)
 npm run deps:baseline         # Update after fixes (tracks progress)
+npm run deps:check            # Fail if any baseline entry no longer reproduces
 ```
 
 ### Violation Categories
@@ -120,29 +121,32 @@ component-to-module loops in the world-creation wizard and the tutorial provider
 3. Apply pub-sub patterns for cross-store communication — this is what `storeEvents` in `src/lib/state/storePubSub.ts` already does for cascade deletes
 4. Break apart monolithic stores (the `loreStore` split into its `loreStore.*` family is an example of this)
 
-**Type Violations (23 errors)**
+**Components importing lib/ai directly (7 in the baseline)**
 
-Type files importing implementation:
-- Constants in type files
-- Type guards importing utils
-- Store types importing store implementations
+The world-creation wizard, the world image form, and the provider setup components reach
+`src/lib/ai/` without going through `lib/api` or a hook. Resolution is the `worldApi` pattern:
+put the call behind a service or a colocated `use*` hook.
 
-**Resolution:** Move or duplicate constants; relocate guards to utils.
+**Dev Dependency Issues (2 in the baseline)**
 
-**Dev Dependency Issues (Expected)**
+`src/types/jest.d.ts` pulls in `@testing-library/jest-dom` types, and a test helper under
+`src/state/__tests__/` imports `@testing-library/react`. Neither reaches production. The 20
+Storybook-file entries that used to sit here were stale: the `not-to-dev-dep` rule's own
+`from.pathNot` already excludes `*.stories.tsx`.
 
-Storybook/test files import dev dependencies - these are safe as they never reach production. Already ignored in baseline.
+**Not violations, by design**
+
+Two categories were rule-scoping noise rather than debt, and the rules now exclude them:
+
+- Jest manual mocks under `__mocks__/` are reached through bare `jest.mock('path')` calls, which
+  aren't import statements, so `no-orphans` saw every one of them as stranded.
+- `typeof import()` positions in `src/types/global.d.ts` erase at compile time, so
+  `types-no-implementation-imports` now skips `type-only`/`type-import` edges.
 
 ### Progress Tracking
 
-Monitor baseline file size over time:
-```bash
-wc -l .dependency-cruiser-known-violations.json
-# Current: 630 lines (51 violations)
-# Target: < 1000 lines (reduce by 60%)
-```
-
-Each fix shrinks the file, providing visible metrics.
+The baseline entry count is the metric, and `deps:check` enforces that it only shrinks. Fix a
+violation and CI fails until you re-baseline. Current: 17.
 
 ## Architecture Rules
 
@@ -161,7 +165,12 @@ Components importing AI/prompt services directly may indicate business logic tha
 Utility functions must be pure with no state dependencies.
 
 ### Rule: `types-no-implementation-imports` (error)
-Type definitions should not import implementation code.
+Type definitions should not import implementation code. Type-only edges (`import type`,
+`typeof import()`) are exempt, since they erase at compile time.
+
+### Rule: `no-orphans` (warning)
+Flags modules nothing imports. Jest manual mocks under `__mocks__/` are exempt, since
+`jest.mock('path')` isn't an import statement dependency-cruiser can follow.
 
 ## Available Commands
 
@@ -170,6 +179,7 @@ Type definitions should not import implementation code.
 npm run deps:validate              # Check for NEW violations only (ignores known)
 npm run deps:validate:strict       # Show ALL violations including known ones
 npm run deps:baseline              # Regenerate baseline after fixing violations
+npm run deps:check                 # Fail on baseline entries that no longer reproduce
 
 # Diagram Generation
 npm run deps:diagram               # Domain-level overview
@@ -204,29 +214,24 @@ Rules are defined in `.dependency-cruiser.cjs`. Key sections:
 3. Generate diagrams: `npm run deps:diagram:all`
 
 **Resolution Priority:**
-1. **High:** Fix type import violations (blocks clean architecture)
-2. **Medium:** Break circular dependencies (one store pair at a time)
-3. **Low:** Document expected dev-dependency violations
-4. **Ongoing:** Use `npm run deps:validate` to prevent new violations
-
-**Progress Tracking:**
-- Monitor baseline file line count over time
-- Celebrate when violations drop below thresholds (60, 40, 20)
-- Regenerate baseline after each fix: `npm run deps:baseline`
+1. **Medium:** Route the 7 direct `lib/ai` imports through `lib/api` services or hooks
+2. **Medium:** Break circular dependencies, starting with the barrel-file self-references
+3. **Low:** The 2 dev-dependency entries are test-only and can stay
+4. **Ongoing:** `npm run deps:validate` prevents new violations; `npm run deps:check` prevents stale ones
 
 ## Integration with CI
 
-Dependency validation runs in CI as the last step of the Lint Check job in
-`.github/workflows/ci.yml`, so a new violation fails the build:
+Both halves of the ratchet run in the Lint Check job in `.github/workflows/ci.yml`:
 
 ```yaml
 - name: Enforce dependency boundaries (no new cycles or dev-dep leaks)
   run: npm run deps:validate
+- name: Enforce a shrinking dependency baseline
+  run: npm run deps:check
 ```
 
-Fix the boundary, or re-baseline deliberately with `npm run deps:baseline`.
-
-That would fail the build on any NEW boundary violation while still tolerating the known ones
+A new boundary violation fails the build. So does a baseline entry that no longer reproduces:
+fix the boundary, then re-baseline with `npm run deps:baseline` and commit the smaller file.
 in the baseline file.
 
 ## Viewing Diagrams

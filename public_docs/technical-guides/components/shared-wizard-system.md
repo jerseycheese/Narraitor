@@ -88,8 +88,10 @@ interface ToggleButtonProps {
 
 ## Hooks & Utilities
 
-### useWizardState
-There are two, neither re-exported from `@/components/shared/wizard`. Import from the specific path.
+### Wizard state hooks
+There are two, neither re-exported from `@/components/shared/wizard`. Import from the specific
+path. `useWizardState` is step state on its own; `useWizardFlow` wraps that in persistence, a
+submit lifecycle, and cancel-routing.
 
 **`@/hooks/useWizardState`** — used by world creation and character creation. Note that
 `canGoNext` is defined as `!isLastStep && isCurrentStepValid && !isProcessing`, so it's always
@@ -115,11 +117,11 @@ interface UseWizardStateOptions<TData> {
 Note `state.data` rather than a top-level `data`, and `goNext`/`goBack` rather than
 `nextStep`/`previousStep`.
 
-**`@/components/shared/wizard/hooks/useWizardState`** — router-aware, used by `ProviderWizard`.
+**`@/components/shared/wizard/hooks/useWizardFlow`** — router-aware, used by `ProviderWizard`.
 Adds localStorage persistence and a completion callback:
 
 ```typescript
-interface WizardConfig<T> {
+interface WizardFlowConfig<T> {
   steps: WizardStep[];
   initialData: T;
   onComplete: (data: T) => void | Promise<void>;
@@ -228,8 +230,8 @@ function MyWizard() {
 ## Best Practices
 
 ### State Management
-- Use `useWizardState` for wizard state, but check which of the two you want first
-- Enable persistence (the `shared/wizard` variant's `persistKey`) when losing progress would hurt
+- Use `useWizardState` for step state, `useWizardFlow` when you also want the flow around it
+- Enable persistence (`useWizardFlow`'s `persistKey`) when losing progress would hurt
 - Implement proper validation rules per step
 
 ### Styling

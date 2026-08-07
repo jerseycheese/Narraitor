@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
+import { useWizardFlow } from '@/components/shared/wizard/hooks/useWizardFlow';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardStep } from '@/components/shared/wizard/WizardStep';
 import { WizardNavigation } from '@/components/shared/wizard/WizardNavigation';
@@ -69,7 +69,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const [verifyState, setVerifyState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [verifyResult, setVerifyResult] = useState<ValidationResult | null>(null);
 
-  // Memoized so useWizardState's validation effect has a stable dependency —
+  // Memoized so useWizardFlow's validation effect has a stable dependency —
   // an inline function would change identity each render and loop the effect.
   const validateStep = useCallback((step: number, data: ProviderWizardData) => {
     if (step === 0) {
@@ -98,7 +98,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     [addProvider, onComplete]
   );
 
-  const wizard = useWizardState<ProviderWizardData>({
+  const wizard = useWizardFlow<ProviderWizardData>({
     steps: STEPS,
     initialData: INITIAL_DATA,
     // No persistKey: the wizard holds a plaintext key in memory only — it must

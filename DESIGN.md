@@ -164,14 +164,19 @@ Use the utility classes when consuming in components:
 
 ### Sizes
 
-There is no named typographic scale yet (no `headline-lg`, `body-md`). Sizes are inline. The values in active use:
+A named type scale exists as `--font-size-*` custom properties in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) (#1622). Steps are calibrated to real anchors already in use rather than forced onto one strict ratio, so adjacent steps span roughly a Major Second to Major Third (1.11-1.25):
 
-- `1.5rem` and up — page titles
-- `1.125rem` — section headings
-- `1rem` — body and narrative default
-- `0.875rem` — interface text, labels
-- `0.75rem` — small metadata
-- Below `0.75rem` is reserved for badges and dense data tables only
+- `--font-size-3xl` (`2.125rem`) — the largest heading in the app (page-layout hero title)
+- `--font-size-2xl` (`1.875rem`)
+- `--font-size-xl` (`1.5rem`) and up — page titles
+- `--font-size-lg` (`1.25rem`)
+- `--font-size-md` (`1.125rem`) — section headings
+- `--font-size-base` (`1rem`) — body and narrative default
+- `--font-size-sm` (`0.875rem`) — interface text, labels
+- `--font-size-xs` (`0.75rem`) — small metadata
+- `--font-size-2xs` (`0.625rem`) — badges and dense data tables only
+
+The highest-traffic hardcoded sizes across the app have been migrated onto these tokens; a handful of one-off in-between values (e.g. `1.0625rem`, `1.75rem`) haven't been touched yet — that's tracked as incremental follow-up, not a gap in the scale itself.
 
 ### Usage rules
 
@@ -194,8 +199,9 @@ The full scale is `--space-0_5` through `--space-8` in [_shared-tokens.css](src/
 ### Layout rules
 
 - **Page max-width** is `--content-max-width` (`1200px`) for general content; narrative content tightens further to `56rem`.
+- **Named page widths**, the tier below the app shell: `--page-width-narrow` (`64rem`/1024px — hero content, ending screen) and `--page-width-prose` (`48rem`/768px — legal text, about's hero copy and section prose, landing's hero copy). Landing's page container itself rides the full `--content-max-width`, matching the app shell, so its hero image and step grid aren't squeezed narrower than the header. Both width tokens live in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) alongside `--page-gutter` (`var(--space-4)`, `var(--space-6)` from `1024px`), the shared, responsive horizontal inset from viewport edge to content.
 - **Game session viewport** is fixed-position, full-viewport, with internal layout governed by [src/styles/manuscript-session.css](src/styles/manuscript-session.css). Don't apply page-level spacing to game-session screens.
-- **Mobile breakpoints**: `640px` (sm), `768px` (md), `1024px` (lg), `1280px` (xl). Mobile-specific layout bugs from the DS migration (#1139, #1143, #1148, #1150) are resolved.
+- **Mobile breakpoints**: `640px` (sm), `768px` (md), `1024px` (lg), `1280px` (xl). These stay literal in media queries — custom properties aren't readable inside `@media` conditions without a build step — but any new breakpoint should snap to this scale rather than introduce a one-off. Mobile-specific layout bugs from the DS migration (#1139, #1143, #1148, #1150) are resolved.
 
 ## Surfaces
 

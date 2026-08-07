@@ -32,10 +32,42 @@ a[href="#main-content"]:focus {
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   z-index: 9999;
   outline: 2px solid var(--color-text-primary);
   outline-offset: 2px;
+}
+
+/* Honor OS-level "reduce motion" (#1678). A blanket reset covers the vast
+   majority of the app's 65 transitions and 14 animations in one place instead
+   of needing every future keyframe to remember to check the media query.
+   `!important` is deliberate here — this has to win over every animation's own
+   specificity, including ones written after this rule. Near-zero duration
+   (rather than `none`) keeps animation/transitionend listeners firing. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Walk back the handful of cases where the blanket reset reads as broken
+     rather than calm. Rotation and positional movement (the die tick, the
+     drawer slide-in) are exactly what triggers vestibular symptoms, so those
+     stay fully stopped. But an in-progress indicator that freezes solid reads
+     as a stalled screen, not "still working" -- these are opacity-only, so
+     they don't carry the same risk. Give them back a slow, steady loop. */
+  :root .manuscript-streaming-dot,
+  .component-loading-pulse-avatar-circle,
+  .component-loading-pulse-line,
+  .component-loading-skeleton-line,
+  .component-loading-dot {
+    animation-duration: 2s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
 /* react-joyride appends its portal as the last child of <body>, where it picks
@@ -65,7 +97,7 @@ a[href="#main-content"]:focus {
 /* Narrative Content Styling for Readable Storytelling */
 .text-narrative {
   font-family: var(--font-narrative);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   line-height: 1.75;
   color: var(--color-text-primary);
 }
@@ -130,7 +162,7 @@ body > * {
 /* Typography role classes */
 .text-technical {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   line-height: 1.4;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -139,7 +171,7 @@ body > * {
 
 .text-ui {
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   line-height: 1.5;
   color: var(--color-text-primary);
 }
@@ -156,7 +188,7 @@ body > * {
   gap: var(--space-2);
   border-radius: var(--radius-md);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
@@ -256,6 +288,22 @@ body > * {
   color: var(--color-text-inverse);
 }
 
+/* Variant: destructive-outline (demoted danger action — color carries the
+ * warning, fill stays reserved for the confirmation dialog's confirm button) */
+.button-destructive-outline {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+
+.button-destructive-outline:hover {
+  /* Neutral surface tint, not a danger-hover text/border swap — darkening
+   * the danger text on hover dropped dark-mode contrast to ~3:1 against the
+   * tinted background, below the 4.5:1 target. Keeping color/border pinned
+   * to --color-danger preserves the resting-state contrast on hover too. */
+  background: var(--color-surface-hover);
+}
+
 /* Variant: success */
 .button-success {
   background: var(--color-success);
@@ -298,28 +346,29 @@ body > * {
 /* Size: default — applied via .button-size-default */
 .button-size-default {
   padding: var(--space-2) var(--space-4);
-  min-height: 2.25rem;
+  min-height: var(--control-height-touch);
 }
 
 /* Size: sm */
 .button-size-sm {
   padding: var(--space-1) var(--space-3);
-  font-size: 0.75rem;
-  min-height: 1.75rem;
+  font-size: var(--font-size-xs);
+  min-height: var(--control-height-touch);
+  min-width: var(--control-height-touch);
 }
 
 /* Size: lg */
 .button-size-lg {
   padding: var(--space-3) var(--space-6);
-  font-size: 1rem;
-  min-height: 2.75rem;
+  font-size: var(--font-size-base);
+  min-height: var(--control-height-touch);
 }
 
 /* Size: icon */
 .button-size-icon {
   padding: var(--space-2);
-  min-height: 2.25rem;
-  min-width: 2.25rem;
+  min-height: var(--control-height-touch);
+  min-width: var(--control-height-touch);
 }
 
 .button-size-icon svg {
@@ -372,7 +421,7 @@ body > * {
   background: transparent;
   color: var(--color-text-muted);
   font-family: var(--font-system);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
   font-weight: 600;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -460,7 +509,7 @@ body > * {
    before a skill can be selected during character creation. */
 
 .component-skill-prerequisites-editor .skill-prerequisites-hint {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   margin-bottom: var(--space-2);
 }
@@ -475,5 +524,67 @@ body > * {
 
 .component-skill-prerequisites-editor .skill-prerequisite-row .form-input {
   max-width: 6rem;
+}
+
+/* Root-layout crash screen (app/global-error.tsx). It renders outside the app
+   shell with none of the layout's chrome, so it carries its own centering and
+   surface rather than inheriting one. */
+
+.app-global-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 100vh;
+  padding: var(--space-8) var(--space-4);
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.app-global-error-title {
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin: 0;
+}
+
+.app-global-error-message {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  max-width: 32rem;
+  margin: 0;
+}
+
+.app-global-error-suggestion {
+  font-family: var(--font-interface);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  max-width: 32rem;
+  margin: 0;
+}
+
+.app-global-error-action {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  padding: var(--space-2) var(--space-5);
+  margin-top: var(--space-2);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  cursor: pointer;
+}
+
+.app-global-error-action:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+
+  /* Hover darkens the accent (in dark mode too), so white clears AA here even
+   * though the base state uses dark ink on the lighter base accent. */
+  color: var(--color-text-inverse);
 }
 

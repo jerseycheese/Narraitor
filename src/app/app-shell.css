@@ -1,15 +1,20 @@
+/* Dot grid is composited here, not on a fixed body pseudo-element: this is
+ * the actual opaque surface root (globals.css's `body > *` stacks every real
+ * surface above body, so a separate fixed background layer behind it would
+ * never show). Single canonical pattern — see ds3.css
+ * --pattern-dot-grid-image. */
 .app-surface-app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--color-canvas);
+  background: var(--pattern-dot-grid-image) 0 0 / 24px 24px, var(--color-canvas);
 }
 
 .app-surface-manuscript {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--color-canvas);
+  background: var(--pattern-dot-grid-image) 0 0 / 24px 24px, var(--color-canvas);
 }
 
 .app-surface-main {
@@ -138,7 +143,7 @@
   }
 
   .home-hero-tagline {
-    font-size: 1.125rem;
+    font-size: var(--font-size-md);
   }
 }
 
@@ -185,7 +190,7 @@
 :root .home-hero-tagline {
   font-family: var(--font-narrative);
   font-style: italic;
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   line-height: 1.6;
   letter-spacing: 0.005em;
   color: var(--color-text-secondary);
@@ -228,13 +233,13 @@
 
 .app-surface-app h2 {
   font-family: var(--font-interface);
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   line-height: 1.25;
 }
 
 .app-surface-app h3 {
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   line-height: 1.35;
 }
 
@@ -338,7 +343,7 @@
 
 .header-nav-links a[data-navigation] {
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-text-secondary);
   text-decoration: none;
@@ -465,7 +470,7 @@
   align-items: center;
   gap: var(--space-1);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .header-dropdown-menu {
@@ -485,7 +490,7 @@
 .header-dropdown-header {
   padding: var(--space-2) var(--space-3);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -500,7 +505,7 @@
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
   text-decoration: none;
   transition: background-color 120ms ease;
@@ -583,7 +588,7 @@
 
 .breadcrumbs-separator {
   color: var(--color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 }
 
 /* Responsive breadcrumb gating: truncated on mobile, full on desktop */
@@ -655,7 +660,7 @@
 
 .mobile-nav-section-title {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -719,7 +724,7 @@
   background: hsl(var(--success-background));
   color: hsl(var(--success-text));
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -883,7 +888,7 @@
 
 .component-world-card footer time {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -893,6 +898,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  min-height: var(--control-height-touch);
   padding: var(--space-1) var(--space-2);
   border: 1px solid transparent;
   border-radius: var(--radius-full, 9999px);
@@ -930,7 +936,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   color: var(--color-text-secondary);
 }
@@ -1052,7 +1058,7 @@
 
 .world-list-empty-title {
   font-family: var(--font-narrative);
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
@@ -1060,7 +1066,7 @@
 
 .world-list-empty-lede {
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
   margin: 0;
   max-width: 36rem;
@@ -1128,7 +1134,7 @@
 .world-list-empty-tip p {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
@@ -1170,7 +1176,7 @@
 .world-detail-section h2 {
   margin: 0 0 var(--space-4);
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -1258,7 +1264,7 @@
 .component-collapsible-section [data-testid="collapsible-section-title"] {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -1323,19 +1329,6 @@
 }
 
 :root .component-collapsible-section
-  [data-testid="collapsible-section-title"]::before {
-  content: "• ";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-:root .component-collapsible-section
   [data-testid="collapsible-section-content"] {
   padding-top: var(--space-4);
 }
@@ -1355,7 +1348,7 @@
 
 .component-character-card h3 {
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -1376,7 +1369,7 @@
 
 .component-character-card > div > div:first-child > p {
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: 1.5;
   margin: var(--space-2) 0;
@@ -1414,7 +1407,7 @@
 .page-layout-description {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
 
   /* Prose keeps its measure while the tables and grids beside it use the full
@@ -1428,7 +1421,7 @@
 
 :root .page-layout-title {
   font-family: var(--font-narrative);
-  font-size: 2.125rem;
+  font-size: var(--font-size-3xl);
   font-weight: 500;
 }
 
@@ -1482,7 +1475,7 @@
 .view-mode-toggle .button {
   border: none;
   border-radius: 0;
-  min-height: 2.25rem; /* matches button-size-default; no --space token at this value */
+  min-height: var(--control-height-touch);
 }
 
 .view-mode-toggle .button:first-child {
@@ -1527,7 +1520,7 @@
 .characters-empty h2 {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -1681,7 +1674,7 @@
   gap: var(--space-4);
   margin-top: var(--space-1);
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .character-detail-header-meta p {
@@ -1704,7 +1697,7 @@
 .character-detail-section h2 {
   margin: 0 0 var(--space-4);
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -1926,7 +1919,7 @@
 .settings-section h2 {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -1947,7 +1940,7 @@
 
 .settings-appearance-label {
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-text-secondary);
 }
@@ -1974,7 +1967,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
@@ -2013,19 +2006,6 @@
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 400;
-}
-
-:root .settings-section h2::before {
-  content: "• ";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  font-style: normal;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
 }
 
 :root .settings-section h2::after {
@@ -2104,7 +2084,7 @@
 
 .journal-list-header h2 {
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
@@ -2140,7 +2120,7 @@
 
 .journal-detail-empty h3 {
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-1);
@@ -2148,7 +2128,7 @@
 
 .journal-detail-empty p {
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   margin: 0;
 }
@@ -2205,7 +2185,7 @@
   align-items: center;
   gap: var(--space-1);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-1);
@@ -2233,7 +2213,7 @@
 
 .journal-entry-list [data-slot="card"] > div:last-child > span {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -2248,7 +2228,7 @@
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
@@ -2262,7 +2242,7 @@
 
 .journal-entry-detail h4 {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -2279,7 +2259,7 @@
 
 .journal-entry-detail > div:nth-child(2) > span {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -2352,7 +2332,7 @@
   padding: var(--space-3) 0 var(--space-4);
   font-family: var(--font-interface);
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 /* DS3 — Mechanical Manuscript: dotted radial-gradient divider above the nav,
@@ -2463,7 +2443,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  max-width: 64rem;
+  max-width: var(--page-width-narrow);
 }
 
 .component-hero-title {
@@ -2478,7 +2458,7 @@
 .component-hero-subtitle {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
 }
 
@@ -2549,7 +2529,7 @@
 .component-section-wrapper-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -2592,7 +2572,7 @@
   flex-direction: column;
   gap: var(--space-6);
   padding: var(--space-5);
-  max-width: 64rem;
+  max-width: var(--page-width-narrow);
   margin: 0 auto;
 }
 
@@ -2673,7 +2653,7 @@
 .component-ending-screen-hero-meta {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
 }
 
@@ -2859,7 +2839,7 @@
 
 .world-detail-npc-avatar-fallback {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   color: var(--color-text-secondary);
 }
@@ -2914,14 +2894,14 @@
 .world-detail-stat-name {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .world-detail-stat-range {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
 }
@@ -2929,7 +2909,7 @@
 .world-detail-stat-description {
   margin: 0 0 var(--space-2);
   font-family: var(--font-interface);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: 1.5;
 }
@@ -2937,7 +2917,7 @@
 .world-detail-stat-default {
   margin: 0;
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -2946,7 +2926,7 @@
   flex-wrap: wrap;
   gap: var(--space-3);
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -3104,14 +3084,14 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 .character-detail-derived-stat-name {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .character-detail-derived-stat-values {
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
 }
@@ -3144,7 +3124,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 .character-detail-derived-stat-warning {
   margin: var(--space-2) 0 0;
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-danger);
 }
 
@@ -3270,7 +3250,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .component-world-card {
   display: grid;
-  grid-template-columns: 9rem 1fr auto;
+  grid-template-columns: 16rem 1fr auto;
   grid-template-rows: auto auto;
   column-gap: var(--space-4);
   align-items: center;
@@ -3302,32 +3282,78 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   border-right: 1px solid var(--color-accent);
 }
 
+/* Flatten only as far as the hero link, which becomes the media cell itself —
+   it keeps a real box so keyboard focus still has something to ring. The hero
+   inside it holds the generated art at row scale (a 144x72 corner thumbnail
+   made the image nearly invisible on the surface players browse most) and
+   keeps its themed gradient, so a world with no image isn't a hole. */
 :root .component-world-card > div:first-child,
-:root .component-world-card > div:first-child > a,
-:root .component-world-card .component-hero,
-:root .component-world-card .component-hero-overlay {
+:root .component-world-card > div:first-child > div:first-child {
   display: contents;
 }
 
-:root .component-world-card .component-hero-image {
+:root .component-world-card > div:first-child > div:first-child > a {
   grid-column: 1;
-  grid-row: 1 / span 2;
-  position: static;
+  grid-row: 1 / -1;
+  display: block;
+  align-self: stretch;
+  min-height: 9rem;
+}
+
+:root .component-world-card .component-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+  height: 100%;
+  overflow: hidden;
+}
+
+:root .component-world-card .component-hero-image {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 4.5rem;
+  height: 100%;
   object-fit: cover;
 }
 
+/* At row scale the hero's own themed wash is too faint to read as a panel and
+   an imageless world looks like a rendering failure. Deepen it only where
+   there's no art to sit under. */
+:root .component-world-card .component-hero:not(:has(.component-hero-image)) {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-accent) 22%, var(--color-surface)) 0%,
+    var(--color-surface) 100%
+  );
+}
+
+/* Title rides the art on the hero's own solid bar, so contrast holds whatever
+   the generator produced. */
+:root .component-world-card .component-hero-overlay {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--color-surface);
+}
+
 :root .component-world-card .component-hero-content {
-  grid-column: 2;
-  grid-row: 1;
   background: transparent;
   padding: 0;
   margin: 0;
 }
 
+:root .component-world-card > div:first-child > div:first-child > a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
 :root .component-world-card .component-hero-title {
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-style: italic;
   font-family: var(--font-narrative);
 
@@ -3380,7 +3406,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .component-character-card {
   display: grid;
-  grid-template-columns: 5rem 1fr auto;
+  grid-template-columns: 8rem 1fr auto;
   column-gap: var(--space-4);
   align-items: center;
   padding: var(--space-3);
@@ -3421,12 +3447,14 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   margin-bottom: var(--space-1);
 }
 
+/* Same reasoning as the world card's hero panel: a 4rem thumbnail made the
+   generated portrait nearly invisible on the roster players browse most. */
 :root .component-character-card .character-card-portrait {
   grid-column: 1;
   align-self: center;
   padding: 0;
-  width: 4rem;
-  height: 4rem;
+  width: 7rem;
+  height: 7rem;
   overflow: hidden;
 }
 
@@ -3436,7 +3464,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   padding: 0;
   font-family: var(--font-narrative);
   font-style: italic;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
 }
 
 :root .component-character-card .character-card-meta {
@@ -3477,7 +3505,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 }
 
 @media (width <= 640px) {
-  :root .component-world-card,
   :root .component-character-card {
     grid-template-columns: 4rem 1fr;
   }
@@ -3488,30 +3515,17 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
     padding-top: var(--space-2);
   }
 
-  /* #1538 — ActiveStateCard's hasImage wrapper inserts a div between
-     div:first-child and the hero link, so the `> div:first-child > a`
-     contents chain above never matches. The whole hero (thumb + title +
-     genre) collapses into ONE auto-placed grid item in the media column:
-     a 64px strip at phone widths. Collapse the two skipped wrappers here
-     so image and title split into their own cells — thumb in the 4rem
-     media column, title in the 1fr text column. Desktop and tablet keep
-     the established caption-under-thumb treatment. */
-  :root .component-world-card > div:first-child > div:first-child,
+  /* A side-by-side image panel and text column don't both fit on a phone, so
+     the hero takes the full width as a band and everything else stacks under
+     it. Keeps the art large rather than shrinking it back to a strip. */
+  :root .component-world-card {
+    grid-template-columns: 1fr;
+  }
+
   :root .component-world-card > div:first-child > div:first-child > a {
-    display: contents;
-  }
-
-  /* The link's box is gone on phones (display: contents), so paint its
-     keyboard focus on the title instead. */
-  :root .component-world-card a:focus-visible .component-hero-title {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-  }
-
-  /* Thumb stays in row 1 beside the title; description and meta take the
-     freed full-width rows below. */
-  :root .component-world-card .component-hero-image {
+    grid-column: 1 / -1;
     grid-row: 1;
+    min-height: 8rem;
   }
 
   :root .component-world-card .world-card-content {
@@ -3523,6 +3537,12 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   :root .world-card-footer-meta {
     grid-column: 1 / -1;
     grid-row: 3;
+  }
+
+  /* A 7rem portrait would swallow a phone row. */
+  :root .component-character-card .character-card-portrait {
+    width: 4rem;
+    height: 4rem;
   }
 }
 

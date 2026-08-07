@@ -14,6 +14,13 @@ interface ManuscriptDrawerProps {
   subtitle?: string;
   children: React.ReactNode;
   side?: 'left' | 'right';
+  /**
+   * Control to focus once the drawer closes, normally whatever opened it.
+   * Radix's own restore runs while the outside content is still hidden from
+   * assistive tech, so the focus call lands on nothing and the player is
+   * dropped at <body> — the top of the tab order — after every Escape.
+   */
+  restoreFocusRef?: React.RefObject<HTMLElement | null>;
 }
 
 export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
@@ -23,6 +30,7 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
   subtitle,
   children,
   side = 'right',
+  restoreFocusRef,
 }) => {
   // Add manuscript-overlay-open class to body when drawer is open
   React.useEffect(() => {
@@ -46,6 +54,14 @@ export const ManuscriptDrawer: React.FC<ManuscriptDrawerProps> = ({
         <DialogPrimitive.Content
           className="manuscript-drawer-layer"
           aria-describedby={undefined}
+          onCloseAutoFocus={(event) => {
+            const trigger = restoreFocusRef?.current;
+            if (!trigger?.isConnected) return;
+            event.preventDefault();
+            // A frame after the layer unwinds, so the trigger is visible to
+            // focus() again rather than still hidden behind the modal.
+            requestAnimationFrame(() => trigger.focus());
+          }}
         >
           <aside
             className={clsx(

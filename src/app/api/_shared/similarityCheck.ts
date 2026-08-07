@@ -3,6 +3,7 @@ import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getDefaultConfig } from '@/lib/ai/config';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { extractJsonObject } from '@/lib/ai/parseJSON';
+import { reportServerError } from '@/lib/telemetry/reportServerError';
 
 interface SimilarityLogger {
   warn: (...args: unknown[]) => void;
@@ -20,6 +21,8 @@ interface SimilarityCheckOptions {
   logger: SimilarityLogger;
   errorLogMessage: string;
   failureMessage: string;
+  /** Literal path of the calling route, for the error report (#1641). */
+  route: string;
 }
 
 export async function handleSimilarityCheck(
@@ -29,6 +32,7 @@ export async function handleSimilarityCheck(
     logger,
     errorLogMessage,
     failureMessage,
+    route,
   }: SimilarityCheckOptions
 ) {
   try {
@@ -74,6 +78,7 @@ export async function handleSimilarityCheck(
     });
   } catch (error) {
     logger.error(errorLogMessage, error);
+    reportServerError(error, { source: 'route', route });
 
     return NextResponse.json(
       {

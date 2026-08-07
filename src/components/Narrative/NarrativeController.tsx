@@ -22,6 +22,7 @@ import {
   evaluateDecisionSkillChecks,
   isFatalCriticalDecision,
 } from '@/lib/narrative/evaluateDecisionSkillChecks';
+import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplication';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
@@ -496,8 +497,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onNarrativeGenerated(newSegment);
       }
 
-      // Check for ending indicators
-      await checkForEndingIndicators(newSegment);
+      // Check for ending indicators. Deferred off the per-turn path: it's
+      // an extra Gemini round-trip that only feeds onEndingSuggested, which
+      // choice generation below doesn't wait on.
+      void checkForEndingIndicators(newSegment);
 
       // Generate choices if enabled - skip when this segment already ends the session
       if (generateChoices && !isSessionEndingSegment(newSegment)) {
@@ -583,6 +586,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     try {
       // Use recent segments for context (last 3 segments for efficiency)
       const recentSegments = segments.slice(-3);
+      // Streak tracked over the whole session, not just the trimmed context
+      // window above — a quiet stretch spans more than 3 segments.
+      const turnsSinceComplication = computeTurnsSinceComplication(segments);
 
       // Get the actual choice text from the narrative store
       const decisions = useNarrativeStore
@@ -696,11 +702,13 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
               currentTags,
               sessionId,
               recentSegments,
+              turnsSinceComplication,
               currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
             },
             generationParameters: {
               includedTopics: [choiceText],
-              desiredLength: 'short',
+              // No desiredLength: the template scales the beat off decisionWeight
+              // so weighty moments get more room than routine ones.
               decisionWeight,
               // Critical decisions with critical failures should have tragic tone
               desiredTone:
@@ -767,8 +775,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         );
       }
 
-      // Check for ending indicators
-      await checkForEndingIndicators(newSegment);
+      // Check for ending indicators. Deferred off the per-turn path: it's
+      // an extra Gemini round-trip that only feeds onEndingSuggested, which
+      // choice generation below doesn't wait on.
+      void checkForEndingIndicators(newSegment);
 
       // Generate choices if enabled - skip when the session is ending
       // (fatal/ending segment or a fatal critical-decision failure).

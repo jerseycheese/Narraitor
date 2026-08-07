@@ -3,6 +3,8 @@
  * Logger utility for standardized debug logging across the application.
  * Provides severity levels, environment-based toggling, and formatted output.
  */
+import { reportError } from '@/lib/telemetry/reportError';
+import { selectReportableError } from '@/lib/telemetry/errorReport';
 
 enum LogLevel {
   DEBUG = 0,
@@ -147,10 +149,22 @@ class Logger {
   }
 
   /**
-   * Logs an error message
+   * Logs an error message, and in production forwards it to the error sink.
+   *
+   * Every logger.error call site in the app funnels through here, which is why
+   * this is the one hook the client needs (#1641). The report is built from the
+   * Error among the arguments, not from args[0] — the first argument is usually
+   * a label string, and reporting it would ship a stack-less report.
    */
   error(...args: unknown[]): void {
     this.log(LogLevel.ERROR, ...args);
+
+    try {
+      reportError(selectReportableError(args), { source: 'client' });
+    } catch {
+      // Reporting must never take out logging. Telemetry deliberately does not
+      // import this module, so there is no cycle to trip over here either.
+    }
   }
 }
 

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 interface ActionButton {
   label: string;
   onClick: () => void;
-  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'primary' | 'success' | 'danger';
+  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'primary' | 'success' | 'danger' | 'danger-outline';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   icon?: React.ReactNode;
   disabled?: boolean;
@@ -34,6 +34,7 @@ export function ActionButtonGroup({
       case 'secondary': return 'secondary';
       case 'success': return 'success';
       case 'danger': return 'destructive';
+      case 'danger-outline': return 'destructive-outline';
       default: return variant as 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | undefined;
     }
   };

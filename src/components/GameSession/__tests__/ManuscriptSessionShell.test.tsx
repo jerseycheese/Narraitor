@@ -77,4 +77,22 @@ describe('ManuscriptSessionShell', () => {
     expect(mainStage).toHaveClass('manuscript-main-stage-mobile-stack');
     expect(characterRail).toHaveClass('manuscript-characters-rail-mobile-stack');
   });
+
+  // AppSurfaceShell already wraps the play route in the page's one main
+  // landmark. A second <main> here nests landmarks, which is invalid and
+  // leaves screen-reader landmark navigation with two "main" destinations.
+  it('labels the narrative stage as a region rather than a second main landmark', () => {
+    render(
+      <ManuscriptSessionShell>
+        <div>Main Content</div>
+      </ManuscriptSessionShell>
+    );
+
+    const shell = screen.getByTestId('manuscript-session-shell');
+    expect(shell.querySelector('main')).toBeNull();
+
+    const stage = shell.querySelector('.manuscript-overlay-main');
+    expect(stage?.tagName).toBe('SECTION');
+    expect(stage).toHaveAttribute('aria-label', 'Story');
+  });
 });

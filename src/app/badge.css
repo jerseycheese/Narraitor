@@ -22,7 +22,7 @@
 
 .badge-sm {
   padding: var(--space-0_5) var(--space-1_5);
-  font-size: 0.625rem;
+  font-size: var(--font-size-2xs);
 }
 
 .badge-md {
@@ -32,7 +32,7 @@
 
 .badge-lg {
   padding: var(--space-1) var(--space-3);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 }
 
 /* ─── Variants ───

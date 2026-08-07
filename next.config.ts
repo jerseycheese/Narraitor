@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 // Content Security Policy (enforced). 'unsafe-inline' is kept for script/style
@@ -110,9 +111,27 @@ const nextConfig: NextConfig = {
   },
 
   // Webpack configuration
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     // Add path resolver fallback for client-side builds
     config.resolve.fallback = { fs: false, path: false };
+
+    // The Gemini tokenizer's BPE vocabulary is 11 MB. The browser reaches it
+    // because NarrativeController assembles prompts client-side before posting
+    // them to /api/narrative/*, so the lazy GameSession chunk pulled the whole
+    // merge table down at the start of every session. Swap in a character-count
+    // approximation for the client and keep the vocabulary in the server
+    // bundle, where serverExternalPackages already makes it a native require
+    // and the API routes count against the real thing.
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@lenml/tokenizer-gemini': path.resolve(
+          process.cwd(),
+          'src/lib/promptContext/geminiTokenizerBrowserStub.ts'
+        ),
+      };
+    }
+
     return config;
   },
 };

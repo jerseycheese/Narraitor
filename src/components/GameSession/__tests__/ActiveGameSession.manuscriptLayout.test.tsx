@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import ActiveGameSession from '../ActiveGameSession';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -43,12 +43,12 @@ jest.mock('../ActiveGameSessionNarrativeColumn', () => ({
 
 jest.mock('../ActiveGameSessionChoicesColumn', () => ({
   __esModule: true,
-  default: ({ inputActions, endStoryAction }: { inputActions?: React.ReactNode; endStoryAction?: React.ReactNode }) => (
+  default: jest.fn(({ inputActions, endStoryAction }: { inputActions?: React.ReactNode; endStoryAction?: React.ReactNode }) => (
     <div data-testid="choices-column">
       {inputActions}
       {endStoryAction}
     </div>
-  ),
+  )),
 }));
 
 jest.mock('../ActiveGameSessionControls', () => ({
@@ -271,6 +271,165 @@ describe('ActiveGameSession Manuscript Layout', () => {
 
     // Assert it closed
     expect(hudToggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  describe('keyboard shortcuts (#276)', () => {
+    it('opens the shortcuts dialog via the HUD button', async () => {
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const trigger = await screen.findByRole('button', { name: /keyboard shortcuts/i });
+      fireEvent.click(trigger);
+
+      expect(await screen.findByRole('dialog', { name: /keyboard shortcuts/i })).toBeInTheDocument();
+    });
+
+    it('opens the shortcuts dialog when "?" is pressed', async () => {
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+      fireEvent.keyDown(document, { key: '?' });
+
+      expect(await screen.findByRole('dialog', { name: /keyboard shortcuts/i })).toBeInTheDocument();
+    });
+
+    it('suspends ChoiceSelector\'s number-key hotkeys while the shortcuts dialog is open (review follow-up)', async () => {
+      const ActiveGameSessionChoicesColumn = require('../ActiveGameSessionChoicesColumn').default;
+      // Progressive disclosure ON so "j" would open the journal drawer if it
+      // weren't suspended - proves the gate actually blocks something,
+      // rather than "j" being a no-op for an unrelated reason.
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+
+      const propsBeforeOpen = (ActiveGameSessionChoicesColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      expect(propsBeforeOpen.shortcutsSuspended).toBe(false);
+
+      fireEvent.keyDown(document, { key: '?' });
+      await screen.findByRole('dialog', { name: /keyboard shortcuts/i });
+
+      const propsWhileOpen = (ActiveGameSessionChoicesColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      expect(propsWhileOpen.shortcutsSuspended).toBe(true);
+
+      // "j" is also suspended once a modal is up, so it must not stack a
+      // second overlay (the journal drawer) behind the shortcuts dialog.
+      fireEvent.keyDown(document, { key: 'j' });
+      expect(screen.queryByTestId('manuscript-drawer')).not.toBeInTheDocument();
+    });
+
+    it('toggles the character summary when "c" is pressed', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      const hudToggle = await screen.findByRole('button', { name: /hero/i });
+      expect(hudToggle).toHaveAttribute('aria-expanded', 'false');
+
+      fireEvent.keyDown(document, { key: 'c' });
+
+      expect(hudToggle).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('opens the journal drawer when "j" is pressed under progressive disclosure', async () => {
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+      fireEvent.keyDown(document, { key: 'j' });
+
+      const drawer = await screen.findByTestId('manuscript-drawer');
+      expect(drawer).toBeInTheDocument();
+    });
+
+    // The restore target is captured per open. Without that, opening from a
+    // HUD icon once leaves the ref pinned to that icon, and a later "j" open
+    // yanks focus to the icon instead of back where the player was.
+    it('returns focus where the player was when the drawer opened via "j"', async () => {
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+
+      const hudTools = within(
+        screen.getByRole('toolbar', { name: 'Session tools' })
+      );
+
+      // Open and close once from the HUD icon so the ref is populated.
+      const journalIcon = hudTools.getByRole('button', { name: 'Journal' });
+      fireEvent.click(journalIcon);
+      await screen.findByTestId('manuscript-drawer');
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+      await waitFor(() =>
+        expect(screen.queryByTestId('manuscript-drawer')).not.toBeInTheDocument()
+      );
+
+      // Now open from somewhere else entirely via the shortcut.
+      const elsewhere = hudTools.getByRole('button', { name: 'End Story' });
+      elsewhere.focus();
+      fireEvent.keyDown(document, { key: 'j' });
+      await screen.findByTestId('manuscript-drawer');
+
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+      await waitFor(() => expect(elsewhere).toHaveFocus());
+    });
+
+    it('routes to the journal page when "j" is pressed without progressive disclosure', async () => {
+      const pushMock = jest.fn();
+      (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+      fireEvent.keyDown(document, { key: 'j' });
+
+      expect(pushMock).toHaveBeenCalledWith(`/worlds/${mockWorldId}/play/journal`);
+    });
   });
 
   it('passes isStreaming to ManuscriptActionRail when generating', async () => {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { analyzeWorldDescription } from '@/lib/ai/worldAnalyzer';
 import Logger from '@/lib/utils/logger';
+import { reportServerError } from '@/lib/telemetry/reportServerError';
 
 const logger = new Logger('API');
 
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('analyze-world API', 'World analysis failed:', error);
+    reportServerError(error, { source: 'route', route: '/api/ai/analyze-world' });
     
     return NextResponse.json(
       { 

@@ -11,7 +11,10 @@ export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   return processGeminiTextRequest(request, {
-    maxTokens: 1024,
+    // Matches lib/ai/config's default. A weighty beat asks for 3-4 paragraphs
+    // plus its JSON metadata, which crowds a 1024 ceiling and gets truncated
+    // mid-object — and a truncated response is unparseable, not just short.
+    maxTokens: 2048,
     temperature: 0.7,
     errorContext: 'Narrative generation'
   });

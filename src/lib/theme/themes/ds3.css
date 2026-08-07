@@ -29,10 +29,27 @@
   --color-on-danger: rgb(255 255 255);
   --color-on-warning: rgb(255 255 255);
 
-  /* Steel Blue accent */
-  --color-accent: rgb(91 122 140);
-  --color-accent-hover: rgb(74 105 120);
-  --color-accent-soft: rgb(91 122 140 / 10%);
+  /* Ink Blue accent — deeper and more saturated than the old steel blue,
+   * per ADR-013's "drafting tool" concept. Text-on-canvas 6.81:1,
+   * white-on-fill 7.52:1 (both well past AA's 4.5:1). */
+  --color-accent: rgb(54 87 120);
+  --color-accent-hover: rgb(41 66 91);
+  --color-accent-soft: rgb(54 87 120 / 10%);
+
+  /* Canonical dot grid. This used to live on a fixed `body::before`
+   * pseudo-element, but that layer was dead: `body > *` (globals.css)
+   * z-index-promotes every real surface above it, so it never painted.
+   * landing/about/dashboard/manuscript-session each grew their own copy of
+   * this same gradient at drifting alpha values to compensate. Single
+   * source now — composited directly onto the two opaque surface roots
+   * (app-shell.css .app-surface-app / .app-surface-manuscript) instead. */
+  --pattern-dot-grid-image: radial-gradient(circle, rgb(42 35 28 / 22%) 1px, transparent 1px);
+
+  /* Accent as body-sized text on --color-accent-soft: plain accent only
+     clears ~3.9:1 there, below the 4.5:1 AA minimum. accent-hover's value
+     works as the darker step that restores contrast in light mode (8.09:1),
+     but not in dark mode — see the dark block below. */
+  --color-accent-strong: rgb(41 66 91);
 
   /* Extended semantic tokens */
   --success: 138 25% 40%;
@@ -146,12 +163,26 @@
   --color-on-danger: rgb(15 12 10);
   --color-on-warning: rgb(23 19 16);
 
-  --color-accent: rgb(123 160 180);
+  /* Ink Blue accent, dark-mode variant — same deepened, more saturated
+   * hue as light mode, kept light enough to clear AA against the dark canvas.
+   * Text-on-canvas 6.58:1, dark-ink-on-fill 6.58:1. */
+  --color-accent: rgb(119 158 197);
 
   /* Hover darkens (not lightens) so white button/CTA text stays legible in dark
-   * mode — white-on-hover ~5.4:1. Base-state contrast tracked separately (#1379). */
-  --color-accent-hover: rgb(80 110 128);
-  --color-accent-soft: rgb(123 160 180 / 12%);
+   * mode — white-on-hover 5.19:1. Base-state contrast tracked separately (#1379). */
+  --color-accent-hover: rgb(67 112 157);
+  --color-accent-soft: rgb(119 158 197 / 12%);
+
+  /* Canonical dot grid, dark-mode variant — lower alpha than light
+   * mode's 22%: light-colored dots on a dark canvas read heavier per unit
+   * alpha than dark dots on a light one, so this keeps the same perceived
+   * weight rather than the same number. */
+  --pattern-dot-grid-image: radial-gradient(circle, rgb(237 232 224 / 15%) 1px, transparent 1px);
+
+  /* Accent as body-sized text on --color-accent-soft needs the LIGHTER step in
+     dark mode (opposite direction from light mode) — plain accent already
+     clears 5.53:1 here, so reuse it rather than accent-hover's darkened value. */
+  --color-accent-strong: rgb(119 158 197);
 
   --success: 138 20% 48%;
   --success-foreground: 222 84% 5%;
@@ -231,20 +262,3 @@
   --color-danger-hover: rgb(170 75 75);
 }
 
-/* DS3 Background Pattern - Dot grid */
-:root body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image: radial-gradient(circle, rgb(42 35 28 / 18%) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.3;
-}
-
-:root.dark body::before {
-  background-image: radial-gradient(circle, rgb(237 232 224 / 12%) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.3;
-}

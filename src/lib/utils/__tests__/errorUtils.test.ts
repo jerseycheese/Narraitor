@@ -271,7 +271,6 @@ describe('errorUtils', () => {
     });
   });
 
-  // Note: createAPIErrorResponse tests are skipped because they require Next.js server environment
-  // The function is a thin wrapper around NextResponse.json() and is better tested via integration tests
-  // The core error mapping logic is already tested via getUserFriendlyError() tests above
+  // Note: createAPIErrorResponse now lives in its own module (it needs a
+  // transport, and errorUtils stays a pure leaf) — see its colocated test.
 });

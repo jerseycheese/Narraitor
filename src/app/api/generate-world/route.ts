@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
-import { createAPIErrorResponse } from '@/lib/utils/errorUtils';
+import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 import { generateWorld } from '@/lib/generators/worldGenerator';
 import Logger from '@/lib/utils/logger';
 

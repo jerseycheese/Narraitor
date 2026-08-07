@@ -1,0 +1,7 @@
+/* Screenshot-only stylesheet for content that changes with the calendar.
+   The world image's "Generated: <date>" line renders today's date, so a
+   baseline captured on one day drifts against every later run. Hide it while
+   keeping its layout box so the rest of the page stays where it was. */
+.image-generation-generated-at {
+  visibility: hidden;
+}
