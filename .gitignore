@@ -154,12 +154,15 @@ build-output.log
 \n# Local tool logs\n.bdg/
 characters-debug.png
 
-# impeccable (design tool): keep local state out of git, share the live config, the
-# surface briefs, and the layout sketches. Briefs say what each route is for; sketches
-# are the pictures those decisions were made from, and each carries a .json sidecar
-# holding the prompt that made it. Both are small and neither is reproducible on demand,
-# since the layout behind each sketch came from a randomised roll. Critique snapshots
-# and full mockups stay local: they regenerate, and they are big.
+# impeccable (design tool): keep local state out of git, share the live config and the
+# artifacts decisions were made from. Briefs say what each route is for; sketches and
+# mockups are the pictures behind those decisions, including the rejected ones the
+# briefs cite by filename, and each carries a .json sidecar holding the prompt that made
+# it. None of it is reproducible on demand, since the layout behind each one came from a
+# randomised roll. Critique snapshots stay local: they regenerate from the code.
+#
+# Mockups are big, so this shares the directory rather than auto-adding to it. A new
+# mockup shows up untracked and only lands if someone names it in a commit.
 .impeccable/*
 !.impeccable/live/
 .impeccable/live/*

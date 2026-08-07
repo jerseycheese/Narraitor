@@ -56,7 +56,7 @@ export const BRAND_IMAGES = [
     caption: 'A rain-soaked port city',
     typed:
       'A rain-soaked port city where it never stops raining and every cop is on ' +
-      'someone\'s payroll. Nineteen-forties, but the neon is wrong.',
+      'someone\'s payroll. Nineteen-forties, but the light is the wrong colour.',
     prompt: [
       'A narrow cobbled street in a harbour city at night in heavy rain, seen at',
       'street level. Wet stone throwing back the light of a few tall iron',
