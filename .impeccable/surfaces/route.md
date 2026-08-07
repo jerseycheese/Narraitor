@@ -64,10 +64,61 @@ carries "free" in three comments (lines 3, 6, 208); internal today, but it leaks
 
 ## 3. Selected direction
 
-**CHOSEN 2026-08-07.** Sketch: `.impeccable/sketches/combined.webp`. High-fidelity mockups
-still pending.
+**STRUCTURE AGREED 2026-08-07. VISUAL TREATMENT STILL OPEN.** Reference mockup:
+`.impeccable/mocks/fix-d.webp`, which shows the structure in one possible treatment only.
+Earlier sketch: `.impeccable/sketches/combined.webp`.
 
-The page runs in two set-pieces with a hard break between them:
+What is settled is the arrangement and the interaction. How it looks, specifically how far the
+imagery dominates and whether the selector sits on paper or in its own band, is not settled
+and is being decided separately.
+
+**Four selectable world plates drive the whole page.** A row of four atmospheric world images
+sits under the hero, each captioned with its world. The first is selected by default and shown
+at full contrast with a solid accent underline; the other three are faded back to roughly
+sixty percent so the row reads unmistakably as a set of controls. Picking one swaps everything
+below it.
+
+Everything below the plates belongs to the selected world, in a single full-width column:
+what someone typed to describe it, the prose that came back, a story passage, the three
+choices with one marked as taken, a failed skill check, and the consequence with its first
+sentence in the accent colour.
+
+This resolves a real flaw the user caught in an earlier version: showing two worlds up top and
+then only one set of choices quietly abandons one of them. One slot fed by a selector has no
+asymmetry to explain.
+
+Default world is the rain-soaked port city. That choice matters more than it looks, because
+most visitors will never touch the selector, so the default is effectively the page for them.
+
+**Implementation: CSS-only radio tabs, not a client component.** All four worlds render
+server-side into the HTML and the selector is radio inputs plus sibling selectors. Keyboard
+navigation comes free, it works with JavaScript off, the page stays a static server component,
+and four worlds of roughly eighty words each is trivial weight. What still needs doing by hand:
+screen-reader labelling on the plates, a visible focus ring that clears 3:1, and an obvious
+enough selected state that nobody mistakes the row for decoration.
+
+Known trade-off, accepted: a visitor who never interacts sees exactly one world, so the range
+argument rests on the four plates being legible as a set at a glance rather than on anyone
+clicking.
+
+**Rejected on the way, and why:**
+
+- **Autocycling the sections.** Every cyclable section is prose someone is mid-sentence in.
+  Moving text fights the product's first principle that reading wins, needs a visible pause
+  control to meet WCAG 2.2.2, and needs reduced-motion handling on top. Adding a control to
+  undo a feature is the tell.
+- **Two worlds side by side all the way down** (`.impeccable/mocks/fix-b.webp`). Proves the
+  most and reads the worst: narrow columns force smaller type, and on a phone the columns
+  stack, destroying the read-across that justified them.
+- **One world in full, then a hard turn to a second** (`.impeccable/mocks/fix-c.webp`). Keeps
+  the asymmetry and makes it deliberate rather than removing it.
+- **Three treatments of the pre-selector layout** (`mock-a`, `mock-b`, `mock-c`): all paper,
+  alternating dark bands, and world imagery. Superseded, but they establish that the imagery
+  treatment is painterly and desaturated rather than neon, which is the trap the current
+  homepage image falls into.
+
+An earlier structure, now folded into the above, ran two set-pieces with a hard break between
+them:
 
 **First, "what you typed, what you got."** Two wide rows. Each pairs a narrow dark block
 holding the handful of words someone actually typed to describe a world against a full,

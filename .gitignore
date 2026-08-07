@@ -166,6 +166,7 @@ characters-debug.png
 !.impeccable/live/config.json
 !.impeccable/surfaces/
 !.impeccable/sketches/
+!.impeccable/mocks/
 
 # design-loop skill's per-worktree session log — local paper trail, not repo docs
 design-loop-log.md
