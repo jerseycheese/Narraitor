@@ -68,6 +68,71 @@ describe('useBufferedNarrativeSegments', () => {
     expect(result.current.isBuffering).toBe(false);
   });
 
+  it('reveals a realistic-length segment within the same fast timer budget as a short one', () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    const initialSegments = [segments[0]];
+    // ~1600 chars, in line with a typical 3-4 paragraph narrative beat.
+    const longContent = 'The old stone bridge creaked underfoot as you crossed into the market square. '.repeat(20);
+
+    const { result, rerender } = renderHook(
+      ({ segs }) => useBufferedNarrativeSegments(segs),
+      { initialProps: { segs: initialSegments } }
+    );
+
+    const newSegments = [
+      ...initialSegments,
+      createMockNarrativeSegment({ id: 'seg-2', content: longContent }),
+    ];
+
+    act(() => {
+      rerender({ segs: newSegments });
+    });
+
+    expect(result.current.renderedSegments[1].content).toBe('');
+
+    // 40 ticks is comfortably enough for production pacing to finish this
+    // content, but nowhere near the ~290 ticks the old CLS-testing pacing
+    // (chunkSize 2, 75ms interval) would have needed for the same length.
+    for (let i = 0; i < 40; i++) {
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+    }
+
+    expect(result.current.renderedSegments[1].content).toBe(longContent);
+    expect(result.current.isBuffering).toBe(false);
+  });
+
+  it('renders stored segments immediately once hydration finishes, even though the parent mounted with an empty array', () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+
+    // Mirrors NarrativeHistoryManager: it mounts with an empty segments array
+    // while it loads and dedupes persisted history, then supplies the real
+    // stored segments only after its stabilization timer fires.
+    const { result, rerender } = renderHook(
+      ({ segs, isHydrating }) => useBufferedNarrativeSegments(segs, { isHydrating }),
+      { initialProps: { segs: [] as typeof segments, isHydrating: true } }
+    );
+
+    expect(result.current.renderedSegments).toEqual([]);
+
+    const storedSegments = [
+      createMockNarrativeSegment({ id: 'seg-1', content: 'First segment.' }),
+      createMockNarrativeSegment({ id: 'seg-2', content: 'Second segment.' }),
+    ];
+
+    act(() => {
+      rerender({ segs: storedSegments, isHydrating: false });
+    });
+
+    // Already-stored, already-read segments should render in full immediately —
+    // no reveal animation should kick in just because this is the first time
+    // the hook has seen them.
+    expect(result.current.renderedSegments[0].content).toBe('First segment.');
+    expect(result.current.renderedSegments[1].content).toBe('Second segment.');
+    expect(result.current.isBuffering).toBe(false);
+  });
+
   it('does not re-buffer already-revealed segments', () => {
     mockIsFeatureEnabled.mockReturnValue(true);
 

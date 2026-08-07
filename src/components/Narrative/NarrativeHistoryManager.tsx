@@ -152,6 +152,12 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
         segments={stabilized ? segments : []}
         // Always show loading animation until stabilized, regardless of whether we have segments
         isLoading={isLoading || !stabilized}
+        // Segments withheld pre-stabilization are historical, not newly generated —
+        // tell the buffered-reveal hook so it doesn't replay the reveal animation on
+        // a stored segment once stabilization finally supplies it. Deliberately just
+        // `!stabilized`, not `isLoading || !stabilized`: isLoading also flips briefly
+        // on later live appends, and stabilized itself doesn't reset for those.
+        isHydrating={!stabilized}
         error={error || undefined}
         className={className}
         disableInitialAutoScroll={disableInitialAutoScroll}
