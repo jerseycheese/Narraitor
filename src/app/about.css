@@ -20,7 +20,7 @@
 
 @media (width >= 1024px) {
   .component-about {
-    padding: var(--space-8) var(--space-6);
+    padding: var(--space-8) var(--page-gutter);
   }
 }
 
@@ -234,7 +234,7 @@
 
 @media (width >= 1024px) {
   .component-about-footer {
-    padding: var(--space-5) var(--space-6);
+    padding: var(--space-5) var(--page-gutter);
   }
 }
 
