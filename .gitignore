@@ -154,11 +154,18 @@ build-output.log
 \n# Local tool logs\n.bdg/
 characters-debug.png
 
-# impeccable (design tool): keep local state out of git, share only the live config
+# impeccable (design tool): keep local state out of git, share the live config, the
+# surface briefs, and the layout sketches. Briefs say what each route is for; sketches
+# are the pictures those decisions were made from, and each carries a .json sidecar
+# holding the prompt that made it. Both are small and neither is reproducible on demand,
+# since the layout behind each sketch came from a randomised roll. Critique snapshots
+# and full mockups stay local: they regenerate, and they are big.
 .impeccable/*
 !.impeccable/live/
 .impeccable/live/*
 !.impeccable/live/config.json
+!.impeccable/surfaces/
+!.impeccable/sketches/
 
 # design-loop skill's per-worktree session log — local paper trail, not repo docs
 design-loop-log.md
