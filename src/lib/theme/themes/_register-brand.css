@@ -1,0 +1,75 @@
+/* ═══════════════════════════════════════════════════════════════
+   Brand register — token overrides for the marketing surface.
+
+   One chrome, two registers: /, /about, /privacy and /terms share the app
+   surface's header, content column and type scale, and differ only in the
+   tokens below. getSurfaceRegister() in src/lib/routing/surfaceMode.ts
+   decides which routes land here and AppSurfaceShell stamps the result onto
+   the surface root as data-register.
+
+   TOKENS ONLY. A rule in this file that isn't a custom-property block is a
+   third chrome arriving through the side door — see DESIGN.md "Surfaces".
+   Two tokens are explicitly off limits:
+     --content-max-width  the header renders inside .app-surface-app, so
+                          moving the width token would move the header.
+     --font-size-*        the DS3 type scale is calibrated once, globally.
+   The text and accent contrast contracts documented in ds3.css are also
+   off limits: they're measured against specific token values, and retinting
+   --color-canvas here would invalidate them (and leave the propagated
+   viewport background on the product tint anyway, since body sits above
+   this element).
+
+   Why every color token appears TWICE: these are declared on :root in
+   ds3.css and again on :root.dark. A declaration on a DESCENDANT of :root
+   always beats an inherited one regardless of specificity, because
+   specificity is never compared across elements — inheritance is only the
+   fallback when an element has no declaration of its own. So a single
+   unqualified block here would pin the light values in dark mode. The
+   :root.dark variant below re-targets the same element, where specificity
+   ((0,4,0) vs (0,2,0)) decides. Colorless tokens have no dark variant and
+   appear once.
+
+   Known and accepted: these tokens inherit into the header too, so a
+   Button variant="info" or an active world trigger rendered on a brand
+   route picks up the brand wash. The register is surface-scoped, not
+   page-scoped.
+   ═══════════════════════════════════════════════════════════════ */
+
+.app-surface[data-register="brand"] {
+  /* One step wider than the product surface's --space-4 / --space-6 pair.
+     Read by landing.css, about.css and legal.css. */
+  --page-gutter: var(--space-6);
+
+  /* The product surface's 10% wash resolves to near-neutral gray, which is
+     fine behind a numeral chip but carries no accent identity as a
+     full-width band — and the brand pages use it as a band. At 18%,
+     --color-accent-strong on this measures 7.17:1 (down from 8.11:1 at
+     10%), so the honesty band keeps its AA headroom. */
+  --color-accent-soft: rgb(54 87 120 / 18%);
+
+  /* Same 24px tile (hard-coded in app-shell.css, not tokenized) with a
+     larger, darker dot, so the brand field reads as drafting paper rather
+     than the app's fine engineering grid. Hard edge at a single radius,
+     matching the base token's idiom. */
+  --pattern-dot-grid-image: radial-gradient(circle, rgb(42 35 28 / 26%) 1.5px, transparent 1.5px);
+}
+
+@media (width >= 1024px) {
+  /* _shared-tokens.css steps --page-gutter up at this breakpoint on :root.
+     That declaration can't reach past the block above, so the register has
+     to step itself or the brand gutter goes flat across breakpoints. */
+  .app-surface[data-register="brand"] {
+    --page-gutter: var(--space-8);
+  }
+}
+
+:root.dark .app-surface[data-register="brand"] {
+  /* --color-accent-strong on this measures 5.19:1, down from 5.56:1 at 12%.
+     Dark mode has the thinner margin of the two, so don't raise this
+     further without re-checking: 22% lands at 4.64:1. */
+  --color-accent-soft: rgb(119 158 197 / 16%);
+
+  /* Light dots on a dark canvas read heavier per unit alpha (see ds3.css),
+     and the dot is growing 1px -> 1.5px, so hold the alpha nearly flat. */
+  --pattern-dot-grid-image: radial-gradient(circle, rgb(237 232 224 / 17%) 1.5px, transparent 1.5px);
+}

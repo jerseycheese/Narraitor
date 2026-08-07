@@ -15,6 +15,9 @@ import './badge.css';
 import './character-display.css';
 import '@/lib/theme/themes/_shared-tokens.css';
 import '@/lib/theme/themes/ds3.css';
+// Last, and route-scoped rather than global: it overrides tokens the two files
+// above define, so reading it as an override layer means reading it after them.
+import '@/lib/theme/themes/_register-brand.css';
 import { DevToolsProvider } from '@/components/devtools';
 import { ClientOnlyDevTools } from '@/components/ClientOnlyDevTools';
 import { AppSurfaceShell } from '@/components/layout/AppSurfaceShell';
