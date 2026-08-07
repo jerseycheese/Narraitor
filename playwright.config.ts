@@ -106,7 +106,29 @@ export default defineConfig({
     
     // Cross-platform snapshot configuration
     testIdAttribute: 'data-testid',
-    
+
+    // Pin the browser's clock zone and locale so rendered dates are identical
+    // everywhere. Several baselined pages print a formatted date (character
+    // detail's "Created:", WorldCard's "Created:", world detail's
+    // Created/Updated fields) via formatDate(), which ends in
+    // toLocaleDateString(undefined, ...) — both the zone and the locale are
+    // ambient, so an unpinned run renders whatever the host machine has.
+    //
+    // The seeded fixture dates sit near midnight UTC (char-cyberpunk-hacker is
+    // 2024-01-01T01:00:00.000Z), so a negative-offset host rolls them back a
+    // day: "Jan 1, 2024" becomes "Dec 31, 2023". That longer string wraps
+    // .character-detail-header-meta's flex row at the 375px mobile viewport and
+    // pushes the rest of the page down 34px, failing mobile-character-detail on
+    // a size mismatch. Re-baselining can't fix that — it just moves the
+    // mismatch to whoever runs in the other zone.
+    //
+    // UTC/en-US is what the GitHub macos-latest runners already use, and the
+    // committed baselines are adopted from that job's artifacts, so pinning
+    // these keeps every existing baseline valid while making local runs
+    // reproduce CI instead of the developer's own zone.
+    timezoneId: 'UTC',
+    locale: 'en-US',
+
     // Force consistent font rendering on Darwin platform
     extraHTTPHeaders: {
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
