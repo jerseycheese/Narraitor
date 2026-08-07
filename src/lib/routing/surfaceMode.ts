@@ -19,6 +19,32 @@ export function getSurfaceMode(pathname: string): SurfaceMode {
   return 'app';
 }
 
+export type SurfaceRegister = 'brand' | 'product';
+
+/**
+ * Brand-register route roots. Sub-paths come along, so a future
+ * /privacy/cookies joins the register without a second edit here. /welcome is
+ * the legacy alias for / — it permanent-redirects today so nothing renders
+ * under it, listed so the two stay in step if that redirect is ever retired.
+ */
+const BRAND_ROUTE_PATTERN = /^\/(?:about|privacy|terms|welcome)(?:\/.*)?$/;
+
+/**
+ * Returns the visual register for a route path. Orthogonal to getSurfaceMode:
+ * the register is a token layer inside the app surface, not a third chrome.
+ * Every manuscript route is 'product'. See DESIGN.md "Surfaces".
+ */
+export function getSurfaceRegister(pathname: string): SurfaceRegister {
+  const normalizedPath = normalizePath(pathname);
+
+  // '/' is matched exactly, not as a prefix, or it would claim every route.
+  if (normalizedPath === '/' || BRAND_ROUTE_PATTERN.test(normalizedPath)) {
+    return 'brand';
+  }
+
+  return 'product';
+}
+
 function normalizePath(pathname: string): string {
   if (!pathname) {
     return '/';
