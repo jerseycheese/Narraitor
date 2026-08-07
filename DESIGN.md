@@ -199,7 +199,7 @@ The full scale is `--space-0_5` through `--space-8` in [_shared-tokens.css](src/
 ### Layout rules
 
 - **Page max-width** is `--content-max-width` (`1200px`) for general content; narrative content tightens further to `56rem`.
-- **Named page widths**, the tier below the app shell: `--page-width-narrow` (`64rem`/1024px — hero content, ending screen) and `--page-width-prose` (`48rem`/768px — legal text, about's hero copy and section prose, landing's hero copy). Landing's page container itself rides the full `--content-max-width`, matching the app shell, so its hero image and step grid aren't squeezed narrower than the header. Both width tokens live in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) alongside `--page-gutter` (`var(--space-4)`, `var(--space-6)` from `1024px`), the shared, responsive horizontal inset from viewport edge to content.
+- **Named page widths**, the tier below the app shell: `--page-width-narrow` (`64rem`/1024px — hero content, ending screen) and `--page-width-prose` (`48rem`/768px — legal text, about's hero copy and section prose, landing's hero copy). Landing's page container itself rides the full `--content-max-width`, matching the app shell, so its hero image and step grid aren't squeezed narrower than the header. Both width tokens live in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) alongside `--page-gutter` (`var(--space-4)`, `var(--space-6)` from `1024px`), the shared, responsive horizontal inset from viewport edge to content. The brand register widens that inset one step, to `var(--space-6)` and `var(--space-8)` — see Surfaces.
 - **Game session viewport** is fixed-position, full-viewport, with internal layout governed by [src/styles/manuscript-session.css](src/styles/manuscript-session.css). Don't apply page-level spacing to game-session screens.
 - **Mobile breakpoints**: `640px` (sm), `768px` (md), `1024px` (lg), `1280px` (xl). These stay literal in media queries — custom properties aren't readable inside `@media` conditions without a build step — but any new breakpoint should snap to this scale rather than introduce a one-off. Mobile-specific layout bugs from the DS migration (#1139, #1143, #1148, #1150) are resolved.
 
@@ -211,11 +211,22 @@ There are two, and only two. `getSurfaceMode()` in [src/lib/routing/surfaceMode.
 
 **Manuscript** — reading and playing a story. `/play*` and `/worlds/{id}/play*`. No chrome at all. The prose is the interface.
 
-Rules that hold across both:
+### Registers, inside the app surface
+
+The app surface carries two **registers**, and they are not a third surface. `getSurfaceRegister()` in [src/lib/routing/surfaceMode.ts](src/lib/routing/surfaceMode.ts) is the source of truth, and [AppSurfaceShell](src/components/layout/AppSurfaceShell.tsx) stamps the result onto the surface root as `data-register`.
+
+- **Brand** — `/`, `/about`, `/privacy`, `/terms` and their sub-paths. The marketing front door.
+- **Product** — everything else on the app surface.
+
+The difference is token values and page-level composition, nothing else: same header component, same content column, same type scale. [_register-brand.css](src/lib/theme/themes/_register-brand.css) holds the overrides and holds **only custom properties** — an element rule in that file is the third chrome arriving through the side door. `--content-max-width` and the `--font-size-*` scale are explicitly off limits, because the header renders inside `.app-surface-app` and would move with the width token.
+
+Every color token overridden there needs both a light and a dark value. The register block sets tokens on a descendant of `:root`, and a declaration on a descendant beats an inherited one regardless of specificity, so a missing dark value silently serves the light one. The manuscript surface has no register.
+
+Rules that hold across both surfaces:
 
 - **Prose caps at `70ch`.** Tables, grids, and cards use the full column; paragraphs don't stretch with them.
 - **One contextual CTA, suppressed where the page owns the action.** A screen that already has a Play button doesn't get a second one in the header.
-- **Breadcrumbs are for nested routes.** `/`, `/dashboard`, `/worlds`, `/characters`, and `/settings` are top-level destinations and suppress them.
+- **Breadcrumbs are for nested product routes.** The whole brand register is breadcrumb-free, and `/dashboard`, `/worlds`, `/characters` and `/settings` are top-level destinations that suppress them too.
 - Canon is the `04-Templates/layouts/AppShell` story, which shows the four header states side by side.
 
 This collapsed a three-surface split (#1655). The retired third surface — a 288px "workshop" rail on `/worlds*`, `/characters*`, and `/settings*` — existed so three design systems could feel like three products; ADR-013 deleted two of them. It reverses [#1432](https://github.com/jerseycheese/Narraitor/issues/1432) F7, which kept the rail on differentiation grounds that no longer apply, and supersedes the archived Workshop layout pattern in `public_docs/design-system/archive/redesign-planning/design-system.html`.
@@ -293,7 +304,8 @@ The don'ts here come from real failures during the design-system migration. They
 - **Don't add per-world theming.** DS3 is fixed, not genre-driven, and was never meant to flex per world. Adding a `world.theme` field is scope creep with no demand.
 - **Don't write new color tokens for one-off shades.** If a shade is needed once, it doesn't deserve a token. If it's needed twice, the existing token is probably the right answer.
 - **Don't use drop shadows for general elevation.** Borders and tonal contrast first; shadows only for modals, drawers, and dropdowns.
-- **Don't introduce a third chrome.** A new page picks app or manuscript. The last time a surface was added to differentiate one part of the product, the two shells drifted until the same three links looked like two different apps (#1655).
+- **Don't introduce a third chrome.** A new page picks app or manuscript. The last time a surface was added to differentiate one part of the product, the two shells drifted until the same three links looked like two different apps (#1655). To make part of the app surface look different, reach for a register, not a shell.
+- **Don't put an element rule in `_register-brand.css`.** It's a token layer. The moment it starts styling elements it's a shell in disguise, and the drift starts again.
 
 ### Do's
 
