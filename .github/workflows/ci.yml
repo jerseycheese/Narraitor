@@ -5,12 +5,22 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+    # Default types (opened, synchronize, reopened) plus edited: the
+    # visual-baseline-check job below reads the PR body, so it needs to
+    # re-run when the author edits baseline notes without pushing a commit.
+    types: [ opened, synchronize, reopened, edited ]
 
 jobs:
   # Phase 1: Setup job - Install dependencies once and cache for all other jobs
+  #
+  # Skipped on a PR-body-only edit: every job below except
+  # visual-baseline-check needs this one (directly or transitively), so
+  # skipping it here keeps the 'edited' trigger scoped to that one job
+  # instead of re-running the whole pipeline for a body edit with no commit.
   setup:
     name: Setup Dependencies
     runs-on: ubuntu-latest
+    if: github.event.action != 'edited'
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -179,6 +189,29 @@ jobs:
       # audit. Review the output and prune manually (#1087).
       - name: Run CSS audit
         run: npm run audit:css
+
+  visual-baseline-check:
+    name: Visual Baseline Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Advisory, like audit-css below: no node_modules needed, the script
+      # only uses git and Node builtins. Flags a PR that changes src/** and a
+      # visual-test snapshot together, and any changed snapshot the PR body
+      # never mentions -- never fails the build, just surfaces it.
+      - name: Check visual baseline changes are documented
+        env:
+          BASE_REF: origin/${{ github.event.pull_request.base.ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node scripts/check-visual-baseline.mjs
 
   docs-check:
     name: Docs Check

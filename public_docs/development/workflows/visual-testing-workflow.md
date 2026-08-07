@@ -22,6 +22,14 @@ npm run test:visual:update
 npm run test:visual:headed
 ```
 
+## Baseline Governance
+
+This is a solo-maintained repo, so baseline review can't lean on a second reviewer -- it leans on the diff being honest about what changed. Three things make that possible (#655):
+
+- **Regenerate baselines in their own commit.** #1546 put it this way: a baseline regen should be "isolated from any other change, so a pixel shift is attributable to this PR alone." When the regen is its own commit, `git show <sha>` is a clean list of exactly what moved visually, separate from what changed in code -- that's what makes a full-page screenshot diff reviewable at all, since GitHub's binary-diff UI can't show a pixel shift in a region.
+- **Name every changed baseline in the PR** using the "Visual Baseline Changes" section of the PR template, with what produced it. A changed baseline with no entry there is the smell to catch.
+- **CI flags it automatically.** The `visual-baseline-check` job in `.github/workflows/ci.yml` warns (not blocks -- legitimate design work changes baselines constantly) when a PR touches both `src/**` and a snapshot PNG, and when a changed snapshot's filename never shows up in the PR body. Run it locally with `npm run test:visual:check-baselines`.
+
 ## Workflow 1: Adding Visual Tests for New Features
 
 ### When to Add Visual Tests

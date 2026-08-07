@@ -35,6 +35,7 @@
     "test:visual:tutorials": "playwright test --project=tutorials",
     "test:visual:update": "playwright test --update-snapshots",
     "test:visual:prune": "node scripts/clean-visual-snapshots.cjs",
+    "test:visual:check-baselines": "node scripts/check-visual-baseline.mjs",
     "test:visual:headed": "playwright test --headed",
     "test:visual:debug": "playwright test --debug",
     "test:visual:report": "./scripts/download-playwright-report.sh",
