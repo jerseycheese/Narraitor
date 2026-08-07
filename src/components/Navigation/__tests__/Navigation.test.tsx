@@ -240,5 +240,27 @@ describe('HeaderNavigation', () => {
 
       expect(screen.getAllByTestId('breadcrumbs').length).toBeGreaterThan(0);
     });
+
+    // The whole brand register is breadcrumb-free, so this asserts the band
+    // itself is absent rather than empty: it carries its own padding and
+    // border, and an empty one is a visible artifact.
+    it.each(['/', '/about', '/privacy', '/terms'])(
+      'renders no breadcrumb band on the brand route %s',
+      (pathname) => {
+        mockPathname = pathname;
+
+        const { container } = render(<HeaderNavigation />);
+
+        expect(container.querySelector('.breadcrumbs-container')).toBeNull();
+      }
+    );
+
+    it('keeps the breadcrumb band on nested product routes', () => {
+      mockPathname = '/worlds/world-1';
+
+      const { container } = render(<HeaderNavigation />);
+
+      expect(container.querySelector('.breadcrumbs-container')).not.toBeNull();
+    });
   });
 });

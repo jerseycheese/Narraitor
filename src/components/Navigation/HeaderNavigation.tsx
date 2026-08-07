@@ -21,6 +21,7 @@ import {
   headerDropdownTriggerClass,
 } from './navigationDropdownStyles';
 import { useNavigationData } from './useNavigationData';
+import { getSurfaceRegister } from '@/lib/routing/surfaceMode';
 import type { Character } from '@/state/characterStore';
 
 const RecentPagesDropdown = dynamic(
@@ -47,10 +48,11 @@ const CTA_SUPPRESSED_ROUTES: readonly RegExp[] = [
   /^\/characters\/[^/]+$/,
 ];
 
-// Top-level destinations orient on their own. Exact match, not a prefix, or
-// /settings/providers and the detail routes lose the breadcrumbs they need.
+// Top-level product destinations orient on their own. Exact match, not a
+// prefix, or /settings/providers and the detail routes lose the breadcrumbs
+// they need. Brand routes aren't listed: the whole register is breadcrumb-free,
+// so a per-path list here would rot the moment a brand sub-route lands.
 const BREADCRUMB_SUPPRESSED_ROUTES = new Set([
-  '/',
   '/dashboard',
   '/worlds',
   '/characters',
@@ -78,7 +80,9 @@ export function HeaderNavigation() {
   const [mounted, setMounted] = useState(false);
 
   const hasWorlds = mounted && hasWorldsStore;
-  const shouldShowBreadcrumbs = !BREADCRUMB_SUPPRESSED_ROUTES.has(pathname);
+  const shouldShowBreadcrumbs =
+    getSurfaceRegister(pathname) === 'product' &&
+    !BREADCRUMB_SUPPRESSED_ROUTES.has(pathname);
   // Public context (no local worlds yet) brands to the landing page at /;
   // once this browser has app state, the brand is a home link to /dashboard
   // so app users aren't sent back to the marketing front door (#1528).
