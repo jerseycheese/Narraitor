@@ -38,7 +38,7 @@
 .component-legal-eyebrow {
   margin: 0;
   font-family: var(--font-system);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -95,7 +95,7 @@
 .component-legal-prose p {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   line-height: 1.65;
   color: var(--color-text-secondary);
 }
@@ -177,7 +177,7 @@
 
 :root .component-legal-lead {
   font-family: var(--font-narrative);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   line-height: 1.55;
 }
 

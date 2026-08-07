@@ -76,7 +76,7 @@
 .component-landing-lead {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
@@ -192,7 +192,7 @@
 .component-landing-step-title {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.125rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -366,5 +366,5 @@
 :root .component-landing-step-description,
 :root .component-landing-note-description {
   font-family: var(--font-system);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }

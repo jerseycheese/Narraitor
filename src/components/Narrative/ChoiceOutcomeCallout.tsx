@@ -61,11 +61,12 @@ const buildConsequenceChips = (
       const value = typeof consequence.value === 'number' ? consequence.value : 0;
       if (value === 0) return;
 
+      const magnitude = Math.abs(value);
       chips.push({
         key: `alignment-${index}`,
         kind: 'alignment',
         direction: value > 0 ? 'positive' : 'negative',
-        label: value > 0 ? 'Order rises' : 'Chaos rises',
+        label: `${value > 0 ? 'Order' : 'Chaos'} +${magnitude}`,
       });
     }
   });

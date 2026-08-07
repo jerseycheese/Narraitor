@@ -381,4 +381,50 @@ test.describe('Manuscript regression assertions', () => {
     // and ~163px (~16%) after.
     expect(gap).toBeLessThan(geometry.viewportHeight * 0.17);
   });
+
+  test('Docked choices rail does not squeeze the narrative row off-screen on mobile', async ({ page }) => {
+    // DS3 always stacks suggested actions in a single column (never a grid,
+    // see :root .manuscript-suggested-actions-grid), so a full set of choices
+    // on a narrow/short viewport used to demand more height than the
+    // `.manuscript-viewport-inner` auto/1fr/auto grid had available, squeezing
+    // the narrative row (`.manuscript-overlay-main`) down to ~16px — the story
+    // text effectively vanished. Reproduces on unmodified `develop` HEAD.
+    await page.setViewportSize({ width: 375, height: 667 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('#manuscript-action-rail', { timeout: 10000 });
+
+    const geometry = await page.evaluate(() => {
+      const main = document.querySelector('.manuscript-overlay-main');
+      const rail = document.querySelector('#manuscript-action-rail');
+      if (!main || !rail) return null;
+
+      const mainRect = main.getBoundingClientRect();
+      return {
+        mainHeight: mainRect.height,
+        railScrollHeight: rail.scrollHeight,
+        railClientHeight: rail.clientHeight,
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected play surface geometry to be measurable');
+    }
+
+    // Floor the narrative row so it stays legible instead of collapsing to a
+    // sliver — before the fix this measured ~16px on a 667px-tall viewport.
+    expect(geometry.mainHeight).toBeGreaterThan(120);
+
+    // The docked rail itself should absorb overflow via its own scrollbar
+    // rather than growing unbounded and starving the narrative row.
+    expect(geometry.railScrollHeight).toBeGreaterThanOrEqual(
+      geometry.railClientHeight
+    );
+  });
 });

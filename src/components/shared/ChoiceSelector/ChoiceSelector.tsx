@@ -120,10 +120,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   // Determine the prompt text
   const displayPrompt = prompt || decision.prompt;
 
-  // Auto-focus input when custom input is enabled
+  // Auto-focus input when custom input is enabled. preventScroll stops the
+  // browser's default focus-scroll-into-view from dragging the now-scrollable
+  // #manuscript-action-rail (see manuscript-session.css) down past the
+  // suggested actions to reveal the input on mount/remount.
   useEffect(() => {
     if (enableCustomInput && inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus({ preventScroll: true });
     }
   }, [enableCustomInput]);
 

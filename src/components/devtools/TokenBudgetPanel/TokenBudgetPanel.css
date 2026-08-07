@@ -86,7 +86,7 @@
 .token-budget-panel-suggestion {
   margin: 0;
   color: var(--color-danger);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 }
 
 .token-budget-panel-calibration {
@@ -113,5 +113,5 @@
 .token-budget-panel-empty {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
 }
