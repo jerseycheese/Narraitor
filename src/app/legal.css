@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════
    Legal Surface
    Styles for /privacy and /terms and the <LegalPage /> component.
-   All values use design tokens for theme-awareness. Structural treatment
-   (mono labels with a dot bullet, compact) mirrors about.css, but tuned
-   for dense text: readability comes first, so there are no full-page
-   background patterns — differentiation lives in the hero, section
-   titles, and rhythm.
+   All values use design tokens for theme-awareness. DS3 ("Mechanical
+   Manuscript") structural treatment — mono uppercase section labels with a
+   dot bullet, mono prose, tight rhythm — mirrors about.css, but tuned for
+   dense text: readability comes first, so there are no full-page background
+   patterns. Differentiation lives in the hero, section titles, and rhythm.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Base layout (token-driven, theme-agnostic) ─── */
@@ -14,7 +14,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--space-6);
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
@@ -56,9 +56,9 @@
 
 .component-legal-lead {
   margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1.0625rem;
-  line-height: 1.6;
+  font-family: var(--font-narrative);
+  font-size: 1.125rem;
+  line-height: 1.55;
   color: var(--color-text-secondary);
 }
 
@@ -77,13 +77,31 @@
   gap: var(--space-3);
 }
 
-.component-legal-section-title {
+/* Scoped (.component-legal prefix) to outrank the app-surface h2 baseline in
+   app-shell.css (.app-surface-app h2) — the section label is deliberately a
+   small mono uppercase eyebrow with a dot bullet, not the 1.5rem surface
+   default. A bare single class loses to `.app-surface-app h2` on specificity. */
+.component-legal .component-legal-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1.1875rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--color-text-primary);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.component-legal .component-legal-section-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
 }
 
 .component-legal-prose {
@@ -94,9 +112,9 @@
 
 .component-legal-prose p {
   margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1rem;
-  line-height: 1.65;
+  font-family: var(--font-system);
+  font-size: 0.9375rem;
+  line-height: 1.6;
   color: var(--color-text-secondary);
 }
 
@@ -141,48 +159,4 @@
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   DS3 — "Mechanical Manuscript"
-   Compact: mono uppercase section labels with a dot bullet, mono
-   prose, tighter rhythm.
-   ═══════════════════════════════════════════════════════════════ */
-
-:root .component-legal {
-  gap: var(--space-6);
-}
-
-:root .component-legal-section-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-:root .component-legal-section-title::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
-  flex-shrink: 0;
-}
-
-:root .component-legal-lead {
-  font-family: var(--font-narrative);
-  font-size: 1.125rem;
-  line-height: 1.55;
-}
-
-:root .component-legal-prose p {
-  font-family: var(--font-system);
-  font-size: 0.9375rem;
-  line-height: 1.6;
 }
