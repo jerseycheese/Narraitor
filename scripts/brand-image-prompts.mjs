@@ -38,10 +38,21 @@ const SHARED_STYLE = [
  * prompt describes. `typed` is the short description a player would have
  * written to make this world, shown on the page as the input side of the
  * "you wrote this, it wrote that" pairing.
+ *
+ * `genre` must be a GenreValue from src/lib/constants/genres.ts, and
+ * `protagonist` / `protagonistContext` stand in for the character a player
+ * would have made. All four are authored, not generated: they are the player's
+ * side of the exchange. generate-homepage-showcase.mjs feeds them to the real
+ * generators and everything that comes back is the model's.
  */
 export const BRAND_IMAGES = [
   {
     id: 'port-city',
+    genre: 'mystery',
+    protagonist: 'Vaughn',
+    protagonistContext:
+      'A harbour-district investigator who used to be police and left on bad terms. '  +
+      'Good at reading a room, bad at leaving one alone.',
     caption: 'A rain-soaked port city',
     typed:
       'A rain-soaked port city where it never stops raining and every cop is on ' +
@@ -57,6 +68,11 @@ export const BRAND_IMAGES = [
   },
   {
     id: 'survey-ship',
+    genre: 'sci-fi',
+    protagonist: 'Aiya',
+    protagonistContext:
+      'The survey ship\'s systems officer, the only crew member who reads the '  +
+      'maintenance logs, which is how she noticed the discrepancy.',
     caption: 'A survey ship, six months dark',
     typed:
       'A survey ship six months into a silent run, the crew down to four, and ' +
@@ -72,6 +88,11 @@ export const BRAND_IMAGES = [
   },
   {
     id: 'normandy',
+    genre: 'historical',
+    protagonist: 'Corporal Ade',
+    protagonistContext:
+      'A rifle-squad corporal holding together four men and no radio, promoted '  +
+      'that morning because the sergeant did not make it off the beach.',
     caption: 'Normandy, June 1944',
     typed:
       'Normandy, June 1944. A rifle squad separated from its unit, working ' +
@@ -86,6 +107,11 @@ export const BRAND_IMAGES = [
   },
   {
     id: 'debt-court',
+    genre: 'fantasy',
+    protagonist: 'Sennen',
+    protagonistContext:
+      'A junior clerk of the ledger, trusted with other people\'s obligations and '  +
+      'carrying one of their own that nobody has called in yet.',
     caption: 'A court that runs on debts',
     typed:
       'A court where nobody uses money and every favour is written down, and ' +
