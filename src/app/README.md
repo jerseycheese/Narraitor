@@ -25,7 +25,7 @@ Storybook (`npm run storybook`) — see [ADR-012](../../public_docs/architecture
 
 ## World Creation Wizard
 
-The wizard has been fully implemented and it's pretty comprehensive:
+The wizard is fully implemented:
 
 - **5 steps**: Basic Info, Description, Attributes, Skills, Finalize
 - **6 default attributes**: Strength, Intelligence, Agility, Charisma, Dexterity, Constitution

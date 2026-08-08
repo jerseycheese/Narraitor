@@ -43,7 +43,7 @@ interface WorldCardProps {
  * - Character count with navigation to characters list
  * - Smart play button that handles session resume
  * - Make active button for non-active worlds
- * - Comprehensive action buttons
+ * - Action buttons
  *
  * @param props - World card configuration and event handlers
  * @returns A formatted world card with image, details, and action buttons

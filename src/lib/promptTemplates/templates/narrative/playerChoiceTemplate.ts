@@ -39,7 +39,7 @@ export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): stri
   // Extract current location for context
   const location = narrativeContext?.currentLocation || '';
   
-  // Create a more comprehensive context by including more of the narrative
+  // Include more of the narrative for context
   // but still managing token usage intelligently
   let shortContext = '';
   if (recentContent.length <= 1000) {

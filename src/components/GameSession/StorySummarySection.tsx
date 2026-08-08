@@ -59,7 +59,7 @@ export const StorySummarySection: React.FC<StorySummarySectionProps> = ({
         </div>
       ) : showFailedState ? (
         <p className="manuscript-story-summary-error">
-          {error ?? 'Story summary failed to generate.'}
+          {error ?? "Couldn't put together a story summary yet."}
         </p>
       ) : (
         <p className="manuscript-story-summary-empty">

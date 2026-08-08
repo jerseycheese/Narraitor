@@ -26,7 +26,7 @@ const CONTINUITY_BADGE_VARIANTS: Record<
 /**
  * Consistency Validation Debug Section
  * 
- * A comprehensive debugging interface for the AI consistency validation system.
+ * A debugging interface for the AI consistency validation system.
  * This DevTools-only component provides real-time analysis of how lore facts
  * are processed and converted into consistency instructions for narrative generation.
  * 

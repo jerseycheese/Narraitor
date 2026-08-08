@@ -203,7 +203,7 @@ const { reference, relationship } = convertToGenerationParams(worldTypeData);
 
 ## Testing
 
-The component includes comprehensive Storybook stories demonstrating:
+The component includes Storybook stories demonstrating:
 
 - All size variants (small, medium, large)
 - Layout options (vertical, horizontal)

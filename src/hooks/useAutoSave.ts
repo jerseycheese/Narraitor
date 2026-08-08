@@ -53,7 +53,7 @@ import { useToast } from '@/components/ui/toast';
 /**
  * Hook for managing auto-save functionality with toast notifications
  * 
- * Provides comprehensive auto-save capabilities with user feedback through toast notifications.
+ * Provides auto-save capabilities with user feedback through toast notifications.
  * Handles both automatic and manual saves, with different notification strategies for each.
  * 
  * @returns Object containing auto-save state and control methods

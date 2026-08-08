@@ -325,7 +325,7 @@ export default function LoreViewerTestPage() {
             <li>• Detects aliases and alternative names for entities</li>
             <li>• Captures events with significance and relationships</li>
             <li>• Recognizes rules and world mechanics</li>
-            <li>• Much more comprehensive than regex patterns</li>
+            <li>• Covers more cases than regex patterns</li>
           </ul>
         </div>
 

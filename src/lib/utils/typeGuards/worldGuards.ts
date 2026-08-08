@@ -3,7 +3,7 @@
 import type { ValidationResult } from '@/lib/utils';
 
 /**
- * Comprehensive World validation with detailed error messages.
+ * World validation with detailed error messages.
  * 
  * Validates that an unknown object conforms to the World interface structure.
  * Returns a ValidationResult object containing validation status and detailed error descriptions.
@@ -133,7 +133,7 @@ export function validateWorld(obj: unknown, partial: boolean = false): Validatio
 }
 
 /**
- * Comprehensive Character validation with detailed error messages.
+ * Character validation with detailed error messages.
  * 
  * Validates that an unknown object conforms to the Character interface structure.
  * Returns a ValidationResult object containing validation status and detailed error descriptions.

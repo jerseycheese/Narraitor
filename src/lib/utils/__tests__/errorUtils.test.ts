@@ -156,7 +156,7 @@ describe('errorUtils', () => {
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Something Went Wrong');
-      expect(result.message).toBe('An unexpected error occurred. Please try again.');
+      expect(result.message).toBe("That didn't work.");
       expect(result.type).toBe(ErrorType.UNKNOWN);
       expect(result.actionLabel).toBe('Try Again');
     });

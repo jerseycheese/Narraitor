@@ -189,7 +189,7 @@ if (!formResult.valid) {
 ## Available Type Guards
 
 ### Core Objects
-- `validateWorld` - Comprehensive world validation with detailed errors
+- `validateWorld` - World validation with detailed errors
 
 ### World Components
 - `validateWorldAttribute`
@@ -212,7 +212,7 @@ function isValidWorld(obj: any): boolean {
          typeof obj.name === 'string';
 }
 
-// After - comprehensive validation
+// After - full validation
 import { validateWorld } from '@/lib/utils/typeGuards';
 
 const result = validateWorld(data);

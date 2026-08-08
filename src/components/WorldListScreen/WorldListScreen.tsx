@@ -85,7 +85,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
           ? getUserFriendlyError(err)
           : ({
               title: 'Failed to Load Worlds',
-              message: 'An unexpected error occurred while loading worlds.',
+              message: 'Try refreshing the page.',
               retryable: false,
               type: ErrorType.UNKNOWN,
               severity: 'error',
