@@ -407,8 +407,26 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding-inline-start: var(--space-4);
+  padding: var(--space-4);
   border-inline-start: 2px solid var(--color-border);
+  background: var(--brand-page-wash);
+}
+
+/* ─── Lifting text off the drafting grid ───
+   The register's dot field is coarse on purpose (--pattern-dot-grid-image in
+   _register-brand.css) and it reads correctly in the margins and behind the
+   headings. Under a run of body text it does not, so the blocks that sit bare
+   on it get an opaque canvas patch instead of the grid being thinned for the
+   whole surface.
+
+   Only the bare ones. The typed block, the choice rows and the closing band
+   already carry fills of their own and are deliberately absent here.
+
+   No border, no radius, no shadow: the direction rules out cards, so the only
+   thing this may do visibly is stop the dots. */
+.component-landing-returned {
+  padding: var(--space-4);
+  background: var(--brand-page-wash);
 }
 
 /* Definition list, because that is what this is: two terms with a set each.
@@ -482,6 +500,29 @@
   color: var(--color-text-primary);
 }
 
+/* Sets up the turn before it plays out. Interface font at the smaller step and
+   secondary ink, so it reads as the page explaining itself rather than as a
+   third run of the narrative prose it introduces. */
+.component-landing-decision-note {
+  max-width: var(--page-width-prose);
+  margin: 0 0 var(--space-5);
+
+  /* Washed for the same reason as the runs below it: secondary ink at the
+     small step is the hardest text on the page to read over the grid. */
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  background: var(--brand-page-wash);
+}
+
+/* The heading and its note are one unit, so the note takes the gap the heading
+   would otherwise open under itself. */
+.component-landing-heading:has(+ .component-landing-decision-note) {
+  margin-bottom: var(--space-2);
+}
+
 /* ─── The choices, at scale ─── */
 
 .component-landing-choices {
@@ -550,16 +591,21 @@
   border-radius: var(--radius-sm);
 }
 
+/* The verdict and the prose it bent are one patch, not two. Split washes would
+   put a stripe of grid between a line and the sentence that answers it, which
+   is the one place on the page they must read as continuous. */
 .component-landing-check {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin: 0 0 var(--space-3);
+  margin: 0;
+  padding: var(--space-4) var(--space-4) var(--space-3);
   font-family: var(--font-system);
   font-size: var(--font-size-xs);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
+  background: var(--brand-page-wash);
 }
 
 .component-landing-check-skill {
@@ -574,6 +620,11 @@
 
 .component-landing-consequence {
   max-width: var(--page-width-prose);
+
+  /* No padding-block-start: the check above closes the gap, so the two share
+     one continuous patch. */
+  padding: 0 var(--space-4) var(--space-4);
+  background: var(--brand-page-wash);
 }
 
 /* The sentence the failed check bent. */

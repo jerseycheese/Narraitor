@@ -93,6 +93,17 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
       <div className="component-landing-decision">
         <h2 className="component-landing-heading">And then you have to decide.</h2>
 
+        {/* The block below is four options, a stat line, and prose that answers
+            a check the visitor never saw start. Naming the sequence first is
+            what makes the stat line legible as a verdict rather than a dice
+            roll the page never explains. It stays one line: the exchange above
+            narrates itself with labels, and this is the same device in prose
+            because there are three beats to connect, not one to name. */}
+        <p className="component-landing-decision-note">
+          The option you take is checked against one of those skills. Miss the
+          number, and the story bends to the failure instead of ignoring it.
+        </p>
+
         {/* world.situation is captured but not rendered. It was the passage the
             choices answer, and reading it made them make sense, but it put a
             third block of body prose on a page whose job is fifteen seconds.
