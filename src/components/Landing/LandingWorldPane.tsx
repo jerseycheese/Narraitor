@@ -14,9 +14,10 @@ import type { ShowcaseWorld } from './homepageShowcase.generated';
  * generic dice roll instead of a world the visitor watched get built, and the
  * copy has to gesture at a mechanism it never shows.
  *
- * Everything except `typed` and `caption` is real generated output. Nothing
- * here is trimmed or tidied for length, because the point of the section is
- * that a visitor is reading what the product actually writes.
+ * The player's side of the exchange is authored: `typed`, `caption`, `genre`,
+ * and the character the prose was generated against. Everything else came back
+ * from the model, and none of it is trimmed or tidied for length, because the
+ * point of the section is that a visitor is reading what the product writes.
  *
  * Four of these render into the HTML and CSS shows one, so the page stays a
  * static server component and the world switcher works with JavaScript off.
@@ -45,7 +46,7 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
     >
       <div className="component-landing-exchange">
         <h2 className="component-landing-heading">
-          You wrote this. Everything else came from it.
+          You wrote this. It built the world from it.
         </h2>
         <div className="component-landing-exchange-grid">
           <div className="component-landing-authored">

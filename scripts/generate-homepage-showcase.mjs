@@ -395,16 +395,18 @@ function serialize(entries, model) {
  * Generated: ${new Date().toISOString()}
  * Turns played per world: ${TURNS_BEFORE_CAPTURE} (the last one is what's kept)
  *
- * The typed descriptions and world captions are authored (they stand in for
- * what a player would write). Everything else here came back from the model:
- * the attribute and skill names, the opening prose, the decision and its
- * options, and the consequence. The skill check numbers are a real roll from
- * the production evaluator, rolled until it failed so the page can show a
- * failure honestly.
+ * The player's side of the exchange is authored, standing in for what someone
+ * would bring: the typed description, the world caption, the genre, and the
+ * character the story is played as. Everything else here came back from the
+ * model: the attribute and skill names, the opening prose, the decision and
+ * its options, and the consequence. The skill check numbers are a real roll
+ * from the production evaluator, rolled until it failed so the page can show
+ * a failure honestly.
  *
- * "opening" is turn 1, so it really is what came back from the typed
- * description. The decision, options, check and consequence are turn
- * ${TURNS_BEFORE_CAPTURE}, played forward from it.
+ * The attributes and skills came from the typed description on its own, the
+ * same single-field call the creation wizard makes. "opening" is turn 1,
+ * written from that world plus the authored character. The decision, options,
+ * check and consequence are turn ${TURNS_BEFORE_CAPTURE}, played forward from it.
  */
 
 export interface ShowcaseOption {

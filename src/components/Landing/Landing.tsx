@@ -55,10 +55,15 @@ export default function Landing() {
               skills you review and edit. Calling the whole thing a description
               makes this sound like a prompt box, which is the shape of product
               Narraitor is positioned against. Name the object instead: the
-              repeated "them" is the argument, one thing in three roles. */}
+              repeated "them" is the argument, one thing in three roles.
+
+              No author is named either. The app proposes the attributes and
+              skills from the description and the player keeps or edits them,
+              so neither "you build" nor "it built" is true on its own, and
+              the pane below already says "what it built". */}
           <p className="component-landing-lead">
-            You build the world&apos;s attributes and skills. The story is
-            written from them, and your choices are tested against them.
+            The world you make has attributes and skills. The story is written
+            from them, and your choices are tested against them.
           </p>
           <div className="component-landing-actions">
             <Link href={START_HREF} className="component-landing-cta">
