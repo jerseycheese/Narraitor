@@ -42,4 +42,39 @@ describe('AppSurfaceShell', () => {
       container.querySelector('[data-surface-mode="manuscript"]')
     ).not.toBeNull();
   });
+
+  it.each([
+    ['/about', 'brand'],
+    ['/', 'brand'],
+    ['/worlds', 'product'],
+    ['/dashboard', 'product'],
+  ])('tags %s with the %s register', (pathname, register) => {
+    mockPathname = pathname;
+
+    const { container } = render(
+      <AppSurfaceShell>
+        <p>content</p>
+      </AppSurfaceShell>
+    );
+
+    expect(
+      container.querySelector('[data-surface-mode="app"]')
+    ).toHaveAttribute('data-register', register);
+  });
+
+  // The manuscript surface is chrome-free, so it has no brand/product
+  // distinction to make. Absent, not 'product'.
+  it('leaves the manuscript surface unregistered', () => {
+    mockPathname = '/worlds/world-1/play';
+
+    const { container } = render(
+      <AppSurfaceShell>
+        <p>content</p>
+      </AppSurfaceShell>
+    );
+
+    const surface = container.querySelector('[data-surface-mode="manuscript"]');
+    expect(surface).not.toBeNull();
+    expect(surface?.hasAttribute('data-register')).toBe(false);
+  });
 });

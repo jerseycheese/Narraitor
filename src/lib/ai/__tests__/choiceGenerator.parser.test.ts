@@ -127,6 +127,67 @@ Requirements: [Stealth 5+]
       value: 5,
     });
   });
+
+  // The model sometimes appends the requirement to the option text instead of
+  // putting it on its own line. That form used to survive into option.text and
+  // get read out to the player as "Requirements: Persuasion 3+".
+  it('strips a trailing Requirements phrase from option text', () => {
+    const world = createMockWorld({
+      id: 'world-1',
+      skills: [
+        {
+          id: 'skill-1',
+          worldId: 'world-1',
+          name: 'Persuasion',
+          description: 'Talk people round',
+          difficulty: 'medium',
+          baseValue: 1,
+          minValue: 0,
+          maxValue: 10,
+        },
+      ],
+    });
+
+    const content = `Decision Weight: [minor]
+Context Summary: Silas is guarding the crates.
+Decision: What do you do?
+
+1. [Neutral] Offer Silas a fair trade. Requirements: Persuasion 3+
+2. [Lawful] Walk away`;
+
+    const decision = parseChoiceResponse(content, narrativeContext, world);
+
+    expect(decision.options[0].text).toBe('Offer Silas a fair trade.');
+    expect(decision.options[0].text).not.toMatch(/requirement/i);
+    expect(decision.options[0].requirements?.[0]).toEqual({
+      type: 'skill',
+      targetId: 'skill-1',
+      operator: 'gte',
+      value: 3,
+    });
+  });
+
+  // Choices render as plain text, so emphasis the model writes for a ship name
+  // or a stressed word reaches the player as literal asterisks.
+  it('strips markdown emphasis from option text', () => {
+    const world = createMockWorld({ id: 'world-1', skills: [] });
+
+    const content = `Decision: What do you do?
+
+1. [Neutral] Cross-reference it with the *Stardust*'s manifest.
+2. [Lawful] Tell them what you **really** think.
+3. [Chaotic] Do it _now_.
+4. [Neutral] Wait 2 * 3 minutes, then knock.`;
+
+    const decision = parseChoiceResponse(content, narrativeContext, world);
+    const texts = decision.options.map((option) => option.text);
+
+    expect(texts[0]).toBe("Cross-reference it with the Stardust's manifest.");
+    expect(texts[1]).toBe('Tell them what you really think.');
+    expect(texts[2]).toBe('Do it now.');
+    // A lone asterisk between spaces isn't emphasis and has to survive.
+    expect(texts[3]).toBe('Wait 2 * 3 minutes, then knock.');
+  });
 });
 
 describe('parseChoiceResponse consequences', () => {

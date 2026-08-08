@@ -106,7 +106,7 @@ export const parseChoiceResponse = (
         }
 
         const inlineRequirement = extractInlineSkillRequirement(text);
-        text = inlineRequirement.cleanedText;
+        text = stripEmphasisMarkers(inlineRequirement.cleanedText);
 
         currentOption = {
           id: generateUniqueId('option'),
@@ -372,7 +372,11 @@ const extractInlineSkillRequirement = (
   const inlinePatterns = [
     /\s*\[\s*([^\]]*?\d+\+?)\s*\]\s*$/i,
     /\s*\(\s*([^)]*?\d+\+?)\s*\)\s*$/i,
-    /\s*(?:-|\u2013|\u2014)?\s*(?:requires?|req\.?)\s*[:\-]?\s*([a-z][a-z\s/-]*\s+\d+\+?)\s*$/i,
+    // "Requirements?" comes first: alternation takes the first match, so
+    // `requires?` would otherwise consume "Require" out of "Requirements" and
+    // then fail on the trailing "ments:", leaving the whole phrase in the
+    // option text for the player to read.
+    /\s*(?:-|\u2013|\u2014)?\s*(?:requirements?|requires?|req\.?)\s*[:\-]?\s*([a-z][a-z\s/-]*\s+\d+\+?)\s*$/i,
   ];
 
   for (const pattern of inlinePatterns) {
@@ -388,6 +392,24 @@ const extractInlineSkillRequirement = (
 
   return { cleanedText: text };
 };
+
+/**
+ * Removes markdown emphasis from choice text.
+ *
+ * Choices render as plain text, so a model that writes *Stardust* for emphasis
+ * puts literal asterisks in front of the player. Scoped to option text only:
+ * narrative prose is a separate path and isn't touched here.
+ *
+ * Only paired markers around non-space content are stripped, so an apostrophe
+ * or a lone asterisk in the middle of a sentence survives untouched.
+ */
+const stripEmphasisMarkers = (text: string): string =>
+  text
+    .replace(/\*\*\*(\S(?:.*?\S)?)\*\*\*/g, '$1')
+    .replace(/\*\*(\S(?:.*?\S)?)\*\*/g, '$1')
+    .replace(/\*(\S(?:.*?\S)?)\*/g, '$1')
+    .replace(/__(\S(?:.*?\S)?)__/g, '$1')
+    .replace(/_(\S(?:.*?\S)?)_/g, '$1');
 
 const addSkillRequirement = (
   option: Partial<DecisionOption> & {
