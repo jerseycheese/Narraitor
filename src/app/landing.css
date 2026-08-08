@@ -355,7 +355,11 @@
 
 .component-landing-typed {
   padding: var(--space-5);
-  background: var(--color-text-primary);
+
+  /* Fixed dark in both themes, not the canvas inverted. See the note on
+     --brand-typed-surface in _register-brand.css for why this is not
+     --color-text-primary. */
+  background: var(--brand-typed-surface);
   border-radius: var(--radius-md);
 }
 
@@ -404,9 +408,11 @@
   border-radius: var(--radius-sm);
 }
 
+/* Paired with --brand-typed-surface, so both sides of the contrast are fixed
+   and the block cannot come apart in one theme. */
 .component-landing-typed .component-landing-label,
 .component-landing-typed-text {
-  color: var(--color-text-inverse);
+  color: var(--brand-typed-ink);
 }
 
 .component-landing-typed-text {

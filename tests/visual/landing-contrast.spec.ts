@@ -209,3 +209,104 @@ test.describe('Hero contrast over world art', () => {
     }
   }
 });
+
+/**
+ * Text on solid backgrounds below the hero, in both themes.
+ *
+ * This block exists because the suite above was green while the typed block
+ * measured 1.22:1 in dark mode: white ink on a background that had inverted to
+ * off-white. The hero was covered four ways over and the rest of the page was
+ * covered not at all, so a green run proved less than it looked like it did.
+ *
+ * The failure mode is specific and worth naming, because it is invisible in
+ * light mode and invisible in a screenshot diff: a background token chosen for
+ * the theme (--color-text-primary, which flips) paired with a foreground token
+ * that does not flip. Both halves have to agree about whether they follow the
+ * canvas.
+ *
+ * Computed colours rather than pixel sampling, deliberately. These sit on flat
+ * fills, so there is no compositing to resolve and nothing the source values
+ * fail to describe. The hero needs the screenshot because a photograph is
+ * behind it; this does not.
+ */
+const SOLID_TEXT_RUNS = [
+  '.component-landing-typed-text',
+  '.component-landing-typed .component-landing-label',
+  '.component-landing-choice-mark',
+  '.component-landing-closing-text',
+] as const;
+
+test.describe('Contrast on solid backgrounds', () => {
+  for (const scheme of COLOR_SCHEMES) {
+    test(`page text clears ${CONTRAST_FLOOR}:1 on its own fills (${scheme})`, async ({
+      page,
+    }) => {
+      await openHeroForWorld(page, scheme, HOMEPAGE_SHOWCASE[0].id);
+
+      const measured = await page.evaluate((selectors) => {
+        function parse(value: string): [number, number, number, number] {
+          const parts = (value.match(/[\d.]+/g) ?? []).map(Number);
+          return [parts[0], parts[1], parts[2], parts[3] ?? 1];
+        }
+
+        function over(
+          src: [number, number, number, number],
+          dst: [number, number, number]
+        ): [number, number, number] {
+          return [0, 1, 2].map(
+            (i) => src[i] * src[3] + dst[i] * (1 - src[3])
+          ) as [number, number, number];
+        }
+
+        // --color-accent-soft is a 16% fill, so the nearest painting ancestor
+        // is not what a reader sees. Collect every layer up to the first
+        // opaque one and composite them back down, or the closing band
+        // measures its own alpha against nothing and reports a failure that
+        // is not there.
+        function backdropOf(node: Element): [number, number, number] {
+          const layers: [number, number, number, number][] = [];
+          let current: Element | null = node.parentElement;
+          while (current) {
+            const layer = parse(getComputedStyle(current).backgroundColor);
+            if (layer[3] > 0) {
+              layers.push(layer);
+              if (layer[3] === 1) break;
+            }
+            current = current.parentElement;
+          }
+
+          const base = layers.pop();
+          let composited: [number, number, number] = base
+            ? [base[0], base[1], base[2]]
+            : [255, 255, 255];
+          while (layers.length) composited = over(layers.pop()!, composited);
+          return composited;
+        }
+
+        return selectors.map((selector) => {
+          const element = document.querySelector(selector);
+          if (!element) throw new Error(`no element for ${selector}`);
+          const own = parse(getComputedStyle(element).backgroundColor);
+          const behind = backdropOf(element);
+          const bg = own[3] > 0 ? over(own, behind) : behind;
+          return {
+            selector,
+            fg: over(parse(getComputedStyle(element).color), bg),
+            bg,
+          };
+        });
+      }, SOLID_TEXT_RUNS as unknown as string[]);
+
+      for (const run of measured) {
+        const ratio = contrastRatio(
+          relativeLuminance(run.fg[0], run.fg[1], run.fg[2]),
+          relativeLuminance(run.bg[0], run.bg[1], run.bg[2])
+        );
+        expect(
+          ratio,
+          `${run.selector} in ${scheme}: ${ratio.toFixed(2)}:1`
+        ).toBeGreaterThanOrEqual(CONTRAST_FLOOR);
+      }
+    });
+  }
+});
