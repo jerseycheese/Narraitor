@@ -78,6 +78,24 @@ const tokenize = (text: string): Set<string> =>
       .map(singularize)
   );
 
+const escapeForRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Whether the option says the skill's name outright.
+ *
+ * Matched on word boundaries rather than by length, so a short name like "Chi"
+ * or "Aim" still counts when the option names it - the token threshold below
+ * would throw those away - while "Aim" stays out of "claim".
+ */
+const mentionsFullName = (skillName: string, optionText: string): boolean => {
+  const name = skillName.trim().toLowerCase();
+  if (name === '') {
+    return false;
+  }
+  return new RegExp(`(^|[^a-z0-9])${escapeForRegExp(name)}([^a-z0-9]|$)`).test(optionText);
+};
+
 const countOverlap = (candidates: Set<string>, optionTokens: Set<string>): number => {
   let matches = 0;
   candidates.forEach((token) => {
@@ -93,8 +111,7 @@ const scoreSkill = (
   optionText: string,
   optionTokens: Set<string>
 ): number => {
-  const skillName = skill.name.toLowerCase();
-  if (skillName.length >= MIN_TOKEN_LENGTH && optionText.includes(skillName)) {
+  if (mentionsFullName(skill.name, optionText)) {
     return FULL_NAME_SCORE;
   }
 

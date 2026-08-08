@@ -259,6 +259,60 @@ Options:
       expect(skillRequirementsOf(result.options[2])).toHaveLength(0);
     });
 
+    it('checks a short skill name the option says outright, but not inside a longer word', async () => {
+      const { useWorldStore } = require('@/state/worldStore');
+      (useWorldStore.getState as jest.Mock).mockReturnValue({
+        worlds: {
+          'world-1': {
+            id: 'world-1',
+            name: 'Test World',
+            description: 'A test world for unit tests',
+            genre: 'fantasy',
+            attributes: [],
+            settings: {
+              maxAttributes: 6,
+              maxSkills: 12,
+              attributePointPool: 27,
+              skillPointPool: 40,
+            },
+            skills: [
+              {
+                id: 'skill-chi',
+                worldId: 'world-1',
+                name: 'Chi',
+                description: 'Inner force',
+                difficulty: 'medium',
+                baseValue: 3,
+                minValue: 1,
+                maxValue: 10,
+              },
+            ],
+          },
+        },
+        currentWorldId: 'world-1',
+      });
+
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: `Decision: What will you do?
+
+Options:
+1. Gather your Chi before the next blow
+2. Wait for dawn
+3. File a formal chinstrap complaint`,
+        finishReason: 'STOP',
+      });
+
+      const result = await generateChoices(mockAIClient, {
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      expect(skillRequirementsOf(result.options[0])[0]?.targetId).toBe('skill-chi');
+      expect(skillRequirementsOf(result.options[1])).toHaveLength(0);
+      expect(skillRequirementsOf(result.options[2])).toHaveLength(0);
+    });
+
     it('matches on a skill description when the option never says the name', async () => {
       mockWorldWithSkills();
 
