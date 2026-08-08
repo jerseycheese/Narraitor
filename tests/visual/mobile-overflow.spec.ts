@@ -149,3 +149,50 @@ test.describe('App-Shell Header Mobile Collapse', () => {
     }
   }
 });
+
+/**
+ * Homepage overflow at narrow widths.
+ *
+ * Unlike the header block above, this asserts at the DOCUMENT level. The
+ * homepage's bands cancel .app-surface-inner's padding with a negative inline
+ * margin, so getting the cancel amount wrong pushes the whole document past
+ * the viewport. That is the failure --landing-bleed exists to prevent:
+ * --page-gutter is retuned by the brand register and would over-pull the bands
+ * by 8px at >=1024.
+ *
+ * The element target is .component-landing-plates, NOT .component-landing.
+ * Fieldsets default to min-inline-size: min-content, which ignores the grid and
+ * overflows at 320px, so the plate strip is the one child worth checking
+ * directly. .component-landing itself is legitimately wider than its content
+ * box by exactly one bleed on each side, so asserting on it would fail on
+ * correct markup.
+ *
+ * Deliberately NOT seeded. seedTestData writes worlds into local storage, and
+ * ReturningUserRedirect soft-navigates any browser with persisted data off /
+ * to /dashboard, so a seeded run would measure the dashboard and pass green
+ * without ever loading the homepage.
+ */
+test.describe('Homepage Mobile Overflow', () => {
+  const theme = 'ds3';
+  const homeViewports = [
+    { name: 'narrow-mobile', width: 320, height: 568 },
+    { name: 'mobile', width: 375, height: 667 },
+  ] as const;
+
+  for (const viewport of homeViewports) {
+    test(`homepage has no horizontal overflow at ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+
+      await page.goto('/');
+      await page.waitForSelector('.component-landing-hero', { timeout: 15000 });
+      await expect(page.locator('.component-landing-plates')).toBeVisible();
+
+      await expectNoHorizontalOverflow(
+        page,
+        theme,
+        viewport.width,
+        '.component-landing-plates'
+      );
+    });
+  }
+});
