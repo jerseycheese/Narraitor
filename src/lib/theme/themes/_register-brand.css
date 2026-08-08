@@ -50,8 +50,19 @@
   /* Same 24px tile (hard-coded in app-shell.css, not tokenized) with a
      larger, darker dot, so the brand field reads as drafting paper rather
      than the app's fine engineering grid. Hard edge at a single radius,
-     matching the base token's idiom. */
+     matching the base token's idiom.
+
+     This is deliberately NOT thinned to fix readability under body text. The
+     grid reads correctly in the margins and behind the headings, and the
+     blocks that were hard to read are the ones sitting bare on it. Those
+     carry --brand-page-wash instead, so the fix is local to the problem. */
   --pattern-dot-grid-image: radial-gradient(circle, rgb(42 35 28 / 26%) 1.5px, transparent 1.5px);
+
+  /* The opaque patch that lifts a run of text off the grid. Canvas-coloured
+     and edgeless on purpose: the direction rules out cards, so this has to
+     read as clean paper under the writing rather than a panel over it. The
+     only visible effect is the dots stopping. */
+  --brand-page-wash: var(--color-canvas);
 
   /* ── Hero: text laid over photography ──────────────────────────────
      These are the one group in this file with NO :root.dark variant, and
@@ -92,6 +103,22 @@
   --brand-hero-scrim-base: rgb(18 15 12 / 22%);
   --brand-hero-scrim-text: rgb(18 15 12 / 68%);
   --brand-hero-scrim-clear: rgb(18 15 12 / 0%);
+
+  /* ── The typed block ───────────────────────────────────────────────
+     Same category as the hero inks above, and no :root.dark variant for the
+     same reason: the direction calls for a dark block holding the handful of
+     words someone typed, so it is dark in both themes by definition. It is
+     not a surface that follows the canvas.
+
+     It used to reach for --color-text-primary as a background, which flips
+     from near-black to near-white between themes, against a foreground that
+     does not flip. Light mode worked by luck. Dark mode measured 1.22:1,
+     white on off-white, and shipped that way. A token whose value is chosen
+     for the theme cannot back a foreground that is fixed.
+
+     15.49:1, identical in both themes because both values are. */
+  --brand-typed-surface: rgb(42 35 28);
+  --brand-typed-ink: rgb(255 255 255);
 }
 
 @media (width >= 1024px) {

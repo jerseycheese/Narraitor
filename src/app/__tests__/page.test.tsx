@@ -48,7 +48,7 @@ describe('HomePage entry decision (#1528)', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: /play a story in any world/i,
+        name: /answers to the world you built/i,
       })
     ).toBeInTheDocument();
     expect(mockReplace).not.toHaveBeenCalled();

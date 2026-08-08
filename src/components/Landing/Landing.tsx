@@ -20,7 +20,12 @@ import { HOMEPAGE_SHOWCASE } from './homepageShowcase.generated';
 
 const GEMINI_KEY_URL = 'https://aistudio.google.com/apikey';
 const START_HREF = '/worlds/create';
-const START_LABEL = 'Start your story';
+/* "Build your world", not "Start your story". The button opens a five-step
+   wizard whose first screen asks for a genre, so promising the story is the
+   same overstatement the hero copy already had to walk back, one level down.
+   It also sells the wizard as the payoff rather than the tollbooth, which is
+   what the whole page below has spent its length arguing. */
+const START_LABEL = 'Build your world';
 
 export default function Landing() {
   return (
@@ -48,7 +53,7 @@ export default function Landing() {
 
         <div className="component-landing-band-inner component-landing-hero-copy">
           <h1 id="landing-hero-heading" className="component-landing-title">
-            Play a story in any world you can imagine
+            Play a story that answers to the world you built
           </h1>
           {/* Not "you describe the world". Describing it is one step of five,
               and the other four turn that description into attributes and
@@ -60,10 +65,16 @@ export default function Landing() {
               No author is named either. The app proposes the attributes and
               skills from the description and the player keeps or edits them,
               so neither "you build" nor "it built" is true on its own, and
-              the pane below already says "what it built". */}
+              the pane below already says "what it built".
+
+              "That world" leans on the headline for ownership so the sentence
+              can open on the mechanism instead of restating whose world it
+              is. The headline earns that: "answers to" is the differentiator,
+              a story bound by rules it did not choose, and the lead is where
+              the binding gets named. */}
           <p className="component-landing-lead">
-            The world you make has attributes and skills. The story is written
-            from them, and your choices are tested against them.
+            That world has attributes and skills. The story is written from
+            them, and your choices are tested against them.
           </p>
           <div className="component-landing-actions">
             <Link href={START_HREF} className="component-landing-cta">
@@ -130,8 +141,8 @@ export default function Landing() {
       >
         <div className="component-landing-band-inner component-landing-closing-inner">
           <h2 id="landing-closing-heading" className="component-landing-closing-text">
-            Bring your own Google Gemini key. It takes about two minutes to set
-            up, it stays in your browser, and there is no account to make.
+            Bring your own Google Gemini key. About two minutes to set up. It
+            stays in your browser, and there&apos;s no account to make.
           </h2>
           <div className="component-landing-actions">
             <Link href={START_HREF} className="component-landing-cta">

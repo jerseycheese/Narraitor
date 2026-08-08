@@ -76,4 +76,67 @@ test.describe('Landing page rendering', () => {
       'landing-ds3-normandy.png'
     );
   });
+
+  // The accent mark under the selected plate is one rule that travels, so its
+  // resting position is computed from a column width and a gap rather than
+  // drawn on the element it belongs to. Geometry is the only thing that proves
+  // it landed: the CSS can be present and correct-looking while the mark sits
+  // under the wrong world. Screenshots can't catch it either, since a mark
+  // under plate 2 and a mark under plate 3 are both just a blue bar.
+  test('the selected plate mark lands on the plate it belongs to', async ({
+    page,
+  }) => {
+    await gotoLanding(page);
+
+    for (const world of [
+      'port-city',
+      'survey-ship',
+      'normandy',
+      'debt-court',
+    ]) {
+      await page.locator(`label[for="landing-world-${world}"]`).click();
+
+      // The mark is a pseudo-element, so it has no box to measure and its
+      // translate computes to a literal calc() string. A probe of the same
+      // width carrying the same translate makes the browser resolve that calc
+      // into a real position, which is the thing worth asserting.
+      const measured = await page.evaluate(() => {
+        const plates = document.querySelector('.component-landing-plates');
+        if (!plates) throw new Error('plate strip missing');
+
+        const mark = getComputedStyle(plates, '::after');
+        const probe = document.createElement('div');
+        probe.style.position = 'absolute';
+        probe.style.insetInlineStart = '0';
+        probe.style.insetBlockEnd = '0';
+        probe.style.blockSize = '1px';
+        probe.style.inlineSize = mark.inlineSize;
+        probe.style.translate = mark.translate;
+        plates.appendChild(probe);
+
+        const stripLeft = plates.getBoundingClientRect().left;
+        const probeBox = probe.getBoundingClientRect();
+        const result = {
+          markLeft: probeBox.left - stripLeft,
+          markWidth: probeBox.width,
+          selectedLabelLeft: 0,
+          selectedLabelWidth: 0,
+        };
+
+        const selectedLabel = plates.querySelector(
+          '.component-landing-plate-input:checked + .component-landing-plate-label'
+        );
+        if (!selectedLabel) throw new Error('no plate is selected');
+        const labelBox = selectedLabel.getBoundingClientRect();
+        result.selectedLabelLeft = labelBox.left - stripLeft;
+        result.selectedLabelWidth = labelBox.width;
+
+        probe.remove();
+        return result;
+      });
+
+      expect(measured.markWidth).toBeCloseTo(measured.selectedLabelWidth, 0);
+      expect(measured.markLeft).toBeCloseTo(measured.selectedLabelLeft, 0);
+    }
+  });
 });
