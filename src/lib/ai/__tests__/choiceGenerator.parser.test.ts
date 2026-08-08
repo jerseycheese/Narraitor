@@ -127,6 +127,45 @@ Requirements: [Stealth 5+]
       value: 5,
     });
   });
+
+  // The model sometimes appends the requirement to the option text instead of
+  // putting it on its own line. That form used to survive into option.text and
+  // get read out to the player as "Requirements: Persuasion 3+".
+  it('strips a trailing Requirements phrase from option text', () => {
+    const world = createMockWorld({
+      id: 'world-1',
+      skills: [
+        {
+          id: 'skill-1',
+          worldId: 'world-1',
+          name: 'Persuasion',
+          description: 'Talk people round',
+          difficulty: 'medium',
+          baseValue: 1,
+          minValue: 0,
+          maxValue: 10,
+        },
+      ],
+    });
+
+    const content = `Decision Weight: [minor]
+Context Summary: Silas is guarding the crates.
+Decision: What do you do?
+
+1. [Neutral] Offer Silas a fair trade. Requirements: Persuasion 3+
+2. [Lawful] Walk away`;
+
+    const decision = parseChoiceResponse(content, narrativeContext, world);
+
+    expect(decision.options[0].text).toBe('Offer Silas a fair trade.');
+    expect(decision.options[0].text).not.toMatch(/requirement/i);
+    expect(decision.options[0].requirements?.[0]).toEqual({
+      type: 'skill',
+      targetId: 'skill-1',
+      operator: 'gte',
+      value: 3,
+    });
+  });
 });
 
 describe('parseChoiceResponse consequences', () => {

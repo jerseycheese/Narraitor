@@ -372,7 +372,11 @@ const extractInlineSkillRequirement = (
   const inlinePatterns = [
     /\s*\[\s*([^\]]*?\d+\+?)\s*\]\s*$/i,
     /\s*\(\s*([^)]*?\d+\+?)\s*\)\s*$/i,
-    /\s*(?:-|\u2013|\u2014)?\s*(?:requires?|req\.?)\s*[:\-]?\s*([a-z][a-z\s/-]*\s+\d+\+?)\s*$/i,
+    // "Requirements?" comes first: alternation takes the first match, so
+    // `requires?` would otherwise consume "Require" out of "Requirements" and
+    // then fail on the trailing "ments:", leaving the whole phrase in the
+    // option text for the player to read.
+    /\s*(?:-|\u2013|\u2014)?\s*(?:requirements?|requires?|req\.?)\s*[:\-]?\s*([a-z][a-z\s/-]*\s+\d+\+?)\s*$/i,
   ];
 
   for (const pattern of inlinePatterns) {
