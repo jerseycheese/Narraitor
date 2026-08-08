@@ -59,7 +59,8 @@ const fontVariables = [
   dmSans.variable,
 ].join(' ');
 
-const SITE_TITLE = 'Narraitor — play a story in any world you can imagine';
+const SITE_TITLE =
+  'Narraitor: play a story that answers to the world you built';
 const SITE_DESCRIPTION =
   'Build a world, create a character, and make the choices that steer the story. A solo role-playing game that runs in your browser.';
 

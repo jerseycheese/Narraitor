@@ -36,14 +36,14 @@ describe('Landing page', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: /play a story in any world/i,
+        name: /answers to the world you built/i,
       })
     ).toBeInTheDocument();
 
     // Two of them on purpose, the hero and the closing band. The CTAs used to
     // disagree about both verb and destination, so the point of the count is
     // that both now say the same thing and go the same place.
-    const ctas = screen.getAllByRole('link', { name: 'Start your story' });
+    const ctas = screen.getAllByRole('link', { name: 'Build your world' });
     expect(ctas).toHaveLength(2);
     ctas.forEach((cta) => expect(cta).toHaveAttribute('href', START_HREF));
   });

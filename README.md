@@ -1,6 +1,6 @@
 # Narraitor
 
-Play a story in any world you can imagine. Build a setting, create a character, and make the choices that steer what happens. Your decisions get tested against your character's skills, so what happens next is earned.
+Play a story that answers to the world you built. Define a setting, create a character, and make the choices that steer what happens. Your decisions get tested against your character's skills, so what happens next is earned.
 
 **[Play it at narraitor-six.vercel.app](https://narraitor-six.vercel.app/)**. No account, runs in your browser, on a Google Gemini key you bring.
 
@@ -47,7 +47,7 @@ npm install
 npm run dev
 ```
 
-That's it. The app comes up on `localhost:3000` at the landing page, and **Start your story** takes you into world creation.
+That's it. The app comes up on `localhost:3000` at the landing page, and **Build your world** starts the wizard.
 
 If you'd rather use a server-side key than go through the provider settings screen (handy locally so you're not re-entering it), copy `.env.example` to `.env.local` and set `GEMINI_API_KEY`. That's a fallback for local work only; in normal use the player's own key wins.
 

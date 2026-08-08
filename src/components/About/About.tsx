@@ -40,10 +40,11 @@ export default function About() {
             About Narraitor
           </h1>
           <p className="component-about-lead">
-            Narraitor is a solo role-playing game you play in any world you can
-            describe. Pick a setting, create a character with real strengths and
-            weaknesses, and make the choices that steer the story. It adapts to
-            what you do, and your character’s skills decide how far you get.
+            Narraitor is a solo role-playing game where the story answers to the
+            world you built. Define a setting, create a character with real
+            strengths and weaknesses, and make the choices that steer the story.
+            It adapts to what you do, and your character’s skills decide how far
+            you get.
           </p>
           <div className="component-about-hero-visual">
             <Image

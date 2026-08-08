@@ -6,8 +6,9 @@ import { ImageResponse } from 'next/og';
  * Branded share card (#1636). Inherited by every route unless that route
  * declares its own `openGraph` block — see the comment in layout.tsx.
  *
- * The mark carries the card, not artwork from a sample world: the pitch is any
- * world you can imagine, and leading with one genre's art argues against it.
+ * The mark carries the card, not artwork from a sample world: the pitch is that
+ * the story is bound by whichever world you built, so leading with one genre's
+ * art puts a setting the reader did not choose in the claim's place.
  * Words stay down to a wordmark and one line, since anything set as pixels here
  * is unreadable to anyone relying on the `alt` export below.
  *
@@ -34,7 +35,7 @@ const logoMark = (() => {
 })();
 
 export const alt =
-  'Narraitor — the quill-and-book logo on aged paper, with the line "a solo role-playing game in any world you can imagine"';
+  'Narraitor: the quill-and-book logo on aged paper, with the line "a solo role-playing game, your world sets the rules"';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -82,7 +83,7 @@ export default function OpengraphImage() {
             <div style={{ display: 'flex', width: 96, height: 5, backgroundColor: ACCENT, marginTop: 28 }} />
 
             <div style={{ display: 'flex', fontSize: 30, color: SECONDARY, marginTop: 28 }}>
-              A solo role-playing game in any world you can imagine
+              A solo role-playing game. Your world sets the rules.
             </div>
           </div>
         </div>
