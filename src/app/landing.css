@@ -362,18 +362,24 @@
   line-height: 1.6;
 }
 
+/* One step up from the app's narrative default, and the reason is measure
+   rather than emphasis. --page-width-prose is 768px, which at the base size
+   runs 99 characters a line, well past the comfortable range and past the
+   ~96 that already reads as a legibility failure on /about. The same column
+   at this size lands near 79. Bigger type in a fixed column is what narrows
+   the measure; capping the width further would leave a short ragged block
+   floating in a wide one.
+
+   It steps back down below 640, where the column is the viewport rather than
+   the cap and the same size overshoots to about 36 characters. Measure is the
+   thing being tuned here, not size, so the size follows the column. */
 .component-landing-prose {
+  max-width: var(--page-width-prose);
   margin: 0;
   font-family: var(--font-narrative);
-  font-size: var(--font-size-base);
-  line-height: 1.65;
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
   color: var(--color-text-primary);
-}
-
-.component-landing-situation {
-  max-width: var(--page-width-prose);
-  margin-bottom: var(--space-5);
-  color: var(--color-text-secondary);
 }
 
 /* ─── The choices, at scale ─── */
@@ -409,10 +415,23 @@
   background: var(--color-accent-soft);
 }
 
+/* The choices are meant to be the largest thing on the page below the
+   headline, and at the section-heading size they read as one more paragraph
+   in a stack of paragraphs. Two steps, both on the scale: 30px where there is
+   room, 24px narrow, where four options at 30 would each wrap to three lines
+   and undo the height work. The in-between 28 that this averages out to is
+   not a step, and this file is not the place to add one. */
 .component-landing-choice-text {
   font-family: var(--font-narrative);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-2xl);
+  line-height: 1.3;
   color: var(--color-text-primary);
+}
+
+@media (width < 640px) {
+  .component-landing-choice-text {
+    font-size: var(--font-size-xl);
+  }
 }
 
 .component-landing-choice-taken .component-landing-choice-text {
@@ -581,8 +600,11 @@
     padding: var(--space-4);
   }
 
-  .component-landing-situation {
-    margin-bottom: var(--space-4);
+  /* See the note on .component-landing-prose: at this width the viewport caps
+     the line, so the larger size overshoots to a ~36 character measure. */
+  .component-landing-prose {
+    font-size: var(--font-size-base);
+    line-height: 1.65;
   }
 
   .component-landing-choices {

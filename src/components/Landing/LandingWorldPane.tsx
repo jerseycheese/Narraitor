@@ -51,10 +51,11 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
 
       <div className="component-landing-decision">
         <h2 className="component-landing-heading">And then you have to decide.</h2>
-        <p className="component-landing-prose component-landing-situation">
-          {world.situation}
-        </p>
 
+        {/* world.situation is captured but not rendered. It was the passage the
+            choices answer, and reading it made them make sense, but it put a
+            third block of body prose on a page whose job is fifteen seconds.
+            The choices carry themselves at this size. */}
         <ol className="component-landing-choices">
           {world.options.map((option) => (
             <li
