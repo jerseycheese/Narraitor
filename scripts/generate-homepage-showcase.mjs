@@ -111,7 +111,7 @@ async function bundleProductionModules() {
       "export { getNarrativeTemplate } from '@/lib/promptTemplates/narrativeTemplateManager';",
       "export { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';",
       "export { parseChoiceResponse } from '@/lib/ai/choiceGenerator.parser';",
-      "export { ensureSkillChecksForAllOptions } from '@/lib/ai/choiceGenerator';",
+      "export { attachSkillChecksWhereRelevant } from '@/lib/ai/choiceGenerator';",
       "export { parseJsonFromLLM } from '@/lib/ai/parseJSON';",
     ].join('\n')
   );
@@ -178,31 +178,44 @@ function rollUntilFailure(evaluateSkillCheck, character, skillCheck, worldSkills
 }
 
 /**
- * The skill a choice actually leans on, taken from the requirement the model
- * tagged it with. Checking an unrelated skill is what made the first pass read
- * as nonsense: a choice about hand signals resolved against Rifle Marksmanship.
- */
-/**
- * The skill the taken option is checked against.
+ * The skill the option is checked against, or null when it carries no check.
  *
- * No fallback on purpose. Callers run the options through the production
- * ensureSkillChecksForAllOptions first, which guarantees a resolvable skill
- * requirement on every option, so a miss here means that step was skipped or
- * the world's skills don't match the parser's. Both are bugs worth stopping
- * for. The previous version returned worldSkills[0] instead, which is how the
- * homepage came to show "cut power to external sensors" checked against
- * Navigation: the first skill in the list, related to nothing.
+ * A choice about hand signals resolved against Rifle Marksmanship is what made
+ * the first pass read as nonsense, so nothing here invents a skill: the answer
+ * comes from the requirement the option actually carries, and an option with no
+ * requirement honestly has no check.
  */
 function skillForOption(option, worldSkills) {
   const requirement = (option.requirements || []).find((req) => req.type === 'skill');
-  const matched = requirement && worldSkills.find((skill) => skill.id === requirement.targetId);
-  if (!matched) {
+  if (!requirement) {
+    return null;
+  }
+  return worldSkills.find((skill) => skill.id === requirement.targetId) || null;
+}
+
+/**
+ * Which option the showcase plays.
+ *
+ * The page shows the check by name, so the option has to be one a world skill
+ * genuinely speaks to. Option 2 reads best against the opening, so it wins when
+ * it carries a check; otherwise the first checked option does. If nothing
+ * carries a check there is no honest check to print, and stopping beats
+ * reaching for an arbitrary skill - the whole point of this evidence.
+ */
+function pickTakenIndex(options, worldSkills) {
+  const preferred = Math.min(1, options.length - 1);
+  if (skillForOption(options[preferred], worldSkills)) {
+    return preferred;
+  }
+
+  const firstChecked = options.findIndex((option) => skillForOption(option, worldSkills));
+  if (firstChecked === -1) {
     throw new Error(
-      `No resolvable skill requirement on the taken option: "${option.text}". ` +
-        `Requirements: ${JSON.stringify(option.requirements || [])}`
+      'No option carries a resolvable skill check, so there is nothing honest to show. ' +
+        `Options: ${JSON.stringify(options.map((option) => option.text))}`
     );
   }
-  return matched;
+  return firstChecked;
 }
 
 /** The situation line the app builds after a choice resolves against a check. */
@@ -220,7 +233,7 @@ async function buildOne(world, ctx) {
     getNarrativeTemplate,
     evaluateSkillCheck,
     parseChoiceResponse,
-    ensureSkillChecksForAllOptions,
+    attachSkillChecksWhereRelevant,
     parseJsonFromLLM,
   } = prod;
 
@@ -295,10 +308,11 @@ async function buildOne(world, ctx) {
     });
     const choiceRaw = await post(port, '/api/narrative/choices', { prompt: choicePrompt, config: { maxTokens: 1024, temperature: 0.7 } }, apiKey);
     // The app never uses a parsed decision raw: generateChoices runs it through
-    // ensureSkillChecksForAllOptions, which fills in a skill requirement from the
-    // option's own text whenever the model left one out. Skipping that step here
-    // is what made the homepage's checks drift from the app's.
-    const decision = ensureSkillChecksForAllOptions(
+    // attachSkillChecksWhereRelevant, which drops requirements this world can't
+    // resolve and fills in a check when the option's own words point at a skill.
+    // Skipping that step here is what made the homepage's checks drift from the
+    // app's.
+    const decision = attachSkillChecksWhereRelevant(
       parseChoiceResponse(
         choiceRaw.content,
         { recentSegments, currentLocation: world.caption },
@@ -312,7 +326,7 @@ async function buildOne(world, ctx) {
     // The roll is local, the same way production does it. Only the captured turn
     // is forced to fail, so the page shows a real failure without the turns
     // leading up to it being rigged.
-    const takenIndex = Math.min(1, options.length - 1);
+    const takenIndex = pickTakenIndex(options, worldSkills);
     const taken = options[takenIndex];
     const checkSkill = skillForOption(taken, worldSkills);
     const skillCheck = { skillId: checkSkill.id, skillName: checkSkill.name, difficulty: 6 };

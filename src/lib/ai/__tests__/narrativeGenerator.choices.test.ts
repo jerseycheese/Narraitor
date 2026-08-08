@@ -135,10 +135,13 @@ describe('NarrativeGenerator - Player Choices', () => {
       expect(result.options[0].text).toBe("Investigate further");
       expect(result.options[1].text).toBe("Talk to nearby characters");
       expect(result.options[2].text).toBe("Move to a new location");
+      // The emergency fallback options are generic on purpose, so they carry no
+      // skill check: a named check nothing in the option asked for is worse
+      // than no roll at all.
       result.options.forEach((option) => {
         const skillRequirements =
           option.requirements?.filter((req) => req.type === 'skill') ?? [];
-        expect(skillRequirements.length).toBeGreaterThan(0);
+        expect(skillRequirements).toHaveLength(0);
       });
       expect(result.id).toMatch(/^decision-fallback-\d+$/);
     });

@@ -113,13 +113,12 @@ REQUIREMENTS:
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
-SKILL REQUIREMENTS (CRITICAL FOR MVP):
-Generate choices with skill requirements only when the situation naturally calls for specialized abilities AND the skill exists in the "AVAILABLE SKILLS" list:
+SKILL REQUIREMENTS (CRITICAL):
+Name the skill an option would actually test whenever one of the "AVAILABLE SKILLS" fits the action. You are the only step that can tell what a choice leans on: an option you leave untagged is played with no check at all.
 - ONLY use the exact skill names from the "AVAILABLE SKILLS" list provided above.
 - NEVER invent new skills or use generic skills (like "Stealth", "Persuasion", "Athletics", etc.) unless they are explicitly listed in the "AVAILABLE SKILLS" for this world.
 - If NO "AVAILABLE SKILLS" are listed for this world, do NOT include any "Requirements:" lines in your options.
-- Analyze the current scene for opportunities where the provided world skills would logically apply.
-- Include a mix of skill-required and non-skill choices for player agency
+- If nothing in the list is what the action tests, leave the requirement off rather than reaching for the nearest name. A wrong skill is worse than no skill.
 - Vary skill requirements across choices - use different character abilities when possible
 - Format skill requirements as: Requirements: SkillName X+
 

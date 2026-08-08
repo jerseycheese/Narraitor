@@ -10,6 +10,7 @@ import { logger } from '@/lib/utils/logger';
 import { buildChoicePrompt } from './choiceGenerator.prompt';
 import { parseChoiceResponse, applyAlignmentConsequences, type KnownNpc } from './choiceGenerator.parser';
 import { generateFallbackChoices } from './choiceGenerator.fallback';
+import { matchSkillToOption } from './choiceGenerator.skillMatch';
 import { createRequestBudget, recordRequestCalibration } from './narrativeGenerator.budget';
 
 /**
@@ -63,7 +64,7 @@ export async function generateChoices(
 
     if (!response?.content || safeTrim(response?.content ?? '') === '') {
       const fallbackDecision = generateFallbackChoices(world, narrativeContext);
-      return applyAlignmentConsequences(ensureSkillChecksForAllOptions(fallbackDecision, world));
+      return applyAlignmentConsequences(attachSkillChecksWhereRelevant(fallbackDecision, world));
     }
 
     const decision = parseChoiceResponse(response.content, narrativeContext, world, getKnownNpcs(worldId));
@@ -93,7 +94,7 @@ export async function generateChoices(
       decision.options = decision.options.slice(0, maxOptions);
     }
 
-    return applyAlignmentConsequences(ensureSkillChecksForAllOptions(decision, world));
+    return applyAlignmentConsequences(attachSkillChecksWhereRelevant(decision, world));
   } catch (error) {
     const errorDetails = {
       error: error instanceof Error ? error.message : String(error),
@@ -109,7 +110,7 @@ export async function generateChoices(
 
     const world = getWorld(params.worldId);
     const fallbackDecision = generateFallbackChoices(world, params.narrativeContext);
-    return applyAlignmentConsequences(ensureSkillChecksForAllOptions(fallbackDecision, world));
+    return applyAlignmentConsequences(attachSkillChecksWhereRelevant(fallbackDecision, world));
   }
 }
 
@@ -144,92 +145,66 @@ const getWorld = (worldId: string): World => {
 };
 
 /**
- * Guarantees every option carries a resolvable skill requirement, inventing one
- * from the option's own text when the model didn't supply it.
+ * Attaches a skill check to the options whose own words point at one of the
+ * world's skills, and leaves the rest unchecked.
+ *
+ * Two deliberate rules:
+ * - An option only gets a check when its text or hint matches a skill's name or
+ *   description. Options that match nothing carry no check. Naming a skill the
+ *   action never implied, and then telling the player that skill is why they
+ *   failed, is worse than rolling nothing.
+ * - Skill requirements that arrive on an option are kept only when they resolve
+ *   to a skill this world has. An unresolvable target is an automatic critical
+ *   failure in evaluateSkillCheck, which reads to the player as a rigged loss.
  *
  * Exported for scripts/generate-homepage-showcase.mjs, which bundles the real
  * generation chain rather than reimplementing it. Anything that reimplements
  * this drifts: the homepage's first pass hand-rolled the same step and shipped
  * a skill nothing in the option had to do with.
  */
-export const ensureSkillChecksForAllOptions = (
+export const attachSkillChecksWhereRelevant = (
   decision: Decision,
   world: World
 ): Decision => {
   const worldSkills = world.skills ?? [];
 
-  decision.options = decision.options.map((option, index) => {
-    const hasSkillRequirement =
-      option.requirements?.some((requirement) => requirement.type === 'skill') ??
-      false;
+  decision.options = decision.options.map((option) => {
+    const resolvable = option.requirements?.filter(
+      (requirement) =>
+        requirement.type !== 'skill' ||
+        worldSkills.some((skill) => skill.id === requirement.targetId)
+    );
 
-    if (hasSkillRequirement) {
-      return option;
+    if (resolvable?.some((requirement) => requirement.type === 'skill')) {
+      return { ...option, requirements: resolvable };
     }
 
-    const skillRequirement = createFallbackSkillRequirement(
-      option.text,
-      option.hint,
-      worldSkills,
-      index
-    );
+    const matchedSkill = matchSkillToOption(option.text, option.hint, worldSkills);
+
+    if (!matchedSkill) {
+      return resolvable ? { ...option, requirements: resolvable } : option;
+    }
 
     return {
       ...option,
-      requirements: [...(option.requirements ?? []), skillRequirement],
+      requirements: [
+        ...(resolvable ?? []),
+        buildSkillRequirement(matchedSkill),
+      ],
     };
   });
 
   return decision;
 };
 
-const createFallbackSkillRequirement = (
-  optionText: string,
-  optionHint: string | undefined,
-  worldSkills: World['skills'],
-  optionIndex: number
-): DecisionRequirement => {
-  if (worldSkills.length === 0) {
-    return {
-      type: 'skill',
-      targetId: 'generic-skill-check',
-      operator: 'gte',
-      value: 1,
-    };
-  }
-
-  const selectedSkill = selectSkillForOption(
-    optionText,
-    optionHint,
-    worldSkills,
-    optionIndex
-  );
-  const requiredLevel = getRequiredSkillLevel(selectedSkill);
-  return {
-    type: 'skill',
-    targetId: selectedSkill.id,
-    operator: 'gte',
-    value: requiredLevel,
-  };
-};
-
-const selectSkillForOption = (
-  optionText: string,
-  optionHint: string | undefined,
-  worldSkills: World['skills'],
-  optionIndex: number
-): World['skills'][number] => {
-  const combinedText = `${optionText} ${optionHint ?? ''}`.toLowerCase();
-  const skillMention = worldSkills.find((skill) =>
-    combinedText.includes(skill.name.toLowerCase())
-  );
-
-  if (skillMention) {
-    return skillMention;
-  }
-
-  return worldSkills[optionIndex % worldSkills.length];
-};
+const buildSkillRequirement = (
+  skill: World['skills'][number]
+): DecisionRequirement => ({
+  type: 'skill',
+  targetId: skill.id,
+  operator: 'gte',
+  value: getRequiredSkillLevel(skill),
+});
 
 const getRequiredSkillLevel = (skill: World['skills'][number]): number => {
   const minValue = Number.isFinite(skill.minValue) ? skill.minValue : 1;

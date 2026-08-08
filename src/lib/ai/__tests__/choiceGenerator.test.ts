@@ -1,7 +1,7 @@
 import { generateChoices } from '../choiceGenerator';
 import { AIClient } from '../types';
 import { EntityID } from '@/types/common.types';
-import { NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
+import { DecisionOption, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the AIClient
@@ -159,7 +159,9 @@ describe('ChoiceGenerator', () => {
       expect(result.prompt).toBeTruthy();
     });
 
-    it('ensures every returned option has a skill requirement', async () => {
+    // Skills in a fixed order, so an option-index assignment would be visible:
+    // index 0 is Stealth, index 1 is Arcana.
+    const mockWorldWithSkills = () => {
       const { useWorldStore } = require('@/state/worldStore');
       (useWorldStore.getState as jest.Mock).mockReturnValue({
         worlds: {
@@ -187,10 +189,10 @@ describe('ChoiceGenerator', () => {
                 maxValue: 10,
               },
               {
-                id: 'skill-magic',
+                id: 'skill-arcana',
                 worldId: 'world-1',
-                name: 'Magic',
-                description: 'Arcane knowledge',
+                name: 'Arcana',
+                description: 'Reading runes and warding sigils',
                 difficulty: 'hard',
                 baseValue: 3,
                 minValue: 1,
@@ -201,14 +203,21 @@ describe('ChoiceGenerator', () => {
         },
         currentWorldId: 'world-1',
       });
+    };
+
+    const skillRequirementsOf = (option: DecisionOption) =>
+      option.requirements?.filter((req) => req.type === 'skill') ?? [];
+
+    it('leaves an option unchecked when nothing in it points at a skill', async () => {
+      mockWorldWithSkills();
 
       mockAIClient.generateContent.mockResolvedValueOnce({
         content: `Decision: What will you do?
-        
+
 Options:
-1. Move quietly through the trees
-2. Search the nearby ruins
-3. Signal your allies from cover`,
+1. Follow the river north
+2. Wait for dawn
+3. Knock on the heavy door`,
         finishReason: 'STOP',
       });
 
@@ -220,13 +229,83 @@ Options:
 
       expect(result.options.length).toBe(3);
       result.options.forEach((option) => {
-        const skillRequirements =
-          option.requirements?.filter((req) => req.type === 'skill') ?? [];
-        expect(skillRequirements.length).toBeGreaterThan(0);
+        expect(skillRequirementsOf(option)).toHaveLength(0);
       });
     });
 
-    it('ensures every returned option has a skill requirement when world has no skills', async () => {
+    it('checks the skill an option names, wherever that option sits in the list', async () => {
+      mockWorldWithSkills();
+
+      // Stealth is skills[0] and this is options[1], so a positional
+      // assignment would resolve it against Arcana instead.
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: `Decision: What will you do?
+
+Options:
+1. Wait for dawn
+2. Cross the courtyard on Stealth alone
+3. Knock on the heavy door`,
+        finishReason: 'STOP',
+      });
+
+      const result = await generateChoices(mockAIClient, {
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      expect(skillRequirementsOf(result.options[1])[0]?.targetId).toBe('skill-stealth');
+      expect(skillRequirementsOf(result.options[0])).toHaveLength(0);
+      expect(skillRequirementsOf(result.options[2])).toHaveLength(0);
+    });
+
+    it('matches on a skill description when the option never says the name', async () => {
+      mockWorldWithSkills();
+
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: `Decision: What will you do?
+
+Options:
+1. Wait for dawn
+2. Follow the river north
+3. Study the runes and sigils above the door`,
+        finishReason: 'STOP',
+      });
+
+      const result = await generateChoices(mockAIClient, {
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      expect(skillRequirementsOf(result.options[2])[0]?.targetId).toBe('skill-arcana');
+    });
+
+    it('drops a skill requirement this world cannot resolve', async () => {
+      mockWorldWithSkills();
+
+      // Empty content routes through generateFallbackChoices, whose genre
+      // options carry hardcoded skill ids no generated world has.
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: '',
+        finishReason: 'STOP',
+      });
+
+      const result = await generateChoices(mockAIClient, {
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      const worldSkillIds = ['skill-stealth', 'skill-arcana'];
+      result.options.forEach((option) => {
+        skillRequirementsOf(option).forEach((requirement) => {
+          expect(worldSkillIds).toContain(requirement.targetId);
+        });
+      });
+    });
+
+    it('assigns no check at all when the world has no skills', async () => {
       const { useWorldStore } = require('@/state/worldStore');
       (useWorldStore.getState as jest.Mock).mockReturnValue({
         worlds: {
@@ -266,9 +345,7 @@ Options:
 
       expect(result.options.length).toBe(3);
       result.options.forEach((option) => {
-        const skillRequirements =
-          option.requirements?.filter((req) => req.type === 'skill') ?? [];
-        expect(skillRequirements.length).toBeGreaterThan(0);
+        expect(skillRequirementsOf(option)).toHaveLength(0);
       });
     });
   });

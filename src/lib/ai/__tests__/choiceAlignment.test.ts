@@ -174,7 +174,7 @@ Options:
         expect.stringContaining('[LAWFUL]')
       );
       expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('SKILL REQUIREMENTS (CRITICAL FOR MVP)')
+        expect.stringContaining('SKILL REQUIREMENTS (CRITICAL)')
       );
       expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
         expect.stringContaining('AVAILABLE SKILLS IN THIS WORLD')
