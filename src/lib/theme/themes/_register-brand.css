@@ -65,19 +65,32 @@
      swapping an image later. --brand-hero-ink has a relative luminance of
      0.900, so 4.5:1 needs a backdrop at or below 0.161, which for a neutral
      is about 112/255. sRGB alpha compositing of this scrim colour over a
-     pure WHITE pixel lands at 255 - 240a, so any effective alpha at or above
-     0.60 clears AA against literally any image. landing.css stacks the two
-     values below to 1 - (1 - 0.45)(1 - 0.50) = 0.725 across the text zone,
-     which measures 7.1:1 for the ink and 6.0:1 for the softer lead over
-     white, and more than that over the real low-key art.
+     pure WHITE pixel lands at 255 - 240a, so any alpha at or above 0.597
+     clears AA against literally any image, and a darker image only helps.
+
+     --brand-hero-scrim-text carries the guarantee ON ITS OWN, at 68%, and
+     landing.css paints it behind the copy block rather than across the band.
+     Over white that measures 6.04:1 for the ink and 5.09:1 for the softer
+     lead, so the lead is what sets the value: at 62% the ink still passed
+     but the lead fell to 4.10:1.
+
+     An earlier version ramped this in over a fraction of the band height and
+     measured fine at the bottom while the top of the headline sat at an
+     effective 0.48, because how far down the band the text starts depends on
+     how far the headline wraps. Anchoring the guaranteed layer to the text
+     itself removes that whole class of failure.
+
+     --brand-hero-scrim-base is a flat wash over the whole band and is
+     deliberately NOT load-bearing for contrast; it only keeps the art from
+     competing with the copy. Lowering it cannot break AA.
 
      tests/visual/landing-contrast.spec.ts screenshots the composite and
      checks the worst pixel behind the text, per image and per theme, so a
      lightened scrim fails loudly rather than silently. */
   --brand-hero-ink: rgb(247 243 237);
   --brand-hero-ink-soft: rgb(231 224 213);
-  --brand-hero-scrim-base: rgb(18 15 12 / 45%);
-  --brand-hero-scrim-text: rgb(18 15 12 / 50%);
+  --brand-hero-scrim-base: rgb(18 15 12 / 22%);
+  --brand-hero-scrim-text: rgb(18 15 12 / 68%);
   --brand-hero-scrim-clear: rgb(18 15 12 / 0%);
 }
 

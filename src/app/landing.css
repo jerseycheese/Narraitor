@@ -1,84 +1,149 @@
 /* ═══════════════════════════════════════════════════════════════
    Landing Surface
-   Styles for the root route (/) and the <Landing /> component — the free public
-   front door. All values use design tokens for theme-awareness. The
-   composition is intentionally bolder than the About surface (large
-   display hero, a stepped grid, a distinct "how it's free" band) so it
-   reads as a front door, not a centered template. Structural treatment
-   (dot-grid, corner-bracket cards, mono labels) mirrors about.css.
-   ═══════════════════════════════════════════════════════════════ */
 
-/* ─── Base layout (token-driven, theme-agnostic) ─── */
+   The root route. A stranger's fifteen seconds, so the page argues with the
+   product's own output rather than claims about it: four world plates drive
+   the hero image and everything under it, and the prose is real generated
+   text from scripts/generate-homepage-showcase.mjs.
+
+   Direction and constraints: .impeccable/surfaces/route.md. Brand-register
+   token values (gutter, dot grid, hero ink and scrim) come from
+   src/lib/theme/themes/_register-brand.css, not from here.
+   ═══════════════════════════════════════════════════════════════ */
 
 .component-landing {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: clamp(var(--space-8), 6vw, 5rem);
+  gap: clamp(var(--space-6), 5vw, 3.5rem);
   width: 100%;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: var(--space-8) var(--page-gutter);
+
+  /* No horizontal padding: .app-surface-inner already insets the column, and
+     padding here would inset it a second time. Dropping it is what puts the
+     hero headline on the same left edge as the header logo. */
+  padding-block: 0 var(--space-8);
+
+  /* The bleed amount the bands cancel against. See the note below for why it
+     is a local token and not --page-gutter. */
+  --landing-bleed: var(--space-4);
+}
+
+/* ─── Full-bleed bands ───────────────────────────────────────────
+   .app-surface-inner is border-box, width 100%, max-width
+   --content-max-width, margin auto, padding <token>. A band cancels exactly
+   that padding with a negative inline margin, so its border box lands flush
+   with the container's border box, which is min(1200px, viewport) and can
+   therefore never be wider than the viewport. Pull equals push at every
+   width, 320 included: that is the whole overflow proof.
+
+   The cancel amount mirrors app-shell.css literally. It is NOT
+   --page-gutter, which _register-brand.css retunes to space-6/space-8 on
+   brand routes. Using that token here would over-pull the band 8px past the
+   viewport edge at >=1024 and put the document into horizontal overflow,
+   which is the trap tests/visual/mobile-overflow.spec.ts guards.
+
+   No vw anywhere in this file either. 100vw counts a classic scrollbar, so
+   on platforms that have one every vw-based bleed is ~15px too wide. */
+
+@media (width < 768px) {
+  .component-landing {
+    --landing-bleed: var(--space-3);
+  }
 }
 
 @media (width >= 1024px) {
   .component-landing {
-    padding: var(--space-8) var(--page-gutter);
+    --landing-bleed: var(--space-6);
   }
+}
+
+.component-landing-band {
+  margin-inline: calc(var(--landing-bleed) * -1);
+  overflow: hidden;
+}
+
+.component-landing-band-inner {
+  box-sizing: border-box;
+  padding-inline: var(--landing-bleed);
 }
 
 /* ─── Hero ─── */
 
 .component-landing-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+
+  /* min-height, never a fixed height: at 200% text zoom the copy has to be
+     able to grow the band instead of spilling off-white onto paper. */
+  min-height: clamp(20rem, 42vh, 30rem);
+  isolation: isolate;
+}
+
+.component-landing-hero-art {
+  z-index: 0;
+  object-fit: cover;
+
+  /* All four ship in the HTML; the switcher below reveals one. */
+  visibility: hidden;
+}
+
+/* Flat wash over the whole band. Aesthetic only: it stops the art competing
+   with the copy, and it is NOT what holds the contrast floor. */
+.component-landing-hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--brand-hero-scrim-base);
+}
+
+/* The guaranteed layer, painted behind the copy rather than across the band.
+   Anchoring it to the band was wrong: where the text starts depends on how
+   far the headline wraps, so a band-relative ramp left the top of the
+   headline under-covered at some widths while measuring fine at the bottom.
+   Behind the copy block, the covered area is the text extent by definition.
+
+   Full width so it reads as a band rather than a card; the text inside is
+   what gets capped to a reading measure. The ramp uses a length rather than
+   a percentage so it always finishes inside the block's own top padding,
+   which is where the first line of the headline begins. */
+.component-landing-hero-copy {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  max-width: var(--page-width-prose);
-}
-
-.component-landing-visual {
-  margin-top: var(--space-2);
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  line-height: 0;
-}
-
-.component-landing-visual-image {
-  display: block;
+  gap: var(--space-4);
   width: 100%;
-  height: auto;
+  padding-block: var(--space-8);
+  background: linear-gradient(
+    to bottom,
+    var(--brand-hero-scrim-clear) 0,
+    var(--brand-hero-scrim-text) var(--space-6),
+    var(--brand-hero-scrim-text) 100%
+  );
 }
 
-.component-landing-eyebrow {
-  margin: 0;
-  font-family: var(--font-system);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-}
-
-/* Scoped (.component-landing prefix) to outrank the app-surface h1 baseline in
-   app-shell.css (.app-surface-app h1) — the hero title is deliberately a large
-   display heading, not the 2rem surface default. */
+/* Scoped to outrank the .app-surface-app h1 baseline in app-shell.css: the
+   hero title is a display heading, not the 2rem surface default. */
 .component-landing .component-landing-title {
+  max-width: var(--page-width-prose);
   margin: 0;
   font-family: var(--font-narrative);
-  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 600;
   line-height: 1.05;
   letter-spacing: -0.02em;
-  color: var(--color-text-primary);
+  color: var(--brand-hero-ink);
 }
 
 .component-landing-lead {
+  max-width: var(--page-width-prose);
   margin: 0;
-  font-family: var(--font-interface);
-  font-size: var(--font-size-lg);
-  line-height: 1.6;
-  color: var(--color-text-secondary);
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-md);
+  line-height: 1.55;
+  color: var(--brand-hero-ink-soft);
 }
 
 .component-landing-actions {
@@ -92,9 +157,10 @@
 .component-landing-cta {
   display: inline-flex;
   align-items: center;
-  padding: var(--space-3) var(--space-6);
+  min-height: var(--control-height-touch);
+  padding-inline: var(--space-6);
   font-family: var(--font-interface);
-  font-size: 1.0625rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-on-accent);
   background: var(--color-accent);
@@ -104,157 +170,322 @@
 }
 
 .component-landing-cta:hover {
-  /* Hover darkens the accent (in dark mode too), so white clears AA here even
-   * though the base state uses dark ink on the lighter base accent. */
+  /* Hover darkens the accent in both themes, so white clears AA here even
+     though the base state uses dark ink on the lighter base accent. */
   color: var(--color-text-inverse);
   background: var(--color-accent-hover);
 }
 
-.component-landing-cta:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
 .component-landing-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height-touch);
   font-family: var(--font-interface);
-  font-size: 1.0625rem;
+  font-size: var(--font-size-base);
   font-weight: 500;
-  color: var(--color-text-primary);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.component-landing-cta-secondary:hover {
-  color: var(--color-accent);
+/* globals.css colours every link with --color-accent, which measures under
+   2:1 over the scrim. Any link sitting on photography has to be pinned to
+   the fixed ink instead, hover included. */
+.component-landing-hero-copy .component-landing-cta-secondary,
+.component-landing-hero-copy .component-landing-cta-secondary:hover {
+  color: var(--brand-hero-ink);
 }
 
+.component-landing-cta:focus-visible,
 .component-landing-cta-secondary:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-/* ─── Shared section title ─── */
-
-.component-landing-section-title {
-  margin: 0 0 var(--space-5);
-  font-family: var(--font-interface);
-  font-size: 1.375rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--color-text-primary);
+.component-landing-hero-copy .component-landing-cta-secondary:focus-visible {
+  outline-color: var(--brand-hero-ink);
 }
 
-/* ─── Steps ─── */
+/* ─── World switcher ─── */
 
-.component-landing-step-list {
+.component-landing-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-landing-showing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.component-landing-label {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.component-landing-plates {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-4);
   margin: 0;
   padding: 0;
-  list-style: none;
+  border: 0;
+
+  /* Fieldsets default to min-inline-size: min-content, which ignores the
+     grid and overflows at 320px. */
+  min-inline-size: 0;
 }
 
-@media (width < 768px) {
-  .component-landing-step-list {
-    grid-template-columns: 1fr;
+@media (width < 640px) {
+  .component-landing-plates {
+    /* Four across at 320px is a 68px thumbnail with an unreadable caption. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.component-landing-step {
+.component-landing-plate {
+  position: relative;
+}
+
+/* Visually hidden but focusable, and deliberately not .sr-only: that class
+   is position absolute with overflow hidden, and an absolutely positioned
+   input inside a static plate can make the page jump on Tab. */
+.component-landing-plate-input {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.component-landing-plate-label {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-5);
+  padding-block-end: var(--space-2);
+  border-block-end: 3px solid transparent;
+  cursor: pointer;
+
+  /* The unselected plates read as a set of controls rather than decoration
+     by being visibly dimmed against the selected one. */
+  opacity: 0.6;
+  transition: opacity 120ms ease, border-color 120ms ease;
+}
+
+.component-landing-plate-label:hover {
+  opacity: 0.85;
+}
+
+.component-landing-plate-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
 }
 
-.component-landing-step-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  font-family: var(--font-system);
-  font-size: 0.9375rem;
-  font-weight: 600;
-
-  /* accent-strong, not accent: plain accent on accent-soft only hits 3.9:1,
-     below the 4.5:1 AA minimum for this text size. */
-  color: var(--color-accent-strong);
-  background: var(--color-accent-soft);
-  border-radius: var(--radius-full);
+.component-landing-plate-thumb img {
+  object-fit: cover;
 }
 
-.component-landing-step-title {
-  margin: 0;
+.component-landing-plate-caption {
   font-family: var(--font-interface);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+/* ─── World panes ─── */
+
+.component-landing-pane {
+  flex-direction: column;
+  gap: clamp(var(--space-6), 5vw, 3.5rem);
+}
+
+.component-landing-heading {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
-.component-landing-step-description {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: 0.9375rem;
-  line-height: 1.55;
-  color: var(--color-text-secondary);
+.component-landing-exchange-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: var(--space-6);
+  align-items: start;
 }
 
-/* ─── "How it's free" honest band ─── */
-
-.component-landing-note {
-  padding: var(--space-6);
-  background: var(--color-accent-soft);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-}
-
-@media (width >= 1024px) {
-  .component-landing-note {
-    padding: var(--space-8);
+@media (width < 768px) {
+  .component-landing-exchange-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.component-landing-note-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-5);
+.component-landing-typed,
+.component-landing-returned {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-landing-typed {
+  padding: var(--space-5);
+  background: var(--color-text-primary);
+  border-radius: var(--radius-md);
+}
+
+.component-landing-typed .component-landing-label,
+.component-landing-typed-text {
+  color: var(--color-text-inverse);
+}
+
+.component-landing-typed-text {
   margin: 0;
+  font-family: var(--font-system);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+.component-landing-prose {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-base);
+  line-height: 1.65;
+  color: var(--color-text-primary);
+}
+
+.component-landing-situation {
+  max-width: var(--page-width-prose);
+  margin-bottom: var(--space-5);
+  color: var(--color-text-secondary);
+}
+
+/* ─── The choices, at scale ─── */
+
+.component-landing-choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
   padding: 0;
   list-style: none;
 }
 
-@media (width < 768px) {
-  .component-landing-note-list {
-    grid-template-columns: 1fr;
-  }
-}
-
-.component-landing-note-item {
+/* Not buttons. This is a depiction of a turn on a surface that shows no app
+   UI, and fake controls would add a tab stop per choice per pane. */
+.component-landing-choice {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
 }
 
-.component-landing-note-title {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1.0625rem;
+/* No thick side bar, even though the approved mockup drew one: the taken
+   choice is already marked three ways over (accent border, accent wash, and
+   the label), and a heavy one-sided accent rule is a well-worn tell. */
+.component-landing-choice-taken {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.component-landing-choice-text {
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+}
+
+.component-landing-choice-taken .component-landing-choice-text {
+  color: var(--color-accent-strong);
+}
+
+.component-landing-choice-mark {
+  font-family: var(--font-system);
+  font-size: var(--font-size-2xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.component-landing-check {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-system);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.component-landing-check-skill {
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
-.component-landing-note-description {
+.component-landing-check-verdict {
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+.component-landing-consequence {
+  max-width: var(--page-width-prose);
+}
+
+/* The sentence the failed check bent. */
+.component-landing-consequence-lead {
+  color: var(--color-accent-strong);
+}
+
+/* ─── Closing band ─── */
+
+.component-landing-closing {
+  background: var(--color-accent-soft);
+  border-block: 1px solid var(--color-border);
+}
+
+.component-landing-closing-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding-block: var(--space-8);
+  text-align: center;
+}
+
+.component-landing .component-landing-closing-text {
+  max-width: var(--page-width-prose);
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
-  line-height: 1.55;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--color-text-primary);
 }
 
 /* ─── Footer links ─── */
@@ -268,8 +499,11 @@
 }
 
 .component-landing-footer-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height-touch);
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   text-decoration: none;
 }
@@ -284,87 +518,188 @@
   border-radius: var(--radius-sm);
 }
 
+/* ─── Narrow-width rhythm ───────────────────────────────────────
+   Two set-pieces make a long page, and this one runs past three thousand
+   pixels at 375. Everything tightened below is chrome: gaps, padding, and one
+   thumbnail crop. Nothing here touches the generated prose, drops a section,
+   or clamps a line, because the prose IS the argument the page makes and
+   trimming it would turn evidence back into a claim.
+
+   The levers deliberately NOT taken, so nobody spends the risk twice:
+
+   - The hero's min-height is inert here. At 375x667, 42vh is 280px so the
+     20rem floor pins, but the copy block already measures past it. Lowering
+     the floor saves nothing and only bites at desktop widths.
+   - The plate grid stays 2x2 with full captions. Most visitors never touch
+     the selector, so four plates legible at a glance is the only thing
+     carrying the range argument for them. A scrolling row that clips the
+     third plate, or truncated captions, deletes the evidence to save space.
+   - The "Now showing" line stays. It is the plain-language half of the
+     selected state; the accent underline is the other half.
+   - The headline's clamp floor stays at 2.5rem. It is the display type on a
+     page whose whole job is the first fifteen seconds. */
+
+@media (width < 640px) {
+  /* Between sections that already separate themselves with a band background,
+     a border, or both. The pane's own gap is untouched: that one divides the
+     two set-pieces, which have to stay visibly apart. */
+  .component-landing {
+    gap: var(--space-4);
+  }
+
+  /* Padding and ramp move together. The ramp has to finish inside the block's
+     own top padding, and at space-6 against space-6 it would land exactly on
+     the first line with nothing to spare. Shortening it to space-4 puts a
+     band of full-strength scrim above the glyphs again. Coverage only
+     improves, but this is the layer carrying the contrast floor, so
+     tests/visual/landing-contrast.spec.ts checks 375 as well as desktop. */
+  .component-landing-hero-copy {
+    padding-block: var(--space-6);
+    background: linear-gradient(
+      to bottom,
+      var(--brand-hero-scrim-clear) 0,
+      var(--brand-hero-scrim-text) var(--space-4),
+      var(--brand-hero-scrim-text) 100%
+    );
+  }
+
+  /* A more cinematic crop at the width where the plate column is ~167px. The
+     grid, the count, and the captions are all unchanged. */
+  .component-landing-plate-thumb {
+    aspect-ratio: 2 / 1;
+  }
+
+  .component-landing-heading {
+    margin-block-end: var(--space-3);
+  }
+
+  .component-landing-exchange-grid {
+    gap: var(--space-4);
+  }
+
+  .component-landing-typed {
+    padding: var(--space-4);
+  }
+
+  .component-landing-situation {
+    margin-bottom: var(--space-4);
+  }
+
+  .component-landing-choices {
+    gap: var(--space-2);
+    margin-block-end: var(--space-4);
+  }
+
+  /* The choice blocks are meant to be the heaviest things on the page. That
+     weight comes from the narrative type size, the border, and the accent
+     wash on the taken one, not from the last 4px of padding. Don't go below
+     space-3. */
+  .component-landing-choice {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .component-landing-closing-inner {
+    padding-block: var(--space-6);
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
-   DS3 — "Mechanical Manuscript"
-   Mono labels with a dot bullet, corner-bracket step cards, compact
-   rhythm, mono prose. Dot-grid field comes from the app-surface root
-   (app-shell.css), not defined per-page — see ds3.css
-   --pattern-dot-grid-image.
+   The switcher itself
+
+   Two selector families on purpose.
+
+   1. `input:checked + label` gives the plate its own selected state. Plain
+      sibling combinator, no :has() dependency, because "which one is
+      selected" is the thing that must never degrade: the direction makes
+      "nobody mistakes the row for decoration" binding.
+
+   2. `.component-landing:has(#id:checked)` drives the hero art, the now
+      showing line and the pane. None of those are siblings of the radios,
+      and the hero PRECEDES them in source order, so `~` cannot reach it.
+      Hoisting four orphan inputs to the top of the page would reach, but it
+      would also separate them from their legend and their visible labels.
+      :has() is already load-bearing in app-shell.css.
+
+   The default-visible state is declared OUTSIDE the @supports block, so an
+   engine without :has() shows one complete world rather than none.
    ═══════════════════════════════════════════════════════════════ */
 
-:root .component-landing {
-  gap: clamp(var(--space-6), 5vw, 3.5rem);
+.component-landing-plate-input:checked + .component-landing-plate-label {
+  opacity: 1;
+  border-block-end-color: var(--color-accent);
 }
 
-:root .component-landing-eyebrow {
-  color: var(--color-text-secondary);
-}
-
-:root .component-landing-lead {
-  font-family: var(--font-narrative);
-  font-size: 1.1875rem;
-  line-height: 1.55;
-}
-
-:root .component-landing-section-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-system);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-:root .component-landing-section-title::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
-  flex-shrink: 0;
-}
-
-:root .component-landing-step {
-  position: relative;
-  border: none;
-  background: var(--color-surface);
-}
-
-/* Corner brackets — top-left + bottom-right L-marks in accent. */
-:root .component-landing-step::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 10px;
-  height: 10px;
-  border-top: 1px solid var(--color-accent);
-  border-left: 1px solid var(--color-accent);
-  pointer-events: none;
-}
-
-:root .component-landing-step::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 10px;
-  height: 10px;
-  border-right: 1px solid var(--color-accent);
-  border-bottom: 1px solid var(--color-accent);
-  pointer-events: none;
-}
-
-:root .component-landing-step-number {
+/* Driven off the input's own focus, and offset clear of the thumbnail art so
+   the ring lands on paper. --color-accent measures ~6.9:1 on canvas in light
+   and ~7.4:1 in dark, both well past the 3:1 non-text floor. */
+.component-landing-plate-input:focus-visible + .component-landing-plate-label {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
   border-radius: var(--radius-sm);
 }
 
-:root .component-landing-step-description,
-:root .component-landing-note-description {
-  font-family: var(--font-system);
-  font-size: var(--font-size-sm);
+.component-landing-hero-art[data-world="port-city"] {
+  visibility: visible;
+}
+
+/* display: none rather than opacity or visibility, so exactly one world is
+   ever in the accessibility tree and in the tab order. */
+.component-landing-showing,
+.component-landing-pane {
+  display: none;
+}
+
+.component-landing-showing[data-world="port-city"] {
+  display: flex;
+}
+
+.component-landing-pane[data-world="port-city"] {
+  display: flex;
+}
+
+@supports selector(:has(*)) {
+  .component-landing:has(.component-landing-plate-input:checked)
+    .component-landing-hero-art {
+    visibility: hidden;
+  }
+
+  .component-landing:has(.component-landing-plate-input:checked)
+    .component-landing-showing,
+  .component-landing:has(.component-landing-plate-input:checked)
+    .component-landing-pane {
+    display: none;
+  }
+
+  .component-landing:has(#landing-world-port-city:checked)
+    .component-landing-hero-art[data-world="port-city"],
+  .component-landing:has(#landing-world-survey-ship:checked)
+    .component-landing-hero-art[data-world="survey-ship"],
+  .component-landing:has(#landing-world-normandy:checked)
+    .component-landing-hero-art[data-world="normandy"],
+  .component-landing:has(#landing-world-debt-court:checked)
+    .component-landing-hero-art[data-world="debt-court"] {
+    visibility: visible;
+  }
+
+  .component-landing:has(#landing-world-port-city:checked)
+    .component-landing-showing[data-world="port-city"],
+  .component-landing:has(#landing-world-survey-ship:checked)
+    .component-landing-showing[data-world="survey-ship"],
+  .component-landing:has(#landing-world-normandy:checked)
+    .component-landing-showing[data-world="normandy"],
+  .component-landing:has(#landing-world-debt-court:checked)
+    .component-landing-showing[data-world="debt-court"] {
+    display: flex;
+  }
+
+  .component-landing:has(#landing-world-port-city:checked)
+    .component-landing-pane[data-world="port-city"],
+  .component-landing:has(#landing-world-survey-ship:checked)
+    .component-landing-pane[data-world="survey-ship"],
+  .component-landing:has(#landing-world-normandy:checked)
+    .component-landing-pane[data-world="normandy"],
+  .component-landing:has(#landing-world-debt-court:checked)
+    .component-landing-pane[data-world="debt-court"] {
+    display: flex;
+  }
 }

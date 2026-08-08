@@ -1,18 +1,36 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import Landing from '../Landing';
+import { HOMEPAGE_SHOWCASE } from '../homepageShowcase.generated';
 
 /**
- * MVP coverage for the free public landing page (#1365). Tests map to the
- * acceptance criteria: a plain-language front door with a clear primary CTA
- * into the existing world-creation flow, an honest "how it's free" note, and
- * footer links out to About / Privacy / Terms. The component now renders at
- * the root route (#1528); the / entry decision is covered by
- * src/app/__tests__/page.test.tsx.
+ * MVP coverage for the homepage. Direction and constraints:
+ * .impeccable/surfaces/route.md. Four tests, one per claim the page has to
+ * keep making after someone edits it:
+ *
+ *   1. one verb and one destination for the primary act
+ *   2. all four worlds ship in the HTML behind native radios, which is the
+ *      proof that the CSS-only switcher works with JavaScript off
+ *   3. the key ask is actionable: named provider, live link, time estimate
+ *   4. the copy rules hold
+ *
+ * Every assertion is on structure, ids, or the authored captions.
+ * homepageShowcase.generated.ts is re-rolled by
+ * scripts/generate-homepage-showcase.mjs, so asserting on the model's prose
+ * would turn a regeneration into a test failure.
+ *
+ * next/image is deliberately not mocked. Under jsdom it renders a plain <img>
+ * with alt="" (role presentation), so the eight hero and thumbnail images
+ * contribute no roles and no accessible names to the queries below.
+ *
+ * The / entry decision lives in src/app/__tests__/page.test.tsx.
  */
 
-describe('Landing page (#1365)', () => {
-  it('renders an outcome-framed hero with a primary CTA into world creation', () => {
+const START_HREF = '/worlds/create';
+const GEMINI_KEY_URL = 'https://aistudio.google.com/apikey';
+
+describe('Landing page', () => {
+  it('leads with the headline and points both CTAs at one destination', () => {
     render(<Landing />);
 
     expect(
@@ -22,41 +40,62 @@ describe('Landing page (#1365)', () => {
       })
     ).toBeInTheDocument();
 
-    const cta = screen.getByRole('link', { name: /start your story/i });
-    expect(cta).toHaveAttribute('href', '/worlds/create');
+    // Two of them on purpose, the hero and the closing band. The CTAs used to
+    // disagree about both verb and destination, so the point of the count is
+    // that both now say the same thing and go the same place.
+    const ctas = screen.getAllByRole('link', { name: 'Start your story' });
+    expect(ctas).toHaveLength(2);
+    ctas.forEach((cta) => expect(cta).toHaveAttribute('href', START_HREF));
   });
 
-  it('states the honest "free / local / no accounts" promises', () => {
-    render(<Landing />);
+  it('ships every world in the HTML behind a native radio switcher', () => {
+    const { container } = render(<Landing />);
 
-    expect(screen.getByText(/your own key/i)).toBeInTheDocument();
-    // Exact match: "runs in your browser" also appears in the hero lead.
-    expect(screen.getByText('Runs in your browser')).toBeInTheDocument();
-    // Provider key explained in plain terms (F3): a key from a model provider.
-    expect(
-      screen.getByText(/a key you get from a model provider/i)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/stay on your device/i)
-    ).toBeInTheDocument();
-    expect(screen.getByText(/no accounts/i)).toBeInTheDocument();
+    const radios = screen.getAllByRole('radio');
+    expect(radios).toHaveLength(HOMEPAGE_SHOWCASE.length);
+    expect(radios[0]).toBeChecked();
+    radios.slice(1).forEach((radio) => expect(radio).not.toBeChecked());
+
+    // One radio and one pane per world, both keyed off the same id so the
+    // :has() rules in landing.css have something to pair. All four panes are
+    // in the document with no JavaScript run, which is the whole reason the
+    // page can stay a server component.
+    //
+    // The label lookup is scoped to the fieldset because each pane carries the
+    // same caption as its aria-label, so an unscoped query matches both.
+    const switcher = screen.getByRole('group', {
+      name: /choose a world to preview/i,
+    });
+
+    HOMEPAGE_SHOWCASE.forEach((world) => {
+      expect(within(switcher).getByLabelText(world.caption)).toHaveAttribute(
+        'id',
+        `landing-world-${world.id}`
+      );
+      expect(
+        container.querySelector(
+          `.component-landing-pane[data-world="${world.id}"]`
+        )
+      ).toBeInTheDocument();
+    });
   });
 
-  it('exposes footer links to about, privacy, and terms', () => {
+  it('makes the Gemini key ask actionable', () => {
     render(<Landing />);
 
-    const footer = screen.getByRole('navigation', { name: /site information/i });
-    expect(within(footer).getByRole('link', { name: /about/i })).toHaveAttribute(
-      'href',
-      '/about'
-    );
-    expect(within(footer).getByRole('link', { name: /privacy/i })).toHaveAttribute(
-      'href',
-      '/privacy'
-    );
-    expect(within(footer).getByRole('link', { name: /terms/i })).toHaveAttribute(
-      'href',
-      '/terms'
-    );
+    const keyLink = screen.getByRole('link', { name: /gemini key/i });
+    expect(keyLink).toHaveAttribute('href', GEMINI_KEY_URL);
+    expect(screen.getByText(/two minutes/i)).toBeInTheDocument();
+  });
+
+  it('keeps "free" and "AI" out of the rendered page', () => {
+    const { container } = render(<Landing />);
+    const rendered = container.textContent ?? '';
+
+    // The guard covers the generated prose as well as the authored copy: a
+    // visitor cannot tell which is which, so a re-roll that writes "free hand"
+    // is a re-roll to redo, not an exception to carve out.
+    expect(rendered).not.toMatch(/\bfree\b/i);
+    expect(rendered).not.toMatch(/\bAI\b/i);
   });
 });
