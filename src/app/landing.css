@@ -26,6 +26,14 @@
   /* The bleed amount the bands cancel against. See the note below for why it
      is a local token and not --page-gutter. */
   --landing-bleed: var(--space-4);
+
+  /* Motion, local for the same reason --landing-bleed is: it belongs to this
+     surface's one interaction, and DS3 carries no duration scale to reach
+     for. The page moves in exactly two places, both on click and both
+     documented at the switcher block below. */
+  --landing-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --landing-mark-travel: 260ms;
+  --landing-develop: 420ms;
 }
 
 /* ─── Full-bleed bands ───────────────────────────────────────────
@@ -86,6 +94,20 @@
 
   /* All four ship in the HTML; the switcher below reveals one. */
   visibility: hidden;
+  opacity: 0;
+
+  /* The develop. Picking a world dissolves the art rather than cutting to
+     it, which is the difference between a tab changing and the page becoming
+     that world. visibility rides along so the hidden three stay out of the
+     way once the fade has finished.
+
+     Deliberately NOT run on first paint. The default hero is priority-loaded
+     and is this page's LCP element, so starting it transparent would push
+     LCP by the length of the fade to say nothing a visitor asked about. The
+     develop marks a change; there is no change on arrival. */
+  transition:
+    opacity var(--landing-develop) var(--landing-ease),
+    visibility var(--landing-develop) var(--landing-ease);
 }
 
 /* Flat wash over the whole band. Aesthetic only: it stops the art competing
@@ -235,6 +257,7 @@
 }
 
 .component-landing-plates {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-4);
@@ -281,9 +304,12 @@
   cursor: pointer;
 
   /* The unselected plates read as a set of controls rather than decoration
-     by being visibly dimmed against the selected one. */
+     by being visibly dimmed against the selected one. Lifting on the same
+     curve as the mark ties the plate to the rule that travels to it. */
   opacity: 0.6;
-  transition: opacity 120ms ease, border-color 120ms ease;
+  transition:
+    opacity var(--landing-mark-travel) var(--landing-ease),
+    border-color var(--landing-mark-travel) var(--landing-ease);
 }
 
 .component-landing-plate-label:hover {
@@ -301,6 +327,20 @@
 
 .component-landing-plate-thumb img {
   object-fit: cover;
+
+  /* The art pushes at its mount under the cursor and the frame holds it. The
+     only ambient life on the page, and it costs nothing: a visitor who never
+     moves the mouse never sees it, and the plate row is where a visitor who
+     is going to interact puts the cursor first. */
+  transition: scale 300ms var(--landing-ease);
+}
+
+.component-landing-plate-label:hover .component-landing-plate-thumb img,
+.component-landing-plate-input:focus-visible
+  + .component-landing-plate-label
+  .component-landing-plate-thumb
+  img {
+  scale: 1.04;
 }
 
 .component-landing-plate-caption {
@@ -711,6 +751,64 @@
   border-block-end-color: var(--color-accent);
 }
 
+/* ─── The mark that travels ──────────────────────────────────────
+   The selected plate's underline is one rule that slides to the world you
+   picked, rather than blinking on under a different thumbnail. A rule being
+   drawn is the drafting gesture DS3 is built out of, and it is the only
+   thing on this page that moves without a photograph.
+
+   It replaces the per-label border rather than joining it: two accent marks
+   during the travel would read as a bug. Everywhere the mark does not run,
+   the border stays and nothing is lost.
+
+   Two gates, both deliberate:
+
+   1. :has() support, because the index comes from the same selector family
+      that drives the hero and the pane. Without it the border already marks
+      the selection correctly.
+   2. >= 640px, because the strip wraps to 2x2 below that and a mark
+      travelling diagonally across a wrapped grid reads as a glitch rather
+      than a gesture. The border handles the wrapped case.
+
+   Geometry: four equal columns with one gap between each, so the mark is one
+   column wide and each step is its own width plus a gap. The translate
+   percentage resolves against the mark, which is what makes that true. */
+@supports selector(:has(*)) {
+  @media (width >= 640px) {
+    .component-landing-plates {
+      --landing-mark-index: 0;
+    }
+
+    .component-landing-plate-input:checked + .component-landing-plate-label {
+      border-block-end-color: transparent;
+    }
+
+    .component-landing-plates::after {
+      content: "";
+      position: absolute;
+      inset-block-end: 0;
+      inset-inline-start: 0;
+      block-size: 3px;
+      inline-size: calc((100% - 3 * var(--space-4)) / 4);
+      background: var(--color-accent);
+      translate: calc(var(--landing-mark-index) * (100% + var(--space-4))) 0;
+      transition: translate var(--landing-mark-travel) var(--landing-ease);
+    }
+
+    .component-landing-plates:has(#landing-world-survey-ship:checked) {
+      --landing-mark-index: 1;
+    }
+
+    .component-landing-plates:has(#landing-world-normandy:checked) {
+      --landing-mark-index: 2;
+    }
+
+    .component-landing-plates:has(#landing-world-debt-court:checked) {
+      --landing-mark-index: 3;
+    }
+  }
+}
+
 /* Driven off the input's own focus, and offset clear of the thumbnail art so
    the ring lands on paper. --color-accent measures ~6.9:1 on canvas in light
    and ~7.4:1 in dark, both well past the 3:1 non-text floor. */
@@ -722,6 +820,7 @@
 
 .component-landing-hero-art[data-world="port-city"] {
   visibility: visible;
+  opacity: 1;
 }
 
 /* display: none rather than opacity or visibility, so exactly one world is
@@ -743,6 +842,7 @@
   .component-landing:has(.component-landing-plate-input:checked)
     .component-landing-hero-art {
     visibility: hidden;
+    opacity: 0;
   }
 
   .component-landing:has(.component-landing-plate-input:checked)
@@ -761,6 +861,7 @@
   .component-landing:has(#landing-world-debt-court:checked)
     .component-landing-hero-art[data-world="debt-court"] {
     visibility: visible;
+    opacity: 1;
   }
 
   .component-landing:has(#landing-world-port-city:checked)
