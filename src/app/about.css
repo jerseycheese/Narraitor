@@ -42,12 +42,19 @@
   color: var(--color-text-primary);
 }
 
+/* Washed for the same reason as .component-about-prose below: the brand
+   register's dot grid (_register-brand.css) is deliberately coarser than the
+   app's, which reads right in the margins and wrong under a run of body
+   text. --brand-page-wash is an opaque canvas patch with no border, radius
+   or shadow, so the only visible effect is the dots stopping. */
 .component-about-lead {
   margin: 0;
+  padding: var(--space-3) var(--space-4);
   font-family: var(--font-interface);
   font-size: var(--font-size-md);
   line-height: 1.6;
   color: var(--color-text-secondary);
+  background: var(--brand-page-wash);
 }
 
 .component-about-hero-visual {
@@ -81,11 +88,16 @@
   color: var(--color-text-primary);
 }
 
+/* Washed against the register's dot grid, same as .component-about-lead
+   above. The step cards and the CTA band already carry their own fills
+   (--color-surface, --color-accent-soft) and are deliberately left alone. */
 .component-about-prose {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   max-width: var(--page-width-prose);
+  padding: var(--space-4);
+  background: var(--brand-page-wash);
 }
 
 .component-about-prose p {
