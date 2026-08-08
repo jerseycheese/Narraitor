@@ -3,7 +3,7 @@
  *
  * A modal dialog that presents recovery options when saved character creation data is detected.
  * Provides clear user choice between recovering previous progress or starting fresh with
- * comprehensive data preview and conflict detection.
+ * data preview and conflict detection.
  *
  * Key Features:
  * - Data preview with character name, progress step, and completion status
@@ -66,7 +66,7 @@ interface RecoveryNotificationProps {
  * RecoveryNotification Component
  *
  * Renders a modal dialog allowing users to choose between recovering saved character data
- * or starting fresh. Includes comprehensive data preview and conflict warnings.
+ * or starting fresh. Includes data preview and conflict warnings.
  *
  * @param props - Component props
  * @returns JSX element or null if not visible

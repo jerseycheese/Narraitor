@@ -100,6 +100,6 @@ You'll see this component throughout the app:
 
 ## Storybook Stories
 
-The component includes comprehensive Storybook stories showing all size variations, loading and error states, different character name lengths, interactive variants, and AI-generated vs placeholder states.
+The component includes Storybook stories showing all size variations, loading and error states, different character name lengths, interactive variants, and AI-generated vs placeholder states.
 
 Run `npm run storybook` and navigate to "Components/CharacterPortrait" to see all the examples in action.

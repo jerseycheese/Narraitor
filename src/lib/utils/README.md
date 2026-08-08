@@ -229,7 +229,7 @@ import {
 
 ## Testing
 
-All utility functions have comprehensive test coverage. Run tests with:
+All utility functions have test coverage. Run tests with:
 
 ```bash
 npm test src/lib/utils/__tests__

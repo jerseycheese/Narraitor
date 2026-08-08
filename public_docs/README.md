@@ -73,7 +73,7 @@ Guides for developers working on Narraitor:
 
 ### Testing
 
-- [Testing Guide](./development/testing-guide.md) - Comprehensive testing strategy
+- [Testing Guide](./development/testing-guide.md) - Testing strategy
 - [Visual Regression Testing](./development/visual-regression-testing.md) - Playwright visual tests
 - [Visual Testing Best Practices](./development/visual-testing-best-practices.md)
 - [Visual Test Examples](./development/visual-test-examples.md)

@@ -15,7 +15,7 @@ export { cssClasses } from './classNames';
 // === FORMATTING UTILITIES ===
 
 /**
- * Comprehensive formatting utilities for dates, strings, and numbers
+ * Formatting utilities for dates, strings, and numbers
  * @see README.md for detailed usage examples
  */
 export {

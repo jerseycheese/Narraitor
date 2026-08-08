@@ -133,7 +133,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   // Default for unknown errors
   return {
     title: 'Something Went Wrong',
-    message: 'An unexpected error occurred. Please try again.',
+    message: "That didn't work.",
     suggestion: 'If this keeps happening, try reloading the page.',
     actionLabel: 'Try Again',
     retryable: isRetryableError(error),

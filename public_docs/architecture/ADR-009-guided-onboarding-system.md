@@ -88,7 +88,7 @@ Built a guided onboarding system for new users:
 - Need to maintain the onboarding flow as core features evolve (this is the big ongoing cost)
 
 ### Mitigation Strategies
-- Comprehensive test coverage (26 tests) because onboarding is critical and can't be broken
+- Test coverage (26 tests) because onboarding is critical and can't be broken
 - Graceful fallback systems so AI service failures don't kill the experience
 - Three-stage verification process (Storybook, then the test harness, then full system integration) for quality assurance
 - Documentation and Storybook coverage so future developers can understand what's happening

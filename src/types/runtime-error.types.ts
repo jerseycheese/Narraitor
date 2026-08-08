@@ -2,7 +2,7 @@
  * Runtime Error Types
  * 
  * Type definitions for runtime error capture and display in DevTools.
- * These types support comprehensive error reporting with context information.
+ * These types support error reporting with context information.
  */
 
 /**

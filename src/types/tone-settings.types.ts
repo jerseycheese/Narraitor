@@ -23,7 +23,7 @@ export type NarrativeStyle =
 export type LanguageComplexity = 'simple' | 'moderate' | 'advanced' | 'literary';
 
 /**
- * Comprehensive tone settings for narrative generation
+ * Tone settings for narrative generation
  */
 export interface ToneSettings {
   /** Content rating that determines mature content filtering */

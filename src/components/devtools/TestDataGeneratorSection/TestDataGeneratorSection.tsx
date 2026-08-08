@@ -620,7 +620,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           
           size="sm"
           variant="info"
-          title="Creates 5 diverse AI worlds with mix of original, 'set in', and 'based on' types for comprehensive testing"
+          title="Creates 5 diverse AI worlds with a mix of original, 'set in', and 'based on' types"
         >
           Generate 5 Diverse AI Worlds
         </Button>

@@ -78,7 +78,7 @@ The wizard handles errors gracefully:
 
 ## Testing
 
-The wizard includes comprehensive test coverage:
+The wizard includes test coverage:
 - Unit tests for each step component
 - Integration tests for the full wizard flow
 - Storybook stories for visual testing

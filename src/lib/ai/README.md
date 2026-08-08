@@ -24,7 +24,7 @@ The system has a few key components:
 
 **`ResponseFormatter`** - Takes the raw AI response and formats it with dialogue formatting, italics, etc.
 
-Plus configuration utilities and comprehensive error handling with retry logic.
+Plus configuration utilities and error handling with retry logic.
 
 ## Basic Usage
 
@@ -132,7 +132,7 @@ Lower temperature gives more consistent responses, higher temperature gives more
 
 ## Testing
 
-The module has comprehensive test coverage with mocked SDK interactions:
+The module has test coverage with mocked SDK interactions:
 
 ```bash
 npm test src/lib/ai/__tests__/geminiClient.test.ts

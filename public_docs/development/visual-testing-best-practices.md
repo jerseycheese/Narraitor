@@ -204,7 +204,7 @@ test('button component states', async ({ page }) => {
 });
 ```
 
-**Page-level testing** (comprehensive, slower):
+**Page-level testing** (full page, slower):
 ```typescript
 test('complete checkout flow', async ({ page }) => {
   await page.goto('/checkout');

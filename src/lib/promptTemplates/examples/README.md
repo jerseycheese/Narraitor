@@ -114,7 +114,7 @@ The `shouldIncludeExamples()` helper determines if examples should be included:
 - **< 50 tokens available**: No examples (budget too limited)
 - **50-150 tokens**: Include only high/critical priority examples
 - **150+ tokens**: Include more examples based on priority
-- **5000+ chars context**: Skip examples (context is already comprehensive)
+- **5000+ chars context**: Skip examples (there's already enough context)
 
 ## Example Types in the Library
 
@@ -203,7 +203,7 @@ Tests cover:
 3. **Quality Control**: Examples guide consistent AI output
 4. **Flexibility**: Easy to add, update, or remove examples
 5. **Type Safety**: Full TypeScript support with interfaces
-6. **Testing**: Comprehensive test coverage ensures reliability
+6. **Testing**: Test coverage ensures reliability
 
 ## Future Enhancements
 

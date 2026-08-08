@@ -72,7 +72,7 @@ Each step includes appropriate validation:
 
 ## Testing
 
-The component includes comprehensive tests covering:
+The component includes tests covering:
 - Step navigation and progression
 - Form validation and error handling
 - Mobile responsiveness

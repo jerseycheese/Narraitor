@@ -1,7 +1,7 @@
 /**
  * Toast Notification System
  * 
- * A comprehensive toast notification system for Narraitor with support for multiple variants,
+ * A toast notification system for Narraitor with support for multiple variants,
  * auto-dismissal, manual dismissal, and accessibility features.
  * 
  * @example

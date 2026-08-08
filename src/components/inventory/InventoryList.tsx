@@ -179,7 +179,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
         setErrorFeedback(result.error?.message || 'Failed to use item');
       }
     } catch {
-      setErrorFeedback('An unexpected error occurred');
+      setErrorFeedback("Couldn't use that item. Try again.");
     } finally {
       setUsingItemId(null);
     }

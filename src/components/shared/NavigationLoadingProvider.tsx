@@ -61,7 +61,7 @@ export const NavigationLoadingProvider: React.FC<NavigationLoadingProviderProps>
       case 'data':
         return 'Loading data...';
       case 'error':
-        return 'Something went wrong. Please wait...';
+        return 'Something went wrong loading this page.';
       default:
         return 'Loading...';
     }

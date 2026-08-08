@@ -58,4 +58,4 @@ The API endpoints are thoroughly tested through:
    - Error conditions verified (missing fields, invalid types, AI failures)
    - Success paths confirmed with real AI responses
 
-The development harnesses provide comprehensive coverage of the API functionality including error conditions, validation, and AI integration, which is more practical than complex Jest setup for Next.js API routes.
+The development harnesses cover the API functionality — error conditions, validation, and AI integration — which is more practical than complex Jest setup for Next.js API routes.

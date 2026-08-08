@@ -146,7 +146,7 @@ export interface PlayerPreferences {
 }
 
 /**
- * Comprehensive personalized context for narrative generation
+ * Personalized context for narrative generation
  */
 export interface PersonalizedNarrativeContext {
   /** Character personality information */

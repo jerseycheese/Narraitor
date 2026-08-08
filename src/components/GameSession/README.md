@@ -60,7 +60,7 @@ This hook encapsulates:
 
 ## Testing
 
-Each component has comprehensive testing:
+Each component is tested:
 - Unit tests in `.test.tsx` files
 - Storybook stories in `.stories.tsx` files
 - Integration tests in `__tests__/integration.test.tsx`

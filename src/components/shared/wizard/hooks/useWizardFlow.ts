@@ -236,7 +236,7 @@ export function useWizardFlow<T>(config: WizardFlowConfig<T>) {
       setState(prev => ({
         ...prev,
         isProcessing: false,
-        errors: { ...prev.errors, submit: error instanceof Error ? error.message : 'An error occurred' },
+        errors: { ...prev.errors, submit: error instanceof Error ? error.message : 'Something went wrong submitting this. Try again.' },
       }));
     }
   }, [state.data, steps.length, validateStep, onComplete, persistKey]);

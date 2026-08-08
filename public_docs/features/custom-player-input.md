@@ -105,7 +105,7 @@ const handleCustomSubmit = (customText: string) => {
 
 ## Testing
 
-Comprehensive test coverage includes:
+Test coverage includes:
 - Unit tests for input validation and character limits
 - Integration tests for narrative flow
 - Manual scenarios: creative actions, combat, social interactions

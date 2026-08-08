@@ -84,7 +84,7 @@ The validation rules are pretty straightforward, but there are a few gotchas:
 
 ## Testing
 
-The component includes comprehensive tests covering:
+The component includes tests covering:
 - Create and edit modes
 - Multi-attribute selection
 - Validation scenarios
