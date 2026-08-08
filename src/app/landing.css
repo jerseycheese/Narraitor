@@ -344,10 +344,64 @@
   gap: var(--space-3);
 }
 
+/* The left column holds two beats, not one: what someone typed, and the
+   attributes and skills that got built from it. They stack rather than sitting
+   side by side so the reading order stays wrote -> built -> came back. */
+.component-landing-authored {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
 .component-landing-typed {
   padding: var(--space-5);
   background: var(--color-text-primary);
   border-radius: var(--radius-md);
+}
+
+.component-landing-built {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-inline-start: var(--space-4);
+  border-inline-start: 2px solid var(--color-border);
+}
+
+/* Definition list, because that is what this is: two terms with a set each.
+   The grid keeps the terms in a column so the two sets align. */
+.component-landing-traits {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+}
+
+.component-landing-trait-term {
+  font-family: var(--font-system);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  /* Aligns the term with the first row of chips rather than the block. */
+  padding-block-start: var(--space-1);
+}
+
+.component-landing-trait-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.component-landing-trait {
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-system);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .component-landing-typed .component-landing-label,

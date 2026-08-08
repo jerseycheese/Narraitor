@@ -111,6 +111,7 @@ async function bundleProductionModules() {
       "export { getNarrativeTemplate } from '@/lib/promptTemplates/narrativeTemplateManager';",
       "export { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';",
       "export { parseChoiceResponse } from '@/lib/ai/choiceGenerator.parser';",
+      "export { ensureSkillChecksForAllOptions } from '@/lib/ai/choiceGenerator';",
       "export { parseJsonFromLLM } from '@/lib/ai/parseJSON';",
     ].join('\n')
   );
@@ -181,10 +182,27 @@ function rollUntilFailure(evaluateSkillCheck, character, skillCheck, worldSkills
  * tagged it with. Checking an unrelated skill is what made the first pass read
  * as nonsense: a choice about hand signals resolved against Rifle Marksmanship.
  */
+/**
+ * The skill the taken option is checked against.
+ *
+ * No fallback on purpose. Callers run the options through the production
+ * ensureSkillChecksForAllOptions first, which guarantees a resolvable skill
+ * requirement on every option, so a miss here means that step was skipped or
+ * the world's skills don't match the parser's. Both are bugs worth stopping
+ * for. The previous version returned worldSkills[0] instead, which is how the
+ * homepage came to show "cut power to external sensors" checked against
+ * Navigation: the first skill in the list, related to nothing.
+ */
 function skillForOption(option, worldSkills) {
   const requirement = (option.requirements || []).find((req) => req.type === 'skill');
   const matched = requirement && worldSkills.find((skill) => skill.id === requirement.targetId);
-  return matched || worldSkills[0];
+  if (!matched) {
+    throw new Error(
+      `No resolvable skill requirement on the taken option: "${option.text}". ` +
+        `Requirements: ${JSON.stringify(option.requirements || [])}`
+    );
+  }
+  return matched;
 }
 
 /** The situation line the app builds after a choice resolves against a check. */
@@ -198,7 +216,13 @@ function describeOutcome(taken, skillName, roll) {
 
 async function buildOne(world, ctx) {
   const { port, apiKey, prod } = ctx;
-  const { getNarrativeTemplate, evaluateSkillCheck, parseChoiceResponse, parseJsonFromLLM } = prod;
+  const {
+    getNarrativeTemplate,
+    evaluateSkillCheck,
+    parseChoiceResponse,
+    ensureSkillChecksForAllOptions,
+    parseJsonFromLLM,
+  } = prod;
 
   console.log(`\n=== ${world.id} — ${world.caption}`);
 
@@ -270,9 +294,16 @@ async function buildOne(world, ctx) {
       worldNpcs: [],
     });
     const choiceRaw = await post(port, '/api/narrative/choices', { prompt: choicePrompt, config: { maxTokens: 1024, temperature: 0.7 } }, apiKey);
-    const decision = parseChoiceResponse(
-      choiceRaw.content,
-      { recentSegments, currentLocation: world.caption },
+    // The app never uses a parsed decision raw: generateChoices runs it through
+    // ensureSkillChecksForAllOptions, which fills in a skill requirement from the
+    // option's own text whenever the model left one out. Skipping that step here
+    // is what made the homepage's checks drift from the app's.
+    const decision = ensureSkillChecksForAllOptions(
+      parseChoiceResponse(
+        choiceRaw.content,
+        { recentSegments, currentLocation: world.caption },
+        worldForParser
+      ),
       worldForParser
     );
     const options = decision?.options || [];

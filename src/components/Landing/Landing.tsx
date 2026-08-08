@@ -50,9 +50,15 @@ export default function Landing() {
           <h1 id="landing-hero-heading" className="component-landing-title">
             Play a story in any world you can imagine
           </h1>
+          {/* Not "you describe the world". Describing it is one step of five,
+              and the other four turn that description into attributes and
+              skills you review and edit. Calling the whole thing a description
+              makes this sound like a prompt box, which is the shape of product
+              Narraitor is positioned against. Name the object instead: the
+              repeated "them" is the argument, one thing in three roles. */}
           <p className="component-landing-lead">
-            You describe the world. What comes back is written for that world,
-            and the choices you make get tested against skills that can fail.
+            You build the world&apos;s attributes and skills. The story is
+            written from them, and your choices are tested against them.
           </p>
           <div className="component-landing-actions">
             <Link href={START_HREF} className="component-landing-cta">

@@ -166,6 +166,28 @@ Decision: What do you do?
       value: 3,
     });
   });
+
+  // Choices render as plain text, so emphasis the model writes for a ship name
+  // or a stressed word reaches the player as literal asterisks.
+  it('strips markdown emphasis from option text', () => {
+    const world = createMockWorld({ id: 'world-1', skills: [] });
+
+    const content = `Decision: What do you do?
+
+1. [Neutral] Cross-reference it with the *Stardust*'s manifest.
+2. [Lawful] Tell them what you **really** think.
+3. [Chaotic] Do it _now_.
+4. [Neutral] Wait 2 * 3 minutes, then knock.`;
+
+    const decision = parseChoiceResponse(content, narrativeContext, world);
+    const texts = decision.options.map((option) => option.text);
+
+    expect(texts[0]).toBe("Cross-reference it with the Stardust's manifest.");
+    expect(texts[1]).toBe('Tell them what you really think.');
+    expect(texts[2]).toBe('Do it now.');
+    // A lone asterisk between spaces isn't emphasis and has to survive.
+    expect(texts[3]).toBe('Wait 2 * 3 minutes, then knock.');
+  });
 });
 
 describe('parseChoiceResponse consequences', () => {

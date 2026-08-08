@@ -3,8 +3,16 @@ import clsx from 'clsx';
 import type { ShowcaseWorld } from './homepageShowcase.generated';
 
 /**
- * One world's evidence: what someone typed, the prose that came back, the
- * decision three turns in, and what a failed check did to it.
+ * One world's evidence: what someone typed, the attributes and skills that got
+ * built from it, the prose that came back, the decision three turns in, and
+ * what a failed check did to it.
+ *
+ * The attribute and skill lists are load-bearing, not decoration. Describing a
+ * world is one step of five in the creation wizard; the other four turn that
+ * description into reviewable data, and that data is what the generator reads
+ * every turn. Without it on the page, the skill check at the bottom reads as a
+ * generic dice roll instead of a world the visitor watched get built, and the
+ * copy has to gesture at a mechanism it never shows.
  *
  * Everything except `typed` and `caption` is real generated output. Nothing
  * here is trimmed or tidied for length, because the point of the section is
@@ -36,11 +44,43 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
       aria-label={world.caption}
     >
       <div className="component-landing-exchange">
-        <h2 className="component-landing-heading">You wrote this. It wrote that.</h2>
+        <h2 className="component-landing-heading">
+          You wrote this. Everything else came from it.
+        </h2>
         <div className="component-landing-exchange-grid">
-          <div className="component-landing-typed">
-            <p className="component-landing-label">Your world</p>
-            <p className="component-landing-typed-text">{world.typed}</p>
+          <div className="component-landing-authored">
+            <div className="component-landing-typed">
+              <p className="component-landing-label">What you wrote</p>
+              <p className="component-landing-typed-text">{world.typed}</p>
+            </div>
+
+            {/* The bridge the page used to skip. The skill named in the failed
+                check below is one of these, so a visitor meets it here first. */}
+            <div className="component-landing-built">
+              <p className="component-landing-label">What it built</p>
+              <dl className="component-landing-traits">
+                <dt className="component-landing-trait-term">Attributes</dt>
+                <dd className="component-landing-trait-list">
+                  {world.attributeNames.map((name) => (
+                    <span key={name} className="component-landing-trait">
+                      {name}
+                    </span>
+                  ))}
+                </dd>
+                <dt className="component-landing-trait-term">Skills</dt>
+                <dd className="component-landing-trait-list">
+                  {/* The skill that fails below is deliberately NOT marked here.
+                      A highlight the visitor can't explain yet is worse than the
+                      connection it buys, and the check block makes it anyway by
+                      naming a skill they've already read. */}
+                  {world.skillNames.map((name) => (
+                    <span key={name} className="component-landing-trait">
+                      {name}
+                    </span>
+                  ))}
+                </dd>
+              </dl>
+            </div>
           </div>
           <div className="component-landing-returned">
             <p className="component-landing-label">What came back</p>

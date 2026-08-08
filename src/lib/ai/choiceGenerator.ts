@@ -143,7 +143,16 @@ const getWorld = (worldId: string): World => {
   return world;
 };
 
-const ensureSkillChecksForAllOptions = (
+/**
+ * Guarantees every option carries a resolvable skill requirement, inventing one
+ * from the option's own text when the model didn't supply it.
+ *
+ * Exported for scripts/generate-homepage-showcase.mjs, which bundles the real
+ * generation chain rather than reimplementing it. Anything that reimplements
+ * this drifts: the homepage's first pass hand-rolled the same step and shipped
+ * a skill nothing in the option had to do with.
+ */
+export const ensureSkillChecksForAllOptions = (
   decision: Decision,
   world: World
 ): Decision => {

@@ -80,6 +80,28 @@ describe('Landing page', () => {
     });
   });
 
+  it('shows the world each story was built from, and checks against it', () => {
+    const { container } = render(<Landing />);
+
+    HOMEPAGE_SHOWCASE.forEach((world) => {
+      const pane = container.querySelector(
+        `.component-landing-pane[data-world="${world.id}"]`
+      ) as HTMLElement;
+
+      const traits = Array.from(
+        pane.querySelectorAll('.component-landing-trait')
+      ).map((el) => el.textContent);
+
+      expect(traits).toEqual([...world.attributeNames, ...world.skillNames]);
+
+      // The connection the section exists to make: the skill that fails is one
+      // the visitor already read in the list above. A regeneration that lands a
+      // check outside the world's own skills breaks the argument, not just the
+      // wording, so it fails here rather than shipping.
+      expect(world.skillNames).toContain(world.check.skillName);
+    });
+  });
+
   it('makes the Gemini key ask actionable', () => {
     render(<Landing />);
 
