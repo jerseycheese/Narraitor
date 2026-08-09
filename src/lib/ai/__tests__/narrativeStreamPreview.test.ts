@@ -49,6 +49,15 @@ describe('extractStreamingContentPreview', () => {
     expect(extractStreamingContentPreview('```json')).toBe('');
   });
 
+  it('withholds output for an in-progress fence word, not just an exact-length prefix', () => {
+    // Regression: a naive "backticks, then the whole word or nothing" check
+    // let a partially-typed fence word ("```j", "```js", "```jso") leak
+    // through as prose for a chunk or two before the fence resolved.
+    expect(extractStreamingContentPreview('```j')).toBe('');
+    expect(extractStreamingContentPreview('```js')).toBe('');
+    expect(extractStreamingContentPreview('```jso')).toBe('');
+  });
+
   it('returns the full value once the JSON object is complete', () => {
     const buffer = JSON.stringify({
       content: 'A complete beat.',

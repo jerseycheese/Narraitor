@@ -2,7 +2,19 @@
 
 import { stripMarkdownFences } from './parseJSON';
 
-const PARTIAL_FENCE_ONLY = /^`{1,3}(json)?$/;
+const FENCE_MARKER = '```json';
+
+/**
+ * True while `text` could still turn into the opening fence marker as more
+ * characters arrive — not just an exact-length match ("`", "``", "```json")
+ * but any in-progress prefix ("```j", "```jso", ...). A prefix-length regex
+ * only catching the exact backtick run or the fully-typed word missed those
+ * partial-word states, which let fence characters leak into the preview as
+ * prose for a chunk or two.
+ */
+function isPartialFencePrefix(text: string): boolean {
+  return FENCE_MARKER.startsWith(text) && text.length < FENCE_MARKER.length;
+}
 
 /**
  * Extracts the currently-decodable prefix of the "content" field from a
@@ -22,11 +34,17 @@ const PARTIAL_FENCE_ONLY = /^`{1,3}(json)?$/;
  * character.
  */
 export function extractStreamingContentPreview(rawBuffer: string): string {
-  const stripped = stripMarkdownFences(rawBuffer);
-
-  if (PARTIAL_FENCE_ONLY.test(stripped)) {
+  // Check the RAW (pre-strip) buffer for a partial fence: stripMarkdownFences
+  // already consumes a complete "```" run, so by the time it's run, a
+  // partial one ("```j") has had its backticks removed and no longer looks
+  // like a fence prefix — checking after stripping missed exactly the
+  // in-progress case this guard exists for.
+  const trimmedRaw = rawBuffer.trimStart();
+  if (isPartialFencePrefix(trimmedRaw)) {
     return '';
   }
+
+  const stripped = stripMarkdownFences(trimmedRaw).trimStart();
 
   const contentFieldStart = stripped.indexOf('"content"');
   if (contentFieldStart === -1) {
@@ -34,7 +52,7 @@ export function extractStreamingContentPreview(rawBuffer: string): string {
     // JSON structure at all, show the raw buffer as-is so early chunks of a
     // plain-prose response (unexpected, but not our contract to enforce)
     // aren't held back.
-    return stripped.trimStart().startsWith('{') ? '' : stripped;
+    return stripped.startsWith('{') ? '' : stripped;
   }
 
   const colonIndex = stripped.indexOf(':', contentFieldStart);

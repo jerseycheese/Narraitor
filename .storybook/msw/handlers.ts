@@ -23,6 +23,22 @@ const textResponse = (content: string) =>
     completionTokens: 0,
   });
 
+// /api/narrative/generate alone streams newline-delimited JSON (issue #1476)
+// instead of the single-JSON shape above — see processGeminiStreamingTextRequest
+// and ClientGeminiClient.generateContent's ndjson reader. One line is a valid
+// stream: just the terminal `done` event, carrying the same fields.
+const streamingTextResponse = (content: string) =>
+  new HttpResponse(
+    `${JSON.stringify({
+      done: true,
+      content,
+      finishReason: 'STOP',
+      promptTokens: 0,
+      completionTokens: 0,
+    })}\n`,
+    { headers: { 'Content-Type': 'application/x-ndjson; charset=utf-8' } }
+  );
+
 const CANNED_NARRATIVE =
   'The corridor opens into a vaulted hall. Dust hangs in the lantern light, ' +
   'and somewhere ahead water drips in a slow, deliberate rhythm. You sense ' +
@@ -44,7 +60,7 @@ const placeholderImage = (seed: string) =>
 
 export const handlers = [
   // --- Narrative text routes ---
-  http.post('/api/narrative/generate', () => textResponse(CANNED_NARRATIVE)),
+  http.post('/api/narrative/generate', () => streamingTextResponse(CANNED_NARRATIVE)),
   http.post('/api/narrative/choices', () => textResponse(CANNED_CHOICES)),
   http.post('/api/narrative/ending', () => textResponse(CANNED_NARRATIVE)),
   http.post('/api/narrative/summarize', () => textResponse('A brief recap of events so far.')),

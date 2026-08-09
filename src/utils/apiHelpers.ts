@@ -399,7 +399,16 @@ export async function* consumeGeminiStreamEvents(
         if (typeof text === 'string') {
           rawContent += text;
           const nextPreview = extractStreamingContentPreview(rawContent);
-          if (nextPreview.length > visiblePreview.length) {
+          // Only ever emit a delta when the new preview grows the previous
+          // one by appending characters. extractStreamingContentPreview is
+          // recomputed from scratch each call and is meant to be monotonic,
+          // but this guard keeps a future edge case there from slicing a
+          // false prefix off content that never actually preceded it, which
+          // would otherwise corrupt the reveal (see #1717 review).
+          if (
+            nextPreview.length > visiblePreview.length &&
+            nextPreview.startsWith(visiblePreview)
+          ) {
             yield { delta: nextPreview.slice(visiblePreview.length) };
             visiblePreview = nextPreview;
           }

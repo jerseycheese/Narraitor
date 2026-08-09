@@ -123,6 +123,31 @@ async function bundleProductionModules() {
   return { modules: await import(out), buildDir };
 }
 
+/**
+ * /api/narrative/generate streams newline-delimited JSON (issue #1476) — one
+ * or more `{delta}` progress lines, then a terminal `{done: true, content,
+ * finishReason, promptTokens, completionTokens}` line carrying the same
+ * fields the old single-JSON response had. The other routes this script
+ * calls still return plain JSON. Rather than branching per-route, parse the
+ * body as JSON first and only fall back to scanning it as ndjson when that
+ * fails, so every caller of post() keeps working unchanged either way.
+ */
+function parseRouteResponse(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    // Fall through to ndjson parsing below.
+  }
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const event = JSON.parse(trimmed);
+    if ('error' in event) throw new Error(event.error);
+    if ('done' in event) return event;
+  }
+  throw new Error('Streamed response ended without a completion event.');
+}
+
 async function post(port, route, body, apiKey) {
   let lastError;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
@@ -134,7 +159,7 @@ async function post(port, route, body, apiKey) {
       });
       const text = await response.text();
       if (!response.ok) throw new Error(`${route} returned ${response.status}: ${text.slice(0, 300)}`);
-      return JSON.parse(text);
+      return parseRouteResponse(text);
     } catch (error) {
       lastError = error;
       if (attempt < MAX_ATTEMPTS) {
