@@ -38,6 +38,6 @@ test('First play tour snapshots (steps 0-1)', async ({ page }) => {
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect.soft(page).toHaveScreenshot(`tutorial-first-play-step${zeroPad(stepIndex)}.png`, { clip });
+    await expect(page).toHaveScreenshot(`tutorial-first-play-step${zeroPad(stepIndex)}.png`, { clip });
   }
 });
