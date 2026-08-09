@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { BookOpen } from 'lucide-react';
 import { BackNavigation } from '@/components/shared/BackNavigation';
 import { PageLayout } from '@/components/shared/PageLayout';
@@ -18,9 +19,18 @@ import { JournalEntry } from '@/types/journal.types';
 import { useShallow } from 'zustand/react/shallow';
 import { clsx } from 'clsx';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { readString, writeString } from '@/lib/utils/browserStorage';
 import { selectSessionEntries } from '@/lib/journal/journalSelectors';
 import { JournalEntryDetail } from './JournalEntryDetail';
 import { JournalEntryList } from './JournalEntryList';
+import { JournalViewToggle, type JournalViewMode } from './JournalViewToggle';
+
+// JournalTable pulls @tanstack/react-table but only renders in table view; the
+// page defaults to the list/detail layout, so load it on demand.
+const JournalTable = dynamic(
+  () => import('./JournalTable').then((m) => ({ default: m.JournalTable })),
+  { ssr: false }
+);
 
 interface JournalPageProps {
   worldId: string;
@@ -44,6 +54,24 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
   const [searchQuery, setSearchQuery] = React.useState('');
   const detailRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Display mode (list/detail cards vs. sortable table), persisted like the
+  // character list screen (useEffect restore, not a lazy useState initializer
+  // — that would read localStorage during the server render too and hydrate
+  // mismatched against the client's first pass).
+  const [displayMode, setDisplayMode] = React.useState<JournalViewMode>('list');
+
+  React.useEffect(() => {
+    const saved = readString('local', 'journal-view-mode');
+    if (saved === 'list' || saved === 'table') {
+      setDisplayMode(saved);
+    }
+  }, []);
+
+  const handleDisplayModeChange = (mode: JournalViewMode) => {
+    setDisplayMode(mode);
+    writeString('local', 'journal-view-mode', mode);
+  };
 
   const entries = useJournalStore(
     useShallow((state) => selectSessionEntries(state, sessionId, characterId))
@@ -76,19 +104,25 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     });
   }, [entries, normalizedQuery]);
 
-  const firstEntryId = filteredEntries[0]?.id ?? null;
+  // Table view gets the full, unfiltered entry set (it has its own search
+  // and type filter — see JournalTable), so selection has to resolve against
+  // that same set. Resolving against filteredEntries here would mean a row
+  // excluded by a stale list-view search query opens the wrong entry (or an
+  // empty detail pane) when clicked in table view.
+  const selectionPool = displayMode === 'table' ? entries : filteredEntries;
+  const firstEntryId = selectionPool[0]?.id ?? null;
   const resolvedSelectedEntryId = React.useMemo(
     () =>
       selectedEntryId &&
-      filteredEntries.some((entry) => entry.id === selectedEntryId)
+      selectionPool.some((entry) => entry.id === selectedEntryId)
         ? selectedEntryId
         : null,
-    [filteredEntries, selectedEntryId]
+    [selectionPool, selectedEntryId]
   );
 
   const activeSelectedEntryId = resolvedSelectedEntryId ?? firstEntryId;
   const selectedEntry = activeSelectedEntryId
-    ? filteredEntries.find((entry) => entry.id === activeSelectedEntryId) ||
+    ? selectionPool.find((entry) => entry.id === activeSelectedEntryId) ||
       null
     : null;
 
@@ -165,7 +199,12 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     }
 
     return (
-      <div className="journal-content">
+      <div
+        className={clsx(
+          'journal-content',
+          displayMode === 'table' && 'journal-content-table'
+        )}
+      >
         {entries.length === 0 ? (
           <div className="journal-empty-state">
             <EmptyState
@@ -178,47 +217,62 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
             <div
               className={clsx(
                 'journal-list-pane',
-                viewMode === 'list' ? '' : 'hidden'
+                viewMode === 'list' ? '' : 'hidden',
+                displayMode === 'table' && 'journal-list-pane-table'
               )}
               data-testid="journal-list-pane"
             >
               <div className="journal-list-header">
                 <h2>Entries</h2>
-              </div>
-              <div className="journal-search-wrapper">
-                <Input
-                  id="journal-search"
-                  type="search"
-                  placeholder="Search entries..."
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  aria-label="Search entries"
+                <JournalViewToggle
+                  mode={displayMode}
+                  onModeChange={handleDisplayModeChange}
                 />
               </div>
-              {filteredEntries.length === 0 ? (
-                <div>No entries match your search.</div>
-              ) : (
-                <JournalEntryList
-                  entries={visibleEntries}
+              {displayMode === 'table' ? (
+                <JournalTable
+                  entries={entries}
                   selectedEntryId={activeSelectedEntryId}
                   onEntrySelect={handleEntrySelect}
                 />
-              )}
-              {canLoadMore && (
-                <div className="journal-load-more">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={() =>
-                      setVisibleCount((prev) =>
-                        Math.min(prev + PAGE_SIZE, entries.length)
-                      )
-                    }
-                  >
-                    Load more
-                  </Button>
-                </div>
+              ) : (
+                <>
+                  <div className="journal-search-wrapper">
+                    <Input
+                      id="journal-search"
+                      type="search"
+                      placeholder="Search entries..."
+                      value={searchQuery}
+                      onChange={(event) => setSearchQuery(event.target.value)}
+                      aria-label="Search entries"
+                    />
+                  </div>
+                  {filteredEntries.length === 0 ? (
+                    <div>No entries match your search.</div>
+                  ) : (
+                    <JournalEntryList
+                      entries={visibleEntries}
+                      selectedEntryId={activeSelectedEntryId}
+                      onEntrySelect={handleEntrySelect}
+                    />
+                  )}
+                  {canLoadMore && (
+                    <div className="journal-load-more">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() =>
+                          setVisibleCount((prev) =>
+                            Math.min(prev + PAGE_SIZE, entries.length)
+                          )
+                        }
+                      >
+                        Load more
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
