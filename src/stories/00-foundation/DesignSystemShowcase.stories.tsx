@@ -481,6 +481,56 @@ export const CompleteShowcase: Story = {
         </div>
       </section>
 
+      {/* Drafting Marks */}
+      <section className="ds-showcase-section ds-showcase-marks">
+        <h2>Drafting Marks</h2>
+        <p className="ds-showcase-marks-intro">
+          DS3&rsquo;s decorative vocabulary is one family of ink marks, not a set of unrelated
+          ornaments. Every mark is drawn in <code>--color-text-muted</code>, and the ones with
+          arms share <code>--mark-arm-length</code>. Accent buys at most one focal mark per
+          surface: per surface, not per card, and not per register.
+        </p>
+        <p className="ds-showcase-marks-intro">
+          The samples below use the production classes rather than copies, so this section
+          cannot drift from what the app renders.
+        </p>
+
+        <div className="ds-showcase-marks-grid">
+          <div className="ds-showcase-mark-item">
+            <div className="component-world-card ds-showcase-mark-sample" />
+            <p className="ds-showcase-mark-name">Corner bracket</p>
+            <p className="ds-showcase-mark-where">
+              The family&rsquo;s quiet default. Top-left and bottom-right of every card and
+              detail section.
+            </p>
+          </div>
+
+          <div className="ds-showcase-mark-item">
+            <div className="component-dashboard-continue-card ds-showcase-mark-sample" />
+            <p className="ds-showcase-mark-name">Registration cross</p>
+            <p className="ds-showcase-mark-where">
+              A bracket promoted to a full trim mark, in accent. One per surface; this is where
+              the accent budget goes.
+            </p>
+          </div>
+
+          <div className="ds-showcase-mark-item ds-showcase-mark-item-wide">
+            <div className="world-detail-section ds-showcase-mark-sample">
+              <h2>Section heading</h2>
+            </div>
+            <p className="ds-showcase-mark-name">
+              Dimension ticks, dotted rule, bullet eyebrow
+            </p>
+            <p className="ds-showcase-mark-where">
+              Ticks measure the section&rsquo;s top edge at the dotted rule&rsquo;s own 12px
+              pitch. The perforated rule sits under the heading, the bullet eyebrow above it.
+              Detail sections only: a tick band repeated across a dense card grid drowns the
+              dot grid.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Theme-Specific Colors */}
       <section className="ds-showcase-section">
         <h2>Theme-Specific Colors</h2>

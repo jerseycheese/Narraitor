@@ -1059,7 +1059,7 @@
   background: transparent;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1130,7 +1130,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1176,7 +1176,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1214,7 +1214,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 8px 4px;
@@ -1234,7 +1234,7 @@
   background: transparent;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 8px 4px;
@@ -1933,7 +1933,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 8px 4px;
@@ -2219,7 +2219,7 @@
   border-top: none;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
