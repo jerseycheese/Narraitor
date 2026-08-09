@@ -40,7 +40,7 @@ export const CharacterSheet: Story = {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <h4 style={{ fontFamily: 'var(--font-narrative)', fontWeight: 700 }}>Attributes</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.875rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: 'var(--font-size-sm)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.25rem' }}><span>Strength</span><span>14</span></div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.25rem' }}><span>Dexterity</span><span>12</span></div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.25rem' }}><span>Intelligence</span><span>16</span></div>
@@ -68,10 +68,10 @@ export const Inventory: Story = {
         ].map((item) => (
           <div key={item.name} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>
             <div>
-              <div style={{ fontSize: '0.875rem', fontWeight: 500 }}>{item.name}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{item.desc}</div>
+              <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500 }}>{item.name}</div>
+              <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>{item.desc}</div>
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>x{item.qty}</span>
+            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>x{item.qty}</span>
           </div>
         ))}
       </div>

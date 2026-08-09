@@ -11,7 +11,7 @@
 
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
   font-size: 0.8125rem;
 }
 
@@ -19,27 +19,27 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-2);
   color: var(--color-text-muted);
 }
 
 .token-budget-panel-rows {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: var(--space-2_5);
 }
 
 .token-budget-panel-row {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .token-budget-panel-row-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-1_5);
 }
 
 .token-budget-panel-component {
@@ -56,14 +56,14 @@
 .token-budget-panel-bar {
   width: 100%;
   height: 0.5rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: var(--color-surface-muted, var(--color-border));
   overflow: hidden;
 }
 
 .token-budget-panel-bar-fill {
   height: 100%;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   transition: width 0.2s ease;
 }
 
@@ -92,8 +92,8 @@
 .token-budget-panel-calibration {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding-top: 0.5rem;
+  gap: var(--space-1);
+  padding-top: var(--space-2);
   border-top: 1px solid var(--color-border);
 }
 
@@ -107,7 +107,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .token-budget-panel-empty {

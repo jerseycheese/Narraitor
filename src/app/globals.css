@@ -444,7 +444,7 @@ body > * {
 }
 
 .dark-mode-toggle-option-compact {
-  padding: 0.1875rem 0.375rem;
+  padding: 0.1875rem var(--space-1_5);
   font-size: 0.5625rem;
 }
 

@@ -18,7 +18,7 @@ export const Open: Story = {
       <DialogContent className="story-dialog">
         <DialogTitle>Delete this world?</DialogTitle>
         <p>This removes the world and every character in it. This can&apos;t be undone.</p>
-        <div style={{ display: 'flex', gap: 'var(--spacing-2, 0.5rem)', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
           <Button variant="secondary">Cancel</Button>
           <Button variant="destructive">Delete</Button>
         </div>

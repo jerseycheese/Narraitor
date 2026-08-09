@@ -39,7 +39,7 @@
 .section-visibility-menu-list {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: var(--space-0_5);
 }
 
 /* Menu items are shared DS Buttons; left-align and fill the menu width.

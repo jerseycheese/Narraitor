@@ -802,7 +802,7 @@
   align-items: center;
   justify-content: center;
   min-width: var(--space-3);
-  padding-top: 1rem;
+  padding-top: var(--space-4);
 }
 
 /* ─── Button rows ─── */
@@ -1185,13 +1185,13 @@
 :root .wizard-page .form-input,
 :root .wizard-page .form-textarea,
 :root .wizard-page .form-select {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-interface);
 }
 
 :root .wizard-page .wizard-card,
 :root .wizard-page .wizard-panel {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 :root .wizard-page .wizard-nav-container {
@@ -1220,7 +1220,7 @@
 
 :root .wizard-page .wizard-nav-primary,
 :root .wizard-page .wizard-nav-secondary {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 /* DS3 step content — monospace card titles, dotted divider/action-row
@@ -1293,18 +1293,18 @@
 }
 
 :root .wizard-page .wizard-toggle {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-system);
   font-size: var(--font-size-xs);
 }
 
 :root .wizard-page .wizard-info-banner {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border-style: dashed;
 }
 
 :root .wizard-page .wizard-empty-state {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-system);
 }
 
@@ -1976,12 +1976,12 @@
 }
 
 :root .wizard-page .wizard-skill-attr-option {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: var(--space-1_5);
 }
 
 :root .wizard-page .wizard-custom-editor {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: var(--space-3);
 }
 
@@ -1994,7 +1994,7 @@
 :root .wizard-page .wizard-custom-editor input,
 :root .wizard-page .wizard-custom-editor textarea,
 :root .wizard-page .wizard-custom-editor select {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 :root .wizard-page .wizard-slot-cell {
@@ -2009,7 +2009,7 @@
 }
 
 :root .wizard-page .wizard-dialog-panel {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border-style: dashed;
 }
 
@@ -2018,16 +2018,16 @@
 }
 
 :root .wizard-page .component-portrait-step .component-character-portrait {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 :root .wizard-page .component-portrait-step button {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: var(--space-1_5) var(--space-3);
 }
 
 :root .wizard-page .portrait-step-success {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border-style: dashed;
 }
 
@@ -2036,7 +2036,7 @@
 }
 
 :root .wizard-page .component-point-pool-manager .point-pool-allocation {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: var(--space-2_5);
 }
 
@@ -2046,7 +2046,7 @@
 }
 
 :root .wizard-page .wizard-error-container {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border-style: dashed;
 }
 
