@@ -3,8 +3,6 @@ import { hideNextDevOverlay, waitForContentStable } from '../utils/wait-helpers'
 import { seedBaseData } from '../utils/seedTestData';
 import { gotoTutorialPage, zeroPad } from '../utils/tutorial-helpers';
 
-const INTRO_ONBOARDING_TEXT_MAX_DIFF_PIXELS = 16000;
-
 test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   test.setTimeout(60000);
 
@@ -32,17 +30,14 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   // The "First time?" title renders in the italic Newsreader webfont
   // (--font-narrative, next/font with display: 'swap'). Without waiting for
   // the swap, an occasional slow font fetch (cold CI dev-server compile)
-  // leaves the fallback-font glyphs painted at screenshot time, producing a
-  // few thousand pixels of diff right at maxDiffPixels — the same wait other
-  // specs already do (e.g. world-creation.spec.ts, landing-page.spec.ts).
+  // leaves the fallback-font glyphs painted at screenshot time, producing
+  // thousands of pixels of diff — the same wait other specs already do
+  // (e.g. world-creation.spec.ts, landing-page.spec.ts).
   await page.evaluate(() => document.fonts.ready);
 
   // Step 0: Welcome
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(0)}.png`, {
+  await expect.soft(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(0)}.png`, {
     fullPage: false,
-    // These frames are mostly text, so Darwin font smoothing can land above
-    // the suite-wide threshold without a visible layout change.
-    maxDiffPixels: INTRO_ONBOARDING_TEXT_MAX_DIFF_PIXELS,
   });
 
   const nextButton = page.getByRole('button', { name: 'Next' });
@@ -52,9 +47,8 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await page.waitForTimeout(500);
   await waitForContentStable(page);
   await page.evaluate(() => document.fonts.ready);
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(1)}.png`, {
+  await expect.soft(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(1)}.png`, {
     fullPage: false,
-    maxDiffPixels: INTRO_ONBOARDING_TEXT_MAX_DIFF_PIXELS,
   });
 
   // Step 2: Details
@@ -62,8 +56,7 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await page.waitForTimeout(500);
   await waitForContentStable(page);
   await page.evaluate(() => document.fonts.ready);
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(2)}.png`, {
+  await expect.soft(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(2)}.png`, {
     fullPage: false,
-    maxDiffPixels: INTRO_ONBOARDING_TEXT_MAX_DIFF_PIXELS,
   });
 });

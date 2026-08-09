@@ -200,7 +200,7 @@ test('Character creation wizard tour snapshots (steps 0-4)', async ({
     await startTourAt(page, 'characterCreationWizard', stepIndex);
     await waitForTooltip(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(
+    await expect.soft(page).toHaveScreenshot(
       `tutorial-character-creation-step${zeroPad(stepIndex)}.png`,
       {
         clip,

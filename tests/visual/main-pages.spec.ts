@@ -3,8 +3,6 @@ import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections,
 import { seedTestData, seedBaseData } from './utils/seedTestData';
 import { waitForStoreReady } from './utils/tutorial-helpers';
 
-const TEXT_HEAVY_ONBOARDING_MAX_DIFF_PIXELS = 11000;
-
 /**
  * Main Pages Visual Regression Tests
  *
@@ -42,9 +40,9 @@ test.describe('Main Pages Visual Tests', () => {
     // title renders in the italic Newsreader webfont (--font-narrative,
     // next/font with display: 'swap'). Without waiting for the swap, an
     // occasional slow font fetch leaves fallback-font glyphs painted at
-    // screenshot time, producing a few thousand pixels of diff right at
-    // maxDiffPixels — the same wait other specs already do (e.g.
-    // world-creation.spec.ts, landing-page.spec.ts).
+    // screenshot time, producing thousands of pixels of diff — the same wait
+    // other specs already do (e.g. world-creation.spec.ts,
+    // landing-page.spec.ts).
     await page.evaluate(() => document.fonts.ready);
     await hideDynamicContent(page);
 
@@ -54,7 +52,6 @@ test.describe('Main Pages Visual Tests', () => {
     // Take full page screenshot - empty QuickPlay form
     await expect(page).toHaveScreenshot('home-empty-state.png', {
       fullPage: true,
-      maxDiffPixels: TEXT_HEAVY_ONBOARDING_MAX_DIFF_PIXELS,
     });
   });
 
