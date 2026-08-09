@@ -36,7 +36,7 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await page.evaluate(() => document.fonts.ready);
 
   // Step 0: Welcome
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(0)}.png`, {
+  await expect.soft(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(0)}.png`, {
     fullPage: false,
   });
 
@@ -47,7 +47,7 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await page.waitForTimeout(500);
   await waitForContentStable(page);
   await page.evaluate(() => document.fonts.ready);
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(1)}.png`, {
+  await expect.soft(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(1)}.png`, {
     fullPage: false,
   });
 
@@ -56,7 +56,7 @@ test('Guided first-time experience snapshots (steps 0-2)', async ({ page }) => {
   await page.waitForTimeout(500);
   await waitForContentStable(page);
   await page.evaluate(() => document.fonts.ready);
-  await expect(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(2)}.png`, {
+  await expect.soft(page).toHaveScreenshot(`tutorial-intro-onboarding-step${zeroPad(2)}.png`, {
     fullPage: false,
   });
 });

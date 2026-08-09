@@ -3231,14 +3231,32 @@ body.manuscript-overlay-open {
   color: var(--color-accent);
 }
 
-/* DS3 narrative segment divider — centered rule */
+/* DS3 narrative segment divider — session-relative time label flanked by rules */
 :root .manuscript-narrative-divider {
-  border: none;
-  width: 120px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 320px;
+  max-width: 60%;
+  margin: var(--space-4) auto;
+  opacity: 0.6;
+}
+
+:root .manuscript-narrative-divider::before,
+:root .manuscript-narrative-divider::after {
+  content: '';
+  flex: 1;
   height: 1px;
   background: var(--color-border);
-  margin: var(--space-4) auto;
-  opacity: 0.4;
+}
+
+:root .manuscript-narrative-divider-label {
+  flex-shrink: 0;
+  font-family: var(--font-system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
 }
 
 /* DS3 save indicator — compact status dot */
