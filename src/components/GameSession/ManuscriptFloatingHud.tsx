@@ -46,9 +46,27 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
 
   const { toolbarRef, onKeyDown, onFocus } = useRovingToolbar<HTMLDivElement>();
 
+  // Close the character panel on an outside click, matching the click-outside
+  // pattern the header's other popovers already use (ThemeMenu,
+  // RecentPagesDropdown). Escape and the toggle button itself stay the
+  // caller's job (ActiveGameSession owns isCharacterSummaryExpanded).
+  const headerLeftRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (!isCharacterSummaryExpanded) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!headerLeftRef.current?.contains(event.target as Node)) {
+        onToggleCharacterSummary();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isCharacterSummaryExpanded, onToggleCharacterSummary]);
+
   return (
     <>
-      <div className="manuscript-overlay-header-left">
+      <div className="manuscript-overlay-header-left" ref={headerLeftRef}>
         <div className="manuscript-header-controls">
           <button
             ref={characterButtonRef}

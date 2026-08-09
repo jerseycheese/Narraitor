@@ -49,6 +49,44 @@ describe('ManuscriptFloatingHud accessibility', () => {
     expect(panel).toHaveFocus();
   });
 
+  // Issue #265: a click anywhere outside the pill/panel closes it, so an open
+  // panel doesn't sit over the narrative until the player finds the tiny
+  // trigger again or reaches for Escape.
+  it('closes the character panel on an outside click', () => {
+    const onToggleCharacterSummary = jest.fn();
+    render(
+      <div>
+        <div data-testid="outside">Narrative text</div>
+        <ManuscriptFloatingHud
+          {...baseProps}
+          onToggleCharacterSummary={onToggleCharacterSummary}
+          isCharacterSummaryExpanded={true}
+          characterSummaryPanel={<div>Character info</div>}
+        />
+      </div>
+    );
+
+    fireEvent.mouseDown(screen.getByTestId('outside'));
+
+    expect(onToggleCharacterSummary).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves the character panel open on a click inside it', () => {
+    const onToggleCharacterSummary = jest.fn();
+    render(
+      <ManuscriptFloatingHud
+        {...baseProps}
+        onToggleCharacterSummary={onToggleCharacterSummary}
+        isCharacterSummaryExpanded={true}
+        characterSummaryPanel={<div>Character info</div>}
+      />
+    );
+
+    fireEvent.mouseDown(screen.getByText('Character info'));
+
+    expect(onToggleCharacterSummary).not.toHaveBeenCalled();
+  });
+
   it('character button has aria-expanded reflecting panel state', () => {
     const { rerender } = render(
       <ManuscriptFloatingHud {...baseProps} isCharacterSummaryExpanded={false} />
