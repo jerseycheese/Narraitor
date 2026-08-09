@@ -1,5 +1,4 @@
 import { GeneratedImage } from '@/types/common.types';
-import { getTimestamp } from '@/lib/utils';
 
 export const MAX_PORTRAIT_UPLOAD_BYTES = 5 * 1024 * 1024;
 
@@ -48,12 +47,12 @@ export function readPortraitFile(file: File): Promise<GeneratedImage> {
         return;
       }
 
-      // No prompt: that field means "the text this image was generated from",
-      // which an uploaded file doesn't have.
+      // No prompt or generatedAt: both describe an AI generation, and the
+      // editor renders generatedAt as "Generated: <date>" — untrue of a file
+      // the player picked off disk.
       resolve({
         type: 'uploaded',
         url,
-        generatedAt: getTimestamp(),
       });
     };
 

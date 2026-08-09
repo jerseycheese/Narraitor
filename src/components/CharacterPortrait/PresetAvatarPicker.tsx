@@ -10,7 +10,6 @@ import {
   PresetAvatarCategory,
   searchPresetAvatars,
 } from '@/lib/portraits/presetAvatars';
-import { getTimestamp } from '@/lib/utils';
 import './PresetAvatarPicker.css';
 
 interface PresetAvatarPickerProps {
@@ -99,11 +98,7 @@ export function PresetAvatarPicker({
                   )}
                   aria-pressed={isSelected}
                   onClick={() =>
-                    onPreview({
-                      type: 'preset',
-                      url: avatar.url,
-                      generatedAt: getTimestamp(),
-                    })
+                    onPreview({ type: 'preset', url: avatar.url })
                   }
                 >
                   <Image

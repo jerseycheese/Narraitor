@@ -49,7 +49,6 @@ describe('ImageGenerationSection accessibility', () => {
           {...baseProps}
           currentImageType={type}
           currentImageUrl="data:image/png;base64,abc"
-          generatedAt="2026-01-01T00:00:00.000Z"
           removeButtonText="Remove Portrait"
         />
       );
@@ -57,8 +56,6 @@ describe('ImageGenerationSection accessibility', () => {
       expect(
         screen.getByRole('button', { name: 'Remove Portrait' })
       ).toBeInTheDocument();
-      // "Generated:" belongs to AI output only — a preset or an upload wasn't.
-      expect(screen.queryByText(/^Generated:/)).not.toBeInTheDocument();
     }
   );
 

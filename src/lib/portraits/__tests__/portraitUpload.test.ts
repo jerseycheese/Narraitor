@@ -37,6 +37,8 @@ describe('readPortraitFile', () => {
 
     expect(portrait.type).toBe('uploaded');
     expect(portrait.url).toMatch(/^data:/);
-    expect(portrait.generatedAt).toBeTruthy();
+    // generatedAt/prompt describe an AI generation; an uploaded file has neither.
+    expect(portrait.generatedAt).toBeUndefined();
+    expect(portrait.prompt).toBeUndefined();
   });
 });

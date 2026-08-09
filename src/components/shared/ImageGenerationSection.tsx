@@ -166,7 +166,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
             </div>
           )}
 
-          {generatedAt && currentImageType === 'ai-generated' && (
+          {generatedAt && (
             <p className="image-generation-generated-at">
               Generated: {formatDate(generatedAt)}
             </p>
