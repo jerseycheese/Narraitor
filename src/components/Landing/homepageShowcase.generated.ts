@@ -7,7 +7,7 @@
  * back into a claim nobody checked. Re-run the script instead.
  *
  * Model: gemini-2.5-flash
- * Generated: 2026-08-08T13:21:17.053Z
+ * Generated: 2026-08-09T19:18:49.036Z
  * Turns played per world: 3 (the last one is what's kept)
  *
  * The player's side of the exchange is authored, standing in for what someone
@@ -64,53 +64,53 @@ export const HOMEPAGE_SHOWCASE: ShowcaseWorld[] = [
     "typed": "A rain-soaked port city where it never stops raining and every cop is on someone's payroll. Nineteen-forties, but the light is the wrong colour.",
     "protagonist": "Vaughn",
     "attributeNames": [
-      "Grit",
-      "Charm",
+      "Brawn",
+      "Agility",
       "Wits",
-      "Prowess"
+      "Resolve"
     ],
     "skillNames": [
-      "Intimidation",
       "Streetwise",
       "Investigation",
+      "Intimidation",
       "Persuasion",
-      "Brawling",
-      "Firearms"
+      "Shadowing",
+      "Bluff"
     ],
-    "opening": "The incessant drizzle, a constant companion in this city, plastered your trench coat to your skin as you hunched under the flickering neon sign of 'The Drowned Man' speakeasy, its red glow casting a sickly pallor on the already grimy street. Inside, the air was thick with stale tobacco smoke and the low murmur of illicit deals, a familiar symphony that always set your teeth on edge. You spotted him immediately: Silas Thorne, a known associate of the docks foreman, hunched over a whiskey, his fat fingers tracing patterns on the condensation of his glass.",
-    "situation": "You meet the bouncer's cold stare, a silent challenge passing between you. You brace yourself, subtly shifting your weight, preparing for a shove or a follow-up question. Instead, his grip tightens on your shoulder, a bone-jarring squeeze that sends a sharp, unexpected pain radiating down your arm. He doesn't say a word, just pushes you forward, a forceful nudge that sends you stumbling off balance towards the bar, away from Silas Thorne's watchful eyes.",
+    "opening": "The perpetual drizzle clung to your trench coat, a cold, insistent reminder of this city's melancholic grip as you navigated the slick, uneven cobblestones of the waterfront. Under the sickly yellow glow of a flickering gas lamp, the overturned fishing trawler, the 'Sea Serpent,' listed heavily against the barnacle-encrusted pier, its splintered hull a gaping maw to the unforgiving grey sky. A lone, uniformed figure, clearly a beat cop too far from his usual patrol, stood silhouetted against the unnatural twilight, his shoulders hunched, his hat brim pulled low, the faint glint of something metallic in his hand suggesting a fresh, illicit payment. You felt the familiar knot in your gut, the one that always tightened when a job pulled you back into the murky waters you'd sworn to leave behind, but the dead man sprawled across the trawler's deck, half-submerged in a growing pool of crimson, wasn't going to investigate himself.",
+    "situation": "“Runner!” you yelled, pointing a finger past the 'Sea Serpent's' bow, towards the dense, rain-streaked shadows of a narrow alleyway. The word hung heavy in the damp air, a flat, unconvincing sound that carried no urgency. The beat cop, his shoulders still hunched, merely shifted his weight, his gaze unwavering as he watched you, the paper-wrapped coins still clutched in his hand. A slow, knowing smirk spread across his face, a silent acknowledgement of your clumsy attempt.",
     "decisionPrompt": "What will you do?",
     "options": [
       {
-        "text": "Calmly find an empty stool at the bar, observing Silas Thorne.",
+        "text": "\"Runner, you say? I'm requisitioning your assistance.\"",
         "alignment": "lawful",
         "taken": false
       },
       {
-        "text": "Steadily regain balance, then scan the room for an escape route.",
+        "text": "Offer the cop your own coins to point out the runner's path.",
         "alignment": "neutral",
         "taken": true
       },
       {
-        "text": "Immediately turn to the bartender, ordering a drink while watching the bouncer.",
+        "text": "Ignore the cop and move towards the alley's mouth, scanning for tracks.",
         "alignment": "neutral",
         "taken": false
       },
       {
-        "text": "Trip over a barstool, sending a tray of drinks crashing near Silas Thorne.",
+        "text": "Snatch the paper-wrapped coins from the cop and dash into the alley.",
         "alignment": "chaotic",
         "taken": false
       }
     ],
     "check": {
       "skillName": "Streetwise",
-      "diceRoll": 5,
+      "diceRoll": 3,
       "skillLevel": 3,
       "attributeBonus": 1,
-      "total": 9,
+      "total": 7,
       "dc": 12
     },
-    "consequence": "You manage to keep your feet under you, the bouncer's rough shove sending a jolt through your shoulder, but the sudden momentum leaves you disoriented. As you try to assess your surroundings, your gaze sweeps past the darkened corners too quickly, a blur of shadowy figures and glinting bottles. Before you can properly focus, the bouncer's heavy hand is back, guiding you with an unwelcome firmness towards an empty stool at the bar, effectively blocking any clear view of Silas Thorne."
+    "consequence": "You reached into your coat, pulling out a small leather pouch, its weight a familiar comfort. As you extended it toward the beat cop, a glint of hope in your eyes, he merely chuckled, a low, guttural sound that seemed to vibrate through the damp air. He held up the roll of coins already in his hand, a mocking gesture, then casually let it drop into his coat pocket. \"Already bought and paid for, Vaughn,\" he rasped, his eyes still fixed on yours, the earlier smirk now a full-blown sneer. \"And you're too late.\""
   },
   {
     "id": "survey-ship",
@@ -125,34 +125,34 @@ export const HOMEPAGE_SHOWCASE: ShowcaseWorld[] = [
       "Wits"
     ],
     "skillNames": [
-      "Astrogation",
+      "Piloting",
       "Engineering",
-      "Security Protocols",
+      "Security Systems",
+      "First Aid",
       "Survival (Ship)",
-      "Investigation",
-      "First Aid"
+      "Xenology"
     ],
-    "opening": "The rhythmic groan of the *Charon*'s failing atmospheric processors was a constant, grating reminder of six months of dead air and dwindling supplies. You hunched over the flickering diagnostic display in the cramped engineering bay, the stale air thick with the smell of ozone and recycled sweat, your fingers tracing the anomaly in the manifest against the ship's current inventory. A single, inexplicable entry, buried deep in the cargo hold's logs, pulsed crimson: 'Unidentified Organic Mass — 1 unit.' The ship's internal sensors, usually so precise, offered only a vague, unsettling hum from that section, a silence far more terrifying than any alarm.",
-    "situation": "You quickly moved to the auxiliary console, its screen still a hazy green from infrequent use, and rerouted the diagnostic. A low, steady thrum immediately replaced the unsettling silence from the cargo hold section. On the display, a schematic of the *Charon*'s power grid flickered to life, showing a clear, strong conduit leading directly to the cargo bay, its energy flow stable and uncompromised. The 'Unidentified Organic Mass' entry remained, now accompanied by a new data point: 'Power Draw: 1.2 GW – stable.'",
+    "opening": "The hum of the ship's life support systems, usually a comforting drone, now felt like a low thrum against your very bones, a constant reminder of the six months you'd been adrift in the void. You traced the faded text on the ancient data pad: 'Cargo Manifest, Stardate 247.03.12.' Your finger hovered over the discrepancy, a single line item, 'Cryo-Containment Unit, Experimental,' that had appeared in the maintenance logs two months prior, a ghost on the ship's internal records that no one else seemed to have noticed, or perhaps, bothered to look for. The flickering emergency lights in the narrow corridor ahead cast long, shifting shadows, making the ship feel less like a vessel and more like a tomb as you headed toward the cargo hold, a sickly premonition coiling in your gut.",
+    "situation": "You quickly navigate the ancient data pad's interface, a series of precise taps and swipes isolating the cargo hold's atmosphere and sealing its heavy blast doors with a low, hydraulic hiss. The ship's internal sensors hummed, now focused entirely on the pulsing red dot. Its rhythmic signature, once faint, now registered with a clearer, more defined cadence, a slow, steady thrum against the backdrop of the ship's failing life support. You held your breath, the chill in the air deepening as you watched the single, isolated heartbeat on the screen.",
     "decisionPrompt": "What will you do?",
     "options": [
       {
-        "text": "Initiate full cargo bay lockdown and report the anomaly to central command.",
+        "text": "Review ship logs for cargo hold anomalies.",
         "alignment": "lawful",
         "taken": false
       },
       {
-        "text": "Isolate the cargo bay power conduit to observe changes in the mass.",
+        "text": "Route remaining life support to this section.",
         "alignment": "neutral",
         "taken": true
       },
       {
-        "text": "Begin detailed spectral analysis of the 'Unidentified Organic Mass' from the console.",
+        "text": "Prepare a hazmat suit and entry tools.",
         "alignment": "neutral",
         "taken": false
       },
       {
-        "text": "Overload the cargo bay's power conduit, hoping to disrupt the mass.",
+        "text": "Open the cargo hold blast doors and trigger an emergency purge.",
         "alignment": "chaotic",
         "taken": false
       }
@@ -165,7 +165,7 @@ export const HOMEPAGE_SHOWCASE: ShowcaseWorld[] = [
       "total": 8,
       "dc": 12
     },
-    "consequence": "You carefully rerouted the power, intending to cut the conduit to the cargo bay, but your fingers slipped on the auxiliary console's slick plating. Instead of isolating the connection, a surge of energy pulsed through the entire grid. The low thrum from the cargo hold instantly intensified, vibrating through the deck plates and up your legs, a deep, resonant hum that filled the engineering bay, pressing in on your eardrums until the air itself felt heavy and thick with an unseen presence. The 'Unidentified Organic Mass' entry on the display flashed, the 'Power Draw: 1.2 GW – stable' momentarily replaced by a rapid, chaotic fluctuation before settling back to its original reading, a fraction higher than before."
+    "consequence": "You slammed your palm against the ancient console, trying to force the power conduit over, but the failing systems responded with a whine of protest. Instead of rerouting, the remaining life support flickered erratically, the dim emergency lights in the corridor ahead dying completely, plunging the passage into an oppressive, inky blackness. The rhythmic thrum from the cargo hold now echoed louder, more distinct, a singular heartbeat in the suffocating silence, a stark counterpoint to the growing chill that seeped into your bones."
   },
   {
     "id": "normandy",
@@ -176,51 +176,51 @@ export const HOMEPAGE_SHOWCASE: ShowcaseWorld[] = [
     "attributeNames": [
       "Strength",
       "Agility",
-      "Constitution",
+      "Stamina",
       "Perception"
     ],
     "skillNames": [
       "Rifle Marksmanship",
       "Stealth",
+      "Survival (Fieldcraft)",
       "Navigation",
-      "Survival (Rural)",
       "First Aid",
-      "Close Quarters Combat"
+      "Observation"
     ],
-    "opening": "The stench of damp earth and distant cordite clung to the air as you pushed through the last tangled hedgerow, thorns snagging at your worn fatigue jacket. Your shoulders ached from the weight of your gear, the M1 Garand feeling like a lead pipe after the hell of the beach, but you kept moving, driven by the five pairs of eyes behind you looking for direction. The oppressive green tunnel of the Norman countryside pressed in, sunlight filtering through the dense leaves in fractured beams, illuminating the swirling dust kicked up by your boots. A distant, muffled thud echoed, a reminder of the relentless, unseen enemy somewhere beyond the next field.",
-    "situation": "You push through the dense undergrowth, trying to keep the line of bushes to your left as you attempt to circle around. The foliage, thicker than you anticipated, snags at your clothes and equipment, slowing your progress. The ground beneath your feet becomes uneven, a slight incline leading to a sudden drop, and you stumble, your boot catching on a gnarled root. The M1 Garand clatters against your webbing, and a small, loose stone dislodges, rolling with an unnerving patter into the unseen dip ahead.",
+    "opening": "The stench of damp earth and shattered concrete clung to the air as you pushed through the tangled briars, the heavy M1 Garand feeling like a lead weight in your hands. The distant rumble of artillery, a constant, sickening heartbeat, vibrated through the soles of your worn boots, reminding you of the chaos you'd barely escaped on the beach. Sweat stung your eyes, blurring the already dense hedgerow ahead, a green, impenetrable wall that seemed to swallow sound and light, making every rustle a potential enemy. You glance back at the four grim faces following you, your new squad, the burden of their lives now resting squarely on your shoulders, a corporal by circumstance, not choice.",
+    "situation": "You attempt to weave through the densest part of the hedgerow, but the thick, intertwined branches refuse to yield, snagging at your uniform and gear. A branch, thicker than your arm, springs back with surprising force as you try to push past it, striking the side of your rifle with a sharp crack that echoes far too loudly in the oppressive quiet. Ahead, the deer trail, once skirted, now seems like a glaringly obvious, easier path, but the opportunity is lost.",
     "decisionPrompt": "What will you do?",
     "options": [
       {
-        "text": "Halt movement, secure the M1 Garand, and listen intently for reactions.",
+        "text": "Halt movement and listen intently for any enemy response.",
         "alignment": "lawful",
         "taken": false
       },
       {
-        "text": "Freeze in place, slowly retrieve the M1 Garand, and scan the dip ahead.",
+        "text": "Backtrack carefully, finding a new, less obvious route.",
         "alignment": "neutral",
         "taken": true
       },
       {
-        "text": "Carefully push aside foliage for a discreet peek into the dip.",
+        "text": "Push through the hedgerow, ignoring the noise for now.",
         "alignment": "neutral",
         "taken": false
       },
       {
-        "text": "Immediately drop prone, M1 Garand ready, and scan for targets.",
+        "text": "Deliberately snap another branch to mask the first sound.",
         "alignment": "chaotic",
         "taken": false
       }
     ],
     "check": {
       "skillName": "Stealth",
-      "diceRoll": 4,
+      "diceRoll": 7,
       "skillLevel": 3,
       "attributeBonus": 1,
-      "total": 8,
+      "total": 11,
       "dc": 12
     },
-    "consequence": "Before you can fully steady yourself, a sharp, guttural shout rips through the quiet, followed by the unmistakable sound of a bolt being worked. Your head snaps up, eyes wide, just in time to see the glint of a helmet through the gap in the bushes directly ahead, a rifle barrel swinging to bear. The sound of your stumbling, the soft clatter of the M1, and the rolling stone had given you away. There's no time to react."
+    "consequence": "You shift your weight, easing back from the snagging branches, trying to retrace your steps without disturbing a single leaf. The snap of the rifle, however, had already echoed too far. A twig under your boot gives way with a sharp crack, followed by the rustle of disturbed leaves just ahead, off the main trail. You freeze, pressing yourself against the rough bark of a thick oak, your M1 Garand now held tightly across your chest, its cold steel a stark contrast to the sudden clammy sweat on your palms."
   },
   {
     "id": "debt-court",
@@ -230,51 +230,51 @@ export const HOMEPAGE_SHOWCASE: ShowcaseWorld[] = [
     "protagonist": "Sennen",
     "attributeNames": [
       "Acumen",
-      "Influence",
       "Composure",
-      "Insight"
+      "Influence",
+      "Diligence"
     ],
     "skillNames": [
       "Ledger-keeping",
-      "Oration",
+      "Negotiation",
+      "Gossip & Rumor",
       "Etiquette",
-      "Favorsmithing",
-      "Debt Recall",
-      "Whisper Network"
+      "Debate & Rhetoric",
+      "Intimidation"
     ],
-    "opening": "The flickering candlelight casts long, dancing shadows across the towering shelves, each laden with heavy, leather-bound ledgers. The air in the Grand Archive is thick with the scent of aged parchment and unspoken obligations, a silent testament to a thousand favors owed and countless lives bound by invisible chains. You trace a finger along the spine of a ledger marked 'House Volkov,' its weight a familiar comfort in your hands, the knowledge of its contents a heavy burden you carry daily. A hushed whisper from the far corner of the room, barely audible over the scratching of a distant quill, speaks of a newly incurred debt, and a chill settles deep in your bones, a stark reminder of the ledger's unforgiving nature.",
-    "situation": "You bend over, a practiced nonchalance in your movements, but your hand trembles slightly as you retrieve the fallen ledger. The heavy thud still reverberates in the quiet space, and the two cloaked figures have not resumed their hushed conversation. Instead, their gazes, though obscured by deep hoods, feel sharp and focused, piercing through your feigned indifference. A low, resonant voice, deep as a cavern, breaks the silence, cutting through the thick air like a blade. \"Sennen, a moment of your time.\"",
+    "opening": "The flickering glow of a single tallow candle casts long, dancing shadows across the meticulously stacked ledgers, their leather-bound spines groaning under the weight of countless obligations. Each page, filled with the elegant script of debts owed and favors granted, represents a life intricately woven into the court's unforgiving fabric, and you, a junior clerk, feel the chilling echo of that power as you carefully turn a brittle leaf. A sudden, sharp rap on the heavy oaken door sends a tremor through the quiet chamber, the sound too abrupt, too insistent for a casual visitor, pulling your gaze from the intricate web of ancient promises. You instinctively adjust the worn satchel at your hip, the familiar weight of your own uncalled debt a cold comfort against the sudden, unwelcome intrusion, as the latch clicks with an ominous finality.",
+    "situation": "You hold Master Theron's gaze, your own expression unwavering as the ledger's open pages lie plainly between you. The faint scent of aged parchment and drying ink fills the air, a familiar comfort. He studies you for a long moment, his eyes, dark as polished obsidian, seeming to pierce through the very fabric of your composure, before a subtle shift in his posture signals a reluctant acceptance. The tension in the room, thick as the dust motes dancing in the candle's glow, eases almost imperceptibly as he finally turns his attention to the precise, elegant script covering the brittle page.",
     "decisionPrompt": "What will you do?",
     "options": [
       {
-        "text": "Present the ledger, awaiting their instructions respectfully.",
+        "text": "Point out the precise, elegant script on the brittle page.",
         "alignment": "lawful",
         "taken": false
       },
       {
-        "text": "Offer the ledger, asking how you can be of service.",
+        "text": "Ask Master Theron to specify which entry concerns him.",
         "alignment": "neutral",
         "taken": true
       },
       {
-        "text": "Glance at the ledger's open page before responding.",
+        "text": "Offer a subtle explanation for the ledger's nuanced entries.",
         "alignment": "neutral",
         "taken": false
       },
       {
-        "text": "Drop the ledger again, feigning clumsiness while scanning the room.",
+        "text": "Casually tear the brittle page from the ledger, offering to rewrite it.",
         "alignment": "chaotic",
         "taken": false
       }
     ],
     "check": {
-      "skillName": "Oration",
-      "diceRoll": 7,
+      "skillName": "Negotiation",
+      "diceRoll": 6,
       "skillLevel": 3,
       "attributeBonus": 1,
-      "total": 11,
+      "total": 10,
       "dc": 12
     },
-    "consequence": "You extend the heavy ledger, your hand shaking imperceptibly as you offer it to the closer of the two cloaked figures. The gesture, meant to convey helpfulness, feels clumsy, the weight of the book suddenly oppressive. The figure doesn't take it. Instead, a gloved hand reaches out, not for the ledger, but to firmly cup your wrist, a silent, unyielding grip that sends a jolt through you. \"Sennen, the ledger can wait,\" the deep voice rumbles, its tone now laced with an edge of impatience that prickles your skin."
+    "consequence": "Master Theron’s eyes narrow, the flicker of the candle catching a cold glint within their depths. He doesn't answer your question directly. Instead, his gaze drifts from your face to the ledger, then back again, a silent, weighty assessment that prickles your skin. The air in the small chamber seems to grow heavier, pressing down on you until the quiet hum of the court's distant machinery feels like a judgment."
   }
 ];
