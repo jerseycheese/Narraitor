@@ -182,7 +182,7 @@ The highest-traffic hardcoded sizes across the app have been migrated onto these
 
 - **Pick the slot by purpose.** A user-facing button label uses `font-interface` even if the surrounding component shows narrative content.
 - **Don't mix slots inside one element.** A heading is one font, even if it contains an inline ID — wrap the ID in a separate `<code>` if it needs `font-system`.
-- **Narrative paragraphs cap at `48rem`** for line-length comfort — the story-reading column in [manuscript-session.css](src/styles/manuscript-session.css) (`.manuscript-main-content-inner`). That's the same measure as `--page-width-prose` ([Layout & Spacing](#layout-spacing)), set as a literal value there rather than the token. Product-surface descriptive text uses a separate `70ch` measure — see [Surfaces](#surfaces). Don't stretch story prose to full container width.
+- **Narrative paragraphs cap at `42.5rem`** for line-length comfort — the story-reading column in [manuscript-session.css](src/styles/manuscript-session.css) (`.manuscript-main-content-inner`). The class carries two rules: an unqualified `48rem` early in the file and a later, more specific `:root .manuscript-main-content-inner` at `42.5rem` — the `:root`-qualified rule wins on specificity as well as source order, so `42.5rem` is what actually reaches readers. That's narrower than `--page-width-prose` (`48rem`, [Layout & Spacing](#layout-spacing)); the two aren't the same measure. Product-surface descriptive text uses a separate `70ch` measure — see [Surfaces](#surfaces). Don't stretch story prose to full container width.
 
 ## Layout & Spacing
 
@@ -198,7 +198,7 @@ The full scale is `--space-0_5` through `--space-8` in [_shared-tokens.css](src/
 
 ### Layout rules
 
-- **Page max-width** is `--content-max-width` (`1200px`) for general content; narrative content tightens further to `48rem` (see [Typography](#typography)).
+- **Page max-width** is `--content-max-width` (`1200px`) for general content; narrative content tightens further to `42.5rem` (see [Typography](#typography)).
 - **Named page widths**, the tier below the app shell: `--page-width-narrow` (`64rem`/1024px — hero content, ending screen) and `--page-width-prose` (`48rem`/768px — legal text, about's hero copy and section prose, landing's hero copy). Landing's page container itself rides the full `--content-max-width`, matching the app shell, so its hero image and step grid aren't squeezed narrower than the header. Both width tokens live in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) alongside `--page-gutter` (`var(--space-4)`, `var(--space-6)` from `1024px`), the shared, responsive horizontal inset from viewport edge to content. The brand register widens that inset one step, to `var(--space-6)` and `var(--space-8)` — see Surfaces.
 - **Game session viewport** is fixed-position, full-viewport, with internal layout governed by [src/styles/manuscript-session.css](src/styles/manuscript-session.css). Don't apply page-level spacing to game-session screens.
 - **Mobile breakpoints**: `640px` (sm), `768px` (md), `1024px` (lg), `1280px` (xl). These stay literal in media queries — custom properties aren't readable inside `@media` conditions without a build step — but any new breakpoint should snap to this scale rather than introduce a one-off. Mobile-specific layout bugs from the DS migration (#1139, #1143, #1148, #1150) are resolved.
@@ -257,13 +257,13 @@ DS3's decorative vocabulary is one family of ink marks, not a set of unrelated o
 
 | Mark | What it is | Where it goes |
 |---|---|---|
-| Corner bracket | L-shaped mark, top-left and bottom-right | Every card and detail section — the quiet default |
+| Corner bracket | L-shaped mark(s) in one or both corners | List cards get two, top-left and bottom-right; detail-page data cards and detail sections get one, top-left only |
 | Registration cross | A bracket promoted to a full trim mark | One per surface, in accent |
 | Dimension ticks | 1px ticks tiled along a top edge at 12px pitch | Detail-section top edge only |
 | Perforated dotted rule | `radial-gradient` dots at `12px 4px` | Section dividers, under headings |
 | Bullet eyebrow | Mono-uppercase label prefixed with a bullet | Above a heading |
 
-The brackets are the root. A corner bracket and a registration cross are the same referent, which is why the family grew out of them rather than being invented beside them. Reference implementation: `.world-detail-npc::before` and its siblings in [app-shell.css](src/app/app-shell.css); the dashboard's registration cross in [dashboard.css](src/app/dashboard.css).
+The brackets are the root. A corner bracket and a registration cross are the same referent, which is why the family grew out of them rather than being invented beside them. The bracket isn't drawn the same everywhere, though: list cards (`.component-world-card`, `.component-character-card`, the dashboard cards) get the full two-corner treatment, `::before` (top-left) paired with `::after` (bottom-right) in [app-shell.css](src/app/app-shell.css) and [dashboard.css](src/app/dashboard.css). Detail-page data cards (`.world-detail-npc`, `.world-detail-stat`, `.world-detail-meta-grid .component-data-field`) and detail sections (`.world-detail-section`, `.character-detail-section`) get a single top-left `::before` bracket only — their `::after` is spent on dimension ticks instead of a second bracket (see below), so a detail section carries one corner mark plus a tick band, not two corner marks.
 
 ### The weight rule
 
