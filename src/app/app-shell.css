@@ -1169,7 +1169,7 @@
   }
 }
 
-/* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
+/* DS3 — Mechanical Manuscript: dotted dividers */
 
 :root .world-detail-section h2 {
   position: relative;
@@ -1179,19 +1179,6 @@
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 400;
-}
-
-:root .world-detail-section h2::before {
-  content: "• ";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  font-style: normal;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
 }
 
 :root .world-detail-section h2::after {
@@ -1691,7 +1678,7 @@
   }
 }
 
-/* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
+/* DS3 — Mechanical Manuscript: dotted dividers */
 
 :root .character-detail-header {
   position: relative;
@@ -1724,19 +1711,6 @@
   font-family: var(--font-narrative);
   font-style: italic;
   font-weight: 400;
-}
-
-:root .character-detail-section h2::before {
-  content: "• ";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  font-style: normal;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
 }
 
 :root .character-detail-section h2::after {
