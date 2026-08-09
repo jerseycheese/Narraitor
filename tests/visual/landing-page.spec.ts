@@ -39,6 +39,10 @@ test.describe('Landing page rendering', () => {
   test('landing renders consistently at the root route', async ({ page }) => {
     await gotoLanding(page);
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
+    // #main-content holds the screenshot (see file banner for why), but
+    // .component-landing is the locator #1383 asked this spec to exercise —
+    // assert it directly too, rather than only through its ancestor.
+    await expect(page.locator('.component-landing')).toBeVisible();
     await expect(page.locator('#main-content')).toHaveScreenshot(
       'landing-ds3.png'
     );
