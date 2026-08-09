@@ -2823,7 +2823,7 @@ body.manuscript-overlay-open {
    ~193px empty band between short narrative content and the docked choices
    rail on tall viewports. */
 :root .manuscript-main-content {
-  padding: 3rem 1.5rem 4rem;
+  padding: 3rem var(--space-6) 4rem;
 }
 
 /* Dot grid background overlay — same canonical pattern as the app surface
@@ -2937,7 +2937,7 @@ body.manuscript-overlay-open {
 
 :root .manuscript-suggested-action {
   position: relative;
-  padding: var(--space-4) 1.25rem var(--space-4) 2.5rem;
+  padding: var(--space-4) var(--space-5) var(--space-4) 2.5rem;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -2973,7 +2973,7 @@ body.manuscript-overlay-open {
 :root .manuscript-suggested-action-label {
   font-size: 0.9375rem;
   line-height: 1.5;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
 }
 
 /* Rotate accent bar colors across choices — hover only */
@@ -3020,7 +3020,7 @@ body.manuscript-overlay-open {
   background: transparent;
   border: 1px solid var(--color-text-muted);
   border-radius: var(--radius-md);
-  padding: var(--space-2_5) 0.875rem;
+  padding: var(--space-2_5) var(--space-3_5);
   height: auto;
 }
 
@@ -3097,7 +3097,7 @@ body.manuscript-overlay-open {
   font-size: var(--font-size-2xs);
   font-weight: 600;
   letter-spacing: 0.1em;
-  padding: 2px 8px;
+  padding: var(--space-0_5) var(--space-2);
   background: var(--color-accent-soft);
   border-radius: var(--radius-sm);
 }
@@ -3209,13 +3209,13 @@ body.manuscript-overlay-open {
 :root .manuscript-ds3-controls {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-0_5);
   background: var(--color-surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 4px;
+  padding: var(--space-1);
 }
 
 :root .manuscript-ds3-controls .manuscript-hud-icon-button {

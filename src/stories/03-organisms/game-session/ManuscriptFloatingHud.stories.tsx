@@ -39,8 +39,8 @@ export const CharacterPanelOpen: Story = {
     characterSummaryPanel: (
       <div style={{ padding: '1rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-drawer)' }}>
         <h4 style={{ fontFamily: 'var(--font-narrative)', fontWeight: 700, marginBottom: '0.5rem' }}>The Archivist</h4>
-        <div style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Level 4 Scholar</div>
-        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem' }}>
+        <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>Level 4 Scholar</div>
+        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: 'var(--font-size-xs)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Strength</span><span>8</span></div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Intelligence</span><span>16</span></div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Wisdom</span><span>14</span></div>

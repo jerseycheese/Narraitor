@@ -36,7 +36,7 @@
 .devtools-panel-prompts-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-1_5);
   color: var(--color-text-secondary);
   white-space: nowrap;
 }
