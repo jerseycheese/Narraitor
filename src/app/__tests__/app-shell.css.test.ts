@@ -5,6 +5,10 @@ const appShellCss = fs.readFileSync(path.join(__dirname, '../app-shell.css'), 'u
 const dashboardCss = fs.readFileSync(path.join(__dirname, '../dashboard.css'), 'utf-8');
 const aboutCss = fs.readFileSync(path.join(__dirname, '../about.css'), 'utf-8');
 const wizardCss = fs.readFileSync(path.join(__dirname, '../wizard.css'), 'utf-8');
+const manuscriptSessionCss = fs.readFileSync(
+  path.join(__dirname, '../../styles/manuscript-session.css'),
+  'utf-8'
+);
 const sharedTokensCss = fs.readFileSync(
   path.join(__dirname, '../../lib/theme/themes/_shared-tokens.css'),
   'utf-8'
@@ -70,6 +74,16 @@ describe('drafting-mark family', () => {
 describe('app-shell.css static checks', () => {
   it('does not use the literal placeholder word "Section" in a section eyebrow (#1577)', () => {
     expect(appShellCss).not.toMatch(/content:\s*"•\s*Section"/);
+  });
+
+  it('does not render a block-level eyebrow bullet with no label after it', () => {
+    // A block-level eyebrow (its own line above the heading) needs label text
+    // between the bullet and the closing quote — otherwise it's a lone bullet
+    // floating over the heading with nothing to say.
+    const bareBulletEyebrow = /content:\s*"•\s*";\s*display:\s*block;/;
+    for (const css of [appShellCss, wizardCss, manuscriptSessionCss]) {
+      expect(css).not.toMatch(bareBulletEyebrow);
+    }
   });
 
   it('does not carry the dead three-design-system theme-menu-* rules (#1583)', () => {
