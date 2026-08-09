@@ -136,6 +136,7 @@ describe('JournalPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    window.localStorage.clear();
     mockUseWorldStore.mockImplementation(mockWorldSelector(buildWorldState()));
   });
 
@@ -171,6 +172,51 @@ describe('JournalPage', () => {
 
     expect(journalStore.markAsRead).toHaveBeenCalledWith('entry-1');
     expect(screen.getByText('Detailed content')).toBeInTheDocument();
+  });
+
+  it('switches to table view, renders the journal table, and persists the choice', async () => {
+    const entries = createEntries(2);
+    const journalStore = buildStore({
+      getSessionEntriesWithCharacter: jest.fn().mockReturnValue(entries),
+      ...buildJournalEntriesState(entries),
+    });
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
+    mockUseSessionStore.mockImplementation((selector) =>
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
+    );
+
+    render(<JournalPage worldId={worldId} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Table view' }));
+
+    const table = await screen.findByRole('table', {
+      name: 'Journal entries table',
+    });
+    expect(within(table).getByText('Entry 1')).toBeInTheDocument();
+    expect(window.localStorage.getItem('journal-view-mode')).toBe('table');
+  });
+
+  it('restores table view from a saved preference on load', async () => {
+    window.localStorage.setItem('journal-view-mode', 'table');
+    const entries = createEntries(1);
+    const journalStore = buildStore({
+      getSessionEntriesWithCharacter: jest.fn().mockReturnValue(entries),
+      ...buildJournalEntriesState(entries),
+    });
+    mockUseJournalStore.mockImplementation(mockJournalSelector(journalStore));
+    mockUseSessionStore.mockImplementation((selector) =>
+      selector(buildSessionState({ id: 'session-1', characterId: 'char-1' }))
+    );
+
+    render(<JournalPage worldId={worldId} />);
+
+    expect(
+      await screen.findByRole('table', { name: 'Journal entries table' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Table view' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
   });
 
   it('shows error state when journal store has an error', () => {
