@@ -44,21 +44,6 @@
   overflow: hidden;
 }
 
-/* Atmospheric dot grid, fading from top */
-.home-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 12%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 24px 24px;
-  pointer-events: none;
-  mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, hsl(0deg 0% 0%) 20%, transparent 80%);
-}
-
 /* Accent glow rising from below */
 .home-hero::after {
   content: '';
@@ -150,14 +135,11 @@
 /* ─── DS3: Mechanical Manuscript ────────────────────────────────
    Aged paper + dotted rhythm. Body carries the dot grid; hero
    gets a dotted rule under the title and a serif italic-feeling
-   tagline. Suppress the home-hero dot pattern (body covers it). */
+   tagline. The home-hero's own dot pattern was removed; body already
+   carries the canonical one. */
 
 :root .home-hero {
   padding: 4rem var(--space-4) 3rem;
-}
-
-:root .home-hero::before {
-  display: none;
 }
 
 :root .home-hero::after {
@@ -1996,7 +1978,7 @@
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
 
 :root .settings-card {
-  border-radius: 6px;
+  border-radius: var(--radius-md);
 }
 
 :root .settings-section h2 {
