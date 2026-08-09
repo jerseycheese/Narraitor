@@ -33,7 +33,22 @@ jobs:
         run: npm ci
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+
+      # The tours are served from a production build, not `next dev`, so no spec
+      # races a first-hit compile (#1521). Building here rather than inside
+      # Playwright's webServer command keeps build failures readable and keeps
+      # build time out of the server-boot timeout.
+      - name: Build the app
+        # getSiteUrl() refuses to fall back to localhost in a production build,
+        # so metadataBase and the sitemap can't publish a dead origin. Under
+        # test the origin genuinely is localhost:3000, so say so.
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+        run: npm run build:app
+
       - name: Run tutorial visual tests
+        env:
+          PLAYWRIGHT_PROD_SERVER: 'true'
         run: npm run test:visual:tutorials
       - name: Upload test results on failure
         uses: actions/upload-artifact@v4

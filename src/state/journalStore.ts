@@ -14,6 +14,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim, getTimestamp } from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
+import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
 
 
 /**
@@ -261,6 +262,6 @@ export const useJournalStore = create<JournalStore>()(
 ));
 
 // Expose store globally in development for easier debugging & manual seeding
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+if (typeof window !== 'undefined' && shouldExposeStoreOnWindow()) {
   window.useJournalStore = useJournalStore;
 }

@@ -26,6 +26,7 @@ const logger = new Logger('CharacterStore');
 // them without pulling in the store module. Re-exported here to keep the
 // existing import surface working.
 import type { Character, CharacterAttribute, CharacterSkill } from './characterStore.types';
+import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
 export type { Character, CharacterAttribute, CharacterSkill } from './characterStore.types';
 
 const addCharacterToRoster = (
@@ -725,7 +726,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
   );
 
 // Expose store globally in development for testing and debugging
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+if (typeof window !== 'undefined' && shouldExposeStoreOnWindow()) {
   window.useCharacterStore = useCharacterStore;
 }
 

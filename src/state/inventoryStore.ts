@@ -14,6 +14,7 @@ import { createEquipmentActions } from './inventoryStore.equipment';
 import { inventoryPersistOptions } from './inventoryStore.persistence';
 
 import Logger from '@/lib/utils/logger';
+import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
 const logger = new Logger('InventoryStore');
 
 export type {
@@ -46,7 +47,7 @@ export const useInventoryStore = create<InventoryStore>()(
 );
 
 // Expose store globally in development for easier debugging & manual seeding
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+if (typeof window !== 'undefined' && shouldExposeStoreOnWindow()) {
   window.useInventoryStore = useInventoryStore;
 }
 

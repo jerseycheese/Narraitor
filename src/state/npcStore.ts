@@ -8,6 +8,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { CrudStore } from './crudStore.types';
+import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
 
 export interface NPCStore extends CrudStore<NPC> {
   npcs: Record<EntityID, NPC>;
@@ -239,7 +240,7 @@ export const useNPCStore = create<NPCStore>()(
 
 // Expose store globally in development to support test data seeding
 // and debugging via window.useNPCStore in dev tools.
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+if (typeof window !== 'undefined' && shouldExposeStoreOnWindow()) {
   window.useNPCStore = useNPCStore;
 }
 
