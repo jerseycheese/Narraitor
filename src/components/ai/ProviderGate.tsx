@@ -8,9 +8,10 @@ import { NoProviderModal } from './NoProviderModal';
 /**
  * Blocks AI-dependent screens when no provider is configured.
  *
- * Only the public production build blocks. Local dev and E2E (which runs `next
- * dev` and sets the Playwright flag) fall back to the server env key, so we
- * never block there — that also keeps the modal out of visual baselines. The
+ * Only the public production build blocks. Local dev and the test suites (which
+ * set the Playwright flag in-page, whichever server they're served from) fall
+ * back to the server env key, so we never block there — that also keeps the
+ * modal out of visual baselines. The
  * check waits for the store to hydrate so a saved provider doesn't briefly read
  * as missing.
  */

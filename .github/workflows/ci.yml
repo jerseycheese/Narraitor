@@ -355,7 +355,11 @@ jobs:
     # server: two workers hitting two uncompiled routes at once stall the
     # single-process dev server past the navigation timeout. One worker per shard
     # removes that contention entirely; sharding keeps wall-clock reasonable.
-    # Stays on `next dev` so rendering (and committed baselines) is unchanged.
+    #
+    # Still on `next dev`. The prod-server switch is opt-in per job (see
+    # playwright.config.ts) and the tutorial job took it first; moving this one
+    # is TODO(#1740), which is blocked on one spec that needs isPlaywrightEnv()
+    # to stay false while still reading a store off window.
     strategy:
       fail-fast: false
       matrix:

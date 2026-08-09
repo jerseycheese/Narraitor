@@ -15,6 +15,7 @@ import {
   type SessionStartedEvent,
   type SessionEndedEvent,
 } from '@/lib/state/storePubSub';
+import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
 
 /**
  * Create logger instance for this store
@@ -737,6 +738,6 @@ export const useSessionStore = create<SessionStore>()(
 
 // Named export for consistent usage
 // Also expose store globally for dev/test to allow direct state seeding
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+if (typeof window !== 'undefined' && shouldExposeStoreOnWindow()) {
   window.useSessionStore = useSessionStore;
 }

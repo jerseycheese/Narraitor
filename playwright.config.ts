@@ -34,6 +34,10 @@ function resolveBaseURL(): string {
  * across multiple browsers and viewports. Optimized for CI/CD environments.
  */
 
+// Opt a CI job into serving from a production build instead of `next dev`.
+// See the webServer block at the bottom of this file.
+const prodServer = process.env.PLAYWRIGHT_PROD_SERVER === 'true';
+
 // Shared Chromium settings for both the main visual project and the tutorial
 // project, so they render identically (viewport + font hinting).
 const chromiumUse = {
@@ -183,15 +187,23 @@ export default defineConfig({
   // Web server configuration for testing actual application pages
   // Note: webServer disabled for local development - assumes server is already running
   // CI will need this enabled for automated server management
+  //
+  // A job opts into a production server by setting PLAYWRIGHT_PROD_SERVER=true
+  // and running `npm run build:app` in an earlier step. `next dev` compiles a
+  // route's client chunks on first request, so whichever spec hits a cold route
+  // pays that cost inside its own timeouts — the root cause behind a long run
+  // of "flaky-red, zero pixel diffs" failures. A prebuilt server has nothing
+  // left to compile. The build is a separate CI step rather than part of this
+  // command so its cost sits in its own log and outside the boot timeout.
   webServer: process.env.CI ? {
-    command: 'npm run dev',
+    command: prodServer ? 'npm run start -- -p 3000' : 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
     // Increased timeout for server to start (especially in CI and app build)
     timeout: 240 * 1000,
     // Ensure server is fully ready before tests start
     env: {
-      NODE_ENV: 'development',
+      NODE_ENV: prodServer ? 'production' : 'development',
       PORT: '3000',
       NEXT_PUBLIC_DISABLE_TUTORIAL: 'true',
     },

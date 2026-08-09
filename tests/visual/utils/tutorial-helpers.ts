@@ -3,12 +3,15 @@ import { Page, expect } from '@playwright/test';
 /**
  * Navigate to a tutorial page without waiting for the `load` event.
  *
- * These specs run against `next dev`, which compiles client chunks on first
- * request. `load` waits for those chunks — app/layout.js alone measured ~12s on
- * a cold CI dev server — so a cold route can blow the 20s navigationTimeout even
- * though the document itself comes back in 0.6-1.6s. That's what turned the
- * Tutorial Visual Tests job into timeout roulette (#1519); #1344 is the same
- * failure mode in the main visual job.
+ * Written for `next dev`, which compiles client chunks on first request: `load`
+ * waits for those chunks — app/layout.js alone measured ~12s on a cold CI dev
+ * server — so a cold route could blow the 20s navigationTimeout even though the
+ * document itself came back in 0.6-1.6s. That's what turned the Tutorial Visual
+ * Tests job into timeout roulette (#1519).
+ *
+ * CI now serves these specs from a prebuilt server, so there's nothing left to
+ * compile and this is belt-and-braces rather than load-bearing. It stays for
+ * local runs, which still use whatever server the developer has up.
  *
  * Every caller follows this with waitForContentStable plus an explicit wait, so
  * dropping to domcontentloaded leaves nothing unsettled.
@@ -20,9 +23,11 @@ export const gotoTutorialPage = async (
   await page.goto(url, { waitUntil: 'domcontentloaded' });
 };
 
-// Hydration can't finish until `next dev` has compiled and served the client
-// chunks on first hit; app/layout.js alone has measured ~12s on a cold CI dev
-// server, so this budget covers compile + hydration, not hydration alone.
+// Sized for `next dev`, where hydration can't finish until the client chunks
+// have been compiled and served on first hit (app/layout.js alone has measured
+// ~12s on a cold CI dev server) — so the budget covers compile + hydration, not
+// hydration alone. CI's prebuilt server has no compile step left, but local runs
+// still hit a dev server, so the headroom stays.
 const STORE_READY_TIMEOUT_MS = 30000;
 
 export const waitForStoreReady = async (page: Page): Promise<void> => {

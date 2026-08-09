@@ -14,6 +14,7 @@ import Logger from '@/lib/utils/logger';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { useSessionStore } from './sessionStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
+import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
 
 const logger = new Logger('WorldStore');
 
@@ -569,6 +570,6 @@ export const useWorldStore = create<WorldStore>()(
 
 // Expose store globally in development to support test data seeding
 // and debugging via window.useWorldStore in dev tools.
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+if (typeof window !== 'undefined' && shouldExposeStoreOnWindow()) {
   window.useWorldStore = useWorldStore;
 }
