@@ -12,8 +12,24 @@ import { mockApiEndpoints } from './utils/mockApi';
  * duplicate that coverage at much higher runtime/flake cost.
  */
 
+/** Root test id of each wizard step, in walk order. */
+const STEP_ROOTS = {
+  basicInfo: 'basic-info-step',
+  description: 'description-step',
+  attributes: 'attribute-review-step',
+  skills: 'skill-review-step',
+  finalize: 'finalize-step',
+} as const;
+
 /** Capture a stable, full-page wizard screenshot with the app shell intact. */
 const captureWizardStep = async (page: Page, name: string): Promise<void> => {
+  // Park the cursor before scrolling. Playwright leaves the pointer wherever the
+  // last click landed, and after the step transition + scroll-to-top that lands
+  // on whatever card happens to sit at those viewport coordinates — which then
+  // renders its :hover background. Which card that is depends on the previous
+  // page's height, so it changes with content. (0, 0) is the header's own
+  // padding, which has no hover state.
+  await page.mouse.move(0, 0);
   await page.evaluate(() => window.scrollTo(0, 0));
   await waitForContentStable(page);
   await page.evaluate(() => document.fonts.ready);
@@ -38,6 +54,34 @@ const captureWizardStep = async (page: Page, name: string): Promise<void> => {
 };
 
 /**
+ * Click Next and wait for the destination step to actually be on screen.
+ *
+ * The wizard's handleNext is async — leaving the Description step awaits the
+ * attribute/skill generation before it advances — so any fixed sleep is a race:
+ * lose it and the capture fires on the step you were leaving, which is what made
+ * this spec's heights bounce run to run. Waiting on the destination step's root
+ * makes the walk position deterministic regardless of how slow the runner is.
+ */
+const advanceTo = async (
+  page: Page,
+  destination: (typeof STEP_ROOTS)[keyof typeof STEP_ROOTS]
+): Promise<void> => {
+  await page
+    .locator('.component-wizard-container')
+    .getByRole('button', { name: 'Next' })
+    .click();
+  // Generation blocks the transition behind a processing overlay; it has to be
+  // gone before the destination is real rather than mid-mount.
+  await page
+    .locator('[data-testid="processing-overlay"]')
+    .waitFor({ state: 'detached', timeout: 15000 })
+    .catch(() => {});
+  await expect(page.locator(`[data-testid="${destination}"]`)).toBeVisible({
+    timeout: 15000,
+  });
+};
+
+/**
  * World Creation Wizard Visual Regression Test (Sequential)
  *
  * Single initialization that walks through Steps 1–5,
@@ -45,12 +89,11 @@ const captureWizardStep = async (page: Page, name: string): Promise<void> => {
  */
 
 test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
-  test.setTimeout(45000); // Extended timeout for complex wizard
-  // Deterministic AI: Step 3 (description -> attributes) calls
-  // /api/ai/analyze-world, which has no key in CI and throws — leaving the
-  // attributes panel mid-render when the capture fires, so the full-page
-  // screenshot comes back short and the diff fails (a develop-wide flake).
-  // Mocking the AI routes makes the analysis resolve instantly and stably.
+  test.setTimeout(60000);
+  // Deterministic AI: leaving the Description step calls /api/ai/analyze-world,
+  // which has no key in CI and throws, dropping the wizard into its local
+  // fallback suggestions. Mocking the route pins the attribute and skill counts
+  // — and therefore every downstream page height — to fixed values.
   await mockApiEndpoints(page);
   await seedTestData(page);
   await page.goto('/worlds');
@@ -92,123 +135,53 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
 
   await test.step('Step 1: Basic Info', async () => {
     await dismissTutorialOverlay();
+    await expect(page.locator(`[data-testid="${STEP_ROOTS.basicInfo}"]`)).toBeVisible();
     await captureWizardStep(page, 'world-creation-step1-basic-info.png');
   });
 
   await test.step('Step 2: Description', async () => {
-    const nameInput = page.locator('input[placeholder*="world name"], input[name="name"], input[placeholder*="Enter name"]');
-    if (await nameInput.count() > 0) {
-      await nameInput.fill('Test World');
-      await page.waitForTimeout(150);
-    }
-    const genreSelect = page.locator('[data-testid="world-genre-select"]');
-    if (await genreSelect.count() > 0) {
-      await genreSelect.selectOption('Fantasy');
-      await page.waitForTimeout(150);
-    }
-    const briefDescTextarea = page.locator('[data-testid="world-description-textarea"]');
-    if (await briefDescTextarea.count() > 0) {
-      await briefDescTextarea.fill('A test world created for visual regression testing.');
-      await page.waitForTimeout(150);
-    }
-    const nextButton = page
-      .locator('.component-wizard-container')
-      .getByRole('button', { name: 'Next' });
-    if (await nextButton.count() > 0) {
-      await dismissTutorialOverlay();
-      await nextButton.click();
-      await page.waitForTimeout(700);
-    }
+    await page.locator('[data-testid="world-genre-select"]').selectOption('Fantasy');
+    await dismissTutorialOverlay();
+    await advanceTo(page, STEP_ROOTS.description);
     await captureWizardStep(page, 'world-creation-step2-description.png');
   });
 
   await test.step('Step 3: Attributes Review', async () => {
     // Full Description requires at least 50 characters before Next is enabled.
-    const descriptionInput = page.locator('[data-testid="world-full-description"]');
-    await descriptionInput.fill(
+    await page.locator('[data-testid="world-full-description"]').fill(
       'A dusty frontier town on the edge of the territory, where law is scarce and every stranger hides a past worth burying.'
     );
-    await page.waitForTimeout(150);
-    const nextButton2 = page
-      .locator('.component-wizard-container')
-      .getByRole('button', { name: 'Next' });
-    if (await nextButton2.count() > 0) {
-      await dismissTutorialOverlay();
-      await nextButton2.click();
-      await page.waitForTimeout(700);
-    }
+    await dismissTutorialOverlay();
+    await advanceTo(page, STEP_ROOTS.attributes);
     await captureWizardStep(page, 'world-creation-step3-attributes.png');
   });
 
   await test.step('Step 4: Skills Review', async () => {
     // Add a minimal custom attribute to satisfy requirement and advance
-    const addCustomAttributeBtn = page.locator('[data-testid="add-custom-attribute-button"]');
-    if (await addCustomAttributeBtn.count() > 0) {
-      await addCustomAttributeBtn.click();
-      await page.waitForTimeout(300);
-      const attributeNameInput = page.getByRole('textbox', { name: 'Attribute Name *' });
-      if (await attributeNameInput.count() > 0) {
-        await attributeNameInput.fill('Test Attribute');
-        await page.waitForTimeout(150);
-        const createAttributeBtn = page.getByRole('button', { name: 'Create Attribute' });
-        if (await createAttributeBtn.count() > 0) {
-          await createAttributeBtn.click();
-          await page.waitForTimeout(300);
-        }
-      }
-    }
-    const nextButton3 = page
-      .locator('.component-wizard-container')
-      .getByRole('button', { name: 'Next' });
-    if (await nextButton3.count() > 0) {
-      await dismissTutorialOverlay();
-      await nextButton3.click();
-      await page.waitForTimeout(700);
-    }
+    await page.locator('[data-testid="add-custom-attribute-button"]').click();
+    await page.getByRole('textbox', { name: 'Attribute Name *' }).fill('Test Attribute');
+    await page.getByRole('button', { name: 'Create Attribute' }).click();
+    await expect(page.getByText('Test Attribute').first()).toBeVisible();
+    await dismissTutorialOverlay();
+    await advanceTo(page, STEP_ROOTS.skills);
     await captureWizardStep(page, 'world-creation-step4-skills.png');
   });
 
   await test.step('Step 5: Finalize', async () => {
     // Add a minimal custom skill and advance
-    const addCustomSkillBtn = page.locator('button:has-text("Add Custom Skill")');
-    if (await addCustomSkillBtn.count() > 0) {
-      await addCustomSkillBtn.click();
-      await page.waitForTimeout(300);
-      const skillNameInput = page.getByRole('textbox', { name: /skill name/i }).first();
-      if (await skillNameInput.count() > 0) {
-        await skillNameInput.fill('Test Skill');
-        await page.waitForTimeout(150);
-        const descriptionInput = page.locator('textarea[placeholder*="Describe what this skill represents"]');
-        if (await descriptionInput.count() > 0) {
-          await descriptionInput.fill('A test skill for visual regression testing.');
-          await page.waitForTimeout(150);
-        }
-        // The SkillEditor lists one checkbox per world attribute (ids start
-        // with "attribute-"). With the AI suggestions mocked there are several,
-        // so the old ':near(Test Attribute)' match resolved to multiple
-        // elements and threw a strict-mode violation. Checking the first
-        // attribute satisfies the "at least one attribute" rule the editor
-        // requires before "Create Skill" enables.
-        const attributeCheckbox = page.locator('input[id^="attribute-"]').first();
-        if (await attributeCheckbox.count() > 0) {
-          await attributeCheckbox.check();
-          await page.waitForTimeout(150);
-        }
-        const createSkillBtn = page.getByRole('button', { name: /create skill/i });
-        if (await createSkillBtn.count() > 0) {
-          await createSkillBtn.click();
-          await page.waitForTimeout(300);
-        }
-      }
-    }
-    const nextButton4 = page
-      .locator('.component-wizard-container')
-      .getByRole('button', { name: 'Next' });
-    if (await nextButton4.count() > 0) {
-      await dismissTutorialOverlay();
-      await nextButton4.click();
-      await page.waitForTimeout(700);
-    }
+    await page.locator('button:has-text("Add Custom Skill")').click();
+    await page.getByRole('textbox', { name: /skill name/i }).first().fill('Test Skill');
+    await page
+      .locator('textarea[placeholder*="Describe what this skill represents"]')
+      .fill('A test skill for visual regression testing.');
+    // The SkillEditor lists one checkbox per world attribute (ids start with
+    // "attribute-"). Checking the first satisfies the "at least one attribute"
+    // rule the editor requires before "Create Skill" enables.
+    await page.locator('input[id^="attribute-"]').first().check();
+    await page.getByRole('button', { name: /create skill/i }).click();
+    await expect(page.getByText('Test Skill').first()).toBeVisible();
+    await dismissTutorialOverlay();
+    await advanceTo(page, STEP_ROOTS.finalize);
     await captureWizardStep(page, 'world-creation-step5-finalize.png');
   });
 });
