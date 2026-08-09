@@ -189,7 +189,9 @@
   min-width: 0;
 }
 
-.component-portrait-step label {
+/* Scoped to the generate panel: the preset and upload panels bring their own
+   field styling, and a bare element selector here would overwrite it. */
+.component-portrait-step .portrait-step-generate label {
   display: block;
   margin-bottom: var(--space-1);
   font-family: var(--font-interface);
@@ -198,8 +200,8 @@
   color: var(--color-text-primary);
 }
 
-.component-portrait-step input,
-.component-portrait-step textarea {
+.component-portrait-step .portrait-step-generate input,
+.component-portrait-step .portrait-step-generate textarea {
   width: 100%;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
@@ -212,12 +214,14 @@
   box-sizing: border-box;
 }
 
-.component-portrait-step textarea {
+.component-portrait-step .portrait-step-generate textarea {
   min-height: calc(var(--space-8) * 3);
   resize: vertical;
 }
 
-.component-portrait-step p {
+.component-portrait-step .portrait-step-header p,
+.component-portrait-step .portrait-step-hint,
+.component-portrait-step .portrait-step-generate p {
   margin: 0;
   color: var(--color-text-secondary);
   line-height: 1.5;
@@ -289,7 +293,37 @@
   object-fit: cover;
 }
 
-.component-portrait-step button {
+.component-portrait-step .portrait-step-sources {
+  width: 100%;
+}
+
+.component-portrait-step .portrait-step-generate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-portrait-step .portrait-step-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.component-portrait-step .portrait-step-preview-label {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.component-portrait-step .portrait-step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.component-portrait-step .portrait-step-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -306,7 +340,7 @@
   transition: background-color 120ms ease;
 }
 
-.component-portrait-step button:hover:not(:disabled) {
+.component-portrait-step .portrait-step-button:hover:not(:disabled) {
   background: var(--color-accent-hover);
 
   /* Hover darkens the accent (in dark mode too), so white clears AA here even
@@ -314,12 +348,12 @@
   color: var(--color-text-inverse);
 }
 
-.component-portrait-step button:disabled {
+.component-portrait-step .portrait-step-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.component-portrait-step button:focus-visible {
+.component-portrait-step .portrait-step-button:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }

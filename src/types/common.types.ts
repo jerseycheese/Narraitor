@@ -30,11 +30,11 @@ export interface TimestampedEntity {
 }
 
 /**
- * Generated image data
- * Used for AI-generated images attached to entities (characters, worlds, etc.)
+ * Image attached to an entity (characters, worlds, etc.).
+ * `preset` is one of the built-in avatars; `uploaded` is a player's own file.
  */
 export interface GeneratedImage {
-  type: 'ai-generated' | 'placeholder';
+  type: 'ai-generated' | 'placeholder' | 'preset' | 'uploaded';
   url: string | null;
   generatedAt?: string;
   prompt?: string;

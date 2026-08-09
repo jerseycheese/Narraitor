@@ -3,7 +3,7 @@ import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { ImageGenerationSection } from '@/components/shared';
 
 interface Portrait {
-  type: 'ai-generated' | 'placeholder';
+  type: 'ai-generated' | 'placeholder' | 'preset' | 'uploaded';
   url: string | null;
   generatedAt?: string;
   prompt?: string;
