@@ -1,43 +1,43 @@
 ---
 version: alpha
 name: Narraitor
-description: AI-driven storytelling app. Single design system now (DS3, ADR-013) — this frontmatter still carries stale DS1 values; ds3.css has the current tokens.
+description: AI-driven storytelling app. Single design system, DS3 ("The Mechanical Manuscript", ADR-013). Values below are read directly from ds3.css and _shared-tokens.css.
 colors:
-  canvas: "#FDFBF7"
-  surface: "#FFFFFF"
-  surface-hover: "#F4F4F5"
-  border: "#E4E4E7"
-  border-strong: "#D4D4D8"
-  text-primary: "#111111"
-  text-secondary: "#3F3F46"
-  text-muted: "#71717A"
-  text-inverse: "#FFFFFF"
-  accent: "#312E81"
-  accent-hover: "#1E1B4B"
-  success: "#16A34A"
-  warning: "#92400E"
-  danger: "#B91C1C"
-  info: "#2563EB"
+  canvas: "rgb(247 243 237)"
+  surface: "rgb(255 252 246 / 80%)"
+  surface-hover: "rgb(239 233 224)"
+  border: "rgb(226 217 206)"
+  border-strong: "rgb(212 201 186)"
+  text-primary: "rgb(42 35 28)"
+  text-secondary: "rgb(115 102 88)"
+  text-muted: "rgb(125 113 99)"
+  text-inverse: "rgb(255 255 255)"
+  accent: "rgb(54 87 120)"
+  accent-hover: "rgb(41 66 91)"
+  success: "rgb(74 124 89)"
+  warning: "rgb(113 88 51)"
+  danger: "rgb(156 64 64)"
+  info: "rgb(91 122 140)"
 typography:
   narrative:
-    fontFamily: Lora
+    fontFamily: Newsreader
     fontSize: 1rem
     fontWeight: "400"
     lineHeight: 1.6
   system:
-    fontFamily: IBM Plex Mono
+    fontFamily: Fira Code
     fontSize: 0.875rem
     fontWeight: "400"
     lineHeight: 1.5
   interface:
-    fontFamily: IBM Plex Sans
+    fontFamily: DM Sans
     fontSize: 0.875rem
     fontWeight: "500"
     lineHeight: 1.25
 rounded:
-  sm: 2px
-  md: 4px
-  DEFAULT: 0.5rem
+  sm: 4px
+  md: 6px
+  lg: 8px
   full: 9999px
 spacing:
   base: 4px
@@ -71,7 +71,7 @@ components:
   card:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text-primary}"
-    rounded: "{rounded.DEFAULT}"
+    rounded: "{rounded.md}"
     padding: "{spacing.md}"
   input:
     backgroundColor: "{colors.surface}"
@@ -84,7 +84,7 @@ components:
 
 # Narraitor Design
 
-> **Note (2026-07-11):** Narraitor now ships a single design system, DS3 ("The Mechanical Manuscript") — see [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md), which collapsed the three-system architecture described in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md). The frontmatter above and most of the prose below still describe **DS1's old values** (colors, fonts, radii, shadows) — that's a historical artifact, left in place pending a full rewrite to DS3's actual numbers in a later pass. Until then, [src/lib/theme/themes/ds3.css](src/lib/theme/themes/ds3.css) is the source of truth for what's actually running. Don't treat anything below as describing DS3's (or any theme's) current values unless it explicitly says so.
+> **Note:** Narraitor ships a single design system, DS3 ("The Mechanical Manuscript") — see [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md), which collapsed the three-system architecture described in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md). Colors, typography, and the drafting-marks vocabulary below are verified against [ds3.css](src/lib/theme/themes/ds3.css) and [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) as of 2026-08-09 (`develop` @ `44fc072d`). Those two files stay the literal source of truth going forward — if a token value here and in the CSS ever disagree, the CSS is right and this doc is stale.
 
 ## Overview
 
@@ -104,55 +104,55 @@ The brand sits at the intersection of **archival** and **literary**: the visual 
 
 ## Colors
 
-DS1 is zinc-based with a single accent (Archival Ink Blue). The palette is intentionally narrow — there's no secondary or tertiary brand color. Color is for hierarchy, status, and storytelling-context tagging, not decoration.
+DS3 is aged-paper canvas with a single ink accent, drafted over a dot grid — the palette is intentionally narrow, with no secondary or tertiary brand color. Color is for hierarchy, status, and storytelling-context tagging, not decoration. Full palette, both modes: [ds3.css](src/lib/theme/themes/ds3.css) — the only theme file. Values below are light mode with each token's dark-mode counterpart alongside.
 
-### Surface scale (light mode)
+### Surface scale
 
-- **canvas** `#FDFBF7` — page background, the warmest surface
-- **surface** `#FFFFFF` — component backgrounds (cards, panels, inputs)
-- **surface-hover** `#F4F4F5` — hover state on interactive surfaces; also used for secondary button background
+- **canvas** `rgb(247 243 237)` (dark `rgb(23 19 16)`) — page background, aged paper, the warmest surface
+- **surface** `rgb(255 252 246 / 80%)` (dark `rgb(30 26 22 / 80%)`) — component backgrounds (cards, panels, inputs); translucent so the dot grid shows through
+- **surface-hover** `rgb(239 233 224)` (dark `rgb(18 15 12)`) — hover state on interactive surfaces; also used for secondary button background
 
 ### Text scale
 
-- **text-primary** `#111111` — body and headings; the only text color used in narrative prose
-- **text-secondary** `#3F3F46` — supporting copy, labels, metadata
-- **text-muted** `#71717A` — disabled state, hints, placeholder text only
-- **text-inverse** `#FFFFFF` — text on accent or danger backgrounds
+- **text-primary** `rgb(42 35 28)` (dark `rgb(237 232 224)`) — body and headings; the only text color used in narrative prose
+- **text-secondary** `rgb(115 102 88)` (dark `rgb(168 156 142)`) — supporting copy, labels, metadata
+- **text-muted** `rgb(125 113 99)` (dark `rgb(141 130 121)`) — disabled state, hints, placeholder text, and the drafting-marks ink (see [Drafting Marks](#drafting-marks))
+- **text-inverse** `rgb(255 255 255)` (both modes) — text on accent or danger backgrounds
 
 ### Accent
 
-- **accent** `#312E81` (Archival Ink Blue) — primary action backgrounds, focus rings, links, and active-state indicators
-- **accent-hover** `#1E1B4B` — hover state on primary action
+- **accent** `rgb(54 87 120)` (dark `rgb(119 158 197)`) — Ink Blue: deeper and more saturated than DS3's original steel blue. Primary action backgrounds, focus rings, links, active-state indicators. 6.81:1 text-on-canvas / 7.52:1 white-on-fill in light mode; 6.58:1 / 6.58:1 in dark — both well past AA's 4.5:1.
+- **accent-hover** `rgb(41 66 91)` (dark `rgb(67 112 157)`) — hover state on primary action
+- **accent-soft** `rgb(54 87 120 / 10%)` (dark `rgb(119 158 197 / 12%)`) — tinted fill, e.g. the dashboard continue card
+- **accent-strong** `rgb(41 66 91)` (dark `rgb(119 158 197)`) — accent used as body-sized text over `accent-soft`. Plain `accent` alone falls short of AA there in light mode, so this points at the darker hover step instead; dark mode needs the opposite move, since plain `accent` already clears AA there and the hover step would overcorrect.
 
 ### Status
 
-- **success** `#16A34A` — completion, confirmation
-- **warning** `#92400E` — caution, soft errors
-- **danger** `#B91C1C` — destructive actions, hard errors
-- **info** `#2563EB` — informational notices
+- **success** `rgb(74 124 89)` (dark `rgb(107 158 122)`) — completion, confirmation
+- **warning** `rgb(113 88 51)` (dark `rgb(176 142 92)`) — caution, soft errors
+- **danger** `rgb(156 64 64)` (dark `rgb(192 96 96)`) — destructive actions, hard errors
+- **info** `rgb(91 122 140)` (dark `rgb(123 160 180)`) — informational notices. This is DS3's original steel-blue accent value, carried forward as `info` once the primary accent deepened to Ink Blue.
+
+### Dot grid
+
+`--pattern-dot-grid-image`, DS3's defining texture: a `radial-gradient` tiled at `24px 24px` on the app's two opaque surface roots (`.app-surface-app`, `.app-surface-manuscript` in [app-shell.css](src/app/app-shell.css)) — `rgb(42 35 28 / 22%)` dots at 1px in light mode, `rgb(237 232 224 / 15%)` at 1px in dark. The lower dark-mode alpha compensates for light dots on a dark canvas reading heavier per unit alpha than the reverse. It's one token composited directly onto each surface, not a separate layer — an earlier `body::before` version never painted because every real surface z-index-promotes above `body`, so four call sites had grown their own duplicate gradients at drifting alpha to compensate before this consolidated. The brand register ([Surfaces](#surfaces)) retints it to a larger, darker dot (`26%` light / `17%` dark at 1.5px) so the marketing surface reads as drafting paper rather than the product's finer grid.
 
 ### Usage rules
 
 - **One accent per view.** The screen has exactly one primary action emphasized in `accent`. Secondary actions use `surface-hover` (secondary button) or `transparent` (ghost button). Two solid-accent buttons on the same screen is wrong.
-- **Never use `text-muted` for narrative or instructional content.** It's reserved for genuinely de-emphasized metadata.
+- **Never use `text-muted` for narrative or instructional content.** It's reserved for genuinely de-emphasized metadata and the drafting marks.
 - **Status colors are for status, not decoration.** Don't use `success` green to make something feel "fresh" or `danger` red to make something feel urgent if no error has occurred.
 - **Lore and ending-tone colors** (`--lore-*`, `--ending-*` tokens in the theme files) are for tagging story content, not general UI. Don't use them on buttons or controls.
-
-### DS3 color notes
-
-- DS3's actual accent is steel blue `#5B7A8C`; canvas is `#F7F3ED` (aged-paper) — both different from the DS1 values used as illustrative examples above.
-- DS3 has a complete dark-mode override under `:root.dark` — toggle the `dark` class on `<html>`.
-- Full current palette: [ds3.css](src/lib/theme/themes/ds3.css) — the only theme file now.
 
 ## Typography
 
 There are exactly three font slots, named by **purpose, not size**:
 
-- **narrative** (DS1: Lora) — long-form prose. Story content, character backgrounds, lore entries. Serif for reading comfort over long sessions.
-- **system** (DS1: IBM Plex Mono) — code-adjacent surfaces, IDs, debug content, computed values. Monospace.
-- **interface** (DS1: IBM Plex Sans) — buttons, navigation, form labels, headings, metadata. Sans-serif.
+- **narrative** (Newsreader) — long-form prose. Story content, character backgrounds, lore entries. Serif for reading comfort over long sessions.
+- **system** (Fira Code) — code-adjacent surfaces, IDs, debug content, computed values. Monospace.
+- **interface** (DM Sans) — buttons, navigation, form labels, headings, metadata. Sans-serif.
 
-These names outlived the multi-theme system that motivated them: DS3's actual fonts are Newsreader (narrative), Fira Code (system), and DM Sans (interface) — different from the DS1 fonts named above, which are shown as illustrative examples, not current values.
+The names predate DS3 and outlived the multi-theme system that motivated them, but they still map to real families, not placeholders. Source: the `next/font/google` imports in [layout.tsx](src/app/layout.tsx) and the `--font-*` custom properties in [ds3.css](src/lib/theme/themes/ds3.css).
 
 Use the utility classes when consuming in components:
 
@@ -182,7 +182,7 @@ The highest-traffic hardcoded sizes across the app have been migrated onto these
 
 - **Pick the slot by purpose.** A user-facing button label uses `font-interface` even if the surrounding component shows narrative content.
 - **Don't mix slots inside one element.** A heading is one font, even if it contains an inline ID — wrap the ID in a separate `<code>` if it needs `font-system`.
-- **Narrative paragraphs get max-width `56rem`** for line-length comfort. Don't stretch story prose to full container width.
+- **Narrative paragraphs cap at `48rem`** for line-length comfort — the story-reading column in [manuscript-session.css](src/styles/manuscript-session.css) (`.manuscript-main-content-inner`). That's the same measure as `--page-width-prose` ([Layout & Spacing](#layout-spacing)), set as a literal value there rather than the token. Product-surface descriptive text uses a separate `70ch` measure — see [Surfaces](#surfaces). Don't stretch story prose to full container width.
 
 ## Layout & Spacing
 
@@ -198,7 +198,7 @@ The full scale is `--space-0_5` through `--space-8` in [_shared-tokens.css](src/
 
 ### Layout rules
 
-- **Page max-width** is `--content-max-width` (`1200px`) for general content; narrative content tightens further to `56rem`.
+- **Page max-width** is `--content-max-width` (`1200px`) for general content; narrative content tightens further to `48rem` (see [Typography](#typography)).
 - **Named page widths**, the tier below the app shell: `--page-width-narrow` (`64rem`/1024px — hero content, ending screen) and `--page-width-prose` (`48rem`/768px — legal text, about's hero copy and section prose, landing's hero copy). Landing's page container itself rides the full `--content-max-width`, matching the app shell, so its hero image and step grid aren't squeezed narrower than the header. Both width tokens live in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) alongside `--page-gutter` (`var(--space-4)`, `var(--space-6)` from `1024px`), the shared, responsive horizontal inset from viewport edge to content. The brand register widens that inset one step, to `var(--space-6)` and `var(--space-8)` — see Surfaces.
 - **Game session viewport** is fixed-position, full-viewport, with internal layout governed by [src/styles/manuscript-session.css](src/styles/manuscript-session.css). Don't apply page-level spacing to game-session screens.
 - **Mobile breakpoints**: `640px` (sm), `768px` (md), `1024px` (lg), `1280px` (xl). These stay literal in media queries — custom properties aren't readable inside `@media` conditions without a build step — but any new breakpoint should snap to this scale rather than introduce a one-off. Mobile-specific layout bugs from the DS migration (#1139, #1143, #1148, #1150) are resolved.
@@ -250,6 +250,49 @@ DS3's radius scale — tight, drafted: `--radius-sm: 4px`, `--radius-md: 6px`, `
 - **Cards and inputs** use `var(--radius)` (`0.375rem`, the default).
 - **Pills and badges** use `var(--radius-full)` (`9999px`).
 - **Pin tokens, not values.** Code that hardcodes `border-radius: 8px` will look right today and wrong the moment the token changes.
+
+## Drafting Marks
+
+DS3's decorative vocabulary is one family of ink marks, not a set of unrelated ornaments. Five members:
+
+| Mark | What it is | Where it goes |
+|---|---|---|
+| Corner bracket | L-shaped mark, top-left and bottom-right | Every card and detail section — the quiet default |
+| Registration cross | A bracket promoted to a full trim mark | One per surface, in accent |
+| Dimension ticks | 1px ticks tiled along a top edge at 12px pitch | Detail-section top edge only |
+| Perforated dotted rule | `radial-gradient` dots at `12px 4px` | Section dividers, under headings |
+| Bullet eyebrow | Mono-uppercase label prefixed with a bullet | Above a heading |
+
+The brackets are the root. A corner bracket and a registration cross are the same referent, which is why the family grew out of them rather than being invented beside them. Reference implementation: `.world-detail-npc::before` and its siblings in [app-shell.css](src/app/app-shell.css); the dashboard's registration cross in [dashboard.css](src/app/dashboard.css).
+
+### The weight rule
+
+Every mark is drawn in `--color-text-muted` — roughly 4.65:1 against the card in light mode and 4.61:1 in dark, close enough that the family reads at one weight in both modes. Two colors it is deliberately not:
+
+- **Not accent.** With a bracket on every card, accent stops reading as emphasis. Accent buys at most one focal mark per surface — per surface, not per card, and not per register. The About page follows the same rule the dashboard does.
+- **Not a border token.** `--color-border-strong` sits about 0.2:1 above a card's own border, so the mark would read as a slightly darker edge rather than as a mark — which is what 20 dotted-rule sites were doing before this vocabulary was named.
+
+Marks with arms share `--mark-arm-length` (`10px`, [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css)) — one dial, defined once.
+
+### The attachment rule
+
+- Marks attach to **cards and detail sections**.
+- **Never the wizard.** It already carries ten dotted rules and six bullet eyebrows — the most decorated surface in the app. A fourth family there is noise.
+- **Never full-bleed.** Marks are figure and the dot grid is ground. A mark that tiles the page stops being figure and becomes a second ground.
+- **Ticks are section-only.** A tick band repeated across a dense card grid drowns the dot grid.
+- Any mark that offsets past its element's edge must check for `overflow: hidden` on that element first. The dashboard continue card clips to contain its world-image background layer, so its registration cross sits inside the corner rather than straddling it.
+
+### Pitch
+
+The dot grid tiles at `24px` (see [Colors](#colors)). The dotted rule and the dimension ticks both tile at `12px`, half the grid — a deliberate sibling pitch. Nothing lands at an in-between value, which would read as grid noise.
+
+### Not part of the family
+
+Anything without a drafting referent: no decorative squiggles, no handwritten-font flourishes, no torn-paper or coffee-ring textures, no sticky-note skeuomorphism. The test is whether it's a mark a person would actually make on a manuscript.
+
+### Reference
+
+The canon rendering is the "Drafting Marks" section in [DesignSystemShowcase.stories.tsx](src/stories/00-foundation/DesignSystemShowcase.stories.tsx) — it renders the production classes rather than copies, so it can't drift from the app.
 
 ## Components
 
