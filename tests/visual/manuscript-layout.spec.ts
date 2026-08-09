@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
-import { hideDynamicContent } from './utils/wait-helpers';
+import { hideDynamicContent, waitForImagesLoadedIn } from './utils/wait-helpers';
 
 const resetPlaySurfaceScroll = async (page: Page) => {
   await page.evaluate(() => {
@@ -166,6 +166,11 @@ test.describe('Manuscript Layout Specific Tests', () => {
     expect(desktopLayout.railIsAboveMain).toBe(true);
 
     await hideDynamicContent(page);
+    // The scene-status rail's character portrait can lose the load race against
+    // the capture, leaving an empty avatar circle — a 331-pixel flip between
+    // otherwise identical runs, and the only nondeterminism measured anywhere in
+    // the chromium suite.
+    await waitForImagesLoadedIn(page, '[data-testid="manuscript-session-shell"]');
 
     await expect(page).toHaveScreenshot('manuscript-full-composition.png', {
       fullPage: true,
