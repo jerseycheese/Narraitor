@@ -56,10 +56,17 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
   const detailRef = React.useRef<HTMLDivElement | null>(null);
 
   // Display mode (list/detail cards vs. sortable table), persisted like the
-  // world and character list screens (following the InventoryList pattern).
-  const [displayMode, setDisplayMode] = React.useState<JournalViewMode>(
-    () => (readString('local', 'journal-view-mode') as JournalViewMode) || 'list'
-  );
+  // character list screen (useEffect restore, not a lazy useState initializer
+  // — that would read localStorage during the server render too and hydrate
+  // mismatched against the client's first pass).
+  const [displayMode, setDisplayMode] = React.useState<JournalViewMode>('list');
+
+  React.useEffect(() => {
+    const saved = readString('local', 'journal-view-mode');
+    if (saved === 'list' || saved === 'table') {
+      setDisplayMode(saved);
+    }
+  }, []);
 
   const handleDisplayModeChange = (mode: JournalViewMode) => {
     setDisplayMode(mode);
@@ -97,19 +104,25 @@ export const JournalPage: React.FC<JournalPageProps> = ({ worldId }) => {
     });
   }, [entries, normalizedQuery]);
 
-  const firstEntryId = filteredEntries[0]?.id ?? null;
+  // Table view gets the full, unfiltered entry set (it has its own search
+  // and type filter — see JournalTable), so selection has to resolve against
+  // that same set. Resolving against filteredEntries here would mean a row
+  // excluded by a stale list-view search query opens the wrong entry (or an
+  // empty detail pane) when clicked in table view.
+  const selectionPool = displayMode === 'table' ? entries : filteredEntries;
+  const firstEntryId = selectionPool[0]?.id ?? null;
   const resolvedSelectedEntryId = React.useMemo(
     () =>
       selectedEntryId &&
-      filteredEntries.some((entry) => entry.id === selectedEntryId)
+      selectionPool.some((entry) => entry.id === selectedEntryId)
         ? selectedEntryId
         : null,
-    [filteredEntries, selectedEntryId]
+    [selectionPool, selectedEntryId]
   );
 
   const activeSelectedEntryId = resolvedSelectedEntryId ?? firstEntryId;
   const selectedEntry = activeSelectedEntryId
-    ? filteredEntries.find((entry) => entry.id === activeSelectedEntryId) ||
+    ? selectionPool.find((entry) => entry.id === activeSelectedEntryId) ||
       null
     : null;
 
