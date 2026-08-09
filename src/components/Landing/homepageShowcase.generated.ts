@@ -7,7 +7,7 @@
  * back into a claim nobody checked. Re-run the script instead.
  *
  * Model: gemini-2.5-flash
- * Generated: 2026-08-09T18:53:58.354Z
+ * Generated: 2026-08-09T19:18:49.036Z
  * Turns played per world: 3 (the last one is what's kept)
  *
  * The player's side of the exchange is authored, standing in for what someone
@@ -119,53 +119,53 @@ export const HOMEPAGE_SHOWCASE: ShowcaseWorld[] = [
     "typed": "A survey ship six months into a silent run, the crew down to four, and something in the hold that was not on the manifest.",
     "protagonist": "Aiya",
     "attributeNames": [
-      "Physique",
-      "Agility",
-      "Intellect",
+      "Constitution",
+      "Dexterity",
+      "Intelligence",
       "Wits"
     ],
     "skillNames": [
       "Piloting",
-      "Mechanics",
+      "Engineering",
       "Security Systems",
       "First Aid",
-      "Investigation",
-      "Stealth"
+      "Survival (Ship)",
+      "Xenology"
     ],
-    "opening": "The rhythmic hum of the *Stardust*'s failing life support systems is a constant, grating companion, a testament to six months of deep-space silence broken only by your own shallow breaths. You trace the flickering readout of the cargo bay's environmental controls, the ambient temperature consistently two degrees colder than every other compartment, a chilling anomaly you first noticed buried deep in the maintenance logs. A metallic clang echoes from below, vibrating through the deck plates and straight into your bones, confirming what your gut has screamed for weeks: something heavy, something *alive*, is definitely down there, and it was never on the manifest.",
-    "situation": "You initiate the ship's diagnostic sweep, feeling the familiar hum of the internal sensors come to life, a low thrumming under your feet. The main console flickers, a cascade of data streaming across the screen, but instead of the expected green and yellow of system checks, the readouts flash red. The internal sensor grid, a complex web designed to map every inch of the *Stardust*, simply reports \"ERROR: DATA CORRUPT\" across every sub-system, a chilling blank space where critical information should be.",
+    "opening": "The hum of the ship's life support systems, usually a comforting drone, now felt like a low thrum against your very bones, a constant reminder of the six months you'd been adrift in the void. You traced the faded text on the ancient data pad: 'Cargo Manifest, Stardate 247.03.12.' Your finger hovered over the discrepancy, a single line item, 'Cryo-Containment Unit, Experimental,' that had appeared in the maintenance logs two months prior, a ghost on the ship's internal records that no one else seemed to have noticed, or perhaps, bothered to look for. The flickering emergency lights in the narrow corridor ahead cast long, shifting shadows, making the ship feel less like a vessel and more like a tomb as you headed toward the cargo hold, a sickly premonition coiling in your gut.",
+    "situation": "You quickly navigate the ancient data pad's interface, a series of precise taps and swipes isolating the cargo hold's atmosphere and sealing its heavy blast doors with a low, hydraulic hiss. The ship's internal sensors hummed, now focused entirely on the pulsing red dot. Its rhythmic signature, once faint, now registered with a clearer, more defined cadence, a slow, steady thrum against the backdrop of the ship's failing life support. You held your breath, the chill in the air deepening as you watched the single, isolated heartbeat on the screen.",
     "decisionPrompt": "What will you do?",
     "options": [
       {
-        "text": "Follow protocol: initiate a full system reboot of the sensor grid.",
+        "text": "Review ship logs for cargo hold anomalies.",
         "alignment": "lawful",
         "taken": false
       },
       {
-        "text": "Bypass the corrupted grid; attempt a manual sweep of the nearest hold.",
+        "text": "Route remaining life support to this section.",
         "alignment": "neutral",
         "taken": true
       },
       {
-        "text": "Cross-reference sensor error data with the ship's security logs.",
+        "text": "Prepare a hazmat suit and entry tools.",
         "alignment": "neutral",
         "taken": false
       },
       {
-        "text": "Overload the sensor grid with a massive data packet, hoping to clear it.",
+        "text": "Open the cargo hold blast doors and trigger an emergency purge.",
         "alignment": "chaotic",
         "taken": false
       }
     ],
     "check": {
-      "skillName": "Investigation",
-      "diceRoll": 7,
+      "skillName": "Engineering",
+      "diceRoll": 4,
       "skillLevel": 3,
       "attributeBonus": 1,
-      "total": 11,
+      "total": 8,
       "dc": 12
     },
-    "consequence": "You carefully depress the manual override for the cargo bay's nearest hold, a low-priority storage unit used for non-essential supplies. The panel, usually glowing with active diagnostics, remains stubbornly dark, unresponsive to your touch. A faint, almost imperceptible tremor—not from the ship's failing systems, but from *within* the hold itself—vibrates through the cold metal, a subtle, chilling confirmation that your attempt to bypass the corrupted grid has only highlighted the silent, unseen presence lurking just beyond the bulkhead."
+    "consequence": "You slammed your palm against the ancient console, trying to force the power conduit over, but the failing systems responded with a whine of protest. Instead of rerouting, the remaining life support flickered erratically, the dim emergency lights in the corridor ahead dying completely, plunging the passage into an oppressive, inky blackness. The rhythmic thrum from the cargo hold now echoed louder, more distinct, a singular heartbeat in the suffocating silence, a stark counterpoint to the growing chill that seeped into your bones."
   },
   {
     "id": "normandy",
