@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell, waitForImagesLoadedIn } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/seedTestData';
 import { waitForStoreReady } from './utils/tutorial-helpers';
 
@@ -72,6 +72,11 @@ test.describe('Main Pages Visual Tests', () => {
 
     // Verify page loaded with expected content
     await expect(page).toHaveTitle(/Narraitor/i);
+
+    // The Continue card's world thumbnail goes through next/image on-demand
+    // optimization, so whether its pixels land before the capture is a coin flip
+    // on CI — the card comes back with either the art or an empty rounded box.
+    await waitForImagesLoadedIn(page, '#main-content');
 
     // Take full page screenshot - should show "Continue Last Game" with character and world info
     await expect(page).toHaveScreenshot('home-page.png', { fullPage: true });
