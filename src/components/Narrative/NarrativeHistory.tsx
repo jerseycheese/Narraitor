@@ -3,6 +3,22 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { NarrativeDisplay } from './NarrativeDisplay';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useBufferedNarrativeSegments } from './hooks/useBufferedNarrativeSegments';
+import { getSessionTimeDividerLabel } from '@/lib/narrative/sessionTimeDivider';
+
+/**
+ * Session-relative time divider between two narrative segments — replaces
+ * the old bare `<hr>` with a labeled rule.
+ */
+const SessionTimeDivider: React.FC<{ segment: NarrativeSegment; previousSegment: NarrativeSegment | null }> = ({
+  segment,
+  previousSegment,
+}) => (
+  <div className="manuscript-narrative-divider" role="separator">
+    <span className="manuscript-narrative-divider-label">
+      {getSessionTimeDividerLabel(segment, previousSegment)}
+    </span>
+  </div>
+);
 
 interface NarrativeHistoryProps {
   segments: NarrativeSegment[];
@@ -257,7 +273,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           {renderedSegments.map((segment, index) => (
             <React.Fragment key={segment.id}>
               {index > 0 && (
-                <hr className="manuscript-narrative-divider" />
+                <SessionTimeDivider segment={segment} previousSegment={renderedSegments[index - 1]} />
               )}
               <NarrativeDisplay
                 segment={segment}
@@ -272,7 +288,10 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           {isLoading && (
             <>
               {streamingPreviewSegment && (
-                <hr className="manuscript-narrative-divider" />
+                <SessionTimeDivider
+                  segment={streamingPreviewSegment}
+                  previousSegment={renderedSegments[renderedSegments.length - 1] ?? null}
+                />
               )}
               <NarrativeDisplay
                 segment={streamingPreviewSegment}
