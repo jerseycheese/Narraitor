@@ -15,9 +15,17 @@ jest.mock('../rateLimiter', () => ({
   }
 }));
 
-import { getSafetySettingsFromPrompt, makeGeminiRequest } from '../apiHelpers';
+import {
+  getSafetySettingsFromPrompt,
+  makeGeminiRequest,
+  consumeGeminiStreamEvents,
+  processGeminiStreamingTextRequest,
+} from '../apiHelpers';
 import { getAIConfig } from '../../lib/ai/config';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../../lib/constants/aiTimeouts';
+import { PROVIDER_API_KEY_HEADER } from '../../lib/ai/providerKeyHeader';
+import { globalRateLimiter } from '../rateLimiter';
+import { NextResponse, type NextRequest } from 'next/server';
 
 describe('getSafetySettingsFromPrompt', () => {
   it('returns BLOCK_MEDIUM_AND_ABOVE for G-rated content', () => {
@@ -181,5 +189,149 @@ describe('makeGeminiRequest', () => {
     } finally {
       jest.useRealTimers();
     }
+  });
+});
+
+describe('consumeGeminiStreamEvents', () => {
+  const encoder = new TextEncoder();
+
+  /** A fake reader that yields the given SSE `data:` payloads one chunk per
+   * read(), then signals done — matches the ByteStreamReader shape without
+   * needing a real web ReadableStream (unavailable in this jsdom test env). */
+  function fakeReader(payloads: unknown[]) {
+    const frames = payloads.map((payload) => encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+    let index = 0;
+    return {
+      read: jest.fn(async () => {
+        if (index >= frames.length) return { done: true };
+        return { done: false, value: frames[index++] };
+      }),
+    };
+  }
+
+  it('yields growing content deltas as candidate text streams in, then a done event', async () => {
+    const reader = fakeReader([
+      { candidates: [{ content: { parts: [{ text: '{"content": "Once upon a ' }] } }] },
+      { candidates: [{ content: { parts: [{ text: 'time, a hero' }] } }] },
+      {
+        candidates: [
+          { content: { parts: [{ text: ' arose.", "type": "scene"}' }] }, finishReason: 'STOP' },
+        ],
+        usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 5 },
+      },
+    ]);
+
+    const events = [];
+    for await (const event of consumeGeminiStreamEvents(reader, 'Test')) {
+      events.push(event);
+    }
+
+    const deltas = events.filter((e): e is { delta: string } => 'delta' in e);
+    expect(deltas.map((d) => d.delta).join('')).toBe('Once upon a time, a hero arose.');
+
+    const last = events[events.length - 1];
+    expect(last).toEqual({
+      done: true,
+      content: '{"content": "Once upon a time, a hero arose.", "type": "scene"}',
+      finishReason: 'STOP',
+      promptTokens: 10,
+      completionTokens: 5,
+    });
+  });
+
+  it('skips an unparsable SSE frame instead of aborting the turn', async () => {
+    const badFrame = encoder.encode('data: {not json\n\n');
+    const goodFrame = encoder.encode(`data: ${JSON.stringify({
+      candidates: [{ content: { parts: [{ text: '{"content": "Still works"}' }] }, finishReason: 'STOP' }],
+    })}\n\n`);
+    let index = 0;
+    const reader = {
+      read: jest.fn(async () => {
+        const frames = [badFrame, goodFrame];
+        if (index >= frames.length) return { done: true };
+        return { done: false, value: frames[index++] };
+      }),
+    };
+
+    const events = [];
+    for await (const event of consumeGeminiStreamEvents(reader, 'Test')) {
+      events.push(event);
+    }
+
+    const last = events[events.length - 1];
+    expect(last).toMatchObject({ done: true, content: '{"content": "Still works"}' });
+  });
+
+  it('yields an error event when the reader itself fails mid-stream', async () => {
+    const reader = {
+      read: jest.fn().mockRejectedValue(new Error('connection reset')),
+    };
+
+    const events = [];
+    for await (const event of consumeGeminiStreamEvents(reader, 'Test')) {
+      events.push(event);
+    }
+
+    expect(events).toEqual([{ error: 'connection reset' }]);
+  });
+});
+
+describe('processGeminiStreamingTextRequest', () => {
+  function fakeRequest(body: unknown, headerKey?: string): NextRequest {
+    return {
+      headers: { get: (name: string) => (name === PROVIDER_API_KEY_HEADER ? headerKey ?? null : null) },
+      json: async () => body,
+    } as unknown as NextRequest;
+  }
+
+  beforeEach(() => {
+    global.fetch = jest.fn();
+    // makeGeminiRequest's describe block above calls jest.resetAllMocks() in
+    // its own afterEach, which wipes the module-level rateLimiter mock's
+    // implementation for every test that runs after it in this file.
+    (globalRateLimiter.checkLimit as jest.Mock).mockReturnValue({
+      allowed: true,
+      remaining: 50,
+      resetTime: Date.now() + 3600000,
+    });
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('rejects a request with no prompt before ever calling Gemini', async () => {
+    await processGeminiStreamingTextRequest(fakeRequest({}), { errorContext: 'Test' });
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('errors without calling Gemini when no API key resolves', async () => {
+    // No header key, and jest.setup.ts pins GEMINI_API_KEY to the MOCK_API_KEY
+    // sentinel, which resolveApiKey treats as unset.
+    await processGeminiStreamingTextRequest(fakeRequest({ prompt: 'hello' }), { errorContext: 'Test' });
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('surfaces an upstream non-ok response as an error instead of streaming', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 429,
+      statusText: 'Too Many Requests',
+      text: async () => 'rate limited upstream',
+    });
+
+    await processGeminiStreamingTextRequest(
+      fakeRequest({ prompt: 'hello' }, 'player-supplied-key'),
+      { errorContext: 'Test' }
+    );
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining(':streamGenerateContent?alt=sse'),
+      expect.any(Object)
+    );
+    expect(NextResponse.json).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ status: 429 })
+    );
   });
 });

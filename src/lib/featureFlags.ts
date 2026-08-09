@@ -9,7 +9,13 @@
  * in the browser.
  */
 const FEATURE_FLAG_DEFAULTS = {
-  BUFFERED_STREAMING: true,
+  // Client-side typewriter reveal over an already-complete response (#1695).
+  // Real token streaming from /api/narrative/generate (issue #1476) now
+  // covers the same "text should arrive progressively" goal for the live
+  // play surface, so this defaults off — playing both back to back would
+  // double the reveal instead of speeding it up. Kept as an opt-in fallback
+  // for embeds/environments where the real stream's onChunk never fires.
+  BUFFERED_STREAMING: false,
   PROGRESSIVE_DISCLOSURE: true,
 } as const;
 

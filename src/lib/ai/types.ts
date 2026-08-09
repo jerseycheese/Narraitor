@@ -77,11 +77,42 @@ export interface AIImageResponse {
 /**
  * Per-call options for AI clients. `signal` lets a caller cancel the
  * underlying request (e.g. when a UI-level timeout races the generation);
- * implementations that can't cancel may ignore it.
+ * implementations that can't cancel may ignore it. `onChunk` is an optional
+ * progressive-reveal hook: implementations that stream (currently
+ * ClientGeminiClient.generateContent) invoke it with each newly-visible
+ * slice of narrative prose as it arrives, ahead of the final resolved
+ * AIResponse. Implementations that don't stream simply never call it.
  */
 export interface AIGenerateOptions {
   signal?: AbortSignal;
+  onChunk?: (delta: string) => void;
 }
+
+/**
+ * Streaming protocol for /api/narrative/generate: the response body is
+ * newline-delimited JSON, zero or more progress events followed by exactly
+ * one terminal event. The terminal `done` event carries the same fields as
+ * the non-streaming GeminiTextResponse, so everything downstream of the
+ * network call (parseNarrativeResponse, the continuity guardrail, lore/item
+ * extraction) reads identical data regardless of which path produced it.
+ */
+export interface NarrativeStreamDelta {
+  delta: string;
+}
+export interface NarrativeStreamDone {
+  done: true;
+  content: string;
+  finishReason?: string;
+  promptTokens?: number;
+  completionTokens?: number;
+}
+export interface NarrativeStreamError {
+  error: string;
+}
+export type NarrativeStreamEvent =
+  | NarrativeStreamDelta
+  | NarrativeStreamDone
+  | NarrativeStreamError;
 
 /**
  * Interface for AI clients (both real and mock)

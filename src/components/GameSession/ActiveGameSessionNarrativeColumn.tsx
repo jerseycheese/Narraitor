@@ -22,6 +22,10 @@ interface ActiveGameSessionNarrativeColumnProps {
   onEndingSuggested: (reason: string, endingType: EndingType) => void;
   segmentCount: number;
   retryToken?: number;
+  /** See NarrativeHistoryManager's isGenerating/streamingContent (issue #1476). */
+  isGenerating?: boolean;
+  streamingContent?: string;
+  onStreamingPreviewChange?: (preview: string) => void;
 }
 
 const ActiveGameSessionNarrativeColumn: React.FC<
@@ -42,6 +46,9 @@ const ActiveGameSessionNarrativeColumn: React.FC<
   onEndingSuggested,
   segmentCount,
   retryToken,
+  isGenerating,
+  streamingContent,
+  onStreamingPreviewChange,
 }) => {
   return (
     <div
@@ -56,6 +63,8 @@ const ActiveGameSessionNarrativeColumn: React.FC<
         key={`display-${controllerKey}`}
         sessionId={sessionId}
         disableInitialAutoScroll={false}
+        isGenerating={isGenerating}
+        streamingContent={streamingContent}
       />
 
       {/* Hidden controller just to generate content - always include it but hide from view */}
@@ -76,6 +85,7 @@ const ActiveGameSessionNarrativeColumn: React.FC<
           generateChoices={true}
           hideHistory={true}
           retryToken={retryToken}
+          onStreamingPreviewChange={onStreamingPreviewChange}
         />
       </div>
     </div>

@@ -6,6 +6,8 @@ import { getAIConfig } from '../lib/ai/config';
 import { resolveApiKey } from '../lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '../lib/utils/createAPIErrorResponse';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../lib/constants/aiTimeouts';
+import { extractStreamingContentPreview } from '../lib/ai/narrativeStreamPreview';
+import type { NarrativeStreamEvent } from '../lib/ai/types';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ApiHelpers');
@@ -320,4 +322,234 @@ export async function processGeminiTextRequest(
       error instanceof Error ? error.message : 'Unknown error'
     );
   }
+}
+
+/** Minimal shape needed to drive the SSE parser — matches a real
+ * ReadableStreamDefaultReader<Uint8Array>, but kept structural so tests can
+ * hand it a plain object instead of constructing a real web ReadableStream. */
+interface ByteStreamReader {
+  read(): Promise<{ done: boolean; value?: Uint8Array }>;
+}
+
+/**
+ * Consumes a Gemini `:streamGenerateContent?alt=sse` response body and
+ * yields our own narrative streaming protocol events (see
+ * NarrativeStreamEvent). Each `data:` SSE frame's text delta is accumulated
+ * into the raw buffer; extractStreamingContentPreview recovers whatever of
+ * the "content" JSON field is decodable so far, and only the newly-revealed
+ * suffix is yielded as a delta — recomputing from scratch each time means a
+ * chunk that lands mid-escape-sequence just withholds output until the next
+ * chunk resolves it, instead of ever yielding a mangled character.
+ *
+ * Kept independent of the real ReadableStream/Response constructors (which
+ * jsdom's jest environment doesn't provide) so it's unit-testable with a
+ * hand-rolled reader.
+ */
+export async function* consumeGeminiStreamEvents(
+  reader: ByteStreamReader,
+  errorContext: string
+): AsyncGenerator<NarrativeStreamEvent> {
+  const decoder = new TextDecoder();
+  let sseBuffer = '';
+  let rawContent = '';
+  let visiblePreview = '';
+  let finishReason = 'STOP';
+  let promptTokens: number | undefined;
+  let completionTokens: number | undefined;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      sseBuffer += decoder.decode(value, { stream: true });
+      const lines = sseBuffer.split('\n');
+      // The last element may be a partial line still being written — hold it
+      // back in the buffer until more bytes complete it.
+      sseBuffer = lines.pop() ?? '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data:')) continue;
+
+        const payload = trimmed.slice('data:'.length).trim();
+        if (!payload || payload === '[DONE]') continue;
+
+        let parsed: {
+          candidates?: Array<{
+            content?: { parts?: Array<{ text?: string }> };
+            finishReason?: string;
+          }>;
+          usageMetadata?: {
+            promptTokenCount?: number;
+            candidatesTokenCount?: number;
+          };
+        };
+        try {
+          parsed = JSON.parse(payload);
+        } catch {
+          // An unparsable SSE frame is skipped rather than aborting the
+          // whole turn — the next frame (or the final done event, built
+          // from whatever text did arrive) carries the turn forward.
+          continue;
+        }
+
+        const candidate = parsed.candidates?.[0];
+        const text = candidate?.content?.parts?.[0]?.text;
+        if (typeof text === 'string') {
+          rawContent += text;
+          const nextPreview = extractStreamingContentPreview(rawContent);
+          // Only ever emit a delta when the new preview grows the previous
+          // one by appending characters. extractStreamingContentPreview is
+          // recomputed from scratch each call and is meant to be monotonic,
+          // but this guard keeps a future edge case there from slicing a
+          // false prefix off content that never actually preceded it, which
+          // would otherwise corrupt the reveal (see #1717 review).
+          if (
+            nextPreview.length > visiblePreview.length &&
+            nextPreview.startsWith(visiblePreview)
+          ) {
+            yield { delta: nextPreview.slice(visiblePreview.length) };
+            visiblePreview = nextPreview;
+          }
+        }
+        if (candidate?.finishReason) {
+          finishReason = candidate.finishReason;
+        }
+        if (parsed.usageMetadata) {
+          promptTokens = parsed.usageMetadata.promptTokenCount ?? promptTokens;
+          completionTokens = parsed.usageMetadata.candidatesTokenCount ?? completionTokens;
+        }
+      }
+    }
+
+    yield {
+      done: true,
+      content: rawContent,
+      finishReason,
+      promptTokens,
+      completionTokens,
+    };
+  } catch (error) {
+    logger.error(`${errorContext} stream error:`, error);
+    yield {
+      error: error instanceof Error ? error.message : 'Stream interrupted',
+    };
+  }
+}
+
+/**
+ * Streaming counterpart to processGeminiTextRequest: same rate limiting,
+ * validation, and key resolution, but calls Gemini's SSE streaming endpoint
+ * and forwards narrative content to the client as it's generated instead of
+ * waiting for the full response. See NarrativeStreamEvent for the wire
+ * protocol. Used only by /api/narrative/generate — the other Gemini text
+ * routes (choices, ending, summarize) have no progressive-reveal UI and stay
+ * on the simpler processGeminiTextRequest.
+ */
+export async function processGeminiStreamingTextRequest(
+  request: NextRequest,
+  options: GeminiTextOptions = {}
+): Promise<Response> {
+  const {
+    maxTokens = 1024,
+    temperature = 0.7,
+    errorContext = 'Generation'
+  } = options;
+
+  const { response: rateLimitResponse, result: rateLimitResult } = handleRateLimiting(request);
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
+  const requestData = await validateAIRequest(request);
+  if (!requestData) {
+    return createAPIErrorResponse(
+      new Error('400 bad request: prompt is required'),
+      400
+    );
+  }
+
+  const apiKey = resolveApiKey(request);
+  if (!apiKey) {
+    return createAPIErrorResponse(
+      new Error('Service configuration error: API key not configured'),
+      500
+    );
+  }
+
+  let upstream: Response;
+  try {
+    upstream = await makeGeminiRequest(
+      `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().modelName}:streamGenerateContent?alt=sse`,
+      apiKey,
+      {
+        contents: [{
+          parts: [{ text: requestData.prompt }]
+        }],
+        generationConfig: {
+          temperature: requestData.config?.temperature || temperature,
+          topP: 1.0,
+          topK: 40,
+          maxOutputTokens: requestData.config?.maxTokens || maxTokens,
+          thinkingConfig: { thinkingBudget: 0 }
+        },
+        safetySettings: getSafetySettingsFromPrompt(requestData.prompt)
+      }
+    );
+  } catch (error) {
+    logger.error(`${errorContext} error:`, error);
+    return createAPIErrorResponse(
+      error instanceof Error ? error : new Error('Unknown error occurred'),
+      500,
+      error instanceof Error ? error.message : 'Unknown error'
+    );
+  }
+
+  if (!upstream.ok) {
+    const errorText = await upstream.text();
+    logger.error('Gemini API Error:', {
+      status: upstream.status,
+      statusText: upstream.statusText,
+      errorText
+    });
+
+    const apiError = upstream.status === 429
+      ? new Error('429 rate limit exceeded')
+      : upstream.status === 401
+      ? new Error('401 unauthorized')
+      : new Error(`Service error: ${upstream.status} ${upstream.statusText}`);
+
+    return createAPIErrorResponse(apiError, upstream.status, errorText);
+  }
+
+  if (!upstream.body) {
+    return createAPIErrorResponse(
+      new Error('Service error: empty stream body'),
+      500
+    );
+  }
+
+  const encoder = new TextEncoder();
+  const upstreamReader = upstream.body.getReader();
+
+  const ndjsonStream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      for await (const event of consumeGeminiStreamEvents(upstreamReader, errorContext)) {
+        controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
+      }
+      controller.close();
+    },
+    cancel() {
+      upstreamReader.cancel().catch(() => {});
+    },
+  });
+
+  return new Response(ndjsonStream, {
+    headers: {
+      ...createRateLimitHeaders(rateLimitResult),
+      'Content-Type': 'application/x-ndjson; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+    },
+  });
 }

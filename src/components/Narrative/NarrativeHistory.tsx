@@ -18,6 +18,14 @@ interface NarrativeHistoryProps {
    * generated one once it does arrive.
    */
   isHydrating?: boolean;
+  /**
+   * The active generation's narrative prose so far, growing as tokens
+   * stream in from /api/narrative/generate (issue #1476). While isLoading is
+   * true, this takes the place of the bare "Continuing your story..."
+   * spinner as soon as the first token arrives — the spinner remains the
+   * fallback for the gap before that.
+   */
+  streamingContent?: string;
 }
 
 export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
@@ -27,7 +35,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   className = '',
   onRetry,
   disableInitialAutoScroll = false,
-  isHydrating = false
+  isHydrating = false,
+  streamingContent
 }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const scrollViewportRef = useRef<HTMLElement>(null);
@@ -193,11 +202,34 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         break;
     }
   }, []);
+  // A synthetic segment carrying the in-progress generation's prose so far,
+  // rendered through the normal NarrativeDisplay presentation instead of the
+  // bare spinner once the first token arrives (issue #1476).
+  const streamingPreviewSegment: NarrativeSegment | null =
+    isLoading && streamingContent
+      ? {
+          id: '__streaming-preview__',
+          content: streamingContent,
+          type: 'scene',
+          metadata: { tags: [] },
+          timestamp: new Date(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+      : null;
+
   // Only render once to prevent flashing
   const renderContent = () => {
-    // If we're loading with no segments, just show the loading indicator
+    // If we're loading with no segments, show the live preview once tokens
+    // have started arriving, otherwise the spinner for the gap before that.
     if (isLoading && renderedSegments.length === 0) {
-      return (
+      return streamingPreviewSegment ? (
+        <NarrativeDisplay
+          segment={streamingPreviewSegment}
+          isLoading={false}
+          error={undefined}
+        />
+      ) : (
         <NarrativeDisplay
           segment={null}
           isLoading={true}
@@ -235,13 +267,19 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
             </React.Fragment>
           ))}
 
-          {/* Loading indicator for additional segments */}
+          {/* Loading indicator (or, once tokens arrive, the live preview)
+              for the segment currently generating */}
           {isLoading && (
-            <NarrativeDisplay
-              segment={null}
-              isLoading={true}
-              error={undefined}
-            />
+            <>
+              {streamingPreviewSegment && (
+                <hr className="manuscript-narrative-divider" />
+              )}
+              <NarrativeDisplay
+                segment={streamingPreviewSegment}
+                isLoading={!streamingPreviewSegment}
+                error={undefined}
+              />
+            </>
           )}
         </>
       );

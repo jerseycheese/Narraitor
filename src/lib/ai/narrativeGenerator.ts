@@ -77,9 +77,20 @@ export class NarrativeGenerator {
 
   constructor(private geminiClient: AIClient) {}
 
+  /**
+   * options.onChunk streams the RAW model draft as it's generated, before
+   * enforceLanguageComplexity/applyContinuityGuardrail below get a chance to
+   * rewrite it. On the rare turn where one of those fires a real correction,
+   * a caller subscribed to onChunk briefly shows the uncorrected line before
+   * the final NarrativeGenerationResult replaces it. Buffering the stream
+   * until guardrails clear would remove that gap, but at the cost of the
+   * extra guardrail round-trip's latency on every turn that has one — the
+   * exact wait this streaming path exists to cut. Accepted trade-off for
+   * now; revisit if guardrail corrections turn out more common than rare.
+   */
   async generateSegment(
     request: NarrativeGenerationRequest,
-    options?: { signal?: AbortSignal }
+    options?: { signal?: AbortSignal; onChunk?: (delta: string) => void }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -174,6 +185,7 @@ export class NarrativeGenerator {
 
       const response = await this.geminiClient.generateContent(finalPrompt, {
         signal: options?.signal,
+        onChunk: options?.onChunk,
       });
       throwIfAborted(options?.signal);
       recordRequestCalibration(budget, finalPrompt, response);
@@ -339,7 +351,11 @@ export class NarrativeGenerator {
     worldId: string,
     characterIds: string[],
     sessionId?: string,
-    options?: { generationParameters?: GenerationParameters; signal?: AbortSignal }
+    options?: {
+      generationParameters?: GenerationParameters;
+      signal?: AbortSignal;
+      onChunk?: (delta: string) => void;
+    }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
@@ -418,6 +434,7 @@ export class NarrativeGenerator {
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt, {
         signal: options?.signal,
+        onChunk: options?.onChunk,
       });
       throwIfAborted(options?.signal);
       recordRequestCalibration(budget, fullyEnhancedPrompt, response);

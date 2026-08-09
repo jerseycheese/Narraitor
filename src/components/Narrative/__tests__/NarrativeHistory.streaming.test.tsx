@@ -153,6 +153,63 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     expect(mockScrollTo).not.toHaveBeenCalled();
   });
 
+  describe('streamingContent (issue #1476: real API streaming)', () => {
+    it('shows the live preview instead of the spinner once tokens arrive, with no segments yet', () => {
+      mockIsFeatureEnabled.mockReturnValue(false);
+      render(
+        <NarrativeHistory
+          segments={[]}
+          isLoading={true}
+          streamingContent="The door creaks"
+        />
+      );
+
+      expect(screen.getByText(/The door creaks/)).toBeInTheDocument();
+      expect(screen.queryByText('Writing your story...')).not.toBeInTheDocument();
+    });
+
+    it('falls back to the spinner before the first token arrives', () => {
+      mockIsFeatureEnabled.mockReturnValue(false);
+      render(
+        <NarrativeHistory segments={[]} isLoading={true} streamingContent="" />
+      );
+
+      expect(screen.getByText('Writing your story...')).toBeInTheDocument();
+    });
+
+    it('appends the live preview after existing segments while generating the next one', () => {
+      mockIsFeatureEnabled.mockReturnValue(false);
+      render(
+        <NarrativeHistory
+          segments={segments}
+          isLoading={true}
+          streamingContent="A new beat unfolds"
+        />
+      );
+
+      expect(screen.getByText('First segment.')).toBeInTheDocument();
+      expect(screen.getByText(/A new beat unfolds/)).toBeInTheDocument();
+    });
+
+    it('does not show a stale preview once loading finishes', () => {
+      mockIsFeatureEnabled.mockReturnValue(false);
+      const { rerender } = render(
+        <NarrativeHistory
+          segments={segments}
+          isLoading={true}
+          streamingContent="A new beat unfolds"
+        />
+      );
+      expect(screen.getByText(/A new beat unfolds/)).toBeInTheDocument();
+
+      rerender(
+        <NarrativeHistory segments={segments} isLoading={false} streamingContent="" />
+      );
+
+      expect(screen.queryByText(/A new beat unfolds/)).not.toBeInTheDocument();
+    });
+  });
+
   it('applies layout classes for height stability', () => {
     mockIsFeatureEnabled.mockReturnValue(true);
     const { container } = render(
