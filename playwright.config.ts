@@ -61,9 +61,16 @@ export default defineConfig({
   expect: {
     // Visual comparison settings
     toHaveScreenshot: {
-      // Allow up to 10k pixels difference to handle font rendering variations
-      maxDiffPixels: 10000,
-      // Slightly tighter threshold for better accuracy
+      // Budget for how many pixels may differ AFTER `threshold` has already
+      // forgiven per-pixel font-rendering variation. Measured floor: three
+      // back-to-back local runs against one commit produced 0 differing pixels
+      // on 73 of 74 chromium snapshots and all 38 tutorial snapshots, and a CI
+      // run's three attempts at the same snapshot also diffed to 0. So this is
+      // pure cushion, not a number anything in the suite needs — anything
+      // genuinely noisier carries its own override next to the assertion.
+      maxDiffPixels: 100,
+      // Per-pixel perceptual tolerance. This is the knob that absorbs font
+      // smoothing; maxDiffPixels is not a second copy of it.
       threshold: 0.2,
       // Animation handling - disable all animations for consistent screenshots
       animations: 'disabled',
