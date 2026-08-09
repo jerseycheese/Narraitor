@@ -267,7 +267,7 @@ Component rules apply to DS3. The token references resolve automatically.
 
 ### Card
 
-- Background `surface`, border `1px solid var(--color-border)`, radius `var(--radius)`, padding `var(--space-md)` (16px).
+- Background `surface`, border `1px solid var(--color-border)`, radius `var(--radius-md)` (6px), padding `var(--space-md)` (16px).
 - No drop shadows. Depth comes from the surface contrast against `canvas`.
 
 ### Input
