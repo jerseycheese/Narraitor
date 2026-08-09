@@ -68,6 +68,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const addProvider = useProviderStore((s) => s.addProvider);
   const [verifyState, setVerifyState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [verifyResult, setVerifyResult] = useState<ValidationResult | null>(null);
+  const [isKeyRevealed, setIsKeyRevealed] = useState(false);
 
   // Memoized so useWizardFlow's validation effect has a stable dependency —
   // an inline function would change identity each render and loop the effect.
@@ -116,6 +117,12 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     setVerifyState('idle');
     setVerifyResult(null);
   }, [data.apiKey, data.model, data.endpoint, data.type]);
+
+  // Reveal is a glance, not a mode: leaving the step re-masks, so a key can't
+  // sit in the clear behind a step the player has already walked past.
+  useEffect(() => {
+    setIsKeyRevealed(false);
+  }, [currentStep]);
 
   const selectPreset = (presetId: string) => {
     const preset = getPresetById(presetId);
@@ -223,14 +230,25 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
               <label className="form-label" htmlFor="provider-key">
                 API key
               </label>
-              <Input
-                id="provider-key"
-                type="password"
-                value={data.apiKey}
-                placeholder="Paste your key"
-                autoComplete="off"
-                onChange={(e) => handlers.updateData({ apiKey: e.target.value })}
-              />
+              <div className="provider-key-field">
+                <Input
+                  id="provider-key"
+                  type={isKeyRevealed ? 'text' : 'password'}
+                  value={data.apiKey}
+                  placeholder="Paste your key"
+                  autoComplete="off"
+                  onChange={(e) => handlers.updateData({ apiKey: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="provider-key-reveal"
+                  aria-pressed={isKeyRevealed}
+                  aria-label={isKeyRevealed ? 'Hide key' : 'Show key'}
+                  onClick={() => setIsKeyRevealed((revealed) => !revealed)}
+                >
+                  {isKeyRevealed ? 'Hide' : 'Show'}
+                </button>
+              </div>
               {data.helpUrl && (
                 <p className="form-help-text">
                   <a href={data.helpUrl} target="_blank" rel="noopener noreferrer">

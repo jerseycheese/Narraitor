@@ -83,4 +83,43 @@ describe('ProviderWizard', () => {
     // Save stays disabled until a successful check.
     expect(screen.getByRole('button', { name: /save provider/i })).toBeDisabled();
   });
+
+  test('masks the key by default and reveals it only while toggled on', async () => {
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    const keyField = screen.getByLabelText(/api key/i);
+    await user.type(keyField, 'AIza-test-key');
+    expect(keyField).toHaveAttribute('type', 'password');
+
+    const toggle = screen.getByRole('button', { name: /show key/i });
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    // Must not double as the wizard's submit control.
+    expect(toggle).toHaveAttribute('type', 'button');
+
+    await user.click(toggle);
+    expect(keyField).toHaveAttribute('type', 'text');
+    expect(screen.getByRole('button', { name: /hide key/i })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+
+    await user.click(screen.getByRole('button', { name: /hide key/i }));
+    expect(keyField).toHaveAttribute('type', 'password');
+    expect(screen.getByRole('button', { name: /show key/i })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
+
+    // Leaving the step re-masks, so a revealed key never survives navigation.
+    await user.click(screen.getByRole('button', { name: /show key/i }));
+    expect(keyField).toHaveAttribute('type', 'text');
+    await user.click(screen.getByRole('button', { name: /^back$/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    expect(screen.getByLabelText(/api key/i)).toHaveAttribute('type', 'password');
+  });
 });
