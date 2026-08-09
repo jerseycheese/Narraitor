@@ -19,7 +19,7 @@ export interface CharacterCreationData {
   description: string;
   portraitPlaceholder: string;
   portrait?: {
-    type: 'ai-generated' | 'placeholder';
+    type: 'ai-generated' | 'placeholder' | 'preset' | 'uploaded';
     url: string | null;
     generatedAt?: string;
     prompt?: string;

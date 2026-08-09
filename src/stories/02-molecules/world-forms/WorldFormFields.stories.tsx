@@ -12,7 +12,7 @@ type Story = StoryObj;
 
 export const Fields: Story = {
   render: () => (
-    <div style={{ display: 'grid', gap: 'var(--spacing-4, 1rem)', maxWidth: '480px' }}>
+    <div style={{ display: 'grid', gap: 'var(--space-4)', maxWidth: '480px' }}>
       <WorldFormFields.NameInput value="The Shattered Isles" onChange={() => {}} />
       <WorldFormFields.GenreSelect value="fantasy" onChange={() => {}} />
       <WorldFormFields.DescriptionTextArea

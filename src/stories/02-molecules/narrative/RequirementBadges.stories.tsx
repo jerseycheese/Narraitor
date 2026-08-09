@@ -15,7 +15,7 @@ type Story = StoryObj;
 
 export const Alignments: Story = {
   render: () => (
-    <div style={{ display: 'flex', gap: 'var(--spacing-2, 0.5rem)' }}>
+    <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
       <AlignmentBadge alignment="lawful" />
       <AlignmentBadge alignment="chaotic" />
     </div>

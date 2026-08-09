@@ -1,7 +1,7 @@
 // src/components/CharacterCreationWizard/__tests__/CharacterCreationWizard.portrait.test.tsx
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
 import { useCharacterStore } from '../../../state/characterStore';
@@ -14,6 +14,15 @@ import type { World } from '@/types/world.types';
 // Mock the dependencies
 jest.mock('../../../state/characterStore');
 jest.mock('../../../state/worldStore');
+
+// Only the async read is mocked; validation stays real so the picker still
+// rejects bad files the way it does in the app.
+jest.mock('@/lib/portraits/portraitUpload', () => ({
+  ...jest.requireActual('@/lib/portraits/portraitUpload'),
+  readPortraitFile: jest.fn(),
+}));
+const readPortraitFileMock = jest.requireMock('@/lib/portraits/portraitUpload')
+  .readPortraitFile as jest.Mock;
 // Mock fetch for API routes
 const mockFetch = jest.fn();
 jest.mock('../../../hooks/useCharacterCreationAutoSave', () => ({
@@ -171,7 +180,208 @@ describe('PortraitStep Component', () => {
       />
     );
 
-    expect(screen.getByText(/skip portrait generation/i)).toBeInTheDocument();
+    expect(screen.getByText(/you can skip this step/i)).toBeInTheDocument();
+  });
+
+  it('offers preset avatars and upload alongside generation', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    expect(screen.getByLabelText(/search avatars/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Upload' }));
+    expect(screen.getByLabelText(/choose an image file/i)).toBeInTheDocument();
+  });
+
+  it('previews a preset avatar without saving it until confirmed', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+
+    expect(screen.getByText(/just a preview/i)).toBeInTheDocument();
+    expect(mockOnUpdate).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: /use this portrait/i }));
+
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        portrait: expect.objectContaining({ type: 'preset' }),
+      })
+    );
+  });
+
+  it('ignores an upload that finishes reading after the player switched source', async () => {
+    const user = userEvent.setup();
+
+    let resolveRead: (portrait: { type: string; url: string }) => void = () => {};
+    readPortraitFileMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveRead = resolve as typeof resolveRead;
+      })
+    );
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Upload' }));
+    await user.upload(
+      screen.getByLabelText(/choose an image file/i),
+      new File(['bytes'], 'hero.png', { type: 'image/png' })
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+
+    await act(async () => {
+      resolveRead({ type: 'uploaded', url: 'data:image/webp;base64,late' });
+    });
+
+    // The abandoned upload must not land on top of the avatar preview.
+    await user.click(screen.getByRole('button', { name: /use this portrait/i }));
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        portrait: expect.objectContaining({ type: 'preset' }),
+      })
+    );
+  });
+
+  it('drops the preview when the player switches source', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+    await user.click(screen.getByRole('button', { name: 'Upload' }));
+
+    expect(screen.queryByText(/just a preview/i)).not.toBeInTheDocument();
+    expect(mockOnUpdate).not.toHaveBeenCalled();
+  });
+
+  it('ignores a generation that resolves after the player switched source', async () => {
+    const user = userEvent.setup();
+
+    let resolveFetch: (value: unknown) => void = () => {};
+    mockFetch.mockReturnValue(
+      new Promise((resolve) => {
+        resolveFetch = resolve;
+      })
+    );
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: /generate portrait/i }));
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+    await user.click(screen.getByRole('button', { name: /use this portrait/i }));
+
+    expect(mockOnUpdate).toHaveBeenCalledTimes(1);
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        portrait: expect.objectContaining({ type: 'preset' }),
+      })
+    );
+
+    await act(async () => {
+      resolveFetch({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            portrait: {
+              type: 'ai-generated',
+              url: 'data:image/png;base64,late',
+              generatedAt: getTimestamp(),
+            },
+          }),
+      });
+    });
+
+    // The late generation must not overwrite the avatar the player chose.
+    expect(mockOnUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a generation failure off the preview the player switched to', async () => {
+    const user = userEvent.setup();
+
+    let rejectFetch: (reason: unknown) => void = () => {};
+    mockFetch.mockReturnValue(
+      new Promise((_resolve, reject) => {
+        rejectFetch = reject;
+      })
+    );
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: /generate portrait/i }));
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+
+    await act(async () => {
+      rejectFetch(new Error('API error'));
+    });
+
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+
+    expect(screen.queryByText(/API error/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/just a preview/i)).toBeInTheDocument();
+  });
+
+  it('drops the preview when the player cancels', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(screen.queryByText(/just a preview/i)).not.toBeInTheDocument();
+    expect(mockOnUpdate).not.toHaveBeenCalled();
   });
 });
 

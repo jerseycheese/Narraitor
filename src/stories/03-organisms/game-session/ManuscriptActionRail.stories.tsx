@@ -22,7 +22,7 @@ type Story = StoryObj<typeof ManuscriptActionRail>;
 
 const choiceButtonStyle: React.CSSProperties = {
   padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
+  fontSize: 'var(--font-size-sm)',
   border: '1px solid var(--color-border)',
   borderRadius: 'var(--radius-md)',
   fontFamily: 'var(--font-interface)',
@@ -53,7 +53,7 @@ export const Streaming: Story = {
     isStreaming: true,
     children: (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '1rem', background: 'color-mix(in srgb, var(--color-surface) 80%, transparent)', backdropFilter: 'blur(4px)', borderTop: '1px solid var(--color-border)' }}>
-        <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-system)', color: 'var(--color-accent)' }}>Generating narrative...</span>
+        <span style={{ fontSize: 'var(--font-size-xs)', fontFamily: 'var(--font-system)', color: 'var(--color-accent)' }}>Generating narrative...</span>
       </div>
     ),
   },

@@ -18,7 +18,7 @@ const meta: Meta<typeof SkipLinks> = {
     (Story) => (
       <div className="story-skiplinks">
         <Story />
-        <main id="main-content" tabIndex={-1} style={{ padding: 'var(--spacing-4, 1rem)' }}>
+        <main id="main-content" tabIndex={-1} style={{ padding: 'var(--space-4)' }}>
           Press Tab to reveal the skip links above.
         </main>
       </div>

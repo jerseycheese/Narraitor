@@ -65,6 +65,9 @@
    *   --page-width-prose: long-form reading measure (legal text, about's
    *     hero copy and section prose, landing's hero copy) -- narrower than
    *     narrow, wide enough that lines don't feel clipped.
+   *   --page-width-form: single-column forms of short fields (settings,
+   *     provider setup). Uncapped, a one-line input stretches the full shell
+   *     and reads as a mistake; this is the tier below prose.
    *   --page-gutter: the shared horizontal inset from viewport edge to
    *     content, matching the padding the marketing pages already use.
    *     Responsive itself (see the media query below) so consumers can
@@ -75,6 +78,7 @@
    * match the scale DESIGN.md documents: 640px / 768px / 1024px. */
   --page-width-narrow: 64rem;
   --page-width-prose: 48rem;
+  --page-width-form: 40rem;
   --page-gutter: var(--space-4);
 }
 

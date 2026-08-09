@@ -41,6 +41,24 @@ describe('ImageGenerationSection accessibility', () => {
     ).toBeInTheDocument();
   });
 
+  it.each(['preset', 'uploaded'] as const)(
+    'treats a %s image as an existing image',
+    (type) => {
+      render(
+        <ImageGenerationSection
+          {...baseProps}
+          currentImageType={type}
+          currentImageUrl="data:image/png;base64,abc"
+          removeButtonText="Remove Portrait"
+        />
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Remove Portrait' })
+      ).toBeInTheDocument();
+    }
+  );
+
   it('omits the heading entirely when the title is empty', () => {
     // FinalizeStep passes title="" so the surrounding section owns the heading;
     // the component must not emit an empty <h2> (#1473).

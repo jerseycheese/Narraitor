@@ -9,7 +9,7 @@ interface ImageGenerationSectionProps {
   title: string;
   description: string;
   currentImageUrl?: string | null;
-  currentImageType?: 'ai-generated' | 'placeholder';
+  currentImageType?: 'ai-generated' | 'placeholder' | 'preset' | 'uploaded';
   generatedAt?: string;
   currentPrompt?: string; // The prompt that was used to generate the current image
   isGenerating: boolean;
@@ -77,7 +77,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
     }
   };
 
-  const hasImage = currentImageType === 'ai-generated' && currentImageUrl;
+  const hasImage = currentImageType !== 'placeholder' && Boolean(currentImageUrl);
 
   return (
     <div className={`${className}`}>

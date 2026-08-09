@@ -49,7 +49,7 @@ interface Character {
   derivedStats?: DerivedStat[];
   status?: CharacterStatus;
   portrait?: {
-    type: 'ai-generated' | 'placeholder';
+    type: 'ai-generated' | 'placeholder' | 'preset' | 'uploaded';
     url: string | null;
     generatedAt?: string;
     prompt?: string;
