@@ -27,6 +27,24 @@ describe('CharacterPortrait', () => {
       expect(img).toHaveAttribute('src', portrait.url);
     });
 
+    it.each(['preset', 'uploaded'] as const)(
+      'should render a %s portrait image',
+      (type) => {
+        const portrait: GeneratedImage = {
+          type,
+          url: 'data:image/png;base64,abc123',
+        };
+
+        render(
+          <CharacterPortrait portrait={portrait} characterName="Test Hero" />
+        );
+
+        expect(
+          screen.getByRole('img', { name: 'Test Hero portrait' })
+        ).toHaveAttribute('src', portrait.url);
+      }
+    );
+
     it('should render placeholder when no portrait', () => {
       const portrait: GeneratedImage = {
         type: 'placeholder',

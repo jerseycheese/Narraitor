@@ -76,7 +76,7 @@ export function CharacterPortrait({
     );
   }
 
-  if (portrait.type === 'ai-generated' && portrait.url) {
+  if (portrait.type !== 'placeholder' && portrait.url) {
     return (
       <div 
         className={containerClasses} 

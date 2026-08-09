@@ -75,7 +75,7 @@ export interface Character {
     itemOrder: EntityID[];
   };
   portrait?: {
-    type: 'ai-generated' | 'placeholder';
+    type: 'ai-generated' | 'placeholder' | 'preset' | 'uploaded';
     url: string | null;
     generatedAt?: string;
     prompt?: string;

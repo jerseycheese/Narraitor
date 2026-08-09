@@ -41,6 +41,27 @@ describe('ImageGenerationSection accessibility', () => {
     ).toBeInTheDocument();
   });
 
+  it.each(['preset', 'uploaded'] as const)(
+    'treats a %s image as an existing image',
+    (type) => {
+      render(
+        <ImageGenerationSection
+          {...baseProps}
+          currentImageType={type}
+          currentImageUrl="data:image/png;base64,abc"
+          generatedAt="2026-01-01T00:00:00.000Z"
+          removeButtonText="Remove Portrait"
+        />
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Remove Portrait' })
+      ).toBeInTheDocument();
+      // "Generated:" belongs to AI output only — a preset or an upload wasn't.
+      expect(screen.queryByText(/^Generated:/)).not.toBeInTheDocument();
+    }
+  );
+
   it('omits the heading entirely when the title is empty', () => {
     // FinalizeStep passes title="" so the surrounding section owns the heading;
     // the component must not emit an empty <h2> (#1473).

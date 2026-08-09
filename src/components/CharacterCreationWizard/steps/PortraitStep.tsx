@@ -8,6 +8,11 @@ import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PortraitCustomizationSection } from '@/components/shared';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  ImageUploadPicker,
+  PresetAvatarPicker,
+} from '@/components/CharacterPortrait';
 import { getTimestamp } from '@/lib/utils';
 import { usePortraitGeneration } from '@/lib/hooks/usePortraitGeneration';
 
@@ -32,6 +37,14 @@ interface CharacterFormData {
   };
 }
 
+type PortraitSource = 'generate' | 'presets' | 'upload';
+
+const PORTRAIT_SOURCES: Array<{ value: PortraitSource; label: string }> = [
+  { value: 'generate', label: 'Generate' },
+  { value: 'presets', label: 'Preset avatars' },
+  { value: 'upload', label: 'Upload' },
+];
+
 interface PortraitStepProps {
   data: {
     characterData: CharacterFormData;
@@ -54,10 +67,23 @@ export function PortraitStep({
   );
   const [environmentHint, setEnvironmentHint] = useState('');
 
-  const portrait: GeneratedImage = data.characterData.portrait || {
+  // Held locally so a player can look at an avatar or an upload without it
+  // replacing the portrait already on the character.
+  const [previewPortrait, setPreviewPortrait] = useState<GeneratedImage | null>(
+    null
+  );
+  const [source, setSource] = useState<PortraitSource>('generate');
+
+  const handleSourceChange = (value: string) => {
+    setSource(value as PortraitSource);
+    setPreviewPortrait(null);
+  };
+
+  const savedPortrait: GeneratedImage = data.characterData.portrait || {
     type: 'placeholder',
     url: null,
   };
+  const portrait = previewPortrait ?? savedPortrait;
 
   const handleGeneratePortrait = async () => {
     const characterForGeneration: Character = {
@@ -117,6 +143,7 @@ export function PortraitStep({
   };
 
   const handleRemovePortrait = () => {
+    setPreviewPortrait(null);
     onUpdate({
       portrait: {
         type: 'placeholder',
@@ -126,6 +153,16 @@ export function PortraitStep({
     clearError();
   };
 
+  const handleUsePreview = () => {
+    if (!previewPortrait) return;
+    onUpdate({ portrait: previewPortrait });
+    setPreviewPortrait(null);
+    clearError();
+  };
+
+  const hasSavedPortrait =
+    savedPortrait.type !== 'placeholder' && Boolean(savedPortrait.url);
+
   return (
     <div className="component-portrait-step">
       <div className="portrait-step-header">
@@ -133,19 +170,9 @@ export function PortraitStep({
         <p>
           {data.characterData.background?.isKnownFigure
             ? `Generate a portrait of ${data.characterData.name} as they are commonly recognized`
-            : 'Generate a portrait for your character or use a placeholder'}
+            : 'Generate a portrait, pick a preset avatar, or upload your own image'}
         </p>
       </div>
-
-      {/* Portrait customization fields */}
-      {portrait.type === 'placeholder' && (
-        <PortraitCustomizationSection
-          physicalDescription={localPhysicalDescription}
-          setPhysicalDescription={setLocalPhysicalDescription}
-          environmentHint={environmentHint}
-          setEnvironmentHint={setEnvironmentHint}
-        />
-      )}
 
       <div className="portrait-step-body">
         {isGenerating ? (
@@ -161,41 +188,100 @@ export function PortraitStep({
           />
         )}
 
-        {portrait.type === 'placeholder' && (
-          <button
-            type="button"
-            onClick={handleGeneratePortrait}
-            disabled={isGenerating}
-            data-tutorial="portrait-generator-action"
-          >
-            Generate Portrait
-          </button>
-        )}
-
-        {portrait.type === 'ai-generated' && portrait.url && (
-          <div className="portrait-step-success">
-            <p className="portrait-step-success-label">
-              <CheckCircle aria-hidden="true" />
-              Portrait generated successfully
+        {previewPortrait && (
+          <div className="portrait-step-preview">
+            <p className="portrait-step-preview-label">
+              Just a preview. Choose &quot;Use this portrait&quot; to keep it —
+              moving on without that leaves the character as it was.
             </p>
             <div className="portrait-step-actions">
               <button
                 type="button"
-                onClick={handleGeneratePortrait}
-                disabled={isGenerating}
+                className="portrait-step-button"
+                onClick={handleUsePreview}
               >
-                Regenerate Portrait
+                Use this portrait
               </button>
-              <button type="button" onClick={handleRemovePortrait}>
+              <button
+                type="button"
+                className="portrait-step-button"
+                onClick={() => setPreviewPortrait(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!previewPortrait && hasSavedPortrait && (
+          <div className="portrait-step-success">
+            <p className="portrait-step-success-label">
+              <CheckCircle aria-hidden="true" />
+              Portrait saved to this character
+            </p>
+            <div className="portrait-step-actions">
+              <button
+                type="button"
+                className="portrait-step-button"
+                onClick={handleRemovePortrait}
+              >
                 Remove Portrait
               </button>
             </div>
           </div>
         )}
 
+        <Tabs
+          value={source}
+          className="portrait-step-sources"
+          onValueChange={handleSourceChange}
+        >
+          <TabsList role="group" aria-label="Where the portrait comes from">
+            {PORTRAIT_SOURCES.map((option) => (
+              <TabsTrigger
+                key={option.value}
+                value={option.value}
+                aria-pressed={source === option.value}
+              >
+                {option.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          <TabsContent value="generate" className="portrait-step-generate">
+            <PortraitCustomizationSection
+              physicalDescription={localPhysicalDescription}
+              setPhysicalDescription={setLocalPhysicalDescription}
+              environmentHint={environmentHint}
+              setEnvironmentHint={setEnvironmentHint}
+            />
+            <button
+              type="button"
+              className="portrait-step-button"
+              onClick={handleGeneratePortrait}
+              disabled={isGenerating}
+              data-tutorial="portrait-generator-action"
+            >
+              {savedPortrait.type === 'ai-generated' && savedPortrait.url
+                ? 'Regenerate Portrait'
+                : 'Generate Portrait'}
+            </button>
+          </TabsContent>
+
+          <TabsContent value="presets">
+            <PresetAvatarPicker
+              onPreview={setPreviewPortrait}
+              selectedUrl={portrait.url}
+            />
+          </TabsContent>
+
+          <TabsContent value="upload">
+            <ImageUploadPicker onPreview={setPreviewPortrait} />
+          </TabsContent>
+        </Tabs>
+
         <p className="portrait-step-hint">
-          Portrait generation is optional. You can skip portrait generation and
-          continue.
+          A portrait is optional. You can skip this step and continue.
         </p>
       </div>
     </div>

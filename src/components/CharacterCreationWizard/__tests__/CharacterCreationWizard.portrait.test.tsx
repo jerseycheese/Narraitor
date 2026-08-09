@@ -171,7 +171,89 @@ describe('PortraitStep Component', () => {
       />
     );
 
-    expect(screen.getByText(/skip portrait generation/i)).toBeInTheDocument();
+    expect(screen.getByText(/you can skip this step/i)).toBeInTheDocument();
+  });
+
+  it('offers preset avatars and upload alongside generation', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    expect(screen.getByLabelText(/search avatars/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Upload' }));
+    expect(screen.getByLabelText(/choose an image file/i)).toBeInTheDocument();
+  });
+
+  it('previews a preset avatar without saving it until confirmed', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+
+    expect(screen.getByText(/just a preview/i)).toBeInTheDocument();
+    expect(mockOnUpdate).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: /use this portrait/i }));
+
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        portrait: expect.objectContaining({ type: 'preset' }),
+      })
+    );
+  });
+
+  it('drops the preview when the player switches source', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+    await user.click(screen.getByRole('button', { name: 'Upload' }));
+
+    expect(screen.queryByText(/just a preview/i)).not.toBeInTheDocument();
+    expect(mockOnUpdate).not.toHaveBeenCalled();
+  });
+
+  it('drops the preview when the player cancels', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={mockWorldConfig}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Preset avatars' }));
+    await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(screen.queryByText(/just a preview/i)).not.toBeInTheDocument();
+    expect(mockOnUpdate).not.toHaveBeenCalled();
   });
 });
 
