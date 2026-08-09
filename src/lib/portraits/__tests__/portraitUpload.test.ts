@@ -1,5 +1,7 @@
 import {
+  MAX_PORTRAIT_EDGE_PX,
   MAX_PORTRAIT_UPLOAD_BYTES,
+  downscalePortraitDataUrl,
   readPortraitFile,
   validatePortraitFile,
 } from '../portraitUpload';
@@ -27,6 +29,52 @@ describe('validatePortraitFile', () => {
       makeFile('big.png', 'image/png', MAX_PORTRAIT_UPLOAD_BYTES + 1)
     );
     expect(error).toMatch(/5MB/i);
+  });
+});
+
+describe('downscalePortraitDataUrl', () => {
+  const original = 'data:image/png;base64,abc';
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('returns the original when there is no 2D canvas to draw on', async () => {
+    jest
+      .spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue(null);
+
+    await expect(downscalePortraitDataUrl(original)).resolves.toBe(original);
+  });
+
+  it('redraws an oversized image down to the long-edge cap', async () => {
+    const drawImage = jest.fn();
+    jest
+      .spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D);
+    jest
+      .spyOn(HTMLCanvasElement.prototype, 'toDataURL')
+      .mockReturnValue('data:image/webp;base64,smaller');
+
+    // jsdom never decodes a data URL, so stand in for the loaded bitmap.
+    jest
+      .spyOn(window.Image.prototype, 'src', 'set')
+      .mockImplementation(function (this: HTMLImageElement) {
+        Object.defineProperty(this, 'width', { value: 2048 });
+        Object.defineProperty(this, 'height', { value: 1024 });
+        this.onload?.(new Event('load'));
+      });
+
+    await expect(downscalePortraitDataUrl(original)).resolves.toBe(
+      'data:image/webp;base64,smaller'
+    );
+    expect(drawImage).toHaveBeenCalledWith(
+      expect.anything(),
+      0,
+      0,
+      MAX_PORTRAIT_EDGE_PX,
+      MAX_PORTRAIT_EDGE_PX / 2
+    );
   });
 });
 

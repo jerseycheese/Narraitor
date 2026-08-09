@@ -1,6 +1,6 @@
 // src/components/CharacterCreationWizard/steps/PortraitStep.tsx
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { GeneratedImage } from '@/types/common.types';
@@ -74,9 +74,24 @@ export function PortraitStep({
   );
   const [source, setSource] = useState<PortraitSource>('generate');
 
+  /**
+   * Bumped whenever the player switches source. Generation and file reads both
+   * finish long after they start, so each one captures the value it began with
+   * and drops its result if this has moved on — otherwise a slow generation
+   * lands on top of the avatar the player picked while waiting for it.
+   */
+  const sourceEpochRef = useRef(0);
+
   const handleSourceChange = (value: string) => {
+    sourceEpochRef.current += 1;
     setSource(value as PortraitSource);
     setPreviewPortrait(null);
+    clearError();
+  };
+
+  const previewIfStillCurrent = (epoch: number) => (portrait: GeneratedImage) => {
+    if (sourceEpochRef.current !== epoch) return;
+    setPreviewPortrait(portrait);
   };
 
   const savedPortrait: GeneratedImage = data.characterData.portrait || {
@@ -86,6 +101,8 @@ export function PortraitStep({
   const portrait = previewPortrait ?? savedPortrait;
 
   const handleGeneratePortrait = async () => {
+    const epoch = sourceEpochRef.current;
+
     const characterForGeneration: Character = {
       id: 'temp',
       name: data.characterData.name,
@@ -134,11 +151,14 @@ export function PortraitStep({
         world: worldConfig,
         customDescription: localPhysicalDescription,
       });
+      if (sourceEpochRef.current !== epoch) return;
       if (generatedPortrait) {
         onUpdate({ portrait: generatedPortrait });
       }
     } catch {
-      // Error already captured in hook state
+      // Error already captured in hook state, but it belongs to a source the
+      // player may have left by now.
+      if (sourceEpochRef.current !== epoch) clearError();
     }
   };
 
@@ -163,6 +183,14 @@ export function PortraitStep({
   const hasSavedPortrait =
     savedPortrait.type !== 'placeholder' && Boolean(savedPortrait.url);
 
+  // A generation failure only belongs on screen while Generate is the live
+  // source and nothing newer is being previewed — the error must never win
+  // over the avatar or upload the player is looking at.
+  const visibleError =
+    source === 'generate' && !previewPortrait ? error : null;
+
+  const previewFromThisSource = previewIfStillCurrent(sourceEpochRef.current);
+
   return (
     <div className="component-portrait-step">
       <div className="portrait-step-header">
@@ -184,7 +212,7 @@ export function PortraitStep({
             portrait={portrait}
             characterName={data.characterData.name}
             size="xlarge"
-            error={error}
+            error={visibleError}
           />
         )}
 
@@ -270,13 +298,13 @@ export function PortraitStep({
 
           <TabsContent value="presets">
             <PresetAvatarPicker
-              onPreview={setPreviewPortrait}
+              onPreview={previewFromThisSource}
               selectedUrl={portrait.url}
             />
           </TabsContent>
 
           <TabsContent value="upload">
-            <ImageUploadPicker onPreview={setPreviewPortrait} />
+            <ImageUploadPicker onPreview={previewFromThisSource} />
           </TabsContent>
         </Tabs>
 

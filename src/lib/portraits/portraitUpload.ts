@@ -27,35 +27,91 @@ export function validatePortraitFile(file: File): string | null {
 }
 
 /**
- * Reads a validated file into a portrait carrying a base64 data URL, which is
- * what the character store persists to IndexedDB.
+ * Longest edge we keep. The largest portrait surface renders at 16rem, so 512
+ * still covers a 2x display, and it keeps a 5MB upload from becoming a ~6.7MB
+ * base64 string — which would blow the ~5MB localStorage quota the character
+ * creation autosave writes to, and bloat every IndexedDB write after that.
  */
-export function readPortraitFile(file: File): Promise<GeneratedImage> {
+export const MAX_PORTRAIT_EDGE_PX = 512;
+
+const DOWNSCALED_PORTRAIT_QUALITY = 0.85;
+
+const READ_FAILURE_MESSAGE =
+  "That image couldn't be read. Try picking it again.";
+
+function readAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-
-    const fail = () =>
-      reject(new Error("That image couldn't be read. Try picking it again."));
+    const fail = () => reject(new Error(READ_FAILURE_MESSAGE));
 
     reader.onerror = fail;
     reader.onabort = fail;
-
     reader.onload = () => {
-      const url = typeof reader.result === 'string' ? reader.result : null;
-      if (!url) {
-        reject(new Error("That image couldn't be read. Try picking it again."));
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
         return;
       }
-
-      // No prompt or generatedAt: both describe an AI generation, and the
-      // editor renders generatedAt as "Generated: <date>" — untrue of a file
-      // the player picked off disk.
-      resolve({
-        type: 'uploaded',
-        url,
-      });
+      fail();
     };
 
     reader.readAsDataURL(file);
   });
+}
+
+function loadImage(dataUrl: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => resolve(null);
+    image.src = dataUrl;
+  });
+}
+
+/**
+ * Shrinks the image to MAX_PORTRAIT_EDGE_PX on its longest edge. Returns the
+ * original data URL untouched when there's no 2D canvas to draw on (server
+ * render, jsdom) or the browser can't decode what was picked.
+ */
+export async function downscalePortraitDataUrl(
+  dataUrl: string
+): Promise<string> {
+  const canvas = document.createElement('canvas');
+
+  let context: CanvasRenderingContext2D | null = null;
+  try {
+    context = canvas.getContext('2d');
+  } catch {
+    context = null;
+  }
+  if (!context) return dataUrl;
+
+  const image = await loadImage(dataUrl);
+  if (!image?.width || !image.height) return dataUrl;
+
+  const scale = Math.min(
+    1,
+    MAX_PORTRAIT_EDGE_PX / Math.max(image.width, image.height)
+  );
+  canvas.width = Math.round(image.width * scale);
+  canvas.height = Math.round(image.height * scale);
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  const encoded = canvas.toDataURL('image/webp', DOWNSCALED_PORTRAIT_QUALITY);
+  return encoded.startsWith('data:image/webp') ? encoded : dataUrl;
+}
+
+/**
+ * Reads a validated file into a portrait carrying a base64 data URL, which is
+ * what the character store persists to IndexedDB.
+ */
+export async function readPortraitFile(file: File): Promise<GeneratedImage> {
+  const original = await readAsDataUrl(file);
+
+  // No prompt or generatedAt: both describe an AI generation, and the editor
+  // renders generatedAt as "Generated: <date>" — untrue of a file the player
+  // picked off disk.
+  return {
+    type: 'uploaded',
+    url: await downscalePortraitDataUrl(original),
+  };
 }
