@@ -16,32 +16,41 @@ describe('featureFlags', () => {
     return require('@/lib/featureFlags') as typeof import('@/lib/featureFlags');
   };
 
-  it('defaults BUFFERED_STREAMING and PROGRESSIVE_DISCLOSURE to true when env vars are missing', () => {
+  it('defaults PROGRESSIVE_DISCLOSURE to true and BUFFERED_STREAMING to false when env vars are missing', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: undefined,
       NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE: undefined,
     });
 
-    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(true);
+    // BUFFERED_STREAMING defaults off: real API streaming (issue #1476)
+    // covers the live play surface's progressive-reveal now, and this
+    // fake-typewriter pass is only an opt-in fallback for when it can't.
+    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(false);
     expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
   });
 
-  it('disables BUFFERED_STREAMING only when env var is exactly "false"', () => {
+  it('enables BUFFERED_STREAMING only when env var is exactly "true"', () => {
     const { isFeatureEnabled } = load({
-      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'false',
+      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'true',
+    });
+
+    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(true);
+  });
+
+  it('treats non-true values as disabled for a default-off flag', () => {
+    const { isFeatureEnabled } = load({
+      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'TRUE',
     });
 
     expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(false);
   });
 
-  it('treats non-false values as enabled for default-on flags', () => {
+  it('treats non-false values as enabled for a default-on flag', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE: 'TRUE',
-      NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: '1',
     });
 
     expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
-    expect(isFeatureEnabled('BUFFERED_STREAMING')).toBe(true);
   });
 
   it('supports downstream gating decisions for BUFFERED_STREAMING', () => {

@@ -56,6 +56,15 @@ interface NarrativeControllerProps {
    * controller's internal retry handler. Ignored at its initial value.
    */
   retryToken?: number;
+  /**
+   * Fires with the growing narrative preview as the active generation
+   * streams in, and with '' once a turn finishes (issue #1476). A composer
+   * that renders its own visible history from the store instead of this
+   * controller's own (often hidden, see hideHistory) NarrativeHistory — the
+   * live play surface does this via NarrativeHistoryManager — uses this to
+   * feed that display instead.
+   */
+  onStreamingPreviewChange?: (preview: string) => void;
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
@@ -72,11 +81,33 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   generateChoices = true,
   hideHistory = false,
   retryToken = 0,
+  onStreamingPreviewChange,
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
+
+  // Live-updating preview of the segment currently generating (issue #1476:
+  // real API streaming). streamingPreviewRef is the source of truth so
+  // handleStreamChunk stays a stable callback and the post-await read in
+  // generate*() below never sees a stale closure; streamingPreview mirrors it
+  // into state purely to trigger the re-render NarrativeHistory needs to show
+  // each new delta.
+  const [streamingPreview, setStreamingPreview] = useState('');
+  const streamingPreviewRef = useRef('');
+
+  const handleStreamChunk = useCallback((delta: string) => {
+    streamingPreviewRef.current += delta;
+    setStreamingPreview(streamingPreviewRef.current);
+    onStreamingPreviewChange?.(streamingPreviewRef.current);
+  }, [onStreamingPreviewChange]);
+
+  const resetStreamingPreview = useCallback(() => {
+    streamingPreviewRef.current = '';
+    setStreamingPreview('');
+    onStreamingPreviewChange?.('');
+  }, [onStreamingPreviewChange]);
 
   // Access store methods in a way that works with testing
   const addSegment = useNarrativeStore((state) => state.addSegment);
@@ -426,6 +457,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
       setIsLoading(true);
       setError(null);
+      resetStreamingPreview();
 
       // Race AI generation with a timeout so we can fallback gracefully.
       // Losing the race must also ABORT the generation: without the signal,
@@ -445,7 +477,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           worldId,
           characterId ? [characterId] : [],
           sessionId,
-          { signal: generationAbort.signal }
+          { signal: generationAbort.signal, onChunk: handleStreamChunk }
         ),
         timeoutPromise,
       ]);
@@ -562,6 +594,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     } finally {
       clearTimeout(generationTimeoutId);
       initialGenerationLocksRef.current.delete(lockKey);
+      resetStreamingPreview();
       if (mountedRef.current) {
         setIsLoading(false);
       }
@@ -581,6 +614,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     setIsLoading(true);
     setError(null);
     clearGenerationError();
+    resetStreamingPreview();
 
     let segmentTimeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
@@ -718,7 +752,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
                   : undefined,
             },
           },
-          { signal: segmentAbort.signal }
+          { signal: segmentAbort.signal, onChunk: handleStreamChunk }
         ),
         segmentTimeoutPromise,
       ]);
@@ -817,6 +851,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setGenerationError(getNarrativeError(err as Error));
     } finally {
       clearTimeout(segmentTimeoutId);
+      resetStreamingPreview();
       if (mountedRef.current) {
         setIsLoading(false);
       }
@@ -864,6 +899,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           isLoading={isLoading || isGeneratingChoices}
           error={error || undefined}
           onRetry={handleRetry}
+          streamingContent={streamingPreview}
         />
       )}
       {!hideHistory && process.env.NODE_ENV !== 'production' && npcRoster.length > 0 && (

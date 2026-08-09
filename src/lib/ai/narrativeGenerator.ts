@@ -79,7 +79,7 @@ export class NarrativeGenerator {
 
   async generateSegment(
     request: NarrativeGenerationRequest,
-    options?: { signal?: AbortSignal }
+    options?: { signal?: AbortSignal; onChunk?: (delta: string) => void }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -174,6 +174,7 @@ export class NarrativeGenerator {
 
       const response = await this.geminiClient.generateContent(finalPrompt, {
         signal: options?.signal,
+        onChunk: options?.onChunk,
       });
       throwIfAborted(options?.signal);
       recordRequestCalibration(budget, finalPrompt, response);
@@ -339,7 +340,11 @@ export class NarrativeGenerator {
     worldId: string,
     characterIds: string[],
     sessionId?: string,
-    options?: { generationParameters?: GenerationParameters; signal?: AbortSignal }
+    options?: {
+      generationParameters?: GenerationParameters;
+      signal?: AbortSignal;
+      onChunk?: (delta: string) => void;
+    }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(worldId);
@@ -418,6 +423,7 @@ export class NarrativeGenerator {
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt, {
         signal: options?.signal,
+        onChunk: options?.onChunk,
       });
       throwIfAborted(options?.signal);
       recordRequestCalibration(budget, fullyEnhancedPrompt, response);

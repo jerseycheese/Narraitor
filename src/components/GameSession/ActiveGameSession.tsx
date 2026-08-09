@@ -74,6 +74,16 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   selectedChoiceId,
 }) => {
   const [isGenerating, setIsGenerating] = React.useState(true);
+  // Live preview of the segment currently generating (issue #1476), fed by
+  // the hidden NarrativeController via onStreamingPreviewChange. Cleared
+  // whenever a turn stops generating, for whatever reason (completion,
+  // error, retry) — isGenerating already tracks all of those.
+  const [streamingPreview, setStreamingPreview] = React.useState('');
+  React.useEffect(() => {
+    if (!isGenerating) {
+      setStreamingPreview('');
+    }
+  }, [isGenerating]);
   const [initialized, setInitialized] = React.useState(false);
   const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
@@ -507,6 +517,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         onEndingSuggested={handleEndingSuggested}
         segmentCount={segmentCount}
         retryToken={retryToken}
+        isGenerating={isGenerating}
+        streamingContent={streamingPreview}
+        onStreamingPreviewChange={setStreamingPreview}
       />
 
       <div className="manuscript-secondary-controls">

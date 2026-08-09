@@ -12,13 +12,26 @@ interface NarrativeHistoryManagerProps {
   className?: string;
   onStabilized?: () => void;
   disableInitialAutoScroll?: boolean;
+  /**
+   * True while a NarrativeController elsewhere in the tree is actively
+   * generating the next turn (issue #1476). This component only displays
+   * persisted segments, so it has no generation state of its own — a
+   * composer that hides its own NarrativeController's history (the live play
+   * surface does, via ActiveGameSessionNarrativeColumn) passes its
+   * isGenerating/streamingContent through here instead.
+   */
+  isGenerating?: boolean;
+  /** The active generation's narrative prose so far — see isGenerating. */
+  streamingContent?: string;
 }
 
 export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = ({
   sessionId,
   className,
   onStabilized,
-  disableInitialAutoScroll = false
+  disableInitialAutoScroll = false,
+  isGenerating = false,
+  streamingContent
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -150,8 +163,10 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       <NarrativeHistory
         // Only show segments when they've stabilized
         segments={stabilized ? segments : []}
-        // Always show loading animation until stabilized, regardless of whether we have segments
-        isLoading={isLoading || !stabilized}
+        // Always show loading animation until stabilized, regardless of whether we have segments —
+        // also true while a sibling NarrativeController generates the next turn (issue #1476).
+        isLoading={isLoading || !stabilized || isGenerating}
+        streamingContent={streamingContent}
         // Segments withheld pre-stabilization are historical, not newly generated —
         // tell the buffered-reveal hook so it doesn't replay the reveal animation on
         // a stored segment once stabilization finally supplies it. Deliberately just
