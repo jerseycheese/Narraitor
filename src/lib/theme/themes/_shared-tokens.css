@@ -42,6 +42,11 @@
   /* Universal radius token */
   --radius-full: 9999px;
 
+  /* Drafting-mark arm length. Corner brackets and their sibling marks read
+   * as one family only if every arm is the same length, so this is the one
+   * dial for all of them rather than a value each surface picks. */
+  --mark-arm-length: 10px;
+
   /* Minimum touch target for interactive controls (WCAG 2.5.5 Target Size).
    * Applied to buttons and other tappable controls app-wide, including
    * desktop — one floor, not a touch-only breakpoint. */

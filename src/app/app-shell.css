@@ -210,7 +210,7 @@
   transform: translateX(-50%);
   width: 120px;
   height: 4px;
-  background-image: radial-gradient(circle, var(--color-border-strong) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, var(--color-text-muted) 1.5px, transparent 1.5px);
   background-size: 12px 4px;
   background-repeat: repeat-x;
 }
@@ -1222,7 +1222,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1314,7 +1314,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1557,7 +1557,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1596,7 +1596,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1726,7 +1726,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1767,7 +1767,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1843,7 +1843,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -1890,7 +1890,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -2018,7 +2018,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -2039,7 +2039,7 @@
   padding-top: var(--space-2);
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -2354,7 +2354,7 @@
 :root .journal-page .journal-nav {
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -2502,7 +2502,7 @@
   height: 4px;
   background-image: radial-gradient(
     circle,
-    var(--color-border-strong) 1.5px,
+    var(--color-text-muted) 1.5px,
     transparent 1.5px
   );
   background-size: 12px 4px;
@@ -3002,7 +3002,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   line-height: 1.45;
 }
 
-/* DS3 console — corner-bracket accent on stat/npc/data cards */
+/* DS3 console — corner brackets on stat/npc/data cards */
 
 :root .world-detail-npc,
 :root .world-detail-stat,
@@ -3018,10 +3018,11 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: absolute;
   top: 0;
   left: 0;
-  width: 8px;
-  height: 8px;
-  border-top: 1px solid var(--color-accent);
-  border-left: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-top: 1px solid var(--color-text-muted);
+  border-left: 1px solid var(--color-text-muted);
+  pointer-events: none;
 }
 
 /* ─── WorldTable — thumbnail in the Name cell ─── */
@@ -3176,7 +3177,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   color: var(--color-text-primary);
 }
 
-/* DS3 console — corner-bracket accent on character content cards */
+/* DS3 console — corner brackets on character content cards */
 
 :root .character-detail-derived-stat,
 :root .character-detail-background-section,
@@ -3194,10 +3195,11 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: absolute;
   top: 0;
   left: 0;
-  width: 8px;
-  height: 8px;
-  border-top: 1px solid var(--color-accent);
-  border-left: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-top: 1px solid var(--color-text-muted);
+  border-left: 1px solid var(--color-text-muted);
+  pointer-events: none;
 }
 
 /* ─── CharacterTable — thumbnail in the Name cell (mirrors WorldTable) ─── */
@@ -3265,10 +3267,11 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: absolute;
   top: 0;
   left: 0;
-  width: 10px;
-  height: 10px;
-  border-top: 1px solid var(--color-accent);
-  border-left: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-top: 1px solid var(--color-text-muted);
+  border-left: 1px solid var(--color-text-muted);
+  pointer-events: none;
 }
 
 :root .component-world-card::after {
@@ -3276,10 +3279,11 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 10px;
-  height: 10px;
-  border-bottom: 1px solid var(--color-accent);
-  border-right: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-bottom: 1px solid var(--color-text-muted);
+  border-right: 1px solid var(--color-text-muted);
+  pointer-events: none;
 }
 
 /* Flatten only as far as the hero link, which becomes the media cell itself —
@@ -3420,10 +3424,11 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: absolute;
   top: 0;
   left: 0;
-  width: 10px;
-  height: 10px;
-  border-top: 1px solid var(--color-accent);
-  border-left: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-top: 1px solid var(--color-text-muted);
+  border-left: 1px solid var(--color-text-muted);
+  pointer-events: none;
 }
 
 :root .component-character-card::after {
@@ -3431,10 +3436,11 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 10px;
-  height: 10px;
-  border-bottom: 1px solid var(--color-accent);
-  border-right: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-bottom: 1px solid var(--color-text-muted);
+  border-right: 1px solid var(--color-text-muted);
+  pointer-events: none;
 }
 
 :root .component-character-card .character-card-body,
@@ -3585,10 +3591,30 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   position: absolute;
   top: 0;
   left: 0;
-  width: 10px;
-  height: 10px;
-  border-top: 1px solid var(--color-accent);
-  border-left: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-top: 1px solid var(--color-text-muted);
+  border-left: 1px solid var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* Dimension ticks along the section's top edge — the measured-drawing sibling
+   of the perforated dotted rule, sharing its 12px pitch and its tiling trick so
+   the two read as one family. Detail sections only: they're large and few, and
+   a tick band repeated across a dense card grid would drown the dot grid. */
+:root .world-detail-section::after,
+:root .character-detail-section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 6px;
+  background-image: linear-gradient(90deg, var(--color-text-muted) 1px, transparent 1px);
+  background-position: 0 0;
+  background-size: 12px 100%;
+  background-repeat: repeat-x;
+  pointer-events: none;
 }
 
 @media (width <= 640px) {

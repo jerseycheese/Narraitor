@@ -491,7 +491,11 @@
   backdrop-filter: blur(6px);
 }
 
-/* Corner brackets — top-left + bottom-right L-marks in accent. */
+/* Corner brackets — top-left + bottom-right L-marks, drawn in muted ink.
+   Not accent: with a bracket on every card, accent stops reading as emphasis,
+   and it's reserved for one focal mark per surface. Not a border token either
+   — those sit within 0.25:1 of the card's own edge, which turns the bracket
+   into a slightly darker corner instead of a mark. */
 :root .component-dashboard-progress-card::before,
 :root .component-dashboard-continue-card::before,
 :root .component-dashboard-recent-worlds::before,
@@ -501,10 +505,10 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 10px;
-  height: 10px;
-  border-top: 1px solid var(--color-accent);
-  border-left: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-top: 1px solid var(--color-text-muted);
+  border-left: 1px solid var(--color-text-muted);
   pointer-events: none;
 }
 
@@ -517,11 +521,43 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 10px;
-  height: 10px;
-  border-bottom: 1px solid var(--color-accent);
-  border-right: 1px solid var(--color-accent);
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border-bottom: 1px solid var(--color-text-muted);
+  border-right: 1px solid var(--color-text-muted);
   pointer-events: none;
+}
+
+/* The continue card is the dashboard's one focal surface, so its corner mark is
+   promoted from a bracket to a full registration cross in accent. Same corner,
+   same family, more mark — this is where the surface's single accent mark is
+   spent, and every other card keeps the quiet bracket.
+
+   The cross sits inside the corner rather than straddling it, which is the more
+   literal trim-mark placement: the card clips to its own box to contain the
+   world-image background layer, so anything offset past the edge loses its outer
+   half. Inset keeps the whole mark. */
+:root .component-dashboard-continue-card::before,
+:root .component-dashboard-continue-card::after {
+  width: calc(var(--mark-arm-length) * 2);
+  height: calc(var(--mark-arm-length) * 2);
+  border: 0;
+  background-image:
+    linear-gradient(var(--color-accent), var(--color-accent)),
+    linear-gradient(var(--color-accent), var(--color-accent));
+  background-position: center, center;
+  background-size: 100% 1px, 1px 100%;
+  background-repeat: no-repeat;
+}
+
+:root .component-dashboard-continue-card::before {
+  top: 0;
+  left: 0;
+}
+
+:root .component-dashboard-continue-card::after {
+  right: 0;
+  bottom: 0;
 }
 
 /* Continue card stays on the aged-paper canvas — the visual emphasis

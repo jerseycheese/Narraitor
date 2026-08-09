@@ -196,3 +196,44 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
+
+/* Drafting marks. Layout only — the marks themselves come from the production
+   classes each sample carries, so this section can't drift from the app. The
+   generous gap gives the registration cross room to straddle its corner without
+   colliding with the neighbouring sample. */
+.ds-showcase-marks-intro {
+  max-width: var(--page-width-prose);
+  margin-bottom: var(--space-3);
+  color: var(--color-text-secondary);
+}
+
+.ds-showcase-marks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-8);
+  margin-top: var(--space-6);
+}
+
+.ds-showcase-mark-item-wide {
+  grid-column: 1 / -1;
+}
+
+.ds-showcase-mark-sample {
+  min-height: 88px;
+  margin-bottom: var(--space-3);
+}
+
+.ds-showcase-mark-name {
+  font-family: var(--font-system);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.ds-showcase-mark-where {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
