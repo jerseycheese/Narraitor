@@ -235,19 +235,19 @@ This collapsed a three-surface split (#1655). The retired third surface — a 28
 
 Two shadow tokens:
 
-- **shadow-overlay** — centered shadow for modals, popovers, floating elements. DS1 light: `0 6px 18px rgb(0 0 0 / 8%)`. Dark mode increases opacity to 40% for visibility.
-- **shadow-drawer** — directional shadow for side panels with a `-12px` x-offset to keep the shadow on the leading edge.
+- **shadow-overlay** — centered shadow for modals, popovers, floating elements. `0 4px 12px rgb(0 0 0 / 10%)` in light mode; dark mode increases opacity to 35% for visibility.
+- **shadow-drawer** — directional shadow for side panels with a `-12px` x-offset to keep the shadow on the leading edge. `-12px 0 12px rgb(0 0 0 / 10%)` in light mode, 35% opacity in dark.
 
 Depth is conveyed primarily through **borders and tonal shifts**, not shadows. Cards sit on `surface` over a `canvas` background; the contrast does the work. Shadows are reserved for genuinely elevated UI (modals, drawers, dropdowns).
 
 ## Shapes
 
-DS3's radius scale — tight, drafted: `--radius-sm: 4px`, `--radius-md: 6px`, `--radius: 0.375rem`.
+DS3's radius scale — tight, drafted: `--radius-sm: 4px`, `--radius-md: 6px`, `--radius-lg: 8px`, `--radius-full: 9999px`.
 
 ### Usage rules
 
 - **Buttons** use `var(--radius-md)` (`6px`).
-- **Cards and inputs** use `var(--radius)` (`0.375rem`, the default).
+- **Cards and inputs** use `var(--radius-md)` (`6px`).
 - **Pills and badges** use `var(--radius-full)` (`9999px`).
 - **Pin tokens, not values.** Code that hardcodes `border-radius: 8px` will look right today and wrong the moment the token changes.
 
