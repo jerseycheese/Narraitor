@@ -93,8 +93,11 @@ const ActiveGameSessionChoicesColumn: React.FC<
   // The decision goes null for a beat while the next turn generates. Letting
   // the context summary blink out with it slides the whole choice block up and
   // back down again, so hold the last one until a new decision replaces it.
+  // Tracking the whole decision, not just a non-empty summary: a replacement
+  // decision that legitimately has no summary must clear the held one rather
+  // than leave the previous turn's context sitting over the new choices.
   const lastContextSummary = React.useRef<string | undefined>(undefined);
-  if (currentDecision?.contextSummary) {
+  if (currentDecision) {
     lastContextSummary.current = currentDecision.contextSummary;
   }
   const contextSummary =

@@ -78,4 +78,10 @@ describe('SaveIndicator', () => {
 
     expect(container.querySelector('svg')).toBeInTheDocument();
   });
+
+  it('should disable the compact manual save button while saving', () => {
+    render(<SaveIndicator status="saving" compact onManualSave={jest.fn()} />);
+
+    expect(screen.getByText(/save now/i)).toBeDisabled();
+  });
 });

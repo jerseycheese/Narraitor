@@ -251,6 +251,33 @@ describe('ActiveGameSessionChoicesColumn', () => {
       ).toBeInTheDocument();
     });
 
+    it('drops the held summary when the replacement decision has none', () => {
+      const decisionWithSummary = {
+        ...baseDecision,
+        contextSummary: 'The road forks under a dead oak.',
+      };
+
+      const { rerender } = render(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={decisionWithSummary}
+          isProgressiveDisclosureEnabled
+        />
+      );
+
+      rerender(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={{ ...baseDecision, id: 'decision-2' }}
+          isProgressiveDisclosureEnabled
+        />
+      );
+
+      expect(
+        screen.queryByText('The road forks under a dead oak.')
+      ).toBeNull();
+    });
+
     it('gives the skeleton the same mobile visibility class as the real selector', () => {
       const { container } = render(
         <ActiveGameSessionChoicesColumn

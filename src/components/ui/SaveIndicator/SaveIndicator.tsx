@@ -88,7 +88,12 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
       </div>
 
       {onManualSave && (
-        <button className="save-indicator-button" onClick={() => onManualSave('manual')} type="button">
+        <button
+          className="save-indicator-button"
+          onClick={() => onManualSave('manual')}
+          type="button"
+          disabled={status === 'saving'}
+        >
           Save Now
         </button>
       )}
