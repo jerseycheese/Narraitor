@@ -26,11 +26,6 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], enabled: boo
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (!enabled) return;
 
-    // Skip if typing in input elements (unless explicitly allowed)
-    if (isInputElement(event.target)) {
-      return;
-    }
-
     // Find matching shortcut
     const matchingShortcut = shortcuts.find(shortcut => {
       const keyMatches = event.key.toLowerCase() === shortcut.key.toLowerCase();
@@ -42,11 +37,18 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], enabled: boo
       return keyMatches && ctrlMatches && altMatches && shiftMatches && metaMatches;
     });
 
-    if (matchingShortcut) {
-      event.preventDefault();
-      event.stopPropagation();
-      matchingShortcut.action();
+    if (!matchingShortcut) return;
+
+    // Typing in a field wins over a shortcut unless that shortcut opts in.
+    // Matching first, then deciding, is what makes the opt-in possible: an
+    // unmatched key never reaches this branch, so it types normally.
+    if (isInputElement(event.target) && !matchingShortcut.ignoreInputs) {
+      return;
     }
+
+    event.preventDefault();
+    event.stopPropagation();
+    matchingShortcut.action();
   }, [shortcuts, enabled]);
 
   useEffect(() => {

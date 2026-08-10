@@ -21,8 +21,8 @@ jest.mock('react-joyride', () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const DummyJoyride = ({ run, stepIndex, steps, callback }: any) => {
-    lastJoyrideProps = { run, stepIndex, steps, callback };
+  const DummyJoyride = ({ run, stepIndex, steps, callback, ...rest }: any) => {
+    lastJoyrideProps = { run, stepIndex, steps, callback, ...rest };
     if (!run) return null;
     return (
       <div data-testid="joyride-mock">
@@ -125,6 +125,24 @@ describe('TutorialProvider', () => {
 
     expect(steps).toBeDefined();
     expect(steps?.every((step) => step.disableBeacon === true)).toBe(true);
+  });
+
+  // Joyride's scroll-parent fix writes an inline `overflow` onto whichever
+  // ancestor scrolls. On the play surface that's `.manuscript-overlay-main`,
+  // and overriding its `overflow-y: auto` lets the story escape its grid row
+  // and paint over the action rail for the rest of the session.
+  it('never takes over the scroll parent', async () => {
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Start World Tour').click();
+    });
+
+    expect(lastJoyrideProps?.disableScrollParentFix).toBe(true);
   });
 
   it('starts the character wizard tour when on the first step', async () => {
