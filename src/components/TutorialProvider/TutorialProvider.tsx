@@ -486,6 +486,12 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
             showProgress={tourOptions.showProgress}
             showSkipButton={tourOptions.showSkipButton}
             disableScrolling={tourOptions.disableScrolling}
+            // Joyride's scroll-parent fix writes an inline `overflow` onto
+            // whichever ancestor scrolls, and on the play surface that ancestor
+            // is `.manuscript-overlay-main`. Overriding its `overflow-y: auto`
+            // lets the story escape its grid row and paint over the action rail,
+            // so the tour leaves the choices unreadable from the next turn on.
+            disableScrollParentFix
             scrollDuration={prefersReducedMotion ? 0 : undefined}
             floaterProps={{ ...tourOptions.floaterProps, getPopper: capturePopper }}
             styles={joyrideStyles}

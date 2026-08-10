@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Decision } from '@/types/narrative.types';
 import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
@@ -120,16 +120,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   // Determine the prompt text
   const displayPrompt = prompt || decision.prompt;
 
-  // Auto-focus input when custom input is enabled. preventScroll stops the
-  // browser's default focus-scroll-into-view from dragging the now-scrollable
-  // #manuscript-action-rail (see manuscript-session.css) down past the
-  // suggested actions to reveal the input on mount/remount.
-  useEffect(() => {
-    if (enableCustomInput && inputRef.current) {
-      inputRef.current.focus({ preventScroll: true });
-    }
-  }, [enableCustomInput]);
-
   // Handle option selection
   const handleOptionSelect = useCallback(
     (optionId: string, isDisabledByReqs: boolean) => {
@@ -143,19 +133,24 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     [onSelect]
   );
 
-  // Number-key shortcuts (1-9) mirror the kbd hints rendered on each option
-  // (#276) so choices are selectable without a mouse. Disabled whenever the
-  // selector itself is disabled (turn in progress, session ended, etc.); the
-  // shared hook already ignores keystrokes while typing in an input.
+  // Number-key shortcuts mirror the kbd hints rendered on each option, so
+  // choices are selectable without a mouse. Disabled whenever the selector
+  // itself is disabled (turn in progress, session ended, etc.).
+  //
+  // They stay live while the composer holds focus but is still empty, which is
+  // where a player lands most turns. Once there's text in it, a digit belongs
+  // to the sentence being written, so the opt-in switches back off.
+  const isComposerEmpty = customInputText.length === 0;
   const choiceShortcuts: KeyboardShortcut[] = useMemo(
     () =>
       allOptions.slice(0, 9).map((option, index) => ({
         key: String(index + 1),
         description: `Select "${option.text}"`,
+        ignoreInputs: isComposerEmpty,
         action: () =>
           handleOptionSelect(option.id, option.isDisabledByRequirements ?? false),
       })),
-    [allOptions, handleOptionSelect]
+    [allOptions, handleOptionSelect, isComposerEmpty]
   );
   useKeyboardShortcuts(choiceShortcuts, !isDisabled && !shortcutsSuspended);
 

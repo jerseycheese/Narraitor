@@ -205,4 +205,56 @@ describe('useKeyboardShortcuts', () => {
     expect(preventDefaultSpy).toHaveBeenCalled();
     expect(stopPropagationSpy).toHaveBeenCalled();
   });
+
+  describe('ignoreInputs', () => {
+    let input: HTMLInputElement;
+
+    beforeEach(() => {
+      input = document.createElement('input');
+      document.body.appendChild(input);
+    });
+
+    afterEach(() => {
+      input.remove();
+    });
+
+    test('skips a shortcut fired from an input by default', () => {
+      const shortcuts = [{ key: '1', action: mockAction, description: 'Select first' }];
+      renderHook(() => useKeyboardShortcuts(shortcuts));
+
+      act(() => {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true }));
+      });
+
+      expect(mockAction).not.toHaveBeenCalled();
+    });
+
+    test('fires a shortcut from an input when it opts in', () => {
+      const shortcuts = [
+        { key: '1', action: mockAction, description: 'Select first', ignoreInputs: true },
+      ];
+      renderHook(() => useKeyboardShortcuts(shortcuts));
+
+      act(() => {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true }));
+      });
+
+      expect(mockAction).toHaveBeenCalled();
+    });
+
+    test('leaves an unrelated key typed into an input alone', () => {
+      const shortcuts = [
+        { key: '1', action: mockAction, description: 'Select first', ignoreInputs: true },
+      ];
+      renderHook(() => useKeyboardShortcuts(shortcuts));
+
+      const event = new KeyboardEvent('keydown', { key: 'j', bubbles: true, cancelable: true });
+      act(() => {
+        input.dispatchEvent(event);
+      });
+
+      expect(mockAction).not.toHaveBeenCalled();
+      expect(event.defaultPrevented).toBe(false);
+    });
+  });
 });

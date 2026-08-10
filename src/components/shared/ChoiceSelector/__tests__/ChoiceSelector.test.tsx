@@ -166,7 +166,8 @@ describe('ChoiceSelector', () => {
       expect(mockOnSelect).not.toHaveBeenCalled();
     });
 
-    it('ignores number keys while typing in the custom input', () => {
+    it('selects by number while the custom input is focused but still empty', async () => {
+      const user = userEvent.setup();
       renderChoiceSelector({
         decision,
         onSelect: mockOnSelect,
@@ -175,9 +176,27 @@ describe('ChoiceSelector', () => {
       });
 
       const input = screen.getByPlaceholderText('Describe your action...');
-      fireEvent.keyDown(input, { key: '1' });
+      input.focus();
+      await user.keyboard('1');
+
+      expect(mockOnSelect).toHaveBeenCalledWith(decision.options[0].id);
+      expect(input).toHaveValue('');
+    });
+
+    it('ignores number keys once the custom input has text', async () => {
+      const user = userEvent.setup();
+      renderChoiceSelector({
+        decision,
+        onSelect: mockOnSelect,
+        enableCustomInput: true,
+        onCustomSubmit: mockOnCustomSubmit,
+      });
+
+      const input = screen.getByPlaceholderText('Describe your action...');
+      await user.type(input, 'Take 1 step back');
 
       expect(mockOnSelect).not.toHaveBeenCalled();
+      expect(input).toHaveValue('Take 1 step back');
     });
 
     it('does not respond to number keys once the selector is disabled', () => {
@@ -215,18 +234,19 @@ describe('ChoiceSelector', () => {
       expect(mockOnCustomSubmit).toHaveBeenCalledWith('Custom action');
     });
 
-    it('autofocuses the input without scrolling its container (mobile choices-rail regression)', () => {
-      // #manuscript-action-rail scrolls internally on mobile (see
-      // manuscript-session.css); autofocus without preventScroll drags that
-      // rail down to reveal the input, hiding the suggested actions above it.
+    it('leaves focus alone on mount so the number shortcuts stay reachable', () => {
+      // The selector remounts every turn. Parking focus in the composer put
+      // every keystroke of the turn into a text box and made 1/2/3 inert,
+      // because the shortcut hook skips events coming from an input.
       const focusSpy = jest.spyOn(HTMLInputElement.prototype, 'focus');
 
       renderChoiceSelector({decision: decision, onSelect: mockOnSelect, enableCustomInput: true, onCustomSubmit: mockOnCustomSubmit});
 
-      expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+      expect(focusSpy).not.toHaveBeenCalled();
 
       focusSpy.mockRestore();
     });
+
   });
 
   describe('Skill Requirements', () => {
