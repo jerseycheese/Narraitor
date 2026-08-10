@@ -166,6 +166,16 @@ describe('ChoiceSelector', () => {
       expect(mockOnSelect).not.toHaveBeenCalled();
     });
 
+    it('names the choice group from the decision prompt', () => {
+      // The prompt heading it used to point at is `display: none` under DS3,
+      // which drops it out of the accessibility tree, and it isn't rendered at
+      // all when hidePrompt is set. Either way the group announced unnamed.
+      renderChoiceSelector({ decision, onSelect: mockOnSelect, hidePrompt: true });
+
+      expect(screen.getByRole('radiogroup', { name: decision.prompt })).toBeInTheDocument();
+      expect(screen.getByRole('group', { name: decision.prompt })).toBeInTheDocument();
+    });
+
     it('selects by number while the custom input is focused but still empty', async () => {
       const user = userEvent.setup();
       renderChoiceSelector({

@@ -201,7 +201,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         .filter(Boolean)
         .join(' ')}
       role="group"
-      aria-labelledby="choices-heading"
+      aria-label={displayPrompt}
     >
       <div className="manuscript-choice-selector-body">
         {/* Ending Suggestion Banner */}
@@ -214,7 +214,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         )}
 
         {!hidePrompt && (
-          <h3 id="choices-heading" className="manuscript-choice-prompt">
+          <h3 className="manuscript-choice-prompt">
             {displayPrompt}
           </h3>
         )}
@@ -222,9 +222,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         {allOptions.length > 0 && (
           <div className="manuscript-suggested-actions-section">
             {/* Regular choice options */}
+            {/* Named from the prompt text rather than the heading below: DS3
+                hides that heading with `display: none`, which takes it out of
+                the accessibility tree, and hidePrompt skips rendering it
+                entirely. Both paths left this group announcing unnamed. */}
             <div
               role="radiogroup"
-              aria-labelledby="choices-heading"
+              aria-label={displayPrompt}
               className="manuscript-suggested-actions-grid"
             >
               {allOptions.map((option, index) => {

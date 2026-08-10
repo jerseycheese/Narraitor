@@ -2549,11 +2549,11 @@ body.manuscript-overlay-open {
 .manuscript-generation-error-title {
   font-family: var(--font-interface), system-ui, sans-serif;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--color-text-primary);
 }
 
 .manuscript-generation-error-message {
-  color: var(--color-text);
+  color: var(--color-text-primary);
   font-size: var(--font-size-sm);
 }
 
@@ -2966,7 +2966,7 @@ body.manuscript-overlay-open {
 
 :root .manuscript-suggested-action:hover {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-float);
+  box-shadow: var(--shadow-overlay);
 }
 
 :root .manuscript-suggested-action:hover::before {
@@ -3360,7 +3360,7 @@ body.manuscript-overlay-open {
 }
 
 :root .manuscript-evaluating-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-system);
   font-size: 0.6875rem;
   color: var(--color-text-muted);
   letter-spacing: 0.04em;
@@ -3421,7 +3421,12 @@ body.manuscript-overlay-open {
   max-width: 42.5rem;
 }
 
-/* DS3 choice cards — neutral colors, not alignment-tinted */
+/* DS3 choice cards — neutral colors, not alignment-tinted. The unaligned card
+   used to be left out of this list, so it alone fell through to the generic
+   secondary-button fill and rendered as the heaviest option on the rail. Weight
+   should track consequence, and an unaligned choice is the least consequential
+   one there. */
+:root .manuscript-suggested-action,
 :root .manuscript-suggested-action.manuscript-suggested-action-lawful,
 :root .manuscript-suggested-action.manuscript-suggested-action-chaotic {
   background: var(--color-surface);
@@ -3821,7 +3826,10 @@ body.manuscript-overlay-open {
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-  color: var(--color-text-muted);
+
+  /* Muted ink measures 4.30:1 against the scene-status bar, under AA for text
+     this size. Secondary clears it at 5.04:1 and still reads as a label. */
+  color: var(--color-text-secondary);
 }
 
 .scene-status-location-value {
