@@ -23,6 +23,10 @@ const ROUTE = '/worlds/world-cyberpunk-2077/play';
 const CLS_THRESHOLD = 0.1;
 const NUM_ITERATIONS = 3;
 
+// A turn is stricter than a cold load: the reader is mid-sentence, so the
+// surface should not move at all while the next beat generates.
+const TURN_CLS_THRESHOLD = 0.05;
+
 test.describe('CLS Measurement - Game Session Surface', () => {
   test('CLS stays below 0.10 across cold-load iterations', async ({ browser }) => {
     test.setTimeout(120_000);
@@ -132,5 +136,92 @@ test.describe('CLS Measurement - Game Session Surface', () => {
     console.log(`  Max: ${max.toFixed(4)}`);
     console.log(`  Threshold: ${CLS_THRESHOLD}`);
     console.log(`  Result: ${max < CLS_THRESHOLD ? 'PASS' : 'FAIL'}`);
+  });
+
+  test('taking a turn does not move the narrative viewport', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    // Every shift counts here, including the ones inside the click's
+    // hadRecentInput window — a rail that resizes 200ms after the tap still
+    // moves the sentence the reader is on.
+    await page.addInitScript(() => {
+      const w = window as unknown as {
+        __TURN_CLS__: number;
+        __TURN_SHIFTS__: Array<{ value: number; sources: string[] }>;
+      };
+      w.__TURN_CLS__ = 0;
+      w.__TURN_SHIFTS__ = [];
+
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const shift = entry as PerformanceEntry & {
+            value: number;
+            sources?: Array<{ node?: Node }>;
+          };
+          w.__TURN_CLS__ += shift.value;
+          w.__TURN_SHIFTS__.push({
+            value: shift.value,
+            sources: (shift.sources || []).map((source) => {
+              const el = source.node as Element | undefined;
+              if (!el?.tagName) return 'unknown';
+              const id = el.id ? `#${el.id}` : '';
+              const cls =
+                typeof el.className === 'string' && el.className
+                  ? `.${el.className.split(' ').slice(0, 2).join('.')}`
+                  : '';
+              return `${el.tagName.toLowerCase()}${id}${cls}`;
+            }),
+          });
+        }
+      }).observe({ type: 'layout-shift', buffered: false });
+    });
+
+    await seedTestData(page);
+    // Delays hold the skeleton and streaming states on screen long enough for
+    // any resize they cause to register.
+    await mockApiEndpoints(page, { narrativeDelayMs: 800, choicesDelayMs: 800 });
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 15_000 });
+    await page.locator('.manuscript-suggested-action').first().waitFor({ timeout: 15_000 });
+    await waitForStableScrollHeight(page, { timeout: 10_000, stableDuration: 1000 });
+    await page.waitForTimeout(1500);
+
+    const railBefore = await page.locator('#manuscript-action-rail').boundingBox();
+    const mainBefore = await page.locator('.manuscript-overlay-main').boundingBox();
+
+    // Zero the counter so only the turn is measured.
+    await page.evaluate(() => {
+      const w = window as unknown as { __TURN_CLS__: number; __TURN_SHIFTS__: unknown[] };
+      w.__TURN_CLS__ = 0;
+      w.__TURN_SHIFTS__.length = 0;
+    });
+
+    await page.locator('.manuscript-suggested-action').first().click();
+
+    // Ride out the skeleton and streaming phases, then let the new choices land.
+    await page.waitForSelector('.manuscript-choices-skeleton', { timeout: 15_000 }).catch(() => {});
+    await page.waitForSelector('.manuscript-choices-skeleton', { state: 'detached', timeout: 30_000 }).catch(() => {});
+    await page.waitForTimeout(2500);
+
+    const turnCls = await page.evaluate(
+      () => (window as unknown as { __TURN_CLS__: number }).__TURN_CLS__
+    );
+    const shifts = await page.evaluate(
+      () => (window as unknown as { __TURN_SHIFTS__: Array<{ value: number; sources: string[] }> }).__TURN_SHIFTS__
+    );
+
+    console.log(`--- Turn CLS: ${turnCls.toFixed(4)} (${shifts.length} shifts) ---`);
+    shifts.forEach((shift, index) => {
+      console.log(`  Shift ${index + 1}: ${shift.value.toFixed(4)} [${shift.sources.join(', ')}]`);
+    });
+
+    const railAfter = await page.locator('#manuscript-action-rail').boundingBox();
+    const mainAfter = await page.locator('.manuscript-overlay-main').boundingBox();
+
+    expect(turnCls).toBeLessThanOrEqual(TURN_CLS_THRESHOLD);
+    expect(railAfter?.height).toBeCloseTo(railBefore?.height ?? 0, 0);
+    expect(mainAfter?.height).toBeCloseTo(mainBefore?.height ?? 0, 0);
   });
 });

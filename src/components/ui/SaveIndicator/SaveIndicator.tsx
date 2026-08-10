@@ -59,14 +59,14 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
     );
   }
 
-  // Handle saving state with LoadingState component
-  if (status === 'saving') {
+  // Handle saving state with LoadingState component. The compact form skips
+  // this: swapping a status dot for a spinner resizes whatever toolbar it sits
+  // in, and in the session HUD that shoved the narrative down the page every
+  // time an auto-save fired. Compact saving reads on the dot instead.
+  if (status === 'saving' && !compact) {
     return (
-      <div className={clsx('save-indicator', compact && 'save-indicator-compact', className)}>
-        <LoadingState
-          variant="spinner"
-          message={compact ? undefined : 'Saving...'}
-        />
+      <div className={clsx('save-indicator', className)} data-status={status}>
+        <LoadingState variant="spinner" message="Saving..." />
         {onManualSave && (
           <button className="save-indicator-button" disabled={true} type="button">
             Save Now
@@ -78,8 +78,8 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
 
   // Handle idle/saved states
   return (
-    <div className={clsx('save-indicator', compact && 'save-indicator-compact', className)}>
-      <div className="save-indicator-status">
+    <div className={clsx('save-indicator', compact && 'save-indicator-compact', className)} data-status={status}>
+      <div className="save-indicator-status" role="status" aria-label={getStatusText()}>
         <div className="save-indicator-copy">
           <span className="save-indicator-text">{getStatusText()}</span>
 

@@ -347,12 +347,14 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-sm);
   padding: var(--space-3);
 
-  /* DS3 always stacks suggested actions in a single column (never a grid),
-     so a full set of choices can grow tall enough to squeeze the narrative
-     row in `.manuscript-viewport-inner`'s auto/1fr/auto grid down to a few
-     px on short viewports. Cap the rail and let it scroll internally instead
-     of starving the story text of space. */
-  max-height: min(50dvh, 26rem);
+  /* A reserved row, not an auto-sized one. The rail's contents swap several
+     times per turn (choices, skeleton, streaming lock) and every set of
+     choices is a different length, so an auto height makes row 2 of
+     `.manuscript-viewport-inner`'s auto/1fr/auto grid counter-resize under
+     the reader mid-sentence. Fixing the height costs a little reading space
+     and buys a narrative viewport that never moves; overflow keeps long
+     choice sets reachable, which is what the old cap was for. */
+  height: min(50dvh, 24rem);
   overflow-y: auto;
 }
 
@@ -391,12 +393,14 @@ body.manuscript-overlay-open {
 
 .hide-mobile-actions .manuscript-suggested-actions-section,
 .hide-mobile-actions .manuscript-choice-prompt,
+.hide-mobile-actions .manuscript-choices-skeleton-prompt,
 .hide-mobile-actions .manuscript-choice-selector-body > .manuscript-choice-prompt {
   display: none;
 }
 
 .show-mobile-actions .manuscript-suggested-actions-section,
-.show-mobile-actions .manuscript-choice-prompt {
+.show-mobile-actions .manuscript-choice-prompt,
+.show-mobile-actions .manuscript-choices-skeleton-prompt {
   display: block;
 }
 
@@ -471,7 +475,13 @@ body.manuscript-overlay-open {
 .manuscript-characters-rail {
   display: block;
   box-sizing: border-box;
-  background: var(--color-overlay-surface);
+
+  /* Story text scrolls under this bar, so the paper wash goes over an opaque
+     canvas layer rather than straight onto the page. At 90% alpha alone the
+     prose underneath stayed legible through the scene status. */
+  background:
+    linear-gradient(var(--color-overlay-surface), var(--color-overlay-surface)),
+    var(--color-canvas);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: var(--space-3);
@@ -2513,6 +2523,12 @@ body.manuscript-overlay-open {
   border-radius: var(--radius-sm);
 }
 
+/* Holds the turn-status line whether or not one is showing, so starting a
+   turn doesn't push the choices down inside the rail. */
+.manuscript-turn-status-slot {
+  min-height: 1rem;
+}
+
 /* Fix 24: Streaming indicator — hidden by default */
 .manuscript-streaming-indicator {
   display: none;
@@ -3277,6 +3293,13 @@ body.manuscript-overlay-open {
   height: 6px;
   border-radius: 50%;
   background: var(--color-success);
+}
+
+/* Saving reads as the same dot, pulsing in the muted ink the streaming
+   indicator uses, so the HUD keeps its size while a save is in flight. */
+:root .manuscript-save-indicator[data-status='saving'] .save-indicator-status::after {
+  background: var(--color-text-muted);
+  animation: ds3-streaming-pulse 1.2s ease-in-out infinite;
 }
 
 :root .manuscript-save-indicator .save-indicator-button {

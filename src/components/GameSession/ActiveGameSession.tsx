@@ -436,6 +436,20 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       }
     : undefined;
 
+  const secondaryControls = (
+    <ActiveGameSessionControls
+      character={character}
+      characterId={characterId || undefined}
+      worldId={worldId}
+      sessionId={sessionId}
+      showEndConfirmation={showEndConfirmation}
+      onConfirmEndStory={handleConfirmEndStory}
+      onCloseEndStory={handleCloseEndStory}
+      onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
+      isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
+    />
+  );
+
   return (
     <ManuscriptSessionShell
       hud={
@@ -522,19 +536,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         onStreamingPreviewChange={setStreamingPreview}
       />
 
-      <div className="manuscript-secondary-controls">
-        <ActiveGameSessionControls
-          character={character}
-          characterId={characterId || undefined}
-          worldId={worldId}
-          sessionId={sessionId}
-          showEndConfirmation={showEndConfirmation}
-          onConfirmEndStory={handleConfirmEndStory}
-          onCloseEndStory={handleCloseEndStory}
-          onOpenJournal={() => router.push(`/worlds/${worldId}/play/journal`)}
-          isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
-        />
-      </div>
+      {/* Progressive disclosure moves every support section into a drawer, so
+          the controls render nothing but the end-story dialog. Wrapping that in
+          the divider rule leaves a rule under the story with nothing below it. */}
+      {isProgressiveDisclosureEnabled ? (
+        secondaryControls
+      ) : (
+        <div className="manuscript-secondary-controls">{secondaryControls}</div>
+      )}
 
       {isProgressiveDisclosureEnabled && (
         <ManuscriptDrawer

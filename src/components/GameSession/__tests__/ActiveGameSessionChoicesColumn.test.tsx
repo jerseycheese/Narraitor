@@ -208,4 +208,62 @@ describe('ActiveGameSessionChoicesColumn', () => {
       expect(screen.queryByRole('alert')).toBeNull();
     });
   });
+
+  describe('rail height stability', () => {
+    it('keeps the turn-status slot mounted when nothing is generating', () => {
+      const { container } = render(<ActiveGameSessionChoicesColumn {...baseProps} />);
+
+      expect(
+        container.querySelector('.manuscript-turn-status-slot')
+      ).toBeInTheDocument();
+      expect(screen.queryByText('Continuing your story...')).toBeNull();
+    });
+
+    it('holds the last context summary while the next decision generates', () => {
+      const decisionWithSummary = {
+        ...baseDecision,
+        contextSummary: 'The road forks under a dead oak.',
+      };
+
+      const { rerender } = render(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={decisionWithSummary}
+          isProgressiveDisclosureEnabled
+        />
+      );
+
+      expect(
+        screen.getByText('The road forks under a dead oak.')
+      ).toBeInTheDocument();
+
+      rerender(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={null}
+          isGeneratingChoices
+          isProgressiveDisclosureEnabled
+        />
+      );
+
+      expect(
+        screen.getByText('The road forks under a dead oak.')
+      ).toBeInTheDocument();
+    });
+
+    it('gives the skeleton the same mobile visibility class as the real selector', () => {
+      const { container } = render(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={null}
+          isGeneratingChoices
+          isProgressiveDisclosureEnabled
+        />
+      );
+
+      expect(
+        container.querySelector('.manuscript-choices-skeleton')
+      ).toHaveClass('hide-mobile-actions');
+    });
+  });
 });

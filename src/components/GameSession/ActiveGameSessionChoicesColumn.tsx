@@ -90,6 +90,25 @@ const ActiveGameSessionChoicesColumn: React.FC<
       : endStoryAction;
   }, [endStoryAction]);
 
+  // The decision goes null for a beat while the next turn generates. Letting
+  // the context summary blink out with it slides the whole choice block up and
+  // back down again, so hold the last one until a new decision replaces it.
+  const lastContextSummary = React.useRef<string | undefined>(undefined);
+  if (currentDecision?.contextSummary) {
+    lastContextSummary.current = currentDecision.contextSummary;
+  }
+  const contextSummary =
+    currentDecision?.contextSummary ?? lastContextSummary.current;
+
+  // The skeleton wears the same visibility class as the real selector so it
+  // predicts the same height — below the desktop breakpoint that means the
+  // prompt is hidden in both, not just in the choices that replace it.
+  const mobileActionsClass = isProgressiveDisclosureEnabled
+    ? showSuggestedActions
+      ? 'show-mobile-actions'
+      : 'hide-mobile-actions'
+    : '';
+
   const resolvedInputActions = isProgressiveDisclosureEnabled ? (
     <>
       {inputActions}
@@ -101,19 +120,23 @@ const ActiveGameSessionChoicesColumn: React.FC<
 
   return (
     <div className={className} aria-busy={isGeneratingChoices || isEvaluatingAction}>
-      {isEvaluatingAction ? (
-        <div className="manuscript-evaluating-indicator" role="status">
-          <span className="manuscript-evaluating-die" aria-hidden="true" />
-          <span className="manuscript-evaluating-label">Evaluating action...</span>
-        </div>
-      ) : (
-        (isGenerating || isGeneratingChoices) && (
-          <div className="manuscript-streaming-indicator">
-            <span className="manuscript-streaming-dot" />
-            <span className="manuscript-streaming-label">Continuing your story...</span>
+      {/* The slot stays mounted whether or not a turn is in flight, so the
+          status line appearing doesn't shove the choices down the rail. */}
+      <div className="manuscript-turn-status-slot">
+        {isEvaluatingAction ? (
+          <div className="manuscript-evaluating-indicator" role="status">
+            <span className="manuscript-evaluating-die" aria-hidden="true" />
+            <span className="manuscript-evaluating-label">Evaluating action...</span>
           </div>
-        )
-      )}
+        ) : (
+          (isGenerating || isGeneratingChoices) && (
+            <div className="manuscript-streaming-indicator">
+              <span className="manuscript-streaming-dot" />
+              <span className="manuscript-streaming-label">Continuing your story...</span>
+            </div>
+          )
+        )}
+      </div>
       <div className="player-choices-container" data-tutorial={dataTutorial}>
         {showGenerationError ? (
           <div
@@ -146,9 +169,9 @@ const ActiveGameSessionChoicesColumn: React.FC<
         ) : (
         <>
         {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}
-        {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && !hidePrompt && (
+        {isProgressiveDisclosureEnabled && contextSummary && !hidePrompt && (
           <p className="manuscript-context-summary">
-            {currentDecision.contextSummary}
+            {contextSummary}
           </p>
         )}
 
@@ -177,7 +200,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
           (currentDecision && segmentCount > 0)) &&
         !isGeneratingChoices ? (
           !hideChoices && (
-            <div className={isProgressiveDisclosureEnabled ? (showSuggestedActions ? 'show-mobile-actions' : 'hide-mobile-actions') : ''}>
+            <div className={mobileActionsClass}>
               <ChoiceSelector
                 decision={currentDecision}
                 onSelect={onChoiceSelected}
@@ -197,7 +220,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
           )
         ) : (
           !hideChoices && (
-            <div className="choice-selector manuscript-choice-selector manuscript-choices-skeleton">
+            <div className={`choice-selector manuscript-choice-selector manuscript-choices-skeleton ${mobileActionsClass}`}>
               <div className="manuscript-choice-selector-body">
                 {/* Choice prompt skeleton */}
                 {!hidePrompt && <div className="manuscript-choices-skeleton-prompt manuscript-skeleton-pulse" />}

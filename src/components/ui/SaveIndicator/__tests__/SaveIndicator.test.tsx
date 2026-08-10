@@ -59,4 +59,23 @@ describe('SaveIndicator', () => {
     const saveButton = screen.getByText(/save now/i);
     expect(saveButton).toBeDisabled();
   });
+
+  it('should keep the compact status element while saving instead of swapping in a spinner', () => {
+    const { container, rerender } = render(
+      <SaveIndicator status="saved" lastSaveTime="2023-01-01T12:00:00.000Z" compact />
+    );
+    expect(container.querySelector('.save-indicator-status')).toBeInTheDocument();
+
+    rerender(<SaveIndicator status="saving" compact />);
+
+    expect(container.querySelector('.save-indicator-status')).toBeInTheDocument();
+    expect(container.querySelector('svg')).not.toBeInTheDocument();
+    expect(container.firstChild).toHaveAttribute('data-status', 'saving');
+  });
+
+  it('should still show the spinner while saving when not compact', () => {
+    const { container } = render(<SaveIndicator status="saving" />);
+
+    expect(container.querySelector('svg')).toBeInTheDocument();
+  });
 });
