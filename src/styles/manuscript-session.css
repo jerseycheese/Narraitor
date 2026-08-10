@@ -898,7 +898,7 @@ body.manuscript-overlay-open {
   gap: var(--space-2);
   width: 100%;
   text-align: left;
-  min-height: 4.125rem;
+  min-height: var(--control-height-touch);
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -2953,7 +2953,7 @@ body.manuscript-overlay-open {
 
 :root .manuscript-suggested-action {
   position: relative;
-  padding: var(--space-4) var(--space-5) var(--space-4) 2.5rem;
+  padding: var(--space-2_5) var(--space-4) var(--space-2_5) 2.5rem;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -2989,7 +2989,6 @@ body.manuscript-overlay-open {
 :root .manuscript-suggested-action-label {
   font-size: 0.9375rem;
   line-height: 1.5;
-  margin-bottom: var(--space-1);
 }
 
 /* Rotate accent bar colors across choices — hover only */
@@ -3461,6 +3460,47 @@ body.manuscript-overlay-open {
   border-radius: 0;
   box-shadow: none;
   padding: var(--space-3) var(--space-6);
+}
+
+/* The rail's band spans the viewport so it still reads as the floor under the
+   page, but its controls answer to a measure like the prose does. 52rem is the
+   knee: below it a choice label and its badge cluster stop sharing a line and
+   every row doubles in height. */
+:root .manuscript-action-rail-stack {
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+/* The recap restates the segment sitting directly above it. It earns its place
+   on narrow screens, where the prose has scrolled away by the time you choose;
+   on a desktop viewport both are on screen at once. */
+@media (width >= 1024px) {
+  :root .manuscript-context-summary {
+    display: none;
+  }
+
+  /* Desktop reads the story in the row above this one, so the reserved box only
+     has to hold the default four choices, the turn status, and the input. Below
+     1024px the labels wrap and the recap is showing, so the taller base
+     reservation stands. */
+  :root #manuscript-action-rail {
+    height: min(36dvh, 18rem);
+  }
+}
+
+/* Narrow viewports can't fit a label and its badges side by side — the badges
+   don't wrap, so the label gets squeezed into a column ~100px wide and runs to
+   six lines. Stack them instead. */
+@media (width < 640px) {
+  :root .manuscript-suggested-action-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1_5);
+  }
+
+  :root .manuscript-suggested-action-badges {
+    flex-wrap: wrap;
+  }
 }
 
 /* DS3 mobile bar hidden (no rail concept) */
