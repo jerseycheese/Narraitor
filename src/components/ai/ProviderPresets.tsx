@@ -10,6 +10,9 @@ interface ProviderPresetsProps {
   className?: string;
 }
 
+const presetPendingNote = (preset: ProviderPreset) =>
+  preset.note ? `Coming soon - ${preset.note}` : 'Coming soon';
+
 /**
  * Grid of popular providers. Only the ones that work in this release are
  * selectable; the rest are shown but disabled so players can see what's coming.
@@ -29,7 +32,9 @@ export function ProviderPresets({ selectedId, onSelect, className }: ProviderPre
         >
           <span className="provider-preset-name">{preset.name}</span>
           <span className="provider-preset-note">
-            {preset.available ? preset.defaultModel : 'Coming soon'}
+            {preset.available
+              ? preset.note ?? preset.defaultModel
+              : presetPendingNote(preset)}
           </span>
         </button>
       ))}

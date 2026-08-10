@@ -60,4 +60,6 @@ export interface ProviderPreset {
   capabilities: ProviderCapabilities;
   helpUrl: string;
   available: boolean;
+  /** Short pitch shown under the name, e.g. what a key costs to get. */
+  note?: string;
 }
