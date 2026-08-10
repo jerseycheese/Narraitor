@@ -3,19 +3,26 @@
 ## Where We Are
 **Major Milestone**: The core MVP is basically complete. AI storytelling, world creation, character building, session persistence, and navigation all work, and a player can go end to end through the loop.
 
-**Current Status**: the 1.0 endgame. The visual-finish work and the QA walkthrough are done.
-What's left in the `v1.0` milestone is the release QA tracking issue (#1417), the archive/retire
-sweep (#1639), this docs sweep (#1638), and tagging the release (#1635), all under #1320.
+**Current Status**: v1.1 shipped on 2026-08-10. v1.0 went out on 2026-08-04 and v1.1 followed as the
+first post-launch pass, finishing the visual identity (the bolder DS3 redesign, #1543), closing the
+two accessibility gaps v1.0 named as incomplete (#276 keyboard control, #1477 touch targets), adding
+client-side error reporting (#1641), and fixing the story-loop problems found in playtesting (#1680,
+#1585, #1681).
+
+Next up is the `v1.2` milestone: AI providers other than Gemini (#878, scoped to #890/#895/#896),
+plus turn-level analytics so play depth is actually measurable. Images stay Gemini-only for now.
 
 Landed along the way: the three-design-system migration
 ([ADR-011](../architecture/ADR-011-three-design-systems.md)), later collapsed to a single design
 system ([ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md));
 bring-your-own-key provider config (#891/#892/#893); Playwright visual-regression testing; the
-dashboard home page; the guided onboarding tutorial; table views for the list screens; and the
-lore entity-management work (fuzzy matching, aliases, deduplication, resolution).
+dashboard home page; the guided onboarding tutorial; table views for the list screens; the
+lore entity-management work (fuzzy matching, aliases, deduplication, resolution); and real SSE
+streaming for narrative generation (#1476).
 
-1.0 ships single-player and browser-local, with the player supplying their own Gemini key. No
-accounts, no server-side sync; monetization is a separate track (#495).
+Narraitor is single-player and browser-local, with the player supplying their own provider key. No
+accounts, no server-side sync. Whether that ever changes is an open decision (#1744), and
+monetization is a separate track behind it (#495).
 
 ## What the MVP Does
 Basically, it's a complete solo narrative RPG experience where you can:
@@ -100,10 +107,9 @@ This is about getting ready for broader use beyond just personal development.
 
 ## Current Priority Queue
 
-The next release to main is **v1.0**, tracked in the `v1.0` GitHub milestone and meta-issue
-**#1320**. The earlier Immediate / High Priority / Medium Priority queues are kept below as a
-record of what shipped and what didn't, followed by the active v1.0 work. This roadmap is a
-running log, not a snapshot.
+The next release to main is **v1.2**, tracked in the `v1.2` GitHub milestone. The earlier
+Immediate / High Priority / Medium Priority queues are kept below as a record of what shipped and
+what didn't. This roadmap is a running log, not a snapshot.
 
 ### Recently shipped (prior queues, kept for history)
 
@@ -129,16 +135,25 @@ running log, not a snapshot.
 - [x] Token usage tracking (#326) and token-estimation optimization (#319)
 - [ ] Visual diff tooling (#652), Docker cross-platform visual consistency (#653), snapshot governance (#655), visual performance metrics (#656) — still open, not blocking 1.0
 
-### v1.0 — active (next release to main)
+### v1.2 — active (next release to main)
 
-Everything below is what's actually still open in the `v1.0` milestone. The dependency order
-lives in #1320.
+Nine issues, in three groups. Lane A runs in order because each story builds on the last; the
+other two are independent and can go in parallel.
 
-- [Tracking] v1.0 release — visual finish + launch gate (#1320)
-- [Tracking] v1.0 release QA walkthrough (#1417)
-- Archive/retire sweep: stale branches, dead knip config, /dev route decision (#1639)
-- Docs correctness sweep across `public_docs/` (#1638)
-- Cut the release: tag and fast-forward `main` (#1635)
+**Multi-provider AI (in order)**
+- Provider abstraction layer, plus splitting the Gemini-shaped `apiHelpers.ts` (#890)
+- Generic OpenAI-compatible provider with presets (#895)
+- Ollama provider for local models (#896)
+
+**Correctness and instrumentation**
+- Provider config lets you pick a model, then always uses `gemini-2.5-flash` (#1745)
+- Context budgeting counts Gemini tokens, wrong number for any other provider (#1746)
+- Turn-level analytics events, so play depth is measurable (#1747)
+
+**Design-system tail from v1.1**
+- Eight undefined CSS custom properties silently dropping declarations (#1731)
+- Two labels failing WCAG AA contrast (#1732)
+- Default focus ring on plain links, `.button` never resets the underline (#1735)
 
 ### Shipped for v1.0
 
@@ -158,15 +173,25 @@ came out of it: style the primitive *in production*, not in the showcase.
 Formerly "MVP Launch Preparation" in the v1.0 queue. Now scoped to a paid product launch and out
 of the 1.0 gate.
 
-### Deferred to 1.1+ (player-facing polish, not blocking 1.0)
-- Preset avatars + custom portrait upload (#1299)
-- Full keyboard control with focus indicators (#276)
-- Session pacing and reading milestones (#805)
+### Shipped for v1.1
+- The bolder DS3 redesign in full: accent depth and dot grid (#1621), drafting-marks motif (#1617),
+  a real type scale (#1622), brand and product surface split (#1623), list-view card imagery (#1625),
+  a real layout grid (#1677), and the DESIGN.md rewrite (#1626), all under epic #1543
+- Full keyboard control with focus indicators (#276) and touch targets at 44px app-wide (#1477)
+- `prefers-reduced-motion` honored across the app (#1678)
+- Client-side error reporting, so production failures stop being invisible (#1641)
+- Cautious play now escalates instead of looping on clue-following (#1680)
+- Variable narrative length, replacing the hardcoded 3-5 sentences (#1585), and a fix for prose
+  reusing the same phrases turn after turn (#1681)
+- Preset avatars + custom portrait upload (#1299/#1730)
+
+Still deferred: session pacing and reading milestones (#805).
 
 ### Partly shipped: Multi-Provider AI (Epic #878)
-Gemini-only at launch. Shipped: secure key storage (#891), provider config UI (#892), Gemini
-refactor to the provider pattern (#893). Still open: provider abstraction (#890), Claude native
-SDK (#894), generic OpenAI-compatible provider (#895).
+Gemini-only through v1.1. Shipped: secure key storage (#891), provider config UI (#892), Gemini
+refactor to the provider pattern (#893), error handling (#902). The BYO-key plumbing turned out to
+be genuinely provider-neutral, so what's left is a dispatch layer: #890, #895 and #896, all in the
+v1.2 milestone. Native SDKs, multi-provider images and the rest live in #879.
 
 ## Technical Debt & Infrastructure
 - Playwright visual regression testing — done (`tests/visual/`, runs in CI)
@@ -179,18 +204,21 @@ SDK (#894), generic OpenAI-compatible provider (#895).
 ## Post-MVP Features (Explicitly Deferred)
 Features that are valuable but not required for initial launch:
 
-**Multi-Provider AI Support (Epic #878), minus what already shipped**
-- OpenAI-compatible provider abstraction (#890)
-- Support for OpenAI, Claude, Deepseek, Mistral, and so on (#894, #895)
+**Multi-provider extras (Epic #879)**
+Native Claude SDK (#894), multi-provider image generation (#897, #898), advanced provider settings
+(#899), a community preset library (#900), per-task provider routing (#901) and MCP integration
+(#904). None of it starts until #878 has shipped and been used.
 
 **Advanced Features**
-- Multiplayer/shared world support
 - Economy and trading systems
 - Advanced character progression systems
 - Content moderation and filters
-- Enhanced AI personalization
 - Voice narration support
 - Mobile app versions
+
+Multiplayer and shared worlds were closed as not planned during the v1.2 scoping pass (#1370 and
+children), along with the adaptive-pacing personalization cluster. Both assumed accounts and a
+server that has never been decided on, and that decision now lives in #1744.
 
 **Infrastructure**
 - Advanced CI/CD pipeline enhancements
