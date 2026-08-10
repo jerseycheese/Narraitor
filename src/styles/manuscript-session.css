@@ -1329,6 +1329,29 @@ body.manuscript-overlay-open {
   box-shadow: inset 0 0 0 1px var(--color-accent-soft);
 }
 
+/* Selecting a choice tints the whole card, which moves the surface under every
+   quiet mark on it while their colors stay put. Both of these were tuned
+   against an untinted card and fall under 4.5:1 once it is selected. */
+
+/* The keycap sits on a transparent background, so it inherits the tint
+   directly: 3.99:1 light / 3.85:1 dark. One step up the text ramp restores it
+   without promoting the keycap to label weight.
+   Specificity note: the base `:root .manuscript-choice-kbd` rule below ties
+   with a two-class selector and wins on order, so this chains :root too. */
+:root .manuscript-suggested-action-selected .manuscript-choice-kbd {
+  color: var(--color-text-secondary);
+}
+
+/* The badge paints its own accent tint, so on a selected card that tint stacks
+   on the card's - and `--color-accent` is the wrong token for accent-sized text
+   on accent-soft in the first place; `--color-accent-strong` is defined for
+   exactly that. Dropping the second tint is what fixes dark mode, where
+   accent-strong is deliberately identical to accent. */
+.manuscript-suggested-action-selected .manuscript-skill-check-badge {
+  background: transparent;
+  color: var(--color-accent-strong);
+}
+
 .manuscript-secondary-controls {
   margin-top: var(--space-4);
   padding-top: var(--space-4);
