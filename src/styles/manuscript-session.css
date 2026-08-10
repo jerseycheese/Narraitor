@@ -358,6 +358,56 @@ body.manuscript-overlay-open {
   overflow-y: auto;
 }
 
+/* Scroll the choice list, not the rail. The composer is the last thing in the
+   rail's content, so on a narrow viewport it fell past the reserved height
+   with nothing to suggest it was there - at 375px the input and its send
+   button were clipped outright and typing an action was unreachable.
+   Scrolling the choices instead pins everything else, which keeps the reserve
+   (and the still narrative viewport it buys) while the one control you can't
+   substitute stays on screen.
+
+   Scoped to narrow viewports on purpose. Above 1024px the rail's content
+   already fits its reserve, so the same rules only bottom-pin a composer that
+   was never in danger - and that turns the skeleton's 5px height mispredict
+   into a real mid-turn shift (measured 0.0391 against a 0.05 budget). The
+   rail keeps overflow-y as a backstop for viewports too short even for the
+   pinned rows. */
+@media (width < 1024px) {
+  #manuscript-action-rail {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Each level between the rail and the choice list has to pass the height
+     constraint down: without min-height, a flex item floors at its content
+     size and the overflow lands back on the rail. */
+  #manuscript-action-rail .manuscript-action-rail-stack,
+  #manuscript-action-rail .manuscript-choices-column,
+  #manuscript-action-rail .player-choices-container,
+  #manuscript-action-rail .manuscript-choice-selector-wrapper,
+  #manuscript-action-rail .manuscript-choice-selector,
+  #manuscript-action-rail .manuscript-choice-selector-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  #manuscript-action-rail .manuscript-suggested-actions-section {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  #manuscript-action-rail .manuscript-turn-status-slot,
+  #manuscript-action-rail .manuscript-context-summary,
+  #manuscript-action-rail .manuscript-mobile-rail-top-controls,
+  #manuscript-action-rail .manuscript-input-row,
+  #manuscript-action-rail .manuscript-choices-skeleton-input-row {
+    flex: 0 0 auto;
+  }
+}
+
 .manuscript-mobile-rail-top-controls {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

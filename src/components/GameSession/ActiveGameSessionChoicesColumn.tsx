@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { clsx } from 'clsx';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import type { Decision } from '@/types/narrative.types';
 import type { WorldSkill } from '@/types/world.types';
@@ -122,7 +123,10 @@ const ActiveGameSessionChoicesColumn: React.FC<
   );
 
   return (
-    <div className={className} aria-busy={isGeneratingChoices || isEvaluatingAction}>
+    <div
+      className={clsx('manuscript-choices-column', className)}
+      aria-busy={isGeneratingChoices || isEvaluatingAction}
+    >
       {/* The slot stays mounted whether or not a turn is in flight, so the
           status line appearing doesn't shove the choices down the rail. */}
       <div className="manuscript-turn-status-slot">
@@ -203,7 +207,7 @@ const ActiveGameSessionChoicesColumn: React.FC<
           (currentDecision && segmentCount > 0)) &&
         !isGeneratingChoices ? (
           !hideChoices && (
-            <div className={mobileActionsClass}>
+            <div className={clsx('manuscript-choice-selector-wrapper', mobileActionsClass)}>
               <ChoiceSelector
                 decision={currentDecision}
                 onSelect={onChoiceSelected}
@@ -228,11 +232,15 @@ const ActiveGameSessionChoicesColumn: React.FC<
                 {/* Choice prompt skeleton */}
                 {!hidePrompt && <div className="manuscript-choices-skeleton-prompt manuscript-skeleton-pulse" />}
 
-                {/* Choice buttons skeleton */}
-                <div className="manuscript-suggested-actions-grid">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="manuscript-choices-skeleton-action manuscript-skeleton-pulse" />
-                  ))}
+                {/* Choice buttons skeleton. Wrapped in the same section the
+                    real selector uses so it inherits the scroll region and the
+                    swap between them doesn't move the pinned composer. */}
+                <div className="manuscript-suggested-actions-section">
+                  <div className="manuscript-suggested-actions-grid">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="manuscript-choices-skeleton-action manuscript-skeleton-pulse" />
+                    ))}
+                  </div>
                 </div>
 
                 {/* Custom input skeleton */}

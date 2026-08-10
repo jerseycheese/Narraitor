@@ -224,4 +224,41 @@ test.describe('CLS Measurement - Game Session Surface', () => {
     expect(railAfter?.height).toBeCloseTo(railBefore?.height ?? 0, 0);
     expect(mainAfter?.height).toBeCloseTo(mainBefore?.height ?? 0, 0);
   });
+
+  // The rail reserves a fixed height, so anything past it is simply cut off.
+  // At 375px that used to be the composer: its input and send button sat below
+  // the reserve with no scroll affordance, which left writing a custom action
+  // with no reachable control at all.
+  test('the composer stays on screen at 375px', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 15_000 });
+    await page.locator('.manuscript-suggested-action').first().waitFor({ timeout: 15_000 });
+    await waitForStableScrollHeight(page, { timeout: 10_000, stableDuration: 1000 });
+
+    const rail = page.locator('#manuscript-action-rail');
+    const composer = page.locator('#manuscript-action-rail .manuscript-input-row');
+    const choiceList = page.locator('#manuscript-action-rail .manuscript-suggested-actions-section');
+
+    const railBox = await rail.boundingBox();
+    const composerBox = await composer.boundingBox();
+    expect(composerBox!.y + composerBox!.height).toBeLessThanOrEqual(railBox!.y + railBox!.height + 1);
+
+    // The choice list, not the rail, is what absorbs a long turn.
+    const overflow = await choiceList.evaluate((el) => el.scrollHeight > el.clientHeight);
+    const railOverflow = await rail.evaluate((el) => el.scrollHeight > el.clientHeight + 1);
+    expect(overflow).toBe(true);
+    expect(railOverflow).toBe(false);
+
+    // Scrolling to the end of the choices must not carry the composer with it.
+    const composerBefore = await composer.boundingBox();
+    await choiceList.evaluate((el) => { el.scrollTop = el.scrollHeight; });
+    const composerAfter = await composer.boundingBox();
+    expect(composerAfter?.y).toBeCloseTo(composerBefore?.y ?? 0, 0);
+  });
 });
