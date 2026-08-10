@@ -4,6 +4,29 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.1.0 - 2026-08-10
+
+Where v1.0 got the loop working end to end, v1.1 is the pass that makes it look and feel like it's supposed to. The bolder DS3 redesign — real accent, a louder dot grid, drafting marks, a named type scale, a brand/product surface split — lands in full, plus the two accessibility gaps and the error-reporting gap named as known-incomplete in the v1.0 notes. The v1.1 milestone closed 16 issues; this tag also carries a batch of unmilestoned play-loop and UI work that shipped alongside it.
+
+**What's in this release**
+
+- Bolder DS3, all the way through — epic [#1543](https://github.com/jerseycheese/narraitor/issues/1543). A deeper ink-blue accent and a louder dot grid ([#1621](https://github.com/jerseycheese/narraitor/issues/1621)), a five-mark drafting-marks family at one weight ([#1617](https://github.com/jerseycheese/narraitor/issues/1617)), a real named type scale with the highest-traffic sizes migrated onto it ([#1622](https://github.com/jerseycheese/narraitor/issues/1622)), a brand-vs-product surface split so marketing pages read differently from the app ([#1623](https://github.com/jerseycheese/narraitor/issues/1623)), room for generated art in list-view cards ([#1625](https://github.com/jerseycheese/narraitor/issues/1625)), and a real page grid with defined widths, columns, and gutters ([#1677](https://github.com/jerseycheese/narraitor/issues/1677)). DESIGN.md got rewritten with the real values instead of DS1's leftover numbers ([#1626](https://github.com/jerseycheese/narraitor/issues/1626)).
+- Two accessibility gaps named in the v1.0 notes are closed: full keyboard control with visible focus indicators ([#276](https://github.com/jerseycheese/narraitor/issues/276)), and touch targets floored at 44px app-wide, including small buttons that were only tall enough, not wide enough ([#1477](https://github.com/jerseycheese/narraitor/issues/1477)). `prefers-reduced-motion` is now honored across the app ([#1678](https://github.com/jerseycheese/narraitor/issues/1678)).
+- Client-side error reporting exists now — production failures are visible instead of silent ([#1641](https://github.com/jerseycheese/narraitor/issues/1641)), the third gap named in the v1.0 notes.
+- The critical bug from the milestone: cautious play could loop on clue-following indefinitely instead of escalating ([#1680](https://github.com/jerseycheese/narraitor/issues/1680)).
+- Two story-loop improvements: narrative segment length now actually scales with decision weight instead of being wired to a dead 3-5 sentence template ([#1585](https://github.com/jerseycheese/narraitor/issues/1585)), and prose that reused the same phrases turn after turn now gets flagged and varied ([#1681](https://github.com/jerseycheese/narraitor/issues/1681)).
+- Alongside the milestone: narrative prose streams in progressively instead of popping in after generation, portrait creation got preset avatars and image upload, journal entries got a table view, and skill inference now reads what a choice says rather than where it sits in the list.
+
+**Known incomplete**
+
+Multi-provider AI support ([#878](https://github.com/jerseycheese/narraitor/issues/878)) stays out — Gemini via BYO-key is still the only path. Platform and dependency upgrades ([#1368](https://github.com/jerseycheese/narraitor/issues/1368)) and visual-regression/test infrastructure work ([#1369](https://github.com/jerseycheese/narraitor/issues/1369)) don't need a release gate and stay on their own tracks. General polish batches ([#1475](https://github.com/jerseycheese/narraitor/issues/1475), [#1494](https://github.com/jerseycheese/narraitor/issues/1494)) and monetization ([#495](https://github.com/jerseycheese/narraitor/issues/495)) are deliberately out of scope for this tag.
+
+**What's next**
+
+- The free-to-play core keeps getting harder to argue with before anything commercial gets scoped: platform upgrades ([#1368](https://github.com/jerseycheese/narraitor/issues/1368)) and whatever the next visual-identity or play-loop pass turns up. Commercialization ([#495](https://github.com/jerseycheese/narraitor/issues/495)) stays parked until the free game is solid.
+
+---
+
 ## v1.0.0 - 2026-08-04
 
 This is 1.0, and what makes it 1.0 is that the whole loop holds together now: describe a world, create a character who fits it, play a story that responds to what you choose, and reach an ending that reads like an ending. Narraitor started from wanting tabletop RPG sessions without coordinating four schedules, and this is the first tag where a stranger can open the app and get that without a walkthrough. The v1.0 milestone closed 60 issues across 554 commits since [v0.5.0](https://github.com/jerseycheese/narraitor/releases/tag/v0.5.0-design-system), most of them about making pieces that already existed work together in someone else's browser.
