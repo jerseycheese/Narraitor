@@ -9,6 +9,11 @@ import type { ProviderPreset } from '@/types/provider.types';
  * others are listed so players can see what's coming and so the schema is ready
  * for the post-1.0 multi-provider work — they're marked unavailable and the UI
  * keeps them out of reach for now.
+ *
+ * Order is deliberate. Gemini leads because it's the only one that works today.
+ * OpenRouter comes next because it's the only other option a player can reach
+ * without a credit card, and one key there covers dozens of models. Everything
+ * below it needs prepaid billing before it generates a single word.
  */
 export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
@@ -21,6 +26,20 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     capabilities: { text: true, images: true, streaming: true },
     helpUrl: 'https://aistudio.google.com/apikey',
     available: true,
+  },
+  {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    type: 'openai-compatible',
+    // TODO(#895): re-check this model list when the provider goes live. OpenRouter's
+    // zero-cost ":free" ids rotate every few weeks, so none are pinned here.
+    models: ['openai/gpt-4o', 'anthropic/claude-3.5-sonnet', 'google/gemini-2.5-flash'],
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    defaultModel: 'openai/gpt-4o',
+    capabilities: { text: true, images: true, streaming: true },
+    helpUrl: 'https://openrouter.ai/keys',
+    available: false,
+    note: 'free tier, no card',
   },
   {
     id: 'openai',
@@ -53,17 +72,6 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     defaultModel: 'mistral-large-latest',
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://console.mistral.ai/api-keys',
-    available: false,
-  },
-  {
-    id: 'openrouter',
-    name: 'OpenRouter',
-    type: 'openai-compatible',
-    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-    models: ['openai/gpt-4o', 'anthropic/claude-3.5-sonnet', 'google/gemini-2.5-flash'],
-    defaultModel: 'openai/gpt-4o',
-    capabilities: { text: true, images: true, streaming: true },
-    helpUrl: 'https://openrouter.ai/keys',
     available: false,
   },
   {
