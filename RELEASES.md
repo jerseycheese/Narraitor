@@ -23,7 +23,7 @@ Multi-provider AI support ([#878](https://github.com/jerseycheese/narraitor/issu
 
 **What's next**
 
-- Commercialization track ([#495](https://github.com/jerseycheese/narraitor/issues/495)), platform upgrades ([#1368](https://github.com/jerseycheese/narraitor/issues/1368)), and whatever the next visual-identity or play-loop pass turns up.
+- The free-to-play core keeps getting harder to argue with before anything commercial gets scoped: platform upgrades ([#1368](https://github.com/jerseycheese/narraitor/issues/1368)) and whatever the next visual-identity or play-loop pass turns up. Commercialization ([#495](https://github.com/jerseycheese/narraitor/issues/495)) stays parked until the free game is solid.
 
 ---
 
