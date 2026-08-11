@@ -122,6 +122,13 @@ test.describe('Manuscript Layout Specific Tests', () => {
 
     await hideDynamicContent(page);
 
+    // The panel leads with a character portrait, and the header carries three
+    // more. Without this wait the capture races them: the diff grew 804 ->
+    // 5732 -> 6536 px across one run's retries, all of it portrait pixels, so
+    // the baseline recorded whichever frame won. The rails test below already
+    // waits this way.
+    await waitForImagesLoadedIn(page, '[data-testid="manuscript-session-shell"]');
+
     await expect(page).toHaveScreenshot('manuscript-hud-expanded.png');
   });
 
