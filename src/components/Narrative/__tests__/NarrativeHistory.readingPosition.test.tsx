@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { NarrativeHistory } from '../NarrativeHistory';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import {
@@ -23,6 +23,11 @@ global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
  * The play surface's one motion rule: the sentence being read holds position.
  * A new beat may appear below it, but must never scroll it out from under the
  * reader — they get a way back to the latest instead.
+ *
+ * These deliberately leave `disableInitialAutoScroll` off, matching what
+ * ActiveGameSessionNarrativeColumn passes. Turning it on switches off the
+ * resume-scroll effect, which is precisely the thing most likely to break the
+ * rule, so a test that sets it can pass while the app still yanks the reader.
  */
 describe('NarrativeHistory (reading position)', () => {
   const mockIsFeatureEnabled = isFeatureEnabled as jest.MockedFunction<typeof isFeatureEnabled>;
@@ -38,70 +43,95 @@ describe('NarrativeHistory (reading position)', () => {
     return viewport;
   };
 
+  // The resume-scroll effect defers 100ms; flush it so a scroll it schedules
+  // can't hide behind the assertion.
+  const flushDeferredScroll = () => {
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+  };
+
   beforeEach(() => {
+    jest.useFakeTimers();
     mockIsFeatureEnabled.mockReturnValue(false);
     mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore());
     Element.prototype.scrollTo = jest.fn();
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     jest.clearAllMocks();
   });
 
   const segment = (id: string) => createMockNarrativeSegment({ id, content: `Beat ${id}.` });
 
+  /**
+   * Render a resumed session the way the app gets there: history renders while
+   * still loading, then isLoading flips false once it has stabilized. That flip
+   * is what runs the resume-scroll effect — on mount the viewport ref isn't
+   * resolved yet — so it's also what arms the regression these tests guard.
+   */
+  const renderResumedSession = () => {
+    const view = render(<NarrativeHistory segments={[segment('seg-1')]} isLoading />);
+    setScrollGeometry({ scrollTop: 1500 });
+    view.rerender(<NarrativeHistory segments={[segment('seg-1')]} isLoading={false} />);
+    flushDeferredScroll();
+    return view;
+  };
+
+  const scrollTo = () => Element.prototype.scrollTo as jest.Mock;
+
   it('does not scroll a reader who has scrolled up to re-read', () => {
-    const { rerender } = render(
-      <NarrativeHistory segments={[segment('seg-1')]} disableInitialAutoScroll />
-    );
+    const { rerender } = renderResumedSession();
 
     const viewport = setScrollGeometry({ scrollTop: 0 });
     fireEvent.scroll(viewport);
-    (Element.prototype.scrollTo as jest.Mock).mockClear();
+    scrollTo().mockClear();
 
-    rerender(
-      <NarrativeHistory segments={[segment('seg-1'), segment('seg-2')]} disableInitialAutoScroll />
-    );
+    rerender(<NarrativeHistory segments={[segment('seg-1'), segment('seg-2')]} isLoading={false} />);
+    flushDeferredScroll();
 
-    expect(Element.prototype.scrollTo).not.toHaveBeenCalled();
+    expect(scrollTo()).not.toHaveBeenCalled();
     expect(screen.getByRole('button', { name: /jump to latest/i })).toBeInTheDocument();
   });
 
   it('follows the story down for a reader already at the latest beat', () => {
-    const { rerender } = render(
-      <NarrativeHistory segments={[segment('seg-1')]} disableInitialAutoScroll />
-    );
+    const { rerender } = renderResumedSession();
 
     const viewport = setScrollGeometry({ scrollTop: 1500 });
     fireEvent.scroll(viewport);
-    (Element.prototype.scrollTo as jest.Mock).mockClear();
+    scrollTo().mockClear();
 
-    rerender(
-      <NarrativeHistory segments={[segment('seg-1'), segment('seg-2')]} disableInitialAutoScroll />
-    );
+    rerender(<NarrativeHistory segments={[segment('seg-1'), segment('seg-2')]} isLoading={false} />);
 
-    expect(Element.prototype.scrollTo).toHaveBeenCalled();
+    expect(scrollTo()).toHaveBeenCalled();
     expect(screen.queryByRole('button', { name: /jump to latest/i })).not.toBeInTheDocument();
   });
 
   it('takes the reader to the latest beat on request', () => {
-    const { rerender } = render(
-      <NarrativeHistory segments={[segment('seg-1')]} disableInitialAutoScroll />
-    );
+    const { rerender } = renderResumedSession();
 
     const viewport = setScrollGeometry({ scrollTop: 0 });
     fireEvent.scroll(viewport);
 
-    rerender(
-      <NarrativeHistory segments={[segment('seg-1'), segment('seg-2')]} disableInitialAutoScroll />
-    );
+    rerender(<NarrativeHistory segments={[segment('seg-1'), segment('seg-2')]} isLoading={false} />);
+    flushDeferredScroll();
 
-    (Element.prototype.scrollTo as jest.Mock).mockClear();
+    scrollTo().mockClear();
     fireEvent.click(screen.getByRole('button', { name: /jump to latest/i }));
 
-    expect(Element.prototype.scrollTo).toHaveBeenCalledWith(
-      expect.objectContaining({ top: 2000 })
-    );
+    expect(scrollTo()).toHaveBeenCalledWith(expect.objectContaining({ top: 2000 }));
     expect(screen.queryByRole('button', { name: /jump to latest/i })).not.toBeInTheDocument();
+  });
+
+  it('still opens a resumed session at its latest beat', () => {
+    const { rerender } = render(<NarrativeHistory segments={[segment('seg-1')]} isLoading />);
+    setScrollGeometry({ scrollTop: 0 });
+
+    scrollTo().mockClear();
+    rerender(<NarrativeHistory segments={[segment('seg-1')]} isLoading={false} />);
+    flushDeferredScroll();
+
+    expect(scrollTo()).toHaveBeenCalledWith(expect.objectContaining({ top: 2000 }));
   });
 });

@@ -60,6 +60,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   const prevSegmentCountRef = useRef(segments.length);
   const hasUserScrollInteractionRef = useRef(false);
   const isNearBottomRef = useRef(true);
+  const hasSettledInitialScrollRef = useRef(false);
   const [hasUnreadBelow, setHasUnreadBelow] = useState(false);
 
   const { renderedSegments } = useBufferedNarrativeSegments(segments, { isHydrating });
@@ -120,21 +121,30 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     });
   }, []);
 
-  // Auto-scroll to bottom on initial load for existing sessions
+  // Open a resumed session at its latest beat — once. This used to re-fire on
+  // every segment because segments.length is a dependency, which would scroll
+  // the reader down 100ms after the effect above had deliberately left them
+  // where they were. It can't run on mount (the viewport ref is resolved by a
+  // later effect), so the run that counts is the one after isLoading flips.
   useEffect(() => {
-    if (segments.length > 0 && scrollViewportRef.current && !isLoading && !disableInitialAutoScroll) {
-      // Use a small delay to ensure content is rendered
-      const scrollTimer = setTimeout(() => {
-        if (scrollViewportRef.current) {
-          scrollViewportRef.current.scrollTo({
-            top: scrollViewportRef.current.scrollHeight,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+    if (hasSettledInitialScrollRef.current) return;
+    if (disableInitialAutoScroll || isLoading || segments.length === 0) return;
+    if (!scrollViewportRef.current) return;
 
-      return () => clearTimeout(scrollTimer);
-    }
+    hasSettledInitialScrollRef.current = true;
+
+    // Use a small delay to ensure content is rendered
+    const scrollTimer = setTimeout(() => {
+      // Skip if they started reading somewhere else during the delay.
+      if (scrollViewportRef.current && !hasUserScrollInteractionRef.current) {
+        scrollViewportRef.current.scrollTo({
+          top: scrollViewportRef.current.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+
+    return () => clearTimeout(scrollTimer);
   }, [segments.length, isLoading, disableInitialAutoScroll]);
 
   // Keyboard navigation handler with snap-to-center behavior
