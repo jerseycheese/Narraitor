@@ -3187,6 +3187,41 @@ body.manuscript-overlay-open {
   white-space: nowrap;
 }
 
+/* Offered instead of scrolling the reader down against their will: a new beat
+   arrived while they were further up, and this is the way back to it. Fixed
+   rather than sticky because the narrative is in the page flow now and has no
+   box of its own to pin against. */
+:root .narrative-jump-to-latest {
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-overlay);
+  color: var(--color-text-primary);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+:root .narrative-jump-to-latest:hover {
+  background: var(--color-surface-hover);
+}
+
+:root .narrative-jump-to-latest:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* DS3 save indicator — compact status dot */
 :root .manuscript-save-indicator {
   border: none;

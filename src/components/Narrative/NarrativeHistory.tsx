@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { NarrativeDisplay } from './NarrativeDisplay';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -60,6 +60,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   const prevSegmentCountRef = useRef(segments.length);
   const hasUserScrollInteractionRef = useRef(false);
   const isNearBottomRef = useRef(true);
+  const [hasUnreadBelow, setHasUnreadBelow] = useState(false);
 
   const { renderedSegments } = useBufferedNarrativeSegments(segments, { isHydrating });
 
@@ -79,24 +80,45 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     // If user scrolled up significantly, mark as manual scroll
     if (!isNearBottomRef.current) {
       hasUserScrollInteractionRef.current = true;
+    } else {
+      // Back at the latest beat under their own steam — nothing left to catch up on.
+      setHasUnreadBelow(false);
     }
   }, [getIsNearBottom]);
 
-  // Auto-scroll to the newest segment when one is appended. A new segment
-  // means the player advanced the story (a deliberate turn), so re-arm
-  // bottom-anchoring and scroll into view even if they'd scrolled up to
-  // re-read — the streaming-growth ResizeObserver then keeps it in view (F51).
+  // A new segment lands below whatever the player is reading. Follow it down
+  // only if they were already at the bottom; if they'd scrolled up to re-read,
+  // the sentence under their eye holds position and they get a way back
+  // instead. Yanking them to the newest beat mid-sentence is the one motion
+  // this surface must not make.
   useEffect(() => {
     if (segments.length > prevSegmentCountRef.current && scrollViewportRef.current) {
-      hasUserScrollInteractionRef.current = false;
-      isNearBottomRef.current = true;
-      scrollViewportRef.current.scrollTo({
-        top: scrollViewportRef.current.scrollHeight,
-        behavior: 'auto'
-      });
+      const wasFollowing =
+        !hasUserScrollInteractionRef.current || isNearBottomRef.current;
+
+      if (wasFollowing) {
+        isNearBottomRef.current = true;
+        scrollViewportRef.current.scrollTo({
+          top: scrollViewportRef.current.scrollHeight,
+          behavior: 'auto'
+        });
+      } else {
+        setHasUnreadBelow(true);
+      }
     }
     prevSegmentCountRef.current = segments.length;
   }, [segments.length]);
+
+  const jumpToLatest = useCallback(() => {
+    if (!scrollViewportRef.current) return;
+    hasUserScrollInteractionRef.current = false;
+    isNearBottomRef.current = true;
+    setHasUnreadBelow(false);
+    scrollViewportRef.current.scrollTo({
+      top: scrollViewportRef.current.scrollHeight,
+      behavior: 'smooth'
+    });
+  }, []);
 
   // Auto-scroll to bottom on initial load for existing sessions
   useEffect(() => {
@@ -369,6 +391,16 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           {renderContent()}
         </div>
       </ScrollArea>
+
+      {hasUnreadBelow && (
+        <button
+          type="button"
+          className="narrative-jump-to-latest"
+          onClick={jumpToLatest}
+        >
+          Jump to latest
+        </button>
+      )}
     </div>
   );
 };
