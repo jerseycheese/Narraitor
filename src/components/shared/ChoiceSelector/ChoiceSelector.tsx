@@ -6,7 +6,6 @@ import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
 import { ArrowUp } from 'lucide-react';
 import { clsx } from 'clsx';
 import { safeTrim } from '@/lib/utils';
@@ -56,11 +55,6 @@ interface ChoiceSelectorProps {
   inventoryItems?: InventoryItem[];
 
   // Ending suggestion props
-  endingSuggestion?: {
-    reason: string;
-    onAccept: () => void;
-    onDismiss: () => void;
-  };
 
   // True while a modal/dialog (shortcuts help, a drawer, End Story
   // confirmation, ...) is open over the session. Suppresses the number-key
@@ -88,7 +82,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   worldSkills = [],
   characterSkills = [],
   inventoryItems = [],
-  endingSuggestion,
   shortcutsSuspended = false,
 }) => {
   // Custom input state
@@ -210,15 +203,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       aria-label={displayPrompt}
     >
       <div className="manuscript-choice-selector-body">
-        {/* Ending Suggestion Banner */}
-        {endingSuggestion && (
-          <EndingSuggestionBanner
-            reason={endingSuggestion.reason}
-            onAccept={endingSuggestion.onAccept}
-            onDismiss={endingSuggestion.onDismiss}
-          />
-        )}
-
         {!hidePrompt && (
           <h3 className="manuscript-choice-prompt">
             {displayPrompt}
