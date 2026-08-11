@@ -2,7 +2,7 @@
 
 ## Why This Matters
 
-Ever notice how some players love getting into long conversations with NPCs while others just want to stab things and move on? Or how some people want every tiny detail described while others prefer to get straight to the action?
+Some players love long conversations with NPCs; others just want to stab things and move on. Some want every detail described; others prefer to get straight to the action.
 
 This system watches how players actually play and adapts the storytelling to match their style. Instead of manually calculating complex patterns, we send raw decision data to Gemini and let the LLM do what it's good at - recognizing patterns and adapting narratives.
 

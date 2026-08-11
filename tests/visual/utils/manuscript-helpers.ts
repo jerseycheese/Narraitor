@@ -110,11 +110,11 @@ export const applyAppStreamingVisualState = async (
   page: Page,
 ): Promise<void> => {
   await page.evaluate(() => {
-    const actionRail = document.getElementById('manuscript-action-rail');
+    const decisionBlock = document.getElementById('manuscript-decision-block');
     const input = document.getElementById('manuscript-input') as HTMLInputElement | null;
     const send = document.getElementById('manuscript-send') as HTMLButtonElement | null;
 
-    actionRail?.classList.add('manuscript-action-rail-streaming');
+    decisionBlock?.classList.add('manuscript-decision-block-streaming');
 
     if (input) {
       input.disabled = true;
@@ -227,7 +227,7 @@ const defaultSelectors = [
   '.manuscript-overlay-header',
   '.manuscript-main-stage',
   '.manuscript-characters-rail',
-  '#manuscript-action-rail',
+  '#manuscript-decision-block',
   '.manuscript-hud-panel',
   '.manuscript-tools-menu-items',
   '.manuscript-tools-menu-item',

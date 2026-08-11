@@ -108,7 +108,7 @@ function syntaxHighlight(json: string): string {
       }
     );
   } catch (error) {
-    // Fail gracefully if highlighting encounters an error
+    // Skip syntax highlighting if it throws, and fall back to escaped plain text
     logger.error('Error while highlighting JSON:', error);
     return json
       .replace(/&/g, '&amp;')

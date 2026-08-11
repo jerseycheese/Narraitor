@@ -274,7 +274,7 @@ const savedData = {
 
 ### Storage Errors
 
-The system gracefully handles localStorage errors:
+localStorage errors are caught and fail silently, without notifying the player:
 
 ```typescript
 try {
@@ -289,7 +289,7 @@ try {
 
 ### Data Corruption
 
-Corrupted save data is handled gracefully:
+Corrupted save data keeps the recovery flag set but clears the preview, instead of crashing the load:
 
 ```typescript
 try {

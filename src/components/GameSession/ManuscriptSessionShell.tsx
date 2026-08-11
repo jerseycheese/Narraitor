@@ -1,28 +1,29 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { clsx } from 'clsx';
 
 interface ManuscriptSessionShellProps {
   children: React.ReactNode;
   hud?: React.ReactNode;
-  actionRail?: React.ReactNode;
   marginContent?: React.ReactNode;
   className?: string;
 }
 
+/**
+ * Two rows: a fixed HUD and one scrolling document beneath it.
+ *
+ * Prose and decision are the same document, so the shell gives them one
+ * scroll container and one measure. There is deliberately no slot for a
+ * docked panel — anything the player acts on is composed into `children` in
+ * reading order.
+ */
 export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
   children,
   hud,
-  actionRail,
   marginContent,
   className,
 }) => {
-  const railRef = useRef<HTMLElement>(null);
-  const viewportInnerRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLElement>(null);
-  const actionRailRef = useRef<HTMLDivElement>(null);
-
   // Lock body scroll when the game session overlay is active
   useEffect(() => {
     document.body.classList.add('manuscript-overlay-open');
@@ -41,9 +42,9 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
       <div className="manuscript-overlay-backdrop" />
 
       <div className="manuscript-viewport-shell">
-        <div className="manuscript-viewport-inner" ref={viewportInnerRef}>
+        <div className="manuscript-viewport-inner">
           {/* Header Region */}
-          <header className="manuscript-overlay-header" ref={headerRef}>
+          <header className="manuscript-overlay-header">
             {hud}
           </header>
 
@@ -51,31 +52,23 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
               already wraps the play route in the page's one main landmark, and
               nesting a second one breaks landmark navigation. */}
           <section aria-label="Story" className="manuscript-overlay-main">
-            <div className={clsx("manuscript-main-stage manuscript-main-stage-mobile-stack", !marginContent && "manuscript-no-rail")}>
-                {marginContent && (
-                  <aside
-                    className="manuscript-characters-rail manuscript-characters-rail-mobile-stack"
-                    aria-label="Scene status"
-                    ref={railRef}
-                  >
-                    {marginContent}
-                  </aside>
-                )}
+            <div className={clsx("manuscript-main-stage", !marginContent && "manuscript-no-rail")}>
+              {marginContent && (
+                <aside
+                  className="manuscript-characters-rail"
+                  aria-label="Scene status"
+                >
+                  {marginContent}
+                </aside>
+              )}
 
-                <div className="manuscript-main-content">
-                  <div className="manuscript-main-content-inner">
-                    {children}
-                  </div>
+              <div className="manuscript-main-content">
+                <div className="manuscript-main-content-inner">
+                  {children}
                 </div>
-
-                <div className="manuscript-rail-spacer" aria-hidden="true" />
               </div>
+            </div>
           </section>
-
-          {/* Docked Action Rail */}
-          <div ref={actionRailRef}>
-            {actionRail}
-          </div>
         </div>
       </div>
     </div>

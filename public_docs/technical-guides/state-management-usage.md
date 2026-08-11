@@ -214,7 +214,7 @@ const useWorldStats = (worldId: string) => {
 
 **Reset state** in tests to avoid test pollution - one test's data shouldn't affect another.
 
-**Handle errors** gracefully with error states - the stores provide error handling, use it.
+**Handle errors** with error states - the stores provide error handling, use it.
 
 **Batch updates** when making multiple changes - don't trigger a re-render for every tiny change.
 

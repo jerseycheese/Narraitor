@@ -12,7 +12,7 @@ interface ShortcutEntry {
 // list in sync with ChoiceSelector's number-key handling and the 'j'/'c'/'?'
 // bindings in ActiveGameSession.
 const SHORTCUTS: ShortcutEntry[] = [
-  { keys: ['1', '-', '9'], description: 'Select a suggested action' },
+  { keys: ['1', '-', '3'], description: 'Select a suggested action' },
   { keys: ['Enter'], description: 'Submit a custom action while typing' },
   { keys: ['J'], description: 'Open journal' },
   { keys: ['C'], description: 'Toggle character sheet' },

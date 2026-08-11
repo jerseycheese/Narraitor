@@ -103,7 +103,7 @@ https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().imageMod
 
 ## Error Handling
 
-The system gracefully handles various error scenarios:
+The system handles these error scenarios:
 
 - **Invalid API Key**: Falls back to intelligent placeholder
 - **API Rate Limits**: Shows fallback with retry suggestion

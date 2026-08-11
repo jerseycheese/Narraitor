@@ -47,7 +47,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
       await downloadGameState();
       showMessage('Export completed successfully', 'success');
     } catch {
-      showMessage('Export failed. Please try again.', 'error');
+      showMessage("Couldn't export your data. Try again in a moment.", 'error');
     } finally {
       setIsExporting(false);
     }

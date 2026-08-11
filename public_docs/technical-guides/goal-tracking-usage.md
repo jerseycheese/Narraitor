@@ -220,7 +220,7 @@ try {
 }
 ```
 
-### Graceful Degradation
+### Fallback Context
 ```typescript
 // Always provide fallback context
 const context = await useAiContextStore.getState().buildContextForSession(sessionId);

@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Decision } from '@/types/narrative.types';
 import { WorldSkill } from '@/types/world.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { EndingSuggestionBanner } from '@/components/GameSession/EndingSuggestionBanner';
 import { ArrowUp } from 'lucide-react';
 import { clsx } from 'clsx';
 import { safeTrim } from '@/lib/utils';
@@ -56,11 +55,6 @@ interface ChoiceSelectorProps {
   inventoryItems?: InventoryItem[];
 
   // Ending suggestion props
-  endingSuggestion?: {
-    reason: string;
-    onAccept: () => void;
-    onDismiss: () => void;
-  };
 
   // True while a modal/dialog (shortcuts help, a drawer, End Story
   // confirmation, ...) is open over the session. Suppresses the number-key
@@ -88,7 +82,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   worldSkills = [],
   characterSkills = [],
   inventoryItems = [],
-  endingSuggestion,
   shortcutsSuspended = false,
 }) => {
   // Custom input state
@@ -120,16 +113,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   // Determine the prompt text
   const displayPrompt = prompt || decision.prompt;
 
-  // Auto-focus input when custom input is enabled. preventScroll stops the
-  // browser's default focus-scroll-into-view from dragging the now-scrollable
-  // #manuscript-action-rail (see manuscript-session.css) down past the
-  // suggested actions to reveal the input on mount/remount.
-  useEffect(() => {
-    if (enableCustomInput && inputRef.current) {
-      inputRef.current.focus({ preventScroll: true });
-    }
-  }, [enableCustomInput]);
-
   // Handle option selection
   const handleOptionSelect = useCallback(
     (optionId: string, isDisabledByReqs: boolean) => {
@@ -143,19 +126,30 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     [onSelect]
   );
 
-  // Number-key shortcuts (1-9) mirror the kbd hints rendered on each option
-  // (#276) so choices are selectable without a mouse. Disabled whenever the
-  // selector itself is disabled (turn in progress, session ended, etc.); the
-  // shared hook already ignores keystrokes while typing in an input.
+  // Number-key shortcuts mirror the kbd hints rendered on each option, so
+  // choices are selectable without a mouse. Disabled whenever the selector
+  // itself is disabled (turn in progress, session ended, etc.).
+  //
+  // They stay live while the composer holds focus but is still empty, which is
+  // where a player lands most turns. Once there's text in it, a digit belongs
+  // to the sentence being written, so the opt-in switches back off. The
+  // listener is document-level, so the opt-in names this composer specifically
+  // rather than every field on the page.
+  const isComposerEmpty = customInputText.length === 0;
+  const isComposerAwaitingFirstKey = useCallback(
+    (target: EventTarget | null) => target === inputRef.current && isComposerEmpty,
+    [isComposerEmpty]
+  );
   const choiceShortcuts: KeyboardShortcut[] = useMemo(
     () =>
       allOptions.slice(0, 9).map((option, index) => ({
         key: String(index + 1),
         description: `Select "${option.text}"`,
+        ignoreInputs: isComposerAwaitingFirstKey,
         action: () =>
           handleOptionSelect(option.id, option.isDisabledByRequirements ?? false),
       })),
-    [allOptions, handleOptionSelect]
+    [allOptions, handleOptionSelect, isComposerAwaitingFirstKey]
   );
   useKeyboardShortcuts(choiceShortcuts, !isDisabled && !shortcutsSuspended);
 
@@ -206,20 +200,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         .filter(Boolean)
         .join(' ')}
       role="group"
-      aria-labelledby="choices-heading"
+      aria-label={displayPrompt}
     >
       <div className="manuscript-choice-selector-body">
-        {/* Ending Suggestion Banner */}
-        {endingSuggestion && (
-          <EndingSuggestionBanner
-            reason={endingSuggestion.reason}
-            onAccept={endingSuggestion.onAccept}
-            onDismiss={endingSuggestion.onDismiss}
-          />
-        )}
-
         {!hidePrompt && (
-          <h3 id="choices-heading" className="manuscript-choice-prompt">
+          <h3 className="manuscript-choice-prompt">
             {displayPrompt}
           </h3>
         )}
@@ -227,9 +212,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         {allOptions.length > 0 && (
           <div className="manuscript-suggested-actions-section">
             {/* Regular choice options */}
+            {/* Named from the prompt text rather than the heading below: DS3
+                hides that heading with `display: none`, which takes it out of
+                the accessibility tree, and hidePrompt skips rendering it
+                entirely. Both paths left this group announcing unnamed. */}
             <div
               role="radiogroup"
-              aria-labelledby="choices-heading"
+              aria-label={displayPrompt}
               className="manuscript-suggested-actions-grid"
             >
               {allOptions.map((option, index) => {

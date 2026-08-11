@@ -459,7 +459,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setError(null);
       resetStreamingPreview();
 
-      // Race AI generation with a timeout so we can fallback gracefully.
+      // Race AI generation against a timeout so a slow response falls back instead of hanging.
       // Losing the race must also ABORT the generation: without the signal,
       // the abandoned request keeps running (and spending) until aiFetch's
       // ceiling, then mutates lore/inventory/NPC state when it settles.

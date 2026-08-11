@@ -6,7 +6,7 @@ This gets new players from "I have no idea what this app does" to "I'm playing a
 
 **Just three steps** - Welcome (explains the value), World Concept (describe what you want), World Details (pick a name and theme). That's it.
 
-**Smart defaults everywhere** - Most settings are pre-filled with sensible choices, so you only have to make the decisions that actually matter for your experience.
+**Sensible defaults** - Most settings are pre-filled, so you only have to make the decisions that actually matter.
 
 **Real-time validation** - No surprises at the end. If something's wrong, you know immediately.
 
@@ -47,9 +47,9 @@ export function QuickPlay() {
 
 **Reuses existing wizard infrastructure** - Built on the shared `useWizardFlow` hook, so it handles step navigation, validation, and persistence automatically.
 
-**Smart user detection** - Hooks into the session store to detect first-time users and track when they've completed onboarding.
+**First-time user detection** - Hooks into the session store to detect first-time users and track when they've completed onboarding.
 
-**Progressive Tutorial System** - After completing the intro wizard, the `GuidedFirstTimeExperience` seamlessly hands off to the `TutorialProvider`, initiating a contextual tour that guides you through the rest of the world and character creation process. This creates a continuous onboarding journey from first click to first gameplay.
+**Tutorial handoff** - After the intro wizard, `GuidedFirstTimeExperience` hands off to `TutorialProvider`, which walks through the rest of world and character creation.
 
 **Simple three-step flow** - Welcome (sets expectations), Concept (captures your idea), Details (finalizes the basics). Then you're off to character creation with your new world ready to go.
 

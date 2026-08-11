@@ -70,7 +70,7 @@ The lore system plugs into several places to maintain consistency:
 
 **Session Scoping** - Facts can be filtered by session or world-wide, depending on what context you need.
 
-**Error Handling** - Graceful degradation when AI services are unavailable. The story continues even if lore extraction fails.
+**Error Handling** - The story continues even if lore extraction fails or AI services are unavailable.
 
 ### AI Prompt Enhancement
 The lore system integrates with both narrative and choice generation:

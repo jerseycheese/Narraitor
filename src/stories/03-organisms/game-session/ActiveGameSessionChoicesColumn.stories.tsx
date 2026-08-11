@@ -60,21 +60,3 @@ export const Skeleton: Story = {
   },
 };
 
-export const WithEndingSuggestion: Story = {
-  args: {
-    currentDecision: mockDecision,
-    segmentCount: 5,
-    status: 'active',
-    isGenerating: false,
-    isGeneratingChoices: false,
-    isSessionEnded: false,
-    worldSkills: [],
-    characterSkills: [],
-    inventoryItems: [],
-    endingSuggestion: {
-      reason: 'Your story has reached a natural conclusion point.',
-      onAccept: fn(),
-      onDismiss: fn(),
-    },
-  },
-};

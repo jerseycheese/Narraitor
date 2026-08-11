@@ -52,4 +52,4 @@ Keep the navigation system fast and reliable:
 - History is capped at `preferences.maxRecentPages` (default 10) and dedupes by path, so revisiting a page moves it to the top rather than duplicating it
 - Read recent pages through `getRecentPages(limit?)` and check prior visits with `hasVisited(path)` rather than poking at `history` directly
 - Store minimal data in navigation state - just what you need to reconstruct context
-- Handle storage quota limits gracefully with fallbacks
+- Handle storage quota limits with fallbacks

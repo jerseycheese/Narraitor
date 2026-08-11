@@ -43,7 +43,12 @@ body.manuscript-overlay-open {
   padding: clamp(0.5rem, 1.5vh, 1rem) clamp(12px, 2vw, 1.5rem);
   min-height: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+
+  /* Two rows only: HUD, then the document. A third row for a docked panel is
+     what made the narrative row's height a function of the choice list — the
+     source of the per-turn layout shift. The decision now scrolls with the
+     prose, so nothing downstream can resize the story. */
+  grid-template-rows: auto minmax(0, 1fr);
   gap: clamp(0.5rem, 1.5vh, 1rem);
   position: relative;
   z-index: 1;
@@ -298,21 +303,12 @@ body.manuscript-overlay-open {
   white-space: nowrap;
 }
 
-#manuscript-action-rail {
+/* The decision reads as the beat's closing paragraph: no panel chrome, no
+   height cap, no scroller of its own. It is sized by its content and the page
+   scrolls to meet it. */
+#manuscript-decision-block {
   touch-action: manipulation;
-  background: var(--color-overlay-surface-strong);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-overlay);
-  border-radius: var(--radius-sm);
-  padding: var(--space-3);
-
-  /* DS3 always stacks suggested actions in a single column (never a grid),
-     so a full set of choices can grow tall enough to squeeze the narrative
-     row in `.manuscript-viewport-inner`'s auto/1fr/auto grid down to a few
-     px on short viewports. Cap the rail and let it scroll internally instead
-     of starving the story text of space. */
-  max-height: min(50dvh, 26rem);
-  overflow-y: auto;
+  margin-top: var(--space-6);
 }
 
 .manuscript-mobile-rail-top-controls {
@@ -440,38 +436,8 @@ body.manuscript-overlay-open {
   z-index: 20;
 }
 
-.manuscript-rail-spacer {
-  display: none;
-}
-
 @media (width >= 1024px) {
-  .manuscript-main-stage {
-    grid-template-columns: minmax(10rem, 12rem) minmax(0, 1fr) minmax(10rem, 12rem);
-  }
-
-  .manuscript-characters-rail {
-    display: block;
-    grid-column: 1;
-  }
-
-  .manuscript-main-content {
-    grid-column: 2;
-  }
-
-  .manuscript-rail-spacer {
-    display: block;
-    grid-column: 3;
-  }
-
-  .manuscript-main-stage.manuscript-no-rail {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .manuscript-main-stage.manuscript-no-rail .manuscript-main-content {
-    grid-column: auto;
-  }
-
-  .manuscript-main-stage.manuscript-no-rail .manuscript-rail-spacer {
+  .manuscript-characters-mobile-bar {
     display: none;
   }
 }
@@ -536,19 +502,19 @@ body.manuscript-overlay-open {
 }
 
 /* Streaming lock styles */
-.manuscript-action-rail-streaming #manuscript-input,
-.manuscript-action-rail-streaming #manuscript-send,
-.manuscript-action-rail-streaming .manuscript-suggested-action {
+.manuscript-decision-block-streaming #manuscript-input,
+.manuscript-decision-block-streaming #manuscript-send,
+.manuscript-decision-block-streaming .manuscript-suggested-action {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
-.manuscript-action-rail-streaming #manuscript-input {
+.manuscript-decision-block-streaming #manuscript-input {
   background: var(--color-surface-hover);
 }
 
-.manuscript-action-rail-streaming #manuscript-input::placeholder {
+.manuscript-decision-block-streaming #manuscript-input::placeholder {
   color: var(--color-accent);
   opacity: 1;
 }
@@ -607,15 +573,6 @@ body.manuscript-overlay-open {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Removed manuscript-action-rail-content as container handles padding directly */
-
-.manuscript-action-rail-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 0;
 }
 
 .manuscript-warning-action-button {
@@ -900,20 +857,6 @@ body.manuscript-overlay-open {
   letter-spacing: 0.05em;
 }
 
-/* Mobile Stack Layouts */
-.manuscript-main-stage-mobile-stack {
-  display: grid;
-}
-
-.manuscript-characters-rail-mobile-stack {
-  order: -1;
-}
-
-@media (width >= 1024px) {
-  .manuscript-characters-rail-mobile-stack {
-    order: unset;
-  }
-}
 
 /* End Story Dialog */
 .manuscript-end-story-backdrop {
@@ -1131,18 +1074,34 @@ body.manuscript-overlay-open {
   border-color: rgb(from var(--color-text-muted) r g b / 25%);
 }
 
-.manuscript-suggested-action.is-selected .manuscript-skill-check-badge {
-
-  background: rgb(from var(--color-text-inverse) r g b / 20%);
-
-  color: var(--color-text-inverse);
-
-  border-color: rgb(from var(--color-text-inverse) r g b / 30%);
-
+/* The inverse treatment here assumed the selected row was a solid accent slab.
+   It is a soft tint, so inverse text lands white-on-light; the badge keeps its
+   ordinary accent colors and reads against the tint unchanged. */
+.manuscript-suggested-action-selected {
+  box-shadow: inset 0 0 0 1px var(--color-accent-soft);
 }
 
-.manuscript-suggested-action-selected {
-  box-shadow: inset 0 0 0 1px rgb(from var(--color-text-inverse) r g b / 20%);
+/* Selecting a choice tints the whole card, which moves the surface under every
+   quiet mark on it while their colors stay put. Both of these were tuned
+   against an untinted card and fall under 4.5:1 once it is selected. */
+
+/* The keycap sits on a transparent background, so it inherits the tint
+   directly: 3.99:1 light / 3.85:1 dark. One step up the text ramp restores it
+   without promoting the keycap to label weight.
+   Specificity note: the base `:root .manuscript-choice-kbd` rule below ties
+   with a two-class selector and wins on order, so this chains :root too. */
+:root .manuscript-suggested-action-selected .manuscript-choice-kbd {
+  color: var(--color-text-secondary);
+}
+
+/* The badge paints its own accent tint, so on a selected card that tint stacks
+   on the card's - and `--color-accent` is the wrong token for accent-sized text
+   on accent-soft in the first place; `--color-accent-strong` is defined for
+   exactly that. Dropping the second tint is what fixes dark mode, where
+   accent-strong is deliberately identical to accent. */
+.manuscript-suggested-action-selected .manuscript-skill-check-badge {
+  background: transparent;
+  color: var(--color-accent-strong);
 }
 
 .manuscript-secondary-controls {
@@ -1863,10 +1822,6 @@ body.manuscript-overlay-open {
     align-items: center;
   }
 
-  #manuscript-action-rail {
-    padding: var(--space-3);
-  }
-
   .manuscript-warning-action-button {
     padding: var(--space-2) var(--space-3);
     height: 2rem;
@@ -1883,10 +1838,6 @@ body.manuscript-overlay-open {
 @media (width >= 640px) and (width < 1024px) {
   .manuscript-overlay-header {
     align-items: center;
-  }
-
-  #manuscript-action-rail {
-    padding: var(--space-4);
   }
 
   .manuscript-warning-action-button {
@@ -1925,10 +1876,6 @@ body.manuscript-overlay-open {
 @media (width >= 1024px) {
   .manuscript-character-summary-columns {
     grid-template-columns: 1fr 1fr;
-  }
-
-  #manuscript-action-rail {
-    padding: var(--space-4);
   }
 
   .manuscript-suggested-actions-grid {
@@ -2390,11 +2337,11 @@ body.manuscript-overlay-open {
 .manuscript-generation-error-title {
   font-family: var(--font-interface), system-ui, sans-serif;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--color-text-primary);
 }
 
 .manuscript-generation-error-message {
-  color: var(--color-text);
+  color: var(--color-text-primary);
   font-size: var(--font-size-sm);
 }
 
@@ -2659,21 +2606,16 @@ body.manuscript-overlay-open {
   grid-template-columns: 1fr;
 }
 
-:root .manuscript-rail-spacer {
-  display: none;
-}
-
 /* Scene status as a compact console bar above the narrative. */
 :root .manuscript-characters-rail {
   display: block;
   margin-bottom: var(--space-3);
 }
 
-/* Top/bottom padding trimmed from 5rem/7.5rem — the original values left a
-   ~193px empty band between short narrative content and the docked choices
-   rail on tall viewports. */
+/* The bottom padding is the document's trailing margin, not a gap before a
+   docked panel — the decision block supplies its own. */
 :root .manuscript-main-content {
-  padding: 3rem var(--space-6) 4rem;
+  padding: 3rem var(--space-6) 0;
 }
 
 /* Dot grid background overlay — same canonical pattern as the app surface
@@ -2807,17 +2749,23 @@ body.manuscript-overlay-open {
 
 :root .manuscript-suggested-action:hover {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-float);
+  box-shadow: var(--shadow-overlay);
 }
 
 :root .manuscript-suggested-action:hover::before {
   background: var(--color-accent);
 }
 
+/* `--color-accent-fill` was never defined anywhere, so this rule painted no
+   background at all while the base `.is-selected` rule's white
+   `--color-on-accent` text still applied — the chosen action rendered white on
+   the cream surface at roughly 1.1:1. The soft accent tint is what the accent
+   border was always drawn against; text stays on the primary color. */
 :root .manuscript-suggested-action.is-selected,
 :root .manuscript-suggested-action[aria-pressed="true"] {
-  background: var(--color-accent-fill);
+  background: var(--color-accent-soft);
   border-color: var(--color-accent);
+  color: var(--color-text-primary);
 }
 
 :root .manuscript-suggested-action-label {
@@ -2991,22 +2939,6 @@ body.manuscript-overlay-open {
 
 /* Desktop override: keep single column */
 @media (width >= 1024px) {
-  :root .manuscript-main-stage {
-    grid-template-columns: 1fr;
-  }
-
-  /* Keep the narrative in the single column. The desktop base places
-     .manuscript-main-content in grid-column 2; without this reset it lands in
-     an implicit second column and the scene-status rail inflates column 1,
-     splitting the stage instead of stacking the scene bar above the narrative. */
-  :root .manuscript-main-content {
-    grid-column: 1;
-  }
-
-  :root .manuscript-rail-spacer {
-    display: none;
-  }
-
   :root .manuscript-suggested-actions-grid {
     grid-template-columns: 1fr;
   }
@@ -3109,6 +3041,41 @@ body.manuscript-overlay-open {
   white-space: nowrap;
 }
 
+/* Offered instead of scrolling the reader down against their will: a new beat
+   arrived while they were further up, and this is the way back to it. Fixed
+   rather than sticky because the narrative is in the page flow now and has no
+   box of its own to pin against. */
+:root .narrative-jump-to-latest {
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-overlay);
+  color: var(--color-text-primary);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+:root .narrative-jump-to-latest:hover {
+  background: var(--color-surface-hover);
+}
+
+:root .narrative-jump-to-latest:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* DS3 save indicator — compact status dot */
 :root .manuscript-save-indicator {
   border: none;
@@ -3189,7 +3156,7 @@ body.manuscript-overlay-open {
 }
 
 :root .manuscript-evaluating-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-system);
   font-size: 0.6875rem;
   color: var(--color-text-muted);
   letter-spacing: 0.04em;
@@ -3245,7 +3212,12 @@ body.manuscript-overlay-open {
   max-width: 42.5rem;
 }
 
-/* DS3 choice cards — neutral colors, not alignment-tinted */
+/* DS3 choice cards — neutral colors, not alignment-tinted. The unaligned card
+   used to be left out of this list, so it alone fell through to the generic
+   secondary-button fill and rendered as the heaviest option on the rail. Weight
+   should track consequence, and an unaligned choice is the least consequential
+   one there. */
+:root .manuscript-suggested-action,
 :root .manuscript-suggested-action.manuscript-suggested-action-lawful,
 :root .manuscript-suggested-action.manuscript-suggested-action-chaotic {
   background: var(--color-surface);
@@ -3268,16 +3240,31 @@ body.manuscript-overlay-open {
   display: none;
 }
 
-/* DS3 action rail — border-top only, no radius, tighter padding (Pass 8, fix 5) */
-:root #manuscript-action-rail {
-  background: var(--color-overlay-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* DS3 input label hidden — uses placeholder text only */
+:root .manuscript-input-label {
+  display: none;
+}
+
+/* DS3 decision block — set in the page, not floated over it. Padding matches
+   .manuscript-main-content's horizontal rhythm so the choices hold the same
+   measure as the prose above them. */
+:root #manuscript-decision-block {
+  background: transparent;
   border: none;
-  border-top: 1px solid var(--color-border);
-  border-radius: 0;
   box-shadow: none;
-  padding: var(--space-3) var(--space-6);
+  padding: 0 var(--space-6) var(--space-6);
+}
+
+/* The beat break: the same labelled rule the narrative already uses between
+   segments, so the decision reads as part of the story rather than a control
+   panel bolted to it. */
+:root .manuscript-decision-block-mark {
+  height: 1px;
+  background: var(--color-border);
+  width: 320px;
+  max-width: 60%;
+  margin: 0 auto var(--space-5);
+  opacity: 0.6;
 }
 
 /* DS3 end story button hidden — exit action is in HUD icon toolbar */
@@ -3594,7 +3581,10 @@ body.manuscript-overlay-open {
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-  color: var(--color-text-muted);
+
+  /* Muted ink measures 4.30:1 against the scene-status bar, under AA for text
+     this size. Secondary clears it at 5.04:1 and still reads as a label. */
+  color: var(--color-text-secondary);
 }
 
 .scene-status-location-value {

@@ -1,6 +1,6 @@
 # Narrative Component System
 
-This is the heart of the storytelling engine - where your choices turn into new story segments and the AI keeps everything feeling consistent with your world's tone and rules. The challenge was building something that feels like playing with a really good game master who remembers everything.
+Turns your choices into new story segments while keeping things consistent with your world's tone and rules — the goal was something that feels like a game master who remembers everything.
 
 ## Components Overview
 
@@ -38,7 +38,7 @@ This handles showing individual story segments with the right formatting and sty
 **What it does:**
 - Formats different types of content appropriately (description, dialogue, action)
 - Shows a nice loading animation while the AI is thinking
-- Handles errors gracefully with clear messages
+- Shows clear error messages instead of a blank screen
 - Parses content that comes back as JSON and extracts the actual story text
 - Displays location info when the AI includes it
 
@@ -145,7 +145,7 @@ The system actually pays attention to the world you've created and generates con
 
 **Optimized rendering** - Components are built to avoid unnecessary re-renders, which keeps things smooth even with long story histories.
 
-**Flexible parsing** - Handles different AI response formats gracefully, so slight variations in the AI's output don't break the experience.
+**Flexible parsing** - Accepts different AI response formats, so slight variations in the AI's output don't break the experience.
 
 ## AI Choice Generation
 
@@ -165,7 +165,7 @@ The system also creates your next set of choices automatically, which keeps the 
 
 **Complete context** - Assembles world data, recent narrative history, and character info to give the AI the full picture.
 
-**Resilient design** - Built to handle failures gracefully so one broken AI call doesn't stop your game.
+**Resilient design** - One broken AI call doesn't stop your game; it retries or falls back instead.
 
 **Persistent storage** - Generated choices are saved to the store so they survive page refreshes and can be referenced later.
 
