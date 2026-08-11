@@ -7,7 +7,6 @@ import { capitalize, truncate, safeTrim, getTimestamp } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 
 import Logger from '@/lib/utils/logger';
-import { isStorybookEnv } from '@/lib/utils/isStorybookEnv';
 const logger = new Logger('PortraitGenerator');
 
 interface PortraitGenerationOptions {
@@ -577,31 +576,6 @@ export async function generatePortrait(
   }
 
   try {
-    if (isStorybookEnv()) {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      const mockPortraits: Record<string, string> = {
-        fantasy: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iZmFjZSIgY3g9IjUwJSIgY3k9IjMwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkUwQjI7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I0Q4OTg2ODtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjMmY0ZjJmIi8+CiAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjEwMCIgcng9IjYwIiByeT0iODAiIGZpbGw9InVybCgjZmFjZSkiLz4KICA8Y2lyY2xlIGN4PSI4NSIgY3k9Ijg1IiByPSI1IiBmaWxsPSIjMzMzIi8+CiAgPGNpcmNsZSBjeD0iMTE1IiBjeT0iODUiIHI9IjUiIGZpbGw9IiMzMzMiLz4KICA8cGF0aCBkPSJNOTAgMTA1IFEgMTAwIDExNSAxMTAgMTA1IiBzdHJva2U9IiMzMzMiIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjEwMCIgeT0iMjMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNGRkZGRkYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZBTlRBU1kgUE9SVFJBSVQ8L3RleHQ+Cjwvc3ZnPg==',
-        modern: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iZmFjZTIiIGN4PSI1MCUiIGN5PSIzMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRkZEQkIyO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNEOEE4Nzg7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2Y1ZjVmNSIvPgogIDxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxMDAiIHJ4PSI2MCIgcnk9IjgwIiBmaWxsPSJ1cmwoI2ZhY2UyKSIvPgogIDxyZWN0IHg9IjQwIiB5PSI5NSIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0IiBmaWxsPSIjNDQ0IiBvcGFjaXR5PSIwLjMiLz4KICA8Y2lyY2xlIGN4PSI4NSIgY3k9Ijg1IiByPSI1IiBmaWxsPSIjMzMzIi8+CiAgPGNpcmNsZSBjeD0iMTE1IiBjeT0iODUiIHI9IjUiIGZpbGw9IiMzMzMiLz4KICA8cGF0aCBkPSJNOTAgMTA1IFEgMTAwIDExNSAxMTAgMTA1IiBzdHJva2U9IiMzMzMiIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjEwMCIgeT0iMjMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk1PREVSTU4gUE9SVFJBSVQ8L3RleHQ+Cjwvc3ZnPg==',
-        default: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iZmFjZTMiIGN4PSI1MCUiIGN5PSIzMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRkZFNEMyO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNEOEE4Nzg7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iIzMzMzMzMyIvPgogIDxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxMDAiIHJ4PSI2MCIgcnk9IjgwIiBmaWxsPSJ1cmwoI2ZhY2UzKSIvPgogIDxjaXJjbGUgY3g9Ijg1IiBjeT0iODUiIHI9IjUiIGZpbGw9IiMzMzMiLz4KICA8Y2lyY2xlIGN4PSIxMTUiIGN5PSI4NSIgcj0iNSIgZmlsbD0iIzMzMyIvPgogIDxwYXRoIGQ9Ik05MCD2NTMgUaEwIDExNSAMIDSNIHN0cm9rZT0iIzMzMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMTAwIiB5PSIyMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UE9SVFJBSVQ8L3RleHQ+Cjwvc3ZnPg==',
-      };
-
-      const genreLC = options.worldGenre?.toLowerCase() || 'default';
-      let mockPortrait = mockPortraits.default;
-      if (genreLC.includes('fantasy') || genreLC.includes('medieval')) {
-        mockPortrait = mockPortraits.fantasy;
-      } else if (genreLC.includes('modern') || genreLC.includes('contemporary')) {
-        mockPortrait = mockPortraits.modern;
-      }
-
-      return {
-        type: 'ai-generated',
-        url: mockPortrait,
-        generatedAt: getTimestamp(),
-        prompt: `Mock portrait for ${character.name} in Storybook`,
-      };
-    }
-
     const detection = await detectKnownFigure(aiClient, character.name);
 
     if (detection.isKnownFigure && (

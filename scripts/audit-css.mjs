@@ -64,6 +64,8 @@ const SAFELIST = {
     /^ending-/, // EndingScreen.tsx: `ending-${tone}`
     /^manuscript-alignment-badge-/, // RequirementBadges.tsx: `...-${alignment}`
     /^card-action-variant-/, // CardActionGroup.tsx: `card-action-variant-${variant}`
+    /^error-display-/, // ErrorDisplay.tsx: `error-display-${severity}`
+    /^component-character-portrait-/, // CharacterPortrait.tsx: `component-character-portrait-${size}`
   ],
   standard: [
     'dark', // documentElement.classList.add('dark')

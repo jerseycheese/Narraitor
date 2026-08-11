@@ -6,8 +6,6 @@ describe('ManuscriptFloatingHud accessibility', () => {
   const baseProps = {
     onToggleCharacterSummary: jest.fn(),
     isCharacterSummaryExpanded: false,
-    onToggleToolsMenu: jest.fn(),
-    isToolsMenuOpen: false,
     drawerTriggers: true,
   };
 

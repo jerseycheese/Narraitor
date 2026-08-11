@@ -1,7 +1,7 @@
 // src/app/api/narrative/generate/route.ts
 
 import { NextRequest } from 'next/server';
-import { processGeminiStreamingTextRequest } from '../../../../utils/apiHelpers';
+import { processGeminiStreamingTextRequest } from '@/utils/apiHelpers';
 
 // Vercel function budget. Must be a static literal (Next.js segment config);
 // sized as the single 30s Gemini attempt (GEMINI_ATTEMPT_TIMEOUT_MS in

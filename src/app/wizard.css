@@ -730,14 +730,6 @@
   gap: var(--space-2);
 }
 
-.wizard-page-header-row {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
 .wizard-page-title {
   font-family: var(--font-interface);
   font-size: var(--font-size-2xl);
@@ -755,13 +747,6 @@
 }
 
 /* ─── Step Headers / Sections ─── */
-
-.wizard-step-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin-bottom: var(--space-6);
-}
 
 .wizard-form-section {
   display: flex;
@@ -816,69 +801,10 @@
   margin-top: var(--space-6);
 }
 
-/* ─── Archetype / character template grid ─── */
-
-.wizard-archetype-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--space-6);
-  align-items: stretch;
-}
-
-@media (width <= 1024px) {
-  .wizard-archetype-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.wizard-archetype-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-}
-
-.wizard-archetype-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.wizard-archetype-section-heading {
-  font-family: var(--font-system);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-  margin: 0;
-}
-
-.wizard-archetype-quote {
-  font-style: italic;
-}
-
 .wizard-badge-row {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
-}
-
-/* ─── Info banner ─── */
-
-.wizard-info-banner {
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-accent-soft);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-}
-
-.wizard-info-banner p {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
-  margin: 0;
-  line-height: 1.5;
 }
 
 /* ─── Empty / loading states ─── */
@@ -897,24 +823,6 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   text-align: center;
-}
-
-/* ─── Help text under wizard sections ─── */
-
-.wizard-help-row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  align-items: center;
-  text-align: center;
-  margin-top: var(--space-4);
-}
-
-.wizard-help-row p {
-  font-family: var(--font-interface);
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  margin: 0;
 }
 
 /* ─── Range sliders / point-pool controls ─── */
@@ -1145,10 +1053,6 @@
   color: var(--color-text-muted);
 }
 
-:root .wizard-page .wizard-archetype-grid .wizard-step-title::before {
-  content: none;
-}
-
 :root .wizard-page .wizard-form-section {
   position: relative;
   padding-top: var(--space-4);
@@ -1189,8 +1093,7 @@
   font-family: var(--font-interface);
 }
 
-:root .wizard-page .wizard-card,
-:root .wizard-page .wizard-panel {
+:root .wizard-page .wizard-card {
   border-radius: var(--radius-sm);
 }
 
@@ -1223,68 +1126,7 @@
   border-radius: var(--radius-sm);
 }
 
-/* DS3 step content — monospace card titles, dotted divider/action-row
-   accents reusing the canon connector pattern, rounded-square chips. */
-
-:root .wizard-page .wizard-card-title {
-  font-family: var(--font-system);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
-
-:root .wizard-page .wizard-card-actions {
-  position: relative;
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
-}
-
-:root .wizard-page .wizard-card-actions::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 8px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
-}
-
-:root .wizard-page .wizard-template-mode-divider {
-  font-family: var(--font-system);
-  letter-spacing: 0.1em;
-}
-
-:root .wizard-page .wizard-template-mode-divider::before,
-:root .wizard-page .wizard-template-mode-divider::after {
-  width: 2.5rem;
-  height: 4px;
-  background: transparent;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 8px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
-}
-
-:root .wizard-page .wizard-archetype-section-heading {
-  font-family: var(--font-system);
-  letter-spacing: 0.1em;
-}
-
-:root .wizard-page .wizard-archetype-section-heading::before {
-  content: "• ";
-  color: var(--color-text-muted);
-}
+/* DS3 step content — dotted rounded-square chips. */
 
 :root .wizard-page .wizard-badge {
   border-radius: 3px;
@@ -1298,37 +1140,9 @@
   font-size: var(--font-size-xs);
 }
 
-:root .wizard-page .wizard-info-banner {
-  border-radius: var(--radius-sm);
-  border-style: dashed;
-}
-
 :root .wizard-page .wizard-empty-state {
   border-radius: var(--radius-sm);
   font-family: var(--font-system);
-}
-
-:root .wizard-page .wizard-help-row {
-  position: relative;
-  padding-top: var(--space-4);
-}
-
-:root .wizard-page .wizard-help-row::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-border) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.5;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1524,13 +1338,6 @@
   :root .component-world-creation-wizard .wizard-nav-group > *,
   :root .component-character-creation-wizard .wizard-nav-group > * {
     flex: 1 1 auto;
-  }
-}
-
-@media (width < 768px) {
-  .component-create-character-page .wizard-page-header-row {
-    flex-direction: column;
-    align-items: stretch;
   }
 }
 
