@@ -66,6 +66,10 @@ const SAFELIST = {
     /^card-action-variant-/, // CardActionGroup.tsx: `card-action-variant-${variant}`
     /^error-display-/, // ErrorDisplay.tsx: `error-display-${severity}`
     /^component-character-portrait-/, // CharacterPortrait.tsx: `component-character-portrait-${size}`
+    // CharacterPropertyGrid.tsx: `character-${kind}-grid`, `-categories`, `-category`,
+    // `-category-heading`, `component-character-${kind}-display` (kind: 'attribute' | 'skill')
+    /^character-(attribute|skill)-(grid|categories|category|category-heading)$/,
+    /^component-character-(attribute|skill)-display$/,
   ],
   standard: [
     'dark', // documentElement.classList.add('dark')

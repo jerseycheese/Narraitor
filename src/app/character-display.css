@@ -5,6 +5,50 @@
    All values use design tokens for theme-awareness.
    ═══════════════════════════════════════════════════════════════ */
 
+/* ─── Empty State ─── */
+
+.component-character-attribute-display .character-display-empty,
+.component-character-skill-display .character-display-empty {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-4) 0;
+}
+
+/* ─── Categories Container ─── */
+
+.character-attribute-categories,
+.character-skill-categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ─── Category ─── */
+
+.character-attribute-category,
+.character-skill-category {
+  display: flex;
+  flex-direction: column;
+}
+
+.character-attribute-category-heading,
+.character-skill-category-heading {
+  margin: 0 0 var(--space-3) 0;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+}
+
+/* ─── Grid ─── */
+
+.character-attribute-grid,
+.character-skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-4);
+}
+
 /* ─── Cards ─── */
 
 .character-attribute-card,
