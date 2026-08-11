@@ -242,6 +242,33 @@ describe('useKeyboardShortcuts', () => {
       expect(mockAction).toHaveBeenCalled();
     });
 
+    test('opts in only from the field a predicate names', () => {
+      const other = document.createElement('select');
+      document.body.appendChild(other);
+
+      const shortcuts = [
+        {
+          key: '1',
+          action: mockAction,
+          description: 'Select first',
+          ignoreInputs: (target: EventTarget | null) => target === input,
+        },
+      ];
+      renderHook(() => useKeyboardShortcuts(shortcuts));
+
+      act(() => {
+        other.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true }));
+      });
+      expect(mockAction).not.toHaveBeenCalled();
+
+      act(() => {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true }));
+      });
+      expect(mockAction).toHaveBeenCalled();
+
+      other.remove();
+    });
+
     test('leaves an unrelated key typed into an input alone', () => {
       const shortcuts = [
         { key: '1', action: mockAction, description: 'Select first', ignoreInputs: true },

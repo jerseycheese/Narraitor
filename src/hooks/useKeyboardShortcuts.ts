@@ -9,7 +9,12 @@ export interface KeyboardShortcut {
   metaKey?: boolean;
   action: () => void;
   description: string;
-  ignoreInputs?: boolean;
+  /**
+   * Stay live while a field holds focus. `true` opts in from every input-like
+   * element on the page; a predicate narrows that to the fields it names,
+   * which is what a document-level listener usually wants.
+   */
+  ignoreInputs?: boolean | ((target: EventTarget | null) => boolean);
 }
 
 /**
@@ -42,7 +47,11 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], enabled: boo
     // Typing in a field wins over a shortcut unless that shortcut opts in.
     // Matching first, then deciding, is what makes the opt-in possible: an
     // unmatched key never reaches this branch, so it types normally.
-    if (isInputElement(event.target) && !matchingShortcut.ignoreInputs) {
+    const { ignoreInputs } = matchingShortcut;
+    const optedIn =
+      typeof ignoreInputs === 'function' ? ignoreInputs(event.target) : !!ignoreInputs;
+
+    if (isInputElement(event.target) && !optedIn) {
       return;
     }
 

@@ -139,18 +139,24 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   //
   // They stay live while the composer holds focus but is still empty, which is
   // where a player lands most turns. Once there's text in it, a digit belongs
-  // to the sentence being written, so the opt-in switches back off.
+  // to the sentence being written, so the opt-in switches back off. The
+  // listener is document-level, so the opt-in names this composer specifically
+  // rather than every field on the page.
   const isComposerEmpty = customInputText.length === 0;
+  const isComposerAwaitingFirstKey = useCallback(
+    (target: EventTarget | null) => target === inputRef.current && isComposerEmpty,
+    [isComposerEmpty]
+  );
   const choiceShortcuts: KeyboardShortcut[] = useMemo(
     () =>
       allOptions.slice(0, 9).map((option, index) => ({
         key: String(index + 1),
         description: `Select "${option.text}"`,
-        ignoreInputs: isComposerEmpty,
+        ignoreInputs: isComposerAwaitingFirstKey,
         action: () =>
           handleOptionSelect(option.id, option.isDisabledByRequirements ?? false),
       })),
-    [allOptions, handleOptionSelect, isComposerEmpty]
+    [allOptions, handleOptionSelect, isComposerAwaitingFirstKey]
   );
   useKeyboardShortcuts(choiceShortcuts, !isDisabled && !shortcutsSuspended);
 
