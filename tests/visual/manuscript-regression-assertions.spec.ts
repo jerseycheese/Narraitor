@@ -70,7 +70,7 @@ const seedMarginaliaLoreFact = async (page: Page) => {
 };
 
 test.describe('Manuscript regression assertions', () => {
-  test('Play surface keeps location visible and scrolls new segments into view', async ({ page }) => {
+  test('Play surface keeps location visible and offers the way back to a new segment', async ({ page }) => {
     await seedTestData(page);
     await mockApiEndpoints(page);
 
@@ -119,6 +119,17 @@ test.describe('Manuscript regression assertions', () => {
       scroller.scrollTo({ top: 0, behavior: 'auto' });
     });
 
+    // The scroll event is what tells the surface the reader has taken over.
+    // Adding a segment before it lands races that handover — and the race is
+    // why this spec passed locally while failing in CI.
+    await page.waitForFunction(
+      () => {
+        const scroller = document.querySelector('.manuscript-overlay-main') as HTMLElement | null;
+        return !!scroller && scroller.scrollTop === 0;
+      },
+      { timeout: 10000 }
+    );
+
     const finalSegmentText =
       'The newest result lands on the page after the player commits to the route, and it must be brought into view by the play surface scroll controller.';
 
@@ -142,6 +153,20 @@ test.describe('Manuscript regression assertions', () => {
         timestamp: new Date('2024-01-01T02:25:00.000Z'),
       });
     }, finalSegmentText);
+
+    // The reader scrolled up, so the new beat must not move them. It waits at
+    // the bottom behind an affordance instead — this used to scroll into view
+    // on its own, which is the yank the play surface no longer performs.
+    const jumpToLatest = page.getByRole('button', { name: /jump to latest/i });
+    await expect(jumpToLatest).toBeVisible({ timeout: 10000 });
+
+    const heldPosition = await page.evaluate(() => {
+      const scroller = document.querySelector('.manuscript-overlay-main') as HTMLElement | null;
+      return scroller?.scrollTop ?? -1;
+    });
+    expect(heldPosition).toBe(0);
+
+    await jumpToLatest.click();
 
     await page.waitForFunction(
       (content) => {
