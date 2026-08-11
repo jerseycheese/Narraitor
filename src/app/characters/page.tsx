@@ -427,7 +427,7 @@ export default function CharactersPage() {
     } catch {
       addToast({
         title: 'Delete Failed',
-        description: 'Failed to delete character. Please try again.',
+        description: "Couldn't delete this character. Try again in a moment.",
         variant: 'error',
       });
       setDeleteDialog((prev) => ({ ...prev, isDeleting: false }));

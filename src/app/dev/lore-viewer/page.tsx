@@ -141,9 +141,9 @@ export default function LoreViewerTestPage() {
       const afterCount = getFacts({ worldId }).length;
       const extracted = afterCount - beforeCount;
 
-      status.show(`AI extraction successful! Added ${extracted} facts with robust error handling.`);
+      status.show(`AI extraction successful! Added ${extracted} facts.`);
     } catch (error) {
-      status.show(`AI extraction failed gracefully: ${error}`);
+      status.show(`AI extraction failed: ${error}`);
     }
   };
 

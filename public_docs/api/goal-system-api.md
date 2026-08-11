@@ -63,7 +63,7 @@ clearSessionGoals(sessionId: EntityID): void
 ```
 
 #### AI Integration
-This is where the magic happens - automatically detecting goals from narrative content:
+Automatically detects goals from narrative content:
 
 ```typescript
 // Process narrative segment for goal extraction. Takes the segment object, not its ID,
@@ -198,7 +198,7 @@ interface GoalExtractionResult {
 
 ## Error Handling
 
-The goal system is designed to fail gracefully because we're dealing with AI that can be unpredictable and user content that can be messy.
+The goal system is designed to keep working when things go wrong, because we're dealing with AI that can be unpredictable and user content that can be messy.
 
 ### Validation
 - Goal creation requires title, description, and sessionId
@@ -209,7 +209,7 @@ The goal system is designed to fail gracefully because we're dealing with AI tha
 When the AI fails to extract goals properly, we fall back to pattern matching. It's not as smart, but it's reliable:
 
 - Pattern matching when AI extraction fails
-- Graceful degradation for missing data
+- Falls back to a default when data is missing
 - Silent failures for non-critical operations
 
 ### Error States

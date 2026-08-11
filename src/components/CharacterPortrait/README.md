@@ -4,7 +4,7 @@ This component handles displaying character portraits throughout the app. The ch
 
 ## What It Does
 
-The component shows character portraits using actual AI-generated images when available, but gracefully handles all the edge cases:
+The component shows character portraits using actual AI-generated images when available, and covers the edge cases:
 
 - **Real AI-Generated Portraits**: Uses Google's Imagen 3.0 API for actual character portraits
 - **Intelligent Fallbacks**: Character-specific SVG placeholders when API unavailable

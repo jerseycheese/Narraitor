@@ -44,7 +44,7 @@ Explain what's being tested and why, not just a checklist of test types.
 
 **Integration Tests**: How components work together or interact with stores/APIs. Explain what scenarios are covered.
 
-**Edge Cases**: Specific weird situations that needed test coverage, like "handles missing data gracefully" or "recovers from network failures."
+**Edge Cases**: Specific weird situations that needed test coverage — describe what actually happens, like "shows a placeholder when the avatar fails to load" or "retries once before showing an error banner."
 
 ## Verification Steps
 

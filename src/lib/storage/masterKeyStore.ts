@@ -11,9 +11,8 @@
  * The CryptoKey is stored with `extractable: false`, so even if hostile script
  * gets a reference it cannot `exportKey` the raw bytes out of the browser.
  *
- * Everything degrades gracefully: with no IndexedDB (private mode, SSR, old
- * browsers) load/clear are no-ops and the caller falls back to an in-memory key
- * for the session.
+ * With no IndexedDB (private mode, SSR, old browsers), load/clear are no-ops
+ * and the caller falls back to an in-memory key for the session.
  */
 
 const DB_NAME = 'narraitor-secure';

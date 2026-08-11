@@ -155,14 +155,11 @@ The design principles behind these components:
 4. **Type Safety**: Full TypeScript support so you can't accidentally pass the wrong data
 5. **Testing**: Components include proper data-testid attributes
 
-## Recent Improvements
+## Layout Integration
 
-These components got some love as part of the walkthrough improvements:
-
-- **Better Navigation Integration**: Cards now work seamlessly with the improved Navigation component
-- **Enhanced Visual Design**: Updated button styling and spacing that actually looks professional
-- **Smarter Action Button Layouts**: More intuitive groupings of primary vs secondary actions
-- **PageLayout Integration**: Everything plays nicely with the new PageLayout component structure
+- **Navigation**: Cards integrate with the Navigation component for consistent world switching and actions
+- **Button layout**: Primary and secondary actions are grouped separately so the main action stands out
+- **PageLayout**: Cards compose with the shared PageLayout component for consistent page structure
 
 ## Related Components
 

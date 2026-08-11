@@ -58,7 +58,7 @@ describe('ExportImportControls', () => {
       fireEvent.click(exportButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/export failed/i)).toBeInTheDocument();
+        expect(screen.getByText(/couldn't export your data/i)).toBeInTheDocument();
       });
     });
   });

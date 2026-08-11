@@ -144,7 +144,7 @@ Goals persist across browser sessions using IndexedDB:
 - **Caching**: Reuses context when appropriate
 
 ### Error Handling
-- **Graceful Degradation**: System continues without goals if needed
+- **Fallback**: System continues without goals if needed
 - **Fallback Mechanisms**: Pattern matching when AI fails
 - **Validation**: Ensures data integrity throughout lifecycle
 
@@ -204,7 +204,7 @@ const completionRate = completedGoals.length / (completedGoals.length + activeGo
 ### Error Resilience
 - Always provide fallback behavior
 - Validate goal data before processing
-- Handle AI service failures gracefully
+- Handle AI service failures instead of letting them crash the session
 - Log errors for debugging without breaking UX
 
 ### Testing Strategy
