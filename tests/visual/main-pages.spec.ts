@@ -66,6 +66,11 @@ test.describe('Main Pages Visual Tests', () => {
     await page.reload();
 
     await waitForContentStable(page);
+    // Same webfont-swap flake as the empty-state test above: the world/character
+    // names in the Continue card render in the italic Newsreader webfont
+    // (--font-narrative, next/font with display: 'swap'), so an occasional slow
+    // font fetch leaves fallback-font glyphs painted at screenshot time.
+    await page.evaluate(() => document.fonts.ready);
     await hideDynamicContent(page);
     // Ensure the Continue section appears (seeded session present)
     await page.waitForSelector('[aria-labelledby="continue-game-heading"]', { timeout: 8000 });

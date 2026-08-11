@@ -10,7 +10,13 @@ export const firstPlayTour: Step[] = [
   {
     target: '[data-tutorial="narrative-display"]',
     content: 'This is where your story unfolds. Read the narrative carefully as it adapts to your choices.',
-    placement: 'auto',
+    placement: 'bottom',
+    // The narrative sits directly above the decision block with no reserved
+    // gap (the action rail was removed -- #1750), so Joyride's default
+    // placement lands the tooltip on top of the choice buttons instead of in
+    // dead space below the narrative -- there isn't any. Pull it back up over
+    // the narrative itself, which is what this step is describing anyway.
+    offset: -140,
     data: { autoScroll: 'down' },
   },
   {

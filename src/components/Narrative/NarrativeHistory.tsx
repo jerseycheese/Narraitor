@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { NarrativeDisplay } from './NarrativeDisplay';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -60,6 +60,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   const prevSegmentCountRef = useRef(segments.length);
   const hasUserScrollInteractionRef = useRef(false);
   const isNearBottomRef = useRef(true);
+  const hasSettledInitialScrollRef = useRef(false);
+  const [hasUnreadBelow, setHasUnreadBelow] = useState(false);
 
   const { renderedSegments } = useBufferedNarrativeSegments(segments, { isHydrating });
 
@@ -79,40 +81,70 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     // If user scrolled up significantly, mark as manual scroll
     if (!isNearBottomRef.current) {
       hasUserScrollInteractionRef.current = true;
+    } else {
+      // Back at the latest beat under their own steam — nothing left to catch up on.
+      setHasUnreadBelow(false);
     }
   }, [getIsNearBottom]);
 
-  // Auto-scroll to the newest segment when one is appended. A new segment
-  // means the player advanced the story (a deliberate turn), so re-arm
-  // bottom-anchoring and scroll into view even if they'd scrolled up to
-  // re-read — the streaming-growth ResizeObserver then keeps it in view (F51).
+  // A new segment lands below whatever the player is reading. Follow it down
+  // only if they were already at the bottom; if they'd scrolled up to re-read,
+  // the sentence under their eye holds position and they get a way back
+  // instead. Yanking them to the newest beat mid-sentence is the one motion
+  // this surface must not make.
   useEffect(() => {
     if (segments.length > prevSegmentCountRef.current && scrollViewportRef.current) {
-      hasUserScrollInteractionRef.current = false;
-      isNearBottomRef.current = true;
-      scrollViewportRef.current.scrollTo({
-        top: scrollViewportRef.current.scrollHeight,
-        behavior: 'auto'
-      });
+      const wasFollowing =
+        !hasUserScrollInteractionRef.current || isNearBottomRef.current;
+
+      if (wasFollowing) {
+        isNearBottomRef.current = true;
+        scrollViewportRef.current.scrollTo({
+          top: scrollViewportRef.current.scrollHeight,
+          behavior: 'auto'
+        });
+      } else {
+        setHasUnreadBelow(true);
+      }
     }
     prevSegmentCountRef.current = segments.length;
   }, [segments.length]);
 
-  // Auto-scroll to bottom on initial load for existing sessions
-  useEffect(() => {
-    if (segments.length > 0 && scrollViewportRef.current && !isLoading && !disableInitialAutoScroll) {
-      // Use a small delay to ensure content is rendered
-      const scrollTimer = setTimeout(() => {
-        if (scrollViewportRef.current) {
-          scrollViewportRef.current.scrollTo({
-            top: scrollViewportRef.current.scrollHeight,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+  const jumpToLatest = useCallback(() => {
+    if (!scrollViewportRef.current) return;
+    hasUserScrollInteractionRef.current = false;
+    isNearBottomRef.current = true;
+    setHasUnreadBelow(false);
+    scrollViewportRef.current.scrollTo({
+      top: scrollViewportRef.current.scrollHeight,
+      behavior: 'smooth'
+    });
+  }, []);
 
-      return () => clearTimeout(scrollTimer);
-    }
+  // Open a resumed session at its latest beat — once. This used to re-fire on
+  // every segment because segments.length is a dependency, which would scroll
+  // the reader down 100ms after the effect above had deliberately left them
+  // where they were. It can't run on mount (the viewport ref is resolved by a
+  // later effect), so the run that counts is the one after isLoading flips.
+  useEffect(() => {
+    if (hasSettledInitialScrollRef.current) return;
+    if (disableInitialAutoScroll || isLoading || segments.length === 0) return;
+    if (!scrollViewportRef.current) return;
+
+    hasSettledInitialScrollRef.current = true;
+
+    // Use a small delay to ensure content is rendered
+    const scrollTimer = setTimeout(() => {
+      // Skip if they started reading somewhere else during the delay.
+      if (scrollViewportRef.current && !hasUserScrollInteractionRef.current) {
+        scrollViewportRef.current.scrollTo({
+          top: scrollViewportRef.current.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+
+    return () => clearTimeout(scrollTimer);
   }, [segments.length, isLoading, disableInitialAutoScroll]);
 
   // Keyboard navigation handler with snap-to-center behavior
@@ -369,6 +401,16 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           {renderContent()}
         </div>
       </ScrollArea>
+
+      {hasUnreadBelow && (
+        <button
+          type="button"
+          className="narrative-jump-to-latest"
+          onClick={jumpToLatest}
+        >
+          Jump to latest
+        </button>
+      )}
     </div>
   );
 };

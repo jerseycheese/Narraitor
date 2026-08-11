@@ -143,7 +143,7 @@ test.describe('Manuscript Layout Specific Tests', () => {
     await resetPlaySurfaceScroll(page);
 
     await expect(page.locator('[data-testid="manuscript-session-shell"]')).toBeVisible();
-    await expect(page.locator('[data-testid="manuscript-action-rail"]')).toBeVisible();
+    await expect(page.locator('[data-testid="manuscript-decision-block"]')).toBeVisible();
 
     await expect(page.getByRole('button', { name: /close/i })).toBeVisible();
 
@@ -189,27 +189,27 @@ test.describe('Manuscript Layout Specific Tests', () => {
 
     const mobileLayout = await page.evaluate(() => {
       const rail = document.querySelector('.manuscript-characters-rail');
-      const actionRail = document.querySelector('#manuscript-action-rail');
+      const decisionBlock = document.querySelector('#manuscript-decision-block');
       const choiceCount = document.querySelectorAll('.manuscript-suggested-action').length;
 
-      if (!rail || !actionRail) return null;
+      if (!rail || !decisionBlock) return null;
 
       return {
         railDisplay: window.getComputedStyle(rail).display,
-        actionRailDisplay: window.getComputedStyle(actionRail).display,
+        decisionBlockDisplay: window.getComputedStyle(decisionBlock).display,
         choiceCount,
       };
     });
 
     expect(mobileLayout).not.toBeNull();
     if (!mobileLayout) {
-      throw new Error('Expected mobile manuscript rail and action rail to be present');
+      throw new Error('Expected mobile manuscript rail and decision block to be present');
     }
 
     // Scene status (the rail) now renders on mobile too, stacked above the
     // narrative, replacing the old DS1-only mobile bar.
     expect(mobileLayout.railDisplay).not.toBe('none');
-    expect(mobileLayout.actionRailDisplay).not.toBe('none');
+    expect(mobileLayout.decisionBlockDisplay).not.toBe('none');
     expect(mobileLayout.choiceCount).toBeGreaterThan(0);
   });
 });

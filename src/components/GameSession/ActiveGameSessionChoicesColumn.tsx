@@ -29,11 +29,6 @@ interface ActiveGameSessionChoicesColumnProps {
   hideCustomInput?: boolean;
   dataTutorial?: string;
   className?: string;
-  endingSuggestion?: {
-    reason: string;
-    onAccept: () => void;
-    onDismiss: () => void;
-  };
   /** Classified narrative-generation failure for the current turn, if any. */
   generationError?: NarrativeError | null;
   /** Retry the failed turn (only meaningful for transient/retryable errors). */
@@ -65,7 +60,6 @@ const ActiveGameSessionChoicesColumn: React.FC<
   hideCustomInput = false,
   dataTutorial = 'player-choices',
   className = '',
-  endingSuggestion,
   generationError = null,
   onRetryGeneration,
   shortcutsSuspended = false,
@@ -145,13 +139,6 @@ const ActiveGameSessionChoicesColumn: React.FC<
           </div>
         ) : (
         <>
-        {/* Context summary shown above suggested actions toggle on mobile, and above selector on desktop */}
-        {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && !hidePrompt && (
-          <p className="manuscript-context-summary">
-            {currentDecision.contextSummary}
-          </p>
-        )}
-
         {/* Mobile-only top controls for Suggested Actions toggle and End Story */}
         {isProgressiveDisclosureEnabled && (
           <div className="manuscript-mobile-rail-top-controls">
@@ -189,7 +176,6 @@ const ActiveGameSessionChoicesColumn: React.FC<
                 worldSkills={worldSkills}
                 characterSkills={characterSkills}
                 inventoryItems={inventoryItems}
-                endingSuggestion={endingSuggestion}
                 inputActions={resolvedInputActions}
                 shortcutsSuspended={shortcutsSuspended}
               />

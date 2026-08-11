@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useEffect, useState } from 'react';
 import { ManuscriptSessionShell } from '@/components/GameSession/ManuscriptSessionShell';
-import { ManuscriptActionRail } from '@/components/GameSession/ManuscriptActionRail';
+import { ManuscriptDecisionBlock } from '@/components/GameSession/ManuscriptDecisionBlock';
 import { ManuscriptFloatingHud } from '@/components/GameSession/ManuscriptFloatingHud';
 import { SceneStatus } from '@/components/GameSession/SceneStatus';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
@@ -13,7 +13,7 @@ import type { Decision, NarrativeSegment } from '@/types/narrative.types';
 /**
  * `ManuscriptSessionShell` is the immersive play surface. These stories render
  * it with the REAL region components the app composes — `ManuscriptFloatingHud`,
- * `SceneStatus`, `ManuscriptActionRail` + `ChoiceSelector`, and `NarrativeHistory`
+ * `SceneStatus`, `ManuscriptDecisionBlock` + `ChoiceSelector`, and `NarrativeHistory`
  * — fed deterministic demo data (no AI), the same shape the living style guide's
  * SessionShowcase uses (issue #1276). Pick light or dark from the toolbar to see
  * the shell in each color mode.
@@ -163,25 +163,22 @@ function SessionShellHarness({
         />
       }
       marginContent={withRail ? <SceneStatus segment={SEGMENTS[SEGMENTS.length - 1]} /> : null}
-      actionRail={
-        <ManuscriptActionRail isStreaming={isStreaming}>
-          <div className="manuscript-action-rail-stack">
-            <ChoiceSelector
-              decision={DECISION}
-              onSelect={() => {}}
-              enableCustomInput
-              onCustomSubmit={() => {}}
-              isDisabled={isStreaming || isLoading}
-            />
-          </div>
-        </ManuscriptActionRail>
-      }
     >
       <NarrativeHistory
         segments={isLoading ? [] : SEGMENTS}
         isLoading={isLoading}
         disableInitialAutoScroll
       />
+
+      <ManuscriptDecisionBlock isStreaming={isStreaming}>
+        <ChoiceSelector
+          decision={DECISION}
+          onSelect={() => {}}
+          enableCustomInput
+          onCustomSubmit={() => {}}
+          isDisabled={isStreaming || isLoading}
+        />
+      </ManuscriptDecisionBlock>
     </ManuscriptSessionShell>
   );
 }

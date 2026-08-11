@@ -75,7 +75,7 @@ test.describe('Mobile Action Row Layout', () => {
       await expect(page.locator('.manuscript-suggested-action').first()).toBeVisible();
 
       // Check for horizontal overflow
-      await expectNoHorizontalOverflow(page, theme, viewport.width, '#manuscript-action-rail');
+      await expectNoHorizontalOverflow(page, theme, viewport.width, '#manuscript-decision-block');
     });
 
     test(`World detail action row should not have horizontal overflow at ${viewport.width}px`, async ({ page }) => {

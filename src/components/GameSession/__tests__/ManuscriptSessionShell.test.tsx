@@ -46,7 +46,6 @@ describe('ManuscriptSessionShell', () => {
     const shell = screen.getByTestId('manuscript-session-shell');
     expect(shell).toHaveClass('manuscript-viewport-layer');
 
-    // These will fail until Task 3 Step 3
     const backdrop = shell.querySelector('.manuscript-overlay-backdrop');
     expect(backdrop).toBeInTheDocument();
 
@@ -63,19 +62,23 @@ describe('ManuscriptSessionShell', () => {
     expect(header).toBeInTheDocument();
   });
 
-  it('applies mobile-first stack classes to the main stage and character rail', () => {
+  // Prose and decision are one document. Everything the player reads or acts
+  // on has to sit inside the single scrolling region, because a second
+  // scrolling row is what let the choice list resize the narrative each turn.
+  it('puts every child inside the one scrolling region', () => {
     render(
-      <ManuscriptSessionShell marginContent={<div data-testid="margin">Margin</div>}>
-        <div>Main Content</div>
+      <ManuscriptSessionShell hud={<div data-testid="hud" />}>
+        <div data-testid="narrative">Narrative</div>
+        <div data-testid="decision">Decision</div>
       </ManuscriptSessionShell>
     );
 
-    const shell = screen.getByTestId('manuscript-session-shell');
-    const mainStage = shell.querySelector('.manuscript-main-stage');
-    const characterRail = shell.querySelector('.manuscript-characters-rail');
+    const measure = screen
+      .getByTestId('manuscript-session-shell')
+      .querySelector('.manuscript-overlay-main .manuscript-main-content-inner');
 
-    expect(mainStage).toHaveClass('manuscript-main-stage-mobile-stack');
-    expect(characterRail).toHaveClass('manuscript-characters-rail-mobile-stack');
+    expect(measure).toContainElement(screen.getByTestId('narrative'));
+    expect(measure).toContainElement(screen.getByTestId('decision'));
   });
 
   // AppSurfaceShell already wraps the play route in the page's one main

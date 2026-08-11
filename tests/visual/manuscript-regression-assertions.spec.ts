@@ -70,7 +70,7 @@ const seedMarginaliaLoreFact = async (page: Page) => {
 };
 
 test.describe('Manuscript regression assertions', () => {
-  test('Play surface keeps location visible and scrolls new segments into view', async ({ page }) => {
+  test('Play surface keeps location visible and offers the way back to a new segment', async ({ page }) => {
     await seedTestData(page);
     await mockApiEndpoints(page);
 
@@ -119,6 +119,17 @@ test.describe('Manuscript regression assertions', () => {
       scroller.scrollTo({ top: 0, behavior: 'auto' });
     });
 
+    // The scroll event is what tells the surface the reader has taken over.
+    // Adding a segment before it lands races that handover — and the race is
+    // why this spec passed locally while failing in CI.
+    await page.waitForFunction(
+      () => {
+        const scroller = document.querySelector('.manuscript-overlay-main') as HTMLElement | null;
+        return !!scroller && scroller.scrollTop === 0;
+      },
+      { timeout: 10000 }
+    );
+
     const finalSegmentText =
       'The newest result lands on the page after the player commits to the route, and it must be brought into view by the play surface scroll controller.';
 
@@ -142,6 +153,20 @@ test.describe('Manuscript regression assertions', () => {
         timestamp: new Date('2024-01-01T02:25:00.000Z'),
       });
     }, finalSegmentText);
+
+    // The reader scrolled up, so the new beat must not move them. It waits at
+    // the bottom behind an affordance instead — this used to scroll into view
+    // on its own, which is the yank the play surface no longer performs.
+    const jumpToLatest = page.getByRole('button', { name: /jump to latest/i });
+    await expect(jumpToLatest).toBeVisible({ timeout: 10000 });
+
+    const heldPosition = await page.evaluate(() => {
+      const scroller = document.querySelector('.manuscript-overlay-main') as HTMLElement | null;
+      return scroller?.scrollTop ?? -1;
+    });
+    expect(heldPosition).toBe(0);
+
+    await jumpToLatest.click();
 
     await page.waitForFunction(
       (content) => {
@@ -390,15 +415,15 @@ test.describe('Manuscript regression assertions', () => {
       const narrativeContainer = document.querySelector(
         '.manuscript-narrative-container'
       );
-      const actionRail = document.querySelector('#manuscript-action-rail');
+      const decision = document.querySelector('#manuscript-decision-block');
 
-      if (!narrativeContainer || !actionRail) {
+      if (!narrativeContainer || !decision) {
         return null;
       }
 
       return {
         narrativeBottom: narrativeContainer.getBoundingClientRect().bottom,
-        actionRailTop: actionRail.getBoundingClientRect().top,
+        decisionTop: decision.getBoundingClientRect().top,
         viewportHeight: window.innerHeight,
       };
     });
@@ -408,27 +433,23 @@ test.describe('Manuscript regression assertions', () => {
       throw new Error('Expected play surface geometry to be measurable');
     }
 
-    const gap = geometry.actionRailTop - geometry.narrativeBottom;
+    const gap = geometry.decisionTop - geometry.narrativeBottom;
 
-    // Guards the regression: for this single-line segment (plus the
-    // decision-outcome callout it inherits), the gap settles deterministically
-    // around 281px (~27% of a 1024px-tall viewport) once the segment has fully
-    // rendered — confirmed identical across repeated runs and across wait
-    // durations from 200ms to 1500ms. The ~163-184px (~16-18%) this test
-    // previously guarded against was itself a measurement taken before the
-    // segment had finished rendering, not a real ceiling; 35% leaves headroom
-    // above the settled value while still catching a dead band anywhere near
-    // the much larger one this test was originally written against.
-    expect(gap).toBeLessThan(geometry.viewportHeight * 0.35);
+    // The dead band was an artifact of docking: the choices sat in their own
+    // grid row at the bottom of the viewport, so a short beat left everything
+    // between them and the prose empty. In one column the decision follows the
+    // prose immediately, and the gap is just the beat break's own margin —
+    // ~48px, and bounded by content rather than by viewport height. 10% of the
+    // viewport still catches any regression toward a reserved row.
+    expect(gap).toBeLessThan(geometry.viewportHeight * 0.1);
   });
 
-  test('Docked choices rail does not squeeze the narrative row off-screen on mobile', async ({ page }) => {
-    // DS3 always stacks suggested actions in a single column (never a grid,
-    // see :root .manuscript-suggested-actions-grid), so a full set of choices
-    // on a narrow/short viewport used to demand more height than the
-    // `.manuscript-viewport-inner` auto/1fr/auto grid had available, squeezing
-    // the narrative row (`.manuscript-overlay-main`) down to ~16px — the story
-    // text effectively vanished. Reproduces on unmodified `develop` HEAD.
+  test('Choices scroll with the story rather than docking against it', async ({ page }) => {
+    // The narrative row used to share the viewport with a docked choices row,
+    // so a full set of choices on a narrow/short viewport squeezed the story
+    // text down to ~16px. The fix isn't a better height budget — it's having
+    // no second row to budget against. Guard the shape, not the numbers: one
+    // scroll container, and the decision sitting after the prose inside it.
     await page.setViewportSize({ width: 375, height: 667 });
     await seedTestData(page);
     await mockApiEndpoints(page);
@@ -437,18 +458,43 @@ test.describe('Manuscript regression assertions', () => {
     await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
       timeout: 10000,
     });
-    await page.waitForSelector('#manuscript-action-rail', { timeout: 10000 });
+    await page.waitForSelector('#manuscript-decision-block', { timeout: 10000 });
 
     const geometry = await page.evaluate(() => {
       const main = document.querySelector('.manuscript-overlay-main');
-      const rail = document.querySelector('#manuscript-action-rail');
-      if (!main || !rail) return null;
+      const decision = document.querySelector('#manuscript-decision-block');
+      const narrative = document.querySelector('.manuscript-narrative-container');
+      if (!main || !decision || !narrative) return null;
 
-      const mainRect = main.getBoundingClientRect();
+      const scrolls = (el: Element) => {
+        const overflowY = window.getComputedStyle(el).overflowY;
+        return (
+          (overflowY === 'auto' || overflowY === 'scroll') &&
+          el.scrollHeight > el.clientHeight + 1
+        );
+      };
+
+      // Every scrolling box between the decision and the surface root. In a
+      // single-flow document that set is exactly {.manuscript-overlay-main}.
+      const scrollAncestors: string[] = [];
+      for (
+        let el: Element | null = decision;
+        el && el !== document.documentElement;
+        el = el.parentElement
+      ) {
+        if (scrolls(el)) {
+          scrollAncestors.push(el.className || el.tagName.toLowerCase());
+        }
+      }
+
       return {
-        mainHeight: mainRect.height,
-        railScrollHeight: rail.scrollHeight,
-        railClientHeight: rail.clientHeight,
+        mainHeight: main.getBoundingClientRect().height,
+        viewportHeight: window.innerHeight,
+        decisionScrollsItself: scrolls(decision),
+        scrollAncestorCount: scrollAncestors.length,
+        decisionFollowsNarrative:
+          decision.getBoundingClientRect().top >=
+          narrative.getBoundingClientRect().top,
       };
     });
 
@@ -457,14 +503,14 @@ test.describe('Manuscript regression assertions', () => {
       throw new Error('Expected play surface geometry to be measurable');
     }
 
-    // Floor the narrative row so it stays legible instead of collapsing to a
-    // sliver — before the fix this measured ~16px on a 667px-tall viewport.
-    expect(geometry.mainHeight).toBeGreaterThan(120);
+    // The document gets the viewport below the HUD — no row is reserved from it.
+    expect(geometry.mainHeight).toBeGreaterThan(geometry.viewportHeight * 0.6);
 
-    // The docked rail itself should absorb overflow via its own scrollbar
-    // rather than growing unbounded and starving the narrative row.
-    expect(geometry.railScrollHeight).toBeGreaterThanOrEqual(
-      geometry.railClientHeight
-    );
+    // A nested scroller is the failure this rework exists to prevent: it puts
+    // the choices behind a second scrollbar the player has to discover.
+    expect(geometry.decisionScrollsItself).toBe(false);
+    expect(geometry.scrollAncestorCount).toBeLessThanOrEqual(1);
+
+    expect(geometry.decisionFollowsNarrative).toBe(true);
   });
 });

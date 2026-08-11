@@ -9,6 +9,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, Character } from '@/state/characterStore';
 import { EndingScreen } from './EndingScreen';
+import { EndingSuggestionBanner } from './EndingSuggestionBanner';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { GameSessionSkeleton } from './GameSessionSkeleton';
 import { useAutoSave } from '@/hooks/useAutoSave';
@@ -25,7 +26,7 @@ import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
 import { ManuscriptSessionShell } from './ManuscriptSessionShell';
 import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
-import { ManuscriptActionRail } from './ManuscriptActionRail';
+import { ManuscriptDecisionBlock } from './ManuscriptDecisionBlock';
 import { ManuscriptDrawer } from './ManuscriptDrawer';
 import {
   CharacterDrawerContent,
@@ -428,13 +429,26 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     </button>
   );
 
-  const endingSuggestion = showEndingSuggestion && endingSuggestionReason
-    ? {
-        reason: endingSuggestionReason,
-        onAccept: handleAcceptEndingSuggestion,
-        onDismiss: handleRejectEndingSuggestion,
-      }
-    : undefined;
+  // The recap and the ending offer are both narration about the story so far,
+  // so they close the beat rather than framing the choices. Rendering them
+  // above the decision keeps the decision block to one job: the move you make.
+  const storyBeatNotes = (
+    <>
+      {isProgressiveDisclosureEnabled && currentDecision?.contextSummary && (
+        <p className="manuscript-context-summary">
+          {currentDecision.contextSummary}
+        </p>
+      )}
+
+      {showEndingSuggestion && endingSuggestionReason && (
+        <EndingSuggestionBanner
+          reason={endingSuggestionReason}
+          onAccept={handleAcceptEndingSuggestion}
+          onDismiss={handleRejectEndingSuggestion}
+        />
+      )}
+    </>
+  );
 
   return (
     <ManuscriptSessionShell
@@ -471,35 +485,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       marginContent={hasSceneStatus ? (
         <SceneStatus segment={latestSegment} />
       ) : null}
-      actionRail={
-        <ManuscriptActionRail
-          isStreaming={isGenerating || isGeneratingChoices}
-        >
-          <div className="manuscript-action-rail-stack">
-            <ActiveGameSessionChoicesColumn
-              currentDecision={currentDecision}
-              segmentCount={segmentCount}
-              status={status}
-              isGenerating={isGenerating}
-              isGeneratingChoices={isGeneratingChoices}
-              isEvaluatingAction={isEvaluatingAction}
-              isSessionEnded={isSessionEnded(sessionId)}
-              worldSkills={world?.skills || []}
-              characterSkills={characterSkills}
-              inventoryItems={inventoryItems}
-              onChoiceSelected={handleChoiceSelected}
-              onCustomSubmit={handleCustomSubmit}
-              inputActions={null}
-              endStoryAction={endStoryAction}
-              isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
-              endingSuggestion={endingSuggestion}
-              generationError={generationError}
-              onRetryGeneration={handleRetryGeneration}
-              shortcutsSuspended={isModalOpen}
-            />
-          </div>
-        </ManuscriptActionRail>
-      }
     >
       <ActiveGameSessionNarrativeColumn
         controllerKey={controllerKey}
@@ -521,6 +506,31 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         streamingContent={streamingPreview}
         onStreamingPreviewChange={setStreamingPreview}
       />
+
+      {storyBeatNotes}
+
+      <ManuscriptDecisionBlock isStreaming={isGenerating || isGeneratingChoices}>
+        <ActiveGameSessionChoicesColumn
+          currentDecision={currentDecision}
+          segmentCount={segmentCount}
+          status={status}
+          isGenerating={isGenerating}
+          isGeneratingChoices={isGeneratingChoices}
+          isEvaluatingAction={isEvaluatingAction}
+          isSessionEnded={isSessionEnded(sessionId)}
+          worldSkills={world?.skills || []}
+          characterSkills={characterSkills}
+          inventoryItems={inventoryItems}
+          onChoiceSelected={handleChoiceSelected}
+          onCustomSubmit={handleCustomSubmit}
+          inputActions={null}
+          endStoryAction={endStoryAction}
+          isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
+          generationError={generationError}
+          onRetryGeneration={handleRetryGeneration}
+          shortcutsSuspended={isModalOpen}
+        />
+      </ManuscriptDecisionBlock>
 
       <div className="manuscript-secondary-controls">
         <ActiveGameSessionControls
