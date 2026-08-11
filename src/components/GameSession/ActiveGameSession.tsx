@@ -25,7 +25,7 @@ import { useActiveGameSessionEnding } from './hooks/useActiveGameSessionEnding';
 import { useTutorial } from '@/components/TutorialProvider';
 import { ManuscriptSessionShell } from './ManuscriptSessionShell';
 import { ManuscriptFloatingHud } from './ManuscriptFloatingHud';
-import { ManuscriptActionRail } from './ManuscriptActionRail';
+import { ManuscriptDecisionBlock } from './ManuscriptDecisionBlock';
 import { ManuscriptDrawer } from './ManuscriptDrawer';
 import {
   CharacterDrawerContent,
@@ -471,35 +471,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       marginContent={hasSceneStatus ? (
         <SceneStatus segment={latestSegment} />
       ) : null}
-      actionRail={
-        <ManuscriptActionRail
-          isStreaming={isGenerating || isGeneratingChoices}
-        >
-          <div className="manuscript-action-rail-stack">
-            <ActiveGameSessionChoicesColumn
-              currentDecision={currentDecision}
-              segmentCount={segmentCount}
-              status={status}
-              isGenerating={isGenerating}
-              isGeneratingChoices={isGeneratingChoices}
-              isEvaluatingAction={isEvaluatingAction}
-              isSessionEnded={isSessionEnded(sessionId)}
-              worldSkills={world?.skills || []}
-              characterSkills={characterSkills}
-              inventoryItems={inventoryItems}
-              onChoiceSelected={handleChoiceSelected}
-              onCustomSubmit={handleCustomSubmit}
-              inputActions={null}
-              endStoryAction={endStoryAction}
-              isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
-              endingSuggestion={endingSuggestion}
-              generationError={generationError}
-              onRetryGeneration={handleRetryGeneration}
-              shortcutsSuspended={isModalOpen}
-            />
-          </div>
-        </ManuscriptActionRail>
-      }
     >
       <ActiveGameSessionNarrativeColumn
         controllerKey={controllerKey}
@@ -521,6 +492,30 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         streamingContent={streamingPreview}
         onStreamingPreviewChange={setStreamingPreview}
       />
+
+      <ManuscriptDecisionBlock isStreaming={isGenerating || isGeneratingChoices}>
+        <ActiveGameSessionChoicesColumn
+          currentDecision={currentDecision}
+          segmentCount={segmentCount}
+          status={status}
+          isGenerating={isGenerating}
+          isGeneratingChoices={isGeneratingChoices}
+          isEvaluatingAction={isEvaluatingAction}
+          isSessionEnded={isSessionEnded(sessionId)}
+          worldSkills={world?.skills || []}
+          characterSkills={characterSkills}
+          inventoryItems={inventoryItems}
+          onChoiceSelected={handleChoiceSelected}
+          onCustomSubmit={handleCustomSubmit}
+          inputActions={null}
+          endStoryAction={endStoryAction}
+          isProgressiveDisclosureEnabled={isProgressiveDisclosureEnabled}
+          endingSuggestion={endingSuggestion}
+          generationError={generationError}
+          onRetryGeneration={handleRetryGeneration}
+          shortcutsSuspended={isModalOpen}
+        />
+      </ManuscriptDecisionBlock>
 
       <div className="manuscript-secondary-controls">
         <ActiveGameSessionControls

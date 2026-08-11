@@ -43,7 +43,12 @@ body.manuscript-overlay-open {
   padding: clamp(0.5rem, 1.5vh, 1rem) clamp(12px, 2vw, 1.5rem);
   min-height: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+
+  /* Two rows only: HUD, then the document. A third row for a docked panel is
+     what made the narrative row's height a function of the choice list — the
+     source of the per-turn layout shift. The decision now scrolls with the
+     prose, so nothing downstream can resize the story. */
+  grid-template-rows: auto minmax(0, 1fr);
   gap: clamp(0.5rem, 1.5vh, 1rem);
   position: relative;
   z-index: 1;
@@ -339,21 +344,12 @@ body.manuscript-overlay-open {
   white-space: nowrap;
 }
 
-#manuscript-action-rail {
+/* The decision reads as the beat's closing paragraph: no panel chrome, no
+   height cap, no scroller of its own. It is sized by its content and the page
+   scrolls to meet it. */
+#manuscript-decision-block {
   touch-action: manipulation;
-  background: var(--color-overlay-surface-strong);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-overlay);
-  border-radius: var(--radius-sm);
-  padding: var(--space-3);
-
-  /* DS3 always stacks suggested actions in a single column (never a grid),
-     so a full set of choices can grow tall enough to squeeze the narrative
-     row in `.manuscript-viewport-inner`'s auto/1fr/auto grid down to a few
-     px on short viewports. Cap the rail and let it scroll internally instead
-     of starving the story text of space. */
-  max-height: min(50dvh, 26rem);
-  overflow-y: auto;
+  margin-top: var(--space-6);
 }
 
 .manuscript-mobile-rail-top-controls {
@@ -481,42 +477,8 @@ body.manuscript-overlay-open {
   z-index: 20;
 }
 
-.manuscript-rail-spacer {
-  display: none;
-}
-
 @media (width >= 1024px) {
   .manuscript-characters-mobile-bar {
-    display: none;
-  }
-
-  .manuscript-main-stage {
-    grid-template-columns: minmax(10rem, 12rem) minmax(0, 1fr) minmax(10rem, 12rem);
-  }
-
-  .manuscript-characters-rail {
-    display: block;
-    grid-column: 1;
-  }
-
-  .manuscript-main-content {
-    grid-column: 2;
-  }
-
-  .manuscript-rail-spacer {
-    display: block;
-    grid-column: 3;
-  }
-
-  .manuscript-main-stage.manuscript-no-rail {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .manuscript-main-stage.manuscript-no-rail .manuscript-main-content {
-    grid-column: auto;
-  }
-
-  .manuscript-main-stage.manuscript-no-rail .manuscript-rail-spacer {
     display: none;
   }
 }
@@ -581,19 +543,19 @@ body.manuscript-overlay-open {
 }
 
 /* Streaming lock styles */
-.manuscript-action-rail-streaming #manuscript-input,
-.manuscript-action-rail-streaming #manuscript-send,
-.manuscript-action-rail-streaming .manuscript-suggested-action {
+.manuscript-decision-block-streaming #manuscript-input,
+.manuscript-decision-block-streaming #manuscript-send,
+.manuscript-decision-block-streaming .manuscript-suggested-action {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
-.manuscript-action-rail-streaming #manuscript-input {
+.manuscript-decision-block-streaming #manuscript-input {
   background: var(--color-surface-hover);
 }
 
-.manuscript-action-rail-streaming #manuscript-input::placeholder {
+.manuscript-decision-block-streaming #manuscript-input::placeholder {
   color: var(--color-accent);
   opacity: 1;
 }
@@ -733,15 +695,6 @@ body.manuscript-overlay-open {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Removed manuscript-action-rail-content as container handles padding directly */
-
-.manuscript-action-rail-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 0;
 }
 
 .manuscript-warning-action-button {
@@ -1031,20 +984,6 @@ body.manuscript-overlay-open {
   letter-spacing: 0.05em;
 }
 
-/* Mobile Stack Layouts */
-.manuscript-main-stage-mobile-stack {
-  display: grid;
-}
-
-.manuscript-characters-rail-mobile-stack {
-  order: -1;
-}
-
-@media (width >= 1024px) {
-  .manuscript-characters-rail-mobile-stack {
-    order: unset;
-  }
-}
 
 /* End Story Dialog */
 .manuscript-end-story-backdrop {
@@ -2017,10 +1956,6 @@ body.manuscript-overlay-open {
     align-items: center;
   }
 
-  #manuscript-action-rail {
-    padding: var(--space-3);
-  }
-
   .manuscript-warning-action-button {
     padding: var(--space-2) var(--space-3);
     height: 2rem;
@@ -2037,10 +1972,6 @@ body.manuscript-overlay-open {
 @media (width >= 640px) and (width < 1024px) {
   .manuscript-overlay-header {
     align-items: center;
-  }
-
-  #manuscript-action-rail {
-    padding: var(--space-4);
   }
 
   .manuscript-warning-action-button {
@@ -2091,10 +2022,6 @@ body.manuscript-overlay-open {
 
   .manuscript-character-summary-columns {
     grid-template-columns: 1fr 1fr;
-  }
-
-  #manuscript-action-rail {
-    padding: var(--space-4);
   }
 
   .manuscript-suggested-actions-grid {
@@ -2825,21 +2752,16 @@ body.manuscript-overlay-open {
   grid-template-columns: 1fr;
 }
 
-:root .manuscript-rail-spacer {
-  display: none;
-}
-
 /* Scene status as a compact console bar above the narrative. */
 :root .manuscript-characters-rail {
   display: block;
   margin-bottom: var(--space-3);
 }
 
-/* Top/bottom padding trimmed from 5rem/7.5rem — the original values left a
-   ~193px empty band between short narrative content and the docked choices
-   rail on tall viewports. */
+/* The bottom padding is the document's trailing margin, not a gap before a
+   docked panel — the decision block supplies its own. */
 :root .manuscript-main-content {
-  padding: 3rem var(--space-6) 4rem;
+  padding: 3rem var(--space-6) 0;
 }
 
 /* Dot grid background overlay — same canonical pattern as the app surface
@@ -3163,22 +3085,6 @@ body.manuscript-overlay-open {
 
 /* Desktop override: keep single column */
 @media (width >= 1024px) {
-  :root .manuscript-main-stage {
-    grid-template-columns: 1fr;
-  }
-
-  /* Keep the narrative in the single column. The desktop base places
-     .manuscript-main-content in grid-column 2; without this reset it lands in
-     an implicit second column and the scene-status rail inflates column 1,
-     splitting the stage instead of stacking the scene bar above the narrative. */
-  :root .manuscript-main-content {
-    grid-column: 1;
-  }
-
-  :root .manuscript-rail-spacer {
-    display: none;
-  }
-
   :root .manuscript-suggested-actions-grid {
     grid-template-columns: 1fr;
   }
@@ -3455,16 +3361,26 @@ body.manuscript-overlay-open {
   display: none;
 }
 
-/* DS3 action rail — border-top only, no radius, tighter padding (Pass 8, fix 5) */
-:root #manuscript-action-rail {
-  background: var(--color-overlay-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* DS3 decision block — set in the page, not floated over it. Padding matches
+   .manuscript-main-content's horizontal rhythm so the choices hold the same
+   measure as the prose above them. */
+:root #manuscript-decision-block {
+  background: transparent;
   border: none;
-  border-top: 1px solid var(--color-border);
-  border-radius: 0;
   box-shadow: none;
-  padding: var(--space-3) var(--space-6);
+  padding: 0 var(--space-6) var(--space-6);
+}
+
+/* The beat break: the same labelled rule the narrative already uses between
+   segments, so the decision reads as part of the story rather than a control
+   panel bolted to it. */
+:root .manuscript-decision-block-mark {
+  height: 1px;
+  background: var(--color-border);
+  width: 320px;
+  max-width: 60%;
+  margin: 0 auto var(--space-5);
+  opacity: 0.6;
 }
 
 /* DS3 mobile bar hidden (no rail concept) */

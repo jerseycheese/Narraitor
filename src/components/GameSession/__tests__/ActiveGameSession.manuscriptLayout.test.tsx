@@ -64,8 +64,8 @@ jest.mock('@/components/Narrative/NarrativeController', () => ({
   NarrativeController: () => <div data-testid="narrative-controller" />,
 }));
 
-jest.mock('../ManuscriptActionRail', () => ({
-  ManuscriptActionRail: jest.fn(({ children }) => <div data-testid="manuscript-action-rail">{children}</div>),
+jest.mock('../ManuscriptDecisionBlock', () => ({
+  ManuscriptDecisionBlock: jest.fn(({ children }) => <div data-testid="manuscript-decision-block">{children}</div>),
 }));
 
 describe('ActiveGameSession Manuscript Layout', () => {
@@ -170,7 +170,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
       />
     );
 
-    expect(await screen.findByTestId('manuscript-action-rail')).toBeInTheDocument();
+    expect(await screen.findByTestId('manuscript-decision-block')).toBeInTheDocument();
   });
 
   it('renders a floating HUD with character toggle button', async () => {
@@ -203,7 +203,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
       />
     );
 
-    expect(await screen.findByTestId('manuscript-action-rail')).toBeInTheDocument();
+    expect(await screen.findByTestId('manuscript-decision-block')).toBeInTheDocument();
     const choicesColumn = await screen.findByTestId('choices-column');
 
     // The mocked ChoicesColumn receives endStoryAction which renders "End Story"
@@ -432,8 +432,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
     });
   });
 
-  it('passes isStreaming to ManuscriptActionRail when generating', async () => {
-    const ManuscriptActionRail = require('../ManuscriptActionRail').ManuscriptActionRail;
+  it('passes isStreaming to ManuscriptDecisionBlock when generating', async () => {
+    const ManuscriptDecisionBlock = require('../ManuscriptDecisionBlock').ManuscriptDecisionBlock;
 
     // Segments exist (so the session shell renders) but choices are still
     // generating - that is the streaming state the action rail reflects.
@@ -459,7 +459,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
     // Wait for initialization
     await screen.findByTestId('manuscript-session-shell');
 
-    const lastCall = (ManuscriptActionRail as jest.Mock).mock.calls.slice(-1)[0][0];
+    const lastCall = (ManuscriptDecisionBlock as jest.Mock).mock.calls.slice(-1)[0][0];
     expect(lastCall.isStreaming).toBe(true);
   });
 

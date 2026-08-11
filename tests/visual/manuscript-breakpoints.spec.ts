@@ -124,14 +124,14 @@ test.describe('Manuscript breakpoints visual regression (app)', () => {
     const mainStage = metrics.nodes.find(
       (node) => node.selector === '.manuscript-main-stage',
     );
-    const actionRail = metrics.nodes.find(
-      (node) => node.selector === '#manuscript-action-rail',
+    const decisionBlock = metrics.nodes.find(
+      (node) => node.selector === '#manuscript-decision-block',
     );
 
     expect(metrics.viewport.width).toBe(1480);
     expect(viewportInner?.exists).toBe(true);
     expect(viewportInner?.width).toBeLessThanOrEqual(1480);
     expect(mainStage?.exists).toBe(true);
-    expect(actionRail?.exists).toBe(true);
+    expect(decisionBlock?.exists).toBe(true);
   });
 });

@@ -52,9 +52,9 @@ jest.mock('@/components/Narrative/NarrativeController', () => ({
   NarrativeController: () => <div data-testid="narrative-controller" />,
 }));
 
-jest.mock('../ManuscriptActionRail', () => ({
-  ManuscriptActionRail: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="manuscript-action-rail">{children}</div>
+jest.mock('../ManuscriptDecisionBlock', () => ({
+  ManuscriptDecisionBlock: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="manuscript-decision-block">{children}</div>
   ),
 }));
 

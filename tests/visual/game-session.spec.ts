@@ -169,7 +169,7 @@ test.describe('Game Session Visual Tests', () => {
     const gameSessionComponents = await page.evaluate(() => {
       const components = {
         active: document.querySelector('[data-testid="manuscript-session-shell"]') ? 'FOUND' : 'NOT FOUND',
-        rail: document.querySelector('[data-testid="manuscript-action-rail"]') ? 'FOUND' : 'NOT FOUND',
+        rail: document.querySelector('[data-testid="manuscript-decision-block"]') ? 'FOUND' : 'NOT FOUND',
         hud: document.querySelector('[data-testid="manuscript-floating-hud"]') ? 'FOUND' : 'NOT FOUND',
         loading: document.querySelector('[data-testid="game-session-loading"]') ? 'FOUND' : 'NOT FOUND',
         resume: document.querySelector('[data-testid="game-session-resume"]') ? 'FOUND' : 'NOT FOUND',
