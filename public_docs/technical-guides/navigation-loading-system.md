@@ -54,7 +54,7 @@ The system is smart about when to show loading indicators. There's a **minimum d
 **Focus Trapping** keeps keyboard focus in the loading modal, **ARIA Support** provides screen reader announcements, and **Keyboard Controls** let users hit Escape to cancel. Accessibility was built in from the start, not added as an afterthought.
 
 ### Error Handling
-There's **automatic cleanup** with a 30-second safety timeout in case something goes wrong, **graceful degradation** that continues navigation even if loading fails, and **error boundaries** that integrate with Next.js error handling. Basically, it fails gracefully instead of breaking the user experience.
+There's **automatic cleanup** with a 30-second safety timeout in case something goes wrong, navigation continues even if loading fails, and **error boundaries** integrate with Next.js error handling.
 
 ### Router Integration
 **Next.js App Router** integration works directly with router events, **route changes** are automatically detected for navigation start/end, and **client-side navigation** works with all Next.js navigation methods. It hooks into the router instead of trying to guess when navigation happens.

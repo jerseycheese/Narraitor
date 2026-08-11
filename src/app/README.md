@@ -1,6 +1,6 @@
 # Narraitor Routes (App Router)
 
-This directory uses the Next.js App Router architecture, which replaced the previous Pages Router implementation. So basically, we migrated from the old file-based routing to the new App Router because it gives us better layouts, loading states, and nested routing capabilities.
+This directory uses the Next.js App Router, which replaced the old Pages Router — better layouts, loading states, and nested routing.
 
 ## How the Routes Work
 
@@ -30,7 +30,7 @@ The wizard is fully implemented:
 - **5 steps**: Basic Info, Description, Attributes, Skills, Finalize
 - **6 default attributes**: Strength, Intelligence, Agility, Charisma, Dexterity, Constitution
 - **12 default skills** with "Learning Curve" instead of "Difficulty" (which tested better with users)
-- **Smart navigation** to `/worlds` on completion or cancellation
+- **Navigates** to `/worlds` on completion or cancellation
 - **State persistence** between steps so you don't lose your work
 - **Local storage integration** for created worlds
 

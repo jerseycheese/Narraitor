@@ -45,7 +45,7 @@ This API endpoint generates AI-powered image prompts for story ending visualizat
 ## Features
 
 - **AI-First Approach:** Uses Google Gemini to generate contextual image prompts
-- **Graceful Degradation:** Falls back to tone-appropriate prompts when AI fails
+- **Fallback prompts:** Tone-appropriate prompts are used when AI generation fails
 - **Tone-Aware Fallbacks:** Different fallback prompts for each ending tone
 - **Accessibility:** Always includes descriptive alt text
 

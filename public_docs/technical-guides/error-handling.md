@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Error Handling
 
-This error handling here focuses on being helpful to users rather than just logging technical details. The pattern is to catch errors gracefully, show user-friendly messages, and provide retry options when it makes sense.
+This error handling focuses on being helpful to users rather than just logging technical details. The pattern is to catch errors, show user-friendly messages, and provide retry options when it makes sense.
 
 ## Standard Pattern
 

@@ -4,8 +4,8 @@
  * 
  * This adapter implements a basic CRUD interface for persisting state in IndexedDB.
  * It follows a factory pattern with async initialization to prevent race conditions.
- * Error handling is designed for graceful degradation - operations fail silently 
- * to allow the application to continue functioning when persistence is unavailable.
+ * Operations fail silently instead of throwing, so the app keeps working when
+ * persistence is unavailable — it just won't save.
  */
 export class IndexedDBAdapter {
   private dbName = 'narraitor-state';
@@ -34,11 +34,11 @@ export class IndexedDBAdapter {
   /**
    * Initialize the IndexedDB database
    * Creates the database and object store if they don't exist
-   * Handles environments without IndexedDB gracefully
+   * Returns early in environments without IndexedDB, instead of throwing
    */
   async initialize(): Promise<void> {
     if (typeof indexedDB === 'undefined') {
-      return; // Gracefully handle environments without IndexedDB
+      return; // No IndexedDB (private mode, SSR, old browsers) - skip init
     }
 
     return new Promise((resolve) => {
@@ -167,7 +167,7 @@ export class IndexedDBAdapter {
   /**
    * Remove an item from storage
    * @param key - The key to remove
-   * @returns Promise that resolves when the item is removed (or if removal fails gracefully)
+   * @returns Promise that resolves whether removal succeeds or fails - failures are swallowed, not thrown
    */
   async removeItem(key: string): Promise<void> {
     if (!this.db) {

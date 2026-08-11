@@ -178,7 +178,7 @@ const getStepDescription = (step?: number) => {
 
 ### Timestamp Formatting
 
-Handles various timestamp formats and errors gracefully:
+Falls back to no timestamp if the format is invalid:
 
 ```typescript
 const formattedDate = lastSaved ? formatDateTime(lastSaved) : null;

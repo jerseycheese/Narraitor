@@ -2,7 +2,7 @@
 
 ## What This Solves
 
-Ever wonder why the AI suddenly forgets that your medieval world doesn't have spaceships? Or why it starts talking about magic when you're running a hard sci-fi campaign? This debugging tool is for figuring out what's going wrong when the AI goes off the rails.
+Sometimes the AI forgets that your medieval world doesn't have spaceships, or starts talking about magic in a hard sci-fi campaign. This debugging tool is for figuring out what's going wrong when the AI goes off the rails.
 
 The challenge with AI storytelling is that the AI needs constant reminders about your world's rules, and sometimes those reminders don't work as expected. This system lets you peek under the hood and see exactly how the AI is processing your lore facts and what consistency instructions it's generating for itself.
 

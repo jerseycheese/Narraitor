@@ -196,7 +196,7 @@ const handlePortraitGeneration = async (character: Character, world: World) => {
 };
 ```
 
-### Graceful Degradation
+### Fallback When Generation Fails
 ```tsx
 const PortraitSection = ({ character }: { character: Character }) => {
   const [portrait, setPortrait] = useState<Portrait | null>(null);

@@ -138,7 +138,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
       logger.error('Failed to generate portrait:', error);
-      setPortraitError('Failed to generate portrait. Please try again.');
+      setPortraitError("Couldn't generate a portrait. Try again in a moment.");
     } finally {
       setGeneratingPortrait(false);
     }

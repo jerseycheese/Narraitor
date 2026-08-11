@@ -16,7 +16,7 @@ This handles player choice selection in all its forms - from simple "go left or 
 
 **Full accessibility** - Keyboard navigation, screen reader support, proper ARIA labels throughout.
 
-**Input validation** - Prevents empty submissions, enforces character limits, handles edge cases gracefully.
+**Input validation** - Prevents empty submissions, enforces character limits, and covers edge cases.
 
 ## Basic Usage
 

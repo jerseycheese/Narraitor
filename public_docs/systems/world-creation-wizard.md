@@ -72,10 +72,10 @@ We keep the validation reasonable but firm - enough to prevent obviously broken 
 
 ### Error Handling
 
-Everything's designed to fail gracefully so users never get stuck:
+Errors are caught so users never get stuck:
 
 - Form validation errors display inline
-- AI failures gracefully fallback to defaults
+- AI failures fall back to defaults
 - Creation errors are caught and displayed
 
 ## API

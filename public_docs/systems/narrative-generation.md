@@ -9,7 +9,7 @@ updated: 2025-10-11
 
 # Narrative Generation System
 
-This is the heart of what makes Narraitor special - AI that doesn't just generate random text, but actually creates coherent stories that feel like they belong in your world. Whether you're in a cyberpunk dystopia or a medieval fantasy realm, the AI adapts its language, tone, and content to match.
+Narraitor's narrative generation creates coherent stories that feel like they belong in your world, rather than generic text. A cyberpunk dystopia and a medieval fantasy realm get different language, tone, and content from the same engine.
 
 ## Overview
 
@@ -75,7 +75,7 @@ import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistory
 
 ### World-Specific Adaptation
 
-This is where the magic happens - the AI actually understands what kind of world you've created and adapts accordingly:
+The AI adapts to the kind of world you've created:
 
 1. **Theme-Based Content**: A Western world feels like the Wild West, not generic fantasy
 2. **Smart Starting Locations**: No more starting in taverns when you're on a space station:
@@ -132,7 +132,7 @@ The narrative system consistently uses second-person perspective ("you") to crea
 
 The system includes several safeguards to prevent common issues. Initial scene deduplication ensures you don't get multiple opening scenes generated for the same session - it happened during early testing and was confusing. Choice tracking prevents the same choice from triggering multiple narrative generations, which could happen if a player clicked quickly or if the UI re-rendered.
 
-Component lifecycle management prevents state updates after a component unmounts, which React will complain about loudly. Error recovery handles AI service failures gracefully instead of crashing, and JSON parsing includes fallbacks for different response formats since the AI doesn't always return perfectly structured JSON.
+Component lifecycle management prevents state updates after a component unmounts, which React will complain about loudly. Error recovery catches AI service failures instead of crashing, and JSON parsing includes fallbacks for different response formats since the AI doesn't always return perfectly structured JSON.
 
 ### AI API Call Patterns
 

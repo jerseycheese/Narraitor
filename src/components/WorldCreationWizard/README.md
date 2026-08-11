@@ -71,9 +71,9 @@ Each step includes validation:
 
 ### Error Handling
 
-The wizard handles errors gracefully:
+The wizard handles errors without losing your progress:
 - Form validation errors display inline
-- AI failures gracefully fallback to default suggestions
+- AI failures fall back to default suggestions
 - Network errors are caught and displayed to users
 
 ## Testing

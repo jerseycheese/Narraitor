@@ -18,7 +18,7 @@ let resilientStoragePromise: Promise<ResilientStorageMiddleware> | null = null;
 /**
  * Get ResilientStorageMiddleware instance with lazy initialization.
  * This ensures the middleware is only initialized once and properly shared.
- * Handles initialization failures gracefully with memory fallback.
+ * Falls back to memory-only storage if initialization fails.
  */
 const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
   if (!resilientStoragePromise) {

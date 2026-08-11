@@ -37,7 +37,7 @@ const processNewSegment = async (segment: NarrativeSegment) => {
 ```
 
 ### AI Context Integration
-Goals are automatically included in AI prompts through the context building system. This is where the magic happens - the AI gets a summary of active goals along with the regular prompt, so it can generate content that's actually relevant to what the player is trying to achieve.
+Goals are automatically included in AI prompts through the context building system. The AI gets a summary of active goals along with the regular prompt, so it can generate content that's actually relevant to what the player is trying to achieve.
 
 ```typescript
 // In narrative generation or AI calls
@@ -164,7 +164,7 @@ const initializeStores = async () => {
 
 ## Error Handling Integration
 
-### Graceful Degradation
+### Failing Without Breaking the Session
 The system continues to function even when goal operations fail. The philosophy is that goal tracking enhances the experience but shouldn't break it if something goes wrong.
 
 ```typescript

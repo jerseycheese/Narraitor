@@ -342,7 +342,7 @@ export function capitalize(text: string): string {
  * Converts text to title case (capitalizes first letter of each word)
  * 
  * Transforms text so that each word starts with a capital letter.
- * Perfect for headings, titles, and proper names. Handles multiple spaces gracefully.
+ * For headings, titles, and proper names. Collapses multiple spaces into one.
  * 
  * @param text - Text to convert
  * @returns Text in title case
