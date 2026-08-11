@@ -104,8 +104,7 @@
 .component-basic-info-form,
 .component-background-form,
 .component-world-basic-info-form,
-.component-world-settings-form,
-.component-world-image-form {
+.component-world-settings-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);

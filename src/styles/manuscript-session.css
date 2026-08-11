@@ -293,47 +293,6 @@ body.manuscript-overlay-open {
   align-items: start;
 }
 
-.manuscript-characters-mobile-bar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: var(--color-manuscript-gradient-end);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
-  margin-bottom: var(--space-3);
-  min-height: 2.25rem;
-}
-
-.manuscript-characters-mobile-label {
-  margin: 0;
-  white-space: nowrap;
-  font-size: 0.6875rem;
-  font-family: var(--font-system);
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-  color: var(--color-text-muted);
-}
-
-.manuscript-characters-mobile-list {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  overflow-x: auto;
-  white-space: nowrap;
-  min-width: 0;
-  flex: 1;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.manuscript-characters-mobile-list::-webkit-scrollbar {
-  display: none;
-}
-
 .manuscript-input-row {
   display: flex;
   align-items: center;
@@ -565,87 +524,6 @@ body.manuscript-overlay-open {
   min-height: 100vh;
 }
 
-.manuscript-tools-menu {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.manuscript-tools-menu-items {
-  display: block;
-}
-
-.manuscript-tools-menu-items > * + * {
-  margin-top: var(--space-2);
-}
-
-.manuscript-tools-menu-item {
-  display: inline-block;
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-family: var(--font-interface), system-ui, sans-serif;
-  font-size: var(--font-size-xs);
-  line-height: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 120ms ease;
-  text-align: left;
-}
-
-.manuscript-tools-menu-item:hover {
-  background: var(--color-surface-hover);
-  border-color: var(--color-border-strong);
-}
-
-.manuscript-tools-menu-item:active {
-  transform: scale(0.98);
-}
-
-.manuscript-tools-menu-item:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-.manuscript-tools-menu-item-active {
-  background: var(--color-accent);
-  border: none;
-  color: var(--color-on-accent);
-}
-
-.manuscript-tools-menu-item-active:hover {
-  background: var(--color-accent-hover);
-  border: none;
-
-  /* Hover darkens the accent (in dark mode too), so white clears AA here even
-   * though the base state uses dark ink on the lighter base accent. */
-  color: var(--color-text-inverse);
-}
-
-.manuscript-tools-menu-item-secondary {
-  background: var(--color-surface-hover);
-  color: var(--color-text-secondary);
-}
-
-.manuscript-tools-menu-item-secondary:hover {
-  background: var(--color-border);
-  color: var(--color-text-primary);
-}
-
-.manuscript-tools-menu-divider {
-  border-top: 1px solid var(--color-border);
-  margin: var(--space-2) 0;
-}
-
-.manuscript-characters-rail-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
 .manuscript-characters-rail-label {
   margin: 0 0 var(--space-2);
   padding: 0;
@@ -781,11 +659,6 @@ body.manuscript-overlay-open {
 .manuscript-custom-input:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-}
-
-.manuscript-input-count {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
 }
 
 .manuscript-send-button {
@@ -1577,13 +1450,6 @@ body.manuscript-overlay-open {
   margin-bottom: var(--space-4);
 }
 
-.manuscript-inventory-view-toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-}
-
 /* Manuscript Inventory Styling */
 .manuscript-inventory-category-group {
   margin-bottom: var(--space-8);
@@ -1986,10 +1852,6 @@ body.manuscript-overlay-open {
     display: none;
   }
 
-  .manuscript-hud-reset-button {
-    display: none;
-  }
-
   .manuscript-header-controls {
     gap: var(--space-1);
   }
@@ -2012,14 +1874,6 @@ body.manuscript-overlay-open {
 }
 
 @media (width >= 1024px) {
-  .manuscript-characters-mobile-bar {
-    display: none;
-  }
-
-  .manuscript-tools-menu-item-mobile-only {
-    display: none;
-  }
-
   .manuscript-character-summary-columns {
     grid-template-columns: 1fr 1fr;
   }
@@ -3334,11 +3188,6 @@ body.manuscript-overlay-open {
   100% { background-position: -200% 0; }
 }
 
-/* DS3 "Suggested Actions" heading — hidden (DS3 uses kbd badge style) */
-:root .manuscript-suggested-actions-heading {
-  display: none;
-}
-
 /* DS3 narrative text — 18px with generous line-height */
 :root .text-narrative {
   font-size: var(--font-size-md);
@@ -3416,11 +3265,6 @@ body.manuscript-overlay-open {
   max-width: 60%;
   margin: 0 auto var(--space-5);
   opacity: 0.6;
-}
-
-/* DS3 mobile bar hidden (no rail concept) */
-:root .manuscript-characters-mobile-bar {
-  display: none;
 }
 
 /* DS3 end story button hidden — exit action is in HUD icon toolbar */

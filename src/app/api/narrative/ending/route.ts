@@ -2,9 +2,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
-import { generateEnding } from '../../../../lib/ai/endingGenerator';
-import { logger } from '../../../../lib/utils/logger';
-import type { EndingGenerationRequest, EndingType, EndingTone } from '../../../../types/narrative.types';
+import { generateEnding } from '@/lib/ai/endingGenerator';
+import { logger } from '@/lib/utils/logger';
+import type { EndingGenerationRequest, EndingType, EndingTone } from '@/types/narrative.types';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
 
 export async function POST(request: NextRequest) {
