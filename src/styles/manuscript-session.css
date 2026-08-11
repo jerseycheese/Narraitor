@@ -1262,18 +1262,34 @@ body.manuscript-overlay-open {
   border-color: rgb(from var(--color-text-muted) r g b / 25%);
 }
 
-.manuscript-suggested-action.is-selected .manuscript-skill-check-badge {
-
-  background: rgb(from var(--color-text-inverse) r g b / 20%);
-
-  color: var(--color-text-inverse);
-
-  border-color: rgb(from var(--color-text-inverse) r g b / 30%);
-
+/* The inverse treatment here assumed the selected row was a solid accent slab.
+   It is a soft tint, so inverse text lands white-on-light; the badge keeps its
+   ordinary accent colors and reads against the tint unchanged. */
+.manuscript-suggested-action-selected {
+  box-shadow: inset 0 0 0 1px var(--color-accent-soft);
 }
 
-.manuscript-suggested-action-selected {
-  box-shadow: inset 0 0 0 1px rgb(from var(--color-text-inverse) r g b / 20%);
+/* Selecting a choice tints the whole card, which moves the surface under every
+   quiet mark on it while their colors stay put. Both of these were tuned
+   against an untinted card and fall under 4.5:1 once it is selected. */
+
+/* The keycap sits on a transparent background, so it inherits the tint
+   directly: 3.99:1 light / 3.85:1 dark. One step up the text ramp restores it
+   without promoting the keycap to label weight.
+   Specificity note: the base `:root .manuscript-choice-kbd` rule below ties
+   with a two-class selector and wins on order, so this chains :root too. */
+:root .manuscript-suggested-action-selected .manuscript-choice-kbd {
+  color: var(--color-text-secondary);
+}
+
+/* The badge paints its own accent tint, so on a selected card that tint stacks
+   on the card's - and `--color-accent` is the wrong token for accent-sized text
+   on accent-soft in the first place; `--color-accent-strong` is defined for
+   exactly that. Dropping the second tint is what fixes dark mode, where
+   accent-strong is deliberately identical to accent. */
+.manuscript-suggested-action-selected .manuscript-skill-check-badge {
+  background: transparent;
+  color: var(--color-accent-strong);
 }
 
 .manuscript-secondary-controls {
@@ -2540,11 +2556,11 @@ body.manuscript-overlay-open {
 .manuscript-generation-error-title {
   font-family: var(--font-interface), system-ui, sans-serif;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--color-text-primary);
 }
 
 .manuscript-generation-error-message {
-  color: var(--color-text);
+  color: var(--color-text-primary);
   font-size: var(--font-size-sm);
 }
 
@@ -2957,17 +2973,23 @@ body.manuscript-overlay-open {
 
 :root .manuscript-suggested-action:hover {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-float);
+  box-shadow: var(--shadow-overlay);
 }
 
 :root .manuscript-suggested-action:hover::before {
   background: var(--color-accent);
 }
 
+/* `--color-accent-fill` was never defined anywhere, so this rule painted no
+   background at all while the base `.is-selected` rule's white
+   `--color-on-accent` text still applied — the chosen action rendered white on
+   the cream surface at roughly 1.1:1. The soft accent tint is what the accent
+   border was always drawn against; text stays on the primary color. */
 :root .manuscript-suggested-action.is-selected,
 :root .manuscript-suggested-action[aria-pressed="true"] {
-  background: var(--color-accent-fill);
+  background: var(--color-accent-soft);
   border-color: var(--color-accent);
+  color: var(--color-text-primary);
 }
 
 :root .manuscript-suggested-action-label {
@@ -3339,7 +3361,7 @@ body.manuscript-overlay-open {
 }
 
 :root .manuscript-evaluating-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-system);
   font-size: 0.6875rem;
   color: var(--color-text-muted);
   letter-spacing: 0.04em;
@@ -3400,7 +3422,12 @@ body.manuscript-overlay-open {
   max-width: 42.5rem;
 }
 
-/* DS3 choice cards — neutral colors, not alignment-tinted */
+/* DS3 choice cards — neutral colors, not alignment-tinted. The unaligned card
+   used to be left out of this list, so it alone fell through to the generic
+   secondary-button fill and rendered as the heaviest option on the rail. Weight
+   should track consequence, and an unaligned choice is the least consequential
+   one there. */
+:root .manuscript-suggested-action,
 :root .manuscript-suggested-action.manuscript-suggested-action-lawful,
 :root .manuscript-suggested-action.manuscript-suggested-action-chaotic {
   background: var(--color-surface);
@@ -3759,7 +3786,10 @@ body.manuscript-overlay-open {
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-  color: var(--color-text-muted);
+
+  /* Muted ink measures 4.30:1 against the scene-status bar, under AA for text
+     this size. Secondary clears it at 5.04:1 and still reads as a label. */
+  color: var(--color-text-secondary);
 }
 
 .scene-status-location-value {

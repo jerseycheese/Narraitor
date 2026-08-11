@@ -73,7 +73,7 @@ export const ManuscriptSessionShell: React.FC<ManuscriptSessionShellProps> = ({
           </section>
 
           {/* Docked Action Rail */}
-          <div ref={actionRailRef}>
+          <div className="manuscript-action-rail-dock" ref={actionRailRef}>
             {actionRail}
           </div>
         </div>
