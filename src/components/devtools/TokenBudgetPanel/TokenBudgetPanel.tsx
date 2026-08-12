@@ -94,7 +94,7 @@ const UsageRow = ({ component }: { component: ComponentBudgetUsage }) => {
         <div
           className={clsx('token-budget-panel-bar-fill', `is-${level}`)}
           data-testid={`token-budget-bar-${component.componentId}`}
-          style={{ width: `${fillPct}%` }}
+          style={{ transform: `translateX(${fillPct - 100}%)` }}
         />
       </div>
 

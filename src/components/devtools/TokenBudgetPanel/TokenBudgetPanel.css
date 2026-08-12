@@ -61,10 +61,16 @@
   overflow: hidden;
 }
 
+/* Full-width and slid left by the empty remainder rather than sized to the
+   fill, so the bar animates on the compositor instead of relaunching layout.
+   The track clips the overhang, and the pill cap on the trailing edge survives
+   because the element is never horizontally squashed. */
 .token-budget-panel-bar-fill {
+  width: 100%;
   height: 100%;
   border-radius: var(--radius-full);
-  transition: width 0.2s ease;
+  transform: translateX(-100%);
+  transition: transform 0.2s ease;
 }
 
 .token-budget-panel-bar-fill.is-ok {

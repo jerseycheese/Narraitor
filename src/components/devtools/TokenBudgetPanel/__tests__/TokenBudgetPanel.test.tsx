@@ -68,6 +68,20 @@ describe('TokenBudgetPanel', () => {
     expect(screen.getByTestId('token-budget-bar-examples')).toHaveClass('is-over');
   });
 
+  it('slides each bar left by the share of its budget still unspent', () => {
+    withSnapshots([sampleSnapshot]);
+    render(<TokenBudgetPanel />);
+
+    // 150/300 spent, so half the track stays empty.
+    expect(screen.getByTestId('token-budget-bar-base-template')).toHaveStyle({
+      transform: 'translateX(-50%)',
+    });
+    // Over budget clamps to a full bar rather than overshooting the track.
+    expect(screen.getByTestId('token-budget-bar-examples')).toHaveStyle({
+      transform: 'translateX(0%)',
+    });
+  });
+
   it('flags over-budget components with a degradation suggestion', () => {
     withSnapshots([sampleSnapshot]);
     render(<TokenBudgetPanel />);
