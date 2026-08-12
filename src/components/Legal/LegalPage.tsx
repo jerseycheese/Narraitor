@@ -34,6 +34,9 @@ export function LegalPage({ title, lead, updated, children }: LegalPageProps) {
         <Link href="/about" className="component-legal-footer-link">
           About
         </Link>
+        <Link href="/faq" className="component-legal-footer-link">
+          FAQ
+        </Link>
         <Link href="/privacy" className="component-legal-footer-link">
           Privacy
         </Link>

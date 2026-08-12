@@ -155,6 +155,9 @@ export default function About() {
       </main>
 
       <nav className="component-about-footer" aria-label="Site information">
+        <Link href="/faq" className="component-about-footer-link">
+          FAQ
+        </Link>
         <Link href="/privacy" className="component-about-footer-link">
           Privacy
         </Link>

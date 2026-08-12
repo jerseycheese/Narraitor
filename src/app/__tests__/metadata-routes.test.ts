@@ -39,6 +39,7 @@ describe('sitemap', () => {
     expect(sitemap().map((entry) => entry.url)).toEqual([
       ORIGIN,
       `${ORIGIN}/about`,
+      `${ORIGIN}/faq`,
       `${ORIGIN}/privacy`,
       `${ORIGIN}/terms`,
     ]);

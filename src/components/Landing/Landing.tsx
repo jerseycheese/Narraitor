@@ -156,6 +156,9 @@ export default function Landing() {
             >
               Get a Gemini key
             </a>
+            <Link href="/faq" className="component-landing-cta-secondary">
+              Read the FAQ
+            </Link>
           </div>
         </div>
       </section>
@@ -163,6 +166,9 @@ export default function Landing() {
       <nav className="component-landing-footer" aria-label="Site information">
         <Link href="/about" className="component-landing-footer-link">
           About
+        </Link>
+        <Link href="/faq" className="component-landing-footer-link">
+          FAQ
         </Link>
         <Link href="/privacy" className="component-landing-footer-link">
           Privacy
