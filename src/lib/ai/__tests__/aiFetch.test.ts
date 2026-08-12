@@ -1,14 +1,17 @@
 jest.mock('@/state/providerStore', () => ({
   getActiveProviderKey: jest.fn(),
+  getActiveProviderModel: jest.fn(),
 }));
 
 import { aiFetch } from '../aiFetch';
-import { getActiveProviderKey } from '@/state/providerStore';
+import { getActiveProviderKey, getActiveProviderModel } from '@/state/providerStore';
 
 const mockGetKey = getActiveProviderKey as jest.MockedFunction<typeof getActiveProviderKey>;
+const mockGetModel = getActiveProviderModel as jest.MockedFunction<typeof getActiveProviderModel>;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockGetModel.mockReturnValue(null);
   global.fetch = jest.fn(async () => ({ ok: true })) as unknown as typeof fetch;
 });
 
@@ -30,6 +33,21 @@ describe('aiFetch', () => {
     await aiFetch('/api/narrative/generate');
 
     expect(lastFetchHeaders().has('x-provider-api-key')).toBe(false);
+  });
+
+  test('attaches the configured model header', async () => {
+    mockGetKey.mockResolvedValue('byo-key');
+    mockGetModel.mockReturnValue('gemini-2.5-pro');
+    await aiFetch('/api/narrative/generate', { method: 'POST' });
+
+    expect(lastFetchHeaders().get('x-provider-model')).toBe('gemini-2.5-pro');
+  });
+
+  test('sends no model header when no model is configured', async () => {
+    mockGetKey.mockResolvedValue('byo-key');
+    await aiFetch('/api/narrative/generate');
+
+    expect(lastFetchHeaders().has('x-provider-model')).toBe(false);
   });
 
   test('preserves caller-supplied headers', async () => {

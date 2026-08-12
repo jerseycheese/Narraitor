@@ -2,72 +2,63 @@
 title: Prompt Context API
 tags: [prompt, context, api, ai]
 created: 2025-05-12
-updated: 2026-05-22
+updated: 2026-08-12
 ---
 
 # Prompt Context API
 
 The AI needs to understand the world, the character, recent events, and lore to write a
-good scene, but the prompt can only carry so much before it gets expensive and noisy. The
-`promptContext` module is the budgeting layer that sits under prompt assembly: it estimates
-how big a chunk of text is, hands each part of the prompt a token allowance, and formats
-the trickier pieces (like inventory) so they stay useful without blowing past their share.
+good scene. The `promptContext` module is the measuring and shaping layer under prompt
+assembly: it counts how big a chunk of text is, formats the trickier pieces (like
+inventory) so they stay useful, and records what each finished request weighed.
 
 There's no single "context manager" class. The module is three small, focused pieces that
 the AI layer composes itself, which keeps each piece testable and avoids one god-object
 owning the whole prompt.
 
-## Token estimation (`tokenUtils.ts`)
+One thing worth saying up front, because the module name suggests otherwise: nothing here
+trims a prompt to fit a global budget. Each prompt component is bounded where it's
+assembled — callers slice the narrative window before it reaches the prompt, lore is
+capped at 20 facts, the character section has no growth term, and inventory caps itself.
+A long session doesn't send a bigger prompt than a short one.
 
-Pulling in a real tokenizer just to budget prompts isn't worth the dependency weight, so
-estimation uses a heuristic that approximates LLM tokenization — word boundaries,
-punctuation, CamelCase and hyphen splits, and a character-count fallback for long words.
-It's not exact, but it's close enough to decide what fits and what gets trimmed.
+## Token counting (`tokenUtils.ts`)
+
+`estimateTokenCount` runs the real Gemini tokenizer (`@lenml/tokenizer-gemini`, wrapped in
+`tokenizer.ts` behind a lazily-built singleton). It's called an estimate because it counts
+the prompt text rather than whatever the provider ultimately bills, not because the
+tokenization is approximate.
 
 ```typescript
-import { estimateTokenCount, truncateToTokenLimit } from '@/lib/promptContext/tokenUtils';
+import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
 
-const tokens = estimateTokenCount('This is a sample text to estimate token count.');
-const trimmed = truncateToTokenLimit(longLoreBlob, 800);
+const tokens = estimateTokenCount('This is a sample text to count.');
 ```
 
-`truncateToTokenLimit` caps a string at an estimated token limit and avoids cutting
-mid-word when it can. That's what the prompt builders lean on to keep a large section
-(recent narrative, lore) inside its allocation.
+## Prompt calibration (`promptCalibration.ts`)
 
-## Token budgeting (`tokenBudgetManager.ts`)
-
-Each prompt is built from competing parts — base template, character context, recent
-narrative, goals, tone, lore, inventory, personalization — and they can't all grow
-unbounded. `RequestBudget` handles the divvying-up for a single request. You give it a set
-of per-component allocations and a total budget, and it resolves how many tokens each
-component actually gets, reducing lower-priority components first when things are tight.
+This is the observability half. `buildCalibrationSnapshot` produces the record the DevTools
+panel reads: what a request's whole prompt weighed by our own count, what the provider
+reported, and the ratio between them.
 
 ```typescript
 import {
-  RequestBudget,
-  ComponentPriority,
-  DEFAULT_ALLOCATIONS,
+  buildCalibrationSnapshot,
   DEFAULT_TOTAL_BUDGET,
-} from '@/lib/promptContext/tokenBudgetManager';
+} from '@/lib/promptContext/promptCalibration';
 
-const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true);
-
-const loreAllowance = budget.getAllocation('lore-context');
-budget.recordUsage('lore-context', actualLoreTokens);
+const snapshot = buildCalibrationSnapshot(estimatedTokens, providerPromptTokens);
+// { totalBudget: 80000, estimated: 2413, actual: 2380, accuracy: 0.986 }
 ```
 
-A few things worth knowing about how it resolves:
+`accuracy` only appears once the provider has reported a count and the estimate is
+non-zero. `DEFAULT_TOTAL_BUDGET` is `80000` — roughly 8% of a 1M-token context window. It's
+the yardstick the panel measures a request against, not a ceiling: nothing enforces it.
 
-- Allocations carry a `ComponentPriority` (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) plus
-  `min`, `target`, and `max`. `CRITICAL` components (base template, character context) get
-  their minimum first, then everything else is filled by priority from what's left.
-- Pass `enabled: false` and it stops enforcing limits — `getAllocation` returns `Infinity`
-  and nothing gets trimmed, which is handy for debugging a prompt without the budget in the
-  way.
-- `DEFAULT_TOTAL_BUDGET` is `80000`, deliberately conservative at roughly 8% of a 1M-token
-  context window. `DEFAULT_ALLOCATIONS` is the narrative-generation preset that ships with
-  the module.
+In practice you don't call this directly. `recordRequestCalibration` in
+`narrativeGenerator.calibration.ts` wraps it and pushes the result into the calibration
+store after each generation. That publishing is browser-only and skipped in production, so
+the panel is a local debugging surface rather than a telemetry pipeline.
 
 ## Inventory context (`inventoryContextBuilder.ts`)
 
@@ -96,21 +87,23 @@ const { context } = buildInventoryContext(characterInventoryItems, {
 Each line carries when and how the item was acquired, which gives the AI something concrete
 to reference in narrative. It defaults to 180 tokens and 8 items; when it has to truncate,
 it appends the "+ N more items" summary line and drops lower-priority items so that summary
-still fits.
+still fits. This is the one limit in the module that actually cuts content, and it's
+self-contained — the caller can pass a different `tokenLimit`, but nothing outside the
+builder decides one for it.
 
 ## Where this gets used
 
 The consumers all live in the AI layer. `narrativeGenerator.prompt.ts`,
-`narrativeGenerator.budget.ts`, `narrativeGenerator.prompt.personalization.ts`, and
-`choiceGenerator.prompt.ts` assemble their prompts on top of these pieces, and the narrative
-templates themselves (`templates/narrative/baseNarrativeTemplate.ts`) pull in formatted
-context. So the flow is roughly: a template knows what sections it wants, `RequestBudget`
-says how big each can be, `tokenUtils` measures and trims, and `buildInventoryContext`
-handles the one section that needs real sorting logic.
+`narrativeGenerator.prompt.personalization.ts`, and `choiceGenerator.prompt.ts` assemble
+their prompts on top of these pieces, and the narrative templates themselves
+(`templates/narrative/baseNarrativeTemplate.ts`) pull in formatted context. So the flow is
+roughly: a template knows what sections it wants, each section bounds itself,
+`buildInventoryContext` handles the one that needs real sorting logic, and
+`narrativeGenerator.calibration.ts` measures the result on the way out.
 
 ## Behavior under bad input
 
 The pieces are built to degrade rather than throw. Missing world or character data just
-produces a smaller context with whatever's available, empty structures return empty strings,
-and a disabled budget skips enforcement entirely. Estimation is O(n) on content length and
-synchronous, so none of this adds latency worth worrying about.
+produces a smaller context with whatever's available, and empty structures return empty
+strings. Counting is O(n) on content length and synchronous, so none of this adds latency
+worth worrying about.

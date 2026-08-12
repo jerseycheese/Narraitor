@@ -1,0 +1,232 @@
+/* ═══════════════════════════════════════════════════════════════
+   FAQ Surface
+   Styles for /faq and the <Faq /> component. All values use design tokens
+   for theme-awareness. DS3 ("Mechanical Manuscript") structural treatment,
+   borrowed from legal.css: mono uppercase group labels with a dot bullet,
+   mono prose, prose-width column. What's different is the second heading
+   level — a question has to read as a question sitting under a topic, not
+   as another eyebrow — and the jump list, which is what makes a long page
+   of open answers navigable without collapsing anything.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Base layout ─── */
+
+.component-faq {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: var(--page-width-prose);
+  margin: 0 auto;
+  padding: var(--space-6) var(--page-gutter);
+}
+
+@media (width >= 1024px) {
+  .component-faq {
+    padding: var(--space-8) var(--page-gutter);
+  }
+}
+
+/* ─── Hero ─── */
+
+.component-faq-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-faq-eyebrow {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.component-faq-title {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.component-faq-lead {
+  margin: 0;
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-md);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Jump list ─── */
+
+.component-faq-jumplist {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+@media (width >= 768px) {
+  .component-faq-jumplist {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.component-faq-jumplist-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-faq-jumplist-title {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.component-faq-jumplist-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.component-faq-jumplist-link {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.component-faq-jumplist-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ─── Groups and questions ─── */
+
+.component-faq-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Scoped (.component-faq prefix) to outrank the app-surface heading baselines
+   in app-shell.css (.app-surface-app h2 / h3) — both headings here are
+   deliberately off the surface default: the group label is a small mono
+   uppercase eyebrow, the question is narrative-face body weight. A bare
+   single class loses to `.app-surface-app h2` on specificity. */
+.component-faq .component-faq-group-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.component-faq .component-faq-group-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.component-faq-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* The header is sticky, so an anchor jump would otherwise tuck the question
+   underneath it. Composed from tokens rather than a magic number: the header's
+   own height is its control row plus block padding (~69px measured), and the
+   last term is the air that keeps the heading from landing flush against it. */
+.component-faq .component-faq-question {
+  margin: 0;
+  scroll-margin-top: calc(
+    var(--control-height-touch) + var(--space-6) + var(--space-4)
+  );
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.component-faq-answer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.component-faq-answer p {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.component-faq-answer code {
+  padding: var(--space-0_5) var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  font-family: var(--font-system);
+  font-size: 0.875em;
+  color: var(--color-text-primary);
+}
+
+.component-faq-answer a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.component-faq-answer a:hover {
+  color: var(--color-accent-hover);
+}
+
+/* ─── Footer links ─── */
+
+.component-faq-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.component-faq-footer-link {
+  font-family: var(--font-interface);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.component-faq-footer-link:hover {
+  color: var(--color-accent);
+}

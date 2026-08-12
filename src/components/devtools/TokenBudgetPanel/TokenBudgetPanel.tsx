@@ -1,45 +1,18 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { clsx } from 'clsx';
-import { Badge } from '@/components/ui/badge';
 import { useCalibrationStore } from '@/state/calibrationStore';
 import {
-  RequestBudget,
-  ComponentPriority,
-  DEFAULT_ALLOCATIONS,
   DEFAULT_TOTAL_BUDGET,
-  type ComponentBudgetUsage,
-  type TokenBudgetSnapshot,
-} from '@/lib/promptContext/tokenBudgetManager';
+  type PromptCalibrationSnapshot,
+} from '@/lib/promptContext/promptCalibration';
 import './TokenBudgetPanel.css';
 
 type UtilizationLevel = 'ok' | 'warn' | 'high' | 'over';
 
-const PRIORITY_LABELS: Record<ComponentPriority, string> = {
-  [ComponentPriority.CRITICAL]: 'Critical',
-  [ComponentPriority.HIGH]: 'High',
-  [ComponentPriority.MEDIUM]: 'Medium',
-  [ComponentPriority.LOW]: 'Low',
-};
-
-/**
- * Degradation guidance for an over-budget component, keyed by how aggressively
- * the budget resolver drops it under pressure.
- */
-const DEGRADATION_SUGGESTIONS: Record<ComponentPriority, string> = {
-  [ComponentPriority.CRITICAL]:
-    'Critical component — cannot be dropped; trim its source content to recover budget.',
-  [ComponentPriority.HIGH]:
-    'High priority — truncated only when budget is tight; consider trimming content.',
-  [ComponentPriority.MEDIUM]:
-    'Medium priority — degraded when budget runs low.',
-  [ComponentPriority.LOW]:
-    'Low priority — first to be dropped under budget pressure.',
-};
-
-const utilization = (estimated: number, allocation: number): number => {
-  if (allocation > 0) return estimated / allocation;
+const utilization = (estimated: number, total: number): number => {
+  if (total > 0) return estimated / total;
   return estimated > 0 ? Infinity : 0;
 };
 
@@ -52,70 +25,46 @@ const levelFor = (ratio: number): UtilizationLevel => {
 
 const formatTokens = (value: number): string => Math.round(value).toLocaleString();
 
-/**
- * Resolve the default allocations (with zero usage) so the panel can show the
- * budget allocation before any request has been captured.
- */
-const buildFallbackSnapshot = (): TokenBudgetSnapshot =>
-  new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true).getSnapshot();
+const EMPTY_SNAPSHOT: PromptCalibrationSnapshot = {
+  totalBudget: DEFAULT_TOTAL_BUDGET,
+  estimated: 0,
+};
 
-const UsageRow = ({ component }: { component: ComponentBudgetUsage }) => {
-  const ratio = utilization(component.estimated, component.allocation);
+const UsageBar = ({ snapshot }: { snapshot: PromptCalibrationSnapshot }) => {
+  const ratio = utilization(snapshot.estimated, snapshot.totalBudget);
   const level = levelFor(ratio);
-  const isOver = level === 'over';
   const fillPct = Number.isFinite(ratio) ? Math.min(100, ratio * 100) : 100;
 
   return (
     <div
       className="token-budget-panel-row"
-      data-testid={`token-budget-row-${component.componentId}`}
+      data-testid="token-budget-row-request-total"
       data-level={level}
     >
       <div className="token-budget-panel-row-head">
-        <span className="token-budget-panel-component">{component.componentId}</span>
-        <Badge variant="outline-static" size="sm" className="token-budget-panel-priority">
-          {PRIORITY_LABELS[component.priority]}
-        </Badge>
-        {isOver && (
-          <Badge
-            variant="destructive-static"
-            size="sm"
-            data-testid={`token-budget-over-${component.componentId}`}
-          >
-            Over budget
-          </Badge>
-        )}
+        <span className="token-budget-panel-component">whole prompt</span>
         <span className="token-budget-panel-numbers">
-          {formatTokens(component.estimated)} / {formatTokens(component.allocation)}
+          {formatTokens(snapshot.estimated)} / {formatTokens(snapshot.totalBudget)}
         </span>
       </div>
 
       <div className="token-budget-panel-bar" role="presentation">
         <div
           className={clsx('token-budget-panel-bar-fill', `is-${level}`)}
-          data-testid={`token-budget-bar-${component.componentId}`}
-          style={{ width: `${fillPct}%` }}
+          data-testid="token-budget-bar-request-total"
+          style={{ transform: `translateX(${fillPct - 100}%)` }}
         />
       </div>
-
-      {isOver && (
-        <p
-          className="token-budget-panel-suggestion"
-          data-testid={`token-budget-suggestion-${component.componentId}`}
-        >
-          {DEGRADATION_SUGGESTIONS[component.priority]}
-        </p>
-      )}
     </div>
   );
 };
 
 const CalibrationSummary = ({
-  calibration,
+  snapshot,
 }: {
-  calibration: TokenBudgetSnapshot['calibration'];
+  snapshot: PromptCalibrationSnapshot;
 }) => {
-  const hasActual = typeof calibration.actual === 'number';
+  const hasActual = typeof snapshot.actual === 'number';
 
   return (
     <div className="token-budget-panel-calibration" data-testid="token-budget-calibration">
@@ -123,13 +72,13 @@ const CalibrationSummary = ({
       {hasActual ? (
         <div className="token-budget-panel-calibration-figures">
           <span data-testid="token-budget-accuracy">
-            {calibration.accuracy !== undefined
-              ? `${calibration.accuracy.toFixed(2)}×`
+            {snapshot.accuracy !== undefined
+              ? `${snapshot.accuracy.toFixed(2)}×`
               : 'n/a'}
           </span>
           <span className="token-budget-panel-numbers">
-            actual {formatTokens(calibration.actual as number)} / estimated{' '}
-            {formatTokens(calibration.estimated)}
+            actual {formatTokens(snapshot.actual as number)} / estimated{' '}
+            {formatTokens(snapshot.estimated)}
           </span>
         </div>
       ) : (
@@ -148,41 +97,31 @@ const CalibrationSummary = ({
 /**
  * TokenBudgetPanel
  *
- * Dev-only observability for the prompt token-budget system (#1333). Surfaces
- * per-component allocation and usage bars, over-budget degradation guidance,
- * and request-level estimate-vs-actual calibration captured after each
- * narrative generation. Reads the latest snapshot from the calibration store
- * and falls back to the static allocation config before any request is seen.
+ * Dev-only observability for prompt size. Shows what the last request's whole
+ * prompt weighed against a reference figure, plus how the heuristic estimate
+ * compared to the provider's own token count.
+ *
+ * Measurement only — nothing here trims a prompt. Components are bounded where
+ * they are assembled, so there is no per-component ceiling to report against.
  */
 export const TokenBudgetPanel = () => {
   const snapshots = useCalibrationStore((state) => state.snapshots);
-
-  const { snapshot, isLive } = useMemo(() => {
-    const latest = snapshots.length > 0 ? snapshots[snapshots.length - 1] : null;
-    return latest
-      ? { snapshot: latest, isLive: true }
-      : { snapshot: buildFallbackSnapshot(), isLive: false };
-  }, [snapshots]);
+  const latest = snapshots.length > 0 ? snapshots[snapshots.length - 1] : null;
+  const snapshot = latest ?? EMPTY_SNAPSHOT;
 
   return (
     <div className="token-budget-panel" data-testid="devtools-token-budget-panel">
       <div className="token-budget-panel-meta">
         <span data-testid="token-budget-status">
-          {isLive ? 'Latest request' : 'No request captured yet — showing allocation config'}
-        </span>
-        <span className="token-budget-panel-numbers">
-          Total budget {formatTokens(snapshot.totalBudget)} ·{' '}
-          {snapshot.enabled ? 'enforcement on' : 'enforcement off'}
+          {latest ? 'Latest request' : 'No request captured yet'}
         </span>
       </div>
 
       <div className="token-budget-panel-rows">
-        {snapshot.components.map((component) => (
-          <UsageRow key={component.componentId} component={component} />
-        ))}
+        <UsageBar snapshot={snapshot} />
       </div>
 
-      <CalibrationSummary calibration={snapshot.calibration} />
+      <CalibrationSummary snapshot={snapshot} />
     </div>
   );
 };

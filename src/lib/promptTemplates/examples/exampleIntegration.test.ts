@@ -1,245 +1,89 @@
 /**
- * @fileoverview Integration tests for example library with templates
- * Tests that verify token budget handling and tag selection logic
+ * @fileoverview Verifies each narrative template embeds its example block, and
+ * that the budget gate still drops examples when there is no room for them.
  */
 
 import { baseNarrativeTemplate } from '../templates/narrative/baseNarrativeTemplate';
 import { sceneTemplate } from '../templates/narrative/sceneTemplate';
 import { transitionTemplate } from '../templates/narrative/transitionTemplate';
+import { playerChoiceTemplate } from '../templates/narrative/playerChoiceTemplate';
 import { skillAcknowledgmentTemplate } from '../templates/narrative/skillAcknowledgmentTemplate';
+import {
+  PERSPECTIVE_AND_EMPHASIS_EXAMPLES,
+  PERSPECTIVE_EXAMPLES,
+  CHOICE_EXAMPLES,
+  SKILL_ACKNOWLEDGMENT_EXAMPLES,
+} from './index';
 
-describe('Example Library Template Integration', () => {
-  describe('Token Budget Handling', () => {
-    it('should respect zero token budget in baseNarrativeTemplate', () => {
-      const context = {
-        worldName: 'Test World',
-        worldDescription: 'A test world',
-        genre: 'fantasy',
-        tone: 'dark',
-        attributes: [],
-        generationParameters: {
-          exampleTokenBudget: 0, // Explicitly disable examples
-        },
-      };
+const baseContext = {
+  worldName: 'Test World',
+  worldDescription: 'A test world',
+  genre: 'fantasy',
+  tone: 'dark',
+  attributes: [],
+};
 
-      const result = baseNarrativeTemplate(context);
+const sceneContext = {
+  ...baseContext,
+  narrativeContext: { recentSegments: [{ content: 'Previous scene content' }] },
+  generationParameters: { segmentType: 'scene' },
+};
 
-      // Should not include "EXAMPLES:" section when budget is 0
-      expect(result).not.toContain('EXAMPLES:');
-      expect(result).not.toContain('Example 1:');
-    });
+const transitionContext = {
+  ...baseContext,
+  previousContent: 'Previous content',
+  previousType: 'scene',
+};
 
-    it('should respect zero token budget in sceneTemplate', () => {
-      const context = {
-        worldName: 'Test World',
-        genre: 'fantasy',
-        tone: 'dark',
-        narrativeContext: {
-          recentSegments: [
-            { content: 'Previous scene content' },
-          ],
-        },
-        generationParameters: {
-          segmentType: 'scene',
-          exampleTokenBudget: 0, // Explicitly disable examples
-        },
-      };
+const skillContext = {
+  worldName: 'Test World',
+  genre: 'fantasy',
+  playerCharacterName: 'Alex',
+  skillUsed: {
+    skillId: 'lockpicking',
+    skillName: 'Lockpicking',
+    success: true,
+    difficulty: 3,
+  },
+};
 
-      const result = sceneTemplate(context);
-
-      // Should not include "EXAMPLES:" section when budget is 0
-      expect(result).not.toContain('EXAMPLES:');
-      expect(result).not.toContain('Example 1:');
-    });
-
-    it('should respect zero token budget in transitionTemplate', () => {
-      const context = {
-        worldName: 'Test World',
-        genre: 'fantasy',
-        tone: 'dark',
-        previousContent: 'Previous content',
-        previousType: 'scene',
-        generationParameters: {
-          exampleTokenBudget: 0, // Explicitly disable examples
-        },
-      };
-
-      const result = transitionTemplate(context);
-
-      // Should not include "EXAMPLES:" section when budget is 0
-      expect(result).not.toContain('EXAMPLES:');
-      expect(result).not.toContain('Example 1:');
-    });
-
-    it('should use default budget when exampleTokenBudget is undefined', () => {
-      const context = {
-        worldName: 'Test World',
-        worldDescription: 'A test world',
-        genre: 'fantasy',
-        tone: 'dark',
-        attributes: [],
-        generationParameters: {
-          // exampleTokenBudget is undefined - should use default
-        },
-      };
-
-      const result = baseNarrativeTemplate(context);
-
-      // With default budget and short context, examples should be included
-      expect(result).toContain('EXAMPLES:');
-    });
-
-    it('should differentiate between 0 and undefined for token budget', () => {
-      const baseContext = {
-        worldName: 'Test World',
-        worldDescription: 'A test world',
-        genre: 'fantasy',
-        tone: 'dark',
-        attributes: [],
-      };
-
-      // Case 1: exampleTokenBudget = 0 (explicit disable)
-      const resultWithZero = baseNarrativeTemplate({
-        ...baseContext,
-        generationParameters: { exampleTokenBudget: 0 },
-      });
-
-      // Case 2: exampleTokenBudget = undefined (use default)
-      const resultWithUndefined = baseNarrativeTemplate({
-        ...baseContext,
-        generationParameters: {},
-      });
-
-      // Zero should prevent examples
-      expect(resultWithZero).not.toContain('EXAMPLES:');
-
-      // Both results should be valid templates
-      expect(resultWithZero).toBeDefined();
-      expect(resultWithUndefined).toBeDefined();
-    });
+describe('narrative templates embed their examples', () => {
+  it('base narrative gets the perspective and emphasis set', () => {
+    expect(baseNarrativeTemplate(baseContext)).toContain(
+      PERSPECTIVE_AND_EMPHASIS_EXAMPLES
+    );
   });
 
-  describe('Skill Acknowledgment Tag Selection', () => {
-    it('should use success tag when skillUsed.success is true', () => {
-      const context = {
-        worldName: 'Test World',
-        genre: 'fantasy',
-        narrativeContext: {
-          worldId: 'test-world',
-          currentSceneId: 'test-scene',
-          characterIds: [],
-          previousSegments: [],
-          currentTags: [],
-          sessionId: 'test-session',
-          recentSegments: [
-            { content: 'You attempt to pick the lock.' },
-          ],
-        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-        playerCharacterName: 'Hero',
-        skillUsed: {
-          skillId: 'lockpicking',
-          skillName: 'Lockpicking',
-          success: true,
-          difficulty: 5,
-        },
-      };
+  it('scene and transition share the perspective set', () => {
+    expect(sceneTemplate(sceneContext)).toContain(PERSPECTIVE_EXAMPLES);
+    expect(transitionTemplate(transitionContext)).toContain(PERSPECTIVE_EXAMPLES);
+  });
 
-      const result = skillAcknowledgmentTemplate(context);
+  it('player choice gets the choice set', () => {
+    expect(playerChoiceTemplate({ ...baseContext, optionCount: 3 })).toContain(
+      CHOICE_EXAMPLES
+    );
+  });
 
-      // Should include success guidance
-      expect(result).toContain('SUCCESS ACKNOWLEDGMENT');
-      expect(result).not.toContain('FAILURE ACKNOWLEDGMENT');
+  it('skill acknowledgment ships both outcomes, whether the skill hit or missed', () => {
+    const onSuccess = skillAcknowledgmentTemplate(skillContext);
+    const onFailure = skillAcknowledgmentTemplate({
+      ...skillContext,
+      skillUsed: { ...skillContext.skillUsed, success: false },
     });
 
-    it('should use failure tag when skillUsed.success is false', () => {
-      const context = {
-        worldName: 'Test World',
-        genre: 'fantasy',
-        narrativeContext: {
-          worldId: 'test-world',
-          currentSceneId: 'test-scene',
-          characterIds: [],
-          previousSegments: [],
-          currentTags: [],
-          sessionId: 'test-session',
-          recentSegments: [
-            { content: 'You attempt to pick the lock.' },
-          ],
-        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-        playerCharacterName: 'Hero',
-        skillUsed: {
-          skillId: 'lockpicking',
-          skillName: 'Lockpicking',
-          success: false,
-          difficulty: 8,
-        },
-      };
+    expect(onSuccess).toContain(SKILL_ACKNOWLEDGMENT_EXAMPLES);
+    expect(onFailure).toContain(SKILL_ACKNOWLEDGMENT_EXAMPLES);
+  });
+});
 
-      const result = skillAcknowledgmentTemplate(context);
-
-      // Should include failure guidance
-      expect(result).toContain('FAILURE ACKNOWLEDGMENT');
+describe('the context-length gate still drops examples', () => {
+  it('scene omits examples once the context is long enough to stand on its own', () => {
+    const result = sceneTemplate({
+      ...sceneContext,
+      narrativeContext: { recentSegments: [{ content: 'x'.repeat(6000) }] },
     });
 
-    it('should default to success tag when skillUsed is undefined', () => {
-      const context = {
-        worldName: 'Test World',
-        genre: 'fantasy',
-        narrativeContext: {
-          worldId: 'test-world',
-          currentSceneId: 'test-scene',
-          characterIds: [],
-          previousSegments: [],
-          currentTags: [],
-          sessionId: 'test-session',
-          recentSegments: [
-            { content: 'You perform a custom action.' },
-          ],
-        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-        playerCharacterName: 'Hero',
-        // skillUsed is undefined - custom action without explicit result
-        customAction: {
-          action: 'inspect the mechanism',
-          implicitSkills: ['perception'],
-        },
-      };
-
-      const result = skillAcknowledgmentTemplate(context);
-
-      // Should include custom action guidance, not default to failure
-      expect(result).toContain('CUSTOM ACTION ACKNOWLEDGMENT');
-      // Should not bias toward failure
-      expect(result).not.toContain('FAILURE ACKNOWLEDGMENT');
-    });
-
-    it('should default to success tag when skillUsed.success is null', () => {
-      const context = {
-        worldName: 'Test World',
-        genre: 'fantasy',
-        narrativeContext: {
-          worldId: 'test-world',
-          currentSceneId: 'test-scene',
-          characterIds: [],
-          previousSegments: [],
-          currentTags: [],
-          sessionId: 'test-session',
-          recentSegments: [
-            { content: 'You perform an action.' },
-          ],
-        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-        playerCharacterName: 'Hero',
-        skillUsed: {
-          skillId: 'custom',
-          skillName: 'Custom Skill',
-          success: null as unknown as boolean, // Null or undefined result
-          difficulty: 5,
-        },
-      };
-
-      const result = skillAcknowledgmentTemplate(context);
-
-      // Should not default to failure guidance for a neutral/undefined result
-      expect(result).not.toContain('FAILURE ACKNOWLEDGMENT');
-    });
+    expect(result).not.toContain('EXAMPLES:');
   });
 });

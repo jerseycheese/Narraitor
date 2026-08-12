@@ -1,5 +1,5 @@
 import { NarrativeContext } from '@/types/narrative.types';
-import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import { CHOICE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 
 interface PlayerChoiceTemplateContext {
   worldName: string;
@@ -188,16 +188,9 @@ Keep your response EXACTLY in this format. Include the Decision Weight line, Con
 
 IMPORTANT: Never include emojis anywhere in your response. Use only plain text - the user interface will add visual elements automatically.`;
 
-  // Get examples for choice generation if token budget allows
-  const tokenBudget = 100;
-  const contextLength = shortContext.length;
-  let examplesSection = '';
-  if (shouldIncludeExamples(tokenBudget, contextLength)) {
-    examplesSection = getExamplesForPrompt('choice', tokenBudget, {
-      tags: ['choice', 'context-summary', 'chaotic'],
-      minPriority: 'medium',
-    });
-  }
+  const examplesSection = shouldIncludeExamples(shortContext.length)
+    ? CHOICE_EXAMPLES
+    : '';
 
   return `${baseContent}${examplesSection}`;
 };

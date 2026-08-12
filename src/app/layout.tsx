@@ -10,6 +10,7 @@ import './wizard.css';
 import './dashboard.css';
 import './about.css';
 import './legal.css';
+import './faq.css';
 import './landing.css';
 import './badge.css';
 import './character-display.css';

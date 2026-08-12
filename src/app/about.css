@@ -13,7 +13,7 @@
   flex-direction: column;
   gap: var(--space-8);
   width: 100%;
-  max-width: var(--content-max-width);
+  max-width: var(--page-width-prose);
   margin: 0 auto;
   padding: var(--space-6) var(--page-gutter);
 }
@@ -224,30 +224,17 @@
   outline-offset: 2px;
 }
 
-/* ─── Footer links (Privacy / Terms) ───
-   Rendered as a sibling of .component-about so the About visual baselines
-   (which screenshot the .component-about locator) stay unchanged; it self-
-   centers to the same measure. */
+/* ─── Footer links ───
+   Inside .component-about, so it inherits the page column and its rule lines
+   up with the content above it — same shape as .component-legal-footer and
+   .component-faq-footer. */
 
 .component-about-footer {
-  /* Without this it falls back to content-box, so width:100% + the inline
-     padding overflows the viewport (~20px) and margin:0 auto resolves both
-     auto margins negative. Matches .component-about. */
-  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-5);
-  width: 100%;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: var(--space-5) var(--page-gutter);
+  padding-top: var(--space-5);
   border-top: 1px solid var(--color-border);
-}
-
-@media (width >= 1024px) {
-  .component-about-footer {
-    padding: var(--space-5) var(--page-gutter);
-  }
 }
 
 .component-about-footer-link {
@@ -289,6 +276,13 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
+}
+
+/* The CTA is the one section whose band is a --color-accent-soft fill rather
+   than canvas, and secondary ink only reaches 3.85:1 on it. accent-strong is
+   the token that exists for small text over that fill. */
+:root .component-about-cta .component-about-section-title {
+  color: var(--color-accent-strong);
 }
 
 :root .component-about-section-title::before {

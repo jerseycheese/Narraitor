@@ -7,7 +7,7 @@ import { test, expect, type Page } from '@playwright/test';
  * why the dark-mode case below is the most important test in this file.
  */
 
-const BRAND_ROUTES = ['/', '/about', '/privacy', '/terms'];
+const BRAND_ROUTES = ['/', '/about', '/faq', '/privacy', '/terms'];
 const PRODUCT_ROUTES = ['/dashboard', '/worlds', '/settings'];
 
 function readRegisterToken(page: Page, token: string): Promise<string> {

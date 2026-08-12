@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { resolveModel } from '@/lib/ai/resolveModel';
 import { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
 import { ToneSettings } from '@/types/tone-settings.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
@@ -167,7 +168,11 @@ export async function POST(request: NextRequest) {
       toneSettings: sanitizeToneSettings(rawBody?.toneSettings),
     };
 
-    const summary = await generateStoryCheckpointSummary(payload, resolveApiKey(request));
+    const summary = await generateStoryCheckpointSummary(
+      payload,
+      resolveApiKey(request),
+      resolveModel(request)
+    );
     return NextResponse.json(summary);
   } catch (error) {
     logger.error('[story-checkpoint] Failed to generate summary', error);

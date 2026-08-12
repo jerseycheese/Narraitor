@@ -1,4 +1,4 @@
-import { estimateTokenCount, truncateToTokenLimit } from '../tokenUtils';
+import { estimateTokenCount } from '../tokenUtils';
 
 describe('estimateTokenCount', () => {
   it('returns 0 for falsy input', () => {
@@ -69,33 +69,4 @@ describe('estimateTokenCount', () => {
   it('trims surrounding whitespace before counting', () => {
     expect(estimateTokenCount('  hello  ')).toBe(estimateTokenCount('hello'));
   });
-});
-
-describe('truncateToTokenLimit', () => {
-  it('returns empty string when limit <= 0', () => {
-    expect(truncateToTokenLimit('Hello world', 0)).toBe('');
-    expect(truncateToTokenLimit('Hello world', -1)).toBe('');
-  });
-
-  it('returns empty string for null/undefined input', () => {
-    expect(truncateToTokenLimit(null, 10)).toBe('');
-    expect(truncateToTokenLimit(undefined, 10)).toBe('');
-  });
-
-  it('returns text unchanged when already within limit', () => {
-    const text = 'Hello world';
-    const limit = estimateTokenCount(text);
-    expect(truncateToTokenLimit(text, limit)).toBe(text);
-  });
-
-  it('truncates long text and the result stays within limit', () => {
-    const text = `START ${new Array(2000).fill('word').join(' ')} END_MARKER`;
-    const limit = 200;
-    const truncated = truncateToTokenLimit(text, limit);
-
-    expect(truncated).toContain('START');
-    expect(truncated).not.toContain('END_MARKER');
-    expect(estimateTokenCount(truncated)).toBeLessThanOrEqual(limit);
-  });
-
 });

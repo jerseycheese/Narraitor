@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { resolveModel } from '@/lib/ai/resolveModel';
 import { categorizeInventoryItems } from '@/lib/ai/inventoryCategorizer';
 import type { InventoryCategorizationResult } from '@/lib/ai/inventoryCategorizer';
 import Logger from '@/lib/utils/logger';
@@ -49,7 +50,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const categorizations = await categorizeInventoryItems(validItems, resolveApiKey(request));
+    const categorizations = await categorizeInventoryItems(
+      validItems,
+      resolveApiKey(request),
+      resolveModel(request)
+    );
     const classifiedAt = getTimestamp();
 
     // Map each categorization back to its original input slot, then emit a

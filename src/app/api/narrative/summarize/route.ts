@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { resolveModel } from '@/lib/ai/resolveModel';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const geminiClient = createDefaultGeminiClient(resolveApiKey(request));
+    const geminiClient = createDefaultGeminiClient(resolveApiKey(request), resolveModel(request));
     
     const prompt = `${instructions}
 

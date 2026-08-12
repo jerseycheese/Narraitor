@@ -27,7 +27,7 @@ export type SurfaceRegister = 'brand' | 'product';
  * the legacy alias for / — it permanent-redirects today so nothing renders
  * under it, listed so the two stay in step if that redirect is ever retired.
  */
-const BRAND_ROUTE_PATTERN = /^\/(?:about|privacy|terms|welcome)(?:\/.*)?$/;
+const BRAND_ROUTE_PATTERN = /^\/(?:about|faq|privacy|terms|welcome)(?:\/.*)?$/;
 
 /**
  * Returns the visual register for a route path. Orthogonal to getSurfaceMode:

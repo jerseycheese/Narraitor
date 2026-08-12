@@ -31,14 +31,19 @@ interface AIAnalysisResponse {
   skills: AISkill[];
 }
 
-export async function analyzeWorldDescription(description: string, apiKey?: string | null): Promise<WorldAnalysisResult> {
+export async function analyzeWorldDescription(
+  description: string,
+  apiKey?: string | null,
+  model?: string | null
+): Promise<WorldAnalysisResult> {
   logger.debug('analyzeWorldDescription called with:', truncate(description, 100));
 
   try {
     const config = getAIConfig();
     const effectiveKey = apiKey ?? config.geminiApiKey;
+    const effectiveModel = model ?? config.modelName;
     logger.debug('Using AI config:', {
-      modelName: config.modelName,
+      modelName: effectiveModel,
       timeout: config.timeout,
       hasApiKey: !!effectiveKey
     });
@@ -99,7 +104,7 @@ export async function analyzeWorldDescription(description: string, apiKey?: stri
     // Call the AI service directly with proper configuration
     const client = new GeminiClient({
       apiKey: effectiveKey,
-      modelName: config.modelName,
+      modelName: effectiveModel,
       maxRetries: config.maxRetries,
       timeout: config.timeout,
       generationConfig: getGenerationConfig(),

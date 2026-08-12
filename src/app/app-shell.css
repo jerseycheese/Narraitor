@@ -777,11 +777,6 @@
   color: var(--color-text-primary);
 }
 
-.card-action-group button:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
 .card-action-group button svg {
   width: 0.875rem;
   height: 0.875rem;
@@ -879,11 +874,6 @@
 .world-card-character-pill:hover {
   background: var(--color-surface-hover);
   border-color: var(--color-border);
-}
-
-.world-card-character-pill:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
 }
 
 .world-card-character-pill img {

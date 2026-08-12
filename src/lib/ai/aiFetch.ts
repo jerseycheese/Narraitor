@@ -1,7 +1,7 @@
 // src/lib/ai/aiFetch.ts
 
-import { PROVIDER_API_KEY_HEADER } from './providerKeyHeader';
-import { getActiveProviderKey } from '@/state/providerStore';
+import { PROVIDER_API_KEY_HEADER, PROVIDER_MODEL_HEADER } from './providerKeyHeader';
+import { getActiveProviderKey, getActiveProviderModel } from '@/state/providerStore';
 import { anySignal, timeoutSignal } from './abortTimeout';
 import { RETRYING_ROUTE_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
@@ -9,10 +9,11 @@ import { RETRYING_ROUTE_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
  * fetch() wrapper for browser -> our own AI routes.
  *
  * Just-in-time pulls the active provider's decrypted key and attaches it as a
- * header, only when one exists. When there's no configured key, this is a plain
- * fetch and the server falls back to the env key — so dev, tests, and E2E are
- * unchanged. The plaintext key lives only in this closure for the duration of
- * the call; it's never stored or logged.
+ * header, only when one exists, along with the model that provider is
+ * configured to use. With nothing configured this is a plain fetch and the
+ * server falls back to the env key and the default model, so dev, tests, and
+ * E2E are unchanged. The plaintext key lives only in this closure for the
+ * duration of the call; it's never stored or logged.
  */
 
 export interface AiFetchOptions {
@@ -41,12 +42,14 @@ export async function aiFetch(
       timeoutSignal(options.timeoutMs ?? RETRYING_ROUTE_TIMEOUT_MS)
     ),
   };
-  // No configured key -> identical to a plain fetch (env fallback applies
-  // server-side). This keeps aiFetch a true drop-in: dev, tests, and E2E behave
-  // exactly as before, and only a configured BYO key adds the header.
-  if (!key) return fetch(input, withTimeout);
+  const model = getActiveProviderModel();
+  // Nothing configured -> identical to a plain fetch (env key and default model
+  // apply server-side). This keeps aiFetch a true drop-in: dev, tests, and E2E
+  // behave exactly as before.
+  if (!key && !model) return fetch(input, withTimeout);
 
   const headers = new Headers(withTimeout.headers);
-  headers.set(PROVIDER_API_KEY_HEADER, key);
+  if (key) headers.set(PROVIDER_API_KEY_HEADER, key);
+  if (model) headers.set(PROVIDER_MODEL_HEADER, model);
   return fetch(input, { ...withTimeout, headers });
 }

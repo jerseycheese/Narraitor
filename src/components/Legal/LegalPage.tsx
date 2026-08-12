@@ -20,7 +20,7 @@ interface LegalPageProps {
 
 export function LegalPage({ title, lead, updated, children }: LegalPageProps) {
   return (
-    <main className="component-legal">
+    <div className="component-legal">
       <header className="component-legal-hero">
         <p className="component-legal-eyebrow">Narraitor</p>
         <h1 className="component-legal-title">{title}</h1>
@@ -34,6 +34,9 @@ export function LegalPage({ title, lead, updated, children }: LegalPageProps) {
         <Link href="/about" className="component-legal-footer-link">
           About
         </Link>
+        <Link href="/faq" className="component-legal-footer-link">
+          FAQ
+        </Link>
         <Link href="/privacy" className="component-legal-footer-link">
           Privacy
         </Link>
@@ -41,7 +44,7 @@ export function LegalPage({ title, lead, updated, children }: LegalPageProps) {
           Terms
         </Link>
       </nav>
-    </main>
+    </div>
   );
 }
 

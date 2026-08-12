@@ -30,7 +30,6 @@ interface NarrativeTemplateNarrativeContext {
 /** Subset of generation parameters the templates read. */
 interface NarrativeTemplateGenerationParameters {
   desiredLength?: 'short' | 'medium' | 'long';
-  exampleTokenBudget?: number;
   segmentType?: string;
   decisionWeight?: string;
 }

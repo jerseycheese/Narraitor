@@ -36,7 +36,8 @@ export interface ValidationContext {
 export async function validateEventSignificance(
   majorEvent: string,
   context: ValidationContext = {},
-  apiKey?: string | null
+  apiKey?: string | null,
+  modelOverride?: string | null
 ): Promise<SignificanceValidationResult> {
   const startTime = Date.now();
 
@@ -60,7 +61,7 @@ export async function validateEventSignificance(
     }
 
     const genAI = new GoogleGenAI({ apiKey: effectiveKey });
-    const model = getAIConfig().modelName;
+    const model = modelOverride ?? getAIConfig().modelName;
 
     const result = await genAI.models.generateContent({
       model,

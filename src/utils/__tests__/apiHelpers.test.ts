@@ -21,9 +21,9 @@ import {
   consumeGeminiStreamEvents,
   processGeminiStreamingTextRequest,
 } from '../apiHelpers';
-import { getAIConfig } from '../../lib/ai/config';
+import { DEFAULT_TEXT_MODEL, getAIConfig } from '../../lib/ai/config';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../../lib/constants/aiTimeouts';
-import { PROVIDER_API_KEY_HEADER } from '../../lib/ai/providerKeyHeader';
+import { PROVIDER_API_KEY_HEADER, PROVIDER_MODEL_HEADER } from '../../lib/ai/providerKeyHeader';
 import { globalRateLimiter } from '../rateLimiter';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -277,9 +277,13 @@ describe('consumeGeminiStreamEvents', () => {
 });
 
 describe('processGeminiStreamingTextRequest', () => {
-  function fakeRequest(body: unknown, headerKey?: string): NextRequest {
+  function fakeRequest(body: unknown, headerKey?: string, headerModel?: string): NextRequest {
+    const headers: Record<string, string | undefined> = {
+      [PROVIDER_API_KEY_HEADER]: headerKey,
+      [PROVIDER_MODEL_HEADER]: headerModel,
+    };
     return {
-      headers: { get: (name: string) => (name === PROVIDER_API_KEY_HEADER ? headerKey ?? null : null) },
+      headers: { get: (name: string) => headers[name] ?? null },
       json: async () => body,
     } as unknown as NextRequest;
   }
@@ -332,6 +336,44 @@ describe('processGeminiStreamingTextRequest', () => {
     expect(NextResponse.json).toHaveBeenCalledWith(
       expect.any(Object),
       expect.objectContaining({ status: 429 })
+    );
+  });
+
+  it('generates with the model the player configured', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Server Error',
+      text: async () => 'upstream boom',
+    });
+
+    await processGeminiStreamingTextRequest(
+      fakeRequest({ prompt: 'hello' }, 'player-supplied-key', 'gemini-2.5-pro'),
+      { errorContext: 'Test' }
+    );
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/models/gemini-2.5-pro:streamGenerateContent'),
+      expect.any(Object)
+    );
+  });
+
+  it('generates with the default model when none is configured', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Server Error',
+      text: async () => 'upstream boom',
+    });
+
+    await processGeminiStreamingTextRequest(
+      fakeRequest({ prompt: 'hello' }, 'player-supplied-key'),
+      { errorContext: 'Test' }
+    );
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining(`/models/${DEFAULT_TEXT_MODEL}:streamGenerateContent`),
+      expect.any(Object)
     );
   });
 });
