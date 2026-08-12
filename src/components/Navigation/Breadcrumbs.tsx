@@ -80,7 +80,7 @@ export function Breadcrumbs({
             <React.Fragment key={segment.href}>
               <span className="breadcrumbs-item" data-testid={testId}>
                 {getSegmentIcon(segment)}
-                {segment.label}
+                <span className="breadcrumbs-label">{segment.label}</span>
               </span>
               {!isLast && <span className="breadcrumbs-separator">{separator}</span>}
             </React.Fragment>
@@ -97,7 +97,7 @@ export function Breadcrumbs({
               aria-current={segment.isCurrentPage ? 'page' : undefined}
             >
               {getSegmentIcon(segment)}
-              {segment.label}
+              <span className="breadcrumbs-label">{segment.label}</span>
             </Link>
             {!isLast && <span className="breadcrumbs-separator">{separator}</span>}
           </React.Fragment>
