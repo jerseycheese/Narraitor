@@ -14,7 +14,7 @@ import { FAQ_GROUPS } from './faqContent';
  */
 export default function Faq() {
   return (
-    <main className="component-faq">
+    <div className="component-faq">
       <header className="component-faq-hero">
         <p className="component-faq-eyebrow">Narraitor</p>
         <h1 className="component-faq-title">Questions and answers</h1>
@@ -79,6 +79,6 @@ export default function Faq() {
           Terms
         </Link>
       </nav>
-    </main>
+    </div>
   );
 }

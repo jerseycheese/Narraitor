@@ -33,7 +33,7 @@ const STEPS: { title: string; description: string }[] = [
 
 export default function About() {
   return (
-    <main className="component-about">
+    <div className="component-about">
       <section className="component-about-hero" aria-labelledby="about-hero-heading">
         <h1 id="about-hero-heading" className="component-about-title">
           About Narraitor
@@ -166,6 +166,6 @@ export default function About() {
           Terms
         </Link>
       </nav>
-    </main>
+    </div>
   );
 }
