@@ -1,4 +1,4 @@
-import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import { describeNarrativeLength } from './narrativeLength';
 import type { NarrativeTemplateContext } from './context';
@@ -149,16 +149,10 @@ Focus on varied sensory details and the character's reactions to bring the scene
 - Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
 - Vary your sensory language to avoid overused phrases`;
 
-  // Get examples for perspective and formatting if token budget allows
   const tokenBudget = generationParameters?.exampleTokenBudget ?? 120;
-  const contextLength = recentContent.length;
-  let examplesSection = '';
-  if (shouldIncludeExamples(tokenBudget, contextLength)) {
-    examplesSection = getExamplesForPrompt('scene', tokenBudget, {
-      tags: ['perspective', 'second-person', 'sensory'],
-      minPriority: 'high',
-    });
-  }
+  const examplesSection = shouldIncludeExamples(tokenBudget, recentContent.length)
+    ? PERSPECTIVE_EXAMPLES
+    : '';
 
   return `${baseContent}${examplesSection}
 

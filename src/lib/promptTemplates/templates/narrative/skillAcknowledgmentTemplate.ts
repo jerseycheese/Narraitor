@@ -6,7 +6,10 @@
  */
 
 import { NarrativeContext } from '@/types/narrative.types';
-import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import {
+  SKILL_ACKNOWLEDGMENT_EXAMPLES,
+  shouldIncludeExamples,
+} from '../../examples';
 
 interface SkillAcknowledgmentContext {
   worldName: string;
@@ -108,20 +111,12 @@ NARRATIVE REQUIREMENTS:
 
 CRITICAL: Make the character's abilities feel like they truly matter to the story outcome.`;
 
-  // Get examples for skill acknowledgment if token budget allows
+  // Both the success and failure examples ship regardless of what happened —
+  // the model needs to see the contrast to phrase either outcome well.
   const tokenBudget = 120;
-  const contextLength = recentContent.length;
-  let examplesSection = '';
-  if (shouldIncludeExamples(tokenBudget, contextLength)) {
-    // Determine appropriate tag based on skill result
-    // Default to 'success' for custom actions without explicit failure
-    const resultTag = skillUsed?.success === false ? 'failure' : 'success';
-
-    examplesSection = getExamplesForPrompt('skill-acknowledgment', tokenBudget, {
-      tags: ['skill', 'acknowledgment', resultTag],
-      minPriority: 'high',
-    });
-  }
+  const examplesSection = shouldIncludeExamples(tokenBudget, recentContent.length)
+    ? SKILL_ACKNOWLEDGMENT_EXAMPLES
+    : '';
 
   return `${baseContent}${examplesSection}
 

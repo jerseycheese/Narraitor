@@ -1,4 +1,7 @@
-import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import {
+  PERSPECTIVE_AND_EMPHASIS_EXAMPLES,
+  shouldIncludeExamples,
+} from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import { describeNarrativeLength } from './narrativeLength';
 import { estimateTokenCount } from '@/lib/promptContext/tokenUtils';
@@ -67,14 +70,9 @@ Generate a narrative segment that:
   const tokenBudget = generationParameters?.exampleTokenBudget ?? 150;
   const contextLength = estimateTokenCount(narrativeContext?.recentSegments?.map((seg) => seg.content).join('\n\n') || '');
 
-  // Get examples if they should be included
-  let examplesSection = '';
-  if (shouldIncludeExamples(tokenBudget, contextLength)) {
-    examplesSection = getExamplesForPrompt('scene', tokenBudget, {
-      tags: ['formatting', 'emphasis', 'perspective'],
-      minPriority: 'medium',
-    });
-  }
+  const examplesSection = shouldIncludeExamples(tokenBudget, contextLength)
+    ? PERSPECTIVE_AND_EMPHASIS_EXAMPLES
+    : '';
 
   return `${baseContent}${examplesSection}
 
