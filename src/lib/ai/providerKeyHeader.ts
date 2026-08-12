@@ -5,3 +5,10 @@
  * server (resolution side) so the name can't drift.
  */
 export const PROVIDER_API_KEY_HEADER = 'x-provider-api-key';
+
+/**
+ * Header carrying the model the player picked in their provider configuration.
+ * It rides alongside the key rather than in each route's body so the routes'
+ * request schemas stay about the generation, not about provider plumbing.
+ */
+export const PROVIDER_MODEL_HEADER = 'x-provider-model';

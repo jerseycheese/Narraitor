@@ -4,6 +4,12 @@ import { AIConfig, GenerationConfig, SafetySetting } from './types';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
 /**
+ * Text model used when the player has not configured one of their own. Every
+ * fallback path resolves here, so the default lives in exactly one place.
+ */
+export const DEFAULT_TEXT_MODEL = 'gemini-2.5-flash';
+
+/**
  * Gets AI configuration from environment variables.
  * A missing key falls back to '' here rather than throwing, because config is
  * also read in mock/test contexts; callers that make real requests validate it
@@ -13,7 +19,7 @@ import { GEMINI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 export const getAIConfig = (): AIConfig => {
   return {
     geminiApiKey: process.env.GEMINI_API_KEY || '',
-    modelName: 'gemini-2.5-flash',
+    modelName: DEFAULT_TEXT_MODEL,
     imageModelName: 'gemini-2.5-flash-image',
     maxRetries: 3,
     timeout: GEMINI_ATTEMPT_TIMEOUT_MS

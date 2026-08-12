@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { makeGeminiRequest } from '@/utils/apiHelpers';
-import { getSafetySettings } from '@/lib/ai/config';
+import { DEFAULT_TEXT_MODEL, getSafetySettings } from '@/lib/ai/config';
 import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 
 /**
@@ -21,7 +21,6 @@ import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 export const maxDuration = 60;
 
 const GEMINI_MODELS_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 type ValidationError =
   | 'NO_KEY'
@@ -56,7 +55,7 @@ export async function POST(request: NextRequest) {
     return fail('UNSUPPORTED_PROVIDER');
   }
 
-  const model = body.model || DEFAULT_MODEL;
+  const model = body.model || DEFAULT_TEXT_MODEL;
   const endpoint = `${GEMINI_MODELS_BASE}/${encodeURIComponent(model)}:generateContent`;
 
   try {

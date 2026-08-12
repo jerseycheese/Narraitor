@@ -46,6 +46,8 @@ import {
   type NarrativeStaticContentCache,
 } from './narrativeGenerator.prompt';
 import { formatNarrativeResponse } from './narrativeGenerator.response';
+import { getActiveProviderModel } from '@/state/providerStore';
+import { DEFAULT_TEXT_MODEL } from './config';
 import { enforceLanguageComplexity } from './narrativeGenerator.languageComplexity';
 import { buildNpcRoster, syncNpcMetadata } from './narrativeGenerator.npc';
 import {
@@ -299,7 +301,7 @@ export class NarrativeGenerator {
           previousSegmentContent: previousSegment?.content,
           previousSegmentType: previousSegment?.type,
           tokenUsage: result.tokenUsage,
-          modelUsed: 'gemini-2.5-flash',
+          modelUsed: getActiveProviderModel() ?? DEFAULT_TEXT_MODEL,
         };
 
         result.metadata.debugInfo = buildPromptDebugInfo(debugInfoContext);

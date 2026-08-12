@@ -240,3 +240,15 @@ export async function getActiveProviderKey(): Promise<string | null> {
 
   return decryptKey(config.encryptedApiKey);
 }
+
+/**
+ * The model the active provider is configured to run on, or null when there is
+ * no provider or it never got one. Null means "use the server's default", which
+ * is what every session before provider configuration existed still does.
+ */
+export function getActiveProviderModel(): string | null {
+  const { providers, activeProviderId } = useProviderStore.getState();
+  if (!activeProviderId) return null;
+
+  return providers[activeProviderId]?.model?.trim() || null;
+}
