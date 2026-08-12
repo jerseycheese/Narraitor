@@ -14,9 +14,17 @@ const rootDir = path.join(__dirname, '../../../../..');
 // out of scope for this guard.
 const BARE_VAR_PATTERN = /var\(\s*(--[a-zA-Z0-9-]+)\s*\)/g;
 const DEFINITION_PATTERN = /(--[a-zA-Z0-9-]+)\s*:/g;
-// next/font (src/app/layout.tsx) injects custom properties via a `variable:
-// '--font-x'` config option rather than a literal CSS declaration.
+// next/font injects custom properties via a `variable: '--font-x'` config
+// option rather than a literal CSS declaration. This is the one file that
+// actually wires them up at runtime.
+const NEXT_FONT_LAYOUT_FILE = 'src/app/layout.tsx';
 const NEXT_FONT_VARIABLE_PATTERN = /variable:\s*['"](--[a-zA-Z0-9-]+)['"]/g;
+
+// Strip /* ... */ comments so a token name mentioned in prose (e.g.
+// "--color-x: was never defined") can't be mistaken for a real declaration.
+function stripCssComments(contents: string): string {
+  return contents.replace(/\/\*[\s\S]*?\*\//g, '');
+}
 
 function findSourceFiles(): string[] {
   return [
@@ -43,15 +51,22 @@ function findBareVarReferences(files: string[]): Map<string, string[]> {
   return references;
 }
 
+// Only real CSS declarations (and the one known runtime injection site)
+// count as a definition — not a token name mentioned in a test assertion,
+// fixture, or comment anywhere else under src/.
 function findDefinedProperties(): Set<string> {
   const defined = new Set<string>();
-  const files = globSync('src/**/*.{css,ts,tsx}', { cwd: rootDir, absolute: true });
 
-  for (const file of files) {
-    const contents = fs.readFileSync(file, 'utf-8');
+  for (const file of globSync('src/**/*.css', { cwd: rootDir, absolute: true })) {
+    const contents = stripCssComments(fs.readFileSync(file, 'utf-8'));
     for (const match of contents.matchAll(DEFINITION_PATTERN)) {
       defined.add(match[1]);
     }
+  }
+
+  const layoutPath = path.join(rootDir, NEXT_FONT_LAYOUT_FILE);
+  if (fs.existsSync(layoutPath)) {
+    const contents = fs.readFileSync(layoutPath, 'utf-8');
     for (const match of contents.matchAll(NEXT_FONT_VARIABLE_PATTERN)) {
       defined.add(match[1]);
     }
