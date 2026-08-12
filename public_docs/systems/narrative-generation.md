@@ -93,11 +93,11 @@ Different moments in the story need different approaches, so we have specialized
 2. **Scene Template**: Handles the main story beats
 3. **Transition Template**: Smoothly connects different narrative moments
 
-### Token Budgeting (Context Window Management)
+### Prompt Size (Context Window Management)
 
-Long-running sessions tend to accumulate a lot of context, and prompts can quietly balloon if nothing pushes back. The narrative and choice generators share a token budget manager that caps the largest prompt sections (recent narrative, lore, goals, tone settings, inventory, personalization, and item acquisition instructions).
+The worry with a long session is that prompts quietly balloon as context accumulates. In practice they don’t, because every prompt component is bounded where it’s assembled: callers slice the segment window before it reaches the prompt, lore is capped at 20 facts, and the character section has no growth term. Turn 5 and turn 500 send comparably sized prompts.
 
-It’s opt-in via `NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER=true`, which makes it easy to turn on gradually and adjust allocations without risking a breaking change to prompt composition.
+What’s left is measurement. Each request records what its whole prompt weighed and reconciles that heuristic estimate against the provider’s own token count, which the DevTools panel reads. Nothing trims a prompt.
 
 ### Tone Settings System
 

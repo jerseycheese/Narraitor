@@ -11,8 +11,6 @@
  */
 
 import type { NarrativeSegment } from '@/types/narrative.types';
-import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
-import { applyBudget } from './narrativeGenerator.budget';
 
 /** How many of the most-repeated words to surface — enough to be useful, small enough to stay cheap. */
 const MAX_FLAGGED_WORDS = 8;
@@ -108,8 +106,7 @@ export const extractRepeatedPhrases = (
 export const enhancePromptWithPhraseVariety = (
   prompt: string,
   recentSegments: NarrativeSegment[] | undefined,
-  knownNameTokens?: Set<string>,
-  budget?: RequestBudget
+  knownNameTokens?: Set<string>
 ): string => {
   const repeated = extractRepeatedPhrases(recentSegments, knownNameTokens);
   if (repeated.length === 0) {
@@ -118,5 +115,5 @@ export const enhancePromptWithPhraseVariety = (
 
   const guidance = `\n\nRECENTLY OVERUSED WORDS (used more than once in the last few segments — find a different way to describe these instead of repeating them):\n${repeated.join(', ')}`;
 
-  return prompt + applyBudget(guidance, 'phrase-variety', budget);
+  return prompt + guidance;
 };

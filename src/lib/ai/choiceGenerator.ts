@@ -11,7 +11,7 @@ import { buildChoicePrompt } from './choiceGenerator.prompt';
 import { parseChoiceResponse, applyAlignmentConsequences, type KnownNpc } from './choiceGenerator.parser';
 import { generateFallbackChoices } from './choiceGenerator.fallback';
 import { matchSkillToOption } from './choiceGenerator.skillMatch';
-import { createRequestBudget, recordRequestCalibration } from './narrativeGenerator.budget';
+import { recordRequestCalibration } from './narrativeGenerator.calibration';
 
 /**
  * Parameters for choice generation
@@ -40,7 +40,6 @@ export async function generateChoices(
     const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 4, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
 
     const world = getWorld(worldId);
-    const budget = createRequestBudget();
     const prompt = buildChoicePrompt({
       world,
       worldId,
@@ -50,7 +49,6 @@ export async function generateChoices(
       useAlignedChoices,
       includeDecisionHistory,
       maxOptions,
-      budget,
     });
 
     // Prefer the explicit choices entry point when the client has one (the
@@ -60,7 +58,7 @@ export async function generateChoices(
       ? await aiClient.generateChoices(prompt)
       : await aiClient.generateContent(prompt);
 
-    recordRequestCalibration(budget, prompt, response);
+    recordRequestCalibration(prompt, response);
 
     if (!response?.content || safeTrim(response?.content ?? '') === '') {
       const fallbackDecision = generateFallbackChoices(world, narrativeContext);
