@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { notFound, useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useSessionStore } from '@/state/sessionStore';
@@ -8,6 +8,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useWorldStore } from '@/state/worldStore';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import { ProviderGate } from '@/components/ai/ProviderGate';
+import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 
 // GameSession pulls the heaviest chain in the app (ActiveGameSession ->
 // NarrativeController -> @google/genai + every drawer panel). The page already
@@ -51,6 +52,53 @@ export default function PlayPage() {
   // Set isClient to true once component mounts
   useEffect(() => {
     setIsClient(true);
+  }, []);
+
+  // session-ended: fires when the player leaves an active session. Covers
+  // three exit paths, since no single one is reliable on its own:
+  //   - beforeunload: tab close/reload on desktop
+  //   - visibilitychange (hidden): backgrounding on mobile, where the OS can
+  //     kill the page before beforeunload or unmount ever runs
+  //   - unmount: navigating away from the play route in-app
+  // The listeners are set up once, so they read the latest session/ending
+  // state off a ref rather than closing over stale React state. A "fired"
+  // ref dedupes across the three paths so a single exit (e.g. background
+  // then later unmount) only reports once. Reaching an ending already
+  // reports its own session-ended event (narrativeStore's markSessionEnded),
+  // so this skips firing when an ending is already set.
+  const sessionEndTrackingRef = useRef({ currentSessionId, currentEnding });
+  useEffect(() => {
+    sessionEndTrackingRef.current = { currentSessionId, currentEnding };
+  }, [currentSessionId, currentEnding]);
+
+  useEffect(() => {
+    const hasFiredRef = { current: false };
+
+    const trackSessionEndedIfActive = () => {
+      if (hasFiredRef.current) return;
+      const { currentSessionId, currentEnding } = sessionEndTrackingRef.current;
+      if (currentSessionId && !currentEnding) {
+        hasFiredRef.current = true;
+        trackFunnelStep('session-ended');
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        trackSessionEndedIfActive();
+      }
+    };
+
+    window.addEventListener('beforeunload', trackSessionEndedIfActive);
+    window.addEventListener('pagehide', trackSessionEndedIfActive);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', trackSessionEndedIfActive);
+      window.removeEventListener('pagehide', trackSessionEndedIfActive);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      trackSessionEndedIfActive();
+    };
   }, []);
 
   // Handle Start New button click with confirmation

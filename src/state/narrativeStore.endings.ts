@@ -8,6 +8,7 @@ import { logger } from '../lib/utils/logger';
 import { aiFetch } from '@/lib/ai/aiFetch';
 import { useSessionStore } from './sessionStore';
 import { useJournalStore } from './journalStore';
+import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
 const FALLBACK_ENDING_TONE: EndingTone = 'hopeful';
@@ -291,5 +292,9 @@ export const createNarrativeEndingActions = (
     } catch (error) {
       logger.warn('Failed to propagate session lifecycle status on ending', error);
     }
+
+    // Single chokepoint for reaching an ending - both the success and
+    // fallback paths in generateEnding funnel through here.
+    trackFunnelStep('session-ended');
   },
 });
