@@ -2,8 +2,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
-import { getAIConfig } from '../lib/ai/config';
 import { resolveApiKey } from '../lib/ai/resolveApiKey';
+import { resolveModel } from '../lib/ai/resolveModel';
 import { createAPIErrorResponse } from '../lib/utils/createAPIErrorResponse';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../lib/constants/aiTimeouts';
 import { extractStreamingContentPreview } from '../lib/ai/narrativeStreamPreview';
@@ -239,7 +239,7 @@ export async function processGeminiTextRequest(
 
     // Call Google's Gemini API from the server using secure header authentication
     const response = await makeGeminiRequest(
-      `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().modelName}:generateContent`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${resolveModel(request)}:generateContent`,
       apiKey,
       {
         contents: [{
@@ -481,7 +481,7 @@ export async function processGeminiStreamingTextRequest(
   let upstream: Response;
   try {
     upstream = await makeGeminiRequest(
-      `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().modelName}:streamGenerateContent?alt=sse`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${resolveModel(request)}:streamGenerateContent?alt=sse`,
       apiKey,
       {
         contents: [{

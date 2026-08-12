@@ -1,5 +1,9 @@
 /**
- * Component priority levels for budget allocation and degradation
+ * Priority levels for a prompt component.
+ *
+ * Display-only: it orders the DevTools panel's rows and picks the guidance
+ * shown when a component runs over. It does not affect how much budget a
+ * component gets — every component has a fixed limit.
  */
 export enum ComponentPriority {
   CRITICAL = 0,
@@ -8,15 +12,11 @@ export enum ComponentPriority {
   LOW = 3,
 }
 
-/**
- * Configuration for a single component's budget allocation
- */
-export interface BudgetAllocation {
+/** A single prompt component's token ceiling. */
+export interface ComponentBudget {
   componentId: string;
   priority: ComponentPriority;
-  min: number;
-  target: number;
-  max: number;
+  limit: number;
 }
 
 /**
@@ -33,7 +33,7 @@ export interface CalibrationData {
 
 /**
  * Per-component usage figures for the observability snapshot. `allocation` is
- * the resolved target budget (the bar denominator); `estimated` is the recorded
+ * the component's limit (the bar denominator); `estimated` is the recorded
  * heuristic token count for the most recent request.
  */
 export interface ComponentBudgetUsage {
@@ -62,96 +62,24 @@ export const REQUEST_TOTAL_COMPONENT_ID = 'request-total';
  * Request budget instance for tracking allocations during a single request
  */
 export class RequestBudget {
-  private allocations: Map<string, BudgetAllocation> = new Map();
+  private budgets: Map<string, ComponentBudget> = new Map();
   private usage: Map<string, number> = new Map();
   private actualUsage: Map<string, number> = new Map();
   private enabled: boolean;
   private totalBudget: number;
 
   constructor(
-    allocations: BudgetAllocation[],
+    budgets: ComponentBudget[],
     totalBudget: number,
     enabled: boolean = true
   ) {
     this.enabled = enabled;
     this.totalBudget = totalBudget;
 
-    if (!enabled) {
-      // When disabled, store allocations but don't enforce limits
-      for (const allocation of allocations) {
-        this.allocations.set(allocation.componentId, allocation);
-        this.usage.set(allocation.componentId, 0);
-      }
-      return;
+    for (const budget of budgets) {
+      this.budgets.set(budget.componentId, budget);
+      this.usage.set(budget.componentId, 0);
     }
-
-    // Calculate actual allocations based on budget constraints
-    const resolved = this.resolveAllocations(allocations, totalBudget);
-    for (const [componentId, allocation] of resolved) {
-      this.allocations.set(componentId, allocation);
-      this.usage.set(componentId, 0);
-    }
-  }
-
-  /**
-   * Resolve allocations to fit within total budget
-   * Uses priority-based reduction when budget is tight
-   */
-  private resolveAllocations(
-    allocations: BudgetAllocation[],
-    totalBudget: number
-  ): Map<string, BudgetAllocation> {
-    const result = new Map<string, BudgetAllocation>();
-
-    // Sort by priority (CRITICAL first)
-    const sorted = [...allocations].sort((a, b) => a.priority - b.priority);
-
-    // First pass: allocate minimum to all CRITICAL components
-    let usedBudget = 0;
-    const criticalComponents: BudgetAllocation[] = [];
-    const otherComponents: BudgetAllocation[] = [];
-
-    for (const allocation of sorted) {
-      if (allocation.priority === ComponentPriority.CRITICAL) {
-        criticalComponents.push(allocation);
-        usedBudget += allocation.min;
-      } else {
-        otherComponents.push(allocation);
-      }
-    }
-
-    // Allocate CRITICAL components first
-    for (const allocation of criticalComponents) {
-      const available = totalBudget - usedBudget + allocation.min;
-      const allocated = Math.min(allocation.target, available, allocation.max);
-      result.set(allocation.componentId, { ...allocation, target: allocated });
-      usedBudget = usedBudget - allocation.min + allocated;
-    }
-
-    // Calculate remaining budget for other components
-    let remainingBudget = totalBudget - usedBudget;
-
-    // Second pass: allocate to other components by priority
-    for (const allocation of otherComponents) {
-      if (remainingBudget <= 0) {
-        // No budget left - allocate minimum (which may be 0)
-        result.set(allocation.componentId, { ...allocation, target: allocation.min });
-        continue;
-      }
-
-      // Calculate allocation based on remaining budget
-      const targetAllocation = Math.min(
-        allocation.target,
-        remainingBudget,
-        allocation.max
-      );
-
-      const actualAllocation = Math.max(targetAllocation, allocation.min);
-      result.set(allocation.componentId, { ...allocation, target: actualAllocation });
-      remainingBudget -= actualAllocation;
-    }
-
-    return result;
   }
 
   /**
@@ -169,8 +97,7 @@ export class RequestBudget {
       return Infinity;
     }
 
-    const allocation = this.allocations.get(componentId);
-    return allocation ? allocation.target : 0;
+    return this.budgets.get(componentId)?.limit ?? 0;
   }
 
   /**
@@ -242,11 +169,11 @@ export class RequestBudget {
    */
   getSnapshot(): TokenBudgetSnapshot {
     const components: ComponentBudgetUsage[] = [];
-    for (const [componentId, allocation] of this.allocations) {
+    for (const [componentId, budget] of this.budgets) {
       components.push({
         componentId,
-        priority: allocation.priority,
-        allocation: allocation.target,
+        priority: budget.priority,
+        allocation: budget.limit,
         estimated: this.usage.get(componentId) ?? 0,
       });
     }
@@ -275,24 +202,26 @@ function buildCalibration(
 }
 
 /**
- * Default component allocations for narrative generation
+ * Per-component token ceilings for narrative generation.
  * Based on initial prompt analysis and expected growth.
  */
-export const DEFAULT_ALLOCATIONS: BudgetAllocation[] = [
-  { componentId: 'base-template', priority: ComponentPriority.CRITICAL, min: 200, target: 300, max: 500 },
-  { componentId: 'character-context', priority: ComponentPriority.CRITICAL, min: 100, target: 200, max: 400 },
-  { componentId: 'recent-narrative', priority: ComponentPriority.HIGH, min: 600, target: 1200, max: 2000 },
-  { componentId: 'goals', priority: ComponentPriority.HIGH, min: 100, target: 300, max: 600 },
-  { componentId: 'tone-settings', priority: ComponentPriority.MEDIUM, min: 0, target: 400, max: 600 },
-  { componentId: 'lore-context', priority: ComponentPriority.MEDIUM, min: 0, target: 800, max: 1500 },
-  { componentId: 'inventory', priority: ComponentPriority.MEDIUM, min: 80, target: 180, max: 300 },
-  { componentId: 'personalization', priority: ComponentPriority.MEDIUM, min: 200, target: 800, max: 1500 },
-  { componentId: 'item-instructions', priority: ComponentPriority.LOW, min: 0, target: 200, max: 400 },
-  { componentId: 'examples', priority: ComponentPriority.LOW, min: 0, target: 200, max: 400 },
-  { componentId: 'phrase-variety', priority: ComponentPriority.LOW, min: 0, target: 100, max: 200 },
+export const DEFAULT_COMPONENT_BUDGETS: ComponentBudget[] = [
+  { componentId: 'base-template', priority: ComponentPriority.CRITICAL, limit: 300 },
+  { componentId: 'character-context', priority: ComponentPriority.CRITICAL, limit: 200 },
+  { componentId: 'recent-narrative', priority: ComponentPriority.HIGH, limit: 1200 },
+  { componentId: 'goals', priority: ComponentPriority.HIGH, limit: 300 },
+  { componentId: 'tone-settings', priority: ComponentPriority.MEDIUM, limit: 400 },
+  { componentId: 'lore-context', priority: ComponentPriority.MEDIUM, limit: 800 },
+  { componentId: 'inventory', priority: ComponentPriority.MEDIUM, limit: 180 },
+  { componentId: 'personalization', priority: ComponentPriority.MEDIUM, limit: 800 },
+  { componentId: 'item-instructions', priority: ComponentPriority.LOW, limit: 200 },
+  { componentId: 'examples', priority: ComponentPriority.LOW, limit: 200 },
+  { componentId: 'phrase-variety', priority: ComponentPriority.LOW, limit: 100 },
 ];
 
 /**
- * Default total budget (conservative ~8% of 1M context window)
+ * Total budget reported by the DevTools panel (conservative ~8% of a 1M context
+ * window). Component limits are enforced individually, so this is the headroom
+ * figure rather than a pool the components compete over.
  */
 export const DEFAULT_TOTAL_BUDGET = 80000;

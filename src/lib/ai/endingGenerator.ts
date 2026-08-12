@@ -135,7 +135,11 @@ function parseResponse(response: string): EndingGenerationResult {
   }
 }
 
-export async function generateEnding(request: EndingGenerationRequest, apiKey?: string | null): Promise<EndingGenerationResult> {
+export async function generateEnding(
+  request: EndingGenerationRequest,
+  apiKey?: string | null,
+  model?: string | null
+): Promise<EndingGenerationResult> {
   try {
     logger.debug('Generating story ending', { request });
 
@@ -175,7 +179,7 @@ export async function generateEnding(request: EndingGenerationRequest, apiKey?: 
     // (config.maxRetries with backoff) — an outer loop here multiplied the
     // attempts. Parse failures throw straight to the caller, matching how
     // narrativeGenerator and choiceGenerator handle them.
-    const client = createDefaultGeminiClient(apiKey);
+    const client = createDefaultGeminiClient(apiKey, model);
     const response = await client.generateContent(finalPrompt);
     const result = parseResponse(response.content);
 

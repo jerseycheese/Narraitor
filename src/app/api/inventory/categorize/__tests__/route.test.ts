@@ -17,6 +17,7 @@ import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { categorizeInventoryItems } from '@/lib/ai/inventoryCategorizer';
 import type { InventoryCategorizationResult } from '@/lib/ai/inventoryCategorizer';
+import { DEFAULT_TEXT_MODEL } from '@/lib/ai/config';
 
 const mockCategorize = categorizeInventoryItems as jest.MockedFunction<
   typeof categorizeInventoryItems
@@ -70,13 +71,15 @@ describe('POST /api/inventory/categorize', () => {
     const data = await response.json();
 
     // Only valid items are sent to the categorizer, with the request-resolved
-    // key (null here: no BYO header and the env key is the MOCK sentinel).
+    // key (null here: no BYO header and the env key is the MOCK sentinel) and
+    // the resolved model, which is the default without a configured provider.
     expect(mockCategorize).toHaveBeenCalledWith(
       [
         { name: 'Iron Sword', description: 'A blade', context: undefined },
         { name: 'Gold Coins', description: 'Currency', context: undefined },
       ],
-      null
+      null,
+      DEFAULT_TEXT_MODEL
     );
 
     // Response is full-length and positionally aligned to the input.

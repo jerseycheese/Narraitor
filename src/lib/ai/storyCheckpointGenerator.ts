@@ -117,7 +117,7 @@ const sanitizeString = (value?: unknown, fallback = ''): string => {
   return safeTrim(value);
 };
 
-const parseResponse = (content: string): StoryCheckpointResponseBody => {
+const parseResponse = (content: string, model: string): StoryCheckpointResponseBody => {
   let payload = stripMarkdownFences(content);
   const extracted = extractJsonObject(payload);
   if (extracted) {
@@ -143,15 +143,16 @@ const parseResponse = (content: string): StoryCheckpointResponseBody => {
     // Record the model the default client actually runs on, not whatever the AI
     // echoed back. The prompt used to carry a stale "gemini-1.5-pro" example and
     // the model dutifully repeated it, mislabelling every checkpoint (#1430 F37).
-    model: getAIConfig().modelName,
+    model,
   };
 };
 
 export const generateStoryCheckpointSummary = async (
   payload: StoryCheckpointRequestBody,
   apiKey?: string | null,
+  model?: string | null,
 ): Promise<StoryCheckpointResponseBody> => {
-  const client = createDefaultGeminiClient(apiKey);
+  const client = createDefaultGeminiClient(apiKey, model);
   const prompt = buildPrompt(payload);
 
   const response = await client.generateContent(prompt);
@@ -161,7 +162,7 @@ export const generateStoryCheckpointSummary = async (
   }
 
   try {
-    return parseResponse(response.content);
+    return parseResponse(response.content, model ?? getAIConfig().modelName);
   } catch {
     // Fallback: create a simple segment from event descriptions
     const eventText = payload.events

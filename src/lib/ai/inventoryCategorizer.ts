@@ -103,10 +103,12 @@ function parseAIResponse(raw: string): AIResponseShape | null {
 
 async function categorizeInventoryItem(
   input: CategorizeInventoryItemInput,
-  apiKey?: string | null
+  apiKey?: string | null,
+  model?: string | null
 ): Promise<InventoryCategorizationResult> {
   const config = getAIConfig();
   const effectiveKey = apiKey ?? config.geminiApiKey;
+  const effectiveModel = model ?? config.modelName;
   const baseLogContext = {
     name: input.name,
     description: truncate(input.description ?? '', 100),
@@ -120,7 +122,7 @@ async function categorizeInventoryItem(
   try {
     const client = new GeminiClient({
       apiKey: effectiveKey,
-      modelName: config.modelName,
+      modelName: effectiveModel,
       maxRetries: config.maxRetries,
       timeout: config.timeout,
       generationConfig: getGenerationConfig(),
@@ -156,7 +158,7 @@ Additional Context: ${input.context ? JSON.stringify(input.context) : 'none'}
       categoryId: parsed.category,
       confidence: Math.min(Math.max(parsed.confidence ?? 0.8, 0), 1),
       rationale: parsed.rationale,
-      model: config.modelName,
+      model: effectiveModel,
       source: 'ai',
     };
   } catch (error) {
@@ -188,18 +190,20 @@ function parseAIBatchResponse(raw: string): AIBatchEntryShape[] | null {
  */
 export async function categorizeInventoryItems(
   inputs: CategorizeInventoryItemInput[],
-  apiKey?: string | null
+  apiKey?: string | null,
+  model?: string | null
 ): Promise<InventoryCategorizationResult[]> {
   if (inputs.length === 0) {
     return [];
   }
 
   if (inputs.length === 1) {
-    return [await categorizeInventoryItem(inputs[0], apiKey)];
+    return [await categorizeInventoryItem(inputs[0], apiKey, model)];
   }
 
   const config = getAIConfig();
   const effectiveKey = apiKey ?? config.geminiApiKey;
+  const effectiveModel = model ?? config.modelName;
 
   if (!effectiveKey) {
     logger.warn(
@@ -213,7 +217,7 @@ export async function categorizeInventoryItems(
   try {
     const client = new GeminiClient({
       apiKey: effectiveKey,
-      modelName: config.modelName,
+      modelName: effectiveModel,
       maxRetries: config.maxRetries,
       timeout: config.timeout,
       generationConfig: getGenerationConfig(),
@@ -265,7 +269,7 @@ ${itemList}
           categoryId: entry.category,
           confidence: Math.min(Math.max(entry.confidence ?? 0.8, 0), 1),
           rationale: entry.rationale,
-          model: config.modelName,
+          model: effectiveModel,
           source: 'ai',
         };
       }

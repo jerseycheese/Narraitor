@@ -44,7 +44,11 @@ const logger = new Logger('CharacterGenerator');
 /**
  * Generate character using AI
  */
-async function generateWithAI(options: CharacterGenerationOptions, apiKey?: string | null): Promise<GeneratedCharacterData> {
+async function generateWithAI(
+  options: CharacterGenerationOptions,
+  apiKey?: string | null,
+  model?: string | null
+): Promise<GeneratedCharacterData> {
   const { world, existingNames = [], suggestedName, generationType = 'known', concept } = options;
   
   // Validate the world data first
@@ -129,7 +133,7 @@ CRITICAL INSTRUCTIONS:
 
     // Import and use the AI client directly for server-side usage
     const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
-    const client = createDefaultGeminiClient(apiKey);
+    const client = createDefaultGeminiClient(apiKey, model);
     
     // Generate with AI
     const response = await client.generateContent(prompt);
@@ -373,7 +377,8 @@ export async function generateAICharacter(
   suggestedName?: string,
   generationType: CharacterGenerationType = 'known',
   concept?: string,
-  apiKey?: string | null
+  apiKey?: string | null,
+  model?: string | null
 ): Promise<GeneratedCharacterData> {
   return generateWithAI({
     world,
@@ -381,5 +386,5 @@ export async function generateAICharacter(
     suggestedName,
     generationType,
     concept
-  }, apiKey);
+  }, apiKey, model);
 }

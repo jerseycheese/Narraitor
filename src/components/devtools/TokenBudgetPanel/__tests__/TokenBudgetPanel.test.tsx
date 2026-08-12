@@ -4,7 +4,7 @@ import { TokenBudgetPanel } from '../TokenBudgetPanel';
 import { useCalibrationStore } from '@/state/calibrationStore';
 import {
   ComponentPriority,
-  DEFAULT_ALLOCATIONS,
+  DEFAULT_COMPONENT_BUDGETS,
   type TokenBudgetSnapshot,
 } from '@/lib/promptContext/tokenBudgetManager';
 
@@ -68,6 +68,20 @@ describe('TokenBudgetPanel', () => {
     expect(screen.getByTestId('token-budget-bar-examples')).toHaveClass('is-over');
   });
 
+  it('slides each bar left by the share of its budget still unspent', () => {
+    withSnapshots([sampleSnapshot]);
+    render(<TokenBudgetPanel />);
+
+    // 150/300 spent, so half the track stays empty.
+    expect(screen.getByTestId('token-budget-bar-base-template')).toHaveStyle({
+      transform: 'translateX(-50%)',
+    });
+    // Over budget clamps to a full bar rather than overshooting the track.
+    expect(screen.getByTestId('token-budget-bar-examples')).toHaveStyle({
+      transform: 'translateX(0%)',
+    });
+  });
+
   it('flags over-budget components with a degradation suggestion', () => {
     withSnapshots([sampleSnapshot]);
     render(<TokenBudgetPanel />);
@@ -112,7 +126,7 @@ describe('TokenBudgetPanel', () => {
       /No request captured yet/i
     );
     // Every configured component is shown from the default allocations.
-    for (const allocation of DEFAULT_ALLOCATIONS) {
+    for (const allocation of DEFAULT_COMPONENT_BUDGETS) {
       expect(
         screen.getByTestId(`token-budget-row-${allocation.componentId}`)
       ).toBeInTheDocument();

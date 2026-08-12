@@ -1,104 +1,28 @@
 /**
- * Simplified tests for NarrativeGenerator personalization integration
- * Focus on core functionality without complex mocking
+ * Integration between the decision tracker and the character prompt section:
+ * decisions recorded during play should shape what the prompt says about how
+ * the player likes to play.
  */
 
-import {
-  analyzePlayerBehavior,
-  createPersonalizedContext,
-  generateNarrativeEnhancement,
-} from '../personalizationEngine';
+import { buildCharacterPromptSection } from '../personalizationEngine';
 import { PlayerDecisionTracker } from '../playerDecisionTracker';
-import { Character } from '@/types/character.types';
-import { World } from '@/types/world.types';
 
-describe('NarrativeGenerator Personalization - Core Tests', () => {
-  const personalizationEngine = {
-    analyzePlayerBehavior,
-    createPersonalizedContext,
-    generateNarrativeEnhancement,
-  };
+describe('decision tracker feeds the character prompt section', () => {
   let tracker: PlayerDecisionTracker;
-  let mockCharacter: Character;
-  let mockWorld: World;
 
-  // Helper to convert Character to PersonalizationCharacter format
-  const convertToPersonalizationCharacter = (character: Character) => ({
-    id: character.id,
-    name: character.name,
-    background:
-      typeof character.background === 'object'
-        ? character.background.history || ''
-        : character.background,
-    attributes: character.attributes,
-    skills: character.skills,
-    createdAt: character.createdAt,
-    updatedAt: character.updatedAt,
-  });
+  const readDecisions = () =>
+    tracker.getRelevantDecisions({ worldId: 'world-1' }, 10, {
+      worldId: 'world-1',
+    });
 
   beforeEach(() => {
     tracker = new PlayerDecisionTracker({
       storageKey: 'test_personalization_decisions',
     });
     tracker.clearDecisions();
-
-    mockCharacter = {
-      id: 'char-1',
-      name: 'Alex Archer',
-      worldId: 'world-1',
-      description: 'A skilled archaeologist seeking ancient mysteries',
-      background: {
-        history: 'Experienced archaeologist with a mysterious past',
-        personality: 'Curious and determined',
-        goals: ['Discover ancient secrets'],
-        fears: ['Failure'],
-        relationships: [],
-      },
-      attributes: [
-        { attributeId: 'attr-intelligence', value: 8 },
-        { attributeId: 'attr-dexterity', value: 6 },
-      ],
-      skills: [
-        { skillId: 'skill-1', level: 8, experience: 100, isActive: true },
-        { skillId: 'skill-2', level: 5, experience: 50, isActive: true },
-      ],
-      derivedStats: [],
-      inventory: {
-        characterId: 'char-1',
-        items: [],
-        capacity: 100,
-        categories: [],
-        itemOrder: [],
-      },
-      status: {
-        health: 100,
-        maxHealth: 100,
-        conditions: [],
-      },
-      createdAt: '2023-01-01',
-      updatedAt: '2023-01-01',
-    };
-
-    mockWorld = {
-      id: 'world-1',
-      name: 'Ancient Mysteries',
-      description: 'A world of archaeological discoveries',
-      genre: 'mystery',
-      settings: {
-        maxAttributes: 6,
-        maxSkills: 12,
-        attributePointPool: 27,
-        skillPointPool: 40,
-      },
-      createdAt: '2023-01-01',
-      updatedAt: '2023-01-01',
-      attributes: [],
-      skills: [],
-    };
   });
 
-  test('personalization engine integrates with decision tracker', () => {
-    // Record some decisions
+  it('carries the tracked choice types through to the prompt', () => {
     tracker.recordDecision(
       'What do you do?',
       'Help the stranger',
@@ -106,7 +30,6 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       'session-1',
       'world-1'
     );
-
     tracker.recordDecision(
       'How do you respond?',
       'Negotiate peacefully',
@@ -115,36 +38,20 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       'world-1'
     );
 
-    // Get decisions for personalization
-    const decisions = tracker.getRelevantDecisions(
-      { worldId: 'world-1' },
-      10,
-      { worldId: 'world-1' }
-    );
+    const decisions = readDecisions();
     expect(decisions).toHaveLength(2);
 
-    // Create personalized context
-    const context = personalizationEngine.createPersonalizedContext(
-      convertToPersonalizationCharacter(mockCharacter),
-      mockWorld,
+    const section = buildCharacterPromptSection({
+      name: 'Alex Archer',
+      goals: [],
       decisions,
-      [],
-      [],
-      []
-    );
+    });
 
-    expect(context.character.personality).toBeDefined();
-    expect(context.playerPreferences).toBeDefined();
-
-    // Generate enhancement
-    const enhancement =
-      personalizationEngine.generateNarrativeEnhancement(context);
-    expect(enhancement).toContain('Alex Archer');
-    expect(enhancement).toMatch(/helpful|diplomatic/i);
+    expect(section).toContain('Alex Archer');
+    expect(section).toMatch(/helpful|diplomatic/i);
   });
 
-  test('decision patterns influence personalization', () => {
-    // Record consistent diplomatic choices
+  it('surfaces a consistent play pattern as the preferred style', () => {
     for (let i = 0; i < 5; i++) {
       tracker.recordDecision(
         `Situation ${i}`,
@@ -155,27 +62,18 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       );
     }
 
-    const decisions = tracker.getRelevantDecisions(
-      { worldId: 'world-1' },
-      10,
-      { worldId: 'world-1' }
-    );
+    const decisions = readDecisions();
     const analysis = tracker.analyzeChoicePatterns(decisions);
 
     expect(analysis.dominantChoiceTypes[0]).toBe('diplomatic');
     expect(analysis.patternStrength).toBeGreaterThan(50);
 
-    // Use in personalization
-    const behaviorAnalysis = personalizationEngine.analyzePlayerBehavior(
-      convertToPersonalizationCharacter(mockCharacter),
+    const section = buildCharacterPromptSection({
+      name: 'Alex Archer',
+      goals: [],
       decisions,
-      [],
-      []
-    );
+    });
 
-    // Trait inference is delegated to the LLM at narrative-generation time.
-    // We still surface the dominant choice type via preferredChoiceTypes for the prompt.
-    expect(behaviorAnalysis.detectedTraits).toEqual([]);
-    expect(behaviorAnalysis.preferences.preferredChoiceTypes).toContain('diplomatic');
+    expect(section).toContain('PREFERRED PLAY STYLE: diplomatic');
   });
 });
