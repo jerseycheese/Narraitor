@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getDefaultConfig } from '@/lib/ai/config';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { resolveModel } from '@/lib/ai/resolveModel';
 import { extractJsonObject } from '@/lib/ai/parseJSON';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
 
@@ -54,7 +55,7 @@ export async function handleSimilarityCheck(
       });
     }
 
-    const config = getDefaultConfig(resolveApiKey(request));
+    const config = getDefaultConfig(resolveApiKey(request), resolveModel(request));
     const client = new GeminiClient(config);
     const response = await client.generateContent(buildPrompt(body));
     const text = response.content.trim();
