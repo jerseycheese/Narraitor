@@ -36,4 +36,20 @@ describe('trackFunnelStep (#1367)', () => {
 
     expect(mockTrack).not.toHaveBeenCalled();
   });
+
+  it('accepts the turn-level events and gates them the same as the others', () => {
+    trackFunnelStep('narrative-turn');
+    trackFunnelStep('session-ended');
+
+    expect(mockTrack).toHaveBeenNthCalledWith(1, 'narrative-turn');
+    expect(mockTrack).toHaveBeenNthCalledWith(2, 'session-ended');
+
+    mockIsPlaywright.mockReturnValue(true);
+    mockTrack.mockClear();
+
+    trackFunnelStep('narrative-turn');
+    trackFunnelStep('session-ended');
+
+    expect(mockTrack).not.toHaveBeenCalled();
+  });
 });

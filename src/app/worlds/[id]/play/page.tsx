@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { notFound, useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useSessionStore } from '@/state/sessionStore';
@@ -8,6 +8,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useWorldStore } from '@/state/worldStore';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import { ProviderGate } from '@/components/ai/ProviderGate';
+import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 
 // GameSession pulls the heaviest chain in the app (ActiveGameSession ->
 // NarrativeController -> @google/genai + every drawer panel). The page already
@@ -51,6 +52,34 @@ export default function PlayPage() {
   // Set isClient to true once component mounts
   useEffect(() => {
     setIsClient(true);
+  }, []);
+
+  // session-ended: fires when the player leaves an active session, via tab
+  // close/reload (beforeunload) or navigating away from the play route
+  // in-app (unmount). The listener is set up once, so it reads the latest
+  // session/ending state off a ref rather than closing over stale React
+  // state. Reaching an ending already reports its own session-ended event
+  // (narrativeStore's markSessionEnded), so this skips firing when an
+  // ending is already set.
+  const sessionEndTrackingRef = useRef({ currentSessionId, currentEnding });
+  useEffect(() => {
+    sessionEndTrackingRef.current = { currentSessionId, currentEnding };
+  }, [currentSessionId, currentEnding]);
+
+  useEffect(() => {
+    const trackSessionEndedIfActive = () => {
+      const { currentSessionId, currentEnding } = sessionEndTrackingRef.current;
+      if (currentSessionId && !currentEnding) {
+        trackFunnelStep('session-ended');
+      }
+    };
+
+    window.addEventListener('beforeunload', trackSessionEndedIfActive);
+
+    return () => {
+      window.removeEventListener('beforeunload', trackSessionEndedIfActive);
+      trackSessionEndedIfActive();
+    };
   }, []);
 
   // Handle Start New button click with confirmation
