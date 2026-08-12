@@ -434,17 +434,20 @@
   min-width: 0;
 }
 
-/* Narrow enough and the trail and the switcher want the same line. Splitting it
-   proportionally keeps both readable — an ellipsized world name in the switcher
-   still has the page's own heading behind it, and a trail clipped to one
-   character stops being a trail at all. */
+/* Narrow enough and the trail and the switcher want the same line. Both size to
+   their content and the switcher gives first, so it keeps the whole band on the
+   routes that suppress breadcrumbs (the path is empty there, and a fixed basis
+   would reserve half a line for nothing, truncating the world name to
+   "Cyber…"), and yields to the trail where they genuinely compete — an
+   ellipsized world name still has the page's own heading behind it, while a
+   trail clipped to one character stops being a trail. */
 @media (width <= 768px) {
   .context-band-path {
-    flex: 1 1 56%;
+    flex: 1 1 auto;
   }
 
   .world-switcher {
-    flex: 0 1 44%;
+    flex: 0 1 auto;
   }
 }
 
@@ -473,12 +476,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-@media (width < 768px) {
-  .world-switcher-name {
-    max-width: 9rem;
-  }
 }
 
 /* The count qualifies the name, so it's set as quieter running text rather
