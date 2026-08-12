@@ -23,6 +23,12 @@
   font-family: var(--font-interface);
 }
 
+.providers-empty-help {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
 .providers-list {
   display: flex;
   flex-direction: column;

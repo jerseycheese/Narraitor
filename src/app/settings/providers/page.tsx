@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Button } from '@/components/ui/button';
 import { ProviderCard } from '@/components/ai/ProviderCard';
@@ -87,6 +88,10 @@ export default function ProvidersSettingsPage() {
           <div className="providers-empty">
             <p>No provider yet. Add one to start playing.</p>
             <Button onClick={() => setShowWizard(true)}>Set up a provider</Button>
+            <p className="providers-empty-help">
+              Not sure why you need your own key, or what it costs?{' '}
+              <Link href="/faq#why-my-own-key">The FAQ covers it</Link>.
+            </p>
           </div>
         ) : (
           <div className="providers-list">

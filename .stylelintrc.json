@@ -165,6 +165,7 @@
         "src/app/wizard.css",
         "src/app/about.css",
         "src/app/legal.css",
+        "src/app/faq.css",
         "src/app/landing.css"
       ],
       "rules": {
