@@ -79,9 +79,7 @@ https://generativelanguage.googleapis.com/v1/models/${getAIConfig().imageModelNa
   }],
   "generationConfig": {
     "responseModalities": ["IMAGE"],
-    "responseFormat": {
-      "image": { "aspectRatio": "1:1" }
-    }
+    "imageConfig": { "aspectRatio": "1:1" }
   }
 }
 ```
