@@ -47,7 +47,9 @@ export async function callGeminiImageAPI(
   logger.debug('callGeminiImageAPI', 'Calling Gemini image generation API');
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().imageModelName}:generateContent`,
+    // v1, not v1beta: gemini-3.1-flash-image is a v1 (GA) model, and imageConfig
+    // was renamed to responseFormat.image under the v1 generateContent surface.
+    `https://generativelanguage.googleapis.com/v1/models/${getAIConfig().imageModelName}:generateContent`,
     {
       method: 'POST',
       headers: {
@@ -60,8 +62,10 @@ export async function callGeminiImageAPI(
         }],
         generationConfig: {
           responseModalities: ["IMAGE"],
-          imageConfig: {
-            aspectRatio: "1:1"
+          responseFormat: {
+            image: {
+              aspectRatio: "1:1"
+            }
           }
         }
       })

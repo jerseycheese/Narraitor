@@ -20,7 +20,7 @@ export const getAIConfig = (): AIConfig => {
   return {
     geminiApiKey: process.env.GEMINI_API_KEY || '',
     modelName: DEFAULT_TEXT_MODEL,
-    imageModelName: 'gemini-2.5-flash-image',
+    imageModelName: 'gemini-3.1-flash-image',
     maxRetries: 3,
     timeout: GEMINI_ATTEMPT_TIMEOUT_MS
   };

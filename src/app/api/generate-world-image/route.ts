@@ -4,6 +4,7 @@ import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
 import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { getAIConfig } from '@/lib/ai/config';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('WorldImageAPI');
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
       // Use the key resolved above (player's BYO key -> env fallback).
       if (apiKey) {
         try {
-          logger.debug('generate-world-image', 'Attempting Gemini image generation with model: gemini-2.5-flash-image');
+          logger.debug('generate-world-image', `Attempting Gemini image generation with model: ${getAIConfig().imageModelName}`);
 
           // Use the same approach as the portrait generation API
           const imagePromptForGemini = `Create a detailed landscape image representing the world "${body.world.name}". ${imageDescription}

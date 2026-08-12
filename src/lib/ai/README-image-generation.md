@@ -63,10 +63,10 @@ face close-up digital painting, high quality, detailed"
 
 ### Endpoint
 
-The model is read from config rather than hardcoded — see `imageModelName` in `src/lib/ai/config.ts` (currently `gemini-2.5-flash-image`), used by `geminiImageGenerator.ts`:
+The model is read from config rather than hardcoded — see `imageModelName` in `src/lib/ai/config.ts` (currently `gemini-3.1-flash-image`), used by `geminiImageGenerator.ts`:
 
 ```
-https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().imageModelName}:generateContent
+https://generativelanguage.googleapis.com/v1/models/${getAIConfig().imageModelName}:generateContent
 ```
 
 ### Request Format
@@ -78,7 +78,10 @@ https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().imageMod
     ]
   }],
   "generationConfig": {
-    "responseModalities": ["TEXT", "IMAGE"]
+    "responseModalities": ["IMAGE"],
+    "responseFormat": {
+      "image": { "aspectRatio": "1:1" }
+    }
   }
 }
 ```
