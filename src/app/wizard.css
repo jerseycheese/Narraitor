@@ -1260,16 +1260,20 @@
   color: var(--color-on-accent);
 }
 
+/* --color-on-accent, not --color-text-inverse: the latter is white in both
+   modes, and the dark-mode accent is a light blue, so white lands at 2.81:1
+   there. on-accent flips to dark ink in dark mode, which is the whole reason
+   it exists. */
 :root .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-label,
 :root .component-character-creation-wizard .wizard-progress-step-active .wizard-progress-label {
-  color: var(--color-text-inverse);
+  color: var(--color-on-accent);
 }
 
 :root .component-world-creation-wizard .wizard-progress-step-active .wizard-progress-circle-active,
 :root .component-character-creation-wizard .wizard-progress-step-active .wizard-progress-circle-active {
-  background: var(--color-text-inverse);
+  background: var(--color-on-accent);
   color: var(--color-accent);
-  border-color: var(--color-text-inverse);
+  border-color: var(--color-on-accent);
 }
 
 :root .component-world-creation-wizard .wizard-progress-circle,
