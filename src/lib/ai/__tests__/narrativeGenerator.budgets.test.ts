@@ -275,13 +275,7 @@ describe('budget logging', () => {
   const buildBudget = (loreLimit: number) =>
     new RequestBudget(
       [
-        {
-          componentId: 'lore-context',
-          priority: ComponentPriority.MEDIUM,
-          min: 0,
-          target: loreLimit,
-          max: loreLimit,
-        },
+        { componentId: 'lore-context', priority: ComponentPriority.MEDIUM, limit: loreLimit },
       ],
       loreLimit,
       true
@@ -358,13 +352,7 @@ describe('budget logging', () => {
   it('warns when recent narrative is truncated to budget', () => {
     const budget = new RequestBudget(
       [
-        {
-          componentId: 'recent-narrative',
-          priority: ComponentPriority.HIGH,
-          min: 0,
-          target: 10,
-          max: 10,
-        },
+        { componentId: 'recent-narrative', priority: ComponentPriority.HIGH, limit: 10 },
       ],
       10,
       true

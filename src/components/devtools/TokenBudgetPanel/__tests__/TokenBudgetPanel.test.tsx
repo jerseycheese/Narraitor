@@ -4,7 +4,7 @@ import { TokenBudgetPanel } from '../TokenBudgetPanel';
 import { useCalibrationStore } from '@/state/calibrationStore';
 import {
   ComponentPriority,
-  DEFAULT_ALLOCATIONS,
+  DEFAULT_COMPONENT_BUDGETS,
   type TokenBudgetSnapshot,
 } from '@/lib/promptContext/tokenBudgetManager';
 
@@ -112,7 +112,7 @@ describe('TokenBudgetPanel', () => {
       /No request captured yet/i
     );
     // Every configured component is shown from the default allocations.
-    for (const allocation of DEFAULT_ALLOCATIONS) {
+    for (const allocation of DEFAULT_COMPONENT_BUDGETS) {
       expect(
         screen.getByTestId(`token-budget-row-${allocation.componentId}`)
       ).toBeInTheDocument();

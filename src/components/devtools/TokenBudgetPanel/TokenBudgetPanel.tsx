@@ -7,7 +7,7 @@ import { useCalibrationStore } from '@/state/calibrationStore';
 import {
   RequestBudget,
   ComponentPriority,
-  DEFAULT_ALLOCATIONS,
+  DEFAULT_COMPONENT_BUDGETS,
   DEFAULT_TOTAL_BUDGET,
   type ComponentBudgetUsage,
   type TokenBudgetSnapshot,
@@ -53,11 +53,11 @@ const levelFor = (ratio: number): UtilizationLevel => {
 const formatTokens = (value: number): string => Math.round(value).toLocaleString();
 
 /**
- * Resolve the default allocations (with zero usage) so the panel can show the
- * budget allocation before any request has been captured.
+ * A zero-usage snapshot so the panel can show the component limits before any
+ * request has been captured.
  */
 const buildFallbackSnapshot = (): TokenBudgetSnapshot =>
-  new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true).getSnapshot();
+  new RequestBudget(DEFAULT_COMPONENT_BUDGETS, DEFAULT_TOTAL_BUDGET, true).getSnapshot();
 
 const UsageRow = ({ component }: { component: ComponentBudgetUsage }) => {
   const ratio = utilization(component.estimated, component.allocation);
