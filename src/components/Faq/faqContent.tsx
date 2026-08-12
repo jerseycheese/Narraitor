@@ -324,9 +324,12 @@ export const FAQ_GROUPS: FaqGroup[] = [
         question: 'I hit a rate limit',
         answer: (
           <p>
-            That&apos;s Google&apos;s limit on your key, not a limit Narraitor
-            sets. Wait a minute and try the turn again. Playing hard enough to
-            hit it regularly means moving your Google account onto a paid tier.
+            Two separate limits can stop a turn. Narraitor caps generation at 50
+            requests an hour from one connection, and that&apos;s usually the one
+            you hit first; the message tells you how long the wait is, and
+            nothing you change at Google will shorten it. Google enforces its own
+            limit on your key on top of that, and moving your account onto a paid
+            tier raises only that second one.
           </p>
         ),
       },
