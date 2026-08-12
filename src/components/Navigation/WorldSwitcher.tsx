@@ -11,6 +11,7 @@ import {
   headerDropdownMenuClass,
 } from './navigationDropdownStyles';
 import { useNavigationData } from './useNavigationData';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import type { Character } from '@/state/characterStore';
 
 /**
@@ -33,6 +34,24 @@ export function WorldSwitcher() {
   } = useNavigationData();
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Escape closes the popup and hands focus back to the trigger. The header's
+  // own Escape shortcut is a separate document listener, so both run: the
+  // hook's stopPropagation only stops bubbling, not sibling listeners.
+  useKeyboardShortcuts(
+    [
+      {
+        key: 'Escape',
+        action: () => {
+          setIsOpen(false);
+          triggerRef.current?.focus();
+        },
+        description: 'Close the world switcher',
+      },
+    ],
+    isOpen
+  );
 
   useEffect(() => {
     if (!isOpen) return;
@@ -57,11 +76,11 @@ export function WorldSwitcher() {
   return (
     <div ref={rootRef} className="world-switcher">
       <Button
+        ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
         variant="ghost"
         className="world-switcher-trigger"
         aria-expanded={isOpen}
-        aria-haspopup="menu"
       >
         <Globe aria-hidden="true" />
         <span className="world-switcher-name">
