@@ -7,6 +7,7 @@ jest.mock('@/lib/ai/storyCheckpointGenerator');
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
+import { DEFAULT_TEXT_MODEL } from '@/lib/ai/config';
 
 const mockGenerateStoryCheckpointSummary = generateStoryCheckpointSummary as jest.MockedFunction<typeof generateStoryCheckpointSummary>;
 
@@ -77,7 +78,8 @@ describe('/api/narrative/story-checkpoint', () => {
     expect(data.summary).toBe('Recap');
     expect(mockGenerateStoryCheckpointSummary).toHaveBeenCalledWith(
       expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' }),
-      null
+      null,
+      DEFAULT_TEXT_MODEL
     );
   });
 

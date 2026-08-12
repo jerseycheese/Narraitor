@@ -53,15 +53,23 @@ export interface WorldGenerationOptions {
 /**
  * Unified world generation function
  */
-export async function generateWorld(options: WorldGenerationOptions, apiKey?: string | null): Promise<GeneratedWorldData> {
+export async function generateWorld(
+  options: WorldGenerationOptions,
+  apiKey?: string | null,
+  model?: string | null
+): Promise<GeneratedWorldData> {
   // Always use AI generation, but with TV/movie inspiration
-  return generateWithAI(options, apiKey);
+  return generateWithAI(options, apiKey, model);
 }
 
 /**
  * Generate world using AI through secure API
  */
-async function generateWithAI(options: WorldGenerationOptions, apiKey?: string | null): Promise<GeneratedWorldData> {
+async function generateWithAI(
+  options: WorldGenerationOptions,
+  apiKey?: string | null,
+  model?: string | null
+): Promise<GeneratedWorldData> {
   // Handle different world generation types
   let prompt: string;
   
@@ -232,7 +240,7 @@ Make the world interesting and playable with concepts appropriate to the setting
     try {
       // Import the AI client for server-side usage
       const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
-      const client = createDefaultGeminiClient(apiKey);
+      const client = createDefaultGeminiClient(apiKey, model);
       
       // Add retry context to prompt for subsequent attempts
       const retryPrompt = attempt > 1 

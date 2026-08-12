@@ -18,6 +18,7 @@ jest.mock('@/lib/storage/encryption', () => ({
 import {
   useProviderStore,
   getActiveProviderKey,
+  getActiveProviderModel,
   type AddProviderInput,
 } from '../providerStore';
 import { clearEncryptionKey } from '@/lib/storage/encryption';
@@ -62,6 +63,15 @@ describe('providerStore', () => {
 
   test('getActiveProviderKey returns null with no active provider', async () => {
     expect(await getActiveProviderKey()).toBeNull();
+  });
+
+  test('getActiveProviderModel returns the model the player picked', async () => {
+    await useProviderStore.getState().addProvider(makeInput({ model: 'gemini-2.5-pro' }));
+    expect(getActiveProviderModel()).toBe('gemini-2.5-pro');
+  });
+
+  test('getActiveProviderModel returns null with no active provider', () => {
+    expect(getActiveProviderModel()).toBeNull();
   });
 
   test('removeProvider clears the master key once the last provider is gone', async () => {
