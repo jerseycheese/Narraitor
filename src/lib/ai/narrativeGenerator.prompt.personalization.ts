@@ -14,10 +14,7 @@ import {
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
-import {
-  createPersonalizedContext,
-  generateNarrativeEnhancement,
-} from './personalizationEngine';
+import { buildCharacterPromptSection } from './personalizationEngine';
 import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 import { applyBudget } from './narrativeGenerator.budget';
 const MAX_OTHER_CHARACTER_THREADS = 3;
@@ -31,7 +28,9 @@ export const enhancePromptWithPersonalization = async (
   budget?: RequestBudget
 ): Promise<string> => {
   try {
-    const world = getWorld(worldId);
+    // Throws when the world is gone, which the catch below turns into "leave
+    // the prompt alone" — personalization is never worth failing generation.
+    getWorld(worldId);
     const { characters } = useCharacterStore.getState();
     const playerCharacterId = characterIds[0];
     const storeCharacter = playerCharacterId ? characters[playerCharacterId] : null;
@@ -79,17 +78,13 @@ export const enhancePromptWithPersonalization = async (
     const narrativeGoals = aiContext?.activeGoals || [];
     const characterGoals = convertToCharacterGoals(narrativeGoals);
 
-    const personalizedContext = createPersonalizedContext(
-      playerCharacter,
-      world,
-      relevantDecisions,
-      [],
-      characterGoals,
-      []
-    );
-
-    const enhancementText =
-      generateNarrativeEnhancement(personalizedContext);
+    const enhancementText = buildCharacterPromptSection({
+      name: playerCharacter.name,
+      attributes: playerCharacter.attributes,
+      skills: playerCharacter.skills,
+      goals: characterGoals,
+      decisions: relevantDecisions,
+    });
     const cleanedEnhancementText = prompt.includes('CURRENT NARRATIVE GOALS:')
       ? enhancementText
           .split('\n\n')
@@ -140,11 +135,6 @@ export const convertToPersonalizationCharacter = (
   skills:
     | Array<{ name: string; level: number; worldSkillId?: string }>
     | Array<{ skillId: string; level: number }>;
-  derivedStats?: Array<{
-    name: string;
-    currentValue: number;
-    maxValue: number;
-  }>;
   createdAt: string;
   updatedAt: string;
 } => {
@@ -175,13 +165,6 @@ export const convertToPersonalizationCharacter = (
           worldSkillId: skill.worldSkillId,
         }))
       : [],
-    derivedStats: Array.isArray(storeCharacter.derivedStats)
-      ? storeCharacter.derivedStats.map((stat) => ({
-          name: stat.name,
-          currentValue: stat.currentValue,
-          maxValue: stat.maxValue,
-        }))
-      : undefined,
     createdAt: storeCharacter.createdAt,
     updatedAt: storeCharacter.updatedAt,
   };
