@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell, waitForImagesLoaded } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, expandAllCollapsibleSections, pinAppShell } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/seedTestData';
 import { waitForStoreReady } from './utils/tutorial-helpers';
 
@@ -71,10 +71,6 @@ test.describe('Main Pages Visual Tests', () => {
     // (--font-narrative, next/font with display: 'swap'), so an occasional slow
     // font fetch leaves fallback-font glyphs painted at screenshot time.
     await page.evaluate(() => document.fonts.ready);
-    // Recent Worlds renders each world's cover art. Without this the shot can
-    // land before a cover decodes, so the baseline captures whichever side of
-    // the race won that day and every later run disagrees with it.
-    await waitForImagesLoaded(page);
     await hideDynamicContent(page);
     // Ensure the Continue section appears (seeded session present)
     await page.waitForSelector('[aria-labelledby="continue-game-heading"]', { timeout: 8000 });
