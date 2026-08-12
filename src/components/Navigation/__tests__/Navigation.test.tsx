@@ -222,6 +222,32 @@ describe('HeaderNavigation', () => {
         ).not.toBeInTheDocument();
       }
     );
+
+    // The brand register (/, /about, /privacy, /terms) suppresses the CTA
+    // wholesale rather than via CTA_SUPPRESSED_ROUTES, so each brand page's
+    // own CTA (or lack of one) is the only primary action on screen (#1734).
+    it.each(['/', '/about', '/privacy', '/terms'])(
+      'suppresses the CTA on the brand route %s',
+      (pathname) => {
+        mockPathname = pathname;
+
+        render(<HeaderNavigation />);
+
+        expect(
+          screen.queryByRole('button', { name: /Create Your First World/ })
+        ).not.toBeInTheDocument();
+      }
+    );
+
+    it('still renders the CTA on a product route not on the suppression list', () => {
+      mockPathname = '/settings';
+
+      render(<HeaderNavigation />);
+
+      expect(
+        screen.getByRole('button', { name: /Create Your First World/ })
+      ).toBeInTheDocument();
+    });
   });
 
   describe('Breadcrumb suppression (#1655)', () => {

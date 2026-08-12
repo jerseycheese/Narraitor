@@ -145,7 +145,11 @@ export default function Landing() {
             stays in your browser, and there&apos;s no account to make.
           </h2>
           <div className="component-landing-actions">
-            <Link href={START_HREF} className="component-landing-cta">
+            {/* Secondary, not the solid-accent style the hero CTA above
+                uses: the hero already spent the page's one primary action,
+                and the demo above it is the stronger case for building a
+                world than a repeated button down here. */}
+            <Link href={START_HREF} className="component-landing-cta-secondary">
               {START_LABEL}
             </Link>
             <a

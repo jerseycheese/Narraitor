@@ -98,9 +98,14 @@ export function HeaderNavigation() {
     setMounted(true);
   }, []);
 
-  const suppressCta = CTA_SUPPRESSED_ROUTES.some((route) =>
-    route.test(pathname)
-  );
+  // Brand routes suppress the header CTA wholesale rather than joining the
+  // regex list above: every brand page either owns its own primary CTA
+  // (about's closing band) or intentionally has none (privacy, terms), so a
+  // per-path entry here would rot the moment a brand sub-route lands — same
+  // reasoning BREADCRUMB_SUPPRESSED_ROUTES already applies.
+  const suppressCta =
+    !isProductRegister ||
+    CTA_SUPPRESSED_ROUTES.some((route) => route.test(pathname));
 
   const cta = suppressCta ? null : currentWorld ? (
     <Button
