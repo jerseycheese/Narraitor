@@ -77,23 +77,7 @@ describe('narrative templates embed their examples', () => {
   });
 });
 
-describe('the budget gate still drops examples', () => {
-  it.each([
-    ['base narrative', baseNarrativeTemplate, baseContext],
-    ['scene', sceneTemplate, sceneContext],
-    ['transition', transitionTemplate, transitionContext],
-  ])('%s omits examples at a zero budget', (_name, template, context) => {
-    const result = template({
-      ...context,
-      generationParameters: {
-        ...(context as { generationParameters?: object }).generationParameters,
-        exampleTokenBudget: 0,
-      },
-    });
-
-    expect(result).not.toContain('EXAMPLES:');
-  });
-
+describe('the context-length gate still drops examples', () => {
   it('scene omits examples once the context is long enough to stand on its own', () => {
     const result = sceneTemplate({
       ...sceneContext,

@@ -45,8 +45,7 @@ Generate a smooth transition that:
 
 IMPORTANT: Write in SECOND PERSON perspective (using "you").`;
 
-  const tokenBudget = context.generationParameters?.exampleTokenBudget ?? 100;
-  const examplesSection = shouldIncludeExamples(tokenBudget, previousContent?.length || 0)
+  const examplesSection = shouldIncludeExamples(previousContent?.length || 0)
     ? PERSPECTIVE_EXAMPLES
     : '';
 

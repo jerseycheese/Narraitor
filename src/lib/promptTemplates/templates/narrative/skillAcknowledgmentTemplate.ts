@@ -113,8 +113,7 @@ CRITICAL: Make the character's abilities feel like they truly matter to the stor
 
   // Both the success and failure examples ship regardless of what happened —
   // the model needs to see the contrast to phrase either outcome well.
-  const tokenBudget = 120;
-  const examplesSection = shouldIncludeExamples(tokenBudget, recentContent.length)
+  const examplesSection = shouldIncludeExamples(recentContent.length)
     ? SKILL_ACKNOWLEDGMENT_EXAMPLES
     : '';
 

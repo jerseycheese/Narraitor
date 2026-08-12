@@ -149,8 +149,7 @@ Focus on varied sensory details and the character's reactions to bring the scene
 - Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
 - Vary your sensory language to avoid overused phrases`;
 
-  const tokenBudget = generationParameters?.exampleTokenBudget ?? 120;
-  const examplesSection = shouldIncludeExamples(tokenBudget, recentContent.length)
+  const examplesSection = shouldIncludeExamples(recentContent.length)
     ? PERSPECTIVE_EXAMPLES
     : '';
 

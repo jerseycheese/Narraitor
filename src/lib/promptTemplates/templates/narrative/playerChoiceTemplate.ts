@@ -188,8 +188,7 @@ Keep your response EXACTLY in this format. Include the Decision Weight line, Con
 
 IMPORTANT: Never include emojis anywhere in your response. Use only plain text - the user interface will add visual elements automatically.`;
 
-  const tokenBudget = 100;
-  const examplesSection = shouldIncludeExamples(tokenBudget, shortContext.length)
+  const examplesSection = shouldIncludeExamples(shortContext.length)
     ? CHOICE_EXAMPLES
     : '';
 

@@ -98,21 +98,9 @@ Your training in lockpicking proves invaluable as the tumblers fall into place.`
 /**
  * Whether examples earn their place in the current prompt.
  *
- * They are dropped when the token budget is too tight to fit a useful set, and
- * when the context is already long enough that the model has plenty of in-world
- * material to pattern-match against.
+ * They are dropped once the context is long enough that the model has plenty of
+ * in-world material to pattern-match against.
  */
-export function shouldIncludeExamples(
-  availableTokens: number,
-  contextLength: number = 0
-): boolean {
-  if (availableTokens < 50) {
-    return false;
-  }
-
-  if (contextLength > 5000) {
-    return false;
-  }
-
-  return true;
+export function shouldIncludeExamples(contextLength: number = 0): boolean {
+  return contextLength <= 5000;
 }
