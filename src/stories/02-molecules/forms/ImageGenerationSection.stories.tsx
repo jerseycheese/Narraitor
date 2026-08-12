@@ -7,7 +7,7 @@ const placeholder = (
     style={{
       width: '160px',
       height: '160px',
-      background: 'var(--color-surface-raised)',
+      background: 'var(--color-surface)',
       border: '1px solid var(--color-border)',
       borderRadius: 'var(--radius-md, 0.5rem)',
     }}
