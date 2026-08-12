@@ -29,10 +29,8 @@ import {
   type DebugInfoContext,
 } from './debugInfoBuilder';
 import {
-  createRequestBudget,
-  limitNarrativeContextToBudget,
   recordRequestCalibration,
-} from './narrativeGenerator.budget';
+} from './narrativeGenerator.calibration';
 import {
   buildNarrativeContext,
   convertToPersonalizationCharacter,
@@ -97,19 +95,7 @@ export class NarrativeGenerator {
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       const template = this.getTemplate('scene');
 
-      const budget = createRequestBudget();
-      // Always route through the budget helper: it records the recent-narrative
-      // estimate for observability and only truncates when enforcement is on
-      // (returns the context unchanged otherwise).
-      const requestForTemplate = {
-        ...request,
-        narrativeContext: limitNarrativeContextToBudget(
-          request.narrativeContext,
-          budget
-        ),
-      } as NarrativeGenerationRequest;
-
-      const context = buildNarrativeContext(world, requestForTemplate);
+      const context = buildNarrativeContext(world, request);
       const prompt = template(context);
 
       const loreContext = getLoreContextForPrompt(request.worldId, request.sessionId, { recordUsage: false });
@@ -117,31 +103,26 @@ export class NarrativeGenerator {
       const toneEnhancedPrompt = enhancePromptWithToneSettings(
         prompt,
         world,
-        this.staticContentCache,
-        budget
+        this.staticContentCache
       );
       const loreEnhancedPrompt = enhancePromptWithLore(
         toneEnhancedPrompt,
         request.worldId,
-        request.sessionId,
-        budget
+        request.sessionId
       );
       const goalEnhancedPrompt = await enhancePromptWithGoalContext(
         loreEnhancedPrompt,
-        request.sessionId,
-        budget
+        request.sessionId
       );
       const personalizedPrompt = await enhancePromptWithPersonalization(
         goalEnhancedPrompt,
         request.worldId,
         request.characterIds || [],
-        request.sessionId,
-        budget
+        request.sessionId
       );
       const inventoryEnhancedPrompt = enhancePromptWithInventory(
         personalizedPrompt,
-        request.characterIds || [],
-        budget
+        request.characterIds || []
       );
 
       // Fetch character inventory for loss context
@@ -152,8 +133,7 @@ export class NarrativeGenerator {
 
       const acquisitionEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
         inventoryEnhancedPrompt,
-        this.staticContentCache,
-        budget
+        this.staticContentCache
       );
 
       const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
@@ -172,9 +152,8 @@ export class NarrativeGenerator {
       ]);
       const phraseVarietyPrompt = enhancePromptWithPhraseVariety(
         fullyEnhancedPrompt,
-        requestForTemplate.narrativeContext?.recentSegments,
-        knownNameTokens,
-        budget
+        request.narrativeContext?.recentSegments,
+        knownNameTokens
       );
 
       const continuityContract = buildContinuityContractFromStores(request);
@@ -188,7 +167,7 @@ export class NarrativeGenerator {
         onChunk: options?.onChunk,
       });
       throwIfAborted(options?.signal);
-      recordRequestCalibration(budget, finalPrompt, response);
+      recordRequestCalibration(finalPrompt, response);
 
       let result = await formatNarrativeResponse(
         response,
@@ -361,7 +340,6 @@ export class NarrativeGenerator {
       const world = this.getWorld(worldId);
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       const template = this.getTemplate('initialScene');
-      const budget = createRequestBudget();
 
       const { characters } = useCharacterStore.getState();
       const playerCharacterId = characterIds[0];
@@ -392,26 +370,22 @@ export class NarrativeGenerator {
       const toneEnhancedPrompt = enhancePromptWithToneSettings(
         prompt,
         world,
-        this.staticContentCache,
-        budget
+        this.staticContentCache
       );
       const loreEnhancedPrompt = enhancePromptWithLore(
         toneEnhancedPrompt,
         worldId,
-        sessionId,
-        budget
+        sessionId
       );
       const personalizedPrompt = await enhancePromptWithPersonalization(
         loreEnhancedPrompt,
         worldId,
         characterIds,
-        sessionId,
-        budget
+        sessionId
       );
       const inventoryEnhancedPrompt = enhancePromptWithInventory(
         personalizedPrompt,
-        characterIds,
-        budget
+        characterIds
       );
 
       // Fetch character inventory for loss context
@@ -422,8 +396,7 @@ export class NarrativeGenerator {
 
       const acquisitionEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
         inventoryEnhancedPrompt,
-        this.staticContentCache,
-        budget
+        this.staticContentCache
       );
 
       const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
@@ -437,7 +410,7 @@ export class NarrativeGenerator {
         onChunk: options?.onChunk,
       });
       throwIfAborted(options?.signal);
-      recordRequestCalibration(budget, fullyEnhancedPrompt, response);
+      recordRequestCalibration(fullyEnhancedPrompt, response);
 
       // Deferred off the per-turn path, same as generateSegment above.
       if (response.content) {
@@ -631,7 +604,6 @@ export class NarrativeGenerator {
       const world = this.getWorld(worldId);
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       const template = this.getTemplate('skillAcknowledgment');
-      const budget = createRequestBudget();
 
       const { characters } = useCharacterStore.getState();
       const playerCharacterId = characterIds[0];
@@ -642,7 +614,7 @@ export class NarrativeGenerator {
       const context = {
         worldName: world.name,
         genre: world.genre,
-        narrativeContext: limitNarrativeContextToBudget(narrativeContext, budget),
+        narrativeContext,
         playerCharacterName: playerCharacter?.name,
         skillUsed,
         customAction,
@@ -652,19 +624,16 @@ export class NarrativeGenerator {
       const toneEnhancedPrompt = enhancePromptWithToneSettings(
         prompt,
         world,
-        this.staticContentCache,
-        budget
+        this.staticContentCache
       );
       const loreEnhancedPrompt = enhancePromptWithLore(
         toneEnhancedPrompt,
         worldId,
-        narrativeContext.sessionId,
-        budget
+        narrativeContext.sessionId
       );
       const inventoryEnhancedPrompt = enhancePromptWithInventory(
         loreEnhancedPrompt,
-        characterIds,
-        budget
+        characterIds
       );
 
       // Fetch character inventory for loss context
@@ -675,8 +644,7 @@ export class NarrativeGenerator {
 
       const acquisitionEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
         inventoryEnhancedPrompt,
-        this.staticContentCache,
-        budget
+        this.staticContentCache
       );
 
       const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
@@ -686,7 +654,7 @@ export class NarrativeGenerator {
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
-      recordRequestCalibration(budget, fullyEnhancedPrompt, response);
+      recordRequestCalibration(fullyEnhancedPrompt, response);
 
       let result = await formatNarrativeResponse(
         response,

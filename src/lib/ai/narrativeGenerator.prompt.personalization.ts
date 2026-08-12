@@ -15,8 +15,6 @@ import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
 import { type SimpleNarrativeContext } from './simpleDecisionRelevance';
 import { buildCharacterPromptSection } from './personalizationEngine';
-import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
-import { applyBudget } from './narrativeGenerator.budget';
 const MAX_OTHER_CHARACTER_THREADS = 3;
 const MAX_CROSS_CHARACTER_REFERENCES = 2;
 const PROMPT_THREAD_SUMMARY_LENGTH = 160;
@@ -24,8 +22,7 @@ export const enhancePromptWithPersonalization = async (
   prompt: string,
   worldId: EntityID,
   characterIds: string[],
-  sessionId?: EntityID,
-  budget?: RequestBudget
+  sessionId?: EntityID
 ): Promise<string> => {
   try {
     // Throws when the world is gone, which the catch below turns into "leave
@@ -112,12 +109,7 @@ export const enhancePromptWithPersonalization = async (
       return prompt;
     }
 
-    if (!budget) {
-      return `${prompt}${personalizationSection}`;
-    }
-
-    const limited = applyBudget(personalizationSection, 'personalization', budget);
-    return safeTrim(limited) ? `${prompt}${limited}` : prompt;
+    return `${prompt}${personalizationSection}`;
   } catch {
     return prompt;
   }

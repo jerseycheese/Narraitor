@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { TokenBudgetSnapshot } from '@/lib/promptContext/tokenBudgetManager';
+import type { PromptCalibrationSnapshot } from '@/lib/promptContext/promptCalibration';
 
 /**
  * Maximum number of request snapshots retained for the DevTools panel. This is
@@ -10,17 +10,17 @@ const MAX_SNAPSHOTS = 25;
 
 interface CalibrationState {
   /** Captured request snapshots, oldest first. Newest is `snapshots.at(-1)`. */
-  snapshots: TokenBudgetSnapshot[];
+  snapshots: PromptCalibrationSnapshot[];
   /** Record a new snapshot, trimming history to the most recent MAX_SNAPSHOTS. */
-  recordSnapshot: (snapshot: TokenBudgetSnapshot) => void;
+  recordSnapshot: (snapshot: PromptCalibrationSnapshot) => void;
   /** Clear all captured snapshots. */
   clear: () => void;
 }
 
 /**
- * Holds token-budget snapshots captured after each narrative generation so the
- * DevTools TokenBudgetPanel can read live usage and calibration data. Populated
- * client-side by `publishBudgetSnapshot` in `narrativeGenerator.budget.ts`.
+ * Holds prompt-size snapshots captured after each narrative generation so the
+ * DevTools TokenBudgetPanel can read live prompt sizes and calibration data. Populated
+ * client-side by `recordRequestCalibration` in `narrativeGenerator.calibration.ts`.
  */
 export const useCalibrationStore = create<CalibrationState>((set) => ({
   snapshots: [],
