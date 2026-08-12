@@ -138,7 +138,14 @@ test.describe('Main Pages Visual Tests', () => {
     // capture — without this the IndexedDB seed loses the race in CI and the
     // page paints empty (chrome only). See #1198.
     await waitForStoreReady(page);
-    await expect(page.getByText('Cyberpunk Neo-Tokyo').first()).toBeVisible({ timeout: 15000 });
+    // getByText matched the header's own "Cyberpunk Neo-Tokyo" copies too, and
+    // .first() isn't guaranteed to land on a visible one — the page now
+    // carries a mobile breadcrumb hidden by media query ahead of the visible
+    // ones in DOM order. The heading is the one instance of the name this
+    // page guarantees.
+    await expect(
+      page.getByRole('heading', { name: 'Cyberpunk Neo-Tokyo' })
+    ).toBeVisible({ timeout: 15000 });
     await waitForContentStable(page);
     await hideDynamicContent(page);
     await pinAppShell(page);
