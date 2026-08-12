@@ -136,6 +136,19 @@
   }
 }
 
+/* Brand and section links are one run of type, so they align on a shared
+   baseline instead of each being centred on its own box. Two faces at two sizes
+   centred in the same row land their baselines about a pixel apart — the offset
+   is a function of each font's ascent and descent, so it survives any
+   line-height, and subpixel rounding moves it with the device pixel ratio.
+   That wobble is what read as the header not quite lining up. */
+.header-nav-sections {
+  display: flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: var(--space-6);
+}
+
 .header-nav-desktop-links {
   /* Hidden at/under 768px: the hamburger + drawer own primary navigation there.
      Shown inline above 768px. The `> 768` boundary is the complement of
@@ -222,22 +235,38 @@
   }
 }
 
-/* Brand lockup: icon + serif wordmark, no link underline. */
+/* Brand lockup: icon + serif wordmark, no link underline. Baseline-aligned so
+   the wordmark's baseline is the one the lockup hands up to
+   `.header-nav-sections`; a box-centred lockup would hand up the mark's bottom
+   edge instead and drop the section links a third of a line. */
 .app-brand {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--space-2);
   text-decoration: none;
   color: var(--color-text-primary);
 }
 
-/* Wordmark in the narrative serif (Newsreader) so the brand carries the
-   app's literary identity instead of plain UI sans. */
+/* The mark has no baseline of its own. Centring it against the wordmark keeps
+   the lockup reading as one object and keeps it out of the baseline maths. */
+.app-brand .logo-icon {
+  align-self: center;
+}
+
+/* Wordmark in the narrative serif (Newsreader) so the brand carries the app's
+   literary identity instead of plain UI sans.
+
+   Its line box is the mark's own height (2rem, matching LogoIcon `small`) and
+   does two jobs: it centres the wordmark against the mark so the lockup reads
+   as one object, and it puts the baseline the lockup hands up to
+   `.header-nav-sections` where a centred wordmark's baseline would be. At
+   `line-height: 1` the box collapsed to the glyphs and the baseline-aligned row
+   pinned the whole cluster near the top of the mark. */
 .app-wordmark {
   font-family: var(--font-narrative);
   font-size: 1.0625rem;
   font-weight: 600;
-  line-height: 1;
+  line-height: 2rem;
   color: var(--color-text-primary);
 }
 
@@ -252,6 +281,7 @@
 /* Nothing in the header row may shrink under its own content — every label is
    fixed product copy, and the only unbounded string (the world name) lives in
    the context band now. */
+.header-nav-sections,
 .app-brand,
 .header-nav-desktop-links,
 .header-nav-actions-group,

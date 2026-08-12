@@ -141,24 +141,32 @@ export function HeaderNavigation() {
               trailing edge, matching how the page below aligns text left and
               button boxes right. */}
           <div className="header-nav-inner">
-            <Link href={brandHref} className="app-brand">
-              <LogoIcon size="small" />
-              <LogoText className="app-wordmark" />
-            </Link>
+            {/* The wordmark and the section links are one run of type, so they
+                share a baseline rather than each being centred on its own box. */}
+            <div className="header-nav-sections">
+              <Link href={brandHref} className="app-brand">
+                <LogoIcon size="small" />
+                <LogoText className="app-wordmark" />
+              </Link>
 
-            <div
-              className="header-nav-desktop-links"
-              data-testid="desktop-navigation"
-            >
-              <Link href="/worlds" data-navigation>
-                Worlds
-              </Link>
-              <Link href="/characters" data-navigation aria-disabled={!hasWorlds}>
-                Characters
-              </Link>
-              <Link href="/settings" data-navigation>
-                Settings
-              </Link>
+              <div
+                className="header-nav-desktop-links"
+                data-testid="desktop-navigation"
+              >
+                <Link href="/worlds" data-navigation>
+                  Worlds
+                </Link>
+                <Link
+                  href="/characters"
+                  data-navigation
+                  aria-disabled={!hasWorlds}
+                >
+                  Characters
+                </Link>
+                <Link href="/settings" data-navigation>
+                  Settings
+                </Link>
+              </div>
             </div>
 
             <div className="header-nav-actions">
