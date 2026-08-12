@@ -1,6 +1,6 @@
 import {
   RequestBudget,
-  DEFAULT_ALLOCATIONS,
+  DEFAULT_COMPONENT_BUDGETS,
   DEFAULT_TOTAL_BUDGET,
   REQUEST_TOTAL_COMPONENT_ID,
 } from '@/lib/promptContext/tokenBudgetManager';
@@ -18,7 +18,7 @@ const APPROACHING_LIMIT_RATIO = 0.9;
 
 export const createRequestBudget = (): RequestBudget => {
   const enabled = process.env.NEXT_PUBLIC_ENABLE_TOKEN_BUDGET_MANAGER === 'true';
-  return new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, enabled);
+  return new RequestBudget(DEFAULT_COMPONENT_BUDGETS, DEFAULT_TOTAL_BUDGET, enabled);
 };
 
 export const applyBudget = (

@@ -327,8 +327,6 @@ export interface NarrativeContext {
 export interface GenerationParameters {
   desiredLength?: 'short' | 'medium' | 'long';
   tone?: string;
-  /** Token budget for in-prompt few-shot examples; templates fall back to a default when unset. */
-  exampleTokenBudget?: number;
   segmentType?: 'scene' | 'dialogue' | 'action' | 'transition';
   includedTopics?: string[];
   excludedTopics?: string[];

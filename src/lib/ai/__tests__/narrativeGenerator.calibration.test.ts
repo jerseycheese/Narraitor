@@ -11,7 +11,7 @@ import {
 } from '../narrativeGenerator.budget';
 import {
   RequestBudget,
-  DEFAULT_ALLOCATIONS,
+  DEFAULT_COMPONENT_BUDGETS,
   DEFAULT_TOTAL_BUDGET,
   REQUEST_TOTAL_COMPONENT_ID,
 } from '@/lib/promptContext/tokenBudgetManager';
@@ -29,7 +29,7 @@ describe('recordRequestCalibration', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('feeds the provider prompt-token count as the actual for request-total', () => {
-    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true);
+    const budget = new RequestBudget(DEFAULT_COMPONENT_BUDGETS, DEFAULT_TOTAL_BUDGET, true);
 
     recordRequestCalibration(budget, 'a fairly short prompt to estimate', {
       promptTokens: 1500,
@@ -42,7 +42,7 @@ describe('recordRequestCalibration', () => {
   });
 
   it('records an estimate but no actual when the response omits promptTokens', () => {
-    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true);
+    const budget = new RequestBudget(DEFAULT_COMPONENT_BUDGETS, DEFAULT_TOTAL_BUDGET, true);
 
     recordRequestCalibration(budget, 'prompt without token usage', {});
 
@@ -52,7 +52,7 @@ describe('recordRequestCalibration', () => {
   });
 
   it('publishes a snapshot to the calibration store', () => {
-    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, true);
+    const budget = new RequestBudget(DEFAULT_COMPONENT_BUDGETS, DEFAULT_TOTAL_BUDGET, true);
 
     recordRequestCalibration(budget, 'prompt', { promptTokens: 900 });
 
@@ -69,7 +69,7 @@ describe('recordRequestCalibration', () => {
 
 describe('measurement decoupled from enforcement (disabled budget)', () => {
   it('applyBudget records the estimate but does not truncate when disabled', () => {
-    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, false);
+    const budget = new RequestBudget(DEFAULT_COMPONENT_BUDGETS, DEFAULT_TOTAL_BUDGET, false);
     const content = 'lore content that should not be truncated '.repeat(60);
 
     const out = applyBudget(content, 'lore-context', budget);
@@ -82,7 +82,7 @@ describe('measurement decoupled from enforcement (disabled budget)', () => {
   });
 
   it('limitNarrativeContextToBudget records recent-narrative usage without dropping segments when disabled', () => {
-    const budget = new RequestBudget(DEFAULT_ALLOCATIONS, DEFAULT_TOTAL_BUDGET, false);
+    const budget = new RequestBudget(DEFAULT_COMPONENT_BUDGETS, DEFAULT_TOTAL_BUDGET, false);
     const context = {
       recentSegments: [
         { content: 'segment one '.repeat(80) },

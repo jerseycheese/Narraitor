@@ -1,4 +1,4 @@
-import { getExamplesForPrompt, shouldIncludeExamples } from '../../examples';
+import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import type { NarrativeTemplateContext } from './context';
 
@@ -45,15 +45,9 @@ Generate a smooth transition that:
 
 IMPORTANT: Write in SECOND PERSON perspective (using "you").`;
 
-  // Get examples for perspective if token budget allows
-  const tokenBudget = context.generationParameters?.exampleTokenBudget ?? 100;
-  let examplesSection = '';
-  if (shouldIncludeExamples(tokenBudget, previousContent?.length || 0)) {
-    examplesSection = getExamplesForPrompt('transition', tokenBudget, {
-      tags: ['perspective', 'second-person'],
-      minPriority: 'high',
-    });
-  }
+  const examplesSection = shouldIncludeExamples(previousContent?.length || 0)
+    ? PERSPECTIVE_EXAMPLES
+    : '';
 
   return `${baseContent}${examplesSection}
 

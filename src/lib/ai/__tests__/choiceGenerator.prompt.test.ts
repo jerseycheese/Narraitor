@@ -131,7 +131,7 @@ describe('buildChoicePrompt', () => {
 
     const world = createMockWorld({ id: 'world-1' });
     const budget = new RequestBudget(
-      [{ componentId: 'lore-context', priority: ComponentPriority.MEDIUM, min: 0, target: 20, max: 20 }],
+      [{ componentId: 'lore-context', priority: ComponentPriority.MEDIUM, limit: 20 }],
       20,
       true
     );

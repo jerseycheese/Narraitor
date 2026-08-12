@@ -1,239 +1,181 @@
 /**
- * MVP-level tests for PersonalizationEngine
- * Focus on core acceptance criteria: providing raw data to LLM for personalization
+ * MVP tests for the character prompt section: what reaches the prompt from a
+ * character's attributes, skills, goals, and decision history.
  */
 
 import {
-  analyzePlayerBehavior,
-  createPersonalizedContext,
-  generateNarrativeEnhancement,
+  buildCharacterPromptSection,
+  inferPreferredChoiceTypes,
 } from '../personalizationEngine';
-import { Character } from '@/types/character.types';
-import { World } from '@/types/world.types';
-import { PlayerDecision } from '@/types/personalization.types';
+import type {
+  CharacterGoal,
+  PlayerDecision,
+} from '@/types/personalization.types';
 
-describe('PersonalizationEngine - MVP Tests', () => {
-  const engine = {
-    analyzePlayerBehavior,
-    createPersonalizedContext,
-    generateNarrativeEnhancement,
-  };
-  let mockCharacter: Character;
-  let mockWorld: World;
+const decision = (
+  id: string,
+  choiceType: PlayerDecision['choiceType']
+): PlayerDecision => ({
+  id,
+  prompt: 'What do you do?',
+  choiceText: 'Something',
+  choiceType,
+  timestamp: '2023-01-01T00:00:00Z',
+  sessionId: 'session-1',
+  worldId: 'world-1',
+  context: {},
+});
 
-  // Helper to convert Character to PersonalizationCharacter format
-  const convertToPersonalizationCharacter = (character: Character) => ({
-    id: character.id,
-    name: character.name,
-    background:
-      typeof character.background === 'object'
-        ? character.background.history || ''
-        : character.background,
-    attributes: character.attributes,
-    skills: character.skills,
-    createdAt: character.createdAt,
-    updatedAt: character.updatedAt,
+const goal = (
+  id: string,
+  description: string,
+  priority: CharacterGoal['priority'],
+  isActive = true
+): CharacterGoal => ({
+  id,
+  description,
+  priority,
+  progress: 0,
+  establishedAt: '2023-01-01',
+  isActive,
+});
+
+const baseInput = {
+  name: 'Skilled Rogue',
+  attributes: [
+    { attributeId: 'attr-dexterity', value: 9 },
+    { attributeId: 'attr-intelligence', value: 7 },
+    { attributeId: 'attr-strength', value: 3 },
+    { attributeId: 'attr-charisma', value: 5 },
+  ],
+  skills: [
+    { skillId: 'skill-lockpicking', level: 4 },
+    { skillId: 'skill-stealth', level: 3 },
+  ],
+  goals: [],
+  decisions: [],
+};
+
+describe('buildCharacterPromptSection', () => {
+  it('names the character', () => {
+    expect(buildCharacterPromptSection(baseInput)).toContain(
+      'CHARACTER: Skilled Rogue'
+    );
   });
 
-  beforeEach(() => {
+  it('reports notable attributes and leaves the unremarkable ones out', () => {
+    const section = buildCharacterPromptSection(baseInput);
 
-    mockCharacter = {
-      id: 'char-1',
-      name: 'Alex Archer',
-      worldId: 'world-1',
-      description: 'A skilled archaeologist seeking ancient mysteries',
-      background: {
-        history: 'Experienced archaeologist with a mysterious past',
-        personality: 'Curious and determined',
-        goals: ['Discover ancient secrets'],
-        fears: ['Failure'],
-        relationships: [],
-      },
-      attributes: [
-        { attributeId: 'attr-intelligence', value: 8 },
-        { attributeId: 'attr-dexterity', value: 6 },
+    expect(section).toContain('attr-dexterity');
+    expect(section).toContain('Exceptional');
+    expect(section).toContain('attr-strength');
+    expect(section).toContain('Low');
+    expect(section).not.toMatch(/attr-charisma.*Moderate/);
+  });
+
+  it('handles record-style attributes as well as the array form', () => {
+    const section = buildCharacterPromptSection({
+      ...baseInput,
+      attributes: { dexterity: 9, strength: 3 },
+    });
+
+    expect(section).toContain('dexterity');
+    expect(section).toContain('Exceptional');
+  });
+
+  it('lists skills with their proficiency', () => {
+    const section = buildCharacterPromptSection(baseInput);
+
+    expect(section).toContain('SKILLS:');
+    expect(section).toContain('skill-lockpicking');
+    expect(section).toMatch(/Expert|Master|Competent/);
+  });
+
+  it('accepts skills keyed by name instead of id', () => {
+    const section = buildCharacterPromptSection({
+      ...baseInput,
+      skills: [{ name: 'Lockpicking', level: 4 }],
+    });
+
+    expect(section).toContain('Lockpicking');
+  });
+
+  it('lists active goals and skips the ones already put down', () => {
+    const section = buildCharacterPromptSection({
+      ...baseInput,
+      goals: [
+        goal('g1', 'Steal the Crown Jewels', 'primary'),
+        goal('g2', 'Pay off the guild debt', 'secondary', false),
       ],
-      skills: [
-        { skillId: 'skill-1', level: 8, experience: 100, isActive: true },
-        { skillId: 'skill-2', level: 5, experience: 50, isActive: true },
+    });
+
+    expect(section).toContain('ACTIVE GOALS:');
+    expect(section).toContain('• Steal the Crown Jewels (primary)');
+    expect(section).not.toContain('Pay off the guild debt');
+  });
+
+  it('names the play style the player actually leans on', () => {
+    const section = buildCharacterPromptSection({
+      ...baseInput,
+      decisions: [
+        decision('d1', 'stealthy'),
+        decision('d2', 'stealthy'),
+        decision('d3', 'diplomatic'),
       ],
-      derivedStats: [],
-      inventory: {
-        characterId: 'char-1',
-        items: [],
-        capacity: 100,
-        categories: [],
-        itemOrder: [],
-      },
-      status: {
-        health: 100,
-        maxHealth: 100,
-        conditions: [],
-      },
-      createdAt: '2023-01-01',
-      updatedAt: '2023-01-01',
-    };
+    });
 
-    mockWorld = {
-      id: 'world-1',
-      name: 'Ancient Mysteries',
-      description: 'A world of archaeological discoveries',
-      genre: 'mystery',
-      settings: {
-        maxAttributes: 6,
-        maxSkills: 12,
-        attributePointPool: 27,
-        skillPointPool: 40,
-      },
-      createdAt: '2023-01-01',
-      updatedAt: '2023-01-01',
-      attributes: [],
-      skills: [],
-    };
+    expect(section).toContain('PREFERRED PLAY STYLE: stealthy, diplomatic');
   });
 
-  describe('Core Personalization Functionality', () => {
-    test('generates narrative enhancement that references character details', () => {
-      const context = engine.createPersonalizedContext(
-        convertToPersonalizationCharacter(mockCharacter),
-        mockWorld,
-        [],
-        [],
-        [],
-        []
-      );
-
-      const enhancement = engine.generateNarrativeEnhancement(context);
-
-      // Should reference character name
-      expect(enhancement).toContain('Alex Archer');
+  it('keeps sections in a stable order', () => {
+    const section = buildCharacterPromptSection({
+      ...baseInput,
+      goals: [goal('g1', 'Steal the Crown Jewels', 'primary')],
+      decisions: [decision('d1', 'stealthy')],
     });
 
-    test('provides basic preference aggregation', () => {
-      const aggressiveDecisions: PlayerDecision[] = [
-        {
-          id: 'dec-1',
-          prompt: 'Combat situation',
-          choiceText: 'Attack directly',
-          choiceType: 'aggressive',
-          timestamp: '2023-01-01',
-          sessionId: 'session-1',
-          worldId: 'world-1',
-          context: {},
-        },
-        {
-          id: 'dec-2',
-          prompt: 'Conflict',
-          choiceText: 'Fight back',
-          choiceType: 'aggressive',
-          timestamp: '2023-01-01',
-          sessionId: 'session-1',
-          worldId: 'world-1',
-          context: {},
-        },
-      ];
+    const order = ['CHARACTER:', 'ATTRIBUTES:', 'SKILLS:', 'ACTIVE GOALS:', 'PREFERRED PLAY STYLE:'];
+    const positions = order.map((heading) => section.indexOf(heading));
 
-      const analysis = engine.analyzePlayerBehavior(
-        convertToPersonalizationCharacter(mockCharacter),
-        aggressiveDecisions,
-        [],
-        []
-      );
-
-      // We aggregate choice types; trait inference is delegated to the LLM at narrative-generation time
-      expect(analysis.preferences.preferredChoiceTypes).toContain('aggressive');
-      expect(analysis.detectedTraits).toEqual([]);
-    });
-
-    test('sanitizes dangerous input in narrative enhancement', () => {
-      const maliciousCharacter = {
-        ...convertToPersonalizationCharacter(mockCharacter),
-        name: 'Alex<script>alert("xss")</script>',
-        background: 'Evil & "dangerous" character',
-      };
-
-      const context = engine.createPersonalizedContext(
-        maliciousCharacter,
-        mockWorld,
-        [],
-        [],
-        [],
-        []
-      );
-
-      const enhancement = engine.generateNarrativeEnhancement(context);
-
-      // Should not contain dangerous characters
-      expect(enhancement).not.toContain('<script>');
-      expect(enhancement).not.toContain('&');
-      expect(enhancement).not.toContain('"');
-      expect(enhancement).toContain('Alex');
-    });
-
-    test('analyzes player behavior from decision history', () => {
-      const decisions: PlayerDecision[] = [
-        {
-          id: 'dec-1',
-          prompt: 'Test prompt',
-          choiceText: 'Diplomatic response',
-          choiceType: 'diplomatic',
-          timestamp: '2023-01-01',
-          sessionId: 'session-1',
-          worldId: 'world-1',
-          context: {},
-        },
-      ];
-
-      const analysis = engine.analyzePlayerBehavior(
-        convertToPersonalizationCharacter(mockCharacter),
-        decisions,
-        [],
-        []
-      );
-
-      expect(analysis.detectedTraits).toEqual([]);
-      expect(analysis.preferences.preferredChoiceTypes).toContain('diplomatic');
-    });
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    expect(positions.every((position) => position >= 0)).toBe(true);
   });
 
-  describe('MVP Acceptance Criteria', () => {
-    test('integrates player decision patterns when available', () => {
-      const decisions: PlayerDecision[] = [
-        {
-          id: 'dec-1',
-          prompt: 'Test',
-          choiceText: 'Help others',
-          choiceType: 'helpful',
-          timestamp: '2023-01-01',
-          sessionId: 'session-1',
-          worldId: 'world-1',
-          context: {},
-        },
-        {
-          id: 'dec-2',
-          prompt: 'Test',
-          choiceText: 'Negotiate peacefully',
-          choiceType: 'diplomatic',
-          timestamp: '2023-01-01',
-          sessionId: 'session-1',
-          worldId: 'world-1',
-          context: {},
-        },
-      ];
-
-      const context = engine.createPersonalizedContext(
-        convertToPersonalizationCharacter(mockCharacter),
-        mockWorld,
-        decisions,
-        [],
-        [],
-        []
-      );
-
-      const enhancement = engine.generateNarrativeEnhancement(context);
-
-      // Should reference decision patterns
-      expect(enhancement).toMatch(/helpful|diplomatic/i);
+  it('omits every optional section for a bare character', () => {
+    const section = buildCharacterPromptSection({
+      name: 'Nobody',
+      goals: [],
+      decisions: [],
     });
+
+    expect(section).toBe('CHARACTER: Nobody');
+  });
+
+  it('strips markup out of a character name before it reaches the prompt', () => {
+    const section = buildCharacterPromptSection({
+      ...baseInput,
+      name: '<script>alert("xss")</script>Rogue',
+    });
+
+    expect(section).not.toContain('<script>');
+    expect(section).toContain('CHARACTER:');
+  });
+});
+
+describe('inferPreferredChoiceTypes', () => {
+  it('orders choice types by how often the player picks them', () => {
+    expect(
+      inferPreferredChoiceTypes([
+        decision('d1', 'aggressive'),
+        decision('d2', 'stealthy'),
+        decision('d3', 'stealthy'),
+      ])
+    ).toEqual(['stealthy', 'aggressive']);
+  });
+
+  it('infers nothing from a malformed decision list', () => {
+    const malformed = [{ id: 'd1' }] as unknown as PlayerDecision[];
+
+    expect(inferPreferredChoiceTypes(malformed)).toEqual([]);
   });
 });
