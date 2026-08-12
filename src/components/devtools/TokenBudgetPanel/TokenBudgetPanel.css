@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-sm);
 }
 
 .token-budget-panel-meta {
@@ -89,12 +89,6 @@
   background: var(--tbp-over);
 }
 
-.token-budget-panel-suggestion {
-  margin: 0;
-  color: var(--color-danger);
-  font-size: var(--font-size-xs);
-}
-
 .token-budget-panel-calibration {
   display: flex;
   flex-direction: column;
@@ -105,7 +99,7 @@
 
 .token-budget-panel-subheading {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
 }
 

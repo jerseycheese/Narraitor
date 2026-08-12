@@ -8,10 +8,8 @@ import type { World } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { safeTrim } from '@/lib/utils';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
-import type { RequestBudget } from '@/lib/promptContext/tokenBudgetManager';
 
 import { buildNpcRoster } from './narrativeGenerator.npc';
-import { applyBudget } from './narrativeGenerator.budget';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getComplexityAlert } from './narrativeGenerator.languageComplexity';
@@ -96,20 +94,18 @@ export const buildNarrativeContext = (
 export const enhancePromptWithLore = (
   prompt: string,
   worldId: EntityID,
-  sessionId?: EntityID,
-  budget?: RequestBudget
+  sessionId?: EntityID
 ): string => {
   const loreContext = getLoreContextForPrompt(worldId, sessionId, {
     recordUsage: true,
     source: 'narrative',
   });
-  return prompt + applyBudget(loreContext, 'lore-context', budget);
+  return prompt + loreContext;
 };
 
 export const enhancePromptWithGoalContext = async (
   prompt: string,
-  sessionId?: string,
-  budget?: RequestBudget
+  sessionId?: string
 ): Promise<string> => {
   if (!sessionId) return prompt;
 
@@ -121,12 +117,7 @@ export const enhancePromptWithGoalContext = async (
     if (aiContext.goalContext && safeTrim(aiContext.goalContext)) {
       const goalSection = `\n\nCURRENT NARRATIVE GOALS:\n${aiContext.goalContext}\n\nPlease consider these goals when generating the narrative content.`;
 
-      if (!budget) {
-        return `${prompt}${goalSection}`;
-      }
-
-      const limited = applyBudget(goalSection, 'goals', budget);
-      return safeTrim(limited) ? `${prompt}${limited}` : prompt;
+      return `${prompt}${goalSection}`;
     }
 
     return prompt;
@@ -140,8 +131,7 @@ export const enhancePromptWithGoalContext = async (
 export const enhancePromptWithToneSettings = (
   prompt: string,
   world: World,
-  cache: NarrativeStaticContentCache,
-  budget?: RequestBudget
+  cache: NarrativeStaticContentCache
 ): string => {
   const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
   const cacheKey = `${world.id}-${toneSettings.contentRating}-${toneSettings.narrativeStyle}-${toneSettings.languageComplexity}`;
@@ -166,19 +156,14 @@ export const enhancePromptWithToneSettings = (
     cache.toneSettings.set(cacheKey, toneInstructions);
   }
 
-  if (!budget) {
-    return prompt + toneInstructions;
-  }
-
-  return prompt + applyBudget(toneInstructions, 'tone-settings', budget);
+  return prompt + toneInstructions;
 };
 
 // ─── Inventory ──────────────────────────────────────────────────────────────
 
 export const enhancePromptWithInventory = (
   prompt: string,
-  characterIds: string[],
-  budget?: RequestBudget
+  characterIds: string[]
 ): string => {
   try {
     if (!characterIds || characterIds.length === 0) {
@@ -194,14 +179,8 @@ export const enhancePromptWithInventory = (
     }
 
     const equippedItemIds = getEquippedItemIds(characterIds);
-    const tokenLimit =
-      budget && budget.isEnabled() ? budget.getAllocation('inventory') : undefined;
-    const { context: inventorySection, tokenCount } = buildInventoryContext(items, {
+    const { context: inventorySection } = buildInventoryContext(items, {
       equippedItemIds,
-      tokenLimit:
-        typeof tokenLimit === 'number' && Number.isFinite(tokenLimit)
-          ? tokenLimit
-          : undefined,
     });
 
     if (!inventorySection) {
@@ -210,12 +189,6 @@ export const enhancePromptWithInventory = (
 
     const guidance =
       'When generating narrative, naturally reference these items only if they matter to the current situation. Avoid forced mentions or repetitive callbacks.';
-
-    // Record the estimate for observability whether or not enforcement is on;
-    // when disabled, content above is left untruncated.
-    if (budget) {
-      budget.recordUsage('inventory', tokenCount);
-    }
 
     return `${prompt}\n\n${inventorySection}\n\n${guidance}`;
   } catch {
@@ -244,8 +217,7 @@ const getEquippedItemIds = (characterIds: string[] | undefined): string[] => {
 
 export const enhancePromptWithItemAcquisitionInstructions = (
   prompt: string,
-  cache: NarrativeStaticContentCache,
-  budget?: RequestBudget
+  cache: NarrativeStaticContentCache
 ): string => {
   if (!cache.itemAcquisitionInstructions) {
     cache.itemAcquisitionInstructions = `
@@ -286,17 +258,7 @@ Important:
 The items will be automatically added to the character's inventory with proper categorization and journal entries.`;
   }
 
-  if (!budget) {
-    return prompt + cache.itemAcquisitionInstructions;
-  }
-
-  const limited = applyBudget(
-    cache.itemAcquisitionInstructions,
-    'item-instructions',
-    budget
-  );
-
-  return safeTrim(limited) ? prompt + limited : prompt;
+  return prompt + cache.itemAcquisitionInstructions;
 };
 
 // ─── Item Loss ──────────────────────────────────────────────────────────────
