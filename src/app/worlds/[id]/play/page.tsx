@@ -54,30 +54,49 @@ export default function PlayPage() {
     setIsClient(true);
   }, []);
 
-  // session-ended: fires when the player leaves an active session, via tab
-  // close/reload (beforeunload) or navigating away from the play route
-  // in-app (unmount). The listener is set up once, so it reads the latest
-  // session/ending state off a ref rather than closing over stale React
-  // state. Reaching an ending already reports its own session-ended event
-  // (narrativeStore's markSessionEnded), so this skips firing when an
-  // ending is already set.
+  // session-ended: fires when the player leaves an active session. Covers
+  // three exit paths, since no single one is reliable on its own:
+  //   - beforeunload: tab close/reload on desktop
+  //   - visibilitychange (hidden): backgrounding on mobile, where the OS can
+  //     kill the page before beforeunload or unmount ever runs
+  //   - unmount: navigating away from the play route in-app
+  // The listeners are set up once, so they read the latest session/ending
+  // state off a ref rather than closing over stale React state. A "fired"
+  // ref dedupes across the three paths so a single exit (e.g. background
+  // then later unmount) only reports once. Reaching an ending already
+  // reports its own session-ended event (narrativeStore's markSessionEnded),
+  // so this skips firing when an ending is already set.
   const sessionEndTrackingRef = useRef({ currentSessionId, currentEnding });
   useEffect(() => {
     sessionEndTrackingRef.current = { currentSessionId, currentEnding };
   }, [currentSessionId, currentEnding]);
 
   useEffect(() => {
+    const hasFiredRef = { current: false };
+
     const trackSessionEndedIfActive = () => {
+      if (hasFiredRef.current) return;
       const { currentSessionId, currentEnding } = sessionEndTrackingRef.current;
       if (currentSessionId && !currentEnding) {
+        hasFiredRef.current = true;
         trackFunnelStep('session-ended');
       }
     };
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        trackSessionEndedIfActive();
+      }
+    };
+
     window.addEventListener('beforeunload', trackSessionEndedIfActive);
+    window.addEventListener('pagehide', trackSessionEndedIfActive);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('beforeunload', trackSessionEndedIfActive);
+      window.removeEventListener('pagehide', trackSessionEndedIfActive);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       trackSessionEndedIfActive();
     };
   }, []);
