@@ -119,12 +119,6 @@
   text-underline-offset: 2px;
 }
 
-.component-faq-jumplist-link:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
 /* ─── Groups and questions ─── */
 
 .component-faq-group {
@@ -216,12 +210,6 @@
   color: var(--color-accent-hover);
 }
 
-.component-faq-answer a:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
 /* ─── Footer links ─── */
 
 .component-faq-footer {
@@ -241,10 +229,4 @@
 
 .component-faq-footer-link:hover {
   color: var(--color-accent);
-}
-
-.component-faq-footer-link:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
 }
