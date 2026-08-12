@@ -241,26 +241,70 @@ describe('HeaderNavigation', () => {
       expect(screen.getAllByTestId('breadcrumbs').length).toBeGreaterThan(0);
     });
 
-    // The whole brand register is breadcrumb-free, so this asserts the band
+    // The whole brand register is context-band-free, so this asserts the band
     // itself is absent rather than empty: it carries its own padding and
     // border, and an empty one is a visible artifact.
     it.each(['/', '/about', '/privacy', '/terms'])(
-      'renders no breadcrumb band on the brand route %s',
+      'renders no context band on the brand route %s',
       (pathname) => {
         mockPathname = pathname;
 
         const { container } = render(<HeaderNavigation />);
 
-        expect(container.querySelector('.breadcrumbs-container')).toBeNull();
+        expect(container.querySelector('.context-band')).toBeNull();
       }
     );
 
-    it('keeps the breadcrumb band on nested product routes', () => {
+    it('keeps the context band on nested product routes', () => {
       mockPathname = '/worlds/world-1';
 
       const { container } = render(<HeaderNavigation />);
 
-      expect(container.querySelector('.breadcrumbs-container')).not.toBeNull();
+      expect(container.querySelector('.context-band')).not.toBeNull();
+    });
+  });
+
+  // The active world reads as story-level context, so it sits in the band with
+  // the path rather than in the header row, where its user-authored width
+  // reflowed every control beside it.
+  describe('World switcher placement', () => {
+    const seedWorlds = () => {
+      mockWorldStore.worlds = {
+        'world-1': { id: 'world-1', name: 'Test World', genre: 'fantasy' },
+      };
+      mockWorldStore.currentWorldId = 'world-1';
+    };
+
+    it('renders the switcher in the context band, not the header row', () => {
+      mockPathname = '/dashboard';
+      seedWorlds();
+
+      const { container } = render(<HeaderNavigation />);
+
+      expect(
+        container.querySelector('.context-band .world-switcher')
+      ).not.toBeNull();
+      expect(container.querySelector('.header-nav .world-switcher')).toBeNull();
+    });
+
+    // A top-level destination suppresses breadcrumbs, so the switcher is the
+    // only thing left to earn the band.
+    it('renders the band for the switcher alone on a breadcrumb-free route', () => {
+      mockPathname = '/dashboard';
+      seedWorlds();
+
+      const { container } = render(<HeaderNavigation />);
+
+      expect(container.querySelector('.context-band')).not.toBeNull();
+      expect(screen.queryByTestId('breadcrumbs')).not.toBeInTheDocument();
+    });
+
+    it('drops the band entirely when there is no path and no world', () => {
+      mockPathname = '/dashboard';
+
+      const { container } = render(<HeaderNavigation />);
+
+      expect(container.querySelector('.context-band')).toBeNull();
     });
   });
 });

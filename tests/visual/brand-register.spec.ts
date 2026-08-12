@@ -50,17 +50,17 @@ test.describe('Brand register', () => {
   }
 
   for (const route of BRAND_ROUTES) {
-    test(`renders no breadcrumb band on ${route}`, async ({ page }) => {
+    test(`renders no context band on ${route}`, async ({ page }) => {
       await page.goto(route);
-      await expect(page.locator('.breadcrumbs-container')).toHaveCount(0);
+      await expect(page.locator('.context-band')).toHaveCount(0);
     });
   }
 
-  test('keeps the breadcrumb band on a nested product route', async ({
+  test('keeps the context band on a nested product route', async ({
     page,
   }) => {
     await page.goto('/worlds/world-cyberpunk-2077');
-    await expect(page.locator('.breadcrumbs-container')).toHaveCount(1);
+    await expect(page.locator('.context-band')).toHaveCount(1);
   });
 
   test('overrides the :root page gutter', async ({ page }) => {

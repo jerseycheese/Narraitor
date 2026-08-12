@@ -107,12 +107,14 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+/* One row, four slots: brand, section links, actions, drawer toggle. The
+   actions cluster takes the free space so the two clusters sit on opposite
+   gutters and nothing floats mid-row. */
 .header-nav-inner {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-6);
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding-block: var(--space-3);
@@ -120,8 +122,8 @@
 }
 
 /* Match the page-content gutter at each breakpoint so the logo lines up with
-   the page's left edge and the CTA with its right edge. app-surface-inner
-   uses space-3 (<768), space-4 (768-1024), space-6 (>=1024). */
+   the page's left edge and the trailing control with its right edge.
+   app-surface-inner uses space-3 (<768), space-4 (768-1024), space-6 (>=1024). */
 @media (width < 768px) {
   .header-nav-inner {
     padding-inline: var(--space-3);
@@ -134,18 +136,17 @@
   }
 }
 
-.header-nav-left {
+/* Brand and section links are one run of type, so they align on a shared
+   baseline instead of each being centred on its own box. Two faces at two sizes
+   centred in the same row land their baselines about a pixel apart — the offset
+   is a function of each font's ascent and descent, so it survives any
+   line-height, and subpixel rounding moves it with the device pixel ratio.
+   That wobble is what read as the header not quite lining up. */
+.header-nav-sections {
   display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.header-nav-links {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: var(--space-6);
 }
 
 .header-nav-desktop-links {
@@ -168,7 +169,9 @@
 /* Hamburger toggle: hidden above 768px, shown at/under it. CSS-gated (not JS
    matchMedia) so the header's mobile collapse has one source of truth and can't
    desync from the layout viewport (#1381). Complements the desktop links and
-   actions, which already collapse purely via media queries. */
+   actions, which already collapse purely via media queries. The auto margin is
+   what anchors it to the trailing gutter once the actions cluster — the row's
+   flexible item — is hidden alongside the links. */
 .header-nav-mobile-toggle {
   display: none;
 }
@@ -176,10 +179,11 @@
 @media (width <= 768px) {
   .header-nav-mobile-toggle {
     display: inline-flex;
+    margin-inline-start: auto;
   }
 }
 
-.header-nav-links a[data-navigation] {
+.header-nav-desktop-links a[data-navigation] {
   font-family: var(--font-interface);
   font-size: var(--font-size-sm);
   font-weight: 500;
@@ -188,23 +192,36 @@
   transition: color 120ms ease;
 }
 
-.header-nav-links a[data-navigation]:hover {
+.header-nav-desktop-links a[data-navigation]:hover {
   color: var(--color-text-primary);
 }
 
+/* Takes the row's free space and pushes its own contents to the trailing
+   gutter, so the brand and the actions sit on the two content edges. */
 .header-nav-actions {
   display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--space-3);
 }
 
-/* The CTA's `SSRClientOnly` wrapper renders even when there's no CTA to put in
-   it — it has to, or the hydration flicker comes back. As a zero-width flex
-   item it still claims the gap before it, so on every route that suppresses the
-   CTA the header's last control stopped one gap short of the content's right
-   edge. A display:none flex item drops its gap with it. (#1655) */
-.header-nav-actions > div:empty {
+/* An `SSRClientOnly` wrapper renders even when its child renders nothing — it
+   has to, or the hydration flicker comes back. As a zero-width flex item it
+   still claims the gap beside it, leaving the last visible control short of the
+   content's right edge: the CTA's wrapper did it to the whole cluster, and
+   RecentPagesDropdown's does it inside the icon group. Both wrappers are direct
+   children of a flex row here, and a display:none flex item drops its gap with
+   it. (#1655) */
+.header-nav-actions > div:empty,
+.header-nav-actions-group > div:empty {
   display: none;
+}
+
+.header-nav-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 /* Below the hamburger breakpoint the mobile drawer owns Theme/Tutorial/Recent,
@@ -218,81 +235,64 @@
   }
 }
 
-/* Brand lockup: icon + serif wordmark, no link underline. */
+/* Brand lockup: icon + serif wordmark, no link underline. Baseline-aligned so
+   the wordmark's baseline is the one the lockup hands up to
+   `.header-nav-sections`; a box-centred lockup would hand up the mark's bottom
+   edge instead and drop the section links a third of a line. */
 .app-brand {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--space-2);
   text-decoration: none;
   color: var(--color-text-primary);
 }
 
-/* Wordmark in the narrative serif (Newsreader) so the brand carries the
-   app's literary identity instead of plain UI sans. */
+/* The mark has no baseline of its own. Centring it against the wordmark keeps
+   the lockup reading as one object and keeps it out of the baseline maths. */
+.app-brand .logo-icon {
+  align-self: center;
+}
+
+/* Wordmark in the narrative serif (Newsreader) so the brand carries the app's
+   literary identity instead of plain UI sans.
+
+   Its line box is the mark's own height (2rem, matching LogoIcon `small`) and
+   does two jobs: it centres the wordmark against the mark so the lockup reads
+   as one object, and it puts the baseline the lockup hands up to
+   `.header-nav-sections` where a centred wordmark's baseline would be. At
+   `line-height: 1` the box collapsed to the glyphs and the baseline-aligned row
+   pinned the whole cluster near the top of the mark. */
 .app-wordmark {
   font-family: var(--font-narrative);
   font-size: 1.0625rem;
   font-weight: 600;
-  line-height: 1;
+  line-height: 2rem;
   color: var(--color-text-primary);
 }
 
-/* Grouped toolbar: utility icons | world context | primary action. */
+/* Segmented icon cluster: the tightest interval in the row, so three bare
+   glyphs read as one control rather than three peers of the nav links. */
 .header-nav-actions-group {
   display: flex;
   align-items: center;
   gap: var(--space-1);
 }
 
-/* Active world reads as "your story": a subtle wash of the theme accent. */
-.header-world-trigger-active {
-  background: var(--color-accent-soft);
-}
-
-/* A world name is user-authored and unbounded, so left alone it pushes the
-   header past the viewport just above the drawer breakpoint, where the links
-   and the whole action cluster are already inline. Rather than hold the drawer
-   through tablet widths, make the name the one thing in the header that gives:
-   it caps at 12rem and ellipsizes below that only when the row runs out of
-   room. Flex items default to min-width:auto (won't shrink under their text),
-   so every ancestor down to the span needs min-width:0, and the controls that
-   must stay legible opt out of shrinking. (#1655) */
-.header-nav-left,
-.header-nav-actions,
+/* Nothing in the header row may shrink under its own content — every label is
+   fixed product copy, and the only unbounded string (the world name) lives in
+   the context band now. */
+.header-nav-sections,
+.app-brand,
+.header-nav-desktop-links,
 .header-nav-actions-group,
-.header-world-trigger {
-  min-width: 0;
-}
-
-.header-nav-links,
-.header-nav-actions-group > *:not(.header-world-trigger),
-.header-world-trigger > :not(.header-world-name) {
+.header-nav-mobile-toggle {
   flex-shrink: 0;
-}
-
-.header-world-name {
-  min-width: 0;
-  max-width: 12rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .header-nav-divider {
   width: 1px;
   height: 1.375rem;
   background: var(--color-border);
-}
-
-/* Active-world character count as a subtle labeled badge, not a bare number. */
-.header-world-count {
-  font-family: var(--font-interface);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  background: var(--color-surface-hover);
-  padding: 0.0625rem var(--space-1_5);
-  border-radius: 999px;
 }
 
 /* ─── Dropdown Menu ─── */
@@ -360,53 +360,180 @@
   padding-top: var(--space-1);
 }
 
-/* ─── Breadcrumbs ─── */
+/* The row below the divider is an icon plus its label, not a value plus its
+   state, so it packs left instead of inheriting the item row's space-between —
+   which was throwing the mark and the words to opposite edges. */
+.header-dropdown-divider .header-dropdown-item {
+  justify-content: flex-start;
+}
 
-.breadcrumbs-container {
+/* ═══════════════════════════════════════════════════════════════
+   Context band (where you are, and which world you're in)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* The header row above is app-level and identical everywhere; this band is the
+   story-level line. Path reads from the leading gutter, active world sits on
+   the trailing one, and the row stays a single line at every width. */
+.context-band {
   border-bottom: 1px solid var(--color-border);
   background: var(--color-surface);
 }
 
-.breadcrumbs-inner {
+.context-band-inner {
   /* Without border-box the gutter lands outside the max-width and the band
      measures 1248px against the other two bands' 1200px, staggering the left
      edge by one gutter on every viewport past the cap. */
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-1) var(--space-4);
 }
 
 /* Match the header's and content column's gutter map so all three bands share a
    left edge. Matters more now that breadcrumbs reach every detail route (#1655). */
 @media (width < 768px) {
-  .breadcrumbs-inner {
+  .context-band-inner {
     padding-inline: var(--space-3);
   }
 }
 
 @media (width >= 1024px) {
-  .breadcrumbs-inner {
+  .context-band-inner {
     padding-inline: var(--space-6);
   }
 }
 
+/* The path gives before the switcher does: a truncated crumb trail still reads,
+   a truncated world name is the thing you came here to check. */
+.context-band-path {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* The SSR wrappers between the band and the crumb trail are plain divs, and a
+   flex item won't shrink under its content without an explicit min-width. Left
+   at auto they hold the trail at full width and it gets clipped mid-word
+   instead of ellipsized. */
+.context-band-path > div {
+  min-width: 0;
+}
+
+/* ─── World switcher ─── */
+
+.world-switcher {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+/* Narrow enough and the trail and the switcher want the same line. Both size to
+   their content and the switcher gives first, so it keeps the whole band on the
+   routes that suppress breadcrumbs (the path is empty there, and a fixed basis
+   would reserve half a line for nothing, truncating the world name to
+   "Cyber…"), and yields to the trail where they genuinely compete — an
+   ellipsized world name still has the page's own heading behind it, while a
+   trail clipped to one character stops being a trail. */
+@media (width <= 768px) {
+  .context-band-path {
+    flex: 1 1 auto;
+  }
+
+  .world-switcher {
+    flex: 0 1 auto;
+  }
+}
+
+.world-switcher-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: 100%;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+}
+
+/* A world name is user-authored and unbounded, so it caps and ellipsizes rather
+   than pushing the switcher off the band. Flex items default to
+   min-width:auto (they won't shrink under their text), so every ancestor down
+   to the span needs min-width:0, and the marks that must stay legible opt out
+   of shrinking. */
+.world-switcher-trigger > :not(.world-switcher-name) {
+  flex-shrink: 0;
+}
+
+.world-switcher-name {
+  min-width: 0;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The count qualifies the name, so it's set as quieter running text rather
+   than a filled badge — a second wash inside the band's own surface reads as
+   a control within a control. */
+.world-switcher-count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+@media (width < 640px) {
+  .world-switcher-count {
+    display: none;
+  }
+}
+
+/* ─── Breadcrumbs ─── */
+
+/* A crumb trail is one line or it isn't a trail: wrapped, it reads as a stack
+   of unrelated links and it pushes the band's height around per route. The
+   final crumb is the one that gives, since the ones before it are short fixed
+   labels. */
 .breadcrumbs-nav {
   display: flex;
+  flex-wrap: nowrap;
+  min-width: 0;
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-interface);
   font-size: 0.8125rem;
   color: var(--color-text-muted);
+  white-space: nowrap;
 }
 
 .breadcrumbs-item {
   display: inline-flex;
+  min-width: 0;
   align-items: center;
   gap: var(--space-1);
+  overflow: hidden;
   color: var(--color-text-secondary);
   text-decoration: none;
+  text-overflow: ellipsis;
   transition: color 120ms ease;
+}
+
+.breadcrumbs-item:not(:last-child),
+.breadcrumbs-separator,
+.breadcrumbs-item svg {
+  flex-shrink: 0;
+}
+
+/* text-overflow needs a non-flex box to act on, so the label carries the
+   ellipsis rather than the flex item holding it. */
+.breadcrumbs-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .breadcrumbs-item:hover {
@@ -2523,8 +2650,12 @@
 
 /* ─── Logo ─── */
 
-.logo-icon-inverted {
-  filter: brightness(0);
+/* The mark is inline SVG filled with currentColor, so it takes the ink of
+   whatever it sits in and needs no per-scheme rule of its own. It used to be a
+   fixed-black image, which meant the dark header rendered a black mark on a
+   near-black band. */
+.logo-icon {
+  flex-shrink: 0;
 }
 
 /* ─── Toast ─── */
