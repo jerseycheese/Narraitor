@@ -69,6 +69,9 @@ export default function Faq() {
         <Link href="/about" className="component-faq-footer-link">
           About
         </Link>
+        <Link href="/faq" className="component-faq-footer-link">
+          FAQ
+        </Link>
         <Link href="/privacy" className="component-faq-footer-link">
           Privacy
         </Link>
