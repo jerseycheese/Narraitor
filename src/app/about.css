@@ -291,6 +291,13 @@
   color: var(--color-text-secondary);
 }
 
+/* The CTA is the one section whose band is a --color-accent-soft fill rather
+   than canvas, and secondary ink only reaches 3.85:1 on it. accent-strong is
+   the token that exists for small text over that fill. */
+:root .component-about-cta .component-about-section-title {
+  color: var(--color-accent-strong);
+}
+
 :root .component-about-section-title::before {
   content: "";
   display: inline-block;
