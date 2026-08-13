@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { ProviderPresets } from './ProviderPresets';
 import { CustomProviderForm } from './CustomProviderForm';
+import { ProviderDisclosure } from './ProviderDisclosure';
 import { useProviderStore } from '@/state/providerStore';
 import { getPresetById } from '@/lib/ai/presets';
 import { validateProviderKey, type ValidationResult } from '@/lib/ai/validateProviderClient';
@@ -27,6 +28,7 @@ interface ProviderWizardData {
   images: boolean;
   streaming: boolean;
   helpUrl: string;
+  privacyNote: string;
 }
 
 const INITIAL_DATA: ProviderWizardData = {
@@ -41,6 +43,7 @@ const INITIAL_DATA: ProviderWizardData = {
   images: false,
   streaming: false,
   helpUrl: '',
+  privacyNote: '',
 };
 
 const STEPS = [
@@ -48,6 +51,13 @@ const STEPS = [
   { id: 'connect', label: 'Connect' },
   { id: 'verify', label: 'Verify' },
 ];
+
+/**
+ * A custom endpoint could be anything, so the honest disclosure is that we
+ * don't know its terms — not silence, which reads as "nothing to worry about".
+ */
+const CUSTOM_PRIVACY_NOTE =
+  'A custom endpoint is whatever you point it at. Check that provider\'s own data-retention terms — we have no way to know them.';
 
 interface ProviderWizardProps {
   onComplete?: () => void;
@@ -58,7 +68,10 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_KEY: 'That key was rejected. Double-check it and try again.',
   INVALID_MODEL: 'That model name was not found for this provider.',
   RATE_LIMITED: 'The provider is rate limiting right now — wait a moment and retry.',
-  UNSUPPORTED_PROVIDER: 'This provider is not supported yet. Only Google Gemini works for now.',
+  UNSUPPORTED_PROVIDER:
+    "This provider's API isn't one we can talk to yet. If it accepts OpenAI-style chat completions, add it as a custom endpoint instead.",
+  INVALID_ENDPOINT:
+    'That endpoint must be an https URL on a public host. Local addresses are not reachable from the server that makes the request.',
   NO_KEY: 'Enter your API key first.',
   NETWORK: 'Could not reach the provider. Check your connection and the endpoint.',
   VALIDATION_FAILED: 'Something went wrong checking this configuration.',
@@ -138,6 +151,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
       images: preset.capabilities.images,
       streaming: preset.capabilities.streaming,
       helpUrl: preset.helpUrl,
+      privacyNote: preset.privacyNote ?? '',
     });
   };
 
@@ -159,6 +173,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     }
   };
 
+  const hasChosenProvider = data.mode === 'preset' ? Boolean(data.presetId) : Boolean(data.endpoint.trim());
   const navDisabled = isLastStep ? verifyState !== 'success' : !(stepValidation?.valid ?? false);
 
   return (
@@ -173,7 +188,13 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             <button
               type="button"
               className="provider-advanced-toggle"
-              onClick={() => handlers.updateData({ mode: data.mode === 'custom' ? 'preset' : 'custom', type: data.mode === 'custom' ? 'gemini' : 'openai-compatible' })}
+              onClick={() =>
+                handlers.updateData({
+                  mode: data.mode === 'custom' ? 'preset' : 'custom',
+                  type: data.mode === 'custom' ? 'gemini' : 'openai-compatible',
+                  privacyNote: data.mode === 'custom' ? '' : CUSTOM_PRIVACY_NOTE,
+                })
+              }
             >
               {data.mode === 'custom' ? 'Use a preset instead' : 'Use a custom endpoint'}
             </button>
@@ -182,6 +203,9 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
                 value={{ name: data.name, endpoint: data.endpoint, model: data.model }}
                 onChange={(updates) => handlers.updateData(updates)}
               />
+            )}
+            {hasChosenProvider && (
+              <ProviderDisclosure type={data.type} model={data.model} privacyNote={data.privacyNote} />
             )}
           </div>
         )}
@@ -257,6 +281,8 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
                 </p>
               )}
             </div>
+
+            <ProviderDisclosure type={data.type} model={data.model} privacyNote={data.privacyNote} />
           </div>
         )}
 

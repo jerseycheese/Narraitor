@@ -16,15 +16,19 @@ interface CustomProviderFormProps {
 }
 
 /**
- * Form for an advanced custom endpoint. Custom endpoints aren't wired up yet —
- * only Google Gemini works for now — so we say so plainly rather than letting a
- * player hit a dead end at the verify step.
+ * Form for an advanced custom endpoint.
+ *
+ * This is the generic door onto the provider abstraction (#890): anything that
+ * accepts OpenAI-style chat completions works here, which is most of them. The
+ * named presets are a curated list on top of the same path.
  */
 export function CustomProviderForm({ value, onChange, className }: CustomProviderFormProps) {
   return (
     <div className={clsx('component-custom-provider-form', className)}>
       <p className="form-help-text">
-        Custom endpoints are coming soon. Right now only Google Gemini works end to end.
+        Any service that accepts OpenAI-style chat completions works here. The endpoint must be an
+        https URL on a public host — the request is made by the server, so a local address is not
+        reachable.
       </p>
 
       <div className="form-group">

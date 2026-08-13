@@ -62,4 +62,10 @@ export interface ProviderPreset {
   available: boolean;
   /** Short pitch shown under the name, e.g. what a key costs to get. */
   note?: string;
+  /**
+   * What this provider does with prompts and outputs. Shown in the wizard
+   * before a player commits a key — see ProviderDisclosure for why this is
+   * surfaced rather than left to the provider's own terms page.
+   */
+  privacyNote?: string;
 }

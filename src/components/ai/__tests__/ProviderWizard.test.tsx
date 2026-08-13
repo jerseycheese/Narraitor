@@ -31,6 +31,19 @@ beforeEach(() => {
 });
 
 describe('ProviderWizard', () => {
+  test('discloses the privacy cost before the player pastes a key', async () => {
+    const user = userEvent.setup();
+    render(<ProviderWizard />);
+
+    // Nothing chosen yet — nothing to disclose.
+    expect(screen.queryByText(/human raters/i)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+
+    expect(screen.getByText(/human raters/i)).toBeInTheDocument();
+    expect(screen.getByText(/safety-filter setting/i)).toBeInTheDocument();
+  });
+
   test('walks preset -> connect -> verify -> save and stores the provider', async () => {
     mockValidate.mockResolvedValue({
       valid: true,

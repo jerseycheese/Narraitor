@@ -26,6 +26,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     capabilities: { text: true, images: true, streaming: true },
     helpUrl: 'https://aistudio.google.com/apikey',
     available: true,
+    privacyNote:
+      "Google's free tier allows your prompts and the model's output to be used to improve their models, and reviewed by human raters. Their paid tiers do not. If you are writing anything personal, use a paid-tier key.",
   },
   {
     id: 'openrouter',
@@ -40,6 +42,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     helpUrl: 'https://openrouter.ai/keys',
     available: false,
     note: 'free tier, no card',
+    privacyNote:
+      'OpenRouter routes your prompts to whichever upstream model you pick, and each of those has its own data-retention terms. Their free models in particular may allow training on your prompts.',
   },
   {
     id: 'openai',
@@ -51,6 +55,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     capabilities: { text: true, images: true, streaming: true },
     helpUrl: 'https://platform.openai.com/api-keys',
     available: false,
+    privacyNote:
+      'OpenAI states that API inputs and outputs are not used to train their models by default, and are retained for up to 30 days for abuse monitoring.',
   },
   {
     id: 'deepseek',
@@ -62,6 +68,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://platform.deepseek.com/api_keys',
     available: false,
+    privacyNote:
+      'Deepseek stores API data on servers in China and reserves the right to use it to improve their services. Check their current terms before sending anything personal.',
   },
   {
     id: 'mistral',
