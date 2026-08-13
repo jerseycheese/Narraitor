@@ -1,7 +1,16 @@
 // src/lib/ai/aiFetch.ts
 
-import { PROVIDER_API_KEY_HEADER, PROVIDER_MODEL_HEADER } from './providerKeyHeader';
-import { getActiveProviderKey, getActiveProviderModel } from '@/state/providerStore';
+import {
+  PROVIDER_API_KEY_HEADER,
+  PROVIDER_ENDPOINT_HEADER,
+  PROVIDER_MODEL_HEADER,
+  PROVIDER_TYPE_HEADER,
+} from './providerKeyHeader';
+import {
+  getActiveProviderKey,
+  getActiveProviderModel,
+  getActiveProviderRouting,
+} from '@/state/providerStore';
 import { anySignal, timeoutSignal } from './abortTimeout';
 import { RETRYING_ROUTE_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
@@ -43,13 +52,21 @@ export async function aiFetch(
     ),
   };
   const model = getActiveProviderModel();
+  const routing = getActiveProviderRouting();
   // Nothing configured -> identical to a plain fetch (env key and default model
   // apply server-side). This keeps aiFetch a true drop-in: dev, tests, and E2E
   // behave exactly as before.
-  if (!key && !model) return fetch(input, withTimeout);
+  if (!key && !model && !routing) return fetch(input, withTimeout);
 
   const headers = new Headers(withTimeout.headers);
   if (key) headers.set(PROVIDER_API_KEY_HEADER, key);
   if (model) headers.set(PROVIDER_MODEL_HEADER, model);
+  // The type and endpoint are what let the server reach a provider other than
+  // Gemini at all; without them a key for any other service is posted to
+  // Google. The server ignores both unless this same request carries the key.
+  if (routing) {
+    headers.set(PROVIDER_TYPE_HEADER, routing.type);
+    if (routing.endpoint) headers.set(PROVIDER_ENDPOINT_HEADER, routing.endpoint);
+  }
   return fetch(input, { ...withTimeout, headers });
 }

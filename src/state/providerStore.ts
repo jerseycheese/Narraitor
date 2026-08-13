@@ -13,6 +13,7 @@ import {
 import { validateProviderKey } from '@/lib/ai/validateProviderClient';
 import type {
   ProviderConfig,
+  ProviderType,
   ProviderValidationRecord,
 } from '@/types/provider.types';
 
@@ -251,4 +252,22 @@ export function getActiveProviderModel(): string | null {
   if (!activeProviderId) return null;
 
   return providers[activeProviderId]?.model?.trim() || null;
+}
+
+/**
+ * What kind of provider is active and where it lives, for `aiFetch` to send
+ * alongside the key. Null when nothing is configured, which keeps the request
+ * header-free and the server on its Gemini default.
+ *
+ * Deliberately excludes the key: that is decrypted separately and on demand by
+ * `getActiveProviderKey`, so the plaintext never travels with the metadata.
+ */
+export function getActiveProviderRouting(): { type: ProviderType; endpoint: string } | null {
+  const { providers, activeProviderId } = useProviderStore.getState();
+  if (!activeProviderId) return null;
+
+  const config = providers[activeProviderId];
+  if (!config) return null;
+
+  return { type: config.type, endpoint: config.endpoint?.trim() ?? '' };
 }

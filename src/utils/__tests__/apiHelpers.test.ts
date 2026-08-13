@@ -19,7 +19,7 @@ import {
   getSafetySettingsFromPrompt,
   makeGeminiRequest,
   consumeGeminiStreamEvents,
-  processGeminiStreamingTextRequest,
+  processAIStreamingTextRequest,
 } from '../apiHelpers';
 import { DEFAULT_TEXT_MODEL, getAIConfig } from '../../lib/ai/config';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../../lib/constants/aiTimeouts';
@@ -276,7 +276,7 @@ describe('consumeGeminiStreamEvents', () => {
   });
 });
 
-describe('processGeminiStreamingTextRequest', () => {
+describe('processAIStreamingTextRequest', () => {
   function fakeRequest(body: unknown, headerKey?: string, headerModel?: string): NextRequest {
     const headers: Record<string, string | undefined> = {
       [PROVIDER_API_KEY_HEADER]: headerKey,
@@ -305,14 +305,14 @@ describe('processGeminiStreamingTextRequest', () => {
   });
 
   it('rejects a request with no prompt before ever calling Gemini', async () => {
-    await processGeminiStreamingTextRequest(fakeRequest({}), { errorContext: 'Test' });
+    await processAIStreamingTextRequest(fakeRequest({}), { errorContext: 'Test' });
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it('errors without calling Gemini when no API key resolves', async () => {
     // No header key, and jest.setup.ts pins GEMINI_API_KEY to the MOCK_API_KEY
     // sentinel, which resolveApiKey treats as unset.
-    await processGeminiStreamingTextRequest(fakeRequest({ prompt: 'hello' }), { errorContext: 'Test' });
+    await processAIStreamingTextRequest(fakeRequest({ prompt: 'hello' }), { errorContext: 'Test' });
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
@@ -324,7 +324,7 @@ describe('processGeminiStreamingTextRequest', () => {
       text: async () => 'rate limited upstream',
     });
 
-    await processGeminiStreamingTextRequest(
+    await processAIStreamingTextRequest(
       fakeRequest({ prompt: 'hello' }, 'player-supplied-key'),
       { errorContext: 'Test' }
     );
@@ -347,7 +347,7 @@ describe('processGeminiStreamingTextRequest', () => {
       text: async () => 'upstream boom',
     });
 
-    await processGeminiStreamingTextRequest(
+    await processAIStreamingTextRequest(
       fakeRequest({ prompt: 'hello' }, 'player-supplied-key', 'gemini-2.5-pro'),
       { errorContext: 'Test' }
     );
@@ -366,7 +366,7 @@ describe('processGeminiStreamingTextRequest', () => {
       text: async () => 'upstream boom',
     });
 
-    await processGeminiStreamingTextRequest(
+    await processAIStreamingTextRequest(
       fakeRequest({ prompt: 'hello' }, 'player-supplied-key'),
       { errorContext: 'Test' }
     );

@@ -2,7 +2,12 @@
  * @jest-environment node
  */
 import { NextRequest } from 'next/server';
-import { PROVIDER_API_KEY_HEADER } from '../providerKeyHeader';
+import {
+  PROVIDER_API_KEY_HEADER,
+  PROVIDER_ENDPOINT_HEADER,
+  PROVIDER_MODEL_HEADER,
+  PROVIDER_TYPE_HEADER,
+} from '../providerKeyHeader';
 import { resolveApiKey } from '../resolveApiKey';
 
 const ORIGINAL = process.env.GEMINI_API_KEY;
@@ -51,5 +56,21 @@ describe('resolveApiKey', () => {
   test('returns null with no request and no env key', () => {
     delete process.env.GEMINI_API_KEY;
     expect(resolveApiKey()).toBeNull();
+  });
+
+  test('withholds the key when the active provider is not Gemini', () => {
+    // These callers post straight to Google. Handing them a player's OpenRouter
+    // key would send that key to a service it was never issued for.
+    delete process.env.GEMINI_API_KEY;
+    const request = new NextRequest('http://localhost/api/x', {
+      headers: {
+        [PROVIDER_API_KEY_HEADER]: 'openrouter-key',
+        [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+        [PROVIDER_ENDPOINT_HEADER]: 'https://openrouter.ai/api/v1/chat/completions',
+        [PROVIDER_MODEL_HEADER]: 'openai/gpt-4o',
+      },
+    });
+
+    expect(resolveApiKey(request)).toBeNull();
   });
 });

@@ -1,17 +1,26 @@
 jest.mock('@/state/providerStore', () => ({
   getActiveProviderKey: jest.fn(),
   getActiveProviderModel: jest.fn(),
+  getActiveProviderRouting: jest.fn(),
 }));
 
 import { aiFetch } from '../aiFetch';
-import { getActiveProviderKey, getActiveProviderModel } from '@/state/providerStore';
+import {
+  getActiveProviderKey,
+  getActiveProviderModel,
+  getActiveProviderRouting,
+} from '@/state/providerStore';
 
 const mockGetKey = getActiveProviderKey as jest.MockedFunction<typeof getActiveProviderKey>;
 const mockGetModel = getActiveProviderModel as jest.MockedFunction<typeof getActiveProviderModel>;
+const mockGetRouting = getActiveProviderRouting as jest.MockedFunction<
+  typeof getActiveProviderRouting
+>;
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockGetModel.mockReturnValue(null);
+  mockGetRouting.mockReturnValue(null);
   global.fetch = jest.fn(async () => ({ ok: true })) as unknown as typeof fetch;
 });
 
@@ -48,6 +57,29 @@ describe('aiFetch', () => {
     await aiFetch('/api/narrative/generate');
 
     expect(lastFetchHeaders().has('x-provider-model')).toBe(false);
+  });
+
+  test('attaches the provider type and endpoint so a key is not posted to Google', async () => {
+    mockGetKey.mockResolvedValue('openrouter-key');
+    mockGetRouting.mockReturnValue({
+      type: 'openai-compatible',
+      endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    });
+    await aiFetch('/api/narrative/generate', { method: 'POST' });
+
+    const headers = lastFetchHeaders();
+    expect(headers.get('x-provider-type')).toBe('openai-compatible');
+    expect(headers.get('x-provider-endpoint')).toBe('https://openrouter.ai/api/v1/chat/completions');
+  });
+
+  test('sends no endpoint header for a provider that has no custom endpoint', async () => {
+    mockGetKey.mockResolvedValue('byo-key');
+    mockGetRouting.mockReturnValue({ type: 'gemini', endpoint: '' });
+    await aiFetch('/api/narrative/generate', { method: 'POST' });
+
+    const headers = lastFetchHeaders();
+    expect(headers.get('x-provider-type')).toBe('gemini');
+    expect(headers.get('x-provider-endpoint')).toBeNull();
   });
 
   test('preserves caller-supplied headers', async () => {
