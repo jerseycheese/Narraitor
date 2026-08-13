@@ -79,7 +79,18 @@ test.describe('Main Pages Visual Tests', () => {
     await expect(page).toHaveTitle(/Narraitor/i);
 
     // Take full page screenshot - should show "Continue Last Game" with character and world info
-    await expect(page).toHaveScreenshot('home-page.png', { fullPage: true });
+    //
+    // The Recent Worlds thumbnail (.dashboard-recent-world-thumb, 48x48px) goes
+    // through next/image on-demand optimization, and whether it decodes before
+    // capture is a coin flip on CI -- sometimes it never resolves at all, so a
+    // scoped image-load wait isn't reliable here (#1742). Mask it instead of
+    // waiting for it: the flake is isolated to that one region, so masking it
+    // out of the comparison is the fix the issue itself calls for, without a
+    // per-spec pixel budget standing in for a real wait.
+    await expect(page).toHaveScreenshot('home-page.png', {
+      fullPage: true,
+      mask: [page.locator('.dashboard-recent-world-thumb')],
+    });
   });
 
   test('Settings page should render consistently', async ({ page }) => {
