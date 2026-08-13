@@ -269,7 +269,7 @@ For network issues, AI requests run against explicit timeout budgets (see `src/l
 
 Environment variables are straightforward: `GEMINI_API_KEY` is an optional server-side fallback (never use a `NEXT_PUBLIC_` provider key), and `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging.
 
-The model configuration (`src/lib/ai/config.ts`) uses gemini-2.5-flash as the primary model and gemini-2.5-flash-image for image generation, temperature of 0.7 for creative content, and a 2048-token default output budget that individual callers can tighten (the significance validator caps at 200, for instance). Gemini's dynamic "thinking" is disabled by default — it burns latency and output-token budget on interactive game requests.
+The model configuration (`src/lib/ai/config.ts`) uses gemini-2.5-flash as the primary model and gemini-3.1-flash-image for image generation, temperature of 0.7 for creative content, and a 2048-token default output budget that individual callers can tighten (the significance validator caps at 200, for instance). Gemini's dynamic "thinking" is disabled by default — it burns latency and output-token budget on interactive game requests.
 
 Timeout budgets live in `src/lib/constants/aiTimeouts.ts`, deliberately derived from each other so client and server can't drift: 30s for a single server-side Gemini attempt, 45s as the browser ceiling for single-attempt text routes, and 120s for routes that run the retry loop server-side or generate images.
 

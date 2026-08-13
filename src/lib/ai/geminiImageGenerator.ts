@@ -47,7 +47,12 @@ export async function callGeminiImageAPI(
   logger.debug('callGeminiImageAPI', 'Calling Gemini image generation API');
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${getAIConfig().imageModelName}:generateContent`,
+    // v1, not v1beta: gemini-3.1-flash-image is a v1 (GA) model. imageConfig
+    // is still the correct field here — verified against the live API, since
+    // Google's docs disagree with themselves (generationConfig.responseFormat
+    // is listed as valid but 400s with "Invalid value at
+    // generation_config.response_format.image.aspect_ratio" in practice).
+    `https://generativelanguage.googleapis.com/v1/models/${getAIConfig().imageModelName}:generateContent`,
     {
       method: 'POST',
       headers: {

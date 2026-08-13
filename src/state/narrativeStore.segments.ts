@@ -6,6 +6,7 @@ import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { applyWorldStateThreadUpdates } from '../lib/narrative/applyWorldStateThreadUpdates';
 import { useSessionStore } from './sessionStore';
 import { useGoalStore } from './goalStore';
+import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
 const normalizeDecisionText = (text: string) => {
@@ -158,6 +159,10 @@ export const createNarrativeSegmentActions = (
         },
       };
     });
+
+    // A generated narrative segment just landed in state and is on its way
+    // to the player - this is the turn-level play-depth signal.
+    trackFunnelStep('narrative-turn');
 
     // Update the saved session's narrative count
     try {

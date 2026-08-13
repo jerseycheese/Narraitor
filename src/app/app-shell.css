@@ -2198,7 +2198,7 @@
   width: 100%;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--color-surface-recessed);
+  background: var(--color-canvas);
   color: var(--color-text-muted);
 }
 

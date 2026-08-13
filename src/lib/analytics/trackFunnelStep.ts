@@ -5,7 +5,13 @@ import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
  * The funnel steps we measure. Names only — this union is the entire
  * vocabulary that ever leaves the browser.
  */
-type FunnelStep = 'landing' | 'session-started' | 'return-visit' | 'world-created';
+type FunnelStep =
+  | 'landing'
+  | 'session-started'
+  | 'return-visit'
+  | 'world-created'
+  | 'narrative-turn'
+  | 'session-ended';
 
 /**
  * Fire an anonymous funnel-step event to Vercel Web Analytics.

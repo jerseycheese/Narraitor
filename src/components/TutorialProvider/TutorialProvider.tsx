@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useState, useCallback, useEffect, ReactNode, useRef } from 'react';
-import type { Step, CallBackProps } from 'react-joyride';
+import type { Step, CallBackProps, StoreHelpers } from 'react-joyride';
 import { useSessionStore } from '@/state/sessionStore';
 import { joyrideStyles, getTourOptions } from '@/lib/tutorial/tutorialConfig';
 import { TutorialPhase } from '@/types/tutorial.types';
@@ -84,6 +84,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   const runRef = useRef(false);
   const isPausedRef = useRef(false);
   const missingTargetRef = useRef<{ index: number; target: string | null } | null>(null);
+  // Guards the getHelpers fallback below so a tour that already reported its
+  // own outcome isn't recorded twice.
+  const terminalOutcomeHandledRef = useRef(false);
   // Mirror the loaded runtime in a ref so the Joyride callback can read its
   // STATUS/ACTIONS/EVENTS enums without re-subscribing; state drives the render.
   const joyrideRuntimeRef = useRef<JoyrideModule | null>(null);
@@ -195,6 +198,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         return;
       }
 
+      terminalOutcomeHandledRef.current = false;
       setSteps(loadedSteps);
       setStepMapping(mapping);
       setActiveTour(tourId);
@@ -255,6 +259,58 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     missingTargetRef.current = null;
   }, [activeTour, ensureJoyrideRuntime]);
 
+  const endTour = useCallback((outcome: 'finished' | 'skipped', index: number) => {
+    terminalOutcomeHandledRef.current = true;
+    setSteps([]);
+    setRun(false);
+    setIsPaused(false);
+    setPauseReason(null);
+    missingTargetRef.current = null;
+    if (activeTour) {
+      if (outcome === 'finished') {
+        if (activeTour === 'characterCreationWizard') {
+          completeTutorialPhase('characterCreation');
+        } else if (stepMapping) {
+          const wizardStepValues = Object.values(stepMapping);
+          const maxWizardStep = wizardStepValues.length > 0 ? Math.max(...wizardStepValues) : null;
+          const isFinalWizardStep = maxWizardStep !== null && currentWizardStep >= maxWizardStep;
+          const isFinalTourStep = steps.length > 0 && index >= steps.length - 1;
+
+          if (isFinalWizardStep && isFinalTourStep) {
+            completeTutorialPhase(activeTour as TutorialPhase);
+          } else {
+            updateTutorialProgress(activeTour as TutorialPhase, { lastStep: index });
+          }
+        } else {
+          // Check if it's a valid phase before completing
+          if (activeTour in tutorialProgress.phases) {
+            completeTutorialPhase(activeTour as TutorialPhase);
+          }
+        }
+      } else {
+        if (activeTour === 'characterCreationWizard') {
+          updateTutorialProgress('characterCreation', { skipped: true });
+        } else if (activeTour in tutorialProgress.phases) {
+          updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });
+        }
+      }
+    }
+    setActiveTour(null);
+  }, [activeTour, completeTutorialPhase, updateTutorialProgress, stepMapping, currentWizardStep, steps, tutorialProgress.phases]);
+
+  // react-joyride only emits its end-of-tour callback when a previous step
+  // exists, so a skip taken on the very first step reports nothing at all: the
+  // phase never records the dismissal and the tour reopens on the next mount.
+  // getHelpers runs on every status change, so read the outcome from the tour's
+  // own state whenever the callback never delivered one.
+  const handleJoyrideHelpers = useCallback((helpers: StoreHelpers) => {
+    if (terminalOutcomeHandledRef.current) return;
+    const { status, index } = helpers.info();
+    if (status === 'skipped' || status === 'finished') {
+      endTour(status, index);
+    }
+  }, [endTour]);
+
   const handleJoyrideCallback = useCallback((data: CallBackProps) => {
     const runtime = joyrideRuntimeRef.current;
     if (!runtime) return;
@@ -262,45 +318,19 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     const { status, type, index, action } = data;
 
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
-      setSteps([]);
-      setRun(false);
-      setIsPaused(false);
-      setPauseReason(null);
-      missingTargetRef.current = null;
-      if (activeTour) {
-        if (status === STATUS.FINISHED) {
-          if (activeTour === 'characterCreationWizard') {
-            completeTutorialPhase('characterCreation');
-          } else if (stepMapping) {
-            const wizardStepValues = Object.values(stepMapping);
-            const maxWizardStep = wizardStepValues.length > 0 ? Math.max(...wizardStepValues) : null;
-            const isFinalWizardStep = maxWizardStep !== null && currentWizardStep >= maxWizardStep;
-            const isFinalTourStep = steps.length > 0 && index >= steps.length - 1;
-
-            if (isFinalWizardStep && isFinalTourStep) {
-              completeTutorialPhase(activeTour as TutorialPhase);
-            } else {
-              updateTutorialProgress(activeTour as TutorialPhase, { lastStep: index });
-            }
-          } else {
-            // Check if it's a valid phase before completing
-            if (activeTour in tutorialProgress.phases) {
-              completeTutorialPhase(activeTour as TutorialPhase);
-            }
-          }
-        } else {
-          if (activeTour === 'characterCreationWizard') {
-            updateTutorialProgress('characterCreation', { skipped: true });
-          } else if (activeTour in tutorialProgress.phases) {
-            updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });
-          }
-        }
-      }
-      setActiveTour(null);
+      endTour(status === STATUS.SKIPPED ? 'skipped' : 'finished', index);
     } else if (type === EVENTS.STEP_BEFORE && action === ACTIONS.PREV) {
       // Some Joyride versions emit STEP_BEFORE on back; keep stepIndex in sync.
       setStepIndex(index);
     } else if (type === EVENTS.STEP_AFTER) {
+      // Escape reaches us as an ordinary step change carrying the CLOSE action,
+      // so without this the key walks the player forward through the tour
+      // instead of dismissing it. Treat it the same as the skip button.
+      if (action === ACTIONS.CLOSE) {
+        endTour('skipped', index);
+        return;
+      }
+
       const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
       
       if (activeTour) {
@@ -356,8 +386,8 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         }
       }, 100);
     }
-  }, [activeTour, completeTutorialPhase, updateTutorialProgress, pauseTour, stopTour, stepMapping, currentWizardStep, steps, tutorialProgress.phases]);
-  
+  }, [activeTour, completeTutorialPhase, updateTutorialProgress, endTour, pauseTour, stopTour, stepMapping, currentWizardStep, steps, tutorialProgress.phases]);
+
   const lastWizardStepRef = useRef<number | null>(null);
 
   // Poll for missing target elements when tour is paused waiting for them
@@ -496,6 +526,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
             floaterProps={{ ...tourOptions.floaterProps, getPopper: capturePopper }}
             styles={joyrideStyles}
             callback={handleJoyrideCallback}
+            getHelpers={handleJoyrideHelpers}
             disableOverlayClose={true}
             spotlightClicks={true}
             scrollOffset={tourOptions.scrollOffset}
