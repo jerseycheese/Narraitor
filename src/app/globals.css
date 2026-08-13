@@ -75,11 +75,20 @@ a[href="#main-content"]:focus {
    pushed the tour overlay + spotlight roughly a viewport down, so the dim
    backdrop and target highlight never appeared and tour popovers floated over
    bright content (the World-Creation tour read as garbled). Anchor the portal
-   at the document origin so the overlay and spotlight measure from the top. (#1431) */
+   at the document origin so the overlay and spotlight measure from the top. (#1431)
+
+   The `body > *` rule above also gives it z-index: 1, same as every other
+   body-level root, so the game session shell's fixed overlay (z-index: 160,
+   manuscript-session.css) painted over the whole tour -- the tooltip was
+   fully hidden, and only the spotlight's box-shadow bled through the shell's
+   translucent regions, reading as a stray scrim with no popover. Match the
+   portal's z-index to joyrideStyles.options.zIndex (tutorialConfig.ts) so the
+   tour actually sits above every in-app overlay, tour included. */
 #react-joyride-portal {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 10000;
 }
 
 /* Visually hidden content helper */
