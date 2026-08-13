@@ -76,6 +76,12 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     };
   }
 
+  // Kept ahead of the generic service branch below, which would append the raw
+  // upstream text and bury the one thing the player needs to know.
+  if (message.includes('blocked this content') || message.includes('content filter')) {
+    return baseError;
+  }
+
   // For other AI errors, append sanitized detail to base message
   if (baseError.type === 'service' || baseError.type === 'unknown') {
     return {

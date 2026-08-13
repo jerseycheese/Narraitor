@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveApiKey } from '@/lib/ai/resolveApiKey';
-import { resolveModel } from '@/lib/ai/resolveModel';
+import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
 import { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
 import { ToneSettings } from '@/types/tone-settings.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
@@ -170,8 +169,7 @@ export async function POST(request: NextRequest) {
 
     const summary = await generateStoryCheckpointSummary(
       payload,
-      resolveApiKey(request),
-      resolveModel(request)
+      resolveProviderCredential(request)
     );
     return NextResponse.json(summary);
   } catch (error) {

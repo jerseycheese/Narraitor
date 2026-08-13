@@ -113,6 +113,18 @@ export function resolveApiKey(request?: NextRequest): string | null {
   return resolution.descriptor.type === 'gemini' ? resolution.descriptor.apiKey : null;
 }
 
+/**
+ * The descriptor for a request, or null when nothing usable resolves.
+ *
+ * The form the generators take (see ProviderCredential): a route calls this and
+ * forwards the result, and every generator downstream builds a client for
+ * whichever provider the player configured without any of them naming one.
+ */
+export function resolveProviderCredential(request?: NextRequest): ProviderDescriptor | null {
+  const resolution = resolveProvider(request);
+  return resolution.ok ? resolution.descriptor : null;
+}
+
 /** An absent type header means Gemini — that is what every session before multi-provider sent. */
 function readProviderType(request?: NextRequest): ProviderType | null {
   const raw = request?.headers.get(PROVIDER_TYPE_HEADER)?.trim().toLowerCase();

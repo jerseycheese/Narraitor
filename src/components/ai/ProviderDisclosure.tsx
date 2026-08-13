@@ -1,7 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { getModelCapabilities } from '@/lib/ai/providers/capabilities';
-import { describeContentRatingEnforcement } from '@/lib/ai/safety/contentRatingGuidance';
+import { useProviderDisclosure } from './useProviderDisclosure';
 import type { ProviderType } from '@/types/provider.types';
 import './provider-config.css';
 
@@ -31,7 +30,7 @@ interface ProviderDisclosureProps {
  * Saying so plainly is better than a player discovering it mid-scene.
  */
 export function ProviderDisclosure({ type, model, privacyNote, className }: ProviderDisclosureProps) {
-  const { nativeSafetySettings } = getModelCapabilities(type, model);
+  const { contentRatingNote } = useProviderDisclosure(type, model);
 
   return (
     <div className={clsx('component-provider-disclosure', className)}>
@@ -43,7 +42,7 @@ export function ProviderDisclosure({ type, model, privacyNote, className }: Prov
       )}
       <p className="provider-disclosure-item">
         <span className="provider-disclosure-label">Content rating</span>
-        {describeContentRatingEnforcement(nativeSafetySettings)}
+        {contentRatingNote}
       </p>
     </div>
   );

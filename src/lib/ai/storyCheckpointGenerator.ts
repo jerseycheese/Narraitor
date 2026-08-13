@@ -4,6 +4,7 @@ import { StoryCheckpointRequestBody, StoryCheckpointResponseBody } from '@/types
 import { safeTrim } from '@/lib/utils';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { stripMarkdownFences, extractJsonObject } from './parseJSON';
+import type { ProviderCredential } from './providers/types';
 
 const RESPONSE_SCHEMA = `{
   "segment": "2-3 sentences (50-75 words) summarizing ONLY the events provided in this checkpoint",
@@ -149,7 +150,7 @@ const parseResponse = (content: string, model: string): StoryCheckpointResponseB
 
 export const generateStoryCheckpointSummary = async (
   payload: StoryCheckpointRequestBody,
-  apiKey?: string | null,
+  apiKey?: ProviderCredential | null,
   model?: string | null,
 ): Promise<StoryCheckpointResponseBody> => {
   const client = createDefaultGeminiClient(apiKey, model);

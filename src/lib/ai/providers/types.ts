@@ -23,6 +23,16 @@ export interface ProviderDescriptor {
 }
 
 /**
+ * What a route hands a generator so it can build a client.
+ *
+ * A descriptor is the current form and carries its own model. A bare string is
+ * the older Gemini-key-only form, still used by the image routes, which are
+ * Gemini-only by design. Accepting both is what let the generators pick up
+ * multi-provider support without every one of them changing shape.
+ */
+export type ProviderCredential = string | ProviderDescriptor;
+
+/**
  * One text generation, described without reference to any provider's wire
  * format. Adapters turn this into a request body.
  */

@@ -12,6 +12,7 @@ import type {
   NarrativeSegment
 } from '../../types/narrative.types';
 import type { JournalEntry } from '../../types/journal.types';
+import type { ProviderCredential } from './providers/types';
 
 function extractRecentNarrative(segments: NarrativeSegment[]): string[] {
   const recentSegments = segments
@@ -137,7 +138,7 @@ function parseResponse(response: string): EndingGenerationResult {
 
 export async function generateEnding(
   request: EndingGenerationRequest,
-  apiKey?: string | null,
+  apiKey?: ProviderCredential | null,
   model?: string | null
 ): Promise<EndingGenerationResult> {
   try {
