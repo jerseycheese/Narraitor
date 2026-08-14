@@ -82,6 +82,27 @@ const eslintConfig = [
       // Indefinitely skipped / commented-out tests are dead weight.
       "jest/no-disabled-tests": "warn",
       "jest/no-commented-out-tests": "warn",
+      // Handing an element its own layout geometry means the test is reading
+      // back numbers it wrote, not observing layout. jsdom has no layout engine,
+      // so there's no repair for this in a unit test — the check belongs in
+      // Playwright. See public_docs/development/visual-testing-best-practices.md,
+      // "Two tiers of layout assertion".
+      //
+      // error rather than the warn the rules above use: those landed against an
+      // existing backlog and needed phasing in. This one starts at zero.
+      "no-restricted-syntax": ["error",
+        {
+          selector: "CallExpression[callee.object.name='Object'][callee.property.name='defineProperty'] > Literal.arguments:matches([value='scrollHeight'], [value='clientHeight'], [value='scrollTop'], [value='getBoundingClientRect'], [value='offsetHeight'], [value='offsetTop'])",
+          message: "Stubbing layout geometry means the test isn't observing layout. Measure it in a Playwright spec under tests/visual/ instead.",
+        },
+        {
+          // Same property set as above. A direct assignment reaches the same
+          // place — `(element as any).scrollHeight = 1000` needs a cast, and a
+          // cast only costs a non-blocking no-explicit-any warning.
+          selector: "AssignmentExpression > MemberExpression.left[property.name=/^(scrollHeight|clientHeight|scrollTop|getBoundingClientRect|offsetHeight|offsetTop)$/]",
+          message: "Stubbing layout geometry means the test isn't observing layout. Measure it in a Playwright spec under tests/visual/ instead.",
+        },
+      ],
     },
   },
 ];

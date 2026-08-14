@@ -15,14 +15,8 @@ jest.mock('@/state/npcStore');
 // Mock ResizeObserver
 const mockObserve = jest.fn();
 const mockDisconnect = jest.fn();
-const resizeObserverInstances: MockResizeObserver[] = [];
 
 class MockResizeObserver {
-  callback: ResizeObserverCallback;
-  constructor(callback: ResizeObserverCallback) {
-    this.callback = callback;
-    resizeObserverInstances.push(this);
-  }
   observe = mockObserve;
   unobserve = jest.fn();
   disconnect = mockDisconnect;
@@ -32,14 +26,12 @@ global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
 describe('NarrativeHistory (Streaming & Anchoring)', () => {
   const mockIsFeatureEnabled = isFeatureEnabled as jest.MockedFunction<typeof isFeatureEnabled>;
-  const mockScrollTo = jest.fn();
 
   beforeEach(() => {
     jest.useFakeTimers();
-    resizeObserverInstances.length = 0;
     mockIsFeatureEnabled.mockReturnValue(false);
     mockZustandStore(useNPCStore as jest.MockedFunction<typeof useNPCStore>, createMockNPCStore());
-    Element.prototype.scrollTo = mockScrollTo;
+    Element.prototype.scrollTo = jest.fn();
   });
 
   afterEach(() => {
@@ -95,65 +87,12 @@ describe('NarrativeHistory (Streaming & Anchoring)', () => {
     expect(screen.getByText(/Streaming content/)).toBeInTheDocument();
   });
 
-  it('anchors on ResizeObserver updates when user has not manually scrolled', () => {
-    mockIsFeatureEnabled.mockReturnValue(true);
-    const { container } = render(
-      <NarrativeHistory segments={segments} disableInitialAutoScroll={true} />
-    );
+  // The anchoring behaviour this component wires the ResizeObserver up for
+  // (hold the latest beat while content grows, hold position instead once the
+  // reader has scrolled up) is measured in tests/visual/narrative-reading-position.spec.ts.
+  // It needs the play surface's real scroller, which jsdom never resolves.
 
-    const viewport = container.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
-    expect(viewport).not.toBeNull();
-
-    Object.defineProperty(viewport, 'scrollHeight', { configurable: true, get: () => 1000 });
-    Object.defineProperty(viewport, 'scrollTop', { configurable: true, get: () => 0 });
-    Object.defineProperty(viewport, 'clientHeight', { configurable: true, get: () => 100 });
-
-    mockScrollTo.mockClear();
-
-    const resizeObserver = resizeObserverInstances[0];
-    expect(resizeObserver).not.toBeUndefined();
-
-    act(() => {
-      resizeObserver.callback([], resizeObserver as unknown as ResizeObserver);
-    });
-
-    expect(mockScrollTo).toHaveBeenCalled();
-    expect(mockScrollTo).toHaveBeenLastCalledWith(
-      expect.objectContaining({ behavior: 'auto' })
-    );
-  });
-
-  it('does not force-scroll on ResizeObserver updates when user has scrolled away from bottom', () => {
-    mockIsFeatureEnabled.mockReturnValue(true);
-    const { container } = render(
-      <NarrativeHistory segments={segments} disableInitialAutoScroll={true} />
-    );
-
-    const viewport = container.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
-    expect(viewport).not.toBeNull();
-
-    // User scrolled far from bottom
-    Object.defineProperty(viewport, 'scrollTop', { configurable: true, get: () => 100 });
-    Object.defineProperty(viewport, 'scrollHeight', { configurable: true, get: () => 1000 });
-    Object.defineProperty(viewport, 'clientHeight', { configurable: true, get: () => 200 });
-
-    act(() => {
-      viewport.dispatchEvent(new Event('scroll'));
-    });
-
-    mockScrollTo.mockClear();
-
-    const resizeObserver = resizeObserverInstances[0];
-    expect(resizeObserver).not.toBeUndefined();
-
-    act(() => {
-      resizeObserver.callback([], resizeObserver as unknown as ResizeObserver);
-    });
-
-    expect(mockScrollTo).not.toHaveBeenCalled();
-  });
-
-  describe('streamingContent (issue #1476: real API streaming)', () => {
+  describe('streamingContent (real API streaming)', () => {
     it('shows the live preview instead of the spinner once tokens arrive, with no segments yet', () => {
       mockIsFeatureEnabled.mockReturnValue(false);
       render(
