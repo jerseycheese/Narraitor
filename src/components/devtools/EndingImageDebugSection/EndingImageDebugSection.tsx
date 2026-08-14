@@ -11,6 +11,7 @@ import { capitalize, getTimestamp } from '@/lib/utils';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { generateEndingImage, generateEndingImagePrompt } from '@/lib/api/endingImageApi';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('EndingImageDebug');
@@ -91,39 +92,21 @@ export function EndingImageDebugSection() {
         ];
       }
       
-      const requestBody = {
+      const params = {
         ending: mockEnding,
         world,
         character,
-        recentNarrative,
-        promptOnly: true // Flag to return only the prompt
+        recentNarrative
       };
-      
-      logger.debug('Calling ending image API with data:', requestBody);
-      
-      const response = await fetch('/api/generate-ending-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API request failed: ${response.status} - ${errorText}`);
-      }
-      
-      const result = await response.json();
+
+      logger.debug('Calling ending image API with data:', params);
+
+      const result = await generateEndingImagePrompt(params);
       logger.debug('API response result:', result);
-      
-      const prompt = result.prompt || result.imageGenerationPrompt || 'No prompt returned';
-      setGeneratedPrompt(prompt);
+
+      setGeneratedPrompt(result.prompt || result.imageGenerationPrompt || 'No prompt returned');
       setLastGenerationResult(result);
-      
-      // If an image was generated, show it
-      if (result.imageUrl && !result.placeholder) {
-        setLastGeneratedImage(result.imageUrl);
-      }
-      
+
     } catch (error) {
       setGeneratedPrompt(`Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
@@ -157,28 +140,17 @@ export function EndingImageDebugSection() {
         ];
       }
       
-      const requestBody = {
+      const params = {
         ending: mockEnding,
         world,
         character,
         recentNarrative
       };
-      
-      logger.debug('Generating full ending image with data:', requestBody);
-      
-      const response = await fetch('/api/generate-ending-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API request failed: ${response.status} - ${errorText}`);
-      }
-      
-      const result = await response.json();
-      
+
+      logger.debug('Generating full ending image with data:', params);
+
+      const result = await generateEndingImage(params);
+
       setGeneratedPrompt(result.imageGenerationPrompt || result.prompt || 'No prompt returned');
       setLastGeneratedImage(result.imageUrl);
       setLastGenerationResult(result);
