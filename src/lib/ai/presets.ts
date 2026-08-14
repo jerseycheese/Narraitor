@@ -164,3 +164,28 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
 /** Look up a preset by its stable id. */
 export const getPresetById = (id: string): ProviderPreset | undefined =>
   PROVIDER_PRESETS.find((preset) => preset.id === id);
+
+/**
+ * The extra headers the service at this endpoint asks for, from its preset.
+ *
+ * Keyed on the endpoint rather than on anything the caller declares about
+ * itself, which is what stops one service's headers from riding along to
+ * another, say a preset id claiming to be OpenRouter next to an endpoint
+ * pointing somewhere else. An endpoint with no matching preset gets none, which
+ * is the right answer: we have nothing to say about a service we don't ship.
+ *
+ * Match is on the exact endpoint string, which is what a player who picked a
+ * preset ends up with. A hand-typed variation misses and simply sends no extra
+ * headers, and every header in play is optional.
+ *
+ * Lives here rather than beside either caller because both the generation path
+ * and the validation ping need the same answer — a preset whose service
+ * requires a header must get it in the check that decides whether the key
+ * works, not only once play starts.
+ */
+export const presetHeadersForEndpoint = (
+  endpoint: string | undefined
+): Record<string, string> | undefined => {
+  if (!endpoint) return undefined;
+  return PROVIDER_PRESETS.find((preset) => preset.endpoint === endpoint)?.customHeaders;
+};

@@ -8,7 +8,7 @@ import {
   PROVIDER_TYPE_HEADER,
 } from './providerKeyHeader';
 import { DEFAULT_TEXT_MODEL } from './config';
-import { PROVIDER_PRESETS } from './presets';
+import { presetHeadersForEndpoint } from './presets';
 import { isProviderSupported } from './providers/adapterRegistry';
 import { isSafeProviderEndpoint } from './providers/endpointGuard';
 import type { ProviderDescriptor } from './providers/types';
@@ -104,27 +104,9 @@ export function resolveProvider(request?: NextRequest): ProviderResolution {
       endpoint,
       model,
       apiKey: headerKey,
-      customHeaders: presetHeadersFor(endpoint),
+      customHeaders: presetHeadersForEndpoint(endpoint),
     },
   };
-}
-
-/**
- * The extra headers the service at this endpoint asks for, from its preset.
- *
- * Keyed on the endpoint rather than on anything the caller declares about
- * itself, which is what stops one service's headers from riding along to
- * another, say a preset id claiming to be OpenRouter next to an endpoint
- * pointing somewhere else. An endpoint with no matching preset gets none, which
- * is the right answer: we have nothing to say about a service we don't ship.
- *
- * Match is on the exact endpoint string, which is what a player who picked a
- * preset ends up with. A hand-typed variation misses and simply sends no extra
- * headers, and every header in play is optional (see presets.ts).
- */
-function presetHeadersFor(endpoint: string): Record<string, string> | undefined {
-  if (!endpoint) return undefined;
-  return PROVIDER_PRESETS.find((preset) => preset.endpoint === endpoint)?.customHeaders;
 }
 
 /**

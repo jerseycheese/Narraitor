@@ -6,6 +6,7 @@ import { DEFAULT_TEXT_MODEL, getSafetySettings } from '@/lib/ai/config';
 import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 import { getProviderAdapter } from '@/lib/ai/providers/adapterRegistry';
 import { isSafeProviderEndpoint } from '@/lib/ai/providers/endpointGuard';
+import { presetHeadersForEndpoint } from '@/lib/ai/presets';
 import { sendProviderRequest } from '@/lib/ai/providers/core/request';
 import { supportsImages } from '@/lib/ai/providers/capabilities';
 import type { ProviderType } from '@/types/provider.types';
@@ -138,7 +139,14 @@ async function validateOpenAICompatible(
         messages: [{ role: 'user', content: 'ping' }],
         max_tokens: 1,
       },
-      { timeoutMs: PING_TIMEOUT_MS, playerSuppliedEndpoint: true }
+      {
+        timeoutMs: PING_TIMEOUT_MS,
+        playerSuppliedEndpoint: true,
+        // A service that requires its declared headers has to get them in the
+        // check that decides whether the key works, not only once play starts,
+        // or the wizard rejects a key that would generate fine.
+        customHeaders: presetHeadersForEndpoint(endpoint),
+      }
     );
 
     if (response.ok) {
