@@ -202,6 +202,35 @@ describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () =>
     expect(headers.Authorization).toBe(`Bearer ${KEY}`);
   });
 
+  test("names the output cap the way the generation path does, not always max_tokens", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    await POST(
+      openAIRequest({
+        endpoint: 'https://api.openai.com/v1/chat/completions',
+        model: 'gpt-5.6-luna',
+      })
+    );
+
+    const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+    const body = JSON.parse(init.body as string);
+    // Hardcoding max_tokens here made the wizard reject a key that generates
+    // fine, so the provider looked enabled and could never be configured.
+    expect(body).not.toHaveProperty('max_tokens');
+    expect(body.max_completion_tokens).toBeGreaterThan(0);
+  });
+
+  test('still says max_tokens for a service that never renamed it', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+
+    const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+    const body = JSON.parse(init.body as string);
+    expect(body.max_tokens).toBeGreaterThan(0);
+    expect(body).not.toHaveProperty('max_completion_tokens');
+  });
+
   test('sends no extra headers for an endpoint no preset claims', async () => {
     (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
 
