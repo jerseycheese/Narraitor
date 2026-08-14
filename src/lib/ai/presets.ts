@@ -80,8 +80,17 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     // the deprecations page, and gpt-4o has quietly left the models index. A
     // preset is a menu a player picks from, so a shutdown date on two of three
     // entries is a bug with a fuse on it rather than a cosmetic one.
-    models: ['gpt-5.6-terra', 'gpt-5.6-sol', 'gpt-5.6-luna'],
-    defaultModel: 'gpt-5.6-terra',
+    models: ['gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-5.6-sol'],
+    // Luna leads for the same reason gemini-2.5-flash does above: it is the
+    // cheap fast tier, and a narrative turn is long output on a short prompt,
+    // which is exactly where the price gap bites. Luna runs $0.20/$1.20 per
+    // MTok against Terra's $2/$12 and Sol's $5/$30 - a tenfold difference on a
+    // default nobody changes. Sol is the one to reach for if prose quality
+    // disappoints.
+    defaultModel: 'gpt-5.6-luna',
+    // Not cosmetic: OpenAI rejects max_tokens outright on these models rather
+    // than ignoring it, so the request 400s without this.
+    maxOutputTokensParam: 'max_completion_tokens',
     // OpenAI's chat models take images as INPUT; they don't generate them, and
     // this flag has only ever meant generation here (providers/capabilities.ts).
     capabilities: { text: true, images: false, streaming: true },
@@ -172,11 +181,8 @@ export const getPresetById = (id: string): ProviderPreset | undefined =>
  * itself, which is what stops one service's headers from riding along to
  * another, say a preset id claiming to be OpenRouter next to an endpoint
  * pointing somewhere else. An endpoint with no matching preset gets none, which
- * is the right answer: we have nothing to say about a service we don't ship.
- *
- * Match is on the exact endpoint string, which is what a player who picked a
- * preset ends up with. A hand-typed variation misses and simply sends no extra
- * headers, and every header in play is optional.
+ * is the right answer: we have nothing to say about a service we don't ship,
+ * and every header in play is optional anyway.
  *
  * Lives here rather than beside either caller because both the generation path
  * and the validation ping need the same answer — a preset whose service
@@ -185,7 +191,28 @@ export const getPresetById = (id: string): ProviderPreset | undefined =>
  */
 export const presetHeadersForEndpoint = (
   endpoint: string | undefined
-): Record<string, string> | undefined => {
-  if (!endpoint) return undefined;
-  return PROVIDER_PRESETS.find((preset) => preset.endpoint === endpoint)?.customHeaders;
-};
+): Record<string, string> | undefined => presetForEndpoint(endpoint)?.customHeaders;
+
+/**
+ * What the service at this endpoint calls the output-length cap, when it is not
+ * the usual `max_tokens`.
+ *
+ * Endpoint-keyed for the same reason the headers are: it describes where the
+ * request is going, not what the caller claims about itself. Undefined is the
+ * common answer and means "the ordinary name" — the adapter supplies it — so a
+ * descriptor only carries this field when a service has genuinely moved.
+ */
+export const presetMaxOutputTokensParamForEndpoint = (
+  endpoint: string | undefined
+): 'max_tokens' | 'max_completion_tokens' | undefined =>
+  presetForEndpoint(endpoint)?.maxOutputTokensParam;
+
+/**
+ * The preset whose endpoint this exactly is, if we ship one.
+ *
+ * Match is on the exact endpoint string, which is what a player who picked a
+ * preset ends up with. A hand-typed variation misses and falls back to the
+ * neutral defaults above.
+ */
+const presetForEndpoint = (endpoint: string | undefined): ProviderPreset | undefined =>
+  endpoint ? PROVIDER_PRESETS.find((preset) => preset.endpoint === endpoint) : undefined;

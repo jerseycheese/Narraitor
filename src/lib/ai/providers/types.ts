@@ -30,6 +30,12 @@ export interface ProviderDescriptor {
    * going, so one service's headers cannot ride along to another.
    */
   customHeaders?: Record<string, string>;
+  /**
+   * What this service calls the output-length cap. Resolved from the endpoint's
+   * preset; absent means `max_tokens`, which is what nearly every
+   * OpenAI-compatible service still takes. See presets.ts.
+   */
+  maxOutputTokensParam?: 'max_tokens' | 'max_completion_tokens';
 }
 
 /**

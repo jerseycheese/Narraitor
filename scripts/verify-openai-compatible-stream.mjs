@@ -108,7 +108,7 @@ async function bundleProductionModules() {
   await writeFile(
     entry,
     [
-      "export { getPresetById } from '@/lib/ai/presets';",
+      "export { getPresetById, presetHeadersForEndpoint, presetMaxOutputTokensParamForEndpoint } from '@/lib/ai/presets';",
       "export { openAICompatibleAdapter } from '@/lib/ai/providers/openai-compatible/adapter';",
       "export { openProviderTextStream } from '@/lib/ai/providers/core/request';",
       "export { consumeProviderStreamEvents } from '@/lib/ai/providers/core/streamConsumer';",
@@ -289,11 +289,17 @@ async function main() {
     console.log('Playing one streamed opening scene...\n');
 
     const prompt = prod.getNarrativeTemplate('narrative/initialScene')(VERIFICATION_WORLD);
+    // Built the way resolveProvider builds it, using the same lookups, rather
+    // than by hand. A descriptor assembled here would be missing whatever the
+    // server derives from the endpoint, and the run would quietly prove out a
+    // request the app never sends.
     const descriptor = {
       type: 'openai-compatible',
       endpoint: target.endpoint,
       model: target.model,
       apiKey,
+      customHeaders: prod.presetHeadersForEndpoint(target.endpoint),
+      maxOutputTokensParam: prod.presetMaxOutputTokensParamForEndpoint(target.endpoint),
     };
 
     let turn;

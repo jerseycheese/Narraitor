@@ -17,6 +17,22 @@ describe('PROVIDER_PRESETS', () => {
     expect(available).toEqual(['gemini', 'openrouter']);
   });
 
+  it('asks OpenAI for max_completion_tokens, which is the only name it accepts', () => {
+    const openai = PROVIDER_PRESETS.find((preset) => preset.id === 'openai');
+    expect(openai?.maxOutputTokensParam).toBe('max_completion_tokens');
+  });
+
+  it('leaves every other preset on max_tokens, which is what they still speak', () => {
+    const moved = PROVIDER_PRESETS.filter((preset) => preset.maxOutputTokensParam).map((p) => p.id);
+    expect(moved).toEqual(['openai']);
+  });
+
+  it('defaults each preset to a model it actually lists', () => {
+    for (const preset of PROVIDER_PRESETS) {
+      expect(preset.models).toContain(preset.defaultModel);
+    }
+  });
+
   it('claims image support only where the provider path can actually generate images', () => {
     for (const preset of PROVIDER_PRESETS) {
       expect(preset.capabilities.images).toBe(supportsImages(preset.type));

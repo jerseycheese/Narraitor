@@ -78,6 +78,35 @@ describe('resolveProvider', () => {
     expect(resolution.ok && resolution.descriptor.customHeaders).toBeUndefined();
   });
 
+  it("carries OpenAI's renamed output cap onto the descriptor, keyed off the endpoint", () => {
+    const resolution = resolveProvider(
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+        [PROVIDER_ENDPOINT_HEADER]: 'https://api.openai.com/v1/chat/completions',
+        [PROVIDER_MODEL_HEADER]: 'gpt-5.6-luna',
+      })
+    );
+
+    // Without this the adapter sends max_tokens and OpenAI 400s the request.
+    expect(resolution.ok && resolution.descriptor.maxOutputTokensParam).toBe(
+      'max_completion_tokens'
+    );
+  });
+
+  it('leaves the output cap unnamed for a service that never moved off max_tokens', () => {
+    const resolution = resolveProvider(
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+        [PROVIDER_ENDPOINT_HEADER]: OPENROUTER,
+        [PROVIDER_MODEL_HEADER]: 'openai/gpt-4o',
+      })
+    );
+
+    expect(resolution.ok && resolution.descriptor.maxOutputTokensParam).toBeUndefined();
+  });
+
   it('reports NO_KEY when neither a header nor a usable env key exists', () => {
     process.env.GEMINI_API_KEY = 'MOCK_API_KEY';
 

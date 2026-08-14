@@ -8,7 +8,7 @@ import {
   PROVIDER_TYPE_HEADER,
 } from './providerKeyHeader';
 import { DEFAULT_TEXT_MODEL } from './config';
-import { presetHeadersForEndpoint } from './presets';
+import { presetHeadersForEndpoint, presetMaxOutputTokensParamForEndpoint } from './presets';
 import { isProviderSupported } from './providers/adapterRegistry';
 import { isSafeProviderEndpoint } from './providers/endpointGuard';
 import type { ProviderDescriptor } from './providers/types';
@@ -105,6 +105,7 @@ export function resolveProvider(request?: NextRequest): ProviderResolution {
       model,
       apiKey: headerKey,
       customHeaders: presetHeadersForEndpoint(endpoint),
+      maxOutputTokensParam: presetMaxOutputTokensParamForEndpoint(endpoint),
     },
   };
 }
