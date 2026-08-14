@@ -76,14 +76,19 @@ export async function sendProviderRequest(
     // http://169.254.169.254/ and fetch follows it without re-checking
     // anything. No provider's chat-completions endpoint legitimately redirects.
     //
-    // The URL is player-supplied by design — this is bring-your-own-provider,
-    // and the feature cannot exist without fetching a URL the player named. It
-    // is constrained by assertPublicProviderEndpoint above (https only, no
-    // private literals, every resolved address checked) and redirects are
-    // refused. See endpointGuard's header comment for what that does and does
-    // not close. The suppression below is annotated rather than dismissed in
-    // the UI so the reasoning lives next to the code it excuses.
-    const response = await fetch(url, { // codeql[js/request-forgery]
+    // CodeQL reports this line as server-side request forgery, and it is right
+    // that the URL is player-supplied — that is what bring-your-own-provider
+    // means, and the feature cannot exist without fetching a URL the player
+    // named. The alert is accepted rather than fixed, on these grounds:
+    // assertPublicProviderEndpoint above (https only, no private literals,
+    // every resolved address checked), redirects refused, and the response body
+    // bounded before it reaches the caller. The residual gap is DNS rebinding —
+    // see endpointGuard's header comment, which states it plainly.
+    //
+    // The acceptance is recorded as a dismissal on the alert itself. Inline
+    // `codeql[...]` comments do nothing on GitHub code scanning, so one here
+    // would look like a control while being decoration.
+    const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
