@@ -36,17 +36,20 @@ The exact change (template diff, config diff); a live dev server with a working 
    verify continuity against loreStore facts and prior segments.
 4. Failure drill: exercise the non-happy path at least once —
    empty/malformed response handling (the parse/normalize layer), a slow response,
-   and a missing/invalid key. MECHANISM, by failure type — they need different tools:
-   - Slow / error / rate-limit / intermittent: the in-app DevTools AI mocking panel
-     (src/components/devtools/AIMockingSection/, driven by MockScenarios in
-     src/lib/ai/__mocks__/mockScenarios.ts — dev builds only) forces CANNED scenarios
-     via shouldSucceed / delay / successRate (e.g. `error-timeout`, `error-rate-limit`,
-     or a custom error). It does NOT emit an arbitrary malformed-byte body.
+   and a missing/invalid key. MECHANISM, by failure type — they need different tools.
+   There is NO in-app mock toggle; mock at the network boundary or below:
+   - Slow / error / rate-limit / intermittent: intercept the route. In Playwright,
+     tests/visual/utils/mockApi.ts already routes the AI endpoints and takes
+     per-endpoint delays (narrativeDelayMs / choicesDelayMs / endingDelayMs); for a
+     non-200 or an intermittent failure, add a `page.route` handler that fulfills with
+     the status you want. In Jest, mock the src/lib/api wrapper the component calls.
    - Truly malformed/empty response BODY (the parse-error path — e.g. the item-image
      20%-parse-failure class): exercise at the parse layer with a unit fixture (a
-     `Response` whose `.json()` throws), or intercept at the network level. The mock
-     panel's canned errors won't reproduce it.
+     `Response` whose `.json()` throws). A routed mock still returns well-formed bytes,
+     so it cannot reproduce this class.
    - Missing/invalid key: omit or corrupt the provider key (see diagnostics-and-tooling).
+     Routes fall back on their own when no key resolves, so a keyless dev environment
+     is itself a useful drill.
    Timeouts are layered: 30s server-side on generate/choices, 120s client-side in aiFetch.
 5. Record: for each cell, verdict + one representative excerpt + what you compared against.
    Template: `.claude/skills/narraitor-prompt-template-governance/templates/eval-log.md`.
