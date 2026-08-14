@@ -326,16 +326,16 @@ npm run test:visual:debug
 
 ### GitHub Actions Workflow
 
-There's no `playwright.yml`. Visual tests run from three places:
+There's no `playwright.yml`. Visual tests run from two places:
 
 - **`ci.yml`, the `e2e` job** - runs on every push and PR to `main`/`develop`, sharded two ways at
-  one worker per shard. This is the one that gates most work.
+  one worker per shard. This is the one that gates most work. `ci.yml` also takes a
+  `workflow_dispatch`, so an off-cycle run without a push goes through this same job and inherits
+  the one-worker config.
 - **`playwright-tutorials.yml`** - the tutorial visual specs, in their own job. Same push/PR
   triggers, separate check.
-- **`playwright-focused.yml`** - `workflow_dispatch` only, so it never fires on its own. Trigger it
-  by hand when you want a visual run without pushing.
 
-All three sit on `macos-latest`. The committed baselines are macOS-rendered, so a Linux runner
+Both sit on `macos-latest`. The committed baselines are macOS-rendered, so a Linux runner
 fails them on font rasterization alone.
 
 ```yaml

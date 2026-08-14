@@ -9,6 +9,9 @@ on:
     # visual-baseline-check job below reads the PR body, so it needs to
     # re-run when the author edits baseline notes without pushing a commit.
     types: [ opened, synchronize, reopened, edited ]
+  # Off-cycle manual runs of the visual suite go through this pipeline, so a
+  # hand-triggered run gets the same sharded --workers=1 e2e job a PR does.
+  workflow_dispatch:
 
 jobs:
   # Phase 1: Setup job - Install dependencies once and cache for all other jobs
