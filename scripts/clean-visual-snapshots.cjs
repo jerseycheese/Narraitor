@@ -89,10 +89,8 @@ function removePngs(snapshotDir, shouldDelete) {
     try {
       fs.unlinkSync(full);
       deleted++;
-      // eslint-disable-next-line no-console
       console.log(`Pruned orphan snapshot: ${path.relative(ROOT, full)}`);
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.warn(`Failed to delete ${full}: ${e.message}`);
     }
   }
@@ -102,7 +100,6 @@ function removePngs(snapshotDir, shouldDelete) {
   if (remaining.length === 0) {
     try {
       fs.rmdirSync(snapshotDir);
-      // eslint-disable-next-line no-console
       console.log(`Removed empty snapshot dir: ${path.relative(ROOT, snapshotDir)}`);
     } catch {}
   }
@@ -121,7 +118,6 @@ function pruneOrphanDirs() {
   for (const dir of snapshotDirs) {
     const siblingSpec = dir.replace(/-snapshots$/, '');
     if (fs.existsSync(siblingSpec)) continue;
-    // eslint-disable-next-line no-console
     console.log(`Orphan snapshot dir (no sibling spec): ${path.relative(ROOT, dir)}`);
     deleted += removePngs(dir, () => true);
   }
@@ -152,7 +148,6 @@ function pruneSnapshots() {
     );
   }
 
-  // eslint-disable-next-line no-console
   console.log(`Snapshot prune complete. Checked ${checked} files, deleted ${deleted}.`);
 }
 

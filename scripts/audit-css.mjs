@@ -107,17 +107,13 @@ async function main() {
     ].sort();
     grandTotal += rejected.length;
     const file = path.relative(rootDir, result.file ?? '(unknown)');
-    // eslint-disable-next-line no-console
     console.log(`\n${file} - ${rejected.length} potentially unused`);
     for (const selector of rejected) {
-      // eslint-disable-next-line no-console
       console.log(`  ${selector}`);
     }
   }
 
-  // eslint-disable-next-line no-console
   console.log(`\n==== TOTAL potentially-unused selectors: ${grandTotal} ====`);
-  // eslint-disable-next-line no-console
   console.log(
     'NOTE: "rejected" = no usage found in scanned content. Review manually; ' +
       'safelist genuinely-dynamic classes and re-run. DO NOT auto-delete.',
@@ -125,7 +121,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  // eslint-disable-next-line no-console
   console.error(error);
   process.exit(1);
 });
