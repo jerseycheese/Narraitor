@@ -513,4 +513,144 @@ test.describe('Manuscript regression assertions', () => {
 
     expect(geometry.decisionFollowsNarrative).toBe(true);
   });
+
+  test('Play surface fits a 375px viewport instead of being clipped past its right edge', async ({
+    page,
+  }) => {
+    // The surface's grid tracks were declared `1fr`, which means `minmax(auto,
+    // 1fr)`, an auto floor equal to the widest item's min-content. The stage's
+    // widest item is the scene-status bar, so the story column rendered 432px
+    // wide inside 351px of room and .manuscript-viewport-shell's `overflow:
+    // hidden` cut the excess off with nowhere to scroll to.
+    //
+    // This measures geometry rather than asserting on the resolved
+    // grid-template-columns. That value reads back fine while the column
+    // overflows, and pinning the declaration would go red on any other correct
+    // way of holding the column in. What a player notices is text disappearing
+    // off the right edge, so that is what gets measured.
+    await page.setViewportSize({ width: 375, height: 812 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.manuscript-suggested-action', { timeout: 10000 });
+
+    const geometry = await page.evaluate(() => {
+      const shell = document.querySelector('.manuscript-viewport-shell');
+      const stage = document.querySelector('.manuscript-main-stage');
+      const content = document.querySelector('.manuscript-main-content');
+      if (!shell || !stage || !content) return null;
+
+      // Every laid-out box whose right edge sits past the viewport. The shell
+      // clips rather than scrolls, so anything here is unreachable, not
+      // merely off-screen. `sr-only` boxes are 1px clipping wrappers by
+      // design and never render text.
+      const overflowing = Array.from(document.querySelectorAll('*'))
+        .filter((el) => {
+          if (el.closest('.sr-only')) return false;
+          const rect = el.getBoundingClientRect();
+          return rect.width > 0 && rect.right > window.innerWidth + 0.5;
+        })
+        .map((el) => `${el.tagName.toLowerCase()}.${el.className}`);
+
+      // A skill check reads "STEALTH · DC 4"; it is `white-space: nowrap`, so
+      // a column that is too narrow truncates the number rather than wrapping.
+      const badges = Array.from(
+        document.querySelectorAll('.manuscript-skill-check-badge')
+      ).map((el) => {
+        const badge = el as HTMLElement;
+        return {
+          right: badge.getBoundingClientRect().right,
+          clipped: badge.scrollWidth > badge.clientWidth + 1,
+        };
+      });
+
+      // Holding the column in isn't enough on its own: the badge row and the
+      // choice label sit in the same flex row, and the label's basis is 0
+      // while the badge row's is `auto`. Pull the badges back inside the
+      // viewport without stacking the two and the badges simply claim their
+      // max-content, leaving the label a zero-width column with the badges
+      // painted over the top of it. So measure both, per choice.
+      const choices = Array.from(
+        document.querySelectorAll('.manuscript-suggested-action')
+      ).map((el) => {
+        const action = el as HTMLElement;
+        const label = action.querySelector('.manuscript-suggested-action-label');
+        const badgeRow = action.querySelector('.manuscript-suggested-action-badges');
+        const actionRect = action.getBoundingClientRect();
+        const labelRect = label?.getBoundingClientRect();
+
+        let overlapArea = 0;
+        if (labelRect && badgeRow) {
+          const badgeRect = badgeRow.getBoundingClientRect();
+          const w = Math.min(labelRect.right, badgeRect.right) - Math.max(labelRect.left, badgeRect.left);
+          const h = Math.min(labelRect.bottom, badgeRect.bottom) - Math.max(labelRect.top, badgeRect.top);
+          overlapArea = w > 0 && h > 0 ? Math.round(w * h) : 0;
+        }
+
+        return {
+          actionWidth: actionRect.width,
+          labelWidth: labelRect?.width ?? 0,
+          labelShare: labelRect ? labelRect.width / actionRect.width : 0,
+          overlapArea,
+        };
+      });
+
+      return {
+        viewportWidth: window.innerWidth,
+        stageWidth: stage.getBoundingClientRect().width,
+        contentWidth: content.getBoundingClientRect().width,
+        overflowingCount: overflowing.length,
+        overflowing: overflowing.slice(0, 5),
+        badgeCount: badges.length,
+        badgesClipped: badges.filter((b) => b.clipped).length,
+        badgesPastEdge: badges.filter((b) => b.right > window.innerWidth + 0.5).length,
+        choiceCount: choices.length,
+        narrowestLabelShare: Math.min(...choices.map((c) => c.labelShare)),
+        narrowestLabelWidth: Math.min(...choices.map((c) => c.labelWidth)),
+        maxLabelBadgeOverlap: Math.max(...choices.map((c) => c.overlapArea)),
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected play surface geometry to be measurable');
+    }
+
+    // The story column is held by its container rather than by its content.
+    expect(geometry.stageWidth).toBeLessThanOrEqual(geometry.viewportWidth);
+    expect(geometry.contentWidth).toBeLessThanOrEqual(geometry.stageWidth);
+
+    expect(
+      geometry.overflowingCount,
+      `Boxes past the right edge: ${geometry.overflowing.join(', ')}`
+    ).toBe(0);
+
+    // Guard against the assertions above passing because no choices rendered.
+    expect(geometry.badgeCount).toBeGreaterThan(0);
+    expect(geometry.choiceCount).toBeGreaterThan(0);
+
+    expect(geometry.badgesPastEdge).toBe(0);
+    expect(geometry.badgesClipped).toBe(0);
+
+    // Nothing may be drawn over the choice text. Measured as real rectangle
+    // intersection rather than a shared-row check, because the two boxes
+    // overlap horizontally while their tops differ once the label wraps tall.
+    expect(
+      geometry.maxLabelBadgeOverlap,
+      'Badge row must not overlap the choice label'
+    ).toBe(0);
+
+    // And the text needs room to actually read as a sentence. Half the button
+    // is a floor, not a target: at 375px the label gets about 76% of it. The
+    // failure this catches is the label collapsing toward a min-content column
+    // one word wide, which stays technically unclipped the whole way down.
+    expect(
+      geometry.narrowestLabelShare,
+      `Narrowest choice label was ${Math.round(geometry.narrowestLabelWidth)}px`
+    ).toBeGreaterThan(0.5);
+  });
 });
