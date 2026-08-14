@@ -95,4 +95,5 @@ For truly automatic execution, select "Yes, and don't ask again this session" on
 ## Pointers
 
 - README.md — product overview.
+- CONTEXT.md — the domain vocabulary (world, turn, decision, provider, etc.) referenced by several local skills.
 - DESIGN.md, ADR-013 (PR #1526, supersedes ADR-011), and ADR-012 (#1484) — the single-design-system decision and the Storybook-as-canon surface.
