@@ -1845,6 +1845,19 @@ body.manuscript-overlay-open {
     flex-wrap: wrap;
   }
 
+  /* Give the choice text its own line on a phone instead of leaving it to
+     fight the badges for one. Side by side, the title row is `flex: 1` (a zero
+     basis) while the badge row's basis is `auto`, so the badges claim their
+     max-content first and the label is left whatever remains. On a 375px
+     screen that remainder was 0px, which collapsed the text to a min-content
+     column and let the badges paint straight over it. Stacking removes the
+     competition rather than trying to referee it, and the badge row keeps its
+     natural width instead of being squeezed. */
+  .manuscript-suggested-action-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
 }
 
 @media (width >= 640px) and (width < 1024px) {

@@ -568,6 +568,37 @@ test.describe('Manuscript regression assertions', () => {
         };
       });
 
+      // Holding the column in isn't enough on its own: the badge row and the
+      // choice label sit in the same flex row, and the label's basis is 0
+      // while the badge row's is `auto`. Pull the badges back inside the
+      // viewport without stacking the two and the badges simply claim their
+      // max-content, leaving the label a zero-width column with the badges
+      // painted over the top of it. So measure both, per choice.
+      const choices = Array.from(
+        document.querySelectorAll('.manuscript-suggested-action')
+      ).map((el) => {
+        const action = el as HTMLElement;
+        const label = action.querySelector('.manuscript-suggested-action-label');
+        const badgeRow = action.querySelector('.manuscript-suggested-action-badges');
+        const actionRect = action.getBoundingClientRect();
+        const labelRect = label?.getBoundingClientRect();
+
+        let overlapArea = 0;
+        if (labelRect && badgeRow) {
+          const badgeRect = badgeRow.getBoundingClientRect();
+          const w = Math.min(labelRect.right, badgeRect.right) - Math.max(labelRect.left, badgeRect.left);
+          const h = Math.min(labelRect.bottom, badgeRect.bottom) - Math.max(labelRect.top, badgeRect.top);
+          overlapArea = w > 0 && h > 0 ? Math.round(w * h) : 0;
+        }
+
+        return {
+          actionWidth: actionRect.width,
+          labelWidth: labelRect?.width ?? 0,
+          labelShare: labelRect ? labelRect.width / actionRect.width : 0,
+          overlapArea,
+        };
+      });
+
       return {
         viewportWidth: window.innerWidth,
         stageWidth: stage.getBoundingClientRect().width,
@@ -577,6 +608,10 @@ test.describe('Manuscript regression assertions', () => {
         badgeCount: badges.length,
         badgesClipped: badges.filter((b) => b.clipped).length,
         badgesPastEdge: badges.filter((b) => b.right > window.innerWidth + 0.5).length,
+        choiceCount: choices.length,
+        narrowestLabelShare: Math.min(...choices.map((c) => c.labelShare)),
+        narrowestLabelWidth: Math.min(...choices.map((c) => c.labelWidth)),
+        maxLabelBadgeOverlap: Math.max(...choices.map((c) => c.overlapArea)),
       };
     });
 
@@ -594,9 +629,28 @@ test.describe('Manuscript regression assertions', () => {
       `Boxes past the right edge: ${geometry.overflowing.join(', ')}`
     ).toBe(0);
 
-    // Guard against the assertion above passing because no choices rendered.
+    // Guard against the assertions above passing because no choices rendered.
     expect(geometry.badgeCount).toBeGreaterThan(0);
+    expect(geometry.choiceCount).toBeGreaterThan(0);
+
     expect(geometry.badgesPastEdge).toBe(0);
     expect(geometry.badgesClipped).toBe(0);
+
+    // Nothing may be drawn over the choice text. Measured as real rectangle
+    // intersection rather than a shared-row check, because the two boxes
+    // overlap horizontally while their tops differ once the label wraps tall.
+    expect(
+      geometry.maxLabelBadgeOverlap,
+      'Badge row must not overlap the choice label'
+    ).toBe(0);
+
+    // And the text needs room to actually read as a sentence. Half the button
+    // is a floor, not a target: at 375px the label gets about 76% of it. The
+    // failure this catches is the label collapsing toward a min-content column
+    // one word wide, which stays technically unclipped the whole way down.
+    expect(
+      geometry.narrowestLabelShare,
+      `Narrowest choice label was ${Math.round(geometry.narrowestLabelWidth)}px`
+    ).toBeGreaterThan(0.5);
   });
 });
