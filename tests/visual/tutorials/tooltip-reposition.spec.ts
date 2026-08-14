@@ -56,18 +56,65 @@ const readAnchorOffsets = (page: Page): Promise<AnchorOffsets | null> =>
     };
   }, TARGET);
 
+// Frames, not milliseconds. waitForFunction polls on requestAnimationFrame, so
+// a loaded runner stretches the real time this covers instead of running out of
+// it — which is the failure mode a fixed sleep has here.
+const ANCHOR_STABLE_FRAMES = 10;
+
+/**
+ * Read the offsets once the tour UI has stopped moving.
+ *
+ * Joyride places the tooltip through Popper and redraws the spotlight from the
+ * target's rect, both a frame or more behind the layout that prompted them, so
+ * a read taken as soon as the elements exist can catch a half-finished redraw.
+ * Waiting for the whole signature to hold still across consecutive frames
+ * covers the initial placement and the post-reflow one with the same rule.
+ */
 const readSettledAnchorOffsets = async (page: Page): Promise<AnchorOffsets> => {
-  let offsets: AnchorOffsets | null = null;
-  await expect
-    .poll(
-      async () => {
-        offsets = await readAnchorOffsets(page);
-        return offsets !== null;
-      },
-      { timeout: 10000 }
-    )
-    .toBe(true);
-  return offsets as unknown as AnchorOffsets;
+  await page.waitForFunction(
+    ({ targetSelector, framesRequired }) => {
+      const tracker = window as unknown as {
+        __anchorSignature?: string;
+        __anchorStableFrames?: number;
+      };
+
+      const target = document.querySelector(targetSelector);
+      const tooltip = document.querySelector('.react-joyride__tooltip');
+      const spotlight = document.querySelector('.react-joyride__spotlight');
+
+      // Reporting the moved target is what makes the provider remount the
+      // spotlight, so there's a frame where it isn't in the tree at all.
+      if (!target || !tooltip || !spotlight) {
+        tracker.__anchorSignature = undefined;
+        tracker.__anchorStableFrames = 0;
+        return false;
+      }
+
+      const targetTop = target.getBoundingClientRect().top;
+      const signature = [
+        Math.round(targetTop + window.scrollY),
+        Math.round(tooltip.getBoundingClientRect().top - targetTop),
+        Math.round(spotlight.getBoundingClientRect().top - targetTop),
+      ].join(':');
+
+      if (tracker.__anchorSignature !== signature) {
+        tracker.__anchorSignature = signature;
+        tracker.__anchorStableFrames = 0;
+        return false;
+      }
+
+      tracker.__anchorStableFrames = (tracker.__anchorStableFrames ?? 0) + 1;
+      return tracker.__anchorStableFrames >= framesRequired;
+    },
+    { targetSelector: TARGET, framesRequired: ANCHOR_STABLE_FRAMES },
+    { timeout: 15000 }
+  );
+
+  const offsets = await readAnchorOffsets(page);
+  if (!offsets) {
+    throw new Error('Expected the tour target, tooltip and spotlight to be measurable');
+  }
+  return offsets;
 };
 
 test('Tour tooltip and spotlight follow a target that a reflow moves', async ({
@@ -95,7 +142,6 @@ test('Tour tooltip and spotlight follow a target that a reflow moves', async ({
 
   await startTourAt(page, 'worldCreation', 0);
   await waitForTooltip(page);
-  await page.waitForTimeout(500);
 
   const before = await readSettledAnchorOffsets(page);
 
@@ -113,9 +159,6 @@ test('Tour tooltip and spotlight follow a target that a reflow moves', async ({
     )
     .toBeGreaterThan(before.targetDocumentTop + REFLOW_HEIGHT_PX / 2);
 
-  // Popper repositions on the frame after the move is reported, so read once
-  // the redraw has landed rather than in the middle of it.
-  await page.waitForTimeout(500);
   const after = await readSettledAnchorOffsets(page);
 
   // Both are drawn in document coordinates, so a tooltip left on its original
