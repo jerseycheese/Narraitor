@@ -99,7 +99,7 @@
 .dashboard-progress-stat-label {
   margin: 0;
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -150,7 +150,7 @@
 
 .dashboard-continue-card-field dt {
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -255,7 +255,7 @@
 .dashboard-recent-item span,
 .dashboard-recent-item p {
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
   margin: 0;
 }
@@ -320,7 +320,7 @@
 .dashboard-recent-empty-state p {
   margin: 0;
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
 }
 
@@ -391,7 +391,7 @@
 
 .dashboard-getting-started-step-label {
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   color: var(--color-text-primary);
 }
 
@@ -679,7 +679,7 @@
   font-family: var(--font-system);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
 }
 
 :root .dashboard-getting-started-steps {
@@ -729,14 +729,14 @@
 
 :root .world-card-description-block p {
   font-family: var(--font-system);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
 }
 
 :root .world-card-footer-meta time {
   font-family: var(--font-system);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
 }
 
 :root .world-list-empty {
@@ -760,7 +760,7 @@
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;

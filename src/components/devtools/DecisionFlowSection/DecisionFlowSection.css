@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
 }
 
 .devtools-decision-flow-controls {
@@ -17,7 +17,7 @@
 
 .devtools-decision-flow-controls .form-select {
   flex: 1 1 12rem;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
 }
 
 .devtools-decision-flow-traces {
@@ -71,7 +71,7 @@
 }
 
 .devtools-decision-flow-step-label {
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;

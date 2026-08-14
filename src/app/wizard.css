@@ -993,7 +993,7 @@
 :root .wizard-page .wizard-progress-circle {
   border-radius: 3px;
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
 }
 
 :root .wizard-page .wizard-progress-connector {
@@ -1023,7 +1023,7 @@
 
 :root .wizard-page .wizard-progress-label {
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   letter-spacing: 0.05em;
 }
 
@@ -1045,7 +1045,7 @@
   display: block;
   margin-bottom: var(--space-1);
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1396,7 +1396,7 @@
 
 .wizard-review-card-meta > span:nth-child(n + 2):not(.wizard-badge) {
   font-weight: 400;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-secondary);
 }
 
@@ -1476,7 +1476,7 @@
 
 .wizard-review-custom-heading p {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-secondary);
 }
 
@@ -1664,7 +1664,7 @@
 }
 
 .portrait-step-hint {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
 }
 
@@ -1711,7 +1711,7 @@
 
 .wizard-skill-card-info p {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-secondary);
 }
 
@@ -1975,7 +1975,7 @@
 .component-guided-first-time-step-description {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   color: var(--color-text-secondary);
 }
 
@@ -2038,7 +2038,7 @@
 
 :root .component-guided-first-time-step-num {
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -2075,7 +2075,7 @@
 
 :root .component-guided-first-time-skip {
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -2163,7 +2163,7 @@
 
 .component-world-creation-wizard .wizard-radio-option-desc {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-secondary);
 }
 
@@ -2183,7 +2183,7 @@
 }
 
 .component-world-creation-wizard .wizard-suggestion-hint {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
 }
 
@@ -2227,7 +2227,7 @@
 }
 
 .component-world-creation-wizard .wizard-suggestion-item-desc {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-secondary);
 }
 
@@ -2249,7 +2249,7 @@
 
 .component-world-creation-wizard .wizard-difficulty-legend-label {
   font-family: var(--font-interface);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   font-weight: 600;
   color: var(--color-text-secondary);
 }

@@ -19,7 +19,7 @@
 
 .alert-title {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   font-weight: 600;
   color: var(--color-text-primary);
 }

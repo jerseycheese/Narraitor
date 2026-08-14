@@ -9,7 +9,7 @@
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
 }
 
 .devtools-panel-header {
@@ -71,7 +71,7 @@
 
 .devtools-panel-group-title {
   margin: 0;
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;

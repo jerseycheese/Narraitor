@@ -11,10 +11,15 @@ const sharedTokensCss = fs.readFileSync(
 // "values in active use" (badges/metadata, interface text, body, section
 // headings, page titles); --font-size-3xl matches the page-layout hero
 // title (app-shell.css .page-layout-title, ex-workshop.css:1810 per #1622).
+// The _5 steps are exact midpoints of the pair they sit between, covering
+// the dense surfaces that land between two named steps.
 const EXPECTED_SCALE: Array<[token: string, rem: number]> = [
   ['--font-size-2xs', 0.625],
+  ['--font-size-2xs_5', 0.6875],
   ['--font-size-xs', 0.75],
+  ['--font-size-xs_5', 0.8125],
   ['--font-size-sm', 0.875],
+  ['--font-size-sm_5', 0.9375],
   ['--font-size-base', 1],
   ['--font-size-md', 1.125],
   ['--font-size-lg', 1.25],

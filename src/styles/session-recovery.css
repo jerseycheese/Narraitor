@@ -69,7 +69,7 @@
 .game-session-recovery-prompt-lead {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.5;
   color: var(--color-text-secondary);
 }
@@ -94,7 +94,7 @@
 
 .game-session-recovery-prompt-detail dt {
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -103,7 +103,7 @@
 .game-session-recovery-prompt-detail dd {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   font-weight: 600;
   color: var(--color-text-primary);
   overflow: hidden;

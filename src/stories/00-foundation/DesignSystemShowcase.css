@@ -92,7 +92,7 @@
 }
 
 .ds-showcase-field-error {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-danger);
 }
 
@@ -187,7 +187,7 @@
 }
 
 .ds-showcase-spacing-px {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-secondary);
 }
 

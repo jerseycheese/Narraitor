@@ -9,8 +9,11 @@ const rootDir = path.join(__dirname, '../../../../..');
 // reference the token instead of repeating the literal.
 const MIGRATED_VALUES = [
   '0.625rem',
+  '0.6875rem',
   '0.75rem',
+  '0.8125rem',
   '0.875rem',
+  '0.9375rem',
   '1rem',
   '1.125rem',
   '1.25rem',
@@ -31,27 +34,49 @@ function findProductionCssFiles(): string[] {
   );
 }
 
+function findProductionTsxFiles(): string[] {
+  return globSync('src/**/*.tsx', { cwd: rootDir, absolute: true });
+}
+
+function findOffenders(files: string[], pattern: RegExp): string[] {
+  return files
+    .filter((file) => pattern.test(fs.readFileSync(file, 'utf-8')))
+    .map((file) => path.relative(rootDir, file));
+}
+
+function escapeValue(value: string): string {
+  return value.replace('.', '\\.');
+}
+
 describe('DS3 type scale migration: no re-introduced literals', () => {
   const cssFiles = findProductionCssFiles();
+  const tsxFiles = findProductionTsxFiles();
 
   it('found production CSS files to check (sanity check on the glob)', () => {
     expect(cssFiles.length).toBeGreaterThan(10);
   });
 
+  it('found production TSX files to check (sanity check on the glob)', () => {
+    expect(tsxFiles.length).toBeGreaterThan(10);
+  });
+
   it.each(MIGRATED_VALUES)(
-    'no font-size declaration hardcodes %s where a token now exists',
+    'no CSS font-size declaration hardcodes %s where a token now exists',
     (value) => {
-      const offenders: string[] = [];
-      const pattern = new RegExp(`font-size:\\s*${value.replace('.', '\\.')}\\b`);
+      const pattern = new RegExp(`font-size:\\s*${escapeValue(value)}\\b`);
+      expect(findOffenders(cssFiles, pattern)).toEqual([]);
+    }
+  );
 
-      for (const file of cssFiles) {
-        const contents = fs.readFileSync(file, 'utf-8');
-        if (pattern.test(contents)) {
-          offenders.push(path.relative(rootDir, file));
-        }
-      }
-
-      expect(offenders).toEqual([]);
+  // Inline styles in TSX bypass the CSS check entirely, which is how eight
+  // literals survived the first migration pass.
+  it.each(MIGRATED_VALUES)(
+    'no TSX inline fontSize hardcodes %s where a token now exists',
+    (value) => {
+      const pattern = new RegExp(
+        `fontSize:\\s*['"\`]${escapeValue(value)}['"\`]`
+      );
+      expect(findOffenders(tsxFiles, pattern)).toEqual([]);
     }
   );
 });

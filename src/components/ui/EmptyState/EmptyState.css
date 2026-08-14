@@ -48,7 +48,7 @@
 .component-empty-state-content p {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.5;
   color: var(--color-text-secondary);
 }

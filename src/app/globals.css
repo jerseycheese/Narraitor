@@ -391,7 +391,7 @@ body > * {
   justify-content: space-between;
   gap: var(--space-2);
   font-family: var(--font-interface);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
 }
 
@@ -535,7 +535,7 @@ body > * {
 
 .app-global-error-message {
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.5;
   max-width: 32rem;
   margin: 0;
@@ -543,7 +543,7 @@ body > * {
 
 .app-global-error-suggestion {
   font-family: var(--font-interface);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   line-height: 1.5;
   color: var(--color-text-secondary);
   max-width: 32rem;

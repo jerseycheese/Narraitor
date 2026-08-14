@@ -46,7 +46,7 @@
   flex: 1;
   padding: var(--space-3) var(--space-4);
   font-family: var(--font-narrative);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
