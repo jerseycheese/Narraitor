@@ -96,8 +96,11 @@ const eslintConfig = [
           message: "Stubbing layout geometry means the test isn't observing layout. Measure it in a Playwright spec under tests/visual/ instead.",
         },
         {
-          selector: "AssignmentExpression > MemberExpression.left[property.name='getBoundingClientRect']",
-          message: "Stubbing getBoundingClientRect means the test isn't observing layout. Measure it in a Playwright spec under tests/visual/ instead.",
+          // Same property set as above. A direct assignment reaches the same
+          // place — `(element as any).scrollHeight = 1000` needs a cast, and a
+          // cast only costs a non-blocking no-explicit-any warning.
+          selector: "AssignmentExpression > MemberExpression.left[property.name=/^(scrollHeight|clientHeight|scrollTop|getBoundingClientRect|offsetHeight|offsetTop)$/]",
+          message: "Stubbing layout geometry means the test isn't observing layout. Measure it in a Playwright spec under tests/visual/ instead.",
         },
       ],
     },
