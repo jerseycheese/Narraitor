@@ -67,6 +67,55 @@ const expectParkedAtLatestBeat = async (page: Page): Promise<void> => {
     .toBeLessThanOrEqual(AT_BOTTOM_TOLERANCE_PX);
 };
 
+/**
+ * Wait until the scroller's geometry has held still across consecutive
+ * animation frames.
+ *
+ * Needed for the assertions that expect the surface *not* to move. scrollHeight
+ * grows during layout but the anchoring runs afterwards, off the ResizeObserver,
+ * so a position read taken the moment the page got taller lands in the frame
+ * before a wrong scroll would arrive and passes for the wrong reason. Verified:
+ * without this, removing the anchoring's own guard leaves the scrolled-up test
+ * green even though the reader gets yanked to the bottom.
+ *
+ * waitForFunction polls on requestAnimationFrame, so each call is one frame and
+ * the count is frames rather than wall clock.
+ */
+const waitForReflowToSettle = async (page: Page): Promise<void> => {
+  const STABLE_FRAMES = 10;
+
+  await page.waitForFunction(
+    (framesRequired) => {
+      const scroller = document.querySelector(
+        '.manuscript-overlay-main'
+      ) as HTMLElement | null;
+      if (!scroller) return false;
+
+      const signature = [
+        scroller.scrollHeight,
+        scroller.clientHeight,
+        Math.round(scroller.scrollTop),
+      ].join(':');
+
+      const tracker = window as unknown as {
+        __reflowSignature?: string;
+        __reflowStableFrames?: number;
+      };
+
+      if (tracker.__reflowSignature !== signature) {
+        tracker.__reflowSignature = signature;
+        tracker.__reflowStableFrames = 0;
+        return false;
+      }
+
+      tracker.__reflowStableFrames = (tracker.__reflowStableFrames ?? 0) + 1;
+      return tracker.__reflowStableFrames >= framesRequired;
+    },
+    STABLE_FRAMES,
+    { timeout: 10000 }
+  );
+};
+
 test.describe('Play surface reading position', () => {
   test('Opens a session at its latest beat', async ({ page }) => {
     await openPlaySurface(page);
@@ -189,6 +238,8 @@ test.describe('Play surface reading position', () => {
         timeout: 10000,
       })
       .toBeGreaterThan(before.scrollHeight);
+
+    await waitForReflowToSettle(page);
 
     expect((await readScrollState(page)).scrollTop).toBe(0);
   });
