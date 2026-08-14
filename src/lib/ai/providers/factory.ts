@@ -9,9 +9,8 @@ import { getAIConfig, getDefaultConfig } from '../config';
 /**
  * Builds the AI client for a resolved provider.
  *
- * The distinction from `clientFactory.ts` and `defaultGeminiClient.ts` is the
- * point of this module: those branch on the *environment* (test / browser /
- * server-with-a-key) and always end at Gemini. This one branches on the
+ * The distinction from `defaultGeminiClient.ts` is the point of this module:
+ * that one takes a key and always ends at Gemini. This one branches on the
  * player's configuration, which is the only thing that knows which provider is
  * actually active.
  *
