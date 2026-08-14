@@ -6,12 +6,9 @@ let resizeObserverCallback: ResizeObserverCallback | undefined;
 
 const TARGET = '[data-tutorial="world-name"]';
 
-const mountTarget = (top: number) => {
+const mountTarget = () => {
   document.body.innerHTML = `<div data-tutorial="world-name"></div>`;
-  const element = document.querySelector(TARGET) as HTMLElement;
-  element.getBoundingClientRect = () =>
-    ({ top, left: 0, bottom: top + 40, right: 100, width: 100, height: 40 }) as DOMRect;
-  return element;
+  return document.querySelector(TARGET) as HTMLElement;
 };
 
 beforeEach(() => {
@@ -39,20 +36,24 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-const renderActiveHook = (onTargetMoved = jest.fn()) => {
+const renderActiveHook = () => {
   const popper = { update: jest.fn() };
   const { result } = renderHook(() =>
-    useTutorialTooltipReposition(true, TARGET, onTargetMoved)
+    useTutorialTooltipReposition(true, TARGET, jest.fn())
   );
   act(() => {
     result.current(popper, 'floater');
   });
-  return { popper, onTargetMoved };
+  return { popper };
 };
 
 describe('useTutorialTooltipReposition', () => {
+  // Whether the tooltip and spotlight actually end up back on a target that
+  // moved is measured in tests/visual/tutorials/tooltip-reposition.spec.ts.
+  // Faking that here means writing the rects the hook then reads back, which
+  // is arithmetic against the test's own numbers rather than against layout.
   it('repositions the tooltip when the page scrolls or reflows', () => {
-    mountTarget(100);
+    mountTarget();
     const { popper } = renderActiveHook();
 
     act(() => {
@@ -66,24 +67,8 @@ describe('useTutorialTooltipReposition', () => {
     expect(popper.update).toHaveBeenCalledTimes(2);
   });
 
-  it('reports a target that a reflow moved, but not a plain scroll', () => {
-    mountTarget(100);
-    const { onTargetMoved } = renderActiveHook();
-
-    act(() => {
-      window.dispatchEvent(new Event('scroll'));
-    });
-    expect(onTargetMoved).not.toHaveBeenCalled();
-
-    mountTarget(300);
-    act(() => {
-      resizeObserverCallback?.([], {} as ResizeObserver);
-    });
-    expect(onTargetMoved).toHaveBeenCalledTimes(1);
-  });
-
   it('ignores the beacon wrapper popper', () => {
-    mountTarget(100);
+    mountTarget();
     const wrapperPopper = { update: jest.fn() };
     const { result } = renderHook(() =>
       useTutorialTooltipReposition(true, TARGET, jest.fn())
@@ -98,7 +83,7 @@ describe('useTutorialTooltipReposition', () => {
   });
 
   it('stops repositioning once the tour is no longer running', () => {
-    mountTarget(100);
+    mountTarget();
     const popper = { update: jest.fn() };
     const { result, rerender } = renderHook(
       ({ isActive }) => useTutorialTooltipReposition(isActive, TARGET, jest.fn()),

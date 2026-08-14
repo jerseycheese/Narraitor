@@ -2,7 +2,7 @@
 title: Visual Testing Best Practices
 tags: [testing, best-practices, visual-testing, playwright, guidelines]
 created: 2025-08-20
-updated: 2026-07-21
+updated: 2026-08-14
 ---
 
 # What actually works for visual testing
@@ -24,6 +24,56 @@ Here's what I've learned about writing visual tests that catch real issues witho
 - **Development tools**: Debug panels, test harnesses (unless the UI matters)
 - **Frequently changing content**: Marketing banners, promotional content
 - **Internal admin interfaces**: Unless visual consistency is business-critical
+
+## Two Tiers of Layout Assertion
+
+A baseline proves the page looked a certain way on the day it was captured. It can't prove a rule is still doing its job, and three regressions from the v1.0 playtest triage got through on exactly that gap (#1574, #1579). So layout and behavior get assertions of their own alongside the pixels, in two tiers.
+
+**Tier 1, geometry and behavior. This is the default.** Measure positions, distances, and post-interaction state, which is to say the thing a player would notice. Scroll the surface and check the location bar is still on screen. Measure the distance between the hero's bottom edge and the portrait's top edge. Assert the world card renders at a bounded height when its description runs long. Each of those survives any implementation that produces the right result, and fails on any that doesn't.
+
+```ts
+// Weak: passes even when sticky is inert
+await expect(rail).toHaveCSS('position', 'sticky');
+
+// Real: scroll, then check the bar is still on screen
+await main.evaluate(el => el.scrollTop = 600);
+expect((await rail.boundingBox()).y).toBeGreaterThanOrEqual(0);
+```
+
+**Tier 2, resolved-value tripwires.** A `toHaveCSS`-style check, written only alongside a tier 1 assertion and never instead of one. There's a narrow case where it earns its place, covered below.
+
+Worked examples of tier 1 assertions live in `tests/visual/manuscript-regression-assertions.spec.ts` and `tests/visual/narrative-reading-position.spec.ts`.
+
+### Why a computed-style assertion mostly doesn't work
+
+A computed-style assertion says a property resolved to a value. It doesn't say the value is doing anything.
+
+#1582 is the proof. That bug was `float: right` declared on a child of a flex container. Floats don't apply to flex items, so the rule did nothing, but the declaration sat right there in the stylesheet and the computed value read back as `right`. A `toHaveCSS('float', 'right')` check would have been green for the entire life of that bug. The same trap is available for `position: sticky` with no `top`, or inside an `overflow: hidden` ancestor, or against the wrong containing block.
+
+The second problem is that a property assertion pins the technique. Say the hero gap currently comes from `margin-bottom` and later comes from `gap` on a restructured parent. The page looks correct and the assertion goes red anyway, so it gets edited to match the new implementation. Do that twice and you've taught yourself to treat that test as noise, which is worse than never having written it.
+
+### Where a tripwire earns its place
+
+One narrow case: when the cascade decides the winner rather than a single declaration. PR #1568 moved 515 selectors from specificity (0,1,1) to (0,1,0), and which rule wins after a change like that isn't readable from any one file. Asserting the resolved value there tests something genuinely emergent.
+
+Label it for what it is. A tripwire catches "the rule vanished", which is what happened to the sticky-location fix when ADR-013 deleted DS1 and took the scoped rule with it. It cannot catch "the rule is present and inert", which is what happened to the marginalia float. Cheap, useful, and not evidence the invariant holds, so it rides along with the geometric assertion rather than standing in for it.
+
+### When a fix has no runtime invariant
+
+Some fixes have nothing to measure, and the honest move is to say so rather than invent an assertion that looks like one. Two from the same batch:
+
+- **Prose quality.** #1578 is about whether a generated ending actually closes. Asserting on generated text is how you get a rigged test, because the assertion ends up encoding whatever the model happened to produce on the day it was written. It gets a template-level guard instead (the prompt requires closure regardless of tone) plus an eval pass over sample generations.
+- **Deletion.** #1583 is mostly removing `.theme-menu-*` rules. There's no runtime behavior left to observe once they're gone, so the check is static: search the stylesheets and assert nothing matches.
+
+If a change fits neither tier and neither of those, write down why in the PR rather than adding a placeholder assertion. A fake invariant costs more than a missing one, because it reads as coverage.
+
+### These Belong in Playwright, Not jsdom
+
+Geometry needs a real layout engine. jsdom has none, so every rect comes back as zero and a jsdom test that wants geometry has to supply it, normally through `Object.defineProperty` on `scrollHeight`, `clientHeight`, or `getBoundingClientRect`. At that point the test is reading back numbers it wrote.
+
+`NarrativeHistory` is the cautionary example. Its anchoring tests stubbed `scrollHeight: 1000` and `clientHeight: 100` onto the Radix viewport, which isn't even the element the app scrolls (the play surface resolves `.manuscript-overlay-main` instead), and they stayed green through the whole auto-scroll regression. Checks like that move to Playwright rather than getting repaired in place.
+
+`eslint.config.mjs` flags the pattern in test files so the next one gets caught while it's being written.
 
 ## Writing Effective Visual Tests
 
