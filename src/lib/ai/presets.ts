@@ -5,10 +5,10 @@ import type { ProviderPreset } from '@/types/provider.types';
 /**
  * Provider presets shown in the configuration wizard.
  *
- * Gemini and OpenRouter work end-to-end (`available: true`). The rest are
- * listed so players can see what's coming and so the schema is ready for the
- * remaining multi-provider work — they're marked unavailable and the UI keeps
- * them out of reach until someone runs a live check against each.
+ * Gemini, OpenRouter and OpenAI work end-to-end (`available: true`). The rest
+ * are listed so players can see what's coming and so the schema is ready for
+ * the remaining multi-provider work — they're marked unavailable and the UI
+ * keeps them out of reach until someone runs a live check against each.
  *
  * Order is deliberate. Gemini leads because it's the longest-proven. OpenRouter
  * comes next because it's the only other option a player can reach without a
@@ -98,7 +98,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     // this flag has only ever meant generation here (providers/capabilities.ts).
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://platform.openai.com/api-keys',
-    available: false,
+    available: true,
     privacyNote:
       'OpenAI states that API inputs and outputs are not used to train their models by default, and are retained for up to 30 days for abuse monitoring.',
   },
