@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
-import { generatePortrait as generatePortraitDirect } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
 import {
   useCharacterStore,
   type Character as StoreCharacter,
@@ -189,20 +187,16 @@ export function PortraitDebugSection({
 
     setIsGenerating(true);
     try {
-      const aiClient = createAIClient();
+      // Same request the preview button sends, minus promptOnly, so what this
+      // panel exercises is the route the app itself uses for portraits.
+      const { portrait } = await generatePortrait({
+        character: createMockCharacter('test'),
+        world: effectiveWorldConfig,
+        customDescription: effectiveCharacterData.background?.physicalDescription,
+      });
 
-      const mockCharacter = createMockCharacter('test');
-
-      const result = await generatePortraitDirect(
-        aiClient,
-        mockCharacter as unknown as Character,
-        {
-          worldGenre: effectiveWorldConfig?.genre,
-        }
-      );
-
-      setLastGeneratedImage(result.url);
-      setGeneratedPrompt(result.prompt || 'No prompt returned');
+      setLastGeneratedImage(portrait?.url ?? null);
+      setGeneratedPrompt(portrait?.prompt || 'No prompt returned');
     } catch (error) {
       setGeneratedPrompt(
         `Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
