@@ -12,3 +12,22 @@ export const PROVIDER_API_KEY_HEADER = 'x-provider-api-key';
  * request schemas stay about the generation, not about provider plumbing.
  */
 export const PROVIDER_MODEL_HEADER = 'x-provider-model';
+
+/**
+ * Header carrying which kind of provider the key belongs to (see ProviderType).
+ * Without it the server can only assume Gemini, which is how a key meant for
+ * another service would end up being sent to Google.
+ */
+export const PROVIDER_TYPE_HEADER = 'x-provider-type';
+
+/**
+ * Header carrying the provider's chat-completions URL. Only meaningful for
+ * OpenAI-compatible providers, which disagree on the path (`/v1/chat/completions`,
+ * `/chat/completions`, or something custom) — so the full URL comes from the
+ * player's configuration rather than being assembled server-side.
+ *
+ * SECURITY: this is an attacker-reachable URL that the *server* dereferences.
+ * It is honoured only when the same request carries the caller's own key, and
+ * only after passing the endpoint guard.
+ */
+export const PROVIDER_ENDPOINT_HEADER = 'x-provider-endpoint';

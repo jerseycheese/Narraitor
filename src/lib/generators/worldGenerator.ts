@@ -5,6 +5,7 @@ import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalizati
 import { validateWorldAttribute, validateWorldSkill, validateWorldSettings } from '@/lib/utils/typeGuards';
 
 import Logger from '@/lib/utils/logger';
+import type { ProviderCredential } from '@/lib/ai/providers/types';
 const logger = new Logger('WorldGenerator');
 
 // Default fallback values for AI validation failures
@@ -55,7 +56,7 @@ export interface WorldGenerationOptions {
  */
 export async function generateWorld(
   options: WorldGenerationOptions,
-  apiKey?: string | null,
+  apiKey?: ProviderCredential | null,
   model?: string | null
 ): Promise<GeneratedWorldData> {
   // Always use AI generation, but with TV/movie inspiration
@@ -67,7 +68,7 @@ export async function generateWorld(
  */
 async function generateWithAI(
   options: WorldGenerationOptions,
-  apiKey?: string | null,
+  apiKey?: ProviderCredential | null,
   model?: string | null
 ): Promise<GeneratedWorldData> {
   // Handle different world generation types

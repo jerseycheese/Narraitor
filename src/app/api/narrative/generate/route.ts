@@ -1,7 +1,7 @@
 // src/app/api/narrative/generate/route.ts
 
 import { NextRequest } from 'next/server';
-import { processGeminiStreamingTextRequest } from '@/utils/apiHelpers';
+import { processAIStreamingTextRequest } from '@/utils/apiHelpers';
 
 // Vercel function budget. Must be a static literal (Next.js segment config);
 // sized as the single 30s Gemini attempt (GEMINI_ATTEMPT_TIMEOUT_MS in
@@ -14,7 +14,7 @@ export const maxDuration = 60;
 // complexity of forwarding progressive content instead of the simpler
 // single-JSON-response path the other narrative routes use.
 export async function POST(request: NextRequest) {
-  return processGeminiStreamingTextRequest(request, {
+  return processAIStreamingTextRequest(request, {
     // Matches lib/ai/config's default. A weighty beat asks for 3-4 paragraphs
     // plus its JSON metadata, which crowds a 1024 ceiling and gets truncated
     // mid-object — and a truncated response is unparseable, not just short.

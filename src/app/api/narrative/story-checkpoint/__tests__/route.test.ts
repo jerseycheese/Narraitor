@@ -7,7 +7,6 @@ jest.mock('@/lib/ai/storyCheckpointGenerator');
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
-import { DEFAULT_TEXT_MODEL } from '@/lib/ai/config';
 
 const mockGenerateStoryCheckpointSummary = generateStoryCheckpointSummary as jest.MockedFunction<typeof generateStoryCheckpointSummary>;
 
@@ -76,10 +75,11 @@ describe('/api/narrative/story-checkpoint', () => {
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.summary).toBe('Recap');
+    // The route forwards a resolved provider descriptor, not a key and a model.
+    // Null here because the test env pins GEMINI_API_KEY to the MOCK sentinel.
     expect(mockGenerateStoryCheckpointSummary).toHaveBeenCalledWith(
       expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' }),
-      null,
-      DEFAULT_TEXT_MODEL
+      null
     );
   });
 

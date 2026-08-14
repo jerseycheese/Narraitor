@@ -4,13 +4,25 @@
 
 jest.mock('@/utils/apiHelpers', () => ({
   makeGeminiRequest: jest.fn(),
+  // Allowed by default; the limit itself is covered by the rate limiter's own
+  // tests, and these are about how upstream answers are classified.
+  handleRateLimiting: jest.fn(() => ({ response: null, result: {} })),
+}));
+
+// The endpoint guard resolves the hostname before any player-supplied URL is
+// fetched. Pinned to a public address here so these stay unit tests rather than
+// quietly depending on DNS.
+jest.mock('node:dns/promises', () => ({
+  lookup: jest.fn(async () => [{ address: '104.18.0.1', family: 4 }]),
 }));
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
-import { makeGeminiRequest } from '@/utils/apiHelpers';
+import { handleRateLimiting, makeGeminiRequest } from '@/utils/apiHelpers';
+import { lookup } from 'node:dns/promises';
 
 const mockMakeGeminiRequest = makeGeminiRequest as jest.MockedFunction<typeof makeGeminiRequest>;
+const mockHandleRateLimiting = handleRateLimiting as jest.MockedFunction<typeof handleRateLimiting>;
 
 const URL = 'http://localhost:3000/api/ai/validate-provider';
 const KEY = 'AIza-candidate-key';
@@ -38,6 +50,24 @@ beforeEach(() => {
 });
 
 describe('POST /api/ai/validate-provider', () => {
+  /**
+   * This route dereferences a URL the caller names and reports whether that
+   * host answered. Unmetered it is a request forwarder with a reachability
+   * oracle, so the limit has to come before anything else the route does.
+   */
+  test('stops at the rate limit before dereferencing anything', async () => {
+    const limited = new Response(null, { status: 429 });
+    mockHandleRateLimiting.mockReturnValueOnce({
+      response: limited,
+      result: {},
+    } as ReturnType<typeof handleRateLimiting>);
+
+    const response = await POST(buildRequest({ key: KEY }));
+
+    expect(response.status).toBe(429);
+    expect(mockMakeGeminiRequest).not.toHaveBeenCalled();
+  });
+
   test('rejects when no key header is present', async () => {
     const response = await POST(buildRequest({ key: undefined }));
     const data = await response.json();
@@ -99,12 +129,110 @@ describe('POST /api/ai/validate-provider', () => {
     expect(data.error).toBe('RATE_LIMITED');
   });
 
-  test('rejects unsupported provider types without calling upstream', async () => {
-    const response = await POST(buildRequest({ key: KEY, body: { type: 'openai-compatible' } }));
+  test('rejects a provider type with no adapter without calling upstream', async () => {
+    // Anthropic's own API is not OpenAI-shaped and has no adapter; reaching
+    // Claude through OpenRouter is an `openai-compatible` provider instead.
+    const response = await POST(buildRequest({ key: KEY, body: { type: 'claude' } }));
     const data = await response.json();
 
     expect(data.valid).toBe(false);
     expect(data.error).toBe('UNSUPPORTED_PROVIDER');
     expect(mockMakeGeminiRequest).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () => {
+  const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
+
+  beforeEach(() => {
+    global.fetch = jest.fn();
+    // resetAllMocks in afterEach strips the module mock's implementation too.
+    (lookup as jest.Mock).mockResolvedValue([{ address: '104.18.0.1', family: 4 }]);
+    mockHandleRateLimiting.mockReturnValue({ response: null, result: {} } as ReturnType<
+      typeof handleRateLimiting
+    >);
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  function openAIRequest(body: Record<string, unknown>) {
+    return buildRequest({ key: KEY, body: { type: 'openai-compatible', ...body } });
+  }
+
+  test('validates through the provider abstraction instead of rejecting outright', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    const response = await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+    const data = await response.json();
+
+    expect(data.valid).toBe(true);
+    expect(data.model).toBe('openai/gpt-4o');
+    // Images are Gemini-only for now, and the registry says so.
+    expect(data.capabilities).toEqual({ text: true, images: false, streaming: true });
+    expect(global.fetch).toHaveBeenCalledWith(
+      ENDPOINT,
+      expect.objectContaining({ method: 'POST' })
+    );
+    expect(JSON.stringify(data)).not.toContain(KEY);
+  });
+
+  test('sends the key as a bearer token and never in the URL', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+
+    const [url, init] = (global.fetch as jest.Mock).mock.calls[0];
+    expect(url).not.toContain(KEY);
+    expect((init.headers as Record<string, string>).Authorization).toBe(`Bearer ${KEY}`);
+  });
+
+  test('refuses a public hostname that resolves to a private address', async () => {
+    // The string check passes — this is the DNS-level bypass it cannot catch.
+    (lookup as jest.Mock).mockResolvedValueOnce([{ address: '169.254.169.254', family: 4 }]);
+
+    const response = await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+
+    expect((await response.json()).error).toBe('NETWORK');
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  test('refuses to follow a redirect, which would sidestep the guard entirely', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+
+    const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+    expect(init.redirect).toBe('error');
+  });
+
+  test('refuses an endpoint the server should never dereference', async () => {
+    const response = await POST(
+      openAIRequest({ endpoint: 'http://169.254.169.254/latest/meta-data', model: 'gpt-4o' })
+    );
+    const data = await response.json();
+
+    expect(data.error).toBe('INVALID_ENDPOINT');
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  test('maps a 401 to INVALID_KEY', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(401));
+
+    const response = await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+
+    expect((await response.json()).error).toBe('INVALID_KEY');
+  });
+
+  test('maps a 400 naming the model to INVALID_MODEL', async () => {
+    // OpenRouter and Together answer 400 for an unknown model where OpenAI 404s.
+    (global.fetch as jest.Mock).mockResolvedValue(
+      fakeResponse(400, { error: { message: 'No endpoints found for model nope/nope-1.' } })
+    );
+
+    const response = await POST(openAIRequest({ endpoint: ENDPOINT, model: 'nope/nope-1' }));
+
+    expect((await response.json()).error).toBe('INVALID_MODEL');
   });
 });

@@ -2,6 +2,7 @@ import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
 import { validateWorld } from '@/lib/utils/typeGuards';
 import { extractJsonObject } from '@/lib/ai/parseJSON';
+import type { ProviderCredential } from '@/lib/ai/providers/types';
 
 // Character level range for generated characters
 const CHARACTER_LEVEL_RANGE = { min: 1, max: 5 };
@@ -46,7 +47,7 @@ const logger = new Logger('CharacterGenerator');
  */
 async function generateWithAI(
   options: CharacterGenerationOptions,
-  apiKey?: string | null,
+  apiKey?: ProviderCredential | null,
   model?: string | null
 ): Promise<GeneratedCharacterData> {
   const { world, existingNames = [], suggestedName, generationType = 'known', concept } = options;
@@ -377,7 +378,7 @@ export async function generateAICharacter(
   suggestedName?: string,
   generationType: CharacterGenerationType = 'known',
   concept?: string,
-  apiKey?: string | null,
+  apiKey?: ProviderCredential | null,
   model?: string | null
 ): Promise<GeneratedCharacterData> {
   return generateWithAI({

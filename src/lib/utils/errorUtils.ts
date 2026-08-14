@@ -116,6 +116,21 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     };
   }
 
+  // Moderation blocks. Checked before the validation branch below, which would
+  // otherwise swallow these on the word "invalid" and tell the player to review
+  // their input — when the input was fine and the provider simply refused it.
+  if (message.includes('blocked this content') || message.includes('content filter')) {
+    return {
+      title: 'Provider Blocked This',
+      message: "Your provider refused to generate this. That's their moderation, not a problem with your story.",
+      suggestion: 'Try the scene again, or switch to a provider whose moderation suits your world.',
+      actionLabel: 'Try Again',
+      retryable: true,
+      type: ErrorType.SERVICE,
+      severity: 'warning'
+    };
+  }
+
   // Validation errors
   if (message.includes('validation') || message.includes('invalid') ||
       message.includes('malformed') || message.includes('bad request') ||

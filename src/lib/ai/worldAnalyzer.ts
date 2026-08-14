@@ -1,5 +1,5 @@
 import { GeminiClient } from '@/lib/ai/geminiClient';
-import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
+import { getAIConfig, getGenerationConfig, getSafetySettings, resolveEffectiveGeminiKey } from '@/lib/ai/config';
 import { AttributeSuggestion, SkillSuggestion } from '@/components/WorldCreationWizard/WorldCreationWizard';
 import { truncate } from '../utils';
 import { logger } from '../utils/logger';
@@ -40,7 +40,7 @@ export async function analyzeWorldDescription(
 
   try {
     const config = getAIConfig();
-    const effectiveKey = apiKey ?? config.geminiApiKey;
+    const effectiveKey = resolveEffectiveGeminiKey(apiKey);
     const effectiveModel = model ?? config.modelName;
     logger.debug('Using AI config:', {
       modelName: effectiveModel,
