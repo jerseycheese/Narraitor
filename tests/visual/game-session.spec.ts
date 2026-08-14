@@ -137,7 +137,7 @@ test.describe('Game Session Visual Tests', () => {
         { timeout: 5000 }
       );
       console.log('✅ NarrativeHistoryManager finished loading');
-    } catch (e) {
+    } catch {
       console.log('⏰ NarrativeHistoryManager still loading after 5s timeout');
     }
     
@@ -228,7 +228,7 @@ test.describe('Game Session Visual Tests', () => {
           const store = (window as any).useSessionStore;
           store.persist.rehydrate();
         }
-      } catch (e) {
+      } catch {
         console.log('Store rehydration not available, using fallback...');
       }
 

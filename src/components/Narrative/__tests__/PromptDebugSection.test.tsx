@@ -171,10 +171,6 @@ describe('PromptDebugSection', () => {
     const user = userEvent.setup();
     render(<PromptDebugSection debugInfo={mockDebugInfo} />);
 
-    // Section starts collapsed - content should be hidden
-    const allContents = screen.getAllByTestId('collapsible-section-content');
-    const mainContent = allContents[0]; // First collapsible is the main section
-
     // Click to expand using the toggle button
     const toggleButton = screen.getByRole('button', { name: /Expand.*Prompt Debug Info/i });
     await user.click(toggleButton);
@@ -194,10 +190,6 @@ describe('PromptDebugSection', () => {
     // Full prompt section should now be visible but still collapsed
     const nestedToggle = screen.getByRole('button', { name: /Expand Full Prompt Text/i });
     expect(nestedToggle).toBeInTheDocument();
-
-    // Full prompt text starts collapsed - find the nested content
-    const allContents = screen.getAllByTestId('collapsible-section-content');
-    const nestedContent = allContents[1]; // Second collapsible is the nested one
 
     // Click the nested toggle to expand
     await user.click(nestedToggle);

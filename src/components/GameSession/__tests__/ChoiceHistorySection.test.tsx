@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { ChoiceHistorySection } from '../ChoiceHistorySection';
 import type { DecisionHistoryEntry, DecisionOption, NarrativeSegment } from '@/types/narrative.types';
 

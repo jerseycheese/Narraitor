@@ -10,13 +10,11 @@ test.beforeEach(async ({ page }, testInfo) => {
       const loc = msg.location();
       const location = loc?.url ? `${loc.url}:${loc.lineNumber || 0}:${loc.columnNumber || 0}` : 'unknown';
       // Log to stdout so CI captures it
-      // eslint-disable-next-line no-console
       console.error(`PW[console.error] ${testName} @ ${page.url()} :: ${location}\n${msg.text()}`);
     }
   });
 
   page.on('pageerror', (error) => {
-    // eslint-disable-next-line no-console
     console.error(`PW[pageerror] ${testName} @ ${page.url()}\n${error?.stack || error?.message || String(error)}`);
   });
 });

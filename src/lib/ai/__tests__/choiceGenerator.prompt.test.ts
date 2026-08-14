@@ -2,7 +2,6 @@ import { buildChoicePrompt } from '../choiceGenerator.prompt';
 import type { NarrativeContext } from '@/types/narrative.types';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { playerDecisionTracker } from '../playerDecisionTracker';
-import { getLoreContextForPrompt } from '../loreContextHelper';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   getNarrativeTemplate: jest.fn().mockReturnValue((context: { worldName: string }) =>

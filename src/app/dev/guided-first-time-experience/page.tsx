@@ -16,7 +16,6 @@ export default function GuidedFirstTimeExperienceTestHarness() {
     isFirstTimeUser,
   } = useSessionStore();
 
-  const isCompleted = !shouldShowOnboarding();
   const showOnboarding = shouldShowOnboarding();
 
   const handleReset = () => {

@@ -56,7 +56,7 @@ async function makeApiRequest(path, method, data, token) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           try {
             resolve(JSON.parse(responseData));
-          } catch (err) {
+          } catch {
             if (responseData.trim()) {
               resolve(responseData);
             } else {
