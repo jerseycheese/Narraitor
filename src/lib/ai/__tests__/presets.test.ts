@@ -27,6 +27,13 @@ describe('PROVIDER_PRESETS', () => {
     expect(moved).toEqual(['openai']);
   });
 
+  it('marks OpenAI as fixing its sampling controls, since its models reject ours', () => {
+    const fixed = PROVIDER_PRESETS.filter((preset) => preset.hasFixedSamplingControls).map(
+      (p) => p.id
+    );
+    expect(fixed).toEqual(['openai']);
+  });
+
   it('defaults each preset to a model it actually lists', () => {
     for (const preset of PROVIDER_PRESETS) {
       expect(preset.models).toContain(preset.defaultModel);

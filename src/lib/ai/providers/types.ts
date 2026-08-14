@@ -36,6 +36,11 @@ export interface ProviderDescriptor {
    * OpenAI-compatible service still takes. See presets.ts.
    */
   maxOutputTokensParam?: 'max_tokens' | 'max_completion_tokens';
+  /**
+   * Whether this service fixes temperature and top_p and rejects being told
+   * otherwise. Resolved from the endpoint's preset. See presets.ts.
+   */
+  hasFixedSamplingControls?: boolean;
 }
 
 /**

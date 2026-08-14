@@ -80,6 +80,17 @@ export interface ProviderPreset {
    * offers is a current one, and a service that has moved has moved wholesale.
    */
   maxOutputTokensParam?: 'max_tokens' | 'max_completion_tokens';
+  /**
+   * Whether this service's models fix the sampling controls and refuse to be
+   * told otherwise.
+   *
+   * OpenAI's current models are reasoning models: they run their own rounds of
+   * generation and selection, so temperature and top_p are locked and the API
+   * rejects the request rather than clamping. Sending the default value is not
+   * a workaround — the field's presence is what some endpoints reject — so the
+   * only correct move is to omit both.
+   */
+  hasFixedSamplingControls?: boolean;
   /** Short pitch shown under the name, e.g. what a key costs to get. */
   note?: string;
   /**
