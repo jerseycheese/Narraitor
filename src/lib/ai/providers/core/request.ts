@@ -46,6 +46,51 @@ export interface SendProviderRequestOptions {
    * call path can reach `fetch` having skipped it.
    */
   playerSuppliedEndpoint?: boolean;
+  /**
+   * Extra headers the destination service asks for, from its preset. Merged
+   * beneath `headers`; see applyCustomHeaders for what they cannot set.
+   */
+  customHeaders?: Record<string, string>;
+}
+
+/**
+ * Header names a preset can never set.
+ *
+ * Compared lowercased because HTTP header names are case-insensitive while a
+ * JavaScript object's keys are not. Spread order alone would let a preset
+ * naming `authorization` in lower case sit alongside the adapter's
+ * `Authorization`: two entries in the object, both reaching `fetch`, and the
+ * player's key either replaced or combined with whatever the preset supplied.
+ * Matching on the lowercased name is what makes "the adapter's auth wins" true
+ * rather than nearly true.
+ */
+const RESERVED_HEADERS = new Set(['authorization', 'content-type']);
+
+/**
+ * Merge a preset's custom headers underneath the adapter's own.
+ *
+ * SECURITY: done here at the sink for the same reason the endpoint guard is:
+ * no call path can reach `fetch` having skipped it, so a future adapter cannot
+ * forget to do this correctly. The adapter's headers carry the player's key and
+ * declare how the body is encoded; a preset must not be able to redirect that
+ * credential or change how the request is read, so reserved names are dropped
+ * outright rather than merely losing the merge.
+ *
+ * Header values are never logged here or anywhere below, since Authorization
+ * is the player's plaintext key.
+ */
+function applyCustomHeaders(
+  headers: Record<string, string>,
+  customHeaders?: Record<string, string>
+): Record<string, string> {
+  if (!customHeaders) return headers;
+
+  const allowed = Object.entries(customHeaders).filter(
+    ([name]) => !RESERVED_HEADERS.has(name.trim().toLowerCase())
+  );
+  if (allowed.length === 0) return headers;
+
+  return { ...Object.fromEntries(allowed), ...headers };
 }
 
 /**
@@ -61,11 +106,13 @@ export async function sendProviderRequest(
   body: object,
   options: SendProviderRequestOptions = {}
 ): Promise<Response> {
-  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false } = options;
+  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false, customHeaders } = options;
 
   if (playerSuppliedEndpoint) {
     await assertPublicProviderEndpoint(url);
   }
+
+  const requestHeaders = applyCustomHeaders(headers, customHeaders);
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -90,7 +137,7 @@ export async function sendProviderRequest(
     // would look like a control while being decoration.
     const response = await fetch(url, {
       method: 'POST',
-      headers,
+      headers: requestHeaders,
       body: JSON.stringify(body),
       redirect: 'error',
       signal: controller.signal,
@@ -155,7 +202,11 @@ export async function openProviderTextStream(
     adapter.buildUrl(descriptor, spec),
     adapter.buildHeaders(descriptor),
     adapter.buildBody(descriptor, spec),
-    { timeoutMs, playerSuppliedEndpoint: adapter.playerSuppliedEndpoint }
+    {
+      timeoutMs,
+      playerSuppliedEndpoint: adapter.playerSuppliedEndpoint,
+      customHeaders: descriptor.customHeaders,
+    }
   );
 
   if (!response.ok) throw await toUpstreamError(adapter, response);
@@ -178,7 +229,11 @@ export async function generateProviderText(
     adapter.buildUrl(descriptor, spec),
     adapter.buildHeaders(descriptor),
     adapter.buildBody(descriptor, spec),
-    { timeoutMs, playerSuppliedEndpoint: adapter.playerSuppliedEndpoint }
+    {
+      timeoutMs,
+      playerSuppliedEndpoint: adapter.playerSuppliedEndpoint,
+      customHeaders: descriptor.customHeaders,
+    }
   );
 
   if (!response.ok) throw await toUpstreamError(adapter, response);

@@ -60,6 +60,14 @@ export interface ProviderPreset {
   capabilities: ProviderCapabilities;
   helpUrl: string;
   available: boolean;
+  /**
+   * Extra request headers this service wants, e.g. OpenRouter's attribution
+   * pair. Attached server-side by matching the endpoint (see resolveProvider)
+   * rather than travelling from the browser, and applied under the adapter's
+   * own headers, so a preset can never set Authorization or Content-Type. See
+   * applyCustomHeaders in providers/core/request.ts.
+   */
+  customHeaders?: Record<string, string>;
   /** Short pitch shown under the name, e.g. what a key costs to get. */
   note?: string;
   /**

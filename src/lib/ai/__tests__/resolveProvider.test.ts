@@ -54,8 +54,28 @@ describe('resolveProvider', () => {
         // Vendor-prefixed ids are the norm off Gemini and must survive.
         model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
         apiKey: 'byo-key',
+        // Attached from the OpenRouter preset because that is where this
+        // request is going, not because anything in it said so.
+        customHeaders: {
+          'HTTP-Referer': 'https://narraitor-six.vercel.app',
+          'X-OpenRouter-Title': 'Narraitor',
+        },
       },
     });
+  });
+
+  it('attaches no preset headers to an endpoint it does not ship a preset for', () => {
+    const resolution = resolveProvider(
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+        [PROVIDER_ENDPOINT_HEADER]: 'https://some-other-service.test/v1/chat/completions',
+        [PROVIDER_MODEL_HEADER]: 'some-model',
+      })
+    );
+
+    expect(resolution.ok).toBe(true);
+    expect(resolution.ok && resolution.descriptor.customHeaders).toBeUndefined();
   });
 
   it('reports NO_KEY when neither a header nor a usable env key exists', () => {

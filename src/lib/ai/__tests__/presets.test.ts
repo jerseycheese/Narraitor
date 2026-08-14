@@ -25,4 +25,31 @@ describe('PROVIDER_PRESETS', () => {
       expect(preset.models).toContain(preset.defaultModel);
     }
   });
+
+  it('covers every service the multi-provider work set out to list', () => {
+    expect(PROVIDER_PRESETS.map((preset) => preset.id).sort()).toEqual([
+      'deepseek',
+      'gemini',
+      'groq',
+      'mistral',
+      'openai',
+      'openrouter',
+      'perplexity',
+      'together',
+    ]);
+  });
+
+  /**
+   * The request layer drops these names before they reach fetch, so a preset
+   * naming one is not a vulnerability. It is a preset whose author believed it
+   * was setting something it isn't, which is worth failing a build over.
+   */
+  it('asks for no header that would carry the key or declare the body', () => {
+    for (const preset of PROVIDER_PRESETS) {
+      const names = Object.keys(preset.customHeaders ?? {}).map((name) => name.toLowerCase());
+
+      expect(names).not.toContain('authorization');
+      expect(names).not.toContain('content-type');
+    }
+  });
 });

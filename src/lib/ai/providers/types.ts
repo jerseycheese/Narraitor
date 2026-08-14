@@ -20,6 +20,16 @@ export interface ProviderDescriptor {
   endpoint: string;
   model: string;
   apiKey: string | null;
+  /**
+   * Extra headers the service at `endpoint` asks for, taken from its preset.
+   *
+   * SECURITY: resolved server-side from the endpoint, never read off the
+   * request. The endpoint already travels from the browser and is guarded; a
+   * second header channel carrying arbitrary names and values would let a
+   * caller shape the outbound request itself. Keyed on where the request is
+   * going, so one service's headers cannot ride along to another.
+   */
+  customHeaders?: Record<string, string>;
 }
 
 /**

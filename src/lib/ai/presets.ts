@@ -49,6 +49,17 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     models: ['openai/gpt-4o', 'anthropic/claude-sonnet-5', 'google/gemini-2.5-flash'],
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
     defaultModel: 'openai/gpt-4o',
+    // Attribution only: OpenRouter uses these to list the app on its public
+    // rankings, and a request without them succeeds exactly as it does with
+    // them. `X-OpenRouter-Title` is the current name for the title header;
+    // `X-Title` still works as a backwards-compatible alias, so it is not worth
+    // sending both. The URL is written out rather than read from getSiteUrl()
+    // because this module is imported by client components and that one is
+    // server-only, where it would quietly resolve to localhost.
+    customHeaders: {
+      'HTTP-Referer': 'https://narraitor-six.vercel.app',
+      'X-OpenRouter-Title': 'Narraitor',
+    },
     // Images here means generation, not vision input, and generation stays on
     // Gemini. See supportsImages in providers/capabilities.ts, which is what
     // the validate-provider route reports back whatever a preset claims.
@@ -124,6 +135,29 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://console.groq.com/keys',
     available: false,
+  },
+  {
+    id: 'perplexity',
+    name: 'Perplexity',
+    type: 'openai-compatible',
+    // Perplexity has two surfaces and only one of them belongs here. The
+    // search-grounded `sonar-*` models answer on /v1/sonar in a shape that is
+    // not OpenAI's, and their chat-completions form carries a published
+    // shutdown date, the same fuse the OpenAI list above was corrected for.
+    // The Gateway is the one Perplexity documents as a drop-in replacement for
+    // an OpenAI integration, so it is the one an openai-compatible preset can
+    // honestly point at. Note the /router segment: there is no bare
+    // /chat/completions on this host.
+    endpoint: 'https://api.perplexity.ai/router/v1/chat/completions',
+    models: ['perplexity/kimi-k3', 'perplexity/glm-5.2', 'perplexity/deepseek-v4-flash-0731'],
+    defaultModel: 'perplexity/kimi-k3',
+    // Perplexity takes images as input and can return them as search results;
+    // it generates none. Generation stays on Gemini (see providers/capabilities).
+    capabilities: { text: true, images: false, streaming: true },
+    helpUrl: 'https://console.perplexity.ai/group/keys',
+    available: false,
+    privacyNote:
+      'Perplexity states that it keeps no record of prompts or responses sent to its chat completions API, and does not use them for training. It retains billing metrics only.',
   },
 ];
 
