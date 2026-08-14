@@ -118,6 +118,17 @@ function parseArgs(argv) {
     console.error(`--tools-mode must be forced-choice or session, got ${args.toolsMode}`);
     process.exit(2);
   }
+  // A fat-fingered --sample turns into NaN, and NaN is falsy, which would
+  // silently drop the sampling and bill a full 376-query sweep. Sampling is the
+  // cost control, so a bad value has to stop the run before anything spawns.
+  for (const name of ['sample', 'runs', 'concurrency']) {
+    const value = args[name];
+    if (value === null) continue;
+    if (!Number.isInteger(value) || value < 1) {
+      console.error(`--${name} must be a positive whole number, got ${String(value)}`);
+      process.exit(2);
+    }
+  }
   return args;
 }
 
@@ -201,18 +212,28 @@ function routeQuery(query, { model, toolsMode }) {
     const env = { ...process.env };
     delete env.CLAUDECODE;
 
-    const child = spawn('claude', args, { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'ignore'] });
+    const child = spawn('claude', args, { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
     let buffer = '';
+    let stderr = '';
     let settled = false;
     let observed = NO_SKILL;
     let costUsd = 0;
+    // Did a model turn actually happen? Without this, a missing binary, a
+    // rejected option or an auth failure exits quietly and gets scored as "no
+    // skill fired", which reads as a routing miss. A harness that reports
+    // infrastructure breakage as a routing result is worse than no harness.
+    let answered = false;
 
-    const finish = () => {
+    const finish = (failure = null) => {
       if (settled) return;
       settled = true;
       child.kill();
-      resolve({ query, observed, costUsd });
+      resolve({ query, observed, costUsd, failure: answered ? null : failure || 'no model turn observed' });
     };
+
+    child.stderr.on('data', (chunk) => {
+      if (stderr.length < 500) stderr += chunk.toString();
+    });
 
     child.stdout.on('data', (chunk) => {
       buffer += chunk.toString();
@@ -228,8 +249,10 @@ function routeQuery(query, { model, toolsMode }) {
         } catch {
           continue;
         }
-        if (event.type === 'result') costUsd = event.total_cost_usd || costUsd;
         if (event.type === 'assistant') {
+          // The model produced a turn, so whatever comes back is a real
+          // observation even if it never reaches for a skill.
+          answered = true;
           const content = (event.message && event.message.content) || [];
           const toolUse = content.find((c) => c.type === 'tool_use');
           if (toolUse) {
@@ -239,14 +262,16 @@ function routeQuery(query, { model, toolsMode }) {
           }
         }
         if (event.type === 'result') {
-          finish();
+          costUsd = event.total_cost_usd || costUsd;
+          if (event.subtype === 'success') answered = true;
+          finish(`session ended with ${event.subtype || 'no subtype'}`);
           return;
         }
       }
     });
 
-    child.on('error', () => finish());
-    child.on('close', () => finish());
+    child.on('error', (error) => finish(`could not run claude: ${error.message}`));
+    child.on('close', (code) => finish(`claude exited ${code}${stderr ? `: ${stderr.trim().split('\n')[0]}` : ''}`));
   });
 }
 
@@ -255,6 +280,7 @@ async function routeAll(cases, { runs, concurrency, model, toolsMode }) {
   for (const item of cases) for (let run = 0; run < runs; run += 1) jobs.push(item);
 
   const results = new Map();
+  const failures = [];
   let totalCost = 0;
   let costReported = 0;
   let done = 0;
@@ -267,8 +293,15 @@ async function routeAll(cases, { runs, concurrency, model, toolsMode }) {
       const result = await routeQuery(item.query, { model, toolsMode });
       totalCost += result.costUsd;
       if (result.costUsd) costReported += 1;
-      if (!results.has(item.query)) results.set(item.query, []);
-      results.get(item.query).push(result.observed);
+      if (result.failure) {
+        // Deliberately not recorded as an observation. A query whose every run
+        // failed drops out of scoring as unresolved rather than counting
+        // against the skill that never got a fair chance to fire.
+        failures.push({ query: item.query, reason: result.failure });
+      } else {
+        if (!results.has(item.query)) results.set(item.query, []);
+        results.get(item.query).push(result.observed);
+      }
       done += 1;
       process.stderr.write(`\r  routed ${done}/${jobs.length}`);
     }
@@ -286,7 +319,7 @@ async function routeAll(cases, { runs, concurrency, model, toolsMode }) {
     return { query, observed: best, labels };
   });
 
-  return { observations, totalCost, costReported, sessions: jobs.length };
+  return { observations, failures, totalCost, costReported, sessions: jobs.length };
 }
 
 async function main() {
@@ -317,10 +350,15 @@ async function main() {
 
   let observations;
   let meta;
+  let scoreAgainst = selected;
 
   if (args.from) {
     const saved = JSON.parse(fs.readFileSync(args.from, 'utf8'));
     observations = saved.observations;
+    // Score against the selection the saved run actually used. Rebuilding it
+    // from this invocation's flags would silently rescore a --pairs run against
+    // all 376 cases and report the difference as unresolved.
+    scoreAgainst = saved.cases || selected;
     meta = { ...saved.meta, router: `${saved.meta.router} (rescored from ${args.from})` };
   } else {
     console.error(
@@ -328,6 +366,17 @@ async function main() {
     );
     const routed = await routeAll(selected, args);
     observations = routed.observations;
+    if (routed.failures.length) {
+      console.error(`\n${routed.failures.length}/${routed.sessions} sessions failed to produce a turn:`);
+      for (const failure of routed.failures.slice(0, 5)) {
+        console.error(`  ${failure.reason} - "${failure.query.slice(0, 60)}"`);
+      }
+      console.error('Those queries are excluded from scoring, not counted as misses.\n');
+    }
+    if (observations.length === 0) {
+      console.error('No query produced a model turn. Check that the claude CLI runs here before trusting any score.');
+      process.exit(1);
+    }
     meta = {
       router: `claude -p, first turn of a cold session, ${args.toolsMode} tools`,
       model: args.model || 'session default',
@@ -340,14 +389,19 @@ async function main() {
       costReportedBy: `${routed.costReported}/${routed.sessions}`,
       fixtureFiles: fixtures.length,
       selectedQueries: selected.length,
+      failedSessions: routed.failures.length,
     };
   }
 
-  const report = scoreRouting(selected, observations);
+  const report = scoreRouting(scoreAgainst, observations);
 
   if (args.out) {
     fs.mkdirSync(path.dirname(args.out), { recursive: true });
-    fs.writeFileSync(args.out, `${JSON.stringify({ meta, observations, report }, null, 2)}\n`);
+    // The case list rides along so --from rescores the same selection.
+    fs.writeFileSync(
+      args.out,
+      `${JSON.stringify({ meta, cases: scoreAgainst, observations, report }, null, 2)}\n`
+    );
     console.error(`Raw observations written to ${args.out} (rescore for free with --from)`);
   }
 
