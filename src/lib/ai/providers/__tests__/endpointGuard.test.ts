@@ -3,7 +3,7 @@
  */
 jest.mock('node:dns/promises', () => ({ lookup: jest.fn() }));
 
-import { assertPublicProviderEndpoint } from '../endpointGuard';
+import { assertPublicProviderEndpoint, isSafeProviderEndpoint } from '../endpointGuard';
 import { lookup } from 'node:dns/promises';
 
 const mockLookup = lookup as jest.MockedFunction<typeof lookup>;
@@ -12,6 +12,29 @@ const PUBLIC = [{ address: '104.18.0.1', family: 4 }];
 
 beforeEach(() => {
   jest.clearAllMocks();
+});
+
+describe('isSafeProviderEndpoint', () => {
+  it('allows an ordinary public https endpoint', () => {
+    expect(isSafeProviderEndpoint('https://openrouter.ai/api/v1/chat/completions')).toBe(true);
+  });
+
+  /**
+   * A URL carries a mapped address in hex, not dotted quads: parsing
+   * `https://[::ffff:127.0.0.1]/` yields the hostname `[::ffff:7f00:1]`. Both
+   * spellings have to be refused, or the sync check passes an address the
+   * player wrote as loopback.
+   */
+  it.each([
+    ['https://[::ffff:127.0.0.1]/v1', 'mapped loopback'],
+    ['https://[::ffff:169.254.169.254]/v1', 'mapped instance metadata'],
+    ['https://[::1]/v1', 'loopback'],
+    ['https://localhost/v1', 'localhost'],
+    ['https://192.168.1.1/v1', 'RFC 1918'],
+    ['http://openrouter.ai/v1', 'plain http'],
+  ])('refuses %s (%s)', (endpoint) => {
+    expect(isSafeProviderEndpoint(endpoint)).toBe(false);
+  });
 });
 
 describe('assertPublicProviderEndpoint', () => {
@@ -32,6 +55,8 @@ describe('assertPublicProviderEndpoint', () => {
     ['127.0.0.1', 'loopback'],
     ['10.1.2.3', 'RFC 1918'],
     ['100.64.0.1', 'carrier-grade NAT'],
+    // dns.lookup reports mapped addresses in the dotted form.
+    ['::ffff:169.254.169.254', 'mapped instance metadata'],
   ])('refuses a hostname resolving to %s (%s)', async (address) => {
     mockLookup.mockResolvedValue([{ address, family: 4 }] as never);
 

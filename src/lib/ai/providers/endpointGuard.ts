@@ -56,9 +56,31 @@ const BLOCKED_ADDRESS_PATTERNS: RegExp[] = [
   /^fe80:/i,
   // Unique local addresses (fc00::/7).
   /^f[cd][0-9a-f]{2}:/i,
-  // IPv4-mapped IPv6 (::ffff:127.0.0.1) — check the embedded address too.
-  /^::ffff:(127\.|10\.|192\.168\.|169\.254\.|0\.)/i,
 ];
+
+/**
+ * The IPv4 address inside an IPv4-mapped IPv6 address, or null.
+ *
+ * Both spellings have to be handled, because the two sources disagree.
+ * `dns.lookup` reports the dotted form, `::ffff:127.0.0.1`. WHATWG URL parsing
+ * serializes the same address as `::ffff:7f00:1`, so a hostname that arrived in
+ * a URL never carries the dotted form — a dotted-only check reads as a control
+ * while passing every mapped address a player can type.
+ *
+ * Unwrapping rather than pattern-matching the mapped form also means the IPv4
+ * list below is the only place private ranges are written down.
+ */
+function mappedIPv4(address: string): string | null {
+  const dotted = address.match(/^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/i);
+  if (dotted) return dotted[1];
+
+  const hex = address.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i);
+  if (!hex) return null;
+
+  const high = parseInt(hex[1], 16);
+  const low = parseInt(hex[2], 16);
+  return [high >> 8, high & 0xff, low >> 8, low & 0xff].join('.');
+}
 
 /** Hostnames that name a local or internal machine without being an address. */
 const BLOCKED_HOST_PATTERNS: RegExp[] = [
@@ -72,7 +94,10 @@ const BLOCKED_HOST_PATTERNS: RegExp[] = [
 
 function isBlockedAddress(address: string): boolean {
   const bare = address.replace(/^\[|\]$/g, '');
-  return BLOCKED_ADDRESS_PATTERNS.some((pattern) => pattern.test(bare));
+  const candidates = [bare, mappedIPv4(bare)].filter((value): value is string => value !== null);
+  return candidates.some((candidate) =>
+    BLOCKED_ADDRESS_PATTERNS.some((pattern) => pattern.test(candidate))
+  );
 }
 
 /**
