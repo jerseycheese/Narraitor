@@ -18,7 +18,7 @@ everything.
 ```
 narraitor/
 ├── .github/
-│   ├── workflows/                # CI, CodeQL, Storybook deploy/preview, focused Playwright
+│   ├── workflows/                # CI, CodeQL, Storybook deploy/preview, tutorial Playwright
 │   ├── ISSUE_TEMPLATE/
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── src/
