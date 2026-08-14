@@ -124,6 +124,9 @@ CLAUDE.local.md
 !.claude/agents/
 # never commit macOS cruft, even within the re-included dirs above
 .claude/**/.DS_Store
+# trigger-eval output is a dated measurement of a nondeterministic router: it is
+# stale the moment a skill description changes, so it stays local
+.claude/skills/_trigger_results/
 
 # Codex
 .codex/

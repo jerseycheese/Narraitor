@@ -19,6 +19,7 @@
     "docs:check-links": "node scripts/check-docs-links.js",
     "docs:check-symbols": "node scripts/check-docs-symbols.mjs",
     "validate:routes": "node scripts/validate-routes.js",
+    "skills:trigger-eval": "node scripts/run-trigger-eval.cjs",
     "type-check": "tsc --noEmit",
     "knip": "knip --no-config-hints",
     "knip:fix": "knip --fix --allow-remove-files",

@@ -17,7 +17,7 @@ grep -rn "Last generated" .claude/skills/narraitor-*/SKILL.md | sort -t: -k3
 grep -n "gemini-" src/lib/ai/config.ts                 # model strings vs domain-reference/diagnostics
 grep '"react-joyride"' package.json                    # archaeology E4 pin
 ls src/lib/state/storePubSub.ts src/state/storeEventWiring.ts src/types/@google/genai.d.ts
-node -e "for (const f of require('glob').sync('.claude/skills/*/evals/trigger_eval.json')) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('eval JSONs parse')"
+npm run skills:trigger-eval -- --dry-run             # fixtures parse; prints the query counts
 npm test > /tmp/nt.log 2>&1; echo "exit=$?"; tail -3 /tmp/nt.log   # suite-count claims (capture exit BEFORE tail)
 ```
 Anything that moved → update the owning skill first (fact-homes table below), then fix pointers.
@@ -55,7 +55,17 @@ When two files disagree about one of these, the HOME wins; everything else is a 
 
 ## Updating trigger evals
 
-When a skill's description changes, regenerate its near-miss negatives (they encode sibling boundaries) — don't just append positives. Re-run the confusable pairs listed at the bottom of `_trigger_matrix.md` after ANY description edit in those pairs.
+When a skill's description changes, regenerate its near-miss negatives (they encode sibling boundaries) — don't just append positives. Re-run the confusable pairs listed at the bottom of `_trigger_matrix.md` after ANY description edit in those pairs. The command for that:
+
+```bash
+npm run skills:trigger-eval -- --pairs --model sonnet     # the confusable pairs
+npm run skills:trigger-eval -- --skill narraitor-change-control --runs 3
+npm run skills:trigger-eval -- --dry-run                  # plan and query counts, no model calls
+```
+
+Every query is a live `claude -p` session, so a full sweep of all 376 queries costs real money and a good half hour. Scope it to the skills whose descriptions actually moved. Pass `--out <file>` to keep the raw observations, then `--from <file>` rescores them for free.
+
+Read the numbers with the register's caveats in hand: routing is nondeterministic, and the two `--tools-mode` settings bracket the true rate rather than pinning it. A one-run swing of a few points is noise. A skill that drops from firing every time to firing never is a regression worth chasing.
 
 ## Re-running the model-transfer benchmark
 
