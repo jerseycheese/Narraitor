@@ -38,6 +38,16 @@ Scripts that help with testing various parts of the project, especially data pro
 - **`test-update-stories.sh`** - Shell script to test the user story update process
 - **`testing/`** - Test files and utilities for testing the scripts themselves
 
+### Provider Verification
+
+- **`verify-openai-compatible-stream.mjs`** - Plays one streamed narrative turn against a live OpenAI-compatible provider, through the same adapter and stream consumer the narrative route uses. This is the check that has to pass before a preset in `src/lib/ai/presets.ts` can be marked `available: true`, since nothing in CI can call a paid endpoint. Reads the key from `OPENAI_COMPAT_API_KEY` at call time, and redacts it from anything it prints:
+
+  ```bash
+  OPENAI_COMPAT_API_KEY=<your key> node scripts/verify-openai-compatible-stream.mjs --preset openrouter
+  ```
+
+  `--preset <id>` takes the endpoint and default model from the preset; `--model` overrides the model, and `--endpoint` (with `--model`) points at a service that has no preset. Exits 0 on pass, 1 on fail.
+
 ### Documentation
 
 - **`github-project-setup.md`** - Documentation for setting up GitHub projects for this repository

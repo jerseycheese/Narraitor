@@ -14,6 +14,11 @@ import type { ProviderPreset } from '@/types/provider.types';
  * OpenRouter comes next because it's the only other option a player can reach
  * without a credit card, and one key there covers dozens of models. Everything
  * below it needs prepaid billing before it generates a single word.
+ *
+ * TODO(#895): flip a preset to `available: true` only after
+ * scripts/verify-openai-compatible-stream.mjs passes against it with a real
+ * key. Nothing in CI can make that call, so `available` is a claim about a
+ * live check somebody ran, not about the code compiling.
  */
 export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
@@ -33,12 +38,21 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     id: 'openrouter',
     name: 'OpenRouter',
     type: 'openai-compatible',
-    // TODO(#895): re-check this model list when the provider goes live. OpenRouter's
-    // zero-cost ":free" ids rotate every few weeks, so none are pinned here.
-    models: ['openai/gpt-4o', 'anthropic/claude-3.5-sonnet', 'google/gemini-2.5-flash'],
+    // Each id below was checked against OpenRouter's live catalogue
+    // (https://openrouter.ai/api/v1/models), which is the only thing that knows
+    // what is actually servable. The catalogue keeps retired slugs resolvable
+    // with an empty `endpoints` array, so "the id still exists" and "something
+    // will answer it" are different questions.
+    //
+    // No zero-cost ":free" id is pinned here: OpenRouter documents that free
+    // availability changes frequently, so any one named here would rot.
+    models: ['openai/gpt-4o', 'anthropic/claude-sonnet-5', 'google/gemini-2.5-flash'],
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
     defaultModel: 'openai/gpt-4o',
-    capabilities: { text: true, images: true, streaming: true },
+    // Images here means generation, not vision input, and generation stays on
+    // Gemini. See supportsImages in providers/capabilities.ts, which is what
+    // the validate-provider route reports back whatever a preset claims.
+    capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://openrouter.ai/keys',
     available: false,
     note: 'free tier, no card',
@@ -50,9 +64,16 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     name: 'OpenAI',
     type: 'openai-compatible',
     endpoint: 'https://api.openai.com/v1/chat/completions',
-    models: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'],
-    defaultModel: 'gpt-4o',
-    capabilities: { text: true, images: true, streaming: true },
+    // The list this replaced was three models OpenAI has since moved off:
+    // gpt-4-turbo and gpt-3.5-turbo both carry a published shutdown date on
+    // the deprecations page, and gpt-4o has quietly left the models index. A
+    // preset is a menu a player picks from, so a shutdown date on two of three
+    // entries is a bug with a fuse on it rather than a cosmetic one.
+    models: ['gpt-5.6-terra', 'gpt-5.6-sol', 'gpt-5.6-luna'],
+    defaultModel: 'gpt-5.6-terra',
+    // OpenAI's chat models take images as INPUT; they don't generate them, and
+    // this flag has only ever meant generation here (providers/capabilities.ts).
+    capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://platform.openai.com/api-keys',
     available: false,
     privacyNote:
