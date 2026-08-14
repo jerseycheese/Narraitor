@@ -7,7 +7,7 @@
  * scorer that reports plausible-looking wrong numbers is worse than none.
  */
 
-import { buildCases, scoreRouting, kindFor, goldFor } from '../trigger-eval-lib.cjs';
+import { buildCases, scoreRouting, formatReport, kindFor, goldFor } from '../trigger-eval-lib.cjs';
 
 const fixtures = [
   {
@@ -148,5 +148,67 @@ describe('scoreRouting', () => {
     const partial = scoreRouting(cases, observations.slice(0, 2));
     expect(partial.summary).toMatchObject({ scored: 2, unresolved: 4 });
     expect(partial.unresolvedQueries).toContain('b positive');
+  });
+});
+
+// The failure this guards against: the router crashes, every case comes back
+// looking like "no skill fired", and the harness prints a confident zero-recall
+// table that reads as a description regression. A case the model was never
+// asked about must not be scoreable as a miss.
+describe('scoreRouting with errored cases', () => {
+  const { cases } = buildCases(fixtures);
+
+  it('excludes an errored case from scoring entirely', () => {
+    const report = scoreRouting(
+      cases,
+      [
+        { query: 'a positive', observed: 'skill-a' },
+        { query: 'a second positive', observed: 'skill-a' },
+        { query: 'belongs to b', observed: 'skill-b' },
+        { query: 'nothing should fire', observed: 'none' },
+        { query: 'b positive', observed: 'skill-b' },
+      ],
+      [{ query: 'belongs to a', reason: 'could not run claude: spawn claude ENOENT' }]
+    );
+
+    expect(report.summary).toMatchObject({ cases: 6, scored: 5, correct: 5, errored: 1, unresolved: 0 });
+    expect(report.summary.passRate).toBe(1);
+
+    // The errored case was a skill-a target. It must not show up as a miss.
+    const a = report.perSkill.find((row) => row.skill === 'skill-a');
+    expect(a).toMatchObject({ support: 2, tp: 2, fn: 0 });
+    expect(a.recall).toBe(1);
+    expect(report.falseNegatives).toEqual([]);
+    expect(report.unresolvedQueries).not.toContain('belongs to a');
+    expect(report.erroredCases).toEqual([
+      {
+        query: 'belongs to a',
+        gold: 'skill-a',
+        kind: 'near-miss',
+        reason: 'could not run claude: spawn claude ENOENT',
+      },
+    ]);
+  });
+
+  it('scores nothing at all when every case errored', () => {
+    const report = scoreRouting(
+      cases,
+      [],
+      cases.map((c) => ({ query: c.query, reason: 'claude exited 1: not authenticated' }))
+    );
+    expect(report.summary).toMatchObject({ scored: 0, correct: 0, errored: 6, unresolved: 0 });
+    expect(report.summary.passRate).toBeNull();
+    expect(report.perSkill).toEqual([]);
+    expect(report.falseNegatives).toEqual([]);
+    expect(report.falsePositives).toEqual([]);
+  });
+
+  it('says plainly in the report that a fully errored run measured nothing', () => {
+    const report = scoreRouting(cases, [], cases.map((c) => ({ query: c.query, reason: 'boom' })));
+    const text = formatReport(report, {});
+    expect(text).toContain('NO CASE WAS SCORED');
+    expect(text).toContain('WARNING: the router could not be reached');
+    expect(text).toContain('Errored cases (router never answered, excluded from all scoring)');
+    expect(text).toContain('cause: boom');
   });
 });

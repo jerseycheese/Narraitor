@@ -80,12 +80,22 @@ function ratio(numerator, denominator) {
 // Score routed observations against the gold labels.
 //
 // `observations` is [{ query, observed }] (or a Map of query -> observed).
-// Cases with no observation are reported as unresolved instead of being counted
-// as misses, so an aborted or partial run cannot look like a routing failure.
-function scoreRouting(cases, observations) {
+// `errors` is [{ query, reason }] for queries where the router could not be
+// asked at all.
+//
+// A case has three outcomes, not two. A skill fired, nothing fired, or the
+// question never reached the model. That third one is the important
+// distinction: "could not ask" is not "the model chose wrong", and collapsing
+// them lets a broken environment print a confident zero-recall table. Errored
+// cases are excluded from precision, recall and the pass rate entirely, and
+// reported on their own with the underlying cause.
+function scoreRouting(cases, observations, errors = []) {
   const observed = observations instanceof Map
     ? observations
     : new Map(observations.map((o) => [o.query, o.observed]));
+  const errored = errors instanceof Map
+    ? errors
+    : new Map(errors.map((e) => [e.query, e.reason]));
 
   const kinds = ['positive', 'near-miss', 'null'];
   const byKind = {};
@@ -101,10 +111,15 @@ function scoreRouting(cases, observations) {
   const falsePositives = [];
   const falseNegatives = [];
   const unresolved = [];
+  const erroredCases = [];
   let scored = 0;
   let correct = 0;
 
   for (const item of cases) {
+    if (errored.has(item.query)) {
+      erroredCases.push({ query: item.query, gold: item.gold, kind: item.kind, reason: errored.get(item.query) });
+      continue;
+    }
     if (!observed.has(item.query)) {
       unresolved.push(item.query);
       continue;
@@ -163,6 +178,7 @@ function scoreRouting(cases, observations) {
       correct,
       passRate: ratio(correct, scored),
       unresolved: unresolved.length,
+      errored: erroredCases.length,
     },
     byKind,
     perSkill: perSkillRows,
@@ -171,6 +187,7 @@ function scoreRouting(cases, observations) {
     falsePositives,
     falseNegatives,
     unresolvedQueries: unresolved,
+    erroredCases,
   };
 }
 
@@ -199,14 +216,29 @@ function formatReport(report, meta = {}) {
     const billed = meta.costReportedBy ? ` (floor; billed by ${meta.costReportedBy} sessions)` : '';
     lines.push(`Reported cost: ${meta.costUsd.toFixed(2)} USD${billed}`);
   }
-  if (meta.failedSessions) {
-    lines.push(`Failed sessions: ${meta.failedSessions} (excluded from scoring, NOT counted as misses)`);
-  }
   lines.push('');
+
+  if (summary.errored) {
+    lines.push('*** WARNING: the router could not be reached for some queries. ***');
+    lines.push(
+      `*** ${summary.errored} of ${summary.cases} cases errored. They are excluded from every`
+    );
+    lines.push('*** number below, and are NOT counted as routing misses. See the errored');
+    lines.push('*** section at the bottom for causes before reading anything as a regression.');
+    lines.push('');
+  }
+
+  if (summary.scored === 0) {
+    lines.push('NO CASE WAS SCORED. Nothing below is a measurement of routing quality.');
+    lines.push(`Cases: ${summary.cases}, errored: ${summary.errored}, unresolved: ${summary.unresolved}.`);
+    lines.push('');
+  }
+
   lines.push(
     `Overall: ${summary.correct}/${summary.scored} routed to the labelled target (${pct(summary.passRate).trim()})`
   );
   if (summary.unresolved) lines.push(`Unresolved (no observation recorded): ${summary.unresolved}`);
+  if (summary.errored) lines.push(`Errored (router unreachable): ${summary.errored}`);
   lines.push('');
 
   lines.push('By case kind');
@@ -255,6 +287,18 @@ function formatReport(report, meta = {}) {
 
   listSection('False negatives (labelled skill did not fire)', report.falseNegatives);
   listSection('False positives (a skill fired that should not have)', report.falsePositives);
+
+  if (report.erroredCases.length) {
+    const title = 'Errored cases (router never answered, excluded from all scoring)';
+    lines.push(title);
+    lines.push('-'.repeat(title.length));
+    for (const row of report.erroredCases) {
+      lines.push(`  [${row.kind}] expected ${row.gold}`);
+      lines.push(`      ${row.query}`);
+      lines.push(`      cause: ${row.reason}`);
+    }
+    lines.push('');
+  }
 
   return lines.join('\n');
 }

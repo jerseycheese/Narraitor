@@ -46,8 +46,10 @@ Still open: a bare-clone zero-exposure control (in-session baselines had skill d
 
 NARROWED (2026-08-14): the trigger evals now have a harness. `npm run skills:trigger-eval` routes the labelled queries through a real Claude Code session and scores precision/recall per skill plus the sibling confusion matrix. What it measures is real - the model's own decision over the real descriptions - but it is not a clean measurement, and two caveats travel with every number it prints:
 
-- Routing is nondeterministic. A single run is a sample, not a property of the descriptions. Vote across repeats with `--runs` before treating a delta as a regression.
+- Routing is nondeterministic, and the size of that noise is now measured rather than guessed. The same 96-query sample, same mode, same model, run twice, scored 89.6% and 85.4%. Treat anything under about five points as noise, and vote across repeats with `--runs` before calling a delta a regression.
 - Both observation modes are biased, in opposite directions. `forced-choice` (the default) withholds every tool but Skill, so the model cannot answer by going and looking, which pushes the trigger rate up. `session` gives the normal toolset, where the model routinely opens with a context-gathering Bash call that the single-turn window scores as silence, which pushes it down. Truth sits somewhere between the two.
+
+The harness has been run end to end against real queries from a local macOS checkout: 96 queries, forced-choice, sonnet, zero errored sessions, 82/96. A run that cannot reach the router no longer looks like a clean run. Errored cases are excluded from every number, listed with their cause, and the process exits 2 (or 1 if nothing scored at all), so a broken environment cannot be mistaken for a description regression.
 
 Still unmeasured: mid-conversation triggering (the harness only ever sends a cold first message), and triggering under any model other than the one passed to `--model`.
 

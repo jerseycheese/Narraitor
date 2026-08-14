@@ -351,10 +351,12 @@ async function main() {
   let observations;
   let meta;
   let scoreAgainst = selected;
+  let errors = [];
 
   if (args.from) {
     const saved = JSON.parse(fs.readFileSync(args.from, 'utf8'));
     observations = saved.observations;
+    errors = saved.errors || [];
     // Score against the selection the saved run actually used. Rebuilding it
     // from this invocation's flags would silently rescore a --pairs run against
     // all 376 cases and report the difference as unresolved.
@@ -366,17 +368,14 @@ async function main() {
     );
     const routed = await routeAll(selected, args);
     observations = routed.observations;
-    if (routed.failures.length) {
-      console.error(`\n${routed.failures.length}/${routed.sessions} sessions failed to produce a turn:`);
-      for (const failure of routed.failures.slice(0, 5)) {
-        console.error(`  ${failure.reason} - "${failure.query.slice(0, 60)}"`);
-      }
-      console.error('Those queries are excluded from scoring, not counted as misses.\n');
+    // Only queries where EVERY run failed are errored. One flaky run out of
+    // three should not discard a query that the model did answer.
+    const answered = new Set(observations.map((o) => o.query));
+    const reasons = new Map();
+    for (const failure of routed.failures) {
+      if (!answered.has(failure.query)) reasons.set(failure.query, failure.reason);
     }
-    if (observations.length === 0) {
-      console.error('No query produced a model turn. Check that the claude CLI runs here before trusting any score.');
-      process.exit(1);
-    }
+    errors = [...reasons.entries()].map(([query, reason]) => ({ query, reason }));
     meta = {
       router: `claude -p, first turn of a cold session, ${args.toolsMode} tools`,
       model: args.model || 'session default',
@@ -393,14 +392,15 @@ async function main() {
     };
   }
 
-  const report = scoreRouting(scoreAgainst, observations);
+  const report = scoreRouting(scoreAgainst, observations, errors);
 
   if (args.out) {
     fs.mkdirSync(path.dirname(args.out), { recursive: true });
-    // The case list rides along so --from rescores the same selection.
+    // The case list and the errors ride along so --from rescores the same
+    // selection and keeps the same errored cases out of the numbers.
     fs.writeFileSync(
       args.out,
-      `${JSON.stringify({ meta, cases: scoreAgainst, observations, report }, null, 2)}\n`
+      `${JSON.stringify({ meta, cases: scoreAgainst, observations, errors, report }, null, 2)}\n`
     );
     console.error(`Raw observations written to ${args.out} (rescore for free with --from)`);
   }
@@ -415,6 +415,18 @@ async function main() {
         'biased observation modes (see the header comment in this script). Re-run with\n' +
         '--runs to vote across repeats before acting on a delta.'
     );
+  }
+
+  // A run with errored cases is not a clean run, and the exit code has to say
+  // so. Anything scripted around this should be able to tell "the descriptions
+  // regressed" from "the router was unreachable" without parsing the report.
+  if (report.summary.scored === 0) {
+    console.error('\nNothing was scored. Check that the claude CLI runs here before trusting any number.');
+    process.exit(1);
+  }
+  if (report.summary.errored) {
+    console.error(`\n${report.summary.errored} case(s) errored and were excluded. Partial result.`);
+    process.exit(2);
   }
 }
 

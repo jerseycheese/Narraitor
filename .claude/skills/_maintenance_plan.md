@@ -65,7 +65,9 @@ npm run skills:trigger-eval -- --dry-run                  # plan and query count
 
 Every query is a live `claude -p` session, so a full sweep of all 376 queries costs real money and a good half hour. Scope it to the skills whose descriptions actually moved. Pass `--out <file>` to keep the raw observations, then `--from <file>` rescores them for free.
 
-Read the numbers with the register's caveats in hand: routing is nondeterministic, and the two `--tools-mode` settings bracket the true rate rather than pinning it. A one-run swing of a few points is noise. A skill that drops from firing every time to firing never is a regression worth chasing.
+Read the numbers with the register's caveats in hand: routing is nondeterministic, and the two `--tools-mode` settings bracket the true rate rather than pinning it. The same sample run twice came out 89.6% and 85.4%, so a swing of a few points is noise. A skill that drops from firing every time to firing never is a regression worth chasing.
+
+Check the exit code before you read the report. 0 means every case was scored. 2 means some cases errored and were excluded, which usually means the environment, not the descriptions. 1 means nothing scored at all.
 
 ## Re-running the model-transfer benchmark
 
