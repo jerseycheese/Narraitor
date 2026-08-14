@@ -205,47 +205,22 @@ await checkForEndingIndicators(newSegment);
 
 The system looks at the last 5 narrative segments for immediate analysis and earlier story summary for overall understanding. It needs at least 3 segments before it starts analyzing for potential endings.
 
-## AI Mocking System
+## Mocking AI Responses
 
-This solves a pretty common development problem: you want to test how your code handles different AI response scenarios, but you don't want to burn through your API quota or deal with network issues while you're trying to debug something.
+There's no in-app mock toggle. Mocking happens at the network boundary instead, which keeps the app on one code path whether or not you're mocking.
 
-The mocking system basically intercepts AI requests when enabled and returns predefined responses instead of hitting the real API. This means you can test timeout scenarios, rate limit errors, or specific response patterns without depending on external services.
-
-There are five built-in scenarios that cover the most common testing situations. The success scenario returns a standard AI response, while the others simulate various failure modes: timeouts (which happen more often than you'd think), rate limiting, API key issues, and network errors. The timeout scenario has a 2-second delay to simulate real network conditions.
-
-You can also create custom scenarios if you need to test specific response patterns. So if you're working on horror-themed narrative generation, you could set up a mock response that returns appropriately dark content:
+For Playwright specs, `tests/visual/utils/mockApi.ts` routes the AI endpoints to fixed responses and takes per-endpoint delays, so you can reproduce a slow generation without waiting on the real thing:
 
 ```typescript
-{
-  id: 'custom-horror-response',
-  name: 'Horror Narrative Test',
-  description: 'Tests dark/horror themed narrative generation',
-  delay: 1500,
-  shouldSucceed: true,
-  response: {
-    segments: [{
-      content: 'The shadows whispered ancient secrets...',
-      choices: [
-        'Investigate the whispers',
-        'Flee immediately',
-        'Light a torch'
-      ]
-    }]
-  }
-}
+import { mockApiEndpoints } from '../utils/mockApi';
+
+await mockApiEndpoints(page, { narrativeDelayMs: 3000 });
+await page.goto('/game-session');
 ```
 
-The nice thing about the integration is that existing AI service calls don't need to change. When mocking is enabled, the system automatically returns mock responses instead of making real API calls:
+For unit tests, mock the wrapper under `src/lib/api/` that the component calls, or hand the parse layer a `Response` whose `.json()` throws — that's the only way to reach the malformed-body path, since a routed mock still returns well-formed bytes.
 
-```typescript
-import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-
-const client = createDefaultGeminiClient();
-// Returns mock response if mocking enabled, otherwise calls real API
-const response = await client.generateContent(prompt);
-```
-
-All the mock configuration persists across browser sessions, so you can set up your testing scenarios once and they stick around. The responses include realistic delays with some variation (about ±20%), which helps catch timing-related bugs that only show up with actual network conditions.
+To exercise a missing or invalid key, omit or corrupt the provider key rather than simulating the failure. The routes already return their own fallbacks when no key resolves — portraits come back as Dicebear placeholders, for instance — so a keyless dev environment is itself a useful mock.
 
 ## Testing & Development
 
@@ -257,7 +232,7 @@ There are several dev routes set up for testing different AI features:
 - `/dev/test-world-generation` - Test generated world data
 
 ### Test Scenarios
-The testing harnesses let you try out different scenarios without having to set up complete game sessions. You can test narrative generation with various world themes, try different choice generation situations, experiment with genre combinations for world suggestions, and compare conclusive vs ongoing stories for ending detection. The AI mocking section is particularly useful for testing error scenarios and edge cases that are hard to reproduce with the real API.
+The testing harnesses let you try out different scenarios without having to set up complete game sessions. You can test narrative generation with various world themes, try different choice generation situations, experiment with genre combinations for world suggestions, and compare conclusive vs ongoing stories for ending detection. For error scenarios and edge cases that are hard to reproduce against the real API, mock at the network boundary as described above.
 
 ## Error Handling
 
