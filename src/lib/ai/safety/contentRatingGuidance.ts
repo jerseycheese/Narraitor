@@ -31,7 +31,11 @@ export type ContentRating = (typeof CONTENT_RATINGS)[number];
  * caller treats as "apply the most conservative default".
  */
 export function parseContentRating(prompt: string): ContentRating | null {
-  const match = prompt.match(/((?:PG-13|NC-17|[A-Z]+))(?:-RATED)? CONTENT GUIDELINES/i);
+  // The quantifier is bounded deliberately. This runs on a whole generated
+  // prompt, and an unbounded `[A-Z]+` before an optional suffix backtracks
+  // polynomially on long runs of letters. No rating is longer than five
+  // characters, so nothing is lost by saying so.
+  const match = prompt.match(/((?:PG-13|NC-17|[A-Z]{1,5}))(?:-RATED)? CONTENT GUIDELINES/i);
   const candidate = match?.[1]?.toLowerCase();
   return CONTENT_RATINGS.find((rating) => rating === candidate) ?? null;
 }

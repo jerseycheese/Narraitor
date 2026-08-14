@@ -53,9 +53,22 @@ export interface TextGenerationSpec {
  */
 export type FinishReason = 'STOP' | 'MAX_TOKENS' | 'SAFETY' | 'ERROR' | 'OTHER';
 
+/**
+ * Finish reasons that mean "the provider refused", not "the model finished".
+ *
+ * `ERROR` is here because OpenRouter reports a Gemini safety block that way
+ * rather than as `content_filter`. Paired with empty content, either one is a
+ * refusal — and a refusal is indistinguishable from a model that legitimately
+ * said nothing unless it is named.
+ */
+export const REFUSAL_FINISH_REASONS: ReadonlySet<FinishReason> = new Set<FinishReason>([
+  'SAFETY',
+  'ERROR',
+]);
+
 export interface ProviderTextResult {
   content: string;
-  finishReason: string;
+  finishReason: FinishReason;
   promptTokens?: number;
   completionTokens?: number;
 }
@@ -84,7 +97,7 @@ export type ProviderParseResult =
  */
 export interface ProviderStreamFrame {
   text?: string;
-  finishReason?: string;
+  finishReason?: FinishReason;
   promptTokens?: number;
   completionTokens?: number;
 }
@@ -95,6 +108,15 @@ export interface ProviderStreamFrame {
  */
 export interface ProviderAdapter {
   readonly type: ProviderType;
+
+  /**
+   * Whether `buildUrl` returns a URL the player supplied.
+   *
+   * SECURITY: the core runs the endpoint guard before any request whose URL is
+   * player-supplied. Gemini pins its own base and sets this false, which is why
+   * the path every default session uses has no attacker-reachable URL at all.
+   */
+  readonly playerSuppliedEndpoint: boolean;
 
   /** Absolute URL for this request. `spec.stream` picks the streaming variant. */
   buildUrl(descriptor: ProviderDescriptor, spec: TextGenerationSpec): string;

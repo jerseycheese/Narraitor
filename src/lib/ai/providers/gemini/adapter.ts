@@ -1,6 +1,7 @@
 // src/lib/ai/providers/gemini/adapter.ts
 
 import type {
+  FinishReason,
   ProviderAdapter,
   ProviderDescriptor,
   ProviderParseResult,
@@ -65,13 +66,13 @@ export function getSafetySettingsForRating(rating: ContentRating | null): Safety
  * later (or that only appears on edge cases, like RECITATION) reports as OTHER
  * rather than leaking a provider-specific token downstream.
  */
-const FINISH_REASONS: Record<string, string> = {
+const FINISH_REASONS: Record<string, FinishReason> = {
   STOP: 'STOP',
   MAX_TOKENS: 'MAX_TOKENS',
   SAFETY: 'SAFETY',
 };
 
-function normalizeFinishReason(raw: string | undefined): string {
+function normalizeFinishReason(raw: string | undefined): FinishReason {
   if (!raw) return 'STOP';
   return FINISH_REASONS[raw.toUpperCase()] ?? 'OTHER';
 }
@@ -88,6 +89,7 @@ interface GeminiPayload {
 
 export const geminiAdapter: ProviderAdapter = {
   type: 'gemini',
+  playerSuppliedEndpoint: false,
 
   buildUrl(descriptor: ProviderDescriptor, spec: TextGenerationSpec): string {
     const model = encodeURIComponent(descriptor.model);

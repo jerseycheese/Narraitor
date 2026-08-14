@@ -149,7 +149,9 @@ export async function makeGeminiRequest(
     endpoint,
     geminiAdapter.buildHeaders({ type: 'gemini', endpoint, model: '', apiKey }),
     payload,
-    timeoutMs
+    // Gemini's URL is built from a pinned base by its callers, never from a
+    // header, so there is no player-supplied endpoint to guard here.
+    { timeoutMs }
   );
 }
 

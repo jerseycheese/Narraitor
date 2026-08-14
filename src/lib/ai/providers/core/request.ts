@@ -7,6 +7,7 @@ import type {
   TextGenerationSpec,
 } from '../types';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
+import { assertPublicProviderEndpoint } from '../endpointGuard';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('ProviderRequest');
@@ -37,6 +38,16 @@ export class ProviderUpstreamError extends Error {
   }
 }
 
+export interface SendProviderRequestOptions {
+  timeoutMs?: number;
+  /**
+   * True when `url` came from the player rather than from a pinned constant.
+   * Runs the endpoint guard immediately before the request — at the sink, so no
+   * call path can reach `fetch` having skipped it.
+   */
+  playerSuppliedEndpoint?: boolean;
+}
+
 /**
  * POST to a provider with a hard timeout.
  *
@@ -48,16 +59,34 @@ export async function sendProviderRequest(
   url: string,
   headers: Record<string, string>,
   body: object,
-  timeoutMs: number = GEMINI_ATTEMPT_TIMEOUT_MS
+  options: SendProviderRequestOptions = {}
 ): Promise<Response> {
+  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false } = options;
+
+  if (playerSuppliedEndpoint) {
+    await assertPublicProviderEndpoint(url);
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
+    // SECURITY: `redirect: 'error'` is doing real work here, not tidiness.
+    // Without it a public host that passes the guard can answer 302 to
+    // http://169.254.169.254/ and fetch follows it without re-checking
+    // anything. No provider's chat-completions endpoint legitimately redirects.
+    //
+    // codeql[js/request-forgery] The URL is player-supplied by design — this is
+    // bring-your-own-provider, and the feature cannot exist without fetching a
+    // URL the player named. It is constrained by assertPublicProviderEndpoint
+    // above (https only, no private literals, every resolved address checked)
+    // and redirects are refused. See endpointGuard's header comment for what
+    // that does and does not close.
     const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
+      redirect: 'error',
       signal: controller.signal,
     });
 
@@ -120,7 +149,7 @@ export async function openProviderTextStream(
     adapter.buildUrl(descriptor, spec),
     adapter.buildHeaders(descriptor),
     adapter.buildBody(descriptor, spec),
-    timeoutMs
+    { timeoutMs, playerSuppliedEndpoint: adapter.playerSuppliedEndpoint }
   );
 
   if (!response.ok) throw await toUpstreamError(adapter, response);
@@ -143,7 +172,7 @@ export async function generateProviderText(
     adapter.buildUrl(descriptor, spec),
     adapter.buildHeaders(descriptor),
     adapter.buildBody(descriptor, spec),
-    timeoutMs
+    { timeoutMs, playerSuppliedEndpoint: adapter.playerSuppliedEndpoint }
   );
 
   if (!response.ok) throw await toUpstreamError(adapter, response);
@@ -159,6 +188,17 @@ export async function generateProviderText(
   throw new ProviderUpstreamError(message, 500, detail);
 }
 
+/**
+ * How much of an upstream error body to keep.
+ *
+ * SECURITY: for a custom endpoint this body is written by that service, and a
+ * provider that echoes the request back would put the bearer credential and the
+ * prompt in it. It is never logged, and only a bounded slice reaches the player
+ * — enough to carry "model not found" or "insufficient quota", not enough to be
+ * a channel.
+ */
+const MAX_UPSTREAM_DETAIL = 300;
+
 /** Read the upstream error body once and turn it into a typed error. */
 async function toUpstreamError(
   adapter: ProviderAdapter,
@@ -166,13 +206,18 @@ async function toUpstreamError(
 ): Promise<ProviderUpstreamError> {
   const errorText = await response.text().catch(() => '');
 
+  // Deliberately logs the shape of the failure, not its content.
   logger.error('Provider API error', {
     provider: adapter.type,
     status: response.status,
     statusText: response.statusText,
-    errorText,
+    detailLength: errorText.length,
   });
 
   const classified = classifyUpstreamStatus(response.status, response.statusText);
-  return new ProviderUpstreamError(classified.message, response.status, errorText);
+  return new ProviderUpstreamError(
+    classified.message,
+    response.status,
+    errorText.slice(0, MAX_UPSTREAM_DETAIL)
+  );
 }

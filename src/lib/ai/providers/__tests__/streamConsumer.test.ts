@@ -107,6 +107,37 @@ describe('consumeProviderStreamEvents', () => {
     expect(revealedText(events)).toBe('Once upon a time, a hero arose.');
   });
 
+  /**
+   * A refusal ends the stream indistinguishable from a successful empty turn.
+   * Emitting `done` with an empty string sends it downstream to
+   * parseNarrativeResponse, which reports a malformed response — an error about
+   * our own parsing for something that was the provider declining.
+   */
+  it.each([
+    ['content_filter', 'SAFETY'],
+    ['error', 'ERROR'],
+  ])('reports a %s refusal as an error, not an empty done event', async (finishReason) => {
+    const events = await collect(
+      fakeReader([{ choices: [{ delta: { content: '' }, finish_reason: finishReason }] }]),
+      openAICompatibleAdapter
+    );
+
+    expect(events).toEqual([{ error: 'The provider blocked this content' }]);
+  });
+
+  it('still reports a refusal that produced partial prose as a normal turn', async () => {
+    // Partial content is worth keeping; only a wholly empty refusal is an error.
+    const events = await collect(
+      fakeReader([
+        { choices: [{ delta: { content: '{"content": "A door opens.' } }] },
+        { choices: [{ delta: { content: '"}' }, finish_reason: 'content_filter' }] },
+      ]),
+      openAICompatibleAdapter
+    );
+
+    expect(events[events.length - 1]).toMatchObject({ done: true, finishReason: 'SAFETY' });
+  });
+
   it('skips the [DONE] sentinel the compatibility endpoint sends', async () => {
     const frames = [
       encoder.encode(

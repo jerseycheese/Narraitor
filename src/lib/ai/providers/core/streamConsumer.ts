@@ -1,6 +1,7 @@
 // src/lib/ai/providers/core/streamConsumer.ts
 
-import type { ProviderAdapter } from '../types';
+import { REFUSAL_FINISH_REASONS } from '../types';
+import type { FinishReason, ProviderAdapter } from '../types';
 import type { NarrativeStreamEvent } from '../../types';
 import { extractStreamingContentPreview } from '../../narrativeStreamPreview';
 import Logger from '@/lib/utils/logger';
@@ -51,7 +52,7 @@ export async function* consumeProviderStreamEvents(
   let sseBuffer = '';
   let rawContent = '';
   let visiblePreview = '';
-  let finishReason = 'STOP';
+  let finishReason: FinishReason = 'STOP';
   let promptTokens: number | undefined;
   let completionTokens: number | undefined;
 
@@ -112,6 +113,18 @@ export async function* consumeProviderStreamEvents(
         if (frame.promptTokens !== undefined) promptTokens = frame.promptTokens;
         if (frame.completionTokens !== undefined) completionTokens = frame.completionTokens;
       }
+    }
+
+    // A refusal ends the stream looking exactly like a successful turn that
+    // happened to produce nothing. Emitting `done` here would send an empty
+    // string downstream, where parseNarrativeResponse reports it as a malformed
+    // response — a misleading error about our own parsing for something that
+    // was actually the provider declining. The non-streaming path names this
+    // correctly (see the adapter's `moderation` parse failure); this is the
+    // streaming half of the same call.
+    if (!rawContent && REFUSAL_FINISH_REASONS.has(finishReason)) {
+      yield { error: 'The provider blocked this content' };
+      return;
     }
 
     yield {

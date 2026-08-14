@@ -1,6 +1,8 @@
 // src/lib/ai/providers/openai-compatible/adapter.ts
 
+import { REFUSAL_FINISH_REASONS } from '../types';
 import type {
+  FinishReason,
   ProviderAdapter,
   ProviderDescriptor,
   ProviderParseResult,
@@ -30,17 +32,14 @@ import { getContentRatingGuidance } from '../../safety/contentRatingGuidance';
  * is indistinguishable from a model that legitimately said nothing unless the
  * adapter names it.
  */
-const FINISH_REASONS: Record<string, string> = {
+const FINISH_REASONS: Record<string, FinishReason> = {
   stop: 'STOP',
   length: 'MAX_TOKENS',
   content_filter: 'SAFETY',
   error: 'ERROR',
 };
 
-/** Finish reasons that mean "the provider refused", not "the model finished". */
-const REFUSAL_REASONS = new Set(['SAFETY', 'ERROR']);
-
-function normalizeFinishReason(raw: string | undefined): string {
+function normalizeFinishReason(raw: string | undefined): FinishReason {
   if (!raw) return 'STOP';
   return FINISH_REASONS[raw.toLowerCase()] ?? 'OTHER';
 }
@@ -78,6 +77,7 @@ function buildMessages(descriptor: ProviderDescriptor, spec: TextGenerationSpec)
 
 export const openAICompatibleAdapter: ProviderAdapter = {
   type: 'openai-compatible',
+  playerSuppliedEndpoint: true,
 
   /**
    * The configured endpoint verbatim. Providers disagree on the path —
@@ -127,7 +127,7 @@ export const openAICompatibleAdapter: ProviderAdapter = {
 
     // A refusal arrives as a 200 with nothing in it. Naming it here is the
     // difference between "the provider blocked this" and a blank story beat.
-    if (!content && REFUSAL_REASONS.has(finishReason)) {
+    if (!content && REFUSAL_FINISH_REASONS.has(finishReason)) {
       return { ok: false, failure: 'moderation' };
     }
 

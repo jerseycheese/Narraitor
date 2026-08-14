@@ -131,7 +131,7 @@ async function validateOpenAICompatible(
         messages: [{ role: 'user', content: 'ping' }],
         max_tokens: 1,
       },
-      PING_TIMEOUT_MS
+      { timeoutMs: PING_TIMEOUT_MS, playerSuppliedEndpoint: true }
     );
 
     if (response.ok) {

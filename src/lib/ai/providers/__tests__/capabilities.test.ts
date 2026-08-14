@@ -65,6 +65,10 @@ describe('isSafeProviderEndpoint', () => {
     'https://10.0.0.5/v1/chat/completions',
     'https://192.168.1.10/v1/chat/completions',
     'https://172.16.0.9/v1/chat/completions',
+    'https://[::1]/v1/chat/completions',
+    // Names that can only mean an internal machine.
+    'https://ollama.local/v1/chat/completions',
+    'https://vault.internal/v1/chat/completions',
     // Plaintext would send the player's key over the wire in the clear.
     'http://api.openai.com/v1/chat/completions',
     'not-a-url',

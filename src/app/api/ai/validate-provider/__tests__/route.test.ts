@@ -6,9 +6,17 @@ jest.mock('@/utils/apiHelpers', () => ({
   makeGeminiRequest: jest.fn(),
 }));
 
+// The endpoint guard resolves the hostname before any player-supplied URL is
+// fetched. Pinned to a public address here so these stay unit tests rather than
+// quietly depending on DNS.
+jest.mock('node:dns/promises', () => ({
+  lookup: jest.fn(async () => [{ address: '104.18.0.1', family: 4 }]),
+}));
+
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { makeGeminiRequest } from '@/utils/apiHelpers';
+import { lookup } from 'node:dns/promises';
 
 const mockMakeGeminiRequest = makeGeminiRequest as jest.MockedFunction<typeof makeGeminiRequest>;
 
@@ -116,6 +124,8 @@ describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () =>
 
   beforeEach(() => {
     global.fetch = jest.fn();
+    // resetAllMocks in afterEach strips the module mock's implementation too.
+    (lookup as jest.Mock).mockResolvedValue([{ address: '104.18.0.1', family: 4 }]);
   });
 
   afterEach(() => {
@@ -151,6 +161,25 @@ describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () =>
     const [url, init] = (global.fetch as jest.Mock).mock.calls[0];
     expect(url).not.toContain(KEY);
     expect((init.headers as Record<string, string>).Authorization).toBe(`Bearer ${KEY}`);
+  });
+
+  test('refuses a public hostname that resolves to a private address', async () => {
+    // The string check passes — this is the DNS-level bypass it cannot catch.
+    (lookup as jest.Mock).mockResolvedValueOnce([{ address: '169.254.169.254', family: 4 }]);
+
+    const response = await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+
+    expect((await response.json()).error).toBe('NETWORK');
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  test('refuses to follow a redirect, which would sidestep the guard entirely', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+
+    const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+    expect(init.redirect).toBe('error');
   });
 
   test('refuses an endpoint the server should never dereference', async () => {
