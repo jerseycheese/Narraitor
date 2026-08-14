@@ -5,15 +5,15 @@ import type { ProviderPreset } from '@/types/provider.types';
 /**
  * Provider presets shown in the configuration wizard.
  *
- * Only Google Gemini works end-to-end in this release (`available: true`). The
- * others are listed so players can see what's coming and so the schema is ready
- * for the post-1.0 multi-provider work — they're marked unavailable and the UI
- * keeps them out of reach for now.
+ * Gemini and OpenRouter work end-to-end (`available: true`). The rest are
+ * listed so players can see what's coming and so the schema is ready for the
+ * remaining multi-provider work — they're marked unavailable and the UI keeps
+ * them out of reach until someone runs a live check against each.
  *
- * Order is deliberate. Gemini leads because it's the only one that works today.
- * OpenRouter comes next because it's the only other option a player can reach
- * without a credit card, and one key there covers dozens of models. Everything
- * below it needs prepaid billing before it generates a single word.
+ * Order is deliberate. Gemini leads because it's the longest-proven. OpenRouter
+ * comes next because it's the only other option a player can reach without a
+ * credit card, and one key there covers dozens of models. Everything below it
+ * needs prepaid billing before it generates a single word.
  *
  * TODO(#895): flip a preset to `available: true` only after
  * scripts/verify-openai-compatible-stream.mjs passes against it with a real
@@ -49,12 +49,23 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     models: ['openai/gpt-4o', 'anthropic/claude-sonnet-5', 'google/gemini-2.5-flash'],
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
     defaultModel: 'openai/gpt-4o',
+    // Attribution only: OpenRouter uses these to list the app on its public
+    // rankings, and a request without them succeeds exactly as it does with
+    // them. `X-OpenRouter-Title` is the current name for the title header;
+    // `X-Title` still works as a backwards-compatible alias, so it is not worth
+    // sending both. The URL is written out rather than read from getSiteUrl()
+    // because this module is imported by client components and that one is
+    // server-only, where it would quietly resolve to localhost.
+    customHeaders: {
+      'HTTP-Referer': 'https://narraitor-six.vercel.app',
+      'X-OpenRouter-Title': 'Narraitor',
+    },
     // Images here means generation, not vision input, and generation stays on
     // Gemini. See supportsImages in providers/capabilities.ts, which is what
     // the validate-provider route reports back whatever a preset claims.
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://openrouter.ai/keys',
-    available: false,
+    available: true,
     note: 'free tier, no card',
     privacyNote:
       'OpenRouter routes your prompts to whichever upstream model you pick, and each of those has its own data-retention terms. Their free models in particular may allow training on your prompts.',
@@ -69,8 +80,17 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     // the deprecations page, and gpt-4o has quietly left the models index. A
     // preset is a menu a player picks from, so a shutdown date on two of three
     // entries is a bug with a fuse on it rather than a cosmetic one.
-    models: ['gpt-5.6-terra', 'gpt-5.6-sol', 'gpt-5.6-luna'],
-    defaultModel: 'gpt-5.6-terra',
+    models: ['gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-5.6-sol'],
+    // Luna leads for the same reason gemini-2.5-flash does above: it is the
+    // cheap fast tier, and a narrative turn is long output on a short prompt,
+    // which is exactly where the price gap bites. Luna runs $0.20/$1.20 per
+    // MTok against Terra's $2/$12 and Sol's $5/$30 - a tenfold difference on a
+    // default nobody changes. Sol is the one to reach for if prose quality
+    // disappoints.
+    defaultModel: 'gpt-5.6-luna',
+    // Not cosmetic: OpenAI rejects max_tokens outright on these models rather
+    // than ignoring it, so the request 400s without this.
+    maxOutputTokensParam: 'max_completion_tokens',
     // OpenAI's chat models take images as INPUT; they don't generate them, and
     // this flag has only ever meant generation here (providers/capabilities.ts).
     capabilities: { text: true, images: false, streaming: true },
@@ -125,8 +145,74 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     helpUrl: 'https://console.groq.com/keys',
     available: false,
   },
+  {
+    id: 'perplexity',
+    name: 'Perplexity',
+    type: 'openai-compatible',
+    // Perplexity has two surfaces and only one of them belongs here. The
+    // search-grounded `sonar-*` models answer on /v1/sonar in a shape that is
+    // not OpenAI's, and their chat-completions form carries a published
+    // shutdown date, the same fuse the OpenAI list above was corrected for.
+    // The Gateway is the one Perplexity documents as a drop-in replacement for
+    // an OpenAI integration, so it is the one an openai-compatible preset can
+    // honestly point at. Note the /router segment: there is no bare
+    // /chat/completions on this host.
+    endpoint: 'https://api.perplexity.ai/router/v1/chat/completions',
+    models: ['perplexity/kimi-k3', 'perplexity/glm-5.2', 'perplexity/deepseek-v4-flash-0731'],
+    defaultModel: 'perplexity/kimi-k3',
+    // Perplexity takes images as input and can return them as search results;
+    // it generates none. Generation stays on Gemini (see providers/capabilities).
+    capabilities: { text: true, images: false, streaming: true },
+    helpUrl: 'https://console.perplexity.ai/group/keys',
+    available: false,
+    privacyNote:
+      'Perplexity states that it keeps no record of prompts or responses sent to its chat completions API, and does not use them for training. It retains billing metrics only.',
+  },
 ];
 
 /** Look up a preset by its stable id. */
 export const getPresetById = (id: string): ProviderPreset | undefined =>
   PROVIDER_PRESETS.find((preset) => preset.id === id);
+
+/**
+ * The extra headers the service at this endpoint asks for, from its preset.
+ *
+ * Keyed on the endpoint rather than on anything the caller declares about
+ * itself, which is what stops one service's headers from riding along to
+ * another, say a preset id claiming to be OpenRouter next to an endpoint
+ * pointing somewhere else. An endpoint with no matching preset gets none, which
+ * is the right answer: we have nothing to say about a service we don't ship,
+ * and every header in play is optional anyway.
+ *
+ * Lives here rather than beside either caller because both the generation path
+ * and the validation ping need the same answer — a preset whose service
+ * requires a header must get it in the check that decides whether the key
+ * works, not only once play starts.
+ */
+export const presetHeadersForEndpoint = (
+  endpoint: string | undefined
+): Record<string, string> | undefined => presetForEndpoint(endpoint)?.customHeaders;
+
+/**
+ * What the service at this endpoint calls the output-length cap, when it is not
+ * the usual `max_tokens`.
+ *
+ * Endpoint-keyed for the same reason the headers are: it describes where the
+ * request is going, not what the caller claims about itself. Undefined is the
+ * common answer and means "the ordinary name" — the adapter supplies it — so a
+ * descriptor only carries this field when a service has genuinely moved.
+ */
+export const presetMaxOutputTokensParamForEndpoint = (
+  endpoint: string | undefined
+): 'max_tokens' | 'max_completion_tokens' | undefined =>
+  presetForEndpoint(endpoint)?.maxOutputTokensParam;
+
+/**
+ * The preset whose endpoint this exactly is, if we ship one.
+ *
+ * Match is on the exact endpoint string, which is what a player who picked a
+ * preset ends up with. A hand-typed variation misses and falls back to the
+ * neutral defaults above.
+ */
+const presetForEndpoint = (endpoint: string | undefined): ProviderPreset | undefined =>
+  endpoint ? PROVIDER_PRESETS.find((preset) => preset.endpoint === endpoint) : undefined;

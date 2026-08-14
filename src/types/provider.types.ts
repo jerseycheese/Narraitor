@@ -60,6 +60,26 @@ export interface ProviderPreset {
   capabilities: ProviderCapabilities;
   helpUrl: string;
   available: boolean;
+  /**
+   * Extra request headers this service wants, e.g. OpenRouter's attribution
+   * pair. Attached server-side by matching the endpoint (see resolveProvider)
+   * rather than travelling from the browser, and applied under the adapter's
+   * own headers, so a preset can never set Authorization or Content-Type. See
+   * applyCustomHeaders in providers/core/request.ts.
+   */
+  customHeaders?: Record<string, string>;
+  /**
+   * What this service calls the output-length cap, when it isn't `max_tokens`.
+   *
+   * OpenAI retired `max_tokens` on its current models and rejects the request
+   * outright rather than ignoring the field, so this is a hard requirement
+   * there, not a preference. Most OpenAI-compatible services still take
+   * `max_tokens`, which is why it stays the default and this is opt-in.
+   *
+   * Keyed to the service rather than the model: every model an OpenAI preset
+   * offers is a current one, and a service that has moved has moved wholesale.
+   */
+  maxOutputTokensParam?: 'max_tokens' | 'max_completion_tokens';
   /** Short pitch shown under the name, e.g. what a key costs to get. */
   note?: string;
   /**

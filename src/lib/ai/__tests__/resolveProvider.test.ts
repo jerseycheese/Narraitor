@@ -54,8 +54,57 @@ describe('resolveProvider', () => {
         // Vendor-prefixed ids are the norm off Gemini and must survive.
         model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
         apiKey: 'byo-key',
+        // Attached from the OpenRouter preset because that is where this
+        // request is going, not because anything in it said so.
+        customHeaders: {
+          'HTTP-Referer': 'https://narraitor-six.vercel.app',
+          'X-OpenRouter-Title': 'Narraitor',
+        },
       },
     });
+  });
+
+  it('attaches no preset headers to an endpoint it does not ship a preset for', () => {
+    const resolution = resolveProvider(
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+        [PROVIDER_ENDPOINT_HEADER]: 'https://some-other-service.test/v1/chat/completions',
+        [PROVIDER_MODEL_HEADER]: 'some-model',
+      })
+    );
+
+    expect(resolution.ok).toBe(true);
+    expect(resolution.ok && resolution.descriptor.customHeaders).toBeUndefined();
+  });
+
+  it("carries OpenAI's renamed output cap onto the descriptor, keyed off the endpoint", () => {
+    const resolution = resolveProvider(
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+        [PROVIDER_ENDPOINT_HEADER]: 'https://api.openai.com/v1/chat/completions',
+        [PROVIDER_MODEL_HEADER]: 'gpt-5.6-luna',
+      })
+    );
+
+    // Without this the adapter sends max_tokens and OpenAI 400s the request.
+    expect(resolution.ok && resolution.descriptor.maxOutputTokensParam).toBe(
+      'max_completion_tokens'
+    );
+  });
+
+  it('leaves the output cap unnamed for a service that never moved off max_tokens', () => {
+    const resolution = resolveProvider(
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+        [PROVIDER_ENDPOINT_HEADER]: OPENROUTER,
+        [PROVIDER_MODEL_HEADER]: 'openai/gpt-4o',
+      })
+    );
+
+    expect(resolution.ok && resolution.descriptor.maxOutputTokensParam).toBeUndefined();
   });
 
   it('reports NO_KEY when neither a header nor a usable env key exists', () => {

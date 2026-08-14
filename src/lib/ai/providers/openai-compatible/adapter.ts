@@ -105,7 +105,11 @@ export const openAICompatibleAdapter: ProviderAdapter = {
       model: descriptor.model,
       messages: buildMessages(descriptor, spec),
       temperature: spec.temperature,
-      max_tokens: spec.maxTokens,
+      // OpenAI renamed this and now rejects the old name outright instead of
+      // ignoring it, while the rest of the ecosystem still speaks max_tokens.
+      // The name travels on the descriptor rather than being branched on here,
+      // so this stays one adapter over one request shape.
+      [descriptor.maxOutputTokensParam ?? 'max_tokens']: spec.maxTokens,
       top_p: 1.0,
       ...(spec.stream
         ? {

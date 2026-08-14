@@ -188,6 +188,31 @@ describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () =>
     expect((init.headers as Record<string, string>).Authorization).toBe(`Bearer ${KEY}`);
   });
 
+  test("sends the preset's declared headers on the validation ping too", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    await POST(openAIRequest({ endpoint: ENDPOINT, model: 'openai/gpt-4o' }));
+
+    const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+    const headers = init.headers as Record<string, string>;
+    // A service that requires its headers would otherwise fail verification
+    // while generating fine, since only the generation path supplied them.
+    expect(headers['HTTP-Referer']).toBe('https://narraitor-six.vercel.app');
+    expect(headers['X-OpenRouter-Title']).toBe('Narraitor');
+    expect(headers.Authorization).toBe(`Bearer ${KEY}`);
+  });
+
+  test('sends no extra headers for an endpoint no preset claims', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    await POST(
+      openAIRequest({ endpoint: 'https://api.example.com/v1/chat/completions', model: 'some-model' })
+    );
+
+    const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+    expect(init.headers as Record<string, string>).not.toHaveProperty('HTTP-Referer');
+  });
+
   test('refuses a public hostname that resolves to a private address', async () => {
     // The string check passes — this is the DNS-level bypass it cannot catch.
     (lookup as jest.Mock).mockResolvedValueOnce([{ address: '169.254.169.254', family: 4 }]);

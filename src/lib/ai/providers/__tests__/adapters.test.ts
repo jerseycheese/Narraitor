@@ -109,6 +109,18 @@ describe('openAICompatibleAdapter', () => {
     expect(body.stream).toBeUndefined();
   });
 
+  it('renames the output cap when the descriptor says the service moved off max_tokens', () => {
+    // OpenAI 400s on max_tokens rather than ignoring it, so this is the
+    // difference between a working provider and one that never generates.
+    const body = openAICompatibleAdapter.buildBody(
+      { ...OPENAI, maxOutputTokensParam: 'max_completion_tokens' },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body.max_completion_tokens).toBe(2048);
+    expect(body).not.toHaveProperty('max_tokens');
+  });
+
   it('folds the guidance into the user turn for a model with no system role', () => {
     const gemma = { ...OPENAI, model: 'google/gemma-3-27b-it' };
     const body = openAICompatibleAdapter.buildBody(gemma, SPEC) as {
