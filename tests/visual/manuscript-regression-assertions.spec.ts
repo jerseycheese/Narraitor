@@ -513,4 +513,90 @@ test.describe('Manuscript regression assertions', () => {
 
     expect(geometry.decisionFollowsNarrative).toBe(true);
   });
+
+  test('Play surface fits a 375px viewport instead of being clipped past its right edge', async ({
+    page,
+  }) => {
+    // The surface's grid tracks were declared `1fr`, which means `minmax(auto,
+    // 1fr)`, an auto floor equal to the widest item's min-content. The stage's
+    // widest item is the scene-status bar, so the story column rendered 432px
+    // wide inside 351px of room and .manuscript-viewport-shell's `overflow:
+    // hidden` cut the excess off with nowhere to scroll to.
+    //
+    // This measures geometry rather than asserting on the resolved
+    // grid-template-columns. That value reads back fine while the column
+    // overflows, and pinning the declaration would go red on any other correct
+    // way of holding the column in. What a player notices is text disappearing
+    // off the right edge, so that is what gets measured.
+    await page.setViewportSize({ width: 375, height: 812 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.manuscript-suggested-action', { timeout: 10000 });
+
+    const geometry = await page.evaluate(() => {
+      const shell = document.querySelector('.manuscript-viewport-shell');
+      const stage = document.querySelector('.manuscript-main-stage');
+      const content = document.querySelector('.manuscript-main-content');
+      if (!shell || !stage || !content) return null;
+
+      // Every laid-out box whose right edge sits past the viewport. The shell
+      // clips rather than scrolls, so anything here is unreachable, not
+      // merely off-screen. `sr-only` boxes are 1px clipping wrappers by
+      // design and never render text.
+      const overflowing = Array.from(document.querySelectorAll('*'))
+        .filter((el) => {
+          if (el.closest('.sr-only')) return false;
+          const rect = el.getBoundingClientRect();
+          return rect.width > 0 && rect.right > window.innerWidth + 0.5;
+        })
+        .map((el) => `${el.tagName.toLowerCase()}.${el.className}`);
+
+      // A skill check reads "STEALTH · DC 4"; it is `white-space: nowrap`, so
+      // a column that is too narrow truncates the number rather than wrapping.
+      const badges = Array.from(
+        document.querySelectorAll('.manuscript-skill-check-badge')
+      ).map((el) => {
+        const badge = el as HTMLElement;
+        return {
+          right: badge.getBoundingClientRect().right,
+          clipped: badge.scrollWidth > badge.clientWidth + 1,
+        };
+      });
+
+      return {
+        viewportWidth: window.innerWidth,
+        stageWidth: stage.getBoundingClientRect().width,
+        contentWidth: content.getBoundingClientRect().width,
+        overflowingCount: overflowing.length,
+        overflowing: overflowing.slice(0, 5),
+        badgeCount: badges.length,
+        badgesClipped: badges.filter((b) => b.clipped).length,
+        badgesPastEdge: badges.filter((b) => b.right > window.innerWidth + 0.5).length,
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected play surface geometry to be measurable');
+    }
+
+    // The story column is held by its container rather than by its content.
+    expect(geometry.stageWidth).toBeLessThanOrEqual(geometry.viewportWidth);
+    expect(geometry.contentWidth).toBeLessThanOrEqual(geometry.stageWidth);
+
+    expect(
+      geometry.overflowingCount,
+      `Boxes past the right edge: ${geometry.overflowing.join(', ')}`
+    ).toBe(0);
+
+    // Guard against the assertion above passing because no choices rendered.
+    expect(geometry.badgeCount).toBeGreaterThan(0);
+    expect(geometry.badgesPastEdge).toBe(0);
+    expect(geometry.badgesClipped).toBe(0);
+  });
 });

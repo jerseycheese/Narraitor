@@ -701,9 +701,13 @@ body.manuscript-overlay-open {
   margin: 0;
 }
 
+/* minmax(0, 1fr) rather than 1fr, for the same reason as
+   .manuscript-main-stage below: bare `1fr` floors the track at the widest
+   choice's min-content, so the buttons render wider than the column meant to
+   hold them. */
 .manuscript-suggested-actions-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
 }
 
@@ -1000,13 +1004,21 @@ body.manuscript-overlay-open {
 
 }
 
+/* Shrinkable and wrappable so a choice carrying both an alignment badge and a
+   skill check still fits a 320px phone. At `flex: 0 0 auto` with `nowrap` the
+   pair claimed 186px of a 200px button and spilled out the side. Each badge is
+   itself `white-space: nowrap`, so the row has to break between them rather
+   than inside one. Above roughly 360px both fit on one line and this changes
+   nothing. */
 .manuscript-suggested-action-badges {
 
-  flex: 0 0 auto;
+  flex: 0 1 auto;
 
   display: flex;
 
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+
+  min-width: 0;
 
   gap: var(--space-1);
 
@@ -2601,9 +2613,16 @@ body.manuscript-overlay-open {
    DS3 "Mechanical Manuscript" — floating pill + icon HUD
    ═══════════════════════════════════════════════════════════════ */
 
-/* Grid: collapse to single column (floating pill replaces rail) */
+/* Grid: collapse to single column (floating pill replaces rail).
+
+   minmax(0, 1fr) rather than 1fr, because bare `1fr` means `minmax(auto, 1fr)`
+   and that `auto` floors the track at the widest item's min-content. The
+   widest item here is the scene-status bar, which floored the track at 432px
+   inside the 351px a 375px phone actually has. The column grew instead of the
+   text reflowing, and .manuscript-viewport-shell's `overflow: hidden` cut off
+   the excess with nowhere to scroll to. A 0 floor lets the content reflow. */
 :root .manuscript-main-stage {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* Scene status as a compact console bar above the narrative. */
@@ -2723,7 +2742,7 @@ body.manuscript-overlay-open {
 
 /* Choices: vertical stack with accent left bar, tighter gap */
 :root .manuscript-suggested-actions-grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2_5);
 }
 
@@ -2940,7 +2959,7 @@ body.manuscript-overlay-open {
 /* Desktop override: keep single column */
 @media (width >= 1024px) {
   :root .manuscript-suggested-actions-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   /* Scale up pill and icon for desktop */
