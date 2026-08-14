@@ -21,14 +21,14 @@ This is the orchestrator that turns your choices into new story content. So when
 **How it behaves:**
 - Creates an opening scene automatically when you start a new session
 - Takes your choices and generates the next story beat
-- **Smart choice generation**: After each story segment, it creates new options that make sense in context (when enabled)
+- **Contextual choice generation**: After each story segment, it creates new options that make sense in context (when enabled)
 - Prevents duplicates through careful tracking - you won't see the same story segment twice
 - Saves everything to the store so your progress is never lost
 - Feeds rich context to the AI so it knows what's happened and can make better choices
 
 ### NarrativeDisplay
 
-This handles showing individual story segments with the right formatting and style. Basically, it takes a piece of generated narrative and makes it look good on screen.
+This handles showing individual story segments with the right formatting and style: it takes a piece of generated narrative and renders it as readable prose.
 
 **Props:**
 - `segment` (NarrativeSegment | null): The story segment to show
@@ -127,7 +127,7 @@ The system actually pays attention to the world you've created and generates con
 
 **Theme awareness** - If you're in a Western setting, you get saloons and sheriffs, not wizards and dragons. The AI reads your world's theme and generates appropriate content.
 
-**Smart starting locations** - First scenes automatically pick sensible places: frontier towns for Westerns, space stations for sci-fi, enchanted forests for fantasy. You don't start your cowboy adventure in a castle.
+**Setting-appropriate starting locations** - First scenes automatically pick sensible places: frontier towns for Westerns, space stations for sci-fi, enchanted forests for fantasy. You don't start your cowboy adventure in a castle.
 
 **Tone matching** - Serious worlds stay serious, humorous ones stay light. The AI tries to match the mood you've established in your world description.
 
@@ -141,7 +141,7 @@ The system actually pays attention to the world you've created and generates con
 
 **Sequential generation** - Only generates one story segment at a time to avoid overwhelming the AI or creating conflicting content.
 
-**Smart deduplication** - Automatically prevents duplicate content from being stored or displayed, which keeps sessions clean.
+**Deduplication** - Automatically prevents duplicate content from being stored or displayed, which keeps sessions clean.
 
 **Optimized rendering** - Components are built to avoid unnecessary re-renders, which keeps things smooth even with long story histories.
 
@@ -156,7 +156,7 @@ The system also creates your next set of choices automatically, which keeps the 
 
 **World-appropriate options** - Choices fit your world's theme and rules. A sci-fi world generates different options than a fantasy one, even in similar situations.
 
-**Smart fallbacks** - If the AI choice generation fails for any reason, the system provides reasonable default options so you're never stuck.
+**Choice fallbacks** - If the AI choice generation fails for any reason, the system provides reasonable default options so you're never stuck.
 
 **Rich context** - Uses the last several story segments to understand the current situation, not just the most recent one.
 

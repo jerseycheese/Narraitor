@@ -178,7 +178,7 @@ export function WorldTable({
   if (worlds.length === 0) {
     return (
       <div>
-        <p>No worlds found. Create your first world to get started!</p>
+        <p>No worlds yet. Create one to get started.</p>
       </div>
     );
   }

@@ -174,7 +174,7 @@ Use React DevTools Profiler to catch re-render issues.
 - Consistent loading indicators
 - Appropriate feedback during long operations
 - Non-blocking UIs during loading
-- Graceful failure handling
+- Failures leave the player somewhere they can act from
 
 ### Empty States
 - Helpful guidance when lists are empty

@@ -176,7 +176,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       if (result.success) {
         // Success path handled via narrative segment entry; no inline feedback needed.
       } else {
-        setErrorFeedback(result.error?.message || 'Failed to use item');
+        setErrorFeedback(result.error?.message || "Couldn't use that item. Try again.");
       }
     } catch {
       setErrorFeedback("Couldn't use that item. Try again.");

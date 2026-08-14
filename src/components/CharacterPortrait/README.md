@@ -10,7 +10,7 @@ The component shows character portraits using actual AI-generated images when av
 - **Intelligent Fallbacks**: Character-specific SVG placeholders when API unavailable
 - **Character Initials**: Shows meaningful initials when no portrait exists
 - **Loading States**: Visual feedback during portrait generation
-- **Error Handling**: Graceful display of generation errors with retry options
+- **Error Handling**: Shows a placeholder and a retry option when generation fails
 - **Multiple Sizes**: Small, medium, and large variants
 - **Interactive**: Optional click handler for user interactions
 

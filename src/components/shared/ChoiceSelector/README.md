@@ -10,7 +10,7 @@ This handles player choice selection in all its forms - from simple "go left or 
 
 **Custom player input** - Optional text area where players can type their own creative responses instead of picking from suggested options.
 
-**Smart visual hierarchy** - Custom input gets prominent placement at the top, suggested choices appear below with less visual weight.
+**Visual hierarchy** - Custom input gets prominent placement at the top, suggested choices appear below with less visual weight.
 
 **Character counting** - Live character counter with color-coded warnings as you approach the limit.
 
@@ -196,7 +196,7 @@ Or choose a suggested action:
 
 **Live character counting** - Updates as you type with color-coded warnings. Gray for normal, amber when you're getting close to the limit, red when you hit the maximum.
 
-**Smart validation** - Submit button stays disabled for empty input. Trims whitespace so you can't submit just spaces. Hard character limit prevents typing beyond the maximum.
+**Input validation** - Submit button stays disabled for empty input. Trims whitespace so you can't submit just spaces. Hard character limit prevents typing beyond the maximum.
 
 **Multiple submission methods** - Click the submit button, press Enter in the text area, or use Shift+Enter for line breaks. Input clears automatically after successful submission.
 

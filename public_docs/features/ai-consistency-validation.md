@@ -45,7 +45,7 @@ The most common debugging scenarios and what to look for:
 ## How This Actually Works Behind the Scenes
 
 ### The Components That Do the Work
-- **ConsistencyValidationSection**: The main interface where all the debugging magic happens
+- **ConsistencyValidationSection**: The main debugging interface
 - **DevToolsSection**: Keeps everything looking consistent with the rest of the DevTools
 - **JsonViewer**: Makes all that structured data readable instead of just a wall of JSON
 

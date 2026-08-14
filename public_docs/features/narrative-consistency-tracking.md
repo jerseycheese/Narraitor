@@ -10,7 +10,7 @@ This system solves that by automatically detecting and tracking goals throughout
 
 **Goals Have Lives** - Every goal gets tracked from birth to death. Whether it gets completed, abandoned, or blocked by circumstances, the system keeps notes on progress, tracks how often it gets mentioned, and maintains a timeline. This helps the AI understand what's currently hot and what's gone cold.
 
-**Smart Context Management** - When the AI is generating new content, this system feeds it a prioritized list of active goals within the token budget. Critical and high-priority stuff always makes the cut first - no more forgetting about the ticking time bomb because you ran out of prompt space.
+**Context Budgeting** - When the AI is generating new content, this system feeds it a prioritized list of active goals within the token budget. Critical and high-priority goals are included first, so the ones driving the story don't get dropped when the budget runs short.
 
 **No Story Mixing** - Goals stay locked to their game sessions, so your cyberpunk investigation doesn't accidentally bleed into your fantasy quest. Each storyline stays clean and focused.
 

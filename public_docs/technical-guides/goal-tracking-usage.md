@@ -54,7 +54,7 @@ goalStore.addProgressNote(goalId, 'Discovered secret passage');
 ## AI Integration
 
 ### Automatic Goal Extraction
-The real magic happens when the AI reads narrative content and automatically detects goals:
+Goals are detected automatically when the AI reads narrative content:
 ```typescript
 import { extractGoalsFromNarrative } from '@/lib/ai/goalExtractor';
 

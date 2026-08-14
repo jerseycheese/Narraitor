@@ -37,7 +37,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   useEffect(() => {
     fetchWorlds().catch((err) => {
       logger.error('Failed to load worlds:', err);
-      setError('Failed to load world');
+      setError("Couldn't load this world. Try refreshing the page.");
       setLoading(false);
     });
   }, [fetchWorlds]);
@@ -78,7 +78,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
 
       router.push('/worlds'); // Navigate back to worlds list
     } catch {
-      setError('Failed to save world');
+      setError("Couldn't save your changes. Try again.");
     } finally {
       setSaving(false);
     }

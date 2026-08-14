@@ -25,7 +25,7 @@ the journal's choice history prints it as a text label (`major WEIGHT`), and
 `getDecisionWeightStyling()` in `choiceStyling.tsx` returns empty strings, so weight adds no
 borders, shadows, or color to the choices themselves.
 
-**Smart Context** - Instead of just repeating the story, the AI generates context that explains why the decision matters:
+**Decision Context** - Instead of just repeating the story, the AI generates context that explains why the decision matters:
 - "Tension builds as you must choose how to respond to the merchant's accusation"
 - "A critical moment where your response could determine if the alliance forms"
 - "The stranger's offer seems too good to be true"

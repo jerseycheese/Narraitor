@@ -242,4 +242,4 @@ test('API returns valid world data', async () => {
 });
 ```
 
-This type guard system ensures runtime type safety while providing excellent developer experience with detailed error messages and TypeScript integration. Basically, it gives you confidence that your data is what you think it is, which prevents a lot of runtime errors.
+These type guards check shape at runtime and narrow types for TypeScript, so a value that came from storage or an AI response is verified before anything downstream trusts it. When a check fails, the error names the field that didn't match.

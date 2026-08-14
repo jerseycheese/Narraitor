@@ -6,7 +6,7 @@ This handles displaying the lore that builds up as players explore their world. 
 
 **Living world reference** - Shows the facts and knowledge that accumulate during gameplay. Characters you've met, places you've been, rules you've discovered. It's like having a campaign journal that writes itself.
 
-**Smart organization** - Groups everything into logical categories (Characters, Locations, Events, Rules) so you can actually find what you're looking for instead of scrolling through a wall of text.
+**Category grouping** - Groups everything into logical categories (Characters, Locations, Events, Rules) so you can actually find what you're looking for instead of scrolling through a wall of text.
 
 ## Basic Usage
 

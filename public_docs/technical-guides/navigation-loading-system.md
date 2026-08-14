@@ -48,7 +48,7 @@ function MyComponent() {
 ## Features
 
 ### Debounced Loading
-The system is smart about when to show loading indicators. There's a **minimum duration** of 150ms to prevent flashing, a **debounce delay** of 100ms before showing loading, and **smart timing** that only shows for operations that actually need it. This prevents the jarring experience of seeing a loading spinner flash for 50ms.
+Loading indicators are gated on three timings: a **minimum duration** of 150ms to prevent flashing, a **debounce delay** of 100ms before showing loading, and a threshold that skips the indicator entirely for operations that finish inside it. This prevents the jarring experience of seeing a loading spinner flash for 50ms.
 
 ### Accessibility
 **Focus Trapping** keeps keyboard focus in the loading modal, **ARIA Support** provides screen reader announcements, and **Keyboard Controls** let users hit Escape to cancel. Accessibility was built in from the start, not added as an afterthought.

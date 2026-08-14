@@ -31,7 +31,7 @@ import { CharacterPortrait } from '@/components/CharacterPortrait';
 case, and the placeholder fallback, but generating the image is a separate call - see
 `generatePortrait` below, or the `usePortraitGeneration` hook, which wires the two together.
 
-## How the AI Magic Happens
+## How the AI Generates a Portrait
 
 ### Generating Portraits
 The API call is straightforward, but there's a lot happening behind the scenes:

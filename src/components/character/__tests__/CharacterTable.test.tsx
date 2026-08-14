@@ -287,9 +287,8 @@ describe('CharacterTable', () => {
   it('shows empty state when no characters', () => {
     render(<CharacterTable {...defaultProps} characters={[]} />);
 
-    expect(screen.getByText(/No characters found/)).toBeInTheDocument();
     expect(
-      screen.getByText(/Create your first character to get started!/)
+      screen.getByText('No characters yet. Create one to get started.')
     ).toBeInTheDocument();
   });
 

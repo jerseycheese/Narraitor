@@ -33,7 +33,7 @@ What it tracks:
 Built-in protection:
 - **XSS protection** because security matters even in single-player games
 - **Storage limits** so the system doesn't eat all your disk space
-- **Smart filtering** to get just the decisions that matter for analysis
+- **Relevance filtering** to get just the decisions that matter for analysis
 
 ## How It Works
 
@@ -95,7 +95,7 @@ const sanitizeString = (str: string) => {
 - Required fields validation
 - Choice type enum validation
 - Context object sanitization
-- Graceful error handling
+- Falls back to unpersonalized narrative when analysis fails
 
 ## Usage Examples
 
