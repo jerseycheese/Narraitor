@@ -17,7 +17,7 @@ const logger = new Logger('ProviderRequest');
  * classification, and the hand-off to an adapter for anything wire-shaped.
  *
  * Nothing here knows which provider is on the other end. That was the point of
- * the #890 split — `apiHelpers.ts` used to hardcode Gemini's URLs, body shape
+ * the split — `apiHelpers.ts` used to hardcode Gemini's URLs, body shape
  * and response paths in the same functions that did rate limiting and error
  * responses, and none of that survived contact with an OpenAI-shaped API.
  */
@@ -122,7 +122,7 @@ export async function sendProviderRequest(
  * uses 400 — without it, an invalid key on those providers reads to the player
  * as a generic service failure.
  */
-export function classifyUpstreamStatus(status: number, statusText: string): Error {
+function classifyUpstreamStatus(status: number, statusText: string): Error {
   if (status === 429) return new Error('429 rate limit exceeded');
   if (status === 401 || status === 403) return new Error('401 unauthorized');
   return new Error(`Service error: ${status} ${statusText}`);

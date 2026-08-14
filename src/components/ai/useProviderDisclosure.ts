@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getModelCapabilities } from '@/lib/ai/providers/capabilities';
+import { hasNativeSafetySettings } from '@/lib/ai/providers/capabilities';
 import { describeContentRatingEnforcement } from '@/lib/ai/safety/contentRatingGuidance';
 import type { ProviderType } from '@/types/provider.types';
 
@@ -10,11 +10,11 @@ import type { ProviderType } from '@/types/provider.types';
  * components-no-direct-lib-imports boundary); a colocated `use*` hook is the
  * sanctioned seam, and it keeps the capability lookup out of render.
  */
-export function useProviderDisclosure(type: ProviderType, model: string): {
+export function useProviderDisclosure(type: ProviderType): {
   contentRatingNote: string;
 } {
-  return useMemo(() => {
-    const { nativeSafetySettings } = getModelCapabilities(type, model);
-    return { contentRatingNote: describeContentRatingEnforcement(nativeSafetySettings) };
-  }, [type, model]);
+  return useMemo(
+    () => ({ contentRatingNote: describeContentRatingEnforcement(hasNativeSafetySettings(type)) }),
+    [type]
+  );
 }

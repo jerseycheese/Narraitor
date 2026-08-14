@@ -14,8 +14,8 @@ import type { ContentRating } from '../../safety/contentRatingGuidance';
 /**
  * Gemini's native REST API, behind the generic provider contract.
  *
- * This adapter is a straight lift of what `apiHelpers.ts` did inline before
- * #890 split it: same URLs, same body, same parsing, same defaults. The one
+ * This adapter is a straight lift of what `apiHelpers.ts` did inline before the
+ * split: same URLs, same body, same parsing, same defaults. The one
  * intentional difference is that finish reasons are normalized here rather than
  * passed through raw, so `AIResponse.finishReason` speaks one vocabulary
  * regardless of which provider produced it.

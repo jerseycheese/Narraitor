@@ -205,7 +205,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
               />
             )}
             {hasChosenProvider && (
-              <ProviderDisclosure type={data.type} model={data.model} privacyNote={data.privacyNote} />
+              <ProviderDisclosure type={data.type} privacyNote={data.privacyNote} />
             )}
           </div>
         )}
@@ -282,7 +282,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
               )}
             </div>
 
-            <ProviderDisclosure type={data.type} model={data.model} privacyNote={data.privacyNote} />
+            <ProviderDisclosure type={data.type} privacyNote={data.privacyNote} />
           </div>
         )}
 

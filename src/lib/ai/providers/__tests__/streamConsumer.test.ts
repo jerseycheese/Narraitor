@@ -63,7 +63,7 @@ describe('consumeProviderStreamEvents', () => {
   });
 
   /**
-   * The regression the #1749 spike found: replaying real compatibility-endpoint
+   * The regression the streaming spike found: replaying real compatibility-endpoint
    * frames through the Gemini consumer produced 0 deltas and an empty done
    * event with finishReason "STOP" — indistinguishable downstream from a model
    * that legitimately returned nothing. With the frame extractor behind the

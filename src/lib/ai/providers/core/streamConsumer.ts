@@ -24,7 +24,7 @@ export interface ByteStreamReader {
  * the event protocol. The adapter's only contribution is `parseStreamFrame`,
  * which maps one parsed `data:` payload to text and metadata.
  *
- * That line was chosen rather than assumed. The #1749 spike replayed real
+ * That line was chosen rather than assumed. A spike replayed real
  * network chunks from both Gemini endpoints and found the framing identical —
  * `200 text/event-stream`, `data:` prefixes, a `[DONE]` sentinel on one of them
  * — and only the payload inside each frame different. It also found buffering
@@ -95,7 +95,7 @@ export async function* consumeProviderStreamEvents(
           // recomputed from scratch each call and is meant to be monotonic,
           // but this guard keeps a future edge case there from slicing a
           // false prefix off content that never actually preceded it, which
-          // would otherwise corrupt the reveal (see #1717 review).
+          // would otherwise corrupt the reveal.
           if (
             nextPreview.length > visiblePreview.length &&
             nextPreview.startsWith(visiblePreview)

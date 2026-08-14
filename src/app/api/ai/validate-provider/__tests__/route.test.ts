@@ -4,6 +4,9 @@
 
 jest.mock('@/utils/apiHelpers', () => ({
   makeGeminiRequest: jest.fn(),
+  // Allowed by default; the limit itself is covered by the rate limiter's own
+  // tests, and these are about how upstream answers are classified.
+  handleRateLimiting: jest.fn(() => ({ response: null, result: {} })),
 }));
 
 // The endpoint guard resolves the hostname before any player-supplied URL is
@@ -15,10 +18,11 @@ jest.mock('node:dns/promises', () => ({
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
-import { makeGeminiRequest } from '@/utils/apiHelpers';
+import { handleRateLimiting, makeGeminiRequest } from '@/utils/apiHelpers';
 import { lookup } from 'node:dns/promises';
 
 const mockMakeGeminiRequest = makeGeminiRequest as jest.MockedFunction<typeof makeGeminiRequest>;
+const mockHandleRateLimiting = handleRateLimiting as jest.MockedFunction<typeof handleRateLimiting>;
 
 const URL = 'http://localhost:3000/api/ai/validate-provider';
 const KEY = 'AIza-candidate-key';
@@ -46,6 +50,24 @@ beforeEach(() => {
 });
 
 describe('POST /api/ai/validate-provider', () => {
+  /**
+   * This route dereferences a URL the caller names and reports whether that
+   * host answered. Unmetered it is a request forwarder with a reachability
+   * oracle, so the limit has to come before anything else the route does.
+   */
+  test('stops at the rate limit before dereferencing anything', async () => {
+    const limited = new Response(null, { status: 429 });
+    mockHandleRateLimiting.mockReturnValueOnce({
+      response: limited,
+      result: {},
+    } as ReturnType<typeof handleRateLimiting>);
+
+    const response = await POST(buildRequest({ key: KEY }));
+
+    expect(response.status).toBe(429);
+    expect(mockMakeGeminiRequest).not.toHaveBeenCalled();
+  });
+
   test('rejects when no key header is present', async () => {
     const response = await POST(buildRequest({ key: undefined }));
     const data = await response.json();
@@ -126,6 +148,9 @@ describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () =>
     global.fetch = jest.fn();
     // resetAllMocks in afterEach strips the module mock's implementation too.
     (lookup as jest.Mock).mockResolvedValue([{ address: '104.18.0.1', family: 4 }]);
+    mockHandleRateLimiting.mockReturnValue({ response: null, result: {} } as ReturnType<
+      typeof handleRateLimiting
+    >);
   });
 
   afterEach(() => {

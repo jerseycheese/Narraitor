@@ -18,14 +18,20 @@ interface CustomProviderFormProps {
 /**
  * Form for an advanced custom endpoint.
  *
- * This is the generic door onto the provider abstraction (#890): anything that
+ * This is the generic door onto the provider abstraction: anything that
  * accepts OpenAI-style chat completions works here, which is most of them. The
  * named presets are a curated list on top of the same path.
  */
 export function CustomProviderForm({ value, onChange, className }: CustomProviderFormProps) {
+  // A shape hint for the field, not the security check: the endpoint is refused
+  // server-side by the endpoint guard, which is the only place that decision is
+  // safe to make. This just stops the player walking to the verify step with an
+  // address the server is always going to turn down.
+  const endpointLooksWrong = value.endpoint.trim().length > 0 && !value.endpoint.trim().startsWith('https://');
+
   return (
     <div className={clsx('component-custom-provider-form', className)}>
-      <p className="form-help-text">
+      <p className="form-help-text" id="custom-provider-endpoint-help">
         Any service that accepts OpenAI-style chat completions works here. The endpoint must be an
         https URL on a public host — the request is made by the server, so a local address is not
         reachable.
@@ -51,6 +57,8 @@ export function CustomProviderForm({ value, onChange, className }: CustomProvide
           id="custom-provider-endpoint"
           value={value.endpoint}
           placeholder="https://api.example.com/v1/chat/completions"
+          aria-describedby="custom-provider-endpoint-help"
+          aria-invalid={endpointLooksWrong || undefined}
           onChange={(e) => onChange({ endpoint: e.target.value })}
         />
       </div>

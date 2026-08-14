@@ -4,7 +4,6 @@ import type { AIClient, AIGenerateOptions, AIResponse, AIServiceConfig } from '.
 import type { ProviderDescriptor, TextGenerationSpec } from '../types';
 import { openAICompatibleAdapter } from './adapter';
 import { generateProviderText } from '../core/request';
-import { getModelCapabilities } from '../capabilities';
 import { parseContentRating } from '../../safety/contentRatingGuidance';
 import { getGenerationConfig } from '../../config';
 import { isRetryableError } from '@/lib/utils/errorUtils';
@@ -19,7 +18,7 @@ import { isRetryableError } from '@/lib/utils/errorUtils';
  * prompt-to-spec translation.
  *
  * Text only. Image generation is a separate endpoint shape on every provider
- * that has one (#878 keeps images on Gemini), so `generateImage` is simply
+ * that has one, and stays on Gemini, so `generateImage` is simply
  * absent rather than present and failing.
  */
 export class OpenAICompatibleClient implements AIClient {
@@ -85,27 +84,6 @@ export class OpenAICompatibleClient implements AIClient {
     throw lastError || new Error('Failed to generate content');
   }
 
-  /**
-   * A cheap reachability check. Deliberately a real generation rather than a
-   * models-list call: providers disagree on whether a listing endpoint exists,
-   * and a key that lists models can still be rejected for completions.
-   */
-  async isAvailable(): Promise<boolean> {
-    if (!this.descriptor.apiKey) return false;
-
-    try {
-      await generateProviderText(
-        openAICompatibleAdapter,
-        this.descriptor,
-        { prompt: 'ping', temperature: 0, maxTokens: 1, contentRating: null, stream: false },
-        this.timeout
-      );
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   private buildSpec(prompt: string): TextGenerationSpec {
     return {
       prompt,
@@ -114,10 +92,5 @@ export class OpenAICompatibleClient implements AIClient {
       contentRating: parseContentRating(prompt),
       stream: false,
     };
-  }
-
-  /** What this provider/model pair actually supports; see the capabilities registry. */
-  get capabilities() {
-    return getModelCapabilities(this.descriptor.type, this.descriptor.model);
   }
 }

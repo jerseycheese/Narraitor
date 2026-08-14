@@ -79,8 +79,8 @@ export interface ProviderTextResult {
  * `malformed` is a response that didn't have the fields it should have.
  * `moderation` is a response that was well-formed and deliberately empty
  * because the provider refused the content — a case that reads identically to
- * "the model returned nothing" unless the adapter names it (see #890's spike
- * note on `finish_reason: "error"`).
+ * "the model returned nothing" unless the adapter names it. OpenRouter reports
+ * one as `finish_reason: "error"`.
  */
 export type ProviderParseFailure = 'malformed' | 'moderation';
 
@@ -92,7 +92,7 @@ export type ProviderParseResult =
  * One decoded streaming frame. The generic core owns the decode loop, the
  * partial-line buffer, the preview extraction and the event protocol; an
  * adapter's only job in streaming is mapping one parsed `data:` payload to
- * this shape. That boundary is where the #1749 spike landed: the reader is
+ * this shape. That boundary is where the streaming spike landed: the reader is
  * provider-generic, the payload inside each frame is not.
  */
 export interface ProviderStreamFrame {

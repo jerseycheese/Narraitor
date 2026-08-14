@@ -6,7 +6,6 @@ import './provider-config.css';
 
 interface ProviderDisclosureProps {
   type: ProviderType;
-  model: string;
   /** What this provider does with prompts and outputs; see PROVIDER_PRESETS. */
   privacyNote?: string;
   className?: string;
@@ -29,11 +28,13 @@ interface ProviderDisclosureProps {
  * in the prompt as guidance — a request to the model, not an enforced filter.
  * Saying so plainly is better than a player discovering it mid-scene.
  */
-export function ProviderDisclosure({ type, model, privacyNote, className }: ProviderDisclosureProps) {
-  const { contentRatingNote } = useProviderDisclosure(type, model);
+export function ProviderDisclosure({ type, privacyNote, className }: ProviderDisclosureProps) {
+  const { contentRatingNote } = useProviderDisclosure(type);
 
   return (
-    <div className={clsx('component-provider-disclosure', className)}>
+    // This text appears only once a provider is chosen, so a screen reader
+    // needs it announced rather than left to be discovered by exploration.
+    <div className={clsx('component-provider-disclosure', className)} role="note" aria-live="polite">
       {privacyNote && (
         <p className="provider-disclosure-item">
           <span className="provider-disclosure-label">Privacy</span>

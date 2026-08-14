@@ -35,7 +35,7 @@ const logger = new Logger('ApiHelpers');
  * Everything provider-shaped — URLs, request bodies, response parsing, stream
  * framing — now lives under `src/lib/ai/providers/`. This file used to hold all
  * of it inline for Gemini, which is what made adding a second provider a
- * rewrite rather than an addition (#890).
+ * rewrite rather than an addition.
  */
 
 /**
@@ -55,8 +55,11 @@ function getClientIP(request: NextRequest): string {
 /**
  * Handle rate limiting for API requests
  * Returns both the rate limit result and a NextResponse if rate limit is exceeded
+ *
+ * Exported for the routes that don't go through processAITextRequest but still
+ * make an outbound call on the caller's behalf — see validate-provider.
  */
-function handleRateLimiting(request: NextRequest): {
+export function handleRateLimiting(request: NextRequest): {
   response: NextResponse | null;
   result: RateLimitResult;
 } {

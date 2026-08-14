@@ -6,12 +6,6 @@ import { OpenAICompatibleClient } from './openai-compatible/client';
 import { GeminiClient } from '../geminiClient';
 import { getAIConfig, getDefaultConfig } from '../config';
 
-export {
-  getProviderAdapter,
-  isProviderSupported,
-  requireProviderAdapter,
-} from './adapterRegistry';
-
 /**
  * Builds the AI client for a resolved provider.
  *

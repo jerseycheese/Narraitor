@@ -1,13 +1,13 @@
 // src/app/api/ai/validate-provider/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { makeGeminiRequest } from '@/utils/apiHelpers';
+import { handleRateLimiting, makeGeminiRequest } from '@/utils/apiHelpers';
 import { DEFAULT_TEXT_MODEL, getSafetySettings } from '@/lib/ai/config';
 import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 import { getProviderAdapter } from '@/lib/ai/providers/adapterRegistry';
 import { isSafeProviderEndpoint } from '@/lib/ai/providers/endpointGuard';
 import { sendProviderRequest } from '@/lib/ai/providers/core/request';
-import { getModelCapabilities } from '@/lib/ai/providers/capabilities';
+import { supportsImages } from '@/lib/ai/providers/capabilities';
 import type { ProviderType } from '@/types/provider.types';
 
 /**
@@ -18,8 +18,8 @@ import type { ProviderType } from '@/types/provider.types';
  * one cheap text ping to the provider and map the upstream status to a stable
  * result. The key is never logged, never persisted, and never echoed back.
  *
- * Since #890 this covers every provider type the adapter registry can reach,
- * not just Gemini. Types with no adapter still report UNSUPPORTED_PROVIDER.
+ * This covers every provider type the adapter registry can reach, not just
+ * Gemini. Types with no adapter still report UNSUPPORTED_PROVIDER.
  */
 
 // Vercel function budget: one single-attempt provider ping (30s) + overhead.
@@ -47,6 +47,13 @@ function fail(error: ValidationError) {
 }
 
 export async function POST(request: NextRequest) {
+  // SECURITY: this route dereferences a URL the caller names, and answers
+  // whether that host responded. Unmetered, it is a request forwarder with a
+  // reachability oracle attached, so it takes the same limit the generation
+  // routes take.
+  const { response: rateLimited } = handleRateLimiting(request);
+  if (rateLimited) return rateLimited;
+
   const key = request.headers.get(PROVIDER_API_KEY_HEADER)?.trim();
   if (!key) {
     return fail('NO_KEY');
@@ -93,7 +100,7 @@ async function validateGemini(key: string, requestedModel?: string) {
     if (response.ok) {
       return NextResponse.json({
         valid: true,
-        capabilities: toWireCapabilities('gemini', model),
+        capabilities: toWireCapabilities('gemini'),
         model,
       });
     }
@@ -137,7 +144,7 @@ async function validateOpenAICompatible(
     if (response.ok) {
       return NextResponse.json({
         valid: true,
-        capabilities: toWireCapabilities(type, requestedModel),
+        capabilities: toWireCapabilities(type),
         model: requestedModel,
       });
     }
@@ -149,16 +156,14 @@ async function validateOpenAICompatible(
 }
 
 /**
- * The registry's capabilities, narrowed to the three fields ProviderConfig
- * stores. The richer per-model flags (JSON mode, system role) drive request
- * construction rather than the config UI, so they stay out of the wire shape.
+ * The three fields ProviderConfig stores. Every provider we can reach streams;
+ * only Gemini generates images.
  */
-function toWireCapabilities(type: ProviderType, model: string) {
-  const capabilities = getModelCapabilities(type, model);
+function toWireCapabilities(type: ProviderType) {
   return {
     text: true,
-    images: capabilities.images,
-    streaming: capabilities.streaming,
+    images: supportsImages(type),
+    streaming: true,
   };
 }
 

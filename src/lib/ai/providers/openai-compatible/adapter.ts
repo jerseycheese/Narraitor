@@ -9,19 +9,22 @@ import type {
   ProviderStreamFrame,
   TextGenerationSpec,
 } from '../types';
-import { getModelCapabilities } from '../capabilities';
-import { normalizeMessages, type ChatMessage } from '../middleware/messageNormalizer';
+import { hasSystemRole } from '../capabilities';
 import { getContentRatingGuidance } from '../../safety/contentRatingGuidance';
+
+interface ChatMessage {
+  role: 'system' | 'user';
+  content: string;
+}
 
 /**
  * The OpenAI chat-completions shape, which every provider in `presets.ts`
  * except Gemini speaks.
  *
- * One adapter covers all of them because the differences that matter are
- * per-model, not per-vendor, and live in the capabilities registry: whether the
- * model takes a system role, whether it demands alternating turns. Anything a
- * single vendor needs on top of this belongs in its own adapter, not in a
- * branch here.
+ * One adapter covers all of them because the difference that matters is
+ * per-model rather than per-vendor: whether the model takes a system role (see
+ * capabilities). Anything a single vendor needs on top of this belongs in its
+ * own adapter, not in a branch here.
  */
 
 /**
@@ -62,17 +65,18 @@ interface OpenAIPayload {
  * and recent narrative are all composed into it upstream), so there is one user
  * turn. The system turn carries the content-rating guidance, which is the only
  * thing this provider family can be told about a world's rating — it has no
- * safety-settings equivalent. `normalizeMessages` then folds that system turn
- * into the user turn for models that have no system role.
+ * safety-settings equivalent. A model with no system role gets the guidance
+ * folded into the user turn instead: the role is lost, the instruction is not.
  */
 function buildMessages(descriptor: ProviderDescriptor, spec: TextGenerationSpec): ChatMessage[] {
-  const capabilities = getModelCapabilities(descriptor.type, descriptor.model);
-  const messages: ChatMessage[] = [
-    { role: 'system', content: getContentRatingGuidance(spec.contentRating) },
-    { role: 'user', content: spec.prompt },
-  ];
+  const guidance = getContentRatingGuidance(spec.contentRating);
 
-  return normalizeMessages(messages, capabilities);
+  return hasSystemRole(descriptor.model)
+    ? [
+        { role: 'system', content: guidance },
+        { role: 'user', content: spec.prompt },
+      ]
+    : [{ role: 'user', content: `${guidance}\n\n${spec.prompt}` }];
 }
 
 export const openAICompatibleAdapter: ProviderAdapter = {
