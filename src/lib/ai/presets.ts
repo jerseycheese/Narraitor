@@ -5,15 +5,15 @@ import type { ProviderPreset } from '@/types/provider.types';
 /**
  * Provider presets shown in the configuration wizard.
  *
- * Only Google Gemini works end-to-end in this release (`available: true`). The
- * others are listed so players can see what's coming and so the schema is ready
- * for the post-1.0 multi-provider work — they're marked unavailable and the UI
- * keeps them out of reach for now.
+ * Gemini and OpenRouter work end-to-end (`available: true`). The rest are
+ * listed so players can see what's coming and so the schema is ready for the
+ * remaining multi-provider work — they're marked unavailable and the UI keeps
+ * them out of reach until someone runs a live check against each.
  *
- * Order is deliberate. Gemini leads because it's the only one that works today.
- * OpenRouter comes next because it's the only other option a player can reach
- * without a credit card, and one key there covers dozens of models. Everything
- * below it needs prepaid billing before it generates a single word.
+ * Order is deliberate. Gemini leads because it's the longest-proven. OpenRouter
+ * comes next because it's the only other option a player can reach without a
+ * credit card, and one key there covers dozens of models. Everything below it
+ * needs prepaid billing before it generates a single word.
  *
  * TODO(#895): flip a preset to `available: true` only after
  * scripts/verify-openai-compatible-stream.mjs passes against it with a real
@@ -65,7 +65,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     // the validate-provider route reports back whatever a preset claims.
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://openrouter.ai/keys',
-    available: false,
+    available: true,
     note: 'free tier, no card',
     privacyNote:
       'OpenRouter routes your prompts to whichever upstream model you pick, and each of those has its own data-retention terms. Their free models in particular may allow training on your prompts.',

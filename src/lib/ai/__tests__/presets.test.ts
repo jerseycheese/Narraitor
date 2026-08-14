@@ -9,9 +9,12 @@ import { supportsImages } from '../providers/capabilities';
  * call - so the test's job is to notice when one gets flipped, not to check it.
  */
 describe('PROVIDER_PRESETS', () => {
-  it('marks only Gemini as available, because it is the only one verified live', () => {
+  it('marks available exactly the presets someone has driven a live turn through', () => {
     const available = PROVIDER_PRESETS.filter((preset) => preset.available).map((p) => p.id);
-    expect(available).toEqual(['gemini']);
+    // OpenRouter joined Gemini after a real streamed turn on openai/gpt-4o came
+    // back in 152 deltas with a parseable envelope. Adding an id here without
+    // that run is the thing this test exists to make somebody think twice about.
+    expect(available).toEqual(['gemini', 'openrouter']);
   });
 
   it('claims image support only where the provider path can actually generate images', () => {
