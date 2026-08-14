@@ -10,7 +10,6 @@ import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 import { LoreManagementSection } from '../LoreManagementSection';
 import { TokenBudgetPanel } from '../TokenBudgetPanel';
-import { AIMockingSection } from '../AIMockingSection';
 import { ErrorSection } from '../ErrorSection';
 import { DecisionConsoleSection } from '../DecisionConsoleSection';
 import { DecisionFlowSection } from '../DecisionFlowSection';
@@ -201,7 +200,6 @@ export const DevToolsPanel = () => {
             <div className="devtools-panel-column">
               {/* AI Tools Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.AI_TESTING) ||
-                isSectionVisible(SectionId.AI_MOCKING) ||
                 isSectionVisible(SectionId.CONSISTENCY_VALIDATION) ||
                 isSectionVisible(SectionId.TOKEN_BUDGET) ||
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
@@ -211,12 +209,6 @@ export const DevToolsPanel = () => {
                     {isSectionVisible(SectionId.AI_TESTING) && (
                       <CollapsibleSection title="AI Testing" initialCollapsed={true}>
                         <AITestingPanel />
-                      </CollapsibleSection>
-                    )}
-
-                    {isSectionVisible(SectionId.AI_MOCKING) && (
-                      <CollapsibleSection title="AI Mocking & Simulation" initialCollapsed={true}>
-                        <AIMockingSection />
                       </CollapsibleSection>
                     )}
 
