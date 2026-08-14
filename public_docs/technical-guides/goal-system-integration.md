@@ -9,7 +9,7 @@ The goal tracking system integrates with existing stores through well-defined in
 ### Store Integration Pattern
 The flow runs from `narrativeStore` (segments) to `goalStore` (extraction) to `aiContextStore` (context building).
 
-Basically, as new story segments are created, the goal store processes them to extract and update goals, then the AI context store includes those goals in future prompts.
+As new story segments are created, the goal store processes them to extract and update goals, then the AI context store includes those goals in future prompts.
 
 ## Integration Points
 

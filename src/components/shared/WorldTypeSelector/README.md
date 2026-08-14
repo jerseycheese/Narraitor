@@ -16,7 +16,7 @@ Before this component, we had world type selection scattered across the guided e
 
 Now we have:
 - **Consistent UI/UX** across all world creation flows
-- **Smart field rendering** - reference field only shows up when needed
+- **Conditional field rendering** - reference field only shows up when needed
 - **Unified validation** with clear error messages
 - **Flexible sizing and layout** options for different contexts
 - **Full TypeScript support** so you can't mess up the data flow

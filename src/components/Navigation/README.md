@@ -4,7 +4,7 @@ This handles the main app navigation with loading states, responsive design, and
 
 ## What It Provides
 
-**Smart context awareness** - Navigation options adapt based on current world and available characters. No dead links or confusing states.
+**Context-aware options** - Navigation options adapt based on current world and available characters. No dead links or confusing states.
 
 **Integrated loading states** - Automatic loading indicators when navigating between pages. Users always know when something is happening.
 

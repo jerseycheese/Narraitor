@@ -6,7 +6,7 @@ This wizard handles character creation with point allocation, skill selection, a
 
 **Guided 4-step process**: basic info, then attribute allocation, then skill selection, then background creation. Each step builds on your world's specific rules and constraints.
 
-**Smart validation**: Prevents duplicate names, enforces point pool limits, provides real-time feedback. You can't accidentally create invalid characters.
+**Validation**: Prevents duplicate names, enforces point pool limits, provides real-time feedback. You can't accidentally create invalid characters.
 
 **Adaptive to world rules**: Uses your world's custom attributes and skills. Creating a character for a Star Wars world feels different from a Lovecraft horror setting.
 

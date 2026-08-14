@@ -21,7 +21,7 @@ interface GoalStore {
 ```
 
 #### Core Actions
-The basic CRUD operations, but with some smart validation and cleanup built in:
+The basic CRUD operations, with validation and cleanup built in:
 
 ```typescript
 // Create goal with validation

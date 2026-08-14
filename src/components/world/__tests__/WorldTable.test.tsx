@@ -142,7 +142,7 @@ describe('WorldTable', () => {
   it('shows empty state when no worlds', () => {
     render(<WorldTable worlds={[]} onDeleteWorld={mockOnDeleteWorld} />);
 
-    expect(screen.getByText('No worlds found. Create your first world to get started!')).toBeInTheDocument();
+    expect(screen.getByText('No worlds yet. Create one to get started.')).toBeInTheDocument();
   });
 
   it('includes search functionality', () => {

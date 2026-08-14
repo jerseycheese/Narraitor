@@ -24,11 +24,11 @@ So whether you want "Force Sensitivity" for Star Wars or "Sanity" for horror gam
 - **Narrative style** - whether you want serious drama, comedy, action-packed adventure, mysterious investigation, whatever fits your mood
 - **Language complexity** and **pacing** so the AI matches how you like your stories told
 
-**Smart Constraints** - We cap things at 6 attributes and 12 skills max. This prevents choice paralysis while still giving you enough customization for pretty much any setting you can think of.
+**Attribute and Skill Caps** - We cap things at 6 attributes and 12 skills max. This prevents choice paralysis while still giving you enough customization for pretty much any setting you can think of.
 
 ## Creating New Worlds
 
-The world creation wizard walks you through everything step by step, with AI assistance to speed things up. No more staring at blank forms wondering what attributes your cyberpunk world should have.
+The world creation wizard walks you through everything step by step, with AI assistance to speed things up. You never start from a blank form wondering what attributes a cyberpunk world should have.
 
 ### How the Wizard Works
 1. **Pick Your Starting Point**: Original creation, setting it within an existing universe, or inspired by something you love
@@ -113,7 +113,7 @@ We all create worlds we later decide we don't want. The deletion system makes su
 - Multiple ways to cancel: click "Cancel", press Escape, or click outside the dialog
 - Only proceeds if you explicitly click "Delete"
 
-**Smart Integration**
+**Where It Shows Up**
 - Delete button appears on each world card
 - Shows visual feedback while the deletion is happening
 - Updates your world list immediately so there's no confusion

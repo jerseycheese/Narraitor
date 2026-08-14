@@ -115,8 +115,8 @@ describe('errorUtils', () => {
       const error = new Error('validation failed: invalid email');
       const result = getUserFriendlyError(error);
 
-      expect(result.title).toBe('Validation Error');
-      expect(result.message).toBe('The provided data is invalid. Please check your input and try again.');
+      expect(result.title).toBe('Check Your Input');
+      expect(result.message).toBe("Some of what you entered doesn't look right.");
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.VALIDATION);
     });
@@ -125,8 +125,8 @@ describe('errorUtils', () => {
       const error = new Error('400 bad request');
       const result = getUserFriendlyError(error);
 
-      expect(result.title).toBe('Validation Error');
-      expect(result.message).toBe('The provided data is invalid. Please check your input and try again.');
+      expect(result.title).toBe('Check Your Input');
+      expect(result.message).toBe("Some of what you entered doesn't look right.");
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.VALIDATION);
     });
@@ -135,8 +135,8 @@ describe('errorUtils', () => {
       const error = new Error('invalid data format');
       const result = getUserFriendlyError(error);
 
-      expect(result.title).toBe('Validation Error');
-      expect(result.message).toBe('The provided data is invalid. Please check your input and try again.');
+      expect(result.title).toBe('Check Your Input');
+      expect(result.message).toBe("Some of what you entered doesn't look right.");
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.VALIDATION);
     });
@@ -145,8 +145,8 @@ describe('errorUtils', () => {
       const error = new Error('malformed request');
       const result = getUserFriendlyError(error);
 
-      expect(result.title).toBe('Validation Error');
-      expect(result.message).toBe('The provided data is invalid. Please check your input and try again.');
+      expect(result.title).toBe('Check Your Input');
+      expect(result.message).toBe("Some of what you entered doesn't look right.");
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.VALIDATION);
     });

@@ -69,7 +69,7 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
       setDismissed(new Set());
       setEditingCard(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate suggestions');
+      setError(err instanceof Error ? err.message : "Couldn't generate suggestions. Try again, or fill this in yourself.");
     } finally {
       setLoading(false);
     }

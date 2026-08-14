@@ -78,7 +78,7 @@ import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistory
 The AI adapts to the kind of world you've created:
 
 1. **Theme-Based Content**: A Western world feels like the Wild West, not generic fantasy
-2. **Smart Starting Locations**: No more starting in taverns when you're on a space station:
+2. **Setting-Appropriate Starting Locations**: First scenes open somewhere the world would put you, not a default tavern:
    - Western worlds start in "Frontier Town"
    - Fantasy worlds start in "Enchanted Forest"
    - Sci-Fi worlds start in "Space Station"

@@ -84,7 +84,7 @@ The `ActiveGameSession` component includes these AI features:
 - **Automated Choice Generation**: AI-powered player choices based on narrative context
 - **Contextual Integration**: Choices reflect recent story segments and world themes
 - **Loading States**: Smooth transitions with "Generating your choices..." feedback
-- **Error Recovery**: Graceful fallbacks when AI generation fails
+- **Error Recovery**: Falls back to default choices when AI generation fails, so the session continues
 
 ### Technical Implementation
 We're using:

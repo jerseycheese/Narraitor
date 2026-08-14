@@ -64,7 +64,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       setLoadError(null); // Clear any previous errors
       setLoading(false);
     } catch (err) {
-      setLoadError('Failed to load character data');
+      setLoadError("Couldn't load this character. Try refreshing the page.");
       setLoading(false);
       logger.error('Error loading character:', err);
     }
@@ -105,7 +105,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
 
       router.push(`/characters/${characterId}`);
     } catch (err) {
-      setLoadError('Failed to save character');
+      setLoadError("Couldn't save your changes. Try again.");
       logger.error('Error saving character:', err);
     } finally {
       setSaving(false);

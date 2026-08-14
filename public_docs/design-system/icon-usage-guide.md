@@ -2,7 +2,7 @@
 
 ## Overview
 
-Icons should be consistent, accessible, and professional throughout the app. That means no more random emojis - we use lucide-react for everything. This guide covers how to pick the right icon, size it properly, and make it accessible.
+Icons should be consistent, accessible, and professional throughout the app. That means no emojis as icons - we use lucide-react for everything. This guide covers how to pick the right icon, size it properly, and make it accessible.
 
 > **Note on the code examples below.** Tailwind was removed in the design-system migration (`#1097`), so the `className="w-4 h-4"` / `text-*-500` sizing-and-color classes shown here no longer apply. Size a lucide icon with the `size` prop (e.g. `<Star size={12} />`) and let color come from `currentColor` / a CSS class that sets `color: var(--token)`. The examples have been updated to the `size` prop; treat any leftover color utilities as "set this via CSS instead."
 

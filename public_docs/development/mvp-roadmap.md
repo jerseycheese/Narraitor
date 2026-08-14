@@ -25,7 +25,7 @@ accounts, no server-side sync. Whether that ever changes is an open decision (#1
 monetization is a separate track behind it (#495).
 
 ## What the MVP Does
-Basically, it's a complete solo narrative RPG experience where you can:
+It's a complete solo narrative RPG experience where you can:
 - Create any fictional world you want with AI assistance for attributes and skills
 - Build characters that actually fit your world's rules and theme
 - Play through AI-generated stories that adapt to your choices and setting

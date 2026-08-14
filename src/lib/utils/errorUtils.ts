@@ -136,9 +136,9 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
       message.includes('malformed') || message.includes('bad request') ||
       message.includes('400')) {
     return {
-      title: 'Validation Error',
-      message: 'The provided data is invalid. Please check your input and try again.',
-      suggestion: 'Review the highlighted fields and correct any invalid entries.',
+      title: 'Check Your Input',
+      message: "Some of what you entered doesn't look right.",
+      suggestion: 'Review the highlighted fields and fix anything marked.',
       retryable: false,
       type: ErrorType.VALIDATION,
       severity: 'warning'

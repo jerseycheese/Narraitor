@@ -2,7 +2,7 @@
 
 These components started life as part of the world editing feature, but we built them to be reusable from the beginning. The challenge was creating form components that could handle complex data structures (like worlds with attributes, skills, and settings) while still being flexible enough to work with other entities later.
 
-Basically, we wanted to avoid the classic mistake of building super-specific forms that only work in one place. So these components are designed to be building blocks you can use for any similar data editing needs.
+We wanted to avoid the classic mistake of building super-specific forms that only work in one place, so these components are building blocks you can use for any similar data editing needs.
 
 ## Available Components
 

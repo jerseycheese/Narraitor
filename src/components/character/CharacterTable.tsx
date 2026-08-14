@@ -229,7 +229,7 @@ export function CharacterTable({
   if (characters.length === 0) {
     return (
       <div>
-        <p>No characters found. Create your first character to get started!</p>
+        <p>No characters yet. Create one to get started.</p>
       </div>
     );
   }

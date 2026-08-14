@@ -17,7 +17,7 @@ The AI integration is pretty central to the whole experience. Generic AI story g
 
 **World Building Assistance** - Suggests appropriate attributes and skills based on your world's genre and description.
 
-**Smart Goal Tracking** - Automatically extracts and tracks player objectives from the narrative flow.
+**Goal Tracking** - Automatically extracts and tracks player objectives from the narrative flow.
 
 **Ending Detection** - Recognizes when a story arc has reached a natural conclusion point.
 

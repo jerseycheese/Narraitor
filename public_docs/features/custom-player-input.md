@@ -7,17 +7,17 @@ updated: 2025-06-08
 
 # Custom Player Input
 
-The problem with most AI narrative games is that you're stuck with whatever choices the AI dreams up. Want to try climbing through the window instead of going through the front door? Want to seduce the dragon instead of fighting it? Tough luck - you only get the three options the AI thought of.
+Most AI narrative games limit you to the choices the model generated. Climbing through the window instead of using the front door, or talking the dragon down instead of fighting it, isn't an option unless the AI happened to offer it.
 
-This feature fixes that. Players can type whatever they want to try, and the AI will respond to it. It's basically "yes, and..." for AI storytelling.
+This feature adds one. Players type what they want to try and the AI responds to it, alongside the suggested actions rather than instead of them.
 
 ## How This Actually Works
 
-**The Input Field That's Always There** - There's a text area sitting right above the suggested actions where you can type whatever crazy idea you've got. We cap it at 250 characters to keep things focused - enough for creative freedom, but not so much that you're writing novels.
+**The Input Field** - A text area sits above the suggested actions, capped at 250 characters. The cap keeps a submission to an action rather than a paragraph of stage direction.
 
-**Smart Enough to Stop You from Breaking Things** - It won't let you submit empty text, and it shows you a live character counter that turns amber when you're getting close to the limit and red when you hit it. Basically, it's got your back.
+**Input Validation** - Empty submissions are blocked, and a live character counter turns amber as you approach the limit and red once you hit it.
 
-**Creativity First, Suggestions Second** - The custom input field is bigger and more prominent than the suggested actions. The AI's suggestions show up below under "Or choose a suggested action" - this way the game encourages you to think outside the box first, then fall back on the AI's ideas if you're stuck.
+**Creativity First, Suggestions Second** - The custom input field is bigger and more prominent than the suggested actions, which sit below under "Or choose a suggested action". The ordering is deliberate: it asks for your own idea before offering the model's.
 
 ## Technical Implementation
 

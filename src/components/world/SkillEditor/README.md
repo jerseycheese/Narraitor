@@ -9,7 +9,7 @@ The challenge was supporting multi-attribute skill linking without making the UI
 ## Key Features
 
 - **Multi-Attribute Linking**: Skills connect to one or more attributes via checkbox selection
-- **Smart Validation**: Prevents duplicate names and validates value ranges
+- **Validation**: Prevents duplicate names and validates value ranges
 - **Skill Limits**: Enforces a maximum of 12 skills per world (because nobody wants to manage 50 skills)
 - **Delete Safety**: Shows warnings when deleting skills linked to multiple attributes
 - **Clean Error Handling**: Clears validation errors when user starts making changes

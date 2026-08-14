@@ -307,8 +307,8 @@ export default function LoreViewerTestPage() {
         <h2>Test Instructions:</h2>
         <ol>
           <li><strong>Add Sample Facts:</strong> Manually adds predefined facts to test display</li>
-          <li><strong>Test AI Structured Extraction:</strong> Uses AI to intelligently extract structured lore with rich metadata</li>
-          <li><strong>Test Error Handling:</strong> Demonstrates robust error handling when AI fails</li>
+          <li><strong>Test AI Structured Extraction:</strong> Runs the AI extractor and stores the structured facts it returns, with their metadata</li>
+          <li><strong>Test Error Handling:</strong> Forces the AI call to fail and shows what the viewer does with it</li>
           <li><strong>Custom Narrative:</strong> Enter your own text to test extraction (any genre/style supported)</li>
           <li><strong>Session Filtering:</strong> Toggle to show only facts from the current session</li>
           <li><strong>Clear All Facts:</strong> Remove all facts to start fresh</li>
