@@ -12,9 +12,9 @@
  * happened to write.
  *
  * It asserts, in order because each fails differently: the key was accepted,
- * deltas arrived BEFORE the terminal event (real progressive streaming rather
- * than one buffered blob dressed as a stream), the turn finished with prose
- * instead of an empty refusal, and that prose is the envelope the app parses.
+ * the turn arrived as more than one delta (real progressive streaming rather
+ * than a buffered blob dressed as a stream), it finished with prose instead of
+ * an empty refusal, and that prose is the envelope the app parses.
  *
  * The key is read from OPENAI_COMPAT_API_KEY at call time. It is never written
  * to disk, never passed as an argument, and every line this prints goes through
@@ -52,6 +52,13 @@ const DEFAULT_PRESET_ID = 'openai';
 /** Matches the app's generation config; see src/lib/ai/config.ts. */
 const TEMPERATURE = 0.7;
 const MAX_TOKENS = 2048;
+
+/**
+ * Wall-clock cap on reading the streamed body. Generous, because a slow model
+ * on a long turn is a pass and not a failure; it exists only so a provider that
+ * stops sending without closing the stream ends the run instead of parking it.
+ */
+const STREAM_BUDGET_MS = 120000;
 
 /** A throwaway world, small enough to read in the output and cheap to generate. */
 const VERIFICATION_WORLD = {
@@ -148,10 +155,11 @@ function resolveTarget(args, getPresetById) {
 /**
  * Play the turn and collect what the route's client would have seen.
  *
- * The delta count is the interesting one. A provider that returns the whole
- * completion in a single frame still produces a valid `done` event, so counting
- * deltas is the only thing separating streaming that works from streaming that
- * merely doesn't error.
+ * The delta count is the interesting one, and the threshold has to be more than
+ * one rather than more than zero. A provider that buffers the whole completion
+ * and hands it back in a single SSE frame still grows the preview once, so it
+ * still produces exactly one delta and then a terminal event. Counting "at
+ * least one" would pass the very response this check exists to catch.
  */
 async function playStreamedTurn(prod, descriptor, prompt) {
   const spec = {
@@ -172,17 +180,39 @@ async function playStreamedTurn(prod, descriptor, prompt) {
   const reader = upstream.body.getReader();
   const result = { deltas: 0, preview: '', done: null, error: null };
 
-  for await (const event of prod.consumeProviderStreamEvents(
-    reader,
-    prod.openAICompatibleAdapter,
-    'Provider verification'
-  )) {
-    if (event.error) result.error = event.error;
-    else if (event.done) result.done = event;
-    else if (typeof event.delta === 'string') {
-      result.deltas += 1;
-      result.preview += event.delta;
+  // sendProviderRequest's timeout is cleared the moment the response headers
+  // land, so nothing upstream bounds the body read. A provider that answers 200,
+  // opens an SSE body and then stalls without closing it would park this loop
+  // forever, which is a poor thing to hand somebody running the check by hand.
+  let timedOut = false;
+  const watchdog = setTimeout(() => {
+    timedOut = true;
+    reader.cancel().catch(() => {});
+  }, STREAM_BUDGET_MS);
+
+  try {
+    for await (const event of prod.consumeProviderStreamEvents(
+      reader,
+      prod.openAICompatibleAdapter,
+      'Provider verification'
+    )) {
+      if (event.error) result.error = event.error;
+      else if (event.done) result.done = event;
+      else if (typeof event.delta === 'string') {
+        result.deltas += 1;
+        result.preview += event.delta;
+      }
     }
+  } finally {
+    // Also stops a pending timer from holding the process open on the fast path.
+    clearTimeout(watchdog);
+  }
+
+  // Cancelling the reader ends the loop cleanly, so the consumer yields a
+  // normal terminal event carrying a partial turn. Naming the timeout here is
+  // what keeps that from being read as a provider that answered badly.
+  if (timedOut) {
+    result.error = `provider stalled: no end of stream within ${STREAM_BUDGET_MS / 1000}s`;
   }
 
   return result;
@@ -211,9 +241,12 @@ function evaluate(turn, prod) {
   return [
     { name: 'stream completed', passed: true, detail: '' },
     {
-      name: 'progressive deltas arrived before the terminal event',
-      passed: turn.deltas > 0,
-      detail: turn.deltas > 0 ? `${turn.deltas} deltas` : 'zero deltas, so nothing revealed progressively',
+      name: 'the turn was revealed progressively, not in one piece',
+      passed: turn.deltas > 1,
+      detail:
+        turn.deltas > 1
+          ? `${turn.deltas} deltas`
+          : `${turn.deltas} delta, so the reply was buffered and handed over whole`,
     },
     {
       name: 'turn produced content',
