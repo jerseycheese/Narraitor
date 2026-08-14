@@ -23,6 +23,8 @@ jest.mock('@/lib/ai/config', () => ({
   }),
   getGenerationConfig: () => ({}),
   getSafetySettings: () => [],
+  resolveEffectiveGeminiKey: (requestKey?: string | null) =>
+    requestKey === undefined ? 'test-key' : requestKey ?? '',
 }));
 
 describe('categorizeInventoryItems (batch)', () => {

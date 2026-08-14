@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { logger } from '@/lib/utils/logger';
-import { getAIConfig } from './config';
+import { getAIConfig, resolveEffectiveGeminiKey } from './config';
 import { extractJsonObject } from './parseJSON';
 
 /**
@@ -50,8 +50,10 @@ export async function validateEventSignificance(
     // Build the validation prompt
     const prompt = buildValidationPrompt(majorEvent, context);
 
-    // Call Gemini Flash for validation (player's BYO key -> env fallback)
-    const effectiveKey = apiKey ?? process.env.GEMINI_API_KEY;
+    // Call Gemini Flash for validation with the player's own key. A player on
+    // another provider resolves to no Gemini key at all, and skipping the check
+    // is the right answer there — see resolveEffectiveGeminiKey.
+    const effectiveKey = resolveEffectiveGeminiKey(apiKey);
     if (!effectiveKey) {
       logger.warn('EventSignificanceValidator', 'GEMINI_API_KEY not found, defaulting to accepting event');
       return {

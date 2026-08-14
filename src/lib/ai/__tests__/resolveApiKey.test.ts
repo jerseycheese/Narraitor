@@ -61,7 +61,7 @@ describe('resolveApiKey', () => {
   test('withholds the key when the active provider is not Gemini', () => {
     // These callers post straight to Google. Handing them a player's OpenRouter
     // key would send that key to a service it was never issued for.
-    delete process.env.GEMINI_API_KEY;
+    process.env.GEMINI_API_KEY = 'env-key';
     const request = new NextRequest('http://localhost/api/x', {
       headers: {
         [PROVIDER_API_KEY_HEADER]: 'openrouter-key',

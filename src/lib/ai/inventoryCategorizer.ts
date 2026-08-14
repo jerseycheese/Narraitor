@@ -1,5 +1,5 @@
 import { GeminiClient } from '@/lib/ai/geminiClient';
-import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
+import { getAIConfig, getGenerationConfig, getSafetySettings, resolveEffectiveGeminiKey } from '@/lib/ai/config';
 import { STANDARD_CATEGORIES } from '@/lib/inventory/categories';
 import { truncate } from '@/lib/utils';
 import { extractFencedJson, extractJsonObject } from '@/lib/ai/parseJSON';
@@ -107,7 +107,7 @@ async function categorizeInventoryItem(
   model?: string | null
 ): Promise<InventoryCategorizationResult> {
   const config = getAIConfig();
-  const effectiveKey = apiKey ?? config.geminiApiKey;
+  const effectiveKey = resolveEffectiveGeminiKey(apiKey);
   const effectiveModel = model ?? config.modelName;
   const baseLogContext = {
     name: input.name,
@@ -202,7 +202,7 @@ export async function categorizeInventoryItems(
   }
 
   const config = getAIConfig();
-  const effectiveKey = apiKey ?? config.geminiApiKey;
+  const effectiveKey = resolveEffectiveGeminiKey(apiKey);
   const effectiveModel = model ?? config.modelName;
 
   if (!effectiveKey) {

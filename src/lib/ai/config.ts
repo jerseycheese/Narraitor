@@ -56,9 +56,25 @@ export const getSafetySettings = (): SafetySetting[] => {
 };
 
 /**
+ * The Gemini key a caller should actually use.
+ *
+ * The two absent values mean different things and must not be collapsed:
+ *
+ * - `undefined` — the caller never resolved a key. The server env key is the
+ *   right answer, and the browser, dev and Storybook paths depend on it.
+ * - `null` — a request resolved no *Gemini* key. That is what a player on
+ *   another provider produces, and substituting the server's key there would
+ *   spend the deployment's Gemini quota on a turn the player is already paying
+ *   for elsewhere.
+ */
+export const resolveEffectiveGeminiKey = (requestKey?: string | null): string =>
+  requestKey === undefined ? getAIConfig().geminiApiKey : requestKey ?? '';
+
+/**
  * Gets default configuration for AI service.
  * @param apiKeyOverride - the player's bring-your-own key for this request; when
- *   omitted, falls back to the server env key (today's behavior).
+ *   omitted, falls back to the server env key. An explicit null does not — see
+ *   resolveEffectiveGeminiKey.
  * @param modelOverride - the model the player picked (see resolveModel); when
  *   omitted, falls back to the default text model.
  * @returns Complete AI service configuration
@@ -69,8 +85,7 @@ export const getDefaultConfig = (
 ) => {
   const aiConfig = getAIConfig();
   return {
-    // The player's resolved key (passed by the route) -> server env key.
-    apiKey: apiKeyOverride ?? aiConfig.geminiApiKey,
+    apiKey: resolveEffectiveGeminiKey(apiKeyOverride),
     modelName: modelOverride ?? aiConfig.modelName,
     maxRetries: aiConfig.maxRetries,
     timeout: aiConfig.timeout,

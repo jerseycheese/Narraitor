@@ -12,8 +12,8 @@ import type { ProviderCredential, ProviderDescriptor } from './providers/types';
  * - Server-side with a credential: the client for the configured provider
  * - Server-side without one: Uses mock (for local development)
  *
- * The environment branches are unchanged; what's new since #890 is that the
- * final branch dispatches on *configuration* rather than assuming Gemini. Pass
+ * The environment branches are unchanged; what is new is that the final branch
+ * dispatches on *configuration* rather than assuming Gemini. Pass
  * a descriptor from `resolveProvider` and a player on any supported provider
  * gets that provider; pass a bare key and it behaves exactly as it always did.
  *
@@ -57,8 +57,10 @@ export const createDefaultGeminiClient = (
  * Normalize whatever the caller passed into a descriptor, or null when there's
  * no usable key at all.
  *
- * The bare-key form still falls back to the server env key, which is what keeps
- * local development working with nothing configured.
+ * An omitted credential still falls back to the server env key, which is what
+ * keeps local development working with nothing configured. An explicit null
+ * does not: that is a request that resolved no Gemini key, and a player on
+ * another provider produces it on every turn.
  */
 function toDescriptor(
   credential?: ProviderCredential | null,
@@ -72,7 +74,7 @@ function toDescriptor(
     process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MOCK_API_KEY'
       ? process.env.GEMINI_API_KEY
       : null;
-  const effectiveKey = credential ?? envKey;
+  const effectiveKey = credential === undefined ? envKey : credential;
   if (!effectiveKey) return null;
 
   return {

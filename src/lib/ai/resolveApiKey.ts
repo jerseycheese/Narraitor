@@ -104,8 +104,12 @@ export function resolveProvider(request?: NextRequest): ProviderResolution {
  * routes that still construct a Gemini client directly.
  *
  * Returns null when the active provider is not Gemini, rather than handing a
- * player's OpenRouter key to Google. Those callers are Gemini-only by design
- * (#878 keeps image generation on Gemini), so "no key" is the honest answer.
+ * player's OpenRouter key to Google. Those callers are Gemini-only by design —
+ * image generation stays on Gemini — so "no key" is the honest answer.
+ *
+ * The null is load-bearing downstream: it means "this request resolved no
+ * Gemini key", which resolveEffectiveGeminiKey refuses to paper over with the
+ * server's own key. See lib/ai/config.
  */
 export function resolveApiKey(request?: NextRequest): string | null {
   const resolution = resolveProvider(request);
