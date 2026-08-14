@@ -138,7 +138,7 @@
   gap: var(--space-2);
   margin: 0;
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -186,7 +186,7 @@
 .component-faq-answer p {
   margin: 0;
   font-family: var(--font-system);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
@@ -222,7 +222,7 @@
 
 .component-faq-footer-link {
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   color: var(--color-text-secondary);
   text-decoration: none;
 }

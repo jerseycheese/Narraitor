@@ -27,7 +27,7 @@
 
 .badge-md {
   padding: var(--space-0_5) var(--space-2);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
 }
 
 .badge-lg {

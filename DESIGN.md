@@ -164,7 +164,7 @@ Use the utility classes when consuming in components:
 
 ### Sizes
 
-A named type scale exists as `--font-size-*` custom properties in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) (#1622). Steps are calibrated to real anchors already in use rather than forced onto one strict ratio, so adjacent steps span roughly a Major Second to Major Third (1.11-1.25):
+A named type scale exists as `--font-size-*` custom properties in [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) (#1622). Steps are calibrated to real anchors already in use rather than forced onto one strict ratio, so adjacent whole steps span roughly a Major Second to Major Third (1.11-1.25):
 
 - `--font-size-3xl` (`2.125rem`) — the largest heading in the app (page-layout hero title)
 - `--font-size-2xl` (`1.875rem`)
@@ -172,11 +172,16 @@ A named type scale exists as `--font-size-*` custom properties in [_shared-token
 - `--font-size-lg` (`1.25rem`)
 - `--font-size-md` (`1.125rem`) — section headings
 - `--font-size-base` (`1rem`) — body and narrative default
+- `--font-size-sm_5` (`0.9375rem`) - one notch under body, for text sitting beside body copy without competing with it
 - `--font-size-sm` (`0.875rem`) — interface text, labels
+- `--font-size-xs_5` (`0.8125rem`) - dense interface text: HUD chrome, wizard helper copy, session metadata
 - `--font-size-xs` (`0.75rem`) — small metadata
+- `--font-size-2xs_5` (`0.6875rem`) - the tightest step that still reads, for stacked labels in the game-session HUD
 - `--font-size-2xs` (`0.625rem`) — badges and dense data tables only
 
-The highest-traffic hardcoded sizes across the app have been migrated onto these tokens; a handful of one-off in-between values (e.g. `1.0625rem`, `1.75rem`) haven't been touched yet — that's tracked as incremental follow-up, not a gap in the scale itself.
+The three `_5` steps are half-steps, the same suffix idiom the `--space-*` scale uses, and each one lands on the exact midpoint of the pair it sits between. They got names because 119 declarations across the app's densest surfaces had already settled on those sizes by hand, one at a time, with nowhere on the nine-step scale to move to. Reach for a whole step first; the half-steps are there for surfaces that genuinely land between two of them.
+
+A handful of genuine one-off sizes (`1.0625rem`, `1.75rem`, a few `clamp()` pairs) still sit outside the scale. Those are incremental follow-up, not a gap in the scale itself.
 
 ### Usage rules
 

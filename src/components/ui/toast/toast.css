@@ -42,7 +42,7 @@
 
 .toast-title {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   font-weight: 600;
   line-height: 1.3;
   color: var(--color-text-primary);

@@ -505,7 +505,7 @@
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-interface);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
   white-space: nowrap;
 }
@@ -765,7 +765,7 @@
   background: var(--color-surface);
   color: var(--color-text-secondary);
   font-family: var(--font-interface);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   font-weight: 500;
   cursor: pointer;
   transition: all 120ms ease;
@@ -865,7 +865,7 @@
   background: transparent;
   cursor: pointer;
   font-family: var(--font-interface);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   font-weight: 500;
   color: var(--color-text-primary);
   transition: background-color 120ms ease, border-color 120ms ease;
@@ -954,7 +954,7 @@
 .world-card-description-block p {
   color: var(--color-text-secondary);
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;
@@ -1029,7 +1029,7 @@
 
 .world-list-empty-description {
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   color: var(--color-text-muted);
   margin: 0;
   max-width: 36rem;
@@ -1051,7 +1051,7 @@
 
 .world-list-empty-guide-heading {
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
@@ -1065,7 +1065,7 @@
   margin: 0;
   color: var(--color-text-secondary);
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.5;
 }
 
@@ -1517,7 +1517,7 @@
   display: block;
   margin-bottom: var(--space-1);
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1961,7 +1961,7 @@
 
 :root .settings-export-import-help {
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
 }
 
 :root .settings-export-import-help p + p {
@@ -2237,7 +2237,7 @@
 :root .journal-page .journal-list-header h2 {
   position: relative;
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -2258,7 +2258,7 @@
   background-position: top left;
   padding-top: var(--space-4);
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
 }
 
@@ -2384,7 +2384,7 @@
   position: relative;
   padding-top: var(--space-2);
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
 }
@@ -2446,7 +2446,7 @@
 :root .component-section-wrapper-title {
   position: relative;
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -2609,7 +2609,7 @@
 
 .component-ending-screen-achievement-description {
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   color: var(--color-text-secondary);
 }
 
@@ -2625,7 +2625,7 @@
 
 :root .component-ending-screen-hero-meta {
   font-family: var(--font-system);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
 }
@@ -2754,7 +2754,7 @@
 .world-detail-npc-name {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -2762,7 +2762,7 @@
 .world-detail-npc-description {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-secondary);
   line-height: 1.5;
 }
@@ -2861,7 +2861,7 @@
 
 .world-detail-meta-grid .component-data-field > span:first-child {
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -2873,13 +2873,13 @@
 .world-detail-meta-grid .component-data-field > div:last-child {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   color: var(--color-text-primary);
 }
 
 .world-detail-meta-grid .component-data-field-stacked > div:first-child {
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -2898,7 +2898,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked {
 }
 
 section[aria-labelledby="image-details-heading"] .component-data-field-stacked > div:last-child {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   line-height: 1.45;
 }
 
@@ -3047,7 +3047,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 .character-detail-background-heading {
   margin: 0 0 var(--space-2);
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -3057,7 +3057,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 .character-detail-background-text {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.6;
   color: var(--color-text-primary);
 }
@@ -3072,7 +3072,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 .character-detail-background-list-item {
   font-family: var(--font-interface);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   line-height: 1.5;
   color: var(--color-text-primary);
 }
@@ -3257,7 +3257,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 }
 
 :root .component-world-card .component-hero-title {
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm_5);
   font-style: italic;
   font-family: var(--font-narrative);
 
@@ -3289,7 +3289,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   grid-row: 2;
   padding: 0;
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
   border-top: 0;
@@ -3380,7 +3380,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   gap: var(--space-2);
   margin-top: var(--space-1);
   font-family: var(--font-system);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-2xs_5);
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
 }
@@ -3390,7 +3390,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   margin: var(--space-1) 0 0;
   padding: 0;
   font-family: var(--font-interface);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-text-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 2;

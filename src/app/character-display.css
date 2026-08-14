@@ -167,7 +167,7 @@
 
 .attributes-form-constraint,
 .skills-form-constraint {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs_5);
   color: var(--color-warning);
   font-weight: 500;
 }
