@@ -76,13 +76,14 @@ export async function sendProviderRequest(
     // http://169.254.169.254/ and fetch follows it without re-checking
     // anything. No provider's chat-completions endpoint legitimately redirects.
     //
-    // codeql[js/request-forgery] The URL is player-supplied by design — this is
-    // bring-your-own-provider, and the feature cannot exist without fetching a
-    // URL the player named. It is constrained by assertPublicProviderEndpoint
-    // above (https only, no private literals, every resolved address checked)
-    // and redirects are refused. See endpointGuard's header comment for what
-    // that does and does not close.
-    const response = await fetch(url, {
+    // The URL is player-supplied by design — this is bring-your-own-provider,
+    // and the feature cannot exist without fetching a URL the player named. It
+    // is constrained by assertPublicProviderEndpoint above (https only, no
+    // private literals, every resolved address checked) and redirects are
+    // refused. See endpointGuard's header comment for what that does and does
+    // not close. The suppression below is annotated rather than dismissed in
+    // the UI so the reasoning lives next to the code it excuses.
+    const response = await fetch(url, { // codeql[js/request-forgery]
       method: 'POST',
       headers,
       body: JSON.stringify(body),

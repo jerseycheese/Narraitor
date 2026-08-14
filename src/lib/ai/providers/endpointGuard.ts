@@ -21,7 +21,19 @@
  * an attack substantially; they are not a proof of unreachability.
  */
 
-import { lookup } from 'node:dns/promises';
+/**
+ * Resolve a hostname to every address it answers with.
+ *
+ * Imported lazily and with `webpackIgnore` because this module is reachable
+ * from the client graph — `defaultGeminiClient` requires the provider factory,
+ * and client hooks import that. A static `node:dns` import there fails the
+ * production build outright (UnhandledSchemeError), so the dependency stays a
+ * runtime one on the server path that actually uses it.
+ */
+async function resolveHostAddresses(hostname: string): Promise<Array<{ address: string }>> {
+  const dns = await import(/* webpackIgnore: true */ 'node:dns/promises');
+  return dns.lookup(hostname, { all: true });
+}
 
 /**
  * Address literals that must never be reachable: loopback, RFC 1918 private
@@ -114,7 +126,7 @@ export async function assertPublicProviderEndpoint(endpoint: string): Promise<vo
 
   let addresses: Array<{ address: string }>;
   try {
-    addresses = await lookup(hostname, { all: true });
+    addresses = await resolveHostAddresses(hostname);
   } catch {
     throw new Error('Network error - the provider endpoint could not be resolved');
   }
