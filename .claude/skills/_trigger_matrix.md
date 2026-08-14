@@ -34,4 +34,6 @@ General disambiguation rules baked into the descriptions:
 - storybook-app-parity ↔ debugging-playbook on "works in Storybook but…" — parity owns the comparison; the playbook's symptom row points there.
 - New library ↔ pre-existing `narraitor-architecture`/`narraitor-pattern-alignment-skill` — pre/post-authoring lanes stated in both new skills' "When not to use".
 
+`npm run skills:trigger-eval -- --pairs` scores exactly the skills named in that list, so if a pair moves here, update `CONFUSABLE_PAIR_SKILLS` in `scripts/run-trigger-eval.cjs` to match.
+
 Last generated: 2026-07-04
