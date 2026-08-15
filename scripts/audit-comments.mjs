@@ -116,7 +116,11 @@ const PATTERNS = {
   // Past-state phrasing only. Bare "used to" is usually present tense
   // ("the salt used to encrypt"), so it is matched with a past-state verb.
   archaeological:
-    /\b(extracted (?:out )?from|moved (?:out )?from|refactored out|refactored from|formerly|previously|renamed from|split out (?:of|from)|used to (?:be|live|call|gate|have|exist|return|do|get|point|sit)|(?:was|were|had) (?:previously|originally)|once (?:was|lived|called)|as of \d)\b/i,
+    /\b((?:was|were|been) extracted (?:out )?from|extracted out from|moved (?:out )?from|refactored out|refactored from|formerly|previously|renamed from|split out (?:of|from)|used to (?:be|live|call|gate|have|exist|return|do|get|point|sit)|(?:was|were|had) (?:previously|originally)|once (?:was|lived|called)|as of \d)\b/i,
+  // "a previously selected skill", "any previously encrypted data": here
+  // "previously" is an adjective describing current data, not a note about how
+  // the code used to be written. An article in front is the tell.
+  adjectivalPrevious: /\b(a|an|any|the|some|each|every|all) previously\b/i,
   // Only line comments draw banners. Block-comment continuation lines are
   // excluded because markdown inside JSDoc ("* - **Bold**:", "* ### Heading")
   // trips any charset loose enough to catch a real divider.
@@ -200,7 +204,10 @@ function scanFile(file) {
       else findings.issueCitation.push(entry);
     }
 
-    if (PATTERNS.archaeological.test(line)) {
+    if (
+      PATTERNS.archaeological.test(line) &&
+      !PATTERNS.adjectivalPrevious.test(line)
+    ) {
       findings.archaeological.push({ at, text: trimmed });
     }
 
@@ -252,6 +259,12 @@ function scanFile(file) {
     // the next line already spells out. "// Add attribute" over "addAttribute:"
     // is the shape this is looking for.
     if (overlapRatio(trimmed, next.line, 4) >= 0.8) {
+      // A comment that matches the line after next as well is heading a GROUP --
+      // a run of sibling constants or literals, like "// Sci-fi" over four
+      // scifi-* preset entries. That labels the run and has to survive; only a
+      // comment that restates one single line is noise.
+      const after = nextCodeLine(lines, next.index + 1);
+      if (after && overlapRatio(trimmed, after.line, 4) >= 0.8) return;
       findings.restating.push({
         at,
         text: trimmed,
