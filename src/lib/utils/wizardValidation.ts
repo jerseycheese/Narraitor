@@ -54,7 +54,13 @@ export const alwaysValid: Validator<unknown> = () => ({
 
 export const createValidationRules = {
   required: <T>(message: string = 'This field is required'): ValidationRule<T> => ({
-    validate: (value: T) => value !== undefined && value !== null && value !== '',
+    // Whitespace-only strings count as missing: persisted wizard state is
+    // untrusted, and a blank-looking value must not advance a step.
+    validate: (value: T) =>
+      value !== undefined &&
+      value !== null &&
+      value !== '' &&
+      !(typeof value === 'string' && value.trim() === ''),
     message,
     required: true,
   }),

@@ -28,6 +28,16 @@ describe('validateFields', () => {
     expect(invalidResult.errors).toContain('Name is required');
   });
 
+  it('rejects whitespace-only required fields', () => {
+    const validator = validateFields<TestFormData>({
+      name: [createValidationRules.required('Name is required')],
+    });
+
+    const result = validator({ name: '   ', email: '' });
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Name is required');
+  });
+
   it('validates string length rules', () => {
     const validator = validateFields<TestFormData>({
       name: [
