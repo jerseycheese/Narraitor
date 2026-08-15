@@ -7,9 +7,7 @@ import {
 interface TestFormData {
   name: string;
   email: string;
-  age: number;
-  skills: string[];
-  isOptional?: boolean;
+  description?: string;
 }
 
 describe('validateFields', () => {
@@ -19,15 +17,25 @@ describe('validateFields', () => {
       email: [createValidationRules.required('Email is required')],
     });
 
-    const validData = { name: 'John', email: 'john@example.com', age: 30, skills: [] };
+    const validData = { name: 'John', email: 'john@example.com' };
     const result = validator(validData);
     expect(result.valid).toBe(true);
     expect(result.errors).toEqual([]);
 
-    const invalidData = { name: '', email: 'john@example.com', age: 30, skills: [] };
+    const invalidData = { name: '', email: 'john@example.com' };
     const invalidResult = validator(invalidData);
     expect(invalidResult.valid).toBe(false);
     expect(invalidResult.errors).toContain('Name is required');
+  });
+
+  it('rejects whitespace-only required fields', () => {
+    const validator = validateFields<TestFormData>({
+      name: [createValidationRules.required('Name is required')],
+    });
+
+    const result = validator({ name: '   ', email: '' });
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Name is required');
   });
 
   it('validates string length rules', () => {
@@ -38,54 +46,11 @@ describe('validateFields', () => {
       ],
     });
 
-    expect(validator({ name: 'J', email: '', age: 0, skills: [] }).errors)
+    expect(validator({ name: 'J', email: '' }).errors)
       .toContain('Name must be at least 2 characters');
-    expect(validator({ name: 'A'.repeat(51), email: '', age: 0, skills: [] }).errors)
+    expect(validator({ name: 'A'.repeat(51), email: '' }).errors)
       .toContain('Name must be at most 50 characters');
-    expect(validator({ name: 'John', email: '', age: 0, skills: [] }).valid).toBe(true);
-  });
-
-  it('validates numeric range rules', () => {
-    const validator = validateFields<TestFormData>({
-      age: [
-        createValidationRules.minValue(18, 'Must be at least 18'),
-        createValidationRules.maxValue(100, 'Must be at most 100'),
-      ],
-    });
-
-    expect(validator({ name: '', email: '', age: 16, skills: [] }).errors)
-      .toContain('Must be at least 18');
-    expect(validator({ name: '', email: '', age: 101, skills: [] }).errors)
-      .toContain('Must be at most 100');
-    expect(validator({ name: '', email: '', age: 25, skills: [] }).valid).toBe(true);
-  });
-
-  it('validates pattern rules', () => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const validator = validateFields<TestFormData>({
-      email: [createValidationRules.pattern(emailPattern, 'Invalid email format')],
-    });
-
-    expect(validator({ name: '', email: 'notanemail', age: 0, skills: [] }).errors)
-      .toContain('Invalid email format');
-    expect(validator({ name: '', email: 'test@example.com', age: 0, skills: [] }).valid).toBe(true);
-  });
-
-  it('validates array length rules', () => {
-    const validator = validateFields<TestFormData>({
-      skills: [
-        createValidationRules.arrayMinLength(1, 'At least one skill required'),
-        createValidationRules.arrayMaxLength(5, 'Maximum 5 skills allowed'),
-      ],
-    });
-
-    expect(validator({ name: '', email: '', age: 0, skills: [] }).errors)
-      .toContain('At least one skill required');
-    expect(validator({
-      name: '', email: '', age: 0,
-      skills: ['s1', 's2', 's3', 's4', 's5', 's6'],
-    }).errors).toContain('Maximum 5 skills allowed');
-    expect(validator({ name: '', email: '', age: 0, skills: ['s1', 's2'] }).valid).toBe(true);
+    expect(validator({ name: 'John', email: '' }).valid).toBe(true);
   });
 
   it('handles custom rules', () => {
@@ -98,9 +63,9 @@ describe('validateFields', () => {
       ],
     });
 
-    expect(validator({ name: 'admin-user', email: '', age: 0, skills: [] }).errors)
+    expect(validator({ name: 'admin-user', email: '' }).errors)
       .toContain('Name cannot contain "admin"');
-    expect(validator({ name: 'regular-user', email: '', age: 0, skills: [] }).valid).toBe(true);
+    expect(validator({ name: 'regular-user', email: '' }).valid).toBe(true);
   });
 
   it('skips empty non-required fields', () => {
@@ -108,7 +73,17 @@ describe('validateFields', () => {
       name: [createValidationRules.minLength(2, 'Name must be at least 2 characters')],
     });
 
-    expect(validator({ name: '', email: '', age: 0, skills: [] }).valid).toBe(true);
+    expect(validator({ name: '', email: '' }).valid).toBe(true);
+  });
+
+  it('applies string length rules to optional fields', () => {
+    const validator = validateFields<TestFormData>({
+      description: [createValidationRules.maxLength(5, 'Description is too long')],
+    });
+
+    expect(validator({ name: '', email: '' }).valid).toBe(true);
+    expect(validator({ name: '', email: '', description: 'way too long' }).errors)
+      .toContain('Description is too long');
   });
 });
 

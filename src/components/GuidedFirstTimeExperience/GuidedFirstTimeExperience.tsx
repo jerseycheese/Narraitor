@@ -7,9 +7,10 @@ import { useWorldStore } from '@/state/worldStore';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { useWizardFlow } from '@/components/shared/wizard/hooks/useWizardFlow';
 import {
-  validators,
-  validateField,
-} from '@/components/shared/wizard/utils/validation';
+  alwaysValid,
+  validateFields,
+  createValidationRules,
+} from '@/lib/utils/wizardValidation';
 import { GENRES } from '@/lib/constants/genres';
 import type { GenreValue } from '@/types/genre.types';
 import {
@@ -72,16 +73,12 @@ export function GuidedFirstTimeExperience() {
         const isSetWithin = data.worldTypeData.worldType === 'set_within';
         const isInspiredBy = data.worldTypeData.worldType === 'inspired_by';
         const isGenreOptional = isSetWithin || isInspiredBy;
-        const genreValidators = isGenreOptional
-          ? []
-          : [(value: string) => validators.required(value, 'Genre')];
-        const genreError = validateField(data.genre, genreValidators);
-        const errors = [genreError].filter(Boolean) as string[];
-        return {
-          valid: errors.length === 0,
-          errors,
-          touched: true,
-        };
+        const validateGenre = isGenreOptional
+          ? alwaysValid
+          : validateFields<OnboardingData>({
+              genre: [createValidationRules.required('Genre is required')],
+            });
+        return validateGenre(data);
       default:
         return { valid: true, errors: [], touched: true };
     }

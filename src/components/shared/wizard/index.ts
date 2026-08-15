@@ -18,6 +18,3 @@ export {
 export { ToggleButton } from './components/ToggleButton';
 
 // Export AI components
-
-// Export validation utilities
-export * from './utils/validation';

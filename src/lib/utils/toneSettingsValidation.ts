@@ -1,55 +1,59 @@
 import { ToneSettings } from '@/types/tone-settings.types';
-import { validators, validateField, ValidationResult } from '@/components/shared/wizard/utils/validation';
+import { validateFields, createValidationRules } from './wizardValidation';
+import type { ValidationResult } from './validationUtils';
+
+const CONTENT_RATINGS: string[] = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
+const NARRATIVE_STYLES: string[] = [
+  'serious',
+  'humorous',
+  'dramatic',
+  'lighthearted',
+  'mysterious',
+  'action-packed',
+  'contemplative',
+  'epic',
+  'balanced',
+];
+const LANGUAGE_COMPLEXITIES: string[] = ['simple', 'moderate', 'advanced', 'literary'];
+
+const MAX_CUSTOM_INSTRUCTIONS_LENGTH = 500;
+
+const validateToneFields = validateFields<Partial<ToneSettings>>({
+  contentRating: [
+    createValidationRules.required('Content Rating is required'),
+    createValidationRules.custom(
+      (value) => CONTENT_RATINGS.includes(value ?? ''),
+      'Content Rating must be a valid rating'
+    ),
+  ],
+  narrativeStyle: [
+    createValidationRules.required('Narrative Style is required'),
+    createValidationRules.custom(
+      (value) => NARRATIVE_STYLES.includes(value ?? ''),
+      'Narrative Style must be a valid style'
+    ),
+  ],
+  languageComplexity: [
+    createValidationRules.required('Language Complexity is required'),
+    createValidationRules.custom(
+      (value) => LANGUAGE_COMPLEXITIES.includes(value ?? ''),
+      'Language Complexity must be a valid level'
+    ),
+  ],
+  customInstructions: [
+    createValidationRules.maxLength(
+      MAX_CUSTOM_INSTRUCTIONS_LENGTH,
+      `Custom Instructions must be no more than ${MAX_CUSTOM_INSTRUCTIONS_LENGTH} characters`
+    ),
+  ],
+});
 
 /**
  * Validates tone settings configuration
  */
-export function validateToneSettings(toneSettings: Partial<ToneSettings>): ValidationResult {
-  const errors: string[] = [];
-
-  // Validate content rating
-  const contentRatingError = validateField(toneSettings.contentRating, [
-    (value) => validators.required(value, 'Content Rating'),
-    (value) => validators.custom(
-      value,
-      (v) => ['G', 'PG', 'PG-13', 'R', 'NC-17'].includes(v as string),
-      'Content Rating must be a valid rating'
-    )
-  ]);
-  if (contentRatingError) errors.push(contentRatingError);
-
-  // Validate narrative style
-  const narrativeStyleError = validateField(toneSettings.narrativeStyle, [
-    (value) => validators.required(value, 'Narrative Style'),
-    (value) => validators.custom(
-      value,
-      (v) => ['serious', 'humorous', 'dramatic', 'lighthearted', 'mysterious', 'action-packed', 'contemplative', 'epic', 'balanced'].includes(v as string),
-      'Narrative Style must be a valid style'
-    )
-  ]);
-  if (narrativeStyleError) errors.push(narrativeStyleError);
-
-  // Validate language complexity
-  const languageComplexityError = validateField(toneSettings.languageComplexity, [
-    (value) => validators.required(value, 'Language Complexity'),
-    (value) => validators.custom(
-      value,
-      (v) => ['simple', 'moderate', 'advanced', 'literary'].includes(v as string),
-      'Language Complexity must be a valid level'
-    )
-  ]);
-  if (languageComplexityError) errors.push(languageComplexityError);
-
-  // Validate custom instructions (optional but limited length)
-  if (toneSettings.customInstructions) {
-    const customInstructionsError = validateField(toneSettings.customInstructions, [
-      (value) => validators.maxLength(value as string, 500, 'Custom Instructions')
-    ]);
-    if (customInstructionsError) errors.push(customInstructionsError);
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors
-  };
+export function validateToneSettings(
+  toneSettings: Partial<ToneSettings>
+): ValidationResult {
+  const { valid, errors } = validateToneFields(toneSettings);
+  return { valid, errors };
 }
