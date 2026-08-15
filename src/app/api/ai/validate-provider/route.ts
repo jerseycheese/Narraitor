@@ -6,7 +6,10 @@ import { DEFAULT_TEXT_MODEL, getSafetySettings } from '@/lib/ai/config';
 import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 import { getProviderAdapter } from '@/lib/ai/providers/adapterRegistry';
 import { isSafeProviderEndpoint } from '@/lib/ai/providers/endpointGuard';
-import { presetHeadersForEndpoint } from '@/lib/ai/presets';
+import {
+  presetHeadersForEndpoint,
+  presetMaxOutputTokensParamForEndpoint,
+} from '@/lib/ai/presets';
 import { sendProviderRequest } from '@/lib/ai/providers/core/request';
 import { supportsImages } from '@/lib/ai/providers/capabilities';
 import type { ProviderType } from '@/types/provider.types';
@@ -30,6 +33,14 @@ const GEMINI_MODELS_BASE = 'https://generativelanguage.googleapis.com/v1beta/mod
 
 /** One ping should answer "does this key work", not generate anything. */
 const PING_TIMEOUT_MS = 10000;
+
+/**
+ * Small, but not 1. On a reasoning model this cap counts the model's own
+ * reasoning tokens as well as the visible ones, so a cap of 1 leaves it no room
+ * to do anything before it stops. The answer we want here is the HTTP status,
+ * not the text, and a handful of tokens costs nothing.
+ */
+const PING_MAX_OUTPUT_TOKENS = 16;
 
 type ValidationError =
   | 'NO_KEY'
@@ -137,7 +148,10 @@ async function validateOpenAICompatible(
       {
         model: requestedModel,
         messages: [{ role: 'user', content: 'ping' }],
-        max_tokens: 1,
+        // Same name the generation path uses. Hardcoding max_tokens here made
+        // the wizard refuse a key that generates fine, which is the third time
+        // this ping has diverged from the real request and broken a provider.
+        [presetMaxOutputTokensParamForEndpoint(endpoint) ?? 'max_tokens']: PING_MAX_OUTPUT_TOKENS,
       },
       {
         timeoutMs: PING_TIMEOUT_MS,

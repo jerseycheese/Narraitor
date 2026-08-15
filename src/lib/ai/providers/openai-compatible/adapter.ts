@@ -104,13 +104,17 @@ export const openAICompatibleAdapter: ProviderAdapter = {
     return {
       model: descriptor.model,
       messages: buildMessages(descriptor, spec),
-      temperature: spec.temperature,
       // OpenAI renamed this and now rejects the old name outright instead of
       // ignoring it, while the rest of the ecosystem still speaks max_tokens.
-      // The name travels on the descriptor rather than being branched on here,
-      // so this stays one adapter over one request shape.
+      // Both this and the sampling controls below travel on the descriptor
+      // rather than being branched on here, so this stays one adapter over one
+      // request shape.
       [descriptor.maxOutputTokensParam ?? 'max_tokens']: spec.maxTokens,
-      top_p: 1.0,
+      // Omitted entirely, not sent at their defaults: a reasoning model rejects
+      // the presence of these fields, not just values it dislikes.
+      ...(descriptor.hasFixedSamplingControls
+        ? {}
+        : { temperature: spec.temperature, top_p: 1.0 }),
       ...(spec.stream
         ? {
             stream: true,

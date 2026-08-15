@@ -108,7 +108,7 @@ async function bundleProductionModules() {
   await writeFile(
     entry,
     [
-      "export { getPresetById, presetHeadersForEndpoint, presetMaxOutputTokensParamForEndpoint } from '@/lib/ai/presets';",
+      "export { getPresetById, presetHeadersForEndpoint, presetMaxOutputTokensParamForEndpoint, presetHasFixedSamplingControlsForEndpoint } from '@/lib/ai/presets';",
       "export { openAICompatibleAdapter } from '@/lib/ai/providers/openai-compatible/adapter';",
       "export { openProviderTextStream } from '@/lib/ai/providers/core/request';",
       "export { consumeProviderStreamEvents } from '@/lib/ai/providers/core/streamConsumer';",
@@ -300,6 +300,7 @@ async function main() {
       apiKey,
       customHeaders: prod.presetHeadersForEndpoint(target.endpoint),
       maxOutputTokensParam: prod.presetMaxOutputTokensParamForEndpoint(target.endpoint),
+      hasFixedSamplingControls: prod.presetHasFixedSamplingControlsForEndpoint(target.endpoint),
     };
 
     let turn;

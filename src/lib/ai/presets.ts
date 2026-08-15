@@ -5,10 +5,10 @@ import type { ProviderPreset } from '@/types/provider.types';
 /**
  * Provider presets shown in the configuration wizard.
  *
- * Gemini and OpenRouter work end-to-end (`available: true`). The rest are
- * listed so players can see what's coming and so the schema is ready for the
- * remaining multi-provider work — they're marked unavailable and the UI keeps
- * them out of reach until someone runs a live check against each.
+ * Gemini, OpenRouter and OpenAI work end-to-end (`available: true`). The rest
+ * are listed so players can see what's coming and so the schema is ready for
+ * the remaining multi-provider work — they're marked unavailable and the UI
+ * keeps them out of reach until someone runs a live check against each.
  *
  * Order is deliberate. Gemini leads because it's the longest-proven. OpenRouter
  * comes next because it's the only other option a player can reach without a
@@ -88,14 +88,17 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     // default nobody changes. Sol is the one to reach for if prose quality
     // disappoints.
     defaultModel: 'gpt-5.6-luna',
-    // Not cosmetic: OpenAI rejects max_tokens outright on these models rather
-    // than ignoring it, so the request 400s without this.
+    // Neither of these is cosmetic. OpenAI rejects max_tokens outright on these
+    // models rather than ignoring it, and locks temperature and top_p because
+    // they are reasoning models running their own generate-and-select rounds.
+    // Both produce a 400, and both were found by a real call, not by reading.
     maxOutputTokensParam: 'max_completion_tokens',
+    hasFixedSamplingControls: true,
     // OpenAI's chat models take images as INPUT; they don't generate them, and
     // this flag has only ever meant generation here (providers/capabilities.ts).
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://platform.openai.com/api-keys',
-    available: false,
+    available: true,
     privacyNote:
       'OpenAI states that API inputs and outputs are not used to train their models by default, and are retained for up to 30 days for abuse monitoring.',
   },
@@ -206,6 +209,16 @@ export const presetMaxOutputTokensParamForEndpoint = (
   endpoint: string | undefined
 ): 'max_tokens' | 'max_completion_tokens' | undefined =>
   presetForEndpoint(endpoint)?.maxOutputTokensParam;
+
+/**
+ * Whether the service at this endpoint refuses to be told how to sample.
+ *
+ * Endpoint-keyed like the two above. Undefined means the ordinary case, where
+ * temperature and top_p are ours to set.
+ */
+export const presetHasFixedSamplingControlsForEndpoint = (
+  endpoint: string | undefined
+): boolean | undefined => presetForEndpoint(endpoint)?.hasFixedSamplingControls;
 
 /**
  * The preset whose endpoint this exactly is, if we ship one.

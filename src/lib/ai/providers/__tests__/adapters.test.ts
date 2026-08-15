@@ -121,6 +121,19 @@ describe('openAICompatibleAdapter', () => {
     expect(body).not.toHaveProperty('max_tokens');
   });
 
+  it('omits the sampling controls entirely for a service that fixes them', () => {
+    // Sending temperature: 1 is not the workaround - a reasoning model rejects
+    // the field being present at all, so both have to be absent.
+    const body = openAICompatibleAdapter.buildBody(
+      { ...OPENAI, hasFixedSamplingControls: true },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body).not.toHaveProperty('temperature');
+    expect(body).not.toHaveProperty('top_p');
+    expect(body.messages).toBeDefined();
+  });
+
   it('folds the guidance into the user turn for a model with no system role', () => {
     const gemma = { ...OPENAI, model: 'google/gemma-3-27b-it' };
     const body = openAICompatibleAdapter.buildBody(gemma, SPEC) as {
