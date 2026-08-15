@@ -266,7 +266,6 @@ export const useWorldStore = create<WorldStore>()(
         deleteWorld: (id) => get().delete(id),
         setCurrentWorld: (id) => get().setCurrent(id),
 
-        // Add attribute
         addAttribute: (worldId, attributeData) => {
           const world = get().worlds[worldId];
           if (!world) {
@@ -294,7 +293,6 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Update attribute
         updateAttribute: (worldId, attributeId, updates) => {
           const world = get().worlds[worldId];
           if (!world) {
@@ -312,7 +310,6 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Remove attribute
         removeAttribute: (worldId, attributeId) => {
           const world = get().worlds[worldId];
           if (!world) {
@@ -330,7 +327,6 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Add skill
         addSkill: (worldId, skillData) => {
           const world = get().worlds[worldId];
           if (!world) {
@@ -358,7 +354,6 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Update skill
         updateSkill: (worldId, skillId, updates) => {
           const world = get().worlds[worldId];
           if (!world) {
@@ -376,7 +371,6 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Remove skill
         removeSkill: (worldId, skillId) => {
           const world = get().worlds[worldId];
           if (!world) {
@@ -394,7 +388,6 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Update settings
         updateSettings: (worldId, settings) => {
           const world = get().worlds[worldId];
           if (!world) {
@@ -411,7 +404,6 @@ export const useWorldStore = create<WorldStore>()(
           });
         },
 
-        // Update tone settings
         updateToneSettings: (worldId, toneSettings) => {
           const world = get().worlds[worldId];
           if (!world) {

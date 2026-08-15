@@ -16,6 +16,8 @@
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
     "audit:css": "node scripts/audit-css.mjs",
+    "audit:comments": "node scripts/audit-comments.mjs",
+    "audit:tests": "node scripts/audit-tests.mjs",
     "docs:check-links": "node scripts/check-docs-links.js",
     "docs:check-symbols": "node scripts/check-docs-symbols.mjs",
     "validate:routes": "node scripts/validate-routes.js",
