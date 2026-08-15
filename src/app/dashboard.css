@@ -602,7 +602,9 @@
   color: var(--color-text-secondary);
 }
 
-/* Canonical DS3 dot bullet — rhymes with the dot-grid background. */
+/* Canonical DS3 dot bullet, in the mark ink the whole drafting-marks family uses
+   and rhyming with the dot-grid background. The dashboard spends its one accent
+   mark on the continue card's registration cross, so these stay quiet. */
 :root .component-dashboard-progress-card h2::before,
 :root .component-dashboard-continue-card h2::before,
 :root .component-dashboard-recent-worlds h2::before,
@@ -613,7 +615,7 @@
   width: 6px;
   height: 6px;
   border-radius: var(--radius-full);
-  background: var(--color-accent);
+  background: var(--color-text-muted);
   flex-shrink: 0;
 }
 
@@ -773,7 +775,7 @@
   width: 6px;
   height: 6px;
   border-radius: var(--radius-full);
-  background: var(--color-accent);
+  background: var(--color-text-muted);
   flex-shrink: 0;
 }
 
