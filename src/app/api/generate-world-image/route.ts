@@ -3,8 +3,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
-import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
-import { getAIConfig } from '@/lib/ai/config';
+import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('WorldImageAPI');
@@ -82,53 +81,32 @@ export async function POST(request: NextRequest) {
     logger.debug('generate-world-image', 'Starting image generation for world:', body.world.name);
 
     try {
-      // Use custom prompt if provided, otherwise generate one using AI
       const apiKey = resolveApiKey(request);
-      const client = createDefaultGeminiClient(apiKey);
-      let imagePrompt: string;
-      
-      if (body.customPrompt) {
-        // Use the custom prompt directly
-        imagePrompt = body.customPrompt;
-        logger.debug('generate-world-image', 'Using custom prompt:', imagePrompt);
-      } else {
-        // Generate image prompt using AI
-        imagePrompt = generateImagePrompt(body.world);
-        logger.debug('generate-world-image', 'Generated image prompt:', imagePrompt);
-      }
+      const imagePrompt = body.customPrompt || generateImagePrompt(body.world);
+      logger.debug('generate-world-image', 'Image prompt:', imagePrompt);
 
-      // Generate a detailed description that could be used with real AI image generation
+      // A custom prompt is already the visual description the player wants, so
+      // only a generated prompt gets elaborated by the model.
       let imageDescription: string;
-      
+
       if (body.customPrompt) {
-        // Use the custom prompt as the image description directly
         imageDescription = body.customPrompt;
-        logger.debug('generate-world-image', 'Using custom prompt as image description:', imageDescription);
       } else {
-        // Generate a detailed description using AI
+        const client = createDefaultGeminiClient(apiKey);
         const promptResponse = await client.generateContent(`
           Generate a detailed, artistic description for an image of this world that could be used as a prompt for an AI image generator like DALL-E or Midjourney. Be very specific about visual elements, atmosphere, lighting, and composition.
-          
+
           ${imagePrompt}
-          
+
           Respond with only the detailed visual description, no other text.
         `);
         imageDescription = promptResponse.content;
         logger.debug('generate-world-image', 'Generated image description:', imageDescription);
       }
 
-      // Try to generate real AI image using Gemini's image generation model
-      let imageUrl = '';
-      let aiGenerated = false;
-      let placeholder = true;
-
-      // Use the key resolved above (player's BYO key -> env fallback).
-      if (apiKey) {
-        try {
-          logger.debug('generate-world-image', `Attempting Gemini image generation with model: ${getAIConfig().imageModelName}`);
-
-          // Use the same approach as the portrait generation API
-          const imagePromptForGemini = `Create a detailed landscape image representing the world "${body.world.name}". ${imageDescription}
+      // Generated as a data URL so it persists in IndexedDB (no disk write)
+      const { url: imageUrl, aiGenerated } = await resolveGeneratedImageUrl({
+        prompt: `Create a detailed landscape image representing the world "${body.world.name}". ${imageDescription}
 
 Requirements:
 - Epic cinematic landscape
@@ -137,39 +115,18 @@ Requirements:
 - Rich atmospheric lighting and details
 - ${body.world.genre} genre elements
 - No text, logos, or watermarks
-- Landscape orientation suitable for world imagery`;
+- Landscape orientation suitable for world imagery`,
+        apiKey,
+        fallbackUrl: generateFallbackImage(body.world),
+        loggerContext: 'generate-world-image',
+        onHardFailure: 'fallback',
+      });
 
-          // Generate image as a data URL so it persists in IndexedDB (no disk write)
-          const generatedImage = await generateImageWithGemini(
-            imagePromptForGemini,
-            apiKey
-          );
-
-          if (generatedImage) {
-            imageUrl = generatedImage.url;
-            aiGenerated = true;
-            placeholder = false;
-
-            logger.debug('generate-world-image', `Gemini image generated successfully: ${generatedImage.url.slice(0, 50)}...`);
-          } else {
-            logger.warn('generate-world-image', 'Image generation failed, using fallback');
-            imageUrl = generateFallbackImage(body.world);
-          }
-
-        } catch (imageGenError) {
-          logger.error('generate-world-image', 'Gemini image generation failed, using fallback:', imageGenError);
-          imageUrl = generateFallbackImage(body.world);
-        }
-      } else {
-        logger.debug('generate-world-image', 'No Gemini API key configured, using fallback');
-        imageUrl = generateFallbackImage(body.world);
-      }
-      
-      return NextResponse.json({ 
+      return NextResponse.json({
         imageUrl,
         description: imageDescription,
         prompt: imagePrompt,
-        placeholder,
+        placeholder: !aiGenerated,
         aiGenerated,
         // Include the prompt for future use
         imageGenerationPrompt: imageDescription,

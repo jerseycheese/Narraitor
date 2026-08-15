@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { JournalEntry } from '@/types/journal.types';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
-import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
@@ -61,41 +61,20 @@ export async function POST(request: NextRequest) {
     logger.debug('generate-journal-image', 'Starting image generation');
 
     const imagePrompt = customPrompt || generateImagePrompt(entry, world);
-    const apiKey = resolveApiKey(request);
 
-    if (!apiKey) {
-      logger.debug('generate-journal-image', 'No Gemini API key configured, using fallback');
-      return NextResponse.json({
-        imageUrl: generateFallbackImage(entry, world),
-        prompt: imagePrompt,
-        placeholder: true,
-        aiGenerated: false,
-      });
-    }
-
-    try {
-      const generatedImage = await generateImageWithGemini(imagePrompt, apiKey);
-
-      if (generatedImage) {
-        logger.debug('generate-journal-image', 'Gemini image generated successfully');
-        return NextResponse.json({
-          imageUrl: generatedImage.url,
-          prompt: imagePrompt,
-          placeholder: false,
-          aiGenerated: true,
-        });
-      }
-
-      logger.warn('generate-journal-image', 'Image generation failed, using fallback');
-    } catch (imageGenError) {
-      logger.error('generate-journal-image', 'Gemini image generation failed, using fallback:', imageGenError);
-    }
+    const { url: imageUrl, aiGenerated } = await resolveGeneratedImageUrl({
+      prompt: imagePrompt,
+      apiKey: resolveApiKey(request),
+      fallbackUrl: generateFallbackImage(entry, world),
+      loggerContext: 'generate-journal-image',
+      onHardFailure: 'fallback',
+    });
 
     return NextResponse.json({
-      imageUrl: generateFallbackImage(entry, world),
+      imageUrl,
       prompt: imagePrompt,
-      placeholder: true,
-      aiGenerated: false,
+      placeholder: !aiGenerated,
+      aiGenerated,
     });
   } catch (error) {
     logger.error('generate-journal-image', 'Journal image generation failed:', error);
