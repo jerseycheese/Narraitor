@@ -42,7 +42,13 @@ const argValue = (flag, fallback) => {
 };
 const asJson = argv.includes('--json');
 const rootDir = path.resolve(argValue('--root', path.join(__dirname, '..')));
-const scopeDir = argValue('--dir', 'src');
+// Every root jest.config.cjs matches, not just src. Auditing only src silently
+// skipped the seven suites under __tests__/ and scripts/, and a suite the audit
+// cannot see is one it can never report a defect in.
+const DEFAULT_SCOPE = ['src', '__tests__', 'scripts'];
+const scopeArg = argValue('--dir', null);
+const scopeDirs = scopeArg ? scopeArg.split(',') : DEFAULT_SCOPE;
+const scopeLabel = scopeDirs.join(', ');
 
 const SKIP_DIRS = new Set(['node_modules', '.next', '.git', 'coverage', 'dist', 'build']);
 const TEST_FILE = /\.(test|spec)\.[jt]sx?$/;
@@ -67,6 +73,11 @@ function walk(dir, out = []) {
 
 const CASE_OPEN =
   /^\s*(?:(x)|f)?(it|test)(\.(?:each|only|skip|todo|concurrent))?\s*(?:\([^)]*\))?\s*\(\s*(['"`])(.*?)\4/;
+// `it.each([` with the table spread over following lines puts the case name on
+// the `])(` line instead. Without this the whole parameterized case is invisible
+// to the audit, which is worse than miscounting it.
+const CASE_EACH_OPEN = /^\s*(?:(x)|f)?(it|test)(\.each)\s*\(\s*[[({]\s*$/;
+const CASE_EACH_NAME = /^\s*[\])}]+\s*\)?\s*\(\s*(['"`])(.*?)\1/;
 const DESCRIBE_OPEN = /^(\s*)(?:x|f)?describe(?:\.\w+)?\s*\(\s*(['"`])(.*?)\2/;
 const DESCRIBE_SKIP = /^\s*(?:x)?describe\s*\.\s*(skip|todo)\s*\(/;
 const ONLY = /^\s*(?:it|test|describe)\s*\.\s*only\s*\(/;
@@ -74,7 +85,15 @@ const ONLY = /^\s*(?:it|test|describe)\s*\.\s*only\s*\(/;
 // Assertion shapes.
 const EXPECT = /\bexpect\s*\(/;
 const MOCK_MATCHER = /\.(toHaveBeenCalled|toHaveBeenCalledWith|toHaveBeenCalledTimes|toHaveBeenLastCalledWith|toHaveBeenNthCalledWith)\b/;
-const MOCK_SUBJECT = /\bexpect\s*\(\s*[^)]*\b(mock[A-Za-z0-9_$]*|[A-Za-z0-9_$]*Mock|jest\.fn|\w+\.mock)\b/i;
+// A case counts as mock-only on the MATCHER alone. An earlier version also
+// required the subject to look mock-named, which made detection depend on what
+// a variable was called: `expect(notFound).toHaveBeenCalled()` slipped through
+// purely because the spy wasn't named mockSomething. A jest call matcher only
+// works on a mock or spy, so the matcher already proves the subject.
+// Any case whose every assertion is a call-check that can fail when the wiring
+// changes and never when the behavior does.
+const ASSERTION_SHAPED =
+  /\bexpect\s*\(|\bassert[A-Za-z0-9_$]*\s*\(|\b(toThrow|rejects|resolves)\b/;
 const SNAPSHOT = /\.(toMatchSnapshot|toMatchInlineSnapshot)\b/;
 const IN_DOCUMENT = /\.(toBeInTheDocument|toBeVisible)\b/;
 const DEFINED_ONLY = /expect\s*\([^)]*\)\s*\.\s*(toBeDefined|toBeTruthy)\s*\(\s*\)/;
@@ -163,10 +182,31 @@ function scanFile(file) {
     if (DESCRIBE_SKIP.test(line)) findings.skipped.push({ at, text: line.trim().slice(0, 90) });
     if (ONLY.test(line)) findings.only.push({ at, text: line.trim().slice(0, 90) });
 
-    const open = line.match(CASE_OPEN);
-    if (!open) return;
-    const modifier = open[3] || '';
-    const name = open[5];
+    let open = line.match(CASE_OPEN);
+    let bodyStart = i;
+    let name;
+    let modifier;
+    if (open) {
+      modifier = open[3] || '';
+      name = open[5];
+    } else {
+      // Multiline `it.each([`: find the `])('name'` line that closes the table.
+      const each = line.match(CASE_EACH_OPEN);
+      if (!each) return;
+      let nameLine = null;
+      for (let k = i + 1; k < lines.length && k < i + 200; k += 1) {
+        const m = lines[k].match(CASE_EACH_NAME);
+        if (m) {
+          nameLine = { index: k, name: m[2] };
+          break;
+        }
+      }
+      if (!nameLine) return;
+      open = each;
+      modifier = each[3];
+      name = nameLine.name;
+      bodyStart = nameLine.index;
+    }
     cases += 1;
     totalCases += 1;
 
@@ -185,7 +225,7 @@ function scanFile(file) {
       seenNames.set(key, at);
     }
 
-    const body = caseBody(lines, i);
+    const body = caseBody(lines, bodyStart);
     const text = body.join('\n');
     const expects = body.filter((l) => EXPECT.test(l));
     const statements = body.filter((l) => l.trim() && !l.trim().startsWith('//')).length;
@@ -193,7 +233,10 @@ function scanFile(file) {
     if (expects.length === 0) {
       // A case with no expect() at all still counts if it awaits an assertion
       // helper, so only flag when nothing assertion-shaped appears anywhere.
-      if (!/\b(expect|assert|toThrow|rejects|resolves)\b/.test(text)) {
+      // `assert\w*\(` rather than a bare `assert` token: this repo delegates to
+      // named helpers like assertChoicesVisible(), which its jest lint config
+      // already recognizes as assertions.
+      if (!ASSERTION_SHAPED.test(text)) {
         findings.noAssertion.push({ at, name, statements });
       }
       return;
@@ -211,9 +254,7 @@ function scanFile(file) {
     // Mock-only: every assertion is a call-check, or targets a mock and checks
     // nothing but call-ness. These can fail when wiring changes, never when
     // behavior does.
-    const allMockMatchers = expects.every((l) => MOCK_MATCHER.test(l));
-    const allMockSubjects = expects.every((l) => MOCK_SUBJECT.test(l));
-    if (allMockMatchers && allMockSubjects) {
+    if (expects.every((l) => MOCK_MATCHER.test(l))) {
       const entry = { at, name, assertions: expects.length };
       findings.mockOnly.push(entry);
       if (PROMISE_WORDS.test(name) || PROMISE_WORDS.test(rel)) {
@@ -234,12 +275,19 @@ function scanFile(file) {
 }
 
 function main() {
-  const scanRoot = path.join(rootDir, scopeDir);
-  if (!fs.existsSync(scanRoot)) {
-    console.error(`No such directory: ${scanRoot}`);
-    return;
+  const roots = scopeDirs
+    .map((d) => path.join(rootDir, d))
+    .filter((full) => {
+      // A missing root is only an error when the user named it explicitly; the
+      // defaults are the union of jest's roots and not every repo has all three.
+      if (fs.existsSync(full)) return true;
+      if (scopeArg) console.error(`No such directory: ${full}`);
+      return false;
+    });
+  if (roots.length === 0) return;
+  for (const root of roots) {
+    for (const file of walk(root)) scanFile(file);
   }
-  for (const file of walk(scanRoot)) scanFile(file);
 
   const mocks = globalMocks();
 
@@ -261,7 +309,7 @@ function main() {
   if (asJson) {
     console.log(
       JSON.stringify(
-        { scope: scopeDir, totalFiles, totalCases, globalMocks: mocks, findings, renderHeavy },
+        { scope: scopeLabel, totalFiles, totalCases, globalMocks: mocks, findings, renderHeavy },
         null,
         2,
       ),
@@ -279,7 +327,7 @@ function main() {
     if (items.length > 30) console.log(`  ... and ${items.length - 30} more`);
   };
 
-  console.log(`Test audit: ${scopeDir} (${totalFiles} files, ${totalCases} cases)`);
+  console.log(`Test audit: ${scopeLabel} (${totalFiles} files, ${totalCases} cases)`);
   if (mocks.length) {
     console.log(`\nGLOBAL MOCKS in jest.setup - suites touching these may have no`);
     console.log(`non-mock observation available. Judge their tests accordingly:`);
