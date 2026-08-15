@@ -13,6 +13,7 @@ import { ProviderDisclosure } from './ProviderDisclosure';
 import { useProviderStore } from '@/state/providerStore';
 import { getPresetById } from '@/lib/ai/presets';
 import { validateProviderKey, type ValidationResult } from '@/lib/ai/validateProviderClient';
+import { KEYLESS_PROVIDER_KEY } from '@/lib/ai/providerKeyHeader';
 import type { ProviderType } from '@/types/provider.types';
 import './provider-config.css';
 
@@ -29,6 +30,13 @@ interface ProviderWizardData {
   streaming: boolean;
   helpUrl: string;
   privacyNote: string;
+  /** False only for a service the player runs themselves — see ProviderPreset. */
+  requiresApiKey: boolean;
+  /**
+   * The shape of address to show as a hint. Only set for a preset that expects
+   * the player to supply their own, where the path is the non-obvious part.
+   */
+  endpointHint: string;
 }
 
 const INITIAL_DATA: ProviderWizardData = {
@@ -44,6 +52,8 @@ const INITIAL_DATA: ProviderWizardData = {
   streaming: false,
   helpUrl: '',
   privacyNote: '',
+  requiresApiKey: true,
+  endpointHint: '',
 };
 
 const STEPS = [
@@ -64,6 +74,25 @@ interface ProviderWizardProps {
   onCancel?: () => void;
 }
 
+/**
+ * What to send as the key. A keyless provider still gets one, because the
+ * server reads a missing key as "use the env Gemini key" — see
+ * KEYLESS_PROVIDER_KEY. A player who does put a key on their own server, behind
+ * an authenticating tunnel, keeps theirs.
+ */
+/** The failure, worded for whichever kind of provider the player picked. */
+function describeVerifyError(code: string | undefined, requiresApiKey: boolean): string {
+  const key = code ?? 'VALIDATION_FAILED';
+  if (!requiresApiKey && SELF_HOSTED_ERROR_MESSAGES[key]) return SELF_HOSTED_ERROR_MESSAGES[key];
+  return ERROR_MESSAGES[key] ?? ERROR_MESSAGES.VALIDATION_FAILED;
+}
+
+function resolveKey(data: ProviderWizardData): string | undefined {
+  const typed = data.apiKey.trim();
+  if (typed) return typed;
+  return data.requiresApiKey ? undefined : KEYLESS_PROVIDER_KEY;
+}
+
 const ERROR_MESSAGES: Record<string, string> = {
   INVALID_KEY: 'That key was rejected. Double-check it and try again.',
   INVALID_MODEL: 'That model name was not found for this provider.',
@@ -77,6 +106,21 @@ const ERROR_MESSAGES: Record<string, string> = {
   VALIDATION_FAILED: 'Something went wrong checking this configuration.',
 };
 
+/**
+ * The same failures, worded for a server the player runs themselves, where the
+ * fix is on their machine rather than in somebody's dashboard.
+ *
+ * Only two states get their own copy, because only two are distinguishable from
+ * here. "The software isn't installed" and "it's on a different port" both
+ * arrive as nothing answering, so writing separate messages for them would mean
+ * guessing at the player and being wrong most of the time.
+ */
+const SELF_HOSTED_ERROR_MESSAGES: Record<string, string> = {
+  NETWORK: 'Nothing answered at that address. Check the server is running and reachable from outside your machine.',
+  INVALID_MODEL:
+    'Your server does not have that model. Install it there, then run the check again.',
+};
+
 export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const addProvider = useProviderStore((s) => s.addProvider);
   const [verifyState, setVerifyState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -87,12 +131,23 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   // an inline function would change identity each render and loop the effect.
   const validateStep = useCallback((step: number, data: ProviderWizardData) => {
     if (step === 0) {
-      const ok = data.mode === 'preset' ? Boolean(data.presetId) : Boolean(data.endpoint.trim());
+      // Picking the card is enough for a hosted service. A preset that lists no
+      // models has only told us the shape of its address, so the address itself
+      // is still outstanding.
+      const ok =
+        data.mode === 'custom'
+          ? Boolean(data.endpoint.trim())
+          : Boolean(data.presetId) && (data.models.length > 0 || Boolean(data.endpoint.trim()));
       return { valid: ok, errors: ok ? [] : ['Choose a provider'], touched: true };
     }
     if (step === 1) {
-      const ok = Boolean(data.apiKey.trim()) && Boolean(data.model.trim());
-      return { valid: ok, errors: ok ? [] : ['Enter your key and model'], touched: true };
+      const hasKey = !data.requiresApiKey || Boolean(data.apiKey.trim());
+      const ok = hasKey && Boolean(data.model.trim());
+      return {
+        valid: ok,
+        errors: ok ? [] : [data.requiresApiKey ? 'Enter your key and model' : 'Enter a model'],
+        touched: true,
+      };
     }
     return { valid: true, errors: [], touched: true };
   }, []);
@@ -104,7 +159,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
         name: data.name.trim() || data.presetId || 'Provider',
         endpoint: data.endpoint,
         model: data.model,
-        apiKey: data.apiKey.trim() || undefined,
+        apiKey: resolveKey(data),
         capabilities: { text: true, images: data.images, streaming: data.streaming },
       });
       onComplete?.();
@@ -140,12 +195,20 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const selectPreset = (presetId: string) => {
     const preset = getPresetById(presetId);
     if (!preset) return;
+    // An empty model list marks a service the player runs themselves: we know
+    // the shape of its address and nothing about the address itself, so the
+    // preset's endpoint becomes a hint to show rather than a value to keep.
+    // Pre-filling it would let a player walk to the verify step with our
+    // example still in the field.
+    const playerSuppliesEndpoint = preset.models.length === 0;
     handlers.updateData({
       mode: 'preset',
       presetId: preset.id,
       name: preset.name,
       type: preset.type,
-      endpoint: preset.endpoint,
+      endpoint: playerSuppliesEndpoint ? '' : preset.endpoint,
+      endpointHint: playerSuppliesEndpoint ? preset.endpoint : '',
+      requiresApiKey: preset.requiresApiKey !== false,
       models: preset.models,
       model: preset.defaultModel,
       images: preset.capabilities.images,
@@ -159,7 +222,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     setVerifyState('loading');
     try {
       const result = await validateProviderKey({
-        apiKey: data.apiKey.trim(),
+        apiKey: resolveKey(data),
         type: data.type,
         endpoint: data.endpoint,
         model: data.model,
@@ -174,6 +237,9 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   };
 
   const hasChosenProvider = data.mode === 'preset' ? Boolean(data.presetId) : Boolean(data.endpoint.trim());
+  // A chosen preset that lists no models still needs its address typed in, so
+  // step 0 keeps going rather than handing straight over to step 1.
+  const playerSuppliesEndpoint = data.mode === 'preset' && Boolean(data.presetId) && data.models.length === 0;
   const navDisabled = isLastStep ? verifyState !== 'success' : !(stepValidation?.valid ?? false);
 
   return (
@@ -185,6 +251,13 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
               Pick a provider. Stories are generated with your own key, kept in this browser.
             </p>
             <ProviderPresets selectedId={data.mode === 'preset' ? data.presetId : null} onSelect={(p) => selectPreset(p.id)} />
+            {playerSuppliesEndpoint && (
+              <CustomProviderForm
+                value={{ name: data.name, endpoint: data.endpoint, model: data.model }}
+                onChange={(updates) => handlers.updateData(updates)}
+                endpointPlaceholder={data.endpointHint}
+              />
+            )}
             <button
               type="button"
               className="provider-advanced-toggle"
@@ -193,6 +266,11 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
                   mode: data.mode === 'custom' ? 'preset' : 'custom',
                   type: data.mode === 'custom' ? 'gemini' : 'openai-compatible',
                   privacyNote: data.mode === 'custom' ? '' : CUSTOM_PRIVACY_NOTE,
+                  // A hand-typed endpoint is somebody else's service until told
+                  // otherwise, so the keyless exemption does not follow it out
+                  // of the preset that granted it.
+                  requiresApiKey: true,
+                  endpointHint: '',
                 })
               }
             >
@@ -252,7 +330,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
 
             <div className="form-group">
               <label className="form-label" htmlFor="provider-key">
-                API key
+                API key{data.requiresApiKey ? '' : ' (optional)'}
               </label>
               <div className="provider-key-field">
                 <Input
@@ -273,10 +351,16 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
                   {isKeyRevealed ? 'Hide' : 'Show'}
                 </button>
               </div>
+              {!data.requiresApiKey && (
+                <p className="form-help-text">
+                  A server you run yourself usually needs no key — leave this blank. Fill it in
+                  only if you put authentication in front of it.
+                </p>
+              )}
               {data.helpUrl && (
                 <p className="form-help-text">
                   <a href={data.helpUrl} target="_blank" rel="noopener noreferrer">
-                    Where do I find my key?
+                    {data.requiresApiKey ? 'Where do I find my key?' : 'How do I set this up?'}
                   </a>
                 </p>
               )}
@@ -307,8 +391,15 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             )}
             {verifyState === 'error' && (
               <div className="provider-verify-status" data-state="error">
-                {ERROR_MESSAGES[verifyResult?.error ?? 'VALIDATION_FAILED'] ??
-                  ERROR_MESSAGES.VALIDATION_FAILED}
+                {describeVerifyError(verifyResult?.error, data.requiresApiKey)}
+                {!data.requiresApiKey && data.helpUrl && (
+                  <>
+                    {' '}
+                    <a href={data.helpUrl} target="_blank" rel="noopener noreferrer">
+                      Setup guide
+                    </a>
+                  </>
+                )}
               </div>
             )}
           </div>

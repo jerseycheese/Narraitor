@@ -91,6 +91,16 @@ export interface ProviderPreset {
    * only correct move is to omit both.
    */
   hasFixedSamplingControls?: boolean;
+  /**
+   * Whether this service needs a key at all. Absent means yes, which is every
+   * hosted service we list.
+   *
+   * False is for a service the player runs themselves, where there is nobody to
+   * bill and nothing to authenticate against. The wizard stops requiring the
+   * field, and a blank one is saved as KEYLESS_PROVIDER_KEY rather than as
+   * nothing — see providerKeyHeader for why the placeholder is load-bearing.
+   */
+  requiresApiKey?: boolean;
   /** Short pitch shown under the name, e.g. what a key costs to get. */
   note?: string;
   /**

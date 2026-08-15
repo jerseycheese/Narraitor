@@ -1,7 +1,11 @@
+'use client';
+
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { clsx } from 'clsx';
 import { GeneratedImage } from '@/types/common.types';
 import { ImageOff, AlertCircle } from 'lucide-react';
+import { useImageGenerationSupport } from '@/hooks/useImageGenerationSupport';
 
 interface WorldImageProps {
   image?: GeneratedImage;
@@ -19,12 +23,13 @@ export const WorldImage: React.FC<WorldImageProps> = ({
   error,
 }) => {
   const [loadFailed, setLoadFailed] = useState(false);
+  const imageSupport = useImageGenerationSupport();
 
   const aspectRatio = size === 'small' ? 'aspect-square' : 'aspect-video';
 
   if (error || loadFailed) {
     return (
-      <div className={`${aspectRatio} ${className}`}>
+      <div className={clsx('component-world-image', aspectRatio, className)}>
         <div>
           <AlertCircle aria-hidden="true" />
           <p>Error loading image</p>
@@ -35,17 +40,19 @@ export const WorldImage: React.FC<WorldImageProps> = ({
 
   if (!image || image.type === 'placeholder' || !image.url) {
     return (
-      <div className={`${aspectRatio} ${className}`}>
+      <div className={clsx('component-world-image', aspectRatio, className)}>
         <div>
           <ImageOff aria-hidden="true" />
-          <p>No image</p>
+          {/* The provider is the likeliest reason there is nothing here, and
+              saying so is the difference between a limit and a broken app. */}
+          <p>{imageSupport.reason ?? 'No image'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`${aspectRatio} ${className}`}>
+    <div className={clsx('component-world-image', aspectRatio, className)}>
       <Image
         src={image.url}
         alt={`${worldName} world image`}

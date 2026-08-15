@@ -31,3 +31,16 @@ export const PROVIDER_TYPE_HEADER = 'x-provider-type';
  * only after passing the endpoint guard.
  */
 export const PROVIDER_ENDPOINT_HEADER = 'x-provider-endpoint';
+
+/**
+ * Stand-in key for a provider the player runs themselves, where there is nobody
+ * to authenticate against. Ollama is the case this exists for: it accepts any
+ * bearer token and ignores it.
+ *
+ * The placeholder is load-bearing, not cosmetic. resolveApiKey reads a *missing*
+ * key header as "use the server's own env key", which would route the turn to
+ * Gemini and hand a stranger our key. Sending something keeps that control
+ * exactly as it is, so a keyless provider costs no widening of the one rule
+ * standing between our routes and an open request forwarder.
+ */
+export const KEYLESS_PROVIDER_KEY = 'no-key-required';

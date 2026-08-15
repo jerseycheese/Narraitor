@@ -162,8 +162,10 @@ export const openAICompatibleAdapter: ProviderAdapter = {
     return {
       text: typeof text === 'string' ? text : undefined,
       finishReason: choice?.finish_reason ? normalizeFinishReason(choice.finish_reason) : undefined,
-      // With include_usage these ride on every chunk and are cumulative, so the
-      // core's last-write-wins read is the correct one.
+      // Where these ride depends on the service. OpenAI puts cumulative counts
+      // on every chunk; Ollama sends one final frame carrying usage and an
+      // empty `choices`, which is why the reads above are all optional. The
+      // core's last-write-wins is the correct read for both.
       promptTokens: parsed.usage?.prompt_tokens,
       completionTokens: parsed.usage?.completion_tokens,
     };

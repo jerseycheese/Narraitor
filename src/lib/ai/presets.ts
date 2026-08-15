@@ -71,6 +71,40 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       'OpenRouter routes your prompts to whichever upstream model you pick, and each of those has its own data-retention terms. Their free models in particular may allow training on your prompts.',
   },
   {
+    id: 'ollama',
+    name: 'Ollama (self-hosted)',
+    type: 'ollama',
+    // Ollama serves an OpenAI-shaped route alongside its own /api/chat, which
+    // is why this shares the openai-compatible adapter (see adapterRegistry).
+    //
+    // The endpoint is an example, not a destination. Every player's is
+    // different, so this one exists to show the shape of the URL and to
+    // pre-fill an editable field. Nothing keys off it: the endpoint-keyed
+    // preset lookups below all return nothing for a hand-typed address, which
+    // is the right answer here because this preset asks for no extra headers
+    // and no renamed parameters.
+    endpoint: 'https://ollama.example.com/v1/chat/completions',
+    // Empty on purpose. A hosted service has a catalogue we can list; a machine
+    // the player runs has only what they pulled onto it. Listing four popular
+    // names would be wrong for most players and would also hide the text field
+    // the wizard gives a preset with no models.
+    models: [],
+    // A suggestion to pre-fill that text field with, not a promise that it is
+    // installed. Deliberately not a gemma id: capabilities.hasSystemRole folds
+    // the system turn into the user turn for that family, so a gemma default
+    // would quietly put every new Ollama player on the fallback prompt path.
+    defaultModel: 'llama3.2',
+    capabilities: { text: true, images: false, streaming: true },
+    helpUrl: 'https://ollama.ai/download',
+    requiresApiKey: false,
+    // Stays false until somebody drives a real streamed turn through a real
+    // Ollama, per the note at the top of this file.
+    available: false,
+    note: 'runs on your own machine',
+    privacyNote:
+      'Ollama runs on hardware you control, so your prompts and the story it writes never leave it. Note that the content rating travels as guidance in the prompt here, and many local models are trained without a refusal layer at all.',
+  },
+  {
     id: 'openai',
     name: 'OpenAI',
     type: 'openai-compatible',
