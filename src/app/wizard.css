@@ -1153,8 +1153,10 @@
 
 /* ─── Shared wizard flow hooks ─── */
 
+/* The character wizard renders its auto-save indicator as an unclassed first
+   grid child, so there's no class to hook. Right-aligning it keeps it reading
+   as status chrome instead of the first row of the form. */
 :root .component-character-creation-wizard > :not(.wizard-header) > :first-child:not(.component-wizard-progress) {
-  grid-column: 1 / -1;
   justify-self: end;
 }
 
