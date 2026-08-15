@@ -141,9 +141,11 @@ Its actions live under `handlers` (`handleNext`, `handleBack`, `handleCancel`, `
 Check which one a component imports before copying its usage.
 
 ### Validation helpers
-Located in `utils/validation.ts`:
-- `createWizardValidator` – composable builder for per-step validation rules
-- `validateFields` / `validateField` – reusable field validation helpers
+There's one toolkit, and it lives outside the wizard folder in `src/lib/utils/wizardValidation.ts`:
+- `validateFields` – builds a step validator from per-field rule arrays; returns the
+  `WizardValidation` shape `useWizardState` expects
+- `createValidationRules` – the rule set (`required`, `minLength`, `maxLength`, `custom`)
+- `alwaysValid` – for steps with nothing to check
 
 ## Styling System
 

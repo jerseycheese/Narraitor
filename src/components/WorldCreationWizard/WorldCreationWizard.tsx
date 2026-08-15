@@ -9,7 +9,6 @@ import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
 import {
   Validator,
-  ValidationRule,
   alwaysValid,
   validateFields,
   createValidationRules,
@@ -132,7 +131,7 @@ export default function WorldCreationWizard({
       1: validateFields<WorldCreationData>({
         description: [
           createValidationRules.required<string | undefined>('World description is required'),
-          createValidationRules.minLength(50, 'Description must be at least 50 characters') as ValidationRule<string | undefined>,
+          createValidationRules.minLength(50, 'Description must be at least 50 characters'),
         ],
       }),
       2: alwaysValid, // Attributes step — suggestions are optional

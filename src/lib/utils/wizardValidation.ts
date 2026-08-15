@@ -59,39 +59,16 @@ export const createValidationRules = {
     required: true,
   }),
 
-  minLength: (min: number, message?: string): ValidationRule<string> => ({
-    validate: (value: string) => !value || value.length >= min,
+  // Optional-tolerant value type so these drop into both `string` and
+  // `string | undefined` rule arrays without a cast at the call site.
+  minLength: (min: number, message?: string): ValidationRule<string | undefined> => ({
+    validate: (value) => !value || value.length >= min,
     message: message || `Must be at least ${min} characters`,
   }),
 
-  maxLength: (max: number, message?: string): ValidationRule<string> => ({
-    validate: (value: string) => !value || value.length <= max,
+  maxLength: (max: number, message?: string): ValidationRule<string | undefined> => ({
+    validate: (value) => !value || value.length <= max,
     message: message || `Must be at most ${max} characters`,
-  }),
-
-  minValue: (min: number, message?: string): ValidationRule<number> => ({
-    validate: (value: number) => value >= min,
-    message: message || `Must be at least ${min}`,
-  }),
-
-  maxValue: (max: number, message?: string): ValidationRule<number> => ({
-    validate: (value: number) => value <= max,
-    message: message || `Must be at most ${max}`,
-  }),
-
-  pattern: (regex: RegExp, message: string): ValidationRule<string> => ({
-    validate: (value: string) => !value || regex.test(value),
-    message,
-  }),
-
-  arrayMinLength: <T>(min: number, message?: string): ValidationRule<T[]> => ({
-    validate: (value: T[]) => !value || value.length >= min,
-    message: message || `Must have at least ${min} items`,
-  }),
-
-  arrayMaxLength: <T>(max: number, message?: string): ValidationRule<T[]> => ({
-    validate: (value: T[]) => !value || value.length <= max,
-    message: message || `Must have at most ${max} items`,
   }),
 
   custom: <T>(
