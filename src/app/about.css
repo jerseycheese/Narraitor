@@ -285,13 +285,16 @@
   color: var(--color-accent-strong);
 }
 
+/* About spends its accent on the CTA button, so the eyebrow dots stay in mark
+   ink. That holds on the CTA band too, where the label goes accent-strong for
+   text contrast a decorative 6px dot doesn't need. */
 :root .component-about-section-title::before {
   content: "";
   display: inline-block;
   width: 6px;
   height: 6px;
   border-radius: var(--radius-full);
-  background: var(--color-accent);
+  background: var(--color-text-muted);
   flex-shrink: 0;
 }
 
