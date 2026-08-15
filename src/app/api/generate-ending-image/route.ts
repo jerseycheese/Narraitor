@@ -5,7 +5,7 @@ import type { StoryEnding } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import type { Character } from '@/types/character.types';
 import Logger from '@/lib/utils/logger';
-import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
 
 const logger = new Logger('EndingImageAPI');
@@ -145,17 +145,8 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Try to generate real AI image using Gemini's image generation model
-      let imageUrl = '';
-      let aiGenerated = false;
-      let placeholder = true;
-
-      // Use the key resolved above (player's BYO key -> env fallback).
-      if (apiKey) {
-        try {
-          logger.debug('generate-ending-image', 'Attempting Gemini image generation');
-          
-          const imagePromptForGemini = `Create a cinematic ending image for this story conclusion. ${imageDescription}
+      const { url: imageUrl, aiGenerated } = await resolveGeneratedImageUrl({
+        prompt: `Create a cinematic ending image for this story conclusion. ${imageDescription}
 
 Requirements:
 - Epic cinematic scene showing story conclusion
@@ -167,35 +158,18 @@ Requirements:
 - Focus on the end of the journey or its aftermath
 - No text, logos, or watermarks
 - Wide landscape orientation (3:1 aspect ratio, panoramic hero banner format)
-- Horizontal panoramic composition suitable for wide hero display`;
+- Horizontal panoramic composition suitable for wide hero display`,
+        apiKey,
+        fallbackUrl: generateFallbackImage(body.ending, body.world),
+        loggerContext: 'generate-ending-image',
+        onHardFailure: 'fallback',
+      });
 
-          const generatedImage = await generateImageWithGemini(imagePromptForGemini, apiKey);
-
-          if (generatedImage) {
-            imageUrl = generatedImage.url;
-            aiGenerated = true;
-            placeholder = false;
-
-            logger.debug('generate-ending-image', 'Gemini image generated successfully');
-          } else {
-            logger.warn('generate-ending-image', 'Image generation failed, using fallback');
-            imageUrl = generateFallbackImage(body.ending, body.world);
-          }
-
-        } catch (imageGenError) {
-          logger.error('generate-ending-image', 'Gemini image generation failed, using fallback:', imageGenError);
-          imageUrl = generateFallbackImage(body.ending, body.world);
-        }
-      } else {
-        logger.debug('generate-ending-image', 'No Gemini API key configured, using fallback');
-        imageUrl = generateFallbackImage(body.ending, body.world);
-      }
-      
-      return NextResponse.json({ 
+      return NextResponse.json({
         imageUrl,
         description: imageDescription,
         prompt: imagePrompt,
-        placeholder,
+        placeholder: !aiGenerated,
         aiGenerated,
         tone: body.ending.tone,
         // Include the prompt for future use

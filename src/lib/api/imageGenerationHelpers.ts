@@ -8,6 +8,35 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('ImageGenerationHelpers');
 
 /**
+ * What a route wants done with a hard failure — auth rejection, rate limit,
+ * network error.
+ *
+ * 'throw' hands it to the route's own error handler, which is the only way a
+ * route can answer with something other than 200. 'fallback' serves the
+ * placeholder instead, so the player still gets an illustration when the
+ * provider is having a bad day.
+ */
+type HardFailurePolicy = 'throw' | 'fallback';
+
+interface ImageUrlRequest {
+  /** The prompt sent to the image model. */
+  prompt: string;
+  /** Resolved key for this request (player's BYO key); null means serve the placeholder. */
+  apiKey: string | null;
+  /** Placeholder served whenever real generation doesn't produce an image. */
+  fallbackUrl: string;
+  /** Logger context name (e.g. 'generate-portrait API'). */
+  loggerContext: string;
+  onHardFailure: HardFailurePolicy;
+}
+
+interface ResolvedImageUrl {
+  url: string;
+  /** False whenever the URL is the placeholder rather than a real generation. */
+  aiGenerated: boolean;
+}
+
+/**
  * Configuration for generating fallback images
  */
 interface FallbackImageConfig {
@@ -17,8 +46,6 @@ interface FallbackImageConfig {
   seed: string;
   /** Image type in response */
   imageType?: 'ai-generated' | 'placeholder';
-  /** Additional query parameters for dicebear */
-  params?: Record<string, string>;
 }
 
 /**
@@ -31,10 +58,8 @@ interface ImageGenerationConfig {
   fallback: FallbackImageConfig;
   /** Logger context name (e.g., 'generate-portrait API') */
   loggerContext: string;
-  /** Additional fields to include in response */
-  responseFields?: Record<string, unknown>;
-  /** Resolved key for this request (player's BYO key); falls back to env when omitted. */
-  apiKey?: string | null;
+  /** Resolved key for this request (player's BYO key). */
+  apiKey: string | null;
 }
 
 /**
@@ -42,44 +67,57 @@ interface ImageGenerationConfig {
  */
 function buildDicebearUrl(config: FallbackImageConfig): string {
   const baseUrl = `https://api.dicebear.com/7.x/${config.variant}/svg`;
-  const params = new URLSearchParams({
-    seed: config.seed,
-    ...config.params,
-  });
+  const params = new URLSearchParams({ seed: config.seed });
   return `${baseUrl}?${params.toString()}`;
 }
 
 /**
- * Create a fallback image object
- */
-function createFallbackImage(config: FallbackImageConfig, prompt: string) {
-  return {
-    type: config.imageType || 'placeholder',
-    url: buildDicebearUrl(config),
-    generatedAt: getTimestamp(),
-    prompt,
-  };
-}
-
-/**
- * Get the Gemini API key if available, null otherwise
- */
-function getGeminiApiKey(): string | null {
-  const apiKey = process.env.GEMINI_API_KEY;
-  return apiKey && apiKey !== 'MOCK_API_KEY' ? apiKey : null;
-}
-
-/**
- * Handle image generation with automatic fallback to mock/placeholder images.
- *
- * This centralizes the pattern of:
- * 1. Check for API key
- * 2. Return mock image if no key
+ * Run the image-generation sequence every image route shares:
+ * 1. Check for a key
+ * 2. Serve the placeholder if there isn't one
  * 3. Try real generation
- * 4. Return fallback if generation returns null (soft failure)
+ * 4. Serve the placeholder if generation returns null (soft failure)
  *
- * Note: Hard failures (auth errors, rate limits, network issues) are allowed
- * to throw so the route's error handler can return proper 500 status codes.
+ * Routes keep their own prompt building and response shape — this owns only
+ * the four steps and the logging around them.
+ *
+ * @throws When generation fails hard and the caller asked for 'throw'
+ */
+export async function resolveGeneratedImageUrl({
+  prompt,
+  apiKey,
+  fallbackUrl,
+  loggerContext,
+  onHardFailure,
+}: ImageUrlRequest): Promise<ResolvedImageUrl> {
+  if (!apiKey) {
+    logger.debug(loggerContext, 'No API key configured, using fallback');
+    return { url: fallbackUrl, aiGenerated: false };
+  }
+
+  try {
+    const generatedImage = await generateImageWithGemini(prompt, apiKey);
+
+    if (generatedImage) {
+      logger.debug(loggerContext, 'Image generated successfully');
+      return { url: generatedImage.url, aiGenerated: true };
+    }
+
+    logger.warn(loggerContext, 'Image generation failed, using fallback');
+  } catch (error) {
+    if (onHardFailure === 'throw') throw error;
+    logger.error(loggerContext, 'Image generation failed, using fallback:', error);
+  }
+
+  return { url: fallbackUrl, aiGenerated: false };
+}
+
+/**
+ * The dicebear-backed variant, for routes that answer with a GeneratedImage
+ * object under an `image` key.
+ *
+ * Hard failures are allowed to throw so the route's error handler can return a
+ * proper 500.
  *
  * @param config - Configuration for image generation
  * @returns NextResponse with image data
@@ -88,45 +126,20 @@ function getGeminiApiKey(): string | null {
 export async function generateImageWithFallback(
   config: ImageGenerationConfig
 ): Promise<NextResponse> {
-  const apiKey = config.apiKey ?? getGeminiApiKey();
-
-  // Mock mode - return placeholder immediately
-  if (!apiKey) {
-    const mockImage = createFallbackImage(config.fallback, config.prompt);
-    logger.debug(config.loggerContext, 'Using mock image for development');
-
-    return NextResponse.json({
-      image: mockImage,
-      ...config.responseFields,
-    });
-  }
-
-  // Try real image generation - let errors bubble to route handler
-  const generatedImage = await generateImageWithGemini(config.prompt, apiKey);
-
-  if (!generatedImage) {
-    // Soft failure - Gemini returned null but didn't throw
-    logger.warn(config.loggerContext, 'Image generation failed, using fallback');
-    const fallbackImage = createFallbackImage(config.fallback, config.prompt);
-
-    return NextResponse.json({
-      image: fallbackImage,
-      ...config.responseFields,
-    });
-  }
-
-  // Success - return generated image
-  const imageData = {
-    type: 'ai-generated' as const,
-    url: generatedImage.url,
-    generatedAt: getTimestamp(),
+  const { url, aiGenerated } = await resolveGeneratedImageUrl({
     prompt: config.prompt,
-  };
-
-  logger.debug(config.loggerContext, 'Image generated successfully');
+    apiKey: config.apiKey,
+    fallbackUrl: buildDicebearUrl(config.fallback),
+    loggerContext: config.loggerContext,
+    onHardFailure: 'throw',
+  });
 
   return NextResponse.json({
-    image: imageData,
-    ...config.responseFields,
+    image: {
+      type: aiGenerated ? 'ai-generated' : config.fallback.imageType ?? 'placeholder',
+      url,
+      generatedAt: getTimestamp(),
+      prompt: config.prompt,
+    },
   });
 }

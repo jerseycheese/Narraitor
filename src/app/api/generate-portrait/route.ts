@@ -5,7 +5,7 @@ import Logger from '@/lib/utils/logger';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { truncate, getTimestamp } from '@/lib/utils';
-import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 
 const logger = new Logger('API');
@@ -199,58 +199,24 @@ export async function POST(request: NextRequest) {
       truncate(prompt, 100)
     );
 
-    if (!apiKey) {
-      // Return a mock portrait for development
-      const mockPortrait = {
-        type: 'ai-generated' as const,
-        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'unknown')}`,
-        generatedAt: getTimestamp(),
-        prompt: prompt,
-      };
+    const { url } = await resolveGeneratedImageUrl({
+      prompt,
+      apiKey,
+      fallbackUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'unknown')}`,
+      loggerContext: 'generate-portrait API',
+      onHardFailure: 'throw',
+    });
 
-      logger.debug(
-        'generate-portrait API',
-        'Using mock portrait for development'
-      );
-      return NextResponse.json({
-        portrait: mockPortrait,
-      });
-    }
-
-    // Call Google's Gemini API for image generation
-    const generatedImage = await generateImageWithGemini(prompt, apiKey);
-
-    if (!generatedImage) {
-      logger.warn(
-        'generate-portrait API',
-        'Image generation failed, using fallback'
-      );
-
-      // Return mock portrait as fallback
-      const fallbackPortrait = {
-        type: 'ai-generated' as const,
-        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
-        generatedAt: getTimestamp(),
-        prompt: prompt,
-      };
-
-      return NextResponse.json({
-        portrait: fallbackPortrait,
-      });
-    }
-
-    // Return the generated portrait
-    const portraitData = {
-      type: 'ai-generated' as const,
-      url: generatedImage.url,
-      generatedAt: getTimestamp(),
-      prompt: prompt,
-    };
-
-    logger.debug('generate-portrait API', 'Portrait generated successfully');
-
+    // Portraits are typed 'ai-generated' even when the URL is the dicebear
+    // placeholder: CharacterPortrait only renders a portrait whose type isn't
+    // 'placeholder', and the avatar is meant to show.
     return NextResponse.json({
-      portrait: portraitData,
+      portrait: {
+        type: 'ai-generated' as const,
+        url,
+        generatedAt: getTimestamp(),
+        prompt: prompt,
+      },
     });
   } catch (error) {
     logger.error('generate-portrait API', 'Portrait generation failed:', error);
