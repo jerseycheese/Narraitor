@@ -145,13 +145,16 @@
   color: var(--color-text-secondary);
 }
 
+/* The FAQ spends its accent on the inline links inside answers, so the eyebrow
+   dots stay in mark ink. No focal accent mark here: the dot is the page's only
+   drafting mark, and there's no bracket to promote to a registration cross. */
 .component-faq .component-faq-group-title::before {
   content: "";
   display: inline-block;
   width: 6px;
   height: 6px;
   border-radius: var(--radius-full);
-  background: var(--color-accent);
+  background: var(--color-text-muted);
   flex-shrink: 0;
 }
 
