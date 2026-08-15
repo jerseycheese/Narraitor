@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { WorldAttribute } from '@/types/world.types';
-import { SectionWrapper } from '@/components/shared/SectionWrapper';
 
 interface WorldAttributesListProps {
   attributes: WorldAttribute[];
@@ -14,10 +13,11 @@ export function WorldAttributesList({ attributes }: WorldAttributesListProps) {
   }
 
   return (
-    <SectionWrapper
-      className="world-detail-section"
-      title="Attributes that apply to characters in this world"
+    <section
+      className="world-detail-section world-detail-attributes"
+      aria-labelledby="world-attributes-heading"
     >
+      <h2 id="world-attributes-heading">Attributes</h2>
       <div className="world-detail-stat-list">
         {attributes.map((attr, index) => (
           <div key={`${attr.id ?? attr.name ?? index}`} className="world-detail-stat">
@@ -36,6 +36,6 @@ export function WorldAttributesList({ attributes }: WorldAttributesListProps) {
           </div>
         ))}
       </div>
-    </SectionWrapper>
+    </section>
   );
 }

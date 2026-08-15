@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
-import { SectionWrapper } from '@/components/shared/SectionWrapper';
 
 interface WorldSkillsListProps {
   skills: WorldSkill[];
@@ -15,10 +14,11 @@ export function WorldSkillsList({ skills, attributes }: WorldSkillsListProps) {
   }
 
   return (
-    <SectionWrapper
-      className="world-detail-section"
-      title="Skills that characters can learn in this world"
+    <section
+      className="world-detail-section world-detail-skills"
+      aria-labelledby="world-skills-heading"
     >
+      <h2 id="world-skills-heading">Skills</h2>
       <div className="world-detail-stat-list">
         {skills.map((skill, index) => (
           <div key={`${skill.id ?? skill.name ?? index}`} className="world-detail-stat">
@@ -46,6 +46,6 @@ export function WorldSkillsList({ skills, attributes }: WorldSkillsListProps) {
           </div>
         ))}
       </div>
-    </SectionWrapper>
+    </section>
   );
 }
