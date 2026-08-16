@@ -13,6 +13,12 @@ updated: 2026-05-22
 > Backfilled 2026-05-22. Retroactive record of an inception-era decision, reconstructed from the
 > codebase and git history.
 
+> **Note (2026-08-15):** Everything below still stands. What it was missing was a reopen condition,
+> since "an accepted trade-off for now" never said for how long.
+> [ADR-014](ADR-014-browser-local-until-named-trigger.md) names the three things that would reopen
+> this decision, and until one of them happens, accounts and server persistence stay off the
+> roadmap.
+
 ## The Situation
 
 Narraitor is a single-player tool built primarily for personal use. There's no multi-user
