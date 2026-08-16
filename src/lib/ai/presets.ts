@@ -1,6 +1,7 @@
 // src/lib/ai/presets.ts
 
 import type { ProviderPreset } from '@/types/provider.types';
+import { KEYLESS_PROVIDER_KEY } from './providerKeyHeader';
 
 /**
  * Provider presets shown in the configuration wizard.
@@ -214,6 +215,24 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       'Perplexity states that it keeps no record of prompts or responses sent to its chat completions API, and does not use them for training. It retains billing metrics only.',
   },
 ];
+
+/**
+ * The key to actually send, given what the player typed and whether this
+ * service needs one.
+ *
+ * Lives here rather than in the wizard because it completes the contract of
+ * `requiresApiKey` above: the field is only meaningful alongside the rule for
+ * what an empty box then means. Keeping the pair together also keeps the
+ * component out of lib/ai internals, which the boundary rules refuse.
+ *
+ * Undefined means "send nothing", which is the right answer for a hosted
+ * service and the wrong one for a keyless provider - see KEYLESS_PROVIDER_KEY.
+ */
+export const keyToSend = (typedKey: string, requiresApiKey: boolean): string | undefined => {
+  const typed = typedKey.trim();
+  if (typed) return typed;
+  return requiresApiKey ? undefined : KEYLESS_PROVIDER_KEY;
+};
 
 /** Look up a preset by its stable id. */
 export const getPresetById = (id: string): ProviderPreset | undefined =>

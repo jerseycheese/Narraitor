@@ -11,9 +11,8 @@ import { ProviderPresets } from './ProviderPresets';
 import { CustomProviderForm } from './CustomProviderForm';
 import { ProviderDisclosure } from './ProviderDisclosure';
 import { useProviderStore } from '@/state/providerStore';
-import { getPresetById } from '@/lib/ai/presets';
+import { getPresetById, keyToSend } from '@/lib/ai/presets';
 import { validateProviderKey, type ValidationResult } from '@/lib/ai/validateProviderClient';
-import { KEYLESS_PROVIDER_KEY } from '@/lib/ai/providerKeyHeader';
 import type { ProviderType } from '@/types/provider.types';
 import './provider-config.css';
 
@@ -74,23 +73,11 @@ interface ProviderWizardProps {
   onCancel?: () => void;
 }
 
-/**
- * What to send as the key. A keyless provider still gets one, because the
- * server reads a missing key as "use the env Gemini key" — see
- * KEYLESS_PROVIDER_KEY. A player who does put a key on their own server, behind
- * an authenticating tunnel, keeps theirs.
- */
 /** The failure, worded for whichever kind of provider the player picked. */
 function describeVerifyError(code: string | undefined, requiresApiKey: boolean): string {
   const key = code ?? 'VALIDATION_FAILED';
   if (!requiresApiKey && SELF_HOSTED_ERROR_MESSAGES[key]) return SELF_HOSTED_ERROR_MESSAGES[key];
   return ERROR_MESSAGES[key] ?? ERROR_MESSAGES.VALIDATION_FAILED;
-}
-
-function resolveKey(data: ProviderWizardData): string | undefined {
-  const typed = data.apiKey.trim();
-  if (typed) return typed;
-  return data.requiresApiKey ? undefined : KEYLESS_PROVIDER_KEY;
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -165,7 +152,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
         name: data.name.trim() || data.presetId || 'Provider',
         endpoint: data.endpoint,
         model: data.model,
-        apiKey: resolveKey(data),
+        apiKey: keyToSend(data.apiKey, data.requiresApiKey),
         capabilities: { text: true, images: data.images, streaming: data.streaming },
       });
       onComplete?.();
@@ -228,7 +215,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     setVerifyState('loading');
     try {
       const result = await validateProviderKey({
-        apiKey: resolveKey(data),
+        apiKey: keyToSend(data.apiKey, data.requiresApiKey),
         type: data.type,
         endpoint: data.endpoint,
         model: data.model,
