@@ -22,8 +22,8 @@ export default function PrivacyPage() {
         </p>
         <p>
           From Settings you can export everything to a file and import it back —
-          that&apos;s your backup, and it&apos;s the only copy that leaves your
-          device, when you choose to make it. Clearing your browser data for this
+          that&apos;s your backup, and it&apos;s the only copy of your saved data
+          that leaves your device, when you choose to make it. Clearing your browser data for this
           site erases everything, so keep an export of anything you&apos;d be sad
           to lose.
         </p>
@@ -32,7 +32,8 @@ export default function PrivacyPage() {
       <LegalSection id="privacy-prompts" heading="What leaves your browser">
         <p>
           To write the story and generate images, the app sends your prompts — the
-          world and character details you create, and the choices you make — to the
+          world and character details you create, and the choices you make — by way
+          of its own server, which passes them on without keeping a copy, to the
           provider that does the generating. By default that&apos;s Google Gemini;
           if you&apos;ve set up your own provider key, it goes to whichever provider
           you chose instead.
