@@ -116,24 +116,34 @@ export async function POST(request: NextRequest) {
     try {
       // Generate image prompt using AI (player's BYO key -> env fallback)
       const apiKey = resolveApiKey(request);
-      const client = createDefaultGeminiClient(apiKey);
       const imagePrompt = generateImagePrompt(body.ending, body.world, body.character, body.recentNarrative);
-      
-      logger.debug('generate-ending-image', 'Generated image prompt:', imagePrompt);
 
-      // Generate a detailed description that could be used with real AI image generation
-      const promptResponse = await client.generateContent(`
+      // Length rather than text - this prompt carries the player's story.
+      logger.debug('generate-ending-image', 'Image prompt built', { length: imagePrompt.length });
+
+      // No Gemini key means the player is on another provider, and asking the
+      // factory for a client here hands back MockGeminiClient - a test double
+      // answering a real request. The generated prompt already describes the
+      // scene, so skip the elaboration rather than fake it.
+      let imageDescription: string;
+      if (!apiKey) {
+        imageDescription = imagePrompt;
+      } else {
+        const client = createDefaultGeminiClient(apiKey);
+        const promptResponse = await client.generateContent(`
         Generate a detailed, artistic description for an image showing the conclusion of this story that could be used as a prompt for an AI image generator. Be very specific about visual elements, atmosphere, lighting, composition, and emotional tone.
-        
+
         ${imagePrompt}
-        
+
         Focus on creating a powerful final image that captures the essence of this ${body.ending.tone} ending.
-        
+
         Respond with only the detailed visual description, no other text.
       `);
-
-      const imageDescription = promptResponse.content;
-      logger.debug('generate-ending-image', 'Generated image description:', imageDescription);
+        imageDescription = promptResponse.content;
+      }
+      logger.debug('generate-ending-image', 'Image description ready', {
+        length: imageDescription.length,
+      });
 
       // If promptOnly flag is set, return just the prompt information
       if (body.promptOnly) {

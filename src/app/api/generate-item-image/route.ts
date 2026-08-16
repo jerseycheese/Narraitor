@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
 
     const prompt = buildItemPrompt(item);
 
-    logger.debug('generate-item-image API', 'Generated prompt:', prompt.substring(0, 100) + '...');
+    // Length rather than text - a truncated prompt is still the player's content.
+    logger.debug('generate-item-image API', 'Prompt built', { length: prompt.length });
 
     // Use centralized helper for image generation with fallback
     return generateImageWithFallback({

@@ -335,6 +335,31 @@ describe('/api/generate-world-image', () => {
         expect(mockGenerateImageWithGemini).not.toHaveBeenCalled();
       }
     });
+
+    /**
+     * resolveApiKey returns null for a player on another provider, and passing
+     * that null to the client factory used to hand back MockGeminiClient - a
+     * test double answering a production request with 'Generated test content'.
+     * Nothing rendered it, which is the only reason it went unnoticed.
+     */
+    it('does not build a client at all when no Gemini key resolves', async () => {
+      delete process.env.GEMINI_API_KEY;
+      mockCreateDefaultGeminiClient.mockClear();
+
+      const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
+        method: 'POST',
+        body: JSON.stringify({ world: mockWorld }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(mockCreateDefaultGeminiClient).not.toHaveBeenCalled();
+      // The description falls back to the prompt built from the world, which is
+      // the player's own content rather than a fixture's.
+      expect(data.description).toContain(mockWorld.name);
+    });
   });
 
   describe('Error Handling', () => {
