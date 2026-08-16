@@ -1,49 +1,14 @@
-import { NarrativeSegment, NarrativeMetadata, DecisionOption } from '../types/narrative.types';
+import { NarrativeSegment, NarrativeMetadata } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { applyWorldStateThreadUpdates } from '../lib/narrative/applyWorldStateThreadUpdates';
+import { formatDecisionText } from '../lib/narrative/formatDecisionText';
 import { useSessionStore } from './sessionStore';
 import { useGoalStore } from './goalStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
-
-const normalizeDecisionText = (text: string) => {
-  const trimmed = safeTrim(text);
-  if (!trimmed) return '';
-
-  const withoutYou = trimmed.replace(/^you\b\s*/i, '');
-  const withoutChoose = withoutYou.replace(/^(choose|decide|decided|chose)\s+to\s+/i, '');
-  const withoutTo = withoutChoose.replace(/^to\s+/i, '');
-  const firstChar = withoutTo.charAt(0);
-  const normalized =
-    firstChar && /[A-Z]/.test(firstChar)
-      ? `${firstChar.toLowerCase()}${withoutTo.slice(1)}`
-      : withoutTo;
-
-  return `You choose to ${normalized}`.trim();
-};
-
-/**
- * An offered option is a verb phrase, so it reads as "You choose to <option>".
- * A typed action is already a complete first-person sentence, and prefixing one
- * shifts person as well as case ("You choose to i walk over to the mill"), so it
- * renders as the player wrote it.
- */
-const formatDecisionText = (option: DecisionOption): string => {
-  if (!option.isCustomInput) {
-    return normalizeDecisionText(option.text);
-  }
-
-  const typed = safeTrim(option.customText || option.text);
-  if (!typed) return '';
-
-  const firstChar = typed.charAt(0);
-  return /[a-z]/.test(firstChar)
-    ? `${firstChar.toUpperCase()}${typed.slice(1)}`
-    : typed;
-};
 
 const normalizeLocationKey = (value: string): string =>
   safeTrim(value)

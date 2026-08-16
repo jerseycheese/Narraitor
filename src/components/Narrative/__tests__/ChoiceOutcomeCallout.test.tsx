@@ -195,6 +195,37 @@ describe('ChoiceOutcomeCallout consequence chips', () => {
     expect(screen.queryByText(/You attempt to/)).not.toBeInTheDocument();
   });
 
+  it('repairs a typed action persisted in the old mangled form', () => {
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-5': {
+          id: 'decision-5',
+          prompt: 'What now?',
+          selectedOptionId: 'opt-custom',
+          options: [
+            {
+              id: 'opt-custom',
+              text: 'i ask Martha Hendricks what they want',
+              isCustomInput: true,
+              customText: 'i ask Martha Hendricks what they want',
+            },
+          ],
+        },
+      },
+    });
+
+    render(
+      <ChoiceOutcomeCallout
+        decisionId="decision-5"
+        decisionText="You choose to i ask Martha Hendricks what they want"
+      />
+    );
+
+    expect(
+      screen.getByText('I ask Martha Hendricks what they want')
+    ).toBeInTheDocument();
+  });
+
   it('surfaces the actual shift size rather than a fixed label', () => {
     useNarrativeStore.setState({
       decisions: {

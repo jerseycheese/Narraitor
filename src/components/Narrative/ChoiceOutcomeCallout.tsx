@@ -6,6 +6,7 @@ import { clsx } from 'clsx';
 import { Consequence, DecisionOutcome } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useNPCStore } from '@/state/npcStore';
+import { formatDecisionText } from '@/lib/narrative/formatDecisionText';
 
 interface ChoiceOutcomeCalloutProps {
   decisionId: EntityID;
@@ -129,11 +130,12 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     (option) => option.id === decision.selectedOptionId
   );
 
-  // A typed action is a first-person sentence; "You attempt to I walk over..."
-  // is the same person shift the stored text already avoids. The outcome label
-  // carries the failure signal on its own.
+  // A typed action is a first-person sentence, so it takes neither prefix -
+  // "You attempt to I walk over..." is the same person shift. Rendering it from
+  // the option rather than the stored text also repairs sessions saved before
+  // addSegment stopped mangling it. The outcome label carries the failure.
   const displayDecisionText = selectedOption?.isCustomInput
-    ? decisionText
+    ? formatDecisionText(selectedOption)
     : buildOutcomeDecisionText(decisionText, decisionOutcome);
 
   const outcomeLabel = decisionOutcome
