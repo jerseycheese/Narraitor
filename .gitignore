@@ -176,3 +176,6 @@ characters-debug.png
 
 # design-loop skill's per-worktree session log — local paper trail, not repo docs
 design-loop-log.md
+
+# narraitor-playtest-loop's running findings log — same deal, findings graduate to issues
+playtest-log.md
