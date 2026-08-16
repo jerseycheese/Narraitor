@@ -101,9 +101,16 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     // Ollama 0.32.5 serving mistral, reached over a public https address. 78
     // deltas, a normal stop, and prose that parsed as the narrative envelope.
     available: true,
-    note: 'runs on your own machine',
+    // Not "runs on your own machine": that describes the case this preset
+    // cannot serve. Ollama on the player's laptop is unreachable from a
+    // server-side route and is its own piece of work.
+    note: 'a server you host yourself',
+    // Careful with the privacy claim here, because the tempting one is false.
+    // The model runs on the player's hardware, but the prompt still travels
+    // browser -> our route -> their server, because our route is what makes the
+    // request. What they avoid is a third-party AI service, not a hop.
     privacyNote:
-      'Ollama runs on hardware you control, so your prompts and the story it writes never leave it. Note that the content rating travels as guidance in the prompt here, and many local models are trained without a refusal layer at all.',
+      'The model runs on hardware you control, so no AI company sees your story. The prompt does pass through Narraitor\'s own server on the way there, because that server makes the request rather than your browser. Note also that the content rating travels as guidance in the prompt, and many local models have no refusal layer at all.',
   },
   {
     id: 'openai',
