@@ -63,9 +63,10 @@ call. Range inputs batch fine. Buttons do not.
 **Capturing a turn:** one JavaScript call returning compact JSON from
 `window.useNarrativeStore.getState()` for `segments` and `decisions`, plus
 `useJournalStore` and `useInventoryStore`. All of them are exposed on `window` whenever
-`NODE_ENV` is not production, per `src/lib/utils/shouldExposeStoreOnWindow.ts`. Every
-segment carries `metadata.debugInfo.tokenUsage` in dev, courtesy of
-`src/lib/ai/debugInfoBuilder.ts`, so prompt and completion tokens come free.
+`NODE_ENV` is not production, per `src/lib/utils/shouldExposeStoreOnWindow.ts`. Note that
+`segments` and `decisions` are both keyed records rather than arrays, so read turns in
+order through `getSessionSegments(sessionId)` and not by index. Token counts are not
+available on this path; see section 4.
 
 **Pair a segment to its decision through `metadata.causedByDecisionId`, never by zipping
 the two arrays on index.** They do not line up, and the failure is silent: the first
@@ -102,14 +103,28 @@ line fails, fix the harness first.
 
 1. `window.__PLAYWRIGHT__` is undefined and the user agent has no "Playwright" in it
 2. The network shows real POSTs to `/api/narrative/generate` and `/api/narrative/choices`
-3. `useNarrativeStore.getState().segments.length` is 3, with distinct prose in each
-4. `segments[2].metadata.debugInfo.tokenUsage.promptTokens` is above zero
-5. A journal entry exists. `/api/narrative/summarize` is suppressed under the Playwright
-   gate, so its output proves the gate is off.
+3. `useNarrativeStore.getState().getSessionSegments(sessionId)` returns 3 segments with
+   distinct prose in each
+4. A journal entry exists. `/api/narrative/summarize` is suppressed under the Playwright
+   gate, so its output proves the gate is off. This is the strongest single signal in the
+   list, because it is the one thing a mocked run cannot fake.
+
+**`segments` is a `Record<EntityID, NarrativeSegment>`, not an array.** `.length` is
+`undefined` on it and `segments[2]` is an id lookup rather than the third turn. Order comes
+from `sessionSegments[sessionId]`, which `getSessionSegments` already resolves and filters.
+Any check written against `segments` as an array fails in a way that looks like a mocked
+harness, which is the most expensive false alarm this checkpoint can raise.
+
+**Do not assert on `debugInfo.tokenUsage`.** The first campaign tried, and the check failed
+at turn 3 on a run that was demonstrably live. `debugInfo` is attached in
+`src/lib/ai/narrativeGenerator.ts` under a condition the browser path does not meet, so
+token counts are absent no matter how real the generation is. Four independent proofs of
+live generation stood while that one criterion said otherwise. Cost per run is better read
+from the provider console than from the store.
 
 ## 5. The campaign
 
-Five runs. Vary one thing at a time so a bad score points somewhere.
+Five scored runs plus an A/B pair. Vary one thing at a time so a bad score points somewhere.
 
 | Run | World | Character | Persona | Turns |
 |---|---|---|---|---|
@@ -117,10 +132,20 @@ Five runs. Vary one thing at a time so a bad score points somewhere.
 | 2 | Camp Crystal Lake | fresh | Reckless | 30 |
 | 3 | Contrast world | fresh | Custom-text-heavy | 30 |
 | 4 | Contrast world | established | Contrarian | to a real ending |
+| 5 | Camp Crystal Lake | established | Cautious | 30 |
 | A/B | Camp Crystal Lake, branched at turn 8 | fresh | opposite choices | 10 per arm |
 
+**The five runs are what close the evaluation matrix, and the matrix is binding.**
+`narraitor-ai-quality-discipline` is the single home of those minimums: two contrasting
+worlds crossed with one fresh and one established character, three or more generations per
+cell. Runs 1 through 5 cover all four cells at 30 generations each. Run 5 exists only to
+close the Camp Crystal Lake and established cell, which the first campaign left open, so
+that campaign's results are a story-quality read and cannot be cited as a matrix. The A/B
+pair sits outside the matrix and answers a different question.
+
 Cautious goes first. That playstyle produced #1680, where the story never escalated because
-the player never forced it to.
+the player never forced it to. Run 5 repeats it on an established character so the only
+thing that changed is the character's history.
 
 Run 1 includes world creation and character creation through the real wizards. The first
 three turns decide whether anyone keeps playing, and a returning player never walks that
