@@ -94,9 +94,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
         answer: (
           <p>
             Because generation runs on your account rather than a shared one.
-            That&apos;s what keeps Narraitor account-free and keeps your stories
-            off anybody&apos;s server. You set the key up once and it stays in
-            this browser.
+            That&apos;s what keeps Narraitor account-free, with no sign-up and
+            nothing to bill. You set the key up once and it stays in this
+            browser.
           </p>
         ),
       },
@@ -186,13 +186,15 @@ export const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         id: 'what-gets-sent',
-        question: 'What gets sent to Google?',
+        question: 'What gets sent to the provider?',
         answer: (
           <>
             <p>
               The prompt for the next piece of story: your world and character
-              details, and the choices you&apos;ve made. What Google does with it
-              is governed by their terms, not ours.
+              details, and the choices you&apos;ve made. It travels by way of
+              our own server, which passes it on without keeping a copy. What
+              the provider does with it from there is governed by their terms,
+              not ours.
             </p>
             <p>
               Treat a prompt like anything you&apos;d paste into a third-party
