@@ -47,14 +47,6 @@ ${lines.join('\n')}
 `;
 };
 
-const PLAYER_ACTION_REQUIREMENTS = `
-PLAYER ACTION REQUIREMENTS:
-- This passage must visibly engage with the action above. A reader should be able to tell what the player just did or said from the prose alone.
-- If the player asked a question, someone answers it, dodges it, or refuses it out loud in this passage. Leaving it hanging is not an option.
-- If nothing established yet supplies the answer, invent one that fits the world and commit to it as canon from here on.
-- If the player raised something from their own background, name it in the fiction and let someone react to it.
-- Do not reprint or paraphrase a passage from STORY SO FAR as this turn's response.`;
-
 export const sceneTemplate = (context: NarrativeTemplateContext) => {
   const {
     worldName,
@@ -112,7 +104,7 @@ ${backgroundSection}
 STORY SO FAR:
 ${recentContent}
 
-${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}\n${PLAYER_ACTION_REQUIREMENTS}` : ''}
+${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
 
 ${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:

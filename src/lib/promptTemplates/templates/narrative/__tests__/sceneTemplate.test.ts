@@ -44,8 +44,8 @@ describe('sceneTemplate pacing guidance', () => {
   });
 });
 
-describe('sceneTemplate player action handling', () => {
-  const typedAction = 'I ask who benefits if the deed goes through';
+describe('sceneTemplate player character background', () => {
+  const typedAction = 'I bring up my grandparents working the looms';
 
   function makeTypedContext(
     overrides: Partial<NarrativeTemplateContext> = {}
@@ -70,32 +70,8 @@ describe('sceneTemplate player action handling', () => {
     };
   }
 
-  it('carries the typed action into the prompt verbatim', () => {
+  it('still renders the player action line alongside the background section', () => {
     expect(sceneTemplate(makeTypedContext())).toContain(typedAction);
-  });
-
-  it('requires the passage to engage with what the player did or said', () => {
-    const prompt = sceneTemplate(makeTypedContext());
-    expect(prompt).toContain('PLAYER ACTION REQUIREMENTS');
-    expect(prompt).toMatch(/must visibly engage with the action above/i);
-  });
-
-  it('requires a direct question to be answered, dodged, or refused on the page', () => {
-    const prompt = sceneTemplate(makeTypedContext());
-    expect(prompt).toMatch(/asked a question/i);
-    expect(prompt).toMatch(/answers it, dodges it, or refuses it/i);
-  });
-
-  it('tells the model to invent an answer when nothing established supplies one', () => {
-    expect(sceneTemplate(makeTypedContext())).toMatch(
-      /invent one that fits the world/i
-    );
-  });
-
-  it("forbids reprinting an earlier passage as this turn's response", () => {
-    expect(sceneTemplate(makeTypedContext())).toMatch(
-      /do not reprint or paraphrase a passage from STORY SO FAR/i
-    );
   });
 
   it('gives the model the character background so raised backstory is answerable', () => {
@@ -122,7 +98,7 @@ describe('sceneTemplate player action handling', () => {
     expect(prompt).not.toContain('PLAYER CHARACTER BACKGROUND');
   });
 
-  it('omits the action requirements when there is no player action', () => {
+  it('renders the background even on a turn with no player action', () => {
     const prompt = sceneTemplate(
       makeTypedContext({
         narrativeContext: {
@@ -131,6 +107,7 @@ describe('sceneTemplate player action handling', () => {
         },
       })
     );
-    expect(prompt).not.toContain('PLAYER ACTION REQUIREMENTS');
+    expect(prompt).toContain('PLAYER CHARACTER BACKGROUND');
+    expect(prompt).not.toContain('PLAYER ACTION:');
   });
 });
