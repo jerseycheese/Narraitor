@@ -142,7 +142,10 @@ describe('choiceGenerator.personality', () => {
 
       const result = formatPersonalityForChoices(character, false);
 
-      expect(result).toContain('within required alignment distribution');
+      expect(result).toContain(
+        'Personality guides HOW an alignment is expressed, not which alignments appear'
+      );
+      expect(result).not.toMatch(/required alignment distribution|the distribution/i);
       expect(result).not.toContain(
         'Lawful/neutral/chaotic alignment should consider personality:'
       );

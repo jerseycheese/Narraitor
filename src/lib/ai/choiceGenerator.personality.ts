@@ -64,9 +64,7 @@ export const formatPersonalityForChoices = (
   }
 
   const guidanceLines = [
-    includeAlignmentHints
-      ? 'PERSONALITY-ALIGNED CHOICE GUIDANCE:'
-      : 'PERSONALITY-ALIGNED CHOICE GUIDANCE (within required alignment distribution):',
+    'PERSONALITY-ALIGNED CHOICE GUIDANCE:',
     "- Create options that reflect the character's personality traits",
     '- Reference active goals when choices can advance or challenge them',
     '- Consider fears when appropriate (avoidance or confrontation options)',
@@ -81,8 +79,12 @@ export const formatPersonalityForChoices = (
       "- Don't force personality alignment if it limits meaningful variety"
     );
   } else {
+    // The aligned template carries its own alignment guidance, so this branch
+    // only clarifies personality's role. It must not reassert a distribution:
+    // the template no longer mandates one, and this section is appended after
+    // it, so a contradiction here is the last thing the model reads.
     guidanceLines.push(
-      '- Personality guides HOW each required alignment is expressed, NOT the distribution'
+      '- Personality guides HOW an alignment is expressed, not which alignments appear'
     );
   }
 
