@@ -7,6 +7,9 @@ A distilled, evidence-disciplined skill library that lets future sessions (weake
 **Pre-existing skills (kept, referenced as siblings — not part of this pass):**
 `narraitor-architecture` (authoring conventions) · `narraitor-pattern-alignment-skill` (post-edit check) · `review` (PR review) · `style-port` (inline-style porting).
 
+**Added after the distillation pass:**
+`narraitor-playtest-loop` (live multi-turn play sessions scored for story quality) — the taste instrument the distilled library had no answer for. Ships its own `rubric.md` and reusable world specs under `worlds/`.
+
 **The distilled library (16 skills):**
 
 | Skill | One line | Invoke when |
@@ -37,7 +40,8 @@ change-control  <- the spine; every skill's status claims route through it
   ├─ validation-and-qa ──── which tier proves what
   │    └─ storybook-app-parity ── the "integrated" bar
   ├─ ai-quality-discipline ── the AI evidence bar
-  │    └─ prompt-template-governance ── consumes the matrix as gate G4
+  │    ├─ prompt-template-governance ── consumes the matrix as gate G4
+  │    └─ playtest-loop ── one way to meet the bar for story quality specifically
   ├─ feature-experiment-lifecycle ── wraps delivery; emits ship/hold memos
   └─ docs-and-writing ── how verdicts get written down
 
@@ -60,7 +64,7 @@ hardest-problem-campaign ── composes: ai-quality-discipline + diagnostics + 
 
 **Safe for automatic model invocation** (procedural, read-mostly, self-limiting): repo-orientation, build-test-env, debugging-playbook, architecture-contract, change-control, ai-quality-discipline, prompt-template-governance, storybook-app-parity, validation-and-qa, failure-archaeology, domain-reference, diagnostics-and-tooling, docs-and-writing.
 
-**Prefer deliberate/manual invocation** (long-running, owner-decision-heavy, or spends money/tokens): `hardest-problem-campaign` (hours of work + owner sign-offs + live generation costs), `feature-experiment-lifecycle` P9 decisions, `product-frontier` (scoping conversations). Auto-triggering their *advice* is fine; executing their protocols is a deliberate act.
+**Prefer deliberate/manual invocation** (long-running, owner-decision-heavy, or spends money/tokens): `hardest-problem-campaign` (hours of work + owner sign-offs + live generation costs), `playtest-loop` (hundreds of live Gemini calls per campaign, owner check-in between every run), `feature-experiment-lifecycle` P9 decisions, `product-frontier` (scoping conversations). Auto-triggering their *advice* is fine; executing their protocols is a deliberate act.
 
 ## Honesty contract
 
