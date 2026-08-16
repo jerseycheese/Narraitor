@@ -219,6 +219,42 @@ describe('narrativeStore - Decision Consequence Tracking (Issue #971)', () => {
       expect(segment2.metadata.causedByDecisionText).toBe('You choose to buy supplies');
     });
 
+    it('should render a typed action as its own sentence', () => {
+      const store = useNarrativeStore.getState();
+      const sessionId = 'session-123';
+      const worldId = 'world-456';
+      const characterId = 'char-789';
+      const typed = 'i walk over to the mill and ask who holds the debt';
+
+      const decisionId = store.addDecision(sessionId, {
+        prompt: 'What do you do?',
+        options: [
+          {
+            id: 'custom-1',
+            text: typed,
+            isCustomInput: true,
+            customText: typed
+          }
+        ] as DecisionOption[]
+      });
+      store.selectDecisionOption(decisionId, 'custom-1', characterId);
+
+      const segmentId = store.addSegment(sessionId, {
+        worldId,
+        content: 'The foreman looks up.',
+        type: 'scene',
+        metadata: { tags: [] },
+        timestamp: new Date(),
+        updatedAt: getTimestamp()
+      });
+
+      const segment = useNarrativeStore.getState().segments[segmentId];
+
+      expect(segment.metadata.causedByDecisionText).toBe(
+        'I walk over to the mill and ask who holds the debt'
+      );
+    });
+
     it('should format decision text with "You choose to" prefix', () => {
       const store = useNarrativeStore.getState();
       const sessionId = 'session-123';

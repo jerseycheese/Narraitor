@@ -125,18 +125,21 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
   const decision = useNarrativeStore((state) => state.decisions[decisionId]);
   const getNpcById = useNPCStore((state) => state.getById);
 
-  const displayDecisionText = buildOutcomeDecisionText(
-    decisionText,
-    decisionOutcome
+  const selectedOption = decision?.options?.find(
+    (option) => option.id === decision.selectedOptionId
   );
+
+  // A typed action is a first-person sentence; "You attempt to I walk over..."
+  // is the same person shift the stored text already avoids. The outcome label
+  // carries the failure signal on its own.
+  const displayDecisionText = selectedOption?.isCustomInput
+    ? decisionText
+    : buildOutcomeDecisionText(decisionText, decisionOutcome);
 
   const outcomeLabel = decisionOutcome
     ? outcomeLabels[decisionOutcome]
     : 'Decision Logged';
 
-  const selectedOption = decision?.options?.find(
-    (option) => option.id === decision.selectedOptionId
-  );
   const chips = buildConsequenceChips(
     selectedOption?.consequences ?? [],
     (id) => getNpcById(id)?.name

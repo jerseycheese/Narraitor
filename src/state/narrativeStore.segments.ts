@@ -1,4 +1,4 @@
-import { NarrativeSegment, NarrativeMetadata } from '../types/narrative.types';
+import { NarrativeSegment, NarrativeMetadata, DecisionOption } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
@@ -23,6 +23,26 @@ const normalizeDecisionText = (text: string) => {
       : withoutTo;
 
   return `You choose to ${normalized}`.trim();
+};
+
+/**
+ * An offered option is a verb phrase, so it reads as "You choose to <option>".
+ * A typed action is already a complete first-person sentence, and prefixing one
+ * shifts person as well as case ("You choose to i walk over to the mill"), so it
+ * renders as the player wrote it.
+ */
+const formatDecisionText = (option: DecisionOption): string => {
+  if (!option.isCustomInput) {
+    return normalizeDecisionText(option.text);
+  }
+
+  const typed = safeTrim(option.customText || option.text);
+  if (!typed) return '';
+
+  const firstChar = typed.charAt(0);
+  return /[a-z]/.test(firstChar)
+    ? `${firstChar.toUpperCase()}${typed.slice(1)}`
+    : typed;
 };
 
 const normalizeLocationKey = (value: string): string =>
@@ -107,7 +127,7 @@ export const createNarrativeSegmentActions = (
 
       if (selectedOption?.text) {
         causedByDecisionId = latestDecisionId;
-        causedByDecisionText = normalizeDecisionText(selectedOption.text);
+        causedByDecisionText = formatDecisionText(selectedOption);
       }
     }
 
