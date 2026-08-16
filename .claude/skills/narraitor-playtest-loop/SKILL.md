@@ -67,11 +67,18 @@ from later calls. The work survives the timeout either way — round 4 lost a ca
 `await` and found the batch had completed in the background regardless — but polling is the
 difference between reading the result and guessing at it.
 
-**Dismiss the ending offer before every action.** Somewhere around turn 14 the session
-offers "Your story could end here" with View Ending and Continue Playing. It suppresses the
-choice list, so a runner that does not click Continue Playing stalls for the rest of its
-batch and reports a timeout that looks like a hung generation. Check for it at the top of
-each turn, not once at the start.
+**Handle the ending offer at the top of every action, and handle it per run.** Somewhere
+around turn 14 the session offers "Your story could end here" with View Ending and Continue
+Playing. It suppresses the choice list, so a runner that ignores it stalls for the rest of
+its batch and reports a timeout that looks like a hung generation. Check for it before each
+action rather than once at the start.
+
+What to click depends on the run. **Fixed-length runs click Continue Playing** — the offer
+fires well before turn 30 and accepting it ends the session early with the block scores
+unfinished. **Run 4 clicks View Ending**, because a naturally suggested ending is the thing
+that run exists to reach; dismissing it there leaves the run either circling forever or
+scoring a forced ending, which is a different question. A runner that hard-codes one branch
+breaks whichever run it did not consider.
 
 **Capturing a turn:** one JavaScript call returning compact JSON from
 `window.useNarrativeStore.getState()` for `segments` and `decisions`, plus
