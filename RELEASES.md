@@ -4,6 +4,36 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.2.0 - 2026-08-16
+
+Every version up to now ran on one provider, so Google alone set the product's quality ceiling. That already bit twice, once when Gemini 2.5 Pro left the free tier and again when `gemini-2.5-flash-image` got a shutdown date. Four providers work now, one of them a model you host yourself, and turn-level analytics finally say whether anyone plays past the first turn. The v1.2 milestone closed 13 issues across 45 commits since [v1.1.0](https://github.com/jerseycheese/narraitor/releases/tag/v1.1.0).
+
+**What's in this release**
+
+- Multi-provider AI, the MVP slice of epic [#878](https://github.com/jerseycheese/narraitor/issues/878). A provider abstraction that splits the old request module into a generic core and per-provider adapters ([#890](https://github.com/jerseycheese/narraitor/issues/890)), a generic OpenAI-compatible provider with presets ([#895](https://github.com/jerseycheese/narraitor/issues/895)), and Ollama for anyone who would rather not pay for a key at all ([#896](https://github.com/jerseycheese/narraitor/issues/896)). Gemini, OpenAI and OpenRouter are each verified against a live key; Ollama is verified against a real self-hosted server.
+- Two provider bugs that only a second provider could expose. Picking a model in the config screen did nothing, since every turn ran on `gemini-2.5-flash` regardless ([#1745](https://github.com/jerseycheese/narraitor/issues/1745)), and context budgeting counted Gemini tokens, which is the wrong number for anyone else ([#1746](https://github.com/jerseycheese/narraitor/issues/1746)). A spike settled whether Gemini could run through its own compatibility endpoint ([#1749](https://github.com/jerseycheese/narraitor/issues/1749)).
+- The image model on a clock. `gemini-2.5-flash-image` shuts down on 2026-10-02, and it sat under every image route ([#1776](https://github.com/jerseycheese/narraitor/issues/1776)).
+- Turn-level analytics, so play depth is measurable rather than inferred from page entry ([#1747](https://github.com/jerseycheese/narraitor/issues/1747)). Still cookieless, still no personal data.
+- The DS3 bug tail from v1.1: four undefined CSS custom properties that were silently dropping their declarations ([#1731](https://github.com/jerseycheese/narraitor/issues/1731)), two labels on accent bands failing WCAG AA ([#1732](https://github.com/jerseycheese/narraitor/issues/1732)), and plain links taking the browser's default focus ring ([#1735](https://github.com/jerseycheese/narraitor/issues/1735)).
+- Copy that had quietly stopped being true. The landing page and FAQ still said a Gemini key was required ([#1814](https://github.com/jerseycheese/narraitor/issues/1814)), and nothing said that prompts reach the provider by way of our own server ([#1815](https://github.com/jerseycheese/narraitor/issues/1815)). A mock was also answering real image requests on a non-Gemini provider, which nothing rendered and so nobody noticed ([#1812](https://github.com/jerseycheese/narraitor/issues/1812)).
+- Alongside the milestone: the play surface stopped jumping every turn and stopped clipping on a 375px phone ([#1750](https://github.com/jerseycheese/narraitor/issues/1750), [#1751](https://github.com/jerseycheese/narraitor/issues/1751)), the five image routes consolidated onto one fallback helper ([#1753](https://github.com/jerseycheese/narraitor/issues/1753)), devtools moved onto the real API wrappers instead of raw fetch ([#1755](https://github.com/jerseycheese/narraitor/issues/1755)), and two visual baselines that had baked in a failed thumbnail load got fixed ([#1742](https://github.com/jerseycheese/narraitor/issues/1742), [#1775](https://github.com/jerseycheese/narraitor/issues/1775)).
+
+**Known incomplete**
+
+Five presets ship disabled. Deepseek, Mistral, Together, Groq and Perplexity are listed but not selectable, because `available: true` here means somebody ran a real streamed turn through it ([#1800](https://github.com/jerseycheese/narraitor/issues/1800)).
+
+Images stay Gemini-only, so world and ending images don't generate on another provider. What's new is that the UI says why instead of showing an empty frame ([#897](https://github.com/jerseycheese/narraitor/issues/897), [#898](https://github.com/jerseycheese/narraitor/issues/898)).
+
+Ollama needs a public address. The version people asked for, a model on your own laptop with no tunnel, isn't buildable the way a turn routes: it goes through a Narraitor route on Vercel, which can't reach `localhost` on someone's machine. That needs a second generation path in the browser ([#1811](https://github.com/jerseycheese/narraitor/issues/1811)). A Claude native SDK ([#894](https://github.com/jerseycheese/narraitor/issues/894)) stays parked while the generic path already covers it.
+
+**What's next**
+
+- Verify the remaining five presets ([#1800](https://github.com/jerseycheese/narraitor/issues/1800)), which is the last unticked item in the multi-provider MVP.
+- Decide the accounts-and-server-persistence question rather than drifting into it ([#1744](https://github.com/jerseycheese/narraitor/issues/1744)). Everything is browser-local today, and that's a choice worth making on purpose.
+- Commercialization ([#495](https://github.com/jerseycheese/narraitor/issues/495)) stays parked until the free game is solid.
+
+---
+
 ## v1.1.0 - 2026-08-10
 
 Where v1.0 got the loop working end to end, v1.1 is the pass that makes it look and feel like it's supposed to. The bolder DS3 redesign — real accent, a louder dot grid, drafting marks, a named type scale, a brand/product surface split — lands in full, plus the two accessibility gaps and the error-reporting gap named as known-incomplete in the v1.0 notes. The v1.1 milestone closed 16 issues; this tag also carries a batch of unmilestoned play-loop and UI work that shipped alongside it.
