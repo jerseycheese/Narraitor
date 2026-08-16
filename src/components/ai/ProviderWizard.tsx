@@ -119,6 +119,12 @@ const SELF_HOSTED_ERROR_MESSAGES: Record<string, string> = {
   NETWORK: 'Nothing answered at that address. Check the server is running and reachable from outside your machine.',
   INVALID_MODEL:
     'Your server does not have that model. Install it there, then run the check again.',
+  // A 403 maps to INVALID_KEY upstream, which is the right read for a hosted
+  // service and exactly wrong here: there is no key to reject. Ollama refuses
+  // any request whose Host header is not its own machine until it is told
+  // otherwise, so a self-hoster behind a tunnel meets this before anything else.
+  INVALID_KEY:
+    'Your server refused the request. Most local model servers only accept requests addressed to their own machine, so a server reached through a tunnel has to be told to allow that address.',
 };
 
 export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {

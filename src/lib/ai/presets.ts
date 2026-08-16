@@ -97,9 +97,10 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://ollama.ai/download',
     requiresApiKey: false,
-    // Stays false until somebody drives a real streamed turn through a real
-    // Ollama, per the note at the top of this file.
-    available: false,
+    // Earned the same way the others did: a real streamed turn through a real
+    // Ollama 0.32.5 serving mistral, reached over a public https address. 78
+    // deltas, a normal stop, and prose that parsed as the narrative envelope.
+    available: true,
     note: 'runs on your own machine',
     privacyNote:
       'Ollama runs on hardware you control, so your prompts and the story it writes never leave it. Note that the content rating travels as guidance in the prompt here, and many local models are trained without a refusal layer at all.',

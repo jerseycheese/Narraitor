@@ -11,11 +11,12 @@ import { supportsImages } from '../providers/capabilities';
 describe('PROVIDER_PRESETS', () => {
   it('marks available exactly the presets someone has driven a live turn through', () => {
     const available = PROVIDER_PRESETS.filter((preset) => preset.available).map((p) => p.id);
-    // OpenRouter and OpenAI each joined Gemini after a real streamed turn came
-    // back in more than one delta with a parseable envelope - 152 deltas on
-    // openai/gpt-4o and 104 on gpt-5.6-luna. Adding an id here without that run
-    // is the thing this test exists to make somebody think twice about.
-    expect(available).toEqual(['gemini', 'openrouter', 'openai']);
+    // OpenRouter, Ollama and OpenAI each joined Gemini after a real streamed
+    // turn came back in more than one delta with a parseable envelope - 152
+    // deltas on openai/gpt-4o, 104 on gpt-5.6-luna, 78 on a self-hosted mistral.
+    // Adding an id here without that run is the thing this test exists to make
+    // somebody think twice about.
+    expect(available).toEqual(['gemini', 'openrouter', 'ollama', 'openai']);
   });
 
   it('asks OpenAI for max_completion_tokens, which is the only name it accepts', () => {

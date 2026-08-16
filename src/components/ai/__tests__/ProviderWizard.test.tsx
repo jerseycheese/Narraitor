@@ -243,6 +243,30 @@ describe('ProviderWizard', () => {
     expect(screen.getByRole('link', { name: /setup guide/i })).toBeInTheDocument();
   });
 
+  /**
+   * The upstream 403 maps to INVALID_KEY, which is correct for a hosted service
+   * and absurd for a provider that has no key. Found by pointing the real check
+   * at a real Ollama through a tunnel, which refused the foreign Host header.
+   */
+  test('does not blame a key that does not exist when a self-hosted server refuses', async () => {
+    mockValidate.mockResolvedValue({ valid: false, error: 'INVALID_KEY' });
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /ollama/i }));
+    await user.type(
+      screen.getByLabelText(/endpoint url/i),
+      'https://ollama.example.net/v1/chat/completions'
+    );
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.click(screen.getByRole('button', { name: /test connection/i }));
+
+    expect(await screen.findByText(/refused the request/i)).toBeInTheDocument();
+    expect(screen.queryByText(/that key was rejected/i)).not.toBeInTheDocument();
+  });
+
   test('still demands a key for a hosted preset', async () => {
     const user = userEvent.setup();
 
