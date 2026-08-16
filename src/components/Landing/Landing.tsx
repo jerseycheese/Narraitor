@@ -141,8 +141,10 @@ export default function Landing() {
       >
         <div className="component-landing-band-inner component-landing-closing-inner">
           <h2 id="landing-closing-heading" className="component-landing-closing-text">
-            Bring your own Google Gemini key. About two minutes to set up. It
-            stays in your browser, and there&apos;s no account to make.
+            Bring your own key. A Google Gemini one takes about two minutes and
+            costs nothing, or use OpenAI, OpenRouter, or a model you host
+            yourself. It stays in your browser, and there&apos;s no account to
+            make.
           </h2>
           <div className="component-landing-actions">
             {/* Secondary, not the solid-accent style the hero CTA above
