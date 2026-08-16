@@ -10,6 +10,51 @@ import type { NarrativeTemplateContext } from './context';
  */
 const STALE_PACING_THRESHOLD = 3;
 
+/**
+ * Puts the player's own sheet in front of the model. Without it the prompt
+ * carries only recent prose, so anything the player raises from their history
+ * has no source the passage could answer it from. Only the two free-text fields
+ * go in — goals and play style already arrive via the personalization section,
+ * and the rest of the sheet would grow every turn's context for no gain.
+ */
+const formatPlayerBackground = (background: unknown): string => {
+  const lines: string[] = [];
+
+  if (typeof background === 'string') {
+    if (background.trim()) {
+      lines.push(`- ${background.trim()}`);
+    }
+  } else if (background && typeof background === 'object') {
+    const { history, personality } = background as {
+      history?: unknown;
+      personality?: unknown;
+    };
+    if (typeof history === 'string' && history.trim()) {
+      lines.push(`- History: ${history.trim()}`);
+    }
+    if (typeof personality === 'string' && personality.trim()) {
+      lines.push(`- Personality: ${personality.trim()}`);
+    }
+  }
+
+  if (lines.length === 0) {
+    return '';
+  }
+
+  return `
+PLAYER CHARACTER BACKGROUND (established canon — true unless the story has already contradicted it):
+${lines.join('\n')}
+`;
+};
+
+const PLAYER_ACTION_REQUIREMENTS = `
+PLAYER ACTION REQUIREMENTS:
+- This passage must visibly engage with the action above. A reader should be able to tell what the player just did or said from the prose alone.
+- If the player asked a question, someone answers it, dodges it, or refuses it out loud in this passage. Leaving it hanging is not an option.
+- If nothing established yet supplies the answer, invent one that fits the world and commit to it as canon from here on.
+- If the player raised something from their own background, name it in the fiction and let someone react to it.
+- Do not reprint or paraphrase a passage from STORY SO FAR as this turn's response.`;
+
 export const sceneTemplate = (context: NarrativeTemplateContext) => {
   const {
     worldName,
@@ -18,6 +63,7 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
     narrativeContext,
     generationParameters,
     playerCharacterName,
+    playerCharacterBackground,
     characterSkillContext,
     enhancedCharacterContext,
     npcRoster = []
@@ -56,15 +102,17 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
 `
     : '';
 
+  const backgroundSection = formatPlayerBackground(playerCharacterBackground);
+
   const baseContent = `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
 World: ${worldName}
 Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}${enhancedCharacterContext ? enhancedCharacterContext : ''}
-
+${backgroundSection}
 STORY SO FAR:
 ${recentContent}
 
-${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
+${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}\n${PLAYER_ACTION_REQUIREMENTS}` : ''}
 
 ${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:
