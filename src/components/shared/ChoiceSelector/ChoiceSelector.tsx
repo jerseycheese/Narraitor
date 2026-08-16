@@ -11,7 +11,6 @@ import { clsx } from 'clsx';
 import { safeTrim } from '@/lib/utils';
 import { useKeyboardShortcuts, KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 import { normalizeDecisionOptions } from './optionNormalizer';
-import type { NormalizedOption } from './optionNormalizer';
 import {
   AlignmentBadge,
   SkillRequirementBadges,
@@ -99,16 +98,15 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     },
   };
 
-  // Normalize the data into a common format
-  const normalizedOptions = normalizeDecisionOptions(
+  // Every generated option is shown. Trimming here used to evict a neutral
+  // choice to guarantee an alignment spread, which quietly threw away the
+  // option most likely to engage the scene. Variety is the generator's job.
+  const allOptions = normalizeDecisionOptions(
     decision,
     selectedOptionId,
     worldSkills,
     requirementEvaluationContext
   );
-
-  // Keep a compact set while preserving alignment variety when possible.
-  const allOptions = selectVisibleOptions(normalizedOptions, 3);
 
   // Determine the prompt text
   const displayPrompt = prompt || decision.prompt;
@@ -318,52 +316,3 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 };
 
 export default ChoiceSelector;
-
-const selectVisibleOptions = (
-  options: NormalizedOption[],
-  maxVisible: number
-): NormalizedOption[] => {
-  if (options.length <= maxVisible) {
-    return options;
-  }
-
-  const base = options.slice(0, maxVisible);
-  const hasLawful = base.some((option) => option.alignment === 'lawful');
-  const hasChaotic = base.some((option) => option.alignment === 'chaotic');
-
-  if (hasLawful && hasChaotic) {
-    return base;
-  }
-
-  const desiredAlignments: Array<'lawful' | 'chaotic'> = [];
-  if (!hasLawful) desiredAlignments.push('lawful');
-  if (!hasChaotic) desiredAlignments.push('chaotic');
-
-  const existingIds = new Set(base.map((option) => option.id));
-  const result = [...base];
-
-  for (const alignment of desiredAlignments) {
-    const candidate = options.find(
-      (option) => option.alignment === alignment && !existingIds.has(option.id)
-    );
-    if (!candidate) continue;
-
-    // Prefer replacing the last neutral option so we keep lawful/chaotic variety.
-    let replaceIndex = -1;
-    for (let i = result.length - 1; i >= 0; i -= 1) {
-      if (result[i].alignment === 'neutral') {
-        replaceIndex = i;
-        break;
-      }
-    }
-    if (replaceIndex === -1) {
-      replaceIndex = result.length - 1;
-    }
-
-    existingIds.delete(result[replaceIndex].id);
-    result[replaceIndex] = candidate;
-    existingIds.add(candidate.id);
-  }
-
-  return result;
-};

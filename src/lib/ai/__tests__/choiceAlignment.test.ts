@@ -79,7 +79,10 @@ Options:
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
-        useAlignedChoices: true
+        useAlignedChoices: true,
+        // Four options so every tag in the mock reaches the parser; play asks
+        // for three.
+        maxOptions: 4
       });
 
       expect(result.options).toHaveLength(4);
@@ -299,7 +302,9 @@ Options:
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1'],
-        useAlignedChoices: true
+        useAlignedChoices: true,
+        // Four options so the empty tag on the last one reaches the parser.
+        maxOptions: 4
       });
 
       expect(result.options).toHaveLength(4);

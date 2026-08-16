@@ -112,9 +112,45 @@ describe('ChoiceGenerator', () => {
       expect(result.options[2].text).toBe('Draw your sword and prepare for combat');
     });
 
+    it('keeps three options by default when the model returns more', async () => {
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: `Decision: What will you do in the forest?
+
+        Options:
+        1. Investigate the strange noise
+        2. Climb a tree to get a better view
+        3. Draw your sword and prepare for combat
+        4. Set the underbrush alight`,
+        finishReason: 'STOP',
+      });
+
+      const result = await generateChoices(mockAIClient, {
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      expect(result.options).toHaveLength(3);
+    });
+
+    it('falls back to exactly three options so nothing generated goes unshown', async () => {
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: '',
+        finishReason: 'STOP',
+      });
+
+      const result = await generateChoices(mockAIClient, {
+        worldId: 'world-1',
+        narrativeContext: createMockNarrativeContext(),
+        characterIds: ['char-1'],
+      });
+
+      expect(result.options).toHaveLength(3);
+    });
+
     it('should handle AI errors and generate fallback choices', async () => {
       mockAIClient.generateContent.mockRejectedValueOnce(new Error('AI Service unavailable'));
-      
+
       const result = await generateChoices(mockAIClient, {
         worldId: 'world-1',
         narrativeContext: createMockNarrativeContext(),

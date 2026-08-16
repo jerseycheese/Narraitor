@@ -12,14 +12,9 @@ export const generateFallbackChoices = (
   const options: DecisionOption[] = [];
   const genre = (world?.genre || 'fantasy').toLowerCase();
 
-  if (narrativeContext?.currentSituation) {
-    options.push({
-      id: generateUniqueId('option'),
-      text: 'Investigate further',
-      alignment: 'neutral',
-    });
-  }
-
+  // Each genre branch contributes exactly three options, matching what the
+  // generator asks the model for. A conditional fourth used to ride along here
+  // and get silently dropped downstream.
   switch (genre) {
     case 'fantasy':
       options.push(

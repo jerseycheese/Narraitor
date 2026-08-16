@@ -279,38 +279,22 @@ describe('ChoiceSelector', () => {
       expect(screen.getByText(/Intimidation.*DC 14/i)).toBeInTheDocument();
     });
 
-    it('limits the number of choices to 3', () => {
-      const decisionWithManyOptions: Decision = {
-        ...decision,
-        options: [
-          { id: '1', text: 'Option 1' },
-          { id: '2', text: 'Option 2' },
-          { id: '3', text: 'Option 3' },
-          { id: '4', text: 'Option 4' },
-        ]
-      };
-      renderChoiceSelector({decision: decisionWithManyOptions, onSelect: mockOnSelect});
-      expect(screen.queryByText('Option 4')).not.toBeInTheDocument();
-      expect(screen.getAllByRole('radio')).toHaveLength(3);
-    });
-
-    it('keeps a chaotic option visible when choices are capped to 3', () => {
+    it('renders every option the decision carries, without evicting one for alignment spread', () => {
       const alignedDecision: Decision = {
         id: 'decision-aligned',
         prompt: 'How do you respond?',
         options: [
           { id: 'lawful-opt', text: 'Follow protocol', alignment: 'lawful' },
           { id: 'neutral-opt-1', text: 'Assess risks', alignment: 'neutral' },
-          { id: 'neutral-opt-2', text: 'Observe quietly', alignment: 'neutral' },
+          { id: 'neutral-opt-2', text: 'Check the radio in the corner', alignment: 'neutral' },
           { id: 'chaotic-opt', text: 'Trigger a loud distraction', alignment: 'chaotic' },
         ],
       };
 
       renderChoiceSelector({ decision: alignedDecision, onSelect: mockOnSelect });
 
-      expect(screen.getByText('Follow protocol')).toBeInTheDocument();
-      expect(screen.getByText('Trigger a loud distraction')).toBeInTheDocument();
-      expect(screen.getAllByRole('radio')).toHaveLength(3);
+      expect(screen.getAllByRole('radio')).toHaveLength(4);
+      expect(screen.getByText('Check the radio in the corner')).toBeInTheDocument();
     });
 
     it('disables options when character lacks required skills', async () => {

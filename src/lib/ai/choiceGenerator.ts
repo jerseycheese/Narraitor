@@ -37,7 +37,7 @@ export async function generateChoices(
   params: ChoiceGenerationParams
 ): Promise<Decision> {
   try {
-    const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 4, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
+    const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 3, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
 
     const world = getWorld(worldId);
     const prompt = buildChoicePrompt({
