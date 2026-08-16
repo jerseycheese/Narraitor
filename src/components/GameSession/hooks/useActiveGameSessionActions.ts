@@ -129,9 +129,11 @@ export const useActiveGameSessionActions = ({
     }
 
     // Disable input immediately; the inference + roll happen before generation.
+    // The choice id itself is published further down, once the option it names
+    // exists on the decision: NarrativeController starts a turn the moment it
+    // sees a new choice id, and reads that option's requirements to roll.
     setIsGenerating(true);
     setIsGeneratingChoices(true);
-    setLocalSelectedChoiceId(customChoiceId);
 
     // Phase 1 (Issue #918): infer skill checks for the typed action so custom
     // actions get the same d20 treatment as predefined choices. The resulting
@@ -186,6 +188,7 @@ export const useActiveGameSessionActions = ({
     setCurrentDecision(null);
 
     // Trigger narrative generation with the custom choice
+    setLocalSelectedChoiceId(customChoiceId);
     setShouldTriggerGeneration(true);
 
     maybeCompleteFirstPlay();
