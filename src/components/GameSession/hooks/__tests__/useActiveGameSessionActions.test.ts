@@ -27,23 +27,30 @@ jest.mock('@/state/narrativeStore', () => ({
   ),
 }));
 
+const mockCharacter = { id: 'character-1', worldId: 'world-1', skills: [] };
+const mockWorld = { id: 'world-1', skills: [{ id: 'negotiation', name: 'Negotiation' }] };
+
 jest.mock('@/state/characterStore', () => ({
   useCharacterStore: Object.assign(
     jest.fn(),
-    { getState: jest.fn(() => ({ characters: {} })) }
+    { getState: jest.fn(() => ({ characters: { 'character-1': mockCharacter } })) }
   ),
 }));
 
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: Object.assign(
     jest.fn(),
-    { getState: jest.fn(() => ({ worlds: {} })) }
+    { getState: jest.fn(() => ({ worlds: { 'world-1': mockWorld } })) }
   ),
 }));
 
 jest.mock('@/lib/ai/customActionSkillInference', () => ({
   inferCustomActionSkillChecks: jest.fn(async () => []),
 }));
+
+const { inferCustomActionSkillChecks } = jest.requireMock(
+  '@/lib/ai/customActionSkillInference'
+);
 
 const buildOptions = (overrides = {}) => ({
   sessionId: 'session-1',
@@ -144,6 +151,52 @@ describe('useActiveGameSessionActions', () => {
       // onChoiceSelected must be called with the same id that was registered
       expect(onChoiceSelected).toHaveBeenCalledTimes(1);
       expect(onChoiceSelected).toHaveBeenCalledWith(patch.selectedOptionId);
+    });
+  });
+
+  describe('handleCustomSubmit — inferred skill checks', () => {
+    const decision = {
+      id: 'decision-3',
+      prompt: 'What do you do?',
+      options: [{ id: 'opt-1', text: 'Walk away' }],
+    };
+
+    it('attaches inferred requirements to the registered option', async () => {
+      inferCustomActionSkillChecks.mockResolvedValueOnce([
+        { type: 'skill', targetId: 'negotiation', operator: 'gte', value: 3 },
+      ]);
+      const { result } = renderHook(() =>
+        useActiveGameSessionActions(buildOptions({ currentDecision: decision }))
+      );
+
+      await act(async () => {
+        await result.current.handleCustomSubmit('I ask Martha what she wants');
+      });
+
+      const [, patch] = mockNarrativeStoreState.updateDecision.mock.calls[0];
+      expect(patch.options[1].requirements).toEqual([
+        { type: 'skill', targetId: 'negotiation', operator: 'gte', value: 3 },
+      ]);
+    });
+
+    it('registers the option before handing its id to the generator', async () => {
+      const setLocalSelectedChoiceId = jest.fn();
+      const { result } = renderHook(() =>
+        useActiveGameSessionActions(
+          buildOptions({ currentDecision: decision, setLocalSelectedChoiceId })
+        )
+      );
+
+      await act(async () => {
+        await result.current.handleCustomSubmit('I ask who benefits from the deed');
+      });
+
+      // NarrativeController generates as soon as it sees a new choice id, and it
+      // reads requirements off the option in the store. Publishing the id first
+      // means the roll happens against an option that isn't there yet.
+      expect(setLocalSelectedChoiceId.mock.invocationCallOrder[0]).toBeGreaterThan(
+        mockNarrativeStoreState.updateDecision.mock.invocationCallOrder[0]
+      );
     });
   });
 });
