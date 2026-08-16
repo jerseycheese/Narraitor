@@ -27,7 +27,7 @@ Narraitor stays browser-local. ADR-002 is unchanged and still governs.
 Three conditions reopen it, and any one is enough:
 
 1. **Storage loss stops being hypothetical.** More than one recorded case of a lost world, character, or session from a cleared browser profile or from IndexedDB eviction. The ADR-002 downside actually biting is the strongest argument for sync there is, and it's observable rather than speculative.
-2. **A paying player asks to play on a second device.** This needs a paid product to exist first, so it depends on how #495 resolves.
+2. **A paying player asks for automatic cross-device sync.** Playing on a second device already works through the export and import controls in Settings, so what fires this trigger is the automatic version rather than the capability. It also needs a paid product to exist first, so it depends on how #495 resolves.
 3. **Shared worlds come back as a product goal.** One player hands a world to another to play in. That was #1370's territory, and closing it retired the goal, so reviving it has to be a deliberate act.
 
 Until one fires, accounts and server persistence are off the roadmap. No issue may assume them.
@@ -50,7 +50,7 @@ What's left is a cost comparison that isn't close. Staying browser-local costs n
 
 ### Upsides
 
-ADR-002's privacy story holds. Player data never reaches a server, the routes under `src/app/api/` stay stateless proxies, and the key stays out of server storage.
+ADR-002's privacy story holds. There is no server-side copy of a player's games and no server-side copy of the key. Both do travel through the routes under `src/app/api/`, since a turn's prompt carries world and character context and the key is what reaches the provider, but those routes stay stateless proxies and write nothing down. That is the claim worth making, and it's the one README already makes.
 
 Feature scoping gets a rule it can apply. If a proposal needs server state, the answer is a named trigger that hasn't fired yet. That check is quick, and it doesn't reopen the argument every time.
 
@@ -58,7 +58,7 @@ Feature scoping gets a rule it can apply. If a proposal needs server state, the 
 
 ### Downsides
 
-Cross-device play still doesn't exist. Starting a session on a laptop and continuing it on a phone isn't possible, and this decision doesn't move that any closer.
+Automatic cross-device sync still doesn't exist. Starting a session on a laptop and continuing it on a phone means exporting a JSON file from Settings and importing it on the other side, which works but is entirely manual, and this decision doesn't move it any closer.
 
 Losing the browser profile still loses the saves. The storage-resilience work lowers the odds without removing the failure mode, and trigger 1 exists precisely because that risk is accepted rather than solved.
 
