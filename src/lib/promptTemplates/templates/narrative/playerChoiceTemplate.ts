@@ -28,7 +28,7 @@ export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): stri
   const choiceCount =
     typeof optionCount === 'number' && Number.isFinite(optionCount)
       ? Math.max(1, Math.floor(optionCount))
-      : 4;
+      : 3;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments

@@ -746,7 +746,7 @@ export class NarrativeGenerator {
         characterIds,
         sessionId: sessionId || narrativeContext.sessionId,
         minOptions: 3,
-        maxOptions: 4,
+        maxOptions: 3,
         useAlignedChoices: true,
       });
 

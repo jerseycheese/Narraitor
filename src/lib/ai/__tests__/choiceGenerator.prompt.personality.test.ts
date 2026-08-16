@@ -168,7 +168,7 @@ describe('buildChoicePrompt personality integration', () => {
       useAlignedChoices: true,
     });
 
-    expect(prompt).toContain('within required alignment distribution');
+    expect(prompt).not.toMatch(/required alignment distribution|the distribution/i);
     expect(prompt).not.toContain(
       'Lawful/neutral/chaotic alignment should consider personality:'
     );

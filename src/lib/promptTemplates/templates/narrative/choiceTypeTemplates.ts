@@ -6,6 +6,7 @@ interface PlayerChoiceTemplateContext {
   genre?: string;
   narrativeContext?: NarrativeContext;
   characterIds?: string[];
+  optionCount?: number;
   worldSkills?: Array<{
     id: string;
     name: string;
@@ -18,12 +19,19 @@ interface PlayerChoiceTemplateContext {
 }
 
 /**
- * Prompt template for generating player choices with lawful/chaotic alignment
- * Generates a decision prompt with 1 lawful, 2 neutral, and 1 chaotic option
+ * Prompt template for generating alignment-tagged player choices.
+ *
+ * The mix of alignments is chosen per scene rather than mandated. A fixed
+ * quota produced the same lawful/neutral/chaotic shape every turn, with the
+ * chaotic option always last and almost never picked.
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills, worldNpcs } = context;
-  
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount } = context;
+  const choiceCount =
+    typeof optionCount === 'number' && Number.isFinite(optionCount)
+      ? Math.max(1, Math.floor(optionCount))
+      : 3;
+
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
     ?.slice(-1) // Use only the latest segment to reduce context size
@@ -89,19 +97,25 @@ ${shortContext}${skillsInfo}${npcInfo}
 === CRITICAL INSTRUCTIONS ===
 You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.
 
-Based on the SPECIFIC narrative situation above, create 4 distinct action choices that follow these alignment categories:
+Based on the SPECIFIC narrative situation above, create ${choiceCount} distinct action choices, each tagged with the alignment it expresses:
 
 ALIGNMENT DEFINITIONS:
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
 - CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. Dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. VARY THE KIND of chaos and do NOT default to making noise (yelling, shouting, singing). Draw from a wide range, fitted to the scene: sudden physical risk ("leap from the balcony onto the chandelier," "kick over the lantern to set the drapes alight"), trickery or deception ("impersonate the captain and bark orders," "bluff an outrageous lie with total confidence"), sabotage or destruction ("cut the rope bridge behind you," "smash the control panel," "throw open the cells and free the prisoners"), turning the tables ("start a brawl to scatter the room," "switch sides mid-negotiation"), or abandoning the obvious goal for something no one expects. The goal is options that dramatically shift the narrative in surprising ways.
 
+CHOOSING THE MIX (IMPORTANT):
+- Always tag every choice [LAWFUL], [NEUTRAL], or [CHAOTIC].
+- Pick the mix the scene actually supports. There is no quota: a tense standoff might offer two chaotic openings, a quiet interrogation none at all.
+- Do NOT make every choice neutral, and do NOT repeat the same mix or the same tag order turn after turn. A player who can predict which slot holds the reckless option has stopped reading the choices.
+- Only offer a chaotic option when a genuinely disruptive action fits the moment. A reckless choice nobody would plausibly take is wasted space.
+
 PERSONALITY-INFORMED CHOICES (when character personality context is provided):
-- Within the REQUIRED alignment distribution (1 lawful, 2 neutral, 1 chaotic), create options that offer ways to express the character's traits
+- Create options that offer ways to express the character's traits
 - Reference active goals when choices can advance or challenge them
 - Consider fears when appropriate (avoidance or confrontation options)
 - Balance personality-consistent choices with growth opportunities
-- Personality context guides HOW each alignment is expressed, NOT the required distribution
+- Personality context guides HOW an alignment is expressed, not which alignments appear
 
 REQUIREMENTS:
 1. MANDATORY: Reference the SPECIFIC characters, objects, and events from the context (e.g., if there's a dragon, mention the dragon; if there's treasure, mention treasure)
@@ -136,14 +150,8 @@ Context Summary: [Write a brief 1-sentence summary that captures WHY this decisi
 Decision: What will you do?
 
 Options:
-1. [LAWFUL] [First choice - follows rules/authority/order]
-   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
-2. [NEUTRAL] [Second choice - balanced/practical approach]
-   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
-3. [NEUTRAL] [Third choice - different practical approach]
-   Requirements: [Optional - SkillName X+]${consequencesFormatLine}
-4. [CHAOTIC] [Fourth choice - WILDLY UNEXPECTED action that could completely change the situation - be creative and dramatic!]
-   Requirements: [Optional - SkillName X+]${consequencesFormatLine}${consequencesInstructions}
+${Array.from({ length: choiceCount }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
+   Requirements: [Optional - SkillName X+]${consequencesFormatLine}`).join('\n')}${consequencesInstructions}
 
 Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary line, then Decision and Options sections with alignment tags.`;
 };
