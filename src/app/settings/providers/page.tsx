@@ -71,7 +71,7 @@ export default function ProvidersSettingsPage() {
   return (
     <PageLayout
       title="Providers"
-      description="Add the provider key used to generate your stories. It stays in this browser, encrypted — it never leaves your device except to your chosen provider."
+      description="Add the provider key used to generate your stories. It stays in this browser, encrypted, and is only ever used to make your own requests."
       actions={
         !showWizard && list.length > 0 ? (
           <Button onClick={() => setShowWizard(true)}>Add provider</Button>

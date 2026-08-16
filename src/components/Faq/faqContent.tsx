@@ -5,9 +5,9 @@ import Link from 'next/link';
  * FAQ content, kept apart from the markup so the page stays a single map.
  *
  * Every answer is pinned to how the app works today, not how it might work:
- * Gemini is the one wired-up provider, storage is browser-local with no server
- * copy, and there are no accounts. When one of those changes, this file changes
- * with it.
+ * a provider is usable only once it has been checked against a live key,
+ * storage is browser-local with no server copy, and there are no accounts. When
+ * one of those changes, this file changes with it.
  */
 
 const GEMINI_KEY_URL = 'https://aistudio.google.com/apikey';
@@ -59,12 +59,13 @@ export const FAQ_GROUPS: FaqGroup[] = [
         question: 'What do I need to start?',
         answer: (
           <p>
-            A browser and a Google Gemini key of your own. Setting it up takes
-            about two minutes under Settings, then Providers.{' '}
+            A browser and a provider key of your own. Setting it up takes about
+            two minutes under Settings, then Providers. Google Gemini is the
+            easiest place to start &mdash;{' '}
             <a href={GEMINI_KEY_URL} target="_blank" rel="noopener noreferrer">
-              Getting a key
+              getting a key
             </a>{' '}
-            is quick, and Google has a tier that costs nothing.
+            is quick, needs no card, and Google has a tier that costs nothing.
           </p>
         ),
       },
@@ -93,24 +94,26 @@ export const FAQ_GROUPS: FaqGroup[] = [
         answer: (
           <p>
             Because generation runs on your account rather than a shared one.
-            That&apos;s what keeps Narraitor account-free and keeps your stories
-            off anybody&apos;s server. You set the key up once and it stays in
-            this browser.
+            That&apos;s what keeps Narraitor account-free, with no sign-up and
+            nothing to bill. You set the key up once and it stays in this
+            browser.
           </p>
         ),
       },
       {
         id: 'where-do-i-get-a-key',
-        question: 'Where do I get a Gemini key?',
+        question: 'Where do I get a key?',
         answer: (
           <p>
-            From{' '}
+            Gemini is easiest:{' '}
             <a href={GEMINI_KEY_URL} target="_blank" rel="noopener noreferrer">
               Google AI Studio
-            </a>
-            . Create a key, copy it, then paste it into Settings, Providers, Set
-            up a provider. The wizard runs a connection check before it saves
-            anything, so you find out then and there whether the key works.
+            </a>{' '}
+            hands you one in a minute. Every other provider issues keys from its
+            own dashboard, and a model you host yourself needs no key at all.
+            Paste whatever you have into Settings, Providers, Set up a provider.
+            The wizard runs a connection check before it saves anything, so you
+            find out then and there whether it works.
           </p>
         ),
       },
@@ -119,21 +122,24 @@ export const FAQ_GROUPS: FaqGroup[] = [
         question: 'What does it cost?',
         answer: (
           <p>
-            Narraitor doesn&apos;t charge anything. Generation is billed to your
-            own Gemini key, and Google&apos;s no-cost tier covers casual play. If
-            you go past it, what you spend is between you and Google.
+            Narraitor doesn&apos;t charge anything. Generation is billed to
+            whichever key you set up, and Google&apos;s no-cost Gemini tier
+            covers casual play. If you go past it, or use a paid provider, what
+            you spend is between you and them. A model you host yourself costs
+            nothing but your own hardware.
           </p>
         ),
       },
       {
         id: 'why-only-gemini',
-        question: 'Why is Gemini the only option?',
+        question: 'Which providers can I use?',
         answer: (
           <p>
-            It&apos;s the one provider wired up end to end right now. The setup
-            screen lists others &mdash; OpenRouter, OpenAI, Deepseek, Mistral,
-            Together, Groq &mdash; so you can see what&apos;s coming, but they
-            stay out of reach until multi-provider support lands.
+            Gemini, OpenAI, OpenRouter, and Ollama if you host a model yourself.
+            OpenRouter is the other one you can reach without a card, and a single
+            key there covers dozens of models. The setup screen also lists
+            Deepseek, Mistral, Together, Groq and Perplexity, which stay out of
+            reach until each has been checked against a live key.
           </p>
         ),
       },
@@ -142,9 +148,10 @@ export const FAQ_GROUPS: FaqGroup[] = [
         question: 'Which model does it use?',
         answer: (
           <p>
-            <code>gemini-2.5-flash</code> by default. The setup wizard also
-            offers <code>gemini-2.5-pro</code> if you&apos;d rather trade speed
-            for depth.
+            <code>gemini-2.5-flash</code> by default. The setup wizard offers{' '}
+            <code>gemini-2.5-pro</code> if you&apos;d rather trade speed for
+            depth, and every other provider brings its own list &mdash; on a
+            model you host yourself, you type the name of whatever you installed.
           </p>
         ),
       },
@@ -179,13 +186,15 @@ export const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         id: 'what-gets-sent',
-        question: 'What gets sent to Google?',
+        question: 'What gets sent to the provider?',
         answer: (
           <>
             <p>
               The prompt for the next piece of story: your world and character
-              details, and the choices you&apos;ve made. What Google does with it
-              is governed by their terms, not ours.
+              details, and the choices you&apos;ve made. It travels by way of
+              our own server, which passes it on without keeping a copy. What
+              the provider does with it from there is governed by their terms,
+              not ours.
             </p>
             <p>
               Treat a prompt like anything you&apos;d paste into a third-party

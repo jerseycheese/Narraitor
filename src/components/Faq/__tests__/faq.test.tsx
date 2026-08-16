@@ -60,9 +60,11 @@ describe('FAQ page', () => {
     expect(
       screen.getByText(/no backend database and no server-side copy/i)
     ).toBeInTheDocument();
-    expect(screen.getByText(/generation is billed to your own gemini key/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/the one provider wired up end to end/i)
+      screen.getByText(/generation is billed to whichever key you set up/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/gemini, openai, openrouter, and ollama/i)
     ).toBeInTheDocument();
   });
 

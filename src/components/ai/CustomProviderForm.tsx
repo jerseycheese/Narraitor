@@ -13,7 +13,15 @@ interface CustomProviderFormProps {
   value: CustomProviderValue;
   onChange: (updates: Partial<CustomProviderValue>) => void;
   className?: string;
+  /**
+   * Shape of address to show in the empty field. A preset that expects the
+   * player to host the service themselves passes its own example, because the
+   * path is the part nobody guesses right.
+   */
+  endpointPlaceholder?: string;
 }
+
+const DEFAULT_ENDPOINT_PLACEHOLDER = 'https://api.example.com/v1/chat/completions';
 
 /**
  * Form for an advanced custom endpoint.
@@ -22,7 +30,12 @@ interface CustomProviderFormProps {
  * accepts OpenAI-style chat completions works here, which is most of them. The
  * named presets are a curated list on top of the same path.
  */
-export function CustomProviderForm({ value, onChange, className }: CustomProviderFormProps) {
+export function CustomProviderForm({
+  value,
+  onChange,
+  className,
+  endpointPlaceholder,
+}: CustomProviderFormProps) {
   // A shape hint for the field, not the security check: the endpoint is refused
   // server-side by the endpoint guard, which is the only place that decision is
   // safe to make. This just stops the player walking to the verify step with an
@@ -56,7 +69,7 @@ export function CustomProviderForm({ value, onChange, className }: CustomProvide
         <Input
           id="custom-provider-endpoint"
           value={value.endpoint}
-          placeholder="https://api.example.com/v1/chat/completions"
+          placeholder={endpointPlaceholder || DEFAULT_ENDPOINT_PLACEHOLDER}
           aria-describedby="custom-provider-endpoint-help"
           aria-invalid={endpointLooksWrong || undefined}
           onChange={(e) => onChange({ endpoint: e.target.value })}

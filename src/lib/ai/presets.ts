@@ -1,6 +1,7 @@
 // src/lib/ai/presets.ts
 
 import type { ProviderPreset } from '@/types/provider.types';
+import { KEYLESS_PROVIDER_KEY } from './providerKeyHeader';
 
 /**
  * Provider presets shown in the configuration wizard.
@@ -69,6 +70,48 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     note: 'free tier, no card',
     privacyNote:
       'OpenRouter routes your prompts to whichever upstream model you pick, and each of those has its own data-retention terms. Their free models in particular may allow training on your prompts.',
+  },
+  {
+    id: 'ollama',
+    name: 'Ollama (self-hosted)',
+    type: 'ollama',
+    // Ollama serves an OpenAI-shaped route alongside its own /api/chat, which
+    // is why this shares the openai-compatible adapter (see adapterRegistry).
+    //
+    // The endpoint is an example, not a destination. Every player's is
+    // different, so this one exists to show the shape of the URL and to
+    // pre-fill an editable field. Nothing keys off it: the endpoint-keyed
+    // preset lookups below all return nothing for a hand-typed address, which
+    // is the right answer here because this preset asks for no extra headers
+    // and no renamed parameters.
+    endpoint: 'https://ollama.example.com/v1/chat/completions',
+    // Empty on purpose. A hosted service has a catalogue we can list; a machine
+    // the player runs has only what they pulled onto it. Listing four popular
+    // names would be wrong for most players and would also hide the text field
+    // the wizard gives a preset with no models.
+    models: [],
+    // A suggestion to pre-fill that text field with, not a promise that it is
+    // installed. Deliberately not a gemma id: capabilities.hasSystemRole folds
+    // the system turn into the user turn for that family, so a gemma default
+    // would quietly put every new Ollama player on the fallback prompt path.
+    defaultModel: 'llama3.2',
+    capabilities: { text: true, images: false, streaming: true },
+    helpUrl: 'https://ollama.ai/download',
+    requiresApiKey: false,
+    // Earned the same way the others did: a real streamed turn through a real
+    // Ollama 0.32.5 serving mistral, reached over a public https address. 78
+    // deltas, a normal stop, and prose that parsed as the narrative envelope.
+    available: true,
+    // Not "runs on your own machine": that describes the case this preset
+    // cannot serve. Ollama on the player's laptop is unreachable from a
+    // server-side route and is its own piece of work.
+    note: 'a server you host yourself',
+    // Careful with the privacy claim here, because the tempting one is false.
+    // The model runs on the player's hardware, but the prompt still travels
+    // browser -> our route -> their server, because our route is what makes the
+    // request. What they avoid is a third-party AI service, not a hop.
+    privacyNote:
+      'The model runs on hardware you control, so no AI company sees your story. The prompt does pass through Narraitor\'s own server on the way there, because that server makes the request rather than your browser. Note also that the content rating travels as guidance in the prompt, and many local models have no refusal layer at all.',
   },
   {
     id: 'openai',
@@ -172,6 +215,24 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       'Perplexity states that it keeps no record of prompts or responses sent to its chat completions API, and does not use them for training. It retains billing metrics only.',
   },
 ];
+
+/**
+ * The key to actually send, given what the player typed and whether this
+ * service needs one.
+ *
+ * Lives here rather than in the wizard because it completes the contract of
+ * `requiresApiKey` above: the field is only meaningful alongside the rule for
+ * what an empty box then means. Keeping the pair together also keeps the
+ * component out of lib/ai internals, which the boundary rules refuse.
+ *
+ * Undefined means "send nothing", which is the right answer for a hosted
+ * service and the wrong one for a keyless provider - see KEYLESS_PROVIDER_KEY.
+ */
+export const keyToSend = (typedKey: string, requiresApiKey: boolean): string | undefined => {
+  const typed = typedKey.trim();
+  if (typed) return typed;
+  return requiresApiKey ? undefined : KEYLESS_PROVIDER_KEY;
+};
 
 /** Look up a preset by its stable id. */
 export const getPresetById = (id: string): ProviderPreset | undefined =>

@@ -11,11 +11,12 @@ import { supportsImages } from '../providers/capabilities';
 describe('PROVIDER_PRESETS', () => {
   it('marks available exactly the presets someone has driven a live turn through', () => {
     const available = PROVIDER_PRESETS.filter((preset) => preset.available).map((p) => p.id);
-    // OpenRouter and OpenAI each joined Gemini after a real streamed turn came
-    // back in more than one delta with a parseable envelope - 152 deltas on
-    // openai/gpt-4o and 104 on gpt-5.6-luna. Adding an id here without that run
-    // is the thing this test exists to make somebody think twice about.
-    expect(available).toEqual(['gemini', 'openrouter', 'openai']);
+    // OpenRouter, Ollama and OpenAI each joined Gemini after a real streamed
+    // turn came back in more than one delta with a parseable envelope - 152
+    // deltas on openai/gpt-4o, 104 on gpt-5.6-luna, 78 on a self-hosted mistral.
+    // Adding an id here without that run is the thing this test exists to make
+    // somebody think twice about.
+    expect(available).toEqual(['gemini', 'openrouter', 'ollama', 'openai']);
   });
 
   it('asks OpenAI for max_completion_tokens, which is the only name it accepts', () => {
@@ -35,9 +36,21 @@ describe('PROVIDER_PRESETS', () => {
     expect(fixed).toEqual(['openai']);
   });
 
-  it('defaults each preset to a model it actually lists', () => {
-    for (const preset of PROVIDER_PRESETS) {
+  /**
+   * An empty `models` is a statement, not an omission: it means only the player
+   * knows what this service can serve, so the wizard offers a text field instead
+   * of a menu. `defaultModel` stays a suggestion to pre-fill it with, which is
+   * why it is not required to be a member of a list that is deliberately empty.
+   */
+  it('defaults each preset to a model it actually lists, where it lists any', () => {
+    for (const preset of PROVIDER_PRESETS.filter((p) => p.models.length > 0)) {
       expect(preset.models).toContain(preset.defaultModel);
+    }
+  });
+
+  it('suggests a model even where it lists none, so the field is never blank', () => {
+    for (const preset of PROVIDER_PRESETS) {
+      expect(preset.defaultModel).not.toBe('');
     }
   });
 
@@ -47,9 +60,17 @@ describe('PROVIDER_PRESETS', () => {
     }
   });
 
-  it('offers a default model that is one of the models it lists', () => {
-    for (const preset of PROVIDER_PRESETS) {
-      expect(preset.models).toContain(preset.defaultModel);
+  /**
+   * A preset that lists no models hands the player both fields, so it must also
+   * be the one that says whether a key is needed. The pairing is what the wizard
+   * branches on; splitting them would let a preset ask for a key it can't use.
+   */
+  it('asks for no key exactly where the player supplies the endpoint themselves', () => {
+    const keyless = PROVIDER_PRESETS.filter((preset) => preset.requiresApiKey === false);
+
+    expect(keyless.map((preset) => preset.id)).toEqual(['ollama']);
+    for (const preset of keyless) {
+      expect(preset.models).toEqual([]);
     }
   });
 
@@ -59,6 +80,7 @@ describe('PROVIDER_PRESETS', () => {
       'gemini',
       'groq',
       'mistral',
+      'ollama',
       'openai',
       'openrouter',
       'perplexity',

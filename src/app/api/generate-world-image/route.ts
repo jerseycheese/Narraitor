@@ -83,7 +83,10 @@ export async function POST(request: NextRequest) {
     try {
       const apiKey = resolveApiKey(request);
       const imagePrompt = body.customPrompt || generateImagePrompt(body.world);
-      logger.debug('generate-world-image', 'Image prompt:', imagePrompt);
+      // Length rather than text: an image prompt is built from the player's
+      // world, so logging it puts their content in a log line that a stray
+      // NEXT_PUBLIC_LOG_LEVEL could switch on in production.
+      logger.debug('generate-world-image', 'Image prompt built', { length: imagePrompt.length });
 
       // A custom prompt is already the visual description the player wants, so
       // only a generated prompt gets elaborated by the model.
@@ -91,6 +94,12 @@ export async function POST(request: NextRequest) {
 
       if (body.customPrompt) {
         imageDescription = body.customPrompt;
+      } else if (!apiKey) {
+        // No Gemini key means the player is on another provider, and asking the
+        // factory for a client here hands back MockGeminiClient - a test double
+        // answering a real request. The generated prompt is already a usable
+        // description, so skip the elaboration rather than fake it.
+        imageDescription = imagePrompt;
       } else {
         const client = createDefaultGeminiClient(apiKey);
         const promptResponse = await client.generateContent(`
@@ -101,7 +110,9 @@ export async function POST(request: NextRequest) {
           Respond with only the detailed visual description, no other text.
         `);
         imageDescription = promptResponse.content;
-        logger.debug('generate-world-image', 'Generated image description:', imageDescription);
+        logger.debug('generate-world-image', 'Image description generated', {
+          length: imageDescription.length,
+        });
       }
 
       // Generated as a data URL so it persists in IndexedDB (no disk write)

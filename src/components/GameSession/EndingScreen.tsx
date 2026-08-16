@@ -29,6 +29,7 @@ import Image from 'next/image';
 import { buildStoryFromCheckpoints } from '@/lib/narrative/storyCheckpointHelpers';
 import { generateEndingImage as requestEndingImage } from '@/lib/api/endingImageApi';
 import { capitalize } from '@/lib/utils/formatters';
+import { useImageGenerationSupport } from '@/hooks/useImageGenerationSupport';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('EndingScreen');
@@ -40,6 +41,7 @@ const logger = new Logger('EndingScreen');
  */
 export function EndingScreen() {
   const router = useRouter();
+  const imageSupport = useImageGenerationSupport();
   const {
     currentEnding,
     isGeneratingEnding,
@@ -341,15 +343,19 @@ export function EndingScreen() {
             className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
           >
             <div className="component-ending-screen-hero-placeholder">
-              <p>Ending image</p>
-              <Button
-                onClick={generateEndingImage}
-                variant="link"
-                size="sm"
-                aria-label="Generate ending image"
-              >
-                Generate Image
-              </Button>
+              {/* Without the reason, a button that can never succeed just looks
+                  broken every time it is pressed. */}
+              <p>{imageSupport.reason ?? 'Ending image'}</p>
+              {imageSupport.supported && (
+                <Button
+                  onClick={generateEndingImage}
+                  variant="link"
+                  size="sm"
+                  aria-label="Generate ending image"
+                >
+                  Generate Image
+                </Button>
+              )}
             </div>
             <div className="component-ending-screen-hero-overlay">
               <header className="component-ending-screen-hero-header">

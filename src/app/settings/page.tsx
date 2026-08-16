@@ -40,8 +40,8 @@ export default function SettingsPage() {
               <CardTitle>Generation provider</CardTitle>
               <CardDescription>
                 Connect the provider key used to generate your stories. It stays
-                in this browser, encrypted, and never leaves your device except to
-                your chosen provider.
+                in this browser, encrypted, and is only ever used to make your
+                own requests.
               </CardDescription>
             </CardHeader>
             <CardContent>
