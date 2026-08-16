@@ -29,6 +29,7 @@ codebase and git history); 009 onward were written as the decisions were made.
 - [ADR-011: Three design systems (DS1/DS2/DS3)](ADR-011-three-design-systems.md) — structural differentiation across themes (**superseded by ADR-013**)
 - [ADR-012: Storybook as the single canon surface](ADR-012-storybook-single-canon-surface.md) — retires the `/dev/design-system*` showcase routes
 - [ADR-013: Collapse to a single design system (DS3)](ADR-013-collapse-to-single-design-system-ds3.md) — greenfield collapse back to one system
+- [ADR-014: Browser-local until a named trigger](ADR-014-browser-local-until-named-trigger.md) — extends ADR-002 with the conditions that would reopen it
 
 ## Frontend Architecture
 
