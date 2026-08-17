@@ -46,13 +46,6 @@ describe('sceneTemplate failed-attempt guidance', () => {
     expect(sceneTemplate(makeContext(undefined, []))).not.toContain('FAILED ATTEMPT');
   });
 
-  it('renders the block when a failure tag sits beside a success tag', () => {
-    const prompt = sceneTemplate(
-      makeContext(undefined, ['skill-success:a', 'skill-failure:b'])
-    );
-    expect(prompt).toContain(HEADER);
-  });
-
   it('co-renders with the fatal outcome block on a critical-weight failure', () => {
     const prompt = sceneTemplate(
       makeContext(undefined, ['skill-failure:skill-1'], 'critical')
@@ -65,6 +58,60 @@ describe('sceneTemplate failed-attempt guidance', () => {
     const prompt = sceneTemplate(makeContext(undefined, ['skill-failure:skill-1']));
     expect(prompt).toContain('see FAILED ATTEMPT rules below');
     expect(prompt).not.toContain('show realistic consequences and setbacks');
+  });
+});
+
+describe('sceneTemplate skill result derivation', () => {
+  const SUCCESS_BULLET = 'The player SUCCEEDED at their action';
+
+  it('gives a critical success the success guidance plus its own bullet', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-critical-success:skill-1'])
+    );
+    expect(prompt).toContain('SKILL CHECK RESULT GUIDANCE');
+    expect(prompt).toContain(SUCCESS_BULLET);
+    expect(prompt).toContain('CRITICAL SUCCESS:');
+    expect(prompt).not.toContain('FAILED ATTEMPT');
+  });
+
+  it('renders both halves when one check succeeds and another fails', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-success:a', 'skill-failure:b'])
+    );
+    expect(prompt).toContain(SUCCESS_BULLET);
+    expect(prompt).toContain('MIXED OUTCOME:');
+    expect(prompt).toContain('FAILED ATTEMPT — THE WORLD STILL MOVES:');
+  });
+
+  it('keeps the critical-failure bullet on a mixed turn that rolled a natural 1', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-critical-failure:a', 'skill-success:b'])
+    );
+    expect(prompt).toContain('MIXED OUTCOME:');
+    expect(prompt).toContain('CRITICAL FAILURE:');
+  });
+
+  it('keeps the critical-success bullet on a mixed turn that rolled a natural 20', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-critical-success:a', 'skill-failure:b'])
+    );
+    expect(prompt).toContain('MIXED OUTCOME:');
+    expect(prompt).toContain('CRITICAL SUCCESS:');
+  });
+
+  it('still marks a critical-weight mixed failure as a critical one', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-critical-failure:a', 'skill-success:b'], 'critical')
+    );
+    expect(prompt).toContain('FATAL/INCAPACITATING OUTCOME:');
+    expect(prompt).toContain('it FAILED critically');
+  });
+
+  it('keeps a plain success free of the mixed and critical bullets', () => {
+    const prompt = sceneTemplate(makeContext(undefined, ['skill-success:skill-1']));
+    expect(prompt).toContain(SUCCESS_BULLET);
+    expect(prompt).not.toContain('MIXED OUTCOME:');
+    expect(prompt).not.toContain('CRITICAL SUCCESS:');
   });
 });
 
