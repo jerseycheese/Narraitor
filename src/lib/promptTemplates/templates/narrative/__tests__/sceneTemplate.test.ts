@@ -83,6 +83,14 @@ describe('sceneTemplate skill result derivation', () => {
     expect(prompt).toContain('FAILED ATTEMPT — THE WORLD STILL MOVES:');
   });
 
+  it('keeps the critical bullet on a mixed turn that contains a critical roll', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-critical-failure:a', 'skill-success:b'])
+    );
+    expect(prompt).toContain('MIXED OUTCOME:');
+    expect(prompt).toContain('CRITICAL FAILURE:');
+  });
+
   it('keeps a plain success free of the mixed and critical bullets', () => {
     const prompt = sceneTemplate(makeContext(undefined, ['skill-success:skill-1']));
     expect(prompt).toContain(SUCCESS_BULLET);

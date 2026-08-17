@@ -127,9 +127,9 @@ ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.curren
 ${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:
 ${showSuccessGuidance ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
-${skillResult === 'critical-success' ? '- CRITICAL SUCCESS: make it count - something extra goes right, beyond what the player was reaching for' : ''}
+${hasCriticalSuccess ? '- CRITICAL SUCCESS: make it count - something extra goes right, beyond what the player was reaching for' : ''}
 ${showFailureGuidance ? '- The player FAILED at their action - the attempt still happens, goes wrong, and costs them (see FAILED ATTEMPT rules below)' : ''}
-${skillResult === 'critical-failure' ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : ''}
+${hasCriticalFailure ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : ''}
 ${skillResult === 'mixed' ? '- MIXED OUTCOME: part of this worked and part did not - show both in the same passage, and the failed part still costs' : ''}
 - DO NOT explicitly mention skill names, skill levels, or game mechanics
 - Show the outcome through what actually happens in the story
