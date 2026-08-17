@@ -71,19 +71,37 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
   const hasCriticalFailure = currentTags.some((tag: string) =>
     tag.startsWith('skill-critical-failure:')
   );
-  const hasFailure = currentTags.some((tag: string) =>
-    tag.startsWith('skill-failure:')
+  const hasCriticalSuccess = currentTags.some((tag: string) =>
+    tag.startsWith('skill-critical-success:')
   );
-  const hasSuccess = currentTags.some((tag: string) =>
-    tag.startsWith('skill-success:')
-  );
-  const skillResult = hasCriticalFailure
-    ? 'critical-failure'
-    : hasFailure
-      ? 'failure'
-      : hasSuccess
-        ? 'success'
-        : null;
+  const failed =
+    hasCriticalFailure ||
+    currentTags.some((tag: string) => tag.startsWith('skill-failure:'));
+  const succeeded =
+    hasCriticalSuccess ||
+    currentTags.some((tag: string) => tag.startsWith('skill-success:'));
+  // A turn can roll several checks. When they split, neither tier alone
+  // describes the turn, so 'mixed' gets both halves of the guidance rather
+  // than letting failure silently win and erase the part that worked.
+  const skillResult = failed && succeeded
+    ? 'mixed'
+    : hasCriticalFailure
+      ? 'critical-failure'
+      : failed
+        ? 'failure'
+        : hasCriticalSuccess
+          ? 'critical-success'
+          : succeeded
+            ? 'success'
+            : null;
+  const showSuccessGuidance =
+    skillResult === 'success' ||
+    skillResult === 'critical-success' ||
+    skillResult === 'mixed';
+  const showFailureGuidance =
+    skillResult === 'failure' ||
+    skillResult === 'critical-failure' ||
+    skillResult === 'mixed';
   const turnsSinceComplication = narrativeContext?.turnsSinceComplication ?? 0;
   const isStale = turnsSinceComplication >= STALE_PACING_THRESHOLD;
 
@@ -108,15 +126,17 @@ ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.curren
 
 ${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:
-${skillResult === 'success' ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
-${skillResult === 'failure' || skillResult === 'critical-failure' ? '- The player FAILED at their action - the attempt still happens, goes wrong, and costs them (see FAILED ATTEMPT rules below)' : ''}
+${showSuccessGuidance ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
+${skillResult === 'critical-success' ? '- CRITICAL SUCCESS: make it count - something extra goes right, beyond what the player was reaching for' : ''}
+${showFailureGuidance ? '- The player FAILED at their action - the attempt still happens, goes wrong, and costs them (see FAILED ATTEMPT rules below)' : ''}
 ${skillResult === 'critical-failure' ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : ''}
+${skillResult === 'mixed' ? '- MIXED OUTCOME: part of this worked and part did not - show both in the same passage, and the failed part still costs' : ''}
 - DO NOT explicitly mention skill names, skill levels, or game mechanics
 - Show the outcome through what actually happens in the story
 - Success = things work out, failure = the attempt goes wrong and leaves the scene worse than it found it
 ` : ''}
 
-${skillResult === 'failure' || skillResult === 'critical-failure' ? `
+${showFailureGuidance ? `
 FAILED ATTEMPT — THE WORLD STILL MOVES:
 - The failed attempt still HAPPENS: show the character doing it and the world answering badly — never render failure as the attempt simply not occurring.
 - The failure must COST something concrete: position or footing lost, a resource spent or broken, an NPC turned colder, noise or attention drawn, an option closed, time burned while the situation worsens.
@@ -133,9 +153,9 @@ PACING GUIDANCE — RISING TENSION:
 - Whatever complication you introduce here counts as a major event: record it in metadata.majorEvent (see the rules below) so this guidance doesn't fire again next turn for a problem you already resolved.
 ` : ''}
 
-${generationParameters?.decisionWeight === 'critical' && narrativeContext?.currentTags?.some((tag: string) => tag.startsWith('skill-failure:') || tag.startsWith('skill-critical-failure:')) ? `
+${generationParameters?.decisionWeight === 'critical' && failed ? `
 FATAL/INCAPACITATING OUTCOME:
-- This was a pivotal, life-or-death decision and it FAILED${narrativeContext?.currentTags?.some((tag: string) => tag.startsWith('skill-critical-failure:')) ? ' critically' : ''}.
+- This was a pivotal, life-or-death decision and it FAILED${hasCriticalFailure ? ' critically' : ''}.
 - The player character should be dead, unconscious, or otherwise unable to continue.
 - Describe the fatal consequence explicitly and dramatically - this is game over.
 - Keep it grounded in established world rules (no sudden miracles or lucky escapes).

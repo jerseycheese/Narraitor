@@ -23,6 +23,7 @@ import {
   isFatalCriticalDecision,
 } from '@/lib/narrative/evaluateDecisionSkillChecks';
 import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplication';
+import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
@@ -691,7 +692,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Combine existing tags with skill check tags
       const existingTags =
         recentSegments[recentSegments.length - 1]?.metadata?.tags || [];
-      const currentTags = [...existingTags, ...skillCheckTags];
+      const currentTags = mergeTurnTags(existingTags, skillCheckTags);
 
       // Build skill check context for the AI
       let skillCheckContext = '';

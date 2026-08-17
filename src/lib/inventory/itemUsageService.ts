@@ -9,6 +9,7 @@ import { createItemUsageJournalEntry } from './itemUsageJournalIntegration';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import type { NarrativeGenerationResult } from '@/types/narrative.types';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
+import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { safeTrim } from '@/lib/utils';
 
 import Logger from '@/lib/utils/logger';
@@ -118,11 +119,10 @@ export async function generateItemUsageNarrative(
     const previousSegments = narrativeStore.getSessionSegments(sessionId);
     const recentSegments = previousSegments.slice(-5);
     const lastSegment = previousSegments[previousSegments.length - 1];
-    const currentTags = [
-      ...(lastSegment?.metadata?.tags || []),
+    const currentTags = mergeTurnTags(lastSegment?.metadata?.tags || [], [
       'item-usage',
       `item-${item.categoryId}`,
-    ];
+    ]);
 
     const generator = new NarrativeGenerator(createDefaultGeminiClient());
 
