@@ -9,6 +9,7 @@ import {
   createFollowState,
   markAtLatestBeat,
   markLeftLatestBeat,
+  markMovedTowardLatestBeat,
   shouldFollowLatestBeat,
   type FollowState,
 } from '@/lib/narrative/autoFollowScroll';
@@ -155,6 +156,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
 
     const { scrollTop, scrollHeight, clientHeight } = scrollViewportRef.current;
     const scrollStep = clientHeight * 0.8; // Scroll 80% of viewport height
+    const measurement = { scrollTop, scrollHeight, clientHeight };
 
     switch (event.key) {
       case 'ArrowDown':
@@ -182,7 +184,10 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
             behavior: 'smooth'
           });
         }
-        followStateRef.current = markLeftLatestBeat(followStateRef.current);
+        followStateRef.current = markMovedTowardLatestBeat(
+          followStateRef.current,
+          measurement
+        );
         break;
       case 'ArrowUp':
         event.preventDefault();
@@ -217,7 +222,10 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           top: Math.min(scrollTop + scrollStep, scrollHeight - clientHeight),
           behavior: 'smooth'
         });
-        followStateRef.current = markLeftLatestBeat(followStateRef.current);
+        followStateRef.current = markMovedTowardLatestBeat(
+          followStateRef.current,
+          measurement
+        );
         break;
       case 'PageUp':
         event.preventDefault();
@@ -238,12 +246,15 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         break;
       case 'End':
         event.preventDefault();
-        // Scroll to the bottom to show the latest content
+        // Scroll to the bottom to show the latest content. End means "take me
+        // to the newest beat", so it re-engages following outright rather than
+        // waiting on a scroll event that a view already parked there never
+        // emits.
         scrollViewportRef.current.scrollTo({
           top: scrollViewportRef.current.scrollHeight,
           behavior: 'smooth'
         });
-        followStateRef.current = markLeftLatestBeat(followStateRef.current);
+        followStateRef.current = markAtLatestBeat(followStateRef.current);
         break;
       default:
         break;

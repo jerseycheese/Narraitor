@@ -70,21 +70,41 @@ export function applyScrollEvent(
 }
 
 /**
- * The reader took the view somewhere themselves (keyboard navigation).
+ * The reader moved away from the newest beat (ArrowUp, PageUp, Home).
  *
- * Deliberately leaves isNearBottom alone. Keys that travel towards the newest
- * beat (End, PageDown) move nothing when the view is already parked there, so
- * the browser fires no scroll event to correct an assumption made here. Let
- * the position speak for itself and following survives those keys, as it did
- * before this state moved out of the component.
+ * Safe to assert without measuring, including when the key moves nothing
+ * because the view already sits at the top: somewhere near the top is not the
+ * newest beat either way.
  */
 export function markLeftLatestBeat(state: FollowState): FollowState {
-  return { ...state, hasLeftLatestBeat: true };
+  return { ...state, hasLeftLatestBeat: true, isNearBottom: false };
 }
 
-/** Snapped back to the newest beat, by the pill or by a following scroll. */
+/** Snapped back to the newest beat, by the pill, End, or a following scroll. */
 export function markAtLatestBeat(state: FollowState): FollowState {
   return { ...state, hasLeftLatestBeat: false, isNearBottom: true };
+}
+
+/**
+ * The reader moved down through the history (ArrowDown, PageDown).
+ *
+ * Measured rather than assumed, because these keys move nothing when the view
+ * already sits at the newest beat, and a scroll that never happens fires no
+ * event to correct state asserted here. Where the keys do move, the scroll
+ * events they emit refine this on the way.
+ */
+export function markMovedTowardLatestBeat(
+  state: FollowState,
+  measurement: ScrollMeasurement
+): FollowState {
+  const nearBottom = measureIsNearBottom(measurement);
+
+  return {
+    ...state,
+    lastScrollTop: measurement.scrollTop,
+    isNearBottom: nearBottom,
+    hasLeftLatestBeat: !nearBottom,
+  };
 }
 
 /** Whether a newly arrived beat should pull the view down to it. */

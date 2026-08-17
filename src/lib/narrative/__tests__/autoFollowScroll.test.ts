@@ -3,6 +3,7 @@ import {
   createFollowState,
   markAtLatestBeat,
   markLeftLatestBeat,
+  markMovedTowardLatestBeat,
   shouldFollowLatestBeat,
 } from '../autoFollowScroll';
 
@@ -69,11 +70,28 @@ describe('autoFollowScroll', () => {
     expect(shouldFollowLatestBeat(markAtLatestBeat(left))).toBe(true);
   });
 
-  it('keeps following when a key moves nothing because the view is already at the bottom', () => {
-    // End and PageDown at the bottom scroll nowhere, so the browser fires no
-    // scroll event to correct a premature "they left" assumption.
-    const atBottom = applyScrollEvent(createFollowState(), PARKED_AT_BOTTOM);
+  // A key pressed at the newest beat scrolls nowhere, so the browser fires no
+  // scroll event, and anything asserted about position here is never corrected.
+  describe('keys that move nothing at the newest beat', () => {
+    const disengaged = { hasLeftLatestBeat: true, isNearBottom: false, lastScrollTop: 500 };
 
-    expect(shouldFollowLatestBeat(markLeftLatestBeat(atBottom))).toBe(true);
+    it('re-engages following on End, which means "take me to the latest"', () => {
+      expect(shouldFollowLatestBeat(markAtLatestBeat(disengaged))).toBe(true);
+    });
+
+    it('keeps following on downward keys, measuring instead of assuming', () => {
+      const state = markMovedTowardLatestBeat(disengaged, PARKED_AT_BOTTOM);
+
+      expect(shouldFollowLatestBeat(state)).toBe(true);
+    });
+  });
+
+  it('stops following when a downward key lands short of the newest beat', () => {
+    const state = markMovedTowardLatestBeat(createFollowState(), {
+      ...PARKED_AT_BOTTOM,
+      scrollTop: 100,
+    });
+
+    expect(shouldFollowLatestBeat(state)).toBe(false);
   });
 });
