@@ -162,6 +162,70 @@ describe('ChoiceOutcomeCallout consequence chips', () => {
     expect(screen.getByText('Order +4')).toBeInTheDocument();
   });
 
+  it('leaves a typed action alone on a failed outcome', () => {
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-4': {
+          id: 'decision-4',
+          prompt: 'What now?',
+          selectedOptionId: 'opt-custom',
+          options: [
+            {
+              id: 'opt-custom',
+              text: 'I walk over to the mill and ask who holds the debt',
+              isCustomInput: true,
+              customText: 'I walk over to the mill and ask who holds the debt',
+            },
+          ],
+        },
+      },
+    });
+
+    render(
+      <ChoiceOutcomeCallout
+        decisionId="decision-4"
+        decisionText="I walk over to the mill and ask who holds the debt"
+        decisionOutcome="failure"
+      />
+    );
+
+    expect(
+      screen.getByText('I walk over to the mill and ask who holds the debt')
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/You attempt to/)).not.toBeInTheDocument();
+  });
+
+  it('repairs a typed action persisted in the old mangled form', () => {
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-5': {
+          id: 'decision-5',
+          prompt: 'What now?',
+          selectedOptionId: 'opt-custom',
+          options: [
+            {
+              id: 'opt-custom',
+              text: 'i ask Martha Hendricks what they want',
+              isCustomInput: true,
+              customText: 'i ask Martha Hendricks what they want',
+            },
+          ],
+        },
+      },
+    });
+
+    render(
+      <ChoiceOutcomeCallout
+        decisionId="decision-5"
+        decisionText="You choose to i ask Martha Hendricks what they want"
+      />
+    );
+
+    expect(
+      screen.getByText('I ask Martha Hendricks what they want')
+    ).toBeInTheDocument();
+  });
+
   it('surfaces the actual shift size rather than a fixed label', () => {
     useNarrativeStore.setState({
       decisions: {

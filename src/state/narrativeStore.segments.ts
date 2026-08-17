@@ -4,26 +4,11 @@ import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { applyWorldStateThreadUpdates } from '../lib/narrative/applyWorldStateThreadUpdates';
+import { formatDecisionText } from '../lib/narrative/formatDecisionText';
 import { useSessionStore } from './sessionStore';
 import { useGoalStore } from './goalStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
-
-const normalizeDecisionText = (text: string) => {
-  const trimmed = safeTrim(text);
-  if (!trimmed) return '';
-
-  const withoutYou = trimmed.replace(/^you\b\s*/i, '');
-  const withoutChoose = withoutYou.replace(/^(choose|decide|decided|chose)\s+to\s+/i, '');
-  const withoutTo = withoutChoose.replace(/^to\s+/i, '');
-  const firstChar = withoutTo.charAt(0);
-  const normalized =
-    firstChar && /[A-Z]/.test(firstChar)
-      ? `${firstChar.toLowerCase()}${withoutTo.slice(1)}`
-      : withoutTo;
-
-  return `You choose to ${normalized}`.trim();
-};
 
 const normalizeLocationKey = (value: string): string =>
   safeTrim(value)
@@ -107,7 +92,7 @@ export const createNarrativeSegmentActions = (
 
       if (selectedOption?.text) {
         causedByDecisionId = latestDecisionId;
-        causedByDecisionText = normalizeDecisionText(selectedOption.text);
+        causedByDecisionText = formatDecisionText(selectedOption);
       }
     }
 
