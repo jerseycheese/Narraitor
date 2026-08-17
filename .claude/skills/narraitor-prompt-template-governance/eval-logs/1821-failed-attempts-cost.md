@@ -23,18 +23,42 @@ Deliberately absent: any quoted no-op imagery in the ban (no "words dying in thr
 
 | World (genre/tone) | Character (fresh/established) | Runs | Verdict | Representative excerpt (1-3 lines) |
 |---|---|---|---|---|
-| Camp Crystal Lake (1984 slasher / tense) | Jamie Holt, fresh | 1 x 30 turns | pending - filled after the matched run below | |
+| Camp Crystal Lake (1984 slasher / tense) | Jamie Holt, fresh | 1 x 54 turns (matched 30 + 24 extension) | improved on this cell: no-op 1-2/6 in the matched 30, 4/11 over the full session, vs 13/18 in run 1 | Turn 19 (failure): "Your boot slides on something greasy ... You catch yourself on the edge of the stainless steel, the impact echoing sharply through the quiet kitchen. The glint ... now vanishes into the deeper shadows." Turn 55 (critical failure): "The blade snags on a particularly tough root, wrenching your wrist ... scraping your palm on rough bark and twisting your ankle." (pocketknife lost) |
 | Camp Crystal Lake | established | 0 | not run - milestone round 5 (#1834) | |
 | Harrowgate | fresh | 0 | not run - milestone round 5 (#1834) | |
 | Harrowgate | established | 0 | not run - milestone round 5 (#1834) | |
 
 Scope decision: one matched cell, honestly filled. This closes #1821's acceptance criterion (a matched 30-turn re-run with the no-op count materially below 13/18); it does not close the eval matrix, which round 5 owns.
 
-Cross-build caveat: run 1 predates #1825 (typed actions now roll checks, so the population of failure turns changed), #1826, #1827, and #1836. The re-run against run 1 is a matched-method comparison, not a controlled A/B on a single variable.
+Cross-build caveat: run 1 predates #1825 (typed actions now roll checks, so the population of failure turns changed), #1826, #1827, and #1836. The re-run against run 1 is a matched-method comparison, not a controlled A/B on a single variable. The same-build A/B was not run.
+
+### The matched run (2026-08-17, build 3760b3b3, live Gemini, cautious persona)
+
+Setup and harness: worktree on the branch, `.env.local` synced from the main checkout (startup log `Environments: .env.local`), dev server on this worktree's port 3302, world and character built through the real wizards to the fixture in `narraitor-playtest-loop/worlds/camp-crystal-lake.md` (attributes renamed to the targets, skills trimmed to the seven targets, Jamie Holt with Stealth/Athletics/First Aid at 5). Harness checkpoint at turn 3 passed: no `__PLAYWRIGHT__`, no Playwright UA, real POSTs to `/api/narrative/generate`, `/choices` and `/summarize`, 4 distinct segments, journal entries present. Turn latency 4.8-8.8 s throughout.
+
+Failure-turn population: the matched 30 player turns produced only 6 failed checks (run 1 produced 18). Jamie's build clears most DCs, and typed actions get model-inferred difficulties of 1-5 (DC 2-10), so a roll of 2 still passes on a Stealth 5 action. Because 6 is a thin denominator, the session was extended past the ending prompt to 54 player turns and 11 failed checks (segments 4, 9, 11, 19, 26, 27, 32, 45, 49, 54, 55; two critical). Both strata are reported. The failure set was taken from `segment.metadata.decisionOutcome`; the tag-derived set matched it exactly, and no `mixed` outcomes occurred.
+
+Scoring: two independent blind judges (fresh subagents, different models, no world spec, no knowledge of the change, inputs = attempted action + resulting prose only) answered per failure turn: does the attempt occur, name the cost as a state delta (feelings and atmosphere excluded), lexicon check, verdict no-op vs world-moved.
+
+| Stratum | Failure turns | Judge A no-op | Judge B no-op | Unanimous no-op | Judge agreement |
+|---|---|---|---|---|---|
+| Matched first 30 turns | 6 | 2/6 (turns 4, 11) | 1/6 (turn 11) | 1/6 | 5/6 |
+| Full 54-turn session | 11 | 4/11 (4, 11, 32, 54) | 4/11 (11, 32, 45, 54) | 3/11 | 9/11 |
+| Run 1 baseline (for reference) | 18 | 13/18 | | | |
+
+The attempt was rendered as not happening on 1/11 failure turns (turn 11, "the words catch in your throat", both judges), against 13/18 in run 1. Run-1 canned lexicon recurred twice: turn 11's throat line, and "clumsy" twice on turn 27. The surviving no-ops (11, 32, 54) are the same shape: a listening or reading action where the world answers with silence and "the stillness intensifies" - atmosphere standing in for cost.
+
+Mechanical store tally, kept separate from the blind call: 8/11 failure turns set `majorEvent`; itemsLost fired on 2 (turn 54's map, turn 55's pocketknife); no location changes on failure turns except 55. Store stasis on the others is consistent with the judges' costs being positional, social, or noise, which touch no store.
+
+Contamination check (over-firing guard): a third blind judge read 13 success or no-check turns and rated 9 as reading like success with no imposed cost. The other 4 (turns 10, 33, 46 neutral; turn 50 read as failure - "the deadbolt gouges the frame" on a roll of 19) are exactly the four turns that immediately follow a failure turn. Every non-adjacent success turn read clean. This is the stale-tag carryover defect (below) showing a real cost now that the failure block is stronger.
+
+Interaction with the PACING signal: 8/11 failure turns set `majorEvent`, so costly failures do count as complications for the escalation guard. That is #1680's problem and it stays untouched here.
+
+Observations for follow-up (not fixed here): the play surface stopped auto-following at around segment 18 and showed "Jump to latest" for three turns until clicked; the ending prompt fired at turn 30 ("secured in a safe location") while a threat was still outside; the story loops in a room once the group is secured (repeated "check the windows/exits" offers).
 
 ## Arc check (>= 3 consecutive turns, one cell)
-- Pending the matched run: 30 consecutive turns; five planted facts checked at turn 30 (dirt road 40 min, dead radio, Jamie knows which doors don't lock, kids not arrived, summer 1984).
-- Contradictions found: pending.
+- 54 consecutive turns, one session, no reload. Planted facts at the end: dead radio held (Chad's handheld stays dead; the walkie-talkie found at turn 34 is a separate object); Jamie knowing which doors don't lock was used at turn 13 and the narrative ran with it (staff cabins have unreliable latches, mess hall has a deadbolt); summer 1984 held (beige landline "relic", walkie-talkie, no anachronisms); dirt road / forty minutes never resurfaced (silence, not contradiction); kids not arrived never contradicted at Crystal Lake (turn 40's "the kids are terrified" is Counselor Davies at a different camp).
+- Contradictions found: none hard. Soft: turn 24 has fluorescent lights humming in a mess hall the group had entered dark; turn 55 has Jamie clearing brush outside alone from an office that was barricaded two turns earlier.
 
 ## Failure drill
 - Malformed/empty response path: unaffected - this change alters outbound prompt text only. Template renders with absent and empty `currentTags` (unit tests: no block on `[]`, no block on success-only tags).
@@ -44,11 +68,12 @@ Cross-build caveat: run 1 predates #1825 (typed actions now roll checks, so the 
 
 ## Regression vs prior good outputs
 - Compared against: the run-1 transcript excerpts in #1821 (the no-op turns) and the run-1 success/no-check turns (the contamination guard - success prose must not start imposing costs).
-- Old strengths preserved? Pending the run. The success bullet, the mechanics-hiding bullet, and the crit-severity bullet are byte-identical.
+- Old strengths preserved? Yes on the turns the block doesn't touch: 9/9 non-adjacent success turns read as success with no imposed cost. The success bullet, the mechanics-hiding bullet, and the crit-severity bullet are byte-identical. Weakened: the turn after a failure, via the pre-existing tag carryover (see contamination check).
 
 ## Cost/latency
 - Token delta: roughly +125-140 tokens on failure turns only, zero on success and no-check turns. While the stale-tag carryover stands, the block also fires on the turn after each failure, so per-session cost is about twice the failure count. No new AI round-trip; no latency change.
 
 ## Verdict
-- Pending the matched run. No behavioral claim is made from the wiring tests - they prove the block assembles on the right turns and only those, nothing about what Gemini does with it.
-- Ship/hold decision recorded at: PR for #1821 (to be linked).
+- Improved on the evaluated matrix (single cell: Camp Crystal Lake x fresh). No-op failures went from 13/18 in run 1 to 1-2/6 in the matched 30 turns and 4/11 across the full 54-turn session, with the attempt itself rendered as not happening on 1/11 instead of 13/18. Both judges independently landed on 4/11 with 9/11 per-turn agreement. That is materially below the baseline; it is not "reliable", and it is not the milestone's 80% bar under the strict unanimous count (6/11 unanimous world-moved, 8/11 by either judge). Sample is thin (11 failure turns) and the comparison is matched-method, not same-build A/B.
+- Hold points, not blockers: the residual no-op shape is the "listen and hear nothing" turn (atmosphere as cost), and the turn after a failure inherits the block through the tag carryover and sometimes reads as a second failure. Both are filed as follow-ups.
+- Ship/hold decision recorded at: PR for #1821 (linked from the PR body).
