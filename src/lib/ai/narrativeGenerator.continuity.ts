@@ -19,6 +19,7 @@ import type {
   NarrativeGenerationRequest,
   NarrativeGenerationResult,
 } from '@/types/narrative.types';
+import type { LoreFact } from '@/types/lore.types';
 import type {
   ContinuityContract,
   ContinuityRecentDecision,
@@ -28,8 +29,10 @@ import type {
 import {
   buildContinuityContract,
   buildContinuityCorrectionPrompt,
+  collectContinuityTopics,
   detectContinuityIssues,
   formatContinuityExpectations,
+  isContinuityContractEmpty,
 } from '@/lib/lore/continuityGuardrail';
 
 const CORRECTION_TIMEOUT_MS = 8000;
@@ -57,13 +60,38 @@ const collectRecentDecisions = (
   return decisions;
 };
 
+const readSessionFacts = (request: NarrativeGenerationRequest): LoreFact[] => {
+  const loreStoreState = useLoreStore.getState();
+  return typeof loreStoreState.getFacts === 'function'
+    ? (loreStoreState.getFacts({
+        worldId: request.worldId,
+        sessionId: request.sessionId,
+      }) ?? [])
+    : [];
+};
+
+/**
+ * Topic labels already in the ledger, handed to the lore extractor so a
+ * repeated question lands on the same label. Empty on any store failure.
+ */
+export const collectContinuityTopicsFromStores = (
+  request: NarrativeGenerationRequest
+): string[] => {
+  try {
+    return collectContinuityTopics(readSessionFacts(request));
+  } catch {
+    return [];
+  }
+};
+
 /**
  * Builds the continuity contract from live stores. Returns null when the
  * contract would be vacuous (nothing to validate against) or when any store
  * read fails — a null contract disables the guardrail for this request.
  */
 export const buildContinuityContractFromStores = (
-  request: NarrativeGenerationRequest
+  request: NarrativeGenerationRequest,
+  options?: { playerName?: string }
 ): ContinuityContract | null => {
   try {
     const worldStoreState = useWorldStore.getState();
@@ -83,23 +111,15 @@ export const buildContinuityContractFromStores = (
       }
     }
 
-    const loreStoreState = useLoreStore.getState();
-    const facts =
-      typeof loreStoreState.getFacts === 'function'
-        ? (loreStoreState.getFacts({
-            worldId: request.worldId,
-            sessionId: request.sessionId,
-          }) ?? [])
-        : [];
-
     const contract = buildContinuityContract({
-      facts,
+      facts: readSessionFacts(request),
       npcRelationships,
       npcNames,
       recentDecisions: collectRecentDecisions(request),
+      playerName: options?.playerName,
     });
 
-    if (contract.npcs.length === 0 && contract.canonFacts.length === 0) {
+    if (isContinuityContractEmpty(contract)) {
       return null;
     }
     return contract;

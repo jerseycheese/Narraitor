@@ -226,6 +226,7 @@ export function addStructuredLoreImpl(
         description: event.significance,
         importance: event.importance || 'medium',
         relatedEntities: event.relatedEntities,
+        continuity: event.continuity,
       }, event.visibility ?? (sessionId ? 'session-private' : 'world-shared'));
       addedCount.events++;
       eventsAdded++;

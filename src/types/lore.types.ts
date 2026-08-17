@@ -52,6 +52,24 @@ export interface LoreUsageStats {
 }
 
 /**
+ * What an event fact means for continuity: a factual answer the story gave,
+ * a promise made or kept, or a lasting change the player made to the scene.
+ * The continuity guardrail builds its contract from these; untagged events are
+ * ordinary lore.
+ */
+export type LoreContinuityKind = 'assertion' | 'commitment' | 'scene-change';
+
+export interface LoreContinuityAnnotation {
+  kind: LoreContinuityKind;
+  /** Short stable label for the question/promise/object so repeats line up across turns. */
+  topic?: string;
+  /** Who made the assertion or promise ("narration" when unattributed). */
+  speaker?: string;
+  /** Commitments only. */
+  status?: 'promised' | 'delivered';
+}
+
+/**
  * Lore fact entry with rich structured data
  */
 export interface LoreFact extends TimestampedEntity {
@@ -71,6 +89,7 @@ export interface LoreFact extends TimestampedEntity {
     type?: string; // character role, location type, event type, etc.
     tags?: string[];
     relatedEntities?: string[];
+    continuity?: LoreContinuityAnnotation;
   };
 }
 
@@ -120,6 +139,7 @@ export interface StructuredLoreExtraction {
     importance?: 'low' | 'medium' | 'high';
     visibility?: 'session-private' | 'world-shared';
     relatedEntities?: string[];
+    continuity?: LoreContinuityAnnotation;
   }>;
   rules: Array<{
     rule: string;

@@ -6,6 +6,7 @@
 import {
   buildContinuityContract,
   buildContinuityCorrectionPrompt,
+  collectContinuityTopics,
   detectContinuityIssues,
   formatContinuityExpectations,
   CONTINUITY_CORRECTION_HEADER,
@@ -171,8 +172,157 @@ describe('formatContinuityExpectations', () => {
 
   it('returns an empty string for an empty contract', () => {
     expect(
-      formatContinuityExpectations({ npcs: [], canonFacts: [], recentDecisions: [] })
+      formatContinuityExpectations({
+        npcs: [],
+        canonFacts: [],
+        recentDecisions: [],
+        assertions: [],
+        commitments: [],
+        sceneChanges: [],
+      })
     ).toBe('');
+  });
+});
+
+// The ledger half of the contract: assertions, commitments and scene changes
+// come from event facts the lore extractor tagged with metadata.continuity.
+const makeEvent = (
+  id: string,
+  value: string,
+  continuity: NonNullable<LoreFact['metadata']>['continuity'],
+  createdAt = '2025-01-01T00:00:00.000Z'
+): LoreFact =>
+  makeFact({
+    id,
+    category: 'events',
+    key: `world-1:event_${id}`,
+    value,
+    aliases: [],
+    createdAt,
+    metadata: { importance: 'high', continuity },
+  });
+
+const buildLedgerContract = (facts: LoreFact[], playerName?: string) =>
+  buildContinuityContract({
+    facts,
+    npcRelationships: {},
+    npcNames: {},
+    recentDecisions: [],
+    playerName,
+  });
+
+describe('ledger-fed contract', () => {
+  it('keeps the first answer per topic and speaker and counts repeats', () => {
+    const contract = buildLedgerContract([
+      makeEvent('e1', 'Aunt Carol says Old Man Rowan paid off the mortgage years ago.',
+        { kind: 'assertion', topic: 'Mill debt', speaker: 'Aunt Carol' }, '2025-01-01T00:00:00.000Z'),
+      makeEvent('e2', 'Aunt Carol says the town holds the mortgage, paid off in 2017.',
+        { kind: 'assertion', topic: 'mill debt', speaker: 'Aunt Carol' }, '2025-01-01T00:10:00.000Z'),
+      makeEvent('e3', 'Davies says the property is unencumbered.',
+        { kind: 'assertion', topic: 'mill debt', speaker: 'Councilman Davies' }, '2025-01-01T00:05:00.000Z'),
+      makeEvent('e4', 'The valuation is one hundred and fifty thousand dollars.',
+        { kind: 'assertion', topic: 'developer valuation' }, '2025-01-01T00:20:00.000Z'),
+    ]);
+
+    expect(contract.assertions.map((a) => [a.speaker, a.claim.slice(0, 20), a.mentions])).toEqual([
+      ['Aunt Carol', 'Aunt Carol says Old ', 3],
+      ['Councilman Davies', 'Davies says the prop', 3],
+      ['narration', 'The valuation is one', 1],
+    ]);
+  });
+
+  it('drops assertions about the player, the ledger\'s known poison path', () => {
+    const contract = buildLedgerContract(
+      [
+        makeEvent('e1', 'Thomas says his cousin Wren Calloway works for the county planning office.',
+          { kind: 'assertion', topic: 'county planning office', speaker: 'Thomas' }),
+        makeEvent('e2', 'The bank held the mortgage on the mill.',
+          { kind: 'assertion', topic: 'mill debt', speaker: 'Aunt Carol' }),
+      ],
+      'Wren Calloway'
+    );
+
+    expect(contract.assertions.map((a) => a.topic)).toEqual(['mill debt']);
+  });
+
+  it('marks a commitment delivered once any fact on its topic says so', () => {
+    const contract = buildLedgerContract([
+      makeEvent('e1', 'Thorn promises the appraisal documents before any vote.',
+        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'promised' }, '2025-01-01T00:00:00.000Z'),
+      makeEvent('e2', 'Thorn hands the appraisal documents to the player.',
+        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered' }, '2025-01-01T00:10:00.000Z'),
+      makeEvent('e3', 'Caleb promises to speak at the meeting.',
+        { kind: 'commitment', topic: 'Caleb speaks publicly', speaker: 'Caleb', status: 'promised' }, '2025-01-01T00:20:00.000Z'),
+    ]);
+
+    expect(contract.commitments).toEqual([
+      expect.objectContaining({ topic: 'appraisal documents', by: 'Thorn', status: 'delivered' }),
+      expect.objectContaining({ topic: 'Caleb speaks publicly', by: 'Caleb', status: 'promised' }),
+    ]);
+  });
+
+  it('keeps only the most recent scene changes', () => {
+    const facts = Array.from({ length: 6 }, (_, i) =>
+      makeEvent(`s${i}`, `Scene change ${i}`, { kind: 'scene-change', topic: `object ${i}` },
+        `2025-01-01T00:${String(i).padStart(2, '0')}:00.000Z`)
+    );
+
+    const contract = buildLedgerContract(facts);
+
+    expect(contract.sceneChanges.map((s) => s.statement)).toEqual([
+      'Scene change 2', 'Scene change 3', 'Scene change 4', 'Scene change 5',
+    ]);
+  });
+
+  it('renders the ledger sections in the prompt block', () => {
+    const contract = buildLedgerContract([
+      makeEvent('e1', 'Aunt Carol says Old Man Rowan paid off the mortgage.',
+        { kind: 'assertion', topic: 'mill debt', speaker: 'Aunt Carol' }),
+      makeEvent('e2', 'Thorn hands over the appraisal documents.',
+        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered' }),
+      makeEvent('e3', 'The vote schedule is torn off the notice board.',
+        { kind: 'scene-change', topic: 'notice board' }),
+    ]);
+
+    const block = formatContinuityExpectations(contract);
+
+    expect(block).toContain('CONTINUITY REQUIREMENTS');
+    expect(block).toContain('mill debt');
+    expect(block).toContain('Aunt Carol');
+    expect(block).toContain('DELIVERED');
+    expect(block).toContain('appraisal documents');
+    expect(block).toContain('torn off the notice board');
+  });
+
+  it('flags a fresh promise of something already delivered, but not a recap of it', () => {
+    const contract = buildLedgerContract([
+      makeEvent('e1', 'Thorn hands over the appraisal documents.',
+        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered' }),
+    ]);
+
+    const issues = detectContinuityIssues(
+      'Thorn straightens. "I promise you the appraisal documents will be made available to every council member before any vote is cast."',
+      contract
+    );
+    expect(issues).toMatchObject([{ type: 'stale-promise', entity: 'appraisal documents' }]);
+
+    expect(
+      detectContinuityIssues('As promised, the appraisal documents sit in your lap.', contract)
+    ).toHaveLength(0);
+    expect(
+      detectContinuityIssues('Thorn promises to look into the drainage complaint.', contract)
+    ).toHaveLength(0);
+  });
+
+  it('collects distinct topic labels for the extractor hint', () => {
+    const topics = collectContinuityTopics([
+      makeEvent('e1', 'a', { kind: 'assertion', topic: 'Mill debt' }),
+      makeEvent('e2', 'b', { kind: 'assertion', topic: 'mill debt' }),
+      makeEvent('e3', 'c', { kind: 'scene-change', topic: 'notice board' }),
+      makeEvent('e4', 'd', { kind: 'scene-change' }),
+    ]);
+
+    expect(topics).toEqual(['Mill debt', 'notice board']);
   });
 });
 

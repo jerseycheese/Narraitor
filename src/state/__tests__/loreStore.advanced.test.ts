@@ -674,5 +674,34 @@ describe('LoreStore - Advanced Features', () => {
       expect(eventFact?.value).toBe('大きな戦いが始まる');
       expect(ruleFact?.value).toBe('魔法には集中が必要');
     });
+
+    test('keeps the continuity annotation on stored event facts', () => {
+      const { result } = renderHook(() => useLoreStore());
+
+      const extraction = {
+        characters: [],
+        locations: [],
+        events: [
+          {
+            description: 'Thorn promises the appraisal before any vote.',
+            importance: 'high' as const,
+            continuity: { kind: 'commitment' as const, topic: 'appraisal', speaker: 'Thorn', status: 'promised' as const },
+          },
+        ],
+        rules: [],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(extraction, 'world-1', 'session-1');
+      });
+
+      const eventFact = result.current.getFacts({ worldId: 'world-1' }).find(f => f.category === 'events');
+      expect(eventFact?.metadata?.continuity).toEqual({
+        kind: 'commitment',
+        topic: 'appraisal',
+        speaker: 'Thorn',
+        status: 'promised',
+      });
+    });
   });
 });

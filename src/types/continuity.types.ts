@@ -8,7 +8,7 @@ import type { EntityID } from './common.types';
  * AI call when an issue is found.
  */
 
-type ContinuityIssueType = 'relationship-tone' | 'reversed-fact';
+type ContinuityIssueType = 'relationship-tone' | 'reversed-fact' | 'stale-promise';
 
 export type ContinuityStatus = 'clean' | 'corrected' | 'flagged';
 
@@ -44,12 +44,43 @@ export interface ContinuityRecentDecision {
 }
 
 /**
+ * A factual answer the story already gave. The first answer per topic and
+ * speaker is canon; later ones on the same topic are what drift looks like.
+ */
+export interface ContinuityAssertion {
+  topic: string;
+  speaker: string;
+  claim: string;
+  /** How many ledger facts share this topic; repeated questions rank first. */
+  mentions: number;
+}
+
+/**
+ * A promise made in the story, and whether it has since been kept. Delivered
+ * commitments are the ones the engine must not promise again.
+ */
+export interface ContinuityCommitment {
+  topic: string;
+  by: string;
+  statement: string;
+  status: 'promised' | 'delivered';
+}
+
+/** A lasting change the player made to the scene, still true until undone on-page. */
+export interface ContinuitySceneChange {
+  statement: string;
+}
+
+/**
  * Compact, deterministic snapshot of the constraints a new segment must honor.
  */
 export interface ContinuityContract {
   npcs: ContinuityNpcExpectation[];
   canonFacts: ContinuityCanonFact[];
   recentDecisions: ContinuityRecentDecision[];
+  assertions: ContinuityAssertion[];
+  commitments: ContinuityCommitment[];
+  sceneChanges: ContinuitySceneChange[];
 }
 
 export interface ContinuityIssue {
