@@ -1,7 +1,11 @@
 import { sceneTemplate } from '../sceneTemplate';
 import type { NarrativeTemplateContext } from '../context';
 
-function makeContext(turnsSinceComplication?: number): NarrativeTemplateContext {
+function makeContext(
+  turnsSinceComplication?: number,
+  currentTags: string[] = [],
+  decisionWeight?: 'minor' | 'major' | 'critical'
+): NarrativeTemplateContext {
   return {
     worldName: 'Butler County Outskirts',
     genre: 'zombie survival',
@@ -10,11 +14,59 @@ function makeContext(turnsSinceComplication?: number): NarrativeTemplateContext 
     narrativeContext: {
       recentSegments: [{ content: 'You crouch by the fence, watching the road.' }],
       currentSituation: 'Player chose: "Follow the trail cautiously"',
-      currentTags: [],
+      currentTags,
       turnsSinceComplication,
     },
+    ...(decisionWeight ? { generationParameters: { decisionWeight } } : {}),
   };
 }
+
+describe('sceneTemplate failed-attempt guidance', () => {
+  const HEADER = 'FAILED ATTEMPT — THE WORLD STILL MOVES:';
+
+  it('renders the failed-attempt block on a failed skill check', () => {
+    const prompt = sceneTemplate(makeContext(undefined, ['skill-failure:skill-1']));
+    expect(prompt).toContain(HEADER);
+    expect(prompt).toContain('never render failure as the attempt simply not occurring');
+  });
+
+  it('co-renders the block with the critical-failure severity bullet', () => {
+    const prompt = sceneTemplate(makeContext(undefined, ['skill-critical-failure:skill-1']));
+    expect(prompt).toContain(HEADER);
+    expect(prompt).toContain('CRITICAL FAILURE:');
+  });
+
+  it('omits the block on a successful check', () => {
+    const prompt = sceneTemplate(makeContext(undefined, ['skill-success:skill-1']));
+    expect(prompt).not.toContain('FAILED ATTEMPT');
+    expect(prompt).toContain('The player SUCCEEDED at their action');
+  });
+
+  it('omits the block when no check was rolled', () => {
+    expect(sceneTemplate(makeContext(undefined, []))).not.toContain('FAILED ATTEMPT');
+  });
+
+  it('renders the block when a failure tag sits beside a success tag', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-success:a', 'skill-failure:b'])
+    );
+    expect(prompt).toContain(HEADER);
+  });
+
+  it('co-renders with the fatal outcome block on a critical-weight failure', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-failure:skill-1'], 'critical')
+    );
+    expect(prompt).toContain(HEADER);
+    expect(prompt).toContain('FATAL/INCAPACITATING OUTCOME:');
+  });
+
+  it('replaces the old consequences-and-setbacks bullet so it cannot compete', () => {
+    const prompt = sceneTemplate(makeContext(undefined, ['skill-failure:skill-1']));
+    expect(prompt).toContain('see FAILED ATTEMPT rules below');
+    expect(prompt).not.toContain('show realistic consequences and setbacks');
+  });
+});
 
 describe('sceneTemplate pacing guidance', () => {
   it('omits pacing guidance when the streak is below the threshold', () => {
