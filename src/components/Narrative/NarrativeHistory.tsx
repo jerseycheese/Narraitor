@@ -4,6 +4,15 @@ import { NarrativeDisplay } from './NarrativeDisplay';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useBufferedNarrativeSegments } from './hooks/useBufferedNarrativeSegments';
 import { getSessionTimeDividerLabel } from '@/lib/narrative/sessionTimeDivider';
+import {
+  applyScrollEvent,
+  createFollowState,
+  markAtLatestBeat,
+  markLeftLatestBeat,
+  markMovedTowardLatestBeat,
+  shouldFollowLatestBeat,
+  type FollowState,
+} from '@/lib/narrative/autoFollowScroll';
 
 /**
  * Session-relative time divider between two narrative segments — replaces
@@ -58,34 +67,29 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   const scrollViewportRef = useRef<HTMLElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
   const prevSegmentCountRef = useRef(segments.length);
-  const hasUserScrollInteractionRef = useRef(false);
-  const isNearBottomRef = useRef(true);
+  const followStateRef = useRef<FollowState>(createFollowState());
   const hasSettledInitialScrollRef = useRef(false);
   const [hasUnreadBelow, setHasUnreadBelow] = useState(false);
 
   const { renderedSegments } = useBufferedNarrativeSegments(segments, { isHydrating });
 
-  // Check if the viewport is near the bottom
-  const getIsNearBottom = useCallback(() => {
-    if (!scrollViewportRef.current) return false;
-    const { scrollTop, scrollHeight, clientHeight } = scrollViewportRef.current;
-    return scrollHeight - scrollTop - clientHeight < 100;
-  }, []);
-
-  // Detect manual scrolling
+  // Fold each scroll event into the follow decision. The rules, and why
+  // distance from the bottom can't decide this on its own, live in
+  // lib/narrative/autoFollowScroll.
   const handleScroll = useCallback(() => {
     if (!scrollViewportRef.current) return;
 
-    isNearBottomRef.current = getIsNearBottom();
+    const { scrollTop, scrollHeight, clientHeight } = scrollViewportRef.current;
+    followStateRef.current = applyScrollEvent(followStateRef.current, {
+      scrollTop,
+      scrollHeight,
+      clientHeight,
+    });
 
-    // If user scrolled up significantly, mark as manual scroll
-    if (!isNearBottomRef.current) {
-      hasUserScrollInteractionRef.current = true;
-    } else {
-      // Back at the latest beat under their own steam — nothing left to catch up on.
+    if (followStateRef.current.isNearBottom) {
       setHasUnreadBelow(false);
     }
-  }, [getIsNearBottom]);
+  }, []);
 
   // A new segment lands below whatever the player is reading. Follow it down
   // only if they were already at the bottom; if they'd scrolled up to re-read,
@@ -94,11 +98,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   // this surface must not make.
   useEffect(() => {
     if (segments.length > prevSegmentCountRef.current && scrollViewportRef.current) {
-      const wasFollowing =
-        !hasUserScrollInteractionRef.current || isNearBottomRef.current;
-
-      if (wasFollowing) {
-        isNearBottomRef.current = true;
+      if (shouldFollowLatestBeat(followStateRef.current)) {
+        followStateRef.current = markAtLatestBeat(followStateRef.current);
         scrollViewportRef.current.scrollTo({
           top: scrollViewportRef.current.scrollHeight,
           behavior: 'auto'
@@ -112,8 +113,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
 
   const jumpToLatest = useCallback(() => {
     if (!scrollViewportRef.current) return;
-    hasUserScrollInteractionRef.current = false;
-    isNearBottomRef.current = true;
+    followStateRef.current = markAtLatestBeat(followStateRef.current);
     setHasUnreadBelow(false);
     scrollViewportRef.current.scrollTo({
       top: scrollViewportRef.current.scrollHeight,
@@ -136,7 +136,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     // Use a small delay to ensure content is rendered
     const scrollTimer = setTimeout(() => {
       // Skip if they started reading somewhere else during the delay.
-      if (scrollViewportRef.current && !hasUserScrollInteractionRef.current) {
+      if (scrollViewportRef.current && !followStateRef.current.hasLeftLatestBeat) {
         scrollViewportRef.current.scrollTo({
           top: scrollViewportRef.current.scrollHeight,
           behavior: 'smooth'
@@ -156,6 +156,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
 
     const { scrollTop, scrollHeight, clientHeight } = scrollViewportRef.current;
     const scrollStep = clientHeight * 0.8; // Scroll 80% of viewport height
+    const measurement = { scrollTop, scrollHeight, clientHeight };
 
     switch (event.key) {
       case 'ArrowDown':
@@ -183,7 +184,10 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
             behavior: 'smooth'
           });
         }
-        hasUserScrollInteractionRef.current = true;
+        followStateRef.current = markMovedTowardLatestBeat(
+          followStateRef.current,
+          measurement
+        );
         break;
       case 'ArrowUp':
         event.preventDefault();
@@ -210,7 +214,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
             behavior: 'smooth'
           });
         }
-        hasUserScrollInteractionRef.current = true;
+        followStateRef.current = markLeftLatestBeat(followStateRef.current);
         break;
       case 'PageDown':
         event.preventDefault();
@@ -218,7 +222,10 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           top: Math.min(scrollTop + scrollStep, scrollHeight - clientHeight),
           behavior: 'smooth'
         });
-        hasUserScrollInteractionRef.current = true;
+        followStateRef.current = markMovedTowardLatestBeat(
+          followStateRef.current,
+          measurement
+        );
         break;
       case 'PageUp':
         event.preventDefault();
@@ -226,7 +233,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           top: Math.max(scrollTop - scrollStep, 0),
           behavior: 'smooth'
         });
-        hasUserScrollInteractionRef.current = true;
+        followStateRef.current = markLeftLatestBeat(followStateRef.current);
         break;
       case 'Home':
         event.preventDefault();
@@ -235,16 +242,19 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           behavior: 'smooth',
           block: 'center'
         });
-        hasUserScrollInteractionRef.current = true;
+        followStateRef.current = markLeftLatestBeat(followStateRef.current);
         break;
       case 'End':
         event.preventDefault();
-        // Scroll to the bottom to show the latest content
+        // Scroll to the bottom to show the latest content. End means "take me
+        // to the newest beat", so it re-engages following outright rather than
+        // waiting on a scroll event that a view already parked there never
+        // emits.
         scrollViewportRef.current.scrollTo({
           top: scrollViewportRef.current.scrollHeight,
           behavior: 'smooth'
         });
-        hasUserScrollInteractionRef.current = true;
+        followStateRef.current = markAtLatestBeat(followStateRef.current);
         break;
       default:
         break;
@@ -363,12 +373,21 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         // so mark it passive to avoid blocking scroll (issue #1358).
         scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
 
-        // ResizeObserver: anchor scroll to bottom during content growth
-        const contentEl = scrollContentRef.current;
+        // ResizeObserver: anchor scroll to bottom during content growth.
+        //
+        // Watch everything the scroller scrolls. The decision block, story-beat
+        // notes and consequence callout are siblings of the narrative inside
+        // the same scroller and change height every turn, so observing the
+        // prose column alone let that growth push the turn's choices below the
+        // fold with nothing re-anchoring. The scroller's only child is the box
+        // whose height tracks all of it: `.manuscript-main-stage` on the play
+        // surface, and the Radix viewport's content wrapper everywhere else.
+        // The prose column is a null guard for a scroller with no children.
+        const contentEl = scrollTarget.firstElementChild ?? scrollContentRef.current;
         let resizeObserver: ResizeObserver | null = null;
         if (contentEl) {
           resizeObserver = new ResizeObserver(() => {
-            if ((!hasUserScrollInteractionRef.current || isNearBottomRef.current) && scrollViewportRef.current) {
+            if (shouldFollowLatestBeat(followStateRef.current) && scrollViewportRef.current) {
               scrollViewportRef.current.scrollTo({
                 top: scrollViewportRef.current.scrollHeight,
                 behavior: 'auto'
