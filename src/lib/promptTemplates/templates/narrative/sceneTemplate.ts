@@ -109,11 +109,19 @@ ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.curren
 ${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:
 ${skillResult === 'success' ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
-${skillResult === 'failure' || skillResult === 'critical-failure' ? '- The player FAILED at their action - show realistic consequences and setbacks' : ''}
+${skillResult === 'failure' || skillResult === 'critical-failure' ? '- The player FAILED at their action - the attempt still happens, goes wrong, and costs them (see FAILED ATTEMPT rules below)' : ''}
 ${skillResult === 'critical-failure' ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : ''}
 - DO NOT explicitly mention skill names, skill levels, or game mechanics
 - Show the outcome through what actually happens in the story
-- Success = things work out, failure = things go wrong or backfire
+- Success = things work out, failure = the attempt goes wrong and leaves the scene worse than it found it
+` : ''}
+
+${skillResult === 'failure' || skillResult === 'critical-failure' ? `
+FAILED ATTEMPT — THE WORLD STILL MOVES:
+- The failed attempt still HAPPENS: show the character doing it and the world answering badly — never render failure as the attempt simply not occurring.
+- The failure must COST something concrete: position or footing lost, a resource spent or broken, an NPC turned colder, noise or attention drawn, an option closed, time burned while the situation worsens.
+- End the segment concretely changed from how it began — if every person, object, and advantage would stand exactly where it started, the outcome is wrong: pick a cost above and show it happening.
+- The cost must appear in the prose as something that happened, not as a feeling or an omen.
 ` : ''}
 
 ${isStale ? `
