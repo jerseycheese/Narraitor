@@ -12,7 +12,7 @@
  * Slack for "parked at the latest beat". A narrative beat renders far taller
  * than this, so it can't absorb one.
  */
-export const NEAR_BOTTOM_THRESHOLD_PX = 100;
+const NEAR_BOTTOM_THRESHOLD_PX = 100;
 
 export interface ScrollMeasurement {
   scrollTop: number;
@@ -31,7 +31,7 @@ export function createFollowState(): FollowState {
   return { hasLeftLatestBeat: false, isNearBottom: true, lastScrollTop: 0 };
 }
 
-export function isNearBottom({
+function measureIsNearBottom({
   scrollTop,
   scrollHeight,
   clientHeight,
@@ -57,7 +57,7 @@ export function applyScrollEvent(
   state: FollowState,
   measurement: ScrollMeasurement
 ): FollowState {
-  const nearBottom = isNearBottom(measurement);
+  const nearBottom = measureIsNearBottom(measurement);
   const didScrollUp = measurement.scrollTop < state.lastScrollTop;
 
   return {
@@ -69,9 +69,17 @@ export function applyScrollEvent(
   };
 }
 
-/** The reader took the view somewhere themselves (keyboard navigation). */
+/**
+ * The reader took the view somewhere themselves (keyboard navigation).
+ *
+ * Deliberately leaves isNearBottom alone. Keys that travel towards the newest
+ * beat (End, PageDown) move nothing when the view is already parked there, so
+ * the browser fires no scroll event to correct an assumption made here. Let
+ * the position speak for itself and following survives those keys, as it did
+ * before this state moved out of the component.
+ */
 export function markLeftLatestBeat(state: FollowState): FollowState {
-  return { ...state, hasLeftLatestBeat: true, isNearBottom: false };
+  return { ...state, hasLeftLatestBeat: true };
 }
 
 /** Snapped back to the newest beat, by the pill or by a following scroll. */

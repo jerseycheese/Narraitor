@@ -368,9 +368,10 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         // notes and consequence callout are siblings of the narrative inside
         // the same scroller and change height every turn, so observing the
         // prose column alone let that growth push the turn's choices below the
-        // fold with nothing re-anchoring. The scroller's content wrapper is the
-        // one box whose height tracks all of it, with the prose column as a
-        // fallback when there's no wrapper.
+        // fold with nothing re-anchoring. The scroller's only child is the box
+        // whose height tracks all of it: `.manuscript-main-stage` on the play
+        // surface, and the Radix viewport's content wrapper everywhere else.
+        // The prose column is a null guard for a scroller with no children.
         const contentEl = scrollTarget.firstElementChild ?? scrollContentRef.current;
         let resizeObserver: ResizeObserver | null = null;
         if (contentEl) {

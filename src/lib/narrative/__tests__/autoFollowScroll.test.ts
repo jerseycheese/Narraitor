@@ -57,10 +57,23 @@ describe('autoFollowScroll', () => {
     expect(shouldFollowLatestBeat(createFollowState())).toBe(true);
   });
 
-  it('treats keyboard navigation as leaving, and the pill as coming back', () => {
-    const left = markLeftLatestBeat(createFollowState());
+  it('treats keyboard navigation away as leaving, and the pill as coming back', () => {
+    const scrolledUp = applyScrollEvent(
+      applyScrollEvent(createFollowState(), PARKED_AT_BOTTOM),
+      { ...PARKED_AT_BOTTOM, scrollTop: 100 }
+    );
+
+    const left = markLeftLatestBeat(scrolledUp);
     expect(shouldFollowLatestBeat(left)).toBe(false);
 
     expect(shouldFollowLatestBeat(markAtLatestBeat(left))).toBe(true);
+  });
+
+  it('keeps following when a key moves nothing because the view is already at the bottom', () => {
+    // End and PageDown at the bottom scroll nowhere, so the browser fires no
+    // scroll event to correct a premature "they left" assumption.
+    const atBottom = applyScrollEvent(createFollowState(), PARKED_AT_BOTTOM);
+
+    expect(shouldFollowLatestBeat(markLeftLatestBeat(atBottom))).toBe(true);
   });
 });
