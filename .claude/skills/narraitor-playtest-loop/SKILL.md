@@ -60,6 +60,26 @@ because React re-renders between them and the later clicks land on stale nodes. 
 them with `setTimeout(fn, 300 * i)` inside one call, then verify the result in the next
 call. Range inputs batch fine. Buttons do not.
 
+**Fire batches, do not await them.** The JavaScript bridge times out at 30 seconds and a
+turn costs 4 to 8, so any batch past three turns dies mid-run holding the tool call open.
+Kick the loop off without awaiting it, park progress on a `window` flag, and poll that flag
+from later calls. The work survives the timeout either way — round 4 lost a call to a 5-turn
+`await` and found the batch had completed in the background regardless — but polling is the
+difference between reading the result and guessing at it.
+
+**Handle the ending offer at the top of every action, and handle it per run.** Somewhere
+around turn 14 the session offers "Your story could end here" with View Ending and Continue
+Playing. It suppresses the choice list, so a runner that ignores it stalls for the rest of
+its batch and reports a timeout that looks like a hung generation. Check for it before each
+action rather than once at the start.
+
+What to click depends on the run. **Fixed-length runs click Continue Playing** — the offer
+fires well before turn 30 and accepting it ends the session early with the block scores
+unfinished. **Run 4 clicks View Ending**, because a naturally suggested ending is the thing
+that run exists to reach; dismissing it there leaves the run either circling forever or
+scoring a forced ending, which is a different question. A runner that hard-codes one branch
+breaks whichever run it did not consider.
+
 **Capturing a turn:** one JavaScript call returning compact JSON from
 `window.useNarrativeStore.getState()` for `segments` and `decisions`, plus
 `useJournalStore` and `useInventoryStore`. All of them are exposed on `window` whenever
