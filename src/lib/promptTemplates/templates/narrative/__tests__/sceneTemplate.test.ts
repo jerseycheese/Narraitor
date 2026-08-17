@@ -83,12 +83,28 @@ describe('sceneTemplate skill result derivation', () => {
     expect(prompt).toContain('FAILED ATTEMPT — THE WORLD STILL MOVES:');
   });
 
-  it('keeps the critical bullet on a mixed turn that contains a critical roll', () => {
+  it('keeps the critical-failure bullet on a mixed turn that rolled a natural 1', () => {
     const prompt = sceneTemplate(
       makeContext(undefined, ['skill-critical-failure:a', 'skill-success:b'])
     );
     expect(prompt).toContain('MIXED OUTCOME:');
     expect(prompt).toContain('CRITICAL FAILURE:');
+  });
+
+  it('keeps the critical-success bullet on a mixed turn that rolled a natural 20', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-critical-success:a', 'skill-failure:b'])
+    );
+    expect(prompt).toContain('MIXED OUTCOME:');
+    expect(prompt).toContain('CRITICAL SUCCESS:');
+  });
+
+  it('still marks a critical-weight mixed failure as a critical one', () => {
+    const prompt = sceneTemplate(
+      makeContext(undefined, ['skill-critical-failure:a', 'skill-success:b'], 'critical')
+    );
+    expect(prompt).toContain('FATAL/INCAPACITATING OUTCOME:');
+    expect(prompt).toContain('it FAILED critically');
   });
 
   it('keeps a plain success free of the mixed and critical bullets', () => {
