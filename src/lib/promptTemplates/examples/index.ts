@@ -83,13 +83,16 @@ Examples of CHAOTIC choices:
 /**
  * Skill acknowledgment examples. Both the success and failure cases ship, so
  * the model sees how to phrase either outcome regardless of which one happened.
+ * The failure example has to cost something concrete: it is the model answer for
+ * what a miss looks like, and a miss that leaves the world untouched is the
+ * failure shape the scene prompt spends a whole section ruling out.
  */
 export const SKILL_ACKNOWLEDGMENT_EXAMPLES = `
 
 EXAMPLES:
 Example 1: Failure Acknowledgment
 ---------------------------------
-Despite your efforts with the lockpicks, the mechanism remains stubbornly locked.
+Your pick binds, then snaps. Half of it stays in the keyway, the sound carries down the corridor behind you, and the lock is fouled for anyone who tries it next.
 
 Example 2: Success Acknowledgment
 ---------------------------------

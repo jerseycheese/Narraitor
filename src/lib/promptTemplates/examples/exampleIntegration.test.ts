@@ -77,6 +77,21 @@ describe('narrative templates embed their examples', () => {
   });
 });
 
+describe('the skill acknowledgment failure exemplar costs something', () => {
+  it('does not model failure as the world refusing to move', () => {
+    const costlessPhrasings = [
+      /remains? (stubbornly )?locked/i,
+      /refuses to budge/i,
+      /nothing (happens|changes)/i,
+      /no closer than before/i,
+    ];
+
+    costlessPhrasings.forEach((phrasing) => {
+      expect(SKILL_ACKNOWLEDGMENT_EXAMPLES).not.toMatch(phrasing);
+    });
+  });
+});
+
 describe('the context-length gate still drops examples', () => {
   it('scene omits examples once the context is long enough to stand on its own', () => {
     const result = sceneTemplate({
