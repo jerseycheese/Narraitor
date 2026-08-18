@@ -131,10 +131,10 @@ describe('sceneTemplate pacing guidance', () => {
     expect(prompt).toContain('3 turns in a row');
   });
 
-  it('tells the model to record the forced complication as a majorEvent so the streak actually resets', () => {
+  it('stops leaning on majorEvent to reset the streak', () => {
     const prompt = sceneTemplate(makeContext(3));
-    expect(prompt).toContain('counts as a major event');
-    expect(prompt).toContain('metadata.majorEvent');
+    expect(prompt).not.toContain('counts as a major event');
+    expect(prompt).toContain('this guidance stands down on its own');
   });
 
   it('keeps escalating the guidance for longer streaks', () => {

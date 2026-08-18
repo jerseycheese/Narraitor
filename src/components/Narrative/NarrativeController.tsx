@@ -22,7 +22,7 @@ import {
   evaluateDecisionSkillChecks,
   isFatalCriticalDecision,
 } from '@/lib/narrative/evaluateDecisionSkillChecks';
-import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplication';
+import { computeTurnsSinceComplication, isPacingStale } from '@/lib/narrative/turnsSinceComplication';
 import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
@@ -624,6 +624,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Streak tracked over the whole session, not just the trimmed context
       // window above — a quiet stretch spans more than 3 segments.
       const turnsSinceComplication = computeTurnsSinceComplication(segments);
+      // The scene prompt only carries the rising-tension block above this
+      // threshold, and the complication it asks for arrives with no dice roll
+      // behind it. Stamping the ask onto the segment is what lets the streak
+      // reset; without it the guidance would repeat on every following turn.
+      const pacingEscalationRequested = isPacingStale(turnsSinceComplication);
 
       // Get the actual choice text from the narrative store
       const decisions = useNarrativeStore
@@ -775,6 +780,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           // Merge skill check tags into metadata
           tags: [...(result.metadata.tags || []), ...skillCheckTags],
           decisionOutcome,
+          pacingEscalationRequested,
         },
         sessionId, // Explicitly set sessionId
         worldId, // Explicitly set worldId
