@@ -21,9 +21,14 @@ interface PlayerChoiceTemplateContext {
 /**
  * Prompt template for generating alignment-tagged player choices.
  *
- * The mix of alignments is chosen per scene rather than mandated. A fixed
- * quota produced the same lawful/neutral/chaotic shape every turn, with the
- * chaotic option always last and almost never picked.
+ * The mix of alignments is chosen per scene rather than mandated. Removing the
+ * quota was not enough on its own: the model kept returning lawful, neutral,
+ * chaotic in that order because the prompt itself taught the pattern. The
+ * glossary listed the tags in exactly the order the numbered slots wanted
+ * them, and the chaotic entry dwarfed the other two, which marked it as the
+ * showy one that always turns up last. So the mix is now a decision the model
+ * has to state before it writes anything, the glossary no longer runs in slot
+ * order, and a chaotic option has to be one a player might really take.
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
   const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount } = context;
@@ -99,16 +104,19 @@ You MUST create choices that directly respond to the specific situation describe
 
 Based on the SPECIFIC narrative situation above, create ${choiceCount} distinct action choices, each tagged with the alignment it expresses:
 
-ALIGNMENT DEFINITIONS:
-- LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
+ALIGNMENT DEFINITIONS (a glossary, not a running order - see CHOOSING THE MIX below):
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
 - CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. Dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. VARY THE KIND of chaos and do NOT default to making noise (yelling, shouting, singing). Draw from a wide range, fitted to the scene: sudden physical risk ("leap from the balcony onto the chandelier," "kick over the lantern to set the drapes alight"), trickery or deception ("impersonate the captain and bark orders," "bluff an outrageous lie with total confidence"), sabotage or destruction ("cut the rope bridge behind you," "smash the control panel," "throw open the cells and free the prisoners"), turning the tables ("start a brawl to scatter the room," "switch sides mid-negotiation"), or abandoning the obvious goal for something no one expects. The goal is options that dramatically shift the narrative in surprising ways.
+- LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 
 CHOOSING THE MIX (IMPORTANT):
 - Always tag every choice [LAWFUL], [NEUTRAL], or [CHAOTIC].
-- Pick the mix the scene actually supports. There is no quota: a tense standoff might offer two chaotic openings, a quiet interrogation none at all.
-- Do NOT make every choice neutral, and do NOT repeat the same mix or the same tag order turn after turn. A player who can predict which slot holds the reckless option has stopped reading the choices.
-- Only offer a chaotic option when a genuinely disruptive action fits the moment. A reckless choice nobody would plausibly take is wasted space.
+- Decide the mix from this scene BEFORE writing a single option, and report it on the Alignment Mix line. Pick what the scene actually supports. There is no quota: a tense standoff might offer two chaotic openings, a quiet interrogation none at all.
+- Two options may share a tag, and so may all of them. A mix of one tag per option is one possibility among many, not the default.
+- The order the tags are listed above is not a running order, and neither is any order you used last turn. Do NOT assign tags to slots by position out of habit, and do NOT repeat the same mix turn after turn. A player who can predict which slot holds the reckless option has stopped reading the choices.
+- Never park the most disruptive option in the last slot by default. When a chaotic option belongs in a scene it can just as easily be the first thing offered.
+- Only offer a chaotic option when a genuinely disruptive action fits the moment.
+- A chaotic option must be something a bold player would actually consider, with a real payoff if it works. An obvious mistake, a pointless stunt, or self-sabotage nobody would pick is wasted space: drop the chaotic tag and offer a different mix instead.
 
 PERSONALITY-INFORMED CHOICES (when character personality context is provided):
 - Create options that offer ways to express the character's traits
@@ -122,7 +130,7 @@ REQUIREMENTS:
 2. Offer meaningfully different paths forward in the story
 3. Are concise (under 15 words) and written as direct actions
 4. Consider both the immediate situation AND the broader story context
-5. Each choice must clearly fit its alignment category
+5. Each choice must clearly express the tag it carries - two choices sharing a tag should express it in visibly different ways
 6. DO NOT use generic terms like "guard" when the context specifies "dragon"
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
@@ -144,7 +152,8 @@ Carefully evaluate the narrative situation and determine the significance of thi
 
 Consider the stakes, potential consequences, and story impact. MOST decisions are MINOR or MAJOR: MINOR for everyday beats, MAJOR for the interesting story moments. Reserve CRITICAL for the RARE, genuinely life-or-death turning points - deadly combat, final confrontations, or choices where failure would plausibly end the character's story. When unsure between MAJOR and CRITICAL, choose MAJOR.
 
-FORMAT (REQUIRED - include alignment tags, decision weight, and context summary):
+FORMAT (REQUIRED - include the alignment mix, alignment tags, decision weight, and context summary):
+Alignment Mix: [the tag for each option in the order you will write them, then a short clause naming what in THIS scene makes that mix right. Examples: "CHAOTIC, LAWFUL, CHAOTIC - the room is already burning, so restraint is the odd choice here" or "NEUTRAL, NEUTRAL, LAWFUL - a quiet archive with nothing to disrupt"]
 Decision Weight: [MINOR/MAJOR/CRITICAL]
 Context Summary: [Write a brief 1-sentence summary that captures WHY this decision matters - focus on the stakes, immediate tension, or key relationships at play. Do NOT retell the story. Examples: "Tension builds as you must choose how to respond to the merchant's accusation." "A critical moment where your response could determine if the alliance forms." "The stranger's offer seems too good to be true."]
 Decision: What will you do?
@@ -153,6 +162,6 @@ Options:
 ${Array.from({ length: choiceCount }, (_, i) => `${i + 1}. [ALIGNMENT] [Action choice]
    Requirements: [Optional - SkillName X+]${consequencesFormatLine}`).join('\n')}${consequencesInstructions}
 
-Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary line, then Decision and Options sections with alignment tags.`;
+Keep your response EXACTLY in this format. Include the Alignment Mix line, Decision Weight line, Context Summary line, then Decision and Options sections with alignment tags.`;
 };
 

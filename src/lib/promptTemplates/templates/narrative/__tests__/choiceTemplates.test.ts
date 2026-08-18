@@ -63,6 +63,6 @@ describe('choice templates ask for as many options as the interface shows', () =
 
     expect(prompt).toContain('[LAWFUL]');
     expect(prompt).not.toContain('1 lawful, 2 neutral, 1 chaotic');
-    expect(prompt).toMatch(/do NOT repeat the same mix or the same tag order/i);
+    expect(prompt).toMatch(/do NOT repeat the same mix turn after turn/i);
   });
 });
