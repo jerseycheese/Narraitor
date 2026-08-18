@@ -75,8 +75,10 @@ ${threadList}`,
 
   if (input.seed) sections.push(formatSeed(input.seed));
 
-  sections.push(`Return the ledger changes under a "worldThreads" key in the JSON:
-"worldThreads": {"opened":[{"kind":"consequence|actor|deadline","summary":"...","dueByTurn":12}],"advanced":[{"id":"thread-id","note":"..."}],"resolved":[{"id":"thread-id","resolution":"...","outcome":"resolved|dropped"}]}`);
+  // The response shape lives in the goal prompt's JSON skeleton, which grows
+  // a "worldThreads" member whenever this section is present; one line here
+  // points at it without repeating it.
+  sections.push('Return the ledger changes under the "worldThreads" key of the JSON below.');
 
   return sections.join('\n\n');
 }
