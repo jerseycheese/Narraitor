@@ -270,6 +270,12 @@ export interface NarrativeMetadata {
   causedByDecisionId?: EntityID;
   causedByDecisionText?: string;
   decisionOutcome?: DecisionOutcome;
+  /**
+   * Set by the engine, not the model: this segment was generated while the
+   * pacing guard was asking for a complication. Asking is what spends the
+   * quiet streak, so the guard paces itself instead of firing every turn.
+   */
+  pacingEscalationRequested?: boolean;
   // Continuity guardrail outcome (#409/#412)
   continuity?: ContinuitySegmentNote;
   // Debug information (dev mode only)

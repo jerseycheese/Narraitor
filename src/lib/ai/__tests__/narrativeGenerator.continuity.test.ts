@@ -316,7 +316,7 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     expect(extractStructuredLore).toHaveBeenCalledWith(
       CLEAN_PROSE,
       expect.anything(),
-      { continuityTopics: ['mill debt'] }
+      { continuityTopics: ['mill debt'], playerCharacterName: 'Hero' }
     );
   });
 });

@@ -2,13 +2,7 @@ import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import { describeNarrativeLength } from './narrativeLength';
 import type { NarrativeTemplateContext } from './context';
-
-/**
- * Number of consecutive uneventful segments before the prompt starts pushing
- * the model to break the calm. Below this, a quiet stretch just reads as
- * normal pacing; at or above it, cautious play stops being a free pass.
- */
-const STALE_PACING_THRESHOLD = 3;
+import { isPacingStale } from '@/lib/narrative/turnsSinceComplication';
 
 /**
  * Puts the player's own sheet in front of the model. Without it the prompt
@@ -103,7 +97,7 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
     skillResult === 'critical-failure' ||
     skillResult === 'mixed';
   const turnsSinceComplication = narrativeContext?.turnsSinceComplication ?? 0;
-  const isStale = turnsSinceComplication >= STALE_PACING_THRESHOLD;
+  const isStale = isPacingStale(turnsSinceComplication);
 
   const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
     ? `
@@ -150,7 +144,7 @@ PACING GUIDANCE — RISING TENSION:
 - This segment MUST introduce a complication: an interruption, a new threat, an unexpected cost, or a setback tied to the current situation.
 - The complication does not need a skill check behind it — it can simply happen (an NPC arrives, a resource runs out, the trail leads somewhere worse than expected, time runs short).
 - Do not extend the current chain with another same-shape discovery (another clue, another trace) with nothing else changing.
-- Whatever complication you introduce here counts as a major event: record it in metadata.majorEvent (see the rules below) so this guidance doesn't fire again next turn for a problem you already resolved.
+- Judge the majorEvent field on its own rules below — this guidance stands down on its own and does not need one.
 ` : ''}
 
 ${generationParameters?.decisionWeight === 'critical' && failed ? `
@@ -212,6 +206,7 @@ CRITICAL INSTRUCTIONS:
 3. Only use "${playerCharacterName}" when OTHER characters speak TO or ABOUT the player
 4. The player experiences everything through ${playerCharacterName || 'their character'}'s perspective
 5. Write only the scene itself - no HTML tags, and no closing note about what the narrative will do next
+${playerCharacterName ? `6. "${playerCharacterName}" is RESERVED for the player - never give a relative, contact, or any other character that name, and never describe a second person who carries it` : ''}
 
 Focus on varied sensory details and the character's reactions to bring the scene to life.
 - Use visual, auditory, and tactile descriptions primarily
