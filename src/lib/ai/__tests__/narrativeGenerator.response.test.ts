@@ -82,11 +82,11 @@ describe('narrative response helpers', () => {
       content: `\n\n\`\`\`json\n{"content":"You wait in the dark.","metadata":{"mood":"tense"}}\n\`\`\``,
     };
 
-    const buildSegment = (location: string): NarrativeSegment => ({
-      id: `segment-${location}`,
+    const buildSegment = (location?: string): NarrativeSegment => ({
+      id: `segment-${location ?? 'nowhere'}`,
       content: 'Something happens.',
       type: 'scene',
-      metadata: { tags: [], location },
+      metadata: { tags: [], ...(location ? { location } : {}) },
       timestamp: new Date(),
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
@@ -115,6 +115,17 @@ describe('narrative response helpers', () => {
       );
 
       expect(result.metadata.location).toBe('Boathouse interior');
+    });
+
+    it('reaches past a recent window that names no place', () => {
+      const boathouse = buildSegment('Boathouse interior');
+
+      const previousLocation = getCarryForwardLocation({
+        previousSegments: [boathouse, buildSegment(), buildSegment()],
+        recentSegments: [buildSegment(), buildSegment()],
+      });
+
+      expect(previousLocation).toBe('Boathouse interior');
     });
 
     it('uses a neutral placeholder on the first segment', async () => {

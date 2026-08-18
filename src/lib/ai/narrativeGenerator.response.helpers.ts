@@ -142,14 +142,16 @@ export const getCarryForwardLocation = (
     'recentSegments' | 'previousSegments' | 'currentLocation'
   >
 ): string | undefined => {
-  const segments = narrativeContext?.recentSegments?.length
-    ? narrativeContext.recentSegments
-    : narrativeContext?.previousSegments;
+  // recentSegments is a subset of previousSegments, so walking both in turn
+  // repeats a few checks and covers a recent window where nobody named a place.
+  const windows = [narrativeContext?.recentSegments, narrativeContext?.previousSegments];
 
-  for (let index = (segments?.length ?? 0) - 1; index >= 0; index -= 1) {
-    const location = safeTrim(segments?.[index]?.metadata?.location ?? '');
-    if (location.length > 0) {
-      return location;
+  for (const segments of windows) {
+    for (let index = (segments?.length ?? 0) - 1; index >= 0; index -= 1) {
+      const location = safeTrim(segments?.[index]?.metadata?.location ?? '');
+      if (location.length > 0) {
+        return location;
+      }
     }
   }
 
