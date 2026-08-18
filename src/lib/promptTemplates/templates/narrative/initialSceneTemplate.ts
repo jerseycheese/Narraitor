@@ -64,6 +64,7 @@ CRITICAL INSTRUCTIONS:
 2. The player IS ${playerCharacterName || 'the main character'} - NEVER refer to them by name in narration
 3. Only use the player's name when OTHER characters speak TO or ABOUT them
 4. The player experiences the story through ${playerCharacterName || 'their character'}'s eyes
+5. Write only the scene itself - no HTML tags, and no closing note about what the narrative will do next
 
 Examples:
 ✓ CORRECT: "You adjust your pack and look at the trail ahead..."

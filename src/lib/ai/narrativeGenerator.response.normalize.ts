@@ -2,6 +2,29 @@ import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 import { safeTrim } from '@/lib/utils';
 import type { NarrativeExtractedMetadata } from './narrativeGenerator.response.types';
 
+/**
+ * Bare HTML the model sometimes reaches for instead of markdown. The prose
+ * renderer only understands markdown, so the tag lands in front of the player
+ * as literal text.
+ */
+const HTML_TAG_PATTERN =
+  /<\/?(?:br|p|div|span|hr|em|strong|b|i|u|ul|ol|li|blockquote|pre|h[1-6])(?:\s[^<>]*)?\/?>/gi;
+
+/**
+ * A final paragraph that is bold end to end - the shape a stage direction takes
+ * when the model signs off about the story instead of staying inside it.
+ */
+const BOLD_CLOSING_PARAGRAPH_PATTERN = /(?:\n\s*)+\*\*([^*]+)\*\*\s*$/;
+
+/**
+ * Narrow on purpose: the narrative has to be the paragraph's own subject with the
+ * verb right behind it. Emphatic in-fiction closers survive, including ones that
+ * mention the story in passing ("the story of the mill will continue to haunt
+ * them"), where that verb belongs to a different subject.
+ */
+const META_COMMENTARY_PATTERN =
+  /^(?:the|this)\s+(?:narrative|story|scene|segment|chapter|passage)\s+(?:will\s+(?:continue|resume|proceed|pick\s+up)|continues|resumes|picks\s+up)\b/i;
+
 export const normalizeNarrativeContent = (
   content: string,
   extractedMetadata: NarrativeExtractedMetadata
@@ -126,7 +149,13 @@ export const normalizeNarrativeContent = (
       .replace(/[ \t]+([,;:.!?])/g, '$1')
       .replace(/[ \t]{2,}/g, ' ')
       .replace(/\s*\[[a-z0-9-]+\]/gi, '')
-      .replace(/\s*\[metadata\.[a-z]+:\s*[a-z0-9-]+\]/gi, '');
+      .replace(/\s*\[metadata\.[a-z]+:\s*[a-z0-9-]+\]/gi, '')
+      .replace(HTML_TAG_PATTERN, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(BOLD_CLOSING_PARAGRAPH_PATTERN, (match, statement: string) =>
+        META_COMMENTARY_PATTERN.test(statement.trim()) ? '' : match
+      )
+      .trim();
   }
 
   return normalizedContent;
