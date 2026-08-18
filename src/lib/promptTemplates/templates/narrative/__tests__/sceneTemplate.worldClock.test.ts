@@ -36,16 +36,65 @@ describe('sceneTemplate world clock block', () => {
         currentTurn: 12,
         turnsSinceWorldMoved: 3,
         threads: [
-          { kind: 'deadline', summary: 'The council vote is in six weeks', ageTurns: 11, overdue: false },
-          { kind: 'actor', summary: 'Davies is out collecting the debt', ageTurns: 4, overdue: true },
+          {
+            kind: 'deadline',
+            summary: 'The council vote is in six weeks',
+            ageTurns: 11,
+            overdue: false,
+            overdueByTurns: 0,
+            dueNow: false,
+          },
+          {
+            kind: 'actor',
+            summary: 'Davies is out collecting the debt',
+            ageTurns: 4,
+            overdue: true,
+            overdueByTurns: 2,
+            dueNow: false,
+          },
         ],
       })
     );
     expect(prompt).toContain(WORLD_CLOCK_HEADER);
     expect(prompt).toContain('Turn 12. Turns since the world last moved on its own: 3.');
     expect(prompt).toContain('(deadline, open 11 turns) The council vote is in six weeks');
-    expect(prompt).toContain('Davies is out collecting the debt [OVERDUE - this must come due now]');
+    expect(prompt).toContain('Davies is out collecting the debt [overdue by 2 turns - bring it toward landing]');
     expect(prompt).toContain('MUST advance, bring due, or resolve at least ONE thread above');
+    expect(prompt).toContain('never introduce one as new');
+    expect(prompt).not.toContain('DUE NOW');
+  });
+
+  it('names one due-now thread and lets the segment cut time forward to land it', () => {
+    const prompt = sceneTemplate(
+      makeContext({
+        currentTurn: 12,
+        turnsSinceWorldMoved: 3,
+        threads: [
+          {
+            kind: 'deadline',
+            summary: 'The environmental report is due',
+            ageTurns: 10,
+            overdue: true,
+            overdueByTurns: 9,
+            dueNow: true,
+          },
+          {
+            kind: 'actor',
+            summary: 'Davies is out collecting the debt',
+            ageTurns: 4,
+            overdue: true,
+            overdueByTurns: 2,
+            dueNow: false,
+          },
+        ],
+      })
+    );
+    expect(prompt).toContain('The environmental report is due [DUE NOW]');
+    expect(prompt).toContain('DUE NOW: The environmental report is due. It has been overdue for 9 turns.');
+    expect(prompt).toContain('this segment is a "transition"');
+    expect(prompt).toContain('time may jump FORWARD to reach it');
+    expect(prompt).toContain('Do not deliver it as fresh news');
+    expect(prompt).not.toContain('Prefer an OVERDUE thread');
   });
 
   it('falls back to an unbidden off-screen move when the ledger is empty', () => {

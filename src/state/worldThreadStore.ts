@@ -10,6 +10,7 @@ import {
 } from '../types/worldThread.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
+import { MIN_DUE_HORIZON_TURNS } from '@/lib/narrative/worldClock';
 import { createIndexedDBStorage } from './persistence';
 import {
   storeEvents,
@@ -227,7 +228,12 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
               worldId,
               kind: entry.kind,
               summary: entry.summary,
-              dueByTurn: entry.dueByTurn,
+              // A due nearer than the horizon is this scene, not a deadline;
+              // floor it rather than lose the thread or its due.
+              dueByTurn:
+                entry.dueByTurn !== undefined
+                  ? Math.max(entry.dueByTurn, currentTurn + MIN_DUE_HORIZON_TURNS)
+                  : undefined,
               openedAtTurn: currentTurn,
               lastAdvancedAtTurn: currentTurn,
               status: 'open',
@@ -253,7 +259,7 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
           if (!thread) continue;
           get().update(thread.id, {
             lastAdvancedAtTurn: currentTurn,
-            notes: entry.note ? [...thread.notes, entry.note] : thread.notes,
+            notes: [...thread.notes, entry.changed],
           });
           applied.advanced.push(thread.summary);
         }

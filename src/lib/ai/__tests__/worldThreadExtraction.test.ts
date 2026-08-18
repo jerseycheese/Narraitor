@@ -34,6 +34,17 @@ describe('buildWorldThreadPromptSection', () => {
     expect(section).not.toContain('SEEDING');
   });
 
+  it('asks for a named state change per advance, refuses restatement, and gives the turn scale', () => {
+    const section = buildWorldThreadPromptSection({ openThreads: [openThread], currentTurn: 7 });
+
+    expect(section).toContain('ADVANCE an open thread only when the prose changes its state');
+    expect(section).toContain('is NOT an advance');
+    expect(section).toContain('`changed`');
+    expect(section).toContain("'dropped' only when the story has made it impossible or irrelevant");
+    expect(section).toContain("'six weeks' about 30");
+    expect(section).toContain('Never earlier than two turns from now');
+  });
+
   it('lists only the observable changes that are present', () => {
     const section = buildWorldThreadPromptSection({
       openThreads: [],
@@ -84,7 +95,14 @@ describe('parseWorldThreadExtraction', () => {
         { kind: 'consequence', summary: 'Guards remember your face', dueByTurn: 'soon' },
         'junk',
       ],
-      advanced: [{ id: 'thread-1', note: ' moved ' }, { id: '' }, { note: 'no id' }, 42],
+      advanced: [
+        { id: 'thread-1', changed: ' Thorne is now in the room ' },
+        { id: 'thread-6', note: 'legacy note, no changed clause' },
+        { id: 'thread-7', changed: '   ' },
+        { id: '' },
+        { changed: 'no id' },
+        42,
+      ],
       resolved: [
         { id: 'thread-2', resolution: 'Paid off', outcome: 'resolved' },
         { id: 'thread-3', resolution: 'Moot now', outcome: 'dropped' },
@@ -98,7 +116,7 @@ describe('parseWorldThreadExtraction', () => {
         { kind: 'deadline', summary: 'The vote', dueByTurn: 30 },
         { kind: 'consequence', summary: 'Guards remember your face' },
       ],
-      advanced: [{ id: 'thread-1', note: 'moved' }],
+      advanced: [{ id: 'thread-1', changed: 'Thorne is now in the room' }],
       resolved: [
         { id: 'thread-2', resolution: 'Paid off', outcome: 'resolved' },
         { id: 'thread-3', resolution: 'Moot now', outcome: 'dropped' },

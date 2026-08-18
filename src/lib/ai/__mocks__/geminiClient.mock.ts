@@ -264,7 +264,7 @@ export class MockGeminiClient {
       : '[]';
     const threadIdMatch = prompt.match(/\[(thread-[\w-]+)\]/);
     const advanced = threadIdMatch
-      ? `[{ "id": "${threadIdMatch[1]}", "note": "The pressure tightened while the player was elsewhere" }]`
+      ? `[{ "id": "${threadIdMatch[1]}", "changed": "The magistrate has reached the capital gates" }]`
       : '[]';
 
     return `,

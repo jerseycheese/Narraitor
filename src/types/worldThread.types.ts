@@ -67,7 +67,8 @@ export interface WorldThreadExtractionInput {
 /** What the extraction returns for the ledger; every array may be empty. */
 export interface WorldThreadExtractionResult {
   opened: Array<{ kind: WorldThreadKind; summary: string; dueByTurn?: number }>;
-  advanced: Array<{ id: EntityID; note?: string }>;
+  /** `changed` names the new state; an advance without one is a restatement and is dropped at parse. */
+  advanced: Array<{ id: EntityID; changed: string }>;
   resolved: Array<{ id: EntityID; resolution: string; outcome: 'resolved' | 'dropped' }>;
 }
 
@@ -81,6 +82,10 @@ export interface WorldClockPromptContext {
     summary: string;
     ageTurns: number;
     overdue: boolean;
+    /** 0 unless overdue. */
+    overdueByTurns: number;
+    /** At most one thread per turn: the one this segment must land. */
+    dueNow: boolean;
   }>;
 }
 

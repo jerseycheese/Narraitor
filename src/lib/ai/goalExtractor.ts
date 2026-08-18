@@ -84,7 +84,7 @@ function buildGoalExtractionPrompt(request: GoalExtractionRequest): string {
     ? `,
   "worldThreads": {
     "opened": [{ "kind": "consequence|actor|deadline", "summary": "...", "dueByTurn": 12 }],
-    "advanced": [{ "id": "thread-id", "note": "..." }],
+    "advanced": [{ "id": "thread-id", "changed": "what is different now that was not before" }],
     "resolved": [{ "id": "thread-id", "resolution": "...", "outcome": "resolved|dropped" }]
   }`
     : '';

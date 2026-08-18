@@ -1,6 +1,7 @@
 // src/state/__tests__/worldThreadStore.test.ts
 
 import { useWorldThreadStore } from '../worldThreadStore';
+import { MIN_DUE_HORIZON_TURNS } from '@/lib/narrative/worldClock';
 import { storeEvents, StoreEventTypes, type SessionFreshStartEvent } from '@/lib/state/storePubSub';
 import type { WorldThreadExtractionResult } from '../../types/worldThread.types';
 
@@ -82,9 +83,9 @@ describe('worldThreadStore', () => {
         {
           opened: [{ kind: 'deadline', summary: 'The festival begins at dusk', dueByTurn: 6 }],
           advanced: [
-            { id: ownId, note: 'His men were seen at the docks' },
-            { id: foreignId, note: 'should not land' },
-            { id: 'thread-missing' },
+            { id: ownId, changed: 'His men were seen at the docks' },
+            { id: foreignId, changed: 'should not land' },
+            { id: 'thread-missing', changed: 'nothing to land on' },
           ],
           resolved: [
             { id: resolvableId, resolution: 'The ferry took them across', outcome: 'resolved' },
@@ -113,6 +114,32 @@ describe('worldThreadStore', () => {
         lastAdvancedAtTurn: 4,
       });
       expect(state.threads[foreignId]).toMatchObject({ status: 'open', lastAdvancedAtTurn: 1, notes: [] });
+    });
+
+    test('a due turn nearer than the horizon is floored, not dropped', () => {
+      useWorldThreadStore.getState().applyExtraction(
+        'session-a',
+        'world-1',
+        {
+          opened: [
+            { kind: 'deadline', summary: 'The vote is this afternoon', dueByTurn: 8 },
+            { kind: 'deadline', summary: 'The report is due next week', dueByTurn: 17 },
+            { kind: 'actor', summary: 'Thorne is calling in favors' },
+          ],
+          advanced: [],
+          resolved: [],
+        },
+        7
+      );
+
+      const bySummary = Object.fromEntries(
+        useWorldThreadStore.getState().getOpenThreadsBySession('session-a').map((t) => [t.summary, t.dueByTurn])
+      );
+      expect(bySummary).toEqual({
+        'The vote is this afternoon': 7 + MIN_DUE_HORIZON_TURNS,
+        'The report is due next week': 17,
+        'Thorne is calling in favors': undefined,
+      });
     });
 
     test('an all-empty result still seeds the session ledger', () => {

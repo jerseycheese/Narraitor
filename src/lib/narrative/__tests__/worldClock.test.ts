@@ -1,9 +1,12 @@
 import {
   isOverdue,
+  overdueByTurns,
   turnsSinceWorldMoved,
   selectThreadsForPrompt,
+  selectDueNowThread,
   buildWorldClockPromptContext,
   summarizeLedgerForSegment,
+  DUE_NOW_OVERDUE_TURNS,
 } from '../worldClock';
 import type { WorldThread } from '@/types/worldThread.types';
 
@@ -62,16 +65,49 @@ describe('worldClock', () => {
     ]);
   });
 
-  test('buildWorldClockPromptContext renders open threads with age and overdue flags', () => {
+  test.each([
+    ['not overdue', { dueByTurn: 6 }, 6, 0],
+    ['no due turn', {}, 20, 0],
+    ['three turns past due', { dueByTurn: 3 }, 6, 3],
+  ])('overdueByTurns: %s', (_label, overrides, currentTurn, expected) => {
+    expect(overdueByTurns(makeThread(overrides), currentTurn)).toBe(expected);
+  });
+
+  test('selectDueNowThread waits out the grace period, then picks the most overdue thread, oldest on a tie', () => {
+    const barelyOverdue = makeThread({ id: 'barely', openedAtTurn: 2, dueByTurn: 9 });
+    expect(selectDueNowThread([barelyOverdue], 10)).toBeUndefined();
+    expect(selectDueNowThread([barelyOverdue], 9 + DUE_NOW_OVERDUE_TURNS)).toBe(barelyOverdue);
+
+    const mostOverdue = makeThread({ id: 'most', openedAtTurn: 5, dueByTurn: 6 });
+    const tiedYounger = makeThread({ id: 'tied-young', openedAtTurn: 7, dueByTurn: 8 });
+    const tiedOlder = makeThread({ id: 'tied-old', openedAtTurn: 3, dueByTurn: 8 });
+    const noDue = makeThread({ id: 'no-due', openedAtTurn: 1 });
+    expect(selectDueNowThread([tiedYounger, noDue, mostOverdue, tiedOlder], 12)?.id).toBe('most');
+    expect(selectDueNowThread([tiedYounger, noDue, tiedOlder], 12)?.id).toBe('tied-old');
+    expect(selectDueNowThread([noDue], 40)).toBeUndefined();
+  });
+
+  test('buildWorldClockPromptContext renders open threads with age, overdue arithmetic and one due-now pick', () => {
     const threads = [
       makeThread({ summary: 'The debt collector is coming', openedAtTurn: 2, dueByTurn: 4 }),
+      makeThread({ summary: 'The vote', openedAtTurn: 1, dueByTurn: 5 }),
       makeThread({ summary: 'The bridge is out', status: 'resolved', lastAdvancedAtTurn: 5 }),
     ];
 
-    expect(buildWorldClockPromptContext(threads, 6)).toEqual({
-      currentTurn: 6,
-      turnsSinceWorldMoved: 1,
-      threads: [{ kind: 'consequence', summary: 'The debt collector is coming', ageTurns: 4, overdue: true }],
+    expect(buildWorldClockPromptContext(threads, 7)).toEqual({
+      currentTurn: 7,
+      turnsSinceWorldMoved: 2,
+      threads: [
+        { kind: 'consequence', summary: 'The vote', ageTurns: 6, overdue: true, overdueByTurns: 2, dueNow: false },
+        {
+          kind: 'consequence',
+          summary: 'The debt collector is coming',
+          ageTurns: 5,
+          overdue: true,
+          overdueByTurns: 3,
+          dueNow: true,
+        },
+      ],
     });
   });
 

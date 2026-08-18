@@ -10,8 +10,44 @@ import type {
 
 const DEFAULT_PROMPT_THREAD_CAP = 8;
 
+/**
+ * Turns a thread may sit overdue before the scene prompt stops asking and
+ * starts insisting. Round 5's overdue mark fired the turn after the due and
+ * kept the same wording for 25 turns, so it stopped carrying information;
+ * a short grace period keeps a rough due from forcing the payoff too early
+ * and makes the DUE NOW instruction mean it.
+ */
+export const DUE_NOW_OVERDUE_TURNS = 3;
+
+/**
+ * The nearest a due may be filed. The model read "end of next week" as one
+ * turn out; anything closer than this is the current scene, not a deadline
+ * the world is holding.
+ */
+export const MIN_DUE_HORIZON_TURNS = 2;
+
 export const isOverdue = (thread: WorldThread, currentTurn: number): boolean =>
   thread.status === 'open' && thread.dueByTurn !== undefined && currentTurn > thread.dueByTurn;
+
+export const overdueByTurns = (thread: WorldThread, currentTurn: number): number =>
+  isOverdue(thread, currentTurn) ? currentTurn - (thread.dueByTurn as number) : 0;
+
+/**
+ * At most one thread is forced to land per segment: asking the model to pay
+ * off four overdue threads at once reads the same as asking for none. The
+ * most overdue wins, the oldest on a tie.
+ */
+export const selectDueNowThread = (
+  openThreads: WorldThread[],
+  currentTurn: number
+): WorldThread | undefined =>
+  openThreads
+    .filter((thread) => overdueByTurns(thread, currentTurn) >= DUE_NOW_OVERDUE_TURNS)
+    .sort(
+      (a, b) =>
+        overdueByTurns(b, currentTurn) - overdueByTurns(a, currentTurn) ||
+        a.openedAtTurn - b.openedAtTurn
+    )[0];
 
 /**
  * Turns since the ledger last moved in any direction. Resolved threads count:
@@ -46,6 +82,7 @@ export const buildWorldClockPromptContext = (
   currentTurn: number
 ): WorldClockPromptContext => {
   const openThreads = sessionThreads.filter((thread) => thread.status === 'open');
+  const dueNow = selectDueNowThread(openThreads, currentTurn);
   return {
     currentTurn,
     turnsSinceWorldMoved: turnsSinceWorldMoved(sessionThreads, currentTurn),
@@ -54,6 +91,8 @@ export const buildWorldClockPromptContext = (
       summary: thread.summary,
       ageTurns: currentTurn - thread.openedAtTurn,
       overdue: isOverdue(thread, currentTurn),
+      overdueByTurns: overdueByTurns(thread, currentTurn),
+      dueNow: thread.id === dueNow?.id,
     })),
   };
 };
