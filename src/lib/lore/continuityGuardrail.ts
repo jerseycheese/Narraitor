@@ -157,6 +157,14 @@ function mentionsPlayer(text: string, playerName?: string): boolean {
   return new RegExp(`\\b${escapeRegExp(name)}\\b`, 'i').test(text);
 }
 
+// The extractor tags the player's own questions as assertions spoken by "the
+// protagonist"; a question is not an answer, so player-spoken lines are dropped.
+const PLAYER_SPEAKER = /^(?:the )?(?:protagonist|player|you)$/i;
+
+function isPlayerSpeaker(speaker: string, playerName?: string): boolean {
+  return PLAYER_SPEAKER.test(speaker) || mentionsPlayer(speaker, playerName);
+}
+
 /**
  * First answer per (topic, speaker) is canon. Topics asked more than once rank
  * first because a repeated question is exactly where drift shows.
@@ -175,6 +183,7 @@ function buildAssertions(ledger: LoreFact[], playerName?: string): ContinuityAss
     if (mentionsPlayer(`${topic} ${fact.value}`, playerName)) continue;
 
     const speaker = annotation.speaker?.trim() || NARRATION_SPEAKER;
+    if (isPlayerSpeaker(speaker, playerName)) continue;
     const key = `${topicKey}|${speaker.toLowerCase()}`;
     if (firstByKey.has(key)) continue;
     firstByKey.set(key, { topic, speaker, claim: fact.value.trim(), mentions: 0 });
@@ -212,11 +221,17 @@ function buildCommitments(ledger: LoreFact[]): ContinuityCommitment[] {
   return Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
 }
 
+/** One line per changed object: later turns retell the same change in new words. */
 function buildSceneChanges(ledger: LoreFact[]): ContinuitySceneChange[] {
-  return ledger
-    .filter((fact) => fact.metadata!.continuity!.kind === 'scene-change')
-    .slice(-MAX_SCENE_CHANGES)
-    .map((fact) => ({ statement: fact.value.trim() }));
+  const firstByTopic = new Map<string, ContinuitySceneChange>();
+  for (const fact of ledger) {
+    const annotation = fact.metadata!.continuity!;
+    if (annotation.kind !== 'scene-change') continue;
+    const topicKey = normalizeTopic(annotation.topic?.trim() || fact.value);
+    if (!topicKey || firstByTopic.has(topicKey)) continue;
+    firstByTopic.set(topicKey, { statement: fact.value.trim() });
+  }
+  return Array.from(firstByTopic.values()).slice(-MAX_SCENE_CHANGES);
 }
 
 export function buildContinuityContract(

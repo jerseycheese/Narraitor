@@ -111,7 +111,7 @@ CRITICAL QUALITY RULES:
 
 CONTINUITY TAGGING (within the 3-event limit, prefer events that carry one of these):
 - Add "continuity" to an event when it is one of:
-  - "assertion": a character or the narration answers a factual question about the world (who owns what, what happened when, how much, whether something exists). "topic" is a short label for the question (e.g. "mill debt"), "speaker" is who said it ("narration" if unattributed).
+  - "assertion": a character or the narration ANSWERS a factual question about the world (who owns what, what happened when, how much, whether something exists). A question being asked is not an assertion; only tag the answer. "topic" is a short label for the question (e.g. "mill debt"), "speaker" is who gave the answer ("narration" if unattributed).
   - "commitment": someone promises to do or provide something ("status": "promised"), or actually delivers on such a promise ("status": "delivered"). "topic" names the thing promised (e.g. "appraisal documents"), "speaker" is who promised.
   - "scene-change": the protagonist physically and lastingly changes the scene (tears, breaks, moves, takes, opens something). "topic" names the object.
 - Leave "continuity" out for everything else.${topicHint}

@@ -245,6 +245,22 @@ describe('ledger-fed contract', () => {
     expect(contract.assertions.map((a) => a.topic)).toEqual(['mill debt']);
   });
 
+  it('drops assertions the player spoke, which are questions the extractor mis-tagged', () => {
+    const contract = buildLedgerContract(
+      [
+        makeEvent('e1', 'The protagonist asks Councilman Davies for the exact offer.',
+          { kind: 'assertion', topic: 'developer offer', speaker: 'protagonist' }),
+        makeEvent('e2', 'Wren asks whether anyone has seen the appraisal.',
+          { kind: 'assertion', topic: 'appraisal', speaker: 'Wren Calloway' }),
+        makeEvent('e3', 'Davies says the offer is nine hundred and fifty thousand dollars.',
+          { kind: 'assertion', topic: 'developer offer', speaker: 'Councilman Davies' }),
+      ],
+      'Wren Calloway'
+    );
+
+    expect(contract.assertions.map((a) => a.speaker)).toEqual(['Councilman Davies']);
+  });
+
   it('marks a commitment delivered once any fact on its topic says so', () => {
     const contract = buildLedgerContract([
       makeEvent('e1', 'Thorn promises the appraisal documents before any vote.',
@@ -261,10 +277,14 @@ describe('ledger-fed contract', () => {
     ]);
   });
 
-  it('keeps only the most recent scene changes', () => {
+  it('keeps only the most recent scene changes, one per topic', () => {
     const facts = Array.from({ length: 6 }, (_, i) =>
       makeEvent(`s${i}`, `Scene change ${i}`, { kind: 'scene-change', topic: `object ${i}` },
         `2025-01-01T00:${String(i).padStart(2, '0')}:00.000Z`)
+    );
+    facts.push(
+      makeEvent('s5b', 'Scene change 5 retold in new words', { kind: 'scene-change', topic: 'Object 5' },
+        '2025-01-01T00:07:00.000Z')
     );
 
     const contract = buildLedgerContract(facts);
