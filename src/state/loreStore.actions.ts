@@ -367,6 +367,7 @@ export const createLoreFactActions = (set: SetState, get: GetState) => ({
       resolveEntity: resolveEntityImpl,
       addAlias: get().addAlias,
       getFact: get().getById,
+      updateFact: get().update,
     };
     addStructuredLoreImpl(extraction, worldId, sessionId, context);
   },

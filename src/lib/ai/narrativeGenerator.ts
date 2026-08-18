@@ -51,6 +51,7 @@ import { buildNpcRoster, syncNpcMetadata } from './narrativeGenerator.npc';
 import {
   applyContinuityGuardrail,
   buildContinuityContractFromStores,
+  collectContinuityTopicsFromStores,
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
 import {
@@ -158,7 +159,9 @@ export class NarrativeGenerator {
         knownNameTokens
       );
 
-      const continuityContract = buildContinuityContractFromStores(request);
+      const continuityContract = buildContinuityContractFromStores(request, {
+        playerName: context.playerCharacterName,
+      });
       const finalPrompt = enhancePromptWithContinuityExpectations(
         phraseVarietyPrompt,
         continuityContract
@@ -206,7 +209,9 @@ export class NarrativeGenerator {
         const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
           recordUsage: false,
         });
-        void extractStructuredLore(result.content, existingLoreContext)
+        void extractStructuredLore(result.content, existingLoreContext, {
+          continuityTopics: collectContinuityTopicsFromStores(request),
+        })
           .then(async (structuredLore) => {
             const { useLoreStore } = await import('@/state/loreStore');
             const { addStructuredLore } = useLoreStore.getState();

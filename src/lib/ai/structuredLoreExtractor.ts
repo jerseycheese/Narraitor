@@ -5,21 +5,42 @@
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { extractFencedJson } from './parseJSON';
-import type { StructuredLoreExtraction } from '@/types/lore.types';
+import type {
+  LoreContinuityAnnotation,
+  LoreContinuityKind,
+  StructuredLoreExtraction,
+} from '@/types/lore.types';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('StructuredLoreExtractor');
+
+const CONTINUITY_KINDS: LoreContinuityKind[] = ['assertion', 'commitment', 'scene-change'];
+const COMMITMENT_STATUSES = ['promised', 'delivered'] as const;
+
+export interface ExtractStructuredLoreOptions {
+  /**
+   * Continuity topic labels already in the ledger. Passed to the model so a
+   * repeated question lands on the same label and the guardrail can line up
+   * the answers.
+   */
+  continuityTopics?: string[];
+}
 
 /**
  * Extract structured lore from narrative text using AI
  */
 export async function extractStructuredLore(
   narrativeText: string,
-  existingLoreContext?: string
+  existingLoreContext?: string,
+  options?: ExtractStructuredLoreOptions
 ): Promise<StructuredLoreExtraction> {
   try {
     const geminiClient = createDefaultGeminiClient();
-    const prompt = buildLoreExtractionPrompt(narrativeText, existingLoreContext);
+    const prompt = buildLoreExtractionPrompt(
+      narrativeText,
+      existingLoreContext,
+      options?.continuityTopics
+    );
     const response = await geminiClient.generateContent(prompt);
     
     if (!response.content) {
@@ -48,9 +69,17 @@ export async function extractStructuredLore(
 /**
  * Build the prompt for lore extraction
  */
-function buildLoreExtractionPrompt(narrativeText: string, existingLoreContext?: string): string {
+function buildLoreExtractionPrompt(
+  narrativeText: string,
+  existingLoreContext?: string,
+  continuityTopics?: string[]
+): string {
   const existingContext = existingLoreContext ? `\n\nExisting Lore Context:\n${existingLoreContext}` : '';
-  
+  const topicHint =
+    continuityTopics && continuityTopics.length > 0
+      ? `\n- Continuity topics already in use (reuse the exact label when an event is about the same question, promise, or object): ${continuityTopics.join('; ')}`
+      : '';
+
   return `You are a lore extraction system. Analyze the following narrative text and extract important facts as structured JSON.
 
 Extract only NEW or SIGNIFICANT information that would be important for maintaining story consistency. Avoid extracting generic or obvious information.
@@ -79,6 +108,13 @@ CRITICAL QUALITY RULES:
 - If a person is unnamed, keep it as part of an event description instead of a character entity.
 - Prefer stable locations ("Vaes Leisi", "Vaes Leisi marketplace") over micro-locations ("marketplace edge", "near a stall"). If you mention a micro-location, include it as an alias in the location entry.
 - Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.
+
+CONTINUITY TAGGING (within the 3-event limit, prefer events that carry one of these):
+- Add "continuity" to an event when it is one of:
+  - "assertion": a character or the narration ANSWERS a factual question about the world (who owns what, what happened when, how much, whether something exists). A question being asked is not an assertion; only tag the answer. "topic" is a short label for the question (e.g. "mill debt"), "speaker" is who gave the answer ("narration" if unattributed).
+  - "commitment": someone promises to do or provide something ("status": "promised"), or actually delivers on such a promise ("status": "delivered"). "topic" names the thing promised (e.g. "appraisal documents"), "speaker" is who promised.
+  - "scene-change": the protagonist physically and lastingly changes the scene (tears, breaks, moves, takes, opens something). "topic" names the object.
+- Leave "continuity" out for everything else.${topicHint}
 
 Narrative Text:
 ${narrativeText}${existingContext}
@@ -115,7 +151,8 @@ Respond with ONLY a JSON block in this exact format:
       "significance": "Why it matters",
       "importance": "low|medium|high",
       "visibility": "session-private|world-shared",
-      "relatedEntities": ["entity1", "entity2"]
+      "relatedEntities": ["entity1", "entity2"],
+      "continuity": { "kind": "assertion|commitment|scene-change", "topic": "short label", "speaker": "who said/promised it", "status": "promised|delivered" }
     }
   ],
   "rules": [
@@ -195,8 +232,9 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
         significance: typeof event.significance === 'string' ? event.significance.trim() : undefined,
         importance: ['low', 'medium', 'high'].includes(event.importance as string) ? event.importance as 'low' | 'medium' | 'high' : 'medium',
         visibility: ['session-private', 'world-shared'].includes(event.visibility as string) ? event.visibility as 'session-private' | 'world-shared' : undefined,
-        relatedEntities: Array.isArray(event.relatedEntities) ? 
-          (event.relatedEntities as unknown[]).filter((e) => typeof e === 'string') as string[] : undefined
+        relatedEntities: Array.isArray(event.relatedEntities) ?
+          (event.relatedEntities as unknown[]).filter((e) => typeof e === 'string') as string[] : undefined,
+        continuity: cleanContinuityAnnotation(event.continuity),
       }));
   }
 
@@ -227,6 +265,24 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
   }
 
   return cleaned;
+}
+
+const trimmedString = (value: unknown): string | undefined =>
+  typeof value === 'string' && value.trim() ? value.trim() : undefined;
+
+/** An annotation with an unknown kind is dropped; bad optional fields are just omitted. */
+function cleanContinuityAnnotation(raw: unknown): LoreContinuityAnnotation | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const annotation = raw as Record<string, unknown>;
+  const kind = annotation.kind as LoreContinuityKind;
+  if (!CONTINUITY_KINDS.includes(kind)) return undefined;
+  const status = annotation.status as (typeof COMMITMENT_STATUSES)[number];
+  return {
+    kind,
+    topic: trimmedString(annotation.topic),
+    speaker: trimmedString(annotation.speaker),
+    status: COMMITMENT_STATUSES.includes(status) ? status : undefined,
+  };
 }
 
 /**

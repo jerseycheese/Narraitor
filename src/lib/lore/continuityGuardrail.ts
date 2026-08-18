@@ -3,9 +3,10 @@
  *
  * Pure contradiction detection for generated narrative. Builds a compact
  * "continuity contract" from established state (lore facts, NPC relationships,
- * recent decisions) and checks new prose against it deterministically, so the
- * fast path adds microseconds — an AI correction call only happens when an
- * issue is detected (per #441's sub-200ms generation-impact constraint).
+ * recent decisions, and the ledger builders in `continuityLedger.ts`) and
+ * checks new prose against it deterministically, so the fast path adds
+ * microseconds — an AI correction call only happens when an issue is detected
+ * (per #441's sub-200ms generation-impact constraint).
  *
  * Like `loreContext.ts`, this module takes data as parameters and imports no
  * stores; store reads live in `lib/ai/narrativeGenerator.continuity.ts`.
@@ -16,12 +17,22 @@ import type { NPCRelationshipState } from '../../types/world-state.types';
 import type { EntityID } from '../../types/common.types';
 import type {
   ContinuityCanonFact,
+  ContinuityCommitment,
   ContinuityContract,
   ContinuityIssue,
   ContinuityNpcExpectation,
   ContinuityRecentDecision,
   ContinuityTone,
 } from '../../types/continuity.types';
+import {
+  MIN_TERM_LENGTH,
+  buildAssertions,
+  buildCommitments,
+  buildSceneChanges,
+  escapeRegExp,
+  ledgerFacts,
+  topicTerms,
+} from './continuityLedger';
 
 /** Routes correction responses in tests and marks the call in debug output. */
 export const CONTINUITY_CORRECTION_HEADER = 'CONTINUITY CORRECTION';
@@ -30,7 +41,6 @@ const MAX_NPC_EXPECTATIONS = 8;
 const MAX_CANON_FACTS = 10;
 const MAX_RECENT_DECISIONS = 3;
 const MAX_EXCERPT_LENGTH = 240;
-const MIN_TERM_LENGTH = 3;
 
 // Lexicons are deliberately conservative: every false positive costs an AI
 // correction call, so prefer missing a soft contradiction over flagging
@@ -45,6 +55,11 @@ const ACTIVE_PRESENCE_LEXICON =
   /\b(says?|said|speak(?:s|ing)?|spoke|asks?|asked|repl(?:y|ies|ied)|smil(?:e|es|ed|ing)|laugh(?:s|ed|ing)?|walk(?:s|ed|ing)?|arriv(?:e|es|ed|ing)|greet(?:s|ed|ing)?|stands?|stood|nods?|nodded|hands you|waves?|waved)\b/i;
 const MEMORY_GUARD =
   /\b(remember(?:s|ed|ing)?|recall(?:s|ed|ing)?|memor\w+|ghost(?:s|ly)?|spirit|vision|dream(?:s|ed|t|ing)?|grave\w*|tomb|dead|died|death|haunt\w*|once|used to|echo(?:es)?|portrait|statue)\b/i;
+// A fresh promise of something the ledger says was already delivered.
+const PROMISE_LEXICON =
+  /\b(promis(?:e|es|ing)|vow(?:s|ing)?|swear(?:s)?|pledg(?:e|es|ing)|assur(?:e|es|ing) you|guarantee(?:s|ing)?|(?:I|we)(?:'ll| will| shall) (?:make sure|see to it|get you|bring you|have|provide|send|give))\b/i;
+const RECAP_GUARD =
+  /\b(as (?:I |he |she |they |we )?promised|promised (?:earlier|before|you)|already|kept (?:his|her|their|my|our) (?:word|promise)|delivered|gave|handed|as agreed|in your (?:hands?|lap|possession))\b/i;
 
 export interface BuildContinuityContractArgs {
   facts: LoreFact[];
@@ -52,6 +67,13 @@ export interface BuildContinuityContractArgs {
   /** npcId -> display name, from the NPC store roster. */
   npcNames: Record<EntityID, string>;
   recentDecisions: ContinuityRecentDecision[];
+  /**
+   * Player character name. Assertions naming the player are excluded from the
+   * contract: an NPC inventing a fact about the player is the ledger's known
+   * poison path, and the player's own facts already reach the prompt through
+   * character context.
+   */
+  playerName?: string;
 }
 
 /**
@@ -68,10 +90,6 @@ function toneForRelationship(trust: number, sentiment: number): ContinuityTone {
 function parseEntityName(value: string): string {
   const match = value.match(/^([^-:]+?)(?:\s*[-:]\s*.+)?$/);
   return (match ? match[1] : value).trim();
-}
-
-function escapeRegExp(term: string): string {
-  return term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function dedupeTerms(terms: Array<string | undefined>): string[] {
@@ -91,7 +109,7 @@ function dedupeTerms(terms: Array<string | undefined>): string[] {
 export function buildContinuityContract(
   args: BuildContinuityContractArgs
 ): ContinuityContract {
-  const { facts, npcRelationships, npcNames, recentDecisions } = args;
+  const { facts, npcRelationships, npcNames, recentDecisions, playerName } = args;
   const characterFacts = facts.filter((fact) => fact?.category === 'characters');
 
   const npcs: ContinuityNpcExpectation[] = [];
@@ -144,11 +162,27 @@ export function buildContinuityContract(
     if (canonFacts.length >= MAX_CANON_FACTS) break;
   }
 
+  const ledger = ledgerFacts(facts);
+
   return {
     npcs: npcs.slice(0, MAX_NPC_EXPECTATIONS),
     canonFacts,
     recentDecisions: recentDecisions.slice(-MAX_RECENT_DECISIONS),
+    assertions: buildAssertions(ledger, playerName),
+    commitments: buildCommitments(ledger),
+    sceneChanges: buildSceneChanges(ledger),
   };
+}
+
+/** True when the contract has nothing to enforce; callers treat that as "guardrail off". */
+export function isContinuityContractEmpty(contract: ContinuityContract): boolean {
+  return (
+    contract.npcs.length === 0 &&
+    contract.canonFacts.length === 0 &&
+    contract.assertions.length === 0 &&
+    contract.commitments.length === 0 &&
+    contract.sceneChanges.length === 0
+  );
 }
 
 function findOffendingSentence(
@@ -217,7 +251,38 @@ export function detectContinuityIssues(
     }
   }
 
+  // Assertions and scene changes are prevention-only: whether a sentence
+  // contradicts "the town holds the mortgage" isn't a regex question. A fresh
+  // promise of a delivered commitment is, so that one gets the fast path.
+  for (const commitment of contract.commitments) {
+    if (commitment.status !== 'delivered') continue;
+    const terms = topicTerms(commitment.topic);
+    if (terms.length === 0) continue;
+    const termPatterns = terms.map((term) => new RegExp(`\\b${escapeRegExp(term)}`, 'i'));
+    const sentence = sentences.find(
+      (candidate) =>
+        PROMISE_LEXICON.test(candidate) &&
+        !RECAP_GUARD.test(candidate) &&
+        termPatterns.every((pattern) => pattern.test(candidate))
+    );
+    if (sentence) {
+      issues.push({
+        type: 'stale-promise',
+        entity: commitment.topic,
+        excerpt: sentence.trim().slice(0, MAX_EXCERPT_LENGTH),
+        expectation: describeCommitmentExpectation(commitment),
+      });
+    }
+  }
+
   return issues;
+}
+
+function describeCommitmentExpectation(commitment: ContinuityCommitment): string {
+  if (commitment.status === 'delivered') {
+    return `${commitment.by} already delivered on "${commitment.topic}" (${commitment.statement}). The player has it; nobody promises it again — refer to it as done.`;
+  }
+  return `${commitment.by} promised "${commitment.topic}" (${commitment.statement}) and has not delivered yet. Do not treat it as done.`;
 }
 
 function describeNpcExpectation(npc: ContinuityNpcExpectation): string {
@@ -254,6 +319,30 @@ export function formatContinuityExpectations(contract: ContinuityContract): stri
   for (const decision of contract.recentDecisions) {
     const outcome = decision.outcome ? ` (outcome: ${decision.outcome})` : '';
     lines.push(`- Recent decision: "${decision.text}"${outcome}. Honor its consequences.`);
+  }
+
+  if (contract.assertions.length > 0) {
+    lines.push(
+      'Answers this story already gave (if the question comes up again, the same answer stands; another character may contradict it only knowingly, never by accident):'
+    );
+    for (const assertion of contract.assertions) {
+      lines.push(`- ${assertion.topic} (${assertion.speaker}): ${assertion.claim}`);
+    }
+  }
+  if (contract.commitments.length > 0) {
+    lines.push(
+      'Promises on record (never re-promise what is DELIVERED; never treat what is OUTSTANDING as done):'
+    );
+    for (const commitment of contract.commitments) {
+      const label = commitment.status === 'delivered' ? 'DELIVERED' : 'OUTSTANDING';
+      lines.push(`- ${label}: ${commitment.topic} (${commitment.by}): ${commitment.statement}`);
+    }
+  }
+  if (contract.sceneChanges.length > 0) {
+    lines.push('Changes the player made to the scene (still true until undone on the page):');
+    for (const change of contract.sceneChanges) {
+      lines.push(`- ${change.statement}`);
+    }
   }
 
   if (lines.length === 0) return '';

@@ -178,6 +178,7 @@ describe('Lore Extraction Hardening Logic', () => {
           addAlias: jest.fn(),
           getFacts: jest.fn((options?: { worldId?: EntityID }) => options?.worldId ? existingFacts.filter(f => f.worldId === options.worldId) : existingFacts),
           getFact: jest.fn((id: EntityID) => addedFacts.find((fact) => fact.id === id) || existingFacts.find((fact) => fact.id === id)),
+          updateFact: jest.fn(),
           resolveEntity: jest.fn(),
         } as AddStructuredLoreContext,
         addedFacts,

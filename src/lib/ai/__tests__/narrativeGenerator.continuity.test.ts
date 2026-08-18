@@ -219,6 +219,7 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     // Lore extraction ran on the corrected prose, not the contradicted draft.
     expect(extractStructuredLore).toHaveBeenCalledWith(
       CORRECTED_PROSE,
+      expect.anything(),
       expect.anything()
     );
 
@@ -270,5 +271,52 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     expect(recorded).toHaveLength(1);
     expect(recorded[0].status).toBe('flagged');
     expect(recorded[0].remainingIssues).toHaveLength(1);
+  });
+
+  it('activates on a ledger-only contract and hands topics to the extractor', async () => {
+    // No relationships and no dead/destroyed lore: before the ledger this
+    // contract was vacuous and the guardrail sat out the turn.
+    (useWorldStore.getState as jest.Mock).mockImplementation(() => ({
+      worlds: { 'world-1': mockWorld },
+      worldStates: {},
+      currentWorldId: 'world-1',
+      error: null,
+      loading: false,
+      getWorldState: jest.fn(() => ({ npcRelationships: {} })),
+    }));
+    (useLoreStore.getState as jest.Mock).mockReturnValue({
+      getFacts: jest.fn().mockReturnValue([
+        {
+          ...miraFact,
+          id: 'fact-debt',
+          category: 'events' as const,
+          key: 'world-1:event_debt',
+          value: 'Aunt Carol says Old Man Rowan paid off the mortgage years ago.',
+          aliases: [],
+          metadata: {
+            importance: 'high' as const,
+            continuity: { kind: 'assertion' as const, topic: 'mill debt', speaker: 'Aunt Carol' },
+          },
+        },
+      ]),
+      getLoreContext: jest.fn().mockReturnValue({ factIds: [] }),
+      recordLoreMentions: jest.fn(),
+      recordLoreUsage: jest.fn(),
+      addStructuredLore: jest.fn(),
+    });
+    const client = createRoutedClient(CLEAN_PROSE, CORRECTED_PROSE);
+    const generator = new NarrativeGenerator(client);
+
+    const result = await generator.generateSegment(request);
+
+    const generationPrompt = client.generateContent.mock.calls[0][0] as string;
+    expect(generationPrompt).toContain('CONTINUITY REQUIREMENTS');
+    expect(generationPrompt).toContain('mill debt (Aunt Carol)');
+    expect(result.metadata.continuity).toEqual({ status: 'clean' });
+    expect(extractStructuredLore).toHaveBeenCalledWith(
+      CLEAN_PROSE,
+      expect.anything(),
+      { continuityTopics: ['mill debt'] }
+    );
   });
 });

@@ -32,6 +32,7 @@ export interface AddStructuredLoreContext {
   addAlias: (id: EntityID, alias: string) => void;
   getFacts: (options?: { worldId?: EntityID }) => LoreFact[];
   getFact: (id: EntityID) => LoreFact | undefined;
+  updateFact: (id: EntityID, updates: Partial<LoreFact>) => void;
   resolveEntity: (
     name: string,
     category: LoreCategory,
@@ -68,7 +69,7 @@ export function addStructuredLoreImpl(
     },
   });
 
-  const { addFact, setAliases, addAlias, getFacts, getFact, resolveEntity } = context;
+  const { addFact, setAliases, addAlias, getFacts, getFact, updateFact, resolveEntity } = context;
 
   const existingFacts = getFacts({ worldId });
   const existingKeys = new Set(existingFacts.map((fact) => fact.key));
@@ -189,12 +190,15 @@ export function addStructuredLoreImpl(
   });
 
   // Process events with deduplication and limiting
-  const existingEventValues = new Set(
-    existingFacts
-      .filter((fact) => fact.category === 'events')
-      .map((fact) => normalizeText(fact.value, NORM_NAME).toLowerCase())
-      .filter(Boolean)
-  );
+  const existingEventsByValue = new Map<string, LoreFact>();
+  existingFacts
+    .filter((fact) => fact.category === 'events')
+    .forEach((fact) => {
+      const normalized = normalizeText(fact.value, NORM_NAME).toLowerCase();
+      if (normalized && !existingEventsByValue.has(normalized)) {
+        existingEventsByValue.set(normalized, fact);
+      }
+    });
 
   const eventCandidates = extraction.events
     .filter((event) => typeof event.description === 'string' && safeTrim(event.description).length > 0)
@@ -216,7 +220,18 @@ export function addStructuredLoreImpl(
     if (!normalizedDescription) {
       return;
     }
-    if (existingEventValues.has(normalizedDescription) || addedEventValues.has(normalizedDescription)) {
+    const existingEvent = existingEventsByValue.get(normalizedDescription);
+    if (existingEvent) {
+      // A repeat of a stored event can still carry the continuity tag the
+      // first extraction missed; the fact stays, the tag is added.
+      if (event.continuity && !existingEvent.metadata?.continuity) {
+        updateFact(existingEvent.id, {
+          metadata: { ...existingEvent.metadata, continuity: event.continuity },
+        });
+      }
+      return;
+    }
+    if (addedEventValues.has(normalizedDescription)) {
       return;
     }
 
@@ -226,6 +241,7 @@ export function addStructuredLoreImpl(
         description: event.significance,
         importance: event.importance || 'medium',
         relatedEntities: event.relatedEntities,
+        continuity: event.continuity,
       }, event.visibility ?? (sessionId ? 'session-private' : 'world-shared'));
       addedCount.events++;
       eventsAdded++;
