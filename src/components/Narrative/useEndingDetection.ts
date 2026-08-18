@@ -4,12 +4,15 @@
 // focused on orchestrating narrative generation. Sends
 // recent narrative context to Gemini and asks whether the story has reached
 // a natural conclusion. Only fires onEndingSuggested for medium/high
-// confidence responses; silent on any AI/parse/network failure (no fallback).
+// confidence responses, and holds the offer back while the story's major
+// events are still unsettled; silent on any AI/parse/network failure (no
+// fallback).
 
 import { useCallback, useEffect, useRef } from 'react';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { truncate } from '@/lib/utils';
 import { safeParseNarrativeAnalysis } from '@/lib/ai/parseNarrativeResponse';
+import { stripMarkdownFences } from '@/lib/ai/parseJSON';
 import type {
   EndingType,
   NarrativeSegment,
@@ -32,6 +35,41 @@ const ACCEPTED_ENDING_TYPES = new Set<EndingType>([
   'character-retirement',
   'session-limit',
 ]);
+const MAX_OPEN_THREADS = 6;
+
+/**
+ * Major events are the story's only durable record that something significant
+ * is in play, and they never reached this prompt before: the model saw prose
+ * only. Listing them gives it something to weigh the current calm against,
+ * which is the difference between a resolution and a lull.
+ */
+function collectOpenThreads(segments: NarrativeSegment[]): string[] {
+  const threads: string[] = [];
+  for (const segment of segments) {
+    const event = segment.metadata?.majorEvent;
+    if (event) threads.push(event);
+  }
+  return threads.slice(-MAX_OPEN_THREADS);
+}
+
+/**
+ * The shared parser narrows to a fixed shape, so the threat census is read
+ * straight off the payload here. Null means the model never answered, which
+ * the caller treats as "the calm went unweighed" rather than "all clear".
+ */
+function readUnresolvedThreats(raw: string): string[] | null {
+  try {
+    const parsed: unknown = JSON.parse(stripMarkdownFences(raw));
+    if (!parsed || typeof parsed !== 'object') return null;
+    const value = (parsed as Record<string, unknown>).unresolvedThreats;
+    if (!Array.isArray(value)) return null;
+    return value.filter(
+      (entry): entry is string => typeof entry === 'string' && entry.trim().length > 0
+    );
+  } catch {
+    return null;
+  }
+}
 
 interface UseEndingDetectionOptions {
   sessionId: string;
@@ -118,9 +156,17 @@ export function useEndingDetection({
               )}\n\n`
             : '';
 
+        const openThreads = collectOpenThreads(recentSegments);
+        const openThreadsContext =
+          openThreads.length > 0
+            ? `Threads this story put in play (each one is unfinished business unless the recent narrative settled it on the page):\n${openThreads
+                .map((thread) => `- ${thread}`)
+                .join('\n')}\n\n`
+            : '';
+
         const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
 
-${fullStoryContext}Recent narrative developments:
+${fullStoryContext}${openThreadsContext}Recent narrative developments:
 ${narrativeContext}
 
 Analyze this story for natural ending points. Consider:
@@ -130,6 +176,11 @@ STORY STRUCTURE:
 - Are character arcs showing completion or fulfillment?
 - Is there a sense of narrative closure or resolution?
 - Does the story feel like it has reached a satisfying conclusion?
+
+OPEN THREATS:
+- Is any danger, pursuer, or unanswered call still active and unaddressed?
+- Reaching safety is not the same as resolving what made it unsafe. A locked
+  door with the threat still outside is a pause, not an ending.
 
 EMOTIONAL SATISFACTION:
 - Would ending here feel fulfilling to the reader?
@@ -144,6 +195,7 @@ DO NOT:
 
 Respond with JSON format:
 {
+  "unresolvedThreats": ["each threat or open question still active, or [] if none remain"],
   "suggestEnding": true/false,
   "confidence": "high" | "medium" | "low",
   "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
@@ -159,6 +211,22 @@ Respond with JSON format:
           analysis.suggestEnding &&
           ACCEPTED_CONFIDENCES.has(analysis.confidence)
         ) {
+          // A story with threads in play only gets an offer once the model
+          // accounts for them. No census means the calm went unweighed, and
+          // suppressing is recoverable where a premature offer is not: the
+          // check runs again on later segments.
+          const unresolvedThreats = readUnresolvedThreats(response.content);
+          if (
+            openThreads.length > 0 &&
+            (unresolvedThreats === null || unresolvedThreats.length > 0)
+          ) {
+            logger.debug('Holding the ending offer back, threads still open', {
+              openThreads,
+              unresolvedThreats,
+            });
+            return;
+          }
+
           const endingType: EndingType = ACCEPTED_ENDING_TYPES.has(analysis.endingType)
             ? analysis.endingType
             : 'story-complete';
