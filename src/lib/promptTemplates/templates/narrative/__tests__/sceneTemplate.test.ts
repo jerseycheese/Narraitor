@@ -210,3 +210,26 @@ describe('sceneTemplate player character background', () => {
     expect(prompt).not.toContain('PLAYER ACTION:');
   });
 });
+
+describe('sceneTemplate reserved player name', () => {
+  const baseContext: NarrativeTemplateContext = {
+    worldName: 'Millbrook',
+    genre: 'small town drama',
+    tone: 'grounded',
+    playerCharacterName: 'Wren Calloway',
+    narrativeContext: {
+      recentSegments: [{ content: 'Thomas leans against the loading dock.' }],
+      currentTags: [],
+    },
+  };
+
+  it('tells the model the player name is reserved for the player', () => {
+    const prompt = sceneTemplate(baseContext);
+    expect(prompt).toContain('"Wren Calloway" is RESERVED for the player');
+  });
+
+  it('omits the rule when the world has no player character name', () => {
+    const prompt = sceneTemplate({ ...baseContext, playerCharacterName: undefined });
+    expect(prompt).not.toContain('is RESERVED for the player');
+  });
+});

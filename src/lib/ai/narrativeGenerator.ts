@@ -211,6 +211,7 @@ export class NarrativeGenerator {
         });
         void extractStructuredLore(result.content, existingLoreContext, {
           continuityTopics: collectContinuityTopicsFromStores(request),
+          playerCharacterName: context.playerCharacterName,
         })
           .then(async (structuredLore) => {
             const { useLoreStore } = await import('@/state/loreStore');
@@ -432,7 +433,9 @@ export class NarrativeGenerator {
         const existingLoreContext = getLoreContextForPrompt(worldId, sessionId, {
           recordUsage: false,
         });
-        void extractStructuredLore(response.content, existingLoreContext)
+        void extractStructuredLore(response.content, existingLoreContext, {
+          playerCharacterName: playerCharacter?.name,
+        })
           .then(async (structuredLore) => {
             const { useLoreStore } = await import('@/state/loreStore');
             const { addStructuredLore } = useLoreStore.getState();
