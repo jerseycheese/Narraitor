@@ -24,6 +24,15 @@ Gates:
 
 Decision rule: G-A and G-B pass in both cells -> SHIP (merge, flag stays on). Either fails in both cells -> HOLD (PR stays draft, memo names the gate, the round-5 clock stays as shipped). Split -> HOLD naming the cell.
 
+## Round 7, declared before the code (2026-08-18)
+
+The memo's three re-entry changes on the same PR, wording only, no seam or store change:
+1. OPEN: an offstage threat the prose introduces (a sound, an arrival, a message, a move by someone not in the scene) is a thread, and a major event the player did not cause with no open thread covering it gets opened; every summary is phrased as the event that will land, not a standing state ("Thorne comes to collect the favor" rather than "the player owes a favor"). The seed phrases its threads the same way. The block's empty-ledger move is named as a thread the story now owes.
+2. RESOLVE: `resolved` requires `resolution` to name the outcome (who won the vote, what came through the door, what was lost); the calling, the departure toward it, or a change of sound is an advance.
+3. DUE NOW keeps its pick rule; with every thread event-shaped by construction there is nothing state-shaped to exclude, and the section's landing list gains "the debt is collected".
+
+Same two cells, same autopilot, same judge prompts, same gates G-A to G-E and the same decision rule as round 6. Comparators: round 6 (this PR before the changes) first, round 5 as context.
+
 ## Gates
 
 - G1 input contract: `WorldClockPromptContext.threads[i]` gains `overdueByTurns` and `dueNow`, both computed in `buildWorldClockPromptContext` from the store's own turn indices; `WorldThreadExtractionResult.advanced[i].changed` replaces the optional `note`. Nothing smuggled through `currentSituation`; the seam (`NarrativeContext.worldClock`) is unchanged.
