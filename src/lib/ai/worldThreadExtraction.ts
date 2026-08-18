@@ -22,9 +22,21 @@ const SEEDING_HEADING = 'SEEDING';
 const THREAD_KINDS: readonly WorldThreadKind[] = ['consequence', 'actor', 'deadline'];
 const RESOLUTION_OUTCOMES = ['resolved', 'dropped'] as const;
 
-const formatThreadLine = (thread: WorldThread): string => {
-  const due = thread.dueByTurn !== undefined ? `, due turn ${thread.dueByTurn}` : '';
-  return `- [${thread.id}] (${thread.kind}, opened turn ${thread.openedAtTurn}, last moved turn ${thread.lastAdvancedAtTurn}${due}) ${thread.summary}`;
+/**
+ * Overdue and DUE NOW are computed here from the same turn index the scene
+ * block used, so the extractor sees the thread the segment was told to land
+ * and can file an arrival under it instead of opening it again as new.
+ */
+const formatThreadLine = (thread: WorldThread, currentTurn: number, isDueNow: boolean): string => {
+  const marks: string[] = [];
+  if (thread.dueByTurn !== undefined) {
+    marks.push(`due turn ${thread.dueByTurn}`);
+    const overdueBy = currentTurn - thread.dueByTurn;
+    if (overdueBy > 0) marks.push(`OVERDUE by ${overdueBy} turn${overdueBy === 1 ? '' : 's'}`);
+  }
+  if (isDueNow) marks.push('DUE NOW: this segment was asked to land it');
+  const suffix = marks.length > 0 ? `, ${marks.join(', ')}` : '';
+  return `- [${thread.id}] (${thread.kind}, opened turn ${thread.openedAtTurn}, last moved turn ${thread.lastAdvancedAtTurn}${suffix}) ${thread.summary}`;
 };
 
 const formatSignals = (signals: WorldThreadSegmentSignals): string => {
@@ -56,7 +68,9 @@ ${material.join('\n')}`;
 export function buildWorldThreadPromptSection(input: WorldThreadExtractionInput): string {
   const threadList =
     input.openThreads.length > 0
-      ? input.openThreads.map(formatThreadLine).join('\n')
+      ? input.openThreads
+          .map((thread) => formatThreadLine(thread, input.currentTurn, thread.id === input.dueNowThreadId))
+          .join('\n')
       : '(none open)';
 
   const sections = [
@@ -68,7 +82,8 @@ ${threadList}`,
   if (input.segmentSignals) sections.push(formatSignals(input.segmentSignals));
 
   sections.push(`A thread is something the world owes the player: a consequence the player loaded that has not paid off, an off-screen actor with somewhere to go, or a deadline.
-- OPEN a thread when THIS segment's prose loads one (max 2 per segment). An offstage threat the prose introduces (a sound from somewhere else, an arrival, a message, a move by someone not in the scene) is a thread; so is a major event the player did not cause that no open thread already covers. Phrase every summary as the event that will land, not a standing state: "Thorne comes to collect the favor owed for the seat", not "the player owes a favor"; "whatever is hitting the shed wall comes through", not "there is a noise at the shed". Do not re-open something already listed. Do not open threads for the player's own intentions; those are goals.
+- OPEN a thread when THIS segment's prose loads one (max 2 per segment). An offstage threat the prose introduces (a sound from somewhere else, an arrival, a message, a move by someone not in the scene) is a thread; so is a major event the player did not cause that no open thread already covers. Phrase every summary as the event that will land, not a standing state: "Thorne comes to collect the favor owed for the seat", not "the player owes a favor"; "whatever is hitting the shed wall comes through", not "there is a noise at the shed". Do not open threads for the player's own intentions; those are goals.
+- Before you OPEN, check the open threads above, the DUE NOW thread first: if the arrival, message, sound or move is one of them landing or moving (the actor it named walks in, the debt it named is called, the thing it named comes through), it is that thread, not a new one. Give the entry \`covers\` with that thread's id and it is filed as the thread's next state, with your summary as its new, more specific wording and your dueByTurn as its new due; \`covers\` null when nothing open covers it. Never re-open something already listed under a new name.
 - ADVANCE an open thread only when the prose changes its state as something the player did not do: someone arrived or left, something was lost or gained, a position, date or distance moved. Cite its id and give \`changed\` as one clause naming the new state. Repeating, reminding, reiterating, re-confirming or reinforcing that a thread exists is NOT an advance; leave it alone. If the observable-changes line shows nothing changed, an advance needs a strong reason.
 - RESOLVE a thread with outcome 'resolved' only when the prose shows the thing happening and \`resolution\` names the outcome: who won the vote and what it decided, what came through the door, what the caller collected, what was lost. Calling the vote, setting off toward the sound, the sound changing, the actor announcing they will act: each is an ADVANCE, not a resolution. Use 'dropped' only when the story has made it impossible or irrelevant, never because it stalled or has not been mentioned.
 - dueByTurn is a rough turn index on this scale: one turn is a few minutes to an hour of story time; 'later today' or 'tonight' is 2-4 turns out, 'tomorrow' about 5, 'end of the week' about 10, 'six weeks' about 30. Never earlier than two turns from now. All stamps are turn indices, never dates.`);
@@ -99,6 +114,13 @@ const asTurnIndex = (value: unknown): number | undefined => {
 
 const asArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
 
+/** The model writes "none" or "null" as often as a JSON null; all of them mean nothing open covers it. */
+const asCoversId = (value: unknown): string | undefined => {
+  const id = asTrimmedString(value);
+  if (!id || id.toLowerCase() === 'none' || id.toLowerCase() === 'null') return undefined;
+  return id;
+};
+
 /**
  * Reads the model's `worldThreads` block. Returns undefined when the block is
  * absent so the caller can tell "the model said nothing" from "the model said
@@ -114,10 +136,12 @@ export function parseWorldThreadExtraction(value: unknown): WorldThreadExtractio
     const summary = asTrimmedString(entry.summary);
     if (!THREAD_KINDS.includes(kind as WorldThreadKind) || !summary) continue;
     const dueByTurn = asTurnIndex(entry.dueByTurn);
+    const covers = asCoversId(entry.covers);
     opened.push({
       kind: kind as WorldThreadKind,
       summary,
       ...(dueByTurn !== undefined ? { dueByTurn } : {}),
+      ...(covers !== undefined ? { covers } : {}),
     });
   }
 

@@ -108,7 +108,37 @@ describe('applyWorldClockUpdates', () => {
     const input = processSpy.mock.calls[0][3];
     expect(input.seed).toBeUndefined();
     expect(input.openThreads.map((t: { summary: string }) => t.summary)).toEqual(['Davies is out collecting']);
+    expect(input.dueNowThreadId).toBeUndefined();
     expect(note).toEqual({ turn: 2, open: 1, overdue: 0, opened: [], advanced: [], resolved: [] });
+  });
+
+  it('hands the extraction the same DUE NOW thread the scene block asked to land', async () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    useWorldThreadStore.getState().applyExtraction(
+      'session-1',
+      worldId,
+      {
+        opened: [
+          { kind: 'actor', summary: 'Those owed favors come to collect', dueByTurn: 3 },
+          { kind: 'deadline', summary: 'The vote in six weeks', dueByTurn: 30 },
+        ],
+        advanced: [],
+        resolved: [],
+      },
+      1
+    );
+    processSpy.mockResolvedValue({
+      newGoalsCreated: 0,
+      goalsUpdated: 0,
+      goalsCompleted: 0,
+      worldThreads: { opened: [], advanced: [], resolved: [] },
+    });
+
+    await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', currentTurn: 9 });
+
+    const input = processSpy.mock.calls[0][3];
+    const favors = input.openThreads.find((t: { summary: string }) => t.summary === 'Those owed favors come to collect');
+    expect(input.dueNowThreadId).toBe(favors.id);
   });
 
   it('runs a session\'s extractions in turn order, so a fast turn 2 waits for turn 1 and seeds once', async () => {

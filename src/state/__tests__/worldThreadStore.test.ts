@@ -142,6 +142,75 @@ describe('worldThreadStore', () => {
       });
     });
 
+    test('an opened entry that covers an open thread refines it instead of opening a new one', () => {
+      const favorsId = openThread('session-a', 'Those who appointed the player will seek repayment');
+      useWorldThreadStore.getState().update(favorsId, { kind: 'actor', dueByTurn: 3 });
+      const resolvedId = openThread('session-a', 'The bridge is out');
+      useWorldThreadStore.getState().update(resolvedId, { status: 'resolved', resolution: 'crossed' });
+      const foreignId = openThread('session-b', 'The king is dying');
+
+      const applied = useWorldThreadStore.getState().applyExtraction(
+        'session-a',
+        'world-1',
+        {
+          opened: [
+            { kind: 'actor', summary: 'Mr. Henderson comes to collect the roof loan', dueByTurn: 12, covers: favorsId },
+            { kind: 'actor', summary: 'A cousin writes about her debt', covers: resolvedId },
+            { kind: 'actor', summary: 'A stranger arrives', covers: foreignId },
+            { kind: 'deadline', summary: 'The festival begins at dusk', dueByTurn: 12, covers: null },
+          ],
+          advanced: [],
+          resolved: [],
+        },
+        9
+      );
+
+      expect(applied.opened).toEqual([
+        'A cousin writes about her debt',
+        'A stranger arrives',
+        'The festival begins at dusk',
+      ]);
+      expect(applied.advanced).toEqual(['Those who appointed the player will seek repayment']);
+
+      const state = useWorldThreadStore.getState();
+      expect(state.getOpenThreadsBySession('session-a')).toHaveLength(4);
+      expect(state.threads[favorsId]).toMatchObject({
+        kind: 'actor',
+        summary: 'Mr. Henderson comes to collect the roof loan',
+        dueByTurn: 12,
+        openedAtTurn: 1,
+        lastAdvancedAtTurn: 9,
+        status: 'open',
+        notes: ['Mr. Henderson comes to collect the roof loan (was: Those who appointed the player will seek repayment)'],
+      });
+      expect(state.threads[foreignId]).toMatchObject({ status: 'open', summary: 'The king is dying', notes: [] });
+    });
+
+    test('a covered entry re-files the due only when it gives one, floored at the horizon', () => {
+      const lateId = openThread('session-a', 'The collector is coming');
+      useWorldThreadStore.getState().update(lateId, { dueByTurn: 3 });
+      const otherId = openThread('session-a', 'The storm is out at sea');
+      useWorldThreadStore.getState().update(otherId, { dueByTurn: 4 });
+
+      useWorldThreadStore.getState().applyExtraction(
+        'session-a',
+        'world-1',
+        {
+          opened: [
+            { kind: 'actor', summary: 'The collector knocks tonight', dueByTurn: 9, covers: lateId },
+            { kind: 'deadline', summary: 'The storm makes landfall', covers: otherId },
+          ],
+          advanced: [],
+          resolved: [],
+        },
+        9
+      );
+
+      const state = useWorldThreadStore.getState();
+      expect(state.threads[lateId].dueByTurn).toBe(9 + MIN_DUE_HORIZON_TURNS);
+      expect(state.threads[otherId]).toMatchObject({ summary: 'The storm makes landfall', dueByTurn: 4 });
+    });
+
     test('an all-empty result still seeds the session ledger', () => {
       expect(useWorldThreadStore.getState().hasSessionLedger('session-a')).toBe(false);
       useWorldThreadStore.getState().applyExtraction('session-a', 'world-1', emptyResult(), 1);

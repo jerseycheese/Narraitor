@@ -62,11 +62,18 @@ export interface WorldThreadExtractionInput {
   currentTurn: number;
   segmentSignals?: WorldThreadSegmentSignals;
   seed?: WorldThreadSeedContext;
+  /** The thread the scene block asked this segment to land, so the extractor matches arrivals to it first. */
+  dueNowThreadId?: EntityID;
 }
 
 /** What the extraction returns for the ledger; every array may be empty. */
 export interface WorldThreadExtractionResult {
-  opened: Array<{ kind: WorldThreadKind; summary: string; dueByTurn?: number }>;
+  /**
+   * `covers` names the open thread this event is landing or moving; the store
+   * refines that thread instead of opening a new one. Absent or null means
+   * nothing open covers it.
+   */
+  opened: Array<{ kind: WorldThreadKind; summary: string; dueByTurn?: number; covers?: EntityID | null }>;
   /** `changed` names the new state; an advance without one is a restatement and is dropped at parse. */
   advanced: Array<{ id: EntityID; changed: string }>;
   resolved: Array<{ id: EntityID; resolution: string; outcome: 'resolved' | 'dropped' }>;

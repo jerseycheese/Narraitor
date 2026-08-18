@@ -62,6 +62,25 @@ describe('buildWorldThreadPromptSection', () => {
     expect(section).toContain('phrased as the event that will land');
   });
 
+  it('marks overdue threads and the DUE NOW thread, and asks for a match under covers before opening', () => {
+    const overdue: WorldThread = { ...openThread, id: 'thread-late', dueByTurn: 3, summary: 'Those owed favors come to collect' };
+    const section = buildWorldThreadPromptSection({
+      openThreads: [openThread, overdue],
+      currentTurn: 9,
+      dueNowThreadId: 'thread-late',
+    });
+
+    expect(section).toContain(
+      '- [thread-late] (deadline, opened turn 1, last moved turn 4, due turn 3, OVERDUE by 6 turns, DUE NOW: this segment was asked to land it) Those owed favors come to collect'
+    );
+    expect(section).toContain(
+      '- [thread-abc] (deadline, opened turn 1, last moved turn 4, due turn 30) The council vote is in six weeks'
+    );
+    expect(section).toContain('`covers`');
+    expect(section).toContain('the DUE NOW thread first');
+    expect(section).not.toContain('OVERDUE by 0');
+  });
+
   it('lists only the observable changes that are present', () => {
     const section = buildWorldThreadPromptSection({
       openThreads: [],
@@ -110,6 +129,9 @@ describe('parseWorldThreadExtraction', () => {
         { kind: 'weather', summary: 'Not a kind' },
         { kind: 'actor', summary: '' },
         { kind: 'consequence', summary: 'Guards remember your face', dueByTurn: 'soon' },
+        { kind: 'actor', summary: 'Henderson comes for the roof loan', dueByTurn: 11, covers: ' thread-late ' },
+        { kind: 'actor', summary: 'A cousin writes', covers: null },
+        { kind: 'actor', summary: 'A stranger writes', covers: 'none' },
         'junk',
       ],
       advanced: [
@@ -132,6 +154,9 @@ describe('parseWorldThreadExtraction', () => {
       opened: [
         { kind: 'deadline', summary: 'The vote', dueByTurn: 30 },
         { kind: 'consequence', summary: 'Guards remember your face' },
+        { kind: 'actor', summary: 'Henderson comes for the roof loan', dueByTurn: 11, covers: 'thread-late' },
+        { kind: 'actor', summary: 'A cousin writes' },
+        { kind: 'actor', summary: 'A stranger writes' },
       ],
       advanced: [{ id: 'thread-1', changed: 'Thorne is now in the room' }],
       resolved: [

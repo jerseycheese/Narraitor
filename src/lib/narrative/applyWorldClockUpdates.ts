@@ -8,7 +8,7 @@ import type {
 } from '@/types/worldThread.types';
 import { logger } from '@/lib/utils/logger';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { summarizeLedgerForSegment } from '@/lib/narrative/worldClock';
+import { selectDueNowThread, summarizeLedgerForSegment } from '@/lib/narrative/worldClock';
 import { useGoalStore } from '@/state/goalStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -76,11 +76,15 @@ async function reconcileSegment({
   const openThreads = threadStore.getOpenThreadsBySession(sessionId);
   const needsSeed = !threadStore.hasSessionLedger(sessionId);
 
+  // Same pick the scene block rendered for this segment: the block reads the
+  // store at segments + 1 before the segment lands, this reads it at the
+  // segment's own index after, and both are this turn.
   const worldThreads: WorldThreadExtractionInput = {
     openThreads,
     currentTurn,
     segmentSignals: collectSegmentSignals(segment),
     seed: needsSeed ? buildSeedContext(worldId, sessionId) : undefined,
+    dueNowThreadId: selectDueNowThread(openThreads, currentTurn)?.id,
   };
 
   try {

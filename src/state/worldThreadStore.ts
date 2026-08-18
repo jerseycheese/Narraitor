@@ -221,19 +221,43 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
           },
         }));
 
+        // Only this session's open threads may move; the model can echo a
+        // stale or foreign id and it must not touch another session's ledger.
+        const openThreadOf = (id: EntityID): WorldThread | undefined => {
+          const thread = get().threads[id];
+          return thread && thread.sessionId === sessionId && thread.status === 'open'
+            ? thread
+            : undefined;
+        };
+
+        // A due nearer than the horizon is this scene, not a deadline; floor
+        // it rather than lose the thread or its due.
+        const floorDue = (dueByTurn: number | undefined): number | undefined =>
+          dueByTurn !== undefined ? Math.max(dueByTurn, currentTurn + MIN_DUE_HORIZON_TURNS) : undefined;
+
         for (const entry of result.opened) {
+          // An arrival that is an open thread landing refines that thread
+          // instead of opening it again under a new name: the specific event
+          // replaces the vague one, and a fresh due clears its DUE NOW pick.
+          const covered = entry.covers ? openThreadOf(entry.covers) : undefined;
+          if (covered) {
+            get().update(covered.id, {
+              kind: entry.kind,
+              summary: entry.summary,
+              lastAdvancedAtTurn: currentTurn,
+              notes: [...covered.notes, `${entry.summary} (was: ${covered.summary})`],
+              ...(entry.dueByTurn !== undefined ? { dueByTurn: floorDue(entry.dueByTurn) } : {}),
+            });
+            applied.advanced.push(covered.summary);
+            continue;
+          }
           try {
             get().create({
               sessionId,
               worldId,
               kind: entry.kind,
               summary: entry.summary,
-              // A due nearer than the horizon is this scene, not a deadline;
-              // floor it rather than lose the thread or its due.
-              dueByTurn:
-                entry.dueByTurn !== undefined
-                  ? Math.max(entry.dueByTurn, currentTurn + MIN_DUE_HORIZON_TURNS)
-                  : undefined,
+              dueByTurn: floorDue(entry.dueByTurn),
               openedAtTurn: currentTurn,
               lastAdvancedAtTurn: currentTurn,
               status: 'open',
@@ -244,15 +268,6 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
             // An invalid entry from the model is dropped, not fatal.
           }
         }
-
-        // Only this session's open threads may move; the model can echo a
-        // stale or foreign id and it must not touch another session's ledger.
-        const openThreadOf = (id: EntityID): WorldThread | undefined => {
-          const thread = get().threads[id];
-          return thread && thread.sessionId === sessionId && thread.status === 'open'
-            ? thread
-            : undefined;
-        };
 
         for (const entry of result.advanced) {
           const thread = openThreadOf(entry.id);

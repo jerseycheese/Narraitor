@@ -223,6 +223,7 @@ describe('goalExtractor', () => {
       expect(mockSentPrompts).toHaveLength(1);
       expect(mockSentPrompts[0]).toContain('WORLD CLOCK LEDGER');
       expect(mockSentPrompts[0]).toContain('[thread-abc]');
+      expect(mockSentPrompts[0]).toContain('"covers"');
       expect(result.worldThreads).toEqual({
         opened: [],
         advanced: [{ id: 'thread-abc', changed: expect.any(String) }],
