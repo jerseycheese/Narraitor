@@ -97,6 +97,43 @@ describe('sceneTemplate world clock block', () => {
     expect(prompt).not.toContain('Prefer an OVERDUE thread');
   });
 
+  it('renders a fired thread as already in the scene, never DUE NOW, and asks for something new when everything has fired', () => {
+    const fired = {
+      kind: 'actor' as const,
+      summary: 'Henderson comes to collect the roof loan',
+      ageTurns: 13,
+      overdue: true,
+      overdueByTurns: 11,
+      dueNow: false,
+      fired: true,
+      firedAtTurn: 12,
+      lastMove: 'He put the worn ledger on the table',
+    };
+    const oneFired = sceneTemplate(makeContext({ currentTurn: 14, turnsSinceWorldMoved: 1, threads: [fired] }));
+    expect(oneFired).toContain(
+      'Henderson comes to collect the roof loan [IN THE SCENE since turn 12: He put the worn ledger on the table]'
+    );
+    expect(oneFired).not.toContain('[overdue by');
+    expect(oneFired).not.toContain('DUE NOW');
+    expect(oneFired).toContain('has already arrived');
+    expect(oneFired).toContain('never arrive it again');
+    expect(oneFired).toContain('Every thread above is already in the scene');
+    expect(oneFired).toContain('NPC roster who is not in the scene');
+
+    const withUnfired = sceneTemplate(
+      makeContext({
+        currentTurn: 14,
+        turnsSinceWorldMoved: 1,
+        threads: [
+          fired,
+          { kind: 'deadline', summary: 'The agreement is signed', ageTurns: 12, overdue: true, overdueByTurns: 10, dueNow: true, fired: false },
+        ],
+      })
+    );
+    expect(withUnfired).toContain('DUE NOW: The agreement is signed.');
+    expect(withUnfired).not.toContain('Every thread above is already in the scene');
+  });
+
   it('falls back to an unbidden off-screen move when the ledger is empty', () => {
     const prompt = sceneTemplate(makeContext({ currentTurn: 2, turnsSinceWorldMoved: 1, threads: [] }));
     expect(prompt).toContain(WORLD_CLOCK_HEADER);

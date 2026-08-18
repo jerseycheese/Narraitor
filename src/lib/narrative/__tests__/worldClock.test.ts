@@ -87,6 +87,13 @@ describe('worldClock', () => {
     expect(selectDueNowThread([noDue], 40)).toBeUndefined();
   });
 
+  test('selectDueNowThread never picks a fired thread, however overdue', () => {
+    const fired = makeThread({ id: 'fired', openedAtTurn: 1, dueByTurn: 3, firedAtTurn: 8 });
+    const later = makeThread({ id: 'later', openedAtTurn: 4, dueByTurn: 9 });
+    expect(selectDueNowThread([fired, later], 12)?.id).toBe('later');
+    expect(selectDueNowThread([fired], 40)).toBeUndefined();
+  });
+
   test('buildWorldClockPromptContext renders open threads with age, overdue arithmetic and one due-now pick', () => {
     const threads = [
       makeThread({ summary: 'The debt collector is coming', openedAtTurn: 2, dueByTurn: 4 }),
@@ -98,7 +105,7 @@ describe('worldClock', () => {
       currentTurn: 7,
       turnsSinceWorldMoved: 2,
       threads: [
-        { kind: 'consequence', summary: 'The vote', ageTurns: 6, overdue: true, overdueByTurns: 2, dueNow: false },
+        { kind: 'consequence', summary: 'The vote', ageTurns: 6, overdue: true, overdueByTurns: 2, dueNow: false, fired: false },
         {
           kind: 'consequence',
           summary: 'The debt collector is coming',
@@ -106,9 +113,46 @@ describe('worldClock', () => {
           overdue: true,
           overdueByTurns: 3,
           dueNow: true,
+          fired: false,
         },
       ],
     });
+  });
+
+  test('buildWorldClockPromptContext marks a fired thread with its last move and gives the pick to the next thread', () => {
+    const threads = [
+      makeThread({
+        summary: 'Henderson comes to collect',
+        openedAtTurn: 1,
+        dueByTurn: 3,
+        firedAtTurn: 12,
+        notes: ['Henderson stepped forward (was: those owed favors collect)', 'The ledger is on the table'],
+      }),
+      makeThread({ summary: 'The agreement is signed', openedAtTurn: 2, dueByTurn: 4 }),
+    ];
+
+    expect(buildWorldClockPromptContext(threads, 14).threads).toEqual([
+      {
+        kind: 'consequence',
+        summary: 'Henderson comes to collect',
+        ageTurns: 13,
+        overdue: true,
+        overdueByTurns: 11,
+        dueNow: false,
+        fired: true,
+        firedAtTurn: 12,
+        lastMove: 'The ledger is on the table',
+      },
+      {
+        kind: 'consequence',
+        summary: 'The agreement is signed',
+        ageTurns: 12,
+        overdue: true,
+        overdueByTurns: 10,
+        dueNow: true,
+        fired: false,
+      },
+    ]);
   });
 
   test('summarizeLedgerForSegment counts open and overdue and passes the applied summaries through', () => {

@@ -11,10 +11,21 @@ const KIND_LABEL: Record<PromptThread['kind'], string> = {
 const pluralTurns = (count: number): string => (count === 1 ? '1 turn' : `${count} turns`);
 
 const ledgerMark = (thread: PromptThread): string => {
+  if (thread.fired) {
+    const lastMove = thread.lastMove ? `: ${thread.lastMove}` : '';
+    return ` [IN THE SCENE since turn ${thread.firedAtTurn}${lastMove}]`;
+  }
   if (thread.dueNow) return ' [DUE NOW]';
   if (thread.overdue) return ` [overdue by ${pluralTurns(thread.overdueByTurns)} - bring it toward landing]`;
   return '';
 };
+
+/**
+ * Once every open thread has landed there is nothing left off-stage to
+ * arrive, and a story with only in-the-room threads sits in one beat asking
+ * the same question again; the empty-ledger ask applies.
+ */
+const OFFSTAGE_MOVE_ASK = `pick someone from the NPC roster who is not in the scene and have them act, arrive, send word, or change their position, unbidden. That move becomes a thread the story now owes, so make it one thing with somewhere to go, not another unexplained noise on top of the last one.`;
 
 /**
  * The scene template tells the model to pick up exactly where the last
@@ -54,13 +65,16 @@ export const worldClockBlock = (worldClock?: WorldClockPromptContext): string =>
           .join('\n')
       : '- (nothing on the ledger yet)';
 
+  const allFired = threads.length > 0 && threads.every((thread) => thread.fired);
   const spendRule =
     threads.length === 0
-      ? `- The ledger is empty, so this segment MUST show the world moving on its own: pick someone from the NPC roster who is not in the scene and have them act, arrive, send word, or change their position, unbidden. That move becomes a thread the story now owes, so make it one thing with somewhere to go, not another unexplained noise on top of the last one.`
+      ? `- The ledger is empty, so this segment MUST show the world moving on its own: ${OFFSTAGE_MOVE_ASK}`
       : dueNow
         ? `- This segment MUST advance, bring due, or resolve at least ONE thread above, in the prose, as something the player did not do. The DUE NOW thread lands this segment (see below); the rest may move or wait.
 - Advance means the world moves on it: the actor arrives or acts, the deadline lands or presses, the consequence comes home. Not a reminder that it exists.`
-        : `- This segment MUST advance, bring due, or resolve at least ONE thread above, in the prose, as something the player did not do. Prefer an OVERDUE thread, then the oldest.
+        : allFired
+          ? `- Every thread above is already in the scene, so this segment MUST move at least one of them by its next move, its cost, or its outcome, AND bring one new pressure in from off-stage: ${OFFSTAGE_MOVE_ASK}`
+          : `- This segment MUST advance, bring due, or resolve at least ONE thread above, in the prose, as something the player did not do. Prefer an OVERDUE thread, then the oldest.
 - Advance means the world moves on it: the actor arrives or acts, the deadline lands or presses, the consequence comes home. Not a reminder that it exists.`;
 
   return `
@@ -71,6 +85,7 @@ ${ledgerLines}
 ${spendRule}
 - Whatever moves must be observable in the prose (someone arrives, something is lost, a position changes), not foreshadowed for later.
 - Every thread above is already known to the player: never introduce one as new (a text that already arrived, a warning already given). Move it or land it.
+- A thread marked IN THE SCENE has already arrived: never arrive it again or deliver it as news; what it owes now is its next move, its cost, or its outcome.
 - Do not invent a new threat when a thread above can carry the pressure. Do not restate the ledger to the player.${dueNow ? dueNowSection(dueNow) : ''}
 `;
 };

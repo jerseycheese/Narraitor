@@ -211,6 +211,58 @@ describe('worldThreadStore', () => {
       expect(state.threads[otherId]).toMatchObject({ summary: 'The storm makes landfall', dueByTurn: 4 });
     });
 
+    test('a thread fires when an entry covers it or when it advances while it is the DUE NOW pick', () => {
+      const dueNowId = openThread('session-a', 'The collector comes to the door');
+      useWorldThreadStore.getState().update(dueNowId, { dueByTurn: 3 });
+      const quietId = openThread('session-a', 'The storm is out at sea');
+      useWorldThreadStore.getState().update(quietId, { dueByTurn: 5 });
+      const coveredId = openThread('session-a', 'Those owed favors come to collect');
+
+      useWorldThreadStore.getState().applyExtraction(
+        'session-a',
+        'world-1',
+        {
+          opened: [{ kind: 'actor', summary: 'Henderson arrives with the ledger', dueByTurn: 12, covers: coveredId }],
+          advanced: [
+            { id: dueNowId, changed: 'The collector is on the porch' },
+            { id: quietId, changed: 'The storm turned toward the coast' },
+          ],
+          resolved: [],
+        },
+        9
+      );
+
+      const state = useWorldThreadStore.getState();
+      expect(state.threads[dueNowId].firedAtTurn).toBe(9);
+      expect(state.threads[coveredId].firedAtTurn).toBe(9);
+      expect(state.threads[quietId].firedAtTurn).toBeUndefined();
+    });
+
+    test('a fired thread is not the DUE NOW pick again, so a later advance on it does not re-fire it', () => {
+      const firedId = openThread('session-a', 'The collector comes to the door');
+      useWorldThreadStore.getState().update(firedId, { dueByTurn: 3, firedAtTurn: 7 });
+      const nextId = openThread('session-a', 'The storm makes landfall');
+      useWorldThreadStore.getState().update(nextId, { dueByTurn: 5 });
+
+      useWorldThreadStore.getState().applyExtraction(
+        'session-a',
+        'world-1',
+        {
+          opened: [],
+          advanced: [
+            { id: firedId, changed: 'The collector names the sum' },
+            { id: nextId, changed: 'The first gust takes the shutters' },
+          ],
+          resolved: [],
+        },
+        10
+      );
+
+      const state = useWorldThreadStore.getState();
+      expect(state.threads[firedId].firedAtTurn).toBe(7);
+      expect(state.threads[nextId].firedAtTurn).toBe(10);
+    });
+
     test('an all-empty result still seeds the session ledger', () => {
       expect(useWorldThreadStore.getState().hasSessionLedger('session-a')).toBe(false);
       useWorldThreadStore.getState().applyExtraction('session-a', 'world-1', emptyResult(), 1);

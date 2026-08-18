@@ -12,6 +12,7 @@ import {
   GoalStatus,
 } from '../../types/goal.types';
 import { capitalize, formatDateTime } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 import {
   buildWorldThreadPromptSection,
   parseWorldThreadExtraction,
@@ -149,6 +150,9 @@ function parseGoalExtractionResponse(
     // Extract JSON from the fenced block; fall back when absent.
     const jsonStr = extractFencedJson(content);
     if (jsonStr === null) {
+      // The ledger stamp goes missing on this path; log it so a gap can be
+      // told apart from a failed call.
+      if (request.worldThreads) logger.warn('[GoalExtraction] No JSON block in the response; ledger not reconciled this turn');
       return createFallbackExtractionResult(request);
     }
 
@@ -193,7 +197,8 @@ function parseGoalExtractionResponse(
     }
 
     return result;
-  } catch {
+  } catch (error) {
+    if (request.worldThreads) logger.warn('[GoalExtraction] Response did not parse; ledger not reconciled this turn', { error });
     return createFallbackExtractionResult(request);
   }
 }

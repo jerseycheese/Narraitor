@@ -35,14 +35,18 @@ export const overdueByTurns = (thread: WorldThread, currentTurn: number): number
 /**
  * At most one thread is forced to land per segment: asking the model to pay
  * off four overdue threads at once reads the same as asking for none. The
- * most overdue wins, the oldest on a tie.
+ * most overdue wins, the oldest on a tie. A fired thread has already landed
+ * and is never picked again, however overdue its original due leaves it.
  */
 export const selectDueNowThread = (
   openThreads: WorldThread[],
   currentTurn: number
 ): WorldThread | undefined =>
   openThreads
-    .filter((thread) => overdueByTurns(thread, currentTurn) >= DUE_NOW_OVERDUE_TURNS)
+    .filter(
+      (thread) =>
+        thread.firedAtTurn === undefined && overdueByTurns(thread, currentTurn) >= DUE_NOW_OVERDUE_TURNS
+    )
     .sort(
       (a, b) =>
         overdueByTurns(b, currentTurn) - overdueByTurns(a, currentTurn) ||
@@ -93,6 +97,10 @@ export const buildWorldClockPromptContext = (
       overdue: isOverdue(thread, currentTurn),
       overdueByTurns: overdueByTurns(thread, currentTurn),
       dueNow: thread.id === dueNow?.id,
+      fired: thread.firedAtTurn !== undefined,
+      ...(thread.firedAtTurn !== undefined
+        ? { firedAtTurn: thread.firedAtTurn, lastMove: thread.notes[thread.notes.length - 1] }
+        : {}),
     })),
   };
 };

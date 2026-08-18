@@ -81,6 +81,17 @@ describe('buildWorldThreadPromptSection', () => {
     expect(section).not.toContain('OVERDUE by 0');
   });
 
+  it('marks a fired thread as in the scene and tells the extractor its actor is not a new thread', () => {
+    const fired: WorldThread = { ...openThread, id: 'thread-fired', dueByTurn: 3, firedAtTurn: 12, summary: 'Henderson comes to collect' };
+    const section = buildWorldThreadPromptSection({ openThreads: [fired], currentTurn: 14, dueNowThreadId: undefined });
+
+    expect(section).toContain(
+      '- [thread-fired] (deadline, opened turn 1, last moved turn 4, due turn 3, IN THE SCENE since turn 12) Henderson comes to collect'
+    );
+    expect(section).not.toContain('OVERDUE by 11');
+    expect(section).toContain('already in the scene is not a new thread');
+  });
+
   it('lists only the observable changes that are present', () => {
     const section = buildWorldThreadPromptSection({
       openThreads: [],

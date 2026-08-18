@@ -10,7 +10,7 @@ import {
 } from '../types/worldThread.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
-import { MIN_DUE_HORIZON_TURNS } from '@/lib/narrative/worldClock';
+import { MIN_DUE_HORIZON_TURNS, selectDueNowThread } from '@/lib/narrative/worldClock';
 import { createIndexedDBStorage } from './persistence';
 import {
   storeEvents,
@@ -235,6 +235,12 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
         const floorDue = (dueByTurn: number | undefined): number | undefined =>
           dueByTurn !== undefined ? Math.max(dueByTurn, currentTurn + MIN_DUE_HORIZON_TURNS) : undefined;
 
+        // The pick the scene block rendered for this segment, read before any
+        // of this turn's changes land: an advance on it is the landing the
+        // block asked for, so the thread fires and is never asked to arrive
+        // again.
+        const dueNowId = selectDueNowThread(get().getOpenThreadsBySession(sessionId), currentTurn)?.id;
+
         for (const entry of result.opened) {
           // An arrival that is an open thread landing refines that thread
           // instead of opening it again under a new name: the specific event
@@ -245,6 +251,7 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
               kind: entry.kind,
               summary: entry.summary,
               lastAdvancedAtTurn: currentTurn,
+              firedAtTurn: covered.firedAtTurn ?? currentTurn,
               notes: [...covered.notes, `${entry.summary} (was: ${covered.summary})`],
               ...(entry.dueByTurn !== undefined ? { dueByTurn: floorDue(entry.dueByTurn) } : {}),
             });
@@ -275,6 +282,7 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
           get().update(thread.id, {
             lastAdvancedAtTurn: currentTurn,
             notes: [...thread.notes, entry.changed],
+            ...(thread.id === dueNowId && thread.firedAtTurn === undefined ? { firedAtTurn: currentTurn } : {}),
           });
           applied.advanced.push(thread.summary);
         }
