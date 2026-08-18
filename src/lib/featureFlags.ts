@@ -18,9 +18,10 @@ const FEATURE_FLAG_DEFAULTS = {
   BUFFERED_STREAMING: false,
   PROGRESSIVE_DISCLOSURE: true,
   // The world clock feeds the scene prompt a ledger of open story threads, so
-  // turning it on changes what the model writes. Off until its ship/hold memo
-  // says otherwise; the env var is the kill switch either way.
-  WORLD_CLOCK: false,
+  // it changes what the model writes. On since the round-5 ship memo
+  // (narraitor-feature-experiment-lifecycle/memos/1822-world-clock.md); the
+  // env var is the kill switch.
+  WORLD_CLOCK: true,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
