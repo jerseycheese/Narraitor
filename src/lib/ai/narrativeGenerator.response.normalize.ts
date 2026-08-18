@@ -5,10 +5,15 @@ import type { NarrativeExtractedMetadata } from './narrativeGenerator.response.t
 /**
  * Bare HTML the model sometimes reaches for instead of markdown. The prose
  * renderer only understands markdown, so the tag lands in front of the player
- * as literal text.
+ * as literal text. Block tags become a line break rather than nothing, since
+ * they are the only thing separating the text on either side of them.
  */
-const HTML_TAG_PATTERN =
-  /<\/?(?:br|p|div|span|hr|em|strong|b|i|u|ul|ol|li|blockquote|pre|h[1-6])(?:\s[^<>]*)?\/?>/gi;
+const BLOCK_HTML_TAG_PATTERN =
+  /<\/?(?:br|p|div|hr|ul|ol|li|blockquote|pre|h[1-6])(?:\s[^<>]*)?\/?>/gi;
+
+/** Inline tags wrap a run of prose, so removing them has to leave it joined. */
+const INLINE_HTML_TAG_PATTERN =
+  /<\/?(?:span|em|strong|b|i|u|code|small|sub|sup)(?:\s[^<>]*)?\/?>/gi;
 
 /**
  * Narrow on purpose: the narrative has to be the paragraph's own subject with the
@@ -172,7 +177,9 @@ export const normalizeNarrativeContent = (
       .replace(/[ \t]{2,}/g, ' ')
       .replace(/\s*\[[a-z0-9-]+\]/gi, '')
       .replace(/\s*\[metadata\.[a-z]+:\s*[a-z0-9-]+\]/gi, '')
-      .replace(HTML_TAG_PATTERN, '')
+      .replace(BLOCK_HTML_TAG_PATTERN, '\n')
+      .replace(INLINE_HTML_TAG_PATTERN, '')
+      .replace(/[ \t]*\n[ \t]*/g, '\n')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
 

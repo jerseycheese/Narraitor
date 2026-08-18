@@ -46,6 +46,17 @@ describe('narrative response helpers', () => {
     );
   });
 
+  it('keeps the text on either side of a stripped tag apart', () => {
+    const normalized = normalizeNarrativeContent(
+      'The door swings shut.<br/>Rain starts against the <em>cracked</em> glass.',
+      {}
+    );
+
+    expect(normalized).toBe(
+      'The door swings shut.\nRain starts against the cracked glass.'
+    );
+  });
+
   it('keeps a bolded closing line that belongs to the scene', () => {
     const content = [
       'The lantern gutters out and the hall goes dark.',
