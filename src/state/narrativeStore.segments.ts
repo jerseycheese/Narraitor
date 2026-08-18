@@ -112,6 +112,7 @@ export const createNarrativeSegmentActions = (
       causedByDecisionId,
       causedByDecisionText,
       decisionOutcome: metadata?.decisionOutcome,
+      pacingEscalationRequested: metadata?.pacingEscalationRequested,
       continuity: metadata?.continuity,
       debugInfo: metadata?.debugInfo, // Preserve debug info from AI generation
     };
