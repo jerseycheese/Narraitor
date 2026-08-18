@@ -30,7 +30,7 @@ Matrix shortfall, stated: the protocol asks for 2 worlds x 2 characters; this ro
 
 ## Failure drill
 - Malformed/empty response path: `parseWorldThreadExtraction` unit-tested on absent block, non-object, junk entries, bad kinds/outcomes, non-numeric dueByTurn; goal extraction's own fail-open paths leave `worldThreads` undefined and the orchestrator returns no note (unit-tested).
-- Slow-response/timeout behavior: extraction is fire-and-forget after `addSegment`; the turn never waits on it. If a second turn lands first, the prompt reads the ledger one turn stale and the seed is guarded by an in-flight set (unit-tested for the unseeded path).
+- Slow-response/timeout behavior: extraction is fire-and-forget after `addSegment`; the turn never waits on it. If a second turn lands first, the prompt reads the ledger one turn stale; extractions chain per session so they reconcile in turn order and an unseeded session seeds once (unit-tested: turn 2 fired during turn 1 waits, sees turn 1's thread, carries no seed).
 - Missing/invalid key behavior: unchanged, the goal call already fails open with no key.
 
 ## Regression vs prior good outputs
