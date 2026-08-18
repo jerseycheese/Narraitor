@@ -47,11 +47,14 @@ export function applyWorldClockUpdates(
     () => reconcileSegment(params)
   );
   chainBySession.set(params.sessionId, current);
-  current.finally(() => {
+  // Both branches settle, so a rejected extraction never leaves this cleanup
+  // promise dangling as an unhandled rejection; the caller handles `current`.
+  const releaseTail = () => {
     if (chainBySession.get(params.sessionId) === current) {
       chainBySession.delete(params.sessionId);
     }
-  });
+  };
+  current.then(releaseTail, releaseTail);
   return current;
 }
 
