@@ -8,14 +8,15 @@ import {
   normalizeCharacterIds,
   getWorldGenre,
   getMoodForGenre,
-  getLocationForGenre,
+  FIRST_SEGMENT_LOCATION,
 } from './narrativeGenerator.response.helpers';
 import { safeTrim } from '@/lib/utils';
 
 export const formatNarrativeResponse = async (
   response: { content?: string; tokenUsage?: number },
   segmentType: string,
-  geminiClient: AIClient
+  geminiClient: AIClient,
+  previousLocation?: string
 ): Promise<NarrativeGenerationResult> => {
   const parsed = parseNarrativeResponse(response, segmentType);
   const actualContent = parsed.actualContent;
@@ -23,7 +24,7 @@ export const formatNarrativeResponse = async (
   const resolvedSegmentType = parsed.segmentType;
 
   const fallbackMood = getMoodForGenre(getWorldGenre());
-  const fallbackLocation = getLocationForGenre(getWorldGenre());
+  const fallbackLocation = previousLocation || FIRST_SEGMENT_LOCATION;
 
   const normalizedContent = normalizeNarrativeContent(
     actualContent,

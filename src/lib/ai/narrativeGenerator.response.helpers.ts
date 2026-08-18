@@ -1,6 +1,6 @@
 import { useWorldStore } from '@/state/worldStore';
 import { safeTrim } from '@/lib/utils';
-import type { ItemLossReason } from '@/types/narrative.types';
+import type { ItemLossReason, NarrativeContext } from '@/types/narrative.types';
 
 export const normalizeId = (id?: string | null): string | undefined => {
   if (!id || typeof id !== 'string') {
@@ -126,26 +126,35 @@ export const getMoodForGenre = (
   }
 };
 
-export const getLocationForGenre = (genre?: string | null): string => {
-  if (!genre) return 'Starting Location';
+/** Stands in for a place only on the first segment, before the story names one. */
+export const FIRST_SEGMENT_LOCATION = 'Starting Location';
 
-  switch (genre.toLowerCase()) {
-    case 'fantasy':
-      return 'Enchanted Forest';
-    case 'sci-fi':
-    case 'science fiction':
-      return 'Space Station';
-    case 'western':
-      return 'Frontier Town';
-    case 'horror':
-      return 'Abandoned Mansion';
-    case 'cyberpunk':
-      return 'Neon City';
-    case 'post-apocalyptic':
-      return 'Ruins';
-    case 'steampunk':
-      return 'Victorian Metropolis';
-    default:
-      return 'Starting Location';
+/**
+ * The place the story was in as of the last segment that named one.
+ *
+ * The model leaves metadata.location out on roughly half the turns of a static
+ * scene, and an omission means the scene did not move, so the last known place
+ * is the right default rather than anything freshly invented.
+ */
+export const getCarryForwardLocation = (
+  narrativeContext?: Pick<
+    NarrativeContext,
+    'recentSegments' | 'previousSegments' | 'currentLocation'
+  >
+): string | undefined => {
+  // recentSegments is a subset of previousSegments, so walking both in turn
+  // repeats a few checks and covers a recent window where nobody named a place.
+  const windows = [narrativeContext?.recentSegments, narrativeContext?.previousSegments];
+
+  for (const segments of windows) {
+    for (let index = (segments?.length ?? 0) - 1; index >= 0; index -= 1) {
+      const location = safeTrim(segments?.[index]?.metadata?.location ?? '');
+      if (location.length > 0) {
+        return location;
+      }
+    }
   }
+
+  const contextLocation = safeTrim(narrativeContext?.currentLocation ?? '');
+  return contextLocation.length > 0 ? contextLocation : undefined;
 };

@@ -1,7 +1,16 @@
 import { formatNarrativeResponse } from '../narrativeGenerator.response';
 import { parseNarrativeResponse } from '../narrativeGenerator.response.parse';
 import { normalizeNarrativeContent } from '../narrativeGenerator.response.normalize';
+import { getCarryForwardLocation } from '../narrativeGenerator.response.helpers';
+import { useWorldStore } from '@/state/worldStore';
 import type { NarrativeExtractedMetadata } from '../narrativeGenerator.response.types';
+import type { NarrativeSegment } from '@/types/narrative.types';
+
+jest.mock('@/state/worldStore', () => ({
+  useWorldStore: {
+    getState: jest.fn(),
+  },
+}));
 
 describe('narrative response helpers', () => {
   it('parses JSON responses with metadata', () => {
@@ -66,6 +75,66 @@ describe('narrative response helpers', () => {
     const normalized = normalizeNarrativeContent(content, {});
 
     expect(normalized).toBe(content);
+  });
+
+  describe('a response with no location', () => {
+    const noLocationResponse = {
+      content: `\n\n\`\`\`json\n{"content":"You wait in the dark.","metadata":{"mood":"tense"}}\n\`\`\``,
+    };
+
+    const buildSegment = (location?: string): NarrativeSegment => ({
+      id: `segment-${location ?? 'nowhere'}`,
+      content: 'Something happens.',
+      type: 'scene',
+      metadata: { tags: [], ...(location ? { location } : {}) },
+      timestamp: new Date(),
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    });
+
+    beforeEach(() => {
+      // A genre is seeded so the fallback can't quietly come from the world
+      // instead of from the story.
+      (useWorldStore.getState as jest.Mock).mockReturnValue({
+        worlds: { 'world-1': { genre: 'Horror' } },
+        currentWorldId: 'world-1',
+      });
+    });
+
+    it('carries the last segment location forward', async () => {
+      const previousLocation = getCarryForwardLocation({
+        previousSegments: [],
+        recentSegments: [buildSegment('Dock'), buildSegment('Boathouse interior')],
+      });
+
+      const result = await formatNarrativeResponse(
+        noLocationResponse,
+        'scene',
+        { generateContent: jest.fn() },
+        previousLocation
+      );
+
+      expect(result.metadata.location).toBe('Boathouse interior');
+    });
+
+    it('reaches past a recent window that names no place', () => {
+      const boathouse = buildSegment('Boathouse interior');
+
+      const previousLocation = getCarryForwardLocation({
+        previousSegments: [boathouse, buildSegment(), buildSegment()],
+        recentSegments: [buildSegment(), buildSegment()],
+      });
+
+      expect(previousLocation).toBe('Boathouse interior');
+    });
+
+    it('uses a neutral placeholder on the first segment', async () => {
+      const result = await formatNarrativeResponse(noLocationResponse, 'scene', {
+        generateContent: jest.fn(),
+      });
+
+      expect(result.metadata.location).toBe('Starting Location');
+    });
   });
 
   it('preserves itemsLost metadata when formatting response', async () => {
