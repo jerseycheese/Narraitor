@@ -111,6 +111,45 @@ describe('applyWorldClockUpdates', () => {
     expect(note).toEqual({ turn: 2, open: 1, overdue: 0, opened: [], advanced: [], resolved: [] });
   });
 
+  it('runs a session\'s extractions in turn order, so a fast turn 2 waits for turn 1 and seeds once', async () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    let releaseTurnOne: (value: unknown) => void = () => undefined;
+    processSpy
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            releaseTurnOne = resolve;
+          })
+      )
+      .mockResolvedValueOnce({
+        newGoalsCreated: 0,
+        goalsUpdated: 0,
+        goalsCompleted: 0,
+        worldThreads: { opened: [], advanced: [], resolved: [] },
+      });
+
+    const turnOne = applyWorldClockUpdates({ segment: segment(worldId, { id: 'seg-1' }), sessionId: 'session-1', currentTurn: 1 });
+    const turnTwo = applyWorldClockUpdates({ segment: segment(worldId, { id: 'seg-2' }), sessionId: 'session-1', currentTurn: 2 });
+    await Promise.resolve();
+
+    expect(processSpy).toHaveBeenCalledTimes(1);
+
+    releaseTurnOne({
+      newGoalsCreated: 0,
+      goalsUpdated: 0,
+      goalsCompleted: 0,
+      worldThreads: { opened: [{ kind: 'deadline', summary: 'The council vote', dueByTurn: 30 }], advanced: [], resolved: [] },
+    });
+    const [noteOne, noteTwo] = await Promise.all([turnOne, turnTwo]);
+
+    expect(processSpy).toHaveBeenCalledTimes(2);
+    expect(processSpy.mock.calls[0][3].seed).toBeDefined();
+    expect(processSpy.mock.calls[1][3].seed).toBeUndefined();
+    expect(processSpy.mock.calls[1][3].openThreads.map((t: { summary: string }) => t.summary)).toEqual(['The council vote']);
+    expect(noteOne?.opened).toEqual(['The council vote']);
+    expect(noteTwo).toEqual({ turn: 2, open: 1, overdue: 0, opened: [], advanced: [], resolved: [] });
+  });
+
   it('leaves the session unseeded when the extraction returned no ledger block', async () => {
     mockIsFeatureEnabled.mockReturnValue(true);
 

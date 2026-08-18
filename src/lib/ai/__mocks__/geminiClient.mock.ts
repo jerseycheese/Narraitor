@@ -262,7 +262,7 @@ export class MockGeminiClient {
     const opened = prompt.includes('SEEDING')
       ? '[{ "kind": "deadline", "summary": "The council vote is in six weeks", "dueByTurn": 30 }]'
       : '[]';
-    const threadIdMatch = prompt.match(/\[(thread-[^\]]+)\]/);
+    const threadIdMatch = prompt.match(/\[(thread-[\w-]+)\]/);
     const advanced = threadIdMatch
       ? `[{ "id": "${threadIdMatch[1]}", "note": "The pressure tightened while the player was elsewhere" }]`
       : '[]';

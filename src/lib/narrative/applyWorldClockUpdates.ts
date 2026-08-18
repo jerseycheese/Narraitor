@@ -23,11 +23,13 @@ export interface ApplyWorldClockUpdatesParams {
 }
 
 /**
- * Seeding is fire-and-forget and the next turn can land before the first
- * extraction resolves; without this guard both calls would see an empty
- * ledger and seed it twice.
+ * Extraction is fire-and-forget and the next turn can land before the last
+ * one resolves. Running a session's extractions one at a time keeps the
+ * ledger reconciling in turn order (a slow turn 2 can't overwrite what turn 3
+ * already applied) and lets each call read the ledger the previous one
+ * wrote, which is also what stops an unseeded session seeding twice.
  */
-const seedInFlight = new Set<EntityID>();
+const chainBySession = new Map<EntityID, Promise<unknown>>();
 
 /**
  * Runs the one post-segment extraction call (goals plus, when the world clock
@@ -36,7 +38,24 @@ const seedInFlight = new Set<EntityID>();
  * clock is off or nothing could be reconciled. Fail-open throughout: the goal
  * path behaves exactly as it did before the clock existed.
  */
-export async function applyWorldClockUpdates({
+export function applyWorldClockUpdates(
+  params: ApplyWorldClockUpdatesParams
+): Promise<WorldClockSegmentNote | undefined> {
+  const previous = chainBySession.get(params.sessionId) ?? Promise.resolve();
+  const current = previous.then(
+    () => reconcileSegment(params),
+    () => reconcileSegment(params)
+  );
+  chainBySession.set(params.sessionId, current);
+  current.finally(() => {
+    if (chainBySession.get(params.sessionId) === current) {
+      chainBySession.delete(params.sessionId);
+    }
+  });
+  return current;
+}
+
+async function reconcileSegment({
   segment,
   sessionId,
   characterId,
@@ -52,7 +71,7 @@ export async function applyWorldClockUpdates({
   const worldId = segment.worldId ?? useSessionStore.getState().worldId ?? undefined;
   const threadStore = useWorldThreadStore.getState();
   const openThreads = threadStore.getOpenThreadsBySession(sessionId);
-  const needsSeed = !threadStore.hasSessionLedger(sessionId) && !seedInFlight.has(sessionId);
+  const needsSeed = !threadStore.hasSessionLedger(sessionId);
 
   const worldThreads: WorldThreadExtractionInput = {
     openThreads,
@@ -61,7 +80,6 @@ export async function applyWorldClockUpdates({
     seed: needsSeed ? buildSeedContext(worldId, sessionId) : undefined,
   };
 
-  if (needsSeed) seedInFlight.add(sessionId);
   try {
     const result = await goalStore.processSegmentForGoals(segment, sessionId, characterId, worldThreads);
     if (!result.worldThreads || !worldId) {
@@ -79,8 +97,6 @@ export async function applyWorldClockUpdates({
   } catch (error) {
     logger.warn('[WorldClock] Ledger reconciliation failed', { sessionId, error });
     return undefined;
-  } finally {
-    if (needsSeed) seedInFlight.delete(sessionId);
   }
 }
 
