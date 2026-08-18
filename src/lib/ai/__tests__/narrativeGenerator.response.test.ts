@@ -32,6 +32,42 @@ describe('narrative response helpers', () => {
     expect(normalized).toBe('Jordan nods.');
   });
 
+  it('drops a bare HTML tag and a trailing meta-commentary paragraph', () => {
+    const content = [
+      'Councilman Davies clears his throat and taps his pen on the table again.',
+      '<br/>',
+      '**The narrative will continue from this point, where the townspeople are reacting to the lack of a formal appraisal.**',
+    ].join('\n\n');
+
+    const normalized = normalizeNarrativeContent(content, {});
+
+    expect(normalized).toBe(
+      'Councilman Davies clears his throat and taps his pen on the table again.'
+    );
+  });
+
+  it('keeps the text on either side of a stripped tag apart', () => {
+    const normalized = normalizeNarrativeContent(
+      'The door swings shut.<br/>Rain starts against the <em>cracked</em> glass.',
+      {}
+    );
+
+    expect(normalized).toBe(
+      'The door swings shut.\nRain starts against the cracked glass.'
+    );
+  });
+
+  it('keeps a bolded closing line that belongs to the scene', () => {
+    const content = [
+      'The lantern gutters out and the hall goes dark.',
+      '**The mill bell rings once, and every head in the room turns.**',
+    ].join('\n\n');
+
+    const normalized = normalizeNarrativeContent(content, {});
+
+    expect(normalized).toBe(content);
+  });
+
   it('preserves itemsLost metadata when formatting response', async () => {
     const response = {
       content: `\n\n\`\`\`json\n{"content":"You drop the knife.","metadata":{"itemsLost":[{"name":"Rusted Knife","lossReason":"dropped","quantity":1}]}}\n\`\`\``,

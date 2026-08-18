@@ -205,7 +205,8 @@ CRITICAL INSTRUCTIONS:
 2. The player IS ${playerCharacterName || 'the main character'} - NEVER use their name in narration
 3. Only use "${playerCharacterName}" when OTHER characters speak TO or ABOUT the player
 4. The player experiences everything through ${playerCharacterName || 'their character'}'s perspective
-${playerCharacterName ? `5. "${playerCharacterName}" is RESERVED for the player - never give a relative, contact, or any other character that name, and never describe a second person who carries it` : ''}
+5. Write only the scene itself - no HTML tags, and no closing note about what the narrative will do next
+${playerCharacterName ? `6. "${playerCharacterName}" is RESERVED for the player - never give a relative, contact, or any other character that name, and never describe a second person who carries it` : ''}
 
 Focus on varied sensory details and the character's reactions to bring the scene to life.
 - Use visual, auditory, and tactile descriptions primarily

@@ -2,6 +2,56 @@ import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
 import { safeTrim } from '@/lib/utils';
 import type { NarrativeExtractedMetadata } from './narrativeGenerator.response.types';
 
+/**
+ * Bare HTML the model sometimes reaches for instead of markdown. The prose
+ * renderer only understands markdown, so the tag lands in front of the player
+ * as literal text. Block tags become a line break rather than nothing, since
+ * they are the only thing separating the text on either side of them.
+ */
+const BLOCK_HTML_TAG_PATTERN =
+  /<\/?(?:br|p|div|hr|ul|ol|li|blockquote|pre|h[1-6])(?:\s[^<>]*)?\/?>/gi;
+
+/** Inline tags wrap a run of prose, so removing them has to leave it joined. */
+const INLINE_HTML_TAG_PATTERN =
+  /<\/?(?:span|em|strong|b|i|u|code|small|sub|sup)(?:\s[^<>]*)?\/?>/gi;
+
+/**
+ * Narrow on purpose: the narrative has to be the paragraph's own subject with the
+ * verb right behind it. Emphatic in-fiction closers survive, including ones that
+ * mention the story in passing ("the story of the mill will continue to haunt
+ * them"), where that verb belongs to a different subject.
+ */
+const META_COMMENTARY_PATTERN =
+  /^(?:the|this)\s+(?:narrative|story|scene|segment|chapter|passage)\s+(?:will\s+(?:continue|resume|proceed|pick\s+up)|continues|resumes|picks\s+up)\b/i;
+
+/**
+ * Drops the closing paragraph when it is bold end to end and reads as a note
+ * about the story rather than a beat of it - the shape a stage direction takes
+ * when the model signs off instead of staying inside the scene. Written as
+ * string slicing rather than an end-anchored regex, which the engine retries
+ * from every position in the passage before it can fail.
+ */
+const dropMetaCommentaryTrailer = (text: string): string => {
+  const breakIndex = text.lastIndexOf('\n\n');
+  if (breakIndex === -1) return text;
+
+  const closing = text.slice(breakIndex + 2).trim();
+  if (
+    closing.length <= 4 ||
+    !closing.startsWith('**') ||
+    !closing.endsWith('**')
+  ) {
+    return text;
+  }
+
+  const statement = closing.slice(2, -2).trim();
+  if (statement.includes('*') || !META_COMMENTARY_PATTERN.test(statement)) {
+    return text;
+  }
+
+  return text.slice(0, breakIndex).trimEnd();
+};
+
 export const normalizeNarrativeContent = (
   content: string,
   extractedMetadata: NarrativeExtractedMetadata
@@ -126,7 +176,14 @@ export const normalizeNarrativeContent = (
       .replace(/[ \t]+([,;:.!?])/g, '$1')
       .replace(/[ \t]{2,}/g, ' ')
       .replace(/\s*\[[a-z0-9-]+\]/gi, '')
-      .replace(/\s*\[metadata\.[a-z]+:\s*[a-z0-9-]+\]/gi, '');
+      .replace(/\s*\[metadata\.[a-z]+:\s*[a-z0-9-]+\]/gi, '')
+      .replace(BLOCK_HTML_TAG_PATTERN, '\n')
+      .replace(INLINE_HTML_TAG_PATTERN, '')
+      .replace(/[ \t]*\n[ \t]*/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    normalizedContent = dropMetaCommentaryTrailer(normalizedContent);
   }
 
   return normalizedContent;
