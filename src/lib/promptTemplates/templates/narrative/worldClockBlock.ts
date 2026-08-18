@@ -25,7 +25,7 @@ const ledgerMark = (thread: PromptThread): string => {
  */
 const dueNowSection = (thread: PromptThread): string => `
 DUE NOW: ${thread.summary}. It has been overdue for ${pluralTurns(thread.overdueByTurns)}.
-- In THIS segment it lands: the vote is held, the report arrives, the actor walks in, the thing at the door comes through. Show it happening and what it costs or changes.
+- In THIS segment it lands: the vote is held and decided, the report arrives, the actor walks in, the thing at the door comes through, the debt is collected. Show it happening and what it costs or changes; calling for it, hearing it again, or setting off toward it does not count.
 - If the scene as it stands cannot reach that moment, this segment is a "transition": let the story time pass and open at the moment it lands. For this one segment that overrides "pick up immediately"; time may jump FORWARD to reach it. Never backward.
 - It has already been announced. Do not deliver it as fresh news, do not have anyone remind the player it is coming, do not foreshadow it again. It happens, and the segment shows the consequence.`;
 
@@ -56,7 +56,7 @@ export const worldClockBlock = (worldClock?: WorldClockPromptContext): string =>
 
   const spendRule =
     threads.length === 0
-      ? `- The ledger is empty, so this segment MUST show the world moving on its own: pick someone from the NPC roster who is not in the scene and have them act, arrive, send word, or change their position, unbidden.`
+      ? `- The ledger is empty, so this segment MUST show the world moving on its own: pick someone from the NPC roster who is not in the scene and have them act, arrive, send word, or change their position, unbidden. That move becomes a thread the story now owes, so make it one thing with somewhere to go, not another unexplained noise on top of the last one.`
       : dueNow
         ? `- This segment MUST advance, bring due, or resolve at least ONE thread above, in the prose, as something the player did not do. The DUE NOW thread lands this segment (see below); the rest may move or wait.
 - Advance means the world moves on it: the actor arrives or acts, the deadline lands or presses, the consequence comes home. Not a reminder that it exists.`

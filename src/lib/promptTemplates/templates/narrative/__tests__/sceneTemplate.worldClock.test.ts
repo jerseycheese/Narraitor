@@ -102,6 +102,7 @@ describe('sceneTemplate world clock block', () => {
     expect(prompt).toContain(WORLD_CLOCK_HEADER);
     expect(prompt).toContain('The ledger is empty');
     expect(prompt).toContain('NPC roster who is not in the scene');
+    expect(prompt).toContain('That move becomes a thread the story now owes');
   });
 
   it('suppresses the pacing guard while the clock renders, and restores it when the clock is off', () => {

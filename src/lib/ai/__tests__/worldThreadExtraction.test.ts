@@ -45,6 +45,23 @@ describe('buildWorldThreadPromptSection', () => {
     expect(section).toContain('Never earlier than two turns from now');
   });
 
+  it('files offstage threats as event-shaped threads and makes resolution name the outcome', () => {
+    const section = buildWorldThreadPromptSection({
+      openThreads: [openThread],
+      currentTurn: 7,
+      segmentSignals: { majorEvent: 'A new thudding sound erupts from the boathouse' },
+      seed: { activeGoals: [] },
+    });
+
+    expect(section).toContain('An offstage threat the prose introduces');
+    expect(section).toContain('is a thread');
+    expect(section).toContain('the event that will land, not a standing state');
+    expect(section).toContain('major event the player did not cause');
+    expect(section).toContain('`resolution` names the outcome');
+    expect(section).toContain('is an ADVANCE, not a resolution');
+    expect(section).toContain('phrased as the event that will land');
+  });
+
   it('lists only the observable changes that are present', () => {
     const section = buildWorldThreadPromptSection({
       openThreads: [],
