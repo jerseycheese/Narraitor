@@ -5,6 +5,7 @@ import type { World } from './world.types';
 import type { Character } from './character.types';
 import type { InventoryAcquisitionMethod, StandardInventoryCategory } from './inventory.types';
 import type { ContinuitySegmentNote } from './continuity.types';
+import type { WorldClockPromptContext, WorldClockSegmentNote } from './worldThread.types';
 
 /**
  * Represents a segment of narrative in the game
@@ -251,6 +252,12 @@ export interface PromptDebugInfo {
 export interface NarrativeMetadata {
   mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
   tags: string[];
+  /**
+   * How the world clock's ledger moved on this turn, stamped after the
+   * post-segment extraction reconciles it. Lives on metadata rather than
+   * debugInfo so the playtest harness can read it off the segment list.
+   */
+  worldClock?: WorldClockSegmentNote;
   location?: string;
   characterIds?: EntityID[];
   characters?: GeneratedCharacterMetadata[];
@@ -325,6 +332,8 @@ export interface NarrativeContext {
     avatarUrl?: string | null;
     role?: string;
   }>;
+  /** The world clock's open ledger for this turn; absent when the clock is off */
+  worldClock?: WorldClockPromptContext;
 }
 
 /**

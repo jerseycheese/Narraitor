@@ -23,6 +23,8 @@ import {
   isFatalCriticalDecision,
 } from '@/lib/narrative/evaluateDecisionSkillChecks';
 import { computeTurnsSinceComplication, isPacingStale } from '@/lib/narrative/turnsSinceComplication';
+import { buildWorldClockPromptContext } from '@/lib/narrative/worldClock';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
@@ -30,6 +32,7 @@ import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
+import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useToast } from '@/components/ui/toast/toaster';
 
 const EMPTY_NPC_IDS: string[] = [];
@@ -624,11 +627,28 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Streak tracked over the whole session, not just the trimmed context
       // window above — a quiet stretch spans more than 3 segments.
       const turnsSinceComplication = computeTurnsSinceComplication(segments);
+      // The turn the prompt names must match the one the store stamps after
+      // this segment lands (sessionSegments length after add), and the local
+      // segments state can lag the store, so read the store count directly.
+      const currentTurn =
+        useNarrativeStore.getState().getSessionSegments(sessionId).length + 1;
+      const worldClock = isFeatureEnabled('WORLD_CLOCK')
+        ? buildWorldClockPromptContext(
+            useWorldThreadStore
+              .getState()
+              .getAll()
+              .filter((thread) => thread.sessionId === sessionId),
+            currentTurn
+          )
+        : undefined;
       // The scene prompt only carries the rising-tension block above this
       // threshold, and the complication it asks for arrives with no dice roll
       // behind it. Stamping the ask onto the segment is what lets the streak
       // reset; without it the guidance would repeat on every following turn.
-      const pacingEscalationRequested = isPacingStale(turnsSinceComplication);
+      // With the world clock on, the template does not render that block, so
+      // the stamp stays off too and flag-off behavior is exactly the guard's.
+      const pacingEscalationRequested =
+        !worldClock && isPacingStale(turnsSinceComplication);
 
       // Get the actual choice text from the narrative store
       const decisions = useNarrativeStore
@@ -743,6 +763,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
               sessionId,
               recentSegments,
               turnsSinceComplication,
+              worldClock,
               currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
             },
             generationParameters: {

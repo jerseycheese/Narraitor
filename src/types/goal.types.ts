@@ -1,6 +1,7 @@
 // src/types/goal.types.ts
 
 import { EntityID, TimestampedEntity } from './common.types';
+import type { WorldThreadExtractionInput, WorldThreadExtractionResult } from './worldThread.types';
 
 /**
  * Priority levels for narrative goals
@@ -64,6 +65,8 @@ export interface GoalExtractionRequest {
   characterId?: EntityID;
   worldId?: EntityID;
   existingGoals?: NarrativeGoal[];
+  /** World-clock ledger context; rides along so the ledger costs no extra AI call. */
+  worldThreads?: WorldThreadExtractionInput;
 }
 
 /**
@@ -77,4 +80,6 @@ export interface GoalExtractionResult {
   }>;
   completedGoals: EntityID[];
   confidence: number; // 0-1 confidence score
+  /** Undefined when the request carried no ledger or the model returned no block. */
+  worldThreads?: WorldThreadExtractionResult;
 }

@@ -1,0 +1,67 @@
+/**
+ * WorldClockSection (dev-only) styles. Token-driven.
+ */
+.world-clock-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs_5);
+}
+
+.world-clock-section-summary-line {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.world-clock-section-subheading {
+  margin: 0;
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-xs_5);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.world-clock-section-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.world-clock-section-thread {
+  line-height: 1.4;
+}
+
+.world-clock-section-thread.is-closed {
+  color: var(--color-text-muted);
+}
+
+.world-clock-section-kind {
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-muted);
+}
+
+.world-clock-section-turns {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.world-clock-section-thread.is-overdue .world-clock-section-summary,
+.world-clock-section-overdue-mark {
+  color: var(--color-danger);
+}
+
+.world-clock-section-overdue-mark {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+}
+
+.world-clock-section-empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}

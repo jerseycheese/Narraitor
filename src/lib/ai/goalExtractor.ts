@@ -12,6 +12,10 @@ import {
   GoalStatus,
 } from '../../types/goal.types';
 import { capitalize, formatDateTime } from '@/lib/utils';
+import {
+  buildWorldThreadPromptSection,
+  parseWorldThreadExtraction,
+} from './worldThreadExtraction';
 
 // Created on first use, not at import time — the class singleton used to
 // construct a client as a module side effect.
@@ -71,6 +75,20 @@ function buildGoalExtractionPrompt(request: GoalExtractionRequest): string {
       ? `\n\nEXISTING GOALS:\n${request.existingGoals.map((g) => `- ${g.title}: ${g.description}`).join('\n')}`
       : '';
 
+  // Both are empty strings when no ledger rides along, so the prompt stays
+  // byte-identical for callers that never heard of the world clock.
+  const worldThreadSection = request.worldThreads
+    ? `\n\n${buildWorldThreadPromptSection(request.worldThreads)}`
+    : '';
+  const worldThreadSkeleton = request.worldThreads
+    ? `,
+  "worldThreads": {
+    "opened": [{ "kind": "consequence|actor|deadline", "summary": "...", "dueByTurn": 12 }],
+    "advanced": [{ "id": "thread-id", "note": "..." }],
+    "resolved": [{ "id": "thread-id", "resolution": "...", "outcome": "resolved|dropped" }]
+  }`
+    : '';
+
   return `You are a goal extraction system. Analyze the following narrative content and extract goals, update existing goals, or mark goals as completed.
 
 NARRATIVE CONTENT:
@@ -81,7 +99,7 @@ Extract goals following these rules:
 2. GOAL UPDATES: If existing goals are mentioned, update their progress or status
 3. COMPLETED GOALS: Mark goals as completed if they are clearly achieved or abandoned
 4. PRIORITY LEVELS: critical (urgent/life-threatening), high (important objectives), medium (standard goals), low (optional/minor)
-5. GOAL TYPES: immediate (right now), quest (specific objectives), exploration (discovering), social (relationships), mystery (solving puzzles), survival (staying alive)
+5. GOAL TYPES: immediate (right now), quest (specific objectives), exploration (discovering), social (relationships), mystery (solving puzzles), survival (staying alive)${worldThreadSection}
 
 Respond with JSON in this exact format:
 \`\`\`json
@@ -115,7 +133,7 @@ Respond with JSON in this exact format:
     }
   ],
   "completedGoals": ["goal-id-1", "goal-id-2"],
-  "confidence": 0.8
+  "confidence": 0.8${worldThreadSkeleton}
 }
 \`\`\``;
 }
@@ -168,6 +186,10 @@ function parseGoalExtractionResponse(
       result.completedGoals = parsed.completedGoals.filter(
         (id: unknown) => typeof id === 'string'
       );
+    }
+
+    if (request.worldThreads) {
+      result.worldThreads = parseWorldThreadExtraction(parsed.worldThreads);
     }
 
     return result;

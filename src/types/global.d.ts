@@ -20,6 +20,7 @@ declare global {
     useJournalStore?: typeof import('@/state/journalStore').useJournalStore;
     useSessionStore?: typeof import('@/state/sessionStore').useSessionStore;
     useNPCStore?: typeof import('@/state/npcStore').useNPCStore;
+    useWorldThreadStore?: typeof import('@/state/worldThreadStore').useWorldThreadStore;
   }
 }
 
