@@ -44,6 +44,7 @@ import {
   type NarrativeStaticContentCache,
 } from './narrativeGenerator.prompt';
 import { formatNarrativeResponse } from './narrativeGenerator.response';
+import { getCarryForwardLocation } from './narrativeGenerator.response.helpers';
 import { getActiveProviderModel } from '@/state/providerStore';
 import { DEFAULT_TEXT_MODEL } from './config';
 import { enforceLanguageComplexity } from './narrativeGenerator.languageComplexity';
@@ -177,7 +178,8 @@ export class NarrativeGenerator {
       let result = await formatNarrativeResponse(
         response,
         inferSegmentType(response.content || ''),
-        this.geminiClient
+        this.geminiClient,
+        getCarryForwardLocation(request.narrativeContext)
       );
 
       result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
@@ -468,6 +470,7 @@ export class NarrativeGenerator {
           });
       }
 
+      // The opening segment is the one turn with no earlier place to carry forward.
       let result = await formatNarrativeResponse(
         response,
         inferSegmentType(response.content || ''),
@@ -562,7 +565,13 @@ export class NarrativeGenerator {
     const prompt = template(context);
     const response = await this.geminiClient.generateContent(prompt);
 
-    const result = await formatNarrativeResponse(response, 'transition', this.geminiClient);
+    const result = await formatNarrativeResponse(
+      response,
+      'transition',
+      this.geminiClient,
+      // A transition is heading somewhere named; without one, it stays put.
+      to.narrativeContext?.currentLocation || from.metadata?.location
+    );
     this.syncNpcMetadata(to.worldId, result.metadata.characters);
     return result;
   }
@@ -669,7 +678,8 @@ export class NarrativeGenerator {
       let result = await formatNarrativeResponse(
         response,
         inferSegmentType(response.content || ''),
-        this.geminiClient
+        this.geminiClient,
+        getCarryForwardLocation(narrativeContext)
       );
 
       result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
