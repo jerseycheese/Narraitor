@@ -26,4 +26,22 @@ describe('parseNarrativeResponse debris guard', () => {
       'The door groans open on a room that has not been aired in years.'
     );
   });
+  it('keeps a short closed content field when the rest of the JSON is malformed', () => {
+    const parsed = parseNarrativeResponse(
+      { content: '{"content":"You flee.","type": scene}' },
+      'scene'
+    );
+
+    expect(parsed.actualContent).toBe('You flee.');
+  });
+
+  it('keeps a short closed content field when the object itself is cut off', () => {
+    const parsed = parseNarrativeResponse(
+      { content: '{"content":"You flee.","type":"sce' },
+      'scene'
+    );
+
+    expect(parsed.actualContent).toBe('You flee.');
+  });
+
 });

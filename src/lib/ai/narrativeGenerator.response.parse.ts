@@ -7,16 +7,16 @@ import { validateMood, validateLossReason } from './narrativeGenerator.response.
 import { stripMarkdownFences, extractJsonObject } from './parseJSON';
 
 /**
- * A recovered passage is at minimum a full sentence, so anything shorter is a
- * fragment the response was cut off mid-way through rather than prose.
+ * A passage salvaged from a cut-off response is at minimum a full sentence, so
+ * anything shorter is the fragment the response stopped in the middle of.
  */
 const MIN_RECOVERED_PASSAGE_LENGTH = 20;
 
 /**
  * Recognises what's left when a response never carried a usable content field -
  * a bare brace, an unclosed object, a fragment cut off mid-sentence. Only
- * applied to text the recovery paths produced; a content field the model
- * actually closed is taken at its word however short it is.
+ * applied to text recovered without a closing quote to stop at; a field the
+ * model actually finished is taken at its word however short it is.
  */
 const isJsonDebris = (text: string): boolean => {
   const trimmed = text.trim();
@@ -34,7 +34,7 @@ export const parseNarrativeResponse = (
 ): ParsedNarrativeResponse => {
   let actualContent = response.content || '';
   let extractedMetadata: NarrativeExtractedMetadata = {};
-  let contentFromParsedField = false;
+  let contentFromClosedField = false;
 
   if (
     actualContent.includes('```json') ||
@@ -57,6 +57,9 @@ export const parseNarrativeResponse = (
             actualContent = contentMatch[1]
               .replace(/\\"/g, '"')
               .replace(/\\n/g, '\n');
+            // Same regex serves both endings, so the terminator is what says
+            // whether the field closed or the response simply ran out.
+            contentFromClosedField = contentMatch[0].endsWith('",');
           } else {
             throw new Error('Incomplete JSON without extractable content');
           }
@@ -67,7 +70,7 @@ export const parseNarrativeResponse = (
         const parsed = JSON.parse(jsonStr);
         if (parsed.content) {
           actualContent = parsed.content;
-          contentFromParsedField = true;
+          contentFromClosedField = true;
         }
         if (
           parsed.type &&
@@ -190,18 +193,21 @@ export const parseNarrativeResponse = (
             .replace(/\\"/g, '"')
             .replace(/\\n/g, '\n')
             .replace(/\\\\/g, '\\');
+          contentFromClosedField = true;
         } else {
           const altContentMatch = actualContent.match(
             /"content"\s*:\s*"([^"]*(?:"[^"]*"[^"]*)*)"/
           );
           if (altContentMatch && altContentMatch[1]) {
             actualContent = altContentMatch[1];
+            contentFromClosedField = true;
           } else {
             const finalContentMatch = actualContent.match(
               /"content"\s*:\s*"(.+?)"\s*,\s*"(?:type|metadata)/
             );
             if (finalContentMatch && finalContentMatch[1]) {
               actualContent = finalContentMatch[1];
+              contentFromClosedField = true;
             }
           }
         }
@@ -231,10 +237,10 @@ export const parseNarrativeResponse = (
       }
     }
 
-    // Every recovery path above can leave the raw text in place. Failing here
-    // hands the turn to the existing retry and fallback-segment handling
-    // instead of shipping a one-character passage.
-    if (!contentFromParsedField && isJsonDebris(actualContent)) {
+    // When no path found a closed content field the raw text is still sitting
+    // there. Failing here hands the turn to the existing retry and
+    // fallback-segment handling instead of shipping a one-character passage.
+    if (!contentFromClosedField && isJsonDebris(actualContent)) {
       throw new Error('Service error: malformed API response');
     }
   }
