@@ -703,5 +703,30 @@ describe('LoreStore - Advanced Features', () => {
         status: 'promised',
       });
     });
+
+    test('tags an already-stored event when a later extraction annotates the same description', () => {
+      const { result } = renderHook(() => useLoreStore());
+      const description = 'Thorn hands over the appraisal envelope.';
+      const untagged = { characters: [], locations: [], rules: [], events: [{ description, importance: 'high' as const }] };
+      const tagged = {
+        ...untagged,
+        events: [{
+          description,
+          importance: 'high' as const,
+          continuity: { kind: 'commitment' as const, topic: 'appraisal', speaker: 'Thorn', status: 'delivered' as const },
+        }],
+      };
+
+      act(() => {
+        result.current.addStructuredLore(untagged, 'world-1', 'session-1');
+        result.current.addStructuredLore(tagged, 'world-1', 'session-1');
+      });
+
+      const events = result.current.getFacts({ worldId: 'world-1' }).filter(f => f.category === 'events');
+      expect(events).toHaveLength(1);
+      expect(events[0].metadata?.continuity).toEqual({
+        kind: 'commitment', topic: 'appraisal', speaker: 'Thorn', status: 'delivered',
+      });
+    });
   });
 });

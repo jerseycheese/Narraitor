@@ -145,17 +145,21 @@ export function buildCommitments(ledger: LoreFact[]): ContinuityCommitment[] {
   return Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
 }
 
-/** One line per changed object: later turns retell the same change in new words. */
+/**
+ * One line per changed object, latest statement wins: later turns retell the
+ * same change in new words, and a reversal (the board repaired) has to replace
+ * the original change rather than sit under it.
+ */
 export function buildSceneChanges(ledger: LoreFact[]): ContinuitySceneChange[] {
-  const firstByTopic = new Map<string, ContinuitySceneChange>();
+  const latestByTopic = new Map<string, ContinuitySceneChange>();
   for (const fact of ledger) {
     const annotation = fact.metadata!.continuity!;
     if (annotation.kind !== 'scene-change') continue;
     const topicKey = normalizeTopic(annotation.topic?.trim() || fact.value);
-    if (!topicKey || firstByTopic.has(topicKey)) continue;
-    firstByTopic.set(topicKey, { statement: fact.value.trim() });
+    if (!topicKey) continue;
+    latestByTopic.set(topicKey, { statement: fact.value.trim() });
   }
-  return Array.from(firstByTopic.values()).slice(-MAX_SCENE_CHANGES);
+  return Array.from(latestByTopic.values()).slice(-MAX_SCENE_CHANGES);
 }
 
 /** Significant words of a topic label; all must appear in a sentence for a stale-promise hit. */

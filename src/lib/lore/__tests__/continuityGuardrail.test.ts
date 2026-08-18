@@ -277,20 +277,20 @@ describe('ledger-fed contract', () => {
     ]);
   });
 
-  it('keeps only the most recent scene changes, one per topic', () => {
+  it('keeps only the most recent scene changes, the latest statement per topic', () => {
     const facts = Array.from({ length: 6 }, (_, i) =>
       makeEvent(`s${i}`, `Scene change ${i}`, { kind: 'scene-change', topic: `object ${i}` },
         `2025-01-01T00:${String(i).padStart(2, '0')}:00.000Z`)
     );
     facts.push(
-      makeEvent('s5b', 'Scene change 5 retold in new words', { kind: 'scene-change', topic: 'Object 5' },
+      makeEvent('s5b', 'Object 5 put back the way it was', { kind: 'scene-change', topic: 'Object 5' },
         '2025-01-01T00:07:00.000Z')
     );
 
     const contract = buildLedgerContract(facts);
 
     expect(contract.sceneChanges.map((s) => s.statement)).toEqual([
-      'Scene change 2', 'Scene change 3', 'Scene change 4', 'Scene change 5',
+      'Scene change 2', 'Scene change 3', 'Scene change 4', 'Object 5 put back the way it was',
     ]);
   });
 
