@@ -86,9 +86,19 @@ export const collectContinuityTopicsFromStores = (
 };
 
 /**
+ * The guardrail's own emptiness test counts only what it can validate a
+ * segment against, and recent decisions are not that: they ride the contract
+ * purely to reach the prompt. Dropping a decisions-only contract strips the
+ * recent-decision lines through the opening turns of a fresh session, before
+ * any relationship or tagged fact exists.
+ */
+const carriesNothingForTheModel = (contract: ContinuityContract): boolean =>
+  isContinuityContractEmpty(contract) && contract.recentDecisions.length === 0;
+
+/**
  * Builds the continuity contract from live stores. Returns null when the
- * contract would be vacuous (nothing to validate against) or when any store
- * read fails — a null contract disables the guardrail for this request.
+ * contract carries nothing for the model, or when any store read fails. A
+ * null contract disables the guardrail for this request.
  */
 export const buildContinuityContractFromStores = (
   request: NarrativeGenerationRequest,
@@ -120,7 +130,7 @@ export const buildContinuityContractFromStores = (
       playerName: options?.playerName,
     });
 
-    if (isContinuityContractEmpty(contract)) {
+    if (carriesNothingForTheModel(contract)) {
       return null;
     }
     return contract;

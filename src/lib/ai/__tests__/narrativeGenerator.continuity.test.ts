@@ -319,4 +319,60 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       { continuityTopics: ['mill debt'], playerCharacterName: 'Hero' }
     );
   });
+
+  it('keeps a decisions-only contract so the recent-decision lines reach the prompt', async () => {
+    // Fresh session: nothing in relationships or lore yet, one decision behind
+    // us. That is exactly the shape the emptiness check used to throw away.
+    (useWorldStore.getState as jest.Mock).mockImplementation(() => ({
+      worlds: { 'world-1': mockWorld },
+      worldStates: {},
+      currentWorldId: 'world-1',
+      error: null,
+      loading: false,
+      getWorldState: jest.fn(() => ({ npcRelationships: {} })),
+    }));
+    (useLoreStore.getState as jest.Mock).mockReturnValue({
+      getFacts: jest.fn().mockReturnValue([]),
+      getLoreContext: jest.fn().mockReturnValue({ factIds: [] }),
+      recordLoreMentions: jest.fn(),
+      recordLoreUsage: jest.fn(),
+      addStructuredLore: jest.fn(),
+    });
+
+    const client = createRoutedClient(CLEAN_PROSE, CORRECTED_PROSE);
+    const generator = new NarrativeGenerator(client);
+
+    const result = await generator.generateSegment({
+      ...request,
+      narrativeContext: {
+        worldId: 'world-1',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        sessionId: 'session-1',
+        currentTags: [],
+        previousSegments: [
+          {
+            id: 'segment-1',
+            content: 'The mill door groans shut behind you.',
+            type: 'scene',
+            timestamp: new Date('2025-01-01T00:00:00.000Z'),
+            createdAt: '2025-01-01T00:00:00.000Z',
+            updatedAt: '2025-01-01T00:00:00.000Z',
+            metadata: {
+              tags: [],
+              causedByDecisionText: 'Bar the mill door from the inside',
+              decisionOutcome: 'success',
+            },
+          },
+        ],
+      },
+    });
+
+    const generationPrompt = client.generateContent.mock.calls[0][0] as string;
+    expect(generationPrompt).toContain('CONTINUITY REQUIREMENTS');
+    expect(generationPrompt).toContain(
+      'Recent decision: "Bar the mill door from the inside"'
+    );
+    expect(result.metadata.continuity).toEqual({ status: 'clean' });
+  });
 });
