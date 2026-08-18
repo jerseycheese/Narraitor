@@ -45,9 +45,14 @@ const tagOrderIn = (section: string): string[] => {
   return order;
 };
 
+/**
+ * Anchors on line starts. The glossary header itself mentions the section that
+ * follows it, so a bare indexOf for the end marker lands inside the header and
+ * yields an empty slice that makes every assertion pass for free.
+ */
 const sectionBetween = (prompt: string, start: string, end: string): string => {
-  const from = prompt.indexOf(start);
-  const to = prompt.indexOf(end, from);
+  const from = prompt.indexOf(`\n${start}`);
+  const to = prompt.indexOf(`\n${end}`, from + 1);
   return prompt.slice(from, to === -1 ? undefined : to);
 };
 
@@ -65,7 +70,26 @@ describe('aligned choice template: alignment spread instructions', () => {
     const prompt = alignedChoiceTemplate(baseContext);
     const glossary = sectionBetween(prompt, 'ALIGNMENT DEFINITIONS', 'CHOOSING THE MIX');
 
+    expect(tagOrderIn(glossary)).toHaveLength(3);
     expect(tagOrderIn(glossary)).not.toEqual(['LAWFUL', 'NEUTRAL', 'CHAOTIC']);
+  });
+
+  it('does not leave CHAOTIC sitting last in the glossary', () => {
+    // Last in an ordered glossary is the slot-3 tell the transcript exposed, so
+    // reordering that leaves CHAOTIC at the end just renames the pattern.
+    const prompt = alignedChoiceTemplate(baseContext);
+    const glossary = sectionBetween(prompt, 'ALIGNMENT DEFINITIONS', 'CHOOSING THE MIX');
+    const order = tagOrderIn(glossary);
+
+    expect(order).toHaveLength(3);
+    expect(order[order.length - 1]).not.toBe('CHAOTIC');
+  });
+
+  it('keeps the shared-tag guidance valid when more than three options are asked for', () => {
+    const prompt = alignedChoiceTemplate({ ...baseContext, optionCount: 5 });
+
+    expect(prompt).toContain('create 5 distinct action choices');
+    expect(prompt).not.toMatch(/all three may/i);
   });
 
   it('says the glossary order is not a running order', () => {
@@ -77,7 +101,7 @@ describe('aligned choice template: alignment spread instructions', () => {
   it('permits two or three options to share a tag', () => {
     const prompt = alignedChoiceTemplate(baseContext);
 
-    expect(prompt).toMatch(/two options may share a tag/i);
+    expect(prompt).toMatch(/two options may share a tag, and so may all of them/i);
   });
 
   it('forbids parking the disruptive option in the last slot', () => {

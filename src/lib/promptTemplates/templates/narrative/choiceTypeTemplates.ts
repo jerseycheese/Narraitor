@@ -106,14 +106,14 @@ Based on the SPECIFIC narrative situation above, create ${choiceCount} distinct 
 
 ALIGNMENT DEFINITIONS (a glossary, not a running order - see CHOOSING THE MIX below):
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
-- LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 - CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. Dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. VARY THE KIND of chaos and do NOT default to making noise (yelling, shouting, singing). Draw from a wide range, fitted to the scene: sudden physical risk ("leap from the balcony onto the chandelier," "kick over the lantern to set the drapes alight"), trickery or deception ("impersonate the captain and bark orders," "bluff an outrageous lie with total confidence"), sabotage or destruction ("cut the rope bridge behind you," "smash the control panel," "throw open the cells and free the prisoners"), turning the tables ("start a brawl to scatter the room," "switch sides mid-negotiation"), or abandoning the obvious goal for something no one expects. The goal is options that dramatically shift the narrative in surprising ways.
+- LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 
 CHOOSING THE MIX (IMPORTANT):
 - Always tag every choice [LAWFUL], [NEUTRAL], or [CHAOTIC].
 - Decide the mix from this scene BEFORE writing a single option, and report it on the Alignment Mix line. Pick what the scene actually supports. There is no quota: a tense standoff might offer two chaotic openings, a quiet interrogation none at all.
-- Two options may share a tag, and all three may. A mix of three different tags is one option among many, not the default.
-- The order the tags are listed above is not a running order. Do NOT tag the first option lawful, the second neutral and the third chaotic out of habit, and do NOT repeat the same mix turn after turn. A player who can predict which slot holds the reckless option has stopped reading the choices.
+- Two options may share a tag, and so may all of them. A mix of one tag per option is one possibility among many, not the default.
+- The order the tags are listed above is not a running order, and neither is any order you used last turn. Do NOT assign tags to slots by position out of habit, and do NOT repeat the same mix turn after turn. A player who can predict which slot holds the reckless option has stopped reading the choices.
 - Never park the most disruptive option in the last slot by default. When a chaotic option belongs in a scene it can just as easily be the first thing offered.
 - Only offer a chaotic option when a genuinely disruptive action fits the moment.
 - A chaotic option must be something a bold player would actually consider, with a real payoff if it works. An obvious mistake, a pointless stunt, or self-sabotage nobody would pick is wasted space: drop the chaotic tag and offer a different mix instead.
