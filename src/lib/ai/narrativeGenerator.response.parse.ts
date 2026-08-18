@@ -6,12 +6,35 @@ import type { ParsedNarrativeResponse, NarrativeExtractedMetadata } from './narr
 import { validateMood, validateLossReason } from './narrativeGenerator.response.helpers';
 import { stripMarkdownFences, extractJsonObject } from './parseJSON';
 
+/**
+ * A passage salvaged from a cut-off response is at minimum a full sentence, so
+ * anything shorter is the fragment the response stopped in the middle of.
+ */
+const MIN_RECOVERED_PASSAGE_LENGTH = 20;
+
+/**
+ * Recognises what's left when a response never carried a usable content field -
+ * a bare brace, an unclosed object, a fragment cut off mid-sentence. Only
+ * applied to text recovered without a closing quote to stop at; a field the
+ * model actually finished is taken at its word however short it is.
+ */
+const isJsonDebris = (text: string): boolean => {
+  const trimmed = text.trim();
+  return (
+    trimmed.startsWith('{') ||
+    trimmed.startsWith('[') ||
+    !/\w/.test(trimmed) ||
+    trimmed.length < MIN_RECOVERED_PASSAGE_LENGTH
+  );
+};
+
 export const parseNarrativeResponse = (
   response: { content?: string },
   segmentType: string
 ): ParsedNarrativeResponse => {
   let actualContent = response.content || '';
   let extractedMetadata: NarrativeExtractedMetadata = {};
+  let contentFromClosedField = false;
 
   if (
     actualContent.includes('```json') ||
@@ -34,6 +57,9 @@ export const parseNarrativeResponse = (
             actualContent = contentMatch[1]
               .replace(/\\"/g, '"')
               .replace(/\\n/g, '\n');
+            // Same regex serves both endings, so the terminator is what says
+            // whether the field closed or the response simply ran out.
+            contentFromClosedField = contentMatch[0].endsWith('",');
           } else {
             throw new Error('Incomplete JSON without extractable content');
           }
@@ -44,6 +70,7 @@ export const parseNarrativeResponse = (
         const parsed = JSON.parse(jsonStr);
         if (parsed.content) {
           actualContent = parsed.content;
+          contentFromClosedField = true;
         }
         if (
           parsed.type &&
@@ -166,18 +193,21 @@ export const parseNarrativeResponse = (
             .replace(/\\"/g, '"')
             .replace(/\\n/g, '\n')
             .replace(/\\\\/g, '\\');
+          contentFromClosedField = true;
         } else {
           const altContentMatch = actualContent.match(
             /"content"\s*:\s*"([^"]*(?:"[^"]*"[^"]*)*)"/
           );
           if (altContentMatch && altContentMatch[1]) {
             actualContent = altContentMatch[1];
+            contentFromClosedField = true;
           } else {
             const finalContentMatch = actualContent.match(
               /"content"\s*:\s*"(.+?)"\s*,\s*"(?:type|metadata)/
             );
             if (finalContentMatch && finalContentMatch[1]) {
               actualContent = finalContentMatch[1];
+              contentFromClosedField = true;
             }
           }
         }
@@ -205,6 +235,13 @@ export const parseNarrativeResponse = (
       } catch {
         // Fallback extraction failed - use default content
       }
+    }
+
+    // When no path found a closed content field the raw text is still sitting
+    // there. Failing here hands the turn to the existing retry and
+    // fallback-segment handling instead of shipping a one-character passage.
+    if (!contentFromClosedField && isJsonDebris(actualContent)) {
+      throw new Error('Service error: malformed API response');
     }
   }
 
