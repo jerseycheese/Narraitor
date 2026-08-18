@@ -42,6 +42,10 @@ const MAX_OPEN_THREADS = 6;
  * is in play, and they never reached this prompt before: the model saw prose
  * only. Listing them gives it something to weigh the current calm against,
  * which is the difference between a resolution and a lull.
+ *
+ * Drawn from the whole session rather than the recent window. A threat that
+ * has been ignored for six turns is more unresolved than one raised last turn,
+ * not less, and windowing would quietly switch the guard off for exactly those.
  */
 function collectOpenThreads(segments: NarrativeSegment[]): string[] {
   const threads: string[] = [];
@@ -56,6 +60,10 @@ function collectOpenThreads(segments: NarrativeSegment[]): string[] {
  * The shared parser narrows to a fixed shape, so the threat census is read
  * straight off the payload here. Null means the model never answered, which
  * the caller treats as "the calm went unweighed" rather than "all clear".
+ *
+ * A census carrying anything that is not a string is malformed rather than
+ * empty. Filtering those out would turn a garbled answer into an all-clear,
+ * which is the one reading that lets a premature ending through.
  */
 function readUnresolvedThreats(raw: string): string[] | null {
   try {
@@ -63,9 +71,8 @@ function readUnresolvedThreats(raw: string): string[] | null {
     if (!parsed || typeof parsed !== 'object') return null;
     const value = (parsed as Record<string, unknown>).unresolvedThreats;
     if (!Array.isArray(value)) return null;
-    return value.filter(
-      (entry): entry is string => typeof entry === 'string' && entry.trim().length > 0
-    );
+    if (!value.every((entry) => typeof entry === 'string')) return null;
+    return (value as string[]).filter((entry) => entry.trim().length > 0);
   } catch {
     return null;
   }
@@ -156,7 +163,7 @@ export function useEndingDetection({
               )}\n\n`
             : '';
 
-        const openThreads = collectOpenThreads(recentSegments);
+        const openThreads = collectOpenThreads(allSegments);
         const openThreadsContext =
           openThreads.length > 0
             ? `Threads this story put in play (each one is unfinished business unless the recent narrative settled it on the page):\n${openThreads

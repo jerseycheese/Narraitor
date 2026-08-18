@@ -122,6 +122,47 @@ describe('useEndingDetection open-threat gate', () => {
     );
   });
 
+  it('keeps protecting a threat that has scrolled out of the recent window', async () => {
+    // The only major event sits at segment 1, eight turns back and well outside
+    // RECENT_SEGMENT_WINDOW. Nothing in the recent window carries one, so a
+    // windowed collection would find no threads and switch the guard off for
+    // exactly the threat that has been ignored longest. 9 segments total keeps
+    // the routine check on its interval without a major event to force it.
+    mockGenerateContent.mockResolvedValue({
+      content: endingOffer({
+        unresolvedThreats: ['The pursuer was never shaken off'],
+      }),
+    });
+    const { result, onEndingSuggested } = renderDetection([
+      segment('1', { majorEvent: 'A pursuer picks up the trail out of town' }),
+      segment('2'),
+      segment('3'),
+      segment('4'),
+      segment('5'),
+      segment('6'),
+      segment('7'),
+      segment('8'),
+    ]);
+
+    await result.current.checkForEndingIndicators(segment('9'));
+
+    expect(mockGenerateContent).toHaveBeenCalled();
+    expect(onEndingSuggested).not.toHaveBeenCalled();
+  });
+
+  it('treats a malformed census as unanswered rather than all clear', async () => {
+    mockGenerateContent.mockResolvedValue({
+      content: endingOffer({ unresolvedThreats: [{ threat: 'the pursuer' }] }),
+    });
+    const { result, onEndingSuggested } = renderDetection(barricadeStory());
+
+    await result.current.checkForEndingIndicators(
+      segment('5', { majorEvent: 'The kitchen door is barred from the inside' })
+    );
+
+    expect(onEndingSuggested).not.toHaveBeenCalled();
+  });
+
   it('puts the open threads in the prompt so the model can weigh them', async () => {
     mockGenerateContent.mockResolvedValue({
       content: endingOffer({ unresolvedThreats: [] }),
