@@ -6,12 +6,35 @@ import type { ParsedNarrativeResponse, NarrativeExtractedMetadata } from './narr
 import { validateMood, validateLossReason } from './narrativeGenerator.response.helpers';
 import { stripMarkdownFences, extractJsonObject } from './parseJSON';
 
+/**
+ * A recovered passage is at minimum a full sentence, so anything shorter is a
+ * fragment the response was cut off mid-way through rather than prose.
+ */
+const MIN_RECOVERED_PASSAGE_LENGTH = 20;
+
+/**
+ * Recognises what's left when a response never carried a usable content field -
+ * a bare brace, an unclosed object, a fragment cut off mid-sentence. Only
+ * applied to text the recovery paths produced; a content field the model
+ * actually closed is taken at its word however short it is.
+ */
+const isJsonDebris = (text: string): boolean => {
+  const trimmed = text.trim();
+  return (
+    trimmed.startsWith('{') ||
+    trimmed.startsWith('[') ||
+    !/\w/.test(trimmed) ||
+    trimmed.length < MIN_RECOVERED_PASSAGE_LENGTH
+  );
+};
+
 export const parseNarrativeResponse = (
   response: { content?: string },
   segmentType: string
 ): ParsedNarrativeResponse => {
   let actualContent = response.content || '';
   let extractedMetadata: NarrativeExtractedMetadata = {};
+  let contentFromParsedField = false;
 
   if (
     actualContent.includes('```json') ||
@@ -44,6 +67,7 @@ export const parseNarrativeResponse = (
         const parsed = JSON.parse(jsonStr);
         if (parsed.content) {
           actualContent = parsed.content;
+          contentFromParsedField = true;
         }
         if (
           parsed.type &&
@@ -205,6 +229,13 @@ export const parseNarrativeResponse = (
       } catch {
         // Fallback extraction failed - use default content
       }
+    }
+
+    // Every recovery path above can leave the raw text in place. Failing here
+    // hands the turn to the existing retry and fallback-segment handling
+    // instead of shipping a one-character passage.
+    if (!contentFromParsedField && isJsonDebris(actualContent)) {
+      throw new Error('Service error: malformed API response');
     }
   }
 
