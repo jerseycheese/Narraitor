@@ -11,12 +11,6 @@ const HTML_TAG_PATTERN =
   /<\/?(?:br|p|div|span|hr|em|strong|b|i|u|ul|ol|li|blockquote|pre|h[1-6])(?:\s[^<>]*)?\/?>/gi;
 
 /**
- * A final paragraph that is bold end to end - the shape a stage direction takes
- * when the model signs off about the story instead of staying inside it.
- */
-const BOLD_CLOSING_PARAGRAPH_PATTERN = /(?:\n\s*)+\*\*([^*]+)\*\*\s*$/;
-
-/**
  * Narrow on purpose: the narrative has to be the paragraph's own subject with the
  * verb right behind it. Emphatic in-fiction closers survive, including ones that
  * mention the story in passing ("the story of the mill will continue to haunt
@@ -24,6 +18,34 @@ const BOLD_CLOSING_PARAGRAPH_PATTERN = /(?:\n\s*)+\*\*([^*]+)\*\*\s*$/;
  */
 const META_COMMENTARY_PATTERN =
   /^(?:the|this)\s+(?:narrative|story|scene|segment|chapter|passage)\s+(?:will\s+(?:continue|resume|proceed|pick\s+up)|continues|resumes|picks\s+up)\b/i;
+
+/**
+ * Drops the closing paragraph when it is bold end to end and reads as a note
+ * about the story rather than a beat of it - the shape a stage direction takes
+ * when the model signs off instead of staying inside the scene. Written as
+ * string slicing rather than an end-anchored regex, which the engine retries
+ * from every position in the passage before it can fail.
+ */
+const dropMetaCommentaryTrailer = (text: string): string => {
+  const breakIndex = text.lastIndexOf('\n\n');
+  if (breakIndex === -1) return text;
+
+  const closing = text.slice(breakIndex + 2).trim();
+  if (
+    closing.length <= 4 ||
+    !closing.startsWith('**') ||
+    !closing.endsWith('**')
+  ) {
+    return text;
+  }
+
+  const statement = closing.slice(2, -2).trim();
+  if (statement.includes('*') || !META_COMMENTARY_PATTERN.test(statement)) {
+    return text;
+  }
+
+  return text.slice(0, breakIndex).trimEnd();
+};
 
 export const normalizeNarrativeContent = (
   content: string,
@@ -152,10 +174,9 @@ export const normalizeNarrativeContent = (
       .replace(/\s*\[metadata\.[a-z]+:\s*[a-z0-9-]+\]/gi, '')
       .replace(HTML_TAG_PATTERN, '')
       .replace(/\n{3,}/g, '\n\n')
-      .replace(BOLD_CLOSING_PARAGRAPH_PATTERN, (match, statement: string) =>
-        META_COMMENTARY_PATTERN.test(statement.trim()) ? '' : match
-      )
       .trim();
+
+    normalizedContent = dropMetaCommentaryTrailer(normalizedContent);
   }
 
   return normalizedContent;
