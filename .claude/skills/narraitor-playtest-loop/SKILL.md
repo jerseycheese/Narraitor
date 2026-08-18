@@ -88,6 +88,15 @@ breaks whichever run it did not consider.
 order through `getSessionSegments(sessionId)` and not by index. Token counts are not
 available on this path; see section 4.
 
+**The world clock rides along on the same capture.** Every segment carries
+`metadata.worldClock`, shaped `{ turn, open, overdue, opened[], advanced[], resolved[] }`.
+It is stamped after the post-segment extraction reconciles the ledger, so it can lag the
+newest turn by one; read it off the segment before, not the one you just captured.
+`window.useWorldThreadStore.getState().getOpenThreadsBySession(sessionId)` shows the live
+ledger. Both dumps go into a separate artifact the orchestrator reads, never into the
+transcript the judge sees. A judge who can see the ledger is scoring the bookkeeping, not
+the story, and the read stops being blind.
+
 **Pair a segment to its decision through `metadata.causedByDecisionId`, never by zipping
 the two arrays on index.** They do not line up, and the failure is silent: the first
 campaign's index-zipped transcript showed turn 1 offering options about a pry bar that did

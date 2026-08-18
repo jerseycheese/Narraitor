@@ -17,6 +17,11 @@ const FEATURE_FLAG_DEFAULTS = {
   // for embeds/environments where the real stream's onChunk never fires.
   BUFFERED_STREAMING: false,
   PROGRESSIVE_DISCLOSURE: true,
+  // The world clock feeds the scene prompt a ledger of open story threads, so
+  // it changes what the model writes. On since the round-5 ship memo
+  // (narraitor-feature-experiment-lifecycle/memos/1822-world-clock.md); the
+  // env var is the kill switch.
+  WORLD_CLOCK: true,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
@@ -37,6 +42,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   PROGRESSIVE_DISCLOSURE: resolve(
     process.env.NEXT_PUBLIC_FEATURE_PROGRESSIVE_DISCLOSURE,
     FEATURE_FLAG_DEFAULTS.PROGRESSIVE_DISCLOSURE
+  ),
+  WORLD_CLOCK: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_WORLD_CLOCK,
+    FEATURE_FLAG_DEFAULTS.WORLD_CLOCK
   ),
 });
 

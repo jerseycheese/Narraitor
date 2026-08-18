@@ -24,7 +24,8 @@ export enum DevToolsSection {
   ERROR_SECTION = 'errorSection',
   TOKEN_BUDGET = 'tokenBudget',
   DECISION_CONSOLE = 'decisionConsole',
-  DECISION_FLOW = 'decisionFlow'
+  DECISION_FLOW = 'decisionFlow',
+  WORLD_CLOCK = 'worldClock'
 }
 
 /**
@@ -48,6 +49,7 @@ export const DEFAULT_SECTION_VISIBILITY: SectionVisibility = {
   [DevToolsSection.TOKEN_BUDGET]: true,
   [DevToolsSection.DECISION_CONSOLE]: true,
   [DevToolsSection.DECISION_FLOW]: true,
+  [DevToolsSection.WORLD_CLOCK]: true,
 };
 
 /**

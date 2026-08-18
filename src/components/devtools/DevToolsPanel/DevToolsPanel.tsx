@@ -10,6 +10,7 @@ import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 import { LoreManagementSection } from '../LoreManagementSection';
 import { TokenBudgetPanel } from '../TokenBudgetPanel';
+import { WorldClockSection } from '../WorldClockSection';
 import { ErrorSection } from '../ErrorSection';
 import { DecisionConsoleSection } from '../DecisionConsoleSection';
 import { DecisionFlowSection } from '../DecisionFlowSection';
@@ -202,6 +203,7 @@ export const DevToolsPanel = () => {
               {(isSectionVisible(SectionId.AI_TESTING) ||
                 isSectionVisible(SectionId.CONSISTENCY_VALIDATION) ||
                 isSectionVisible(SectionId.TOKEN_BUDGET) ||
+                isSectionVisible(SectionId.WORLD_CLOCK) ||
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
                 <div className="devtools-panel-group">
                   <h3 className="devtools-panel-group-title">AI Tools &amp; Validation</h3>
@@ -227,6 +229,12 @@ export const DevToolsPanel = () => {
                     {isSectionVisible(SectionId.TOKEN_BUDGET) && (
                       <CollapsibleSection title="Token Budget" initialCollapsed={true}>
                         <TokenBudgetPanel />
+                      </CollapsibleSection>
+                    )}
+
+                    {isSectionVisible(SectionId.WORLD_CLOCK) && (
+                      <CollapsibleSection title="World Clock" initialCollapsed={true}>
+                        <WorldClockSection />
                       </CollapsibleSection>
                     )}
                   </div>

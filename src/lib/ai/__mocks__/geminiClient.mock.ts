@@ -31,6 +31,7 @@ export class MockGeminiClient {
 
   private handleGoalExtraction(prompt: string): string {
     const content = prompt.toLowerCase();
+    const worldThreads = this.buildWorldThreadsBlock(prompt);
 
     // Extract IDs from the prompt
     const sessionIdMatch = prompt.match(/"sessionId":\s*"([^"]+)"/);
@@ -59,7 +60,7 @@ export class MockGeminiClient {
     }
   ],
   "completedGoals": [],
-  "confidence": 0.85
+  "confidence": 0.85${worldThreads}
 }
 \`\`\``;
     }
@@ -78,7 +79,7 @@ export class MockGeminiClient {
     }
   ],
   "completedGoals": ["goal-123"],
-  "confidence": 0.9
+  "confidence": 0.9${worldThreads}
 }
 \`\`\``;
     }
@@ -106,7 +107,7 @@ export class MockGeminiClient {
   ],
   "updatedGoals": [],
   "completedGoals": [],
-  "confidence": 0.8
+  "confidence": 0.8${worldThreads}
 }
 \`\`\``;
     }
@@ -134,7 +135,7 @@ export class MockGeminiClient {
   ],
   "updatedGoals": [],
   "completedGoals": [],
-  "confidence": 0.75
+  "confidence": 0.75${worldThreads}
 }
 \`\`\``;
     }
@@ -192,7 +193,7 @@ export class MockGeminiClient {
   ],
   "updatedGoals": [],
   "completedGoals": [],
-  "confidence": 0.9
+  "confidence": 0.9${worldThreads}
 }
 \`\`\``;
     }
@@ -235,7 +236,7 @@ export class MockGeminiClient {
   ],
   "updatedGoals": [],
   "completedGoals": [],
-  "confidence": 0.85
+  "confidence": 0.85${worldThreads}
 }
 \`\`\``;
     }
@@ -246,9 +247,28 @@ export class MockGeminiClient {
   "newGoals": [],
   "updatedGoals": [],
   "completedGoals": [],
-  "confidence": 0
+  "confidence": 0${worldThreads}
 }
 \`\`\``;
+  }
+
+  // The world clock rides along on goal extraction; when the prompt carries
+  // the ledger heading, echo a plausible block back so callers can see it
+  // round-trip. Returned as a trailing JSON member (leading comma included) so
+  // every branch above can splice it in after "confidence".
+  private buildWorldThreadsBlock(prompt: string): string {
+    if (!prompt.includes('WORLD CLOCK LEDGER')) return '';
+
+    const opened = prompt.includes('SEEDING')
+      ? '[{ "kind": "deadline", "summary": "The council vote is in six weeks", "dueByTurn": 30 }]'
+      : '[]';
+    const threadIdMatch = prompt.match(/\[(thread-[\w-]+)\]/);
+    const advanced = threadIdMatch
+      ? `[{ "id": "${threadIdMatch[1]}", "note": "The pressure tightened while the player was elsewhere" }]`
+      : '[]';
+
+    return `,
+  "worldThreads": { "opened": ${opened}, "advanced": ${advanced}, "resolved": [] }`;
   }
 
   private handleGoalCompletion(prompt: string): string {

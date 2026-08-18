@@ -53,6 +53,14 @@ describe('featureFlags', () => {
     expect(isFeatureEnabled('PROGRESSIVE_DISCLOSURE')).toBe(true);
   });
 
+  it('defaults WORLD_CLOCK on and turns it off only for the exact string "false"', () => {
+    expect(load({ NEXT_PUBLIC_FEATURE_WORLD_CLOCK: undefined }).isFeatureEnabled('WORLD_CLOCK')).toBe(true);
+    jest.resetModules();
+    expect(load({ NEXT_PUBLIC_FEATURE_WORLD_CLOCK: 'false' }).isFeatureEnabled('WORLD_CLOCK')).toBe(false);
+    jest.resetModules();
+    expect(load({ NEXT_PUBLIC_FEATURE_WORLD_CLOCK: 'FALSE' }).isFeatureEnabled('WORLD_CLOCK')).toBe(true);
+  });
+
   it('supports downstream gating decisions for BUFFERED_STREAMING', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'false',

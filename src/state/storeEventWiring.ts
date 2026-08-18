@@ -20,6 +20,7 @@ import './inventoryStore';
 // deleted from a page that never renders NPCs, goals, or lore.
 import './npcStore';
 import './goalStore';
+import './worldThreadStore';
 import './loreStore';
 import {
   storeEvents,

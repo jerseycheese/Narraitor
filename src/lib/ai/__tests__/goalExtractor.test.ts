@@ -11,6 +11,25 @@ jest.mock('../geminiClient', () => ({
   })),
 }));
 
+// The extractor caches its client, so wrap the factory once to record every
+// prompt it sends; the recorded prompts prove what rode along.
+const mockSentPrompts: string[] = [];
+jest.mock('../defaultGeminiClient', () => {
+  const actual = jest.requireActual('../defaultGeminiClient');
+  return {
+    ...actual,
+    createDefaultGeminiClient: (...args: unknown[]) => {
+      const client = actual.createDefaultGeminiClient(...args);
+      const generateContent = client.generateContent.bind(client);
+      client.generateContent = (prompt: string) => {
+        mockSentPrompts.push(prompt);
+        return generateContent(prompt);
+      };
+      return client;
+    },
+  };
+});
+
 describe('goalExtractor', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -165,6 +184,66 @@ describe('goalExtractor', () => {
       expect(urgentGoal?.priority).toBe('critical');
       expect(urgentGoal?.type).toBe('survival');
       expect(routineGoal?.priority).toBe('low');
+    });
+  });
+
+  describe('world clock pass-through', () => {
+    beforeEach(() => {
+      mockSentPrompts.length = 0;
+    });
+
+    test('carries the ledger section out and the worldThreads block back', async () => {
+      const request: GoalExtractionRequest = {
+        content: 'You continue your quest',
+        sessionId: 'session-123',
+        segmentId: 'segment-456',
+        existingGoals: [],
+        worldThreads: {
+          currentTurn: 3,
+          openThreads: [
+            {
+              id: 'thread-abc',
+              sessionId: 'session-123',
+              worldId: 'world-101',
+              kind: 'actor',
+              summary: 'The magistrate is riding for the capital',
+              openedAtTurn: 1,
+              lastAdvancedAtTurn: 1,
+              status: 'open',
+              notes: [],
+              createdAt: getTimestamp(),
+              updatedAt: getTimestamp(),
+            },
+          ],
+        },
+      };
+
+      const result = await extractGoalsFromNarrative(request);
+
+      expect(mockSentPrompts).toHaveLength(1);
+      expect(mockSentPrompts[0]).toContain('WORLD CLOCK LEDGER');
+      expect(mockSentPrompts[0]).toContain('[thread-abc]');
+      expect(result.worldThreads).toEqual({
+        opened: [],
+        advanced: [{ id: 'thread-abc', note: expect.any(String) }],
+        resolved: [],
+      });
+    });
+
+    test('leaves the prompt and result untouched when no ledger is passed', async () => {
+      const request: GoalExtractionRequest = {
+        content: 'You continue your quest',
+        sessionId: 'session-123',
+        segmentId: 'segment-456',
+        existingGoals: [],
+      };
+
+      const result = await extractGoalsFromNarrative(request);
+
+      expect(mockSentPrompts).toHaveLength(1);
+      expect(mockSentPrompts[0]).not.toContain('WORLD CLOCK LEDGER');
+      expect(mockSentPrompts[0]).not.toContain('worldThreads');
+      expect(result.worldThreads).toBeUndefined();
     });
   });
 

@@ -4,9 +4,9 @@ import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { applyWorldStateThreadUpdates } from '../lib/narrative/applyWorldStateThreadUpdates';
+import { applyWorldClockUpdates } from '../lib/narrative/applyWorldClockUpdates';
 import { formatDecisionText } from '../lib/narrative/formatDecisionText';
 import { useSessionStore } from './sessionStore';
-import { useGoalStore } from './goalStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
@@ -158,19 +158,27 @@ export const createNarrativeSegmentActions = (
       logger.error('[NarrativeStore]', 'Failed to update session narrative count:', error);
     }
 
-    // Process the segment for goal extraction asynchronously.
-    // Passing segment + sessionId in avoids the goalStore needing to read
-    // back from narrativeStore (which previously required a dynamic import
-    // to dodge a circular dependency).
+    // One post-segment extraction call covers goals and the world clock's
+    // ledger. Fire-and-forget: nothing in this turn's UI waits on it. The
+    // ledger note is stamped back onto the segment once reconciled so the
+    // per-turn record survives reloads and the playtest harness can read it.
+    const currentTurn = (get().sessionSegments[sessionId] || []).length;
     void Promise.resolve().then(async () => {
       try {
-        await useGoalStore.getState().processSegmentForGoals(
-          newSegment,
+        const worldClock = await applyWorldClockUpdates({
+          segment: newSegment,
           sessionId,
-          segmentData.metadata?.characterIds?.[0]
-        );
+          characterId: segmentData.metadata?.characterIds?.[0],
+          currentTurn,
+        });
+        const current = get().segments[segmentId];
+        if (worldClock && current) {
+          get().updateSegment(segmentId, {
+            metadata: { ...current.metadata, worldClock },
+          });
+        }
       } catch {
-        // Silently fail goal processing — not critical for narrative
+        // Silently fail extraction — not critical for narrative
       }
     });
 

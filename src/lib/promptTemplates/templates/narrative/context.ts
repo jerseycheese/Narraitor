@@ -1,4 +1,5 @@
 import type { WorldAttribute } from '@/types/world.types';
+import type { WorldClockPromptContext } from '@/types/worldThread.types';
 
 /** Minimal NPC shape the narrative templates render into the roster section. */
 interface NpcRosterEntry {
@@ -25,6 +26,8 @@ interface NarrativeTemplateNarrativeContext {
     name?: string;
     description?: string;
   }>;
+  /** The world clock's open ledger for this turn — see worldClockBlock */
+  worldClock?: WorldClockPromptContext;
 }
 
 /** Subset of generation parameters the templates read. */

@@ -1,5 +1,6 @@
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
+import { worldClockBlock } from './worldClockBlock';
 import { describeNarrativeLength } from './narrativeLength';
 import type { NarrativeTemplateContext } from './context';
 import { isPacingStale } from '@/lib/narrative/turnsSinceComplication';
@@ -97,7 +98,10 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
     skillResult === 'critical-failure' ||
     skillResult === 'mixed';
   const turnsSinceComplication = narrativeContext?.turnsSinceComplication ?? 0;
-  const isStale = isPacingStale(turnsSinceComplication);
+  // The world clock carries its own pressure rule every turn, so the pacing
+  // guard only speaks when the clock is off; the two aim at the same symptom.
+  const worldClock = narrativeContext?.worldClock;
+  const isStale = !worldClock && isPacingStale(turnsSinceComplication);
 
   const formattedRoster = Array.isArray(npcRoster) && npcRoster.length > 0
     ? `
@@ -146,6 +150,7 @@ PACING GUIDANCE — RISING TENSION:
 - Do not extend the current chain with another same-shape discovery (another clue, another trace) with nothing else changing.
 - Judge the majorEvent field on its own rules below — this guidance stands down on its own and does not need one.
 ` : ''}
+${worldClockBlock(worldClock)}
 
 ${generationParameters?.decisionWeight === 'critical' && failed ? `
 FATAL/INCAPACITATING OUTCOME:

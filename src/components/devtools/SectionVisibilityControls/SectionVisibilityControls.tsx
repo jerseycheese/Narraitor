@@ -22,6 +22,7 @@ const SECTION_INFO = {
   [DevToolsSection.TOKEN_BUDGET]: 'Token Budget',
   [DevToolsSection.DECISION_CONSOLE]: 'Decision Console',
   [DevToolsSection.DECISION_FLOW]: 'Decision Creation Flow',
+  [DevToolsSection.WORLD_CLOCK]: 'World Clock',
 } as const;
 
 /**
@@ -39,6 +40,7 @@ const SECTION_TEST_IDS = {
   [DevToolsSection.TOKEN_BUDGET]: 'toggle-token-budget',
   [DevToolsSection.DECISION_CONSOLE]: 'toggle-decision-console',
   [DevToolsSection.DECISION_FLOW]: 'toggle-decision-flow',
+  [DevToolsSection.WORLD_CLOCK]: 'toggle-world-clock',
 } as const;
 
 /**

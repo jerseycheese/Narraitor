@@ -11,6 +11,7 @@ import { useNarrativeStore } from '../../state/narrativeStore';
 import { useInventoryStore } from '../../state/inventoryStore';
 import { useLoreStore } from '../../state/loreStore';
 import { useGoalStore } from '../../state/goalStore';
+import { useWorldThreadStore } from '../../state/worldThreadStore';
 import { useNPCStore } from '../../state/npcStore';
 import { validateWorld } from '@/lib/utils/typeGuards';
 import { getTimestamp } from '../utils';
@@ -29,6 +30,7 @@ interface GameStateExport {
   inventoryState?: unknown;
   loreState?: unknown;
   goalState?: unknown;
+  worldThreadState?: unknown;
   npcState?: unknown;
 }
 
@@ -67,6 +69,7 @@ export async function exportGameState(): Promise<ExportResult> {
       },
       loreState: useLoreStore.getState(),
       goalState: useGoalStore.getState(),
+      worldThreadState: useWorldThreadStore.getState(),
       npcState: useNPCStore.getState(),
     };
 
@@ -179,6 +182,10 @@ async function importGameState(gameState: unknown): Promise<ImportResult> {
 
     if (validatedGameState.goalState) {
       useGoalStore.setState(validatedGameState.goalState);
+    }
+
+    if (validatedGameState.worldThreadState) {
+      useWorldThreadStore.setState(validatedGameState.worldThreadState);
     }
 
     if (validatedGameState.npcState) {

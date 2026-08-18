@@ -9,6 +9,7 @@ import {
   GoalExtractionResult,
 } from '../types/goal.types';
 import type { NarrativeSegment } from '../types/narrative.types';
+import type { WorldThreadExtractionInput, WorldThreadExtractionResult } from '../types/worldThread.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
@@ -20,6 +21,8 @@ interface ProcessSegmentResult {
   newGoalsCreated: number;
   goalsUpdated: number;
   goalsCompleted: number;
+  /** The world clock's ledger changes, when the caller passed ledger context in. */
+  worldThreads?: WorldThreadExtractionResult;
   error?: UserFriendlyError;
 }
 
@@ -42,7 +45,12 @@ export interface GoalStore extends CrudStore<NarrativeGoal> {
   addProgressNote: (goalId: EntityID, note: string) => void;
   clearSessionGoals: (sessionId: EntityID) => void;
   clearWorldGoals: (worldId: EntityID) => void;
-  processSegmentForGoals: (segment: NarrativeSegment, sessionId: EntityID, characterId?: EntityID) => Promise<ProcessSegmentResult>;
+  processSegmentForGoals: (
+    segment: NarrativeSegment,
+    sessionId: EntityID,
+    characterId?: EntityID,
+    worldThreads?: WorldThreadExtractionInput
+  ) => Promise<ProcessSegmentResult>;
 }
 
 const getInitialState = () => ({
@@ -292,7 +300,7 @@ export const useGoalStore = create<GoalStore>()(
           .forEach((goal) => get().delete(goal.id));
       },
 
-      processSegmentForGoals: async (segment, sessionId, characterId) => {
+      processSegmentForGoals: async (segment, sessionId, characterId, worldThreads) => {
         set({ loading: true, error: null });
         try {
           if (!segment) {
@@ -317,6 +325,7 @@ export const useGoalStore = create<GoalStore>()(
             characterId,
             worldId: segment.worldId,
             existingGoals,
+            worldThreads,
           };
 
           const extractionResult: GoalExtractionResult =
@@ -349,7 +358,7 @@ export const useGoalStore = create<GoalStore>()(
             }
           });
 
-          return { newGoalsCreated, goalsUpdated, goalsCompleted };
+          return { newGoalsCreated, goalsUpdated, goalsCompleted, worldThreads: extractionResult.worldThreads };
         } catch (error) {
           const friendlyError = createStoreError(
             'Goal Processing Failed',
