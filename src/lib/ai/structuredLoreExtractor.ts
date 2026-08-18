@@ -5,6 +5,7 @@
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { extractFencedJson } from './parseJSON';
+import { normalizeText, NORM_NAME } from '@/lib/utils/textNormalization';
 import type {
   LoreContinuityAnnotation,
   LoreContinuityKind,
@@ -24,6 +25,11 @@ export interface ExtractStructuredLoreOptions {
    * the answers.
    */
   continuityTopics?: string[];
+  /**
+   * The player character's name. Reserved: the character store already owns the
+   * player, so nothing extracted under that name can be new information.
+   */
+  playerCharacterName?: string;
 }
 
 /**
@@ -39,7 +45,8 @@ export async function extractStructuredLore(
     const prompt = buildLoreExtractionPrompt(
       narrativeText,
       existingLoreContext,
-      options?.continuityTopics
+      options?.continuityTopics,
+      options?.playerCharacterName
     );
     const response = await geminiClient.generateContent(prompt);
     
@@ -58,7 +65,10 @@ export async function extractStructuredLore(
     }
 
     const extractedLore = JSON.parse(jsonStr) as StructuredLoreExtraction;
-    return validateAndCleanExtraction(extractedLore);
+    return reservePlayerCharacterName(
+      validateAndCleanExtraction(extractedLore),
+      options?.playerCharacterName
+    );
 
   } catch (error) {
     logger.warn('Failed to extract structured lore:', error);
@@ -72,9 +82,13 @@ export async function extractStructuredLore(
 function buildLoreExtractionPrompt(
   narrativeText: string,
   existingLoreContext?: string,
-  continuityTopics?: string[]
+  continuityTopics?: string[],
+  playerCharacterName?: string
 ): string {
   const existingContext = existingLoreContext ? `\n\nExisting Lore Context:\n${existingLoreContext}` : '';
+  const playerNameRule = playerCharacterName
+    ? `\n- "${playerCharacterName}" is the PLAYER CHARACTER, not an NPC. Never create a character entry for them. If the text names a separate person who happens to share that name, that is a mistake in the prose — do not record them as a character.`
+    : '';
   const topicHint =
     continuityTopics && continuityTopics.length > 0
       ? `\n- Continuity topics already in use (reuse the exact label when an event is about the same question, promise, or object): ${continuityTopics.join('; ')}`
@@ -107,7 +121,7 @@ CRITICAL QUALITY RULES:
 - Characters must be specific named individuals. Do NOT create character entries for unnamed or generic groups (e.g. "a guard", "unnamed warrior", "the villagers").
 - If a person is unnamed, keep it as part of an event description instead of a character entity.
 - Prefer stable locations ("Vaes Leisi", "Vaes Leisi marketplace") over micro-locations ("marketplace edge", "near a stall"). If you mention a micro-location, include it as an alias in the location entry.
-- Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.
+- Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.${playerNameRule}
 
 CONTINUITY TAGGING (within the 3-event limit, prefer events that carry one of these):
 - Add "continuity" to an event when it is one of:
@@ -265,6 +279,45 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
   }
 
   return cleaned;
+}
+
+const canonicalizeName = (name: string): string =>
+  normalizeText(name, NORM_NAME).trim().toLowerCase();
+
+/**
+ * Reserves the player character's name against the extracted lore.
+ *
+ * The character store already owns the player, so a lore character entry under
+ * their name is never new information — it is either a duplicate of the sheet
+ * or a third party the model minted wearing the player's name, which then reads
+ * back as world fact in later prompts. An entry that only claims the name as an
+ * alias goes too — entity resolution would otherwise merge it into the player.
+ *
+ * Events are left alone on purpose. Most events naming the player record real
+ * on-screen player actions, and no cheap signal separates those from an
+ * invented off-screen attribution, so filtering them would cost far more true
+ * facts than it saved false ones.
+ */
+function reservePlayerCharacterName(
+  extraction: StructuredLoreExtraction,
+  playerCharacterName?: string
+): StructuredLoreExtraction {
+  const reserved = playerCharacterName ? canonicalizeName(playerCharacterName) : '';
+  if (!reserved) return extraction;
+
+  const characters = extraction.characters.filter((character) => {
+    const claimsPlayerName =
+      canonicalizeName(character.name) === reserved ||
+      (character.aliases ?? []).some((alias) => canonicalizeName(alias) === reserved);
+    if (claimsPlayerName) {
+      logger.debug('Dropped extracted character claiming the player name', {
+        name: character.name,
+      });
+    }
+    return !claimsPlayerName;
+  });
+
+  return { ...extraction, characters };
 }
 
 const trimmedString = (value: unknown): string | undefined =>
