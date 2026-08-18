@@ -3,9 +3,10 @@
  *
  * Pure contradiction detection for generated narrative. Builds a compact
  * "continuity contract" from established state (lore facts, NPC relationships,
- * recent decisions) and checks new prose against it deterministically, so the
- * fast path adds microseconds — an AI correction call only happens when an
- * issue is detected (per #441's sub-200ms generation-impact constraint).
+ * recent decisions, and the ledger builders in `continuityLedger.ts`) and
+ * checks new prose against it deterministically, so the fast path adds
+ * microseconds — an AI correction call only happens when an issue is detected
+ * (per #441's sub-200ms generation-impact constraint).
  *
  * Like `loreContext.ts`, this module takes data as parameters and imports no
  * stores; store reads live in `lib/ai/narrativeGenerator.continuity.ts`.
@@ -15,16 +16,23 @@ import type { LoreFact } from '../../types/lore.types';
 import type { NPCRelationshipState } from '../../types/world-state.types';
 import type { EntityID } from '../../types/common.types';
 import type {
-  ContinuityAssertion,
   ContinuityCanonFact,
   ContinuityCommitment,
   ContinuityContract,
   ContinuityIssue,
   ContinuityNpcExpectation,
   ContinuityRecentDecision,
-  ContinuitySceneChange,
   ContinuityTone,
 } from '../../types/continuity.types';
+import {
+  MIN_TERM_LENGTH,
+  buildAssertions,
+  buildCommitments,
+  buildSceneChanges,
+  escapeRegExp,
+  ledgerFacts,
+  topicTerms,
+} from './continuityLedger';
 
 /** Routes correction responses in tests and marks the call in debug output. */
 export const CONTINUITY_CORRECTION_HEADER = 'CONTINUITY CORRECTION';
@@ -32,16 +40,7 @@ export const CONTINUITY_CORRECTION_HEADER = 'CONTINUITY CORRECTION';
 const MAX_NPC_EXPECTATIONS = 8;
 const MAX_CANON_FACTS = 10;
 const MAX_RECENT_DECISIONS = 3;
-// Ledger caps bound prompt growth: the block was measured at 3 lines before the
-// ledger existed and the whole prompt already runs 20-34k chars over a session.
-const MAX_ASSERTIONS = 10;
-const MAX_COMMITMENTS = 6;
-const MAX_SCENE_CHANGES = 4;
 const MAX_EXCERPT_LENGTH = 240;
-const MIN_TERM_LENGTH = 3;
-const MIN_TOPIC_TERM_LENGTH = 4;
-const MAX_TOPIC_TERMS = 3;
-const NARRATION_SPEAKER = 'narration';
 
 // Lexicons are deliberately conservative: every false positive costs an AI
 // correction call, so prefer missing a soft contradiction over flagging
@@ -61,10 +60,6 @@ const PROMISE_LEXICON =
   /\b(promis(?:e|es|ing)|vow(?:s|ing)?|swear(?:s)?|pledg(?:e|es|ing)|assur(?:e|es|ing) you|guarantee(?:s|ing)?|(?:I|we)(?:'ll| will| shall) (?:make sure|see to it|get you|bring you|have|provide|send|give))\b/i;
 const RECAP_GUARD =
   /\b(as (?:I |he |she |they |we )?promised|promised (?:earlier|before|you)|already|kept (?:his|her|their|my|our) (?:word|promise)|delivered|gave|handed|as agreed|in your (?:hands?|lap|possession))\b/i;
-const TOPIC_STOPWORDS = new Set([
-  'the', 'this', 'that', 'with', 'from', 'about', 'their', 'there', 'what', 'when',
-  'will', 'would', 'have', 'been', 'into', 'over', 'your', 'them', 'they',
-]);
 
 export interface BuildContinuityContractArgs {
   facts: LoreFact[];
@@ -97,10 +92,6 @@ function parseEntityName(value: string): string {
   return (match ? match[1] : value).trim();
 }
 
-function escapeRegExp(term: string): string {
-  return term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function dedupeTerms(terms: Array<string | undefined>): string[] {
   const seen = new Set<string>();
   const result: string[] = [];
@@ -113,125 +104,6 @@ function dedupeTerms(terms: Array<string | undefined>): string[] {
     result.push(trimmed);
   }
   return result;
-}
-
-/** Topic labels compare case- and punctuation-insensitively so "Mill debt" and "mill debt" line up. */
-function normalizeTopic(topic: string): string {
-  return topic
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-    .replace(/\s+/g, ' ')
-    .replace(/^the /, '')
-    .trim();
-}
-
-function factTime(fact: LoreFact): number {
-  const time = new Date(fact.createdAt).getTime();
-  return Number.isNaN(time) ? 0 : time;
-}
-
-/** Distinct continuity topic labels in the ledger, for the extractor's reuse hint. */
-export function collectContinuityTopics(facts: LoreFact[]): string[] {
-  const seen = new Set<string>();
-  const topics: string[] = [];
-  for (const fact of facts) {
-    const topic = fact?.metadata?.continuity?.topic?.trim();
-    if (!topic) continue;
-    const normalized = normalizeTopic(topic);
-    if (!normalized || seen.has(normalized)) continue;
-    seen.add(normalized);
-    topics.push(topic);
-  }
-  return topics;
-}
-
-function ledgerFacts(facts: LoreFact[]): LoreFact[] {
-  return facts
-    .filter((fact) => fact?.category === 'events' && fact.value && fact.metadata?.continuity?.kind)
-    .sort((a, b) => factTime(a) - factTime(b));
-}
-
-function mentionsPlayer(text: string, playerName?: string): boolean {
-  const name = playerName?.trim();
-  if (!name || name.length < MIN_TERM_LENGTH) return false;
-  return new RegExp(`\\b${escapeRegExp(name)}\\b`, 'i').test(text);
-}
-
-// The extractor tags the player's own questions as assertions spoken by "the
-// protagonist"; a question is not an answer, so player-spoken lines are dropped.
-const PLAYER_SPEAKER = /^(?:the )?(?:protagonist|player|you)$/i;
-
-function isPlayerSpeaker(speaker: string, playerName?: string): boolean {
-  return PLAYER_SPEAKER.test(speaker) || mentionsPlayer(speaker, playerName);
-}
-
-/**
- * First answer per (topic, speaker) is canon. Topics asked more than once rank
- * first because a repeated question is exactly where drift shows.
- */
-function buildAssertions(ledger: LoreFact[], playerName?: string): ContinuityAssertion[] {
-  const mentionsByTopic = new Map<string, number>();
-  const firstByKey = new Map<string, ContinuityAssertion>();
-
-  for (const fact of ledger) {
-    const annotation = fact.metadata!.continuity!;
-    if (annotation.kind !== 'assertion') continue;
-    const topic = annotation.topic?.trim() || fact.value.trim();
-    const topicKey = normalizeTopic(topic);
-    if (!topicKey) continue;
-    mentionsByTopic.set(topicKey, (mentionsByTopic.get(topicKey) ?? 0) + 1);
-    if (mentionsPlayer(`${topic} ${fact.value}`, playerName)) continue;
-
-    const speaker = annotation.speaker?.trim() || NARRATION_SPEAKER;
-    if (isPlayerSpeaker(speaker, playerName)) continue;
-    const key = `${topicKey}|${speaker.toLowerCase()}`;
-    if (firstByKey.has(key)) continue;
-    firstByKey.set(key, { topic, speaker, claim: fact.value.trim(), mentions: 0 });
-  }
-
-  return Array.from(firstByKey.values())
-    .map((assertion) => ({
-      ...assertion,
-      mentions: mentionsByTopic.get(normalizeTopic(assertion.topic)) ?? 1,
-    }))
-    .sort((a, b) => b.mentions - a.mentions)
-    .slice(0, MAX_ASSERTIONS);
-}
-
-/** Delivered beats promised on the same topic; the delivering fact is the statement kept. */
-function buildCommitments(ledger: LoreFact[]): ContinuityCommitment[] {
-  const byTopic = new Map<string, ContinuityCommitment>();
-  for (const fact of ledger) {
-    const annotation = fact.metadata!.continuity!;
-    if (annotation.kind !== 'commitment') continue;
-    const topic = annotation.topic?.trim() || fact.value.trim();
-    const topicKey = normalizeTopic(topic);
-    if (!topicKey) continue;
-    const status = annotation.status ?? 'promised';
-    const existing = byTopic.get(topicKey);
-    if (existing && existing.status === 'delivered') continue;
-    if (existing && status === 'promised') continue;
-    byTopic.set(topicKey, {
-      topic,
-      by: annotation.speaker?.trim() || existing?.by || NARRATION_SPEAKER,
-      statement: fact.value.trim(),
-      status,
-    });
-  }
-  return Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
-}
-
-/** One line per changed object: later turns retell the same change in new words. */
-function buildSceneChanges(ledger: LoreFact[]): ContinuitySceneChange[] {
-  const firstByTopic = new Map<string, ContinuitySceneChange>();
-  for (const fact of ledger) {
-    const annotation = fact.metadata!.continuity!;
-    if (annotation.kind !== 'scene-change') continue;
-    const topicKey = normalizeTopic(annotation.topic?.trim() || fact.value);
-    if (!topicKey || firstByTopic.has(topicKey)) continue;
-    firstByTopic.set(topicKey, { statement: fact.value.trim() });
-  }
-  return Array.from(firstByTopic.values()).slice(-MAX_SCENE_CHANGES);
 }
 
 export function buildContinuityContract(
@@ -311,14 +183,6 @@ export function isContinuityContractEmpty(contract: ContinuityContract): boolean
     contract.commitments.length === 0 &&
     contract.sceneChanges.length === 0
   );
-}
-
-/** Significant words of a topic label; all must appear in a sentence for a stale-promise hit. */
-function topicTerms(topic: string): string[] {
-  return normalizeTopic(topic)
-    .split(' ')
-    .filter((term) => term.length >= MIN_TOPIC_TERM_LENGTH && !TOPIC_STOPWORDS.has(term))
-    .slice(0, MAX_TOPIC_TERMS);
 }
 
 function findOffendingSentence(

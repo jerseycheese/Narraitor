@@ -6,11 +6,11 @@
 import {
   buildContinuityContract,
   buildContinuityCorrectionPrompt,
-  collectContinuityTopics,
   detectContinuityIssues,
   formatContinuityExpectations,
   CONTINUITY_CORRECTION_HEADER,
 } from '../continuityGuardrail';
+import { collectContinuityTopics } from '../continuityLedger';
 import type { LoreFact } from '@/types/lore.types';
 import type { ContinuityContract } from '@/types/continuity.types';
 import type { NPCRelationshipState } from '@/types/world-state.types';

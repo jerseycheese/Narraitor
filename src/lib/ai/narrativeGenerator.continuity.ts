@@ -2,7 +2,8 @@
  * Continuity guardrail wiring for narrative generation (#409/#412).
  *
  * Owns the store reads and the single corrective AI call so the pure
- * detection logic in `lib/lore/continuityGuardrail.ts` stays store-free.
+ * detection logic in `lib/lore/continuityGuardrail.ts` and the ledger
+ * builders in `lib/lore/continuityLedger.ts` stay store-free.
  * Everything here is fail-open: any error leaves the generated segment
  * untouched — continuity checking must never block the player.
  */
@@ -29,11 +30,11 @@ import type {
 import {
   buildContinuityContract,
   buildContinuityCorrectionPrompt,
-  collectContinuityTopics,
   detectContinuityIssues,
   formatContinuityExpectations,
   isContinuityContractEmpty,
 } from '@/lib/lore/continuityGuardrail';
+import { collectContinuityTopics } from '@/lib/lore/continuityLedger';
 
 const CORRECTION_TIMEOUT_MS = 8000;
 
