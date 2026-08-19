@@ -165,10 +165,13 @@ export const createNarrativeSegmentActions = (
     const currentTurn = (get().sessionSegments[sessionId] || []).length;
     void Promise.resolve().then(async () => {
       try {
+        // characterIds lists the NPCs in the scene; the player is the session's character.
+        const session = useSessionStore.getState();
         const notes = await applyWorldClockUpdates({
           segment: newSegment,
           sessionId,
           characterId: segmentData.metadata?.characterIds?.[0],
+          playerCharacterId: session.id === sessionId ? session.characterId ?? undefined : undefined,
           currentTurn,
         });
         const current = get().segments[segmentId];

@@ -20,7 +20,10 @@ import { useWorldThreadStore } from '@/state/worldThreadStore';
 export interface ApplyWorldClockUpdatesParams {
   segment: NarrativeSegment;
   sessionId: EntityID;
+  /** What the goal path has always been handed: the first id in the segment's `characterIds` (an NPC in the scene), kept as is. */
   characterId?: EntityID;
+  /** The session's player character; the cost channel reads and writes this one, never a scene NPC. */
+  playerCharacterId?: EntityID;
   /** 1-based index of this segment in the session, read after it was added. */
   currentTurn: number;
 }
@@ -72,6 +75,7 @@ async function reconcileSegment({
   segment,
   sessionId,
   characterId,
+  playerCharacterId,
   currentTurn,
 }: ApplyWorldClockUpdatesParams): Promise<ReconciledSegmentNotes | undefined> {
   const goalStore = useGoalStore.getState();
@@ -85,7 +89,7 @@ async function reconcileSegment({
 
   const worldId = segment.worldId ?? useSessionStore.getState().worldId ?? undefined;
   const worldThreads = clockOn ? buildThreadInput(sessionId, worldId, currentTurn, segment) : undefined;
-  const worldCost = costOn && characterId ? buildCostInput(characterId, segment) : undefined;
+  const worldCost = costOn && playerCharacterId ? buildCostInput(playerCharacterId, segment) : undefined;
 
   try {
     const result = await goalStore.processSegmentForGoals(segment, sessionId, characterId, worldThreads, worldCost);
@@ -102,8 +106,8 @@ async function reconcileSegment({
       notes.worldClock = summarizeLedgerForSegment(sessionThreads, currentTurn, applied);
     }
 
-    if (result.worldCost && characterId) {
-      notes.worldCost = applyWorldCost({ sessionId, characterId, result: result.worldCost });
+    if (result.worldCost && playerCharacterId) {
+      notes.worldCost = applyWorldCost({ sessionId, characterId: playerCharacterId, result: result.worldCost });
     }
 
     return notes.worldClock || notes.worldCost ? notes : undefined;

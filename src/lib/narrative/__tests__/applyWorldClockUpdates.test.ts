@@ -194,7 +194,7 @@ describe('applyWorldClockUpdates', () => {
         metadata: { tags: [], itemsLost: [{ name: 'rusty shovel', lossReason: 'stolen' }] },
       });
 
-      const note = await applyWorldClockUpdates({ segment: lostShovel, sessionId: 'session-1', characterId: 'char-1', currentTurn: 4 });
+      const note = await applyWorldClockUpdates({ segment: lostShovel, sessionId: 'session-1', playerCharacterId: 'char-1', currentTurn: 4 });
 
       expect(processSpy.mock.calls[0][4]).toEqual({ conditions: ['shaken'], itemsLost: ['rusty shovel'] });
       expect(note?.worldCost).toEqual({
@@ -202,6 +202,30 @@ describe('applyWorldClockUpdates', () => {
         cleared: ['shaken'],
       });
       expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['gashed left forearm']);
+    });
+
+    it('keys the cost channel on the player character, not on the first NPC the scene listed', async () => {
+      mockIsFeatureEnabled.mockReturnValue(true);
+      processSpy.mockResolvedValue({
+        newGoalsCreated: 0,
+        goalsUpdated: 0,
+        goalsCompleted: 0,
+        worldThreads: { opened: [], advanced: [], resolved: [] },
+        worldCost: { imposed: [{ kind: 'condition', detail: 'discredited before the room' }], cleared: [] },
+      });
+
+      // The store hands the goal path metadata.characterIds[0], an NPC id that is not in the character store.
+      const note = await applyWorldClockUpdates({
+        segment: segment(worldId),
+        sessionId: 'session-1',
+        characterId: 'npc-henderson',
+        playerCharacterId: 'char-1',
+        currentTurn: 4,
+      });
+
+      expect(processSpy.mock.calls[0][4]).toEqual({ conditions: ['shaken'], itemsLost: [] });
+      expect(note?.worldCost?.imposed).toEqual([{ kind: 'condition', detail: 'discredited before the room' }]);
+      expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken', 'discredited before the room']);
     });
 
     it('with the flag off, the extractor gets no cost input and nothing is stamped or written', async () => {
@@ -213,7 +237,7 @@ describe('applyWorldClockUpdates', () => {
         worldThreads: { opened: [], advanced: [], resolved: [] },
       });
 
-      const note = await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', characterId: 'char-1', currentTurn: 4 });
+      const note = await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', playerCharacterId: 'char-1', currentTurn: 4 });
 
       expect(processSpy.mock.calls[0][4]).toBeUndefined();
       expect(note?.worldCost).toBeUndefined();
@@ -229,7 +253,7 @@ describe('applyWorldClockUpdates', () => {
         worldCost: { imposed: [{ kind: 'condition', detail: 'hoarse' }], cleared: [] },
       });
 
-      const note = await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', characterId: 'char-1', currentTurn: 4 });
+      const note = await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', playerCharacterId: 'char-1', currentTurn: 4 });
 
       expect(processSpy.mock.calls[0][3]).toBeUndefined();
       expect(processSpy.mock.calls[0][4]).toEqual({ conditions: ['shaken'], itemsLost: [] });
