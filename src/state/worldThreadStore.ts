@@ -10,7 +10,11 @@ import {
 } from '../types/worldThread.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
-import { MIN_DUE_HORIZON_TURNS, selectDueNowThread } from '@/lib/narrative/worldClock';
+import {
+  FIRED_THREAD_FUSE_TURNS,
+  MIN_DUE_HORIZON_TURNS,
+  selectDueNowThread,
+} from '@/lib/narrative/worldClock';
 import { createIndexedDBStorage } from './persistence';
 import {
   storeEvents,
@@ -241,19 +245,30 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
         // again.
         const dueNowId = selectDueNowThread(get().getOpenThreadsBySession(sessionId), currentTurn)?.id;
 
+        // Firing lights the fuse: the landed thread now owes its strike, cost
+        // or outcome a few turns out, whatever due the arrival carried. An
+        // already-fired thread that strikes while it is the pick is re-fused,
+        // so the pressure returns instead of sitting on it every turn.
+        const fuse = { dueByTurn: currentTurn + FIRED_THREAD_FUSE_TURNS };
+
         for (const entry of result.opened) {
           // An arrival that is an open thread landing refines that thread
           // instead of opening it again under a new name: the specific event
-          // replaces the vague one, and a fresh due clears its DUE NOW pick.
+          // replaces the vague one, and the fuse replaces its due.
           const covered = entry.covers ? openThreadOf(entry.covers) : undefined;
           if (covered) {
+            const firing = covered.firedAtTurn === undefined;
             get().update(covered.id, {
               kind: entry.kind,
               summary: entry.summary,
               lastAdvancedAtTurn: currentTurn,
               firedAtTurn: covered.firedAtTurn ?? currentTurn,
               notes: [...covered.notes, `${entry.summary} (was: ${covered.summary})`],
-              ...(entry.dueByTurn !== undefined ? { dueByTurn: floorDue(entry.dueByTurn) } : {}),
+              ...(firing
+                ? fuse
+                : entry.dueByTurn !== undefined
+                  ? { dueByTurn: floorDue(entry.dueByTurn) }
+                  : {}),
             });
             applied.advanced.push(covered.summary);
             continue;
@@ -279,10 +294,12 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
         for (const entry of result.advanced) {
           const thread = openThreadOf(entry.id);
           if (!thread) continue;
+          const isPick = thread.id === dueNowId;
           get().update(thread.id, {
             lastAdvancedAtTurn: currentTurn,
             notes: [...thread.notes, entry.changed],
-            ...(thread.id === dueNowId && thread.firedAtTurn === undefined ? { firedAtTurn: currentTurn } : {}),
+            ...(isPick && thread.firedAtTurn === undefined ? { firedAtTurn: currentTurn, ...fuse } : {}),
+            ...(isPick && thread.firedAtTurn !== undefined ? fuse : {}),
           });
           applied.advanced.push(thread.summary);
         }

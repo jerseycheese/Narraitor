@@ -1,7 +1,7 @@
 // src/state/__tests__/worldThreadStore.test.ts
 
 import { useWorldThreadStore } from '../worldThreadStore';
-import { MIN_DUE_HORIZON_TURNS } from '@/lib/narrative/worldClock';
+import { FIRED_THREAD_FUSE_TURNS, MIN_DUE_HORIZON_TURNS } from '@/lib/narrative/worldClock';
 import { storeEvents, StoreEventTypes, type SessionFreshStartEvent } from '@/lib/state/storePubSub';
 import type { WorldThreadExtractionResult } from '../../types/worldThread.types';
 
@@ -186,11 +186,11 @@ describe('worldThreadStore', () => {
       expect(state.threads[foreignId]).toMatchObject({ status: 'open', summary: 'The king is dying', notes: [] });
     });
 
-    test('a covered entry re-files the due only when it gives one, floored at the horizon', () => {
+    test('a covered entry on an already-fired thread re-files the due only when it gives one, floored at the horizon', () => {
       const lateId = openThread('session-a', 'The collector is coming');
-      useWorldThreadStore.getState().update(lateId, { dueByTurn: 3 });
+      useWorldThreadStore.getState().update(lateId, { dueByTurn: 3, firedAtTurn: 5 });
       const otherId = openThread('session-a', 'The storm is out at sea');
-      useWorldThreadStore.getState().update(otherId, { dueByTurn: 4 });
+      useWorldThreadStore.getState().update(otherId, { dueByTurn: 4, firedAtTurn: 6 });
 
       useWorldThreadStore.getState().applyExtraction(
         'session-a',
@@ -236,11 +236,40 @@ describe('worldThreadStore', () => {
       expect(state.threads[dueNowId].firedAtTurn).toBe(9);
       expect(state.threads[coveredId].firedAtTurn).toBe(9);
       expect(state.threads[quietId].firedAtTurn).toBeUndefined();
+      // Firing lights the fuse: the strike, cost or outcome is owed three turns out, whatever due the entry carried.
+      expect(state.threads[dueNowId].dueByTurn).toBe(9 + FIRED_THREAD_FUSE_TURNS);
+      expect(state.threads[coveredId].dueByTurn).toBe(9 + FIRED_THREAD_FUSE_TURNS);
+      expect(state.threads[quietId].dueByTurn).toBe(5);
     });
 
-    test('a fired thread is not the DUE NOW pick again, so a later advance on it does not re-fire it', () => {
+    test('an advance on a fired thread that is the DUE NOW pick re-fuses it; one off the pick leaves the fuse alone', () => {
+      const atFuseId = openThread('session-a', 'The creature is inside the shed');
+      useWorldThreadStore.getState().update(atFuseId, { dueByTurn: 10, firedAtTurn: 7 });
+      const restingId = openThread('session-a', 'Henderson is in the room');
+      useWorldThreadStore.getState().update(restingId, { dueByTurn: 12, firedAtTurn: 9 });
+
+      useWorldThreadStore.getState().applyExtraction(
+        'session-a',
+        'world-1',
+        {
+          opened: [],
+          advanced: [
+            { id: atFuseId, changed: 'It raked the player across the forearm' },
+            { id: restingId, changed: 'Henderson named the sum' },
+          ],
+          resolved: [],
+        },
+        10
+      );
+
+      const state = useWorldThreadStore.getState();
+      expect(state.threads[atFuseId]).toMatchObject({ firedAtTurn: 7, dueByTurn: 10 + FIRED_THREAD_FUSE_TURNS });
+      expect(state.threads[restingId]).toMatchObject({ firedAtTurn: 9, dueByTurn: 12 });
+    });
+
+    test('a fired thread short of its fuse is not the DUE NOW pick, so an advance on it does not re-fire it', () => {
       const firedId = openThread('session-a', 'The collector comes to the door');
-      useWorldThreadStore.getState().update(firedId, { dueByTurn: 3, firedAtTurn: 7 });
+      useWorldThreadStore.getState().update(firedId, { dueByTurn: 11, firedAtTurn: 8 });
       const nextId = openThread('session-a', 'The storm makes landfall');
       useWorldThreadStore.getState().update(nextId, { dueByTurn: 5 });
 
@@ -259,7 +288,7 @@ describe('worldThreadStore', () => {
       );
 
       const state = useWorldThreadStore.getState();
-      expect(state.threads[firedId].firedAtTurn).toBe(7);
+      expect(state.threads[firedId]).toMatchObject({ firedAtTurn: 8, dueByTurn: 11 });
       expect(state.threads[nextId].firedAtTurn).toBe(10);
     });
 

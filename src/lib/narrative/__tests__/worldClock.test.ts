@@ -87,11 +87,23 @@ describe('worldClock', () => {
     expect(selectDueNowThread([noDue], 40)).toBeUndefined();
   });
 
-  test('selectDueNowThread never picks a fired thread, however overdue', () => {
-    const fired = makeThread({ id: 'fired', openedAtTurn: 1, dueByTurn: 3, firedAtTurn: 8 });
-    const later = makeThread({ id: 'later', openedAtTurn: 4, dueByTurn: 9 });
-    expect(selectDueNowThread([fired, later], 12)?.id).toBe('later');
-    expect(selectDueNowThread([fired], 40)).toBeUndefined();
+  test('selectDueNowThread leaves a fired thread alone until its fuse, then picks it with no grace, ahead of an unfired overdue one', () => {
+    // Fired at 8, fused to due 11: turns 9 and 10 are the thread's own; at 11 it is the pick.
+    const fired = makeThread({ id: 'fired', openedAtTurn: 1, dueByTurn: 11, firedAtTurn: 8 });
+    const later = makeThread({ id: 'later', openedAtTurn: 4, dueByTurn: 5 });
+    expect(selectDueNowThread([fired], 10)).toBeUndefined();
+    expect(selectDueNowThread([fired], 11)?.id).toBe('fired');
+    expect(selectDueNowThread([fired, later], 11)?.id).toBe('fired');
+    expect(selectDueNowThread([later], 11)?.id).toBe('later');
+    expect(selectDueNowThread([fired, later], 10)?.id).toBe('later');
+  });
+
+  test('selectDueNowThread takes the most overdue fired thread first, oldest on a tie', () => {
+    const young = makeThread({ id: 'young', openedAtTurn: 5, dueByTurn: 12, firedAtTurn: 9 });
+    const old = makeThread({ id: 'old', openedAtTurn: 2, dueByTurn: 12, firedAtTurn: 9 });
+    const longest = makeThread({ id: 'longest', openedAtTurn: 6, dueByTurn: 10, firedAtTurn: 7 });
+    expect(selectDueNowThread([young, old, longest], 12)?.id).toBe('longest');
+    expect(selectDueNowThread([young, old], 12)?.id).toBe('old');
   });
 
   test('buildWorldClockPromptContext renders open threads with age, overdue arithmetic and one due-now pick', () => {
@@ -119,40 +131,43 @@ describe('worldClock', () => {
     });
   });
 
-  test('buildWorldClockPromptContext marks a fired thread with its last move and gives the pick to the next thread', () => {
+  test('buildWorldClockPromptContext marks a fired thread by its own summary, never its notes, and hands it the pick at its fuse', () => {
     const threads = [
       makeThread({
         summary: 'Henderson comes to collect',
         openedAtTurn: 1,
-        dueByTurn: 3,
+        dueByTurn: 15,
         firedAtTurn: 12,
         notes: ['Henderson stepped forward (was: those owed favors collect)', 'The ledger is on the table'],
       }),
       makeThread({ summary: 'The agreement is signed', openedAtTurn: 2, dueByTurn: 4 }),
     ];
 
-    expect(buildWorldClockPromptContext(threads, 14).threads).toEqual([
-      {
-        kind: 'consequence',
-        summary: 'Henderson comes to collect',
-        ageTurns: 13,
-        overdue: true,
-        overdueByTurns: 11,
-        dueNow: false,
-        fired: true,
-        firedAtTurn: 12,
-        lastMove: 'The ledger is on the table',
-      },
-      {
-        kind: 'consequence',
-        summary: 'The agreement is signed',
-        ageTurns: 12,
-        overdue: true,
-        overdueByTurns: 10,
-        dueNow: true,
-        fired: false,
-      },
-    ]);
+    const before = buildWorldClockPromptContext(threads, 14).threads;
+    expect(before[0]).toEqual({
+      kind: 'consequence',
+      summary: 'The agreement is signed',
+      ageTurns: 12,
+      overdue: true,
+      overdueByTurns: 10,
+      dueNow: true,
+      fired: false,
+    });
+    expect(before[1]).toEqual({
+      kind: 'consequence',
+      summary: 'Henderson comes to collect',
+      ageTurns: 13,
+      overdue: false,
+      overdueByTurns: 0,
+      dueNow: false,
+      fired: true,
+      firedAtTurn: 12,
+    });
+    expect(JSON.stringify(before)).not.toContain('ledger is on the table');
+
+    const atFuse = buildWorldClockPromptContext(threads, 15).threads;
+    expect(atFuse.find((thread) => thread.fired)?.dueNow).toBe(true);
+    expect(atFuse.find((thread) => !thread.fired)?.dueNow).toBe(false);
   });
 
   test('summarizeLedgerForSegment counts open and overdue and passes the applied summaries through', () => {

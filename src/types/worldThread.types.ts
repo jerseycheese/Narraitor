@@ -31,7 +31,8 @@ export interface WorldThread extends TimestampedEntity {
    * The turn its event landed (the actor walked in, the thing came through):
    * set when an arrival is reconciled onto it or when it advances while it
    * is the DUE NOW pick. A fired thread is in the scene and is never asked
-   * to arrive again; what it owes from then on is its next move or outcome.
+   * to arrive again; firing re-files its due as a short fuse, and at that
+   * due the block demands its strike, its cost or its outcome.
    */
   firedAtTurn?: number;
   status: WorldThreadStatus;
@@ -100,10 +101,9 @@ export interface WorldClockPromptContext {
     overdueByTurns: number;
     /** At most one thread per turn: the one this segment must land. */
     dueNow: boolean;
-    /** Already in the scene; rendered with its last recorded move instead of an arrival ask. */
+    /** Already in the scene; rendered by its own summary with no arrival ask, and picked at its fuse for the strike. */
     fired: boolean;
     firedAtTurn?: number;
-    lastMove?: string;
   }>;
 }
 

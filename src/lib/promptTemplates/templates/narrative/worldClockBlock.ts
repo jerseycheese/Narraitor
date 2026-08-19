@@ -12,8 +12,10 @@ const pluralTurns = (count: number): string => (count === 1 ? '1 turn' : `${coun
 
 const ledgerMark = (thread: PromptThread): string => {
   if (thread.fired) {
-    const lastMove = thread.lastMove ? `: ${thread.lastMove}` : '';
-    return ` [IN THE SCENE since turn ${thread.firedAtTurn}${lastMove}]`;
+    // The summary on the line is the thread's own; nothing model-written
+    // from a later turn is repeated here (round 9 fed a mis-parse back
+    // into the scene prompt for 22 turns through the last move).
+    return ` [IN THE SCENE since turn ${thread.firedAtTurn}${thread.dueNow ? ', DUE NOW' : ''}]`;
   }
   if (thread.dueNow) return ' [DUE NOW]';
   if (thread.overdue) return ` [overdue by ${pluralTurns(thread.overdueByTurns)} - bring it toward landing]`;
@@ -39,6 +41,17 @@ DUE NOW: ${thread.summary}. It has been overdue for ${pluralTurns(thread.overdue
 - In THIS segment it lands: the vote is held and decided, the report arrives, the actor walks in, the thing at the door comes through, the debt is collected. Show it happening and what it costs or changes; calling for it, hearing it again, or setting off toward it does not count.
 - If the scene as it stands cannot reach that moment, this segment is a "transition": let the story time pass and open at the moment it lands. For this one segment that overrides "pick up immediately"; time may jump FORWARD to reach it. Never backward.
 - It has already been announced. Do not deliver it as fresh news, do not have anyone remind the player it is coming, do not foreshadow it again. It happens, and the segment shows the consequence.`;
+
+/**
+ * The fuse. A thread that has landed and then stands in the scene doing
+ * nothing is what both round-9 judges named; once its fuse runs out the ask
+ * is the strike, the cost or the outcome, never the arrival again, and
+ * there is no forward cut because it is already here.
+ */
+const firedDueNowSection = (thread: PromptThread): string => `
+IN THE SCENE AND DUE NOW: ${thread.summary}. It has been in the scene since turn ${thread.firedAtTurn} and it has not yet acted.
+- In THIS segment it acts, on the character, now: it strikes, takes, seizes, decides, or delivers the blow it came for. Show the act and what it costs: the landing takes something recordable from the character, an item they hold (name it in itemsLost with lossReason "stolen" or "destroyed") or a wound or lasting state they now carry, stated plainly in the prose. Or the matter is settled one way or the other, and the segment shows the outcome.
+- It does not wait, threaten again, announce itself, or take one more step closer. It is already here; no time cut is needed and none is granted. A threat that has arrived and takes nothing has not acted.`;
 
 /**
  * The world's own turn. The ledger is the story's memory of what it owes the
@@ -70,7 +83,7 @@ export const worldClockBlock = (worldClock?: WorldClockPromptContext): string =>
     threads.length === 0
       ? `- The ledger is empty, so this segment MUST show the world moving on its own: ${OFFSTAGE_MOVE_ASK}`
       : dueNow
-        ? `- This segment MUST advance, bring due, or resolve at least ONE thread above, in the prose, as something the player did not do. The DUE NOW thread lands this segment (see below); the rest may move or wait.
+        ? `- This segment MUST advance, bring due, or resolve at least ONE thread above, in the prose, as something the player did not do. The DUE NOW thread ${dueNow.fired ? 'acts' : 'lands'} this segment (see below); the rest may move or wait.
 - Advance means the world moves on it: the actor arrives or acts, the deadline lands or presses, the consequence comes home. Not a reminder that it exists.`
         : allFired
           ? `- Every thread above is already in the scene, so this segment MUST move at least one of them by its next move, its cost, or its outcome, AND bring one new pressure in from off-stage: ${OFFSTAGE_MOVE_ASK}`
@@ -86,6 +99,6 @@ ${spendRule}
 - Whatever moves must be observable in the prose (someone arrives, something is lost, a position changes), not foreshadowed for later.
 - Every thread above is already known to the player: never introduce one as new (a text that already arrived, a warning already given). Move it or land it.
 - A thread marked IN THE SCENE has already arrived: never arrive it again or deliver it as news; what it owes now is its next move, its cost, or its outcome.
-- Do not invent a new threat when a thread above can carry the pressure. Do not restate the ledger to the player.${dueNow ? dueNowSection(dueNow) : ''}
+- Do not invent a new threat when a thread above can carry the pressure. Do not restate the ledger to the player.${dueNow ? (dueNow.fired ? firedDueNowSection(dueNow) : dueNowSection(dueNow)) : ''}
 `;
 };

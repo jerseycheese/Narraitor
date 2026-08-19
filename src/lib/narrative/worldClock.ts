@@ -26,6 +26,15 @@ export const DUE_NOW_OVERDUE_TURNS = 3;
  */
 export const MIN_DUE_HORIZON_TURNS = 2;
 
+/**
+ * The fuse on a landed thread. Round 9 let a thread that had arrived stand in
+ * the scene indefinitely (the creature inside the shed for eight turns, three
+ * actors in the council chamber for thirteen); the judge asked for a fuse.
+ * Firing re-files the due this many turns out, and at that due the block
+ * demands the strike, the cost or the outcome rather than the arrival.
+ */
+export const FIRED_THREAD_FUSE_TURNS = 3;
+
 export const isOverdue = (thread: WorldThread, currentTurn: number): boolean =>
   thread.status === 'open' && thread.dueByTurn !== undefined && currentTurn > thread.dueByTurn;
 
@@ -33,22 +42,31 @@ export const overdueByTurns = (thread: WorldThread, currentTurn: number): number
   isOverdue(thread, currentTurn) ? currentTurn - (thread.dueByTurn as number) : 0;
 
 /**
+ * A fired thread's due is the fuse the store set, exact rather than a model
+ * estimate, so it is eligible the turn it reaches it with no grace. An
+ * unfired thread keeps the grace period on its rough due.
+ */
+const isDueNowEligible = (thread: WorldThread, currentTurn: number): boolean =>
+  thread.firedAtTurn !== undefined
+    ? thread.dueByTurn !== undefined && currentTurn >= thread.dueByTurn
+    : overdueByTurns(thread, currentTurn) >= DUE_NOW_OVERDUE_TURNS;
+
+/**
  * At most one thread is forced to land per segment: asking the model to pay
- * off four overdue threads at once reads the same as asking for none. The
- * most overdue wins, the oldest on a tie. A fired thread has already landed
- * and is never picked again, however overdue its original due leaves it.
+ * off four overdue threads at once reads the same as asking for none. A fired
+ * thread at its fuse wins over an unfired overdue one (the thing already in
+ * the room acts before the next thing arrives); within each group the most
+ * overdue wins, the oldest on a tie.
  */
 export const selectDueNowThread = (
   openThreads: WorldThread[],
   currentTurn: number
 ): WorldThread | undefined =>
   openThreads
-    .filter(
-      (thread) =>
-        thread.firedAtTurn === undefined && overdueByTurns(thread, currentTurn) >= DUE_NOW_OVERDUE_TURNS
-    )
+    .filter((thread) => isDueNowEligible(thread, currentTurn))
     .sort(
       (a, b) =>
+        Number(b.firedAtTurn !== undefined) - Number(a.firedAtTurn !== undefined) ||
         overdueByTurns(b, currentTurn) - overdueByTurns(a, currentTurn) ||
         a.openedAtTurn - b.openedAtTurn
     )[0];
@@ -98,9 +116,7 @@ export const buildWorldClockPromptContext = (
       overdueByTurns: overdueByTurns(thread, currentTurn),
       dueNow: thread.id === dueNow?.id,
       fired: thread.firedAtTurn !== undefined,
-      ...(thread.firedAtTurn !== undefined
-        ? { firedAtTurn: thread.firedAtTurn, lastMove: thread.notes[thread.notes.length - 1] }
-        : {}),
+      ...(thread.firedAtTurn !== undefined ? { firedAtTurn: thread.firedAtTurn } : {}),
     })),
   };
 };

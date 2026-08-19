@@ -37,7 +37,13 @@ const formatThreadLine = (thread: WorldThread, currentTurn: number, isDueNow: bo
     }
   }
   if (thread.firedAtTurn !== undefined) marks.push(`IN THE SCENE since turn ${thread.firedAtTurn}`);
-  if (isDueNow) marks.push('DUE NOW: this segment was asked to land it');
+  if (isDueNow) {
+    marks.push(
+      thread.firedAtTurn !== undefined
+        ? 'DUE NOW: this segment was asked to make it act, cost the character, or conclude; if the prose settled it, RESOLVE it with the outcome'
+        : 'DUE NOW: this segment was asked to land it'
+    );
+  }
   const suffix = marks.length > 0 ? `, ${marks.join(', ')}` : '';
   return `- [${thread.id}] (${thread.kind}, opened turn ${thread.openedAtTurn}, last moved turn ${thread.lastAdvancedAtTurn}${suffix}) ${thread.summary}`;
 };

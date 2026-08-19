@@ -101,22 +101,19 @@ describe('sceneTemplate world clock block', () => {
     expect(prompt).not.toContain('Prefer an OVERDUE thread');
   });
 
-  it('renders a fired thread as already in the scene, never DUE NOW, and asks for something new when everything has fired', () => {
+  it('renders a fired thread as already in the scene by its own summary, and asks for something new when everything has fired', () => {
     const fired = {
       kind: 'actor' as const,
       summary: 'Henderson comes to collect the roof loan',
       ageTurns: 13,
-      overdue: true,
-      overdueByTurns: 11,
+      overdue: false,
+      overdueByTurns: 0,
       dueNow: false,
       fired: true,
       firedAtTurn: 12,
-      lastMove: 'He put the worn ledger on the table',
     };
     const oneFired = sceneTemplate(makeContext({ currentTurn: 14, turnsSinceWorldMoved: 1, threads: [fired] }));
-    expect(oneFired).toContain(
-      'Henderson comes to collect the roof loan [IN THE SCENE since turn 12: He put the worn ledger on the table]'
-    );
+    expect(oneFired).toContain('Henderson comes to collect the roof loan [IN THE SCENE since turn 12]');
     expect(oneFired).not.toContain('[overdue by');
     expect(oneFired).not.toContain('DUE NOW');
     expect(oneFired).toContain('has already arrived');
@@ -136,6 +133,36 @@ describe('sceneTemplate world clock block', () => {
     );
     expect(withUnfired).toContain('DUE NOW: The agreement is signed.');
     expect(withUnfired).not.toContain('Every thread above is already in the scene');
+  });
+
+  it('demands the strike, the cost or the outcome when the DUE NOW pick is a fired thread', () => {
+    const prompt = sceneTemplate(
+      makeContext({
+        currentTurn: 15,
+        turnsSinceWorldMoved: 2,
+        threads: [
+          {
+            kind: 'actor',
+            summary: 'The creature is inside the shed',
+            ageTurns: 9,
+            overdue: false,
+            overdueByTurns: 0,
+            dueNow: true,
+            fired: true,
+            firedAtTurn: 12,
+          },
+          { kind: 'deadline', summary: 'Dawn comes', ageTurns: 3, overdue: false, overdueByTurns: 0, dueNow: false, fired: false },
+        ],
+      })
+    );
+    expect(prompt).toContain('The creature is inside the shed [IN THE SCENE since turn 12, DUE NOW]');
+    expect(prompt).toContain('IN THE SCENE AND DUE NOW: The creature is inside the shed. It has been in the scene since turn 12');
+    expect(prompt).toContain('The DUE NOW thread acts this segment');
+    expect(prompt).toContain('it strikes, takes, seizes, decides');
+    expect(prompt).toContain('name it in itemsLost with lossReason "stolen" or "destroyed"');
+    expect(prompt).toContain('no time cut is needed and none is granted');
+    expect(prompt).not.toContain('this segment is a "transition"');
+    expect(prompt).not.toContain('It has been overdue for');
   });
 
   it('falls back to an unbidden off-screen move when the ledger is empty', () => {

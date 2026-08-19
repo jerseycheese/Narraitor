@@ -90,6 +90,12 @@ describe('buildWorldThreadPromptSection', () => {
     );
     expect(section).not.toContain('OVERDUE by 11');
     expect(section).toContain('already in the scene is not a new thread');
+
+    const atFuse = buildWorldThreadPromptSection({ openThreads: [fired], currentTurn: 15, dueNowThreadId: 'thread-fired' });
+    expect(atFuse).toContain(
+      'IN THE SCENE since turn 12, DUE NOW: this segment was asked to make it act, cost the character, or conclude; if the prose settled it, RESOLVE it with the outcome) Henderson comes to collect'
+    );
+    expect(atFuse).not.toContain('asked to land it');
   });
 
   it('lists only the observable changes that are present', () => {
