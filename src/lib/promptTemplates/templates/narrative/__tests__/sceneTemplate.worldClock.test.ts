@@ -43,6 +43,7 @@ describe('sceneTemplate world clock block', () => {
             overdue: false,
             overdueByTurns: 0,
             dueNow: false,
+            fired: false,
           },
           {
             kind: 'actor',
@@ -51,6 +52,7 @@ describe('sceneTemplate world clock block', () => {
             overdue: true,
             overdueByTurns: 2,
             dueNow: false,
+            fired: false,
           },
         ],
       })
@@ -77,6 +79,7 @@ describe('sceneTemplate world clock block', () => {
             overdue: true,
             overdueByTurns: 9,
             dueNow: true,
+            fired: false,
           },
           {
             kind: 'actor',
@@ -85,6 +88,7 @@ describe('sceneTemplate world clock block', () => {
             overdue: true,
             overdueByTurns: 2,
             dueNow: false,
+            fired: false,
           },
         ],
       })
