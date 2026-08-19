@@ -32,6 +32,8 @@ export interface WorldThread extends TimestampedEntity {
   resolution?: string;
   /** Short notes from each advance, oldest first. */
   notes: string[];
+  /** What this thread took from the character, oldest first; most threads never do. */
+  costs?: string[];
 }
 
 /**

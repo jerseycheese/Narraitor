@@ -48,6 +48,14 @@ Decision rule: G-F passes in both cells and G-G, G-H hold in both -> SHIP (flag 
 
 What a HOLD would mean here: the mechanism is present and measured, the demand is the next lever. A HOLD with zero costs recorded while the judge reads wounds and thefts in the prose is a contract defect in this PR; a HOLD with the prose still passive is the fuse's round.
 
-## Round 10 results
+## Round 10 build (2026-08-19), playtest not yet run
 
-Not yet run. The build is the deliverable of this PR; the playtest is the next step.
+Built as declared. Files: flag `src/lib/featureFlags.ts` (`WORLD_COST`, default off); types `src/types/worldCost.types.ts`, `WorldThread.costs`, `NarrativeMetadata.worldCost`, `GoalExtractionRequest.worldCost` / `GoalExtractionResult.worldCost`; extraction `src/lib/ai/worldCostExtraction.ts` composed by `goalExtractor.ts` when the request carries `worldCost`; store `characterStore.addCondition` / `removeCondition`, `worldThreadStore.recordThreadCost`; apply `src/lib/narrative/applyWorldCost.ts` called from `applyWorldClockUpdates.ts` (which now returns `{ worldClock?, worldCost? }` and `narrativeStore.segments.ts` stamps both); scene side `templates/narrative/worldCostBlock.ts` rendered by `enhancePromptWithWorldCost` in `narrativeGenerator.prompt.ts`, wired into `generateSegment` and `generateInitialScene` only; the play drawer's `Health 100 / 100` row removed from `CharacterSummary.tsx`. The goal-extraction test mock echoes one imposed condition when the prompt carries the WORLD COST heading.
+
+Sizes (chars, ~4 per token), flag on: scene block 580 with no conditions / 618 with two; extraction section 1,283 with nothing carried or lost / 1,339 with two conditions and one item lost, plus a 170-char JSON skeleton. Roughly 150 input tokens on the scene call and 360 on the extraction call per turn. Zero new calls. Flag off: both prompts byte-identical to develop (unit-tested).
+
+Quality gate on the build: jest 433 suites / 3,009 tests exit 0; `tsc --noEmit` exit 0; eslint exit 0; no CSS touched; `deps:validate` exit 2 on the same two pre-existing `not-to-dev-dep` entries develop carries, none from this change.
+
+Red-before-green: the seven new or extended suites failed on the missing modules and store methods before the implementation (missing `worldCostExtraction`, `applyWorldCost`, `addCondition`, `recordThreadCost`, no WORLD COST section in the extraction prompt), then passed after it.
+
+The playtest declared above is the next step; nothing in "The number that decides it" has been measured yet.

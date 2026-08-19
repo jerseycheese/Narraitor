@@ -8,6 +8,8 @@ import type { World } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { safeTrim } from '@/lib/utils';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
+import { worldCostBlock } from '@/lib/promptTemplates/templates/narrative/worldCostBlock';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 import { buildNpcRoster } from './narrativeGenerator.npc';
 import { getLoreContextForPrompt } from './loreContextHelper';
@@ -279,6 +281,22 @@ export const enhancePromptWithItemLossInstructions = (
   );
 
   return basePrompt + '\n\n' + fullInstructions;
+};
+
+/**
+ * The cost channel's scene-side half: what the character carries, and the
+ * rule that a landing world-clock thread takes something recordable. Off the
+ * flag, or with no character, the prompt is returned untouched.
+ */
+export const enhancePromptWithWorldCost = (prompt: string, characterIds: string[]): string => {
+  if (!isFeatureEnabled('WORLD_COST') || characterIds.length === 0) {
+    return prompt;
+  }
+  const character = useCharacterStore.getState().characters[characterIds[0]];
+  if (!character) {
+    return prompt;
+  }
+  return prompt + '\n' + worldCostBlock(character.status.conditions);
 };
 
 function formatInventoryForPrompt(items: InventoryItem[]): string {

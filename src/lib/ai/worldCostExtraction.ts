@@ -1,0 +1,78 @@
+// src/lib/ai/worldCostExtraction.ts
+
+import type {
+  WorldCostEntry,
+  WorldCostExtractionInput,
+  WorldCostExtractionResult,
+  WorldCostKind,
+} from '@/types/worldCost.types';
+
+/**
+ * The cost channel rides along on goal extraction, like the world clock, so
+ * recording what the world took costs no extra AI call. This module builds
+ * the prompt fragment and reads the answer back; it knows nothing about
+ * clients or stores.
+ */
+
+/** Stable heading the test mock keys off; keep it verbatim. */
+const WORLD_COST_MARKER = 'WORLD COST';
+
+const COST_KINDS: readonly WorldCostKind[] = ['condition', 'item'];
+
+const formatList = (items: string[]): string =>
+  items.length > 0 ? items.map((item) => `- ${item}`).join('\n') : '(none)';
+
+/**
+ * Prompt fragment appended after the goal-extraction rules. The character's
+ * own conditions and this turn's recorded item losses; no ids beyond the
+ * thread ids the ledger section already shows.
+ */
+export function buildWorldCostPromptSection(input: WorldCostExtractionInput): string {
+  return `${WORLD_COST_MARKER} (what the world took from the character this turn)
+Conditions the character already carries:
+${formatList(input.conditions)}
+Items the scene recorded as lost this turn:
+${formatList(input.itemsLost)}
+
+A cost is something the character lost or now carries that they did not choose to spend: a wound or lasting state (kind "condition"), or an item taken, broken or destroyed by someone or something else (kind "item"). The player using, spending, bracing with or giving away an item is not a cost. A failed action whose prose leaves a mark on the character (shaken, discredited before the room, a bleeding hand) is a cost.
+- IMPOSE one entry per cost this segment's prose actually states. "detail" is a short noun phrase in the character's terms ("gashed left forearm", "discredited before the council"), not a sentence. If an open thread from the WORLD CLOCK LEDGER imposed it, set "threadId" to that thread's id; otherwise null.
+- CLEAR a condition from the list above only when this segment's prose plainly ends it (the wound is bound, the room warms to the character again). Copy its text exactly.
+- Do not impose a condition already on the list. Do not invent a cost the prose does not state. Most turns impose nothing, and an empty list is the right answer then.
+Return it under the "worldCost" key of the JSON below.`;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const asTrimmedString = (value: unknown): string | undefined => {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
+
+const asArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
+
+/**
+ * Reads the model's `worldCost` block. Returns undefined when the block is
+ * absent so the caller can tell "the model said nothing" from "the world took
+ * nothing"; invalid entries are dropped one at a time.
+ */
+export function parseWorldCostExtraction(value: unknown): WorldCostExtractionResult | undefined {
+  if (!isRecord(value)) return undefined;
+
+  const imposed: WorldCostEntry[] = [];
+  for (const entry of asArray(value.imposed)) {
+    if (!isRecord(entry)) continue;
+    const kind = entry.kind;
+    const detail = asTrimmedString(entry.detail);
+    if (!COST_KINDS.includes(kind as WorldCostKind) || !detail) continue;
+    const threadId = asTrimmedString(entry.threadId);
+    imposed.push({ kind: kind as WorldCostKind, detail, ...(threadId ? { threadId } : {}) });
+  }
+
+  const cleared = asArray(value.cleared)
+    .map(asTrimmedString)
+    .filter((condition): condition is string => Boolean(condition));
+
+  return { imposed, cleared };
+}

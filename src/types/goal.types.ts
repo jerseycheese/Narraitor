@@ -2,6 +2,7 @@
 
 import { EntityID, TimestampedEntity } from './common.types';
 import type { WorldThreadExtractionInput, WorldThreadExtractionResult } from './worldThread.types';
+import type { WorldCostExtractionInput, WorldCostExtractionResult } from './worldCost.types';
 
 /**
  * Priority levels for narrative goals
@@ -67,6 +68,8 @@ export interface GoalExtractionRequest {
   existingGoals?: NarrativeGoal[];
   /** World-clock ledger context; rides along so the ledger costs no extra AI call. */
   worldThreads?: WorldThreadExtractionInput;
+  /** What the character carries and lost this turn; rides along the same way. */
+  worldCost?: WorldCostExtractionInput;
 }
 
 /**
@@ -82,4 +85,6 @@ export interface GoalExtractionResult {
   confidence: number; // 0-1 confidence score
   /** Undefined when the request carried no ledger or the model returned no block. */
   worldThreads?: WorldThreadExtractionResult;
+  /** Undefined when the request carried no cost input or the model returned no block. */
+  worldCost?: WorldCostExtractionResult;
 }

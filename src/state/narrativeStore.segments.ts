@@ -165,16 +165,16 @@ export const createNarrativeSegmentActions = (
     const currentTurn = (get().sessionSegments[sessionId] || []).length;
     void Promise.resolve().then(async () => {
       try {
-        const worldClock = await applyWorldClockUpdates({
+        const notes = await applyWorldClockUpdates({
           segment: newSegment,
           sessionId,
           characterId: segmentData.metadata?.characterIds?.[0],
           currentTurn,
         });
         const current = get().segments[segmentId];
-        if (worldClock && current) {
+        if (notes && current) {
           get().updateSegment(segmentId, {
-            metadata: { ...current.metadata, worldClock },
+            metadata: { ...current.metadata, ...notes },
           });
         }
       } catch {

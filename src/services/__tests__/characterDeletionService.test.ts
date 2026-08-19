@@ -91,6 +91,8 @@ describe('CharacterDeletionService', () => {
     createCharacter: jest.fn(),
     updateCharacter: jest.fn(),
     applyAlignmentShift: jest.fn(),
+    addCondition: jest.fn(),
+    removeCondition: jest.fn(),
     deleteCharacter: jest.fn(),
     setCurrentCharacter: jest.fn(),
     addAttribute: jest.fn(),

@@ -6,9 +6,12 @@ import type {
   WorldThreadSeedContext,
   WorldThreadSegmentSignals,
 } from '@/types/worldThread.types';
+import type { WorldCostExtractionInput, WorldCostSegmentNote } from '@/types/worldCost.types';
 import { logger } from '@/lib/utils/logger';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { summarizeLedgerForSegment } from '@/lib/narrative/worldClock';
+import { applyWorldCost } from '@/lib/narrative/applyWorldCost';
+import { useCharacterStore } from '@/state/characterStore';
 import { useGoalStore } from '@/state/goalStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -22,6 +25,12 @@ export interface ApplyWorldClockUpdatesParams {
   currentTurn: number;
 }
 
+/** What the one extraction call reconciled this turn; each member stamps its own metadata field. */
+export interface ReconciledSegmentNotes {
+  worldClock?: WorldClockSegmentNote;
+  worldCost?: WorldCostSegmentNote;
+}
+
 /**
  * Extraction is fire-and-forget and the next turn can land before the last
  * one resolves. Running a session's extractions one at a time keeps the
@@ -33,14 +42,15 @@ const chainBySession = new Map<EntityID, Promise<unknown>>();
 
 /**
  * Runs the one post-segment extraction call (goals plus, when the world clock
- * is on, the thread ledger) and reconciles the ledger from what it returns.
- * Resolves to the note that gets stamped on the segment, or undefined when the
- * clock is off or nothing could be reconciled. Fail-open throughout: the goal
- * path behaves exactly as it did before the clock existed.
+ * is on, the thread ledger, plus, when the cost channel is on, what the world
+ * took) and reconciles each from what it returns. Resolves to the notes that
+ * get stamped on the segment, or undefined when both flags are off or nothing
+ * could be reconciled. Fail-open throughout: the goal path behaves exactly as
+ * it did before either existed.
  */
 export function applyWorldClockUpdates(
   params: ApplyWorldClockUpdatesParams
-): Promise<WorldClockSegmentNote | undefined> {
+): Promise<ReconciledSegmentNotes | undefined> {
   const previous = chainBySession.get(params.sessionId) ?? Promise.resolve();
   const current = previous.then(
     () => reconcileSegment(params),
@@ -63,44 +73,69 @@ async function reconcileSegment({
   sessionId,
   characterId,
   currentTurn,
-}: ApplyWorldClockUpdatesParams): Promise<WorldClockSegmentNote | undefined> {
+}: ApplyWorldClockUpdatesParams): Promise<ReconciledSegmentNotes | undefined> {
   const goalStore = useGoalStore.getState();
+  const clockOn = isFeatureEnabled('WORLD_CLOCK');
+  const costOn = isFeatureEnabled('WORLD_COST');
 
-  if (!isFeatureEnabled('WORLD_CLOCK')) {
+  if (!clockOn && !costOn) {
     await goalStore.processSegmentForGoals(segment, sessionId, characterId);
     return undefined;
   }
 
   const worldId = segment.worldId ?? useSessionStore.getState().worldId ?? undefined;
-  const threadStore = useWorldThreadStore.getState();
-  const openThreads = threadStore.getOpenThreadsBySession(sessionId);
-  const needsSeed = !threadStore.hasSessionLedger(sessionId);
-
-  const worldThreads: WorldThreadExtractionInput = {
-    openThreads,
-    currentTurn,
-    segmentSignals: collectSegmentSignals(segment),
-    seed: needsSeed ? buildSeedContext(worldId, sessionId) : undefined,
-  };
+  const worldThreads = clockOn ? buildThreadInput(sessionId, worldId, currentTurn, segment) : undefined;
+  const worldCost = costOn && characterId ? buildCostInput(characterId, segment) : undefined;
 
   try {
-    const result = await goalStore.processSegmentForGoals(segment, sessionId, characterId, worldThreads);
-    if (!result.worldThreads || !worldId) {
-      return undefined;
+    const result = await goalStore.processSegmentForGoals(segment, sessionId, characterId, worldThreads, worldCost);
+    const notes: ReconciledSegmentNotes = {};
+
+    if (result.worldThreads && worldId) {
+      const applied = useWorldThreadStore
+        .getState()
+        .applyExtraction(sessionId, worldId, result.worldThreads, currentTurn);
+      const sessionThreads = useWorldThreadStore
+        .getState()
+        .getAll()
+        .filter((thread) => thread.sessionId === sessionId);
+      notes.worldClock = summarizeLedgerForSegment(sessionThreads, currentTurn, applied);
     }
 
-    const applied = useWorldThreadStore
-      .getState()
-      .applyExtraction(sessionId, worldId, result.worldThreads, currentTurn);
-    const sessionThreads = useWorldThreadStore
-      .getState()
-      .getAll()
-      .filter((thread) => thread.sessionId === sessionId);
-    return summarizeLedgerForSegment(sessionThreads, currentTurn, applied);
+    if (result.worldCost && characterId) {
+      notes.worldCost = applyWorldCost({ sessionId, characterId, result: result.worldCost });
+    }
+
+    return notes.worldClock || notes.worldCost ? notes : undefined;
   } catch (error) {
     logger.warn('[WorldClock] Ledger reconciliation failed', { sessionId, error });
     return undefined;
   }
+}
+
+function buildThreadInput(
+  sessionId: EntityID,
+  worldId: EntityID | undefined,
+  currentTurn: number,
+  segment: NarrativeSegment
+): WorldThreadExtractionInput {
+  const threadStore = useWorldThreadStore.getState();
+  return {
+    openThreads: threadStore.getOpenThreadsBySession(sessionId),
+    currentTurn,
+    segmentSignals: collectSegmentSignals(segment),
+    seed: threadStore.hasSessionLedger(sessionId) ? undefined : buildSeedContext(worldId, sessionId),
+  };
+}
+
+/** What the character carries and what the scene took this turn, so the extractor records against real state. */
+function buildCostInput(characterId: EntityID, segment: NarrativeSegment): WorldCostExtractionInput | undefined {
+  const character = useCharacterStore.getState().characters[characterId];
+  if (!character) return undefined;
+  return {
+    conditions: character.status.conditions,
+    itemsLost: segment.metadata?.itemsLost?.map((item) => item.name) ?? [],
+  };
 }
 
 function collectSegmentSignals(segment: NarrativeSegment): WorldThreadSegmentSignals | undefined {

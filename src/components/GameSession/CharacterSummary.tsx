@@ -14,8 +14,6 @@ interface CharacterBackground {
 }
 
 interface CharacterStatus {
-  health?: number;
-  maxHealth?: number;
   conditions?: string[];
   location?: string;
 }
@@ -193,12 +191,6 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({
             <div className="manuscript-character-summary-column">
               <h3 className="manuscript-character-summary-subheading">Status</h3>
               <div className="manuscript-character-summary-list">
-                {character.status.health !== undefined && character.status.maxHealth !== undefined && (
-                  <div className="manuscript-character-summary-item">
-                    <span className="manuscript-character-summary-item-label">Health</span>
-                    <span className="manuscript-character-summary-item-value">{character.status.health} / {character.status.maxHealth}</span>
-                  </div>
-                )}
                 {character.status.location && (
                   <div className="manuscript-character-summary-item">
                     <span className="manuscript-character-summary-item-label">Location</span>

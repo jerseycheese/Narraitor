@@ -22,6 +22,12 @@ const FEATURE_FLAG_DEFAULTS = {
   // (narraitor-feature-experiment-lifecycle/memos/1822-world-clock.md); the
   // env var is the kill switch.
   WORLD_CLOCK: true,
+  // The world can take something from the character: the post-segment
+  // extraction records a cost (a condition written to the character, an item
+  // loss attributed to the thread that took it) and the scene prompt carries
+  // the character's conditions. Off until the playtest declared in
+  // narraitor-prompt-template-governance/eval-logs/1882-world-cost.md measures it.
+  WORLD_COST: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
@@ -46,6 +52,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   WORLD_CLOCK: resolve(
     process.env.NEXT_PUBLIC_FEATURE_WORLD_CLOCK,
     FEATURE_FLAG_DEFAULTS.WORLD_CLOCK
+  ),
+  WORLD_COST: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_WORLD_COST,
+    FEATURE_FLAG_DEFAULTS.WORLD_COST
   ),
 });
 
