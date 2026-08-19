@@ -37,5 +37,7 @@ export function applyWorldCost({ sessionId, characterId, result }: ApplyWorldCos
     note.cleared.push(condition);
   }
 
+  if (result.fatal) note.fatal = true;
+
   return note;
 }

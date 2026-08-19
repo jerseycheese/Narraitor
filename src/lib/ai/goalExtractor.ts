@@ -98,7 +98,8 @@ function buildGoalExtractionPrompt(request: GoalExtractionRequest): string {
     ? `,
   "worldCost": {
     "imposed": [{ "kind": "condition|item", "detail": "...", "threadId": "thread-id or null" }],
-    "cleared": ["condition text"]
+    "cleared": ["condition text"],
+    "fatal": false
   }`
     : '';
 

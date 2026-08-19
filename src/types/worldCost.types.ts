@@ -34,6 +34,11 @@ export interface WorldCostExtractionResult {
   imposed: WorldCostEntry[];
   /** Conditions from the input list the prose plainly ended, verbatim. */
   cleared: string[];
+  /**
+   * The prose killed the character or left them unable to act. Death is never
+   * a condition; it is the one cost the session has to end on.
+   */
+  fatal: boolean;
 }
 
 /**
@@ -48,4 +53,6 @@ export interface WorldCostSegmentNote {
     thread?: string;
   }>;
   cleared: string[];
+  /** Set when the extractor read a death or incapacitation in the prose; the segment is tagged fatal-outcome. */
+  fatal?: boolean;
 }

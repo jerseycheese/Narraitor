@@ -176,8 +176,16 @@ export const createNarrativeSegmentActions = (
         });
         const current = get().segments[segmentId];
         if (notes && current) {
+          // A death the extractor read in the prose becomes the fatal-outcome
+          // tag, which is what the controller and isSessionEndingSegment
+          // already look for; until now nothing wrote it.
+          const currentTags = current.metadata?.tags ?? [];
+          const tags =
+            notes.worldCost?.fatal && !currentTags.includes('fatal-outcome')
+              ? [...currentTags, 'fatal-outcome']
+              : currentTags;
           get().updateSegment(segmentId, {
-            metadata: { ...current.metadata, ...notes },
+            metadata: { ...current.metadata, ...notes, tags },
           });
         }
       } catch {

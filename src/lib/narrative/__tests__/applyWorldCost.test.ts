@@ -49,6 +49,7 @@ describe('applyWorldCost', () => {
       result: {
         imposed: [{ kind: 'condition', detail: 'gashed left forearm', threadId }],
         cleared: ['shaken'],
+        fatal: false,
       },
     });
 
@@ -64,7 +65,7 @@ describe('applyWorldCost', () => {
     const note = applyWorldCost({
       sessionId: 'session-1',
       characterId: 'char-1',
-      result: { imposed: [{ kind: 'item', detail: 'rusty shovel', threadId }], cleared: [] },
+      result: { imposed: [{ kind: 'item', detail: 'rusty shovel', threadId }], cleared: [], fatal: false },
     });
 
     expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken']);
@@ -76,10 +77,21 @@ describe('applyWorldCost', () => {
     const note = applyWorldCost({
       sessionId: 'session-1',
       characterId: 'char-1',
-      result: { imposed: [{ kind: 'condition', detail: 'hoarse', threadId: 'thread-nope' }], cleared: [] },
+      result: { imposed: [{ kind: 'condition', detail: 'hoarse', threadId: 'thread-nope' }], cleared: [], fatal: false },
     });
 
     expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken', 'hoarse']);
     expect(note.imposed).toEqual([{ kind: 'condition', detail: 'hoarse' }]);
+  });
+
+  it('carries a fatal read onto the note and writes no condition for it', () => {
+    const note = applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: { imposed: [], cleared: [], fatal: true },
+    });
+
+    expect(note).toEqual({ imposed: [], cleared: [], fatal: true });
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken']);
   });
 });

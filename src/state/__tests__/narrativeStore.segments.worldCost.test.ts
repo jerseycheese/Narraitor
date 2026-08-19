@@ -57,4 +57,29 @@ describe('addSegment hands the extraction the player character', () => {
       currentTurn: 1,
     });
   });
+
+  it('tags the segment fatal-outcome when the extraction read a death, and leaves the tags alone otherwise', async () => {
+    const spy = jest
+      .spyOn(applyWorldClock, 'applyWorldClockUpdates')
+      .mockResolvedValueOnce({ worldCost: { imposed: [], cleared: [], fatal: true } })
+      .mockResolvedValueOnce({ worldCost: { imposed: [{ kind: 'condition', detail: 'gashed arm' }], cleared: [] } });
+
+    const segmentData = {
+      worldId,
+      type: 'scene' as const,
+      metadata: { tags: ['woods'], characterIds: [] },
+      timestamp: new Date(),
+      updatedAt: new Date().toISOString(),
+    };
+    const deadId = useNarrativeStore.getState().addSegment(sessionId, { ...segmentData, content: 'You are simply gone.' });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const woundedId = useNarrativeStore.getState().addSegment(sessionId, { ...segmentData, content: 'The blade opens your arm.' });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(spy).toHaveBeenCalledTimes(2);
+    const segments = useNarrativeStore.getState().segments;
+    expect(segments[deadId].metadata?.tags).toEqual(['woods', 'fatal-outcome']);
+    expect(segments[deadId].metadata?.worldCost).toEqual({ imposed: [], cleared: [], fatal: true });
+    expect(segments[woundedId].metadata?.tags).toEqual(['woods']);
+  });
 });

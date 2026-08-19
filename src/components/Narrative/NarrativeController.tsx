@@ -125,6 +125,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     (state) => state.clearGenerationError
   );
   const hasHydrated = useNarrativeStore((state) => state._hasHydrated);
+  // The fatal-outcome tag lands on a segment after the post-segment
+  // extraction reads a death in the prose, seconds after the segment itself,
+  // so the synchronous check after addSegment cannot see it; this does.
+  const sessionHasFatalSegment = useNarrativeStore((state) =>
+    (state.sessionSegments[sessionId] ?? []).some((segmentId) =>
+      state.segments[segmentId]?.metadata?.tags?.includes('fatal-outcome')
+    )
+  );
   const narrativeGenerator = useNarrativeGenerator();
 
   const npcIds = useNPCStore(
@@ -171,6 +179,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     segments,
     onEndingSuggested,
   });
+
+  useEffect(() => {
+    if (!sessionHasFatalSegment) return;
+    suggestEnding(
+      'fatal: narrative segment marked the player as dead or incapacitated.',
+      'story-complete'
+    );
+  }, [sessionHasFatalSegment, suggestEnding]);
 
   const { isGeneratingChoices, generatePlayerChoices } = usePlayerChoices({
     sessionId,
@@ -700,8 +716,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Fatal outcome check: a critical decision only ends the run on a true
       // critical-failure roll (natural 1). An ordinary missed roll is a
       // survivable setback the AI narrates (and can still escalate via the
-      // fatal-outcome tag below), so one unlucky-but-ordinary roll no longer
-      // ends the story (issue #1426).
+      // fatal-outcome tag the extraction stamps), so one unlucky-but-ordinary
+      // roll no longer ends the story (issue #1426).
       const isFatalCriticalFailure = isFatalCriticalDecision(
         decisionWeight,
         rollResults
@@ -826,15 +842,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
-      }
-
-      // If the AI marked this segment as fatal, surface an ending suggestion immediately
-      const hasFatalTag = newSegment.metadata?.tags?.includes('fatal-outcome');
-      if (hasFatalTag) {
-        suggestEnding(
-          'fatal: narrative segment marked the player as dead or incapacitated.',
-          'story-complete'
-        );
       }
 
       // Check for ending indicators. Deferred off the per-turn path: it's

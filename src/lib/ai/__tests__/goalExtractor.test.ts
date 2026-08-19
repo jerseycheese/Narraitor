@@ -269,6 +269,7 @@ describe('goalExtractor', () => {
       expect(result.worldCost).toEqual({
         imposed: [{ kind: 'condition', detail: expect.any(String) }],
         cleared: [],
+        fatal: false,
       });
     });
 
