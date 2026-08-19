@@ -92,6 +92,12 @@ export interface WorldClockPromptContext {
   currentTurn: number;
   /** Turns since any thread advanced, resolved, or was opened; 0 on the seed turn. */
   turnsSinceWorldMoved: number;
+  /**
+   * The world's own tone line (its custom instructions), so a strike is asked
+   * for in that register and not in a borrowed one. Absent when the world has
+   * none.
+   */
+  register?: string;
   threads: Array<{
     kind: WorldThreadKind;
     summary: string;

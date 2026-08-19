@@ -638,7 +638,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
               .getState()
               .getAll()
               .filter((thread) => thread.sessionId === sessionId),
-            currentTurn
+            currentTurn,
+            useWorldStore.getState().worlds[worldId]?.toneSettings?.customInstructions
           )
         : undefined;
       // The scene prompt only carries the rising-tension block above this

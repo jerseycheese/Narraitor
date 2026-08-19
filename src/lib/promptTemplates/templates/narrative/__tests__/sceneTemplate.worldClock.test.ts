@@ -158,11 +158,42 @@ describe('sceneTemplate world clock block', () => {
     expect(prompt).toContain('The creature is inside the shed [IN THE SCENE since turn 12, DUE NOW]');
     expect(prompt).toContain('IN THE SCENE AND DUE NOW: The creature is inside the shed. It has been in the scene since turn 12');
     expect(prompt).toContain('The DUE NOW thread acts this segment');
-    expect(prompt).toContain('it strikes, takes, seizes, decides');
+    expect(prompt).toContain('it acts on the character, now, and the act costs them');
     expect(prompt).toContain('name it in itemsLost with lossReason "stolen" or "destroyed"');
     expect(prompt).toContain('no time cut is needed and none is granted');
     expect(prompt).not.toContain('this segment is a "transition"');
     expect(prompt).not.toContain('It has been overdue for');
+  });
+
+  it('asks for the act in the world\'s own register when the context carries one, and never lets the block into the passage', () => {
+    const fired = {
+      kind: 'actor' as const,
+      summary: "Albright's call demands an answer",
+      ageTurns: 9,
+      overdue: false,
+      overdueByTurns: 0,
+      dueNow: true,
+      fired: true,
+      firedAtTurn: 9,
+    };
+    const withRegister = sceneTemplate(
+      makeContext({
+        currentTurn: 12,
+        turnsSinceWorldMoved: 1,
+        register: 'small-town civic drama; tension comes from money, memory and who owes whom, never from violence',
+        threads: [fired],
+      })
+    );
+    expect(withRegister).toContain(
+      'in its own register: "small-town civic drama; tension comes from money, memory and who owes whom, never from violence"'
+    );
+    expect(withRegister).not.toContain('strikes, takes, seizes');
+    expect(withRegister).toContain('Nothing in this block reaches the passage');
+
+    const withoutRegister = sceneTemplate(
+      makeContext({ currentTurn: 12, turnsSinceWorldMoved: 1, threads: [fired] })
+    );
+    expect(withoutRegister).toContain('in its own register (the Tone above)');
   });
 
   it('falls back to an unbidden off-screen move when the ledger is empty', () => {

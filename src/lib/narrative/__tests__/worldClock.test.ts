@@ -131,6 +131,14 @@ describe('worldClock', () => {
     });
   });
 
+  test('buildWorldClockPromptContext carries the world\'s tone line as the register, and leaves it off when blank', () => {
+    const threads = [makeThread({ summary: 'The vote', openedAtTurn: 1, dueByTurn: 5 })];
+
+    expect(buildWorldClockPromptContext(threads, 3, '  never from violence ').register).toBe('never from violence');
+    expect(buildWorldClockPromptContext(threads, 3, '   ')).not.toHaveProperty('register');
+    expect(buildWorldClockPromptContext(threads, 3)).not.toHaveProperty('register');
+  });
+
   test('buildWorldClockPromptContext marks a fired thread by its own summary, never its notes, and hands it the pick at its fuse', () => {
     const threads = [
       makeThread({

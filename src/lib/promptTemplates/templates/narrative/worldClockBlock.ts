@@ -45,13 +45,16 @@ DUE NOW: ${thread.summary}. It has been overdue for ${pluralTurns(thread.overdue
 /**
  * The fuse. A thread that has landed and then stands in the scene doing
  * nothing is what both round-9 judges named; once its fuse runs out the ask
- * is the strike, the cost or the outcome, never the arrival again, and
- * there is no forward cut because it is already here.
+ * is the act, the cost or the outcome, never the arrival again, and there is
+ * no forward cut because it is already here. The act is asked for in the
+ * world's own register: round 10's "strikes, seizes, the blow" pulled a
+ * no-violence civic drama into a poisoned package.
  */
-const firedDueNowSection = (thread: PromptThread): string => `
+const firedDueNowSection = (thread: PromptThread, register?: string): string => `
 IN THE SCENE AND DUE NOW: ${thread.summary}. It has been in the scene since turn ${thread.firedAtTurn} and it has not yet acted.
-- In THIS segment it acts, on the character, now: it strikes, takes, seizes, decides, or delivers the blow it came for. Show the act and what it costs: the landing takes something recordable from the character, an item they hold (name it in itemsLost with lossReason "stolen" or "destroyed") or a wound or lasting state they now carry, stated plainly in the prose. Or the matter is settled one way or the other, and the segment shows the outcome.
-- It does not wait, threaten again, announce itself, or take one more step closer. It is already here; no time cut is needed and none is granted. A threat that has arrived and takes nothing has not acted.`;
+- In THIS segment it acts on the character, now, and the act costs them: something recordable they did not choose to give up, an item they hold (name it in itemsLost with lossReason "stolen" or "destroyed") or a lasting state they now carry, stated plainly in the prose. Or the matter is settled one way or the other, and the segment shows the outcome.
+- What the act looks like is this world's to decide, in its own register${register ? `: "${register}"` : ' (the Tone above)'}. A blow in one world is a vote lost, a name struck from a list, a debt called in; in another it is a blade. Do not borrow a harder genre's violence to make it land.
+- It does not wait, threaten again, announce itself, or take one more step closer. It is already here; no time cut is needed and none is granted. A thread that has arrived and takes nothing has not acted.`;
 
 /**
  * The world's own turn. The ledger is the story's memory of what it owes the
@@ -65,7 +68,7 @@ IN THE SCENE AND DUE NOW: ${thread.summary}. It has been in the scene since turn
 export const worldClockBlock = (worldClock?: WorldClockPromptContext): string => {
   if (!worldClock) return '';
 
-  const { currentTurn, turnsSinceWorldMoved, threads } = worldClock;
+  const { currentTurn, turnsSinceWorldMoved, threads, register } = worldClock;
   const dueNow = threads.find((thread) => thread.dueNow);
 
   const ledgerLines =
@@ -99,6 +102,7 @@ ${spendRule}
 - Whatever moves must be observable in the prose (someone arrives, something is lost, a position changes), not foreshadowed for later.
 - Every thread above is already known to the player: never introduce one as new (a text that already arrived, a warning already given). Move it or land it.
 - A thread marked IN THE SCENE has already arrived: never arrive it again or deliver it as news; what it owes now is its next move, its cost, or its outcome.
-- Do not invent a new threat when a thread above can carry the pressure. Do not restate the ledger to the player.${dueNow ? (dueNow.fired ? firedDueNowSection(dueNow) : dueNowSection(dueNow)) : ''}
+- Do not invent a new threat when a thread above can carry the pressure. Do not restate the ledger to the player.
+- Nothing in this block reaches the passage. No "World Clock", no "thread", no "update", no turn number, no note from the storyteller, no bracketed or parenthetical line about what has landed, acted or been taken. The prose shows it as story; the record goes in metadata.${dueNow ? (dueNow.fired ? firedDueNowSection(dueNow, register) : dueNowSection(dueNow)) : ''}
 `;
 };
