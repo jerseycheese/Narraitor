@@ -62,7 +62,7 @@ interface NarrativeControllerProps {
   retryToken?: number;
   /**
    * Fires with the growing narrative preview as the active generation
-   * streams in, and with '' once a turn finishes (issue #1476). A composer
+   * streams in, and with '' once a turn finishes. A composer
    * that renders its own visible history from the store instead of this
    * controller's own (often hidden, see hideHistory) NarrativeHistory — the
    * live play surface does this via NarrativeHistoryManager — uses this to
@@ -92,8 +92,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
 
-  // Live-updating preview of the segment currently generating (issue #1476:
-  // real API streaming). streamingPreviewRef is the source of truth so
+  // Live-updating preview of the segment currently generating as the real API
+  // streams. streamingPreviewRef is the source of truth so
   // handleStreamChunk stays a stable callback and the post-await read in
   // generate*() below never sees a stale closure; streamingPreview mirrors it
   // into state purely to trigger the re-render NarrativeHistory needs to show
@@ -705,7 +705,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Read characters/worlds at call time via getState() rather than
       // subscribing — they're only needed here inside this async handler, so a
       // store subscription would re-render the controller on every character/
-      // world write for no benefit (issue #1358).
+      // world write for no benefit.
       const character = characterId
         ? useCharacterStore.getState().characters[characterId]
         : undefined;
@@ -723,7 +723,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // critical-failure roll (natural 1). An ordinary missed roll is a
       // survivable setback the AI narrates (and can still escalate via the
       // fatal-outcome tag the extraction stamps), so one unlucky-but-ordinary
-      // roll no longer ends the story (issue #1426).
+      // roll does not end the story.
       const isFatalCriticalFailure = isFatalCriticalDecision(
         decisionWeight,
         rollResults

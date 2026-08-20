@@ -1,6 +1,6 @@
 /**
  * Lore Management Type Definitions
- * Issue #434: Basic lore consistency tracking
+ * Basic lore consistency tracking
  */
 
 import type { EntityID, TimestampedEntity } from './common.types';

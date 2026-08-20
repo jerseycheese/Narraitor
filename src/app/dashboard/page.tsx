@@ -5,8 +5,9 @@ import { DashboardHome } from '@/components/Dashboard';
 import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 
 /**
- * App home (#1528). Moved from / so the public Landing page can own the root
- * route; first-time users still get GuidedFirstTimeExperience via DashboardHome.
+ * App home. Lives here rather than at / so the public Landing page can own the
+ * root route; first-time users still get GuidedFirstTimeExperience via
+ * DashboardHome.
  */
 export default function DashboardPage() {
   return (

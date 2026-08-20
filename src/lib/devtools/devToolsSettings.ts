@@ -15,9 +15,6 @@ export interface DevToolsSettings {
   showPromptDebugInfo: boolean;
 }
 
-/**
- * Default settings
- */
 export const DEFAULT_DEVTOOLS_SETTINGS: DevToolsSettings = {
   showPromptDebugInfo: false,
 };
@@ -40,9 +37,6 @@ function isStorageAvailable(): boolean {
   }
 }
 
-/**
- * Load DevTools settings from localStorage
- */
 export function loadDevToolsSettings(): DevToolsSettings {
   if (!isStorageAvailable()) {
     return { ...DEFAULT_DEVTOOLS_SETTINGS };
@@ -68,9 +62,6 @@ export function loadDevToolsSettings(): DevToolsSettings {
   }
 }
 
-/**
- * Save DevTools settings to localStorage
- */
 export function saveDevToolsSettings(settings: DevToolsSettings): void {
   if (!isStorageAvailable()) {
     return;
@@ -83,9 +74,6 @@ export function saveDevToolsSettings(settings: DevToolsSettings): void {
   }
 }
 
-/**
- * Update a specific setting
- */
 export function updateSetting<K extends keyof DevToolsSettings>(
   key: K,
   value: DevToolsSettings[K]

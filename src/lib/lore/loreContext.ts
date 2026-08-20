@@ -91,10 +91,8 @@ function parseCharacterFact(fact: LoreFact): ConsistencyLoreContext['characters'
   const name = safeTrim(nameMatch[1]);
   const description = safeTrim(nameMatch[2] || '') || value;
 
-  // Extract traits from description
   const traits = extractTraitsFromDescription(description);
   
-  // Extract background information
   const background = extractBackgroundFromDescription(description);
 
   // Determine importance based on source and content
@@ -108,9 +106,6 @@ function parseCharacterFact(fact: LoreFact): ConsistencyLoreContext['characters'
   };
 }
 
-/**
- * Parses location fact into enhanced location format
- */
 function parseLocationFact(fact: LoreFact): ConsistencyLoreContext['locations'][0] | null {
   const value = safeTrim(fact.value);
   if (!value) return null;
@@ -122,10 +117,8 @@ function parseLocationFact(fact: LoreFact): ConsistencyLoreContext['locations'][
   const name = safeTrim(nameMatch[1]);
   const description = safeTrim(nameMatch[2] || '') || value;
 
-  // Extract location type from description
   const type = extractLocationTypeFromDescription(description);
 
-  // Determine importance
   const importance = determineImportance(fact, description);
 
   return {
@@ -136,9 +129,6 @@ function parseLocationFact(fact: LoreFact): ConsistencyLoreContext['locations'][
   };
 }
 
-/**
- * Parses world rule fact into enhanced world rule format
- */
 function parseWorldRuleFact(fact: LoreFact): ConsistencyLoreContext['worldRules'][0] | null {
   const value = safeTrim(fact.value);
   if (!value) return null;
@@ -158,9 +148,6 @@ function parseWorldRuleFact(fact: LoreFact): ConsistencyLoreContext['worldRules'
   };
 }
 
-/**
- * Parses historical event fact into enhanced historical event format
- */
 function parseHistoricalEventFact(fact: LoreFact): ConsistencyLoreContext['historicalEvents'][0] | null {
   const value = safeTrim(fact.value);
   if (!value) return null;
@@ -172,7 +159,6 @@ function parseHistoricalEventFact(fact: LoreFact): ConsistencyLoreContext['histo
   const event = safeTrim(eventMatch[1]);
   const description = safeTrim(eventMatch[2] || '') || value;
 
-  // Determine importance
   const importance = determineImportance(fact, description);
 
   return {
@@ -182,9 +168,6 @@ function parseHistoricalEventFact(fact: LoreFact): ConsistencyLoreContext['histo
   };
 }
 
-/**
- * Extracts character traits from description text
- */
 function extractTraitsFromDescription(description: string): string[] {
   const traits: string[] = [];
   
@@ -211,9 +194,6 @@ function extractTraitsFromDescription(description: string): string[] {
   return traits.length > 0 ? traits : ['undefined'];
 }
 
-/**
- * Extracts background information from description
- */
 function extractBackgroundFromDescription(description: string): string {
   // Remove common prefixes and return cleaned description
   const result = description
@@ -223,9 +203,6 @@ function extractBackgroundFromDescription(description: string): string {
   return safeTrim(result);
 }
 
-/**
- * Extracts location type from description
- */
 function extractLocationTypeFromDescription(description: string): string {
   const lowerDescription = description.toLowerCase();
   

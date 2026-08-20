@@ -80,8 +80,6 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
     if (editingCard === key) setEditingCard(null);
   };
 
-  // --- Adopt handlers -------------------------------------------------------
-
   const adoptDescription = (value: string) => {
     onAdopt({ description: value });
     dismiss('description');
@@ -128,8 +126,6 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
     dismiss('skills');
   };
 
-  // --- Derived suggestion views --------------------------------------------
-
   const attributeSuggestions = suggestion
     ? suggestion.attributes
         .map((a) => {
@@ -166,8 +162,6 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
         })
         .filter((s): s is NonNullable<typeof s> => s !== null)
     : [];
-
-  // --- Edit-mode initializers ----------------------------------------------
 
   const startEdit = (key: CardKey) => {
     if (!suggestion) return;

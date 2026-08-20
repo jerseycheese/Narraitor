@@ -27,8 +27,6 @@ import {
 
 type SessionStatusLookup = (sessionId: EntityID) => SessionLifecycleStatus | undefined;
 
-// === Public API ===
-
 export const mergeState = (current: WorldState, incoming: WorldState): WorldState => {
   const version = Math.max(current.version, incoming.version);
   const lastModified =
