@@ -165,16 +165,27 @@ export const createNarrativeSegmentActions = (
     const currentTurn = (get().sessionSegments[sessionId] || []).length;
     void Promise.resolve().then(async () => {
       try {
-        const worldClock = await applyWorldClockUpdates({
+        // characterIds lists the NPCs in the scene; the player is the session's character.
+        const session = useSessionStore.getState();
+        const notes = await applyWorldClockUpdates({
           segment: newSegment,
           sessionId,
           characterId: segmentData.metadata?.characterIds?.[0],
+          playerCharacterId: session.id === sessionId ? session.characterId ?? undefined : undefined,
           currentTurn,
         });
         const current = get().segments[segmentId];
-        if (worldClock && current) {
+        if (notes && current) {
+          // A death the extractor read in the prose becomes the fatal-outcome
+          // tag, which is what the controller and isSessionEndingSegment
+          // already look for; until now nothing wrote it.
+          const currentTags = current.metadata?.tags ?? [];
+          const tags =
+            notes.worldCost?.fatal && !currentTags.includes('fatal-outcome')
+              ? [...currentTags, 'fatal-outcome']
+              : currentTags;
           get().updateSegment(segmentId, {
-            metadata: { ...current.metadata, worldClock },
+            metadata: { ...current.metadata, ...notes, tags },
           });
         }
       } catch {

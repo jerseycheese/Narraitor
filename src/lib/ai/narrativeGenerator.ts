@@ -37,6 +37,7 @@ import {
   enhancePromptWithInventory,
   enhancePromptWithItemAcquisitionInstructions,
   enhancePromptWithItemLossInstructions,
+  enhancePromptWithWorldCost,
   enhancePromptWithGoalContext,
   enhancePromptWithLore,
   enhancePromptWithPersonalization,
@@ -140,10 +141,14 @@ export class NarrativeGenerator {
         this.staticContentCache
       );
 
-      const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
+      const lossEnhancedPrompt = enhancePromptWithItemLossInstructions(
         acquisitionEnhancedPrompt,
         this.staticContentCache,
         characterInventory
+      );
+      const fullyEnhancedPrompt = enhancePromptWithWorldCost(
+        lossEnhancedPrompt,
+        request.characterIds || []
       );
 
       // Never flag names the model is instructed to use naturally (sceneTemplate.ts) —
@@ -409,10 +414,14 @@ export class NarrativeGenerator {
         this.staticContentCache
       );
 
-      const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
+      const lossEnhancedPrompt = enhancePromptWithItemLossInstructions(
         acquisitionEnhancedPrompt,
         this.staticContentCache,
         characterInventory
+      );
+      const fullyEnhancedPrompt = enhancePromptWithWorldCost(
+        lossEnhancedPrompt,
+        characterIds
       );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt, {

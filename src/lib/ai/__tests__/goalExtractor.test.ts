@@ -247,6 +247,48 @@ describe('goalExtractor', () => {
     });
   });
 
+  describe('world cost pass-through', () => {
+    beforeEach(() => {
+      mockSentPrompts.length = 0;
+    });
+
+    test('carries the cost section out and the worldCost block back', async () => {
+      const request: GoalExtractionRequest = {
+        content: 'The claw rakes your forearm and the shovel is torn from your grip.',
+        sessionId: 'session-123',
+        segmentId: 'segment-456',
+        existingGoals: [],
+        worldCost: { conditions: [], itemsLost: ['rusty shovel'] },
+      };
+
+      const result = await extractGoalsFromNarrative(request);
+
+      expect(mockSentPrompts).toHaveLength(1);
+      expect(mockSentPrompts[0]).toContain('WORLD COST');
+      expect(mockSentPrompts[0]).toContain('rusty shovel');
+      expect(result.worldCost).toEqual({
+        imposed: [{ kind: 'condition', detail: expect.any(String) }],
+        cleared: [],
+        fatal: false,
+      });
+    });
+
+    test('leaves the prompt and result untouched when no cost input is passed', async () => {
+      const request: GoalExtractionRequest = {
+        content: 'You continue your quest',
+        sessionId: 'session-123',
+        segmentId: 'segment-456',
+        existingGoals: [],
+      };
+
+      const result = await extractGoalsFromNarrative(request);
+
+      expect(mockSentPrompts[0]).not.toContain('WORLD COST');
+      expect(mockSentPrompts[0]).not.toContain('worldCost');
+      expect(result.worldCost).toBeUndefined();
+    });
+  });
+
   describe('Error Handling', () => {
     test('should handle malformed narrative content', async () => {
       const request: GoalExtractionRequest = {

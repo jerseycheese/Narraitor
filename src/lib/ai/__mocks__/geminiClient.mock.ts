@@ -31,7 +31,7 @@ export class MockGeminiClient {
 
   private handleGoalExtraction(prompt: string): string {
     const content = prompt.toLowerCase();
-    const worldThreads = this.buildWorldThreadsBlock(prompt);
+    const worldThreads = this.buildWorldThreadsBlock(prompt) + this.buildWorldCostBlock(prompt);
 
     // Extract IDs from the prompt
     const sessionIdMatch = prompt.match(/"sessionId":\s*"([^"]+)"/);
@@ -269,6 +269,15 @@ export class MockGeminiClient {
 
     return `,
   "worldThreads": { "opened": ${opened}, "advanced": ${advanced}, "resolved": [] }`;
+  }
+
+  // The cost channel rides along the same way; when the prompt carries the
+  // WORLD COST heading, echo one imposed condition back.
+  private buildWorldCostBlock(prompt: string): string {
+    if (!prompt.includes('WORLD COST')) return '';
+
+    return `,
+  "worldCost": { "imposed": [{ "kind": "condition", "detail": "gashed left forearm", "threadId": null }], "cleared": [] }`;
   }
 
   private handleGoalCompletion(prompt: string): string {

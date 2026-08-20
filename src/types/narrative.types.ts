@@ -6,6 +6,7 @@ import type { Character } from './character.types';
 import type { InventoryAcquisitionMethod, StandardInventoryCategory } from './inventory.types';
 import type { ContinuitySegmentNote } from './continuity.types';
 import type { WorldClockPromptContext, WorldClockSegmentNote } from './worldThread.types';
+import type { WorldCostSegmentNote } from './worldCost.types';
 
 /**
  * Represents a segment of narrative in the game
@@ -258,6 +259,8 @@ export interface NarrativeMetadata {
    * debugInfo so the playtest harness can read it off the segment list.
    */
   worldClock?: WorldClockSegmentNote;
+  /** What the world took from the character on this turn, stamped the same way. */
+  worldCost?: WorldCostSegmentNote;
   location?: string;
   characterIds?: EntityID[];
   characters?: GeneratedCharacterMetadata[];

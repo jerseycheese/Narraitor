@@ -123,6 +123,32 @@ describe('worldThreadStore', () => {
     });
   });
 
+  describe('recordThreadCost', () => {
+    test('appends what a thread took to the open thread and returns it', () => {
+      const threadId = openThread('session-a', 'The creature comes through the shed wall');
+
+      const recorded = useWorldThreadStore.getState().recordThreadCost('session-a', threadId, 'gashed left forearm');
+
+      expect(recorded?.summary).toBe('The creature comes through the shed wall');
+      expect(useWorldThreadStore.getState().threads[threadId].costs).toEqual(['gashed left forearm']);
+    });
+
+    test('ignores a foreign or closed thread id', () => {
+      const foreignId = openThread('session-b', 'Someone else\'s pressure');
+      const closedId = openThread('session-a', 'Already paid off');
+      useWorldThreadStore.getState().applyExtraction(
+        'session-a',
+        'world-1',
+        { opened: [], advanced: [], resolved: [{ id: closedId, resolution: 'done', outcome: 'resolved' }] },
+        2
+      );
+
+      expect(useWorldThreadStore.getState().recordThreadCost('session-a', foreignId, 'x')).toBeUndefined();
+      expect(useWorldThreadStore.getState().recordThreadCost('session-a', closedId, 'x')).toBeUndefined();
+      expect(useWorldThreadStore.getState().threads[foreignId].costs).toBeUndefined();
+    });
+  });
+
   test('clearSessionThreads drops the threads and the ledger key', () => {
     openThread('session-a', 'The debt collector is coming');
     openThread('session-b', 'The king is dying');

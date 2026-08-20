@@ -16,6 +16,7 @@ import {
   buildWorldThreadPromptSection,
   parseWorldThreadExtraction,
 } from './worldThreadExtraction';
+import { buildWorldCostPromptSection, parseWorldCostExtraction } from './worldCostExtraction';
 
 // Created on first use, not at import time — the class singleton used to
 // construct a client as a module side effect.
@@ -89,6 +90,19 @@ function buildGoalExtractionPrompt(request: GoalExtractionRequest): string {
   }`
     : '';
 
+  // Same shape as the ledger: both empty unless the request carries the input.
+  const worldCostSection = request.worldCost
+    ? `\n\n${buildWorldCostPromptSection(request.worldCost)}`
+    : '';
+  const worldCostSkeleton = request.worldCost
+    ? `,
+  "worldCost": {
+    "imposed": [{ "kind": "condition|item", "detail": "...", "threadId": "thread-id or null" }],
+    "cleared": ["condition text"],
+    "fatal": false
+  }`
+    : '';
+
   return `You are a goal extraction system. Analyze the following narrative content and extract goals, update existing goals, or mark goals as completed.
 
 NARRATIVE CONTENT:
@@ -99,7 +113,7 @@ Extract goals following these rules:
 2. GOAL UPDATES: If existing goals are mentioned, update their progress or status
 3. COMPLETED GOALS: Mark goals as completed if they are clearly achieved or abandoned
 4. PRIORITY LEVELS: critical (urgent/life-threatening), high (important objectives), medium (standard goals), low (optional/minor)
-5. GOAL TYPES: immediate (right now), quest (specific objectives), exploration (discovering), social (relationships), mystery (solving puzzles), survival (staying alive)${worldThreadSection}
+5. GOAL TYPES: immediate (right now), quest (specific objectives), exploration (discovering), social (relationships), mystery (solving puzzles), survival (staying alive)${worldThreadSection}${worldCostSection}
 
 Respond with JSON in this exact format:
 \`\`\`json
@@ -133,7 +147,7 @@ Respond with JSON in this exact format:
     }
   ],
   "completedGoals": ["goal-id-1", "goal-id-2"],
-  "confidence": 0.8${worldThreadSkeleton}
+  "confidence": 0.8${worldThreadSkeleton}${worldCostSkeleton}
 }
 \`\`\``;
 }
@@ -190,6 +204,10 @@ function parseGoalExtractionResponse(
 
     if (request.worldThreads) {
       result.worldThreads = parseWorldThreadExtraction(parsed.worldThreads);
+    }
+
+    if (request.worldCost) {
+      result.worldCost = parseWorldCostExtraction(parsed.worldCost);
     }
 
     return result;

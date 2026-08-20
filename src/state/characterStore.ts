@@ -110,6 +110,10 @@ export interface CharacterStore extends CrudStore<Character> {
   updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
   /** Shift the lawful/chaotic alignment axis by delta, clamped to -100..100. */
   applyAlignmentShift: (characterId: EntityID, delta: number) => void;
+  /** A condition the world imposed; no-op if the character already carries it. */
+  addCondition: (characterId: EntityID, condition: string) => void;
+  /** Clears a condition by text, case-insensitively. */
+  removeCondition: (characterId: EntityID, condition: string) => void;
   deleteCharacter: (id: EntityID) => Promise<void>;
   setCurrentCharacter: (id: EntityID) => void;
 
@@ -160,6 +164,9 @@ const getInitialState = () => ({
 });
 
 // Character Store implementation with persistence
+const sameCondition = (a: string, b: string): boolean =>
+  a.trim().toLowerCase() === b.trim().toLowerCase();
+
 export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
   create<CharacterStore>()(
     persist(
@@ -490,6 +497,37 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             const current = character.alignment ?? 0;
             const next = Math.max(-100, Math.min(100, current + delta));
             get().update(characterId, { alignment: next });
+          },
+
+          addCondition: (characterId, condition) => {
+            const character = get().characters[characterId];
+            const trimmed = condition.trim();
+            if (!character || !trimmed) {
+              return;
+            }
+            const conditions = character.status.conditions;
+            if (conditions.some((existing) => sameCondition(existing, trimmed))) {
+              return;
+            }
+            get().update(characterId, {
+              status: { ...character.status, conditions: [...conditions, trimmed] },
+            });
+          },
+
+          removeCondition: (characterId, condition) => {
+            const character = get().characters[characterId];
+            if (!character) {
+              return;
+            }
+            const remaining = character.status.conditions.filter(
+              (existing) => !sameCondition(existing, condition)
+            );
+            if (remaining.length === character.status.conditions.length) {
+              return;
+            }
+            get().update(characterId, {
+              status: { ...character.status, conditions: remaining },
+            });
           },
 
           deleteCharacter: async (id) => await get().delete(id),

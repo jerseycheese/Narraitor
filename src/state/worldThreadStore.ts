@@ -42,6 +42,8 @@ export interface WorldThreadStore extends CrudStore<WorldThread> {
     result: WorldThreadExtractionResult,
     currentTurn: number
   ) => AppliedExtraction;
+  /** Appends a cost to one of this session's open threads; returns it, or undefined when the id is foreign or closed. */
+  recordThreadCost: (sessionId: EntityID, threadId: EntityID, detail: string) => WorldThread | undefined;
   clearSessionThreads: (sessionId: EntityID) => void;
   clearWorldThreads: (worldId: EntityID) => void;
 }
@@ -270,6 +272,15 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
         }
 
         return applied;
+      },
+
+      recordThreadCost: (sessionId, threadId, detail) => {
+        const thread = get().threads[threadId];
+        if (!thread || thread.sessionId !== sessionId || thread.status !== 'open') {
+          return undefined;
+        }
+        get().update(thread.id, { costs: [...(thread.costs ?? []), detail] });
+        return get().threads[thread.id];
       },
 
       clearSessionThreads: (sessionId) => {
