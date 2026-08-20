@@ -175,6 +175,16 @@ describe('worldThreadStore', () => {
     });
   });
 
+  test('migration drops a persisted ledger key that never got a thread', () => {
+    const migrate = useWorldThreadStore.persist.getOptions().migrate;
+    const migrated = migrate?.(
+      { threads: {}, sessionThreads: { 'session-a': [], 'session-b': ['thread-1'] } },
+      1
+    ) as { sessionThreads: Record<string, string[]> };
+
+    expect(migrated.sessionThreads).toEqual({ 'session-b': ['thread-1'] });
+  });
+
   test('clearSessionThreads drops the threads and the ledger key', () => {
     openThread('session-a', 'The debt collector is coming');
     openThread('session-b', 'The king is dying');

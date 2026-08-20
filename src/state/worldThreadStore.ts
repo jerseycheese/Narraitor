@@ -321,12 +321,24 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
     {
       name: 'narraitor-world-thread-store',
       storage: createIndexedDBStorage(),
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         threads: state.threads,
         sessionThreads: state.sessionThreads,
       }),
-      migrate: (persistedState) => persistedState || getInitialState(),
+      // A stored session key with no threads was written by a seed that opened
+      // nothing and marked the ledger seeded anyway. Dropping those keys hands
+      // the sessions that hit that back to the capped retry.
+      migrate: (persistedState) => {
+        const state = (persistedState || getInitialState()) as { sessionThreads?: Record<EntityID, EntityID[]> };
+        if (!state.sessionThreads) return state;
+        return {
+          ...state,
+          sessionThreads: Object.fromEntries(
+            Object.entries(state.sessionThreads).filter(([, threadIds]) => threadIds.length > 0)
+          ),
+        };
+      },
     }
   )
 );
