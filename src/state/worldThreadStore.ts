@@ -31,6 +31,12 @@ export interface WorldThreadStore extends CrudStore<WorldThread> {
    * that would make the next turn re-seed a ledger the model already judged.
    */
   sessionThreads: Record<EntityID, EntityID[]>;
+  /**
+   * Seed turns a session has spent without opening anything. Deliberately not
+   * persisted: it only exists to stop a world with nothing to seed paying for
+   * the seed block on every turn of a run.
+   */
+  seedAttempts: Record<EntityID, number>;
   error: UserFriendlyError | null;
   loading: boolean;
 
@@ -50,10 +56,14 @@ export interface WorldThreadStore extends CrudStore<WorldThread> {
 
 const THREAD_KINDS: readonly WorldThreadKind[] = ['consequence', 'actor', 'deadline'];
 
+/** Seed turns that may come back empty before the ledger is taken as seeded anyway. */
+const MAX_SEED_ATTEMPTS = 3;
+
 const getInitialState = () => ({
   threads: {} as Record<EntityID, WorldThread>,
   entities: {} as Record<EntityID, WorldThread>,
   sessionThreads: {} as Record<EntityID, EntityID[]>,
+  seedAttempts: {} as Record<EntityID, number>,
   currentEntityId: null as EntityID | null,
   error: null as UserFriendlyError | null,
   loading: false,
@@ -212,15 +222,7 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
 
       applyExtraction: (sessionId, worldId, result, currentTurn) => {
         const applied: AppliedExtraction = { opened: [], advanced: [], resolved: [] };
-
-        // Seed the session key first so an all-empty result still marks the
-        // ledger as seeded and the next turn doesn't re-run the seed prompt.
-        set((state) => ({
-          sessionThreads: {
-            ...state.sessionThreads,
-            [sessionId]: state.sessionThreads[sessionId] || [],
-          },
-        }));
+        const wasSeeded = sessionId in get().sessionThreads;
 
         for (const entry of result.opened) {
           try {
@@ -239,6 +241,21 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
           } catch {
             // An invalid entry from the model is dropped, not fatal.
           }
+        }
+
+        // A seed that opened nothing is not a seeded ledger: leaving the key
+        // absent lets the next turn seed again, since the model reading an
+        // established session can read the per-turn rules over the seed's.
+        // After MAX_SEED_ATTEMPTS take the empty ledger as the answer.
+        if (!wasSeeded && applied.opened.length === 0) {
+          const attempts = (get().seedAttempts[sessionId] ?? 0) + 1;
+          set((state) => ({
+            seedAttempts: { ...state.seedAttempts, [sessionId]: attempts },
+            sessionThreads:
+              attempts >= MAX_SEED_ATTEMPTS
+                ? { ...state.sessionThreads, [sessionId]: state.sessionThreads[sessionId] || [] }
+                : state.sessionThreads,
+          }));
         }
 
         // Only this session's open threads may move; the model can echo a
@@ -290,7 +307,8 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
         // Dropping the key (unlike delete) is what lets a fresh session re-seed.
         set((state) => {
           const { [sessionId]: _removedSession, ...remainingSessionThreads } = state.sessionThreads;
-          return { sessionThreads: remainingSessionThreads };
+          const { [sessionId]: _removedAttempts, ...remainingSeedAttempts } = state.seedAttempts;
+          return { sessionThreads: remainingSessionThreads, seedAttempts: remainingSeedAttempts };
         });
       },
 
@@ -303,12 +321,24 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
     {
       name: 'narraitor-world-thread-store',
       storage: createIndexedDBStorage(),
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         threads: state.threads,
         sessionThreads: state.sessionThreads,
       }),
-      migrate: (persistedState) => persistedState || getInitialState(),
+      // A stored session key with no threads was written by a seed that opened
+      // nothing and marked the ledger seeded anyway. Dropping those keys hands
+      // the sessions that hit that back to the capped retry.
+      migrate: (persistedState) => {
+        const state = (persistedState || getInitialState()) as { sessionThreads?: Record<EntityID, EntityID[]> };
+        if (!state.sessionThreads) return state;
+        return {
+          ...state,
+          sessionThreads: Object.fromEntries(
+            Object.entries(state.sessionThreads).filter(([, threadIds]) => threadIds.length > 0)
+          ),
+        };
+      },
     }
   )
 );

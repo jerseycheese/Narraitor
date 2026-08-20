@@ -45,7 +45,7 @@ const formatSeed = (seed: WorldThreadSeedContext): string => {
     material.push(`Player's goals:\n${seed.activeGoals.map((goal) => `- ${goal}`).join('\n')}`);
   }
   return `${SEEDING_HEADING}:
-This session's ledger is empty. Derive its starting pressure sources from the world description, tone instructions and the player's goals below as 'deadline' or 'actor' threads (3 to 5), each with a rough dueByTurn where the prose gives a timescale (treat one turn as a few minutes to an hour of story time; 'six weeks' is roughly turn 30). Prefer pressures that can act without the player: a named antagonist, a vote, a storm, a debt.
+This session's ledger is empty. Open 3 to 5 threads on THIS turn from the material below. The OPEN rules above do not apply while seeding: seed threads come from the world's standing pressures rather than from this segment's prose, the two-per-segment cap is lifted, and 'be conservative' does not apply. Use 'deadline', 'actor' or 'consequence', whichever fits the pressure; a threat that is unnamed or unseen is still an 'actor'. Give each a rough dueByTurn where the prose gives a timescale (treat one turn as a few minutes to an hour of story time; 'six weeks' is roughly turn 30). Prefer pressures that can act without the player: a named antagonist, a vote, a storm, a debt, something in the woods.
 ${material.join('\n')}`;
 };
 
