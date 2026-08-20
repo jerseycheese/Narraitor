@@ -67,9 +67,34 @@ const splitParagraphs = (text: string): string[] =>
 const isScaffoldingLine = (line: string): boolean =>
   line.length > 0 && SCAFFOLDING_LINE_PATTERNS.some((pattern) => pattern.test(line));
 
+const isJsonObjectText = (text: string): boolean => {
+  const trimmed = text.trim();
+  if (!/^[{[]/.test(trimmed)) return false;
+
+  try {
+    return typeof JSON.parse(trimmed) === 'object';
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * A fence earns removal only when what it holds is machine data. Fenced prose
+ * belongs to the fiction often enough - an inscription, a screen the character
+ * is reading, a transcript - and deleting it on the strength of the fence
+ * alone would take the scene with it.
+ */
+const isFencedMachineData = (lines: string[]): boolean => {
+  const label = lines[0].slice(3).trim().toLowerCase();
+  const isClosed = lines.length > 1 && lines[lines.length - 1].startsWith('```');
+  const body = lines.slice(1, isClosed ? -1 : undefined).join('\n');
+
+  return label === 'metadata' || isJsonObjectText(body);
+};
+
 const isMetadataBlock = (lines: string[]): boolean => {
   if (METADATA_LEAD_PATTERN.test(lines[0])) return true;
-  if (lines[0].startsWith('```')) return true;
+  if (lines[0].startsWith('```')) return isFencedMachineData(lines);
 
   const joined = lines.join(' ').trim();
   return joined.startsWith('{') && joined.endsWith('}');

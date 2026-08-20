@@ -92,6 +92,32 @@ describe('stripNonNarrativeBlocks', () => {
     expect(stripNonNarrativeBlocks(content)).toBe(`${PROSE}\n\n${MORE_PROSE}`);
   });
 
+  it('keeps a fenced block that holds prose rather than machine data', () => {
+    const inscription = [
+      '```',
+      'HERE LIES THE HARROWGATE WATCH',
+      'WHO KEPT THE ROAD UNTIL THE ROAD ENDED',
+      '```',
+    ].join('\n');
+    const content = [PROSE, '', inscription, '', MORE_PROSE].join('\n');
+
+    expect(stripNonNarrativeBlocks(content)).toBe(content);
+  });
+
+  it('removes a fenced block explicitly labelled metadata', () => {
+    const content = [
+      PROSE,
+      '',
+      '```metadata',
+      'location: Harrowgate',
+      '```',
+      '',
+      MORE_PROSE,
+    ].join('\n');
+
+    expect(stripNonNarrativeBlocks(content)).toBe(`${PROSE}\n\n${MORE_PROSE}`);
+  });
+
   it('removes loose ledger and clock scaffolding lines', () => {
     const content = [
       PROSE,
