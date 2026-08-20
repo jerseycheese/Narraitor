@@ -3,6 +3,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
+import { applyNarrativeContentGate } from '../lib/narrative/narrativeContentGate';
 import { applyWorldStateThreadUpdates } from '../lib/narrative/applyWorldStateThreadUpdates';
 import { applyWorldClockUpdates } from '../lib/narrative/applyWorldClockUpdates';
 import { formatDecisionText } from '../lib/narrative/formatDecisionText';
@@ -42,6 +43,16 @@ export const createNarrativeSegmentActions = (
     const previousSegment = previousSegmentId
       ? get().segments[previousSegmentId]
       : undefined;
+
+    // Everything the player reads passes through here, so bookkeeping the
+    // generator wrote into the prose is stripped and recycled paragraphs are
+    // trimmed once, rather than at each of the callers that generate a scene.
+    const gatedContent = applyNarrativeContentGate(
+      normalizedContent,
+      sessionSegmentIds
+        .map((id) => get().segments[id]?.content)
+        .filter((content): content is string => Boolean(content))
+    );
 
     let metadata = segmentData.metadata
       ? { ...segmentData.metadata }
@@ -119,7 +130,7 @@ export const createNarrativeSegmentActions = (
     const newSegment: NarrativeSegment = {
       ...segmentData,
       metadata: finalMetadata,
-      content: normalizeText(segmentData.content, NORM_DESC),
+      content: gatedContent,
       id: segmentId,
       sessionId,
       createdAt: now,
