@@ -67,8 +67,6 @@ export const WithCustomInput: Story = {
     },
   },
 };
-
-// === ALIGNMENT STORIES ===
 // Mock aligned decision for alignment testing
 const createAlignedDecision = (): Decision => ({
   id: 'mock-decision-aligned',

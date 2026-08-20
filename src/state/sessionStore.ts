@@ -41,7 +41,7 @@ const buildLifecycleMetadata = (
 /**
  * Keep the crash-recovery marker in step with the live session. Only an active
  * session with full world/character context is recoverable, so that's the only
- * shape we record. Called on activation and on each save/heartbeat (issue #221).
+ * shape we record. Called on activation and on each save/heartbeat.
  */
 const syncRecoveryMarker = (
   state: Pick<SessionStore, 'id' | 'status' | 'worldId' | 'characterId'>,
@@ -189,12 +189,12 @@ export const useSessionStore = create<SessionStore>()(
         };
       });
 
-      // Mark the session live for crash recovery (issue #221)
+      // Mark the session live for crash recovery
       syncRecoveryMarker(get(), activationTimestamp);
 
 
-      // Session-start journal entry (Issue #176) — created by the
-      // SESSION_STARTED subscriber in src/lib/session/sessionJournalEntries.ts
+      // Session-start journal entry, created by the SESSION_STARTED subscriber
+      // in src/lib/session/sessionJournalEntries.ts
       await storeEvents.emit<SessionStartedEvent>(StoreEventTypes.SESSION_STARTED, {
         sessionId,
         worldId,
@@ -218,7 +218,7 @@ export const useSessionStore = create<SessionStore>()(
   // re-running activation. The play surface clears the marker on a clean
   // refresh (pagehide), but remounting an already-active session skips
   // initializeSession/resumeSavedSession — so without this, a crash in the
-  // window before the next save would leave no marker and no recovery (issue #221).
+  // window before the next save would leave no marker and no recovery.
   refreshRecoveryMarker: () => {
     syncRecoveryMarker(get(), getTimestamp());
   },
@@ -229,13 +229,13 @@ export const useSessionStore = create<SessionStore>()(
     const lifecycleUpdateTime = getTimestamp();
 
     // Clean exit: drop the crash-recovery marker so the next load doesn't
-    // mistake this for an abnormal end (issue #221)
+    // mistake this for an abnormal end
     clearRecoveryMarker();
 
     if (state.id && state.worldId && state.characterId) {
 
-      // Session-end journal entry with duration + segment count (Issue #176) —
-      // created by the SESSION_ENDED subscriber in
+      // Session-end journal entry with duration + segment count, created by
+      // the SESSION_ENDED subscriber in
       // src/lib/session/sessionJournalEntries.ts. Emitted while this store
       // still holds the session identity (state resets just below).
       await storeEvents.emit<SessionEndedEvent>(StoreEventTypes.SESSION_ENDED, {
@@ -296,22 +296,18 @@ export const useSessionStore = create<SessionStore>()(
     }
   },
 
-  // Set session status
   setStatus: (status) => {
     set({ status });
   },
 
-  // Set error message
   setError: (error) => {
     set({ error });
   },
 
-  // Set player choices
   setPlayerChoices: (choices) => {
     set({ playerChoices: choices });
   },
 
-  // Select a player choice
   selectChoice: (choiceId) => {
     const { playerChoices } = get();
     const updatedChoices = playerChoices.map(choice => ({
@@ -322,37 +318,30 @@ export const useSessionStore = create<SessionStore>()(
     set({ playerChoices: updatedChoices });
   },
 
-  // Clear player choices
   clearPlayerChoices: () => {
     set({ playerChoices: [] });
   },
 
-  // Set current scene
   setCurrentScene: (sceneId) => {
     set({ currentSceneId: sceneId });
   },
 
-  // Pause the session
   pauseSession: () => {
     set({ status: 'paused' });
   },
 
-  // Resume the session from paused state
   resumeSession: () => {
     set({ status: 'active' });
   },
   
-  // Set session ID
   setSessionId: (id) => {
     set({ id });
   },
   
-  // Set character ID
   setCharacterId: (characterId: string) => {
     set({ characterId });
   },
   
-  // Get saved session for a world/character combination
   getSavedSession: (worldId: string, characterId: string) => {
     const { savedSessions } = get();
     const found = Object.values(savedSessions).find(
@@ -361,7 +350,6 @@ export const useSessionStore = create<SessionStore>()(
     return found;
   },
   
-  // Resume a saved session
   resumeSavedSession: (sessionId: string) => {
     const { savedSessions } = get();
     const savedSession = savedSessions[sessionId];
@@ -400,14 +388,13 @@ export const useSessionStore = create<SessionStore>()(
           sessionLifecycle: nextLifecycle,
         };
       });
-      // Mark the resumed session live for crash recovery (issue #221)
+      // Mark the resumed session live for crash recovery
       syncRecoveryMarker(get(), activationTimestamp);
       return true;
     }
     return false;
   },
   
-  // Delete a saved session
   deleteSavedSession: (sessionId: string) => {
     set(state => {
       const { [sessionId]: _, ...remainingSessions } = state.savedSessions;
@@ -518,7 +505,7 @@ export const useSessionStore = create<SessionStore>()(
     });
 
     // Heartbeat: refresh the crash-recovery marker as the story progresses so a
-    // crash recovers state from at most a few minutes ago (issue #221)
+    // crash recovers state from at most a few minutes ago
     syncRecoveryMarker(get(), getTimestamp());
   },
 

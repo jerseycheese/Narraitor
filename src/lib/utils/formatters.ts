@@ -61,8 +61,6 @@ export interface DateTimeFormatOptions extends DateFormatOptions {
   hour12?: boolean;
 }
 
-// === DATE FORMATTING ===
-
 /**
  * Validates and parses a date input, handling both Date objects and strings
  * 
@@ -407,10 +405,6 @@ export function safeTrim(text: string | null | undefined): string {
   if (text === null || text === undefined) return '';
   return text.trim();
 }
-
-// =============================================================================
-// SERIALIZATION AND DEBUGGING UTILITIES
-// =============================================================================
 
 /**
  * Safely serializes objects for JSON storage, handling functions, dates, and circular references.

@@ -370,9 +370,9 @@ const GameSession: React.FC<GameSessionProps> = ({
   // Treat 'loading' as an active session to allow the
   // ActiveGameSession to show its coordinated skeleton and
   // continue initialization even if the store is still 'loading'
-  // (fresh sessions should not be blocked by this gate).
-  // Previously this returned <GameSessionLoading /> and could get stuck.
-  
+  // (fresh sessions should not be blocked by this gate). Returning
+  // <GameSessionLoading /> here instead gets stuck.
+
   if (error || sessionState.error) {
     return (
       <div className="manuscript-play-entry">

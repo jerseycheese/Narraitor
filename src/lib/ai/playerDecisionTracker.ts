@@ -191,16 +191,10 @@ export class PlayerDecisionTracker {
     };
   }
 
-  /**
-   * Gets decisions for a specific session
-   */
   getSessionDecisions(sessionId: EntityID): PlayerDecision[] {
     return this.decisions.filter(decision => decision.sessionId === sessionId);
   }
 
-  /**
-   * Gets decisions for a specific world
-   */
   getWorldDecisions(worldId: EntityID): PlayerDecision[] {
     return this.decisions.filter(decision => decision.worldId === worldId);
   }
@@ -217,16 +211,10 @@ export class PlayerDecisionTracker {
     );
   }
 
-  /**
-   * Gets all decisions
-   */
   getAllDecisions(): PlayerDecision[] {
     return [...this.decisions];
   }
 
-  /**
-   * Analyzes choice patterns
-   */
   analyzeChoicePatterns(decisions?: PlayerDecision[]): {
     dominantChoiceTypes: ChoiceTypePreference[];
     choiceDistribution: Record<ChoiceTypePreference, number>;
@@ -253,17 +241,11 @@ export class PlayerDecisionTracker {
     };
   }
 
-  /**
-   * Clears all decisions
-   */
   clearDecisions(): void {
     this.decisions = [];
     this.saveDecisions();
   }
 
-  /**
-   * Clears decisions for a specific session
-   */
   clearSessionDecisions(sessionId: EntityID): void {
     this.decisions = this.decisions.filter(decision => decision.sessionId !== sessionId);
     this.saveDecisions();

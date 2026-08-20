@@ -276,7 +276,7 @@ export interface NarrativeMetadata {
   itemsLost?: LostItemMetadata[];
   // Major event tracking
   majorEvent?: string;
-  // Decision consequence tracking (Issue #971)
+  // Decision consequence tracking
   causedByDecisionId?: EntityID;
   causedByDecisionText?: string;
   decisionOutcome?: DecisionOutcome;
@@ -286,7 +286,7 @@ export interface NarrativeMetadata {
    * quiet streak, so the guard paces itself instead of firing every turn.
    */
   pacingEscalationRequested?: boolean;
-  // Continuity guardrail outcome (#409/#412)
+  // Continuity guardrail outcome
   continuity?: ContinuitySegmentNote;
   // Debug information (dev mode only)
   debugInfo?: PromptDebugInfo;
@@ -396,7 +396,7 @@ export interface NarrativeGenerationResult {
     itemsLost?: LostItemMetadata[];
     // Major event tracking
     majorEvent?: string;
-    // Continuity guardrail outcome (#409/#412)
+    // Continuity guardrail outcome
     continuity?: ContinuitySegmentNote;
     // Debug information (dev mode only)
     debugInfo?: PromptDebugInfo;

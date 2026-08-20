@@ -5,7 +5,7 @@
  *
  * Only Gemini works end-to-end in this release; the other types exist so the
  * presets UI can list popular services and so the schema is ready for the
- * post-1.0 multi-provider work (epic #878).
+ * post-1.0 multi-provider work.
  */
 
 export type ProviderType = 'gemini' | 'openai-compatible' | 'claude' | 'ollama';

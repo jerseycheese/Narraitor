@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { FAQ_GROUPS } from './faqContent';
 
 /**
- * Faq — the answers to the questions a new player asks before they've played,
- * gathered from copy that was previously scattered across the README, /about,
- * /privacy, and the provider wizard.
+ * Faq — the answers to the questions a new player asks before they've played.
+ * The same ground is covered in the README, /about, /privacy, and the provider
+ * wizard, so changes here usually want a matching edit there.
  *
  * Server component, deliberately: every answer ships open, with a jump list of
  * questions on top. Nothing collapses, so in-page find works and there's no

@@ -75,7 +75,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   selectedChoiceId,
 }) => {
   const [isGenerating, setIsGenerating] = React.useState(true);
-  // Live preview of the segment currently generating (issue #1476), fed by
+  // Live preview of the segment currently generating, fed by
   // the hidden NarrativeController via onStreamingPreviewChange. Cleared
   // whenever a turn stops generating, for whatever reason (completion,
   // error, retry) — isGenerating already tracks all of those.
@@ -144,12 +144,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   // Live story-generation failure for the current turn (timeout, network,
   // provider 429/5xx, bad key). Captured in the store by NarrativeController so
-  // the choices column can surface inline error + Retry — see issue #1478.
+  // the choices column can surface inline error + Retry.
   const generationError = useNarrativeStore((state) => state.generationError);
 
   // A failure must drop the "Continuing your story..." spinner/skeleton —
-  // otherwise the turn hangs on the loading state forever (the original #1478
-  // bug). Clearing both generation flags lets the error surface take over.
+  // otherwise the turn hangs on the loading state forever. Clearing both
+  // generation flags lets the error surface take over.
   React.useEffect(() => {
     if (generationError) {
       setIsGenerating(false);
@@ -288,14 +288,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // - must not fire while one of these is open: the underlying content stays
   // mounted behind the overlay, so without this gate a player reading the
   // shortcuts dialog could press "1" and silently advance the turn behind it
-  // (#276 review follow-up). The character summary panel is deliberately
-  // excluded - it's non-modal and doesn't trap focus.
+  // behind it. The character summary panel is deliberately excluded - it's
+  // non-modal and doesn't trap focus.
   const isModalOpen = isShortcutsHelpOpen || activeDrawer !== null || showEndConfirmation;
 
-  // Game-session keyboard shortcuts (#276): number keys for choices live in
+  // Game-session keyboard shortcuts: number keys for choices live in
   // ChoiceSelector itself since that's where the option list is. These cover
-  // the remaining common actions the issue calls out - journal, character
-  // sheet, and a discoverable reference for all of it. Only active once the
+  // the remaining common actions - journal, character sheet, and a
+  // discoverable reference for all of it. Only active once the
   // session has rendered its real HUD (isGameReady) and no modal is already
   // covering it.
   const gameSessionShortcuts = React.useMemo(
@@ -358,7 +358,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     createJournalEntryFromSegment,
   });
 
-  // One modal decision at a time (#1536): the End Story confirmation renders
+  // One modal decision at a time: the End Story confirmation renders
   // without a focus trap, so the HUD Close/Reset controls stay reachable while
   // it is open. Those controls hand off to page-level confirmation dialogs, so
   // close the End Story confirmation first or both dialogs mount at once.
@@ -571,7 +571,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                           subtitle={
                             // Session-scoped drawers show the world name as
                             // readable context — never the raw persistence ID,
-                            // which truncated to "Session session-" (#1534).
+                            // which truncated to "Session session-".
                             // No world name means no subtitle at all.
                             activeDrawer === 'character'
                               ? character?.name

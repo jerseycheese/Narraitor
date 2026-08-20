@@ -53,12 +53,12 @@ interface JournalMetadata {
   tags: string[];
   automaticEntry: boolean;
   narrativeSegmentId?: EntityID;
-  // Decision-specific metadata for issue #174
+  // Decision-specific metadata
   decisionId?: EntityID;
   choiceText?: string;
   decisionPrompt?: string;
   outcomeSegmentId?: EntityID;
-  // Session-specific metadata for issue #176
+  // Session-specific metadata
   sessionDuration?: number;
   sessionStartTime?: string;
   sessionEndTime?: string;
@@ -71,6 +71,6 @@ interface JournalMetadata {
     characterName?: string;
     sessionNumber?: number;
   };
-  // AI-generated visual for the entry (issue #975)
+  // AI-generated visual for the entry
   image?: GeneratedImage;
 }

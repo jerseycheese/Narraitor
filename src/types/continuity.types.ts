@@ -3,7 +3,7 @@
 import type { EntityID } from './common.types';
 
 /**
- * Types for the runtime continuity guardrail (#409/#412): deterministic
+ * Types for the runtime continuity guardrail: deterministic
  * contradiction detection over generated narrative, with a single corrective
  * AI call when an issue is found.
  */

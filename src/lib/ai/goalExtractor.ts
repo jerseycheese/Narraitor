@@ -67,9 +67,6 @@ export async function extractGoalsFromNarrative(
   }
 }
 
-/**
- * Build prompt for goal extraction
- */
 function buildGoalExtractionPrompt(request: GoalExtractionRequest): string {
   const existingGoalsText =
     request.existingGoals && request.existingGoals.length > 0
@@ -152,9 +149,6 @@ Respond with JSON in this exact format:
 \`\`\``;
 }
 
-/**
- * Parse goal extraction response from AI
- */
 function parseGoalExtractionResponse(
   content: string,
   request: GoalExtractionRequest
@@ -267,9 +261,6 @@ function createFallbackExtractionResult(
   return result;
 }
 
-/**
- * Extract goal from pattern match
- */
 function extractGoalFromPattern(
   content: string,
   pattern: RegExp
@@ -278,9 +269,6 @@ function extractGoalFromPattern(
   return match ? match[1]?.trim() || match[2]?.trim() : null;
 }
 
-/**
- * Create basic goal from extracted text
- */
 function createBasicGoal(
   title: string,
   request: GoalExtractionRequest,
@@ -302,9 +290,6 @@ function createBasicGoal(
   };
 }
 
-/**
- * Validate and clean goal data
- */
 function validateAndCleanGoal(
   goal: Record<string, unknown>
 ): Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'> {
@@ -358,9 +343,6 @@ function validateAndCleanGoal(
   };
 }
 
-/**
- * Validate goal updates
- */
 function validateGoalUpdates(
   updates: Record<string, unknown>
 ): Partial<NarrativeGoal> {

@@ -48,7 +48,6 @@ interface JournalStore {
   setLoading: (loading: boolean) => void;
 }
 
-// Initial state
 const initialState = {
   entries: {},
   sessionEntries: {},
@@ -62,7 +61,6 @@ export const useJournalStore = create<JournalStore>()(
     (set, get) => ({
   ...initialState,
 
-  // Add entry
   addEntry: (sessionId, entryData) => {
     if (!entryData.content || safeTrim(entryData.content) === '') {
       throw new Error('Entry content is required');
@@ -98,7 +96,6 @@ export const useJournalStore = create<JournalStore>()(
     return entryId;
   },
 
-  // Update entry
   updateEntry: (entryId, updates) => set((state) => {
     if (!state.entries[entryId]) {
       return { error: createStoreError('Entry Not Found', 'The specified journal entry could not be found') };
@@ -118,7 +115,6 @@ export const useJournalStore = create<JournalStore>()(
     };
   }),
 
-  // Delete entry
   deleteEntry: (entryId) => set((state) => {
     const entry = state.entries[entryId];
     if (!entry) {
@@ -142,7 +138,6 @@ export const useJournalStore = create<JournalStore>()(
     };
   }),
 
-  // Mark as read
   markAsRead: (entryId) => set((state) => {
     if (!state.entries[entryId]) {
       return { error: createStoreError('Entry Not Found', 'The specified journal entry could not be found') };
@@ -197,7 +192,6 @@ export const useJournalStore = create<JournalStore>()(
     return sorted.filter((entry) => new Date(entry.createdAt).getTime() >= startTimestamp);
   },
 
-  // Get entries by type
   getEntriesByType: (type) => {
     const state = get();
     return Object.values(state.entries).filter((entry) => entry.type === type);

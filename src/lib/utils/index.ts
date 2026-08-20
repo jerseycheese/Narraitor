@@ -1,4 +1,3 @@
-// === CORE UTILITIES ===
 
 /** UUID generation utilities */
 export { generateUniqueId } from './generateId';
@@ -11,8 +10,6 @@ export { formatAIResponse } from './textFormatter';
 
 /** CSS class name utilities */
 export { cssClasses } from './classNames';
-
-// === FORMATTING UTILITIES ===
 
 /**
  * Formatting utilities for dates, strings, and numbers

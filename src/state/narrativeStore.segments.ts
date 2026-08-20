@@ -20,7 +20,6 @@ export const createNarrativeSegmentActions = (
   set: NarrativeStoreSet,
   get: NarrativeStoreGet
 ) => ({
-  // Add segment
   addSegment: (sessionId: EntityID, segmentData: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>): EntityID => {
     const normalizedContent = normalizeText(segmentData.content || '', NORM_DESC);
     if (!normalizedContent) {
@@ -77,7 +76,7 @@ export const createNarrativeSegmentActions = (
       }
     }
 
-    // Link to the most recent decision (if any) - Issue #971
+    // Link to the most recent decision (if any)
     const sessionDecisionIds = get().sessionDecisions[sessionId] || [];
     const latestDecisionId = sessionDecisionIds[sessionDecisionIds.length - 1];
 
@@ -204,7 +203,6 @@ export const createNarrativeSegmentActions = (
     return segmentId;
   },
 
-  // Update segment
   updateSegment: (segmentId: EntityID, updates: Partial<NarrativeSegment>) => set((state) => {
     if (!state.segments[segmentId]) {
       return { error: 'Segment not found' };
@@ -224,7 +222,6 @@ export const createNarrativeSegmentActions = (
     };
   }),
 
-  // Delete segment
   deleteSegment: (segmentId: EntityID) => set((state) => {
     const segment = state.segments[segmentId];
     if (!segment) {
@@ -248,7 +245,6 @@ export const createNarrativeSegmentActions = (
     };
   }),
 
-  // Get session segments
   getSessionSegments: (sessionId: EntityID): NarrativeSegment[] => {
     const state = get();
     const segmentIds = state.sessionSegments[sessionId] || [];

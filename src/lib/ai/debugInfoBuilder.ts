@@ -85,9 +85,6 @@ export function buildPromptDebugInfo(context: DebugInfoContext): PromptDebugInfo
   };
 }
 
-/**
- * Extract lore entries from lore context string
- */
 function extractLoreEntries(loreContext: string): Array<{
   loreId: EntityID;
   title: string;
@@ -119,9 +116,6 @@ function extractLoreEntries(loreContext: string): Array<{
   return entries;
 }
 
-/**
- * Extract active goals from full prompt string
- */
 function extractActiveGoalsFromPrompt(fullPrompt: string): string[] {
   const goals: string[] = [];
 
@@ -164,9 +158,6 @@ function buildCharacterContext(
   }));
 }
 
-/**
- * Extract inventory items from full prompt string
- */
 function extractInventoryItemsFromPrompt(fullPrompt: string): Array<{
   itemName: string;
   isEquipped?: boolean;
@@ -220,9 +211,6 @@ function truncateText(text: string, maxLength: number): string {
   return text.substring(0, maxLength) + '...';
 }
 
-/**
- * Check if debug info capture is enabled
- */
 export function isDebugInfoEnabled(): boolean {
   // Check if we're in a browser environment
   if (typeof window !== 'undefined') {

@@ -4,7 +4,7 @@ import { EntityID, NamedEntity, TimestampedEntity, ISODateString, GeneratedImage
 
 /**
  * Standard inventory category types for organizing items in any narrative genre.
- * Following the proven pattern from lore categorization (issue #183).
+ * Follows the same categorization pattern as lore facts.
  *
  * Genre-agnostic categories that work across fantasy, sci-fi, modern, historical, etc.:
  * - equipment: Items used for tasks or carried regularly (tools, devices, gear)

@@ -8,7 +8,7 @@ import { openAICompatibleAdapter } from './openai-compatible/adapter';
 /**
  * Which wire format each provider type speaks.
  *
- * Split out from `factory.ts` so that request-path code (`resolveProvider`)
+ * Kept separate from `factory.ts` so that request-path code (`resolveProvider`)
  * can ask "can we talk to this type?" without pulling the Gemini SDK and the
  * client classes in behind it.
  *
