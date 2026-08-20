@@ -34,6 +34,7 @@ describe('worldThreadStore', () => {
       threads: {},
       entities: {},
       sessionThreads: {},
+      seedAttempts: {},
       currentEntityId: null,
       error: null,
       loading: false,
@@ -115,11 +116,36 @@ describe('worldThreadStore', () => {
       expect(state.threads[foreignId]).toMatchObject({ status: 'open', lastAdvancedAtTurn: 1, notes: [] });
     });
 
-    test('an all-empty result still seeds the session ledger', () => {
+    test('a seed that opened nothing leaves the ledger unseeded so the next turn retries', () => {
       expect(useWorldThreadStore.getState().hasSessionLedger('session-a')).toBe(false);
       useWorldThreadStore.getState().applyExtraction('session-a', 'world-1', emptyResult(), 1);
+      expect(useWorldThreadStore.getState().hasSessionLedger('session-a')).toBe(false);
+    });
+
+    test('stops retrying the seed after three empty attempts', () => {
+      const store = () => useWorldThreadStore.getState();
+      store().applyExtraction('session-a', 'world-1', emptyResult(), 1);
+      store().applyExtraction('session-a', 'world-1', emptyResult(), 2);
+      expect(store().hasSessionLedger('session-a')).toBe(false);
+
+      store().applyExtraction('session-a', 'world-1', emptyResult(), 3);
+
+      expect(store().hasSessionLedger('session-a')).toBe(true);
+      expect(store().getOpenThreadsBySession('session-a')).toEqual([]);
+    });
+
+    test('an empty result on a seeded ledger leaves it seeded', () => {
+      const threadId = openThread('session-a', 'The debt collector is coming');
+      useWorldThreadStore.getState().applyExtraction(
+        'session-a',
+        'world-1',
+        { opened: [], advanced: [], resolved: [{ id: threadId, resolution: 'Paid', outcome: 'resolved' }] },
+        2
+      );
+
       expect(useWorldThreadStore.getState().hasSessionLedger('session-a')).toBe(true);
-      expect(useWorldThreadStore.getState().getOpenThreadsBySession('session-a')).toEqual([]);
+      useWorldThreadStore.getState().applyExtraction('session-a', 'world-1', emptyResult(), 3);
+      expect(useWorldThreadStore.getState().hasSessionLedger('session-a')).toBe(true);
     });
   });
 

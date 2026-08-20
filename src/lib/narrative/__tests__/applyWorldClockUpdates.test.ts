@@ -29,7 +29,7 @@ describe('applyWorldClockUpdates', () => {
   let worldId: string;
 
   beforeEach(() => {
-    useWorldThreadStore.setState({ threads: {}, entities: {}, sessionThreads: {} });
+    useWorldThreadStore.setState({ threads: {}, entities: {}, sessionThreads: {}, seedAttempts: {} });
     // jest.setup.ts swaps worldStore for its manual mock, which has no
     // setState; seed the one world through the mock's own createWorld.
     (useWorldStore as unknown as { __resetMocks: () => void }).__resetMocks();
@@ -88,6 +88,28 @@ describe('applyWorldClockUpdates', () => {
     );
     expect(note?.worldClock).toEqual({ turn: 1, open: 1, overdue: 0, opened: ['The council vote'], advanced: [], resolved: [] });
     expect(useWorldThreadStore.getState().getOpenThreadsBySession('session-1')).toHaveLength(1);
+  });
+
+  it('with the flag on, a seed that opened nothing carries the seed into the next turn', async () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    processSpy.mockResolvedValue({
+      newGoalsCreated: 0,
+      goalsUpdated: 0,
+      goalsCompleted: 0,
+      worldThreads: { opened: [], advanced: [], resolved: [] },
+    });
+
+    await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', currentTurn: 1 });
+
+    expect(useWorldThreadStore.getState().hasSessionLedger('session-1')).toBe(false);
+
+    await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', currentTurn: 2 });
+
+    expect(processSpy.mock.calls[1][3].seed).toEqual({
+      worldDescription: 'The council votes in six weeks.',
+      toneInstructions: 'civic drama',
+      activeGoals: [],
+    });
   });
 
   it('with the flag on and a seeded ledger, passes the open threads and no seed', async () => {

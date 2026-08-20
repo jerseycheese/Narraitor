@@ -65,6 +65,18 @@ describe('buildWorldThreadPromptSection', () => {
     expect(section).toContain('Tone instructions: Slow-burn political dread');
     expect(section).toContain('- Find the missing ledger');
   });
+
+  it('lifts the per-turn OPEN rules and offers consequence while seeding', () => {
+    const section = buildWorldThreadPromptSection({
+      openThreads: [],
+      currentTurn: 16,
+      segmentSignals: { location: 'The lake' },
+      seed: { worldDescription: 'Something watches from the woods', activeGoals: [] },
+    });
+
+    expect(section).toContain('The OPEN rules above do not apply while seeding');
+    expect(section).toContain("'consequence'");
+  });
 });
 
 describe('parseWorldThreadExtraction', () => {
