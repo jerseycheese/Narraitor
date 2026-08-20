@@ -286,6 +286,12 @@ export interface NarrativeMetadata {
    * quiet streak, so the guard paces itself instead of firing every turn.
    */
   pacingEscalationRequested?: boolean;
+  /**
+   * Set by the engine, not the model: this turn's pivotal decision was allowed
+   * to end the run. Permission is what gets spent, so the marker lands whether
+   * or not the dice took it. Read by turnsSinceFatalRiskAllowed.
+   */
+  fatalRiskAllowed?: boolean;
   // Continuity guardrail outcome
   continuity?: ContinuitySegmentNote;
   // Debug information (dev mode only)
