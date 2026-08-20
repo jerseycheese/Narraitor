@@ -126,6 +126,33 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     (state) => state.clearGenerationError
   );
   const hasHydrated = useNarrativeStore((state) => state._hasHydrated);
+
+  /**
+   * addSegment applies the sanitization and dedupe gate, so the passage it
+   * kept is the one the player must read. Taking the content back from the
+   * store keeps a single gate: local state, the journal callback and ending
+   * detection all read the same string the store holds, and there is no
+   * second copy of the gating logic here to drift from it.
+   */
+  const storeSegmentAndTakeGated = useCallback(
+    (segment: NarrativeSegment): NarrativeSegment => {
+      const storedSegmentId = addSegment(sessionId, {
+        content: segment.content,
+        type: segment.type,
+        characterIds: segment.characterIds || [],
+        metadata: segment.metadata,
+        worldId: segment.worldId,
+        updatedAt: segment.updatedAt,
+        timestamp: segment.timestamp,
+      });
+
+      const stored = useNarrativeStore.getState().segments[storedSegmentId];
+
+      return stored ? { ...segment, content: stored.content } : segment;
+    },
+    [addSegment, sessionId]
+  );
+
   // The fatal-outcome tag lands on a segment after the post-segment
   // extraction reads a death in the prose, seconds after the segment itself,
   // so the synchronous check after addSegment cannot see it; this does.
@@ -538,31 +565,22 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         updatedAt: now.toISOString(),
       };
 
-      // Add to local state
-      setSegments((prev) => [...prev, newSegment]);
+      const gatedSegment = storeSegmentAndTakeGated(newSegment);
 
-      // Add to store
-      addSegment(sessionId, {
-        content: newSegment.content,
-        type: newSegment.type,
-        characterIds: newSegment.characterIds || [],
-        metadata: newSegment.metadata,
-        worldId: newSegment.worldId,
-        updatedAt: newSegment.updatedAt,
-        timestamp: newSegment.timestamp,
-      });
+      // Add to local state
+      setSegments((prev) => [...prev, gatedSegment]);
 
       if (onNarrativeGenerated) {
-        onNarrativeGenerated(newSegment);
+        onNarrativeGenerated(gatedSegment);
       }
 
       // Check for ending indicators. Deferred off the per-turn path: it's
       // an extra Gemini round-trip that only feeds onEndingSuggested, which
       // choice generation below doesn't wait on.
-      void checkForEndingIndicators(newSegment);
+      void checkForEndingIndicators(gatedSegment);
 
       // Generate choices if enabled - skip when this segment already ends the session
-      if (generateChoices && !isSessionEndingSegment(newSegment)) {
+      if (generateChoices && !isSessionEndingSegment(gatedSegment)) {
         // Start generating AI choices immediately without showing fallback choices first
         setTimeout(() => {
           generatePlayerChoices();
@@ -592,24 +610,16 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         };
 
         // Add locally and to the store to unblock the UI
-        setSegments((prev) => [...prev, fallbackSegment]);
-        addSegment(sessionId, {
-          content: fallbackSegment.content,
-          type: fallbackSegment.type,
-          characterIds: fallbackSegment.characterIds || [],
-          metadata: fallbackSegment.metadata,
-          worldId: fallbackSegment.worldId,
-          updatedAt: fallbackSegment.updatedAt,
-          timestamp: fallbackSegment.timestamp,
-        });
+        const gatedFallback = storeSegmentAndTakeGated(fallbackSegment);
+        setSegments((prev) => [...prev, gatedFallback]);
 
         // Notify parent so it can progress to choices skeleton + generation
         if (onNarrativeGenerated) {
-          onNarrativeGenerated(fallbackSegment);
+          onNarrativeGenerated(gatedFallback);
         }
 
         // Kick off choice generation (will provide AI or fallback choices)
-        if (generateChoices && !isSessionEndingSegment(fallbackSegment)) {
+        if (generateChoices && !isSessionEndingSegment(gatedFallback)) {
           setTimeout(() => {
             generatePlayerChoices();
           }, 500);
@@ -840,28 +850,19 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         updatedAt: now.toISOString(),
       };
 
-      // Add to local state
-      setSegments((prev) => [...prev, newSegment]);
+      const gatedSegment = storeSegmentAndTakeGated(newSegment);
 
-      // Add to store
-      addSegment(sessionId, {
-        content: newSegment.content,
-        type: newSegment.type,
-        characterIds: newSegment.characterIds || [],
-        metadata: newSegment.metadata,
-        worldId: newSegment.worldId,
-        updatedAt: newSegment.updatedAt,
-        timestamp: newSegment.timestamp,
-      });
+      // Add to local state
+      setSegments((prev) => [...prev, gatedSegment]);
 
       if (onNarrativeGenerated) {
-        onNarrativeGenerated(newSegment);
+        onNarrativeGenerated(gatedSegment);
       }
 
       // Check for ending indicators. Deferred off the per-turn path: it's
       // an extra Gemini round-trip that only feeds onEndingSuggested, which
       // choice generation below doesn't wait on.
-      void checkForEndingIndicators(newSegment);
+      void checkForEndingIndicators(gatedSegment);
 
       // Generate choices if enabled - skip when the session is ending
       // (fatal/ending segment or a fatal critical-decision failure).
@@ -874,7 +875,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         isFatalCriticalFailure && Boolean(onEndingSuggested);
       if (
         generateChoices &&
-        !isSessionEndingSegment(newSegment) &&
+        !isSessionEndingSegment(gatedSegment) &&
         !criticalFailureEndsSession
       ) {
         if (isCustomInput) {
