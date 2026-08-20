@@ -138,7 +138,7 @@ const wordBigrams = (words: string[]): string[] =>
  * stands in for difflib's sequence ratio at a fraction of its cost, which
  * matters because this runs on the turn's write path.
  */
-export const similarityRatio = (left: string, right: string): number => {
+const similarityRatio = (left: string, right: string): number => {
   const leftGrams = wordBigrams(comparableWords(left));
   const rightGrams = wordBigrams(comparableWords(right));
 
