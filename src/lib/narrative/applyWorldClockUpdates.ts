@@ -95,6 +95,16 @@ async function reconcileSegment({
     const result = await goalStore.processSegmentForGoals(segment, sessionId, characterId, worldThreads, worldCost);
     const notes: ReconciledSegmentNotes = {};
 
+    // Cost before ledger. A cost is attributed to a thread that was open while
+    // the segment was being written, and recordThreadCost takes only an open
+    // thread, so applying the extraction first drops the cost on exactly the
+    // turn this channel exists to catch: the one where a thread lands and takes
+    // something. The extractor can only cite ids it was handed, so nothing it
+    // attributes can belong to a thread opened by this same result.
+    if (result.worldCost && playerCharacterId) {
+      notes.worldCost = applyWorldCost({ sessionId, characterId: playerCharacterId, result: result.worldCost });
+    }
+
     if (result.worldThreads && worldId) {
       const applied = useWorldThreadStore
         .getState()
@@ -104,10 +114,6 @@ async function reconcileSegment({
         .getAll()
         .filter((thread) => thread.sessionId === sessionId);
       notes.worldClock = summarizeLedgerForSegment(sessionThreads, currentTurn, applied);
-    }
-
-    if (result.worldCost && playerCharacterId) {
-      notes.worldCost = applyWorldCost({ sessionId, characterId: playerCharacterId, result: result.worldCost });
     }
 
     return notes.worldClock || notes.worldCost ? notes : undefined;
