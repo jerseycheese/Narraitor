@@ -8,7 +8,7 @@ import type {
 } from '@/types/worldThread.types';
 import { logger } from '@/lib/utils/logger';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { selectDueNowThread, summarizeLedgerForSegment } from '@/lib/narrative/worldClock';
+import { needsOpenAsk, selectDueNowThread, summarizeLedgerForSegment } from '@/lib/narrative/worldClock';
 import { useGoalStore } from '@/state/goalStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -74,8 +74,10 @@ async function reconcileSegment({
   const worldId = segment.worldId ?? useSessionStore.getState().worldId ?? undefined;
   const threadStore = useWorldThreadStore.getState();
   const openThreads = threadStore.getOpenThreadsBySession(sessionId);
-  const needsSeed = !threadStore.hasSessionLedger(sessionId);
-
+  const seeded = threadStore.hasSessionLedger(sessionId);
+  // The quiet check reads ALL the session's threads, any status: a resolved
+  // thread's open still counts as the last time something opened.
+  const sessionThreads = threadStore.getAll().filter((thread) => thread.sessionId === sessionId);
   // Same pick the scene block rendered for this segment: the block reads the
   // store at segments + 1 before the segment lands, this reads it at the
   // segment's own index after, and both are this turn.
@@ -83,8 +85,9 @@ async function reconcileSegment({
     openThreads,
     currentTurn,
     segmentSignals: collectSegmentSignals(segment),
-    seed: needsSeed ? buildSeedContext(worldId, sessionId) : undefined,
+    seed: seeded ? undefined : buildSeedContext(worldId, sessionId),
     dueNowThreadId: selectDueNowThread(openThreads, currentTurn)?.id,
+    ...(seeded && needsOpenAsk(sessionThreads, currentTurn) ? { openAsk: true } : {}),
   };
 
   try {

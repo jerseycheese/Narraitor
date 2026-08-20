@@ -8,6 +8,7 @@ import type {
   WorldThreadSegmentSignals,
   WorldThreadSeedContext,
 } from '@/types/worldThread.types';
+import { FIRED_THREAD_MAX_STRIKES, OPEN_ASK_QUIET_TURNS } from '@/lib/narrative/worldClock';
 
 /**
  * The world clock rides along on goal extraction so the ledger costs no
@@ -39,9 +40,11 @@ const formatThreadLine = (thread: WorldThread, currentTurn: number, isDueNow: bo
   if (thread.firedAtTurn !== undefined) marks.push(`IN THE SCENE since turn ${thread.firedAtTurn}`);
   if (isDueNow) {
     marks.push(
-      thread.firedAtTurn !== undefined
-        ? 'DUE NOW: this segment was asked to make it act, cost the character, or conclude; if the prose settled it, RESOLVE it with the outcome'
-        : 'DUE NOW: this segment was asked to land it'
+      thread.firedAtTurn === undefined
+        ? 'DUE NOW: this segment was asked to land it'
+        : (thread.strikeCount ?? 0) >= FIRED_THREAD_MAX_STRIKES
+          ? 'DUE NOW: this segment was asked to CONCLUDE the matter (settled one way or the other, the actor gone or changed, or the character out of its reach); RESOLVE is expected - if the prose closed it in any of those ways, that is a resolution with its outcome, not an advance'
+          : 'DUE NOW: this segment was asked to make it act, cost the character, or conclude; if the prose settled it, RESOLVE it with the outcome'
     );
   }
   const suffix = marks.length > 0 ? `, ${marks.join(', ')}` : '';
@@ -96,6 +99,14 @@ ${threadList}`,
 - ADVANCE an open thread only when the prose changes its state as something the player did not do: someone arrived or left, something was lost or gained, a position, date or distance moved. Cite its id and give \`changed\` as one clause naming the new state. Repeating, reminding, reiterating, re-confirming or reinforcing that a thread exists is NOT an advance; leave it alone. If the observable-changes line shows nothing changed, an advance needs a strong reason.
 - RESOLVE a thread with outcome 'resolved' only when the prose shows the thing happening and \`resolution\` names the outcome: who won the vote and what it decided, what came through the door, what the caller collected, what was lost. Calling the vote, setting off toward the sound, the sound changing, the actor announcing they will act: each is an ADVANCE, not a resolution. Use 'dropped' only when the story has made it impossible or irrelevant, never because it stalled or has not been mentioned.
 - dueByTurn is a rough turn index on this scale: one turn is a few minutes to an hour of story time; 'later today' or 'tonight' is 2-4 turns out, 'tomorrow' about 5, 'end of the week' about 10, 'six weeks' about 30. Never earlier than two turns from now. All stamps are turn indices, never dates.`);
+
+  // Round 8 and round 11 both measured the extractor opening nothing for a
+  // whole session once the seeds resolved, leaving the story with no incoming
+  // pressure; when the ledger has gone quiet the ask is explicit, and it is
+  // one thread, because "file everything" (round 7) is the opposite failure.
+  if (input.openAsk) {
+    sections.push(`THE LEDGER HAS GONE QUIET: nothing has opened in ${OPEN_ASK_QUIET_TURNS} or more turns and no open thread has an arrival coming. OPEN exactly one new off-stage pressure this turn: who arrives, what is decided, who comes to collect. Take it from this segment's prose if it loaded one; otherwise derive it from the world's own pressure sources (an actor, a debt, a deadline the story has established but not yet cashed). One thread, phrased as the event that will land, with a rough dueByTurn on the turn scale above. Not a repeat of anything resolved, and not a second copy of anything open.`);
+  }
 
   if (input.seed) sections.push(formatSeed(input.seed));
 

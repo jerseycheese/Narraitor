@@ -35,6 +35,13 @@ export interface WorldThread extends TimestampedEntity {
    * due the block demands its strike, its cost or its outcome.
    */
   firedAtTurn?: number;
+  /**
+   * Times this thread has acted since it fired (each advance on it while it
+   * is the DUE NOW pick re-fuses it and counts one strike). Past the strike
+   * cap the block stops demanding another act and demands the matter
+   * conclude, so a fired thread has an exit besides resolution or a kill.
+   */
+  strikeCount?: number;
   status: WorldThreadStatus;
   /** How it came due or closed, set when status leaves 'open'. */
   resolution?: string;
@@ -72,6 +79,12 @@ export interface WorldThreadExtractionInput {
   seed?: WorldThreadSeedContext;
   /** The thread the scene block asked this segment to land, so the extractor matches arrivals to it first. */
   dueNowThreadId?: EntityID;
+  /**
+   * Set when the ledger has gone quiet: nothing opened for a window of turns
+   * and no unfired open thread is due inside it. The extraction section then
+   * asks for one new off-stage pressure.
+   */
+  openAsk?: boolean;
 }
 
 /** What the extraction returns for the ledger; every array may be empty. */
@@ -110,6 +123,8 @@ export interface WorldClockPromptContext {
     /** Already in the scene; rendered by its own summary with no arrival ask, and picked at its fuse for the strike. */
     fired: boolean;
     firedAtTurn?: number;
+    /** Strikes since firing; at the cap the fired DUE NOW ask becomes "conclude", not another strike. */
+    strikes: number;
   }>;
 }
 

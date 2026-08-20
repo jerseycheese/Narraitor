@@ -299,7 +299,11 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
             lastAdvancedAtTurn: currentTurn,
             notes: [...thread.notes, entry.changed],
             ...(isPick && thread.firedAtTurn === undefined ? { firedAtTurn: currentTurn, ...fuse } : {}),
-            ...(isPick && thread.firedAtTurn !== undefined ? fuse : {}),
+            // Each re-fuse is one strike landed; past the cap the block asks
+            // the matter to conclude instead of demanding another.
+            ...(isPick && thread.firedAtTurn !== undefined
+              ? { ...fuse, strikeCount: (thread.strikeCount ?? 0) + 1 }
+              : {}),
           });
           applied.advanced.push(thread.summary);
         }

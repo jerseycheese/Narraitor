@@ -35,6 +35,43 @@ export const MIN_DUE_HORIZON_TURNS = 2;
  */
 export const FIRED_THREAD_FUSE_TURNS = 3;
 
+/**
+ * Strikes a fired thread may land before the ask changes from "act again" to
+ * "conclude". Round 11's fused pick re-demanded the strike every fuse for 20
+ * turns because the only exits were resolution or a kill; past this cap the
+ * block asks for the matter to close instead.
+ */
+export const FIRED_THREAD_MAX_STRIKES = 3;
+
+/**
+ * Turns the ledger may go without an open before the extraction is asked to
+ * open one. Round 11's Harrowgate extractor opened nothing in 30 turns once
+ * the seeds resolved, and the story circled one conversation for 22 of them.
+ */
+export const OPEN_ASK_QUIET_TURNS = 5;
+
+/**
+ * Whether the extraction should be asked to open a new off-stage pressure:
+ * nothing has opened for the quiet window (across ALL the session's threads,
+ * any status - a resolved thread's open still counts as one) and no unfired
+ * open thread is due inside it. A due further out is not incoming pressure,
+ * and a thread with no due can never reach DUE NOW at all; both were what
+ * kept the literal "no unfired open thread" from ever firing on the measured
+ * case. Self-limiting: an open resets the window.
+ */
+export const needsOpenAsk = (sessionThreads: WorldThread[], currentTurn: number): boolean => {
+  if (sessionThreads.length === 0) return false;
+  const lastOpenedAtTurn = Math.max(...sessionThreads.map((thread) => thread.openedAtTurn));
+  if (currentTurn - lastOpenedAtTurn < OPEN_ASK_QUIET_TURNS) return false;
+  return sessionThreads.every(
+    (thread) =>
+      thread.status !== 'open' ||
+      thread.firedAtTurn !== undefined ||
+      thread.dueByTurn === undefined ||
+      thread.dueByTurn > currentTurn + OPEN_ASK_QUIET_TURNS
+  );
+};
+
 export const isOverdue = (thread: WorldThread, currentTurn: number): boolean =>
   thread.status === 'open' && thread.dueByTurn !== undefined && currentTurn > thread.dueByTurn;
 
@@ -120,6 +157,7 @@ export const buildWorldClockPromptContext = (
       dueNow: thread.id === dueNow?.id,
       fired: thread.firedAtTurn !== undefined,
       ...(thread.firedAtTurn !== undefined ? { firedAtTurn: thread.firedAtTurn } : {}),
+      strikes: thread.strikeCount ?? 0,
     })),
   };
 };

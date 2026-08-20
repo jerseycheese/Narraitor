@@ -98,6 +98,33 @@ describe('buildWorldThreadPromptSection', () => {
     expect(atFuse).not.toContain('asked to land it');
   });
 
+  it('expects a RESOLVE once the fired DUE NOW pick has struck out', () => {
+    const struckOut: WorldThread = {
+      ...openThread,
+      id: 'thread-fired',
+      dueByTurn: 17,
+      firedAtTurn: 8,
+      strikeCount: 3,
+      summary: 'The thing from the boathouse hunts the shore',
+    };
+    const section = buildWorldThreadPromptSection({ openThreads: [struckOut], currentTurn: 17, dueNowThreadId: 'thread-fired' });
+
+    expect(section).toContain('DUE NOW: this segment was asked to CONCLUDE the matter');
+    expect(section).toContain('RESOLVE is expected');
+    expect(section).toContain('that is a resolution with its outcome, not an advance');
+    expect(section).not.toContain('asked to make it act');
+  });
+
+  it('asks for one new off-stage pressure when the ledger has gone quiet', () => {
+    const withAsk = buildWorldThreadPromptSection({ openThreads: [openThread], currentTurn: 12, openAsk: true });
+    expect(withAsk).toContain('THE LEDGER HAS GONE QUIET');
+    expect(withAsk).toContain('OPEN exactly one new off-stage pressure this turn');
+    expect(withAsk).toContain('Not a repeat of anything resolved');
+
+    const withoutAsk = buildWorldThreadPromptSection({ openThreads: [openThread], currentTurn: 12 });
+    expect(withoutAsk).not.toContain('THE LEDGER HAS GONE QUIET');
+  });
+
   it('lists only the observable changes that are present', () => {
     const section = buildWorldThreadPromptSection({
       openThreads: [],

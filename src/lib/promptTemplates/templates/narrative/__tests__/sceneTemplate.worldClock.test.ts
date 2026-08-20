@@ -44,6 +44,7 @@ describe('sceneTemplate world clock block', () => {
             overdueByTurns: 0,
             dueNow: false,
             fired: false,
+            strikes: 0,
           },
           {
             kind: 'actor',
@@ -53,6 +54,7 @@ describe('sceneTemplate world clock block', () => {
             overdueByTurns: 2,
             dueNow: false,
             fired: false,
+            strikes: 0,
           },
         ],
       })
@@ -80,6 +82,7 @@ describe('sceneTemplate world clock block', () => {
             overdueByTurns: 9,
             dueNow: true,
             fired: false,
+            strikes: 0,
           },
           {
             kind: 'actor',
@@ -89,6 +92,7 @@ describe('sceneTemplate world clock block', () => {
             overdueByTurns: 2,
             dueNow: false,
             fired: false,
+            strikes: 0,
           },
         ],
       })
@@ -111,6 +115,7 @@ describe('sceneTemplate world clock block', () => {
       dueNow: false,
       fired: true,
       firedAtTurn: 12,
+      strikes: 0,
     };
     const oneFired = sceneTemplate(makeContext({ currentTurn: 14, turnsSinceWorldMoved: 1, threads: [fired] }));
     expect(oneFired).toContain('Henderson comes to collect the roof loan [IN THE SCENE since turn 12]');
@@ -127,7 +132,7 @@ describe('sceneTemplate world clock block', () => {
         turnsSinceWorldMoved: 1,
         threads: [
           fired,
-          { kind: 'deadline', summary: 'The agreement is signed', ageTurns: 12, overdue: true, overdueByTurns: 10, dueNow: true, fired: false },
+          { kind: 'deadline', summary: 'The agreement is signed', ageTurns: 12, overdue: true, overdueByTurns: 10, dueNow: true, fired: false, strikes: 0 },
         ],
       })
     );
@@ -150,8 +155,9 @@ describe('sceneTemplate world clock block', () => {
             dueNow: true,
             fired: true,
             firedAtTurn: 12,
+            strikes: 0,
           },
-          { kind: 'deadline', summary: 'Dawn comes', ageTurns: 3, overdue: false, overdueByTurns: 0, dueNow: false, fired: false },
+          { kind: 'deadline', summary: 'Dawn comes', ageTurns: 3, overdue: false, overdueByTurns: 0, dueNow: false, fired: false, strikes: 0 },
         ],
       })
     );
@@ -165,6 +171,42 @@ describe('sceneTemplate world clock block', () => {
     expect(prompt).not.toContain('It has been overdue for');
   });
 
+  it('asks the matter to conclude, with a forward cut, once a fired pick has struck out', () => {
+    const prompt = sceneTemplate(
+      makeContext({
+        currentTurn: 24,
+        turnsSinceWorldMoved: 1,
+        register: 'slasher; the woods are hungry',
+        threads: [
+          {
+            kind: 'actor',
+            summary: 'The thing from the boathouse hunts the shore',
+            ageTurns: 16,
+            overdue: false,
+            overdueByTurns: 0,
+            dueNow: true,
+            fired: true,
+            firedAtTurn: 8,
+            strikes: 3,
+          },
+        ],
+      })
+    );
+    expect(prompt).toContain('It has been in the scene since turn 8 and it has acted 3 times without the matter closing. It does not act again.');
+    expect(prompt).toContain('In THIS segment the matter CONCLUDES');
+    expect(prompt).toContain('the actor is gone or permanently changed, or the character is somewhere else and out of its reach');
+    expect(prompt).toContain('this segment is a "transition"');
+    expect(prompt).toContain('time may jump FORWARD');
+    expect(prompt).not.toContain('it acts on the character, now, and the act costs them');
+    expect(prompt).not.toContain('no time cut is needed and none is granted');
+  });
+
+  it('names the resolve-turn caption shape in the no-leak rule on every render', () => {
+    const prompt = sceneTemplate(makeContext({ currentTurn: 2, turnsSinceWorldMoved: 1, threads: [] }));
+    expect(prompt).toContain('Never copy a ledger line above into the passage as a heading, a label or a summary sentence, bold or plain');
+    expect(prompt).toContain('when a thread resolves, the prose shows the outcome happening and never captions it');
+  });
+
   it('asks for the act in the world\'s own register when the context carries one, and never lets the block into the passage', () => {
     const fired = {
       kind: 'actor' as const,
@@ -175,6 +217,7 @@ describe('sceneTemplate world clock block', () => {
       dueNow: true,
       fired: true,
       firedAtTurn: 9,
+      strikes: 0,
     };
     const withRegister = sceneTemplate(
       makeContext({

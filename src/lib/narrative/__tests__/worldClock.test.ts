@@ -6,7 +6,9 @@ import {
   selectDueNowThread,
   buildWorldClockPromptContext,
   summarizeLedgerForSegment,
+  needsOpenAsk,
   DUE_NOW_OVERDUE_TURNS,
+  OPEN_ASK_QUIET_TURNS,
 } from '../worldClock';
 import type { WorldThread } from '@/types/worldThread.types';
 
@@ -117,7 +119,7 @@ describe('worldClock', () => {
       currentTurn: 7,
       turnsSinceWorldMoved: 2,
       threads: [
-        { kind: 'consequence', summary: 'The vote', ageTurns: 6, overdue: true, overdueByTurns: 2, dueNow: false, fired: false },
+        { kind: 'consequence', summary: 'The vote', ageTurns: 6, overdue: true, overdueByTurns: 2, dueNow: false, fired: false, strikes: 0 },
         {
           kind: 'consequence',
           summary: 'The debt collector is coming',
@@ -126,6 +128,7 @@ describe('worldClock', () => {
           overdueByTurns: 3,
           dueNow: true,
           fired: false,
+          strikes: 0,
         },
       ],
     });
@@ -160,6 +163,7 @@ describe('worldClock', () => {
       overdueByTurns: 10,
       dueNow: true,
       fired: false,
+      strikes: 0,
     });
     expect(before[1]).toEqual({
       kind: 'consequence',
@@ -170,12 +174,40 @@ describe('worldClock', () => {
       dueNow: false,
       fired: true,
       firedAtTurn: 12,
+      strikes: 0,
     });
     expect(JSON.stringify(before)).not.toContain('ledger is on the table');
 
     const atFuse = buildWorldClockPromptContext(threads, 15).threads;
     expect(atFuse.find((thread) => thread.fired)?.dueNow).toBe(true);
     expect(atFuse.find((thread) => !thread.fired)?.dueNow).toBe(false);
+  });
+
+  test('buildWorldClockPromptContext carries a thread\'s strike count into the prompt shape', () => {
+    const threads = [makeThread({ summary: 'The thing in the boathouse', dueByTurn: 11, firedAtTurn: 8, strikeCount: 3 })];
+    expect(buildWorldClockPromptContext(threads, 11).threads[0].strikes).toBe(3);
+  });
+
+  test('needsOpenAsk fires only when the quiet window has passed and nothing unfired is due inside it', () => {
+    // Quiet for the window, only a fired thread open: ask.
+    const fired = makeThread({ openedAtTurn: 1, dueByTurn: 11, firedAtTurn: 8 });
+    expect(needsOpenAsk([fired], 1 + OPEN_ASK_QUIET_TURNS)).toBe(true);
+    expect(needsOpenAsk([fired], OPEN_ASK_QUIET_TURNS)).toBe(false);
+
+    // An unfired thread due far out (round 11's vote, due 30) does not block the ask; one due inside the window does.
+    const farDue = makeThread({ openedAtTurn: 1, dueByTurn: 30 });
+    expect(needsOpenAsk([farDue], 10)).toBe(true);
+    const nearDue = makeThread({ openedAtTurn: 1, dueByTurn: 12 });
+    expect(needsOpenAsk([nearDue], 10)).toBe(false);
+
+    // A thread with no due can never reach DUE NOW, so it does not block; a recent open resets the window even if resolved since.
+    const noDue = makeThread({ openedAtTurn: 1 });
+    expect(needsOpenAsk([noDue], 10)).toBe(true);
+    const recentlyOpenedResolved = makeThread({ openedAtTurn: 8, status: 'resolved' });
+    expect(needsOpenAsk([fired, recentlyOpenedResolved], 10)).toBe(false);
+
+    // An empty session is the seed path's, not the ask's.
+    expect(needsOpenAsk([], 10)).toBe(false);
   });
 
   test('summarizeLedgerForSegment counts open and overdue and passes the applied summaries through', () => {

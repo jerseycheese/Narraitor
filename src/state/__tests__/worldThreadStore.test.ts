@@ -265,6 +265,29 @@ describe('worldThreadStore', () => {
       const state = useWorldThreadStore.getState();
       expect(state.threads[atFuseId]).toMatchObject({ firedAtTurn: 7, dueByTurn: 10 + FIRED_THREAD_FUSE_TURNS });
       expect(state.threads[restingId]).toMatchObject({ firedAtTurn: 9, dueByTurn: 12 });
+      // Each re-fuse is one strike landed; the advance off the pick counts none.
+      expect(state.threads[atFuseId].strikeCount).toBe(1);
+      expect(state.threads[restingId].strikeCount).toBeUndefined();
+    });
+
+    test('strikes accumulate across re-fuses, and the first firing counts none', () => {
+      const threadId = openThread('session-a', 'The thing from the boathouse hunts the shore');
+      useWorldThreadStore.getState().update(threadId, { dueByTurn: 5 });
+
+      const strike = (turn: number, changed: string) =>
+        useWorldThreadStore
+          .getState()
+          .applyExtraction('session-a', 'world-1', { opened: [], advanced: [{ id: threadId, changed }], resolved: [] }, turn);
+
+      strike(8, 'It came out of the water'); // fires: overdue past the grace, so it is the pick
+      expect(useWorldThreadStore.getState().threads[threadId].strikeCount).toBeUndefined();
+
+      strike(11, 'It wrenched the player\'s shoulder'); // at the fuse: first strike
+      strike(14, 'It dragged them toward the treeline'); // second
+      strike(17, 'It re-popped the shoulder'); // third
+      const thread = useWorldThreadStore.getState().threads[threadId];
+      expect(thread.strikeCount).toBe(3);
+      expect(thread.dueByTurn).toBe(17 + FIRED_THREAD_FUSE_TURNS);
     });
 
     test('a fired thread short of its fuse is not the DUE NOW pick, so an advance on it does not re-fire it', () => {

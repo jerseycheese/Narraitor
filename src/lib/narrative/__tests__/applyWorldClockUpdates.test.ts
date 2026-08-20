@@ -139,6 +139,35 @@ describe('applyWorldClockUpdates', () => {
     const input = processSpy.mock.calls[0][3];
     const favors = input.openThreads.find((t: { summary: string }) => t.summary === 'Those owed favors come to collect');
     expect(input.dueNowThreadId).toBe(favors.id);
+    expect(input.openAsk).toBeUndefined();
+  });
+
+  it('asks for an open once the ledger has gone quiet with nothing incoming, and not before', async () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    useWorldThreadStore.getState().create({
+      sessionId: 'session-1',
+      worldId,
+      kind: 'actor',
+      summary: 'The thing from the boathouse hunts the shore',
+      openedAtTurn: 1,
+      lastAdvancedAtTurn: 1,
+      dueByTurn: 11,
+      firedAtTurn: 8,
+      status: 'open',
+      notes: [],
+    });
+    processSpy.mockResolvedValue({
+      newGoalsCreated: 0,
+      goalsUpdated: 0,
+      goalsCompleted: 0,
+      worldThreads: { opened: [], advanced: [], resolved: [] },
+    });
+
+    await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', currentTurn: 4 });
+    expect(processSpy.mock.calls[0][3].openAsk).toBeUndefined();
+
+    await applyWorldClockUpdates({ segment: segment(worldId), sessionId: 'session-1', currentTurn: 9 });
+    expect(processSpy.mock.calls[1][3].openAsk).toBe(true);
   });
 
   it('runs a session\'s extractions in turn order, so a fast turn 2 waits for turn 1 and seeds once', async () => {
