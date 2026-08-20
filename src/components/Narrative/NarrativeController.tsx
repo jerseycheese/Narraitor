@@ -23,6 +23,7 @@ import {
   isFatalCriticalDecision,
 } from '@/lib/narrative/evaluateDecisionSkillChecks';
 import { computeTurnsSinceComplication, isPacingStale } from '@/lib/narrative/turnsSinceComplication';
+import { isFatalCadenceOffCooldown } from '@/lib/narrative/fatalDecisionCadence';
 import { buildWorldClockPromptContext } from '@/lib/narrative/worldClock';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { mergeTurnTags } from '@/lib/narrative/turnTags';
@@ -724,10 +725,16 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // survivable setback the AI narrates (and can still escalate via the
       // fatal-outcome tag the extraction stamps), so one unlucky-but-ordinary
       // roll does not end the story.
-      const isFatalCriticalFailure = isFatalCriticalDecision(
-        decisionWeight,
-        rollResults
-      );
+      //
+      // Critical weight is model-assigned and unbudgeted, so a tense genre can
+      // mark every turn pivotal and turn that natural 1 into a per-turn death
+      // roll. The cadence guard is what budgets it: only a decision off
+      // cooldown may be fatal, and taking that permission is what spends it,
+      // whichever way the dice then fall.
+      const fatalRiskAllowed =
+        decisionWeight === 'critical' && isFatalCadenceOffCooldown(segments);
+      const isFatalCriticalFailure =
+        fatalRiskAllowed && isFatalCriticalDecision(decisionWeight, rollResults);
 
       if (isFatalCriticalFailure) {
         suggestEnding(
@@ -824,6 +831,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           tags: [...(result.metadata.tags || []), ...skillCheckTags],
           decisionOutcome,
           pacingEscalationRequested,
+          fatalRiskAllowed,
         },
         sessionId, // Explicitly set sessionId
         worldId, // Explicitly set worldId
