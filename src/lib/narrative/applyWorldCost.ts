@@ -20,8 +20,18 @@ export function applyWorldCost({ sessionId, characterId, result }: ApplyWorldCos
   const threadStore = useWorldThreadStore.getState();
   const note: WorldCostSegmentNote = { imposed: [], cleared: [] };
 
+  // A condition the character already carries, re-imposed verbatim, is not a
+  // new cost: skipping it here keeps it off the note and out of every count,
+  // not just out of the store (which already ignored the duplicate write).
+  const carried = new Set(
+    (characterStore.characters[characterId]?.status.conditions ?? []).map((condition) =>
+      condition.trim().toLowerCase()
+    )
+  );
+
   for (const cost of result.imposed) {
     if (cost.kind === 'condition') {
+      if (carried.has(cost.detail.trim().toLowerCase())) continue;
       characterStore.addCondition(characterId, cost.detail);
     }
     const thread = cost.threadId ? threadStore.recordThreadCost(sessionId, cost.threadId, cost.detail) : undefined;

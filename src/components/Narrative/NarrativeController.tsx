@@ -128,7 +128,13 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   // The fatal-outcome tag lands on a segment after the post-segment
   // extraction reads a death in the prose, seconds after the segment itself,
   // so the synchronous check after addSegment cannot see it; this does.
+  // A session that already has its ending is excluded: the tag stays on the
+  // dead session's segments forever, and a later mount that briefly renders
+  // with that session id (rehydration before a fresh session settles) would
+  // otherwise re-suggest the ending it already has - an async generation
+  // that can land on the successor session.
   const sessionHasFatalSegment = useNarrativeStore((state) =>
+    !state.endedSessions[sessionId] &&
     (state.sessionSegments[sessionId] ?? []).some((segmentId) =>
       state.segments[segmentId]?.metadata?.tags?.includes('fatal-outcome')
     )

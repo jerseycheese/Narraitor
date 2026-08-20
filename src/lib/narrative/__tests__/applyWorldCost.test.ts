@@ -84,6 +84,37 @@ describe('applyWorldCost', () => {
     expect(note.imposed).toEqual([{ kind: 'condition', detail: 'hoarse' }]);
   });
 
+  it('skips a re-imposed condition the character already carries, keeping it off the note and the thread', () => {
+    const note = applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: {
+        imposed: [{ kind: 'condition', detail: '  SHAKEN ', threadId }],
+        cleared: [],
+        fatal: false,
+      },
+    });
+
+    expect(note.imposed).toEqual([]);
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken']);
+    expect(useWorldThreadStore.getState().threads[threadId].costs).toBeUndefined();
+  });
+
+  it('still imposes a condition worded differently from what the character carries', () => {
+    const note = applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: {
+        imposed: [{ kind: 'condition', detail: 'badly shaken' }],
+        cleared: [],
+        fatal: false,
+      },
+    });
+
+    expect(note.imposed).toEqual([{ kind: 'condition', detail: 'badly shaken' }]);
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken', 'badly shaken']);
+  });
+
   it('carries a fatal read onto the note and writes no condition for it', () => {
     const note = applyWorldCost({
       sessionId: 'session-1',

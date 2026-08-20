@@ -54,12 +54,13 @@ const makeSegment = (id: string, tags: string[]) => ({
   characterIds: [],
 });
 
-const seedStores = (tags: string[]) => {
+const seedStores = (tags: string[], endedSessions: Record<string, boolean> = {}) => {
   const segment = makeSegment('seg-1', tags);
   const narrativeStoreMock = createMockNarrativeStore({
     _hasHydrated: true,
     segments: { 'seg-1': segment },
     sessionSegments: { 'test-session': ['seg-1'] },
+    endedSessions,
     getSessionSegments: jest.fn().mockReturnValue([segment]),
     getSessionDecisions: jest.fn().mockReturnValue([]),
   }) as unknown as NarrativeStore;
@@ -96,6 +97,19 @@ describe('NarrativeController - a segment tagged fatal-outcome ends the session'
     expect(onEndingSuggested).toHaveBeenCalledTimes(1);
     expect(onEndingSuggested.mock.calls[0][0]).toMatch(/^fatal:/);
     expect(onEndingSuggested.mock.calls[0][1]).toBe('story-complete');
+  });
+
+  it('stays quiet when the tagged session already has its ending', async () => {
+    // The tag outlives the session: a later mount that briefly renders with
+    // the dead session's id must not re-suggest the ending it already has.
+    seedStores(['fatal-outcome'], { 'test-session': true });
+    const onEndingSuggested = jest.fn();
+
+    await act(async () => {
+      renderController(onEndingSuggested);
+    });
+
+    expect(onEndingSuggested).not.toHaveBeenCalled();
   });
 
   it('stays quiet when no segment carries the tag', async () => {
