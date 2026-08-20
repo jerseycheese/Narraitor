@@ -228,6 +228,41 @@ describe('applyWorldClockUpdates', () => {
       expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken', 'discredited before the room']);
     });
 
+    it('records a cost against the thread the same extraction resolved', async () => {
+      mockIsFeatureEnabled.mockReturnValue(true);
+      useWorldThreadStore.getState().applyExtraction(
+        'session-1',
+        worldId,
+        { opened: [{ kind: 'actor', summary: 'The thing in the shed' }], advanced: [], resolved: [] },
+        1
+      );
+      const threadId = useWorldThreadStore.getState().getOpenThreadsBySession('session-1')[0].id;
+      processSpy.mockResolvedValue({
+        newGoalsCreated: 0,
+        goalsUpdated: 0,
+        goalsCompleted: 0,
+        worldThreads: {
+          opened: [],
+          advanced: [],
+          resolved: [{ id: threadId, outcome: 'resolved', resolution: 'It got through and struck' }],
+        },
+        worldCost: { imposed: [{ kind: 'condition', detail: 'gashed left forearm', threadId }], cleared: [] },
+      });
+
+      const note = await applyWorldClockUpdates({
+        segment: segment(worldId),
+        sessionId: 'session-1',
+        playerCharacterId: 'char-1',
+        currentTurn: 4,
+      });
+
+      expect(useWorldThreadStore.getState().threads[threadId].costs).toEqual(['gashed left forearm']);
+      expect(note?.worldCost?.imposed).toEqual([
+        { kind: 'condition', detail: 'gashed left forearm', thread: 'The thing in the shed' },
+      ]);
+      expect(note?.worldClock?.resolved).toEqual(['The thing in the shed']);
+    });
+
     it('with the flag off, the extractor gets no cost input and nothing is stamped or written', async () => {
       mockIsFeatureEnabled.mockImplementation(clockOnly as typeof isFeatureEnabled);
       processSpy.mockResolvedValue({
