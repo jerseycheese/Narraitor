@@ -19,7 +19,7 @@ Current epic map (`gh issue list --label epic --state open`) — frontier work m
 
 ## 5. Procedure — the frontier problems
 
-**F1. Long-arc story memory & coherence.** *Falls short today:* context is a token-budgeted window over recent segments + lore facts; long sessions lose early threads; coherence is enforced by prompt instructions + a deterministic continuity guardrail with ONE corrective AI call (fail-open). *Assets:* loreStore (facts + dedup/merge + audit log), continuityStore, `narrative/summarize` + `story-checkpoint` routes, tokenBudgetManager. *First steps:* (1) instrument how often the guardrail fires and on what, across 3 long sessions; (2) measure what falls out of the context window in a 30+ turn arc; (3) prototype checkpoint-summary layering into context assembly behind a feature flag. *Result when:* on a scripted 30-turn arc, a plot fact from turns 1–5 is correctly referenced at turn 30 in >=4/5 runs across 2 worlds, vs a measured baseline.
+**F1. Long-arc story memory & coherence.** *Falls short today:* context is a fixed window over recent segments + lore facts, capped at assembly rather than by any budget; long sessions lose early threads; coherence is enforced by prompt instructions + a deterministic continuity guardrail with ONE corrective AI call (fail-open). *Assets:* loreStore (facts + dedup/merge + audit log), continuityStore, `narrative/summarize` + `story-checkpoint` routes, the `src/lib/promptContext/` assembly path (measurement only — no allocator). *First steps:* (1) instrument how often the guardrail fires and on what, across 3 long sessions; (2) measure what falls out of the context window in a 30+ turn arc; (3) prototype checkpoint-summary layering into context assembly behind a feature flag. *Result when:* on a scripted 30-turn arc, a plot fact from turns 1–5 is correctly referenced at turn 30 in >=4/5 runs across 2 worlds, vs a measured baseline.
 
 **F2. Consequence tracking that players feel.** *Falls short:* choices carry alignment/trust metadata (#468 shipped) and world-state impacts exist (`narrativeStore.worldStateImpacts.ts`), but long-range payoff of early choices is weak. *Assets:* decisions with metadata, goalStore + goalExtractor, journal. *First steps:* (1) trace one real decision's data end-to-end; (2) define 3 concrete consequence archetypes (unlocked path, changed NPC stance, resource shift) and where each is injected into context; (3) eval per ai-quality-discipline matrix. *Result when:* a blind reader identifies which of two turn-20 transcripts followed choice A vs B, >=8/10 sessions.
 
@@ -48,7 +48,7 @@ A scoped epic/issue per the experiment lifecycle, citing which frontier problem,
 
 Re-verify volatile claims with:
 - `gh issue view 1476 --json state,title` (streaming still open?)
-- `ls src/state/continuityStore.ts src/lib/promptContext/tokenBudgetManager.ts` (assets intact)
+- `ls src/state/continuityStore.ts src/lib/promptContext/promptCalibration.ts` (assets intact)
 
 Last generated: 2026-07-04 (develop @ 4bec88e6)
 Known uncertainty:

@@ -17,7 +17,7 @@
   {"query": "get v1.0 out the door — whats left on the gate?", "should_trigger": false, "expected_skill": "narraitor-hardest-problem-campaign"},
   {"query": "small feature idea for the journal — where do i file and scope it?", "should_trigger": false, "expected_skill": "narraitor-feature-experiment-lifecycle"},
   {"query": "didnt we already try and revert some streaming middleware once?", "should_trigger": false, "expected_skill": "narraitor-failure-archaeology"},
-  {"query": "how is tokenBudgetManager wired into context assembly today?", "should_trigger": false, "expected_skill": "narraitor-domain-reference"},
+  {"query": "how is promptCalibration wired into context assembly today?", "should_trigger": false, "expected_skill": "narraitor-domain-reference"},
   {"query": "my prompt tweak makes long stories read better on my world — good enough to ship?", "should_trigger": false, "expected_skill": "narraitor-ai-quality-discipline"},
   {"query": "whats the state of the art in text-to-speech right now?", "should_trigger": false, "expected_skill": null},
   {"query": "brainstorm villain names for my dnd campaign", "should_trigger": false, "expected_skill": null},

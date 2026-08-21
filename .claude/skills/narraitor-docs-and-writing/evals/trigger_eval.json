@@ -13,7 +13,7 @@
   {"query": "should the new persistence guide go in docs/ or public_docs/?", "should_trigger": true, "expected_skill": "narraitor-docs-and-writing"},
   {"query": "write the v1.0 release notes in the project voice", "should_trigger": true, "expected_skill": "narraitor-docs-and-writing"},
   {"query": "drafting the error toast copy — does 'AI generation failed, retry?' fit the project voice rules for user-facing prose?", "should_trigger": true, "expected_skill": "narraitor-docs-and-writing"},
-  {"query": "adding a section on tokenBudgetManager to the technical guide — which template applies?", "should_trigger": true, "expected_skill": "narraitor-docs-and-writing"},
+  {"query": "adding a section on promptCalibration to the technical guide — which template applies?", "should_trigger": true, "expected_skill": "narraitor-docs-and-writing"},
   {"query": "before i declare this done in the PR, what evidence do i actually need?", "should_trigger": false, "expected_skill": "narraitor-change-control"},
   {"query": "why did the old streaming middleware get deleted? whats the story there", "should_trigger": false, "expected_skill": "narraitor-failure-archaeology"},
   {"query": "where do the docs of record even live in this repo? give me the lay of the land", "should_trigger": false, "expected_skill": "narraitor-repo-orientation"},

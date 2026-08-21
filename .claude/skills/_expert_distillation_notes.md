@@ -84,7 +84,9 @@ Any "no" → the change is not done; the item names the next action.
 4. Regression: do existing good outputs still generate acceptably? (No golden corpus exists yet — candidate
    improvement; compare manually against excerpts saved in prior eval logs. NOTE: src/lib/promptTemplates/examples/
    is a few-shot library injected INTO prompts — editing it changes live behavior; it is not a regression corpus.)
-5. Cost/latency: longer prompts cost tokens and time; check the token budget path (src/lib/promptContext/tokenBudgetManager.ts).
+5. Cost/latency: longer prompts cost tokens and time, and nothing trims the assembled prompt. Estimate with
+   estimateTokenCount (src/lib/promptContext/tokenUtils.ts); confirm against a real request via the DevTools
+   calibration panel (recordRequestCalibration, src/lib/ai/narrativeGenerator.calibration.ts).
 6. Ship decision recorded with evidence, not "reads better".
 ```
 
