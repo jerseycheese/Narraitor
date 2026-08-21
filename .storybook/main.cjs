@@ -7,8 +7,7 @@ const path = require('path');
 const config = {
   stories: [
     // Include all stories from the atomic design structure
-    '../src/stories/**/*.stories.@(js|jsx|ts|tsx)',
-    '../src/stories/**/*.mdx'
+    '../src/stories/**/*.stories.@(js|jsx|ts|tsx)'
   ],
   addons: [
     '@storybook/addon-essentials',
@@ -17,7 +16,7 @@ const config = {
   framework: {
     name: '@storybook/nextjs',
     options: {
-      nextConfigPath: path.resolve(__dirname, '../next.config.js'),
+      nextConfigPath: path.resolve(__dirname, '../next.config.ts'),
     }
   },
   staticDirs: [
@@ -28,7 +27,17 @@ const config = {
   webpackFinal: async (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': path.resolve(__dirname, '../src')
+      '@': path.resolve(__dirname, '../src'),
+      // Same swap as next.config.ts's webpack() hook: the Gemini tokenizer's
+      // BPE vocabulary is 11 MB and every story that reaches
+      // baseNarrativeTemplate pulls it in. @storybook/nextjs reads
+      // next.config.ts but never calls its webpack() hook, so the alias has to
+      // be repeated here. Storybook is browser-only, so there's no isServer
+      // branch to mirror.
+      '@lenml/tokenizer-gemini': path.resolve(
+        __dirname,
+        '../src/lib/promptContext/geminiTokenizerBrowserStub.ts'
+      )
     };
     return config;
   },

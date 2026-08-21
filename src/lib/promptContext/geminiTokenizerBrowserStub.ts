@@ -1,6 +1,7 @@
 /**
  * Browser stand-in for `@lenml/tokenizer-gemini`, swapped in by the client-side
- * webpack alias in next.config.ts.
+ * webpack alias in next.config.ts and by the matching alias in
+ * .storybook/main.cjs.
  *
  * The real package carries an 11 MB BPE merge table. Webpack emitted the whole
  * thing into the client build, and the `next/dynamic` GameSession import pulled
