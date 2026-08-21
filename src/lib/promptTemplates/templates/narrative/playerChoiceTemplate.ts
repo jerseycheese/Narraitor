@@ -1,5 +1,6 @@
 import { NarrativeContext } from '@/types/narrative.types';
 import { CHOICE_EXAMPLES, shouldIncludeExamples } from '../../examples';
+import { protagonistGuidance } from './protagonistGuidance';
 
 interface PlayerChoiceTemplateContext {
   worldName: string;
@@ -17,6 +18,7 @@ interface PlayerChoiceTemplateContext {
     id: string;
     name: string;
   }>;
+  playerCharacterName?: string;
 }
 
 /**
@@ -24,7 +26,7 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt and options based on the current narrative context
  */
 export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount } = context;
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount, playerCharacterName } = context;
   const choiceCount =
     typeof optionCount === 'number' && Number.isFinite(optionCount)
       ? Math.max(1, Math.floor(optionCount))
@@ -60,6 +62,8 @@ AVAILABLE SKILLS IN THIS WORLD:
 ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
   }
 
+  const protagonistInfo = protagonistGuidance(playerCharacterName);
+
   // Build the known-character roster + consequence instructions. Only emitted
   // when the world has NPCs, so the parser has names to resolve against.
   const hasNpcs = !!worldNpcs && worldNpcs.length > 0;
@@ -88,7 +92,7 @@ ${genre ? `Genre: ${genre}` : ''}
 
 CURRENT CONTEXT (brief summary):
 ${shortContext}
-${location ? `Current location: ${location}` : ''}${skillsInfo}${npcInfo}
+${location ? `Current location: ${location}` : ''}${skillsInfo}${protagonistInfo}${npcInfo}
 
 INSTRUCTIONS:
 Based on the ENTIRE narrative context (both beginning and end if provided), create ${choiceCount} distinct action choices that:

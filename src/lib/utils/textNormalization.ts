@@ -135,3 +135,14 @@ function normalizeSpecialCharacters(text: string): string {
     .replace(/–/g, '-')   // En dash → hyphen
     .replace(/…/g, '...'); // Ellipsis → three periods
 }
+
+/**
+ * Folds a character name to a comparison key.
+ *
+ * Names reach us from three places that punctuate differently - the character
+ * sheet, AI-generated metadata, and prose - so an exact match is too strict to
+ * tell "the player" from "a third party wearing the player's name".
+ */
+export function canonicalizeName(name: string): string {
+  return normalizeText(name, NORM_NAME).trim().toLowerCase();
+}

@@ -5,7 +5,7 @@
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { extractFencedJson } from './parseJSON';
-import { normalizeText, NORM_NAME } from '@/lib/utils/textNormalization';
+import { canonicalizeName } from '@/lib/utils/textNormalization';
 import type {
   LoreContinuityAnnotation,
   LoreContinuityKind,
@@ -280,9 +280,6 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
 
   return cleaned;
 }
-
-const canonicalizeName = (name: string): string =>
-  normalizeText(name, NORM_NAME).trim().toLowerCase();
 
 /**
  * Reserves the player character's name against the extracted lore.

@@ -1,4 +1,5 @@
 import { NarrativeContext } from '@/types/narrative.types';
+import { protagonistGuidance } from './protagonistGuidance';
 
 interface PlayerChoiceTemplateContext {
   worldName: string;
@@ -16,6 +17,7 @@ interface PlayerChoiceTemplateContext {
     id: string;
     name: string;
   }>;
+  playerCharacterName?: string;
 }
 
 /**
@@ -31,7 +33,7 @@ interface PlayerChoiceTemplateContext {
  * order, and a chaotic option has to be one a player might really take.
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount } = context;
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount, playerCharacterName } = context;
   const choiceCount =
     typeof optionCount === 'number' && Number.isFinite(optionCount)
       ? Math.max(1, Math.floor(optionCount))
@@ -66,6 +68,8 @@ AVAILABLE SKILLS IN THIS WORLD:
 ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
   }
 
+  const protagonistInfo = protagonistGuidance(playerCharacterName);
+
   // Known-character roster + consequence contract; only emitted when the
   // world has NPCs so the parser has names to resolve against.
   const hasNpcs = !!worldNpcs && worldNpcs.length > 0;
@@ -97,7 +101,7 @@ LOCATION: ${location || 'Unknown location'}
 SITUATION: ${narrativeContext?.currentSituation || 'General scenario'}
 
 FULL CONTEXT:
-${shortContext}${skillsInfo}${npcInfo}
+${shortContext}${skillsInfo}${protagonistInfo}${npcInfo}
 
 === CRITICAL INSTRUCTIONS ===
 You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.
