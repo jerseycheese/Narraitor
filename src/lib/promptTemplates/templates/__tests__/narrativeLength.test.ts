@@ -28,18 +28,16 @@ describe('resolveNarrativeLength', () => {
   });
 });
 
-describe('sceneTemplate length instruction', () => {
-  const buildScene = (
-    generationParameters?: Record<string, unknown>
-  ) =>
-    sceneTemplate({
-      worldName: 'Testworld',
-      genre: 'fantasy',
-      tone: 'grim',
-      narrativeContext: { recentSegments: [{ content: 'Something happened.' }] },
-      generationParameters,
-    } as Parameters<typeof sceneTemplate>[0]);
+const buildScene = (generationParameters?: Record<string, unknown>) =>
+  sceneTemplate({
+    worldName: 'Testworld',
+    genre: 'fantasy',
+    tone: 'grim',
+    narrativeContext: { recentSegments: [{ content: 'Something happened.' }] },
+    generationParameters,
+  } as Parameters<typeof sceneTemplate>[0]);
 
+describe('sceneTemplate length instruction', () => {
   it('no longer hardcodes a 3-5 sentence cap', () => {
     const longScene = buildScene({ desiredLength: 'long' });
     expect(longScene).toContain(describeNarrativeLength({ desiredLength: 'long' }));
@@ -51,5 +49,20 @@ describe('sceneTemplate length instruction', () => {
     expect(buildScene({ decisionWeight: 'minor' })).toContain(
       '3-5 sentences (1 focused paragraph)'
     );
+  });
+});
+
+// The renderer splits on a blank line and the model will otherwise satisfy
+// "1-2 paragraphs" as one unbroken block, so the separator has to be asked for
+// in the prompt the loop actually sends.
+describe('sceneTemplate paragraph separator instruction', () => {
+  it('asks for a blank line between paragraphs at medium length', () => {
+    expect(buildScene({ desiredLength: 'medium' })).toMatch(/blank line/i);
+  });
+
+  it('asks for it at every length the loop can request', () => {
+    for (const desiredLength of ['short', 'medium', 'long']) {
+      expect(buildScene({ desiredLength })).toMatch(/blank line/i);
+    }
   });
 });
