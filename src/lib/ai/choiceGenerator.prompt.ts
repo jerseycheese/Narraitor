@@ -16,6 +16,7 @@ import type { NarrativeContext } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { logger } from '@/lib/utils/logger';
+import { canonicalizeName } from '@/lib/utils/textNormalization';
 interface ChoicePromptInput {
   world: World;
   worldId: string;
@@ -108,27 +109,76 @@ const buildContext = (
   narrativeContext: NarrativeContext,
   characterIds: string[],
   maxOptions?: number
-) => ({
-  worldName: world.name,
-  worldDescription: world.description,
-  genre: world.genre,
-  narrativeContext,
-  characterIds,
-  optionCount: maxOptions,
-  worldSkills:
-    world.skills?.map((skill) => ({
-      id: skill.id,
-      name: skill.name,
-      description: skill.description,
-    })) || [],
-  worldNpcs: getWorldNpcs(world.id),
-});
+) => {
+  const playerCharacterName = getPlayerCharacter(characterIds)?.name;
 
-const getWorldNpcs = (worldId: string): Array<{ id: string; name: string }> => {
+  return {
+    worldName: world.name,
+    worldDescription: world.description,
+    genre: world.genre,
+    narrativeContext,
+    characterIds,
+    optionCount: maxOptions,
+    playerCharacterName,
+    worldSkills:
+      world.skills?.map((skill) => ({
+        id: skill.id,
+        name: skill.name,
+        description: skill.description,
+      })) || [],
+    worldNpcs: getWorldNpcs(world.id, characterIds, playerCharacterName),
+  };
+};
+
+const getPlayerCharacter = (characterIds: string[]) => {
   try {
+    if (!characterIds || characterIds.length === 0) return undefined;
+    const { characters } = useCharacterStore.getState();
+    for (const characterId of characterIds) {
+      const character = characters[characterId];
+      if (character?.isPlayer) return character;
+    }
+    return characterIds.length === 1 ? characters[characterIds[0]] : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * The world's NPCs minus the player.
+ *
+ * Nothing stops the player landing in the NPC store: every entry the narrative
+ * model puts in metadata.characters is synced there, and a model that writes
+ * the protagonist into that list mints them an NPC. Left in, they arrive here
+ * under a heading that tells the model to use these exact names, and it duly
+ * writes options that negotiate with the player.
+ */
+const getWorldNpcs = (
+  worldId: string,
+  characterIds: string[],
+  playerCharacterName?: string
+): Array<{ id: string; name: string }> => {
+  try {
+    const playerIds = new Set(characterIds);
+    const reservedName = playerCharacterName
+      ? canonicalizeName(playerCharacterName)
+      : '';
+
     return useNPCStore
       .getState()
       .getNPCsByWorld(worldId)
+      .filter((npc) => {
+        const isPlayer =
+          playerIds.has(npc.id) ||
+          (!!reservedName && canonicalizeName(npc.name) === reservedName);
+        if (isPlayer) {
+          logger.debug('Dropped an NPC entry claiming the player identity', {
+            npcId: npc.id,
+            name: npc.name,
+          });
+        }
+        return !isPlayer;
+      })
       .map((npc) => ({ id: npc.id, name: npc.name }));
   } catch {
     return [];
@@ -235,19 +285,7 @@ const enhancePromptWithPersonality = (
   useAlignedChoices: boolean
 ): string => {
   try {
-    if (!characterIds || characterIds.length === 0) return prompt;
-    const { characters } = useCharacterStore.getState();
-    let playerCharacter;
-    for (const characterId of characterIds) {
-      const character = characters[characterId];
-      if (character?.isPlayer) {
-        playerCharacter = character;
-        break;
-      }
-    }
-    if (!playerCharacter && characterIds.length === 1) {
-      playerCharacter = characters[characterIds[0]];
-    }
+    const playerCharacter = getPlayerCharacter(characterIds);
     if (!playerCharacter) return prompt;
     const personalitySection = formatPersonalityForChoices(
       playerCharacter,

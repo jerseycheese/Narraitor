@@ -66,3 +66,19 @@ describe('choice templates ask for as many options as the interface shows', () =
     expect(prompt).toMatch(/do NOT repeat the same mix turn after turn/i);
   });
 });
+
+describe('choice templates keep the player out of their own options', () => {
+  it('names the protagonist and rules them out as a target in the aligned template', () => {
+    const prompt = alignedChoiceTemplate({
+      ...baseContext,
+      playerCharacterName: 'Wren Calloway',
+    });
+
+    expect(prompt).toContain('PROTAGONIST: The player is Wren Calloway.');
+    expect(prompt).toMatch(/never the person an option targets/i);
+  });
+
+  it('says nothing about a protagonist when no player name is supplied', () => {
+    expect(alignedChoiceTemplate(baseContext)).not.toContain('PROTAGONIST:');
+  });
+});

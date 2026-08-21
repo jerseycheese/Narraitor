@@ -27,7 +27,7 @@ export {
 } from './formatters';
 
 /** Text normalization utilities for consistent text formatting */
-export { normalizeText, NORM_NAME, NORM_DESC } from './textNormalization';
+export { normalizeText, NORM_NAME, NORM_DESC, canonicalizeName } from './textNormalization';
 
 // Validation utilities
 export { type ValidationResult } from './validationUtils';
