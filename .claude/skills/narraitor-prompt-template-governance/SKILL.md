@@ -54,8 +54,12 @@ G6 COST/LATENCY — measure the delta yourself. Nothing enforces a prompt budget
    then check a real request in the DevTools calibration panel, which
    recordRequestCalibration (src/lib/ai/narrativeGenerator.calibration.ts) feeds with
    estimated vs provider-reported prompt size. DEFAULT_TOTAL_BUDGET (80000) is that
-   panel's yardstick, not a ceiling. Put the before/after in the eval log — a template
-   that grows context grows every turn's cost and the 5-8s prose wait.
+   panel's yardstick, not a ceiling. Only narrativeGenerator and choiceGenerator call
+   recordRequestCalibration, so the panel is blind to ending templates —
+   endingGenerator never publishes a snapshot, and a stale narrative reading will sit
+   there looking like yours. For an ending-template change, estimateTokenCount is the
+   whole measurement. Put the before/after in the eval log — a template that grows
+   context grows every turn's cost and the 5-8s prose wait.
 G7 INTEGRATION — at least one eval cell through the real /worlds/[id]/play loop and
    unit tests green (template __tests__ pin assembly, not prose).
 ```
