@@ -18,6 +18,22 @@ import {
 } from './worldThreadExtraction';
 import { buildWorldCostPromptSection, parseWorldCostExtraction } from './worldCostExtraction';
 
+import Logger from '@/lib/utils/logger';
+const logger = new Logger('GoalExtractor');
+
+/**
+ * This call answers with a JSON object, not prose, and the object grows with
+ * the session: goals, then the thread ledger, then what the world took. On the
+ * narrative panel's 2048 ceiling a late-session extraction ran past the limit
+ * and came back with an unterminated fence, which parses as nothing at all —
+ * the ledger then went a turn staler with every miss. Sized so the whole
+ * object fits with room for a fat ledger.
+ */
+const EXTRACTION_MAX_OUTPUT_TOKENS = 6144;
+
+/** Gemini and the OpenAI-compatible providers both normalize to this. */
+const TRUNCATED_FINISH_REASON = 'MAX_TOKENS';
+
 // Created on first use, not at import time — the class singleton used to
 // construct a client as a module side effect.
 let defaultClient: AIClient | null = null;
@@ -44,9 +60,15 @@ export async function extractGoalsFromNarrative(
     const prompt = buildGoalExtractionPrompt(request);
 
     // Call AI service
-    const response = await getClient().generateContent(prompt);
+    const response = await getClient().generateContent(prompt, {
+      maxTokens: EXTRACTION_MAX_OUTPUT_TOKENS,
+    });
 
     if (!response.content) {
+      logger.warn('Extraction returned no content', {
+        segmentId: request.segmentId,
+        finishReason: response.finishReason,
+      });
       return {
         newGoals: [],
         updatedGoals: [],
@@ -56,8 +78,9 @@ export async function extractGoalsFromNarrative(
     }
 
     // Parse AI response
-    return parseGoalExtractionResponse(response.content, request);
-  } catch {
+    return parseGoalExtractionResponse(response.content, request, response.finishReason);
+  } catch (error) {
+    logger.warn('Extraction call failed', { segmentId: request.segmentId, error });
     return {
       newGoals: [],
       updatedGoals: [],
@@ -151,12 +174,23 @@ Respond with JSON in this exact format:
 
 function parseGoalExtractionResponse(
   content: string,
-  request: GoalExtractionRequest
+  request: GoalExtractionRequest,
+  finishReason?: string
 ): GoalExtractionResult {
+  const wasTruncated = finishReason === TRUNCATED_FINISH_REASON;
   try {
     // Extract JSON from the fenced block; fall back when absent.
     const jsonStr = extractFencedJson(content);
     if (jsonStr === null) {
+      // Named apart so a miss can be counted as one or the other: a response
+      // cut at the output ceiling never closes its fence, which is a different
+      // problem from a model that answered in prose.
+      logger.warn(
+        wasTruncated
+          ? 'Extraction response was truncated at the output-token ceiling; no JSON block to reconcile'
+          : 'No JSON block in the extraction response',
+        { segmentId: request.segmentId, finishReason, contentLength: content.length }
+      );
       return createFallbackExtractionResult(request);
     }
 
@@ -205,7 +239,12 @@ function parseGoalExtractionResponse(
     }
 
     return result;
-  } catch {
+  } catch (error) {
+    logger.warn('Extraction JSON could not be parsed', {
+      segmentId: request.segmentId,
+      finishReason,
+      error,
+    });
     return createFallbackExtractionResult(request);
   }
 }

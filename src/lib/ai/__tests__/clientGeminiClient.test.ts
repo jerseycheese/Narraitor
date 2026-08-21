@@ -74,6 +74,21 @@ describe('ClientGeminiClient.generateContent', () => {
     expect(result.content).toBe('Hello');
   });
 
+  it('sends the caller output ceiling when one is given, and the default otherwise', async () => {
+    const doneLine = JSON.stringify({ done: true, content: 'Hello', finishReason: 'STOP' });
+    mockedAiFetch.mockResolvedValue(fakeStreamingResponse([doneLine]) as unknown as Response);
+
+    const client = new ClientGeminiClient();
+    await client.generateContent('a prompt', { maxTokens: 6144 });
+    mockedAiFetch.mockResolvedValue(fakeStreamingResponse([doneLine]) as unknown as Response);
+    await client.generateContent('a prompt');
+
+    const sentMaxTokens = mockedAiFetch.mock.calls.map(
+      ([, init]) => JSON.parse(String(init?.body)).config.maxTokens
+    );
+    expect(sentMaxTokens).toEqual([6144, 2048]);
+  });
+
   it('rejects with a friendly message when the stream carries an error event', async () => {
     mockedAiFetch.mockResolvedValue(
       fakeStreamingResponse([JSON.stringify({ error: 'connection reset' })]) as unknown as Response

@@ -82,10 +82,16 @@ export interface AIImageResponse {
  * ClientGeminiClient.generateContent) invoke it with each newly-visible
  * slice of narrative prose as it arrives, ahead of the final resolved
  * AIResponse. Implementations that don't stream simply never call it.
+ * `maxTokens` raises or lowers the output ceiling for one call: callers whose
+ * answer is longer than a narrative beat (structured extraction, which returns
+ * a JSON object that grows with the session) need more room than the panel's
+ * default, and a response cut at the ceiling comes back unparseable rather
+ * than short. Implementations that can't vary it per call ignore it.
  */
 export interface AIGenerateOptions {
   signal?: AbortSignal;
   onChunk?: (delta: string) => void;
+  maxTokens?: number;
 }
 
 /**
