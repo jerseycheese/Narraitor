@@ -21,6 +21,9 @@ interface NormalizedAttribute {
 
 /**
  * Normalized skill format for internal processing
+ *
+ * `skillId` is the label that ends up in the prompt, so it holds the skill's
+ * display name whenever one is available rather than its world id.
  */
 interface NormalizedSkill {
   skillId: string;
@@ -69,12 +72,15 @@ export function normalizeSkillArray(skills: SkillInput): NormalizedSkill[] {
   }
 
   // Check if skills have 'name' property (from Character.skills)
+  // Prefer the name over worldSkillId: these strings are read by the model, and
+  // a world skill's id is a generated `skill_<uuid>` that says nothing about
+  // what the character can do.
   const firstSkill = skills[0];
   if (firstSkill && 'name' in firstSkill) {
     return (
       skills as Array<{ name: string; level: number; worldSkillId?: string }>
     ).map((skill) => ({
-      skillId: skill.worldSkillId || skill.name,
+      skillId: skill.name || skill.worldSkillId || '',
       level: skill.level,
     }));
   }

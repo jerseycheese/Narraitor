@@ -91,30 +91,33 @@ export function createMockCharacterWithSkills(): Character {
       fears: ['Failure'],
       relationships: [],
     },
+    // Attribute values sit on the 1-10 scale worlds actually use (worldAnalyzer
+    // pins minValue 1 / maxValue 10), so the narrative descriptors resolve to
+    // Exceptional / High / Moderate rather than falling off the scale.
     attributes: [
       {
         id: 'attr-1',
         characterId: 'char-1',
         worldAttributeId: 'strength',
         name: 'Strength',
-        baseValue: 16,
-        modifiedValue: 16,
+        baseValue: 9,
+        modifiedValue: 9,
       },
       {
         id: 'attr-2',
         characterId: 'char-1',
         worldAttributeId: 'intelligence',
         name: 'Intelligence',
-        baseValue: 14,
-        modifiedValue: 14,
+        baseValue: 7,
+        modifiedValue: 7,
       },
       {
         id: 'attr-3',
         characterId: 'char-1',
         worldAttributeId: 'dexterity',
         name: 'Dexterity',
-        baseValue: 12,
-        modifiedValue: 12,
+        baseValue: 4,
+        modifiedValue: 4,
       },
     ],
     skills: [

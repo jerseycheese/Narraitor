@@ -41,6 +41,7 @@ describe('attributeSkillFormatter - MVP Tests', () => {
   });
 
   describe('normalizeSkillArray', () => {
+    // The label goes into a prompt, so the readable name wins over the world id.
     test('normalizes skills with name property to skillId format', () => {
       const nameFormat = [
         { name: 'Lockpicking', level: 7, worldSkillId: 'skill-lockpicking' },
@@ -49,7 +50,7 @@ describe('attributeSkillFormatter - MVP Tests', () => {
       const result = normalizeSkillArray(nameFormat);
 
       expect(result).toEqual([
-        { skillId: 'skill-lockpicking', level: 7 },
+        { skillId: 'Lockpicking', level: 7 },
         { skillId: 'Stealth', level: 5 }
       ]);
     });
@@ -212,7 +213,7 @@ describe('attributeSkillFormatter - MVP Tests', () => {
 
       const result = formatSkillsForNarrative(skills);
 
-      expect(result).toContain('skill-lockpicking (Expert)');
+      expect(result).toContain('Lockpicking (Expert)');
       expect(result).toContain('Stealth (Competent)');
     });
   });

@@ -99,13 +99,14 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
   });
 
   /**
-   * What the scene prompt actually carries about the player character. Skills
-   * are NOT in it: `formatSkillsForNarrative` is wired into the choice prompt
-   * (choiceGenerator.prompt.ts), not this path. This case guards the character
-   * context that IS supposed to be here, and the player-identity rules that
-   * keep the narrator from writing the player as a third party.
+   * What the scene prompt carries about the player character: the background,
+   * the player-identity rules that keep the narrator from writing the player as
+   * a third party, and (the part #1912 was about) the character's skills and
+   * notable attributes under names the model can actually read. The labels are
+   * asserted with their descriptors attached ("Athletics (Master)") so this
+   * can't pass off a stray "Athletics" from somewhere else in the 16k prompt.
    */
-  test('carries the player character background into the scene prompt', async () => {
+  test('carries the player character background, skills and attributes into the scene prompt', async () => {
     const mockResponse = {
       content: "You assess your options, drawing on your athletic prowess and magical knowledge.",
       finishReason: 'stop' as const,
@@ -133,6 +134,16 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
     expect(calledPrompt).toContain('Skilled adventurer with years of experience');
     expect(calledPrompt).toContain('Brave and resourceful');
     expect(calledPrompt).toContain('The player IS Test Hero');
+
+    // Every skill the player invested in, named and rated.
+    expect(calledPrompt).toContain('Athletics (Master)');
+    expect(calledPrompt).toContain('Magic (Expert)');
+    expect(calledPrompt).toContain('Stealth (Competent)');
+
+    // Notable attributes only. Dexterity sits at 4 and stays out.
+    expect(calledPrompt).toContain('Strength (Exceptional)');
+    expect(calledPrompt).toContain('Intelligence (High)');
+    expect(calledPrompt).not.toContain('Dexterity (');
   });
 
   // Lore extraction is a full extra Gemini round-trip that only enriches
