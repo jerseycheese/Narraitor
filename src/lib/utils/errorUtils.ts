@@ -75,6 +75,22 @@ export function isRetryableError(error: Error): boolean {
 export function getUserFriendlyError(error: Error): UserFriendlyError {
   const message = error.message.toLowerCase();
 
+  // Timeout errors. Checked before the network branch below, which would
+  // otherwise swallow them: AbortSignal.timeout raises a TimeoutError reading
+  // "aborted due to timeout", and telling a player their connection is down
+  // when the request merely ran long sends them to fix the wrong thing.
+  if (message.includes('timeout')) {
+    return {
+      title: 'Request Timed Out',
+      message: 'The request is taking too long. Please try again.',
+      suggestion: 'This is usually temporary — wait a moment and try again.',
+      actionLabel: 'Try Again',
+      retryable: true,
+      type: ErrorType.NETWORK,
+      severity: 'warning'
+    };
+  }
+
   // Network errors. An aborted stream is the same class of transport failure as
   // a dropped connection, and the player can pick the story back up either way.
   if (message.includes('network') || isAbortError(error)) {
@@ -86,19 +102,6 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
       retryable: true,
       type: ErrorType.NETWORK,
       severity: 'error'
-    };
-  }
-
-  // Timeout errors
-  if (message.includes('timeout')) {
-    return {
-      title: 'Request Timed Out',
-      message: 'The request is taking too long. Please try again.',
-      suggestion: 'This is usually temporary — wait a moment and try again.',
-      actionLabel: 'Try Again',
-      retryable: true,
-      type: ErrorType.NETWORK,
-      severity: 'warning'
     };
   }
 

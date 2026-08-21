@@ -17,6 +17,14 @@ function streamAbortError(): Error {
   return error;
 }
 
+// AbortSignal.timeout raises a TimeoutError whose message carries both "aborted"
+// and "timeout", so it is the case that tells the two branches apart.
+function signalTimeoutError(): Error {
+  const error = new Error('The operation was aborted due to timeout');
+  error.name = 'TimeoutError';
+  return error;
+}
+
 describe('errorUtils', () => {
   describe('isRetryableError', () => {
     it('should return true for network errors', () => {
@@ -88,6 +96,15 @@ describe('errorUtils', () => {
       expect(result.type).toBe(ErrorType.NETWORK);
       expect(result.retryable).toBe(true);
       expect(result.actionLabel).toBe('Try Again');
+    });
+
+    it('should keep a signal timeout on the timeout branch', () => {
+      const result = getUserFriendlyError(signalTimeoutError());
+
+      expect(result.title).toBe('Request Timed Out');
+      expect(result.severity).toBe('warning');
+      expect(result.type).toBe(ErrorType.NETWORK);
+      expect(result.retryable).toBe(true);
     });
 
     it('should map 429 rate limit errors with generic message', () => {
