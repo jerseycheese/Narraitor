@@ -1,5 +1,6 @@
 import { getNarrativeTemplate } from '../promptTemplates/narrativeTemplateManager';
 import { useCharacterStore } from '@/state/characterStore';
+import type { Character as StoreCharacter } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -110,7 +111,7 @@ const buildContext = (
   characterIds: string[],
   maxOptions?: number
 ) => {
-  const playerCharacterName = getPlayerCharacter(characterIds)?.name;
+  const playerCharacter = getPlayerCharacter(characterIds);
 
   return {
     worldName: world.name,
@@ -119,14 +120,14 @@ const buildContext = (
     narrativeContext,
     characterIds,
     optionCount: maxOptions,
-    playerCharacterName,
+    playerCharacterName: playerCharacter?.name,
     worldSkills:
       world.skills?.map((skill) => ({
         id: skill.id,
         name: skill.name,
         description: skill.description,
       })) || [],
-    worldNpcs: getWorldNpcs(world.id, characterIds, playerCharacterName),
+    worldNpcs: getWorldNpcs(world.id, playerCharacter),
   };
 };
 
@@ -155,13 +156,12 @@ const getPlayerCharacter = (characterIds: string[]) => {
  */
 const getWorldNpcs = (
   worldId: string,
-  characterIds: string[],
-  playerCharacterName?: string
+  playerCharacter?: StoreCharacter
 ): Array<{ id: string; name: string }> => {
   try {
-    const playerIds = new Set(characterIds);
-    const reservedName = playerCharacterName
-      ? canonicalizeName(playerCharacterName)
+    const playerId = playerCharacter?.id;
+    const reservedName = playerCharacter?.name
+      ? canonicalizeName(playerCharacter.name)
       : '';
 
     return useNPCStore
@@ -169,7 +169,7 @@ const getWorldNpcs = (
       .getNPCsByWorld(worldId)
       .filter((npc) => {
         const isPlayer =
-          playerIds.has(npc.id) ||
+          (!!playerId && npc.id === playerId) ||
           (!!reservedName && canonicalizeName(npc.name) === reservedName);
         if (isPlayer) {
           logger.debug('Dropped an NPC entry claiming the player identity', {

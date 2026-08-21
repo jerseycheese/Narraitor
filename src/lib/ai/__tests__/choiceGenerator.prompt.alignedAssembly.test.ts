@@ -162,4 +162,28 @@ describe('the player character in their own choice prompt', () => {
 
     expect(knownCharacterRoster(buildAlignedPrompt())).toContain('Mayor Thorn');
   });
+
+  it('keeps a scene NPC that shares the character list with the player', () => {
+    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+      characters: {
+        'char-1': playerCharacter,
+        'npc-thorn': { ...playerCharacter, id: 'npc-thorn', name: 'Mayor Thorn', isPlayer: false },
+      },
+    });
+    seedNpcs([npc('npc-thorn', 'Mayor Thorn')]);
+
+    const roster = knownCharacterRoster(
+      buildChoicePrompt({
+        world: createMockWorld({ id: 'world-1', name: 'Test World' }),
+        worldId: 'world-1',
+        narrativeContext,
+        characterIds: ['char-1', 'npc-thorn'],
+        sessionId: 'session-1',
+        includeDecisionHistory: false,
+        useAlignedChoices: true,
+      })
+    );
+
+    expect(roster).toContain('Mayor Thorn');
+  });
 });
