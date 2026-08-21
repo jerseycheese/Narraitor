@@ -11,7 +11,7 @@ Automatically, with no button to press. `useStoryCheckpointManager` watches the 
 Major events are what drive all of this, and they're gated two different ways:
 
 - The first narrative segment of a session always records one, so the recap has something in it from the start.
-- Every candidate after that goes through `POST /api/narrative/validate-event-significance`, and only the events the AI calls consequential get recorded.
+- Every candidate after that goes through `POST /api/narrative/validate-event-significance`, and only the events the AI calls consequential get recorded. That check fails open: if the request errors or the response won't parse, the candidate is recorded anyway rather than dropped. So an event that looks insignificant in the recap may have arrived that way, not because the AI approved it.
 
 The hook also listens for a `narraitor:finalize-checkpoint` window event so a session can capture one last checkpoint on the way out, though nothing in the app dispatches that event right now. Checkpoint generation is skipped entirely under Playwright (`isPlaywrightEnv`), because seeded E2E and visual pages have no AI key and the request would just hang.
 
@@ -24,7 +24,9 @@ Each checkpoint stores:
 - The narrative segment, 50 to 75 words, covering only the events in that checkpoint
 - Highlights distilled from the included events
 - The ids of every major event and decision merged into the segment
-- Metadata: included event and decision counts, the last event timestamp, the prompt version, and the model that produced it
+- Metadata: included event and decision counts, the last event timestamp, the prompt version, and a model name
+
+Treat that model name as a default rather than provenance. The route calls `generateStoryCheckpointSummary` without a model argument, so the value stored is whatever `getAIConfig().modelName` returns, not the model the resolved provider actually used. On Claude, Ollama, an OpenAI-compatible provider, or any non-default model, it will misattribute. The fallback path records the literal string `fallback` instead.
 
 Because the system tracks which event IDs have already been summarized, you won't accidentally double-count the same moment in multiple checkpoints.
 
