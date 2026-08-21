@@ -154,7 +154,6 @@ export async function POST(request: NextRequest) {
       characterId: rawBody?.characterId ? safeTrim(String(rawBody.characterId)) : undefined,
       events,
       decisions: sanitizeDecisions(rawBody?.decisions),
-      narrativeSummary: rawBody?.narrativeSummary ? safeTrim(String(rawBody.narrativeSummary)) : undefined,
       currentLocation: rawBody?.currentLocation ? safeTrim(String(rawBody.currentLocation)) : undefined,
       activeGoals: Array.isArray(rawBody?.activeGoals)
         ? rawBody.activeGoals

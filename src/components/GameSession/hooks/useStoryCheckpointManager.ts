@@ -17,7 +17,6 @@ interface UseStoryCheckpointManagerArgs {
 }
 
 const MAX_DECISIONS = 5;
-const MAX_SEGMENT_SUMMARY = 600;
 
 const buildCheckpointFromResponse = (
   data: StoryCheckpointResponseBody,
@@ -86,29 +85,12 @@ const buildDecisionPayload = (
     .slice(-MAX_DECISIONS);
 };
 
-const collectNarrativeContext = (
-  sessionId: string,
-): { summary?: string; location?: string } => {
+const collectCurrentLocation = (sessionId: string): string | undefined => {
   const { getSessionSegments } = useNarrativeStore.getState();
   const segments = getSessionSegments(sessionId);
-  if (!segments.length) {
-    return {};
-  }
-
-  const summary = segments
-    .slice(-3)
-    .map((segment) => safeTrim(segment.content))
-    .filter(Boolean)
-    .join(' ')
-    .slice(0, MAX_SEGMENT_SUMMARY);
-
   const latest = segments[segments.length - 1];
-  const location = latest?.metadata?.location ? safeTrim(latest.metadata.location) : undefined;
 
-  return {
-    summary: summary || undefined,
-    location,
-  };
+  return latest?.metadata?.location ? safeTrim(latest.metadata.location) : undefined;
 };
 
 const formatEventsForApi = (
@@ -226,7 +208,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
 
     try {
       const decisions = buildDecisionPayload(sessionId);
-      const narrativeContext = collectNarrativeContext(sessionId);
+      const currentLocation = collectCurrentLocation(sessionId);
 
       // Get last 2-3 checkpoint segments for narrative continuity
       const existingCheckpoints = worldState?.storyCheckpoints ?? [];
@@ -247,8 +229,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
         characterName: characterId ? characterNameLookup[characterId] : undefined,
         events: formattedEvents,
         decisions,
-        narrativeSummary: narrativeContext.summary,
-        currentLocation: narrativeContext.location,
+        currentLocation,
         previousSegments,
         toneSettings: world?.toneSettings,
       });
