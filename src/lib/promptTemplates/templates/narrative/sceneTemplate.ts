@@ -1,7 +1,10 @@
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import { worldClockBlock } from './worldClockBlock';
-import { describeNarrativeLength } from './narrativeLength';
+import {
+  describeNarrativeLength,
+  PARAGRAPH_SEPARATOR_INSTRUCTION,
+} from './narrativeLength';
 import type { NarrativeTemplateContext } from './context';
 import { isPacingStale } from '@/lib/narrative/turnsSinceComplication';
 
@@ -192,6 +195,7 @@ Generate a ${segmentType} that:
 4. Advances the story forward in time (never backward)
 5. Maintains the ${tone} tone
 6. Is approximately ${lengthDescription} in length
+7. ${PARAGRAPH_SEPARATOR_INSTRUCTION}
 
 ${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
 

@@ -7,6 +7,14 @@ const LENGTH_GUIDE: Record<NarrativeLength, string> = {
 };
 
 /**
+ * The reader only sees paragraphs where the renderer can split on a blank line.
+ * A model told to write "1-2 paragraphs" will happily satisfy that as one
+ * unbroken block, so the separator has to be asked for outright.
+ */
+export const PARAGRAPH_SEPARATOR_INSTRUCTION =
+  'Separate each paragraph with a blank line (one empty line between them), never a single line break';
+
+/**
  * Weightier beats earn more room on the page. Without this every segment comes
  * back the same size, which is a large part of why long sessions read flat.
  * decisionWeight is the only length signal available before generation —
