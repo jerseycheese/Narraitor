@@ -144,9 +144,14 @@ export const convertToPersonalizationCharacter = (
     id: storeCharacter.id,
     name: storeCharacter.name,
     background,
+    // attributeId is a prompt label here, never a lookup key, so prefer the
+    // display name. A world attribute's id is a generated `attr_<uuid>` and
+    // the model can't read anything into that.
     attributes: Array.isArray(storeCharacter.attributes)
       ? storeCharacter.attributes.map((attribute) => ({
-          attributeId: String(attribute.worldAttributeId ?? attribute.id),
+          attributeId: String(
+            attribute.name || attribute.worldAttributeId || attribute.id
+          ),
           value: Number(attribute.modifiedValue ?? attribute.baseValue ?? 0),
         }))
       : {},
