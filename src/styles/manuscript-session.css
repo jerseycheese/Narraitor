@@ -3231,13 +3231,10 @@ body.manuscript-overlay-open {
   margin-bottom: var(--space-2);
 }
 
-/* DS3 dialogue segments — italic with left border accent (Pass 8, fix 6) */
-:root .dialogue-segment {
-  font-style: italic;
-  border-left: 2px solid var(--color-border-strong);
-  padding-left: var(--space-4);
-  margin-left: var(--space-1);
-}
+/* `.dialogue-segment` deliberately carries no styling. The model types a whole
+   scene as `dialogue` whenever it contains spoken lines, so the class lands on
+   ordinary narration and any treatment hung on it styles the narration too. The
+   class stays in the DOM as a hook; the prose reads uniformly. */
 
 /* DS3 main content inner — narrower journal column */
 :root .manuscript-main-content-inner {
