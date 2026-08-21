@@ -310,18 +310,6 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
     return () => clearTimeout(timeoutId);
   }, [pendingEvents, status, createCheckpoint]);
 
-  // Listen for session end event to capture final checkpoint
-  React.useEffect(() => {
-    const handleFinalCheckpoint = () => {
-      if (pendingEvents.length > 0 && status !== 'loading') {
-        createCheckpoint();
-      }
-    };
-
-    window.addEventListener('narraitor:finalize-checkpoint', handleFinalCheckpoint);
-    return () => window.removeEventListener('narraitor:finalize-checkpoint', handleFinalCheckpoint);
-  }, [pendingEvents.length, status, createCheckpoint]);
-
   return {
     status,
     error,
