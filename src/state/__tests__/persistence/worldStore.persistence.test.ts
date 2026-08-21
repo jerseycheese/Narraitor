@@ -35,7 +35,7 @@ jest.mock('../../persistence', () => {
 jest.unmock('../../worldStore');
 
 import { useWorldStore } from '../../worldStore';
-import { createMockWorld } from '@/lib/test-utils';
+import { createMockWorld, createMockWorldAttribute, createMockWorldSkill } from '@/lib/test-utils';
 import type { World } from '@/types';
 
 const STORE_KEY = 'narraitor-world-store';
@@ -152,34 +152,50 @@ describe('worldStore persistence', () => {
     });
 
     test('preserves every world property through a round trip', async () => {
+      // Every optional field and both collections are populated, and the
+      // comparison is whole-object, so dropping any one of them fails here
+      // rather than passing on the handful a partial match happens to list.
       const worldId = useWorldStore.getState().createWorld(
         worldInput({
           name: 'Full Featured World',
           genre: 'sci-fi',
           description: 'A complex world with all properties',
+          attributes: [createMockWorldAttribute({ id: 'attr-1' })],
+          skills: [createMockWorldSkill({ id: 'skill-1', attributeIds: ['attr-1'] })],
           settings: {
             maxAttributes: 8,
             maxSkills: 10,
             attributePointPool: 32,
             skillPointPool: 25,
           },
+          image: {
+            type: 'ai-generated',
+            url: 'data:image/png;base64,abc',
+            generatedAt: '2024-01-01T00:00:00Z',
+          },
+          reference: 'Dune',
+          relationship: 'inspired_by',
+          toneSettings: {
+            contentRating: 'R',
+            narrativeStyle: 'mysterious',
+            languageComplexity: 'literary',
+            customInstructions: 'Keep the prose lean.',
+          },
         })
       );
+
+      // The in-memory world BEFORE any reload. Comparing the reloaded world
+      // against the persisted bytes would be circular: a field dropped on
+      // write is missing from both sides and the assertion still passes.
+      const inMemory = useWorldStore.getState().worlds[worldId];
+      expect(inMemory.attributes).toHaveLength(1);
+      expect(inMemory.skills).toHaveLength(1);
+      expect(inMemory.toneSettings).toBeDefined();
 
       await flushPersist();
       await reloadFromStorage();
 
-      expect(useWorldStore.getState().worlds[worldId]).toMatchObject({
-        name: 'Full Featured World',
-        genre: 'sci-fi',
-        description: 'A complex world with all properties',
-        settings: {
-          maxAttributes: 8,
-          maxSkills: 10,
-          attributePointPool: 32,
-          skillPointPool: 25,
-        },
-      });
+      expect(useWorldStore.getState().worlds[worldId]).toEqual(inMemory);
     });
   });
 });

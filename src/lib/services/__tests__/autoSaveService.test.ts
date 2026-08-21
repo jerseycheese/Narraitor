@@ -77,9 +77,19 @@ describe('createAutoSave', () => {
       );
 
       mockOnSave.mockClear();
-      service.triggerSave('scene-change');
+      const pending = service.triggerSave('scene-change');
 
       expect(mockOnSave).not.toHaveBeenCalled();
+
+      // And it is deferred, not dropped: once the window elapses the save runs.
+      // Without this half, a scheduler that stopped firing entirely would still
+      // pass on the assertion above.
+      await jest.advanceTimersByTimeAsync(600);
+      await pending;
+
+      expect(mockOnSave).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, reason: 'scene-change' })
+      );
     });
   });
 });
