@@ -13,7 +13,7 @@ Major events are what drive all of this, and they're gated two different ways:
 - The first narrative segment of a session always records one, so the recap has something in it from the start.
 - Every candidate after that goes through `POST /api/narrative/validate-event-significance`, and only the events the AI calls consequential get recorded. That check fails open: if the request errors or the response won't parse, the candidate is recorded anyway rather than dropped. So an event that looks insignificant in the recap may have arrived that way, not because the AI approved it.
 
-The hook also listens for a `narraitor:finalize-checkpoint` window event so a session can capture one last checkpoint on the way out, though nothing in the app dispatches that event right now. Checkpoint generation is skipped entirely under Playwright (`isPlaywrightEnv`), because seeded E2E and visual pages have no AI key and the request would just hang.
+Checkpoint generation is skipped entirely under Playwright (`isPlaywrightEnv`), because seeded E2E and visual pages have no AI key and the request would just hang.
 
 Where the recap shows up depends on the progressive disclosure flag. With the flag off it sits in the support column below the narrative, and with it on it moves into the Story So Far drawer.
 
@@ -60,7 +60,7 @@ Server-side AI work happens through `POST /api/narrative/story-checkpoint`. The 
 }
 ```
 
-That's the minimum the route needs. It also takes `characterName`, `currentLocation`, `activeGoals`, `toneSettings`, and `previousSegments`, which carries the last three checkpoint segments and is the only reason consecutive segments read as one story. There's a `narrativeSummary` field too, but the prompt builder ignores it. The full shape lives in `src/types/story-checkpoint.types.ts`. Events are capped at 10 per request and decisions at 5.
+That's the minimum the route needs. It also takes `characterName`, `currentLocation`, `activeGoals`, `toneSettings`, and `previousSegments`, which carries the last three checkpoint segments and is the only reason consecutive segments read as one story. The full shape lives in `src/types/story-checkpoint.types.ts`. Events are capped at 10 per request and decisions at 5.
 
 The response:
 
