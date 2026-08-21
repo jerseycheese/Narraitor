@@ -38,7 +38,7 @@ narraitor/
 │   │   └── GameSession/  Narrative/  WorldCreationWizard/  ...  # feature components (PascalCase dirs)
 │   ├── lib/                      # Domain logic, integrations, utilities
 │   │   ├── ai/                   # Gemini integration via @google/genai
-│   │   ├── promptContext/  promptTemplates/   # Prompt assembly + token budgeting
+│   │   ├── promptContext/  promptTemplates/   # Prompt assembly + token measurement
 │   │   ├── narrative/  narrativeStreaming/    # Narrative generation
 │   │   ├── lore/  inventory/  journal/  world/  generators/
 │   │   ├── storage/             # IndexedDB persistence helpers

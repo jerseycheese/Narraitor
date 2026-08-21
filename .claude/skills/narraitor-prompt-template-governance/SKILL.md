@@ -23,7 +23,7 @@ The template diff; the context fields it reads; the eval log (or a plan to produ
 **The registry (where prompts live — nothing lives elsewhere):**
 - Narrative templates: `src/lib/promptTemplates/templates/narrative/*` (scene, initial scene, action, transition, player-choice, choice-type, skill-acknowledgment, major-event guidelines), registered by id through `src/lib/promptTemplates/narrativeTemplateManager.ts` → `getNarrativeTemplate(id)` (throws on unknown id).
 - Ending templates: `src/lib/promptTemplates/templates/endingTemplates.ts`.
-- Context assembly + token budgeting: `src/lib/promptContext/` (`tokenBudgetManager.ts`, `tokenUtils.ts`).
+- Context assembly + token measurement: `src/lib/promptContext/` (`tokenUtils.ts` estimates a string, `promptCalibration.ts` builds the DevTools snapshot, `inventoryContextBuilder.ts` trims inventory to a caller-supplied `tokenLimit`). Nothing here budgets or trims the assembled prompt.
 - Reference examples: `src/lib/promptTemplates/examples/`.
 
 **HARD RULE:** Prompt experiments may output registered, evaluated templates only. They may not hardcode one-off prompt strings into narrative-generation code paths (generators, routes, components). If you see an inline prompt string outside the registry, that is a defect — file it.
@@ -46,8 +46,20 @@ G5 REGRESSION — compare against excerpts saved in earlier eval logs. Old stren
    must survive. WARNING: src/lib/promptTemplates/examples/ is a few-shot library
    injected INTO prompts (exampleLibrary.ts) — it is NOT a regression corpus, and
    editing it changes live generation behavior.
-G6 COST/LATENCY — estimate token delta (tokenBudgetManager path); a template that
-   grows context grows every turn's cost and the 5-8s prose wait (#1476).
+G6 COST/LATENCY — measure the delta yourself. Nothing enforces a prompt budget, and
+   no allocator will trim your template back. Components are bounded only where they
+   are assembled (the caller slices the segment window, getLoreContext defaults to 20
+   facts, buildInventoryContext trims to a tokenLimit); the assembled whole is never
+   trimmed. Estimate with estimateTokenCount (src/lib/promptContext/tokenUtils.ts),
+   then check a real request in the DevTools calibration panel, which
+   recordRequestCalibration (src/lib/ai/narrativeGenerator.calibration.ts) feeds with
+   estimated vs provider-reported prompt size. DEFAULT_TOTAL_BUDGET (80000) is that
+   panel's yardstick, not a ceiling. Only narrativeGenerator and choiceGenerator call
+   recordRequestCalibration, so the panel is blind to ending templates —
+   endingGenerator never publishes a snapshot, and a stale narrative reading will sit
+   there looking like yours. For an ending-template change, estimateTokenCount is the
+   whole measurement. Put the before/after in the eval log — a template that grows
+   context grows every turn's cost and the 5-8s prose wait.
 G7 INTEGRATION — at least one eval cell through the real /worlds/[id]/play loop and
    unit tests green (template __tests__ pin assembly, not prose).
 ```

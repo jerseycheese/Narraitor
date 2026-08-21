@@ -74,7 +74,7 @@ An eval log (matrix + excerpts + verdict) attached to the issue/PR. For hold dec
 - Testing only on `/dev/*` harnesses: they bypass parts of the real loop. At least one matrix cell must run the real `/worlds/[id]/play` flow.
 - Letting the model grade itself: "the output says it followed the tone" is not evidence; you compare output to store state and tone settings yourself.
 - Fixing bad output by adding instructions ("do not repeat yourself") without re-running the matrix — instruction soup degrades other cells silently.
-- Cost blindness: longer prompts/context raise latency + token cost per turn; check the token budget path (`src/lib/promptContext/tokenBudgetManager.ts`) when growing context.
+- Cost blindness: longer prompts/context raise latency + token cost per turn, and nothing trims the prompt back for you. When growing context, estimate the delta with `estimateTokenCount` (`src/lib/promptContext/tokenUtils.ts`) and read the real figure off the DevTools calibration panel, fed by `recordRequestCalibration` (`src/lib/ai/narrativeGenerator.calibration.ts`).
 
 ## 9. Related skills
 `narraitor-prompt-template-governance` (lifecycle + registry rules) · `narraitor-diagnostics-and-tooling` (curl smokes, watching real payloads) · `narraitor-change-control` (what "reliable" may claim) · `narraitor-product-frontier` (automating this protocol is an open problem).
