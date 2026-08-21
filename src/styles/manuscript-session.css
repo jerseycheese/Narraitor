@@ -3231,12 +3231,18 @@ body.manuscript-overlay-open {
   margin-bottom: var(--space-2);
 }
 
-/* DS3 dialogue segments — italic with left border accent (Pass 8, fix 6) */
-:root .dialogue-segment {
-  font-style: italic;
-  border-left: 2px solid var(--color-border-strong);
-  padding-left: var(--space-4);
-  margin-left: var(--space-1);
+/* DS3 dialogue segments. The model types a whole scene as `dialogue` whenever it
+   contains spoken lines, so italics behind a left rule set ordinary narration as
+   if it were quoted from elsewhere, and set it that way for nine lines at a
+   stretch. The prose now stays upright and flush in the same column as every
+   other segment, and a drafting arm above the block carries the distinction
+   instead. */
+:root .dialogue-segment::before {
+  content: '';
+  display: block;
+  width: calc(var(--mark-arm-length) * 2);
+  border-top: 1px solid var(--color-text-muted);
+  margin-bottom: var(--space-3);
 }
 
 /* DS3 main content inner — narrower journal column */
