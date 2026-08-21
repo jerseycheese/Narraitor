@@ -9,6 +9,14 @@ import {
   createStoreError
 } from '../errorUtils';
 
+// A stream abort arrives as a DOM AbortError. Its message carries none of the
+// words the message patterns look for, so name is the only usable signal.
+function streamAbortError(): Error {
+  const error = new Error('BodyStreamBuffer was aborted');
+  error.name = 'AbortError';
+  return error;
+}
+
 describe('errorUtils', () => {
   describe('isRetryableError', () => {
     it('should return true for network errors', () => {
@@ -29,6 +37,10 @@ describe('errorUtils', () => {
     it('should return true for rate limit errors', () => {
       const error = new Error('rate limit exceeded');
       expect(isRetryableError(error)).toBe(true);
+    });
+
+    it('should return true for a stream abort', () => {
+      expect(isRetryableError(streamAbortError())).toBe(true);
     });
 
     it('should return false for auth errors', () => {
@@ -67,6 +79,14 @@ describe('errorUtils', () => {
       expect(result.message).toBe('The request is taking too long. Please try again.');
       expect(result.retryable).toBe(true);
       expect(result.type).toBe(ErrorType.NETWORK);
+      expect(result.actionLabel).toBe('Try Again');
+    });
+
+    it('should map a stream abort to the network branch', () => {
+      const result = getUserFriendlyError(streamAbortError());
+
+      expect(result.type).toBe(ErrorType.NETWORK);
+      expect(result.retryable).toBe(true);
       expect(result.actionLabel).toBe('Try Again');
     });
 
