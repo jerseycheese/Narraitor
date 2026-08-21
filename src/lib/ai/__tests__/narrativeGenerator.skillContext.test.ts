@@ -98,7 +98,14 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
     narrativeGenerator = new NarrativeGenerator(mockAIClient);
   });
 
-  test('should include character skill information in narrative context', async () => {
+  /**
+   * What the scene prompt actually carries about the player character. Skills
+   * are NOT in it: `formatSkillsForNarrative` is wired into the choice prompt
+   * (choiceGenerator.prompt.ts), not this path. This case guards the character
+   * context that IS supposed to be here, and the player-identity rules that
+   * keep the narrator from writing the player as a third party.
+   */
+  test('carries the player character background into the scene prompt', async () => {
     const mockResponse = {
       content: "You assess your options, drawing on your athletic prowess and magical knowledge.",
       finishReason: 'stop' as const,
@@ -121,13 +128,11 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
       }
     });
 
-    // Verify that the AI client was called with a prompt
-    expect(mockAIClient.generateContent).toHaveBeenCalled();
-    const calledPrompt = mockAIClient.generateContent.mock.calls[0][0];
+    const calledPrompt = mockAIClient.generateContent.mock.calls[0][0] as string;
 
-    // The prompt should include character skill context
-    expect(typeof calledPrompt).toBe('string');
-    expect(calledPrompt.length).toBeGreaterThan(0);
+    expect(calledPrompt).toContain('Skilled adventurer with years of experience');
+    expect(calledPrompt).toContain('Brave and resourceful');
+    expect(calledPrompt).toContain('The player IS Test Hero');
   });
 
   // Lore extraction is a full extra Gemini round-trip that only enriches

@@ -241,9 +241,13 @@ describe('Persistence Integration - MVP', () => {
 
       expect(worldId).toBeDefined();
 
-      // State should work in memory
-      const state = useWorldStore.getState();
-      expect(state.worlds[worldId]).toBeDefined();
+      // State should work in memory, with the world intact rather than merely present.
+      const stored = useWorldStore.getState().worlds[worldId];
+      expect(stored).toMatchObject({
+        id: worldId,
+        name: 'Fallback World',
+        genre: 'fantasy',
+      });
     });
 
     test('should handle persistence errors gracefully', async () => {

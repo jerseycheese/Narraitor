@@ -1,248 +1,185 @@
-import { useWorldStore, WorldStore } from '../../worldStore';
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+/**
+ * worldStore persistence against the real zustand persist middleware.
+ *
+ * The storage layer is faked, but it is a working fake: a write lands in an
+ * in-memory map and a read gets it back, so every assertion here observes what
+ * the middleware actually serialized rather than that a mock was called.
+ * `../../persistence` is the seam because it is the last point before the
+ * browser, and `worldStore` is unmocked so the store code under test runs.
+ */
+
+// Backed by a real map so persisted state can be read back. Defined inside the
+// factory (not a module const) because jest hoists this above the imports.
+jest.mock('../../persistence', () => {
+  const backing = new Map<string, string>();
+
+  const storage = {
+    backing,
+    getItem: jest.fn(async (name: string) => {
+      const raw = backing.get(name);
+      return raw ? JSON.parse(raw) : null;
+    }),
+    setItem: jest.fn(async (name: string, value: unknown) => {
+      backing.set(name, JSON.stringify(value));
+    }),
+    removeItem: jest.fn(async (name: string) => {
+      backing.delete(name);
+    }),
+  };
+
+  (global as { __worldStoreTestStorage?: typeof storage }).__worldStoreTestStorage = storage;
+
+  return { createIndexedDBStorage: () => storage };
+});
+
+jest.unmock('../../worldStore');
+
+import { useWorldStore } from '../../worldStore';
 import { createMockWorld } from '@/lib/test-utils';
+import type { World } from '@/types';
 
-// Create mock adapter functions
-const mockGetItem = jest.fn().mockResolvedValue(null);
-const mockSetItem = jest.fn().mockResolvedValue(undefined);
-const mockRemoveItem = jest.fn().mockResolvedValue(undefined);
+const STORE_KEY = 'narraitor-world-store';
 
-// Create mock adapter object
-const mockAdapter = {
-  initialize: jest.fn().mockResolvedValue(undefined),
-  getItem: mockGetItem,
-  setItem: mockSetItem,
-  removeItem: mockRemoveItem
+type TestStorage = {
+  backing: Map<string, string>;
+  getItem: jest.Mock;
+  setItem: jest.Mock;
+  removeItem: jest.Mock;
 };
 
-// Mock the IndexedDBAdapter module
-jest.mock('../../../lib/storage/indexedDBAdapter', () => {
-  const MockAdapter = jest.fn().mockImplementation(() => mockAdapter);
-  (MockAdapter as jest.MockedFunction<typeof MockAdapter> & { create: jest.MockedFunction<() => Promise<typeof mockAdapter>> }).create = jest.fn().mockResolvedValue(mockAdapter);
-  
-  return {
-    IndexedDBAdapter: MockAdapter
-  };
-});
+const testStorage = (global as unknown as { __worldStoreTestStorage: TestStorage })
+  .__worldStoreTestStorage;
 
-// Mock zustand persist middleware
-jest.mock('zustand/middleware', () => ({
-  persist: jest.fn((config: (...args: unknown[]) => unknown) => 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (set: any, get: any, api: any) => {
-      // Return the original store config with mock persist behavior
-      return config(set, get, api);
-    })
-}));
+/** The state the middleware most recently wrote, parsed back out of storage. */
+const readPersistedState = (): { worlds: Record<string, World>; currentWorldId: string | null } | null => {
+  const raw = testStorage.backing.get(STORE_KEY);
+  return raw ? JSON.parse(raw).state : null;
+};
 
-// Test world factory
-const createTestWorld = (overrides = {}) => createMockWorld({
-  id: 'test-world-1',
-  settings: {
-    maxAttributes: 6,
-    maxSkills: 8,
-    attributePointPool: 27,
-    skillPointPool: 20
-  },
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z',
-  ...overrides
-});
+/** Persist writes are async; let the middleware's write settle before reading. */
+const flushPersist = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+/**
+ * Model a fresh page load: keep the bytes the last session wrote, drop the
+ * in-memory state, and rehydrate from those bytes. `reset()` alone is not
+ * enough, because the middleware immediately persists the emptied state over
+ * the top of what we are trying to read back.
+ */
+const reloadFromStorage = async () => {
+  const written = testStorage.backing.get(STORE_KEY)!;
+  useWorldStore.getState().reset();
+  await flushPersist();
+  testStorage.backing.set(STORE_KEY, written);
+  await useWorldStore.persist.rehydrate();
+};
+
+const worldInput = (overrides: Partial<World> = {}) => {
+  const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...rest } = createMockWorld(overrides);
+  return rest;
+};
 
 describe('worldStore persistence', () => {
   beforeEach(() => {
-    // Clear all mocks
     jest.clearAllMocks();
-    
-    // Reset the store
+    testStorage.backing.clear();
     useWorldStore.getState().reset();
   });
 
   describe('state persistence', () => {
-    test('should persist state changes to IndexedDB', async () => {
-      // Create a persisted store
-      const worldData = createTestWorld();
-      
-      // Create a world to trigger persistence
-      useWorldStore.getState().createWorld(worldData);
-      
-      // Manually call the mock setItem with expected data
-      mockSetItem('narraitor-world-store', JSON.stringify({
-        state: {
-          worlds: {
-            'test-world-1': worldData
-          },
-          currentWorldId: null,
-          error: null,
-          loading: false
-        },
-        version: 0
-      }));
+    test('writes a created world through to storage', async () => {
+      const worldId = useWorldStore.getState().createWorld(worldInput({ name: 'Persisted World' }));
 
-      // Allow async operations to complete
-      await new Promise(resolve => setTimeout(resolve, 10)); 
-      
-      // Verify that setItem was called with the right key
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'narraitor-world-store',
-        expect.stringContaining('"test-world-1"')
-      );
+      await flushPersist();
+
+      const persisted = readPersistedState();
+      expect(persisted?.worlds[worldId]).toMatchObject({
+        id: worldId,
+        name: 'Persisted World',
+      });
     });
 
-    test('should restore state from IndexedDB on initialization', async () => {
-      // Setup persisted state
-      const persistedState = {
-        state: {
-          worlds: {
-            'world-1': createTestWorld({ id: 'world-1', name: 'Persisted World' })
-          },
-          currentWorldId: 'world-1',
-          error: null,
-          loading: false
-        },
-        version: 0
-      };
-      
-      // Set mock to return persisted state
-      mockGetItem.mockResolvedValue(JSON.stringify(persistedState));
-      
-      // Mock getItem call to simulate state restoration
-      mockGetItem('narraitor-world-store');
+    test('restores worlds from storage on rehydrate', async () => {
+      const stored = createMockWorld({ id: 'world-1', name: 'Restored World' });
+      testStorage.backing.set(
+        STORE_KEY,
+        JSON.stringify({
+          state: { worlds: { 'world-1': stored }, currentWorldId: 'world-1' },
+          version: 5,
+        })
+      );
 
-      // Allow async restoration to complete
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await useWorldStore.persist.rehydrate();
 
-      // Verify the getItem was called
-      expect(mockGetItem).toHaveBeenCalledWith('narraitor-world-store');
+      const state = useWorldStore.getState();
+      expect(state.worlds['world-1']).toMatchObject({ id: 'world-1', name: 'Restored World' });
+      expect(state.currentWorldId).toBe('world-1');
     });
 
-    test('should handle empty persisted state', async () => {
-      // Return null to simulate no persisted state
-      mockGetItem.mockResolvedValue(null);
+    test('rehydrates to empty defaults when storage holds nothing', async () => {
+      await useWorldStore.persist.rehydrate();
 
-      // Create persisted store
-      const persistedStore = create<WorldStore>()(
-        persist(
-          (_set, _get, _api) => useWorldStore.getState(),
-          {
-            name: 'narraitor-world-store',
-            storage: {
-              getItem: mockGetItem,
-              setItem: mockSetItem,
-              removeItem: mockRemoveItem
-            }
-          }
-        )
-      );
-      
-      // Manually trigger getItem call
-      mockGetItem('narraitor-world-store');
-
-      // Allow async operations to complete
-      await new Promise(resolve => setTimeout(resolve, 10));
-
-      // Verify that getItem was called
-      expect(mockGetItem).toHaveBeenCalledWith('narraitor-world-store');
-      
-      // Store should have default state when no persisted state exists
-      const state = persistedStore.getState();
+      const state = useWorldStore.getState();
       expect(state.worlds).toEqual({});
       expect(state.currentWorldId).toBeNull();
+    });
+
+    test('drops a deleted world from storage', async () => {
+      const worldId = useWorldStore.getState().createWorld(worldInput());
+      await flushPersist();
+
+      useWorldStore.getState().deleteWorld(worldId);
+      await flushPersist();
+
+      expect(readPersistedState()?.worlds[worldId]).toBeUndefined();
     });
   });
 
   describe('data integrity', () => {
-    test('should maintain date serialization', async () => {
-      // Create world with dates
-      const worldWithDates = createTestWorld({
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-02T00:00:00Z'
-      });
+    test('survives a full write and read back with its dates intact', async () => {
+      const worldId = useWorldStore
+        .getState()
+        .createWorld(worldInput({ name: 'Dated World' }));
 
-      // Create world to trigger persistence
-      useWorldStore.getState().createWorld(worldWithDates);
-      
-      // Manually simulate persistence
-      mockSetItem('narraitor-world-store', JSON.stringify({
-        state: {
-          worlds: {
-            'test-world-1': worldWithDates
-          },
-          currentWorldId: null,
-          error: null,
-          loading: false
-        },
-        version: 0
-      }));
+      await flushPersist();
+      const written = readPersistedState()!.worlds[worldId];
 
-      // Verify dates are properly serialized
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'narraitor-world-store',
-        expect.stringContaining('2024-01-01')
-      );
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'narraitor-world-store',
-        expect.stringContaining('2024-01-02')
-      );
+      await reloadFromStorage();
+
+      const restored = useWorldStore.getState().worlds[worldId];
+      expect(restored.createdAt).toBe(written.createdAt);
+      expect(restored.updatedAt).toBe(written.updatedAt);
+      expect(typeof restored.createdAt).toBe('string');
     });
 
-    test('should preserve all world properties', async () => {
-      // Create full-featured world
-      const fullWorld = createTestWorld({
+    test('preserves every world property through a round trip', async () => {
+      const worldId = useWorldStore.getState().createWorld(
+        worldInput({
+          name: 'Full Featured World',
+          genre: 'sci-fi',
+          description: 'A complex world with all properties',
+          settings: {
+            maxAttributes: 8,
+            maxSkills: 10,
+            attributePointPool: 32,
+            skillPointPool: 25,
+          },
+        })
+      );
+
+      await flushPersist();
+      await reloadFromStorage();
+
+      expect(useWorldStore.getState().worlds[worldId]).toMatchObject({
         name: 'Full Featured World',
         genre: 'sci-fi',
         description: 'A complex world with all properties',
-        imageUrl: 'https://example.com/world.jpg',
         settings: {
           maxAttributes: 8,
           maxSkills: 10,
           attributePointPool: 32,
           skillPointPool: 25,
-          difficultyLevel: 'hard'
-        }
-      });
-
-      // Manually simulate persistence
-      mockSetItem('narraitor-world-store', JSON.stringify({
-        state: {
-          worlds: {
-            'test-world-1': fullWorld
-          },
-          currentWorldId: null,
-          error: null,
-          loading: false
         },
-        version: 0
-      }));
-
-      // Verify all properties are included
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'narraitor-world-store',
-        expect.stringContaining('Full Featured World')
-      );
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'narraitor-world-store',
-        expect.stringContaining('sci-fi')
-      );
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'narraitor-world-store',
-        expect.stringContaining('description')
-      );
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'narraitor-world-store',
-        expect.stringContaining('imageUrl')
-      );
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'narraitor-world-store',
-        expect.stringContaining('difficultyLevel')
-      );
+      });
     });
   });
-
-  // NOTE: a "fallback behavior / logs errors on persistence failure" test was removed
-  // here. It was self-fulfilling (it called the mock itself, then asserted the mock was
-  // called) and could not be salvaged in place: this file mocks out zustand's `persist`
-  // middleware, so `onRehydrateStorage`'s error handler never runs. Real persistence-error
-  // logging coverage needs a separate test that exercises the un-mocked persist path.
 });

@@ -46,81 +46,74 @@ describe('CharacterSummary', () => {
   };
 
   describe('Core Functionality', () => {
-    it('displays character name prominently', () => {
+    it('renders the character identity: name, level, and portrait', () => {
       render(<CharacterSummary character={mockCharacter} />);
-      
+
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
+      expect(screen.getByText(/Level 5/)).toBeInTheDocument();
+      expect(screen.getByRole('img', { name: /Aldric the Bold/i })).toBeInTheDocument();
     });
 
-    it('displays character history when expanded', async () => {
+    it('expands the details on request and collapses them again', async () => {
       const user = userEvent.setup();
       render(<CharacterSummary character={mockCharacter} />);
-      
-      // History should be collapsed by default
-      expect(screen.queryByText('Raised in a noble family, trained in the art of combat since childhood')).not.toBeInTheDocument();
-      
-      // Click to expand
-      const expandButton = screen.getByRole('button');
-      await user.click(expandButton);
-      
-      // Now history should be visible
-      expect(screen.getByText('Raised in a noble family, trained in the art of combat since childhood')).toBeInTheDocument();
-    });
 
-    it('displays character level', () => {
-      render(<CharacterSummary character={mockCharacter} />);
-      
-      expect(screen.getByText(/Level 5/)).toBeInTheDocument();
+      const history = 'Raised in a noble family, trained in the art of combat since childhood';
+      const toggle = screen.getByRole('button', { name: /show details/i });
+
+      expect(screen.queryByText(history)).not.toBeInTheDocument();
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+      await user.click(toggle);
+
+      expect(screen.getByText(history)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /hide details/i })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      );
+
+      await user.click(screen.getByRole('button', { name: /hide details/i }));
+
+      expect(screen.queryByText(history)).not.toBeInTheDocument();
     });
   });
 
   describe('Portrait Handling', () => {
-    it('displays character portrait when available', () => {
-      render(<CharacterSummary character={mockCharacter} />);
-      
-      const portrait = screen.getByRole('img', { name: /Aldric the Bold/i });
-      expect(portrait).toBeInTheDocument();
-    });
+    it('drops the portrait block entirely when the character has none', () => {
+      const { container } = render(
+        <CharacterSummary character={{ ...mockCharacter, portrait: undefined }} />
+      );
 
-    it('handles missing portrait gracefully', () => {
-      const characterWithoutPortrait = {
-        ...mockCharacter,
-        portrait: undefined
-      };
-      
-      render(<CharacterSummary character={characterWithoutPortrait} />);
-      
-      // Should still render without crashing
+      expect(container.querySelector('.manuscript-character-summary-portrait')).toBeNull();
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
     });
 
-    it('handles placeholder portrait type', () => {
-      const characterWithPlaceholder = {
-        ...mockCharacter,
-        portrait: { type: 'placeholder' as const, url: null }
-      };
-      
-      render(<CharacterSummary character={characterWithPlaceholder} />);
-      
-      // Should still render without crashing
-      expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
+    it('keeps the portrait block for a placeholder portrait', () => {
+      const { container } = render(
+        <CharacterSummary
+          character={{ ...mockCharacter, portrait: { type: 'placeholder' as const, url: null } }}
+        />
+      );
+
+      expect(container.querySelector('.manuscript-character-summary-portrait')).not.toBeNull();
     });
   });
 
   describe('Missing Data Handling', () => {
-    it('handles missing history gracefully', () => {
-      const characterWithoutHistory = {
-        ...mockCharacter,
-        background: {
-          ...mockCharacter.background,
-          history: ''
-        }
-      };
-      
-      render(<CharacterSummary character={characterWithoutHistory} />);
-      
-      // Should still render name and other available info
-      expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
+    it('omits the history paragraph when the character has no history', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <CharacterSummary
+          character={{
+            ...mockCharacter,
+            background: { ...mockCharacter.background, history: '' },
+          }}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: /show details/i }));
+
+      expect(container.querySelector('.manuscript-character-summary-history')).toBeNull();
       expect(screen.getByText(/Level 5/)).toBeInTheDocument();
     });
 
@@ -134,30 +127,21 @@ describe('CharacterSummary', () => {
           fears: []
         }
       };
-      
+
       render(<CharacterSummary character={characterWithoutBackground} />);
-      
-      // Should still render name and level but not background info
+
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
       expect(screen.getByText(/Level 5/)).toBeInTheDocument();
-      // Should not show empty background content
       expect(screen.queryByText('Raised in a noble family, trained in the art of combat since childhood')).not.toBeInTheDocument();
     });
   });
 
-  describe('Responsive Design', () => {
-    it('renders with appropriate structure', () => {
+  describe('Structure', () => {
+    it('exposes the summary as a labelled region', () => {
       const { container } = render(<CharacterSummary character={mockCharacter} />);
-      
-      const summaryElement = container.querySelector('[data-testid="character-summary"]');
-      expect(summaryElement).toBeInTheDocument();
-    });
 
-    it('applies proper accessibility attributes', () => {
-      render(<CharacterSummary character={mockCharacter} />);
-      
-      const summaryRegion = screen.getByRole('region', { name: /character information/i });
-      expect(summaryRegion).toBeInTheDocument();
+      const region = screen.getByRole('region', { name: /character information/i });
+      expect(region).toBe(container.querySelector('[data-testid="character-summary"]'));
     });
   });
 });
