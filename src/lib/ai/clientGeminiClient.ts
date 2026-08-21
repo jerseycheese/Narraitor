@@ -8,6 +8,9 @@ import { SINGLE_ATTEMPT_TEXT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ClientGeminiClient');
 
+/** Output ceiling for a narrative beat: 3-4 paragraphs plus its JSON metadata. */
+const NARRATIVE_MAX_OUTPUT_TOKENS = 2048;
+
 /**
  * Client-side proxy for Gemini API that routes through Next.js API routes
  * This ensures API keys are never exposed to the client
@@ -166,7 +169,7 @@ export class ClientGeminiClient implements AIClient {
   async generateContent(prompt: string, options?: AIGenerateOptions): Promise<AIResponse> {
     return this.postNdjsonStream(
       '/api/narrative/generate',
-      { prompt, config: { temperature: 0.7, maxTokens: 2048 } },
+      { prompt, config: { temperature: 0.7, maxTokens: options?.maxTokens ?? NARRATIVE_MAX_OUTPUT_TOKENS } },
       'generation',
       // The route makes a single 30s Gemini attempt (makeGeminiRequest), so
       // the wait ceiling is that budget + headroom, not the retry worst case.
