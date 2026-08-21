@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useRouter } from 'next/navigation';
 import CharactersPage from '../page';
+import { ToastProvider } from '@/components/ui/toast';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -94,7 +95,11 @@ describe('CharactersPage heading hierarchy (#1530)', () => {
   it('renders exactly one page-level h1 when populated with a world hero', async () => {
     mockStores({ populated: true });
 
-    render(<CharactersPage />);
+    render(
+      <ToastProvider>
+        <CharactersPage />
+      </ToastProvider>
+    );
 
     const h1s = await screen.findAllByRole('heading', { level: 1 });
     expect(h1s).toHaveLength(1);
@@ -109,7 +114,11 @@ describe('CharactersPage heading hierarchy (#1530)', () => {
   it('renders exactly one page-level h1 in the empty no-world state', async () => {
     mockStores({ populated: false });
 
-    render(<CharactersPage />);
+    render(
+      <ToastProvider>
+        <CharactersPage />
+      </ToastProvider>
+    );
 
     const h1s = await screen.findAllByRole('heading', { level: 1 });
     expect(h1s).toHaveLength(1);
