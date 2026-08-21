@@ -48,8 +48,6 @@ describe('/api/narrative/story-checkpoint', () => {
       summary: 'Recap',
       highlights: ['Highlight'],
       majorEvents: ['Event'],
-      characterDevelopment: [],
-      nextHooks: [],
       includedEvents: 1,
       includedDecisions: 0,
       lastEventTimestamp: '2025-11-20T18:00:00Z',

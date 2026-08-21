@@ -35,9 +35,6 @@ export interface StoryCheckpointResponseBody {
   segment: string; // 50-75 word immutable segment about events in this checkpoint only
   highlights: string[];
   majorEvents: string[];
-  characterDevelopment: string[];
-  nextHooks: string[];
-  themes?: string[];
   includedEvents: number;
   includedDecisions: number;
   lastEventTimestamp?: ISODateString;
