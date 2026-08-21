@@ -24,7 +24,7 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator';
 import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
-import { Toast } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/toast';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { GeneratedImage } from '@/types/common.types';
@@ -144,6 +144,7 @@ export default function CharactersPage() {
   const { worlds, currentWorldId, worldStates } = useWorldStore();
   const currentSessionId = useSessionStore((state) => state.id);
   const { getSessionSegments } = useNarrativeStore();
+  const toast = useToast();
   const [mounted, setMounted] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -168,15 +169,6 @@ export default function CharactersPage() {
     characterId: null as string | null,
     characterName: '',
   });
-  const [toasts, setToasts] = useState<
-    Array<{
-      id: string;
-      title: string;
-      description?: string;
-      variant: 'success' | 'error';
-      duration?: number;
-    }>
-  >([]);
 
   const [viewMode, setViewMode] = useState<CharacterViewMode>('grid');
 
@@ -265,30 +257,6 @@ export default function CharactersPage() {
     mounted && currentWorld?.image?.url
       ? undefined
       : 'Create unique characters for your interactive narrative adventures.';
-
-  const addToast = (
-    toast: Omit<
-      {
-        id: string;
-        title: string;
-        description?: string;
-        variant: 'success' | 'error';
-        duration?: number;
-      },
-      'id'
-    >
-  ) => {
-    const id = `toast-${Date.now()}-${Math.random()}`;
-    const newToast = { ...toast, id };
-    setToasts((prev) => [...prev, newToast]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, toast.duration || 3000);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
 
   const handleCreateCharacter = () => {
     router.push('/characters/create');
@@ -413,11 +381,10 @@ export default function CharactersPage() {
     try {
       const characterName = deleteDialog.characterName;
       await deleteCharacterWithCleanup(deleteDialog.characterId);
-      addToast({
-        title: 'Character Deleted',
-        description: `${characterName} has been permanently deleted`,
-        variant: 'success',
-      });
+      toast.success(
+        'Character Deleted',
+        `${characterName} has been permanently deleted`
+      );
       setDeleteDialog({
         isOpen: false,
         characterId: null,
@@ -425,11 +392,10 @@ export default function CharactersPage() {
         isDeleting: false,
       });
     } catch {
-      addToast({
-        title: 'Delete Failed',
-        description: "Couldn't delete this character. Try again in a moment.",
-        variant: 'error',
-      });
+      toast.error(
+        'Delete Failed',
+        "Couldn't delete this character. Try again in a moment."
+      );
       setDeleteDialog((prev) => ({ ...prev, isDeleting: false }));
     }
   };
@@ -637,18 +603,6 @@ export default function CharactersPage() {
         characterName={characterSwitchDialog.characterName}
         currentProgress={currentProgress}
       />
-
-      <div>
-        {toasts.map((toast) => (
-          <Toast
-            key={toast.id}
-            title={toast.title}
-            description={toast.description}
-            variant={toast.variant}
-            onDismiss={() => removeToast(toast.id)}
-          />
-        ))}
-      </div>
     </PageLayout>
   );
 }
