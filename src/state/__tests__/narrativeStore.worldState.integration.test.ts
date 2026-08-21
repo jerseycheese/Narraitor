@@ -3,6 +3,8 @@ import { useWorldStore } from '../worldStore';
 import { useSessionStore } from '../sessionStore';
 import { useCharacterStore } from '../characterStore';
 import { createTestCharacterData } from './characterStore.testHelpers';
+import { extractWorldStateImpacts } from '../narrativeStore.worldStateImpacts';
+import type { Decision } from '../../types/narrative.types';
 const resetSessionStore = () => {
   useSessionStore.setState(() => ({
     id: null,
@@ -435,5 +437,63 @@ describe('Narrative store world state integration', () => {
       'Story begins at Ancient Chamber'
     );
     jest.restoreAllMocks();
+  });
+});
+
+describe('extractWorldStateImpacts major-event detection', () => {
+  const buildDecision = (prompt: string, optionText: string): Decision => ({
+    id: 'decision-1',
+    prompt,
+    options: [{ id: 'option-1', text: optionText }],
+  });
+
+  it('reads the same major events out of a decision whatever genre its prose wears', () => {
+    const fantasy = buildDecision(
+      'The square fills as word spreads. What do you do?',
+      "Join the kingdom's celebration in the square."
+    );
+    const civic = buildDecision(
+      'The square fills as word spreads. What do you do?',
+      "Join the borough's ribbon-cutting in the square."
+    );
+
+    const fantasyEvents = extractWorldStateImpacts(
+      fantasy,
+      fantasy.options[0],
+      'character-1'
+    ).events.map((event) => event.description);
+    const civicEvents = extractWorldStateImpacts(
+      civic,
+      civic.options[0],
+      'character-1'
+    ).events.map((event) => event.description);
+
+    expect(fantasyEvents).toEqual(civicEvents);
+  });
+
+  it('still records an event a consequence explicitly declares', () => {
+    const decision: Decision = {
+      id: 'decision-2',
+      prompt: 'The council calls the vote. How do you argue?',
+      options: [{ id: 'option-1', text: 'Read the inspection report aloud.' }],
+      consequences: [
+        {
+          type: 'narrative',
+          action: 'add',
+          targetId: 'event',
+          value: 'The council dissolved the water board.',
+        },
+      ],
+    };
+
+    const { events } = extractWorldStateImpacts(
+      decision,
+      decision.options[0],
+      'character-1'
+    );
+
+    expect(events.map((event) => event.description)).toEqual([
+      'The council dissolved the water board.',
+    ]);
   });
 });

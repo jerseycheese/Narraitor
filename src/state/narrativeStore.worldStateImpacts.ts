@@ -10,6 +10,10 @@ import {
  * Pure extraction of structured world-state impacts from a selected decision
  * option. No store coupling — narrativeStore.decisions.ts consumes the result
  * and pushes it into worldStore.
+ *
+ * Major events come only from what a consequence explicitly declares. Detecting
+ * a major event in prose is the model's job, via metadata.majorEvent and the
+ * significance-validation route, so it works for any world the player builds.
  */
 export interface ExtractedWorldStateImpact {
   relationships: Record<EntityID, NPCRelationshipUpdate>;
@@ -25,18 +29,6 @@ export type DecisionWorldStatePayload = {
   events: WorldStateMajorEventInput[];
   alignmentDelta: number;
 };
-
-const MAJOR_EVENT_PATTERNS: RegExp[] = [
-  /world[-\s]?changing/i,
-  /major\s+event/i,
-  /kingdom\s+(?:falls|celebrates|rejoices|crumbles)/i,
-  /celebration/i,
-  /catastrophe/i,
-  /disaster/i,
-  /uprising/i,
-  /war\s+erupts/i,
-  /reputation\s+(?:soars|plummets|spreads)/i,
-];
 
 const parseNumericValue = (value: unknown): number | undefined => {
   if (typeof value === 'number' && Number.isFinite(value)) {
@@ -177,39 +169,6 @@ export const extractWorldStateImpacts = (
   const optionConsequences = selectedOption.consequences ?? [];
   optionConsequences.forEach(handleConsequence);
   (decision.consequences ?? []).forEach(handleConsequence);
-
-  const candidateTexts: string[] = [];
-  const optionText = safeTrim(selectedOption.text || '');
-  if (optionText) candidateTexts.push(optionText);
-
-  const customText = safeTrim((selectedOption as { customText?: string }).customText ?? '');
-  if (customText) candidateTexts.push(customText);
-
-  const hintText = safeTrim((selectedOption as { hint?: string }).hint ?? '');
-  if (hintText) candidateTexts.push(hintText);
-
-  const decisionPrompt = safeTrim(decision.prompt || '');
-  if (decisionPrompt) candidateTexts.push(decisionPrompt);
-
-  const consequenceDescriptions = [...optionConsequences, ...(decision.consequences ?? [])]
-    .map((cons) => safeTrim(cons?.description || (typeof cons?.value === 'string' ? cons.value : '')))
-    .filter(Boolean) as string[];
-
-  candidateTexts.push(...consequenceDescriptions);
-
-  candidateTexts.forEach(text => {
-    const sentences = text.split(/(?<=[.!?])\s+/u);
-    sentences.forEach(sentence => {
-      const trimmed = safeTrim(sentence);
-      if (!trimmed) {
-        return;
-      }
-
-      if (MAJOR_EVENT_PATTERNS.some(pattern => pattern.test(trimmed))) {
-        queueMajorEvent(trimmed, characterId, processedDescriptions, events);
-      }
-    });
-  });
 
   for (const [npcId, update] of Object.entries(relationships)) {
     const meaningful =
