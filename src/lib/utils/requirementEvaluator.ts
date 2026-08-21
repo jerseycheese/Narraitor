@@ -39,15 +39,30 @@ const compareValues = (current: number, required: number, operator: string): boo
   }
 };
 
+/**
+ * Lowercase a value only when it really is a string. Requirements come from
+ * model-generated JSON and characters from persisted IndexedDB records, so a
+ * field typed as string can arrive as a number, and a bare optional-chain still
+ * throws on one.
+ */
+const lowerString = (value: unknown): string =>
+  typeof value === 'string' ? value.toLowerCase() : '';
+
 export const evaluateRequirement = (
   requirement: DecisionRequirement,
   character: Character
 ): RequirementEvaluationResult => {
+  // An absent targetId must not match: `undefined === undefined` would pair the
+  // requirement with any skill that has no worldSkillId.
+  const rawTargetId = requirement.targetId;
+  const hasTargetId = rawTargetId !== undefined && rawTargetId !== null && rawTargetId !== '';
+  const targetId = lowerString(rawTargetId);
+
   if (requirement.type === 'skill') {
     // Try to find skill by worldSkillId first, then by name (case-insensitive)
-    const skill = character.skills.find(s =>
-      s.worldSkillId === requirement.targetId ||
-      s.name.toLowerCase() === requirement.targetId.toLowerCase()
+    const skill = !hasTargetId ? undefined : (character.skills || []).find(s =>
+      s.worldSkillId === rawTargetId ||
+      (targetId !== '' && lowerString(s.name) === targetId)
     );
     const currentLevel = skill ? skill.level : 0;
     const requiredValue = typeof requirement.value === 'number' ? requirement.value : 0;
@@ -63,9 +78,9 @@ export const evaluateRequirement = (
   if (requirement.type === 'item') {
     // Try to find item by ID first, then by name (case-insensitive)
     const inventoryItems = character.inventory?.items || [];
-    const item = inventoryItems.find(i =>
-      i.id === requirement.targetId ||
-      i.name.toLowerCase() === requirement.targetId.toLowerCase()
+    const item = !hasTargetId ? undefined : inventoryItems.find(i =>
+      i.id === rawTargetId ||
+      (targetId !== '' && lowerString(i.name) === targetId)
     );
     const currentQuantity = item ? item.quantity : 0;
     const requiredValue = typeof requirement.value === 'number' ? requirement.value : 0;

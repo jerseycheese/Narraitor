@@ -268,5 +268,107 @@ describe('requirementEvaluator', () => {
       expect(result.current).toBe(0);
       expect(result.required).toBe(5);
     });
+
+    // Persisted characters predate the current store shape and model-generated
+    // requirements can omit targetId, so neither is trustworthy at runtime.
+    it('should not throw when a persisted skill has no name', () => {
+      const characterWithNamelessSkill = {
+        ...mockCharacter,
+        skills: [{ id: 'skill-x', characterId: 'char-1', level: 4 }],
+      } as unknown as Character;
+
+      const requirement: DecisionRequirement = {
+        type: 'skill',
+        targetId: 'intimidation',
+        operator: 'gte',
+        value: 5,
+      };
+
+      expect(() =>
+        evaluateRequirement(requirement, characterWithNamelessSkill)
+      ).not.toThrow();
+    });
+
+    it('should not throw when the character has no skills array', () => {
+      const characterWithoutSkills = {
+        ...mockCharacter,
+        skills: undefined,
+      } as unknown as Character;
+
+      const requirement: DecisionRequirement = {
+        type: 'skill',
+        targetId: 'intimidation',
+        operator: 'gte',
+        value: 5,
+      };
+
+      expect(() =>
+        evaluateRequirement(requirement, characterWithoutSkills)
+      ).not.toThrow();
+    });
+
+    it('should not throw when the requirement has no targetId', () => {
+      const characterWithItem = {
+        ...mockCharacter,
+        inventory: {
+          ...mockCharacter.inventory,
+          items: [
+            { id: 'item-1', name: 'Lockpick', quantity: 1 },
+          ],
+        },
+      } as unknown as Character;
+
+      const requirement = {
+        type: 'item',
+        operator: 'gte',
+        value: 1,
+      } as unknown as DecisionRequirement;
+
+      expect(() => evaluateRequirement(requirement, characterWithItem)).not.toThrow();
+    });
+
+    it('should not throw when the requirement targetId is a number', () => {
+      const requirement = {
+        type: 'skill',
+        targetId: 42,
+        operator: 'gte',
+        value: 5,
+      } as unknown as DecisionRequirement;
+
+      expect(() => evaluateRequirement(requirement, mockCharacter)).not.toThrow();
+    });
+
+    it('should not throw when a persisted skill name is a number', () => {
+      const characterWithNumericSkillName = {
+        ...mockCharacter,
+        skills: [{ id: 'skill-x', characterId: 'char-1', name: 7, level: 4 }],
+      } as unknown as Character;
+
+      const requirement: DecisionRequirement = {
+        type: 'skill',
+        targetId: 'intimidation',
+        operator: 'gte',
+        value: 5,
+      };
+
+      expect(() =>
+        evaluateRequirement(requirement, characterWithNumericSkillName)
+      ).not.toThrow();
+    });
+
+    it('should not match a nameless skill against a missing targetId', () => {
+      const characterWithNamelessSkill = {
+        ...mockCharacter,
+        skills: [{ id: 'skill-x', characterId: 'char-1', level: 9 }],
+      } as unknown as Character;
+
+      const requirement = {
+        type: 'skill',
+        operator: 'gte',
+        value: 5,
+      } as unknown as DecisionRequirement;
+
+      expect(evaluateRequirement(requirement, characterWithNamelessSkill).current).toBe(0);
+    });
   });
 });
