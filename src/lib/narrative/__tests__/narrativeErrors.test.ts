@@ -24,6 +24,15 @@ describe('getNarrativeError', () => {
     assertNoJargon(result.suggestion ?? '');
   });
 
+  it('lets the player continue after a stream abort', () => {
+    const abort = new Error('BodyStreamBuffer was aborted');
+    abort.name = 'AbortError';
+
+    const result = getNarrativeError(abort);
+    expect(result.title).toBe('The story paused');
+    expect(result.retryable).toBe(true);
+  });
+
   it('frames rate-limit/service errors as the story needing a moment', () => {
     const result = getNarrativeError(new Error('429 too many requests'));
     expect(result.title).toBe('The story needs a moment');

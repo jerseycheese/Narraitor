@@ -33,13 +33,23 @@ export interface UserFriendlyError {
 }
 
 /**
+ * A dropped stream surfaces as a DOM AbortError whose message ("BodyStreamBuffer
+ * was aborted") contains none of the words the patterns below look for, so the
+ * name has to be read alongside the message or the failure looks unrecognized.
+ */
+function isAbortError(error: Error): boolean {
+  return error.name === 'AbortError' || error.message.toLowerCase().includes('aborted');
+}
+
+/**
  * Determines if an error should be retryable based on common patterns
  */
 export function isRetryableError(error: Error): boolean {
   const message = error.message.toLowerCase();
-  
-  // Network, timeout, and rate limit errors are retryable
-  return message.includes('network') || 
+
+  // Network, abort, timeout, and rate limit errors are retryable
+  return isAbortError(error) ||
+         message.includes('network') ||
          message.includes('timeout') ||
          message.includes('429') ||
          message.includes('rate limit');
@@ -65,20 +75,10 @@ export function isRetryableError(error: Error): boolean {
 export function getUserFriendlyError(error: Error): UserFriendlyError {
   const message = error.message.toLowerCase();
 
-  // Network errors
-  if (message.includes('network')) {
-    return {
-      title: 'Connection Problem',
-      message: 'Unable to connect. Please check your internet connection.',
-      suggestion: 'Make sure you are online, then try again.',
-      actionLabel: 'Try Again',
-      retryable: true,
-      type: ErrorType.NETWORK,
-      severity: 'error'
-    };
-  }
-
-  // Timeout errors
+  // Timeout errors. Checked before the network branch below, which would
+  // otherwise swallow them: AbortSignal.timeout raises a TimeoutError reading
+  // "aborted due to timeout", and telling a player their connection is down
+  // when the request merely ran long sends them to fix the wrong thing.
   if (message.includes('timeout')) {
     return {
       title: 'Request Timed Out',
@@ -88,6 +88,20 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
       retryable: true,
       type: ErrorType.NETWORK,
       severity: 'warning'
+    };
+  }
+
+  // Network errors. An aborted stream is the same class of transport failure as
+  // a dropped connection, and the player can pick the story back up either way.
+  if (message.includes('network') || isAbortError(error)) {
+    return {
+      title: 'Connection Problem',
+      message: 'Unable to connect. Please check your internet connection.',
+      suggestion: 'Make sure you are online, then try again.',
+      actionLabel: 'Try Again',
+      retryable: true,
+      type: ErrorType.NETWORK,
+      severity: 'error'
     };
   }
 

@@ -9,6 +9,22 @@ import {
   createStoreError
 } from '../errorUtils';
 
+// A stream abort arrives as a DOM AbortError. Its message carries none of the
+// words the message patterns look for, so name is the only usable signal.
+function streamAbortError(): Error {
+  const error = new Error('BodyStreamBuffer was aborted');
+  error.name = 'AbortError';
+  return error;
+}
+
+// AbortSignal.timeout raises a TimeoutError whose message carries both "aborted"
+// and "timeout", so it is the case that tells the two branches apart.
+function signalTimeoutError(): Error {
+  const error = new Error('The operation was aborted due to timeout');
+  error.name = 'TimeoutError';
+  return error;
+}
+
 describe('errorUtils', () => {
   describe('isRetryableError', () => {
     it('should return true for network errors', () => {
@@ -29,6 +45,10 @@ describe('errorUtils', () => {
     it('should return true for rate limit errors', () => {
       const error = new Error('rate limit exceeded');
       expect(isRetryableError(error)).toBe(true);
+    });
+
+    it('should return true for a stream abort', () => {
+      expect(isRetryableError(streamAbortError())).toBe(true);
     });
 
     it('should return false for auth errors', () => {
@@ -68,6 +88,23 @@ describe('errorUtils', () => {
       expect(result.retryable).toBe(true);
       expect(result.type).toBe(ErrorType.NETWORK);
       expect(result.actionLabel).toBe('Try Again');
+    });
+
+    it('should map a stream abort to the network branch', () => {
+      const result = getUserFriendlyError(streamAbortError());
+
+      expect(result.type).toBe(ErrorType.NETWORK);
+      expect(result.retryable).toBe(true);
+      expect(result.actionLabel).toBe('Try Again');
+    });
+
+    it('should keep a signal timeout on the timeout branch', () => {
+      const result = getUserFriendlyError(signalTimeoutError());
+
+      expect(result.title).toBe('Request Timed Out');
+      expect(result.severity).toBe('warning');
+      expect(result.type).toBe(ErrorType.NETWORK);
+      expect(result.retryable).toBe(true);
     });
 
     it('should map 429 rate limit errors with generic message', () => {
