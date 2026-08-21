@@ -43,14 +43,17 @@ const loggedText = (spy: jest.SpyInstance): string =>
 
 describe('goalExtractor output budget and failure visibility', () => {
   let warnSpy: jest.SpyInstance;
+  let errorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     mockGenerateContent.mockReset();
     warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     warnSpy.mockRestore();
+    errorSpy.mockRestore();
   });
 
   it('asks for more output room than a narrative beat gets', async () => {
@@ -69,7 +72,7 @@ describe('goalExtractor output budget and failure visibility', () => {
     expect(options.maxTokens).toBeGreaterThan(NARRATIVE_MAX_OUTPUT_TOKENS);
   });
 
-  it('says so when a response cut at the ceiling costs the turn its stamp', async () => {
+  it('reports a response cut at the ceiling at error level, where production keeps it', async () => {
     mockGenerateContent.mockResolvedValue({
       content: '```json\n{\n  "newGoals": [\n    {\n      "title": "Reach the ford before',
       finishReason: 'MAX_TOKENS',
@@ -78,7 +81,9 @@ describe('goalExtractor output budget and failure visibility', () => {
     const result = await extractGoalsFromNarrative(buildRequest());
 
     expect(result.worldThreads).toBeUndefined();
-    expect(loggedText(warnSpy)).toContain('truncated');
+    expect(loggedText(errorSpy)).toContain('truncated');
+    const reported = errorSpy.mock.calls.flat().find((arg) => arg instanceof Error);
+    expect((reported as Error).name).toBe('ExtractionTruncatedError');
   });
 
   it('names a prose answer as a parse failure, not a truncation', async () => {

@@ -34,6 +34,17 @@ const EXTRACTION_MAX_OUTPUT_TOKENS = 6144;
 /** Gemini and the OpenAI-compatible providers both normalize to this. */
 const TRUNCATED_FINISH_REASON = 'MAX_TOKENS';
 
+/**
+ * Carries the truncation to the first-party error sink, where the name is what
+ * makes a miss countable — a report's free-form text never leaves the browser.
+ */
+class ExtractionTruncatedError extends Error {
+  constructor() {
+    super('Extraction response truncated at the output-token ceiling');
+    this.name = 'ExtractionTruncatedError';
+  }
+}
+
 // Created on first use, not at import time — the class singleton used to
 // construct a client as a module side effect.
 let defaultClient: AIClient | null = null;
@@ -184,13 +195,23 @@ function parseGoalExtractionResponse(
     if (jsonStr === null) {
       // Named apart so a miss can be counted as one or the other: a response
       // cut at the output ceiling never closes its fence, which is a different
-      // problem from a model that answered in prose.
-      logger.warn(
-        wasTruncated
-          ? 'Extraction response was truncated at the output-token ceiling; no JSON block to reconcile'
-          : 'No JSON block in the extraction response',
-        { segmentId: request.segmentId, finishReason, contentLength: content.length }
-      );
+      // problem from a model that answered in prose. Truncation goes out at
+      // error level because that is the only level production keeps by
+      // default, and it's the failure worth counting where players are.
+      const context = {
+        segmentId: request.segmentId,
+        finishReason,
+        contentLength: content.length,
+      };
+      if (wasTruncated) {
+        logger.error(
+          'Extraction response truncated at the output-token ceiling; no JSON block to reconcile',
+          new ExtractionTruncatedError(),
+          context
+        );
+      } else {
+        logger.warn('No JSON block in the extraction response', context);
+      }
       return createFallbackExtractionResult(request);
     }
 
