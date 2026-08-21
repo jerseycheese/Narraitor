@@ -43,11 +43,15 @@ export const evaluateRequirement = (
   requirement: DecisionRequirement,
   character: Character
 ): RequirementEvaluationResult => {
+  // Requirements come from model-generated JSON and characters from persisted
+  // IndexedDB records, so neither side is guaranteed to match its declared type.
+  const targetId = (requirement.targetId || '').toLowerCase();
+
   if (requirement.type === 'skill') {
     // Try to find skill by worldSkillId first, then by name (case-insensitive)
-    const skill = character.skills.find(s =>
+    const skill = (character.skills || []).find(s =>
       s.worldSkillId === requirement.targetId ||
-      s.name.toLowerCase() === requirement.targetId.toLowerCase()
+      s.name?.toLowerCase() === targetId
     );
     const currentLevel = skill ? skill.level : 0;
     const requiredValue = typeof requirement.value === 'number' ? requirement.value : 0;
@@ -65,7 +69,7 @@ export const evaluateRequirement = (
     const inventoryItems = character.inventory?.items || [];
     const item = inventoryItems.find(i =>
       i.id === requirement.targetId ||
-      i.name.toLowerCase() === requirement.targetId.toLowerCase()
+      i.name?.toLowerCase() === targetId
     );
     const currentQuantity = item ? item.quantity : 0;
     const requiredValue = typeof requirement.value === 'number' ? requirement.value : 0;
