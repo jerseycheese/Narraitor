@@ -25,7 +25,6 @@ export interface StoryCheckpointRequestBody {
   characterName?: string;
   events: StoryCheckpointEventPayload[];
   decisions?: StoryCheckpointDecisionPayload[];
-  narrativeSummary?: string;
   currentLocation?: string;
   activeGoals?: string[];
   previousSegments?: string[]; // Last 2-3 checkpoint segments for narrative continuity
