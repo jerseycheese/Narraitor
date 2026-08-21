@@ -163,13 +163,16 @@ describe('useAutoSave', () => {
     expect(result.current.isRunning).toBe(true);
   });
 
-  it('should trigger manual save with player choice reason', async () => {
+  it('should carry the player-choice reason through to the save service', async () => {
     const { result } = renderHook(() => useAutoSave());
-    
+
     await act(async () => {
       await result.current.triggerSave('player-choice');
     });
-    
+
+    // The reason is the point: the service debounces or skips on it, so a save
+    // that arrives under the wrong reason behaves differently downstream.
+    expect(mockAutoSaveService.triggerSave).toHaveBeenCalledWith('player-choice');
     expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saving');
   });
 
@@ -184,13 +187,28 @@ describe('useAutoSave', () => {
   });
 
   it('should allow enabling/disabling auto-save', () => {
-    const { result } = renderHook(() => useAutoSave());
-    
+    // Let the store mock reflect the write, so the hook's reported isEnabled
+    // is read back from state rather than assumed from the call.
+    (mockSessionStore.setAutoSaveEnabled as jest.Mock).mockImplementation((enabled: boolean) => {
+      mockSessionStore.autoSave.enabled = enabled;
+    });
+
+    const { result, rerender } = renderHook(() => useAutoSave());
+    expect(result.current.isEnabled).toBe(true);
+
     act(() => {
       result.current.setEnabled(false);
     });
-    
-    expect(mockSessionStore.setAutoSaveEnabled).toHaveBeenCalledWith(false);
+    rerender();
+
+    expect(result.current.isEnabled).toBe(false);
+
+    act(() => {
+      result.current.setEnabled(true);
+    });
+    rerender();
+
+    expect(result.current.isEnabled).toBe(true);
   });
 
 });

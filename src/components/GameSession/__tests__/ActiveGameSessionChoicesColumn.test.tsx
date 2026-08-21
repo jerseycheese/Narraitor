@@ -4,8 +4,12 @@ import ActiveGameSessionChoicesColumn from '../ActiveGameSessionChoicesColumn';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import type { Decision } from '@/types/narrative.types';
 
+// The stub renders whatever lands in inputActions, so a test can assert on the
+// controls the player would actually get rather than on the prop's existence.
 jest.mock('@/components/shared/ChoiceSelector', () => ({
-  ChoiceSelector: jest.fn(() => <div data-testid="choice-selector" />),
+  ChoiceSelector: jest.fn((props: { inputActions?: React.ReactNode }) => (
+    <div data-testid="choice-selector">{props.inputActions}</div>
+  )),
 }));
 
 const baseDecision: Decision = {
@@ -124,7 +128,7 @@ describe('ActiveGameSessionChoicesColumn', () => {
     ).toBeInTheDocument();
   });
 
-  it('passes end story action to desktop input actions when progressive disclosure is enabled', () => {
+  it('puts the end story action in the desktop input row when progressive disclosure is enabled', () => {
     render(
       <ActiveGameSessionChoicesColumn
         {...baseProps}
@@ -133,11 +137,27 @@ describe('ActiveGameSessionChoicesColumn', () => {
       />
     );
 
-    const selectorProps = (ChoiceSelector as jest.Mock).mock.calls[0][0] as {
-      inputActions?: React.ReactNode;
-    };
+    // The action is placed twice, once in the mobile rail and once in the
+    // desktop input row, with CSS picking the one that shows.
+    const placements = screen.getAllByRole('button', { name: 'End Story' });
+    expect(placements).toHaveLength(2);
+    expect(
+      placements.map((button) => button.parentElement?.className)
+    ).toEqual(
+      expect.arrayContaining(['manuscript-end-story-mobile', 'manuscript-end-story-desktop'])
+    );
+  });
 
-    expect(selectorProps.inputActions).toBeTruthy();
+  it('leaves the end story action out when progressive disclosure is off', () => {
+    render(
+      <ActiveGameSessionChoicesColumn
+        {...baseProps}
+        isProgressiveDisclosureEnabled={false}
+        endStoryAction={<button type="button">End Story</button>}
+      />
+    );
+
+    expect(screen.queryByRole('button', { name: 'End Story' })).toBeNull();
   });
 
   describe('generation error surface (#1478)', () => {

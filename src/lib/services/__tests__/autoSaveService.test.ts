@@ -36,29 +36,60 @@ describe('createAutoSave', () => {
   });
 
   describe('Basic Functionality', () => {
-    it('should handle paused sessions appropriately', async () => {
+    it('skips a scheduled save on a paused session but still runs a manual one', async () => {
+      const onSave = jest.fn();
       mockStateProvider.mockResolvedValue({
         session: { id: 'test-session', status: 'paused' },
       });
-      
-      // Test manual trigger with paused session
+      service = createAutoSave(mockStateProvider, { onSave });
+
+      // A scheduled reason on a paused session reports back as a skip. Not
+      // awaited: the debounced promise only settles once the timer runs.
+      void service.triggerSave('player-choice');
+      await jest.advanceTimersByTimeAsync(600);
+
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({ success: false, reason: 'player-choice' })
+      );
+
+      onSave.mockClear();
+
+      // The player asking for a save explicitly still goes through.
       await service.triggerSave('manual');
-      
-      // Should still call state provider for manual saves
-      expect(mockStateProvider).toHaveBeenCalled();
+
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, reason: 'manual' })
+      );
     });
   });
 
   describe('Event-Based Auto-Save', () => {
-    it('should save immediately when triggered manually', async () => {
+    it('saves a manual trigger immediately and debounces every other reason', async () => {
       const mockOnSave = jest.fn();
       service = createAutoSave(mockStateProvider, { onSave: mockOnSave });
-      
-      service.start();
-      await service.triggerSave('manual'); // Manual saves are immediate
-      
-      expect(mockStateProvider).toHaveBeenCalled();
-      expect(mockOnSave).toHaveBeenCalled();
+
+      // No timer is advanced anywhere in this test, so anything that lands is
+      // something that did not wait for the debounce window.
+      await service.triggerSave('manual');
+
+      expect(mockOnSave).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, reason: 'manual' })
+      );
+
+      mockOnSave.mockClear();
+      const pending = service.triggerSave('scene-change');
+
+      expect(mockOnSave).not.toHaveBeenCalled();
+
+      // And it is deferred, not dropped: once the window elapses the save runs.
+      // Without this half, a scheduler that stopped firing entirely would still
+      // pass on the assertion above.
+      await jest.advanceTimersByTimeAsync(600);
+      await pending;
+
+      expect(mockOnSave).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, reason: 'scene-change' })
+      );
     });
   });
 });
