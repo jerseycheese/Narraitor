@@ -3231,19 +3231,10 @@ body.manuscript-overlay-open {
   margin-bottom: var(--space-2);
 }
 
-/* DS3 dialogue segments. The model types a whole scene as `dialogue` whenever it
-   contains spoken lines, so italics behind a left rule set ordinary narration as
-   if it were quoted from elsewhere, and set it that way for nine lines at a
-   stretch. The prose now stays upright and flush in the same column as every
-   other segment, and a drafting arm above the block carries the distinction
-   instead. */
-:root .dialogue-segment::before {
-  content: '';
-  display: block;
-  width: calc(var(--mark-arm-length) * 2);
-  border-top: 1px solid var(--color-text-muted);
-  margin-bottom: var(--space-3);
-}
+/* `.dialogue-segment` deliberately carries no styling. The model types a whole
+   scene as `dialogue` whenever it contains spoken lines, so the class lands on
+   ordinary narration and any treatment hung on it styles the narration too. The
+   class stays in the DOM as a hook; the prose reads uniformly. */
 
 /* DS3 main content inner — narrower journal column */
 :root .manuscript-main-content-inner {
