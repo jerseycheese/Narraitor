@@ -282,7 +282,11 @@ export function detectContinuityIssues(
     const terms = topicTerms(commitment.topic);
     if (terms.length === 0) continue;
     const termPatterns = terms.map(termPattern);
-    const referencePatterns = commitment.terms.map(termPattern);
+    // Only the words the topic label doesn't already use. A topic word on its own
+    // is far too common in ordinary prose to carry a correction by itself.
+    const aliasPatterns = commitment.terms
+      .filter((term) => !terms.includes(term))
+      .map(termPattern);
 
     const sentence = sentences.find((candidate) => {
       if (RECAP_GUARD.test(candidate)) return false;
@@ -293,11 +297,13 @@ export function detectContinuityIssues(
       ) {
         return true;
       }
-      // Named obliquely: a future delivery to the player plus any one word the
-      // thing goes by, so a pronoun or a synonym still lands.
+      // Named obliquely: a future delivery to the player, plus either a name only
+      // the delivered item goes by or the whole topic spelled out. Anything looser
+      // fires on prose that merely reuses a topic word for something else.
       return (
         FUTURE_DELIVERY_LEXICON.test(candidate) &&
-        referencePatterns.some((pattern) => pattern.test(candidate))
+        (aliasPatterns.some((pattern) => pattern.test(candidate)) ||
+          termPatterns.every((pattern) => pattern.test(candidate)))
       );
     });
     if (sentence) {

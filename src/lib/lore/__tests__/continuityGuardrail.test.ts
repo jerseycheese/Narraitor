@@ -368,6 +368,28 @@ describe('ledger-fed contract', () => {
     ).toHaveLength(0);
   });
 
+  it('leaves an unrelated future event that happens to share one topic word', () => {
+    const contract = buildLedgerContract(
+      [
+        makeEvent('e1', 'Councilman Davies hands over the parcel appraisal.', {
+          kind: 'commitment',
+          topic: 'parcel appraisal documents',
+          speaker: 'Councilman Davies',
+          status: 'delivered',
+        }),
+      ],
+      undefined,
+      ['Copy of the parcel appraisal']
+    );
+
+    expect(
+      detectContinuityIssues(
+        '"You\'ll have the parcel rezoned before the vote," Davies says.',
+        contract
+      )
+    ).toHaveLength(0);
+  });
+
   it('collects distinct topic labels for the extractor hint', () => {
     const topics = collectContinuityTopics([
       makeEvent('e1', 'a', { kind: 'assertion', topic: 'Mill debt' }),
