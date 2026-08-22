@@ -145,6 +145,7 @@ describe('sceneTemplate pacing guidance', () => {
 
 describe('sceneTemplate player character background', () => {
   const typedAction = 'I bring up my grandparents working the looms';
+  const RAISED_HEADER = 'RAISED BACKGROUND — IT GETS AN ANSWER:';
 
   function makeTypedContext(
     overrides: Partial<NarrativeTemplateContext> = {}
@@ -208,6 +209,22 @@ describe('sceneTemplate player character background', () => {
     );
     expect(prompt).toContain('PLAYER CHARACTER BACKGROUND');
     expect(prompt).not.toContain('PLAYER ACTION:');
+    expect(prompt).not.toContain(RAISED_HEADER);
+  });
+
+  it('puts the raised-background duty directly after the player action', () => {
+    const prompt = sceneTemplate(makeTypedContext());
+    expect(prompt).toContain(RAISED_HEADER);
+    expect(prompt.indexOf(RAISED_HEADER)).toBeGreaterThan(
+      prompt.indexOf('PLAYER ACTION:')
+    );
+  });
+
+  it('omits the duty when the character has no background to raise', () => {
+    const prompt = sceneTemplate(
+      makeTypedContext({ playerCharacterBackground: undefined })
+    );
+    expect(prompt).not.toContain(RAISED_HEADER);
   });
 });
 

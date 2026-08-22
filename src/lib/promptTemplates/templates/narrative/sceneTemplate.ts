@@ -115,6 +115,19 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
 
   const backgroundSection = formatPlayerBackground(playerCharacterBackground);
 
+  // The background block on its own was measured to change nothing: the prose
+  // abstracted or skipped a raised sheet fact on every try. A duty on the
+  // passage, in the shape the failed-attempt block uses, is what gets obeyed.
+  const raisedBackgroundSection =
+    backgroundSection && narrativeContext?.currentSituation
+      ? `
+RAISED BACKGROUND — IT GETS AN ANSWER:
+- If the PLAYER ACTION brings up anything from the PLAYER CHARACTER BACKGROUND above (a person, a place, a job, a date, an event), the passage answers it: at least one NAMED character replies in spoken dialogue to the specific thing the player raised.
+- The reply uses the player's own specifics — the same names, places, dates and work the player named — and responds to them from the speaker's own knowledge or stake; a general version of the fact is not an answer, and neither is a reply that invents new history for the player.
+- A reaction without words is not an answer. If no named character has spoken directly to what the player raised, the passage is wrong: choose someone present and have them answer before the passage ends.
+`
+      : '';
+
   const baseContent = `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
 World: ${worldName}
@@ -124,7 +137,7 @@ STORY SO FAR:
 ${recentContent}
 
 ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
-
+${raisedBackgroundSection}
 ${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:
 ${showSuccessGuidance ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
