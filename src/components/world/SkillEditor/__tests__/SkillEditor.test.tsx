@@ -240,8 +240,14 @@ describe('SkillEditor', () => {
       },
     ])('validates $name limits', async ({ input, errorMatch }) => {
       const user = renderAndSetup();
-      await user.type(screen.getByLabelText(/skill name/i), input.name);
-      await user.type(screen.getByLabelText(/description/i), input.description);
+      // Paste instead of type. These inputs run to hundreds of characters, and a
+      // keystroke-by-keystroke loop that long can outrun the test timeout. Jest then
+      // abandons the test while the typing keeps going, and the stray keystrokes land
+      // on whatever input the next test has focused.
+      await user.click(screen.getByLabelText(/skill name/i));
+      await user.paste(input.name);
+      await user.click(screen.getByLabelText(/description/i));
+      await user.paste(input.description);
       await user.click(screen.getByRole('button', { name: /create skill/i }));
       expect(screen.getByText(errorMatch)).toBeInTheDocument();
     });
