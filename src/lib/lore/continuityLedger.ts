@@ -25,6 +25,7 @@ const MAX_COMMITMENTS = 6;
 const MAX_SCENE_CHANGES = 4;
 const MIN_TOPIC_TERM_LENGTH = 4;
 const MAX_TOPIC_TERMS = 3;
+const MAX_REFERENCE_TERMS = 6;
 const NARRATION_SPEAKER = 'narration';
 /** Shortest name or alias worth matching as a whole word. */
 export const MIN_TERM_LENGTH = 3;
@@ -123,7 +124,10 @@ export function buildAssertions(ledger: LoreFact[], playerName?: string): Contin
 }
 
 /** Delivered beats promised on the same topic; the delivering fact is the statement kept. */
-export function buildCommitments(ledger: LoreFact[]): ContinuityCommitment[] {
+export function buildCommitments(
+  ledger: LoreFact[],
+  itemNames: string[] = []
+): ContinuityCommitment[] {
   const byTopic = new Map<string, ContinuityCommitment>();
   for (const fact of ledger) {
     const annotation = fact.metadata!.continuity!;
@@ -140,6 +144,7 @@ export function buildCommitments(ledger: LoreFact[]): ContinuityCommitment[] {
       by: annotation.speaker?.trim() || existing?.by || NARRATION_SPEAKER,
       statement: fact.value.trim(),
       status,
+      terms: referenceTerms(topic, itemNames, fact.value),
     });
   }
   return Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
@@ -162,10 +167,43 @@ export function buildSceneChanges(ledger: LoreFact[]): ContinuitySceneChange[] {
   return Array.from(latestByTopic.values()).slice(-MAX_SCENE_CHANGES);
 }
 
+/** Words of a label worth matching on: long enough to be distinctive, not filler. */
+function significantTerms(label: string): string[] {
+  return normalizeTopic(label)
+    .split(' ')
+    .filter((term) => term.length >= MIN_TOPIC_TERM_LENGTH && !TOPIC_STOPWORDS.has(term));
+}
+
 /** Significant words of a topic label; all must appear in a sentence for a stale-promise hit. */
 export function topicTerms(topic: string): string[] {
-  return normalizeTopic(topic)
-    .split(' ')
-    .filter((term) => term.length >= MIN_TOPIC_TERM_LENGTH && !TOPIC_STOPWORDS.has(term))
-    .slice(0, MAX_TOPIC_TERMS);
+  return significantTerms(topic).slice(0, MAX_TOPIC_TERMS);
+}
+
+/**
+ * Every word a sentence might use to point at this commitment: the topic's own
+ * terms, plus the terms of any inventory item the commitment actually names.
+ * That is what lets "You'll have a copy" land on "parcel appraisal documents".
+ * The item in the player's hands is called a copy; the topic label never is.
+ *
+ * An item counts as named when it overlaps the topic or the delivering line.
+ * A topic label and its item are often genuine synonyms sharing no word at all
+ * — "mayor's letter" against a Sealed Envelope — and the prose that handed it
+ * over is what ties them together. Items neither one mentions contribute
+ * nothing, otherwise the whole backpack becomes a trigger word list.
+ */
+export function referenceTerms(
+  topic: string,
+  itemNames: string[] = [],
+  statement = ''
+): string[] {
+  const terms = topicTerms(topic);
+  const named = new Set([...terms, ...significantTerms(statement)]);
+  for (const name of itemNames) {
+    const itemTerms = significantTerms(name);
+    if (!itemTerms.some((term) => named.has(term))) continue;
+    for (const term of itemTerms) {
+      if (!terms.includes(term)) terms.push(term);
+    }
+  }
+  return terms.slice(0, MAX_REFERENCE_TERMS);
 }

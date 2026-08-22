@@ -58,6 +58,11 @@ const MEMORY_GUARD =
 // A fresh promise of something the ledger says was already delivered.
 const PROMISE_LEXICON =
   /\b(promis(?:e|es|ing)|vow(?:s|ing)?|swear(?:s)?|pledg(?:e|es|ing)|assur(?:e|es|ing) you|guarantee(?:s|ing)?|(?:I|we)(?:'ll| will| shall) (?:make sure|see to it|get you|bring you|have|provide|send|give))\b/i;
+// The other shape a re-promise takes: no promise verb at all, just a future
+// delivery aimed at the player ("You'll have a copy"). Second person only —
+// first-person futures are already the promise lexicon's job.
+const FUTURE_DELIVERY_LEXICON =
+  /\byou(?:['’]ll| will| shall| ['’]re going to| are going to)\s+(?:have|get|receive|be given|be handed)\b/i;
 const RECAP_GUARD =
   /\b(as (?:I |he |she |they |we )?promised|promised (?:earlier|before|you)|already|kept (?:his|her|their|my|our) (?:word|promise)|delivered|gave|handed|as agreed|in your (?:hands?|lap|possession))\b/i;
 
@@ -74,6 +79,12 @@ export interface BuildContinuityContractArgs {
    * character context.
    */
   playerName?: string;
+  /**
+   * Names of items the player is carrying. A delivered commitment borrows the
+   * names of the items that match it, so prose can refer to the thing the way
+   * the player's inventory does rather than the way the topic label does.
+   */
+  inventoryItemNames?: string[];
 }
 
 /**
@@ -109,7 +120,14 @@ function dedupeTerms(terms: Array<string | undefined>): string[] {
 export function buildContinuityContract(
   args: BuildContinuityContractArgs
 ): ContinuityContract {
-  const { facts, npcRelationships, npcNames, recentDecisions, playerName } = args;
+  const {
+    facts,
+    npcRelationships,
+    npcNames,
+    recentDecisions,
+    playerName,
+    inventoryItemNames,
+  } = args;
   const characterFacts = facts.filter((fact) => fact?.category === 'characters');
 
   const npcs: ContinuityNpcExpectation[] = [];
@@ -169,7 +187,7 @@ export function buildContinuityContract(
     canonFacts,
     recentDecisions: recentDecisions.slice(-MAX_RECENT_DECISIONS),
     assertions: buildAssertions(ledger, playerName),
-    commitments: buildCommitments(ledger),
+    commitments: buildCommitments(ledger, inventoryItemNames),
     sceneChanges: buildSceneChanges(ledger),
   };
 }
@@ -183,6 +201,11 @@ export function isContinuityContractEmpty(contract: ContinuityContract): boolean
     contract.commitments.length === 0 &&
     contract.sceneChanges.length === 0
   );
+}
+
+/** Word-start match, so "document" also catches "documents". */
+function termPattern(term: string): RegExp {
+  return new RegExp(`\\b${escapeRegExp(term)}`, 'i');
 }
 
 function findOffendingSentence(
@@ -258,13 +281,31 @@ export function detectContinuityIssues(
     if (commitment.status !== 'delivered') continue;
     const terms = topicTerms(commitment.topic);
     if (terms.length === 0) continue;
-    const termPatterns = terms.map((term) => new RegExp(`\\b${escapeRegExp(term)}`, 'i'));
-    const sentence = sentences.find(
-      (candidate) =>
+    const termPatterns = terms.map(termPattern);
+    // Only the words the topic label doesn't already use. A topic word on its own
+    // is far too common in ordinary prose to carry a correction by itself.
+    const aliasPatterns = commitment.terms
+      .filter((term) => !terms.includes(term))
+      .map(termPattern);
+
+    const sentence = sentences.find((candidate) => {
+      if (RECAP_GUARD.test(candidate)) return false;
+      // Named outright: a promise verb plus every word of the topic.
+      if (
         PROMISE_LEXICON.test(candidate) &&
-        !RECAP_GUARD.test(candidate) &&
         termPatterns.every((pattern) => pattern.test(candidate))
-    );
+      ) {
+        return true;
+      }
+      // Named obliquely: a future delivery to the player, plus either a name only
+      // the delivered item goes by or the whole topic spelled out. Anything looser
+      // fires on prose that merely reuses a topic word for something else.
+      return (
+        FUTURE_DELIVERY_LEXICON.test(candidate) &&
+        (aliasPatterns.some((pattern) => pattern.test(candidate)) ||
+          termPatterns.every((pattern) => pattern.test(candidate)))
+      );
+    });
     if (sentence) {
       issues.push({
         type: 'stale-promise',

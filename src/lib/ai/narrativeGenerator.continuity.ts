@@ -12,6 +12,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useLoreStore } from '@/state/loreStore';
 import { useContinuityStore } from '@/state/continuityStore';
+import { useInventoryStore } from '@/state/inventoryStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { logger } from '@/lib/utils/logger';
 import type { AIClient } from './types';
@@ -72,6 +73,24 @@ const readSessionFacts = (request: NarrativeGenerationRequest): LoreFact[] => {
 };
 
 /**
+ * Names of what the player is carrying. A delivered commitment matches these
+ * against its own topic so prose can name the thing the way the inventory does
+ * ("a copy", "the envelope") and still be recognised as that commitment.
+ */
+const readInventoryItemNames = (request: NarrativeGenerationRequest): string[] => {
+  const inventoryStoreState = useInventoryStore.getState();
+  if (typeof inventoryStoreState?.getCharacterItems !== 'function') return [];
+
+  const names: string[] = [];
+  for (const characterId of request.characterIds ?? []) {
+    for (const item of inventoryStoreState.getCharacterItems(characterId) ?? []) {
+      if (item?.name) names.push(item.name);
+    }
+  }
+  return names;
+};
+
+/**
  * Topic labels already in the ledger, handed to the lore extractor so a
  * repeated question lands on the same label. Empty on any store failure.
  */
@@ -128,6 +147,7 @@ export const buildContinuityContractFromStores = (
       npcNames,
       recentDecisions: collectRecentDecisions(request),
       playerName: options?.playerName,
+      inventoryItemNames: readInventoryItemNames(request),
     });
 
     if (carriesNothingForTheModel(contract)) {
