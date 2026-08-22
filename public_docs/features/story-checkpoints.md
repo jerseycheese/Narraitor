@@ -69,9 +69,6 @@ The response:
   "segment": "Maera dissolved the council and forced the player into open rebellion.",
   "highlights": ["Council disbanded", "Royal guard split"],
   "majorEvents": ["Maera dissolved the council"],
-  "characterDevelopment": ["Player now leads a rebel cell"],
-  "nextHooks": ["Secure funding", "Recruit officers"],
-  "themes": ["Loyalty tested"],
   "includedEvents": 1,
   "includedDecisions": 1,
   "lastEventTimestamp": "2025-11-20T18:00:00Z",
@@ -79,7 +76,7 @@ The response:
 }
 ```
 
-`segment` is the only field the UI renders. `highlights` is stored on the checkpoint but nothing displays it yet, and `characterDevelopment`, `nextHooks`, and `themes` get dropped on the way into the store.
+`segment` is the only field the UI renders. `highlights` is stored on the checkpoint but nothing displays it yet, and `majorEvents` is only a fallback source for `highlights` when the model returns none.
 
 The browser calls this endpoint directly, through `aiFetch` rather than a bare `fetch` (see
 `useStoryCheckpointManager`). `aiFetch` attaches the player's key as a request header and the
