@@ -436,12 +436,6 @@ body.manuscript-overlay-open {
   z-index: 20;
 }
 
-@media (width >= 1024px) {
-  .manuscript-characters-mobile-bar {
-    display: none;
-  }
-}
-
 .manuscript-suggested-action {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -3266,11 +3260,6 @@ body.manuscript-overlay-open {
 
 /* DS3 choice prompt hidden — no heading above choices */
 :root .manuscript-choice-prompt {
-  display: none;
-}
-
-/* DS3 input label hidden — uses placeholder text only */
-:root .manuscript-input-label {
   display: none;
 }
 

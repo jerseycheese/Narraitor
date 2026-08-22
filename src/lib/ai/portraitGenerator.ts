@@ -1,9 +1,8 @@
 // src/lib/ai/portraitGenerator.ts
 
 import { Character } from '../../types/character.types';
-import { GeneratedImage } from '../../types/common.types';
 import { AIClient } from './types';
-import { capitalize, truncate, safeTrim, getTimestamp } from '@/lib/utils';
+import { truncate, safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
 
 import Logger from '@/lib/utils/logger';
@@ -173,71 +172,6 @@ async function enhancePhysicalDiversity(
     const feature = additionalFeatures[(hash * 3) % additionalFeatures.length];
 
     return description ? `${description}, ${bodyType}, ${feature}` : `${bodyType}, ${feature}`;
-  }
-}
-
-async function enhanceKnownCharacter(
-  aiClient: AIClient,
-  character: Character,
-  detection: { isKnownFigure: boolean; figureType?: string; actorName?: string }
-): Promise<Character> {
-  try {
-    const contextHint = detection.figureType === 'videogame' ? 'video game character' :
-                       detection.figureType === 'fictional' ? 'fictional character' :
-                       detection.figureType === 'comedian' ? 'comedian' :
-                       'person';
-
-    const enhancements: { physicalDescription?: string; personality?: string; history?: string } = {};
-
-    if (!character?.background?.physicalDescription || safeTrim(character?.background?.physicalDescription ?? '').length === 0) {
-      const prompt = `Provide an accurate physical description of ${character.name} (the ${contextHint}) in 30-35 words.
-        ${detection.figureType === 'fictional' && detection.actorName ? `As portrayed by ${detection.actorName} in the film/show.` : ''}
-        MUST include: age, race/ethnicity, hair length (short/medium/long/shoulder-length/etc), hair style, hair color, facial features, build/body type, and typical clothing.
-        ${!detection.actorName ? 'Include realistic imperfections like weight, balding, scars, or plain features - not everyone is beautiful.' : ''}
-        Be accurate to their actual appearance. Answer with just the description, no extra text.`;
-
-      const response = await aiClient.generateContent(prompt);
-      let description = normalizeText(response.content, NORM_DESC);
-
-      const namePattern = new RegExp(`^${character.name}\\s+(is\\s+)?`, 'i');
-      description = description.replace(namePattern, '');
-
-      description = capitalize(description);
-
-      enhancements.physicalDescription = description.replace(/\.+$/, '.');
-    }
-
-    if (!character?.background?.personality || safeTrim(character?.background?.personality ?? '').length === 0) {
-      const prompt = `Describe ${character.name}'s (the ${contextHint}) personality in 15 words or less.
-        Focus on their key character traits.
-        Answer with just the description, no extra text.`;
-
-      const response = await aiClient.generateContent(prompt);
-      enhancements.personality = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
-    }
-
-    if (!character?.background?.history || safeTrim(character?.background?.history ?? '').length === 0) {
-      const prompt = `Provide a one-sentence background for ${character.name} (the ${contextHint}).
-        ${detection.figureType === 'videogame' ? 'MUST include the specific video game title they are from (e.g., "from Red Dead Redemption 2", "from The Legend of Zelda", etc.).' : ''}
-        ${detection.figureType === 'fictional' ? 'MUST include the specific movie or TV show title they are from.' : ''}
-        Answer with just one sentence, no extra text.`;
-
-      const response = await aiClient.generateContent(prompt);
-      enhancements.history = normalizeText(response.content, NORM_DESC).replace(/\.+$/, '.');
-    }
-
-    return {
-      ...character,
-      background: {
-        ...character.background,
-        physicalDescription: character?.background?.physicalDescription || enhancements.physicalDescription || '',
-        personality: character?.background?.personality || enhancements.personality || '',
-        history: character?.background?.history || enhancements.history || '',
-      },
-    };
-  } catch (error) {
-    logger.error('Failed to enhance character:', error);
-    return character;
   }
 }
 
@@ -561,57 +495,4 @@ export async function buildPortraitPrompt(
   const fullPrompt = promptParts.join(', ');
 
   return truncate(fullPrompt, 1900);
-}
-
-/**
- * Generate a portrait image for a character.
- */
-export async function generatePortrait(
-  aiClient: AIClient,
-  character: Character,
-  options: PortraitGenerationOptions = {}
-): Promise<GeneratedImage> {
-  if (!aiClient.generateImage) {
-    throw new Error('AI client does not support image generation');
-  }
-
-  try {
-    const detection = await detectKnownFigure(aiClient, character.name);
-
-    if (detection.isKnownFigure && (
-      !character.background?.physicalDescription ||
-      !character.background?.personality ||
-      !character.background?.history
-    )) {
-      character = await enhanceKnownCharacter(aiClient, character, detection);
-    }
-
-    if (typeof window !== 'undefined') {
-      const windowWithDetection = window as Window & { lastDetectionResult?: typeof detection };
-      windowWithDetection.lastDetectionResult = detection;
-    }
-
-    const mergedOptions = {
-      ...options,
-      isKnownFigure: detection.isKnownFigure,
-      knownFigureContext: detection.figureType || options.knownFigureContext,
-      actorName: detection.actorName || options.actorName,
-      detection,
-    };
-
-    const prompt = await buildPortraitPrompt(aiClient, character, mergedOptions);
-
-    const response = await aiClient.generateImage(prompt);
-
-    return {
-      type: 'ai-generated',
-      url: response.image,
-      generatedAt: getTimestamp(),
-      prompt: response.prompt,
-    };
-  } catch (error) {
-    throw new Error(
-      `Failed to generate character portrait: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
-  }
 }
