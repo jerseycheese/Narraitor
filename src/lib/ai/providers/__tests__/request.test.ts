@@ -89,15 +89,18 @@ describe('custom headers', () => {
     expect(sent['HTTP-Referer']).toBe('https://narraitor-six.vercel.app');
   });
 
-  it.each(['Content-Type', 'content-type'])('refuses to let a preset set %s', async (name) => {
-    await sendProviderRequest(ENDPOINT, AUTH_HEADERS, { model: 'x' }, {
-      customHeaders: { [name]: 'text/plain' },
-    });
+  it.each(['Content-Type', 'content-type'])(
+    'refuses to let a preset override the Content-Type header as %s',
+    async (name) => {
+      await sendProviderRequest(ENDPOINT, AUTH_HEADERS, { model: 'x' }, {
+        customHeaders: { [name]: 'text/plain' },
+      });
 
-    const sent = headersSent();
-    expect(Object.values(sent)).not.toContain('text/plain');
-    expect(sent['Content-Type']).toBe('application/json');
-  });
+      const sent = headersSent();
+      expect(Object.values(sent)).not.toContain('text/plain');
+      expect(sent['Content-Type']).toBe('application/json');
+    }
+  );
 
   it("carries a descriptor's custom headers through a real generation", async () => {
     await generateProviderText(

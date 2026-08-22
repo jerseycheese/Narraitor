@@ -6,24 +6,20 @@ import { resolveProvider, type ProviderResolutionFailure } from '../lib/ai/resol
 import { createAPIErrorResponse } from '../lib/utils/createAPIErrorResponse';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../lib/constants/aiTimeouts';
 import { requireProviderAdapter } from '../lib/ai/providers/adapterRegistry';
-import { geminiAdapter, getSafetySettingsForRating } from '../lib/ai/providers/gemini/adapter';
+import { geminiAdapter } from '../lib/ai/providers/gemini/adapter';
 import {
   generateProviderText,
   openProviderTextStream,
   ProviderUpstreamError,
   sendProviderRequest,
 } from '../lib/ai/providers/core/request';
-import {
-  consumeProviderStreamEvents,
-  type ByteStreamReader,
-} from '../lib/ai/providers/core/streamConsumer';
+import { consumeProviderStreamEvents } from '../lib/ai/providers/core/streamConsumer';
 import { parseContentRating } from '../lib/ai/safety/contentRatingGuidance';
 import type {
   ProviderAdapter,
   ProviderDescriptor,
   TextGenerationSpec,
 } from '../lib/ai/providers/types';
-import type { NarrativeStreamEvent, SafetySetting } from '../lib/ai/types';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('ApiHelpers');
@@ -125,17 +121,6 @@ function createRateLimitHeaders(result: RateLimitResult): Record<string, string>
 }
 
 /**
- * Extract tone settings from prompt and return appropriate Gemini safety settings.
- *
- * Kept here for the Gemini-native callers (the validate-provider ping, the
- * direct-SDK clients). The rating parse and the threshold table both live in
- * the provider layer now; this is the composition of the two.
- */
-export function getSafetySettingsFromPrompt(prompt: string): SafetySetting[] {
-  return getSafetySettingsForRating(parseContentRating(prompt));
-}
-
-/**
  * Make a request to Gemini's REST API using header authentication.
  *
  * A Gemini-shaped convenience over the generic `sendProviderRequest`, for the
@@ -156,19 +141,6 @@ export async function makeGeminiRequest(
     // header, so there is no player-supplied endpoint to guard here.
     { timeoutMs }
   );
-}
-
-/**
- * Consume a Gemini SSE body into our narrative streaming protocol.
- *
- * The loop is provider-generic (see consumeProviderStreamEvents); this binds it
- * to the Gemini frame shape.
- */
-export function consumeGeminiStreamEvents(
-  reader: ByteStreamReader,
-  errorContext: string
-): AsyncGenerator<NarrativeStreamEvent> {
-  return consumeProviderStreamEvents(reader, geminiAdapter, errorContext);
 }
 
 /**

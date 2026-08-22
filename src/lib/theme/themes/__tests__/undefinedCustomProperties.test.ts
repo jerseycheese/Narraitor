@@ -85,15 +85,13 @@ describe('no undefined CSS custom properties referenced without a fallback', () 
   });
 
   it('every bare var(--name) reference has a matching --name: definition', () => {
+    // Each entry carries its usage sites, so the failure output names the
+    // property and the files that reference it.
     const undefinedProperties = [...references.keys()]
       .filter((name) => !defined.has(name))
-      .sort();
+      .sort()
+      .map((name) => `${name} (used in: ${references.get(name)!.join(', ')})`);
 
-    if (undefinedProperties.length > 0) {
-      const details = undefinedProperties
-        .map((name) => `${name} (used in: ${references.get(name)!.join(', ')})`)
-        .join('\n');
-      throw new Error(`Undefined custom properties:\n${details}`);
-    }
+    expect(undefinedProperties).toEqual([]);
   });
 });

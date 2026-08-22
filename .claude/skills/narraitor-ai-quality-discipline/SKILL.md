@@ -59,7 +59,7 @@ The exact change (template diff, config diff); a live dev server with a working 
 **Judging quality (what to actually look at):**
 - Consistency: names, locations, inventory, attributes match store state; no retconning prior segments.
 - Choice quality: choices are distinct, in-world, consequential — not three flavors of "continue".
-- Tone adherence: matches the world's tone settings (they flow into safety settings and prompts — `src/utils/apiHelpers.ts` `getSafetySettingsFromPrompt`).
+- Tone adherence: matches the world's tone settings (they flow into safety settings and prompts — `parseContentRating` in `src/lib/ai/safety/contentRatingGuidance.ts`, then `getSafetySettingsForRating` in `src/lib/ai/providers/gemini/adapter.ts`).
 - Ending integrity: endings resolve threads present in the session, not generic epilogues.
 - Length/pacing: respects `desiredLength`; no runaway walls of text (maxOutputTokens caps exist per route).
 
