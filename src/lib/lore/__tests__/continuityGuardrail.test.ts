@@ -202,13 +202,18 @@ const makeEvent = (
     metadata: { importance: 'high', continuity },
   });
 
-const buildLedgerContract = (facts: LoreFact[], playerName?: string) =>
+const buildLedgerContract = (
+  facts: LoreFact[],
+  playerName?: string,
+  inventoryItemNames?: string[]
+) =>
   buildContinuityContract({
     facts,
     npcRelationships: {},
     npcNames: {},
     recentDecisions: [],
     playerName,
+    inventoryItemNames,
   });
 
 describe('ledger-fed contract', () => {
@@ -331,6 +336,35 @@ describe('ledger-fed contract', () => {
     ).toHaveLength(0);
     expect(
       detectContinuityIssues('Thorn promises to look into the drainage complaint.', contract)
+    ).toHaveLength(0);
+  });
+
+  it('flags a future-tense re-promise that names the delivered item by an inventory alias', () => {
+    const contract = buildLedgerContract(
+      [
+        makeEvent('e1', 'Councilman Davies hands over the parcel appraisal.', {
+          kind: 'commitment',
+          topic: 'parcel appraisal documents',
+          speaker: 'Councilman Davies',
+          status: 'delivered',
+        }),
+      ],
+      undefined,
+      ['Copy of the parcel appraisal']
+    );
+
+    expect(
+      detectContinuityIssues(
+        'Davies spreads his hands. "You\'ll have a copy. Before the vote, just as I said."',
+        contract
+      )
+    ).toMatchObject([{ type: 'stale-promise', entity: 'parcel appraisal documents' }]);
+
+    expect(
+      detectContinuityIssues(
+        '"You\'ll have my answer before the vote," Davies says.',
+        contract
+      )
     ).toHaveLength(0);
   });
 

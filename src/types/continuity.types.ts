@@ -64,6 +64,12 @@ export interface ContinuityCommitment {
   by: string;
   statement: string;
   status: 'promised' | 'delivered';
+  /**
+   * Words a sentence can use to refer to this commitment — the topic's own
+   * significant terms plus those of a matching inventory item. Detection only;
+   * these never reach the prompt.
+   */
+  terms: string[];
 }
 
 /** A lasting change the player made to the scene, still true until undone on-page. */
