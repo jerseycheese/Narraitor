@@ -368,6 +368,36 @@ describe('ledger-fed contract', () => {
     ).toHaveLength(0);
   });
 
+  it('flags a re-promise naming an item the delivery prose named but the topic never did', () => {
+    const contract = buildLedgerContract(
+      [
+        makeEvent('e1', 'The mayor hands you a sealed envelope.', {
+          kind: 'commitment',
+          topic: "mayor's letter",
+          speaker: 'The mayor',
+          status: 'delivered',
+        }),
+      ],
+      undefined,
+      ['Sealed Envelope', 'Rusted Lantern']
+    );
+
+    expect(
+      detectContinuityIssues(
+        '"You\'ll have the envelope before dawn," the mayor says.',
+        contract
+      )
+    ).toMatchObject([{ type: 'stale-promise', entity: "mayor's letter" }]);
+
+    // An item the delivery prose never mentioned stays out of the trigger list.
+    expect(
+      detectContinuityIssues(
+        '"You\'ll have the lantern before dawn," the mayor says.',
+        contract
+      )
+    ).toHaveLength(0);
+  });
+
   it('leaves an unrelated future event that happens to share one topic word', () => {
     const contract = buildLedgerContract(
       [

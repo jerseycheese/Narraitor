@@ -144,7 +144,7 @@ export function buildCommitments(
       by: annotation.speaker?.trim() || existing?.by || NARRATION_SPEAKER,
       statement: fact.value.trim(),
       status,
-      terms: referenceTerms(topic, itemNames),
+      terms: referenceTerms(topic, itemNames, fact.value),
     });
   }
   return Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
@@ -181,18 +181,26 @@ export function topicTerms(topic: string): string[] {
 
 /**
  * Every word a sentence might use to point at this commitment: the topic's own
- * terms, plus the terms of any inventory item that overlaps the topic. That is
- * what lets "You'll have a copy" land on "parcel appraisal documents". The item
- * in the player's hands is called a copy; the topic label never is.
+ * terms, plus the terms of any inventory item the commitment actually names.
+ * That is what lets "You'll have a copy" land on "parcel appraisal documents".
+ * The item in the player's hands is called a copy; the topic label never is.
+ *
+ * An item counts as named when it overlaps the topic or the delivering line.
+ * A topic label and its item are often genuine synonyms sharing no word at all
+ * — "mayor's letter" against a Sealed Envelope — and the prose that handed it
+ * over is what ties them together. Items neither one mentions contribute
+ * nothing, otherwise the whole backpack becomes a trigger word list.
  */
-export function referenceTerms(topic: string, itemNames: string[] = []): string[] {
+export function referenceTerms(
+  topic: string,
+  itemNames: string[] = [],
+  statement = ''
+): string[] {
   const terms = topicTerms(topic);
-  const topicSet = new Set(terms);
+  const named = new Set([...terms, ...significantTerms(statement)]);
   for (const name of itemNames) {
     const itemTerms = significantTerms(name);
-    // Only items the topic actually names contribute; otherwise the whole
-    // backpack becomes a trigger word list.
-    if (!itemTerms.some((term) => topicSet.has(term))) continue;
+    if (!itemTerms.some((term) => named.has(term))) continue;
     for (const term of itemTerms) {
       if (!terms.includes(term)) terms.push(term);
     }
