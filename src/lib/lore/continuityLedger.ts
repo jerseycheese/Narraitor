@@ -182,8 +182,8 @@ export function topicTerms(topic: string): string[] {
 /**
  * Every word a sentence might use to point at this commitment: the topic's own
  * terms, plus the terms of any inventory item that overlaps the topic. That is
- * what lets "You'll have a copy" land on "parcel appraisal documents" — the
- * item in the player's hands is called a copy, the topic label never is.
+ * what lets "You'll have a copy" land on "parcel appraisal documents". The item
+ * in the player's hands is called a copy; the topic label never is.
  */
 export function referenceTerms(topic: string, itemNames: string[] = []): string[] {
   const terms = topicTerms(topic);
