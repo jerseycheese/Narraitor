@@ -146,3 +146,8 @@ function normalizeSpecialCharacters(text: string): string {
 export function canonicalizeName(name: string): string {
   return normalizeText(name, NORM_NAME).trim().toLowerCase();
 }
+
+/** Escapes a string so it matches literally inside a RegExp source. */
+export function escapeRegExp(term: string): string {
+  return term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

@@ -17,6 +17,8 @@ import type {
   ContinuityCommitment,
   ContinuitySceneChange,
 } from '../../types/continuity.types';
+import { escapeRegExp } from '../utils';
+import { claimsPlayerKin } from './playerSheetGuard';
 
 // Ledger caps bound prompt growth: the block was measured at 3 lines before the
 // ledger existed and the whole prompt already runs 20-34k chars over a session.
@@ -38,10 +40,6 @@ const TOPIC_STOPWORDS = new Set([
 // The extractor tags the player's own questions as assertions spoken by "the
 // protagonist"; a question is not an answer, so player-spoken lines are dropped.
 const PLAYER_SPEAKER = /^(?:the )?(?:protagonist|player|you)$/i;
-
-export function escapeRegExp(term: string): string {
-  return term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 
 /** Topic labels compare case- and punctuation-insensitively so "Mill debt" and "mill debt" line up. */
 function normalizeTopic(topic: string): string {
@@ -105,7 +103,10 @@ export function buildAssertions(ledger: LoreFact[], playerName?: string): Contin
     const topicKey = normalizeTopic(topic);
     if (!topicKey) continue;
     mentionsByTopic.set(topicKey, (mentionsByTopic.get(topicKey) ?? 0) + 1);
-    if (mentionsPlayer(`${topic} ${fact.value}`, playerName)) continue;
+    // An NPC's claim about the player, or about the player's family, is the
+    // ledger's known poison path: the sheet owns those, not the story.
+    const text = `${topic} ${fact.value}`;
+    if (mentionsPlayer(text, playerName) || claimsPlayerKin(text, playerName)) continue;
 
     const speaker = annotation.speaker?.trim() || NARRATION_SPEAKER;
     if (isPlayerSpeaker(speaker, playerName)) continue;

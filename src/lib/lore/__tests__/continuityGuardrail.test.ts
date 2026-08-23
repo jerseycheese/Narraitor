@@ -250,6 +250,20 @@ describe('ledger-fed contract', () => {
     expect(contract.assertions.map((a) => a.topic)).toEqual(['mill debt']);
   });
 
+  it("drops assertions about the player's family, even when they only use the first name", () => {
+    const contract = buildLedgerContract(
+      [
+        makeEvent('e1', "Mr. Henderson says Wren's grandparents, Clara and Thomas, worked the looms until 2014.",
+          { kind: 'assertion', topic: "Wren's grandparents", speaker: 'Mr. Henderson' }),
+        makeEvent('e2', 'The bank held the mortgage on the mill.',
+          { kind: 'assertion', topic: 'mill debt', speaker: 'Aunt Carol' }),
+      ],
+      'Wren Calloway'
+    );
+
+    expect(contract.assertions.map((a) => a.topic)).toEqual(['mill debt']);
+  });
+
   it('drops assertions the player spoke, which are questions the extractor mis-tagged', () => {
     const contract = buildLedgerContract(
       [

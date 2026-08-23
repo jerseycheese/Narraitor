@@ -16,6 +16,7 @@ import { EntityID } from '@/types/common.types';
 import { generateChoices } from './choiceGenerator';
 import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
+import { buildPlayerSheetCanon } from '@/lib/lore/playerSheetGuard';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import { processLostItems } from '@/lib/narrative/itemLossProcessor';
@@ -219,6 +220,11 @@ export class NarrativeGenerator {
         void extractStructuredLore(result.content, existingLoreContext, {
           continuityTopics: collectContinuityTopicsFromStores(request),
           playerCharacterName: context.playerCharacterName,
+          playerSheet: buildPlayerSheetCanon({
+            background: context.playerCharacterBackground,
+            worldDescription: world.description,
+            knownNames: context.npcRoster.map((npc) => npc.name),
+          }),
         })
           .then(async (structuredLore) => {
             const { useLoreStore } = await import('@/state/loreStore');
@@ -446,6 +452,11 @@ export class NarrativeGenerator {
         });
         void extractStructuredLore(response.content, existingLoreContext, {
           playerCharacterName: playerCharacter?.name,
+          playerSheet: buildPlayerSheetCanon({
+            background: playerCharacter?.background,
+            worldDescription: world.description,
+            knownNames: npcRoster.map((npc) => npc.name),
+          }),
         })
           .then(async (structuredLore) => {
             const { useLoreStore } = await import('@/state/loreStore');

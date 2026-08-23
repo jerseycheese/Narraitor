@@ -6,6 +6,10 @@
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { extractFencedJson } from './parseJSON';
 import { canonicalizeName } from '@/lib/utils/textNormalization';
+import {
+  guardExtractionAgainstPlayerSheet,
+  type PlayerSheetCanon,
+} from '@/lib/lore/playerSheetGuard';
 import type {
   LoreContinuityAnnotation,
   LoreContinuityKind,
@@ -30,6 +34,12 @@ export interface ExtractStructuredLoreOptions {
    * player, so nothing extracted under that name can be new information.
    */
   playerCharacterName?: string;
+  /**
+   * The player's character sheet, and what else can vouch for a name. With it
+   * the prompt tells the model the player's family and past are the sheet's
+   * to state, and the guard drops whatever gets recorded about them anyway.
+   */
+  playerSheet?: PlayerSheetCanon;
 }
 
 /**
@@ -46,7 +56,8 @@ export async function extractStructuredLore(
       narrativeText,
       existingLoreContext,
       options?.continuityTopics,
-      options?.playerCharacterName
+      options?.playerCharacterName,
+      options?.playerSheet
     );
     const response = await geminiClient.generateContent(prompt);
     
@@ -65,10 +76,11 @@ export async function extractStructuredLore(
     }
 
     const extractedLore = JSON.parse(jsonStr) as StructuredLoreExtraction;
-    return reservePlayerCharacterName(
+    const reserved = reservePlayerCharacterName(
       validateAndCleanExtraction(extractedLore),
       options?.playerCharacterName
     );
+    return guardPlayerSheet(reserved, options?.playerCharacterName, options?.playerSheet);
 
   } catch (error) {
     logger.warn('Failed to extract structured lore:', error);
@@ -83,12 +95,17 @@ function buildLoreExtractionPrompt(
   narrativeText: string,
   existingLoreContext?: string,
   continuityTopics?: string[],
-  playerCharacterName?: string
+  playerCharacterName?: string,
+  playerSheet?: PlayerSheetCanon
 ): string {
   const existingContext = existingLoreContext ? `\n\nExisting Lore Context:\n${existingLoreContext}` : '';
   const playerNameRule = playerCharacterName
     ? `\n- "${playerCharacterName}" is the PLAYER CHARACTER, not an NPC. Never create a character entry for them. If the text names a separate person who happens to share that name, that is a mistake in the prose — do not record them as a character.`
     : '';
+  const playerSheetRule =
+    playerCharacterName && playerSheet
+      ? `\n- The family and past of "${playerCharacterName}" belong to their character sheet, which reads:\n${playerSheet.sheet}\n  Do not record a relative of the player character, or an event in the player character's past, that the sheet does not state. A character in the text asserting one (a relative's name, something the player character once did) is making a claim, not stating a fact: leave it out of every category.`
+      : '';
   const topicHint =
     continuityTopics && continuityTopics.length > 0
       ? `\n- Continuity topics already in use (reuse the exact label when an event is about the same question, promise, or object): ${continuityTopics.join('; ')}`
@@ -121,7 +138,7 @@ CRITICAL QUALITY RULES:
 - Characters must be specific named individuals. Do NOT create character entries for unnamed or generic groups (e.g. "a guard", "unnamed warrior", "the villagers").
 - If a person is unnamed, keep it as part of an event description instead of a character entity.
 - Prefer stable locations ("Vaes Leisi", "Vaes Leisi marketplace") over micro-locations ("marketplace edge", "near a stall"). If you mention a micro-location, include it as an alias in the location entry.
-- Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.${playerNameRule}
+- Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.${playerNameRule}${playerSheetRule}
 
 CONTINUITY TAGGING (within the 3-event limit, prefer events that carry one of these):
 - Add "continuity" to an event when it is one of:
@@ -315,6 +332,28 @@ function reservePlayerCharacterName(
   });
 
   return { ...extraction, characters };
+}
+
+/**
+ * The deterministic half of the sheet rule: whatever the model records about
+ * the player's family despite being told not to still goes, so a relative
+ * invented in the prose cannot become ledger canon.
+ */
+function guardPlayerSheet(
+  extraction: StructuredLoreExtraction,
+  playerCharacterName?: string,
+  playerSheet?: PlayerSheetCanon
+): StructuredLoreExtraction {
+  if (!playerCharacterName || !playerSheet) return extraction;
+  const { extraction: guarded, dropped } = guardExtractionAgainstPlayerSheet(
+    extraction,
+    playerCharacterName,
+    playerSheet.canon
+  );
+  if (dropped.length > 0) {
+    logger.debug("Dropped extracted lore about the player character's family", { dropped });
+  }
+  return guarded;
 }
 
 const trimmedString = (value: unknown): string | undefined =>

@@ -316,7 +316,13 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     expect(extractStructuredLore).toHaveBeenCalledWith(
       CLEAN_PROSE,
       expect.anything(),
-      { continuityTopics: ['mill debt'], playerCharacterName: 'Hero' }
+      {
+        continuityTopics: ['mill debt'],
+        playerCharacterName: 'Hero',
+        playerSheet: expect.objectContaining({
+          sheet: 'History: A brave warrior\nPersonality: Courageous',
+        }),
+      }
     );
   });
 

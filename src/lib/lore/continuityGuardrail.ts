@@ -24,12 +24,12 @@ import type {
   ContinuityRecentDecision,
   ContinuityTone,
 } from '../../types/continuity.types';
+import { escapeRegExp } from '../utils';
 import {
   MIN_TERM_LENGTH,
   buildAssertions,
   buildCommitments,
   buildSceneChanges,
-  escapeRegExp,
   ledgerFacts,
   topicTerms,
 } from './continuityLedger';
