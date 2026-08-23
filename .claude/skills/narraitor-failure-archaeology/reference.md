@@ -136,3 +136,16 @@ Append new entries at the bottom; never rewrite existing ones (corrections per c
 ---
 
 (Add new entries below this line, following the same format. Append-only.)
+
+## E17. Making the prose answer a character-sheet fact (#1828, closed unfixed 2026-08-23)
+
+- **Symptom:** When the player raised a fact from their own sheet, the prose gave a generic reaction instead of having a named NPC answer it. Filed as F26 of the #1818 playtest campaign.
+- **Wrong path:** Thirteen measured rounds, almost all of them wording rounds on `sceneTemplate.ts`. Each killed the failure it targeted and produced a new one — the same pattern #1872 had already shown. Two draft PRs (#1925, #1927) reached CI-green and neither could merge.
+- **Root cause of the dead end:** engagement and invention are the same reflex. Round 13's block got a named NPC answering with the player's specifics on 7/9 Harrowgate raises against 1/9 without it, and invented player history (relatives, events the sheet never carried) on 7/9 of those same raises. The invented names then persisted as `world-shared` lore facts. Two structural follow-ons each closed part of it and left the rest: the #1926 player-sheet guard took kin-tied entries from 28 flagged to 5 with 0 incorrect drops of 32, but the name walked back in kin-free (24 kept entries under the guard alone), and a simulated session quarantine list caught 15 of those 24 against a gate of 2 while colliding with real on-screen NPCs that share first names with the invented ones.
+- **Evidence:** known — eval logs `1828-raised-background-answered.md` and `1926-player-sheet-guard.md`; the full replay, judge items, unblinding map and scripts under `~/.claude/projects/-Users-jackhaas-Projects-personal-narraitor/artifacts/1926-replay/`; the closing comments on #1828 and #1926.
+- **Doctrine:**
+  (a) **Do not reopen #1828 with a wording round.** New evidence has to be a different mechanism, not different words in the same block. Presence-gating is not a shippable subset either: the invention happened where NPCs *were* present.
+  (b) **Split A/B flags by which build wrote the prose before claiming a bug exists on develop.** The #1926 guard read as a 28-to-5 win until the split showed all 28 came from treatment-build prose and 0 from control — it was a prerequisite for an unshipped block, not a standalone fix, and on develop it dropped four true entries for one catch.
+  (c) **A prompt change that trades one named failure for another is a stop signal, not a tuning signal.** Two rounds of that (here and #1872) is enough to conclude the lever is wrong.
+  (d) **Prefer measurements that settle several claims at once.** This arc spent live sessions and blind judges per round to move one issue. The #1829 instrumented run reads out four.
+- **Encoded in:** failure-archaeology index; ai-quality-discipline (the stop rule); playtest-loop.

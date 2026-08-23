@@ -69,6 +69,22 @@ The recorded matrix (step 5). A claim without a matrix is downgraded to "single-
 ## 7. Output artifact
 An eval log (matrix + excerpts + verdict) attached to the issue/PR. For hold decisions, the log states which cell failed.
 
+## 7a. When to stop measuring and park the issue
+A matrix tells you whether a change works. It does not tell you when to give up, and the
+expensive failure mode here is a prompt arc that measures honestly every round and still never
+converges. Two stop conditions, both earned on #1828 (13 rounds, two CI-green PRs, no merged
+code — see `narraitor-failure-archaeology` E17):
+
+- **A change that trades one named failure for another is a stop signal, not a tuning signal.**
+  If round N kills the failure round N-1 named and the log now names a different one, the lever
+  is wrong. Twice in a row is enough; change the mechanism or park it.
+- **Split the flags by which build wrote the prose before claiming the bug is on `develop`.**
+  A guard measured against treatment-build prose can look like a large win and still be a
+  prerequisite for an unshipped change rather than a standalone fix.
+
+When parking, say so on the issue with the numbers and close it. Prefer the next measurement
+that settles several claims at once over another round that moves one.
+
 ## 8. Common traps
 - Bad behavior this prevents: a prompt tweak looks great in the fantasy test world, ships, and produces tonally absurd output in a player's noir detective world — the tweak baked fantasy assumptions into shared template text.
 - Testing only on `/dev/*` harnesses: they bypass parts of the real loop. At least one matrix cell must run the real `/worlds/[id]/play` flow.

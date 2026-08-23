@@ -36,6 +36,8 @@ The thing you're about to change/propose, and a search of closed issues/PRs for 
 - **Ambient `@google/genai` types shadow the SDK** — extend `src/types/@google/genai.d.ts`, don't fight tsc.
 - **Split store files are deliberate** — `narrativeStore.*.ts` / `loreStore.*.ts` module splits are the pattern FOR god-files, not clutter to re-merge (inventoryStore split is pending, #1415).
 - **Dev harnesses are throwaway** — test effort goes into app suites, not `/dev/*` tooling.
+- **#1828 is closed unfixed; don't reopen it with a wording round** — 13 rounds each traded one named failure for another. Engagement and invention are the same reflex. A reopen needs a different mechanism, and presence-gating is not a shippable subset.
+- **Split A/B flags by which build wrote the prose** before claiming a prompt-side bug exists on develop — #1926 read as a 28-to-5 win until the split showed all 28 came from treatment-build prose and 0 from control.
 
 ## 6. Evidence required
 When overturning a doctrine: the original constraint, why it no longer binds, and a passing demonstration (e.g., for a joyride bump: a branch where `type-check` and the tutorial visual specs pass).
