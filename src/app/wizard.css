@@ -1224,7 +1224,7 @@
   grid-area: progress;
   min-width: 0;
   padding: var(--space-2);
-  overflow-x: visible;
+  overflow-x: auto;
 }
 
 :root .component-world-creation-wizard > .wizard-nav-container,
@@ -1245,11 +1245,11 @@
 
 :root .component-world-creation-wizard .wizard-progress-row,
 :root .component-character-creation-wizard .wizard-progress-row {
-  flex-flow: column nowrap;
+  flex-flow: row nowrap;
   align-items: stretch;
   justify-content: flex-start;
-  gap: var(--space-1_5);
-  min-width: 0;
+  gap: var(--space-1);
+  min-width: max-content;
 }
 
 :root .component-world-creation-wizard .wizard-progress-connector-wrapper,
@@ -2108,22 +2108,36 @@
 /* ═══════════════════════════════════════════════════════════════
    World-wizard DS pass (#1433)
 
-   Scoped to .component-world-creation-wizard (or world-only classes).
-   Appended last so source order wins over the shared rules above for
-   the world wizard. F8's vertical stepper is no longer a world-only
-   override — it moved into the shared progress-row rules above and
-   now applies to both wizards, closing the DS3 stepper mismatch
-   between them. F13's nav-position change stays world-only below —
-   it was never asked for on the character wizard.
-   ═════════════════════════════════════════════════════════════════ */
+   Scoped to .component-world-creation-wizard (or world-only classes)
+   so a parallel character-wizard branch can't collide. Appended last
+   so source order wins over the shared rules above for the world wizard.
 
-/* ─── F13 — DS3: Back/Next moved to the bottom (world wizard only) ─── */
+   F8 stays world-only on purpose. The world wizard's five step labels
+   run 72 characters ("Basic Information", "World Description", "Review
+   Attributes", ...) against the character wizard's 44 ("Basic Info",
+   "Attributes", "Skills", ...), so only the world strip is long enough
+   to overflow. Stacking the character wizard's much shorter chips would
+   cost ~176px of height and push the form down for no gain.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── F8 + F13 — DS3: vertical step-nav, Back/Next moved to the bottom ─── */
 
 :root .component-world-creation-wizard {
   grid-template-areas:
     "progress"
     "content"
     "actions";
+}
+
+:root .component-world-creation-wizard > .component-wizard-progress {
+  overflow-x: visible;
+}
+
+:root .component-world-creation-wizard .wizard-progress-row {
+  flex-flow: column nowrap;
+  align-items: stretch;
+  gap: var(--space-1_5);
+  min-width: 0;
 }
 
 :root .component-world-creation-wizard > .wizard-nav-container {
