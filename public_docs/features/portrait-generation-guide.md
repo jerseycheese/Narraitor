@@ -7,7 +7,7 @@ updated: 2026-07-21
 
 # Portrait Generation Guide
 
-Let's be honest - character portraits make everything better. There's something about seeing your character's face that makes the whole experience more immersive. This system generates AI-powered portraits that actually fit with your character's description and the world they live in.
+This system generates character portraits from the character's own description and the setting of the world they live in.
 
 The challenge was making this work with character creation while handling AI image generation issues - rate limits, failed generations, inappropriate content.
 
@@ -106,7 +106,7 @@ const CharacterCreationWizard = () => {
 };
 ```
 
-The beauty of this approach is that character creation never fails just because portrait generation does. If the AI service is down or hits rate limits, you still get your character - they just don't have a picture yet.
+Character creation never fails just because portrait generation does. If the AI service is down or hits rate limits, you still get your character - they just don't have a picture yet.
 
 ## Display Components
 

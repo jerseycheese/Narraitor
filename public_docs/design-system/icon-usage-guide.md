@@ -376,7 +376,7 @@ When you find an emoji in the code, here's how to fix it:
 
 ### Badge Component
 
-The Badge component is designed to work seamlessly with lucide-react icons:
+The Badge component takes lucide-react icons directly:
 
 ```tsx
 // The icon prop accepts React.ReactNode

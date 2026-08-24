@@ -95,7 +95,7 @@ export function getMostRelevantDecisions(
 **simpleDecisionFormatter.ts** (48 lines):
 - Single consistent format for all decisions
 - No adaptive levels, no token optimization
-- Works perfectly because we only pass 10-15 decisions anyway
+- Fine at this scale, since only 10-15 decisions ever get passed
 
 ### Files Changed
 **Deleted:**

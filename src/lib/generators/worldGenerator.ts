@@ -384,5 +384,5 @@ Make the world interesting and playable with concepts appropriate to the setting
   
   // If we get here, all retries failed
   logger.error('Failed to generate world after all retries:', lastError);
-  throw new Error('Failed to generate world configuration. Please try again.');
+  throw new Error("Couldn't generate this world. Try again in a moment.");
 }

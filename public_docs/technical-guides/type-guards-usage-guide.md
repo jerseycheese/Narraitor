@@ -1,6 +1,6 @@
 # Type Guards Usage Guide
 
-So here's the thing - TypeScript gives you compile-time safety, but at runtime you're still dealing with unknown data from APIs, user input, and localStorage. The type guards system solves this by giving you runtime validation that actually works.
+TypeScript gives you compile-time safety, but at runtime you're still handling unknown data from APIs, user input, and localStorage. The type guards system covers that gap with runtime validation.
 
 ## Why This Exists
 

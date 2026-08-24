@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # How We Name Things
 
-So file naming was getting inconsistent across the project, which makes it harder to find what you're looking for. Here's the approach that's been working:
+File naming was getting inconsistent across the project, which makes it harder to find what you're looking for. Here's the approach that's been working:
 
 ## The Basic Rules
 

@@ -42,7 +42,7 @@ The most common debugging scenarios and what to look for:
 
 **Instructions are gibberish**: Check the structured context output. If the raw data is messy, the instructions will be too.
 
-## How This Actually Works Behind the Scenes
+## What Happens Behind the Scenes
 
 ### The Components That Do the Work
 - **ConsistencyValidationSection**: The main debugging interface

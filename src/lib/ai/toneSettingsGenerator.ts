@@ -130,7 +130,7 @@ function parseResponse(content: string): ToneAnalysisResult {
     }
 
     logger.error('Failed to parse AI tone settings response:', error);
-    throw new Error('That response came back unreadable. Please try again.');
+    throw new Error("That response came back unreadable. Try again.");
   }
 }
 
@@ -154,20 +154,20 @@ export async function generateToneSettings(
       });
 
       if (error.message.includes('rate limit') || error.message.includes('429')) {
-        throw new Error('The model provider is busy. Please try again in a moment.');
+        throw new Error('The model provider is busy. Try again in a moment.');
       } else if (error.message.includes('network') || error.message.includes('timeout')) {
-        throw new Error('Network error occurred. Please check your connection and try again.');
+        throw new Error("Couldn't reach the model provider. Check your connection, then try again.");
         // Matches what parseResponse() throws above — keep the two in step.
       } else if (error.message.includes('No JSON found') || error.message.includes('came back unreadable')) {
-        throw new Error('That response came back unreadable. Please try generating again.');
+        throw new Error("That response came back unreadable. Try again.");
       } else if (error.message.startsWith('Invalid ') || error.message.startsWith('Missing ') || error.message.includes('empty response')) {
         throw error;
       } else {
-        throw new Error('Unable to generate tone settings. Please try again or set them manually.');
+        throw new Error("Couldn't generate tone settings. Try again, or set them manually.");
       }
     } else {
       logger.error('Unknown error generating AI tone settings:', error);
-      throw new Error('An unexpected error occurred. Please try again.');
+      throw new Error("Couldn't generate tone settings. Try again in a moment.");
     }
   }
 }

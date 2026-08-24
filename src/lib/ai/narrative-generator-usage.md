@@ -116,7 +116,7 @@ interface NarrativeGenerationResult {
 }
 ```
 
-So you get the actual narrative text plus useful metadata about what kind of content was generated and which characters were involved.
+You get the narrative text plus metadata about what kind of content was generated and which characters were involved.
 
 ## Error Handling
 

@@ -205,7 +205,7 @@ Requirements:
   } catch (error) {
     logger.error('generate-ending-image', 'Ending image generation failed:', error);
     return NextResponse.json(
-      { error: 'Unable to load ending image. Please try again.' },
+      { error: "Couldn't generate the ending image. Try again in a moment." },
       { status: 500 }
     );
   }

@@ -11,7 +11,7 @@ Most AI narrative games limit you to the choices the model generated. Climbing t
 
 This feature adds one. Players type what they want to try and the AI responds to it, alongside the suggested actions rather than instead of them.
 
-## How This Actually Works
+## How It Works
 
 **The Input Field** - A text area sits above the suggested actions, capped at 250 characters. The cap keeps a submission to an action rather than a paragraph of stage direction.
 

@@ -4,7 +4,7 @@ This component handles editing existing worlds after they've been created. The c
 
 ## The Problem We're Solving
 
-So you've got a world created through the wizard, but now you want to tweak it. Maybe add a new skill, adjust some attributes, or just fix a typo in the description. The tricky part is that we're not starting fresh like in the wizard - we're working with existing data that might have characters and stories already attached to it.
+Editing a world means starting from data that already exists. Maybe you're adding a skill, adjusting some attributes, or fixing a typo in the description. Either way the editor is working against a world that might already have characters and stories attached to it, which is the part the creation wizard never has to deal with.
 
 ## Usage
 
@@ -25,14 +25,14 @@ import WorldEditor from '@/components/WorldEditor/WorldEditor';
 
 The editor breaks editing into four logical chunks:
 
-1. **Basic Information** - Name, description, and theme (the easy stuff)
+1. **Basic Information** - Name, description, and theme
 2. **Attributes** - Add, edit, and remove world attributes
-3. **Skills** - Manage skills with attribute linking (this gets complex fast)
+3. **Skills** - Manage skills and the attribute each one links to
 4. **Settings** - Configure limits and point pools
 
 ## State Management Approach
 
-Here's where it gets interesting. The component keeps all changes in its own local form state until you hit save. Why? Because we don't want half-edited worlds sitting in the store if you decide to bail out.
+The component keeps all changes in its own local form state until you hit save, so a half-edited world never lands in the store if you decide to bail out.
 
 The flow is basically:
 1. Load world data from store into local form state
@@ -52,7 +52,7 @@ Both actions take you back to the worlds list because that's usually where you c
 We handle a few different error scenarios:
 - World not found (shows error message with a "go back" button)
 - Save errors (keeps you on the page so you can try again)
-- Loading states (because nobody likes blank screens)
+- Loading states while the world data comes out of the store
 
 ## Example
 

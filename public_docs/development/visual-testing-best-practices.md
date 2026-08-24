@@ -5,7 +5,7 @@ created: 2025-08-20
 updated: 2026-08-14
 ---
 
-# What actually works for visual testing
+# Visual Testing Best Practices
 
 Here's what I've learned about writing visual tests that catch real issues without driving you crazy with false positives.
 

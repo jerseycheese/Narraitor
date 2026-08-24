@@ -82,4 +82,4 @@ By cutting the complex stuff, we ended up with:
 - No advanced feature dependencies
 - Much lower overall type complexity
 
-The result? An MVP that's actually achievable instead of a six-month type engineering project. We can always add the complex stuff back later when we have users who actually want it.
+That leaves an MVP that's achievable now rather than a six-month type engineering project. The complex stuff can come back later, once there are users asking for it.

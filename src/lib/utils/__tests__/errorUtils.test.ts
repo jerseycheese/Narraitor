@@ -84,7 +84,7 @@ describe('errorUtils', () => {
       const result = getUserFriendlyError(error);
 
       expect(result.title).toBe('Request Timed Out');
-      expect(result.message).toBe('The request is taking too long. Please try again.');
+      expect(result.message).toBe('The request is taking too long. Try again.');
       expect(result.retryable).toBe(true);
       expect(result.type).toBe(ErrorType.NETWORK);
       expect(result.actionLabel).toBe('Try Again');

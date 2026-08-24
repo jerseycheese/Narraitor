@@ -9,7 +9,7 @@ updated: 2026-07-21
 
 World creation is where the magic starts - it's where players define the rules and tone that make their narrative experience unique. The challenge was building something flexible enough for any fictional universe (Star Wars, Lovecraft, your own weird sci-fi thing) while keeping it simple enough that someone can just jump in and start playing.
 
-So whether you want "Force Sensitivity" for Star Wars or "Sanity" for horror games, the system adapts to what you need while keeping character creation from becoming a spreadsheet nightmare.
+Whether you want "Force Sensitivity" for Star Wars or "Sanity" for horror games, the system adapts to what you need while keeping character creation from becoming a spreadsheet nightmare.
 
 ## The Building Blocks of Your World
 
