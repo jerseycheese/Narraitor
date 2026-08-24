@@ -4,7 +4,7 @@ This is the modal dialog that pops up when someone returns to character creation
 
 ## What It's For
 
-So you've got the auto-save system quietly saving character data in the background. When users come back to character creation later - maybe they closed their browser yesterday, or accidentally navigated away - this component shows up to let them know we found their previous work.
+The auto-save system quietly saves character data in the background while users work. When they come back to character creation later - maybe they closed their browser yesterday, or accidentally navigated away - this component shows up to tell them their previous work is still there.
 
 The tricky part is handling conflicts. If they've already started entering new data in the current session, we need to warn them that recovering will overwrite what they've typed. That's where the conflict detection comes in.
 
@@ -278,7 +278,7 @@ return (
 
 ### With Auto-Save Hook
 
-The component is designed to work seamlessly with `useCharacterCreationAutoSave`:
+The component is built to pair with `useCharacterCreationAutoSave`:
 
 ```typescript
 const {

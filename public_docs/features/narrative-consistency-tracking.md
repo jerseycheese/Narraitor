@@ -4,7 +4,7 @@ Here's what happens without this system: you're in the middle of a tense investi
 
 This system solves that by automatically detecting and tracking goals throughout your narrative. It figures out what the player is supposed to be doing and makes sure the AI keeps those objectives front and center when generating new content.
 
-## How This Actually Works
+## How It Works
 
 **The AI Reads Between the Lines** - It's pretty smart about picking up both obvious goals ("Find the Sword of Light") and implied ones. When the wizard says "The dragon will attack at dawn," the system figures out that means "Stop the dragon attack" even though nobody explicitly said that. If the AI extraction fails for some reason, it falls back to pattern matching so you don't lose functionality.
 

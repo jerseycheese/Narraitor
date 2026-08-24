@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Lore Tracking System
 
-So this system solves a major problem with AI storytelling: the AI forgetting important details from earlier in the story. You know how you're playing through a narrative and suddenly the AI forgets that your character's name is Marcus, or that the tavern you've been staying at is called The Prancing Pony? This tracks characters, locations, events, and world rules automatically so the AI can maintain consistency.
+AI storytelling has a memory problem: the model forgets details it established earlier in the story, so a character's name or the tavern the player has been staying at drifts between turns. This system tracks characters, locations, events, and world rules automatically so the AI can stay consistent.
 
 ## What It Does
 
@@ -116,4 +116,4 @@ Continue the story...
 - `npm test -- choiceGenerator.loreContext.test.ts` - Choice generation integration
 - `npm test -- narrativeGenerator.loreContext.test.ts` - Narrative generation integration
 
-This gives you confidence that the lore extraction and context building actually works as expected.
+Between them these cover extraction, prompt-context formatting, and both generators that consume the context.

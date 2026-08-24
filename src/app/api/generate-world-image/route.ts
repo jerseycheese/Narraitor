@@ -162,7 +162,7 @@ Requirements:
   } catch (error) {
     logger.error('generate-world-image', 'World image generation failed:', error);
     return NextResponse.json(
-      { error: 'Failed to generate world image. Please try again.' },
+      { error: "Couldn't generate the world image. Try again in a moment." },
       { status: 500 }
     );
   }

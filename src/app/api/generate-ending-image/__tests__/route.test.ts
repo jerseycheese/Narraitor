@@ -154,6 +154,6 @@ describe('/api/generate-ending-image', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Unable to load ending image. Please try again.');
+    expect(data.error).toBe("Couldn't generate the ending image. Try again in a moment.");
   });
 });

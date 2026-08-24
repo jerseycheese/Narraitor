@@ -1,8 +1,8 @@
 # DeleteConfirmationDialog
 
-You know that moment when a user clicks "Delete" and you realize you should probably ask them if they're sure? This component handles that conversation. It's designed to be both user-friendly and hard to dismiss accidentally - because nobody wants to explain to a user why their important data just vanished.
+A confirmation step for destructive actions. It wraps `ConfirmationDialog` with the `destructive` variant, names the thing being deleted, and puts initial focus on Cancel so the dangerous button isn't the one sitting under the return key.
 
-The key thing here is making deletion feel intentional, not accidental. So we use clear language, show what's about to be deleted, and make the dangerous action visually distinct from the safe one.
+The aim is to make deletion take a deliberate second action. The dialog says what's about to go, styles the confirm button as destructive, and disables both buttons while the delete is in flight.
 
 ## Usage
 
@@ -57,11 +57,9 @@ function MyComponent() {
 
 ## Features
 
-This dialog does all the things you'd expect:
-
-- **Accessibility**: Works perfectly with keyboards and screen readers
-- **Loading State**: Shows "Deleting..." and prevents double-clicks during the actual deletion
-- **Backdrop Click**: Clicking outside closes it (but only if it's not currently deleting)
+- **Accessibility**: Built on the Radix dialog primitive, so focus moves into the dialog and stays trapped there while it's open, landing on Cancel because the variant is destructive. The confirm button's `aria-label` names the item (`Delete My Important Item`); the cancel button's doesn't (`Cancel deletion`), so the item name reaches a screen reader through the dialog body and the confirm button rather than through Cancel.
+- **Loading State**: Shows "Deleting..." and disables both buttons, so a slow delete can't be fired twice
+- **Backdrop Click**: Clicking outside closes the dialog. That isn't suppressed mid-delete - only the buttons are disabled.
 - **Escape Key**: Press Escape to bail out quickly
 - **Custom Button Text**: You can change the button labels if "Delete" and "Cancel" don't fit your context
 

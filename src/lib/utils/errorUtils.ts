@@ -82,7 +82,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   if (message.includes('timeout')) {
     return {
       title: 'Request Timed Out',
-      message: 'The request is taking too long. Please try again.',
+      message: 'The request is taking too long. Try again.',
       suggestion: 'This is usually temporary — wait a moment and try again.',
       actionLabel: 'Try Again',
       retryable: true,

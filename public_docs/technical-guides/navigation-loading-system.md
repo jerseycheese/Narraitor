@@ -1,6 +1,6 @@
 # Navigation Loading System
 
-So this system handles one of those user experience details that really matters: showing loading states during navigation. Without it, users click something and wonder if it worked, especially on slower connections or when there's a lot of data to load.
+This system shows loading states during navigation. Without it, users click something and wonder if it worked, especially on slower connections or when there's a lot of data to load.
 
 ## How It Works
 

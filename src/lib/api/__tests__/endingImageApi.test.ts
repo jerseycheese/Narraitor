@@ -49,11 +49,11 @@ describe('endingImageApi', () => {
     mockAiFetch.mockResolvedValue({
       ok: false,
       status: 500,
-      json: async () => ({ error: 'Unable to load ending image. Please try again.' }),
+      json: async () => ({ error: "Couldn't generate the ending image. Try again in a moment." }),
     } as unknown as Response);
 
     await expect(generateEndingImage(params)).rejects.toThrow(
-      'Unable to load ending image. Please try again.'
+      "Couldn't generate the ending image. Try again in a moment."
     );
   });
 

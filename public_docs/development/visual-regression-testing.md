@@ -405,7 +405,6 @@ We use a **Darwin-only visual testing strategy**, meaning all baseline screensho
 
 **Benefits of Docker migration**:
 - **True consistency**: Same rendering environment across all platforms
-- **Industry standard**: Docker containers are the 2025 best practice for visual testing
 - **CI/CD reliability**: Eliminates "works on my machine" issues for visual tests
 
 **Multi-Platform Baseline Management**:

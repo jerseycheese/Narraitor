@@ -75,14 +75,14 @@ describe('generateToneSettings', () => {
       mockClient.generateContent.mockRejectedValueOnce(new Error('rate limit exceeded - 429'));
 
       await expect(generateToneSettings(mockClient, sampleWorldData))
-        .rejects.toThrow('The model provider is busy. Please try again in a moment.');
+        .rejects.toThrow('The model provider is busy. Try again in a moment.');
     });
 
     it('should throw specific error for network issues', async () => {
       mockClient.generateContent.mockRejectedValueOnce(new Error('network timeout occurred'));
 
       await expect(generateToneSettings(mockClient, sampleWorldData))
-        .rejects.toThrow('Network error occurred. Please check your connection and try again.');
+        .rejects.toThrow("Couldn't reach the model provider. Check your connection, then try again.");
     });
 
     it('should throw specific error for parsing failures', async () => {
@@ -94,7 +94,7 @@ describe('generateToneSettings', () => {
       mockClient.generateContent.mockResolvedValueOnce(mockResponse);
 
       await expect(generateToneSettings(mockClient, sampleWorldData))
-        .rejects.toThrow('That response came back unreadable. Please try generating again.');
+        .rejects.toThrow('That response came back unreadable. Try again.');
     });
 
     it('should throw error for empty AI response', async () => {

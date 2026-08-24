@@ -140,6 +140,6 @@ describe('/api/generate-journal-image', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Failed to generate journal image. Please try again.');
+    expect(data.error).toBe("Couldn't generate the journal image. Try again in a moment.");
   });
 });

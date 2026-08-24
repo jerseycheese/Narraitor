@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Working with State Management
 
-So here's how to actually work with the Zustand stores in practice. The idea is that each major area of the app gets its own store - World stuff, Character stuff, Narrative stuff - which keeps things organized and makes it easier to reason about what's changing and why.
+This is how the Zustand stores work in practice. Each major area of the app gets its own store - World stuff, Character stuff, Narrative stuff - which keeps things organized and makes it easier to reason about what's changing and why.
 
 ## How the Stores Work
 

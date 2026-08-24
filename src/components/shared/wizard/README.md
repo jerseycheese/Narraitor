@@ -1,6 +1,6 @@
 # Shared Wizard Components
 
-So we had wizard components scattered all over the place, each doing things slightly differently. This is the unified wizard system that brings consistency to multi-step forms across the app.
+Wizard components were scattered all over the place, each doing things slightly differently. This is the unified wizard system that brings consistency to multi-step forms across the app.
 
 ## The Basic Pattern
 
@@ -49,7 +49,7 @@ function MyWizard() {
 
 ### Form Components
 - **WizardFormSection** - Form section with proper heading hierarchy
-- **ToggleButton** - Styled toggle switches that actually look good
+- **ToggleButton** - Styled toggle switches
 
 - ### Hooks & Utilities
 - **useWizardFlow** - Complete state management with persistence, submit, and cancel (saves you from prop drilling hell). For step state without any of that, there's `useWizardState` in `@/hooks`.
@@ -57,7 +57,7 @@ function MyWizard() {
 
 ## Why Use This Instead of Rolling Your Own
 
-- Responsive design that actually works on mobile
+- Responsive design that holds up on mobile
 - Automatic session persistence (users can close browser and come back)
 - Built-in validation patterns that make sense
 - Consistent styling via `wizardStyles` (no more "does this look right?" questions)

@@ -215,7 +215,7 @@ test('creates character and updates store', async () => {
 });
 ```
 
-## What Actually Works
+## Test-Writing Habits
 
 **Descriptive test names** save so much debugging time. When a test fails, you should immediately know what broke:
 

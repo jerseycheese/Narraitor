@@ -391,7 +391,7 @@ describe('/api/generate-world-image', () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe('Failed to generate world image. Please try again.');
+      expect(data.error).toBe("Couldn't generate the world image. Try again in a moment.");
     });
   });
 

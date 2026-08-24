@@ -35,7 +35,7 @@ The core functionality is working and stable. All the main systems (world creati
 
 **Adaptive AI Narratives**: This is the interesting part. The AI doesn't just generate random fantasy stories. It maintains context about your world's rules, your character's abilities, and the ongoing story to create narratives that feel consistent with your setting.
 
-**Choice Weighting**: Decisions get labeled by importance (Minor/Major/Critical) and alignment (Lawful/Neutral/Chaotic) so you can see what really matters for your character's development.
+**Choice Weighting**: Decisions get labeled by importance (Minor/Major/Critical) and alignment (Lawful/Neutral/Chaotic) so you can see which decisions carry weight for your character's development.
 
 **Session Persistence**: Games save automatically using IndexedDB with graceful fallback to memory-only if storage fails. Pick up where you left off anytime.
 

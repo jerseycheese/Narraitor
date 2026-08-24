@@ -1,6 +1,6 @@
 # Goal System Integration Guide
 
-So the goal tracking system was built to solve the problem of AI narratives that wander aimlessly. Players would start with clear objectives, but the AI would gradually drift away from them because it had no memory of what the player was trying to achieve.
+The goal tracking system exists because AI narratives wander. Players would start with clear objectives, but the AI would gradually drift away from them because it had no memory of what the player was trying to achieve.
 
 ## Architecture Overview
 
@@ -141,7 +141,7 @@ export const useGoalStore = create<GoalStore>()(
 ```
 
 ### State Hydration
-Goals load automatically when the application starts. The persistence middleware handles this seamlessly, but you can add integrity checks to clean up any corrupted data.
+Goals load automatically when the application starts. The persistence middleware handles the rehydration, but you can add integrity checks to clean up any corrupted data.
 
 ```typescript
 // Application initialization

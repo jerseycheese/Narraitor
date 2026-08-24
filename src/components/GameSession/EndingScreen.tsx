@@ -146,7 +146,7 @@ export function EndingScreen() {
       });
     } catch (error) {
       logger.error('Failed to load ending image:', error);
-      setImageError('Failed to load ending image');
+      setImageError("Couldn't load the ending image.");
       generatedForEndingRef.current = null; // Reset on error so user can retry
     } finally {
       setIsGeneratingImage(false);
@@ -319,7 +319,7 @@ export function EndingScreen() {
             className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
           >
             <div className="component-ending-screen-hero-error">
-              <p>Unable to load ending image</p>
+              <p>{imageError}</p>
               <Button
                 onClick={generateEndingImage}
                 variant="link"

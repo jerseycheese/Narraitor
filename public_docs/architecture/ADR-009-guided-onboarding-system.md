@@ -11,7 +11,7 @@ updated: 2026-08-01
 **Date**: 2025-06-20
 
 ## Context
-So we had a problem with new users hitting Narraitor and just bouncing. The world creation process was asking too much of them upfront - they needed to understand attributes, skills, and settings before they could even get started. There wasn't a clear path for first-time users, and the cognitive load was just too high. People were dropping off before they got to experience what the app actually does.
+New users were hitting Narraitor and bouncing. The world creation process asked too much of them upfront - they needed to understand attributes, skills, and settings before they could even get started. There wasn't a clear path for first-time users, and the cognitive load was too high. People were dropping off before they got to see what the app does.
 
 ## Decision
 Built a guided onboarding system for new users:
@@ -20,7 +20,7 @@ Built a guided onboarding system for new users:
 2. **Simplifies world creation** to just 2 essential steps (concept + details) instead of the full complex flow
 3. **Uses AI to enhance user input** with contextually appropriate defaults so they don't have to figure everything out
 4. **Moves straight from world to character creation** with no dead end in between
-5. **Maintains professional UX standards** with responsive design and proper error handling
+5. **Keeps the flow usable on small screens** and surfaces an explicit error state when an AI call fails
 
 ## Implementation Architecture
 
@@ -34,7 +34,7 @@ Built a guided onboarding system for new users:
 
 #### State Management
 - **Choice**: Integrate with existing sessionStore rather than creating separate state
-- **Rationale**: Why reinvent the wheel? We already had auto-save infrastructure and persistence working
+- **Rationale**: The auto-save infrastructure and persistence were already working
 - **Implementation**: Just added onboarding completion tracking to the existing session state
 
 #### AI Integration Strategy

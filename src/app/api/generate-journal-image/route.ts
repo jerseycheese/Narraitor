@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('generate-journal-image', 'Journal image generation failed:', error);
     return NextResponse.json(
-      { error: 'Failed to generate journal image. Please try again.' },
+      { error: "Couldn't generate the journal image. Try again in a moment." },
       { status: 500 }
     );
   }

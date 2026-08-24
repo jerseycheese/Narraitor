@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
       
       if (error.message.includes('API') || error.message.includes('generation')) {
         return NextResponse.json(
-          { error: 'Model provider unavailable', details: 'Please try again later' },
+          { error: 'Model provider unavailable', details: 'Try again in a moment.' },
           { status: 503 }
         );
       }
