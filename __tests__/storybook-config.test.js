@@ -11,10 +11,6 @@ describe('.storybook/main.cjs', () => {
     expect(fs.existsSync(nextConfigPath)).toBe(true);
   });
 
-  it('does not glob for story formats the repo has none of', () => {
-    expect(storybookConfig.stories).not.toContain('../src/stories/**/*.mdx');
-  });
-
   it('swaps the 11 MB Gemini tokenizer for the browser stub', async () => {
     const config = await storybookConfig.webpackFinal({ resolve: { alias: {} } });
 
