@@ -127,8 +127,14 @@ for generic), `state/` (Zustand stores — the source of truth for app data, plu
 ### AI integration
 
 - Lives in `src/lib/ai/`, SDK `@google/genai`.
-- **NEVER** expose API keys or AI calls on the client. All AI interactions happen in Server
-  Actions or API routes.
+- **NEVER** call a provider directly from the browser. Every AI interaction goes through a
+  Server Action or an API route.
+- The player's provider key is browser-owned by design — `providerStore` holds it encrypted,
+  `aiFetch` decrypts it and passes it to the route in an `x-provider-api-key` header. That's
+  the BYO-key architecture working as intended; don't redesign it around a server-held key
+  store, which doesn't exist here.
+- Server-owned secrets are the opposite case: anything in `.env.local` stays server-side and
+  never reaches the client.
 
 ### Error handling
 

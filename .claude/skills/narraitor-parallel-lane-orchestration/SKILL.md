@@ -43,7 +43,9 @@ wrong and score the body.
 ## 4. Batch selection
 
 Run the `prioritize-issues` skill for the ranking, then subtract everything that cannot safely
-run right now:
+run right now. That skill is user-level, not committed here — where it isn't available (a fresh
+clone, a cloud session), the repo ships `.claude/agents/issue-prioritizer.md`, which does the
+same ranking job:
 
 - **Already in motion.** Any issue with an open PR, or an existing worktree/branch matching its
   number. A pre-existing worktree is not proof of abandonment — ask before touching it.
@@ -63,8 +65,9 @@ Lanes start faster and cleaner when the orchestrator does this work up front rat
 each lane do it:
 
 ```bash
+REPO=$(git rev-parse --show-toplevel)   # never hardcode a home path; this file is public
 git worktree add -b claude/issue-<n> \
-  /Users/jackhaas/Projects/personal/narraitor/.claude/worktrees/issue-<n> origin/develop
+  "$REPO/.claude/worktrees/issue-<n>" origin/develop
 git -C <worktree> branch --unset-upstream    # else a bare git push targets develop
 ( cd <worktree> && npm ci )                  # node_modules is per-worktree
 ```
@@ -126,7 +129,8 @@ one what changed and what proves it works. Do not merge anything — leave them 
 for me. [Or: merge each on green with `gh pr merge --squash --delete-branch`, then run the
 `post-merge` skill for each.]
 
-Pick the batch with the `prioritize-issues` skill, then subtract what can't run right now:
+Pick the batch with the `prioritize-issues` skill (or the committed `issue-prioritizer` agent,
+if that skill isn't installed), then subtract what can't run right now:
 anything with an open PR or an existing worktree or branch for its number, anything the body
 says is blocked or held, and anything whose likely file set collides with another candidate's.
 Read bodies before scoring — the labels went on in one retroactive pass and some of them are
@@ -163,7 +167,8 @@ didn't, and what you need from me — plain sentences, no working shorthand.
 
 ## 9. Related
 
-- `prioritize-issues` — the ranking half of batch selection.
+- `prioritize-issues` — the ranking half of batch selection. User-level, not committed.
+- `issue-prioritizer` agent — the committed fallback for the same ranking.
 - `worktree-enhanced` — single-lane worktree setup.
 - `post-merge` — after a lane's PR merges.
 - `narraitor-change-control` — the evidence bar a lane's "done" claim has to clear.
