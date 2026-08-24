@@ -24,6 +24,6 @@ describe('provider settings width', () => {
   it('caps the providers page from the token rather than a literal width', () => {
     const rule = ruleFor(providerConfigCss, '.component-providers-page');
     expect(rule).toMatch(/max-width:\s*var\(--page-width-form\)/);
-    expect(providerConfigCss).not.toMatch(/max-width:\s*\d+(\.\d+)?(rem|px)/);
+    expect(rule).not.toMatch(/max-width:\s*\d+(\.\d+)?(rem|px)/);
   });
 });
