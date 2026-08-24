@@ -6,6 +6,7 @@ import { normalizeText, NORM_DESC } from '../lib/utils/textNormalization';
 import { applyNarrativeContentGate } from '../lib/narrative/narrativeContentGate';
 import { applyWorldStateThreadUpdates } from '../lib/narrative/applyWorldStateThreadUpdates';
 import { applyWorldClockUpdates } from '../lib/narrative/applyWorldClockUpdates';
+import { countWorldClockTurns } from '../lib/narrative/worldClock';
 import { formatDecisionText } from '../lib/narrative/formatDecisionText';
 import { useSessionStore } from './sessionStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
@@ -173,7 +174,11 @@ export const createNarrativeSegmentActions = (
     // ledger. Fire-and-forget: nothing in this turn's UI waits on it. The
     // ledger note is stamped back onto the segment once reconciled so the
     // per-turn record survives reloads and the playtest harness can read it.
-    const currentTurn = (get().sessionSegments[sessionId] || []).length;
+    const currentTurn = countWorldClockTurns(
+      (get().sessionSegments[sessionId] || [])
+        .map((id) => get().segments[id])
+        .filter((segment): segment is NarrativeSegment => Boolean(segment))
+    );
     void Promise.resolve().then(async () => {
       try {
         // characterIds lists the NPCs in the scene; the player is the session's character.

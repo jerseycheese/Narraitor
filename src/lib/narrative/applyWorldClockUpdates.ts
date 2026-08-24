@@ -9,7 +9,7 @@ import type {
 import type { WorldCostExtractionInput, WorldCostSegmentNote } from '@/types/worldCost.types';
 import { logger } from '@/lib/utils/logger';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { summarizeLedgerForSegment } from '@/lib/narrative/worldClock';
+import { isWorldClockTurnSegment, summarizeLedgerForSegment } from '@/lib/narrative/worldClock';
 import { applyWorldCost } from '@/lib/narrative/applyWorldCost';
 import { useCharacterStore } from '@/state/characterStore';
 import { useGoalStore } from '@/state/goalStore';
@@ -79,7 +79,7 @@ async function reconcileSegment({
   currentTurn,
 }: ApplyWorldClockUpdatesParams): Promise<ReconciledSegmentNotes | undefined> {
   const goalStore = useGoalStore.getState();
-  const clockOn = isFeatureEnabled('WORLD_CLOCK');
+  const clockOn = isFeatureEnabled('WORLD_CLOCK') && isWorldClockTurnSegment(segment);
   const costOn = isFeatureEnabled('WORLD_COST');
 
   if (!clockOn && !costOn) {
@@ -105,7 +105,7 @@ async function reconcileSegment({
       notes.worldCost = applyWorldCost({ sessionId, characterId: playerCharacterId, result: result.worldCost });
     }
 
-    if (result.worldThreads && worldId) {
+    if (clockOn && result.worldThreads && worldId) {
       const applied = useWorldThreadStore
         .getState()
         .applyExtraction(sessionId, worldId, result.worldThreads, currentTurn);

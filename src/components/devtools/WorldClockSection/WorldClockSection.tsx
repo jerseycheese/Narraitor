@@ -5,8 +5,9 @@ import { clsx } from 'clsx';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
-import { isOverdue, turnsSinceWorldMoved } from '@/lib/narrative/worldClock';
+import { countWorldClockTurns, isOverdue, turnsSinceWorldMoved } from '@/lib/narrative/worldClock';
 import type { WorldThread } from '@/types/worldThread.types';
+import type { NarrativeSegment } from '@/types/narrative.types';
 import './WorldClockSection.css';
 
 const RECENT_CLOSED_LIMIT = 5;
@@ -56,7 +57,14 @@ const ClosedThreadRow = ({ thread }: { thread: WorldThread }) => (
 export const WorldClockSection = () => {
   const sessionId = useSessionStore((state) => state.id);
   const currentTurn = useNarrativeStore(
-    (state) => (sessionId ? state.sessionSegments[sessionId]?.length ?? 0 : 0)
+    (state) =>
+      sessionId
+        ? countWorldClockTurns(
+            (state.sessionSegments[sessionId] ?? [])
+              .map((id) => state.segments?.[id])
+              .filter((segment): segment is NarrativeSegment => Boolean(segment))
+          )
+        : 0
   );
   // Subscribe to the raw slices rather than calling the selector methods so the
   // section re-renders when the ledger moves; the methods read get() and would
