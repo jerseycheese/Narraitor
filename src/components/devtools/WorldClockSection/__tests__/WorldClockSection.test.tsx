@@ -13,7 +13,16 @@ jest.mock('@/state/sessionStore', () => {
 });
 jest.mock('@/state/narrativeStore', () => {
   const state = {
-    sessionSegments: { 'session-1': ['seg-1', 'seg-2', 'seg-3', 'seg-4', 'seg-5', 'seg-6'] },
+    sessionSegments: { 'session-1': ['seg-1', 'seg-2', 'seg-item', 'seg-3', 'seg-4', 'seg-5', 'seg-6'] },
+    segments: {
+      'seg-1': { metadata: { tags: [] } },
+      'seg-2': { metadata: { tags: [] } },
+      'seg-item': { metadata: { tags: ['item-usage'] } },
+      'seg-3': { metadata: { tags: [] } },
+      'seg-4': { metadata: { tags: [] } },
+      'seg-5': { metadata: { tags: [] } },
+      'seg-6': { metadata: { tags: [] } },
+    },
   };
   return { useNarrativeStore: (selector: (s: typeof state) => unknown) => selector(state) };
 });

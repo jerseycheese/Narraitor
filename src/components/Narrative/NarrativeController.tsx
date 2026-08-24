@@ -24,7 +24,7 @@ import {
 } from '@/lib/narrative/evaluateDecisionSkillChecks';
 import { computeTurnsSinceComplication, isPacingStale } from '@/lib/narrative/turnsSinceComplication';
 import { isFatalCadenceOffCooldown } from '@/lib/narrative/fatalDecisionCadence';
-import { buildWorldClockPromptContext } from '@/lib/narrative/worldClock';
+import { buildWorldClockPromptContext, countWorldClockTurns } from '@/lib/narrative/worldClock';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { logger } from '@/lib/utils/logger';
@@ -664,7 +664,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // this segment lands (sessionSegments length after add), and the local
       // segments state can lag the store, so read the store count directly.
       const currentTurn =
-        useNarrativeStore.getState().getSessionSegments(sessionId).length + 1;
+        countWorldClockTurns(useNarrativeStore.getState().getSessionSegments(sessionId)) + 1;
       const worldClock = isFeatureEnabled('WORLD_CLOCK')
         ? buildWorldClockPromptContext(
             useWorldThreadStore

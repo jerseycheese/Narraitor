@@ -18,6 +18,10 @@ describe('mergeTurnTags', () => {
       )
     ).toEqual(['forest', 'skill-success:a', 'skill-roll:19']);
   });
+
+  it('drops previous item-usage tags before building the next turn', () => {
+    expect(mergeTurnTags(['forest', 'item-usage'], ['combat'])).toEqual(['forest', 'combat']);
+  });
 });
 
 describe('scene prompt built from merged turn tags', () => {

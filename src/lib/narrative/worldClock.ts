@@ -2,6 +2,7 @@
  * Turn arithmetic over the world-thread ledger. Pure functions: the store
  * owns the data, the scene prompt and the segment stamp consume these shapes.
  */
+import type { NarrativeSegment } from '@/types/narrative.types';
 import type {
   WorldThread,
   WorldClockPromptContext,
@@ -57,6 +58,12 @@ export const buildWorldClockPromptContext = (
     })),
   };
 };
+
+export const isWorldClockTurnSegment = (segment: NarrativeSegment): boolean =>
+  !segment.metadata?.tags?.includes('item-usage');
+
+export const countWorldClockTurns = (segments: NarrativeSegment[]): number =>
+  segments.filter(isWorldClockTurnSegment).length;
 
 export const summarizeLedgerForSegment = (
   sessionThreads: WorldThread[],

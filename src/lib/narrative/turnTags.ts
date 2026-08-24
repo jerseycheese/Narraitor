@@ -1,4 +1,5 @@
 const SKILL_CHECK_TAG_PREFIX = 'skill-';
+const TRANSIENT_TURN_TAGS = new Set(['item-usage']);
 
 /**
  * Builds the tag list a turn's prompt sees.
@@ -12,6 +13,8 @@ export const mergeTurnTags = (
   previousSegmentTags: string[],
   currentTurnTags: string[]
 ): string[] => [
-  ...previousSegmentTags.filter((tag) => !tag.startsWith(SKILL_CHECK_TAG_PREFIX)),
+  ...previousSegmentTags.filter(
+    (tag) => !tag.startsWith(SKILL_CHECK_TAG_PREFIX) && !TRANSIENT_TURN_TAGS.has(tag)
+  ),
   ...currentTurnTags,
 ];

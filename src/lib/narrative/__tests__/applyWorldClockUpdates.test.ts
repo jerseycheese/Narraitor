@@ -135,6 +135,33 @@ describe('applyWorldClockUpdates', () => {
     expect(note?.worldClock).toEqual({ turn: 2, open: 1, overdue: 0, opened: [], advanced: [], resolved: [] });
   });
 
+  it('keeps item-usage segments off the world clock even when the flag is on', async () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    processSpy.mockResolvedValue({
+      newGoalsCreated: 0,
+      goalsUpdated: 0,
+      goalsCompleted: 0,
+      worldThreads: {
+        opened: [{ kind: 'consequence', summary: 'The item attracted attention' }],
+        advanced: [],
+        resolved: [],
+      },
+    });
+
+    const note = await applyWorldClockUpdates({
+      segment: segment(worldId, {
+        type: 'action',
+        metadata: { tags: ['item-usage', 'quest-items'] },
+      }),
+      sessionId: 'session-1',
+      currentTurn: 2,
+    });
+
+    expect(processSpy).toHaveBeenCalledWith(expect.anything(), 'session-1', undefined, undefined, undefined);
+    expect(note).toBeUndefined();
+    expect(useWorldThreadStore.getState().hasSessionLedger('session-1')).toBe(false);
+  });
+
   it('runs a session\'s extractions in turn order, so a fast turn 2 waits for turn 1 and seeds once', async () => {
     mockIsFeatureEnabled.mockReturnValue(true);
     let releaseTurnOne: (value: unknown) => void = () => undefined;

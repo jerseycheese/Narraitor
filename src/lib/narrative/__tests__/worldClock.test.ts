@@ -3,8 +3,11 @@ import {
   turnsSinceWorldMoved,
   selectThreadsForPrompt,
   buildWorldClockPromptContext,
+  countWorldClockTurns,
+  isWorldClockTurnSegment,
   summarizeLedgerForSegment,
 } from '../worldClock';
+import type { NarrativeSegment } from '@/types/narrative.types';
 import type { WorldThread } from '@/types/worldThread.types';
 
 let nextId = 0;
@@ -21,6 +24,18 @@ const makeThread = (overrides: Partial<WorldThread> = {}): WorldThread => ({
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
   ...overrides,
+});
+
+const makeSegment = (id: string, tags: string[] = []): NarrativeSegment => ({
+  id,
+  sessionId: 'session-a',
+  worldId: 'world-1',
+  content: 'A scene unfolds.',
+  type: tags.includes('item-usage') ? 'action' : 'scene',
+  metadata: { tags },
+  timestamp: new Date('2026-01-01T00:00:00.000Z'),
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
 });
 
 describe('worldClock', () => {
@@ -73,6 +88,16 @@ describe('worldClock', () => {
       turnsSinceWorldMoved: 1,
       threads: [{ kind: 'consequence', summary: 'The debt collector is coming', ageTurns: 4, overdue: true }],
     });
+  });
+
+  test('countWorldClockTurns treats item usage as a beat, not a clock turn', () => {
+    const opening = makeSegment('seg-1');
+    const itemUse = makeSegment('seg-2', ['item-usage', 'quest-items']);
+    const nextScene = makeSegment('seg-3');
+
+    expect(isWorldClockTurnSegment(opening)).toBe(true);
+    expect(isWorldClockTurnSegment(itemUse)).toBe(false);
+    expect(countWorldClockTurns([opening, itemUse, nextScene])).toBe(2);
   });
 
   test('summarizeLedgerForSegment counts open and overdue and passes the applied summaries through', () => {
