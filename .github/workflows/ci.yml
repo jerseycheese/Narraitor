@@ -353,16 +353,15 @@ jobs:
     name: E2E Tests
     runs-on: macos-latest
     needs: [build]
-    # Shard across runners and force --workers=1 per shard. The visual suite's
-    # timeouts (#1344) come from worker concurrency against a single `next dev`
-    # server: two workers hitting two uncompiled routes at once stall the
-    # single-process dev server past the navigation timeout. One worker per shard
-    # removes that contention entirely; sharding keeps wall-clock reasonable.
+    # Shard across runners and force --workers=1 per shard. That started as a
+    # fix for the visual suite's timeouts: two workers hitting two uncompiled
+    # routes at once stalled the single-process `next dev` server past the
+    # navigation timeout.
     #
-    # Still on `next dev`. The prod-server switch is opt-in per job (see
-    # playwright.config.ts) and the tutorial job took it first; moving this one
-    # is TODO(#1740), which is blocked on one spec that needs isPlaywrightEnv()
-    # to stay false while still reading a store off window.
+    # Serving from a production build instead removes that root cause outright,
+    # since a prebuilt server has nothing left to compile. The sharding stays
+    # regardless — it's also what keeps wall-clock reasonable on a 74-snapshot
+    # suite.
     strategy:
       fail-fast: false
       matrix:
@@ -400,7 +399,21 @@ jobs:
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+
+      # Building here rather than inside Playwright's webServer command keeps
+      # build failures readable and keeps build time out of the server-boot
+      # timeout. Mirrors playwright-tutorials.yml.
+      - name: Build the app
+        # getSiteUrl() refuses to fall back to localhost in a production build,
+        # so metadataBase and the sitemap can't publish a dead origin. Under
+        # test the origin genuinely is localhost:3000, so say so.
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+        run: npm run build:app
+
       - name: Run E2E tests (fail on visual diffs)
+        env:
+          PLAYWRIGHT_PROD_SERVER: 'true'
         run: npm run test:e2e:critical -- --shard=${{ matrix.shard }}/2 --workers=1
       - name: Upload test results
         uses: actions/upload-artifact@v4

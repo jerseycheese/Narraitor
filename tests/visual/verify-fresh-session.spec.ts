@@ -15,6 +15,12 @@ const GET_TIMESTAMP_SOURCE = getTimestamp.toString();
 // the other worker (#1342). Mocks keep the skeleton→content transition this test
 // checks, just deterministically.
 //
+// It also seeds a provider config. ProviderGate blocks AI screens behind a
+// non-dismissible modal when a production build finds no provider configured
+// and the page isn't flagged as a Playwright runtime — both true here by
+// design. "Has a provider" and "suppress live AI" were never the same
+// question, so the seed keeps that gate shut without touching the flag.
+//
 // DS coverage (#1264): single-theme (default DS1) by design — this verifies the
 // skeleton -> active-session content *transition* behaviour, not theme layout.
 // The play surface's per-theme visuals are covered by
@@ -214,9 +220,38 @@ test.describe('Fresh GameSession skeleton → content', () => {
           version: 2,
         } as const;
 
+        // Keyless on purpose: the AI routes are mocked, so no key needs to
+        // reach a provider — this only has to be a provider that exists.
+        const providerPersist = {
+          state: {
+            providers: {
+              'provider-playwright': {
+                id: 'provider-playwright',
+                type: 'gemini',
+                name: 'Playwright Test Provider',
+                endpoint: '',
+                model: '',
+                capabilities: { text: true, images: false, streaming: true },
+                createdAt: now,
+                updatedAt: now,
+              },
+            },
+            activeProviderId: 'provider-playwright',
+            validationStatus: {},
+          },
+          version: 1,
+        } as const;
+
         put('narraitor-world-store', worldPersist);
         put('narraitor-character-store', characterPersist);
         put('narraitor-session-store', sessionPersist);
+        put('narraitor-provider-store', providerPersist);
+        // The provider store reads IndexedDB first and falls back to
+        // localStorage, so seed both rather than betting on the adapter.
+        localStorage.setItem(
+          'narraitor-provider-store',
+          JSON.stringify(providerPersist)
+        );
       },
       { getTimestampSource: GET_TIMESTAMP_SOURCE }
     );
@@ -503,16 +538,26 @@ test.describe('Fresh GameSession skeleton → content', () => {
         throw e;
       });
 
+    // Check the gate before the prose. A modal doesn't hide the shell from
+    // toBeVisible() — occlusion isn't part of that check — so without this the
+    // spec could go green while the app sat behind a blocking dialog,
+    // generating nothing.
+    await expect(page.locator('.component-no-provider-modal')).toHaveCount(0);
+
+    // Assert on the rendered prose rather than on the narrative store. The
+    // header above explains why isPlaywrightEnv() has to stay false here, and
+    // in a production build that's the same flag that publishes stores on
+    // `window` — so reading the store would cost the live generation path this
+    // spec exists to exercise. Prose on screen proves segments arrived, and it
+    // proves it the way a player would see it.
+    const narrativeProse = page
+      .locator(
+        '[data-testid="manuscript-session-shell"] [data-testid="narrative-content-container"]'
+      )
+      .first();
     try {
-      await page.waitForFunction(
-        () => {
-          const narrativeStore = (window as any).useNarrativeStore?.getState?.();
-          if (!narrativeStore) return false;
-          const segments = narrativeStore.segments || {};
-          return Object.keys(segments).length > 0;
-        },
-        { timeout: 20000 }
-      );
+      await expect(narrativeProse).toBeVisible({ timeout: 20000 });
+      await expect(narrativeProse).not.toBeEmpty();
     } catch (e) {
       console.log('--- Debug logs ---');
       for (const l of logs) console.log(l);
@@ -528,6 +573,10 @@ test.describe('Fresh GameSession skeleton → content', () => {
           document.querySelector('[data-testid="choice-selector"]') ||
             document.querySelector('#choices-container .player-choices-container')
         ),
+      // waitForFunction's signature is (fn, arg, options) — a timeout in the
+      // second slot gets serialized as the page-function argument and the call
+      // quietly falls back to the default action timeout.
+      undefined,
       { timeout: 10000 }
     );
     const hasChoices = await choiceSelector.isVisible();

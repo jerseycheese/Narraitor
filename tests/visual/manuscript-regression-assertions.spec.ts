@@ -106,9 +106,43 @@ test.describe('Manuscript regression assertions', () => {
 
     await page.waitForFunction(
       () => document.querySelectorAll('.narrative-segment').length >= 16,
+      undefined,
       { timeout: 10000 }
     );
 
+    // Let the surface finish parking itself at the latest beat before scrolling
+    // away from it. Its own settle scroll is smooth, so it emits a run of scroll
+    // events over several frames; scrolling up mid-animation hands the surface
+    // an event that's still moving *down*, which reads as following rather than
+    // as the reader taking over, and then no affordance ever appears. Polling is
+    // per animation frame, so an unchanged scrollTop across two polls means the
+    // animation has stopped rather than that it hasn't started.
+    await page.waitForFunction(
+      () => {
+        const scroller = document.querySelector('.manuscript-overlay-main') as HTMLElement | null;
+        if (!scroller) return false;
+
+        const tracker = window as unknown as { __parkedScrollTop?: number };
+        const { scrollTop, scrollHeight, clientHeight } = scroller;
+        const previous = tracker.__parkedScrollTop;
+        tracker.__parkedScrollTop = scrollTop;
+
+        return (
+          scrollTop > 0 &&
+          previous === scrollTop &&
+          scrollHeight - scrollTop - clientHeight < 100
+        );
+      },
+      undefined,
+      { timeout: 10000 }
+    );
+
+    // The scroll event is what tells the surface the reader has taken over, so
+    // wait for the surface to have *handled* it rather than for the position to
+    // read 0 — a position check passes the moment the number lands, which is
+    // before the listener runs, and passes vacuously if the view never moved at
+    // all. This listener is registered after the surface's own, so it runs after
+    // it: once the flag flips, the handover is done.
     await page.evaluate(() => {
       const scroller = document.querySelector(
         '.manuscript-overlay-main'
@@ -116,17 +150,22 @@ test.describe('Manuscript regression assertions', () => {
       if (!scroller) {
         throw new Error('Expected play surface scroller to exist');
       }
+
+      (window as unknown as { __readerTookOver?: boolean }).__readerTookOver = false;
+      scroller.addEventListener(
+        'scroll',
+        () => {
+          (window as unknown as { __readerTookOver?: boolean }).__readerTookOver = true;
+        },
+        { once: true, passive: true }
+      );
+
       scroller.scrollTo({ top: 0, behavior: 'auto' });
     });
 
-    // The scroll event is what tells the surface the reader has taken over.
-    // Adding a segment before it lands races that handover — and the race is
-    // why this spec passed locally while failing in CI.
     await page.waitForFunction(
-      () => {
-        const scroller = document.querySelector('.manuscript-overlay-main') as HTMLElement | null;
-        return !!scroller && scroller.scrollTop === 0;
-      },
+      () => (window as unknown as { __readerTookOver?: boolean }).__readerTookOver === true,
+      undefined,
       { timeout: 10000 }
     );
 
@@ -379,6 +418,7 @@ test.describe('Manuscript regression assertions', () => {
 
     await page.waitForFunction(
       () => document.querySelectorAll('.narrative-segment').length === 1,
+      undefined,
       { timeout: 10000 }
     );
 
@@ -408,6 +448,7 @@ test.describe('Manuscript regression assertions', () => {
 
         return Date.now() - (tracker.__deadBandStableSince ?? Date.now()) >= 200;
       },
+      undefined,
       { timeout: 10000 }
     );
 

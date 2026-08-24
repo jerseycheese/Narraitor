@@ -148,6 +148,14 @@ test.describe('Character roster context', () => {
       'Diplomatic envoy assigned to border talks'
     );
 
+    // This spec seeds through the stores on `window`, and that seam is closed
+    // in a production build unless the page flags itself as a Playwright
+    // runtime. Set it before any app script runs, the way seedTestData() does —
+    // without it the hydration wait below never resolves against `next start`.
+    await page.addInitScript(() => {
+      (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__ = true;
+    });
+
     await page.goto(`${baseURL}/characters?worldId=${WORLD_ID}`, {
       waitUntil: 'domcontentloaded',
     });
@@ -163,6 +171,10 @@ test.describe('Character roster context', () => {
           win.useWorldStore?.persist?.hasHydrated?.() ?? false;
         return charHydrated && worldHydrated;
       },
+      // waitForFunction's signature is (fn, arg, options) — a timeout in the
+      // second slot gets serialized as the page-function argument and the call
+      // quietly falls back to the default action timeout.
+      undefined,
       { timeout: 15000 }
     );
 

@@ -9,10 +9,26 @@ import {
 } from '@/tests/fixtures';
 
 /**
+ * Flag the page as a Playwright runtime before any app script runs.
+ *
+ * Stores only publish themselves on `window` in a production build when this
+ * flag is set (shouldExposeStoreOnWindow), so every seeder needs it — a spec
+ * that skips it seeds fine against `next dev` and then hangs on hydration
+ * against `next start`.
+ */
+async function flagPlaywrightRuntime(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__ = true;
+  });
+}
+
+/**
  * Base seeding for empty state tests - minimal data needed for app initialization
  */
 export async function seedBaseData(page: Page): Promise<void> {
   console.log('Seeding base data for empty state tests...');
+
+  await flagPlaywrightRuntime(page);
 
   await page.addInitScript(async () => {
     // Clear any existing data to ensure true empty state
@@ -113,6 +129,8 @@ export async function seedBaseData(page: Page): Promise<void> {
  */
 export async function seedBarelyStartedData(page: Page): Promise<void> {
   console.log('Seeding barely-started data (one world, no characters/sessions)...');
+
+  await flagPlaywrightRuntime(page);
 
   await page.addInitScript(
     async ({ world }) => {
@@ -226,10 +244,7 @@ export async function seedBarelyStartedData(page: Page): Promise<void> {
 export async function seedTestData(page: Page): Promise<void> {
   console.log('Seeding full test data for populated state tests...');
 
-  // Flag Playwright runtime
-  await page.addInitScript(() => {
-    (window as typeof window & { __PLAYWRIGHT__?: boolean }).__PLAYWRIGHT__ = true;
-  });
+  await flagPlaywrightRuntime(page);
 
   // Use addInitScript to set data BEFORE the app loads
   await page.addInitScript(
