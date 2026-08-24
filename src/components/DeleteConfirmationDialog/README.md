@@ -57,7 +57,7 @@ function MyComponent() {
 
 ## Features
 
-- **Accessibility**: Built on the Radix dialog primitive, so focus moves into the dialog and stays there while it's open. Both buttons carry an `aria-label` naming the item.
+- **Accessibility**: Built on the Radix dialog primitive, so focus moves into the dialog and stays trapped there while it's open, landing on Cancel because the variant is destructive. The confirm button's `aria-label` names the item (`Delete My Important Item`); the cancel button's doesn't (`Cancel deletion`), so the item name reaches a screen reader through the dialog body and the confirm button rather than through Cancel.
 - **Loading State**: Shows "Deleting..." and disables both buttons, so a slow delete can't be fired twice
 - **Backdrop Click**: Clicking outside closes the dialog. That isn't suppressed mid-delete - only the buttons are disabled.
 - **Escape Key**: Press Escape to bail out quickly
