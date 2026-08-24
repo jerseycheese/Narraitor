@@ -503,16 +503,20 @@ test.describe('Fresh GameSession skeleton → content', () => {
         throw e;
       });
 
+    // Assert on the rendered prose rather than on the narrative store. The
+    // header above explains why isPlaywrightEnv() has to stay false here, and
+    // in a production build that's the same flag that publishes stores on
+    // `window` — so reading the store would cost the live generation path this
+    // spec exists to exercise. Prose on screen proves segments arrived, and it
+    // proves it the way a player would see it.
+    const narrativeProse = page
+      .locator(
+        '[data-testid="manuscript-session-shell"] [data-testid="narrative-content-container"]'
+      )
+      .first();
     try {
-      await page.waitForFunction(
-        () => {
-          const narrativeStore = (window as any).useNarrativeStore?.getState?.();
-          if (!narrativeStore) return false;
-          const segments = narrativeStore.segments || {};
-          return Object.keys(segments).length > 0;
-        },
-        { timeout: 20000 }
-      );
+      await expect(narrativeProse).toBeVisible({ timeout: 20000 });
+      await expect(narrativeProse).not.toBeEmpty();
     } catch (e) {
       console.log('--- Debug logs ---');
       for (const l of logs) console.log(l);
@@ -528,6 +532,10 @@ test.describe('Fresh GameSession skeleton → content', () => {
           document.querySelector('[data-testid="choice-selector"]') ||
             document.querySelector('#choices-container .player-choices-container')
         ),
+      // waitForFunction's signature is (fn, arg, options) — a timeout in the
+      // second slot gets serialized as the page-function argument and the call
+      // quietly falls back to the default action timeout.
+      undefined,
       { timeout: 10000 }
     );
     const hasChoices = await choiceSelector.isVisible();
