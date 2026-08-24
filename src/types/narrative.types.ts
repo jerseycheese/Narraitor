@@ -45,6 +45,13 @@ export interface Decision {
   contextSummary?: string;
   decisionWeight?: DecisionWeight;
   narrativeSegmentId?: EntityID;
+  /**
+   * The prompt that produced this decision's options (dev mode only). Segments
+   * carry the scene/prose prompt on metadata.debugInfo; this is the choice
+   * generator's own prompt, which nothing captured before #1829 round 6 - a
+   * gap that made the alignment-mix instruction itself unverifiable.
+   */
+  debugInfo?: PromptDebugInfo;
 }
 
 export interface DecisionHistoryEntry {
@@ -245,6 +252,15 @@ export interface PromptDebugInfo {
   modelUsed: string;
   /** Timestamp when this prompt was generated */
   generatedAt: Date;
+  /**
+   * The unparsed AI response text (dev mode only). Parsing throws away
+   * anything the model wrote outside the fields a parser extracts, which
+   * hides whether the model complied with a prompt instruction that isn't
+   * itself one of those fields - e.g. whether it emitted an Alignment Mix
+   * line before #1829 round 6, nothing captured this and the question was
+   * unanswerable after the fact.
+   */
+  rawResponse?: string;
 }
 
 /**

@@ -121,4 +121,27 @@ describe('aligned choice template: alignment spread instructions', () => {
 
     expect(prompt).toMatch(/there is no quota/i);
   });
+
+  it('rotates the glossary listing order across turns instead of holding one order for the whole session (#1829 round 6)', () => {
+    const ordersByTurn = [0, 1, 2, 3, 4].map((turnCount) => {
+      const context = {
+        ...baseContext,
+        narrativeContext: {
+          ...narrativeContext,
+          previousSegments: Array(turnCount).fill(segment),
+        },
+      };
+      const glossary = sectionBetween(alignedChoiceTemplate(context), 'ALIGNMENT DEFINITIONS', 'CHOOSING THE MIX');
+      return tagOrderIn(glossary);
+    });
+
+    // Every order stays a full three-tag glossary...
+    ordersByTurn.forEach((order) => expect(order).toHaveLength(3));
+    // ...but not the same order turn after turn - that's the pattern round 5 measured.
+    const distinctOrders = new Set(ordersByTurn.map((order) => order.join(',')));
+    expect(distinctOrders.size).toBeGreaterThan(1);
+    // Turn 4 cycles back to turn 0's order (four permitted orders), proving the
+    // rotation is turn-keyed rather than incidental.
+    expect(ordersByTurn[4]).toEqual(ordersByTurn[0]);
+  });
 });

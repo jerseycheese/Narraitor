@@ -12,6 +12,9 @@ import { parseChoiceResponse, applyAlignmentConsequences, type KnownNpc } from '
 import { generateFallbackChoices } from './choiceGenerator.fallback';
 import { matchSkillToOption } from './choiceGenerator.skillMatch';
 import { recordRequestCalibration } from './narrativeGenerator.calibration';
+import { buildPromptDebugInfo, isDebugInfoEnabled, type DebugInfoContext } from './debugInfoBuilder';
+import { getActiveProviderModel } from '@/state/providerStore';
+import { DEFAULT_TEXT_MODEL } from './config';
 
 /**
  * Parameters for choice generation
@@ -66,6 +69,21 @@ export async function generateChoices(
     }
 
     const decision = parseChoiceResponse(response.content, narrativeContext, world, getKnownNpcs(worldId));
+
+    // Nothing captured this call's prompt or response before #1829 round 6,
+    // which made prompt-level instructions particular to choice generation
+    // (the Alignment Mix line among them) unverifiable after the fact.
+    if (isDebugInfoEnabled()) {
+      const debugInfoContext: DebugInfoContext = {
+        fullPrompt: prompt,
+        templateName: useAlignedChoices ? 'Aligned Choice Template' : 'Player Choice Template',
+        world,
+        characterIds,
+        modelUsed: getActiveProviderModel() ?? DEFAULT_TEXT_MODEL,
+        rawResponse: response.content,
+      };
+      decision.debugInfo = buildPromptDebugInfo(debugInfoContext);
+    }
 
     try {
       checkAndRecordLoreMentions(worldId, sessionId, response.content, 'choices');

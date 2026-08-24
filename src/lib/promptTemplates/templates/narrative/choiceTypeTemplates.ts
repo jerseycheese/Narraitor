@@ -20,17 +20,40 @@ interface PlayerChoiceTemplateContext {
   playerCharacterName?: string;
 }
 
+/** Definition text for each alignment tag, kept separate from the glossary's listing order (see ALIGNMENT_GLOSSARY_ORDERS) so the order can rotate without touching the wording. */
+const ALIGNMENT_DEFINITIONS: Record<'NEUTRAL' | 'CHAOTIC' | 'LAWFUL', string> = {
+  NEUTRAL: 'Balanced approach, practical solutions, adapts to situation, moderate response',
+  CHAOTIC:
+    'WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. Dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. VARY THE KIND of chaos and do NOT default to making noise (yelling, shouting, singing). Draw from a wide range, fitted to the scene: sudden physical risk ("leap from the balcony onto the chandelier," "kick over the lantern to set the drapes alight"), trickery or deception ("impersonate the captain and bark orders," "bluff an outrageous lie with total confidence"), sabotage or destruction ("cut the rope bridge behind you," "smash the control panel," "throw open the cells and free the prisoners"), turning the tables ("start a brawl to scatter the room," "switch sides mid-negotiation"), or abandoning the obvious goal for something no one expects. The goal is options that dramatically shift the narrative in surprising ways.',
+  LAWFUL: 'Follows rules, respects authority, seeks order, honors agreements, protects others',
+};
+
+/**
+ * The glossary orders in rotation. Excludes LAWFUL/NEUTRAL/CHAOTIC (the
+ * canonical running order #1877 removed from the numbered slots) and any
+ * order ending in CHAOTIC (the slot-3 tell round 5 found still holding at
+ * 83% even with the order shuffled) - the two shapes the alignment-spread
+ * tests forbid.
+ */
+const ALIGNMENT_GLOSSARY_ORDERS: Array<Array<'NEUTRAL' | 'CHAOTIC' | 'LAWFUL'>> = [
+  ['NEUTRAL', 'CHAOTIC', 'LAWFUL'],
+  ['CHAOTIC', 'LAWFUL', 'NEUTRAL'],
+  ['CHAOTIC', 'NEUTRAL', 'LAWFUL'],
+  ['LAWFUL', 'CHAOTIC', 'NEUTRAL'],
+];
+
 /**
  * Prompt template for generating alignment-tagged player choices.
  *
  * The mix of alignments is chosen per scene rather than mandated. Removing the
  * quota was not enough on its own: the model kept returning lawful, neutral,
- * chaotic in that order because the prompt itself taught the pattern. The
- * glossary listed the tags in exactly the order the numbered slots wanted
- * them, and the chaotic entry dwarfed the other two, which marked it as the
- * showy one that always turns up last. So the mix is now a decision the model
- * has to state before it writes anything, the glossary no longer runs in slot
- * order, and a chaotic option has to be one a player might really take.
+ * chaotic in that order because the prompt itself taught the pattern. #1877
+ * moved the mix decision earlier and took the glossary out of slot order, but
+ * a FIXED reordering is still a pattern - round 5 (#1829) measured 70% one
+ * dominant order and 83-87% slot-predicts-tag against a single static
+ * glossary. So the glossary's own listing order now rotates per turn (see
+ * ALIGNMENT_GLOSSARY_ORDERS below) instead of landing on one order and
+ * staying there for the rest of the session.
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
   const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount, playerCharacterName } = context;
@@ -69,6 +92,19 @@ ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`
   }
 
   const protagonistInfo = protagonistGuidance(playerCharacterName);
+
+  // Round 5 (#1829) measured slot-predicts-tag at 87%/70%/83% even after the
+  // glossary stopped running in slot order: a FIXED glossary order is still a
+  // pattern to learn against, just one call removed from the numbered slots.
+  // Rotate which of the four permitted orders (no LAWFUL-NEUTRAL-CHAOTIC, none
+  // ending in CHAOTIC - the two orders the alignment-spread tests forbid) is
+  // shown, keyed off the turn count so it's deterministic and testable rather
+  // than reaching for Math.random in a prompt builder.
+  const turnIndex = narrativeContext?.previousSegments?.length ?? 0;
+  const glossaryOrder = ALIGNMENT_GLOSSARY_ORDERS[turnIndex % ALIGNMENT_GLOSSARY_ORDERS.length];
+  const glossaryText = glossaryOrder
+    .map((tag) => `- ${tag}: ${ALIGNMENT_DEFINITIONS[tag]}`)
+    .join('\n');
 
   // Known-character roster + consequence contract; only emitted when the
   // world has NPCs so the parser has names to resolve against.
@@ -109,9 +145,7 @@ You MUST create choices that directly respond to the specific situation describe
 Based on the SPECIFIC narrative situation above, create ${choiceCount} distinct action choices, each tagged with the alignment it expresses:
 
 ALIGNMENT DEFINITIONS (a glossary, not a running order - see CHOOSING THE MIX below):
-- NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
-- CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. Dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. VARY THE KIND of chaos and do NOT default to making noise (yelling, shouting, singing). Draw from a wide range, fitted to the scene: sudden physical risk ("leap from the balcony onto the chandelier," "kick over the lantern to set the drapes alight"), trickery or deception ("impersonate the captain and bark orders," "bluff an outrageous lie with total confidence"), sabotage or destruction ("cut the rope bridge behind you," "smash the control panel," "throw open the cells and free the prisoners"), turning the tables ("start a brawl to scatter the room," "switch sides mid-negotiation"), or abandoning the obvious goal for something no one expects. The goal is options that dramatically shift the narrative in surprising ways.
-- LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
+${glossaryText}
 
 CHOOSING THE MIX (IMPORTANT):
 - Always tag every choice [LAWFUL], [NEUTRAL], or [CHAOTIC].
