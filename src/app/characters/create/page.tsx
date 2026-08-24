@@ -54,7 +54,7 @@ export default function CharacterCreatePage() {
         <div className="wizard-page-header">
           <h1 className="wizard-page-title">Create Character</h1>
         </div>
-        <div className="wizard-empty-state">
+        <div className="wizard-empty-state wizard-world-required-state">
           <AlertTriangle aria-hidden="true" />
           <h2 className={wizardStyles.step.title}>World Required</h2>
           <p>Characters are created within specific worlds.</p>

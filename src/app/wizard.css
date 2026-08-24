@@ -823,18 +823,14 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   text-align: center;
+}
 
-  /* Caps the guard card on wide desktop — matches the 36rem cap used for
-     the world-list empty state's constrained content. */
+.wizard-world-required-state {
   max-width: 36rem;
   margin: 0 auto;
 }
 
-/* The CTA row defaults to width: 100% with a left-justified flex row
-   (.action-button-group), so a single action reads as left-hung inside
-   this centered card. Center it here rather than in the shared component,
-   which other callers rely on staying left-justified. */
-.wizard-empty-state .action-button-group {
+.wizard-world-required-state .action-button-group {
   justify-content: center;
 }
 
