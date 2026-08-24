@@ -61,6 +61,26 @@ describe('featureFlags', () => {
     expect(load({ NEXT_PUBLIC_FEATURE_WORLD_CLOCK: 'FALSE' }).isFeatureEnabled('WORLD_CLOCK')).toBe(true);
   });
 
+  it('defaults WORLD_DESCRIPTION_IN_SCENE to false and enables it only for the exact string "true"', () => {
+    expect(
+      load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: undefined }).isFeatureEnabled(
+        'WORLD_DESCRIPTION_IN_SCENE'
+      )
+    ).toBe(false);
+    jest.resetModules();
+    expect(
+      load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: 'true' }).isFeatureEnabled(
+        'WORLD_DESCRIPTION_IN_SCENE'
+      )
+    ).toBe(true);
+    jest.resetModules();
+    expect(
+      load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: 'TRUE' }).isFeatureEnabled(
+        'WORLD_DESCRIPTION_IN_SCENE'
+      )
+    ).toBe(false);
+  });
+
   it('supports downstream gating decisions for BUFFERED_STREAMING', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'false',

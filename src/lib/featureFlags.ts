@@ -28,6 +28,12 @@ const FEATURE_FLAG_DEFAULTS = {
   // the character's conditions. Off until the playtest declared in
   // narraitor-prompt-template-governance/eval-logs/1882-world-cost.md measures it.
   WORLD_COST: false,
+  // Renders the world's own founding description in the per-turn scene
+  // prompt (#1865), not just the opening scene. Experiment, not a fix: it
+  // might carry the world's pressures further into the session, or it might
+  // do nothing but cost tokens every turn. Off until a playtest measures it —
+  // see narraitor-prompt-template-governance/eval-logs/1865-world-description-in-scene.md.
+  WORLD_DESCRIPTION_IN_SCENE: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
@@ -56,6 +62,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   WORLD_COST: resolve(
     process.env.NEXT_PUBLIC_FEATURE_WORLD_COST,
     FEATURE_FLAG_DEFAULTS.WORLD_COST
+  ),
+  WORLD_DESCRIPTION_IN_SCENE: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE,
+    FEATURE_FLAG_DEFAULTS.WORLD_DESCRIPTION_IN_SCENE
   ),
 });
 
