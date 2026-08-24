@@ -1920,6 +1920,14 @@
     align-items: center;
     gap: var(--space-2);
   }
+
+  /* .settings-export-import-actions stretches its direct children full
+     width, but the Import button sits one level deeper inside this wrapper
+     (around the hidden file input), so it doesn't inherit that stretch and
+     stays auto-width next to the full-width Export button. Match it. */
+  .settings-export-import-files .button {
+    width: 100%;
+  }
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
@@ -3531,6 +3539,10 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 :root .component-character-editor {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  /* Default stretch forces a collapsed card up to its expanded row-mate's
+     height, leaving a large empty void inside the shorter card. */
+  align-items: start;
   gap: var(--space-4);
 }
 
