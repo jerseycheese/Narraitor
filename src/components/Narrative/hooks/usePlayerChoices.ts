@@ -187,6 +187,10 @@ export function usePlayerChoices({
           options: decision.options,
           decisionWeight: decision.decisionWeight,
           contextSummary: decision.contextSummary,
+          // Dev-mode only (#1829 round 6) - without this, the persisted
+          // decision never carries the prompt/response a later playtest
+          // round would need to check the model's actual compliance.
+          debugInfo: decision.debugInfo,
         });
 
       // Update the decision with the stored ID before passing to parent

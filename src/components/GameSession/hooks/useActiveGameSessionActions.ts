@@ -217,6 +217,9 @@ export const useActiveGameSessionActions = ({
       selectedOptionId: decision.selectedOptionId,
       decisionWeight: decision.decisionWeight,
       contextSummary: decision.contextSummary,
+      // Dev-mode only (#1829 round 6) - dropped here, same as the store
+      // call site in usePlayerChoices.ts, before a codex review caught it.
+      debugInfo: decision.debugInfo,
     };
 
     // Update the current decision state with the copy

@@ -121,4 +121,41 @@ describe('aligned choice template: alignment spread instructions', () => {
 
     expect(prompt).toMatch(/there is no quota/i);
   });
+
+  it('rotates the glossary listing order across turns instead of holding one order for the whole session (#1829 round 6)', () => {
+    const ordersByTurn = [0, 1, 2, 3, 4].map((turnIndex) => {
+      const glossary = sectionBetween(
+        alignedChoiceTemplate({ ...baseContext, turnIndex }),
+        'ALIGNMENT DEFINITIONS',
+        'CHOOSING THE MIX'
+      );
+      return tagOrderIn(glossary);
+    });
+
+    // Every order stays a full three-tag glossary...
+    ordersByTurn.forEach((order) => expect(order).toHaveLength(3));
+    // ...but not the same order turn after turn - that's the pattern round 5 measured.
+    const distinctOrders = new Set(ordersByTurn.map((order) => order.join(',')));
+    expect(distinctOrders.size).toBeGreaterThan(1);
+    // Turn 4 cycles back to turn 0's order (four permitted orders), proving the
+    // rotation is turn-keyed rather than incidental.
+    expect(ordersByTurn[4]).toEqual(ordersByTurn[0]);
+  });
+
+  it('keeps rotating past turn 5, where previousSegments.length would have frozen (codex catch on round 6)', () => {
+    // Every production caller caps previousSegments at a 5-segment slice
+    // (see usePlayerChoices.ts), so a rotation keyed off that count would
+    // land on ALIGNMENT_GLOSSARY_ORDERS[1] forever past turn 5. turnIndex is
+    // sourced from the session's decision count instead, which isn't capped.
+    const ordersPastFive = [5, 6, 7, 8].map((turnIndex) => {
+      const glossary = sectionBetween(
+        alignedChoiceTemplate({ ...baseContext, turnIndex }),
+        'ALIGNMENT DEFINITIONS',
+        'CHOOSING THE MIX'
+      );
+      return tagOrderIn(glossary).join(',');
+    });
+
+    expect(new Set(ordersPastFive).size).toBeGreaterThan(1);
+  });
 });

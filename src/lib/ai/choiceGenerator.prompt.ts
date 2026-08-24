@@ -4,6 +4,7 @@ import type { Character as StoreCharacter } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
@@ -46,7 +47,8 @@ export const buildChoicePrompt = ({
     world,
     narrativeContext,
     resolvedCharacterIds,
-    maxOptions
+    maxOptions,
+    getTurnIndex(sessionId)
   );
   const basePrompt = template(context);
   const inventoryAwarePrompt = enhancePromptWithInventory(
@@ -109,7 +111,8 @@ const buildContext = (
   world: World,
   narrativeContext: NarrativeContext,
   characterIds: string[],
-  maxOptions?: number
+  maxOptions?: number,
+  turnIndex?: number
 ) => {
   const playerCharacter = getPlayerCharacter(characterIds);
 
@@ -120,6 +123,7 @@ const buildContext = (
     narrativeContext,
     characterIds,
     optionCount: maxOptions,
+    turnIndex,
     playerCharacterName: playerCharacter?.name,
     worldSkills:
       world.skills?.map((skill) => ({
@@ -129,6 +133,22 @@ const buildContext = (
       })) || [],
     worldNpcs: getWorldNpcs(world.id, playerCharacter),
   };
+};
+
+/**
+ * Decisions already made this session - uncapped, unlike
+ * NarrativeContext.previousSegments, which every production caller populates
+ * from a 5-segment slice (see usePlayerChoices.ts). A codex review on round 6
+ * caught that the glossary rotation had keyed off previousSegments.length and
+ * would freeze on one order past turn 5.
+ */
+const getTurnIndex = (sessionId?: EntityID): number => {
+  if (!sessionId) return 0;
+  try {
+    return useNarrativeStore.getState().getSessionDecisions(sessionId).length;
+  } catch {
+    return 0;
+  }
 };
 
 const getPlayerCharacter = (characterIds: string[]) => {

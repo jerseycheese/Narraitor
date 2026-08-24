@@ -33,6 +33,8 @@ export interface DebugInfoContext {
     totalTokens: number;
   };
   modelUsed: string;
+  /** The unparsed AI response text - see PromptDebugInfo.rawResponse. */
+  rawResponse?: string;
 }
 
 /**
@@ -82,6 +84,7 @@ export function buildPromptDebugInfo(context: DebugInfoContext): PromptDebugInfo
     tokenUsage: context.tokenUsage,
     modelUsed: context.modelUsed,
     generatedAt: new Date(),
+    rawResponse: context.rawResponse,
   };
 }
 

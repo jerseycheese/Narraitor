@@ -45,6 +45,11 @@ jest.mock('@/lib/promptTemplates/narrativeTemplateManager', () => ({
   })
 }));
 
+// Mock providerStore for the debugInfo test below (getActiveProviderModel)
+jest.mock('@/state/providerStore', () => ({
+  getActiveProviderModel: jest.fn().mockReturnValue('test-model'),
+}));
+
 // Generate simple mock narrative context
 const createMockNarrativeContext = (): NarrativeContext => {
   const createSegment = (id: string, content: string): NarrativeSegment => ({
@@ -131,6 +136,47 @@ describe('ChoiceGenerator', () => {
       });
 
       expect(result.options).toHaveLength(3);
+    });
+
+    it('attaches debugInfo with the sent prompt and the raw response when debug info is enabled (#1829 round 6)', async () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'development',
+        writable: true,
+        configurable: true,
+      });
+
+      try {
+        const rawResponse = `Alignment Mix: NEUTRAL, CHAOTIC, LAWFUL - a quiet moment before the plan
+        Decision: What will you do in the forest?
+
+        Options:
+        1. [NEUTRAL] Investigate the strange noise
+        2. [CHAOTIC] Climb a tree to get a better view
+        3. [LAWFUL] Draw your sword and prepare for combat`;
+
+        mockAIClient.generateContent.mockResolvedValueOnce({
+          content: rawResponse,
+          finishReason: 'STOP',
+        });
+
+        const result = await generateChoices(mockAIClient, {
+          worldId: 'world-1',
+          narrativeContext: createMockNarrativeContext(),
+          characterIds: ['char-1'],
+        });
+
+        expect(result.debugInfo).toBeDefined();
+        expect(result.debugInfo?.fullPrompt).toContain('Generate player choices for this scenario');
+        expect(result.debugInfo?.rawResponse).toBe(rawResponse);
+        expect(result.debugInfo?.modelUsed).toBe('test-model');
+      } finally {
+        Object.defineProperty(process.env, 'NODE_ENV', {
+          value: originalNodeEnv,
+          writable: true,
+          configurable: true,
+        });
+      }
     });
 
     it('falls back to exactly three options so nothing generated goes unshown', async () => {
