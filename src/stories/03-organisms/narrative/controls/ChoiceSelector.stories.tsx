@@ -160,7 +160,7 @@ const createMockCharacter = () => ({
   ],
   background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
   inventory: { characterId: 'test-char', items: [], capacity: 20, categories: [] },
-  status: { health: 100, maxHealth: 100, conditions: [] },
+  status: { conditions: [] },
   createdAt: getTimestamp(),
   updatedAt: getTimestamp()
 });

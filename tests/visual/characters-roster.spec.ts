@@ -125,7 +125,7 @@ test.describe('Character roster context', () => {
         fears: ['Losing the trail'],
         relationships: [],
       },
-      status: { health: 100, maxHealth: 100, conditions: [] },
+      status: { conditions: [] },
       inventory: {
         characterId: id,
         items: [],

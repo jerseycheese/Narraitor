@@ -128,8 +128,6 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       relationships: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
     },
     inventory: {
@@ -170,8 +168,6 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       itemOrder: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
     },
     portrait: {
@@ -198,8 +194,6 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       relationships: [],
     },
     status: {
-      health: 90,
-      maxHealth: 100,
       conditions: [],
     },
     inventory: {

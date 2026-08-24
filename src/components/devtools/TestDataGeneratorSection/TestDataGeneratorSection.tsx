@@ -272,8 +272,6 @@ export const TestDataGeneratorSection: React.FC = () => {
             isKnownFigure: characterType === 'known',
           },
           status: {
-            health: 100,
-            maxHealth: 100,
             conditions: [],
           },
           inventory: {
@@ -333,8 +331,6 @@ export const TestDataGeneratorSection: React.FC = () => {
                   categories: [],
                 },
                 status: {
-                  health: storeCharacter.status.health,
-                  maxHealth: storeCharacter.status.maxHealth,
                   conditions: storeCharacter.status.conditions,
                   location: currentWorld.name,
                 },

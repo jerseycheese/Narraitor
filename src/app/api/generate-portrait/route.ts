@@ -66,8 +66,6 @@ async function buildPortraitPrompt(
         itemOrder: [],
       },
       status: {
-        health: 100,
-        maxHealth: 100,
         conditions: [],
       },
       createdAt: getTimestamp(),

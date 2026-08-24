@@ -47,8 +47,6 @@ describe('Skill Check Integration - ID-based Flow', () => {
       relationships: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
     },
     attributes: [

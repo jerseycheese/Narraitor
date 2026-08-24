@@ -68,8 +68,6 @@ const mockCharacter = {
     url: 'https://i.pravatar.cc/200?img=1',
   },
   status: {
-    health: 100,
-    maxHealth: 100,
     conditions: [],
   },
   inventory: {

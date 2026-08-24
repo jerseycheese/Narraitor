@@ -80,8 +80,6 @@ export const mockCharacter: Character = {
     { id: 'ds-mp', characterId: STORY_CHARACTER_ID, derivedStatId: 'ds-mp', name: 'Mana', currentValue: 22, maxValue: 30, lastCalculated: '2025-01-15T00:00:00Z' },
   ],
   status: {
-    health: 38,
-    maxHealth: 45,
     conditions: ['Arcane Focus'],
     location: 'Thornhaven Docks',
   },

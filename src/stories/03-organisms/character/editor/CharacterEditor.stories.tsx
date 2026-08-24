@@ -140,8 +140,6 @@ export const NewCharacter: Story = {
         },
         isPlayer: true,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {
@@ -198,8 +196,6 @@ export const WithPortrait: Story = {
         },
         isPlayer: true,
         status: {
-          health: 150,
-          maxHealth: 150,
           conditions: [],
         },
         portrait: {
@@ -327,8 +323,6 @@ export const CustomPromptTesting: Story = {
         },
         isPlayer: true,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {
@@ -420,8 +414,6 @@ export const UIComponentShowcase: Story = {
         },
         isPlayer: true,
         status: {
-          health: 150,
-          maxHealth: 150,
           conditions: ['Enhanced UI'],
         },
         inventory: {

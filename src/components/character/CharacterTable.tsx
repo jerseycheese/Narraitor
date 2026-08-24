@@ -36,7 +36,7 @@ interface CharacterTableProps {
  * CharacterTable - A data table component for comparing and managing multiple characters
  *
  * Displays characters in a row-based format with columns for key metrics like
- * level, health, and type. Includes action buttons for gameplay and CRUD operations.
+ * level and type. Includes action buttons for gameplay and CRUD operations.
  *
  * @param props - Component properties
  * @param props.characters - Array of Character objects to display in the table

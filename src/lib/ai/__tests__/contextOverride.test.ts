@@ -48,8 +48,6 @@ describe('contextOverride', () => {
       itemOrder: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
       location: 'Test Location',
     },

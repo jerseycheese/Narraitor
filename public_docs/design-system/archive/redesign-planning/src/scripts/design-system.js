@@ -49,8 +49,6 @@
           isKnownFigure: false,
         },
         status: {
-          health: 85,
-          maxHealth: 100,
           conditions: ['Cybernetic Enhancement'],
           location: 'Neo-Tokyo Underground',
         },
@@ -1629,7 +1627,6 @@
             <p><strong style="color: var(--color-text-primary);">Goals:</strong> ${escapeHtml((manuscriptSourceRecords.character.background?.goals || []).join(', ') || 'None')}</p>
             <p><strong style="color: var(--color-text-primary);">Fears:</strong> ${escapeHtml((manuscriptSourceRecords.character.background?.fears || []).join(', ') || 'None')}</p>
             <p><strong style="color: var(--color-text-primary);">Physical Description:</strong> ${escapeHtml(manuscriptSourceRecords.character.background?.physicalDescription || 'None')}</p>
-            <p><strong style="color: var(--color-text-primary);">Health:</strong> ${escapeHtml(manuscriptSourceRecords.character.status?.health || 'Unknown')} / ${escapeHtml(manuscriptSourceRecords.character.status?.maxHealth || 'Unknown')}</p>
             <p><strong style="color: var(--color-text-primary);">Conditions:</strong> ${escapeHtml((manuscriptSourceRecords.character.status?.conditions || []).join(', ') || 'None')}</p>
             <p><strong style="color: var(--color-text-primary);">Status Location:</strong> ${escapeHtml(manuscriptSourceRecords.character.status?.location || 'Unknown')}</p>
             <p><strong style="color: var(--color-text-primary);">Inventory Capacity:</strong> ${escapeHtml(manuscriptSourceRecords.character.inventory?.capacity || 'Unknown')}</p>

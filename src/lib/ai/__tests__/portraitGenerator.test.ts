@@ -95,7 +95,7 @@ describe('portraitGenerator', () => {
         characterId: 'char-1',
         itemOrder: [],
       },
-      status: { health: 100, maxHealth: 100, conditions: [] },
+      status: { conditions: [] },
       createdAt: getTimestamp(),
       updatedAt: getTimestamp(),
     };

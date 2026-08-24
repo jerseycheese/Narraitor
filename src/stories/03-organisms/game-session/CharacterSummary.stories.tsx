@@ -43,8 +43,6 @@ export const WithAllDetails: Story = {
         { id: 'ds-mp', name: 'Mana', currentValue: 22, maxValue: 30 },
       ],
       status: {
-        health: 38,
-        maxHealth: 45,
         conditions: ['Arcane Focus', 'Fatigued'],
         location: 'Thornhaven Docks',
       },

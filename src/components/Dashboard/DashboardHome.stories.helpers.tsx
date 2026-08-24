@@ -62,7 +62,7 @@ export const mockCharacterA = {
     categories: [],
     itemOrder: [],
   },
-  status: { health: 100, maxHealth: 100, conditions: [] },
+  status: { conditions: [] },
   portrait: {
     type: 'ai-generated' as const,
     url: '/visual-assets/portrait-fantasy.png',

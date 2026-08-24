@@ -14,7 +14,7 @@ const makeCharacter = (id: string, alignment?: number): Character =>
     derivedStats: [],
     background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
     isPlayer: true,
-    status: { health: 10, maxHealth: 10, conditions: [] },
+    status: { conditions: [] },
     inventory: { characterId: id, items: [], capacity: 10, categories: [], itemOrder: [] },
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',

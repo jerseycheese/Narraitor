@@ -25,8 +25,6 @@ const createCharacter = (
     },
     isPlayer: true,
     status: {
-      health: 10,
-      maxHealth: 10,
       conditions: [],
     },
     inventory: {

@@ -51,7 +51,7 @@ const playerCharacter: StoreCharacter = {
     relationships: [],
   },
   isPlayer: true,
-  status: { health: 10, maxHealth: 10, conditions: [] },
+  status: { conditions: [] },
   inventory: {
     characterId: 'char-1',
     items: [],

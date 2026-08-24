@@ -110,8 +110,6 @@ Decision Weight: [minor]`,
         itemOrder: [],
       },
       status: {
-        health: 100,
-        maxHealth: 100,
         conditions: [],
       },
       createdAt: '2023-01-01',
