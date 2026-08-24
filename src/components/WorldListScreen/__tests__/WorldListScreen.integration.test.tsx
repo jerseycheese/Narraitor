@@ -3,105 +3,52 @@
  *
  * Unlike WorldListScreen.test.tsx, which stubs out WorldList and
  * DeleteConfirmationDialog to isolate the screen's own branching, these
- * tests render the real WorldList -> WorldCard subtree so the screen is
- * exercised the way it actually runs in the app: real routing links and
- * buttons, real cross-store reads from characterStore, and a live
- * useWorldStore.subscribe() wired to a fake store that notifies listeners
- * on change (the shared global worldStore mock has no subscribe()).
+ * tests render the real WorldList -> WorldCard subtree AND drive the real
+ * worldStore/characterStore (not hand-rolled doubles). jest.setup.ts
+ * automocks @/state/worldStore globally, and that shared mock has no
+ * subscribe() (WorldListScreen calls useWorldStore.subscribe() directly,
+ * not the selector-hook pattern), so an earlier version of this file wrote
+ * its own store double. That double reassigned a module-local variable
+ * between renders, which meant the persistence test proved nothing about
+ * real store behavior — it would have passed even if store writes never
+ * survived a remount. jest.unmock() below switches this file to the real
+ * store instead, so a broken create/read/subscribe cycle would actually
+ * fail these tests. IndexedDB isn't available in jsdom, so the persist
+ * middleware falls back to memory-only storage (see the ResilientStorage
+ * warning in test output) — fine here, since what these tests need is the
+ * store's in-memory single-source-of-truth behavior across mount cycles,
+ * not a real IndexedDB round trip.
  *
  * There is no React ErrorBoundary component anywhere in this codebase, so
  * "error boundaries work correctly" is covered against what the screen
  * actually implements: the try/catch-driven error state and its
  * ErrorDisplay/retry UI.
+ *
+ * Known gap: "navigation to WorldListScreen from main app" is covered by
+ * mounting WorldListScreen directly with state already in the store, not
+ * by rendering the real /worlds route and clicking into it. WorldsPage
+ * (src/app/worlds/page.tsx) pulls in world generation, tutorial context,
+ * and session-store dependencies unrelated to this screen; mocking all of
+ * that to reach the same assertion isn't worth it under this component's
+ * ownership. What's covered instead, and what's actually this component's
+ * job: that it independently bootstraps from already-existing global state
+ * on a fresh mount, rather than requiring some hand-off payload from
+ * whichever screen sent the user here.
  */
 
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
-import type { World } from '@/types/world.types';
-import type { Character } from '@/types/character.types';
-import type { UserFriendlyError } from '@/lib/utils/errorUtils';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { ErrorType } from '@/lib/utils/errorUtils';
+import type { World } from '@/types/world.types';
 
-// ---- Fake worldStore: a real subscribe/notify loop, unlike the shared
-// __mocks__/worldStore.ts (no subscribe), so cross-store reactivity is
-// actually exercised rather than assumed. ----
-type MockWorldState = {
-  worlds: Record<string, World>;
-  currentWorldId: string | null;
-  loading: boolean;
-  error: UserFriendlyError | null;
-};
+// Bypass the global automock from jest.setup.ts for this file only — see
+// the file header for why.
+jest.unmock('@/state/worldStore');
 
-let worldState: MockWorldState = {
-  worlds: {},
-  currentWorldId: null,
-  loading: false,
-  error: null,
-};
-let worldListeners: Array<(state: MockWorldState) => void> = [];
-
-const notifyWorldListeners = () => {
-  worldListeners.slice().forEach((listener) => listener(worldState));
-};
-
-const setWorldState = (updates: Partial<MockWorldState>) => {
-  worldState = { ...worldState, ...updates };
-  notifyWorldListeners();
-};
-
-const mockSetCurrentWorld = jest.fn((id: string | null) => {
-  setWorldState({ currentWorldId: id });
-});
-const mockDeleteWorld = jest.fn((id: string) => {
-  const remaining = { ...worldState.worlds };
-  delete remaining[id];
-  setWorldState({ worlds: remaining });
-});
-const mockFetchWorlds = jest.fn(() => Promise.resolve());
-
-jest.mock('@/state/worldStore', () => {
-  const useWorldStore = Object.assign(
-    jest.fn((selector?: (state: MockWorldState) => unknown) =>
-      selector ? selector(worldState) : worldState
-    ),
-    {
-      getState: () => ({
-        ...worldState,
-        setCurrentWorld: mockSetCurrentWorld,
-        deleteWorld: mockDeleteWorld,
-        fetchWorlds: mockFetchWorlds,
-      }),
-      subscribe: (listener: (state: MockWorldState) => void) => {
-        worldListeners.push(listener);
-        return () => {
-          worldListeners = worldListeners.filter((l) => l !== listener);
-        };
-      },
-    }
-  );
-  return { useWorldStore };
-});
-
-// ---- Fake characterStore: real enough for WorldCard's cross-store read
-// (used to decide where "Play" routes to) and WorldList's character-count
-// lookup, without pulling in the full persisted store. ----
-let characterState: { characters: Record<string, Character> } = {
-  characters: {},
-};
-
-jest.mock('@/state/characterStore', () => ({
-  useCharacterStore: Object.assign(
-    jest.fn((selector?: (state: typeof characterState) => unknown) =>
-      selector ? selector(characterState) : characterState
-    ),
-    { getState: () => characterState }
-  ),
-}));
-
-// next/navigation's useRouter is a jest.fn() globally (jest.setup.ts);
-// give it a real push spy per test.
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
@@ -115,17 +62,16 @@ const baseSettings = {
   skillPointPool: 100,
 };
 
-function createWorld(overrides: Partial<World> = {}): World {
+function worldData(
+  overrides: Partial<Omit<World, 'id' | 'createdAt' | 'updatedAt'>> = {}
+): Omit<World, 'id' | 'createdAt' | 'updatedAt'> {
   return {
-    id: 'world-1',
     name: 'Fantasy Realm',
     description: 'A magical world',
     genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: baseSettings,
-    createdAt: '2023-01-01T10:00:00Z',
-    updatedAt: '2023-01-01T10:00:00Z',
     ...overrides,
   };
 }
@@ -135,46 +81,35 @@ describe('WorldListScreen integration (#347)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    worldState = { worlds: {}, currentWorldId: null, loading: false, error: null };
-    worldListeners = [];
-    characterState = { characters: {} };
+    useWorldStore.getState().reset();
+    useCharacterStore.getState().reset();
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
   });
 
   // AC: Integration tests cover navigation to WorldListScreen from main app
-  it('displays worlds already in global state when the screen mounts, as when navigating in from elsewhere', () => {
-    worldState = {
-      ...worldState,
-      worlds: { 'world-1': createWorld() },
-      currentWorldId: 'world-1',
-    };
+  // (see the "Known gap" note in the file header for what this does and
+  // does not prove)
+  it('bootstraps from worlds already in the real store on a fresh mount', () => {
+    useWorldStore.getState().createWorld(worldData());
 
     render(<WorldListScreen />);
 
-    // Real WorldList -> WorldCard subtree, not a stub — proves the whole
-    // tree mounts and renders app state correctly on entry.
     expect(screen.getByTestId('world-card-name')).toHaveTextContent(
       'Fantasy Realm'
     );
   });
 
   // AC: Tests verify data persistence across navigation
-  it('reflects worlds created elsewhere after the screen unmounts and remounts', () => {
-    worldState = { ...worldState, worlds: { 'world-1': createWorld() } };
+  it('shows a world created elsewhere in the app after the screen unmounts and remounts', () => {
+    useWorldStore.getState().createWorld(worldData());
 
     const { unmount } = render(<WorldListScreen />);
     expect(screen.getByText('Fantasy Realm')).toBeInTheDocument();
 
-    // Simulate navigating away, then another part of the app adding a world
-    // to the same persistent store.
+    // Simulate navigating away, then another part of the app creating a
+    // world against the same real store.
     unmount();
-    worldState = {
-      ...worldState,
-      worlds: {
-        ...worldState.worlds,
-        'world-2': createWorld({ id: 'world-2', name: 'Neon City' }),
-      },
-    };
+    useWorldStore.getState().createWorld(worldData({ name: 'Neon City' }));
 
     // Simulate navigating back to the screen.
     render(<WorldListScreen />);
@@ -184,20 +119,16 @@ describe('WorldListScreen integration (#347)', () => {
   });
 
   // AC: Tests confirm proper interaction with global state management
-  it('re-renders via the store subscription when another feature changes the active world', () => {
-    worldState = {
-      ...worldState,
-      worlds: { 'world-1': createWorld() },
-      currentWorldId: null,
-    };
+  it('re-renders via the real store subscription when another feature changes the active world', () => {
+    const worldId = useWorldStore.getState().createWorld(worldData());
 
     render(<WorldListScreen />);
     expect(screen.queryByText('Currently Active World')).not.toBeInTheDocument();
 
-    // No re-render triggered by the test — this call comes from outside the
-    // component, the way another screen or store action would.
+    // No re-render triggered by the test itself — this call comes from
+    // outside the component, the way another screen or store action would.
     act(() => {
-      mockSetCurrentWorld('world-1');
+      useWorldStore.getState().setCurrentWorld(worldId);
     });
 
     expect(screen.getByText('Currently Active World')).toBeInTheDocument();
@@ -206,47 +137,47 @@ describe('WorldListScreen integration (#347)', () => {
   // AC: Tests validate proper routing behavior when selecting worlds
   it('routes to character creation when Play is clicked for a world with no characters', async () => {
     const user = userEvent.setup();
-    worldState = { ...worldState, worlds: { 'world-1': createWorld() } };
-    characterState = { characters: {} };
+    const worldId = useWorldStore.getState().createWorld(worldData());
 
     render(<WorldListScreen />);
 
     await user.click(screen.getByTestId('world-card-actions-play-button'));
 
-    expect(mockPush).toHaveBeenCalledWith('/characters?worldId=world-1');
+    expect(mockPush).toHaveBeenCalledWith(`/characters?worldId=${worldId}`);
   });
 
-  // AC: Tests ensure error boundaries work correctly
-  it('shows retryable error UI and re-fetches worlds on retry (no ErrorBoundary exists; this is the screen\'s own error state)', async () => {
+  // AC: Tests ensure error boundaries work correctly (no ErrorBoundary
+  // exists in this codebase; this is the screen's own error state)
+  it('clears a retryable error and shows the world list after Try Again is clicked', async () => {
     const user = userEvent.setup();
-    worldState = {
-      ...worldState,
-      error: {
-        title: 'Failed to Load Worlds',
-        message: 'The world list could not be loaded.',
-        retryable: true,
-        type: ErrorType.UNKNOWN,
-        severity: 'error',
-      },
-    };
+    useWorldStore.getState().createWorld(worldData());
+    useWorldStore.getState().setError({
+      title: 'Failed to Load Worlds',
+      message: 'The world list could not be loaded.',
+      retryable: true,
+      type: ErrorType.SERVICE,
+      severity: 'error',
+    });
 
     render(<WorldListScreen />);
-
     expect(screen.getByTestId('world-list-screen-error-message')).toBeInTheDocument();
+
     await user.click(screen.getByRole('button', { name: /try again/i }));
 
-    expect(mockFetchWorlds).toHaveBeenCalled();
+    // Retry calls the real fetchWorlds(), which clears the store's error —
+    // if that wiring broke, the error UI would still be showing here.
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId('world-list-screen-error-message')
+      ).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('Fantasy Realm')).toBeInTheDocument();
   });
 
   // AC: Tests verify accessibility in the integrated context
   it('exposes a main landmark and an accessible name for every world card action, across the real subtree', () => {
-    worldState = {
-      ...worldState,
-      worlds: {
-        'world-1': createWorld(),
-        'world-2': createWorld({ id: 'world-2', name: 'Neon City' }),
-      },
-    };
+    useWorldStore.getState().createWorld(worldData());
+    useWorldStore.getState().createWorld(worldData({ name: 'Neon City' }));
 
     render(<WorldListScreen />);
 
