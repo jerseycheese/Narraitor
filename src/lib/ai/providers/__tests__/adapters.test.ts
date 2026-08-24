@@ -80,6 +80,17 @@ describe('geminiAdapter', () => {
       failure: 'malformed',
     });
   });
+
+  it("uses the player's advanced-settings overrides in place of the spec defaults", () => {
+    const body = geminiAdapter.buildBody(
+      { ...GEMINI, temperatureOverride: 1.5, topPOverride: 0.8, maxTokensOverride: 512 },
+      SPEC
+    ) as { generationConfig: { temperature: number; topP: number; maxOutputTokens: number } };
+
+    expect(body.generationConfig.temperature).toBe(1.5);
+    expect(body.generationConfig.topP).toBe(0.8);
+    expect(body.generationConfig.maxOutputTokens).toBe(512);
+  });
 });
 
 describe('openAICompatibleAdapter', () => {
@@ -132,6 +143,27 @@ describe('openAICompatibleAdapter', () => {
     expect(body).not.toHaveProperty('temperature');
     expect(body).not.toHaveProperty('top_p');
     expect(body.messages).toBeDefined();
+  });
+
+  it("uses the player's advanced-settings overrides in place of the spec defaults", () => {
+    const body = openAICompatibleAdapter.buildBody(
+      { ...OPENAI, temperatureOverride: 1.5, topPOverride: 0.8, maxTokensOverride: 512 },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body.temperature).toBe(1.5);
+    expect(body.top_p).toBe(0.8);
+    expect(body.max_tokens).toBe(512);
+  });
+
+  it('still omits sampling overrides for a service that fixes them, even when one is configured', () => {
+    const body = openAICompatibleAdapter.buildBody(
+      { ...OPENAI, hasFixedSamplingControls: true, temperatureOverride: 1.5, topPOverride: 0.8 },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body).not.toHaveProperty('temperature');
+    expect(body).not.toHaveProperty('top_p');
   });
 
   it('folds the guidance into the user turn for a model with no system role', () => {

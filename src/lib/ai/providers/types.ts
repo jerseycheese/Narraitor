@@ -41,6 +41,21 @@ export interface ProviderDescriptor {
    * otherwise. Resolved from the endpoint's preset. See presets.ts.
    */
   hasFixedSamplingControls?: boolean;
+  /**
+   * Player-configured overrides from the provider's advanced settings panel
+   * (see AdvancedSettings in types/provider.types.ts), resolved the same way
+   * `hasFixedSamplingControls` and `maxOutputTokensParam` are: as a fact about
+   * this request that travels with the descriptor rather than something an
+   * adapter goes looking for elsewhere.
+   *
+   * `temperatureOverride` and `topPOverride` still lose to
+   * `hasFixedSamplingControls` above — an adapter must omit both when that
+   * flag is set, override configured or not, because the field's presence is
+   * what some services reject.
+   */
+  temperatureOverride?: number;
+  topPOverride?: number;
+  maxTokensOverride?: number;
 }
 
 /**

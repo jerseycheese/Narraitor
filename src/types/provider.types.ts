@@ -17,6 +17,55 @@ export interface ProviderCapabilities {
 }
 
 /**
+ * Power-user overrides for one provider's generation parameters, edited from
+ * the collapsed "Advanced" panel on that provider's card.
+ *
+ * Absent (the whole object, or any field within it) means "use this call
+ * site's own default" - the same absent-means-default contract
+ * `hasFixedSamplingControls` and `maxOutputTokensParam` already use on
+ * `ProviderPreset`. "Reset to defaults" is exactly clearing this object back
+ * to undefined, not writing defaults into it.
+ *
+ * `temperature` / `topP` / `maxTokens` apply to every text generation this
+ * provider makes, not per feature - a narrative turn and a background
+ * classification call share one override, because a per-provider panel has no
+ * way to know which call site is asking. `temperature` and `topP` are still
+ * silently dropped for a provider whose preset sets
+ * `hasFixedSamplingControls` - see providers/types.ts.
+ *
+ * `customSafetyPrompt` and `customSystemPrompt` are persisted and shown back
+ * to the player, but are not yet read by prompt assembly - threading them in
+ * means touching the governed prompt-template pipeline, which is its own
+ * piece of work.
+ */
+export interface AdvancedSettings {
+  /** 0.0-2.0. Higher is more creative/random, lower is more consistent/focused. */
+  temperature?: number;
+  /** 0.0-1.0 nucleus sampling - an alternative to temperature, rarely tuned alongside it. */
+  topP?: number;
+  /** Response length cap in tokens. Higher costs more and takes longer per turn. */
+  maxTokens?: number;
+  /**
+   * Replaces the default content-rating guidance sent with a request. Risky:
+   * a weaker prompt does not weaken a provider's own safety filtering, and a
+   * stronger one is not a substitute for picking the right content rating on
+   * the world itself.
+   */
+  customSafetyPrompt?: string;
+  /** Extra system-prompt content appended for this provider only. */
+  customSystemPrompt?: string;
+  /** Whether the client-side request budget below is enforced. */
+  rateLimitEnabled?: boolean;
+  /**
+   * Requests allowed per rolling hour when `rateLimitEnabled` is true. A
+   * safety net against accidentally burning through your own quota - tracked
+   * in memory for the current browser session, not persisted or synced with
+   * any server-side limit.
+   */
+  maxRequestsPerHour?: number;
+}
+
+/**
  * A saved provider configuration. The API key is stored ONLY as an encrypted
  * payload (serialized {ciphertext, iv}); plaintext never lives here. Keyless
  * providers (e.g. a local Ollama) omit it.
@@ -31,6 +80,8 @@ export interface ProviderConfig {
   model: string;
   customHeaders?: Record<string, string>;
   capabilities: ProviderCapabilities;
+  /** Power-user generation-parameter overrides; absent means "use the defaults". */
+  advancedSettings?: AdvancedSettings;
   createdAt: string;
   updatedAt: string;
 }

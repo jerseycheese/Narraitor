@@ -4,7 +4,10 @@ import type { NextRequest } from 'next/server';
 import {
   PROVIDER_API_KEY_HEADER,
   PROVIDER_ENDPOINT_HEADER,
+  PROVIDER_MAX_TOKENS_HEADER,
   PROVIDER_MODEL_HEADER,
+  PROVIDER_TEMPERATURE_HEADER,
+  PROVIDER_TOP_P_HEADER,
   PROVIDER_TYPE_HEADER,
 } from './providerKeyHeader';
 import { DEFAULT_TEXT_MODEL } from './config';
@@ -111,6 +114,9 @@ export function resolveProvider(request?: NextRequest): ProviderResolution {
       customHeaders: presetHeadersForEndpoint(endpoint),
       maxOutputTokensParam: presetMaxOutputTokensParamForEndpoint(endpoint),
       hasFixedSamplingControls: presetHasFixedSamplingControlsForEndpoint(endpoint),
+      temperatureOverride: readTemperatureOverride(request),
+      topPOverride: readTopPOverride(request),
+      maxTokensOverride: readMaxTokensOverride(request),
     },
   };
 }
@@ -182,4 +188,42 @@ function readEndpoint(request: NextRequest | undefined, type: ProviderType): str
   const raw = request?.headers.get(PROVIDER_ENDPOINT_HEADER)?.trim();
   if (!raw || !isSafeProviderEndpoint(raw)) return null;
   return raw;
+}
+
+/**
+ * A header carrying one of the advanced-settings overrides, parsed and
+ * range-checked. Undefined for a missing, non-numeric, or out-of-range value —
+ * the same "ignore rather than fail the whole resolution" treatment a bad
+ * model id gets, since this is optional player tuning, not a required field.
+ */
+function readBoundedNumberHeader(
+  request: NextRequest | undefined,
+  header: string,
+  min: number,
+  max: number
+): number | undefined {
+  const raw = request?.headers.get(header);
+  if (!raw) return undefined;
+
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= min && value <= max ? value : undefined;
+}
+
+/** 0.0-2.0, same bound the settings UI enforces. */
+function readTemperatureOverride(request?: NextRequest): number | undefined {
+  return readBoundedNumberHeader(request, PROVIDER_TEMPERATURE_HEADER, 0, 2);
+}
+
+/** 0.0-1.0 nucleus sampling. */
+function readTopPOverride(request?: NextRequest): number | undefined {
+  return readBoundedNumberHeader(request, PROVIDER_TOP_P_HEADER, 0, 1);
+}
+
+/**
+ * Response-length cap. Upper-bounded generously rather than to any one
+ * provider's ceiling — a request that names more than a provider allows is the
+ * provider's own 400 to give, same as an unrecognized model id is.
+ */
+function readMaxTokensOverride(request?: NextRequest): number | undefined {
+  return readBoundedNumberHeader(request, PROVIDER_MAX_TOKENS_HEADER, 1, 1_000_000);
 }

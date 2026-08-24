@@ -12,6 +12,7 @@ import {
 } from '@/lib/storage/encryption';
 import { validateProviderKey } from '@/lib/ai/validateProviderClient';
 import type {
+  AdvancedSettings,
   ProviderConfig,
   ProviderType,
   ProviderValidationRecord,
@@ -44,6 +45,13 @@ export interface ProviderStore {
     id: string,
     updates: Partial<AddProviderInput>
   ) => Promise<void>;
+  /**
+   * Save the Advanced panel's settings for one provider. Separate from
+   * `updateProvider` because those are generation-parameter tuning, not a
+   * changed key or endpoint — they should not throw away a passing "Connected"
+   * check the way any other edit does.
+   */
+  updateAdvancedSettings: (id: string, settings: AdvancedSettings | undefined) => void;
   removeProvider: (id: string) => Promise<void>;
   setActiveProvider: (id: string) => void;
   validateProvider: (id: string) => Promise<boolean>;
@@ -129,6 +137,27 @@ export const useProviderStore = create<ProviderStore>()(
           providers: { ...state.providers, [id]: updated },
           // A changed config can no longer be assumed valid.
           validationStatus: omitKey(state.validationStatus, id),
+          error: null,
+        }));
+      },
+
+      updateAdvancedSettings: (id, settings) => {
+        const existing = get().providers[id];
+        if (!existing) {
+          set({ error: 'Provider not found' });
+          return;
+        }
+
+        const updated: ProviderConfig = {
+          ...existing,
+          advancedSettings: settings,
+          updatedAt: getTimestamp(),
+        };
+
+        // Deliberately leaves validationStatus alone: generation-parameter
+        // tuning doesn't change whether the key and endpoint work.
+        set((state) => ({
+          providers: { ...state.providers, [id]: updated },
           error: null,
         }));
       },
@@ -270,4 +299,57 @@ export function getActiveProviderRouting(): { type: ProviderType; endpoint: stri
   if (!config) return null;
 
   return { type: config.type, endpoint: config.endpoint?.trim() ?? '' };
+}
+
+/**
+ * The active provider's advanced generation-parameter overrides, for
+ * `aiFetch` to send alongside the key. Null when nothing is configured or the
+ * player never opened the Advanced panel — both mean "use this call site's
+ * own default".
+ */
+export function getActiveProviderAdvancedSettings(): AdvancedSettings | null {
+  const { providers, activeProviderId } = useProviderStore.getState();
+  if (!activeProviderId) return null;
+
+  return providers[activeProviderId]?.advancedSettings ?? null;
+}
+
+/**
+ * Rolling one-hour request counts per provider, for the client-side rate
+ * limit below. Deliberately in memory only: a safety net against burning
+ * through your own quota within a session, not a persisted or server-enforced
+ * budget — a reload clears it, same as the provider's own dashboard would show
+ * a fresh count on a new billing period.
+ */
+const requestTimestamps = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+
+/**
+ * Whether the active provider's request budget allows one more call right
+ * now. Records the request when it does — a caller that gets `false` back
+ * must not go on to make the request anyway.
+ *
+ * True (allowed) whenever no provider is active, rate limiting is off, or no
+ * budget was set: the feature only ever restricts a player who deliberately
+ * turned it on.
+ */
+export function checkActiveProviderRateLimit(): boolean {
+  const { providers, activeProviderId } = useProviderStore.getState();
+  if (!activeProviderId) return true;
+
+  const settings = providers[activeProviderId]?.advancedSettings;
+  if (!settings?.rateLimitEnabled || !settings.maxRequestsPerHour) return true;
+
+  const now = Date.now();
+  const cutoff = now - RATE_LIMIT_WINDOW_MS;
+  const recent = (requestTimestamps.get(activeProviderId) ?? []).filter((t) => t > cutoff);
+
+  if (recent.length >= settings.maxRequestsPerHour) {
+    requestTimestamps.set(activeProviderId, recent);
+    return false;
+  }
+
+  recent.push(now);
+  requestTimestamps.set(activeProviderId, recent);
+  return true;
 }

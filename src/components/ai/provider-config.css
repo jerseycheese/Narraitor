@@ -311,3 +311,39 @@
   justify-content: flex-end;
   gap: var(--space-2);
 }
+
+/* Advanced generation-parameter panel — one per provider card, collapsed by
+   default via CollapsibleSection (styled globally in app-shell.css). Only the
+   fields inside are this component's own concern. */
+.component-provider-advanced-settings {
+  font-family: var(--font-interface);
+}
+
+.provider-advanced-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.provider-advanced-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.provider-advanced-slider {
+  accent-color: var(--color-accent);
+  width: 100%;
+}
+
+.provider-advanced-rate-limit-value {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.provider-advanced-actions {
+  display: flex;
+  justify-content: flex-end;
+}
