@@ -1,12 +1,14 @@
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import { worldClockBlock } from './worldClockBlock';
+import { worldDescriptionBlock } from './worldDescriptionBlock';
 import {
   describeNarrativeLength,
   PARAGRAPH_SEPARATOR_INSTRUCTION,
 } from './narrativeLength';
 import type { NarrativeTemplateContext } from './context';
 import { isPacingStale } from '@/lib/narrative/turnsSinceComplication';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 /**
  * Puts the player's own sheet in front of the model. Without it the prompt
@@ -48,6 +50,7 @@ ${lines.join('\n')}
 export const sceneTemplate = (context: NarrativeTemplateContext) => {
   const {
     worldName,
+    worldDescription,
     genre,
     tone,
     narrativeContext,
@@ -114,12 +117,16 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
     : '';
 
   const backgroundSection = formatPlayerBackground(playerCharacterBackground);
+  // EXPERIMENT (#1865), unmeasured — see worldDescriptionBlock for why.
+  const worldDescriptionSection = isFeatureEnabled('WORLD_DESCRIPTION_IN_SCENE')
+    ? worldDescriptionBlock(worldDescription)
+    : '';
 
   const baseContent = `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
 World: ${worldName}
 Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}${enhancedCharacterContext ? enhancedCharacterContext : ''}
-${backgroundSection}
+${worldDescriptionSection}${backgroundSection}
 STORY SO FAR:
 ${recentContent}
 
