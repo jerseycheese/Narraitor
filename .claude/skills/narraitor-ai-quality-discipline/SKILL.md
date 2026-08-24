@@ -72,8 +72,8 @@ An eval log (matrix + excerpts + verdict) attached to the issue/PR. For hold dec
 ## 7a. When to stop measuring and park the issue
 A matrix tells you whether a change works. It does not tell you when to give up, and the
 expensive failure mode here is a prompt arc that measures honestly every round and still never
-converges. Two stop conditions, both earned on #1828 (13 rounds, two CI-green PRs, no merged
-code — see `narraitor-failure-archaeology` E17):
+converges. Three stop conditions, the first two earned on #1828 (13 rounds, two CI-green PRs,
+no merged code — see `narraitor-failure-archaeology` E17) and the third on #1829 (E18):
 
 - **A change that trades one named failure for another is a stop signal, not a tuning signal.**
   If round N kills the failure round N-1 named and the log now names a different one, the lever
@@ -81,6 +81,11 @@ code — see `narraitor-failure-archaeology` E17):
 - **Split the flags by which build wrote the prose before claiming the bug is on `develop`.**
   A guard measured against treatment-build prose can look like a large win and still be a
   prerequisite for an unshipped change rather than a standalone fix.
+- **A mechanism you verified working is not a fix, and one run per arm is not a trend.**
+  Earned on #1829 (E18): round 6's glossary rotation was confirmed correct live at eight
+  sampled turns and the player-facing metric got worse anyway, after the previous round's
+  apparent 26-point gain failed to hold. Report the metric, not the mechanism, and treat a
+  single improved run mid-arc as unconfirmed.
 
 When parking, say so on the issue with the numbers and close it. Prefer the next measurement
 that settles several claims at once over another round that moves one.

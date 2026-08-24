@@ -38,6 +38,8 @@ The thing you're about to change/propose, and a search of closed issues/PRs for 
 - **Dev harnesses are throwaway** — test effort goes into app suites, not `/dev/*` tooling.
 - **#1828 is closed unfixed; don't reopen it with a wording round** — 13 rounds each traded one named failure for another. Engagement and invention are the same reflex. A reopen needs a different mechanism, and presence-gating is not a shippable subset.
 - **Split A/B flags by which build wrote the prose** before claiming a prompt-side bug exists on develop — #1926 read as a 28-to-5 win until the split showed all 28 came from treatment-build prose and 0 from control.
+- **#1829 is closed unfixed; the prompt cannot control option order** - two levers on the alignment glossary's listing order were measured live and left the order at least as predictable as baseline. A reopen needs a post-parse mechanism, not another prompt reorder.
+- **A mechanism verified working is not a fix** - round 6's glossary rotation was confirmed correct at eight sampled turns and the player-facing metric still got worse. Verify the mechanism and the metric separately.
 
 ## 6. Evidence required
 When overturning a doctrine: the original constraint, why it no longer binds, and a passing demonstration (e.g., for a joyride bump: a branch where `type-check` and the tutorial visual specs pass).
