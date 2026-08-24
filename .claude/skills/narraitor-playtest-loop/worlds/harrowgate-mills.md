@@ -11,7 +11,6 @@ Field values below are the real wizard options, verified against the running app
 
 ## World, manual create path
 
-- Template step: "Start from scratch"
 - **World Name**: `Harrowgate Mills`
 - **Genre**: `Modern`
 - **World Type**: `Original World`

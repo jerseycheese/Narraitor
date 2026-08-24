@@ -13,7 +13,6 @@ takes that crutch away.
 
 Wizard fields, in order:
 
-- Template step: pick "Start from scratch" and skip the templates
 - **World Name**: `Camp Crystal Lake`
 - **Genre**: `Horror`
 - **World Type**: `Inspired By`, with **Existing Setting** `Friday the 13th`
