@@ -10,7 +10,7 @@ import type {
   TextGenerationSpec,
 } from '../types';
 import { hasSystemRole } from '../capabilities';
-import { getContentRatingGuidance } from '../../safety/contentRatingGuidance';
+import { buildProviderSystemPrompt } from '../promptOverrides';
 
 interface ChatMessage {
   role: 'system' | 'user';
@@ -69,7 +69,7 @@ interface OpenAIPayload {
  * folded into the user turn instead: the role is lost, the instruction is not.
  */
 function buildMessages(descriptor: ProviderDescriptor, spec: TextGenerationSpec): ChatMessage[] {
-  const guidance = getContentRatingGuidance(spec.contentRating);
+  const guidance = buildProviderSystemPrompt(descriptor, spec.contentRating);
 
   return hasSystemRole(descriptor.model)
     ? [
@@ -109,12 +109,17 @@ export const openAICompatibleAdapter: ProviderAdapter = {
       // Both this and the sampling controls below travel on the descriptor
       // rather than being branched on here, so this stays one adapter over one
       // request shape.
-      [descriptor.maxOutputTokensParam ?? 'max_tokens']: spec.maxTokens,
+      [descriptor.maxOutputTokensParam ?? 'max_tokens']: descriptor.maxTokensOverride ?? spec.maxTokens,
       // Omitted entirely, not sent at their defaults: a reasoning model rejects
-      // the presence of these fields, not just values it dislikes.
+      // the presence of these fields, not just values it dislikes. A player's
+      // advanced-settings override is still subject to that same rule — it
+      // only ever replaces the value sent, never forces the field to be sent.
       ...(descriptor.hasFixedSamplingControls
         ? {}
-        : { temperature: spec.temperature, top_p: 1.0 }),
+        : {
+            temperature: descriptor.temperatureOverride ?? spec.temperature,
+            top_p: descriptor.topPOverride ?? 1.0,
+          }),
       ...(spec.stream
         ? {
             stream: true,

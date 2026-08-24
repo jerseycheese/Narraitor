@@ -5,6 +5,7 @@ import type { ProviderDescriptor } from './types';
 import { OpenAICompatibleClient } from './openai-compatible/client';
 import { GeminiClient } from '../geminiClient';
 import { getAIConfig, getDefaultConfig } from '../config';
+import { applyGeminiPromptOverrides } from './promptOverrides';
 
 /**
  * Builds the AI client for a resolved provider.
@@ -19,7 +20,26 @@ import { getAIConfig, getDefaultConfig } from '../config';
  */
 export function createProviderClient(descriptor: ProviderDescriptor): AIClient {
   if (descriptor.type === 'gemini') {
-    return new GeminiClient(getDefaultConfig(descriptor.apiKey, descriptor.model));
+    const config = getDefaultConfig(descriptor.apiKey, descriptor.model);
+    const client = new GeminiClient({
+      ...config,
+      generationConfig: {
+        ...config.generationConfig,
+        temperature: descriptor.temperatureOverride ?? config.generationConfig?.temperature,
+        topP: descriptor.topPOverride ?? config.generationConfig?.topP,
+        maxOutputTokens: descriptor.maxTokensOverride ?? config.generationConfig?.maxOutputTokens,
+      },
+    });
+
+    if (!descriptor.customSafetyPromptOverride && !descriptor.customSystemPromptOverride) {
+      return client;
+    }
+
+    return {
+      generateContent(prompt: string) {
+        return client.generateContent(applyGeminiPromptOverrides(prompt, descriptor));
+      },
+    };
   }
 
   const { maxRetries, timeout } = getAIConfig();

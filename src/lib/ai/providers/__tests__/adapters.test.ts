@@ -80,6 +80,33 @@ describe('geminiAdapter', () => {
       failure: 'malformed',
     });
   });
+
+  it("uses the player's advanced-settings overrides in place of the spec defaults", () => {
+    const body = geminiAdapter.buildBody(
+      { ...GEMINI, temperatureOverride: 1.5, topPOverride: 0.8, maxTokensOverride: 512 },
+      SPEC
+    ) as { generationConfig: { temperature: number; topP: number; maxOutputTokens: number } };
+
+    expect(body.generationConfig.temperature).toBe(1.5);
+    expect(body.generationConfig.topP).toBe(0.8);
+    expect(body.generationConfig.maxOutputTokens).toBe(512);
+  });
+
+  it('prepends custom prompt guidance for Gemini requests', () => {
+    const body = geminiAdapter.buildBody(
+      {
+        ...GEMINI,
+        customSafetyPromptOverride: 'Keep violence implied.',
+        customSystemPromptOverride: 'Write in clipped sentences.',
+      },
+      SPEC
+    ) as { contents: Array<{ parts: Array<{ text: string }> }> };
+
+    const text = body.contents[0].parts[0].text;
+    expect(text).toContain('Safety guidance:\nKeep violence implied.');
+    expect(text).toContain('Additional system instructions:\nWrite in clipped sentences.');
+    expect(text).toContain('Continue the story.');
+  });
 });
 
 describe('openAICompatibleAdapter', () => {
@@ -109,6 +136,24 @@ describe('openAICompatibleAdapter', () => {
     expect(body.stream).toBeUndefined();
   });
 
+  it('uses custom safety and system prompts in the system turn', () => {
+    const body = openAICompatibleAdapter.buildBody(
+      {
+        ...OPENAI,
+        customSafetyPromptOverride: 'Keep violence implied.',
+        customSystemPromptOverride: 'Write in clipped sentences.',
+      },
+      SPEC
+    ) as { messages: Array<{ role: string; content: string }> };
+
+    expect(body.messages[0]).toEqual({
+      role: 'system',
+      content: 'Keep violence implied.\n\nWrite in clipped sentences.',
+    });
+    expect(body.messages[0].content).not.toContain('adult audience');
+    expect(body.messages[1]).toEqual({ role: 'user', content: 'Continue the story.' });
+  });
+
   it('renames the output cap when the descriptor says the service moved off max_tokens', () => {
     // OpenAI 400s on max_tokens rather than ignoring it, so this is the
     // difference between a working provider and one that never generates.
@@ -132,6 +177,27 @@ describe('openAICompatibleAdapter', () => {
     expect(body).not.toHaveProperty('temperature');
     expect(body).not.toHaveProperty('top_p');
     expect(body.messages).toBeDefined();
+  });
+
+  it("uses the player's advanced-settings overrides in place of the spec defaults", () => {
+    const body = openAICompatibleAdapter.buildBody(
+      { ...OPENAI, temperatureOverride: 1.5, topPOverride: 0.8, maxTokensOverride: 512 },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body.temperature).toBe(1.5);
+    expect(body.top_p).toBe(0.8);
+    expect(body.max_tokens).toBe(512);
+  });
+
+  it('still omits sampling overrides for a service that fixes them, even when one is configured', () => {
+    const body = openAICompatibleAdapter.buildBody(
+      { ...OPENAI, hasFixedSamplingControls: true, temperatureOverride: 1.5, topPOverride: 0.8 },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body).not.toHaveProperty('temperature');
+    expect(body).not.toHaveProperty('top_p');
   });
 
   it('folds the guidance into the user turn for a model with no system role', () => {

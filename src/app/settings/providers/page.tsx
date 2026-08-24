@@ -8,6 +8,7 @@ import { ProviderCard } from '@/components/ai/ProviderCard';
 import { ProviderWizard } from '@/components/ai/ProviderWizard';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/DeleteConfirmationDialog';
 import { useProviderStore } from '@/state/providerStore';
+import { presetHasFixedSamplingControlsForEndpoint } from '@/lib/ai/presets';
 import '@/components/ai/provider-config.css';
 
 /**
@@ -22,6 +23,7 @@ export default function ProvidersSettingsPage() {
   const setActiveProvider = useProviderStore((s) => s.setActiveProvider);
   const removeProvider = useProviderStore((s) => s.removeProvider);
   const validateProvider = useProviderStore((s) => s.validateProvider);
+  const updateAdvancedSettings = useProviderStore((s) => s.updateAdvancedSettings);
 
   const [showWizard, setShowWizard] = useState(false);
   const [validatingId, setValidatingId] = useState<string | null>(null);
@@ -104,6 +106,8 @@ export default function ProvidersSettingsPage() {
                 onSetActive={setActiveProvider}
                 onValidate={handleValidate}
                 onDelete={setProviderToRemoveId}
+                onUpdateAdvancedSettings={updateAdvancedSettings}
+                samplingControlsFixed={presetHasFixedSamplingControlsForEndpoint(provider.endpoint)}
                 isValidating={validatingId === provider.id}
               />
             ))}

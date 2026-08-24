@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveApiKey } from '@/lib/ai/resolveApiKey';
-import { resolveModel } from '@/lib/ai/resolveModel';
+import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
 import { analyzeWorldDescription } from '@/lib/ai/worldAnalyzer';
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
@@ -30,8 +29,7 @@ export async function POST(request: NextRequest) {
     // Analyze the world description using the AI service
     const analysis = await analyzeWorldDescription(
       body.description,
-      resolveApiKey(request),
-      resolveModel(request)
+      resolveProviderCredential(request)
     );
     
     logger.debug('analyze-world API', 'Analysis completed successfully');

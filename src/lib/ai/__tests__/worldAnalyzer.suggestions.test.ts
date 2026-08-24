@@ -1,20 +1,18 @@
 import { analyzeWorldDescription } from '../worldAnalyzer';
-import { GeminiClient } from '../geminiClient';
 
-// Mock the GeminiClient
-jest.mock('../geminiClient');
+const mockGenerateContent = jest.fn();
+
+jest.mock('../defaultGeminiClient', () => ({
+  createDefaultGeminiClient: jest.fn(() => ({
+    generateContent: mockGenerateContent,
+  })),
+}));
 // Mock the config
 jest.mock('../config');
 
 describe('worldAnalyzer - AI Suggestions', () => {
-  let mockGenerateContent: jest.Mock;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGenerateContent = jest.fn();
-    (GeminiClient as jest.Mock).mockImplementation(() => ({
-      generateContent: mockGenerateContent,
-    }));
   });
 
   describe('analyzeWorldDescription', () => {

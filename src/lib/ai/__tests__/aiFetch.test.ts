@@ -1,11 +1,15 @@
 jest.mock('@/state/providerStore', () => ({
+  checkActiveProviderRateLimit: jest.fn(),
+  getActiveProviderAdvancedSettings: jest.fn(),
   getActiveProviderKey: jest.fn(),
   getActiveProviderModel: jest.fn(),
   getActiveProviderRouting: jest.fn(),
 }));
 
-import { aiFetch } from '../aiFetch';
+import { aiFetch, ProviderRateLimitError } from '../aiFetch';
 import {
+  checkActiveProviderRateLimit,
+  getActiveProviderAdvancedSettings,
   getActiveProviderKey,
   getActiveProviderModel,
   getActiveProviderRouting,
@@ -16,11 +20,19 @@ const mockGetModel = getActiveProviderModel as jest.MockedFunction<typeof getAct
 const mockGetRouting = getActiveProviderRouting as jest.MockedFunction<
   typeof getActiveProviderRouting
 >;
+const mockGetAdvanced = getActiveProviderAdvancedSettings as jest.MockedFunction<
+  typeof getActiveProviderAdvancedSettings
+>;
+const mockCheckRateLimit = checkActiveProviderRateLimit as jest.MockedFunction<
+  typeof checkActiveProviderRateLimit
+>;
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockGetModel.mockReturnValue(null);
   mockGetRouting.mockReturnValue(null);
+  mockGetAdvanced.mockReturnValue(null);
+  mockCheckRateLimit.mockReturnValue(true);
   global.fetch = jest.fn(async () => ({ ok: true })) as unknown as typeof fetch;
 });
 
@@ -153,5 +165,52 @@ describe('aiFetch', () => {
     } finally {
       delete (AbortSignal as unknown as { timeout?: unknown }).timeout;
     }
+  });
+
+  test('attaches the advanced-settings overrides that are actually set', async () => {
+    mockGetKey.mockResolvedValue('byo-key');
+    mockGetAdvanced.mockReturnValue({ temperature: 1.2, topP: 0.5, maxTokens: 4096 });
+    await aiFetch('/api/narrative/generate', { method: 'POST' });
+
+    const headers = lastFetchHeaders();
+    expect(headers.get('x-provider-temperature')).toBe('1.2');
+    expect(headers.get('x-provider-top-p')).toBe('0.5');
+    expect(headers.get('x-provider-max-tokens')).toBe('4096');
+  });
+
+  test('attaches prompt overrides when they are set', async () => {
+    mockGetKey.mockResolvedValue('byo-key');
+    mockGetAdvanced.mockReturnValue({
+      customSafetyPrompt: ' keep it PG ',
+      customSystemPrompt: ' be terse ',
+    });
+    await aiFetch('/api/narrative/generate', { method: 'POST' });
+
+    const headers = lastFetchHeaders();
+    expect(headers.has('x-provider-temperature')).toBe(false);
+    expect(headers.has('x-provider-top-p')).toBe(false);
+    expect(headers.has('x-provider-max-tokens')).toBe(false);
+    expect(headers.get('x-provider-custom-safety-prompt')).toBe('keep it PG');
+    expect(headers.get('x-provider-custom-system-prompt')).toBe('be terse');
+  });
+
+  test('sends no override headers for settings that were never touched', async () => {
+    mockGetKey.mockResolvedValue('byo-key');
+    mockGetAdvanced.mockReturnValue({});
+    await aiFetch('/api/narrative/generate', { method: 'POST' });
+
+    const headers = lastFetchHeaders();
+    expect(headers.has('x-provider-temperature')).toBe(false);
+    expect(headers.has('x-provider-top-p')).toBe(false);
+    expect(headers.has('x-provider-max-tokens')).toBe(false);
+    expect(headers.has('x-provider-custom-safety-prompt')).toBe(false);
+    expect(headers.has('x-provider-custom-system-prompt')).toBe(false);
+  });
+
+  test('rejects before fetching once the configured request budget is exhausted', async () => {
+    mockCheckRateLimit.mockReturnValue(false);
+
+    await expect(aiFetch('/api/narrative/generate')).rejects.toThrow(ProviderRateLimitError);
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });

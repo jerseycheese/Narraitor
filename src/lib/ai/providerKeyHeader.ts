@@ -33,6 +33,18 @@ export const PROVIDER_TYPE_HEADER = 'x-provider-type';
 export const PROVIDER_ENDPOINT_HEADER = 'x-provider-endpoint';
 
 /**
+ * Headers carrying the player's advanced generation-parameter overrides (see
+ * AdvancedSettings in types/provider.types.ts). Sent only when the
+ * corresponding field is actually set — an absent header means "use this call
+ * site's own default", never "use zero".
+ */
+export const PROVIDER_TEMPERATURE_HEADER = 'x-provider-temperature';
+export const PROVIDER_TOP_P_HEADER = 'x-provider-top-p';
+export const PROVIDER_MAX_TOKENS_HEADER = 'x-provider-max-tokens';
+export const PROVIDER_CUSTOM_SAFETY_PROMPT_HEADER = 'x-provider-custom-safety-prompt';
+export const PROVIDER_CUSTOM_SYSTEM_PROMPT_HEADER = 'x-provider-custom-system-prompt';
+
+/**
  * Stand-in key for a provider the player runs themselves, where there is nobody
  * to authenticate against. Ollama is the case this exists for: it accepts any
  * bearer token and ignores it.

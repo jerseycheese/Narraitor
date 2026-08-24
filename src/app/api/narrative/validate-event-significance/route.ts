@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveApiKey } from '@/lib/ai/resolveApiKey';
-import { resolveModel } from '@/lib/ai/resolveModel';
+import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
 import { validateEventSignificance, ValidationContext } from '@/lib/ai/eventSignificanceValidator';
 
 import Logger from '@/lib/utils/logger';
@@ -29,8 +28,7 @@ export async function POST(request: NextRequest) {
     const result = await validateEventSignificance(
       majorEvent,
       context,
-      resolveApiKey(request),
-      resolveModel(request)
+      resolveProviderCredential(request)
     );
 
     return NextResponse.json(result);

@@ -1,9 +1,10 @@
-import { GeminiClient } from '@/lib/ai/geminiClient';
-import { getAIConfig, getGenerationConfig, getSafetySettings, resolveEffectiveGeminiKey } from '@/lib/ai/config';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { getAIConfig, resolveEffectiveGeminiKey } from '@/lib/ai/config';
 import { AttributeSuggestion, SkillSuggestion } from '@/components/WorldCreationWizard/WorldCreationWizard';
 import { truncate } from '../utils';
 import { logger } from '../utils/logger';
 import { parseJsonFromLLM } from './parseJSON';
+import type { ProviderCredential } from './providers/types';
 
 export interface WorldAnalysisResult {
   attributes: AttributeSuggestion[];
@@ -33,15 +34,19 @@ interface AIAnalysisResponse {
 
 export async function analyzeWorldDescription(
   description: string,
-  apiKey?: string | null,
+  credential?: ProviderCredential | null,
   model?: string | null
 ): Promise<WorldAnalysisResult> {
   logger.debug('analyzeWorldDescription called with:', truncate(description, 100));
 
   try {
     const config = getAIConfig();
-    const effectiveKey = resolveEffectiveGeminiKey(apiKey);
-    const effectiveModel = model ?? config.modelName;
+    const effectiveKey =
+      credential && typeof credential === 'object'
+        ? credential.apiKey
+        : resolveEffectiveGeminiKey(credential);
+    const effectiveModel =
+      credential && typeof credential === 'object' ? credential.model : model ?? config.modelName;
     logger.debug('Using AI config:', {
       modelName: effectiveModel,
       timeout: config.timeout,
@@ -101,15 +106,7 @@ export async function analyzeWorldDescription(
     `;
     
     logger.debug('Calling AI service directly...');
-    // Call the AI service directly with proper configuration
-    const client = new GeminiClient({
-      apiKey: effectiveKey,
-      modelName: effectiveModel,
-      maxRetries: config.maxRetries,
-      timeout: config.timeout,
-      generationConfig: getGenerationConfig(),
-      safetySettings: getSafetySettings()
-    });
+    const client = createDefaultGeminiClient(credential, model);
     
     logger.debug('Making AI request...');
     const response = await client.generateContent(prompt);

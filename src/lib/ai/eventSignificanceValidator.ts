@@ -2,6 +2,8 @@ import { GoogleGenAI } from '@google/genai';
 import { logger } from '@/lib/utils/logger';
 import { getAIConfig, resolveEffectiveGeminiKey } from './config';
 import { extractJsonObject } from './parseJSON';
+import { applyGeminiPromptOverrides } from './providers/promptOverrides';
+import type { ProviderCredential, ProviderDescriptor } from './providers/types';
 
 /**
  * Event Significance Validation Result
@@ -36,7 +38,7 @@ export interface ValidationContext {
 export async function validateEventSignificance(
   majorEvent: string,
   context: ValidationContext = {},
-  apiKey?: string | null,
+  credential?: ProviderCredential | null,
   modelOverride?: string | null
 ): Promise<SignificanceValidationResult> {
   const startTime = Date.now();
@@ -53,8 +55,8 @@ export async function validateEventSignificance(
     // Call Gemini Flash for validation with the player's own key. A player on
     // another provider resolves to no Gemini key at all, and skipping the check
     // is the right answer there — see resolveEffectiveGeminiKey.
-    const effectiveKey = resolveEffectiveGeminiKey(apiKey);
-    if (!effectiveKey) {
+    const descriptor = resolveGeminiDescriptor(credential, modelOverride);
+    if (!descriptor) {
       logger.warn('EventSignificanceValidator', 'GEMINI_API_KEY not found, defaulting to accepting event');
       return {
         isSignificant: true,
@@ -62,17 +64,17 @@ export async function validateEventSignificance(
       };
     }
 
-    const genAI = new GoogleGenAI({ apiKey: effectiveKey });
-    const model = modelOverride ?? getAIConfig().modelName;
+    const genAI = new GoogleGenAI({ apiKey: descriptor.apiKey ?? '' });
 
     const result = await genAI.models.generateContent({
-      model,
-      contents: prompt,
+      model: descriptor.model,
+      contents: applyGeminiPromptOverrides(prompt, descriptor),
       config: {
         // These live directly on `config`; the SDK ignores anything it doesn't
         // recognise, so a nested `generationConfig` reaches the model as nothing.
-        temperature: 0.1, // Low temperature for consistent classification
-        maxOutputTokens: 200, // Short response needed
+        temperature: descriptor.temperatureOverride ?? 0.1,
+        topP: descriptor.topPOverride,
+        maxOutputTokens: descriptor.maxTokensOverride ?? 200,
         // Thinking tokens count against maxOutputTokens, and 200 of them would
         // be spent deliberating instead of answering. This is a yes/no call.
         thinkingConfig: { thinkingBudget: 0 },
@@ -110,6 +112,25 @@ export async function validateEventSignificance(
       reason: `Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     };
   }
+}
+
+function resolveGeminiDescriptor(
+  credential?: ProviderCredential | null,
+  modelOverride?: string | null
+): ProviderDescriptor | null {
+  if (credential && typeof credential === 'object') {
+    return credential.type === 'gemini' && credential.apiKey ? credential : null;
+  }
+
+  const apiKey = resolveEffectiveGeminiKey(credential);
+  if (!apiKey) return null;
+
+  return {
+    type: 'gemini',
+    endpoint: '',
+    model: modelOverride ?? getAIConfig().modelName,
+    apiKey,
+  };
 }
 
 /**

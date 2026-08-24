@@ -17,6 +17,8 @@ jest.mock('@/lib/storage/encryption', () => ({
 
 import {
   useProviderStore,
+  checkActiveProviderRateLimit,
+  getActiveProviderAdvancedSettings,
   getActiveProviderKey,
   getActiveProviderModel,
   type AddProviderInput,
@@ -72,6 +74,71 @@ describe('providerStore', () => {
 
   test('getActiveProviderModel returns null with no active provider', () => {
     expect(getActiveProviderModel()).toBeNull();
+  });
+
+  test('getActiveProviderAdvancedSettings returns what was saved on the active provider', async () => {
+    const id = await useProviderStore.getState().addProvider(makeInput());
+    await useProviderStore.getState().updateProvider(id, {
+      advancedSettings: { temperature: 1.1, rateLimitEnabled: false },
+    });
+
+    expect(getActiveProviderAdvancedSettings()).toEqual({
+      temperature: 1.1,
+      rateLimitEnabled: false,
+    });
+  });
+
+  test('getActiveProviderAdvancedSettings returns null when nothing was ever set', async () => {
+    await useProviderStore.getState().addProvider(makeInput());
+    expect(getActiveProviderAdvancedSettings()).toBeNull();
+  });
+
+  test('updateAdvancedSettings persists without touching an existing validation result', async () => {
+    const id = await useProviderStore.getState().addProvider(makeInput());
+    useProviderStore.setState({
+      validationStatus: { [id]: { valid: true, lastChecked: 1 } },
+    });
+
+    useProviderStore.getState().updateAdvancedSettings(id, { temperature: 0.3 });
+
+    expect(useProviderStore.getState().providers[id].advancedSettings).toEqual({
+      temperature: 0.3,
+    });
+    expect(useProviderStore.getState().validationStatus[id]).toEqual({
+      valid: true,
+      lastChecked: 1,
+    });
+  });
+
+  test('updateAdvancedSettings(undefined) clears back to defaults, for the Reset button', async () => {
+    const id = await useProviderStore.getState().addProvider(makeInput());
+    useProviderStore.getState().updateAdvancedSettings(id, { temperature: 1.9 });
+
+    useProviderStore.getState().updateAdvancedSettings(id, undefined);
+
+    expect(useProviderStore.getState().providers[id].advancedSettings).toBeUndefined();
+  });
+
+  describe('checkActiveProviderRateLimit', () => {
+    test('allows requests when no provider is active', () => {
+      expect(checkActiveProviderRateLimit()).toBe(true);
+    });
+
+    test('allows requests when rate limiting was never turned on', async () => {
+      await useProviderStore.getState().addProvider(makeInput());
+      expect(checkActiveProviderRateLimit()).toBe(true);
+    });
+
+    test('allows requests up to the configured budget, then blocks the next one', async () => {
+      const id = await useProviderStore.getState().addProvider(makeInput());
+      await useProviderStore.getState().updateProvider(id, {
+        advancedSettings: { rateLimitEnabled: true, maxRequestsPerHour: 2 },
+      });
+
+      expect(checkActiveProviderRateLimit()).toBe(true);
+      expect(checkActiveProviderRateLimit()).toBe(true);
+      expect(checkActiveProviderRateLimit()).toBe(false);
+    });
   });
 
   test('removeProvider clears the master key once the last provider is gone', async () => {

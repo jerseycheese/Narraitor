@@ -1,7 +1,8 @@
 import React from 'react';
 import { clsx } from 'clsx';
 import { Button } from '@/components/ui/button';
-import type { ProviderConfig, ProviderValidationRecord } from '@/types/provider.types';
+import { ProviderAdvancedSettings } from './ProviderAdvancedSettings';
+import type { AdvancedSettings, ProviderConfig, ProviderValidationRecord } from '@/types/provider.types';
 import './provider-config.css';
 
 interface ProviderCardProps {
@@ -11,11 +12,19 @@ interface ProviderCardProps {
   onSetActive: (id: string) => void;
   onValidate: (id: string) => void;
   onDelete: (id: string) => void;
+  onUpdateAdvancedSettings: (id: string, settings: AdvancedSettings | undefined) => void;
   isValidating?: boolean;
+  /**
+   * True when this provider's model rejects temperature/top-p being sent at
+   * all. Resolved by the caller (see presetHasFixedSamplingControlsForEndpoint)
+   * rather than here — components reach lib/ai through a mediating layer, not
+   * by importing it directly.
+   */
+  samplingControlsFixed?: boolean;
   className?: string;
 }
 
-/** A saved provider with its status and switch / re-check / remove actions. */
+/** A saved provider with its status, switch / re-check / remove actions, and its Advanced panel. */
 export function ProviderCard({
   provider,
   isActive,
@@ -23,7 +32,9 @@ export function ProviderCard({
   onSetActive,
   onValidate,
   onDelete,
+  onUpdateAdvancedSettings,
   isValidating = false,
+  samplingControlsFixed = false,
   className,
 }: ProviderCardProps) {
   return (
@@ -72,6 +83,13 @@ export function ProviderCard({
           Remove
         </Button>
       </div>
+
+      <ProviderAdvancedSettings
+        providerId={provider.id}
+        value={provider.advancedSettings}
+        onChange={(settings) => onUpdateAdvancedSettings(provider.id, settings)}
+        samplingControlsFixed={samplingControlsFixed}
+      />
     </div>
   );
 }

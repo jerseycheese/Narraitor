@@ -10,6 +10,7 @@ import type {
 } from '../types';
 import type { SafetySetting } from '../../types';
 import type { ContentRating } from '../../safety/contentRatingGuidance';
+import { applyGeminiPromptOverrides } from '../promptOverrides';
 
 /**
  * Gemini's native REST API, behind the generic provider contract.
@@ -105,14 +106,17 @@ export const geminiAdapter: ProviderAdapter = {
     };
   },
 
-  buildBody(_descriptor: ProviderDescriptor, spec: TextGenerationSpec): object {
+  buildBody(descriptor: ProviderDescriptor, spec: TextGenerationSpec): object {
     return {
-      contents: [{ parts: [{ text: spec.prompt }] }],
+      contents: [{ parts: [{ text: applyGeminiPromptOverrides(spec.prompt, descriptor) }] }],
       generationConfig: {
-        temperature: spec.temperature,
-        topP: 1.0,
+        // Gemini has no reasoning-model preset that fixes sampling — unlike
+        // the openai-compatible adapter, an override here is always safe to
+        // send. See ProviderDescriptor.temperatureOverride.
+        temperature: descriptor.temperatureOverride ?? spec.temperature,
+        topP: descriptor.topPOverride ?? 1.0,
         topK: 40,
-        maxOutputTokens: spec.maxTokens,
+        maxOutputTokens: descriptor.maxTokensOverride ?? spec.maxTokens,
         // Disable gemini-2.5-flash dynamic thinking: it adds latency and eats
         // into the (small) maxOutputTokens budget meant for visible prose.
         thinkingConfig: { thinkingBudget: 0 },

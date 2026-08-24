@@ -217,3 +217,32 @@ describe('ProvidersSettingsPage — remove confirmation', () => {
     expect(removeSpy).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('ProvidersSettingsPage — advanced settings', () => {
+  test('a change in the Advanced panel persists onto the provider in the store', async () => {
+    seedProviders([makeProvider('p1', 'Visual QA Gemini')], 'p1');
+    const user = userEvent.setup();
+    render(<ProvidersSettingsPage />);
+
+    await user.click(screen.getByRole('button', { name: /expand advanced/i }));
+    const maxTokens = screen.getByLabelText(/max response length/i);
+    await user.type(maxTokens, '2048');
+    await user.tab();
+
+    expect(useProviderStore.getState().providers['p1'].advancedSettings).toEqual({
+      maxTokens: 2048,
+    });
+  });
+
+  test('Reset to defaults clears a previously saved override from the store', async () => {
+    const provider = { ...makeProvider('p1', 'Visual QA Gemini'), advancedSettings: { temperature: 1.8 } };
+    seedProviders([provider], 'p1');
+    const user = userEvent.setup();
+    render(<ProvidersSettingsPage />);
+
+    await user.click(screen.getByRole('button', { name: /expand advanced/i }));
+    await user.click(screen.getByRole('button', { name: /reset to defaults/i }));
+
+    expect(useProviderStore.getState().providers['p1'].advancedSettings).toBeUndefined();
+  });
+});
