@@ -56,6 +56,8 @@ export interface ProviderDescriptor {
   temperatureOverride?: number;
   topPOverride?: number;
   maxTokensOverride?: number;
+  customSafetyPromptOverride?: string;
+  customSystemPromptOverride?: string;
 }
 
 /**

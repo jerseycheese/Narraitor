@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveApiKey } from '@/lib/ai/resolveApiKey';
-import { resolveModel } from '@/lib/ai/resolveModel';
+import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
 import { categorizeInventoryItems } from '@/lib/ai/inventoryCategorizer';
 import type { InventoryCategorizationResult } from '@/lib/ai/inventoryCategorizer';
 import Logger from '@/lib/utils/logger';
@@ -52,8 +51,7 @@ export async function POST(request: NextRequest) {
 
     const categorizations = await categorizeInventoryItems(
       validItems,
-      resolveApiKey(request),
-      resolveModel(request)
+      resolveProviderCredential(request)
     );
     const classifiedAt = getTimestamp();
 

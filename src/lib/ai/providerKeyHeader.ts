@@ -41,6 +41,8 @@ export const PROVIDER_ENDPOINT_HEADER = 'x-provider-endpoint';
 export const PROVIDER_TEMPERATURE_HEADER = 'x-provider-temperature';
 export const PROVIDER_TOP_P_HEADER = 'x-provider-top-p';
 export const PROVIDER_MAX_TOKENS_HEADER = 'x-provider-max-tokens';
+export const PROVIDER_CUSTOM_SAFETY_PROMPT_HEADER = 'x-provider-custom-safety-prompt';
+export const PROVIDER_CUSTOM_SYSTEM_PROMPT_HEADER = 'x-provider-custom-system-prompt';
 
 /**
  * Stand-in key for a provider the player runs themselves, where there is nobody

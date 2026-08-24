@@ -2,6 +2,8 @@
 
 import {
   PROVIDER_API_KEY_HEADER,
+  PROVIDER_CUSTOM_SAFETY_PROMPT_HEADER,
+  PROVIDER_CUSTOM_SYSTEM_PROMPT_HEADER,
   PROVIDER_ENDPOINT_HEADER,
   PROVIDER_MAX_TOKENS_HEADER,
   PROVIDER_MODEL_HEADER,
@@ -76,10 +78,14 @@ export async function aiFetch(
   const model = getActiveProviderModel();
   const routing = getActiveProviderRouting();
   const advanced = getActiveProviderAdvancedSettings();
+  const customSafetyPrompt = advanced?.customSafetyPrompt?.trim();
+  const customSystemPrompt = advanced?.customSystemPrompt?.trim();
   const hasAdvancedOverrides =
     advanced?.temperature !== undefined ||
     advanced?.topP !== undefined ||
-    advanced?.maxTokens !== undefined;
+    advanced?.maxTokens !== undefined ||
+    Boolean(customSafetyPrompt) ||
+    Boolean(customSystemPrompt);
   // Nothing configured -> identical to a plain fetch (env key and default model
   // apply server-side). This keeps aiFetch a true drop-in: dev, tests, and E2E
   // behave exactly as before.
@@ -106,6 +112,12 @@ export async function aiFetch(
   }
   if (advanced?.maxTokens !== undefined) {
     headers.set(PROVIDER_MAX_TOKENS_HEADER, String(advanced.maxTokens));
+  }
+  if (customSafetyPrompt) {
+    headers.set(PROVIDER_CUSTOM_SAFETY_PROMPT_HEADER, customSafetyPrompt);
+  }
+  if (customSystemPrompt) {
+    headers.set(PROVIDER_CUSTOM_SYSTEM_PROMPT_HEADER, customSystemPrompt);
   }
   return fetch(input, { ...withTimeout, headers });
 }

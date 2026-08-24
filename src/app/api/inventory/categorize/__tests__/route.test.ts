@@ -17,7 +17,6 @@ import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { categorizeInventoryItems } from '@/lib/ai/inventoryCategorizer';
 import type { InventoryCategorizationResult } from '@/lib/ai/inventoryCategorizer';
-import { DEFAULT_TEXT_MODEL } from '@/lib/ai/config';
 
 const mockCategorize = categorizeInventoryItems as jest.MockedFunction<
   typeof categorizeInventoryItems
@@ -39,8 +38,15 @@ const aiResult = (
 });
 
 describe('POST /api/inventory/categorize', () => {
+  const originalApiKey = process.env.GEMINI_API_KEY;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.GEMINI_API_KEY = 'MOCK_API_KEY';
+  });
+
+  afterAll(() => {
+    process.env.GEMINI_API_KEY = originalApiKey;
   });
 
   it('returns 400 when no item has a usable name', async () => {
@@ -70,16 +76,14 @@ describe('POST /api/inventory/categorize', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
 
-    // Only valid items are sent to the categorizer, with the request-resolved
-    // key (null here: no BYO header and the env key is the MOCK sentinel) and
-    // the resolved model, which is the default without a configured provider.
+    // Only valid items are sent to the categorizer with the request-resolved
+    // provider descriptor (null here: no BYO header and no usable env key).
     expect(mockCategorize).toHaveBeenCalledWith(
       [
         { name: 'Iron Sword', description: 'A blade', context: undefined },
         { name: 'Gold Coins', description: 'Currency', context: undefined },
       ],
-      null,
-      DEFAULT_TEXT_MODEL
+      null
     );
 
     // Response is full-length and positionally aligned to the input.

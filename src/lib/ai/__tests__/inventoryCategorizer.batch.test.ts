@@ -9,8 +9,8 @@ import { categorizeInventoryItems } from '../inventoryCategorizer';
 const mockGenerateContent = jest.fn();
 
 jest.mock('@/lib/utils/logger');
-jest.mock('@/lib/ai/geminiClient', () => ({
-  GeminiClient: jest.fn().mockImplementation(() => ({
+jest.mock('@/lib/ai/defaultGeminiClient', () => ({
+  createDefaultGeminiClient: jest.fn(() => ({
     generateContent: mockGenerateContent,
   })),
 }));

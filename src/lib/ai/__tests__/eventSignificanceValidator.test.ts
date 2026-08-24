@@ -46,4 +46,40 @@ describe('validateEventSignificance', () => {
       reason: 'No consequential change.',
     });
   });
+
+  it('applies Gemini descriptor overrides to validation requests', async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify({
+        isSignificant: true,
+        reason: 'A consequential discovery.',
+      }),
+    });
+
+    await validateEventSignificance('Found the missing ledger.', {}, {
+      type: 'gemini',
+      endpoint: '',
+      model: 'gemini-2.5-pro',
+      apiKey: 'player-key',
+      temperatureOverride: 0.4,
+      topPOverride: 0.7,
+      maxTokensOverride: 300,
+      customSafetyPromptOverride: 'Keep danger off page.',
+      customSystemPromptOverride: 'Answer tersely.',
+    });
+
+    expect(mockGenerateContent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        model: 'gemini-2.5-pro',
+        contents: expect.stringContaining('Safety guidance:\nKeep danger off page.'),
+        config: expect.objectContaining({
+          temperature: 0.4,
+          topP: 0.7,
+          maxOutputTokens: 300,
+        }),
+      })
+    );
+    expect(mockGenerateContent.mock.calls[0][0].contents).toContain(
+      'Additional system instructions:\nAnswer tersely.'
+    );
+  });
 });

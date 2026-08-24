@@ -33,10 +33,9 @@ export interface ProviderCapabilities {
  * silently dropped for a provider whose preset sets
  * `hasFixedSamplingControls` - see providers/types.ts.
  *
- * `customSafetyPrompt` and `customSystemPrompt` are persisted and shown back
- * to the player, but are not yet read by prompt assembly - threading them in
- * means touching the governed prompt-template pipeline, which is its own
- * piece of work.
+ * `customSafetyPrompt` and `customSystemPrompt` travel with the request's
+ * provider descriptor and are applied at the provider boundary, where Gemini
+ * and OpenAI-compatible providers have different prompt shapes.
  */
 export interface AdvancedSettings {
   /** 0.0-2.0. Higher is more creative/random, lower is more consistent/focused. */

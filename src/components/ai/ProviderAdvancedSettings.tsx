@@ -28,6 +28,13 @@ interface ProviderAdvancedSettingsProps {
 const TEMPERATURE_DEFAULT = 0.7;
 const TOP_P_DEFAULT = 1.0;
 
+function parsePositiveInteger(value: string): number | undefined {
+  if (!value) return undefined;
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
 /**
  * Per-provider generation-parameter tuning, collapsed by default. Everything
  * here is optional: an absent field means "use this call site's own
@@ -185,10 +192,7 @@ export function ProviderAdvancedSettings({
                 placeholder="e.g. 60"
                 value={value?.maxRequestsPerHour ?? ''}
                 onChange={(e) =>
-                  set(
-                    'maxRequestsPerHour',
-                    e.target.value ? Number(e.target.value) : undefined
-                  )
+                  set('maxRequestsPerHour', parsePositiveInteger(e.target.value))
                 }
               />
             </div>

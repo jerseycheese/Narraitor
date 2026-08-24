@@ -15,3 +15,12 @@ export const getSafetySettings = jest.fn(() => []);
 export const resolveEffectiveGeminiKey = jest.fn((requestKey?: string | null) =>
   requestKey === undefined ? 'test-api-key' : requestKey ?? ''
 );
+
+export const getDefaultConfig = jest.fn((apiKeyOverride?: string | null, modelOverride?: string | null) => ({
+  apiKey: resolveEffectiveGeminiKey(apiKeyOverride),
+  modelName: modelOverride ?? 'gemini-pro',
+  maxRetries: 3,
+  timeout: 30000,
+  generationConfig: getGenerationConfig(),
+  safetySettings: getSafetySettings(),
+}));

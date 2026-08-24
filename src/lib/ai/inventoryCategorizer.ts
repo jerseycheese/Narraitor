@@ -1,10 +1,11 @@
-import { GeminiClient } from '@/lib/ai/geminiClient';
-import { getAIConfig, getGenerationConfig, getSafetySettings, resolveEffectiveGeminiKey } from '@/lib/ai/config';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { getAIConfig, resolveEffectiveGeminiKey } from '@/lib/ai/config';
 import { STANDARD_CATEGORIES } from '@/lib/inventory/categories';
 import { truncate } from '@/lib/utils';
 import { extractFencedJson, extractJsonObject } from '@/lib/ai/parseJSON';
 import { logger } from '@/lib/utils/logger';
 import type { StandardInventoryCategory } from '@/types/inventory.types';
+import type { ProviderCredential } from './providers/types';
 
 type CategorizationSource = 'ai' | 'fallback';
 
@@ -103,12 +104,16 @@ function parseAIResponse(raw: string): AIResponseShape | null {
 
 async function categorizeInventoryItem(
   input: CategorizeInventoryItemInput,
-  apiKey?: string | null,
+  credential?: ProviderCredential | null,
   model?: string | null
 ): Promise<InventoryCategorizationResult> {
   const config = getAIConfig();
-  const effectiveKey = resolveEffectiveGeminiKey(apiKey);
-  const effectiveModel = model ?? config.modelName;
+  const effectiveKey =
+    credential && typeof credential === 'object'
+      ? credential.apiKey
+      : resolveEffectiveGeminiKey(credential);
+  const effectiveModel =
+    credential && typeof credential === 'object' ? credential.model : model ?? config.modelName;
   const baseLogContext = {
     name: input.name,
     description: truncate(input.description ?? '', 100),
@@ -120,14 +125,7 @@ async function categorizeInventoryItem(
   }
 
   try {
-    const client = new GeminiClient({
-      apiKey: effectiveKey,
-      modelName: effectiveModel,
-      maxRetries: config.maxRetries,
-      timeout: config.timeout,
-      generationConfig: getGenerationConfig(),
-      safetySettings: getSafetySettings(),
-    });
+    const client = createDefaultGeminiClient(credential, model);
 
     const prompt = `You are an expert inventory categorizer for a narrative RPG.
 Choose exactly one category from the following list and respond with JSON only.
@@ -190,7 +188,7 @@ function parseAIBatchResponse(raw: string): AIBatchEntryShape[] | null {
  */
 export async function categorizeInventoryItems(
   inputs: CategorizeInventoryItemInput[],
-  apiKey?: string | null,
+  credential?: ProviderCredential | null,
   model?: string | null
 ): Promise<InventoryCategorizationResult[]> {
   if (inputs.length === 0) {
@@ -198,12 +196,16 @@ export async function categorizeInventoryItems(
   }
 
   if (inputs.length === 1) {
-    return [await categorizeInventoryItem(inputs[0], apiKey, model)];
+    return [await categorizeInventoryItem(inputs[0], credential, model)];
   }
 
   const config = getAIConfig();
-  const effectiveKey = resolveEffectiveGeminiKey(apiKey);
-  const effectiveModel = model ?? config.modelName;
+  const effectiveKey =
+    credential && typeof credential === 'object'
+      ? credential.apiKey
+      : resolveEffectiveGeminiKey(credential);
+  const effectiveModel =
+    credential && typeof credential === 'object' ? credential.model : model ?? config.modelName;
 
   if (!effectiveKey) {
     logger.warn(
@@ -215,14 +217,7 @@ export async function categorizeInventoryItems(
   }
 
   try {
-    const client = new GeminiClient({
-      apiKey: effectiveKey,
-      modelName: effectiveModel,
-      maxRetries: config.maxRetries,
-      timeout: config.timeout,
-      generationConfig: getGenerationConfig(),
-      safetySettings: getSafetySettings(),
-    });
+    const client = createDefaultGeminiClient(credential, model);
 
     const itemList = inputs
       .map(

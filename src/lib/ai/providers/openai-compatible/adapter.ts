@@ -10,7 +10,7 @@ import type {
   TextGenerationSpec,
 } from '../types';
 import { hasSystemRole } from '../capabilities';
-import { getContentRatingGuidance } from '../../safety/contentRatingGuidance';
+import { buildProviderSystemPrompt } from '../promptOverrides';
 
 interface ChatMessage {
   role: 'system' | 'user';
@@ -69,7 +69,7 @@ interface OpenAIPayload {
  * folded into the user turn instead: the role is lost, the instruction is not.
  */
 function buildMessages(descriptor: ProviderDescriptor, spec: TextGenerationSpec): ChatMessage[] {
-  const guidance = getContentRatingGuidance(spec.contentRating);
+  const guidance = buildProviderSystemPrompt(descriptor, spec.contentRating);
 
   return hasSystemRole(descriptor.model)
     ? [

@@ -91,6 +91,22 @@ describe('geminiAdapter', () => {
     expect(body.generationConfig.topP).toBe(0.8);
     expect(body.generationConfig.maxOutputTokens).toBe(512);
   });
+
+  it('prepends custom prompt guidance for Gemini requests', () => {
+    const body = geminiAdapter.buildBody(
+      {
+        ...GEMINI,
+        customSafetyPromptOverride: 'Keep violence implied.',
+        customSystemPromptOverride: 'Write in clipped sentences.',
+      },
+      SPEC
+    ) as { contents: Array<{ parts: Array<{ text: string }> }> };
+
+    const text = body.contents[0].parts[0].text;
+    expect(text).toContain('Safety guidance:\nKeep violence implied.');
+    expect(text).toContain('Additional system instructions:\nWrite in clipped sentences.');
+    expect(text).toContain('Continue the story.');
+  });
 });
 
 describe('openAICompatibleAdapter', () => {
@@ -118,6 +134,24 @@ describe('openAICompatibleAdapter', () => {
     expect(body.messages[1]).toEqual({ role: 'user', content: 'Continue the story.' });
     expect(body).not.toHaveProperty('safetySettings');
     expect(body.stream).toBeUndefined();
+  });
+
+  it('uses custom safety and system prompts in the system turn', () => {
+    const body = openAICompatibleAdapter.buildBody(
+      {
+        ...OPENAI,
+        customSafetyPromptOverride: 'Keep violence implied.',
+        customSystemPromptOverride: 'Write in clipped sentences.',
+      },
+      SPEC
+    ) as { messages: Array<{ role: string; content: string }> };
+
+    expect(body.messages[0]).toEqual({
+      role: 'system',
+      content: 'Keep violence implied.\n\nWrite in clipped sentences.',
+    });
+    expect(body.messages[0].content).not.toContain('adult audience');
+    expect(body.messages[1]).toEqual({ role: 'user', content: 'Continue the story.' });
   });
 
   it('renames the output cap when the descriptor says the service moved off max_tokens', () => {

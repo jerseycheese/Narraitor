@@ -178,15 +178,33 @@ describe('aiFetch', () => {
     expect(headers.get('x-provider-max-tokens')).toBe('4096');
   });
 
-  test('sends no override headers for settings that were never touched', async () => {
+  test('attaches prompt overrides when they are set', async () => {
     mockGetKey.mockResolvedValue('byo-key');
-    mockGetAdvanced.mockReturnValue({ customSystemPrompt: 'be terse' });
+    mockGetAdvanced.mockReturnValue({
+      customSafetyPrompt: ' keep it PG ',
+      customSystemPrompt: ' be terse ',
+    });
     await aiFetch('/api/narrative/generate', { method: 'POST' });
 
     const headers = lastFetchHeaders();
     expect(headers.has('x-provider-temperature')).toBe(false);
     expect(headers.has('x-provider-top-p')).toBe(false);
     expect(headers.has('x-provider-max-tokens')).toBe(false);
+    expect(headers.get('x-provider-custom-safety-prompt')).toBe('keep it PG');
+    expect(headers.get('x-provider-custom-system-prompt')).toBe('be terse');
+  });
+
+  test('sends no override headers for settings that were never touched', async () => {
+    mockGetKey.mockResolvedValue('byo-key');
+    mockGetAdvanced.mockReturnValue({});
+    await aiFetch('/api/narrative/generate', { method: 'POST' });
+
+    const headers = lastFetchHeaders();
+    expect(headers.has('x-provider-temperature')).toBe(false);
+    expect(headers.has('x-provider-top-p')).toBe(false);
+    expect(headers.has('x-provider-max-tokens')).toBe(false);
+    expect(headers.has('x-provider-custom-safety-prompt')).toBe(false);
+    expect(headers.has('x-provider-custom-system-prompt')).toBe(false);
   });
 
   test('rejects before fetching once the configured request budget is exhausted', async () => {

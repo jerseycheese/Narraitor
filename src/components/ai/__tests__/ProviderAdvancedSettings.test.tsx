@@ -91,6 +91,23 @@ describe('ProviderAdvancedSettings', () => {
     expect(onChange).toHaveBeenCalledWith({ rateLimitEnabled: true, maxRequestsPerHour: 10 });
   });
 
+  test('rejects non-positive and fractional requests-per-hour values before persisting', async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    renderPanel({ rateLimitEnabled: true, maxRequestsPerHour: 30 }, onChange);
+    await expand(user);
+
+    const perHour = screen.getByLabelText(/max requests per hour/i);
+    fireEvent.change(perHour, { target: { value: '0' } });
+    fireEvent.change(perHour, { target: { value: '-5' } });
+    fireEvent.change(perHour, { target: { value: '1.5' } });
+
+    expect(onChange).toHaveBeenCalledTimes(3);
+    expect(onChange).toHaveBeenNthCalledWith(1, { rateLimitEnabled: true });
+    expect(onChange).toHaveBeenNthCalledWith(2, { rateLimitEnabled: true });
+    expect(onChange).toHaveBeenNthCalledWith(3, { rateLimitEnabled: true });
+  });
+
   test('disables temperature and top-p when the provider fixes its sampling controls', async () => {
     const user = userEvent.setup();
     renderPanel(undefined, jest.fn(), true);
@@ -114,4 +131,3 @@ describe('ProviderAdvancedSettings', () => {
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
 });
-

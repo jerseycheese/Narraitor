@@ -4,6 +4,8 @@
 import { NextRequest } from 'next/server';
 import {
   PROVIDER_API_KEY_HEADER,
+  PROVIDER_CUSTOM_SAFETY_PROMPT_HEADER,
+  PROVIDER_CUSTOM_SYSTEM_PROMPT_HEADER,
   PROVIDER_ENDPOINT_HEADER,
   PROVIDER_MAX_TOKENS_HEADER,
   PROVIDER_MODEL_HEADER,
@@ -91,6 +93,8 @@ describe('resolveProvider', () => {
         [PROVIDER_TEMPERATURE_HEADER]: '1.4',
         [PROVIDER_TOP_P_HEADER]: '0.9',
         [PROVIDER_MAX_TOKENS_HEADER]: '3000',
+        [PROVIDER_CUSTOM_SAFETY_PROMPT_HEADER]: 'Keep it cinematic, not graphic.',
+        [PROVIDER_CUSTOM_SYSTEM_PROMPT_HEADER]: 'Use spare prose.',
       })
     );
 
@@ -98,6 +102,10 @@ describe('resolveProvider', () => {
     expect(resolution.ok && resolution.descriptor.temperatureOverride).toBe(1.4);
     expect(resolution.ok && resolution.descriptor.topPOverride).toBe(0.9);
     expect(resolution.ok && resolution.descriptor.maxTokensOverride).toBe(3000);
+    expect(resolution.ok && resolution.descriptor.customSafetyPromptOverride).toBe(
+      'Keep it cinematic, not graphic.'
+    );
+    expect(resolution.ok && resolution.descriptor.customSystemPromptOverride).toBe('Use spare prose.');
   });
 
   it('drops an out-of-range advanced-settings override rather than passing it through', () => {

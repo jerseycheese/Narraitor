@@ -3,6 +3,8 @@
 import type { NextRequest } from 'next/server';
 import {
   PROVIDER_API_KEY_HEADER,
+  PROVIDER_CUSTOM_SAFETY_PROMPT_HEADER,
+  PROVIDER_CUSTOM_SYSTEM_PROMPT_HEADER,
   PROVIDER_ENDPOINT_HEADER,
   PROVIDER_MAX_TOKENS_HEADER,
   PROVIDER_MODEL_HEADER,
@@ -48,6 +50,7 @@ const GEMINI_MODEL_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9.\-_]{0,63}$/;
  * are not, and the length is capped so a header can't carry a payload.
  */
 const BODY_MODEL_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9.\-_/:]{0,127}$/;
+const MAX_PROMPT_OVERRIDE_CHARS = 4000;
 
 export type ProviderResolutionFailure =
   | 'NO_KEY'
@@ -117,6 +120,14 @@ export function resolveProvider(request?: NextRequest): ProviderResolution {
       temperatureOverride: readTemperatureOverride(request),
       topPOverride: readTopPOverride(request),
       maxTokensOverride: readMaxTokensOverride(request),
+      customSafetyPromptOverride: readPromptOverride(
+        request,
+        PROVIDER_CUSTOM_SAFETY_PROMPT_HEADER
+      ),
+      customSystemPromptOverride: readPromptOverride(
+        request,
+        PROVIDER_CUSTOM_SYSTEM_PROMPT_HEADER
+      ),
     },
   };
 }
@@ -226,4 +237,10 @@ function readTopPOverride(request?: NextRequest): number | undefined {
  */
 function readMaxTokensOverride(request?: NextRequest): number | undefined {
   return readBoundedNumberHeader(request, PROVIDER_MAX_TOKENS_HEADER, 1, 1_000_000);
+}
+
+function readPromptOverride(request: NextRequest | undefined, header: string): string | undefined {
+  const raw = request?.headers.get(header)?.trim();
+  if (!raw) return undefined;
+  return raw.slice(0, MAX_PROMPT_OVERRIDE_CHARS);
 }

@@ -10,6 +10,7 @@ import type {
 } from '../types';
 import type { SafetySetting } from '../../types';
 import type { ContentRating } from '../../safety/contentRatingGuidance';
+import { applyGeminiPromptOverrides } from '../promptOverrides';
 
 /**
  * Gemini's native REST API, behind the generic provider contract.
@@ -107,7 +108,7 @@ export const geminiAdapter: ProviderAdapter = {
 
   buildBody(descriptor: ProviderDescriptor, spec: TextGenerationSpec): object {
     return {
-      contents: [{ parts: [{ text: spec.prompt }] }],
+      contents: [{ parts: [{ text: applyGeminiPromptOverrides(spec.prompt, descriptor) }] }],
       generationConfig: {
         // Gemini has no reasoning-model preset that fixes sampling — unlike
         // the openai-compatible adapter, an override here is always safe to
