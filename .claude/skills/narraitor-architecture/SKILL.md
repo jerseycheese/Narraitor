@@ -22,7 +22,7 @@ Do NOT invoke for: small bug fixes, copy changes, config tweaks, or test-only ch
 
 ## Place code in the right module
 - Put routes and API handlers in `src/app/` and `src/app/api/` (Next.js 15 App Router).
-- Put UI in `src/components/`, grouped by domain/feature; use `src/components/ui` for shared primitives (Button, Input, Dialog, Card, etc.) and `src/components/shared` for cross-domain UI.
+- Put UI in `src/components/`, grouped by domain/feature; use `src/components/ui` for shared primitives and `src/components/shared` for cross-domain UI.
 - Put state in `src/state/` with domain stores; use persistence helpers in `src/state/persistence.ts` when needed.
 - Put types in `src/types/*.types.ts`; keep `src/types/index.ts` type-only (no runtime imports).
 - Put hooks in `src/hooks/` and services in `src/services/` unless an existing `src/lib/*` module already owns the behavior.
