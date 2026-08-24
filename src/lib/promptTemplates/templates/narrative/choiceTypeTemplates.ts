@@ -18,6 +18,13 @@ interface PlayerChoiceTemplateContext {
     name: string;
   }>;
   playerCharacterName?: string;
+  /**
+   * Decisions already made this session, uncapped - see getTurnIndex in
+   * choiceGenerator.prompt.ts. NOT narrativeContext.previousSegments.length:
+   * every production caller populates previousSegments from a 5-segment
+   * slice, so that count freezes once a session passes turn 5.
+   */
+  turnIndex?: number;
 }
 
 /** Definition text for each alignment tag, kept separate from the glossary's listing order (see ALIGNMENT_GLOSSARY_ORDERS) so the order can rotate without touching the wording. */
@@ -56,7 +63,7 @@ const ALIGNMENT_GLOSSARY_ORDERS: Array<Array<'NEUTRAL' | 'CHAOTIC' | 'LAWFUL'>> 
  * staying there for the rest of the session.
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount, playerCharacterName } = context;
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount, playerCharacterName, turnIndex } = context;
   const choiceCount =
     typeof optionCount === 'number' && Number.isFinite(optionCount)
       ? Math.max(1, Math.floor(optionCount))
@@ -98,10 +105,9 @@ ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`
   // pattern to learn against, just one call removed from the numbered slots.
   // Rotate which of the four permitted orders (no LAWFUL-NEUTRAL-CHAOTIC, none
   // ending in CHAOTIC - the two orders the alignment-spread tests forbid) is
-  // shown, keyed off the turn count so it's deterministic and testable rather
-  // than reaching for Math.random in a prompt builder.
-  const turnIndex = narrativeContext?.previousSegments?.length ?? 0;
-  const glossaryOrder = ALIGNMENT_GLOSSARY_ORDERS[turnIndex % ALIGNMENT_GLOSSARY_ORDERS.length];
+  // shown, keyed off turnIndex so it's deterministic and testable rather than
+  // reaching for Math.random in a prompt builder.
+  const glossaryOrder = ALIGNMENT_GLOSSARY_ORDERS[(turnIndex ?? 0) % ALIGNMENT_GLOSSARY_ORDERS.length];
   const glossaryText = glossaryOrder
     .map((tag) => `- ${tag}: ${ALIGNMENT_DEFINITIONS[tag]}`)
     .join('\n');
