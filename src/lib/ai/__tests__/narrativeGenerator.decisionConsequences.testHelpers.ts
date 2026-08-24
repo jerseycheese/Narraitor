@@ -71,8 +71,6 @@ const mockCharacter = {
     itemOrder: [],
   },
   status: {
-    health: 100,
-    maxHealth: 100,
     conditions: [],
   },
   createdAt: '2025-01-01T00:00:00.000Z',

@@ -129,11 +129,6 @@ export function PortraitDebugSection({
         itemOrder: [],
       },
       status: {
-        health:
-          effectiveCharacterData.status?.health ||
-          (effectiveCharacterData.status as { hp?: number } | undefined)?.hp ||
-          100,
-        maxHealth: effectiveCharacterData.status?.maxHealth || 100,
         conditions: effectiveCharacterData.status?.conditions || [],
       },
       createdAt: getTimestamp(),

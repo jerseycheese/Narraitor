@@ -37,8 +37,6 @@ const mockCharacters: Character[] = [
     },
     isPlayer: true,
     status: {
-      health: 85,
-      maxHealth: 100,
       conditions: [],
     },
     inventory: {
@@ -75,8 +73,6 @@ const mockCharacters: Character[] = [
     },
     isPlayer: false,
     status: {
-      health: 20,
-      maxHealth: 80,
       conditions: [],
     },
     inventory: {
@@ -113,8 +109,6 @@ const mockCharacters: Character[] = [
     },
     isPlayer: false,
     status: {
-      health: 60,
-      maxHealth: 120,
       conditions: [],
     },
     inventory: {

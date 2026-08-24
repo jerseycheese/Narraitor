@@ -26,7 +26,7 @@ const buildCharacter = (): StoreCharacter =>
       },
     ],
     background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-    status: { health: 10, maxHealth: 10, conditions: [] },
+    status: { conditions: [] },
     inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',

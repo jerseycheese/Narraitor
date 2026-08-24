@@ -128,8 +128,6 @@ export function createMockCharacter(
       itemOrder: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
     },
     createdAt: DEFAULT_TIMESTAMP,

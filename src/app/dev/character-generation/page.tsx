@@ -98,8 +98,6 @@ export default function CharacterGenerationTestPage() {
       },
       isPlayer: true,
       status: {
-        health: 100,
-        maxHealth: 100,
         conditions: [],
       },
       inventory: {

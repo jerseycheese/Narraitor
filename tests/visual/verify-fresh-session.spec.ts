@@ -141,7 +141,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
                   fears: [],
                   relationships: [],
                 },
-                status: { health: 100, maxHealth: 100, conditions: [] },
+                status: { conditions: [] },
                 inventory: {
                   characterId: CHAR_ID,
                   items: [],
@@ -170,7 +170,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
                   fears: [],
                   relationships: [],
                 },
-                status: { health: 100, maxHealth: 100, conditions: [] },
+                status: { conditions: [] },
                 inventory: {
                   characterId: CHAR_ID,
                   items: [],
@@ -291,7 +291,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
               fears: [],
               relationships: [],
             },
-            status: { health: 100, maxHealth: 100, conditions: [] },
+            status: { conditions: [] },
             inventory: {
               characterId: CHAR_ID,
               items: [],
@@ -391,7 +391,7 @@ test.describe('Fresh GameSession skeleton → content', () => {
               fears: [],
               relationships: [],
             },
-            status: { health: 100, maxHealth: 100, conditions: [] },
+            status: { conditions: [] },
             inventory: {
               characterId: CHAR_ID,
               items: [],

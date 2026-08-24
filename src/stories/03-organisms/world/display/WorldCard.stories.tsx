@@ -22,7 +22,7 @@ const mockCharacters: Character[] = [
       relationships: [],
     },
     isPlayer: false,
-    status: { health: 100, maxHealth: 100, conditions: [] },
+    status: { conditions: [] },
     inventory: {
       characterId: 'char1',
       items: [],
@@ -56,7 +56,7 @@ const mockCharacters: Character[] = [
       relationships: [],
     },
     isPlayer: true,
-    status: { health: 100, maxHealth: 100, conditions: [] },
+    status: { conditions: [] },
     inventory: {
       characterId: 'char2',
       items: [],
@@ -90,7 +90,7 @@ const mockCharacters: Character[] = [
       relationships: [],
     },
     isPlayer: false,
-    status: { health: 100, maxHealth: 100, conditions: [] },
+    status: { conditions: [] },
     inventory: {
       characterId: 'char3',
       items: [],

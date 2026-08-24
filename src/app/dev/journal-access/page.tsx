@@ -105,8 +105,6 @@ export default function JournalAccessTestPage() {
           itemOrder: [],
         },
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
           location: 'Test Area',
         },

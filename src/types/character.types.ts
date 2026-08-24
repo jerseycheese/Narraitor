@@ -86,8 +86,6 @@ interface CharacterRelationship {
  * Current status of a character
  */
 interface CharacterStatus {
-  health: number;
-  maxHealth: number;
   conditions: string[];
   location?: string;
 }

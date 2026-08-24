@@ -76,8 +76,6 @@ describe('buildEndingContext', () => {
       },
       isPlayer: true,
       status: {
-        health: 100,
-        maxHealth: 100,
         conditions: [],
         location: undefined,
       },
@@ -132,8 +130,6 @@ describe('buildEndingContext', () => {
       },
       isPlayer: false,
       status: {
-        health: 80,
-        maxHealth: 100,
         conditions: [],
         location: 'Clocktower',
       },
@@ -208,8 +204,6 @@ describe('buildEndingContext', () => {
       },
       isPlayer: true,
       status: {
-        health: 90,
-        maxHealth: 120,
         conditions: [],
         location: 'Library',
       },

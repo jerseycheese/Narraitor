@@ -58,8 +58,6 @@ const mockCharacter = {
   },
   isPlayer: true,
   status: {
-    health: 100,
-    maxHealth: 100,
     conditions: [],
   },
   inventory: {

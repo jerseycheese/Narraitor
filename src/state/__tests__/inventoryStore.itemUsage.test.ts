@@ -33,8 +33,6 @@ describe('InventoryStore - Item Usage', () => {
       level: 1,
       isPlayer: true,
       status: {
-        health: 100,
-        maxHealth: 100,
         conditions: [],
       },
       inventory: {
@@ -184,8 +182,6 @@ describe('InventoryStore - Item Usage', () => {
         level: 1,
         isPlayer: false,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {

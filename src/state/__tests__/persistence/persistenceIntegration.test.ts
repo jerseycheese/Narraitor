@@ -118,8 +118,6 @@ describe('Persistence Integration - MVP', () => {
           itemOrder: [],
         },
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
       });
@@ -188,8 +186,6 @@ describe('Persistence Integration - MVP', () => {
           itemOrder: [],
         },
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
       });

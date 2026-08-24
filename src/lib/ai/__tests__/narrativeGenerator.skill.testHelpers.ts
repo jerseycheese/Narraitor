@@ -152,8 +152,6 @@ export function createMockCharacterWithSkills(): Character {
       itemOrder: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
     },
     createdAt: getTimestamp(),

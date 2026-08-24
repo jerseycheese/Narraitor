@@ -63,7 +63,7 @@ describe('processItemUsage - skip choice regeneration on session end (#925)', ()
       description: 'A courageous warrior',
       level: 1,
       isPlayer: true,
-      status: { health: 100, maxHealth: 100, conditions: [] },
+      status: { conditions: [] },
       inventory: {
         characterId: '',
         items: [],

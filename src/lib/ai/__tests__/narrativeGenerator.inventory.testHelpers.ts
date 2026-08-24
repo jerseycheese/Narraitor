@@ -57,8 +57,6 @@ export function setupTestWorldAndCharacter() {
     level: 1,
     isPlayer: true,
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
     },
     background: {

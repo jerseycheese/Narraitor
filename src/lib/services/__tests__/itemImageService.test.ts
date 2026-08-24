@@ -58,8 +58,6 @@ describe('ItemImageService', () => {
         level: 1,
         isPlayer: true,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {
@@ -139,8 +137,6 @@ describe('ItemImageService', () => {
         level: 1,
         isPlayer: true,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {
@@ -238,8 +234,6 @@ describe('ItemImageService', () => {
         level: 1,
         isPlayer: true,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {
@@ -323,8 +317,6 @@ describe('ItemImageService', () => {
         level: 1,
         isPlayer: true,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {
@@ -406,8 +398,6 @@ describe('ItemImageService', () => {
         level: 1,
         isPlayer: true,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {
@@ -475,8 +465,6 @@ describe('ItemImageService', () => {
         level: 1,
         isPlayer: true,
         status: {
-          health: 100,
-          maxHealth: 100,
           conditions: [],
         },
         inventory: {

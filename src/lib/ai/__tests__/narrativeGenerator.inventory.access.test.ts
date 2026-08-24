@@ -106,8 +106,6 @@ describe('NarrativeGenerator - Inventory Data Access', () => {
       level: 1,
       isPlayer: false,
       status: {
-        health: 100,
-        maxHealth: 100,
         conditions: [],
       },
       background: {

@@ -27,7 +27,7 @@ export const firstPlayTour: Step[] = [
   },
   {
     target: '[data-tutorial="session-character"]',
-    content: 'Open the Character panel anytime to check your stats, health, and current status.',
+    content: 'Open the Character panel anytime to check your stats and current status.',
     placement: 'bottom',
   },
   {

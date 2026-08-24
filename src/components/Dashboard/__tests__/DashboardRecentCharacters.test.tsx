@@ -33,7 +33,7 @@ describe('DashboardRecentCharacters', () => {
       skills: [],
       derivedStats: [],
       background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-      status: { health: 100, maxHealth: 100, conditions: [] },
+      status: { conditions: [] },
       inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-03T00:00:00.000Z'
@@ -50,7 +50,7 @@ describe('DashboardRecentCharacters', () => {
       skills: [],
       derivedStats: [],
       background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-      status: { health: 100, maxHealth: 100, conditions: [] },
+      status: { conditions: [] },
       inventory: { characterId: 'char-2', items: [], capacity: 10, categories: [], itemOrder: [] },
       createdAt: '2024-01-02T00:00:00.000Z',
       updatedAt: '2024-01-05T00:00:00.000Z' // Most recent
@@ -67,7 +67,7 @@ describe('DashboardRecentCharacters', () => {
       skills: [],
       derivedStats: [],
       background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-      status: { health: 100, maxHealth: 100, conditions: [] },
+      status: { conditions: [] },
       inventory: { characterId: 'char-3', items: [], capacity: 10, categories: [], itemOrder: [] },
       createdAt: '2024-01-03T00:00:00.000Z',
       updatedAt: '2024-01-04T00:00:00.000Z'

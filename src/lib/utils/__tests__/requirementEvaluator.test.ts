@@ -37,8 +37,6 @@ interface Character {
   };
   isPlayer: boolean;
   status: {
-    health: number;
-    maxHealth: number;
     conditions: string[];
   };
   inventory: {
@@ -111,8 +109,6 @@ describe('requirementEvaluator', () => {
     },
     isPlayer: true,
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
     },
     inventory: {

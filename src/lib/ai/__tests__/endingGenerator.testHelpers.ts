@@ -71,8 +71,6 @@ export function createMockCharacter(): StoreCharacter {
     },
     isPlayer: true,
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
       location: 'Dark Castle',
     },

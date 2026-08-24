@@ -59,7 +59,7 @@ const mockStoredCharacter = {
   },
   attributes: [],
   skills: [],
-  status: { health: 100, maxHealth: 100, conditions: [] },
+  status: { conditions: [] },
   createdAt: '2026-08-14T00:00:00Z',
   updatedAt: '2026-08-14T00:00:00Z',
 };

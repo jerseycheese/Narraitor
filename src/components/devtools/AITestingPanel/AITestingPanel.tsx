@@ -69,8 +69,6 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       itemOrder: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
       location: 'Test Area',
     },

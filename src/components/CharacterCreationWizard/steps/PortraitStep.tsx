@@ -140,7 +140,7 @@ export function PortraitStep({
         characterId: 'temp',
         itemOrder: [],
       },
-      status: { health: 100, maxHealth: 100, conditions: [] },
+      status: { conditions: [] },
       createdAt: getTimestamp(),
       updatedAt: getTimestamp(),
     };

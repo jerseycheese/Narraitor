@@ -51,8 +51,6 @@ const mockCharacters = {
       categories: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
       location: 'Starting Village',
     },
@@ -83,8 +81,6 @@ const mockCharacters = {
       categories: [],
     },
     status: {
-      health: 100,
-      maxHealth: 100,
       conditions: [],
       location: 'Wizard Tower',
     },

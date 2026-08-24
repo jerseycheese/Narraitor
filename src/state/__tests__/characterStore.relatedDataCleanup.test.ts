@@ -76,8 +76,6 @@ describe('CharacterStore - Related Data Cleanup', () => {
           },
           isPlayer: true,
           status: {
-            health: 100,
-            maxHealth: 100,
             conditions: [],
           },
           inventory: {
@@ -126,8 +124,6 @@ describe('CharacterStore - Related Data Cleanup', () => {
           },
           isPlayer: true,
           status: {
-            health: 100,
-            maxHealth: 100,
             conditions: [],
           },
           inventory: {
@@ -156,8 +152,6 @@ describe('CharacterStore - Related Data Cleanup', () => {
           },
           isPlayer: true,
           status: {
-            health: 100,
-            maxHealth: 100,
             conditions: [],
           },
           inventory: {
