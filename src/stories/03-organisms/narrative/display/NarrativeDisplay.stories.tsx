@@ -473,7 +473,7 @@ export const WithTermDefinitions: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Narrative with lore term buttons. Click a dotted-underline term to see the definition panel. On mobile the panel appears as a bottom sheet; on desktop it floats right as a margin note. Keyboard: Tab to term, Enter/Space to open, Escape to dismiss (focus returns to trigger).',
+        story: 'Narrative with lore term buttons. Click a dotted-underline term to see the definition panel. Placement is responsive: a bottom sheet below 1024px, a margin note pulled to the prose column\'s right edge from 1024 to 1279px, and a note in the page gutter beside the paragraph from 1280px up. The gutter lane needs the play surface\'s scroller and prose column, so this canvas shows the 1024-1279px presentation. Keyboard: Tab to term, Enter/Space to open, Escape to dismiss (focus returns to trigger).',
       },
     },
   },
