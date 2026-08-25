@@ -106,10 +106,20 @@ export const collectUnrecordedExchanges = (
   const claim = detectUnrecordedExchangeClaim(readPlayerActionText(request), npcNames);
   if (!claim) return [];
 
-  const narrativeStoreState = useNarrativeStore.getState();
-  if (typeof narrativeStoreState?.getSessionSegments !== 'function') return [];
-  const counts = countSharedScenes(narrativeStoreState.getSessionSegments(sessionId) ?? []);
-  const record = counts[claim.npcId];
+  // Fails open on its own rather than through the caller's catch: a narrative
+  // store that throws should cost this one section, not the whole contract and
+  // with it the relationship and ledger guards for the turn.
+  let record;
+  try {
+    const narrativeStoreState = useNarrativeStore.getState();
+    if (typeof narrativeStoreState?.getSessionSegments !== 'function') return [];
+    record = countSharedScenes(
+      narrativeStoreState.getSessionSegments(sessionId) ?? []
+    )[claim.npcId];
+  } catch (error) {
+    logger.warn('[UnrecordedExchange] Failed to read session co-presence', { error });
+    return [];
+  }
 
   // Having been alone together makes an off-page conversation plausible, and
   // the contract only ever states what it can check.
