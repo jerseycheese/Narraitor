@@ -3701,6 +3701,19 @@ body.manuscript-overlay-open {
     color: var(--color-text-muted);
   }
 
+  /* The decision sentence is dropped in this lane, not just destyled: sitting
+     flush beside the segment it caused, it restates the paragraph's own
+     opening line rather than adding anything a glance at the prose doesn't
+     already give ("You choose to crawl through the ventilation system" next
+     to "You crawl through the ventilation shaft…"). The outcome word carries
+     what the prose can't - whether the roll succeeded - and the chips carry
+     the consequence; the sentence was the one part of the card that didn't
+     survive becoming a label-and-a-value mark. Component and its tests are
+     unchanged; this is presentation only, scoped to the carved lane. */
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-text {
+    display: none;
+  }
+
   /* Corner bracket (DESIGN.md drafting-mark vocabulary): top-left L-shape,
      same arm length and color as world-detail-npc / world-detail-stat. */
   :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-callout::before {
