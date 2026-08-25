@@ -2,7 +2,10 @@ import { IndexedDBAdapter } from '../indexedDBAdapter';
 import {
   createMockDB,
   createMockIDB,
-  createMockRequest
+  createMockRequest,
+  createMockStore,
+  setupMockTransaction,
+  triggerSuccess
 } from './indexedDBAdapter.testHelpers';
 
 describe('IndexedDBAdapter - Initialization', () => {
@@ -68,6 +71,12 @@ describe('IndexedDBAdapter - Initialization', () => {
         if (mockTransaction.oncomplete) {
           mockTransaction.oncomplete();
         }
+        // Real IndexedDB fires the open request's onsuccess once the upgrade
+        // transaction completes — without it, the adapter never gets a db
+        // handle, which the round-trip check below would otherwise catch.
+        if (mockRequest.onsuccess) {
+          mockRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
+        }
       }, 0);
 
       return mockRequest;
@@ -76,6 +85,16 @@ describe('IndexedDBAdapter - Initialization', () => {
     await adapter.initialize();
 
     expect(mockDB.createObjectStore).toHaveBeenCalledWith('narraitor-store');
+
+    // A schema-only check would still pass if the newly created store were
+    // unusable — prove the adapter can actually read/write through it.
+    const mockStore = createMockStore();
+    mockStore.put.mockImplementation(() => createMockRequest());
+    setupMockTransaction(mockDB, mockStore);
+
+    const setPromise = adapter.setItem('smoke-key', JSON.stringify({ ok: true }));
+    triggerSuccess(mockStore.put.mock.results[0].value);
+    await expect(setPromise).resolves.toBeUndefined();
   });
 
   test('should handle database upgrade scenarios', async () => {

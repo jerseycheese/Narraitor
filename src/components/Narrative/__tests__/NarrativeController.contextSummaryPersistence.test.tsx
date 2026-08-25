@@ -66,7 +66,16 @@ describe('NarrativeController context summary persistence', () => {
   });
 
   it('persists contextSummary when storing generated decisions', async () => {
-    const addDecision = jest.fn().mockReturnValue('decision-123');
+    // A tiny fake store slice, not just a call-recorder: addDecision writes
+    // into storedDecisions and getSessionDecisions reads it back, so the test
+    // can prove the decision is readable after storing it rather than only
+    // that addDecision was invoked with the right arguments.
+    const storedDecisions: Array<Record<string, unknown>> = [];
+    const addDecision = jest.fn((sessionId: string, decisionData: Record<string, unknown>) => {
+      const id = 'decision-123';
+      storedDecisions.push({ id, sessionId, ...decisionData });
+      return id;
+    });
     const getSessionSegments = jest.fn().mockReturnValue([
       {
         id: 'segment-1',
@@ -78,7 +87,7 @@ describe('NarrativeController context summary persistence', () => {
         timestamp: new Date(),
       },
     ]);
-    const getSessionDecisions = jest.fn().mockReturnValue([]);
+    const getSessionDecisions = jest.fn(() => storedDecisions);
 
     mockZustandStore(
       useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>,
@@ -134,14 +143,16 @@ describe('NarrativeController context summary persistence', () => {
       expect(addDecision).toHaveBeenCalled();
     });
 
-    expect(addDecision).toHaveBeenCalledWith(
-      'test-session',
-      expect.objectContaining({
-        prompt: 'What do you do?',
-        decisionWeight: 'major',
-        contextSummary: 'A tense standoff unfolds at the crossroads.',
-      })
-    );
+    // Read the decision back through the same getter the store exposes,
+    // rather than inspecting addDecision's call args, so this proves the
+    // decision is actually stored and retrievable.
+    const [stored] = getSessionDecisions();
+    expect(stored).toMatchObject({
+      sessionId: 'test-session',
+      prompt: 'What do you do?',
+      decisionWeight: 'major',
+      contextSummary: 'A tense standoff unfolds at the crossroads.',
+    });
 
     // Post-hydration choice generation should fire exactly once (no double-trigger).
     expect(addDecision).toHaveBeenCalledTimes(1);

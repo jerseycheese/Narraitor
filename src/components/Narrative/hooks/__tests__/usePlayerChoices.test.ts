@@ -25,9 +25,18 @@ const aiDecision = {
 };
 
 function setupStore(overrides: Record<string, unknown> = {}) {
-  const addDecision = jest.fn().mockReturnValue('stored-decision-1');
+  // A tiny fake store slice, not just a call-recorder: addDecision writes into
+  // storedDecisions and getSessionDecisions reads it back, so a test can prove
+  // a decision is readable after storing it rather than only that addDecision
+  // was invoked with the right arguments.
+  const storedDecisions: Array<Record<string, unknown>> = [];
+  const addDecision = jest.fn((sessionId: string, decisionData: Record<string, unknown>) => {
+    const id = 'stored-decision-1';
+    storedDecisions.push({ id, sessionId, ...decisionData });
+    return id;
+  });
   const getSessionSegments = jest.fn().mockReturnValue([baseSegment]);
-  const getSessionDecisions = jest.fn().mockReturnValue([]);
+  const getSessionDecisions = jest.fn(() => storedDecisions);
   mockZustandStore(
     useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>,
     createMockNarrativeStore({
@@ -85,7 +94,7 @@ describe('usePlayerChoices', () => {
   });
 
   it('generates AI choices, persists the decision, and notifies the parent', async () => {
-    const { addDecision } = setupStore();
+    const { getSessionDecisions } = setupStore();
     const { result, aiGenerate, onChoicesGenerated } = renderPlayerChoices();
 
     await act(async () => {
@@ -93,14 +102,17 @@ describe('usePlayerChoices', () => {
     });
 
     expect(aiGenerate).toHaveBeenCalledWith('w1', expect.any(Object), ['c1']);
-    expect(addDecision).toHaveBeenCalledWith(
-      's1',
-      expect.objectContaining({
-        prompt: 'What do you do?',
-        decisionWeight: 'major',
-        contextSummary: 'A fork in the road.',
-      })
-    );
+
+    // Read the decision back through the same getter the store exposes,
+    // rather than inspecting addDecision's call args, so this proves the
+    // decision is actually stored and retrievable.
+    const [stored] = getSessionDecisions();
+    expect(stored).toMatchObject({
+      sessionId: 's1',
+      prompt: 'What do you do?',
+      decisionWeight: 'major',
+      contextSummary: 'A fork in the road.',
+    });
     expect(onChoicesGenerated).toHaveBeenCalledTimes(1);
   });
 

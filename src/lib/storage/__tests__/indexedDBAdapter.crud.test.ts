@@ -91,24 +91,30 @@ describe('IndexedDBAdapter - CRUD Operations', () => {
   describe('setItem', () => {
     test('should store value with key', async () => {
       const testData = { name: 'Test World' };
-      const mockRequest = createMockRequest();
+      // A tiny in-memory backing map, not just call-recorders: put writes into
+      // it and get reads back from it, so the test can prove the value round
+      // trips rather than only that put was called with the right shape.
+      const backing = new Map<string, unknown>();
       const mockStore = createMockStore();
-      mockStore.put.mockReturnValue(mockRequest);
+      mockStore.put.mockImplementation((record: { id: string; value: unknown }) => {
+        backing.set(record.id, record.value);
+        return createMockRequest();
+      });
+      mockStore.get.mockImplementation((key: string) =>
+        createMockRequest(backing.has(key) ? { value: backing.get(key) } : undefined)
+      );
 
       setupMockTransaction(mockDB, mockStore);
 
       const setPromise = adapter.setItem('test-key', JSON.stringify(testData));
-      triggerSuccess(mockRequest);
-
+      triggerSuccess(mockStore.put.mock.results[0].value);
       await setPromise;
 
-      expect(mockStore.put).toHaveBeenCalledWith(
-        {
-          id: 'test-key',
-          value: testData
-        },
-        'test-key'
-      );
+      const getPromise = adapter.getItem('test-key');
+      triggerSuccess(mockStore.get.mock.results[0].value);
+      const result = await getPromise;
+
+      expect(result).toBe(JSON.stringify(testData));
     });
 
     test('should overwrite existing value', async () => {
@@ -173,18 +179,30 @@ describe('IndexedDBAdapter - CRUD Operations', () => {
 
   describe('removeItem', () => {
     test('should remove stored value by key', async () => {
-      const mockRequest = createMockRequest();
+      // Seed the backing map so removal has something real to remove, then
+      // read it back afterward to prove the key is actually gone rather than
+      // only that delete was called with it.
+      const backing = new Map<string, unknown>([['test-key', { name: 'Test World' }]]);
       const mockStore = createMockStore();
-      mockStore.delete.mockReturnValue(mockRequest);
+      mockStore.delete.mockImplementation((key: string) => {
+        backing.delete(key);
+        return createMockRequest();
+      });
+      mockStore.get.mockImplementation((key: string) =>
+        createMockRequest(backing.has(key) ? { value: backing.get(key) } : undefined)
+      );
 
       setupMockTransaction(mockDB, mockStore);
 
       const removePromise = adapter.removeItem('test-key');
-      triggerSuccess(mockRequest);
-
+      triggerSuccess(mockStore.delete.mock.results[0].value);
       await removePromise;
 
-      expect(mockStore.delete).toHaveBeenCalledWith('test-key');
+      const getPromise = adapter.getItem('test-key');
+      triggerSuccess(mockStore.get.mock.results[0].value);
+      const result = await getPromise;
+
+      expect(result).toBeNull();
     });
 
     test('should handle removal of non-existent key', async () => {

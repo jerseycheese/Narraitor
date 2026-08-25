@@ -163,15 +163,17 @@ describe('useAutoSave', () => {
     expect(result.current.isRunning).toBe(true);
   });
 
-  it('should carry the player-choice reason through to the save service', async () => {
+  it('forwards the triggerSave reason to the save service', async () => {
     const { result } = renderHook(() => useAutoSave());
 
     await act(async () => {
       await result.current.triggerSave('player-choice');
     });
 
-    // The reason is the point: the service debounces or skips on it, so a save
-    // that arrives under the wrong reason behaves differently downstream.
+    // This only proves the hook wires the reason string through unchanged.
+    // Whether a given reason actually debounces or skips is the save
+    // service's own behavior, exercised against the real service (not
+    // mocked) in autoSaveService.test.ts.
     expect(mockAutoSaveService.triggerSave).toHaveBeenCalledWith('player-choice');
     expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saving');
   });

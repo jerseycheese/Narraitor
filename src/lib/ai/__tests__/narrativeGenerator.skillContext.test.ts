@@ -194,13 +194,17 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
     // The segment resolved even though lore extraction is still pending.
     expect(addStructuredLore).not.toHaveBeenCalled();
 
-    resolveLoreExtraction({ characters: [], locations: [], events: [], rules: [] });
+    const resolvedLore = { characters: [], locations: [], events: [], rules: [] };
+    resolveLoreExtraction(resolvedLore);
     // Flush the microtask queue so the deferred .then() chain (which
     // includes an `await import(...)`) has a chance to run.
     await Promise.resolve();
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(addStructuredLore).toHaveBeenCalled();
+    // Check the actual payload reaches the store, not just that some call
+    // happened — a call with the wrong world/session/lore shape should still
+    // fail this.
+    expect(addStructuredLore).toHaveBeenCalledWith(resolvedLore, 'skill-world', 'session-1');
   });
 });
