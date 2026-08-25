@@ -89,7 +89,7 @@ export const useActiveGameSessionActions = ({
     setLocalSelectedChoiceId(choiceId);
     setShouldTriggerGeneration(true); // Trigger narrative generation
 
-    // Create decision journal entry (Issue #174)
+    // Create decision journal entry
     if (currentDecision && characterId) {
       createDecisionJournalEntry(currentDecision, choiceId, false);
     }
@@ -123,7 +123,7 @@ export const useActiveGameSessionActions = ({
     // Handle custom player input
     const customChoiceId = generateUniqueId('custom');
 
-    // Create decision journal entry for custom choice (Issue #174)
+    // Create decision journal entry for custom choice
     if (currentDecision && characterId) {
       createDecisionJournalEntry(currentDecision, customText, true);
     }
@@ -135,7 +135,7 @@ export const useActiveGameSessionActions = ({
     setIsGenerating(true);
     setIsGeneratingChoices(true);
 
-    // Phase 1 (Issue #918): infer skill checks for the typed action so custom
+    // Phase 1: infer skill checks for the typed action so custom
     // actions get the same d20 treatment as predefined choices. The resulting
     // requirements are attached to the option below; NarrativeController then
     // rolls them via its existing skill-check evaluation.
@@ -217,7 +217,7 @@ export const useActiveGameSessionActions = ({
       selectedOptionId: decision.selectedOptionId,
       decisionWeight: decision.decisionWeight,
       contextSummary: decision.contextSummary,
-      // Dev-mode only (#1829 round 6) - dropped here, same as the store
+      // Dev-mode only - this was dropped here, same as the store
       // call site in usePlayerChoices.ts, before a codex review caught it.
       debugInfo: decision.debugInfo,
     };
