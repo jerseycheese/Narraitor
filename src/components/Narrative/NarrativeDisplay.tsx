@@ -83,13 +83,28 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   );
 
   const [activeTerm, setActiveTerm] = React.useState<TermDefinitionData | null>(null);
+  const [activeTermTopOffset, setActiveTermTopOffset] = React.useState<
+    number | undefined
+  >(undefined);
   const triggerRef = useRef<HTMLElement | null>(null);
 
   const handleTermClick = React.useCallback(
     (termText: string, anchorElement: HTMLElement) => {
       const definition = getDefinition(termText);
       if (definition) {
+        // Where the term sits inside its segment, so the gutter note can start
+        // beside the line that names it. TermDefinition clamps it from there.
+        const segmentRect = anchorElement
+          .closest('.narrative-segment')
+          ?.getBoundingClientRect();
+        const anchorRect = anchorElement.getBoundingClientRect();
+
         triggerRef.current = anchorElement;
+        setActiveTermTopOffset(
+          segmentRect
+            ? Math.max(0, Math.round(anchorRect.top - segmentRect.top))
+            : undefined
+        );
         setActiveTerm(definition);
       }
     },
@@ -101,6 +116,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
       triggerRef.current?.focus({ preventScroll: true });
     }
     triggerRef.current = null;
+    setActiveTermTopOffset(undefined);
     setActiveTerm(null);
   }, []);
 
@@ -144,13 +160,15 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           />
         )}
 
-      {/* Rendered before the prose so the desktop margin note (align-self:
-          flex-end) sits above it, matching the choice outcome callout.
-          Mobile renders it as a bottom sheet via CSS (F41). */}
+      {/* Rendered before the prose so the 1024-1279px margin note (align-self:
+          flex-end) sits above it, matching the choice outcome callout. From
+          1280px up CSS lifts it into the page gutter; mobile renders it as a
+          bottom sheet (F41). */}
       {activeTerm && (
         <TermDefinition
           term={activeTerm}
           onDismiss={handleTermDismiss}
+          topOffsetPx={activeTermTopOffset}
         />
       )}
 

@@ -269,7 +269,9 @@ test.describe('Manuscript regression assertions', () => {
     expect(geometry.newestBottom).toBeLessThanOrEqual(geometry.scrollerBottom);
   });
 
-  test('Desktop marginalia definition sits to the right of the prose column, not flush with it', async ({ page }) => {
+  test('Marginalia definition below the gutter lane sits to the right of the prose column, not flush with it', async ({ page }) => {
+    // 1100px is below the 1280px lane floor, so this is the in-flow fallback:
+    // align-self: flex-end inside the segment's flex column.
     await page.setViewportSize({ width: 1100, height: 800 });
     await seedTestData(page);
     await seedMarginaliaLoreFact(page);
@@ -323,6 +325,155 @@ test.describe('Manuscript regression assertions', () => {
     expect(geometry.definitionRight).toBeLessThanOrEqual(
       geometry.viewportWidth
     );
+  });
+
+  test('Gutter marginalia stays inside the visible scroller and clear of the prose', async ({ page }) => {
+    // The invariant #1592 shipped without. That round bounded the note only
+    // from the left and from above the clicked term, both of which stayed true
+    // while the note's own top ran off the top of the scroller and
+    // `overflow: hidden` ate the category badge and term name - the parts that
+    // make it a definition rather than a stray paragraph.
+    //
+    // The seeded description is deliberately longer than the paragraph it
+    // annotates (a ~219px note against a ~121px segment at this width), which
+    // is the exact shape that broke: clamping the note against its own segment
+    // leaves no slot to fit it in.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await seedTestData(page);
+    await seedMarginaliaLoreFact(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.narrative-segment', { timeout: 10000 });
+
+    // Scroll the paragraph that names the term up to the top of the scroller
+    // before opening the note. That is both the ordinary reading position and
+    // the one with no headroom above the segment, so a note taller than its
+    // paragraph has nowhere to go but off the top - which is exactly what the
+    // old segment-relative clamp did.
+    const annotatedSegmentIndex = await page.evaluate(() => {
+      const scroller = document.querySelector(
+        '.manuscript-overlay-main'
+      ) as HTMLElement;
+      const segments = Array.from(
+        document.querySelectorAll('.narrative-segment')
+      );
+      const index = segments.findIndex((segment) =>
+        segment.querySelector('.manuscript-marginalia-term')
+      );
+      if (!scroller || index < 0) return -1;
+      scroller.scrollTop +=
+        segments[index].getBoundingClientRect().top -
+        scroller.getBoundingClientRect().top -
+        8;
+      return index;
+    });
+    expect(annotatedSegmentIndex).toBeGreaterThanOrEqual(0);
+    await page.waitForTimeout(200);
+
+    const proseBefore = await page.evaluate(() => {
+      const prose = document.querySelector(
+        '[data-testid="narrative-content-container"]'
+      );
+      if (!prose) return null;
+      const rect = prose.getBoundingClientRect();
+      return { left: Math.round(rect.left), right: Math.round(rect.right) };
+    });
+    expect(proseBefore).not.toBeNull();
+
+    await page.getByRole('button', { name: 'Arasaka' }).first().click();
+    await expect(
+      page.getByRole('complementary', { name: 'Definition: Arasaka' })
+    ).toBeVisible();
+
+    const geometry = await page.evaluate(() => {
+      const definition = document.querySelector(
+        '.manuscript-marginalia-definition'
+      );
+      const segment = definition?.closest('.narrative-segment');
+      const prose = segment?.querySelector(
+        '[data-testid="narrative-content-container"]'
+      );
+      const scroller = document.querySelector('.manuscript-overlay-main');
+      const category = definition?.querySelector(
+        '.manuscript-marginalia-category'
+      );
+      const name = definition?.querySelector('.manuscript-marginalia-name');
+
+      if (!definition || !prose || !scroller || !category || !name) {
+        return null;
+      }
+
+      const definitionRect = definition.getBoundingClientRect();
+      const proseRect = prose.getBoundingClientRect();
+      const scrollerRect = scroller.getBoundingClientRect();
+      const categoryRect = category.getBoundingClientRect();
+      const nameRect = name.getBoundingClientRect();
+
+      return {
+        definitionTop: Math.round(definitionRect.top),
+        definitionBottom: Math.round(definitionRect.bottom),
+        definitionLeft: Math.round(definitionRect.left),
+        definitionRight: Math.round(definitionRect.right),
+        definitionWidth: Math.round(definitionRect.width),
+        proseRight: Math.round(proseRect.right),
+        proseLeft: Math.round(proseRect.left),
+        segmentBottom: Math.round(
+          (segment as HTMLElement).getBoundingClientRect().bottom
+        ),
+        scrollerTop: Math.round(scrollerRect.top),
+        scrollerBottom: Math.round(scrollerRect.bottom),
+        scrollerRight: Math.round(scrollerRect.right),
+        categoryTop: Math.round(categoryRect.top),
+        nameBottom: Math.round(nameRect.bottom),
+        documentScrollWidth: document.documentElement.scrollWidth,
+        documentClientWidth: document.documentElement.clientWidth,
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry || !proseBefore) {
+      throw new Error('Expected gutter marginalia geometry to be measurable');
+    }
+
+    // The invariant that was missing: every edge of the note, and the two
+    // pieces of it that identify the term, sit inside the visible scroller.
+    expect(geometry.definitionTop).toBeGreaterThanOrEqual(
+      geometry.scrollerTop
+    );
+    expect(geometry.definitionBottom).toBeLessThanOrEqual(
+      geometry.scrollerBottom
+    );
+    expect(geometry.categoryTop).toBeGreaterThanOrEqual(geometry.scrollerTop);
+    expect(geometry.nameBottom).toBeLessThanOrEqual(geometry.scrollerBottom);
+
+    // Taller than the paragraph it annotates, which is what made the old
+    // segment-relative clamp unsatisfiable. If this stops being true the test
+    // above has stopped covering the bug and the fixture needs a longer
+    // description.
+    expect(geometry.definitionBottom).toBeGreaterThan(geometry.segmentBottom);
+
+    // In the gutter, not in the prose column.
+    expect(geometry.definitionLeft).toBeGreaterThanOrEqual(
+      geometry.proseRight
+    );
+    expect(geometry.definitionRight).toBeLessThanOrEqual(
+      geometry.scrollerRight
+    );
+
+    // Readability floor from #1595: the old formula bottomed out near 88px,
+    // which left about 64px of text and broke ordinary words mid-syllable.
+    expect(geometry.definitionWidth).toBeGreaterThanOrEqual(224);
+
+    // Carving the lane must not shift the prose column.
+    expect(geometry.proseLeft).toBe(proseBefore.left);
+    expect(geometry.proseRight).toBe(proseBefore.right);
+
+    // And it must not buy the lane with a horizontal scrollbar.
+    expect(geometry.documentScrollWidth).toBe(geometry.documentClientWidth);
   });
 
   test('Choice badges stay above the 12px legibility floor', async ({ page }) => {

@@ -7,14 +7,16 @@ const meta: Meta<typeof TermDefinition> = {
   component: TermDefinition,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          "The definition panel's own design - category badge, term name, type label and description - across the categories it renders for. Where the panel lands on the page is not shown here and can't be: placement depends on the play surface's scroller and prose column, neither of which exists in this canvas. For that, see the NarrativeDisplay story \"With Term Definitions (marginalia)\", and the geometry assertions in tests/visual/manuscript-regression-assertions.spec.ts.",
+      },
+    },
   },
   decorators: [
     (Story) => (
-      <div style={{ position: 'relative', minHeight: 400, padding: '2rem' }}>
-        <p style={{ fontFamily: 'var(--font-narrative)', marginBottom: '1rem' }}>
-          The narrative text flows here. Below is the term definition panel,
-          positioned as it would appear when a player clicks a highlighted term.
-        </p>
+      <div style={{ padding: '2rem', maxWidth: 320 }}>
         <Story />
       </div>
     ),

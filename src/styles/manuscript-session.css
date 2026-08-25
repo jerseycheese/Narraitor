@@ -3534,9 +3534,11 @@ body.manuscript-overlay-open {
   overflow-wrap: anywhere;
 }
 
-/* Desktop: margin note pulled to the column's right edge (matches DS3
+/* 1024-1279px: margin note pulled to the column's right edge (matches DS3
    choice-outcome-callout pattern). The parent (.narrative-segment) is a flex
-   column, so float is inert here; align-self does the cross-axis pull. */
+   column, so float is inert here; align-self does the cross-axis pull. This is
+   also the fallback below the gutter lane's readability floor - see the
+   >= 1280px block further down. */
 @media (width >= 1024px) {
   .manuscript-marginalia-definition {
     position: relative;
@@ -3572,6 +3574,107 @@ body.manuscript-overlay-open {
 @media (width >= 1024px) {
   :root .manuscript-marginalia-definition {
     box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+  }
+}
+
+/* >= 1280px: the definition moves out of the prose flow and into the real page
+   gutter, beside the paragraph that names the term.
+   =========================================================================
+
+   Why the container has to grow. The note's nearest scroll ancestor is the
+   Radix ScrollArea Viewport, which sets `overflow-x: hidden` inline - CSS
+   can't override an inline style without `!important`, so an absolutely
+   positioned note placed past the prose column's right edge gets clipped. The
+   way around it is to widen the whole history container into the gutter and
+   narrow the segments back by the same amount: the prose column keeps its
+   position and measure, and the note is placed inside the viewport's box
+   rather than outside it.
+
+   The lane holds exactly one note. TermDefinition dismisses on any outside
+   mousedown, so clicking a second term closes the first before it opens - no
+   two notes ever share the lane, which is why the note is free to run past its
+   own segment's bottom edge.
+
+   Scoped to `:has(.manuscript-marginalia-definition)` rather than to the term
+   spans: with nothing open, the surface is byte-identical to the in-flow
+   presentation. */
+@media (width >= 1280px) {
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) {
+    --manuscript-marginalia-gap: var(--space-4);
+
+    /* Every term in this arithmetic is a box on the page, measured from CSS
+       rather than guessed:
+         min(50vw, 46.25rem)  half the page - .manuscript-viewport-inner is
+                              `width: min(100%, 1480px)`, so the half-page
+                              stops growing at 740px.
+         21.25rem             half .manuscript-main-content-inner's 42.5rem
+                              prose column, which is centred on the page.
+         1.5rem + 1.5rem      .manuscript-viewport-inner's horizontal padding
+                              (pinned at 1.5rem from 1280px up) and
+                              .manuscript-main-content's - the two insets the
+                              note stays inside.
+         1rem + 0.75rem       the gap to the prose, plus slack so the lane
+                              never lands flush against the padding edge.
+       That sums to the 26rem subtracted below.
+
+       14rem is the readability floor: 198px of text after padding and border,
+       about 30 characters at 13px. The old formula bottomed out near 88px,
+       which broke ordinary words mid-syllable (#1595). The floor is also why
+       the lane starts at 1280px - the calc resolves to exactly 14rem there,
+       and anything narrower has no gutter worth using. */
+    --manuscript-marginalia-width: clamp(
+      14rem,
+      calc(min(50vw, 46.25rem) - 26rem),
+      17.5rem
+    );
+
+    width: calc(
+      100%
+      + var(--manuscript-marginalia-gap)
+      + var(--manuscript-marginalia-width)
+    );
+  }
+
+  /* Give back exactly what the container took, so the prose column doesn't
+     move when a note opens. */
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) .narrative-history-segments {
+    width: calc(
+      100%
+      - var(--manuscript-marginalia-gap)
+      - var(--manuscript-marginalia-width)
+    );
+  }
+
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) .narrative-segment:has(.manuscript-marginalia-definition) {
+    position: relative;
+  }
+
+  /* Scoped to the history container like the two rules above it, and for the
+     same reason the lane exists at all: the gutter is carved out of that
+     container, so a note rendered anywhere else has no lane to go into.
+     Unscoped, this rule caught every TermDefinition on the page - including
+     the Storybook molecule stories, where the two custom properties are
+     undefined, `width` falls back to auto and the `inset` shorthand is
+     invalid at computed-value time. The panels went absolute with no
+     positioned ancestor and stacked on top of each other. Fallbacks on the
+     properties wouldn't have fixed that; `position: absolute` is simply wrong
+     for a standalone render.
+
+     --manuscript-marginalia-top and --manuscript-marginalia-max-height come
+     from TermDefinition's layout effect, which clamps the note into the
+     visible scroller. Both have inert fallbacks so the note is still placed
+     before the effect runs. */
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) .manuscript-marginalia-definition {
+    position: absolute;
+    inset: var(--manuscript-marginalia-top, 0) auto auto
+      calc(100% + var(--manuscript-marginalia-gap));
+    align-self: auto;
+    box-sizing: border-box;
+    width: var(--manuscript-marginalia-width);
+    max-width: none;
+    max-height: var(--manuscript-marginalia-max-height, none);
+    overflow-y: auto;
+    margin: 0;
   }
 }
 
