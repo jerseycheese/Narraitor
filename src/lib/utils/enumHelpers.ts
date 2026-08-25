@@ -1,4 +1,4 @@
-import { titleCase } from '@/lib/utils';
+import { titleCase } from './formatters';
 
 /**
  * Interface for select option with description

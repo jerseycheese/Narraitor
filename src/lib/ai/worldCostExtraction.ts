@@ -6,6 +6,7 @@ import type {
   WorldCostExtractionResult,
   WorldCostKind,
 } from '@/types/worldCost.types';
+import { isRecord, asTrimmedString, asArray } from '@/lib/utils/typeGuards';
 
 /**
  * The cost channel rides along on goal extraction, like the world clock, so
@@ -45,17 +46,6 @@ A cost is something the character lost or now carries that they did not choose t
 - Do not invent a cost the prose does not state. Most turns impose nothing and are not fatal; an empty list and false are the right answer then.
 Return it under the "worldCost" key of the JSON below.`;
 }
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const asTrimmedString = (value: unknown): string | undefined => {
-  if (typeof value !== 'string') return undefined;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
-};
-
-const asArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
 
 /**
  * Reads the model's `worldCost` block. Returns undefined when the block is

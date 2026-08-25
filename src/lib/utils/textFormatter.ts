@@ -1,4 +1,4 @@
-import { safeTrim } from '@/lib/utils';
+import { safeTrim } from './formatters';
 
 /**
  * Options for formatting AI-generated text

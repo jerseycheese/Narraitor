@@ -1,4 +1,4 @@
-import { safeTrim } from './index';
+import { safeTrim } from './formatters';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('NarrativeParser');
