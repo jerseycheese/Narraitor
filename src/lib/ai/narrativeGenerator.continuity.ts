@@ -356,7 +356,7 @@ export const applyContinuityGuardrail = async (options: {
     sessionId,
     status,
     issues,
-    remainingIssues: corrected ? undefined : remainingIssues,
+    remainingIssues: remainingIssues.length > 0 ? remainingIssues : undefined,
     detectionMs,
     correctionMs,
     timestamp: new Date().toISOString(),
@@ -375,8 +375,17 @@ export const applyContinuityGuardrail = async (options: {
       ? { ...result, content: correctedContent }
       : result;
 
+  const survived = corrected ? remainingIssues : issues;
   return withContinuityNote(finalResult, {
     status,
     issues: issues.map((issue) => ({ type: issue.type, entity: issue.entity })),
+    ...(survived.length > 0
+      ? {
+          remainingIssues: survived.map((issue) => ({
+            type: issue.type,
+            entity: issue.entity,
+          })),
+        }
+      : {}),
   });
 };

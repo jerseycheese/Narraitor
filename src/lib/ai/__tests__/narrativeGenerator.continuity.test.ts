@@ -469,4 +469,66 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       expect.objectContaining({ unattestedSpeakers: ['Davies'] })
     );
   });
+
+  // A partial correction still reports 'corrected'. If the quarantine keys on
+  // that status, an invention the corrector left behind gets tagged as canon,
+  // which is the #1855 poison path reopening inside the guard built to close it.
+  it('quarantines an invention the correction left behind on an otherwise corrected turn', async () => {
+    (useNPCStore.getState as jest.Mock).mockImplementation(() => ({
+      getNPCsByWorld: jest.fn().mockReturnValue([
+        { id: 'npc-mira', name: 'Mira', worldId: 'world-1' },
+        { id: 'npc-davies', name: 'Davies', worldId: 'world-1' },
+      ]),
+      getById: jest.fn(),
+      createNPC: jest.fn(),
+      updateNPC: jest.fn(),
+    }));
+    (useNarrativeStore.getState as jest.Mock).mockReturnValue({
+      getSessionSegments: jest.fn().mockReturnValue([
+        { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
+        { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
+      ]),
+    });
+
+    // Two issues: Mira's tanked trust written as warm, and Davies recounting
+    // the exchange the player baited.
+    const TWO_ISSUES =
+      'Mira beams at you and embraces you warmly, delighted to see her old friend again. ' +
+      'Davies straightens his tie. "What I told you in the stairwell still stands," he says to the room.';
+    // The correction fixes Mira and leaves Davies exactly as he was.
+    const HALF_FIXED =
+      'Mira watches you from behind the counter, her expression closed. ' +
+      'Davies straightens his tie. "What I told you in the stairwell still stands," he says to the room.';
+
+    const client = createRoutedClient(TWO_ISSUES, HALF_FIXED);
+    const result = await new NarrativeGenerator(client).generateSegment({
+      ...request,
+      narrativeContext: {
+        worldId: 'world-1',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        sessionId: 'session-1',
+        currentTags: [],
+        previousSegments: [],
+        currentSituation:
+          'Player chose: "Ask Davies to repeat publicly what he told me privately."',
+      },
+    });
+
+    // Fewer issues than before, so the turn reports corrected.
+    expect(result.metadata.continuity?.status).toBe('corrected');
+    expect(result.content).toBe(HALF_FIXED);
+
+    // The invention survived into the shipped prose, and the note says so.
+    expect(result.metadata.continuity?.remainingIssues).toEqual([
+      { type: 'invented-exchange', entity: 'Davies' },
+    ]);
+
+    // So the lore backstop still runs, on that speaker only.
+    expect(extractStructuredLore).toHaveBeenLastCalledWith(
+      HALF_FIXED,
+      expect.anything(),
+      expect.objectContaining({ unattestedSpeakers: ['Davies'] })
+    );
+  });
 });

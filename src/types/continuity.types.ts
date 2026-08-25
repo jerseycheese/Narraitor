@@ -126,6 +126,14 @@ export interface ContinuityIssue {
 export interface ContinuitySegmentNote {
   status: ContinuityStatus;
   issues?: Array<{ type: ContinuityIssueType; entity: string }>;
+  /**
+   * Issues still present after the correction attempt. Set whenever any
+   * survive, including on a `corrected` turn: `corrected` only means the
+   * correction removed SOME issue, so a segment can report corrected while a
+   * specific contradiction is still in the prose. Downstream steps that care
+   * about one kind of issue have to read this rather than the status.
+   */
+  remainingIssues?: Array<{ type: ContinuityIssueType; entity: string }>;
 }
 
 /** Full record for the DevTools feed (continuityStore). */

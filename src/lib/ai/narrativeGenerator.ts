@@ -216,14 +216,15 @@ export class NarrativeGenerator {
         const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
           recordUsage: false,
         });
-        // A turn the corrector fixed keeps normal tagging; only a flagged one
-        // (the invention survived) strips the speaker's canon annotations.
-        const unattestedSpeakers =
-          result.metadata.continuity?.status === 'flagged'
-            ? (continuityContract?.unrecordedExchanges ?? []).map(
-                (exchange) => exchange.name
-              )
-            : [];
+        // Keyed on the invented-exchange issues that actually survived into the
+        // shipped prose, not on the aggregate status: a segment whose
+        // correction fixed a different issue reports 'corrected' with the
+        // invention still in it. Quarantine only those speakers, nobody else.
+        const unattestedSpeakers = (
+          result.metadata.continuity?.remainingIssues ?? []
+        )
+          .filter((issue) => issue.type === 'invented-exchange')
+          .map((issue) => issue.entity);
 
         void extractStructuredLore(result.content, existingLoreContext, {
           continuityTopics: collectContinuityTopicsFromStores(request),
