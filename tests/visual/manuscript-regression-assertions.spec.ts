@@ -476,6 +476,270 @@ test.describe('Manuscript regression assertions', () => {
     expect(geometry.documentScrollWidth).toBe(geometry.documentClientWidth);
   });
 
+  test('Left gutter outcome marks stay inside the visible scroller, clear of the prose, and clear of each other', async ({ page }) => {
+    // Mirrors the right-gutter invariant above, with the same scoping the
+    // marginalia test uses: control which segments carry a mark and where
+    // they land, rather than trusting whichever segment seedTestData's own
+    // decision happens to auto-link and wherever the app's default
+    // scroll-to-latest leaves it. The default seed links exactly one segment,
+    // and auto-follow can leave that segment straddling the fold — a couple
+    // of its own pixels legitimately scrolled past the top, same as any other
+    // content in that segment. That's ordinary scrolling, not a defect; two
+    // short segments seeded directly, both fitting in the viewport at
+    // scrollTop 0, is what actually exercises the invariant this test names:
+    // whether the carve places a mark correctly beside its own segment, and
+    // whether two marks on screen at once clear each other.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.narrative-segment', { timeout: 10000 });
+
+    await page.evaluate(() => {
+      const store = (window as any).useNarrativeStore?.getState?.();
+      if (!store?.clearSessionSegments || !store?.addSegment) {
+        throw new Error('Expected narrative store to be available');
+      }
+
+      const sessionId = 'session-cyberpunk-ghost';
+      store.clearSessionSegments(sessionId);
+      store.addSegment(sessionId, {
+        worldId: 'world-cyberpunk-2077',
+        content: 'The first short beat of narration.',
+        type: 'scene',
+        characterIds: ['char-cyberpunk-hacker'],
+        metadata: {
+          causedByDecisionId: 'decision-left-gutter-a',
+          causedByDecisionText: 'You choose to slip past the guard',
+          decisionOutcome: 'success',
+        },
+        timestamp: new Date(),
+      });
+      store.addSegment(sessionId, {
+        worldId: 'world-cyberpunk-2077',
+        content: 'The second short beat of narration.',
+        type: 'scene',
+        characterIds: ['char-cyberpunk-hacker'],
+        metadata: {
+          causedByDecisionId: 'decision-left-gutter-b',
+          causedByDecisionText: 'You choose to bluff the fixer',
+          decisionOutcome: 'failure',
+        },
+        timestamp: new Date(),
+      });
+    });
+
+    await page.waitForFunction(
+      () => document.querySelectorAll('.choice-outcome-callout').length === 2,
+      undefined,
+      { timeout: 10000 }
+    );
+
+    // Auto-follow anchors the newest segment to the bottom of the scroller on
+    // every addSegment, even when both segments would otherwise fit — the
+    // same "keep the latest turn in view" behavior a chat-style history has
+    // by design. That's a real, separate feature, not this lane's failure
+    // mode; scroll back to the top to measure the invariant this test
+    // actually names — both marks placed correctly and clear of each other —
+    // independent of auto-follow's own target.
+    await page.evaluate(() => {
+      const scroller = document.querySelector('.manuscript-overlay-main');
+      if (scroller) (scroller as HTMLElement).scrollTop = 0;
+    });
+    await page.waitForTimeout(100);
+
+    const geometry = await page.evaluate(() => {
+      const marks = Array.from(
+        document.querySelectorAll('.choice-outcome-callout')
+      );
+      const scroller = document.querySelector('.manuscript-overlay-main');
+
+      // Any segment's prose container — all share the same column position.
+      const prose = document.querySelector(
+        '[data-testid="narrative-content-container"]'
+      );
+
+      if (marks.length !== 2 || !scroller || !prose) return null;
+
+      const scrollerRect = scroller.getBoundingClientRect();
+      const proseRect = prose.getBoundingClientRect();
+
+      const markRects = marks.map((mark) => {
+        const r = mark.getBoundingClientRect();
+        return {
+          top: Math.round(r.top),
+          bottom: Math.round(r.bottom),
+          left: Math.round(r.left),
+          right: Math.round(r.right),
+        };
+      });
+
+      return {
+        markRects,
+        proseLeft: Math.round(proseRect.left),
+        scrollerTop: Math.round(scrollerRect.top),
+        scrollerBottom: Math.round(scrollerRect.bottom),
+        scrollerLeft: Math.round(scrollerRect.left),
+        scrollerScrollTop: (scroller as HTMLElement).scrollTop,
+        documentScrollWidth: document.documentElement.scrollWidth,
+        documentClientWidth: document.documentElement.clientWidth,
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected left gutter mark geometry to be measurable');
+    }
+
+    // Both short segments fit without scrolling, so both marks are fully in
+    // view — the scenario that actually exercises "inside the scroller" and
+    // "clear of each other" at once.
+    expect(geometry.scrollerScrollTop).toBe(0);
+
+    for (const mark of geometry.markRects) {
+      // Every edge inside the visible scroller.
+      expect(mark.top).toBeGreaterThanOrEqual(geometry.scrollerTop);
+      expect(mark.bottom).toBeLessThanOrEqual(geometry.scrollerBottom);
+      expect(mark.left).toBeGreaterThanOrEqual(geometry.scrollerLeft);
+
+      // Mark is in the left lane, not overlapping the prose column.
+      expect(mark.right).toBeLessThanOrEqual(geometry.proseLeft);
+    }
+
+    // Marks must not overlap each other (the failure mode the right lane
+    // can't have, since it holds one note at a time).
+    for (let i = 1; i < geometry.markRects.length; i++) {
+      expect(geometry.markRects[i].top).toBeGreaterThanOrEqual(
+        geometry.markRects[i - 1].bottom
+      );
+    }
+
+    // Must not buy the lane with a horizontal scrollbar.
+    expect(geometry.documentScrollWidth).toBe(geometry.documentClientWidth);
+  });
+
+  test('A mark with many consequence chips is capped rather than overlapping the next mark', async ({ page }) => {
+    // Being absolute, a mark reserves no height in the segment's flow, unlike
+    // the sub-1280px card, which pushes the next segment down by whatever it
+    // needs. An option with several consequence chips on a short segment can
+    // grow taller than the segment box and run into the next segment's own
+    // mark - a real defect a code reviewer caught in this PR, reproduced here
+    // with five consequences (four relationships plus an alignment shift) on
+    // a one-word segment immediately followed by another decision-linked
+    // segment. The fix is a height cap with overflow hidden on the mark
+    // itself: worse than showing everything, better than corrupting the
+    // neighbor's mark, and the realistic case (the one or two consequences an
+    // option actually carries) never gets near the cap - see the sibling test
+    // above, which has no cap-related slack in its assertions.
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.narrative-segment', { timeout: 10000 });
+
+    await page.evaluate(() => {
+      const useStore = (window as any).useNarrativeStore;
+      const store = useStore?.getState?.();
+      if (!useStore || !store?.clearSessionSegments || !store?.addSegment) {
+        throw new Error('Expected narrative store to be available');
+      }
+
+      const sessionId = 'session-cyberpunk-ghost';
+
+      useStore.setState({
+        decisions: {
+          ...store.decisions,
+          'decision-stress-many-chips': {
+            id: 'decision-stress-many-chips',
+            prompt: 'stress',
+            options: [
+              {
+                id: 'opt-stress',
+                text: 'stress option',
+                consequences: [
+                  { type: 'relationship', targetId: 'npc-kira', value: { trustDelta: -15 } },
+                  { type: 'relationship', targetId: 'npc-raven', value: { trustDelta: 12 } },
+                  { type: 'relationship', targetId: 'npc-fixer', value: { trustDelta: -8 } },
+                  { type: 'relationship', targetId: 'npc-guard-1', value: { trustDelta: 6 } },
+                  { type: 'alignment', value: 12 },
+                ],
+              },
+            ],
+            selectedOptionId: 'opt-stress',
+          },
+        },
+      });
+
+      store.clearSessionSegments(sessionId);
+      store.addSegment(sessionId, {
+        worldId: 'world-cyberpunk-2077',
+        content: 'Short.',
+        type: 'scene',
+        characterIds: ['char-cyberpunk-hacker'],
+        metadata: {
+          causedByDecisionId: 'decision-stress-many-chips',
+          causedByDecisionText: 'You choose to bluff the fixer',
+          decisionOutcome: 'success',
+        },
+        timestamp: new Date(),
+      });
+      store.addSegment(sessionId, {
+        worldId: 'world-cyberpunk-2077',
+        content: 'The next beat.',
+        type: 'scene',
+        characterIds: ['char-cyberpunk-hacker'],
+        metadata: {
+          causedByDecisionId: 'decision-left-gutter-b',
+          causedByDecisionText: 'You choose to run',
+          decisionOutcome: 'failure',
+        },
+        timestamp: new Date(),
+      });
+    });
+
+    await page.waitForFunction(
+      () => document.querySelectorAll('.choice-outcome-callout').length === 2,
+      undefined,
+      { timeout: 10000 }
+    );
+
+    await page.evaluate(() => {
+      const scroller = document.querySelector('.manuscript-overlay-main');
+      if (scroller) (scroller as HTMLElement).scrollTop = 0;
+    });
+    await page.waitForTimeout(100);
+
+    const geometry = await page.evaluate(() => {
+      const marks = Array.from(
+        document.querySelectorAll('.choice-outcome-callout')
+      );
+      if (marks.length !== 2) return null;
+
+      return marks.map((mark) => {
+        const r = mark.getBoundingClientRect();
+        return { top: Math.round(r.top), bottom: Math.round(r.bottom) };
+      });
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected both marks to be measurable');
+    }
+
+    // The overlap this guards against: the first mark's five chips push its
+    // own bottom edge down; without a cap it lands below the second mark's
+    // top and both become unreadable where they cross.
+    expect(geometry[1].top).toBeGreaterThanOrEqual(geometry[0].bottom);
+  });
+
   test('Choice badges stay above the 12px legibility floor', async ({ page }) => {
     await seedTestData(page);
     await mockApiEndpoints(page);

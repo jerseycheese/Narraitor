@@ -11,6 +11,17 @@ const meta: Meta<typeof ChoiceOutcomeCallout> = {
   component: ChoiceOutcomeCallout,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        // Rendered without a .narrative-history-container ancestor, so the
+        // :has() scoping keeps the component in-flow. This canvas shows the
+        // card presentation used below 1280px. Left-gutter mark placement at
+        // >=1280px is covered by the geometry assertions in
+        // manuscript-regression-assertions.spec.ts.
+        component:
+          'Renders in the card form used below 1280px. Left-gutter mark placement at >=1280px is covered by the geometry assertions in manuscript-regression-assertions.spec.ts.',
+      },
+    },
   },
 };
 
