@@ -42,7 +42,6 @@ jest.unmock('../../characterStore');
 import { useWorldStore } from '../../worldStore';
 import { useCharacterStore } from '../../characterStore';
 
-// Mock indexedDB
 const mockIndexedDB = {
   deleteDatabase: jest.fn(),
   open: jest.fn(),
@@ -56,7 +55,6 @@ describe('Persistence Integration - MVP', () => {
   };
 
   beforeEach(() => {
-    // Clear all mocks
     jest.clearAllMocks();
 
     // Get the mock storage
@@ -75,7 +73,6 @@ describe('Persistence Integration - MVP', () => {
     useWorldStore.getState().reset();
     useCharacterStore.getState().reset();
 
-    // Mock global indexedDB
     (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB =
       mockIndexedDB;
   });
@@ -87,7 +84,6 @@ describe('Persistence Integration - MVP', () => {
 
   describe('basic persistence functionality', () => {
     test('should persist character store data', async () => {
-      // Use Jest's fake timers
       jest.useFakeTimers();
 
       // Clear the mock after initialization
@@ -140,13 +136,11 @@ describe('Persistence Integration - MVP', () => {
     }, 10000);
 
     test('should maintain data relationships between stores', async () => {
-      // Use Jest's fake timers
       jest.useFakeTimers();
 
       // Clear the mock after initialization
       mockStorage.setItem.mockClear();
 
-      // Create a world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Reference World',
         description: 'A test world for persistence testing',
@@ -247,7 +241,6 @@ describe('Persistence Integration - MVP', () => {
     });
 
     test('should handle persistence errors gracefully', async () => {
-      // Use Jest's fake timers
       jest.useFakeTimers();
 
       // Simulate persistence errors

@@ -29,9 +29,6 @@ interface DevToolsContextType {
   updateSetting: <K extends keyof DevToolsSettings>(key: K, value: DevToolsSettings[K]) => void;
 }
 
-/**
- * Default context values
- */
 const defaultContext: DevToolsContextType = {
   isOpen: false,
   toggleDevTools: () => {
@@ -46,9 +43,6 @@ const defaultContext: DevToolsContextType = {
   updateSetting: () => {}
 };
 
-/**
- * DevTools Context
- */
 const DevToolsContext = createContext<DevToolsContextType>(defaultContext);
 
 /**
@@ -107,7 +101,6 @@ export const DevToolsProvider = ({
     setSectionVisibilityState(newVisibility);
   };
 
-  // Check if a section is visible
   const checkSectionVisible = (sectionId: string) => {
     return isSectionVisible(sectionId, sectionVisibility);
   };
@@ -144,7 +137,4 @@ export const DevToolsProvider = ({
   );
 };
 
-/**
- * Hook to use DevTools context
- */
 export const useDevTools = () => useContext(DevToolsContext);
