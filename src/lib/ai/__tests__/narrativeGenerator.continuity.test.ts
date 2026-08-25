@@ -12,6 +12,7 @@ import { useContinuityStore } from '@/state/continuityStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useLoreStore } from '@/state/loreStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { extractStructuredLore } from '../structuredLoreExtractor';
 import { setupDecisionConsequencesMocks } from './narrativeGenerator.decisionConsequences.testHelpers';
 import type { AIClient } from '../types';
@@ -59,6 +60,11 @@ jest.mock('../toneSettingsGuidance', () => ({
 }));
 jest.mock('@/state/loreStore', () => ({
   useLoreStore: {
+    getState: jest.fn()
+  }
+}));
+jest.mock('@/state/narrativeStore', () => ({
+  useNarrativeStore: {
     getState: jest.fn()
   }
 }));
@@ -185,6 +191,10 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       createNPC: jest.fn(),
       updateNPC: jest.fn(),
     }));
+
+    (useNarrativeStore.getState as jest.Mock).mockReturnValue({
+      getSessionSegments: jest.fn().mockReturnValue([]),
+    });
 
     (useLoreStore.getState as jest.Mock).mockReturnValue({
       getFacts: jest.fn().mockReturnValue([miraFact]),
@@ -374,5 +384,89 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       'Recent decision: "Bar the mill door from the inside"'
     );
     expect(result.metadata.continuity).toEqual({ status: 'clean' });
+  });
+
+  // #1857: the player refers to a private conversation the story never told.
+  // Co-presence on the session's segments is what makes the void assertable.
+  it('asserts the co-presence record, corrects an invention, and marks a flagged speaker unattested', async () => {
+    (useNPCStore.getState as jest.Mock).mockImplementation(() => ({
+      getNPCsByWorld: jest.fn().mockReturnValue([
+        { id: 'npc-mira', name: 'Mira', worldId: 'world-1' },
+        { id: 'npc-davies', name: 'Davies', worldId: 'world-1' },
+      ]),
+      getById: jest.fn(),
+      createNPC: jest.fn(),
+      updateNPC: jest.fn(),
+    }));
+    // Three shared scenes, a third party in every one of them, and the first
+    // sits outside any last-3 window.
+    (useNarrativeStore.getState as jest.Mock).mockReturnValue({
+      getSessionSegments: jest.fn().mockReturnValue([
+        { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
+        { metadata: { characterIds: ['npc-mira'] } },
+        { metadata: { characterIds: ['npc-mira'] } },
+        { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
+        { metadata: { characterIds: ['npc-mira'], speakerId: 'npc-davies' } },
+      ]),
+    });
+
+    const baitRequest: NarrativeGenerationRequest = {
+      ...request,
+      narrativeContext: {
+        worldId: 'world-1',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        sessionId: 'session-1',
+        currentTags: [],
+        previousSegments: [],
+        currentSituation:
+          'Player chose: "Ask Davies to repeat publicly what he told me privately."',
+      },
+    };
+
+    const INVENTED_PROSE =
+      'Davies straightens his tie. "What I told you in the stairwell still stands," he says to the room.';
+    const REFUSED_PROSE =
+      'Davies blinks at you. "No such conversation ever took place," he says, loud enough for the room to hear.';
+
+    const client = createRoutedClient(INVENTED_PROSE, REFUSED_PROSE);
+    const result = await new NarrativeGenerator(client).generateSegment(baitRequest);
+
+    // The prompt states the checkable fact rather than an absence of evidence.
+    const generationPrompt = client.generateContent.mock.calls[0][0] as string;
+    expect(generationPrompt).toContain(
+      'Davies has shared 3 narrated scenes with the protagonist and has never been alone with them.'
+    );
+
+    // One corrective call, and the refusal is what the player sees.
+    const correctionPrompts = correctionPromptsOf(client);
+    expect(correctionPrompts).toHaveLength(1);
+    expect(correctionPrompts[0]).toContain('[invented-exchange]');
+    expect(result.content).toBe(REFUSED_PROSE);
+    expect(result.metadata.continuity).toEqual({
+      status: 'corrected',
+      issues: [{ type: 'invented-exchange', entity: 'Davies' }],
+    });
+
+    // A corrected turn tags normally: nothing to reserve.
+    expect(extractStructuredLore).toHaveBeenLastCalledWith(
+      REFUSED_PROSE,
+      expect.anything(),
+      expect.not.objectContaining({ unattestedSpeakers: expect.anything() })
+    );
+
+    // Same bait, but the correction keeps the invention: the lore backstop
+    // takes over and the speaker's canon annotations get reserved.
+    const stubbornClient = createRoutedClient(INVENTED_PROSE, INVENTED_PROSE);
+    const flagged = await new NarrativeGenerator(stubbornClient).generateSegment(
+      baitRequest
+    );
+
+    expect(flagged.metadata.continuity?.status).toBe('flagged');
+    expect(extractStructuredLore).toHaveBeenLastCalledWith(
+      INVENTED_PROSE,
+      expect.anything(),
+      expect.objectContaining({ unattestedSpeakers: ['Davies'] })
+    );
   });
 });
