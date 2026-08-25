@@ -1,11 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { ColorScheme } from './index';
+import type { ColorScheme } from './colorScheme';
 import {
   DEFAULT_COLOR_SCHEME,
   STORAGE_KEY_COLOR_SCHEME,
-} from './index';
+} from './colorScheme';
 
 export interface ThemeContextValue {
   colorScheme: ColorScheme;

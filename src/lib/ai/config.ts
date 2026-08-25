@@ -75,7 +75,7 @@ export const resolveEffectiveGeminiKey = (requestKey?: string | null): string =>
  * @param apiKeyOverride - the player's bring-your-own key for this request; when
  *   omitted, falls back to the server env key. An explicit null does not — see
  *   resolveEffectiveGeminiKey.
- * @param modelOverride - the model the player picked (see resolveModel); when
+ * @param modelOverride - the model the player picked (see resolveProvider); when
  *   omitted, falls back to the default text model.
  * @returns Complete AI service configuration
  */

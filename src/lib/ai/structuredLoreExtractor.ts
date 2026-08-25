@@ -6,6 +6,7 @@
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { extractFencedJson } from './parseJSON';
 import { canonicalizeName } from '@/lib/utils/textNormalization';
+import { asTrimmedString } from '@/lib/utils/typeGuards';
 import type {
   LoreContinuityAnnotation,
   LoreContinuityKind,
@@ -364,9 +365,6 @@ function dropUnattestedAssertions(
   return { ...extraction, events };
 }
 
-const trimmedString = (value: unknown): string | undefined =>
-  typeof value === 'string' && value.trim() ? value.trim() : undefined;
-
 /** An annotation with an unknown kind is dropped; bad optional fields are just omitted. */
 function cleanContinuityAnnotation(raw: unknown): LoreContinuityAnnotation | undefined {
   if (!raw || typeof raw !== 'object') return undefined;
@@ -376,8 +374,8 @@ function cleanContinuityAnnotation(raw: unknown): LoreContinuityAnnotation | und
   const status = annotation.status as (typeof COMMITMENT_STATUSES)[number];
   return {
     kind,
-    topic: trimmedString(annotation.topic),
-    speaker: trimmedString(annotation.speaker),
+    topic: asTrimmedString(annotation.topic),
+    speaker: asTrimmedString(annotation.speaker),
     status: COMMITMENT_STATUSES.includes(status) ? status : undefined,
   };
 }

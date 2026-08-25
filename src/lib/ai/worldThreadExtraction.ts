@@ -8,6 +8,7 @@ import type {
   WorldThreadSegmentSignals,
   WorldThreadSeedContext,
 } from '@/types/worldThread.types';
+import { isRecord, asTrimmedString, asArray } from '@/lib/utils/typeGuards';
 
 /**
  * The world clock rides along on goal extraction so the ledger costs no
@@ -83,21 +84,10 @@ ${threadList}`,
   return sections.join('\n\n');
 }
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const asTrimmedString = (value: unknown): string | undefined => {
-  if (typeof value !== 'string') return undefined;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
-};
-
 const asTurnIndex = (value: unknown): number | undefined => {
   const numeric = typeof value === 'string' ? Number(value) : value;
   return typeof numeric === 'number' && Number.isFinite(numeric) ? Math.round(numeric) : undefined;
 };
-
-const asArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
 
 /**
  * Reads the model's `worldThreads` block. Returns undefined when the block is

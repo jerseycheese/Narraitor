@@ -1,7 +1,4 @@
-export type ColorScheme = 'light' | 'dark' | 'system';
-
-export const DEFAULT_COLOR_SCHEME: ColorScheme = 'light';
-
-export const STORAGE_KEY_COLOR_SCHEME = 'narraitor-color-scheme';
+export type { ColorScheme } from './colorScheme';
+export { DEFAULT_COLOR_SCHEME, STORAGE_KEY_COLOR_SCHEME } from './colorScheme';
 
 export { ThemeProvider, useTheme } from './ThemeProvider';

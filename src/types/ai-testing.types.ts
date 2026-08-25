@@ -1,4 +1,6 @@
-import type { World, Character, NarrativeContext } from './index';
+import type { World } from './world.types';
+import type { Character } from './character.types';
+import type { NarrativeContext } from './session.types';
 
 // AI Testing Configuration
 export interface AITestConfig {
