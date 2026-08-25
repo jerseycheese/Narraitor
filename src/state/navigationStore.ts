@@ -74,9 +74,6 @@ const sessionStorageHelpers = {
   },
 };
 
-/**
- * Local storage helpers for persistent preferences
- */
 const localStorageHelpers = {
   setFlowState: (flowState: string | null): void => {
     if (!isStorageAvailable()) return;
@@ -135,7 +132,6 @@ export interface NavigationState {
   // Navigation history (recent pages)
   history: NavigationHistoryEntry[];
   
-  // Navigation preferences
   preferences: NavigationPreferences;
   
   // Modal/dialog states
@@ -156,7 +152,6 @@ export interface NavigationState {
   clearHistory: () => void;
   removeFromHistory: (path: string) => void;
   
-  // Preferences
   updatePreferences: (updates: Partial<NavigationPreferences>) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   
@@ -164,7 +159,6 @@ export interface NavigationState {
   setModalState: (modalId: string, isOpen: boolean) => void;
   closeAllModals: () => void;
   
-  // Flow state
   setCurrentFlowStep: (step: NavigationState['currentFlowStep']) => void;
   
   // Breadcrumb management
@@ -181,9 +175,6 @@ export interface NavigationState {
   hasVisited: (path: string) => boolean;
 }
 
-/**
- * Default navigation preferences
- */
 const defaultPreferences: NavigationPreferences = {
   sidebarCollapsed: false,
   breadcrumbsEnabled: true,

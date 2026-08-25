@@ -37,7 +37,7 @@ const ALIGNMENT_DEFINITIONS: Record<'NEUTRAL' | 'CHAOTIC' | 'LAWFUL', string> = 
 
 /**
  * The glossary orders in rotation. Excludes LAWFUL/NEUTRAL/CHAOTIC (the
- * canonical running order #1877 removed from the numbered slots) and any
+ * canonical running order removed from the numbered slots) and any
  * order ending in CHAOTIC (the slot-3 tell round 5 found still holding at
  * 83% even with the order shuffled) - the two shapes the alignment-spread
  * tests forbid.
@@ -54,9 +54,9 @@ const ALIGNMENT_GLOSSARY_ORDERS: Array<Array<'NEUTRAL' | 'CHAOTIC' | 'LAWFUL'>> 
  *
  * The mix of alignments is chosen per scene rather than mandated. Removing the
  * quota was not enough on its own: the model kept returning lawful, neutral,
- * chaotic in that order because the prompt itself taught the pattern. #1877
- * moved the mix decision earlier and took the glossary out of slot order, but
- * a FIXED reordering is still a pattern - round 5 (#1829) measured 70% one
+ * chaotic in that order because the prompt itself taught the pattern. Moving
+ * the mix decision earlier and taking the glossary out of slot order wasn't
+ * enough either - a FIXED reordering is still a pattern - round 5 measured 70% one
  * dominant order and 83-87% slot-predicts-tag against a single static
  * glossary. So the glossary's own listing order now rotates per turn (see
  * ALIGNMENT_GLOSSARY_ORDERS below) instead of landing on one order and
@@ -100,7 +100,7 @@ ${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`
 
   const protagonistInfo = protagonistGuidance(playerCharacterName);
 
-  // Round 5 (#1829) measured slot-predicts-tag at 87%/70%/83% even after the
+  // Round 5 measured slot-predicts-tag at 87%/70%/83% even after the
   // glossary stopped running in slot order: a FIXED glossary order is still a
   // pattern to learn against, just one call removed from the numbered slots.
   // Rotate which of the four permitted orders (no LAWFUL-NEUTRAL-CHAOTIC, none

@@ -14,7 +14,7 @@ interface NarrativeHistoryManagerProps {
   disableInitialAutoScroll?: boolean;
   /**
    * True while a NarrativeController elsewhere in the tree is actively
-   * generating the next turn (issue #1476). This component only displays
+   * generating the next turn. This component only displays
    * persisted segments, so it has no generation state of its own — a
    * composer that hides its own NarrativeController's history (the live play
    * surface does, via ActiveGameSessionNarrativeColumn) passes its
@@ -38,7 +38,6 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
   // We define error state but don't currently use setError - this is for future error handling
   const [error] = useState<string | null>(null);
   
-  // Get segments from the store
   const getSegments = useNarrativeStore(state => state.getSessionSegments);
   
   // Subscribe to narrative store updates
@@ -69,7 +68,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     // changes, instead of on every narrative-store write. Segments stream in
     // token-by-token during play (each a store write), and addSegment replaces
     // sessionSegments[sessionId] with a new array, so a reference check catches
-    // every add/remove for this session (issue #1358).
+    // every add/remove for this session.
     let prevSegmentIds = useNarrativeStore.getState().sessionSegments[sessionId];
     const unsubscribe = useNarrativeStore.subscribe((state) => {
       const nextSegmentIds = state.sessionSegments[sessionId];
@@ -164,7 +163,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
         // Only show segments when they've stabilized
         segments={stabilized ? segments : []}
         // Always show loading animation until stabilized, regardless of whether we have segments —
-        // also true while a sibling NarrativeController generates the next turn (issue #1476).
+        // also true while a sibling NarrativeController generates the next turn.
         isLoading={isLoading || !stabilized || isGenerating}
         streamingContent={streamingContent}
         // Segments withheld pre-stabilization are historical, not newly generated —

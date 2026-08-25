@@ -80,7 +80,7 @@ export const useGameSessionState = ({
   // Scope each store subscription to the slice this hook actually uses, so the
   // game session doesn't re-render on every unrelated store write during play.
   // Session state itself is consumed via the dedicated subscription below; here
-  // we only need its (stable) action methods (issue #1358).
+  // we only need its (stable) action methods.
   const actualWorldState = useWorldStore(
     useShallow((state) => ({ worlds: state.worlds }))
   );
@@ -161,7 +161,6 @@ export const useGameSessionState = ({
     }
   }, [worldId, currentCharacterId, isClient, actualCharacterState, logger, worldCharacters]); // Dependencies to prevent stale closures
   
-  // Handle retry
   const handleRetry = useCallback(() => {
     setError(null);
     setSessionState(prev => ({ ...prev, error: null }));
@@ -175,7 +174,6 @@ export const useGameSessionState = ({
     }
   }, [sessionCharacterId, worldId, onSessionStart, actualSessionState, logger]);
 
-  // Handle dismiss error
   const handleDismissError = () => {
     setError(null);
     setSessionState(prev => ({ ...prev, error: null }));
@@ -226,7 +224,6 @@ export const useGameSessionState = ({
   };
 
 
-  // Handle end session
   const handleEndSession = () => {
     actualSessionState.endSession?.();
     setSessionState(prev => ({ ...prev, status: 'ended' }));
@@ -246,7 +243,7 @@ export const useGameSessionState = ({
     // If store already has an active session that matches our requirements, don't
     // re-initialize — but re-arm the crash-recovery marker. A clean refresh clears
     // it on pagehide, and this remount path skips initializeSession/resumeSavedSession,
-    // so without this a crash before the next save would leave no marker (issue #221).
+    // so without this a crash before the next save would leave no marker.
     if (!disableAutoResume &&
         currentStoreState.status === 'active' &&
         currentStoreState.worldId === worldId &&
