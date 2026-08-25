@@ -25,9 +25,6 @@ export const createTestTracker = () => new PlayerDecisionTracker({
   maxTotalDecisions: 100
 });
 
-/**
- * Resets the narrative store to initial state
- */
 export const resetNarrativeStore = () => {
   useNarrativeStore.setState({
     segments: {},
@@ -97,9 +94,6 @@ export const createMarketplaceSegment = (sessionId: string, worldId: string): Se
   timestamp: new Date()
 });
 
-/**
- * Creates a merchant encounter segment
- */
 export const createMerchantEncounterSegment = (sessionId: string, worldId: string, characterId: string): SegmentInput => ({
   worldId,
   content: 'A distressed merchant approaches you, wringing his hands nervously.',
@@ -113,9 +107,6 @@ export const createMerchantEncounterSegment = (sessionId: string, worldId: strin
   timestamp: new Date()
 });
 
-/**
- * Creates a merchant plea segment
- */
 export const createMerchantPleaSegment = (sessionId: string, worldId: string, characterId: string): SegmentInput => ({
   worldId,
   content: '"Please, adventurer! Bandits stole my entire shipment on the road from Millhaven!"',
@@ -171,9 +162,6 @@ export const createMerchantHelpOptions = (): DecisionOption[] => [
   }
 ];
 
-/**
- * Creates bandit camp decision options
- */
 export const createBanditCampOptions = (): DecisionOption[] => [
   { id: 'sneak-stealth', text: 'Sneak in quietly and recover the goods without fighting' },
   { id: 'negotiate-bandits', text: 'Approach openly and try to negotiate the return of the goods' },
@@ -181,9 +169,6 @@ export const createBanditCampOptions = (): DecisionOption[] => [
   { id: 'retreat-plan', text: 'Retreat and come back with town guards for backup' }
 ];
 
-/**
- * Records a decision in the tracker with standard parameters
- */
 export const recordDecisionInTracker = (
   tracker: PlayerDecisionTracker,
   prompt: string,

@@ -39,9 +39,6 @@ export function createMockWorld(overrides: Partial<World> = {}): World {
   };
 }
 
-/**
- * Creates a mock WorldAttribute object
- */
 export function createMockWorldAttribute(
   overrides: Partial<WorldAttribute> = {}
 ): WorldAttribute {
@@ -58,9 +55,6 @@ export function createMockWorldAttribute(
   };
 }
 
-/**
- * Creates a mock WorldSkill object
- */
 export function createMockWorldSkill(
   overrides: Partial<WorldSkill> = {}
 ): WorldSkill {
@@ -136,9 +130,6 @@ export function createMockCharacter(
   };
 }
 
-/**
- * Creates a mock NarrativeSegment object
- */
 export function createMockNarrativeSegment(
   overrides: Partial<NarrativeSegment> = {}
 ): NarrativeSegment {
@@ -161,9 +152,6 @@ export function createMockNarrativeSegment(
   };
 }
 
-/**
- * Creates a mock JournalEntry object
- */
 export function createMockJournalEntry(
   overrides: Partial<JournalEntry> = {}
 ): JournalEntry {
@@ -188,9 +176,6 @@ export function createMockJournalEntry(
   };
 }
 
-/**
- * Creates a mock InventoryItem object
- */
 export function createMockInventoryItem(
   overrides: Partial<InventoryItem> = {}
 ): InventoryItem {
