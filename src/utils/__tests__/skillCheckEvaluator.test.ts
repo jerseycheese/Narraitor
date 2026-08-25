@@ -22,10 +22,6 @@ import {
 import { WorldSkill } from '@/types/world.types';
 import { SkillCheck } from '../skillCheckEvaluator';
 
-// ============================================================================
-// TEST DATA SETUP
-// ============================================================================
-
 /**
  * Mock character attributes for testing various attribute bonus scenarios
  */
@@ -95,10 +91,6 @@ const mockWorldSkills: WorldSkill[] = [
     maxValue: 20,
   },
 ];
-
-// ============================================================================
-// TEST SUITES
-// ============================================================================
 
 describe('rollD20', () => {
   it('should return a number between 1 and 20', () => {
