@@ -156,7 +156,7 @@ export default function DescriptionStep({
     <div data-testid="description-step">
       <WizardFormSection
         title="Describe Your World"
-        description="Provide a detailed description of your world. Include information about the setting, tone, major themes, and any unique aspects. This will help us suggest appropriate attributes and skills."
+        description="Describe your world's setting, tone, and major themes. This shapes the attributes and skills we suggest."
       >
         <WizardFormGroup
           label="Full Description"

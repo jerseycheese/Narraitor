@@ -148,4 +148,4 @@ We're thinking about adding:
 - Support for streaming responses
 - Additional AI provider integrations
 
-The architecture is designed to be flexible, so adding new providers or features shouldn't require major changes to the existing code.
+Adding a new provider or feature shouldn't require major changes elsewhere.

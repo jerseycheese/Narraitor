@@ -1,8 +1,6 @@
 /**
- * Centralized genre constants for the Narraitor application
- * 
- * This file serves as the single source of truth for all available genres
- * used throughout the application, including UI components, AI generators, and templates.
+ * The single source of truth for available genres — used by UI components,
+ * AI generators, and templates throughout the app.
  */
 
 import { capitalize } from '@/lib/utils';

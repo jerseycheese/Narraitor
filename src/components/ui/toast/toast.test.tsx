@@ -1,7 +1,7 @@
 /**
  * Toast Component Tests
  * 
- * Comprehensive test suite for the Toast component covering:
+ * Tests for the Toast component covering:
  * - Content rendering and variants
  * - Auto-dismissal behavior
  * - Manual dismissal interaction

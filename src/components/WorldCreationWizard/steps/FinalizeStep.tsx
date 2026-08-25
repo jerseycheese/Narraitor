@@ -104,7 +104,7 @@ export default function FinalizeStep({
     <div data-testid="finalize-step">
       <WizardFormSection
         title="Review Your World"
-        description="Review your world configuration before creating it. You can go back to make changes or proceed to create your world."
+        description="Review your world configuration before creating it."
       >
 
       <div className="wizard-review-summary">
