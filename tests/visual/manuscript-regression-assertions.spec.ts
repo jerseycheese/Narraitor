@@ -622,6 +622,124 @@ test.describe('Manuscript regression assertions', () => {
     expect(geometry.documentScrollWidth).toBe(geometry.documentClientWidth);
   });
 
+  test('A mark with many consequence chips is capped rather than overlapping the next mark', async ({ page }) => {
+    // Being absolute, a mark reserves no height in the segment's flow, unlike
+    // the sub-1280px card, which pushes the next segment down by whatever it
+    // needs. An option with several consequence chips on a short segment can
+    // grow taller than the segment box and run into the next segment's own
+    // mark - a real defect a code reviewer caught in this PR, reproduced here
+    // with five consequences (four relationships plus an alignment shift) on
+    // a one-word segment immediately followed by another decision-linked
+    // segment. The fix is a height cap with overflow hidden on the mark
+    // itself: worse than showing everything, better than corrupting the
+    // neighbor's mark, and the realistic case (the one or two consequences an
+    // option actually carries) never gets near the cap - see the sibling test
+    // above, which has no cap-related slack in its assertions.
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+      timeout: 10000,
+    });
+    await page.waitForSelector('.narrative-segment', { timeout: 10000 });
+
+    await page.evaluate(() => {
+      const useStore = (window as any).useNarrativeStore;
+      const store = useStore?.getState?.();
+      if (!useStore || !store?.clearSessionSegments || !store?.addSegment) {
+        throw new Error('Expected narrative store to be available');
+      }
+
+      const sessionId = 'session-cyberpunk-ghost';
+
+      useStore.setState({
+        decisions: {
+          ...store.decisions,
+          'decision-stress-many-chips': {
+            id: 'decision-stress-many-chips',
+            prompt: 'stress',
+            options: [
+              {
+                id: 'opt-stress',
+                text: 'stress option',
+                consequences: [
+                  { type: 'relationship', targetId: 'npc-kira', value: { trustDelta: -15 } },
+                  { type: 'relationship', targetId: 'npc-raven', value: { trustDelta: 12 } },
+                  { type: 'relationship', targetId: 'npc-fixer', value: { trustDelta: -8 } },
+                  { type: 'relationship', targetId: 'npc-guard-1', value: { trustDelta: 6 } },
+                  { type: 'alignment', value: 12 },
+                ],
+              },
+            ],
+            selectedOptionId: 'opt-stress',
+          },
+        },
+      });
+
+      store.clearSessionSegments(sessionId);
+      store.addSegment(sessionId, {
+        worldId: 'world-cyberpunk-2077',
+        content: 'Short.',
+        type: 'scene',
+        characterIds: ['char-cyberpunk-hacker'],
+        metadata: {
+          causedByDecisionId: 'decision-stress-many-chips',
+          causedByDecisionText: 'You choose to bluff the fixer',
+          decisionOutcome: 'success',
+        },
+        timestamp: new Date(),
+      });
+      store.addSegment(sessionId, {
+        worldId: 'world-cyberpunk-2077',
+        content: 'The next beat.',
+        type: 'scene',
+        characterIds: ['char-cyberpunk-hacker'],
+        metadata: {
+          causedByDecisionId: 'decision-left-gutter-b',
+          causedByDecisionText: 'You choose to run',
+          decisionOutcome: 'failure',
+        },
+        timestamp: new Date(),
+      });
+    });
+
+    await page.waitForFunction(
+      () => document.querySelectorAll('.choice-outcome-callout').length === 2,
+      undefined,
+      { timeout: 10000 }
+    );
+
+    await page.evaluate(() => {
+      const scroller = document.querySelector('.manuscript-overlay-main');
+      if (scroller) (scroller as HTMLElement).scrollTop = 0;
+    });
+    await page.waitForTimeout(100);
+
+    const geometry = await page.evaluate(() => {
+      const marks = Array.from(
+        document.querySelectorAll('.choice-outcome-callout')
+      );
+      if (marks.length !== 2) return null;
+
+      return marks.map((mark) => {
+        const r = mark.getBoundingClientRect();
+        return { top: Math.round(r.top), bottom: Math.round(r.bottom) };
+      });
+    });
+
+    expect(geometry).not.toBeNull();
+    if (!geometry) {
+      throw new Error('Expected both marks to be measurable');
+    }
+
+    // The overlap this guards against: the first mark's five chips push its
+    // own bottom edge down; without a cap it lands below the second mark's
+    // top and both become unreadable where they cross.
+    expect(geometry[1].top).toBeGreaterThanOrEqual(geometry[0].bottom);
+  });
+
   test('Choice badges stay above the 12px legibility floor', async ({ page }) => {
     await seedTestData(page);
     await mockApiEndpoints(page);

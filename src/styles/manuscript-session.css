@@ -3696,9 +3696,25 @@ body.manuscript-overlay-open {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     border-radius: 0;
-    padding: 0;
+
+    /* Top padding only: clears the corner bracket the way a padded card's
+       padding does for the same bracket elsewhere (world-detail-npc etc.),
+       without padding the sides of what's meant to read as a mark, not a
+       card. Zero padding put the label flush against the bracket's arm. */
+    padding: calc(var(--mark-arm-length) + var(--space-1)) 0 0;
     margin: 0;
     color: var(--color-text-muted);
+
+    /* Being absolute, this mark reserves no height in the segment's flow -
+       unlike the sub-1280px card, which pushes the next segment down by
+       whatever it needs. An option with several consequence chips on a short
+       segment can grow taller than the segment box, running into the next
+       segment's own mark. Capping height and clipping the overflow keeps
+       that failure contained to "this mark's tail is cut off" rather than
+       "two marks overlap, both unreadable" - the realistic case (the chips
+       an option actually carries in practice) fits well inside this. */
+    max-height: 6rem;
+    overflow: hidden;
   }
 
   /* The decision sentence is dropped in this lane, not just destyled: sitting
