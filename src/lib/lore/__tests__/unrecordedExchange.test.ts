@@ -32,6 +32,30 @@ describe('detectUnrecordedExchangeClaim', () => {
       })
     ).toBeNull();
   });
+
+  it('stays quiet on a conversation the story actually narrated', () => {
+    // A council meeting the player watched, with others present. Firing here
+    // would assert "nothing passed between you off the page" about a real
+    // on-page scene and push the model to deny its own canon, so a past
+    // communication needs an off-page marker before it counts.
+    expect(
+      detectUnrecordedExchangeClaim(
+        'Ask Davies to repeat what he told me at the council meeting.',
+        { 'npc-davies': 'Davies' }
+      )
+    ).toBeNull();
+  });
+
+  it('declines when two rostered names make the attribution ambiguous', () => {
+    // Taking the first roster hit would have Davies deny a conversation the
+    // player attributed to Mira.
+    expect(
+      detectUnrecordedExchangeClaim(
+        'Ask Davies why Mira told me the vote was fixed, just between us.',
+        { 'npc-davies': 'Davies', 'npc-mira': 'Mira' }
+      )
+    ).toBeNull();
+  });
 });
 
 describe('countSharedScenes', () => {

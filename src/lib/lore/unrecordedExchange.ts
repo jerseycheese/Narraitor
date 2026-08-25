@@ -21,13 +21,33 @@ import type { EntityID } from '../../types/common.types';
 import { escapeRegExp } from './continuityLedger';
 
 /**
- * The player's action asserts a prior exchange aimed at them: a past-tense
- * telling with the player on the receiving end, or a named prior meeting.
- * Deliberately anchored on the past tense — "tell Davies privately that I'll
- * vote no" proposes a conversation rather than recalling one.
+ * Two tiers, because the single sharpest failure mode here is firing on a
+ * conversation the story DID narrate. "Repeat what he told me at the council
+ * meeting" refers to a scene the player watched, with others present, so
+ * `aloneTogether` would be false and the contract would assert that nothing
+ * passed between them off the page. Half of that is true and the operative
+ * half is false, and it would instruct the model to deny real canon.
+ *
+ * So a claim needs either a phrase that names an off-page private exchange on
+ * its own, or a past communication aimed at the player PLUS a marker putting it
+ * off the page. The false negatives that buys are deliberate: a missed catch
+ * costs one rare turn, and a false positive rewrites established canon into a
+ * denial, which is worse than the bug.
  */
-const PRIOR_EXCHANGE_CLAIM =
-  /\b(?:(?:told|admitted|confided|confessed|promised|mentioned|whispered|said)\s+(?:it\s+)?(?:to\s+)?me\b|what\s+(?:he|she|they|you)\s+(?:told|said|admitted|confided|confessed|promised|mentioned|whispered)\b|(?:our|that|the)\s+(?:private\s+|earlier\s+|previous\s+)?(?:conversation|talk|chat|exchange|meeting|discussion)\b|when\s+we\s+(?:last\s+)?(?:spoke|talked|met)\b|(?:you|he|she|they)\s+already\s+(?:told|said|admitted|promised)\b)/i;
+const SELF_SUFFICIENT_CLAIM =
+  /\b(?:(?:our|that|the|your)\s+(?:private|secret|confidential|off-the-record)\s+(?:conversation|talk|chat|exchange|meeting|discussion|word)|confided\s+(?:in|to)\s+me|in\s+confidence)\b/i;
+
+/** A past communication with the player on the receiving end. */
+const PAST_COMMUNICATION_TO_PLAYER =
+  /\b(?:(?:told|admitted|confided|confessed|promised|mentioned|whispered|revealed|swore)\s+(?:it\s+)?(?:to\s+)?me\b|what\s+(?:he|she|they|you)\s+(?:told|said|admitted|confided|confessed|promised|mentioned|whispered|revealed)\b|(?:he|she|they|you)\s+(?:told|said\s+to|admitted\s+to|promised|whispered\s+to)\s+me\b)/i;
+
+/** Puts that communication somewhere the story never showed. */
+const OFF_PAGE_MARKER =
+  /\b(?:privately|in\s+private|in\s+confidence|confidentially|off\s+the\s+record|behind\s+closed\s+doors|just\s+between\s+us|between\s+you\s+and\s+me|alone|in\s+secret|secretly|when\s+we\s+(?:last\s+)?(?:spoke|talked|met))\b/i;
+
+const claimsUnrecordedExchange = (text: string): boolean =>
+  SELF_SUFFICIENT_CLAIM.test(text) ||
+  (PAST_COMMUNICATION_TO_PLAYER.test(text) && OFF_PAGE_MARKER.test(text));
 
 /**
  * Prose in which the NPC recounts the exchange instead of refusing the premise.
@@ -121,16 +141,22 @@ export function detectUnrecordedExchangeClaim(
   npcNames: Record<EntityID, string>
 ): UnrecordedExchangeClaim | null {
   const text = actionText?.trim();
-  if (!text || !PRIOR_EXCHANGE_CLAIM.test(text)) return null;
+  if (!text || !claimsUnrecordedExchange(text)) return null;
 
-  for (const [npcId, name] of Object.entries(npcNames ?? {})) {
+  const named = Object.entries(npcNames ?? {}).filter(([, name]) => {
     const trimmed = name?.trim();
-    if (!trimmed) continue;
-    if (!new RegExp(`\\b${escapeRegExp(trimmed)}\\b`, 'i').test(text)) continue;
-    return { npcId, name: trimmed, excerpt: text.slice(0, MAX_CLAIM_LENGTH) };
-  }
+    return (
+      !!trimmed && new RegExp(`\\b${escapeRegExp(trimmed)}\\b`, 'i').test(text)
+    );
+  });
 
-  return null;
+  // Exactly one, or nothing. "Ask Davies why Mira told me the vote was fixed"
+  // names two, and taking the first would have Davies deny a conversation the
+  // player attributed to Mira. A miss is cheap; a wrong denial is not.
+  if (named.length !== 1) return null;
+
+  const [npcId, name] = named[0];
+  return { npcId, name: name.trim(), excerpt: text.slice(0, MAX_CLAIM_LENGTH) };
 }
 
 /** True when this sentence recounts the exchange rather than refusing it. */
