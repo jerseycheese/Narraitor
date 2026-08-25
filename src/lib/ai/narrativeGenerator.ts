@@ -216,9 +216,19 @@ export class NarrativeGenerator {
         const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
           recordUsage: false,
         });
+        // A turn the corrector fixed keeps normal tagging; only a flagged one
+        // (the invention survived) strips the speaker's canon annotations.
+        const unattestedSpeakers =
+          result.metadata.continuity?.status === 'flagged'
+            ? (continuityContract?.unrecordedExchanges ?? []).map(
+                (exchange) => exchange.name
+              )
+            : [];
+
         void extractStructuredLore(result.content, existingLoreContext, {
           continuityTopics: collectContinuityTopicsFromStores(request),
           playerCharacterName: context.playerCharacterName,
+          ...(unattestedSpeakers.length > 0 ? { unattestedSpeakers } : {}),
         })
           .then(async (structuredLore) => {
             const { useLoreStore } = await import('@/state/loreStore');

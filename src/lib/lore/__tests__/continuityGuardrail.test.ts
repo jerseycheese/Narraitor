@@ -179,6 +179,7 @@ describe('formatContinuityExpectations', () => {
         assertions: [],
         commitments: [],
         sceneChanges: [],
+        unrecordedExchanges: [],
       })
     ).toBe('');
   });

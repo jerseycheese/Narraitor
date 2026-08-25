@@ -23,6 +23,7 @@ import type {
   ContinuityNpcExpectation,
   ContinuityRecentDecision,
   ContinuityTone,
+  ContinuityUnrecordedExchange,
 } from '../../types/continuity.types';
 import {
   MIN_TERM_LENGTH,
@@ -33,6 +34,7 @@ import {
   ledgerFacts,
   topicTerms,
 } from './continuityLedger';
+import { recountsUnrecordedExchange } from './unrecordedExchange';
 
 /** Routes correction responses in tests and marks the call in debug output. */
 export const CONTINUITY_CORRECTION_HEADER = 'CONTINUITY CORRECTION';
@@ -85,6 +87,13 @@ export interface BuildContinuityContractArgs {
    * the player's inventory does rather than the way the topic label does.
    */
   inventoryItemNames?: string[];
+  /**
+   * Prior exchanges the player's action claims but the session never narrated
+   * (#1857). Passed through rather than derived here: co-presence lives on the
+   * narrative store, and this module stays store-free. Optional so the existing
+   * fixtures keep compiling.
+   */
+  unrecordedExchanges?: ContinuityUnrecordedExchange[];
 }
 
 /**
@@ -127,6 +136,7 @@ export function buildContinuityContract(
     recentDecisions,
     playerName,
     inventoryItemNames,
+    unrecordedExchanges,
   } = args;
   const characterFacts = facts.filter((fact) => fact?.category === 'characters');
 
@@ -189,6 +199,7 @@ export function buildContinuityContract(
     assertions: buildAssertions(ledger, playerName),
     commitments: buildCommitments(ledger, inventoryItemNames),
     sceneChanges: buildSceneChanges(ledger),
+    unrecordedExchanges: unrecordedExchanges ?? [],
   };
 }
 
@@ -199,7 +210,8 @@ export function isContinuityContractEmpty(contract: ContinuityContract): boolean
     contract.canonFacts.length === 0 &&
     contract.assertions.length === 0 &&
     contract.commitments.length === 0 &&
-    contract.sceneChanges.length === 0
+    contract.sceneChanges.length === 0 &&
+    contract.unrecordedExchanges.length === 0
   );
 }
 
@@ -316,7 +328,40 @@ export function detectContinuityIssues(
     }
   }
 
+  // The NPC does not have to be named in the offending sentence. An entry here
+  // exists only because the player's typed action named this NPC on this turn,
+  // so the segment is that claim's answer and recounting anywhere in it is the
+  // invention. Denial is what the change wants, and it is guarded.
+  for (const exchange of contract.unrecordedExchanges) {
+    const sentence = sentences.find((candidate) =>
+      recountsUnrecordedExchange(candidate)
+    );
+    if (sentence) {
+      issues.push({
+        type: 'invented-exchange',
+        entity: exchange.name,
+        excerpt: sentence.trim().slice(0, MAX_EXCERPT_LENGTH),
+        expectation: describeUnrecordedExchange(exchange),
+      });
+    }
+  }
+
   return issues;
+}
+
+/**
+ * The assertable fact behind the void. Shared by the prompt block and the
+ * correction prompt so the model reads the same sentence either way.
+ */
+export function describeUnrecordedExchange(
+  exchange: ContinuityUnrecordedExchange
+): string {
+  const premise = `The player's action refers to a private conversation with ${exchange.name} ("${exchange.claim}") that this story never told.`;
+  const record =
+    exchange.scenes === 0
+      ? `${exchange.name} has not shared a single narrated scene with the protagonist.`
+      : `${exchange.name} has shared ${exchange.scenes} narrated ${exchange.scenes === 1 ? 'scene' : 'scenes'} with the protagonist and has never been alone with them.`;
+  return `${premise} ${record} Do not write the conversation as if it happened, and do not have ${exchange.name} recount, confirm, or repeat it. Play the false premise: ${exchange.name} says no such conversation took place, or is confused by the question.`;
 }
 
 function describeCommitmentExpectation(commitment: ContinuityCommitment): string {
@@ -383,6 +428,12 @@ export function formatContinuityExpectations(contract: ContinuityContract): stri
     lines.push('Changes the player made to the scene (still true until undone on the page):');
     for (const change of contract.sceneChanges) {
       lines.push(`- ${change.statement}`);
+    }
+  }
+  if (contract.unrecordedExchanges.length > 0) {
+    lines.push('Conversations the player refers to that never happened on the page:');
+    for (const exchange of contract.unrecordedExchanges) {
+      lines.push(`- ${describeUnrecordedExchange(exchange)}`);
     }
   }
 

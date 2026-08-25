@@ -34,6 +34,13 @@ const FEATURE_FLAG_DEFAULTS = {
   // do nothing but cost tokens every turn. Off until a playtest measures it —
   // see narraitor-prompt-template-governance/eval-logs/1865-world-description-in-scene.md.
   WORLD_DESCRIPTION_IN_SCENE: false,
+  // Guards against the engine backfilling a conversation that never happened
+  // (#1857). The player naming a prior private exchange with a rostered NPC
+  // turns co-presence already on the segments into an assertable fact, which
+  // reaches the contract, the deterministic detector, and the lore extractor.
+  // On by default: the whole path is gated on a rare turn, and off means a
+  // byte-identical prompt and no extra calls.
+  UNRECORDED_EXCHANGE_GUARD: true,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
@@ -66,6 +73,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   WORLD_DESCRIPTION_IN_SCENE: resolve(
     process.env.NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE,
     FEATURE_FLAG_DEFAULTS.WORLD_DESCRIPTION_IN_SCENE
+  ),
+  UNRECORDED_EXCHANGE_GUARD: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_UNRECORDED_EXCHANGE_GUARD,
+    FEATURE_FLAG_DEFAULTS.UNRECORDED_EXCHANGE_GUARD
   ),
 });
 
