@@ -2990,11 +2990,12 @@ body.manuscript-overlay-open {
     height: 1rem;
   }
 
-  /* DS3 outcome callout — compact margin note pulled to the column's right
-     edge on desktop. The parent (.narrative-segment) is a flex column, so float
-     is inert here; align-self does the cross-axis pull. True page-gutter
-     marginalia is blocked by the narrative scroll container's overflow-x clip
-     (.scroll-smooth) — tracked as a separate follow-up. */
+  /* DS3 outcome callout: three ranges.
+     < 1024px   — base styles above: in-flow card, full prose-column width.
+     1024–1279px — compact margin note at the column's right edge (align-self:
+                   flex-end, 220px); the flex cross-axis does the placement.
+     >= 1280px  — indexical mark in the left page gutter; see the @media block
+                  near the end of this file. */
   :root .choice-outcome-callout {
     align-self: flex-end;
     width: 220px;
@@ -3577,93 +3578,177 @@ body.manuscript-overlay-open {
   }
 }
 
-/* >= 1280px: the definition moves out of the prose flow and into the real page
-   gutter, beside the paragraph that names the term.
+
+/* >= 1280px: lore-term definitions move into the right page gutter, and each
+   segment's outcome callout moves into the left gutter as a drafting mark.
    =========================================================================
 
    Why the container has to grow. The note's nearest scroll ancestor is the
    Radix ScrollArea Viewport, which sets `overflow-x: hidden` inline - CSS
    can't override an inline style without `!important`, so an absolutely
-   positioned note placed past the prose column's right edge gets clipped. The
-   way around it is to widen the whole history container into the gutter and
+   positioned element placed past the prose column's edge gets clipped. The
+   way around it is to widen the whole history container into both gutters and
    narrow the segments back by the same amount: the prose column keeps its
-   position and measure, and the note is placed inside the viewport's box
-   rather than outside it.
+   position and measure, and both lanes are inside the viewport's box.
 
-   The lane holds exactly one note. TermDefinition dismisses on any outside
-   mousedown, so clicking a second term closes the first before it opens - no
-   two notes ever share the lane, which is why the note is free to run past its
-   own segment's bottom edge.
+   Two lanes, two jobs.
+   - Left (indexical): outcome marks — what a turn did, system-emitted,
+     persistent with their segment, narrow. One per segment; if a mark is
+     taller than a short segment it can run into the next, which is tested.
+   - Right (semantic): lore-term definitions — what a term means,
+     reader-initiated, transient, reading-measure wide. One at a time;
+     TermDefinition dismisses on any outside mousedown.
 
-   Scoped to `:has(.manuscript-marginalia-definition)` rather than to the term
-   spans: with nothing open, the surface is byte-identical to the in-flow
-   presentation. */
+   Both lanes feed shared gutter properties so the container width and its
+   left offset are a single expression regardless of which lanes are live.
+
+   Scoped to `:has(...)` rather than unconditional: with nothing open the
+   surface is byte-identical to the in-flow presentation. */
 @media (width >= 1280px) {
+  /* Left lane: set the outcome-mark gutter size. */
+  :root .narrative-history-container:has(.choice-outcome-callout) {
+    --manuscript-outcome-mark-gap: var(--space-4);
+
+    /* 10rem + 1rem gap = 176px. At 1280px the gutter is ~252px, leaving
+       76px of slack at the floor and only growing from there — no clamp
+       needed. */
+    --manuscript-outcome-mark-width: 10rem;
+    --manuscript-gutter-left: calc(
+      var(--manuscript-outcome-mark-gap)
+      + var(--manuscript-outcome-mark-width)
+    );
+  }
+
+  /* Right lane: set the definition gutter size.
+     Width arithmetic: every term is a measured box, not a guess.
+       min(50vw, 46.25rem)  half the page (.manuscript-viewport-inner is
+                            width: min(100%, 1480px), half-page stops at 740px)
+       21.25rem             half .manuscript-main-content-inner's 42.5rem prose
+                            column, centred on the page.
+       1.5rem + 1.5rem      .manuscript-viewport-inner's horizontal padding
+                            (pinned at 1.5rem from 1280px up) and
+                            .manuscript-main-content's - the two insets the
+                            note stays inside.
+       1rem + 0.75rem       the gap to the prose, plus slack.
+     That sums to the 26rem subtracted below.
+     14rem is the readability floor: 198px of text after padding and border,
+     about 30 characters at 13px. The old formula bottomed out near 88px,
+     which broke ordinary words mid-syllable (#1595). The floor is also why
+     the lane starts at 1280px - the calc resolves to exactly 14rem there,
+     and anything narrower has no gutter worth using. */
   :root .narrative-history-container:has(.manuscript-marginalia-definition) {
     --manuscript-marginalia-gap: var(--space-4);
-
-    /* Every term in this arithmetic is a box on the page, measured from CSS
-       rather than guessed:
-         min(50vw, 46.25rem)  half the page - .manuscript-viewport-inner is
-                              `width: min(100%, 1480px)`, so the half-page
-                              stops growing at 740px.
-         21.25rem             half .manuscript-main-content-inner's 42.5rem
-                              prose column, which is centred on the page.
-         1.5rem + 1.5rem      .manuscript-viewport-inner's horizontal padding
-                              (pinned at 1.5rem from 1280px up) and
-                              .manuscript-main-content's - the two insets the
-                              note stays inside.
-         1rem + 0.75rem       the gap to the prose, plus slack so the lane
-                              never lands flush against the padding edge.
-       That sums to the 26rem subtracted below.
-
-       14rem is the readability floor: 198px of text after padding and border,
-       about 30 characters at 13px. The old formula bottomed out near 88px,
-       which broke ordinary words mid-syllable (#1595). The floor is also why
-       the lane starts at 1280px - the calc resolves to exactly 14rem there,
-       and anything narrower has no gutter worth using. */
     --manuscript-marginalia-width: clamp(
       14rem,
       calc(min(50vw, 46.25rem) - 26rem),
       17.5rem
     );
-
-    width: calc(
-      100%
-      + var(--manuscript-marginalia-gap)
+    --manuscript-gutter-right: calc(
+      var(--manuscript-marginalia-gap)
       + var(--manuscript-marginalia-width)
     );
   }
 
-  /* Give back exactly what the container took, so the prose column doesn't
-     move when a note opens. */
+  /* Grow the container into whichever lanes are live. The margin-left pulls
+     the container left so the left lane has room; the segments are narrowed
+     and shifted right by the same amount to keep the prose column in place. */
+  :root .narrative-history-container:has(.choice-outcome-callout),
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) {
+    width: calc(
+      100%
+      + var(--manuscript-gutter-left, 0)
+      + var(--manuscript-gutter-right, 0)
+    );
+    margin-left: calc(-1 * var(--manuscript-gutter-left, 0));
+  }
+
+  /* Give back both sides so the prose column stays put. */
+  :root .narrative-history-container:has(.choice-outcome-callout) .narrative-history-segments,
   :root .narrative-history-container:has(.manuscript-marginalia-definition) .narrative-history-segments {
     width: calc(
       100%
-      - var(--manuscript-marginalia-gap)
-      - var(--manuscript-marginalia-width)
+      - var(--manuscript-gutter-left, 0)
+      - var(--manuscript-gutter-right, 0)
     );
+    margin-left: var(--manuscript-gutter-left, 0);
   }
 
+  /* Left lane — segment positioning. */
+  :root .narrative-history-container:has(.choice-outcome-callout) .narrative-segment:has(.choice-outcome-callout) {
+    position: relative;
+  }
+
+  /* Left lane — place the mark and strip the DS3 card chrome.
+     Scoped to the history container so standalone Storybook renders — which
+     have no container and therefore no carved lane — stay in-flow (same
+     scoping rationale as the right lane below). */
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-callout {
+    position: absolute;
+    inset: 0 calc(100% + var(--manuscript-outcome-mark-gap)) auto auto;
+    width: var(--manuscript-outcome-mark-width);
+    box-sizing: border-box;
+
+    /* Override the 1024px card chrome. */
+    align-self: auto;
+    border: none;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  /* Corner bracket (DESIGN.md drafting-mark vocabulary): top-left L-shape,
+     same arm length and color as world-detail-npc / world-detail-stat. */
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-callout::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--mark-arm-length);
+    height: var(--mark-arm-length);
+    border-top: 1px solid var(--color-text-muted);
+    border-left: 1px solid var(--color-text-muted);
+    background: none;
+    border-radius: 0;
+  }
+
+  /* Outcome label: lose the accent-soft pill; step up to the type-scale
+     minimum (0.5625rem in the 1024px block is below the smallest scale step). */
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-label {
+    background: none;
+    padding: 0;
+    font-size: var(--font-size-2xs_5);
+    color: var(--color-text-muted);
+  }
+
+  /* Consequence chips in the lane: plain muted text, no status colours.
+     The words carry the meaning ("Kira Tanaka -15 trust", "Order +12"). */
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-chip,
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-chip[data-kind='relationship'][data-direction='positive'],
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-chip[data-kind='relationship'][data-direction='negative'],
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-chip[data-kind='alignment'][data-direction='positive'],
+  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-chip[data-kind='alignment'][data-direction='negative'] {
+    border: none;
+    background: none;
+    color: var(--color-text-muted);
+    padding: 0;
+  }
+
+  /* Right lane — segment positioning. */
   :root .narrative-history-container:has(.manuscript-marginalia-definition) .narrative-segment:has(.manuscript-marginalia-definition) {
     position: relative;
   }
 
-  /* Scoped to the history container like the two rules above it, and for the
-     same reason the lane exists at all: the gutter is carved out of that
-     container, so a note rendered anywhere else has no lane to go into.
-     Unscoped, this rule caught every TermDefinition on the page - including
-     the Storybook molecule stories, where the two custom properties are
-     undefined, `width` falls back to auto and the `inset` shorthand is
-     invalid at computed-value time. The panels went absolute with no
-     positioned ancestor and stacked on top of each other. Fallbacks on the
-     properties wouldn't have fixed that; `position: absolute` is simply wrong
-     for a standalone render.
-
+  /* Right lane — place the definition.
+     Scoped to the history container (same rationale as the left lane above):
+     unscoped, this catches every TermDefinition on the page including
+     Storybook stories where the custom properties are undefined.
      --manuscript-marginalia-top and --manuscript-marginalia-max-height come
-     from TermDefinition's layout effect, which clamps the note into the
-     visible scroller. Both have inert fallbacks so the note is still placed
-     before the effect runs. */
+     from TermDefinition's layout effect; both have inert fallbacks. */
   :root .narrative-history-container:has(.manuscript-marginalia-definition) .manuscript-marginalia-definition {
     position: absolute;
     inset: var(--manuscript-marginalia-top, 0) auto auto
