@@ -216,9 +216,20 @@ export class NarrativeGenerator {
         const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
           recordUsage: false,
         });
+        // Keyed on the invented-exchange issues that actually survived into the
+        // shipped prose, not on the aggregate status: a segment whose
+        // correction fixed a different issue reports 'corrected' with the
+        // invention still in it. Quarantine only those speakers, nobody else.
+        const unattestedSpeakers = (
+          result.metadata.continuity?.remainingIssues ?? []
+        )
+          .filter((issue) => issue.type === 'invented-exchange')
+          .map((issue) => issue.entity);
+
         void extractStructuredLore(result.content, existingLoreContext, {
           continuityTopics: collectContinuityTopicsFromStores(request),
           playerCharacterName: context.playerCharacterName,
+          ...(unattestedSpeakers.length > 0 ? { unattestedSpeakers } : {}),
         })
           .then(async (structuredLore) => {
             const { useLoreStore } = await import('@/state/loreStore');

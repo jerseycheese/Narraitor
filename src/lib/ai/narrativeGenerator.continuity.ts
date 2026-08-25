@@ -13,6 +13,7 @@ import { useNPCStore } from '@/state/npcStore';
 import { useLoreStore } from '@/state/loreStore';
 import { useContinuityStore } from '@/state/continuityStore';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { logger } from '@/lib/utils/logger';
 import type { AIClient } from './types';
@@ -26,6 +27,7 @@ import type {
   ContinuityContract,
   ContinuityRecentDecision,
   ContinuitySegmentNote,
+  ContinuityUnrecordedExchange,
   ContinuityValidationResult,
 } from '@/types/continuity.types';
 import {
@@ -36,6 +38,11 @@ import {
   isContinuityContractEmpty,
 } from '@/lib/lore/continuityGuardrail';
 import { collectContinuityTopics } from '@/lib/lore/continuityLedger';
+import {
+  countSharedScenes,
+  detectUnrecordedExchangeClaim,
+} from '@/lib/lore/unrecordedExchange';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 const CORRECTION_TIMEOUT_MS = 8000;
 
@@ -60,6 +67,73 @@ const collectRecentDecisions = (
     decisions.push({ text: currentSituation });
   }
   return decisions;
+};
+
+/**
+ * The player's typed action, unwrapped. `currentSituation` arrives as
+ * `Player chose: "<text>"[ Skill checks: ...]` (NarrativeController), and
+ * `collectRecentDecisions` above already parses the same field, so reading it
+ * here is not a new coupling.
+ */
+const readPlayerActionText = (request: NarrativeGenerationRequest): string => {
+  const raw = request.narrativeContext?.currentSituation?.trim();
+  if (!raw?.startsWith('Player chose')) return '';
+  return raw
+    .replace(/^Player chose:\s*/i, '')
+    .replace(/\s*\[Skill checks?:[^\]]*\]\s*$/i, '')
+    .replace(/^["'\u201c]([\s\S]*)["'\u201d]$/, '$1')
+    .trim();
+};
+
+/**
+ * Prior exchanges the player's action claims but the session never narrated
+ * (#1857). The flag check lives here and nowhere else, so flag-off is a
+ * byte-identical prompt and zero extra work rather than an argument that it is.
+ *
+ * Reads whole-session segments, not `request.narrativeContext.previousSegments`,
+ * which is the last three: that would report "never met" for an NPC first met
+ * at turn 4, putting a false fact in the prompt.
+ */
+export const collectUnrecordedExchanges = (
+  request: NarrativeGenerationRequest,
+  npcNames: Record<EntityID, string>
+): ContinuityUnrecordedExchange[] => {
+  if (!isFeatureEnabled('UNRECORDED_EXCHANGE_GUARD')) return [];
+
+  const sessionId = request.sessionId;
+  if (!sessionId) return [];
+
+  const claim = detectUnrecordedExchangeClaim(readPlayerActionText(request), npcNames);
+  if (!claim) return [];
+
+  // Fails open on its own rather than through the caller's catch: a narrative
+  // store that throws should cost this one section, not the whole contract and
+  // with it the relationship and ledger guards for the turn.
+  let record;
+  try {
+    const narrativeStoreState = useNarrativeStore.getState();
+    if (typeof narrativeStoreState?.getSessionSegments !== 'function') return [];
+    record = countSharedScenes(
+      narrativeStoreState.getSessionSegments(sessionId) ?? []
+    )[claim.npcId];
+  } catch (error) {
+    logger.warn('[UnrecordedExchange] Failed to read session co-presence', { error });
+    return [];
+  }
+
+  // Having been alone together makes an off-page conversation plausible, and
+  // the contract only ever states what it can check.
+  if (record?.aloneTogether) return [];
+
+  return [
+    {
+      npcId: claim.npcId,
+      name: claim.name,
+      scenes: record?.scenes ?? 0,
+      aloneTogether: false,
+      claim: claim.excerpt,
+    },
+  ];
 };
 
 const readSessionFacts = (request: NarrativeGenerationRequest): LoreFact[] => {
@@ -148,6 +222,7 @@ export const buildContinuityContractFromStores = (
       recentDecisions: collectRecentDecisions(request),
       playerName: options?.playerName,
       inventoryItemNames: readInventoryItemNames(request),
+      unrecordedExchanges: collectUnrecordedExchanges(request, npcNames),
     });
 
     if (carriesNothingForTheModel(contract)) {
@@ -281,7 +356,7 @@ export const applyContinuityGuardrail = async (options: {
     sessionId,
     status,
     issues,
-    remainingIssues: corrected ? undefined : remainingIssues,
+    remainingIssues: remainingIssues.length > 0 ? remainingIssues : undefined,
     detectionMs,
     correctionMs,
     timestamp: new Date().toISOString(),
@@ -300,8 +375,17 @@ export const applyContinuityGuardrail = async (options: {
       ? { ...result, content: correctedContent }
       : result;
 
+  const survived = corrected ? remainingIssues : issues;
   return withContinuityNote(finalResult, {
     status,
     issues: issues.map((issue) => ({ type: issue.type, entity: issue.entity })),
+    ...(survived.length > 0
+      ? {
+          remainingIssues: survived.map((issue) => ({
+            type: issue.type,
+            entity: issue.entity,
+          })),
+        }
+      : {}),
   });
 };

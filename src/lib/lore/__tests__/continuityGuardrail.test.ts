@@ -12,7 +12,10 @@ import {
 } from '../continuityGuardrail';
 import { collectContinuityTopics } from '../continuityLedger';
 import type { LoreFact } from '@/types/lore.types';
-import type { ContinuityContract } from '@/types/continuity.types';
+import type {
+  ContinuityContract,
+  ContinuityUnrecordedExchange,
+} from '@/types/continuity.types';
 import type { NPCRelationshipState } from '@/types/world-state.types';
 
 const makeFact = (overrides: Partial<LoreFact> = {}): LoreFact => ({
@@ -179,6 +182,7 @@ describe('formatContinuityExpectations', () => {
         assertions: [],
         commitments: [],
         sceneChanges: [],
+        unrecordedExchanges: [],
       })
     ).toBe('');
   });
@@ -444,5 +448,55 @@ describe('buildContinuityCorrectionPrompt', () => {
     expect(prompt).toContain('embraces you warmly');
     expect(prompt).toContain('CONTINUITY REQUIREMENTS');
     expect(prompt).toContain(content);
+  });
+});
+
+describe('unrecorded exchange (#1857)', () => {
+  const buildExchangeContract = (
+    scenes: number
+  ): ContinuityContract & { unrecordedExchanges: ContinuityUnrecordedExchange[] } =>
+    buildContinuityContract({
+      facts: [],
+      npcRelationships: {},
+      npcNames: {},
+      recentDecisions: [],
+      unrecordedExchanges: [
+        {
+          npcId: 'npc-davies',
+          name: 'Davies',
+          scenes,
+          aloneTogether: false,
+          claim: 'Ask Davies to repeat publicly what he told me privately.',
+        },
+      ],
+    });
+
+  it('renders the never-met line at zero scenes and the record at three', () => {
+    expect(formatContinuityExpectations(buildExchangeContract(0))).toContain(
+      'Davies has not shared a single narrated scene with the protagonist.'
+    );
+    expect(formatContinuityExpectations(buildExchangeContract(3))).toContain(
+      'Davies has shared 3 narrated scenes with the protagonist and has never been alone with them.'
+    );
+  });
+
+  it('flags prose that recounts the exchange and leaves a denial alone', () => {
+    const contract = buildExchangeContract(3);
+
+    const recounting = detectContinuityIssues(
+      'Davies straightens his tie. "What I told you in the stairwell still stands," he says to the room.',
+      contract
+    );
+    expect(recounting).toHaveLength(1);
+    expect(recounting[0]).toMatchObject({
+      type: 'invented-exchange',
+      entity: 'Davies',
+    });
+
+    const denying = detectContinuityIssues(
+      'Davies blinks at you. "We never spoke privately," he says. "I don\'t know what you think I told you."',
+      contract
+    );
+    expect(denying).toEqual([]);
   });
 });

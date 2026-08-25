@@ -30,6 +30,13 @@ export interface ExtractStructuredLoreOptions {
    * player, so nothing extracted under that name can be new information.
    */
   playerCharacterName?: string;
+  /**
+   * Names whose lines on this turn recounted a conversation the story never
+   * told (#1857). The events still get recorded; what gets dropped is the
+   * `continuity` annotation, which is the field that turns a line into a
+   * permanent canon assertion. Scoped to one turn and one speaker.
+   */
+  unattestedSpeakers?: string[];
 }
 
 /**
@@ -46,7 +53,8 @@ export async function extractStructuredLore(
       narrativeText,
       existingLoreContext,
       options?.continuityTopics,
-      options?.playerCharacterName
+      options?.playerCharacterName,
+      options?.unattestedSpeakers
     );
     const response = await geminiClient.generateContent(prompt);
     
@@ -65,9 +73,12 @@ export async function extractStructuredLore(
     }
 
     const extractedLore = JSON.parse(jsonStr) as StructuredLoreExtraction;
-    return reservePlayerCharacterName(
-      validateAndCleanExtraction(extractedLore),
-      options?.playerCharacterName
+    return dropUnattestedAssertions(
+      reservePlayerCharacterName(
+        validateAndCleanExtraction(extractedLore),
+        options?.playerCharacterName
+      ),
+      options?.unattestedSpeakers
     );
 
   } catch (error) {
@@ -83,12 +94,17 @@ function buildLoreExtractionPrompt(
   narrativeText: string,
   existingLoreContext?: string,
   continuityTopics?: string[],
-  playerCharacterName?: string
+  playerCharacterName?: string,
+  unattestedSpeakers?: string[]
 ): string {
   const existingContext = existingLoreContext ? `\n\nExisting Lore Context:\n${existingLoreContext}` : '';
   const playerNameRule = playerCharacterName
     ? `\n- "${playerCharacterName}" is the PLAYER CHARACTER, not an NPC. Never create a character entry for them. If the text names a separate person who happens to share that name, that is a mistake in the prose — do not record them as a character.`
     : '';
+  const unattestedRule =
+    unattestedSpeakers && unattestedSpeakers.length > 0
+      ? `\n- ${unattestedSpeakers.join(', ')} just recounted a conversation that never happened in this story. Record what happened on the page, but do NOT add a "continuity" annotation to any event carrying what they claim was said earlier.`
+      : '';
   const topicHint =
     continuityTopics && continuityTopics.length > 0
       ? `\n- Continuity topics already in use (reuse the exact label when an event is about the same question, promise, or object): ${continuityTopics.join('; ')}`
@@ -121,7 +137,7 @@ CRITICAL QUALITY RULES:
 - Characters must be specific named individuals. Do NOT create character entries for unnamed or generic groups (e.g. "a guard", "unnamed warrior", "the villagers").
 - If a person is unnamed, keep it as part of an event description instead of a character entity.
 - Prefer stable locations ("Vaes Leisi", "Vaes Leisi marketplace") over micro-locations ("marketplace edge", "near a stall"). If you mention a micro-location, include it as an alias in the location entry.
-- Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.${playerNameRule}
+- Keep events concise and non-redundant: **extract EXACTLY 3 or fewer** high-signal events that add lasting story state. Never exceed this limit.${playerNameRule}${unattestedRule}
 
 CONTINUITY TAGGING (within the 3-event limit, prefer events that carry one of these):
 - Add "continuity" to an event when it is one of:
@@ -315,6 +331,37 @@ function reservePlayerCharacterName(
   });
 
   return { ...extraction, characters };
+}
+
+/**
+ * Strips the `continuity` annotation from events attributed to a speaker whose
+ * lines on this turn recounted a conversation the story never told (#1857).
+ * The event survives; only its claim to canon goes. Deliberately narrow: one
+ * turn, one speaker, one field, nothing deleted and no name blacklisted.
+ */
+function dropUnattestedAssertions(
+  extraction: StructuredLoreExtraction,
+  unattestedSpeakers?: string[]
+): StructuredLoreExtraction {
+  const unattested = new Set(
+    (unattestedSpeakers ?? []).map(canonicalizeName).filter(Boolean)
+  );
+  if (unattested.size === 0) return extraction;
+
+  let dropped = 0;
+  const events = extraction.events.map((event) => {
+    const speaker = event.continuity?.speaker;
+    if (!speaker || !unattested.has(canonicalizeName(speaker))) return event;
+    dropped += 1;
+    return { ...event, continuity: undefined };
+  });
+
+  if (dropped > 0) {
+    logger.debug('Dropped continuity annotations from an unattested speaker', {
+      dropped,
+    });
+  }
+  return { ...extraction, events };
 }
 
 const trimmedString = (value: unknown): string | undefined =>
