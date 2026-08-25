@@ -3645,15 +3645,26 @@ body.manuscript-overlay-open {
     );
   }
 
-  :root .narrative-segment:has(.manuscript-marginalia-definition) {
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) .narrative-segment:has(.manuscript-marginalia-definition) {
     position: relative;
   }
 
-  /* --manuscript-marginalia-top and --manuscript-marginalia-max-height come
+  /* Scoped to the history container like the two rules above it, and for the
+     same reason the lane exists at all: the gutter is carved out of that
+     container, so a note rendered anywhere else has no lane to go into.
+     Unscoped, this rule caught every TermDefinition on the page - including
+     the Storybook molecule stories, where the two custom properties are
+     undefined, `width` falls back to auto and the `inset` shorthand is
+     invalid at computed-value time. The panels went absolute with no
+     positioned ancestor and stacked on top of each other. Fallbacks on the
+     properties wouldn't have fixed that; `position: absolute` is simply wrong
+     for a standalone render.
+
+     --manuscript-marginalia-top and --manuscript-marginalia-max-height come
      from TermDefinition's layout effect, which clamps the note into the
      visible scroller. Both have inert fallbacks so the note is still placed
      before the effect runs. */
-  :root .manuscript-marginalia-definition {
+  :root .narrative-history-container:has(.manuscript-marginalia-definition) .manuscript-marginalia-definition {
     position: absolute;
     inset: var(--manuscript-marginalia-top, 0) auto auto
       calc(100% + var(--manuscript-marginalia-gap));
