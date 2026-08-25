@@ -525,8 +525,8 @@ npm run test:visual
 - **Review together**: Discuss visual changes during code review
 - **Maintain consistency**: Follow established visual patterns
 
-## Conclusion
+## Summary
 
-Effective visual testing requires careful planning, consistent practices, and ongoing maintenance. Focus on testing what matters to users, handle dynamic content properly, and maintain a clear review process for baseline updates.
+Test what matters to users, handle dynamic content properly, and keep a clear review process for baseline updates.
 
 Remember: Visual tests are documentation of your UI's expected appearance. Keep them accurate, focused, and valuable for catching real regressions.

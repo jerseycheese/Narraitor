@@ -1,6 +1,6 @@
 # Narraitor Documentation
 
-Complete documentation for the Narraitor AI-powered storytelling application.
+Documentation for Narraitor, an AI-driven storytelling app.
 
 ## Quick Start
 

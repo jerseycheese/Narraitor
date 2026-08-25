@@ -1,7 +1,7 @@
 /**
  * @fileoverview Tests for Skill Check Evaluator with D20 Rolls
  *
- * Comprehensive test suite covering:
+ * Tests covering:
  * - D20 roll mechanics and total calculation
  * - Critical successes (natural 20) and critical failures (natural 1)
  * - Untrained character attempts (skill level 0)

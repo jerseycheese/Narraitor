@@ -8,16 +8,16 @@ updated: 2025-06-26
 # Narraitor Project Overview
 
 ## What This Project Does
-I built this AI storytelling app that lets you play RPG narratives in any fictional universe you can imagine. The key insight was that most AI story generators produce generic fantasy, but what if the AI could actually understand and adapt to specific world rules and tones? 
+I built this AI storytelling app that lets you play RPG narratives in any fictional universe you can imagine. Most AI story generators default to generic fantasy; Narraitor instead learns the world's own rules and tone, so what it generates actually fits the setting you described.
 
-Whether you want noir detective stories, space opera adventures, or something set in Middle Earth, Narraitor learns your world's mechanics and generates narratives that feel authentic to that setting. It's designed for solo play when you want a narrative RPG experience but don't have a group or game master available.
+Middle Earth, the beaches of Normandy, something you invented last week: all fair game. It's designed for solo play when you want a narrative RPG experience but don't have a group or game master available.
 
 ## Current Status
 The core functionality is working and stable. All the main systems (world creation, character building, AI narrative generation, session persistence) are operational. Currently in the polish phase: fixing UI edge cases, optimizing performance, and preparing for broader use.
 
 ## Technical Foundation
 
- Built on a solid foundation of modern tools:
+The stack:
 - **Framework**: Next.js 15 (15.5.x) with App Router
 - **AI Integration**: Google Gemini, with the player supplying their own key (encrypted in the browser, proxied through server-side routes)
 - **State Management**: Zustand stores with IndexedDB persistence

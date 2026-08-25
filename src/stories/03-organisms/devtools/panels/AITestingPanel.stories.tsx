@@ -8,7 +8,7 @@ const meta: Meta<typeof AITestingPanel> = {
     layout: 'padded',
     docs: {
       description: {
-        component: `The AI Testing Panel is a development tool that allows developers to test narrative generation with custom inputs. It provides form controls to override world, character, and narrative context for testing purposes. **Key Features:** - World context override (name, theme) - Character context override (name) - Mock AI narrative generation - Request/response logging - Dark theme styling for DevTools integration **Usage:** This component is designed to be used within the DevTools panel during development. It allows developers to quickly test different scenarios without creating full world/character data.`
+        component: `A DevTools panel for testing narrative generation with custom inputs, without creating full world/character data: override world, character, and narrative context, run mock generation, and log the request/response. Used within the DevTools panel during development.`
       }
     }
   },
