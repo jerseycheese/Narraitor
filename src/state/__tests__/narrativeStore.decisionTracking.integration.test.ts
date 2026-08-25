@@ -1,32 +1,18 @@
 /**
  * Integration tests for Issue #142: PlayerDecisionTracker integration with narrativeStore.selectDecisionOption()
- * 
+ *
  * These tests verify that when players make choices through narrativeStore.selectDecisionOption(),
  * the decisions are automatically tracked by PlayerDecisionTracker for personalization.
- * 
- * Focus: Integration behavior, not implementation details
+ *
+ * Focus: Integration behavior, not implementation details — exercises the real
+ * playerDecisionTracker singleton rather than mocking it, so a case actually
+ * proves tracking happened instead of only that a function was called.
  */
 
 import { useNarrativeStore } from '../narrativeStore';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { playerDecisionTracker } from '../../lib/ai/playerDecisionTracker';
 import { DecisionOption } from '../../types/narrative.types';
-
-// Mock the PlayerDecisionTracker to control its behavior in tests
-jest.mock('../../lib/ai/playerDecisionTracker', () => ({
-  playerDecisionTracker: {
-    recordDecision: jest.fn(),
-    getSessionDecisions: jest.fn(() => []),
-    clearDecisions: jest.fn(),
-    analyzeChoicePatterns: jest.fn(() => ({
-      dominantChoiceTypes: [],
-      choiceDistribution: {},
-      patternStrength: 0
-    }))
-  }
-}));
-
-const mockPlayerDecisionTracker = playerDecisionTracker as jest.Mocked<typeof playerDecisionTracker>;
 
 // Test helpers
 const TEST_SESSION = 'session-123';
@@ -64,7 +50,7 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
       loading: false,
       error: null
     });
-    jest.clearAllMocks();
+    playerDecisionTracker.clearDecisions();
   });
 
   describe('Core Integration Behavior', () => {
@@ -86,18 +72,16 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
 
       useNarrativeStore.getState().selectDecisionOption(decisionId, 'help-option', TEST_CHARACTER);
 
-      expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledTimes(1);
-      expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledWith(
-        'You encounter a wounded traveler on the road. What do you do?',
-        'Help the traveler with healing supplies',
-        'diplomatic',
-        TEST_SESSION,
-        TEST_WORLD,
-        expect.objectContaining({
-          situation: expect.any(String),
-          location: 'Forest Road'
-        })
-      );
+      const tracked = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(tracked).toHaveLength(1);
+      expect(tracked[0]).toMatchObject({
+        prompt: 'You encounter a wounded traveler on the road. What do you do?',
+        choiceText: 'Help the traveler with healing supplies',
+        choiceType: 'diplomatic',
+        sessionId: TEST_SESSION,
+        worldId: TEST_WORLD
+      });
+      expect(tracked[0].context).toMatchObject({ location: 'Forest Road' });
     });
 
     it('should correctly infer choice types from decision options', () => {
@@ -116,12 +100,11 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
 
         useNarrativeStore.getState().selectDecisionOption(decisionId, `opt-${i}`, TEST_CHARACTER);
 
-        expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledWith(
-          prompt, text, type, TEST_SESSION, expect.any(String), expect.any(Object)
-        );
+        const [latest] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+        expect(latest).toMatchObject({ prompt, choiceText: text, choiceType: type });
       });
 
-      expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledTimes(testCases.length);
+      expect(playerDecisionTracker.getSessionDecisions(TEST_SESSION)).toHaveLength(testCases.length);
     });
 
     it('should extract relevant context from game session', () => {
@@ -147,22 +130,21 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
 
       useNarrativeStore.getState().selectDecisionOption(decisionId, 'help-merchant', TEST_CHARACTER);
 
-      expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledWith(
-        expect.any(String), expect.any(String), expect.any(String), TEST_SESSION, expect.any(String),
-        expect.objectContaining({
-          location: 'Rivertown Marketplace',
-          situation: expect.stringContaining('merchant'),
-          charactersPresent: expect.arrayContaining(['merchant-npc'])
-        })
-      );
+      const [tracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(tracked.context).toMatchObject({
+        location: 'Rivertown Marketplace',
+        situation: expect.stringContaining('merchant')
+      });
+      expect(tracked.context?.charactersPresent).toEqual(expect.arrayContaining(['merchant-npc']));
     });
   });
 
   describe('Error Handling and Edge Cases', () => {
     it('should handle tracking failures gracefully without breaking game flow', () => {
-      mockPlayerDecisionTracker.recordDecision.mockImplementation(() => {
-        throw new Error('Tracking system temporarily unavailable');
-      });
+      const recordDecisionSpy = jest.spyOn(playerDecisionTracker, 'recordDecision')
+        .mockImplementationOnce(() => {
+          throw new Error('Tracking system temporarily unavailable');
+        });
 
       const decisionId = createTestDecision(TEST_SESSION, 'Choose your path', [
         { id: 'left-path', text: 'Take the left path' },
@@ -179,6 +161,8 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
       expect(decisions[decisionId].characterId).toBe(TEST_CHARACTER);
       expect(decisions[decisionId].selectedAt).toBeInstanceOf(Date);
       expect(error).toBeNull();
+
+      recordDecisionSpy.mockRestore();
     });
 
     it('should handle decisions without character IDs appropriately', () => {
@@ -189,7 +173,7 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
 
       useNarrativeStore.getState().selectDecisionOption(decisionId, 'answer-honestly');
 
-      expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledTimes(0);
+      expect(playerDecisionTracker.getSessionDecisions(TEST_SESSION)).toHaveLength(0);
 
       const decision = useNarrativeStore.getState().decisions[decisionId];
       expect(decision.selectedOptionId).toBe('answer-honestly');
@@ -204,10 +188,10 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
 
       useNarrativeStore.getState().selectDecisionOption(decisionId, 'look-around', TEST_CHARACTER);
 
-      expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledTimes(1);
-      const [, , , calledSessionId, calledWorldId] = mockPlayerDecisionTracker.recordDecision.mock.calls[0];
-      expect(calledSessionId).toBe(TEST_SESSION);
-      expect(calledWorldId).toBeDefined();
+      const [tracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(tracked).toBeDefined();
+      expect(tracked.sessionId).toBe(TEST_SESSION);
+      expect(tracked.worldId).toBeDefined();
     });
   });
 
@@ -224,18 +208,15 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
         useNarrativeStore.getState().selectDecisionOption(decisionId, `diplomatic-${i}`, TEST_CHARACTER);
       });
 
-      expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledTimes(3);
-
       sessions.forEach((sessionId, i) => {
-        expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenNthCalledWith(
-          i + 1,
-          expect.stringContaining(`Session ${i + 1}`),
-          'Try to find a peaceful solution',
-          'diplomatic',
-          sessionId,
-          expect.any(String),
-          expect.any(Object)
-        );
+        const tracked = playerDecisionTracker.getSessionDecisions(sessionId);
+        expect(tracked).toHaveLength(1);
+        expect(tracked[0]).toMatchObject({
+          prompt: expect.stringContaining(`Session ${i + 1}`),
+          choiceText: 'Try to find a peaceful solution',
+          choiceType: 'diplomatic',
+          sessionId
+        });
       });
     });
 
@@ -256,16 +237,16 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
 
         useNarrativeStore.getState().selectDecisionOption(decisionId, `lawful-${i}`, TEST_CHARACTER);
 
-        expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenNthCalledWith(
-          i + 1,
-          expect.any(String),
-          choiceText,
-          'diplomatic',
-          TEST_SESSION,
-          expect.any(String),
-          expect.any(Object)
-        );
+        // recordDecision sanitizes stored text by stripping `<>'"&` — match
+        // what actually lands, not the pre-sanitized source string.
+        const [latest] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+        expect(latest).toMatchObject({
+          choiceText: choiceText.replace(/[<>'"&]/g, ''),
+          choiceType: 'diplomatic'
+        });
       });
+
+      expect(playerDecisionTracker.getSessionDecisions(TEST_SESSION)).toHaveLength(lawfulVariations.length);
     });
   });
 });
