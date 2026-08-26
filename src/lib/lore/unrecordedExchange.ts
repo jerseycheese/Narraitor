@@ -18,7 +18,7 @@
  */
 
 import type { EntityID } from '../../types/common.types';
-import { escapeRegExp } from './continuityLedger';
+import { MIN_TERM_LENGTH, escapeRegExp } from './continuityLedger';
 
 /**
  * Two tiers, because the single sharpest failure mode here is firing on a
@@ -93,6 +93,7 @@ export interface UnrecordedExchangeClaim {
 }
 
 const MAX_CLAIM_LENGTH = 200;
+const NPC_NAME_PART_STOPWORDS = new Set(['a', 'an', 'and', 'of', 'the']);
 
 /**
  * Counts, per NPC, the narrated scenes shared with the protagonist and whether
@@ -145,8 +146,15 @@ export function detectUnrecordedExchangeClaim(
 
   const named = Object.entries(npcNames ?? {}).filter(([, name]) => {
     const trimmed = name?.trim();
-    return (
-      !!trimmed && new RegExp(`\\b${escapeRegExp(trimmed)}\\b`, 'i').test(text)
+    if (!trimmed) return false;
+    const nameParts = trimmed.split(/\s+/).filter(
+      (part) =>
+        part.length >= MIN_TERM_LENGTH &&
+        !NPC_NAME_PART_STOPWORDS.has(part.toLowerCase())
+    );
+    const terms = [trimmed, ...nameParts];
+    return terms.some((term) =>
+      new RegExp(`\\b${escapeRegExp(term)}\\b`, 'i').test(text)
     );
   });
 

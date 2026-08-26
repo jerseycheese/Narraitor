@@ -56,6 +56,49 @@ describe('detectUnrecordedExchangeClaim', () => {
       )
     ).toBeNull();
   });
+
+  it('resolves a multi-word NPC name by an individual name part when unique', () => {
+    const claim = detectUnrecordedExchangeClaim(
+      'Ask Marla to repeat what she told me privately.',
+      { 'npc-marla': 'Marla Jones' }
+    );
+    expect(claim).toMatchObject({ npcId: 'npc-marla', name: 'Marla Jones' });
+  });
+
+  it('ignores incidental name stopwords when resolving a unique NPC', () => {
+    const claim = detectUnrecordedExchangeClaim(
+      'Ask Mira to repeat what she told me privately at the mill.',
+      { 'npc-mira': 'Mira', 'npc-caretaker': 'The Caretaker' }
+    );
+    expect(claim).toMatchObject({ npcId: 'npc-mira', name: 'Mira' });
+  });
+
+  it('does not resolve an NPC from an incidental name stopword alone', () => {
+    expect(
+      detectUnrecordedExchangeClaim(
+        'Ask Mira to repeat what she told me privately at the mill.',
+        { 'npc-caretaker': 'The Caretaker' }
+      )
+    ).toBeNull();
+  });
+
+  it('declines when release-smoke phrasing mentions multiple rostered NPCs partially or fully', () => {
+    expect(
+      detectUnrecordedExchangeClaim(
+        'Ask Marla why Coach Barry told me the game was off, just between us.',
+        { 'npc-marla': 'Marla Jones', 'npc-barry': 'Coach Barry' }
+      )
+    ).toBeNull();
+  });
+
+  it('declines when a name part is shared by multiple rostered NPCs', () => {
+    expect(
+      detectUnrecordedExchangeClaim(
+        'Ask Marla to repeat what she told me privately.',
+        { 'npc-marla-1': 'Marla Jones', 'npc-marla-2': 'Marla Singer' }
+      )
+    ).toBeNull();
+  });
 });
 
 describe('countSharedScenes', () => {
