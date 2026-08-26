@@ -65,6 +65,23 @@ describe('detectUnrecordedExchangeClaim', () => {
     expect(claim).toMatchObject({ npcId: 'npc-marla', name: 'Marla Jones' });
   });
 
+  it('ignores incidental name stopwords when resolving a unique NPC', () => {
+    const claim = detectUnrecordedExchangeClaim(
+      'Ask Mira to repeat what she told me privately at the mill.',
+      { 'npc-mira': 'Mira', 'npc-caretaker': 'The Caretaker' }
+    );
+    expect(claim).toMatchObject({ npcId: 'npc-mira', name: 'Mira' });
+  });
+
+  it('does not resolve an NPC from an incidental name stopword alone', () => {
+    expect(
+      detectUnrecordedExchangeClaim(
+        'Ask Mira to repeat what she told me privately at the mill.',
+        { 'npc-caretaker': 'The Caretaker' }
+      )
+    ).toBeNull();
+  });
+
   it('declines when release-smoke phrasing mentions multiple rostered NPCs partially or fully', () => {
     expect(
       detectUnrecordedExchangeClaim(
