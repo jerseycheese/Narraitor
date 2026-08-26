@@ -294,48 +294,13 @@ export const TestDataGeneratorSection: React.FC = () => {
           if (storeCharacter) {
             const { portrait } = await generatePortrait({
               character: {
-                id: storeCharacter.id,
                 name: storeCharacter.name,
-                worldId: storeCharacter.worldId,
                 background: {
                   history: storeCharacter.background.history,
                   personality: storeCharacter.background.personality,
                   physicalDescription:
                     storeCharacter.background.physicalDescription || '',
-                  goals: storeCharacter.background.goals,
-                  fears: storeCharacter.background.fears,
-                  relationships: [],
                 },
-                attributes: storeCharacter.attributes.map(
-                  (attr: { id: string; name: string; baseValue: number }) => ({
-                    attributeId:
-                      currentWorld.attributes.find(
-                        (wa) => wa.name === attr.name
-                      )?.id || attr.id,
-                    value: attr.baseValue,
-                  })
-                ),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                skills: storeCharacter.skills.map((skill: any) => ({
-                  skillId:
-                    currentWorld.skills.find((ws) => ws.name === skill.name)
-                      ?.id || skill.id,
-                  level: skill.level,
-                  experience: 0,
-                  isActive: true,
-                })),
-                inventory: {
-                  characterId: storeCharacter.id,
-                  items: [],
-                  capacity: 100,
-                  categories: [],
-                },
-                status: {
-                  conditions: storeCharacter.status.conditions,
-                  location: currentWorld.name,
-                },
-                createdAt: storeCharacter.createdAt,
-                updatedAt: storeCharacter.updatedAt,
               },
               world: currentWorld,
             });

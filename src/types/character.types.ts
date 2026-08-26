@@ -22,6 +22,16 @@ export interface Character extends NamedEntity, TimestampedEntity {
   portrait?: GeneratedImage;
 }
 
+export interface PortraitSubject {
+  name: string;
+  background?: Partial<
+    Pick<
+      CharacterBackground,
+      'physicalDescription' | 'history' | 'personality' | 'isKnownFigure'
+    >
+  >;
+}
+
 /**
  * Represents a character's attribute value
  */

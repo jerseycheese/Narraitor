@@ -96,4 +96,20 @@ describe('evaluateDecisionSkillChecks', () => {
     expect(result.skillCheckTags).toEqual(['skill-critical-failure:skill-1', 'skill-roll:1']);
     expect(result.decisionOutcome).toBe('critical-failure');
   });
+
+  it('translates store character skills to roll results with matching skillLevel', () => {
+    jest.spyOn(Math, 'random').mockReturnValue(0.5); // d20 -> 11
+
+    const character = buildCharacter(); // cs-1 has worldSkillId: 'skill-1' and level: 3
+
+    const result = evaluateDecisionSkillChecks({
+      selectedOption: optionWithSkill(),
+      character,
+      world: buildWorld([worldSkill('skill-1', 'Stealth')]),
+    });
+
+    expect(result.rollResults).toHaveLength(1);
+    expect(result.rollResults[0].skillLevel).toBe(3);
+    expect(result.rollResults[0].skillId).toBe('skill-1');
+  });
 });

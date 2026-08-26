@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import Logger from '@/lib/utils/logger';
-import { Character } from '@/types/character.types';
+import { PortraitSubject } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { truncate, getTimestamp } from '@/lib/utils';
 import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
@@ -41,46 +41,22 @@ async function buildPortraitPrompt(
     logger.debug('generate-portrait API', 'Creating AI client and generator');
     const aiClient = createDefaultGeminiClient(apiKey);
 
-    // Create a minimal character object for detection
-    const mockCharacter: Character = {
-      id: 'detection-temp',
-      name: characterName,
-      description: '',
-      worldId: 'temp',
-      background: {
-        physicalDescription: physicalDescription,
-        history: '',
-        personality: '',
-        goals: [],
-        fears: [],
-        relationships: [],
-      },
-      attributes: [],
-      skills: [],
-      derivedStats: [],
-      inventory: {
-        characterId: 'detection-temp',
-        items: [],
-        capacity: 100,
-        categories: [],
-        itemOrder: [],
-      },
-      status: {
-        conditions: [],
-      },
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
-    };
-
     logger.debug(
       'generate-portrait API',
       'Calling buildPortraitPrompt directly to avoid image generation'
     );
 
     // Call buildPortraitPrompt directly to avoid the image generation requirement
-    const prompt = await buildPortraitPromptFn(aiClient, mockCharacter, {
-      worldGenre: worldGenre,
-    });
+    const prompt = await buildPortraitPromptFn(
+      aiClient,
+      {
+        name: characterName,
+        background: { physicalDescription },
+      },
+      {
+        worldGenre: worldGenre,
+      }
+    );
 
     logger.debug(
       'generate-portrait API',
@@ -116,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // Handle different input formats
     let prompt: string;
-    let character: Character | undefined;
+    let character: PortraitSubject | undefined;
     let world: World | undefined;
     const apiKey = resolveApiKey(request);
 

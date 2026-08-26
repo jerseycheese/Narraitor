@@ -5,6 +5,9 @@
 jest.mock('@/lib/ai/geminiImageGenerator', () => ({
   generateImageWithGemini: jest.fn(),
 }));
+jest.mock('@/lib/ai/portraitGenerator', () => ({
+  buildPortraitPrompt: jest.fn(),
+}));
 jest.mock('@/lib/utils/logger', () => {
   return jest.fn().mockImplementation(() => ({
     debug: jest.fn(),
@@ -16,8 +19,10 @@ jest.mock('@/lib/utils/logger', () => {
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
+import { buildPortraitPrompt } from '@/lib/ai/portraitGenerator';
 
 const mockGenerate = generateImageWithGemini as jest.MockedFunction<typeof generateImageWithGemini>;
+const mockBuildPortraitPrompt = buildPortraitPrompt as jest.MockedFunction<typeof buildPortraitPrompt>;
 
 // The direct-prompt input format skips the AI-assisted prompt builder, which
 // keeps these tests on the generate-and-fall-back path they're about.
@@ -92,5 +97,51 @@ describe('/api/generate-portrait', () => {
     expect(response.status).toBe(200);
     expect(data.portrait.url).toContain('api.dicebear.com/7.x/avataaars/svg');
     expect(data.portrait.prompt).toContain('rate limited');
+  });
+
+  it('uses recognizable source material fallback when prompt generation fails for a known figure', async () => {
+    mockBuildPortraitPrompt.mockRejectedValue(new Error('AI detection failed'));
+
+    const response = await POST(
+      makeRequest({
+        character: {
+          name: 'Sherlock Holmes',
+          background: {
+            physicalDescription: 'tall with a deerstalker hat',
+            isKnownFigure: true,
+          },
+        },
+        world: { genre: 'mystery' },
+        promptOnly: true,
+      })
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.prompt).toContain(
+      'This should be recognizable as Sherlock Holmes from the source material.'
+    );
+  });
+
+  it('uses original character fallback when prompt generation fails for a non-known figure', async () => {
+    mockBuildPortraitPrompt.mockRejectedValue(new Error('AI detection failed'));
+
+    const response = await POST(
+      makeRequest({
+        character: {
+          name: 'Original Hero',
+          background: {
+            physicalDescription: 'armored warrior',
+            isKnownFigure: false,
+          },
+        },
+        world: { genre: 'fantasy' },
+        promptOnly: true,
+      })
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.prompt).toContain('This is an original character.');
   });
 });

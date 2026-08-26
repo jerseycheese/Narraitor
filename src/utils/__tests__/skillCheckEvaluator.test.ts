@@ -13,14 +13,17 @@
  * @author Generated with Claude Code
  */
 
-import { evaluateSkillCheck, rollD20 } from '../skillCheckEvaluator';
 import {
-  Character,
+  evaluateSkillCheck,
+  rollD20,
+  SkillCheck,
+  SkillCheckSubject,
+} from '../skillCheckEvaluator';
+import {
   CharacterSkill,
   CharacterAttribute,
 } from '@/types/character.types';
 import { WorldSkill } from '@/types/world.types';
-import { SkillCheck } from '../skillCheckEvaluator';
 
 /**
  * Mock character attributes for testing various attribute bonus scenarios
@@ -43,9 +46,7 @@ const mockCharacterSkills: CharacterSkill[] = [
 /**
  * Complete mock character with attributes and skills for comprehensive testing
  */
-const mockCharacter: Partial<Character> = {
-  id: 'test-character',
-  name: 'Test Character',
+const mockCharacter: SkillCheckSubject = {
   attributes: mockCharacterAttributes,
   skills: mockCharacterSkills,
 };
@@ -129,7 +130,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        mockCharacter as Character,
+        mockCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -153,7 +154,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        mockCharacter as Character,
+        mockCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -172,7 +173,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        mockCharacter as Character,
+        mockCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -188,7 +189,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
     it('should auto-succeed on natural 20 even if total < DC', () => {
       (Math.random as jest.Mock).mockReturnValue(0.95); // Returns 20
 
-      const weakCharacter: Partial<Character> = {
+      const weakCharacter: SkillCheckSubject = {
         ...mockCharacter,
         skills: [], // No skills
         attributes: [{ attributeId: 'strength', value: 1 }], // Minimal attribute
@@ -200,7 +201,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        weakCharacter as Character,
+        weakCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -220,12 +221,10 @@ describe('evaluateSkillCheck with d20 rolls', () => {
     it('should auto-fail on natural 1 even if total >= DC', () => {
       (Math.random as jest.Mock).mockReturnValue(0.0); // Returns 1
 
-      const expertCharacter: Partial<Character> = {
-        ...mockCharacter,
+      const expertCharacter: SkillCheckSubject = {
         skills: [
-          { skillId: 'athletics', level: 20, experience: 0, isActive: true },
+          { skillId: 'athletics', level: 20, isActive: true },
         ],
-        derivedStats: [],
         attributes: [{ attributeId: 'strength', value: 30 }],
       };
 
@@ -235,7 +234,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        expertCharacter as Character,
+        expertCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -255,7 +254,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
     it('should allow untrained characters (skill level 0) to attempt', () => {
       (Math.random as jest.Mock).mockReturnValue(0.9); // Returns 19
 
-      const untrainedCharacter: Partial<Character> = {
+      const untrainedCharacter: SkillCheckSubject = {
         ...mockCharacter,
         skills: [], // No athletics skill
       };
@@ -266,7 +265,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        untrainedCharacter as Character,
+        untrainedCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -286,7 +285,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        mockCharacter as Character,
+        mockCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -307,7 +306,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        mockCharacter as Character,
+        mockCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -329,7 +328,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        mockCharacter as Character,
+        mockCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -349,7 +348,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
 
       expect(() => {
         evaluateSkillCheck(
-          mockCharacter as Character,
+          mockCharacter,
           skillCheck,
           mockWorldSkills
         );
@@ -367,7 +366,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        mockCharacter as Character,
+        mockCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -389,7 +388,7 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       };
 
       const result = evaluateSkillCheck(
-        mockCharacter as Character,
+        mockCharacter,
         skillCheck,
         mockWorldSkills
       );
@@ -402,6 +401,56 @@ describe('evaluateSkillCheck with d20 rolls', () => {
       expect(result.success).toBe(false); // 9 < 20
       expect(result.isCriticalSuccess).toBe(false);
       expect(result.isCriticalFailure).toBe(false);
+    });
+  });
+
+  describe('skill active status', () => {
+    it('should exclude skills marked with isActive: false (treating as skill level 0)', () => {
+      (Math.random as jest.Mock).mockReturnValue(0.5); // Returns 11
+
+      const characterWithInactiveSkill: SkillCheckSubject = {
+        attributes: mockCharacterAttributes,
+        skills: [
+          { skillId: 'athletics', level: 8, isActive: false },
+        ],
+      };
+
+      const skillCheck: SkillCheck = {
+        skillId: 'athletics',
+        difficulty: 5,
+      };
+
+      const result = evaluateSkillCheck(
+        characterWithInactiveSkill,
+        skillCheck,
+        mockWorldSkills
+      );
+
+      expect(result.skillLevel).toBe(0);
+    });
+
+    it('should use skills when isActive is absent (defaults to active)', () => {
+      (Math.random as jest.Mock).mockReturnValue(0.5); // Returns 11
+
+      const characterWithAbsentIsActive: SkillCheckSubject = {
+        attributes: mockCharacterAttributes,
+        skills: [
+          { skillId: 'athletics', level: 8 },
+        ],
+      };
+
+      const skillCheck: SkillCheck = {
+        skillId: 'athletics',
+        difficulty: 5,
+      };
+
+      const result = evaluateSkillCheck(
+        characterWithAbsentIsActive,
+        skillCheck,
+        mockWorldSkills
+      );
+
+      expect(result.skillLevel).toBe(8);
     });
   });
 });

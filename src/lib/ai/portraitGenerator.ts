@@ -1,6 +1,4 @@
-// src/lib/ai/portraitGenerator.ts
-
-import { Character } from '../../types/character.types';
+import { PortraitSubject } from '../../types/character.types';
 import { AIClient } from './types';
 import { truncate, safeTrim } from '@/lib/utils';
 import { normalizeText, NORM_NAME, NORM_DESC } from '@/lib/utils/textNormalization';
@@ -181,7 +179,7 @@ async function enhancePhysicalDiversity(
  */
 export async function buildPortraitPrompt(
   aiClient: AIClient,
-  character: Character,
+  character: PortraitSubject,
   options: PortraitGenerationOptions = {}
 ): Promise<string> {
   // If no detection options provided, run AI detection

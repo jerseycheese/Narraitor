@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { GeneratedImage } from '@/types/common.types';
-import { Character } from '@/types/character.types';
+import { PortraitSubject } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PortraitCustomizationSection } from '@/components/shared';
@@ -13,7 +13,6 @@ import {
   ImageUploadPicker,
   PresetAvatarPicker,
 } from '@/components/CharacterPortrait';
-import { getTimestamp } from '@/lib/utils';
 import { usePortraitGeneration } from '@/lib/hooks/usePortraitGeneration';
 
 interface CharacterFormData {
@@ -103,24 +102,8 @@ export function PortraitStep({
   const handleGeneratePortrait = async () => {
     const epoch = sourceEpochRef.current;
 
-    const characterForGeneration: Character = {
-      id: 'temp',
+    const characterForGeneration: PortraitSubject = {
       name: data.characterData.name,
-      description: '',
-      worldId: data.worldId,
-      attributes: data.characterData.attributes.map((attr) => ({
-        attributeId: attr.attributeId,
-        value: attr.value,
-      })),
-      skills: data.characterData.skills
-        .filter((skill) => skill.isSelected)
-        .map((skill) => ({
-          skillId: skill.skillId,
-          level: skill.level,
-          experience: 0,
-          isActive: true,
-        })),
-      derivedStats: [],
       background: {
         history:
           data.characterData.background.history +
@@ -129,20 +112,7 @@ export function PortraitStep({
         physicalDescription:
           localPhysicalDescription ||
           data.characterData.background.physicalDescription,
-        goals: data.characterData.background.goals,
-        fears: [],
-        relationships: [],
       },
-      inventory: {
-        items: [],
-        capacity: 100,
-        categories: [],
-        characterId: 'temp',
-        itemOrder: [],
-      },
-      status: { conditions: [] },
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
     };
 
     try {
