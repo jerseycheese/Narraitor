@@ -88,4 +88,25 @@ describe('parseNarrativeResponse debris guard', () => {
       'The sign read content: "closed" and she turned away down the long wet street.'
     );
   });
+
+  it('reads a flattened dump the model wrapped in a json fence', () => {
+    const raw =
+      '```json\nmetadata.characterIds: [] metadata.mood: tense content: "Panic claws at your throat as the shadow lunges forward." type: action\n```';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'Panic claws at your throat as the shadow lunges forward.'
+    );
+    expect(parsed.segmentType).toBe('action');
+  });
+
+  it('reads a flattened dump the model wrapped in braces', () => {
+    const raw =
+      '{ metadata.mood: tense content: "Panic claws at your throat as the shadow lunges forward." type: action }';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'Panic claws at your throat as the shadow lunges forward.'
+    );
+  });
 });
