@@ -161,8 +161,9 @@ describe('stripNonNarrativeBlocks', () => {
   it('leaves ordinary prose containing colons and metadata keywords untouched', () => {
     const line1 = 'She read the label aloud: content: three grams of powder.';
     const line2 = 'He hesitated. Type: unknown, the screen said.';
-    const line3 = 'The metadata of the archive meant nothing to her now.';
-    const content = `${line1}\n\n${line2}\n\n${line3}`;
+    const line3 = 'The medical display flashed her blood type: O';
+    const line4 = 'The metadata of the archive meant nothing to her now.';
+    const content = `${line1}\n\n${line2}\n\n${line3}\n\n${line4}`;
 
     expect(stripNonNarrativeBlocks(content)).toBe(content);
   });

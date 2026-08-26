@@ -63,7 +63,7 @@ const CONTENT_MARKER_PATTERN = /(?:^|[\s,])["']?content["']?\s*[:=]/i;
 const METADATA_MARKER_PATTERN = /(?:metadata\.\w+|content|type)\s*[:=]\s*/gi;
 const SENTENCE_END_PATTERN = /[.!?]["']?\s/;
 const TRAILING_METADATA_SUFFIX_PATTERN =
-  /\s*["']?\s*(?:type|metadata\.\w+)\s*[:=]\s*[^\s.!?]+(?:\s+(?:type|metadata\.\w+)\s*[:=]\s*[^\s.!?]+)*\s*$/i;
+  /\s*["']?\s*(?:type\s*[:=]\s*(?:scene|dialogue|action|transition|ending)|metadata\.\w+\s*[:=]\s*[^\s.!?]+)(?:\s+(?:type\s*[:=]\s*(?:scene|dialogue|action|transition|ending)|metadata\.\w+\s*[:=]\s*[^\s.!?]+))*\s*$/i;
 
 const trimDottedMetadataPrefix = (block: string): string => {
   if (
