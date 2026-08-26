@@ -145,8 +145,10 @@ export function detectUnrecordedExchangeClaim(
 
   const named = Object.entries(npcNames ?? {}).filter(([, name]) => {
     const trimmed = name?.trim();
-    return (
-      !!trimmed && new RegExp(`\\b${escapeRegExp(trimmed)}\\b`, 'i').test(text)
+    if (!trimmed) return false;
+    const terms = [trimmed, ...trimmed.split(/\s+/).filter(Boolean)];
+    return terms.some((term) =>
+      new RegExp(`\\b${escapeRegExp(term)}\\b`, 'i').test(text)
     );
   });
 
