@@ -322,7 +322,7 @@ describe('settled commitments in aligned choices (#1963)', () => {
 
   it('caps at six commitments and stays below 150 estimated tokens', () => {
     process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = 'true';
-    const facts = Array.from({ length: 8 }, (_, i) => ({
+    const facts: Array<Partial<LoreFact>> = Array.from({ length: 8 }, (_, i) => ({
       id: `e${i}`,
       category: 'events',
       value: `Actor ${i} handed over item ${i}.`,
@@ -337,6 +337,7 @@ describe('settled commitments in aligned choices (#1963)', () => {
       },
     }));
     seedFacts(facts);
+
 
     const prompt = buildAlignedPrompt();
     const settledSectionMatch = prompt.match(/ALREADY SETTLED[\s\S]*?(?=\n\n===|\n\n[A-Z]|$)/);
