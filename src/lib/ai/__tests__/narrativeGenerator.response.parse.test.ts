@@ -68,4 +68,24 @@ describe('parseNarrativeResponse debris guard', () => {
 
     expect(parsed.actualContent).toBe(prose);
   });
+
+  it('keeps the whole passage when malformed JSON holds a content marker in its prose', () => {
+    const raw =
+      '{"content":"She squinted at the terminal. content: "redacted" it said, and nothing else. Mira stepped back from the glow.","type":"scene"}';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'She squinted at the terminal. content: "redacted" it said, and nothing else. Mira stepped back from the glow.'
+    );
+  });
+
+  it('keeps the whole passage when a fenced response holds a content marker in its prose', () => {
+    const raw =
+      '```json\n{"content":"The sign read content: "closed" and she turned away down the long wet street."}\n```';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'The sign read content: "closed" and she turned away down the long wet street.'
+    );
+  });
 });

@@ -76,15 +76,21 @@ export const parseNarrativeResponse = (
   let extractedMetadata: NarrativeExtractedMetadata = {};
   let contentFromClosedField = false;
 
-  const flattened = extractFlattenedFields(actualContent);
+  // A response that already looks like JSON goes down the JSON path even when
+  // it is malformed, because prose can legitimately contain the flattened
+  // shape's marker - a character reading a config file, a screen quoted inside
+  // the scene. Reaching for the flattened reader first would cut such a passage
+  // at its own prose and ship the object's tail along with it.
+  const looksLikeJson =
+    actualContent.includes('```json') ||
+    actualContent.startsWith('{') ||
+    actualContent.includes('"content":');
+  const flattened = looksLikeJson ? null : extractFlattenedFields(actualContent);
+
   if (flattened) {
     actualContent = flattened.content;
     if (flattened.type) segmentType = flattened.type;
-  } else if (
-    actualContent.includes('```json') ||
-    actualContent.startsWith('{') ||
-    actualContent.includes('"content":')
-  ) {
+  } else if (looksLikeJson) {
     try {
       const stripped = stripMarkdownFences(actualContent);
       const jsonStr = extractJsonObject(stripped);
