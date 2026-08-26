@@ -17,6 +17,7 @@ async function buildPortraitPrompt(
   characterName: string,
   physicalDescription: string,
   worldGenre: string,
+  isKnownFigure?: boolean,
   apiKey?: string | null
 ): Promise<string> {
   try {
@@ -71,7 +72,7 @@ async function buildPortraitPrompt(
     );
 
     // Fallback to basic prompt if AI detection fails
-    return `Create a professional portrait of ${characterName}, ${physicalDescription}. This is an original character. Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting genre: ${worldGenre}.`;
+    return `Create a professional portrait of ${characterName}, ${physicalDescription}. ${isKnownFigure ? `This should be recognizable as ${characterName} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting genre: ${worldGenre}.`;
   }
 }
 
@@ -120,11 +121,13 @@ export async function POST(request: NextRequest) {
         const physicalDesc =
           customDescription || character?.background?.physicalDescription || '';
         const worldGenre = world?.genre || 'modern';
+        const isKnownFigure = character?.background?.isKnownFigure;
 
         const prompt = await buildPortraitPrompt(
           characterName,
           physicalDesc,
           worldGenre,
+          isKnownFigure,
           apiKey
         );
 
@@ -140,11 +143,13 @@ export async function POST(request: NextRequest) {
           character?.background?.physicalDescription ||
           'No specific appearance described';
         const worldGenre = world?.genre || 'fantasy';
+        const isKnownFigure = character?.background?.isKnownFigure;
 
         prompt = await buildPortraitPrompt(
           characterName,
           physicalDesc,
           worldGenre,
+          isKnownFigure,
           apiKey
         );
       }

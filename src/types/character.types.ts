@@ -25,7 +25,10 @@ export interface Character extends NamedEntity, TimestampedEntity {
 export interface PortraitSubject {
   name: string;
   background?: Partial<
-    Pick<CharacterBackground, 'physicalDescription' | 'history' | 'personality'>
+    Pick<
+      CharacterBackground,
+      'physicalDescription' | 'history' | 'personality' | 'isKnownFigure'
+    >
   >;
 }
 
