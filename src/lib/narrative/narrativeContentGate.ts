@@ -38,7 +38,7 @@ const CONTAINER_TAG_PATTERN =
 const BOOKKEEPING_LABEL_PATTERN =
   /^(?:world\s+(?:clock|state)|player\s+status|character\s+status|current\s+(?:status|goals?|conditions?|threats?|threads?)|status|outstanding\s+goals?|goals?|objectives?|open\s+threads?|threads?|threats?|conditions?|inventory|ledger|cost|clock|time|storyteller['’]?s?\s+note|narrator['’]?s?\s+note|gm\s+note|metadata|summary)\b/i;
 
-const METADATA_LEAD_PATTERN = /^(?:\*\*)?["']?metadata["']?(?:\*\*)?\s*[:=]/i;
+const METADATA_LEAD_PATTERN = /^(?:\*\*)?["']?metadata(?:\.\w+)?["']?(?:\*\*)?\s*[:=]/i;
 
 const LIST_ITEM_PATTERN = /^(?:[-*+•]|\d+[.)])\s+/;
 
@@ -57,6 +57,43 @@ const SCAFFOLDING_LINE_PATTERNS: RegExp[] = [
   /^\**\s*world\s+clock\b[^.!?]*:?\s*\**$/i,
   /^\[?\s*overdue\b[^\]]*\]?$/i,
 ];
+
+const DOTTED_METADATA_LEAD_PATTERN = /^(?:\*\*)?["']?metadata\.\w+/i;
+const CONTENT_MARKER_PATTERN = /(?:^|[\s,])["']?content["']?\s*[:=]/i;
+const METADATA_MARKER_PATTERN = /(?:metadata\.\w+|content|type)\s*[:=]\s*/gi;
+const SENTENCE_END_PATTERN = /[.!?]["']?\s/;
+const TRAILING_METADATA_SUFFIX_PATTERN =
+  /\s*["']?\s*(?:(?:type|metadata\.\w+)\s*[:=]\s*[^\s.!?]+\s*)+$/i;
+
+const trimDottedMetadataPrefix = (block: string): string => {
+  if (
+    !DOTTED_METADATA_LEAD_PATTERN.test(block.trim()) ||
+    !CONTENT_MARKER_PATTERN.test(block)
+  ) {
+    return block;
+  }
+
+  const matches = Array.from(block.matchAll(METADATA_MARKER_PATTERN));
+  if (matches.length === 0) return block;
+
+  let lastMarker = matches[0];
+  for (let i = 1; i < matches.length; i++) {
+    const nextMarker = matches[i];
+    const gap = block.slice(
+      lastMarker.index + lastMarker[0].length,
+      nextMarker.index
+    );
+    if (SENTENCE_END_PATTERN.test(gap)) break;
+    lastMarker = nextMarker;
+  }
+
+  const cutIndex = lastMarker.index + lastMarker[0].length;
+  const remaining = block.slice(cutIndex);
+  return remaining.replace(/^["']/, '').trimStart();
+};
+
+const trimTrailingMetadataSuffix = (block: string): string =>
+  block.replace(TRAILING_METADATA_SUFFIX_PATTERN, '').trimEnd();
 
 const splitParagraphs = (text: string): string[] =>
   text
@@ -140,7 +177,10 @@ export const stripNonNarrativeBlocks = (content: string): string => {
 
   return withoutScaffolding
     .split(/\n{2,}/)
+    .map(trimDottedMetadataPrefix)
     .filter((block) => !isBookkeepingBlock(block))
+    .map(trimTrailingMetadataSuffix)
+    .filter(Boolean)
     .join('\n\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();

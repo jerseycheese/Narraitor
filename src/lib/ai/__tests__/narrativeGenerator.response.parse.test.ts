@@ -44,4 +44,28 @@ describe('parseNarrativeResponse debris guard', () => {
     expect(parsed.actualContent).toBe('You flee.');
   });
 
+  it('recovers prose from a flattened dotted-key dump', () => {
+    const raw =
+      'metadata.characterIds: [] metadata.speakerId: null metadata.location: "Ruins" metadata.mood: "grim" metadata.majorEvent: "The fall" content: "Panic claws at your throat as the shadow lunges forward. Your blade rises too late, and the iron edge finds its mark." type: action';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'Panic claws at your throat as the shadow lunges forward. Your blade rises too late, and the iron edge finds its mark.'
+    );
+  });
+
+  it('takes the segment type from trailing unquoted type in a flattened dump', () => {
+    const raw =
+      'metadata.characterIds: [] content: "Panic claws at your throat as the shadow lunges forward." type: action';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.segmentType).toBe('action');
+  });
+
+  it('leaves ordinary prose containing colons untouched', () => {
+    const prose = 'She read the label aloud: content: three grams of powder.';
+    const parsed = parseNarrativeResponse({ content: prose }, 'scene');
+
+    expect(parsed.actualContent).toBe(prose);
+  });
 });
