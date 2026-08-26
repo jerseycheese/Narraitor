@@ -6,6 +6,8 @@ import { clsx } from 'clsx';
 import { Consequence, DecisionOutcome } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useNPCStore } from '@/state/npcStore';
+import { useWorldStore } from '@/state/worldStore';
+import { resolveSkillData } from '@/lib/utils/gameDataResolver';
 import { formatDecisionText } from '@/lib/narrative/formatDecisionText';
 
 interface ChoiceOutcomeCalloutProps {
@@ -130,6 +132,22 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     (option) => option.id === decision.selectedOptionId
   );
 
+  // Snapshot — world skills don't change during a session, so no subscription needed.
+  const worldSkills = Object.values(
+    useWorldStore.getState()?.worlds ?? {}
+  ).flatMap((w) => w.skills ?? []);
+
+  const skillReqs = selectedOption?.requirements?.filter(
+    (r) => r.type === 'skill'
+  ) ?? [];
+  const skillNames = Array.from(
+    new Set(
+      skillReqs
+        .map((r) => resolveSkillData(r.targetId, worldSkills)?.name)
+        .filter((name): name is string => Boolean(name))
+    )
+  );
+
   // A typed action is a first-person sentence, so it takes neither prefix -
   // "You attempt to I walk over..." is the same person shift. Rendering it from
   // the option rather than the stored text also repairs sessions saved before
@@ -138,9 +156,15 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     ? formatDecisionText(selectedOption)
     : buildOutcomeDecisionText(decisionText, decisionOutcome);
 
-  const outcomeLabel = decisionOutcome
+  const baseOutcomeLabel = decisionOutcome
     ? outcomeLabels[decisionOutcome]
     : 'Decision Logged';
+  // Fold contributing skills into the gutter label so the player knows which
+  // check(s) produced this outcome without needing the toast that was deleted.
+  const outcomeLabel =
+    decisionOutcome && skillNames.length > 0
+      ? `${baseOutcomeLabel} · ${skillNames.join(', ')}`
+      : baseOutcomeLabel;
 
   const chips = buildConsequenceChips(
     selectedOption?.consequences ?? [],

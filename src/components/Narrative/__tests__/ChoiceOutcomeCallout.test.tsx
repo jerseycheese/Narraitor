@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { ChoiceOutcomeCallout } from '../ChoiceOutcomeCallout';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useNPCStore } from '@/state/npcStore';
+import { useWorldStore } from '@/state/worldStore';
 
 describe('ChoiceOutcomeCallout', () => {
   const defaultProps = {
@@ -256,3 +257,125 @@ describe('ChoiceOutcomeCallout consequence chips', () => {
     expect(screen.getByText('Order +12')).toBeInTheDocument();
   });
 });
+
+describe('ChoiceOutcomeCallout skill name in outcome label', () => {
+  beforeEach(() => {
+    useNPCStore.setState({ npcs: {} });
+  });
+
+  it('folds the skill name into the label when the world skill is resolvable', () => {
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
+      worlds: {
+        'world-1': {
+          id: 'world-1',
+          skills: [{ id: 'skill-stealth', name: 'Stealth' }],
+        },
+      },
+    });
+
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-skill': {
+          id: 'decision-skill',
+          prompt: 'What do you do?',
+          selectedOptionId: 'opt-skill',
+          options: [
+            {
+              id: 'opt-skill',
+              text: 'Sneak past',
+              requirements: [{ type: 'skill', targetId: 'skill-stealth', operator: 'gte', value: 3 }],
+            },
+          ],
+        },
+      },
+    });
+
+    render(
+      <ChoiceOutcomeCallout
+        decisionId="decision-skill"
+        decisionText="You sneak past"
+        decisionOutcome="success"
+      />
+    );
+
+    expect(screen.getByText('Success · Stealth')).toBeInTheDocument();
+  });
+
+  it('falls back to the bare outcome label when the skill cannot be resolved', () => {
+    (useWorldStore.getState as jest.Mock).mockReturnValue({ worlds: {} });
+
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-unknown-skill': {
+          id: 'decision-unknown-skill',
+          prompt: 'What do you do?',
+          selectedOptionId: 'opt-unknown',
+          options: [
+            {
+              id: 'opt-unknown',
+              text: 'Try something',
+              requirements: [{ type: 'skill', targetId: 'skill-does-not-exist', operator: 'gte', value: 3 }],
+            },
+          ],
+        },
+      },
+    });
+
+    render(
+      <ChoiceOutcomeCallout
+        decisionId="decision-unknown-skill"
+        decisionText="You try something"
+        decisionOutcome="success"
+      />
+    );
+
+    expect(screen.getByText('Success')).toBeInTheDocument();
+    expect(screen.queryByText(/·/)).not.toBeInTheDocument();
+  });
+
+  it('lists all contributing skills for multi-skill actions', () => {
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
+      worlds: {
+        'world-1': {
+          id: 'world-1',
+          skills: [
+            { id: 'skill-stealth', name: 'Stealth' },
+            { id: 'skill-hacking', name: 'Hacking' },
+          ],
+        },
+      },
+    });
+
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-multi-skill': {
+          id: 'decision-multi-skill',
+          prompt: 'What do you do?',
+          selectedOptionId: 'opt-multi',
+          options: [
+            {
+              id: 'opt-multi',
+              text: 'Hack security while sneaking past',
+              requirements: [
+                { type: 'skill', targetId: 'skill-stealth', operator: 'gte', value: 3 },
+                { type: 'skill', targetId: 'skill-hacking', operator: 'gte', value: 4 },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    render(
+      <ChoiceOutcomeCallout
+        decisionId="decision-multi-skill"
+        decisionText="You hack security while sneaking past"
+        decisionOutcome="mixed"
+      />
+    );
+
+    expect(screen.getByText('Mixed · Stealth, Hacking')).toBeInTheDocument();
+  });
+});
+
+

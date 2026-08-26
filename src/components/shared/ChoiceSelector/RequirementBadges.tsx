@@ -30,7 +30,6 @@ export const AlignmentBadge: React.FC<AlignmentBadgeProps> = ({
 interface SkillRequirement {
   skillName?: string;
   met?: boolean;
-  dc?: number;
   requirement?: {
     targetId: string;
   };
@@ -59,8 +58,8 @@ interface ItemRequirementBadgesProps {
 }
 
 /**
- * Renders skill requirement badges (pre-selection only)
- * Roll results are shown via toasts instead
+ * Renders skill requirement badges (pre-selection only).
+ * Shows the skill name and a RISKY qualifier when the character is under the bar.
  */
 export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   requirements,
@@ -83,20 +82,24 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   const badgeLabel = hasNamedSkill
     ? primaryRequirement.skillName!
     : 'Skill';
-  const { dc, met } = primaryRequirement;
-  const displayLabel =
-    typeof dc === 'number' ? `${badgeLabel} · DC ${dc}` : badgeLabel;
+  const isAnyRisky = requirements.some((req) => req.met === false);
+  const displayLabel = isAnyRisky ? `${badgeLabel} · RISKY` : badgeLabel;
+  const dataMet = isAnyRisky
+    ? 'false'
+    : requirements.every((req) => req.met === true)
+      ? 'true'
+      : undefined;
 
   return (
     <span
       className="manuscript-skill-check-badge"
       data-option-id={optionId}
-      data-met={met === undefined ? undefined : String(met)}
+      data-met={dataMet}
       aria-label={
-        typeof dc === 'number'
-          ? `Skill check: ${badgeLabel}, difficulty class ${dc}`
+        isAnyRisky
+          ? `${badgeLabel} check, risky for this character`
           : hasNamedSkill
-            ? `Skill check required: ${badgeLabel}`
+            ? `${badgeLabel} check`
             : 'Skill check required'
       }
     >

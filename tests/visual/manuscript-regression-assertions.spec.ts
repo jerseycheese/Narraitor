@@ -1012,7 +1012,7 @@ test.describe('Manuscript regression assertions', () => {
         })
         .map((el) => `${el.tagName.toLowerCase()}.${el.className}`);
 
-      // A skill check reads "STEALTH · DC 4"; it is `white-space: nowrap`, so
+      // A skill check reads "STEALTH" or "STEALTH · RISKY"; it is `white-space: nowrap`, so
       // a column that is too narrow truncates the number rather than wrapping.
       const badges = Array.from(
         document.querySelectorAll('.manuscript-skill-check-badge')
