@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import Logger from '@/lib/utils/logger';
-import { Character } from '@/types/character.types';
+import { PortraitSubject } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { truncate, getTimestamp } from '@/lib/utils';
 import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
@@ -17,7 +17,6 @@ async function buildPortraitPrompt(
   characterName: string,
   physicalDescription: string,
   worldGenre: string,
-  isKnownFigure?: boolean,
   apiKey?: string | null
 ): Promise<string> {
   try {
@@ -41,46 +40,22 @@ async function buildPortraitPrompt(
     logger.debug('generate-portrait API', 'Creating AI client and generator');
     const aiClient = createDefaultGeminiClient(apiKey);
 
-    // Create a minimal character object for detection
-    const mockCharacter: Character = {
-      id: 'detection-temp',
-      name: characterName,
-      description: '',
-      worldId: 'temp',
-      background: {
-        physicalDescription: physicalDescription,
-        history: '',
-        personality: '',
-        goals: [],
-        fears: [],
-        relationships: [],
-      },
-      attributes: [],
-      skills: [],
-      derivedStats: [],
-      inventory: {
-        characterId: 'detection-temp',
-        items: [],
-        capacity: 100,
-        categories: [],
-        itemOrder: [],
-      },
-      status: {
-        conditions: [],
-      },
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
-    };
-
     logger.debug(
       'generate-portrait API',
       'Calling buildPortraitPrompt directly to avoid image generation'
     );
 
     // Call buildPortraitPrompt directly to avoid the image generation requirement
-    const prompt = await buildPortraitPromptFn(aiClient, mockCharacter, {
-      worldGenre: worldGenre,
-    });
+    const prompt = await buildPortraitPromptFn(
+      aiClient,
+      {
+        name: characterName,
+        background: { physicalDescription },
+      },
+      {
+        worldGenre: worldGenre,
+      }
+    );
 
     logger.debug(
       'generate-portrait API',
@@ -96,7 +71,7 @@ async function buildPortraitPrompt(
     );
 
     // Fallback to basic prompt if AI detection fails
-    return `Create a professional portrait of ${characterName}, ${physicalDescription}. ${isKnownFigure ? `This should be recognizable as ${characterName} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting genre: ${worldGenre}.`;
+    return `Create a professional portrait of ${characterName}, ${physicalDescription}. This is an original character. Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting genre: ${worldGenre}.`;
   }
 }
 
@@ -116,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     // Handle different input formats
     let prompt: string;
-    let character: Character | undefined;
+    let character: PortraitSubject | undefined;
     let world: World | undefined;
     const apiKey = resolveApiKey(request);
 
@@ -145,13 +120,11 @@ export async function POST(request: NextRequest) {
         const physicalDesc =
           customDescription || character?.background?.physicalDescription || '';
         const worldGenre = world?.genre || 'modern';
-        const isKnownFigure = character?.background?.isKnownFigure;
 
         const prompt = await buildPortraitPrompt(
           characterName,
           physicalDesc,
           worldGenre,
-          isKnownFigure,
           apiKey
         );
 
@@ -167,13 +140,11 @@ export async function POST(request: NextRequest) {
           character?.background?.physicalDescription ||
           'No specific appearance described';
         const worldGenre = world?.genre || 'fantasy';
-        const isKnownFigure = character?.background?.isKnownFigure;
 
         prompt = await buildPortraitPrompt(
           characterName,
           physicalDesc,
           worldGenre,
-          isKnownFigure,
           apiKey
         );
       }

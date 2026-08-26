@@ -10,14 +10,14 @@
  * skill checks would fail even when the character had the required skill.
  */
 
-import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
+import {
+  evaluateSkillCheck,
+  type SkillCheckSubject,
+} from '@/utils/skillCheckEvaluator';
 import { WorldSkill } from '@/types/world.types';
-import { Character } from '@/types/character.types';
-import { EntityID } from '@/types/common.types';
 
 describe('Skill Check Integration - ID-based Flow', () => {
   const mockStealthSkillId = 'stealth-skill';
-  const mockCharacterId = 'test-character' as EntityID;
 
   const mockWorldSkills: WorldSkill[] = [
     {
@@ -34,21 +34,7 @@ describe('Skill Check Integration - ID-based Flow', () => {
     },
   ];
 
-  const mockCharacter: Character = {
-    id: mockCharacterId,
-    name: 'Test Hero',
-    worldId: 'test-world',
-    description: 'A skilled hero',
-    background: {
-      history: 'A skilled adventurer',
-      personality: 'Cautious and observant',
-      goals: ['Master the art of stealth'],
-      fears: [],
-      relationships: [],
-    },
-    status: {
-      conditions: [],
-    },
+  const mockCharacter: SkillCheckSubject = {
     attributes: [
       {
         attributeId: 'dexterity',
@@ -59,20 +45,8 @@ describe('Skill Check Integration - ID-based Flow', () => {
       {
         skillId: mockStealthSkillId,
         level: 5,
-        experience: 0,
-        isActive: true,
       },
     ],
-    derivedStats: [],
-    inventory: {
-      characterId: mockCharacterId,
-      items: [],
-      capacity: 10,
-      categories: [],
-      itemOrder: [],
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
   };
 
   it('evaluates skill check using skill ID directly', () => {

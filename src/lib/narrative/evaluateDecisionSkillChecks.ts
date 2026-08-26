@@ -4,9 +4,11 @@
 // NarrativeController.generateNextSegment as a pure (no React state) unit;
 // the only side effect is the injected onSkillCheckPerformed callback.
 
-import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
+import {
+  evaluateSkillCheck,
+  type SkillCheckSubject,
+} from '@/utils/skillCheckEvaluator';
 import { logger } from '@/lib/utils/logger';
-import type { Character as UtilCharacter } from '@/types/character.types';
 import type { Character as StoreCharacter } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 import type {
@@ -29,41 +31,16 @@ export interface DecisionSkillCheckResult {
   decisionOutcome?: DecisionOutcome;
 }
 
-// Adapt the store's character shape to the skill-check evaluator's expected format.
-function adaptStoreCharacterToUtil(character: StoreCharacter): UtilCharacter {
+function toSkillCheckSubject(character: StoreCharacter): SkillCheckSubject {
   return {
-    id: character.id,
-    name: character.name,
-    description: character.description,
-    worldId: character.worldId,
     skills: character.skills.map((skill) => ({
       skillId: skill.worldSkillId || skill.id,
       level: skill.level,
-      experience: 0,
-      isActive: true,
     })),
     attributes: character.attributes.map((attr) => ({
       attributeId: attr.worldAttributeId || attr.id,
       value: attr.modifiedValue || attr.baseValue,
     })),
-    derivedStats: [],
-    background: {
-      history: character.background?.history || '',
-      personality: character.background?.personality || '',
-      goals: character.background?.goals || [],
-      fears: character.background?.fears || [],
-      relationships: [],
-    },
-    inventory: {
-      characterId: character.inventory.characterId,
-      items: [],
-      capacity: character.inventory.capacity,
-      categories: [],
-      itemOrder: [],
-    },
-    status: character.status,
-    createdAt: character.createdAt,
-    updatedAt: character.updatedAt,
   };
 }
 
@@ -81,6 +58,7 @@ export function evaluateDecisionSkillChecks({
     const skillRequirements = selectedOption.requirements.filter(
       (req) => req.type === 'skill'
     );
+    const subject = toSkillCheckSubject(character);
 
     for (const requirement of skillRequirements) {
       const requiredLevel =
@@ -95,11 +73,9 @@ export function evaluateDecisionSkillChecks({
         difficulty: requiredLevel,
       };
 
-      const adaptedCharacter = adaptStoreCharacterToUtil(character);
-
       try {
         const rollResult = evaluateSkillCheck(
-          adaptedCharacter,
+          subject,
           skillCheck,
           world.skills || []
         );

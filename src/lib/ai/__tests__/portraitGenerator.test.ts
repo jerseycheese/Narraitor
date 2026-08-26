@@ -1,9 +1,8 @@
 // src/lib/ai/__tests__/portraitGenerator.test.ts
 
 import { buildPortraitPrompt } from '../portraitGenerator';
-import { Character } from '../../../types/character.types';
+import { PortraitSubject } from '../../../types/character.types';
 import { AIClient } from '../types';
-import { getTimestamp } from '@/lib/utils/timestamp';
 
 // Mock the AI client
 const mockAIClient: AIClient = {
@@ -12,7 +11,7 @@ const mockAIClient: AIClient = {
 };
 
 describe('portraitGenerator', () => {
-  let mockCharacter: Character;
+  let mockCharacter: PortraitSubject;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -66,38 +65,13 @@ describe('portraitGenerator', () => {
     );
 
     mockCharacter = {
-      id: 'char-1',
       name: 'Elara Moonshadow',
-      worldId: 'world-1',
-      description:
-        'A mysterious elven mage with silver hair and piercing blue eyes',
-      attributes: [
-        { attributeId: 'strength', value: 8 },
-        { attributeId: 'intelligence', value: 15 },
-      ],
-      skills: [
-        { skillId: 'magic', level: 10, experience: 100, isActive: true },
-      ],
-      derivedStats: [],
       background: {
         history: 'A skilled mage from the northern kingdoms',
         personality: 'Wise and mysterious',
         physicalDescription:
           'Tall elf with long silver hair and piercing blue eyes',
-        goals: ['Master ancient magic'],
-        fears: ['Losing control of power'],
-        relationships: [],
       },
-      inventory: {
-        items: [],
-        capacity: 100,
-        categories: [],
-        characterId: 'char-1',
-        itemOrder: [],
-      },
-      status: { conditions: [] },
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
     };
   });
 

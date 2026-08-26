@@ -1,8 +1,9 @@
 import type { GeneratedImage } from '@/types/common.types';
+import type { PortraitSubject } from '@/types/character.types';
 import { aiFetch } from '@/lib/ai/aiFetch';
 
 export interface PortraitRequest {
-  character?: unknown;
+  character?: PortraitSubject;
   world?: unknown;
   customDescription?: string;
   prompt?: string;

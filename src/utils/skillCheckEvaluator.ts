@@ -1,6 +1,6 @@
 // Probabilistic d20-based skill check evaluation used by the narrative system.
 
-import { Character } from '@/types/character.types';
+import { CharacterSkill, CharacterAttribute } from '@/types/character.types';
 import { WorldSkill } from '@/types/world.types';
 import { SkillCheckRoll } from '@/types/narrative.types';
 
@@ -20,8 +20,13 @@ export interface SkillCheck {
   difficulty: number;
 }
 
+export interface SkillCheckSubject {
+  skills: (Pick<CharacterSkill, 'skillId' | 'level'> & { isActive?: boolean })[];
+  attributes: Pick<CharacterAttribute, 'attributeId' | 'value'>[];
+}
+
 export function evaluateSkillCheck(
-  character: Character,
+  character: SkillCheckSubject,
   skillCheck: SkillCheck,
   worldSkills: WorldSkill[]
 ): SkillCheckRoll {
@@ -51,7 +56,7 @@ export function evaluateSkillCheck(
 
   // Untrained (skill level 0) is allowed: anyone can attempt.
   const characterSkill = character.skills.find(skill =>
-    skill.skillId === worldSkill.id && skill.isActive
+    skill.skillId === worldSkill.id && skill.isActive !== false
   );
   const skillLevel = characterSkill?.level || 0;
 

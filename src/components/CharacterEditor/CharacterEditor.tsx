@@ -128,7 +128,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     setPortraitError(null); // Clear previous portrait errors
     try {
       const { portrait } = await generatePortrait({
-        character: { ...editingCharacter, id: characterId },
+        character: editingCharacter,
         world: world,
         customDescription: customDescription,
       });
