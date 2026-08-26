@@ -1062,11 +1062,13 @@ body.manuscript-overlay-open {
 }
 
 /* F47: a skill the player hasn't met yet reads as a muted/locked gate rather
-   than the accent "you have this" treatment. Choice stays selectable. */
+   than the accent "you have this" treatment. Choice stays selectable.
+   Uses --color-text-secondary on a transparent background to clear 4.5:1 WCAG
+   contrast across both light and dark card surfaces. */
 .manuscript-skill-check-badge[data-met="false"] {
-  background: rgb(from var(--color-text-muted) r g b / 12%);
-  color: var(--color-text-muted);
-  border-color: rgb(from var(--color-text-muted) r g b / 25%);
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
 }
 
 /* The inverse treatment here assumed the selected row was a solid accent slab.
