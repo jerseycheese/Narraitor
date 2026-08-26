@@ -128,9 +128,6 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
         <p className="component-landing-check">
           <span className="component-landing-check-skill">{world.check.skillName}</span>
           <span className="component-landing-check-verdict">Failed</span>
-          <span className="component-landing-check-roll">
-            rolled {world.check.total}, needed {world.check.dc}
-          </span>
         </p>
 
         <p className="component-landing-prose component-landing-consequence">

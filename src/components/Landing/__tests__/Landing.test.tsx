@@ -120,4 +120,13 @@ describe('Landing page', () => {
     expect(rendered).not.toMatch(/\bfree\b/i);
     expect(rendered).not.toMatch(/\bAI\b/i);
   });
+
+  it('keeps tabletop jargon out of the rendered page', () => {
+    const { container } = render(<Landing />);
+    const rendered = container.textContent ?? '';
+
+    expect(rendered).not.toMatch(/\brolled\b/i);
+    expect(rendered).not.toMatch(/\bd20\b/i);
+    expect(rendered).not.toMatch(/\bDC\b/);
+  });
 });
