@@ -62,7 +62,7 @@ export function normalizeDecisionOptions(
   return (decision.options || []).map(opt => {
     // Surface every skill-gated option so players can see the gate before
     // choosing (F47). The choice stays selectable — a d20 check still rolls —
-    // but the badge shows the skill and its DC up front.
+    // but the badge shows the skill name, plus a risk qualifier when the character is under the bar.
     const skillRequirements = (opt.requirements?.filter(req => req.type === 'skill').map(req => {
       const skillData = resolveSkillData(req.targetId, worldSkills);
       const evaluation = evaluateRequirement(req, evaluationContext);
