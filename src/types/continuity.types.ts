@@ -74,6 +74,11 @@ export interface ContinuityCommitment {
    * these never reach the prompt.
    */
   terms: string[];
+  /**
+   * True on a turn where the player's typed action directly asks to re-promise
+   * or reconfirm this specific delivered commitment (#1963).
+   */
+  isReconfirmationRequested?: boolean;
 }
 
 /** A lasting change the player made to the scene, still true until undone on-page. */

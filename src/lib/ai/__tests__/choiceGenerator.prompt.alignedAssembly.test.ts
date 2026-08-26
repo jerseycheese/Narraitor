@@ -5,6 +5,8 @@ import { useCharacterStore } from '@/state/characterStore';
 import type { Character as StoreCharacter } from '@/state/characterStore';
 import { useNPCStore } from '@/state/npcStore';
 import type { NPC } from '@/types/npc.types';
+import { useLoreStore } from '@/state/loreStore';
+import type { LoreFact } from '@/types/lore.types';
 
 // The template registry is deliberately NOT mocked here. Every other suite
 // stubs it out, which is why a contradiction between the aligned template and
@@ -31,6 +33,31 @@ jest.mock('@/state/npcStore', () => ({
 jest.mock('@/state/characterStore', () => ({
   useCharacterStore: {
     getState: jest.fn(),
+  },
+}));
+
+jest.mock('@/state/loreStore', () => ({
+  useLoreStore: {
+    getState: jest.fn().mockReturnValue({
+      getFacts: jest.fn(() => []),
+    }),
+  },
+}));
+
+jest.mock('@/state/worldStore', () => ({
+  useWorldStore: {
+    getState: jest.fn().mockReturnValue({
+      getWorldState: jest.fn(() => ({})),
+    }),
+  },
+}));
+
+jest.mock('@/state/narrativeStore', () => ({
+  useNarrativeStore: {
+    getState: jest.fn().mockReturnValue({
+      getSessionDecisions: jest.fn(() => []),
+      getSessionSegments: jest.fn(() => []),
+    }),
   },
 }));
 
@@ -187,3 +214,143 @@ describe('the player character in their own choice prompt', () => {
     expect(roster).toContain('Mayor Thorn');
   });
 });
+
+describe('settled commitments in aligned choices (#1963)', () => {
+  const originalEnv = process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES;
+
+  afterEach(() => {
+    process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = originalEnv;
+  });
+
+  const seedFacts = (facts: Array<Partial<LoreFact>>) => {
+    (useLoreStore.getState as jest.Mock).mockReturnValue({
+      getFacts: jest.fn(() => facts),
+    });
+  };
+
+
+  it('preserves the prompt byte-for-byte when flag is disabled (default)', () => {
+    process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = 'false';
+    seedFacts([
+      {
+        id: 'e1',
+        category: 'events',
+        value: 'Davies delivered the parcel appraisal documents.',
+        createdAt: '2025-01-01T00:00:00.000Z',
+        metadata: {
+          continuity: {
+            kind: 'commitment',
+            topic: 'parcel appraisal documents',
+            speaker: 'Councilman Davies',
+            status: 'delivered',
+          },
+        },
+      },
+    ]);
+
+    const prompt = buildAlignedPrompt();
+    expect(prompt).not.toContain('ALREADY SETTLED');
+    expect(prompt).not.toContain('parcel appraisal documents');
+  });
+
+  it('renders delivered commitments and excludes outstanding commitments and continuity sections when flag is on', () => {
+    process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = 'true';
+    seedFacts([
+      {
+        id: 'e1',
+        category: 'events',
+        value: 'Davies handed over the parcel appraisal.',
+        createdAt: '2025-01-01T00:00:00.000Z',
+        metadata: {
+          continuity: {
+            kind: 'commitment',
+            topic: 'parcel appraisal documents',
+            speaker: 'Councilman Davies',
+            status: 'delivered',
+          },
+        },
+      },
+      {
+        id: 'e2',
+        category: 'events',
+        value: 'Thorn promised a public hearing.',
+        createdAt: '2025-01-01T00:05:00.000Z',
+        metadata: {
+          continuity: {
+            kind: 'commitment',
+            topic: 'public hearing',
+            speaker: 'Mayor Thorn',
+            status: 'promised',
+          },
+        },
+      },
+      {
+        id: 'e3',
+        category: 'events',
+        value: 'Aunt Carol says the debt was settled.',
+        createdAt: '2025-01-01T00:10:00.000Z',
+        metadata: {
+          continuity: {
+            kind: 'assertion',
+            topic: 'mill debt',
+            speaker: 'Aunt Carol',
+          },
+        },
+      },
+    ]);
+
+    const prompt = buildAlignedPrompt();
+    expect(prompt).toContain('ALREADY SETTLED (do not offer, request, negotiate, or obtain again):');
+    expect(prompt).toContain('- parcel appraisal documents (delivered by Councilman Davies)');
+    // Outstanding commitments and assertions must NOT appear in choices prompt
+    expect(prompt).not.toContain('public hearing');
+    expect(prompt).not.toContain('mill debt');
+    expect(prompt).not.toContain('CONTINUITY REQUIREMENTS');
+  });
+
+  it('fails open when store throws', () => {
+    process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = 'true';
+    (useLoreStore.getState as jest.Mock).mockReturnValue({
+      getFacts: jest.fn(() => {
+        throw new Error('Store failure');
+      }),
+    });
+
+    const prompt = buildAlignedPrompt();
+    expect(prompt).not.toContain('ALREADY SETTLED');
+  });
+
+  it('caps at six commitments and stays below 150 estimated tokens', () => {
+    process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = 'true';
+    const facts = Array.from({ length: 8 }, (_, i) => ({
+      id: `e${i}`,
+      category: 'events',
+      value: `Actor ${i} handed over item ${i}.`,
+      createdAt: `2025-01-01T00:0${i}:00.000Z`,
+      metadata: {
+        continuity: {
+          kind: 'commitment',
+          topic: `settled topic number ${i} with long description`,
+          speaker: `Important Official Name ${i}`,
+          status: 'delivered',
+        },
+      },
+    }));
+    seedFacts(facts);
+
+    const prompt = buildAlignedPrompt();
+    const settledSectionMatch = prompt.match(/ALREADY SETTLED[\s\S]*?(?=\n\n===|\n\n[A-Z]|$)/);
+    expect(settledSectionMatch).not.toBeNull();
+    const settledSection = settledSectionMatch![0];
+
+    const lines = settledSection.split('\n').filter((l) => l.startsWith('- '));
+    expect(lines.length).toBe(6);
+
+    // Measure token count
+    const { estimateTokenCount } = require('@/lib/promptContext/tokenUtils');
+    const tokenCount = estimateTokenCount(settledSection);
+    expect(tokenCount).toBeLessThan(150);
+  });
+});
+
+

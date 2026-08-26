@@ -123,10 +123,52 @@ export function buildAssertions(ledger: LoreFact[], playerName?: string): Contin
     .slice(0, MAX_ASSERTIONS);
 }
 
+const REPROMISE_LEXICON =
+  /\b(?:re-?promis\w*|reassur\w*|reiterate(?:\s+your|\s+the|\s+his|\s+her|\s+their)?\s+promise|repeat(?:\s+your|\s+the|\s+his|\s+her|\s+their)?\s+promise)\b|\b(?:promis\w*|swear\w*|vow\w*|assur\w*|give\s+(?:me\s+)?your\s+word)\b[\s\S]*?\bagain\b/i;
+
+/** Word-start match, so "document" also catches "documents". */
+function termPattern(term: string): RegExp {
+  return new RegExp(`\\b${escapeRegExp(term)}`, 'i');
+}
+
+/**
+ * Derives isReconfirmationRequested on delivered commitments when the player's
+ * action directly asks to re-promise one specific delivered commitment (#1963).
+ * Ambiguous (multiple matching) or non-matching requests leave all false.
+ */
+export function annotateReconfirmationRequests(
+  commitments: ContinuityCommitment[],
+  playerActionText?: string
+): ContinuityCommitment[] {
+  const text = playerActionText?.trim();
+  if (!text || !REPROMISE_LEXICON.test(text)) {
+    return commitments;
+  }
+
+  const matchingIndices: number[] = [];
+  commitments.forEach((commitment, idx) => {
+    if (commitment.status !== 'delivered') return;
+    const matches = commitment.terms.some((term) => termPattern(term).test(text));
+    if (matches) {
+      matchingIndices.push(idx);
+    }
+  });
+
+  if (matchingIndices.length === 1) {
+    const targetIdx = matchingIndices[0];
+    return commitments.map((commitment, idx) =>
+      idx === targetIdx ? { ...commitment, isReconfirmationRequested: true } : commitment
+    );
+  }
+
+  return commitments;
+}
+
 /** Delivered beats promised on the same topic; the delivering fact is the statement kept. */
 export function buildCommitments(
   ledger: LoreFact[],
-  itemNames: string[] = []
+  itemNames: string[] = [],
+  playerActionText?: string
 ): ContinuityCommitment[] {
   const byTopic = new Map<string, ContinuityCommitment>();
   for (const fact of ledger) {
@@ -147,8 +189,10 @@ export function buildCommitments(
       terms: referenceTerms(topic, itemNames, fact.value),
     });
   }
-  return Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
+  const commitments = Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
+  return annotateReconfirmationRequests(commitments, playerActionText);
 }
+
 
 /**
  * One line per changed object, latest statement wins: later turns retell the

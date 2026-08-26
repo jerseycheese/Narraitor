@@ -19,6 +19,9 @@ import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { logger } from '@/lib/utils/logger';
 import { canonicalizeName } from '@/lib/utils/textNormalization';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { buildContinuityContractFromStores } from './narrativeGenerator.continuity';
+import type { SettledCommitmentDTO } from '../promptTemplates/templates/narrative/context';
 interface ChoicePromptInput {
   world: World;
   worldId: string;
@@ -29,6 +32,30 @@ interface ChoicePromptInput {
   includeDecisionHistory?: boolean;
   maxOptions?: number;
 }
+const getSettledCommitments = (
+  worldId: string,
+  sessionId?: EntityID,
+  characterIds?: string[],
+  narrativeContext?: NarrativeContext
+): SettledCommitmentDTO[] | undefined => {
+  if (!isFeatureEnabled('SETTLED_COMMITMENT_CHOICES') || !sessionId) return undefined;
+  try {
+    const contract = buildContinuityContractFromStores({
+      worldId,
+      sessionId,
+      characterIds: characterIds ?? [],
+      narrativeContext,
+    });
+    if (!contract) return undefined;
+    const delivered = contract.commitments.filter((c) => c.status === 'delivered');
+    if (delivered.length === 0) return undefined;
+    return delivered.slice(0, 6).map((c) => ({ topic: c.topic, by: c.by }));
+  } catch {
+    return undefined;
+  }
+};
+
+
 export const buildChoicePrompt = ({
   world,
   worldId,
@@ -43,12 +70,16 @@ export const buildChoicePrompt = ({
   const template = getTemplate(
     useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice'
   );
+  const settledCommitments = useAlignedChoices
+    ? getSettledCommitments(worldId, sessionId, resolvedCharacterIds, narrativeContext)
+    : undefined;
   const context = buildContext(
     world,
     narrativeContext,
     resolvedCharacterIds,
     maxOptions,
-    getTurnIndex(sessionId)
+    getTurnIndex(sessionId),
+    settledCommitments
   );
   const basePrompt = template(context);
   const inventoryAwarePrompt = enhancePromptWithInventory(
@@ -112,7 +143,8 @@ const buildContext = (
   narrativeContext: NarrativeContext,
   characterIds: string[],
   maxOptions?: number,
-  turnIndex?: number
+  turnIndex?: number,
+  settledCommitments?: SettledCommitmentDTO[]
 ) => {
   const playerCharacter = getPlayerCharacter(characterIds);
 
@@ -132,8 +164,10 @@ const buildContext = (
         description: skill.description,
       })) || [],
     worldNpcs: getWorldNpcs(world.id, playerCharacter),
+    settledCommitments,
   };
 };
+
 
 /**
  * Decisions already made this session - uncapped, unlike

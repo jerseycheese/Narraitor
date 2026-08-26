@@ -81,6 +81,26 @@ describe('featureFlags', () => {
     ).toBe(false);
   });
 
+  it('defaults SETTLED_COMMITMENT_CHOICES to false and enables it only for the exact string "true"', () => {
+    expect(
+      load({ NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES: undefined }).isFeatureEnabled(
+        'SETTLED_COMMITMENT_CHOICES'
+      )
+    ).toBe(false);
+    jest.resetModules();
+    expect(
+      load({ NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES: 'true' }).isFeatureEnabled(
+        'SETTLED_COMMITMENT_CHOICES'
+      )
+    ).toBe(true);
+    jest.resetModules();
+    expect(
+      load({ NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES: 'TRUE' }).isFeatureEnabled(
+        'SETTLED_COMMITMENT_CHOICES'
+      )
+    ).toBe(false);
+  });
+
   it('supports downstream gating decisions for BUFFERED_STREAMING', () => {
     const { isFeatureEnabled } = load({
       NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING: 'false',
@@ -90,3 +110,4 @@ describe('featureFlags', () => {
     expect(mode).toBe('legacy');
   });
 });
+
