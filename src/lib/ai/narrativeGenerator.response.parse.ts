@@ -12,6 +12,14 @@ import { stripMarkdownFences, extractJsonObject } from './parseJSON';
  */
 const MIN_RECOVERED_PASSAGE_LENGTH = 20;
 
+const VALID_SEGMENT_TYPES = [
+  'scene',
+  'dialogue',
+  'action',
+  'transition',
+  'ending',
+];
+
 /**
  * Recognises what's left when a response never carried a usable content field -
  * a bare brace, an unclosed object, a fragment cut off mid-sentence. Only
@@ -28,6 +36,38 @@ const isJsonDebris = (text: string): boolean => {
   );
 };
 
+/**
+ * The shape a response takes when it answers with the schema's keys but not its
+ * JSON: dotted metadata paths and an unquoted content key. The quoted-key
+ * extraction below cannot see it, so without this the whole dump ships as prose.
+ */
+const FLATTENED_FIELD_PATTERN =
+  /(?:^|\s)(?:metadata\.\w+\s*[:=]|content\s*[:=]\s*")/;
+
+const extractFlattenedFields = (
+  raw: string
+): { content: string; type?: string } | null => {
+  if (!FLATTENED_FIELD_PATTERN.test(raw)) return null;
+
+  const contentMatch = raw.match(/(?:^|[\s,])["']?content["']?\s*[:=]\s*"/i);
+  if (!contentMatch) return null;
+
+  const afterMarker = raw.slice(contentMatch.index! + contentMatch[0].length);
+  const lastQuoteIndex = afterMarker.lastIndexOf('"');
+  if (lastQuoteIndex === -1) return null;
+
+  const content = afterMarker.slice(0, lastQuoteIndex);
+  if (isJsonDebris(content)) return null;
+
+  const trailing = afterMarker.slice(lastQuoteIndex + 1);
+  const typeMatch = trailing.match(/(?:^|\s)type\s*[:=]\s*["']?(\w+)["']?/i);
+  const rawType = typeMatch ? typeMatch[1].toLowerCase() : undefined;
+  const type =
+    rawType && VALID_SEGMENT_TYPES.includes(rawType) ? rawType : undefined;
+
+  return { content, type };
+};
+
 export const parseNarrativeResponse = (
   response: { content?: string },
   segmentType: string
@@ -36,7 +76,11 @@ export const parseNarrativeResponse = (
   let extractedMetadata: NarrativeExtractedMetadata = {};
   let contentFromClosedField = false;
 
-  if (
+  const flattened = extractFlattenedFields(actualContent);
+  if (flattened) {
+    actualContent = flattened.content;
+    if (flattened.type) segmentType = flattened.type;
+  } else if (
     actualContent.includes('```json') ||
     actualContent.startsWith('{') ||
     actualContent.includes('"content":')
@@ -72,12 +116,7 @@ export const parseNarrativeResponse = (
           actualContent = parsed.content;
           contentFromClosedField = true;
         }
-        if (
-          parsed.type &&
-          ['scene', 'dialogue', 'action', 'transition', 'ending'].includes(
-            parsed.type
-          )
-        ) {
+        if (parsed.type && VALID_SEGMENT_TYPES.includes(parsed.type)) {
           segmentType = parsed.type;
         }
         if (parsed.metadata) {

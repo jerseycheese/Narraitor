@@ -128,6 +128,45 @@ describe('stripNonNarrativeBlocks', () => {
 
     expect(stripNonNarrativeBlocks(content)).toBe(`${PROSE}\n${MORE_PROSE}`);
   });
+
+  it('removes a standalone dotted-metadata block', () => {
+    const content = [
+      PROSE,
+      '',
+      'metadata.characterIds: [] metadata.speakerId: null',
+      'metadata.mood: "tense"',
+      '',
+      MORE_PROSE,
+    ].join('\n');
+
+    expect(stripNonNarrativeBlocks(content)).toBe(`${PROSE}\n\n${MORE_PROSE}`);
+  });
+
+  it('keeps prose when a block begins with a dotted-metadata run', () => {
+    const content = [
+      `metadata.characterIds: [] metadata.speakerId: null content: "${PROSE}" type: action`,
+      '',
+      MORE_PROSE,
+    ].join('\n');
+
+    expect(stripNonNarrativeBlocks(content)).toBe(`${PROSE}\n\n${MORE_PROSE}`);
+  });
+
+  it('trims a trailing bare type fragment from the end of a paragraph', () => {
+    const content = `${PROSE}" type: action`;
+
+    expect(stripNonNarrativeBlocks(content)).toBe(PROSE);
+  });
+
+  it('leaves ordinary prose containing colons and metadata keywords untouched', () => {
+    const line1 = 'She read the label aloud: content: three grams of powder.';
+    const line2 = 'He hesitated. Type: unknown, the screen said.';
+    const line3 = 'The medical display flashed her blood type: O';
+    const line4 = 'The metadata of the archive meant nothing to her now.';
+    const content = `${line1}\n\n${line2}\n\n${line3}\n\n${line4}`;
+
+    expect(stripNonNarrativeBlocks(content)).toBe(content);
+  });
 });
 
 describe('dedupeAgainstRecent', () => {
