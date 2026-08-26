@@ -76,15 +76,12 @@ export const parseNarrativeResponse = (
   let extractedMetadata: NarrativeExtractedMetadata = {};
   let contentFromClosedField = false;
 
-  const flattened = extractFlattenedFields(actualContent);
-  if (flattened) {
-    actualContent = flattened.content;
-    if (flattened.type) segmentType = flattened.type;
-  } else if (
+  const looksLikeJson =
     actualContent.includes('```json') ||
     actualContent.startsWith('{') ||
-    actualContent.includes('"content":')
-  ) {
+    actualContent.includes('"content":');
+
+  if (looksLikeJson) {
     try {
       const stripped = stripMarkdownFences(actualContent);
       const jsonStr = extractJsonObject(stripped);
@@ -275,13 +272,28 @@ export const parseNarrativeResponse = (
         // Fallback extraction failed - use default content
       }
     }
+  }
 
-    // When no path found a closed content field the raw text is still sitting
-    // there. Failing here hands the turn to the existing retry and
-    // fallback-segment handling instead of shipping a one-character passage.
-    if (!contentFromClosedField && isJsonDebris(actualContent)) {
-      throw new Error('Service error: malformed API response');
+  // The flattened reader runs after the JSON path rather than ahead of it.
+  // Prose carries the flattened shape's marker often enough - a character
+  // reading a config file, a screen quoted inside the scene - that going first
+  // would cut a malformed object's passage at its own prose and ship the
+  // object's tail with it. Running second still catches a dotted-key dump the
+  // JSON recovery could not read, fenced or braced.
+  if (!contentFromClosedField) {
+    const flattened = extractFlattenedFields(actualContent);
+    if (flattened) {
+      actualContent = flattened.content;
+      contentFromClosedField = true;
+      if (flattened.type) segmentType = flattened.type;
     }
+  }
+
+  // When no path found a closed content field the raw text is still sitting
+  // there. Failing here hands the turn to the existing retry and
+  // fallback-segment handling instead of shipping a one-character passage.
+  if (looksLikeJson && !contentFromClosedField && isJsonDebris(actualContent)) {
+    throw new Error('Service error: malformed API response');
   }
 
   return {

@@ -68,4 +68,45 @@ describe('parseNarrativeResponse debris guard', () => {
 
     expect(parsed.actualContent).toBe(prose);
   });
+
+  it('keeps the whole passage when malformed JSON holds a content marker in its prose', () => {
+    const raw =
+      '{"content":"She squinted at the terminal. content: "redacted" it said, and nothing else. Mira stepped back from the glow.","type":"scene"}';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'She squinted at the terminal. content: "redacted" it said, and nothing else. Mira stepped back from the glow.'
+    );
+  });
+
+  it('keeps the whole passage when a fenced response holds a content marker in its prose', () => {
+    const raw =
+      '```json\n{"content":"The sign read content: "closed" and she turned away down the long wet street."}\n```';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'The sign read content: "closed" and she turned away down the long wet street.'
+    );
+  });
+
+  it('reads a flattened dump the model wrapped in a json fence', () => {
+    const raw =
+      '```json\nmetadata.characterIds: [] metadata.mood: tense content: "Panic claws at your throat as the shadow lunges forward." type: action\n```';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'Panic claws at your throat as the shadow lunges forward.'
+    );
+    expect(parsed.segmentType).toBe('action');
+  });
+
+  it('reads a flattened dump the model wrapped in braces', () => {
+    const raw =
+      '{ metadata.mood: tense content: "Panic claws at your throat as the shadow lunges forward." type: action }';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'Panic claws at your throat as the shadow lunges forward.'
+    );
+  });
 });
