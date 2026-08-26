@@ -4,6 +4,45 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.3.0 - 2026-08-26
+
+The theme is the story staying true to itself. Every prior release added a capability; this one went looking for the specific ways a 20-30 turn session quietly stops matching what it already told the player, and closed what it found one measured fix at a time. The v1.3 milestone closed 9 issues across 77 commits since [v1.2.0](https://github.com/jerseycheese/narraitor/releases/tag/v1.2.0), all of it fed by the live-playtest campaign tracked in [#1818](https://github.com/jerseycheese/narraitor/issues/1818).
+
+**What's in this release**
+
+- The engine no longer confirms a conversation that never happened. Ask an NPC to repeat something they supposedly told you in private off-page, and the story denies the false premise instead of inventing content to match it ([#1857](https://github.com/jerseycheese/narraitor/issues/1857), guard measured live this release - see Known incomplete).
+- Two continuity guardrails, both measured against live Gemini rather than shipped on faith. Contradicting an established fact mid-session dropped to 30 of 30 clean turns in one measured run and 11 of 12 in a second ([#1831](https://github.com/jerseycheese/narraitor/issues/1831)). Choices that cast the player as the counterparty to their own settled business - re-offering something already delivered - measured 4 hits to 0 across 105 options per arm ([#1830](https://github.com/jerseycheese/narraitor/issues/1830)).
+- A guard against a specific invention: an NPC naming a fact about the player's own family (a grandparent's name, a detail off the character sheet that was never entered) and the story's memory writing it down as canon for the rest of the session ([#1926](https://github.com/jerseycheese/narraitor/issues/1926)), the fix that came out of a 13-round investigation into character-sheet facts never reaching the prose ([#1828](https://github.com/jerseycheese/narraitor/issues/1828)).
+- A failed skill check costs something more often now, instead of quietly undoing the attempt. A 30-turn session that scored 13 of 18 failures as "nothing happened" - the world not moving for ten straight turns - was the original evidence; a fuller 54-turn measurement cut that to 4 of 11, still short of the milestone's bar (see Known incomplete) ([#1821](https://github.com/jerseycheese/narraitor/issues/1821)).
+- Cautious play stops looping. A session could run nine turns of pure clue-following - find a trace, follow it, find the next one - with no setback and no NPC ever entering the scene ([#1680](https://github.com/jerseycheese/narraitor/issues/1680)).
+- A typed custom action now renders as written. It used to get lowercased and forced behind a fixed "You choose to" prefix, breaking every custom turn's consequence card on sentences that didn't start that way ([#1832](https://github.com/jerseycheese/narraitor/issues/1832)).
+- The world clock ships on by default: a ledger of open threads now feeds the scene prompt, so an off-screen actor can advance, a threat can close in, or a deadline can tick on a turn the player isn't touching that thread. What makes a thread open, overdue, or resolved was settled as a design spike first ([#1835](https://github.com/jerseycheese/narraitor/issues/1835)), then measured live and turned on ([#1822](https://github.com/jerseycheese/narraitor/issues/1822)).
+
+**Known incomplete**
+
+The failed-check cost fix ([#1821](https://github.com/jerseycheese/narraitor/issues/1821)) measured improved but not reliable: a fuller 54-turn run still saw 4 of 11 failure turns read as nothing happening, below the milestone's 80% bar. The residual shape is mostly a "listen and hear nothing" turn, plus a tag-carryover bug that reapplies the failure block to the turn right after a failure.
+
+The unrecorded-exchange guard ([#1857](https://github.com/jerseycheese/narraitor/issues/1857)) held on both baits tried in this release's smoke test - a precise one naming an NPC's full name got a clean, in-character denial. But the smoke also found the detector only matches an NPC's complete stored name, so a player using just a first name (the phrasing anyone would actually type) can point the guard at the wrong character or miss the claim entirely ([#1967](https://github.com/jerseycheese/narraitor/issues/1967)).
+
+The world clock's ledger and orchestration are live, but a thread coming due and resolving on its own is not: advancing a thread can degrade into re-announcing it instead of it arriving ([#1872](https://github.com/jerseycheese/narraitor/issues/1872)), and a fired thread's strike counter rides an extraction path that never arms its own exit ([#1889](https://github.com/jerseycheese/narraitor/issues/1889)).
+
+World cost - making an arrived threat actually take something from the player - stays off. Round 13 measured 2 of 30 turns crossing the trigger threshold of 3, so it's still not pulling its weight live ([#1882](https://github.com/jerseycheese/narraitor/issues/1882)).
+
+Not everything measured came back a win, and this release says so rather than burying it. The fix for skewed alignment scoring (lawful/neutral/chaotic landing on 29 of 30 turns) measured *worse* than the baseline it was meant to improve on - 83.3% dominant-outcome ordering against a 70.0% baseline - and got closed not-planned rather than shipped on a technicality ([#1829](https://github.com/jerseycheese/narraitor/issues/1829)). Prompt-side reordering is a dead lever for that specific problem.
+
+Two smaller gaps came out of this release's own smoke test, filed rather than fixed mid-check: a raw-metadata parsing defect that put technical text where narrative prose should be, on the single most consequential turn of a session ([#1965](https://github.com/jerseycheese/narraitor/issues/1965)), and endings that resolve the thread they're pointed at while staying silent on other threads the same session built, sometimes filling the gap with invented lore ([#1966](https://github.com/jerseycheese/narraitor/issues/1966)).
+
+Delivered commitments (a promise an NPC makes and later keeps) are tracked and guarded in the prose, but the guard never reaches the choices a player is offered - a stale promise can still get re-offered as an option even though the narration itself won't repeat it ([#1963](https://github.com/jerseycheese/narraitor/issues/1963)).
+
+**What's next**
+
+- The two residual gaps from this release's evidence: the commitments-in-choices gap ([#1963](https://github.com/jerseycheese/narraitor/issues/1963)) and the guard name-matching gap ([#1967](https://github.com/jerseycheese/narraitor/issues/1967)).
+- The world clock ships live; making threads actually come due rather than re-announce themselves is next ([#1872](https://github.com/jerseycheese/narraitor/issues/1872), [#1889](https://github.com/jerseycheese/narraitor/issues/1889)).
+- The unrecorded-exchange guard shipped and is now measured; whether it holds under a real evaluation matrix rather than one release smoke is still open ([#1857](https://github.com/jerseycheese/narraitor/issues/1857) stays tracked).
+- The UX side of the backlog has almost nothing filed against it - 62 open issues and effectively none of them about the experience rather than the engine. That needs its own pass before it can become schedulable work.
+
+---
+
 ## v1.2.0 - 2026-08-16
 
 Every version up to now ran on one provider, so Google alone set the product's quality ceiling. That already bit twice, once when Gemini 2.5 Pro left the free tier and again when `gemini-2.5-flash-image` got a shutdown date. Four providers work now, one of them a model you host yourself, and turn-level analytics finally say whether anyone plays past the first turn. The v1.2 milestone closed 13 issues across 45 commits since [v1.1.0](https://github.com/jerseycheese/narraitor/releases/tag/v1.1.0).
