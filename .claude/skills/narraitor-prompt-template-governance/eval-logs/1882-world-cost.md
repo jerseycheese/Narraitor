@@ -177,3 +177,79 @@ What the conditions are now: Crystal Lake's are right ("jagged splinter in right
 - HOLD on (c) residue, by the declared rule: G-F and G-H pass in both cells, G-G splits - Crystal Lake passes with the cadence down (the round-11 verdict's "if the count falls with the cadence, the cadence was the count" branch, confirmed), Harrowgate fails on filing discipline (pressures-as-states, reworded re-imposition, zero clears). (c2) itself did exactly what it was built for: exact re-imposition is eliminated deterministically in both cells.
 - What flips the residue is a prompt matter on the condition rule's letter (a pressure or a denied request is not a state of the character; an outcome already listed under other words is not a new cost; a state that no longer holds gets a CLEAR) - but the #1872 log's round-12 verdict says the next move on this defect family is not another wording pass while the leak/re-emission family is unsolved, and this PR holds with that read rather than shipping half.
 - Flag default stays off; PR #1883 carries the condition rule, (c2), the fatal chain and the ended-session guard, and stays open. Ship/hold memo: `.claude/skills/narraitor-feature-experiment-lifecycle/memos/1882-world-cost.md`. Round posted to #1818 as round 12.
+
+## Round 13, declared before the run (2026-08-25): measure the develop build that would ship
+
+Round 13 is a measurement round. Nothing in the prompt changes. The question is whether the channel holds G-F, G-G and G-H on current `origin/develop` (`2861285c`) with `WORLD_COST` as the only experimental flag, which is the build that would actually ship if the default flips.
+
+### Deviations from rounds 10-12
+
+1. **No fuse.** Rounds 10-12 stacked PR #1878's thread deadlines onto develop. That draft is held and is not on this build: `WorldThread` has `dueByTurn` but no `firedAtTurn` or `strikeCount`, and the prompt has no `IN THE SCENE AND DUE NOW` section. Round 12 established that the strike cadence was Crystal Lake's G-G count. With that pressure absent, a Crystal Lake G-G pass is weaker evidence than round 12's pass.
+2. **Base drift.** Eighteen prompt-path commits landed on develop since round 12's `2dbb6053` build, including #1899, #1896, #1934, #1929, #1922, #1920, #1918, #1916, #1909 and #1902. The Memory / Voice / Choice comparison to round 12 is confounded by this drift and by the missing fuse.
+3. **Harrowgate gains a control arm.** Both cells use the same shape in one session: 15 turns with `WORLD_COST` off, then 30 turns with it on. This separates base drift from the flag in the cell that failed G-G in rounds 10-12, while shifting Harrowgate's treated block from t1-30 to t16-45.
+
+One second attempt is budgeted per cell. If both attempts end inside the declared window, both attempts are reported and the last-block gate is unscorable. That is a finding rather than a harness failure.
+
+### Matrix
+
+Both cells use the same Cautious autopilot as rounds 6-12. The flag is build-time, so phase 2 restarts the dev server with `NEXT_PUBLIC_FEATURE_WORLD_COST=true` and resumes the same session through `/play` without `?fresh=true`. `WORLD_CLOCK` stays on in both phases as the shipped base.
+
+| Cell | Phase 1, control | Phase 2, treatment |
+|---|---|---|
+| Harrowgate Mills, civic drama with no violence | t1-15, `WORLD_COST` off | t16-45, `WORLD_COST` on |
+| Camp Crystal Lake, slasher horror | t1-15, `WORLD_COST` off | t16-45, `WORLD_COST` on |
+
+Each cell becomes one transcript containing all four 10-turn blocks implied by the 15-off / 30-on shape. One blind judge scores each transcript against `narraitor-playtest-loop/rubric.md`. The judge receives only the transcript path and never sees the ledger.
+
+### Metrics and gates
+
+The primary metric remains **world-took turns per session**: a turn where an `itemsLost` entry carries `lossReason` `stolen` or `destroyed`, or a condition was imposed. The baseline is 0.
+
+Recorded per arm: world-took turns; the conditions versus stolen or destroyed item split; conditions imposed per 10-turn block; exact re-impositions reaching the note; cleared conditions; thread attribution; `item` costs with no matching `itemsLost`; `fatal` reads versus deaths in the prose; and conditions at the end. The round-12 watch item is also explicit: extraction stamps present / treated turns. Round 12 lost 9 of 17 Crystal Lake stamps to the extraction output limit fixed by #1887 / PR #1899. If the rate remains bad, that diagnosis outranks the gates.
+
+- **G-F - world-took turns:** at least 3 per session with the flag on, in both cells. Either cell below 3 is a failure.
+- **G-G - no cost spam:** conditions imposed per 10-turn block at or below 3, and the rubric's Memory / Voice / Choice no more than 1 below round 12's same block.
+- **G-H - consistency:** no more than 1 `item` cost without matching `itemsLost` per session; no death reversed on the next turn; no false fatal; and any condition contradicted by the prose within 3 turns named as a failure mode. A `fatal` that does not end the session or a kill in the prose with no `fatal` fails the death gate.
+
+Decision rule: G-F, G-G and G-H hold in both cells -> SHIP (the `WORLD_COST` default flips to `true`). G-G fails on the count -> HOLD, naming which cell and which shape (pressures-as-states, reworded re-imposition, missing clears). G-H fails on a death -> HOLD on the fatal chain. G-F fails -> HOLD and the memo names whether the extractor is not recording takes the prose asserts, or the prose is not taking.
+
+On a HOLD, the PR is record-only: this eval log, the memo, the artifacts pointer and the #1818 comment. No prompt wording ships unmeasured, and the flag stays off.
+
+## Round 13 results (2026-08-25, build `2861285c`; declaration `a6f236e0c`)
+
+Run as declared with no prompt wording changes and `WORLD_COST` as the only experimental flag. Both cells survived the full 15-turn control and 30-turn treatment windows, so neither used its budgeted second attempt. The first treated request in each cell carried both `WHAT THE WORLD CAN TAKE` and `WORLD COST`; all 30 treated scene calls per cell carried the take section, all 30 treated extraction calls carried the cost section, and the fuse-negative markers stayed absent (`fired` 0, `CONCLUDE` 0, `quiet` 0).
+
+One harness-only session was discarded before Crystal Lake treatment: navigating from Harrowgate briefly auto-initialized a one-segment session with the Crystal Lake URL but Harrowgate's active character. No measured choice was played on it. The harness resumed the already captured Crystal Lake saved session by exact id, then verified its Crystal Lake world id, character id and 15-segment count before turn 16.
+
+### The numbers that decide it, round 13
+
+| Arm | Extraction stamps | World-took turns | Of which conditions / stolen-destroyed items | Conditions imposed per treated 10-turn block | Exact re-impositions on the note | Cleared | Attributed to a thread | `item` costs with no matching `itemsLost` | `fatal` reads / character deaths in prose | Conditions at arm end |
+|---|---:|---:|---|---|---:|---:|---:|---:|---|---|
+| Harrowgate, t1-15 control | 0/15, expected off | 0 of 15 | 0 / 0 | none, channel off | none | 0 | 0 | 0 | 0 / 0 | none |
+| Harrowgate, t16-45 treatment | 30/30 | 2 of 30, t16 and t21 | 2 / 0 | 2 / 0 / 0 | 0 | 1 | 0 | 0 | 0 / 0 | `discredited before the council` |
+| Crystal Lake, t1-15 control | 0/15, expected off | 0 of 15 | 0 / 0 | none, channel off | none | 0 | 0 | 0 | 0 / 0 | none |
+| Crystal Lake, t16-45 treatment | 30/30 | 2 of 30, t36 and t43 | 2 / 0 | 0 / 0 / 2 | 0 | 0 | 0 | 0 | 0 / 0 | `bruised from fall`; `scraped knee` |
+
+The round-12 stamp-loss watch item is closed on this build: 60 of 60 treated segments have `metadata.worldCost`, including 30 of 30 at Crystal Lake after round 12 returned only 8 of 17. The channel was live and the extractor recorded the four concrete lasting states the prose actually put on the player. No stolen or destroyed player item appeared in either treatment arm. Harrowgate repeatedly delivered, gifted or sacrificed the same laminated bylaws, but those reasons are deliberately outside the primary metric and no `item` cost was asserted for them.
+
+The blind-judge Memory / Voice / Choice scores were:
+
+| Cell | Control t1-15 | Treatment t16-25 | Treatment t26-35 | Treatment t36-45 |
+|---|---|---|---|---|
+| Harrowgate | 4 / 2 / 2 | 1 / 1 / 1 | 1 / 1 / 1 | 1 / 1 / 2 |
+| Crystal Lake | 4 / 3 / 4 | 2 / 1 / 2 | 1 / 2 / 3 | 1 / 1 / 2 |
+
+Against Harrowgate round 12's cost-on blocks (4/2/3, 2/3/3, 1/2/2), the first treatment block loses 3 Memory points and 2 Choice points, and the second loses 2 Voice points and 2 Choice points. That fails the rubric half of G-G even though the condition counts are under the cap. The judge's sharpest diagnosis is the missing durable procedural state: tabled motions, recess status, seconds and known bylaws reset so the Davies-Miller obstruction loop can replay. Crystal Lake's control is at or above its round-12 comparator (4/3/3), and its first treatment block is not below the scored round-12 treated block (1/1/2). Round 12 ended fatally at t32 and did not score a later block, so the remaining Crystal Lake same-block comparison has no scored comparator; its round-13 continuity still collapses around Chris's location, the arriving children, the bus departure and the mess-hall barricade.
+
+### Gates, round 13
+
+- **G-F: FAIL in both cells.** Harrowgate and Crystal Lake each recorded 2 world-took turns against the threshold of 3. This is not an extraction miss: the cost request was present on every treated turn, every treated turn returned a stamp, and each concrete lasting player state in the prose was recorded. The prose did not take from the player often enough. Harrowgate barely moved beyond a procedural loop; Crystal Lake moved aggressively around the player but spent most of that motion on off-screen victims and nearby threats rather than the player's inventory or status.
+- **G-G: FAIL in Harrowgate; count PASS in both.** Conditions stayed at 2/0/0 and 0/0/2, exact re-impositions stayed at zero, and Harrowgate cleared one temporary condition. Harrowgate fails the rubric half on Memory, Voice and Choice drops greater than one in the first two treatment blocks. Crystal Lake's available scored comparator holds, but later round-12 blocks are unavailable because that run ended at t32.
+- **G-H: PASS.** Both cells have zero unmatched `item` costs, zero false fatals, zero character deaths in the prose and no reversal. Harrowgate cleared `loss of momentum` at t18 and did not contradict `discredited before the council`; Crystal Lake carried the t36 bruise and t43 scraped knee through the following prose. The deaths implied around Crystal Lake concern NPCs, not the player, so `fatal: false` is the correct character-cost read.
+
+### Verdict, round 13
+
+- **HOLD**, by the precommitted rule. G-F fails in both cells at 2 of 30, and Harrowgate independently fails G-G's rubric half. G-H passes and the extraction-budget fix holds at 60 of 60 stamps, so neither the extractor contract nor truncation is the next problem.
+- The flag stays off. This PR is record-only: declaration, results, memo and artifact pointer. No prompt wording or feature default changes.
+- Re-entry is a scene-side behavior question, not another extraction wording pass: the world must impose at least three durable player costs without breaking the procedural or spatial state that the blind judges found. The artifacts are stored under `~/.claude/projects/-Users-jackhaas-Projects-personal-narraitor/artifacts/1882-round13-*`.
+- Quality gate on the record-only diff: Jest 450 suites / 3,137 tests, `npm run type-check` exit 0, and `npm run lint` exit 0 with 127 existing warnings in visual-test files. No CSS, visual or E2E surface changed.
