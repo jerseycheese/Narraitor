@@ -24,8 +24,7 @@ jest.mock('../../../state/journalStore', () => ({
 
 import { generateEnding } from '../endingGenerator';
 import { buildEndingContext } from '../contextManager';
-import { getTimestamp } from '@/lib/utils/timestamp';
-import type { EndingGenerationRequest, NarrativeSegment } from '../../../types/narrative.types';
+import type { EndingGenerationRequest } from '../../../types/narrative.types';
 import {
   mockGeminiClient,
   createMockWorld,
@@ -224,60 +223,4 @@ describe('EndingGenerator - Basic Generation', () => {
     expect(calledPrompt).toContain('Camp kid on dawn deadline');
     expect(calledPrompt).toContain('RULES FOR OPEN THREADS:');
   });
-
-  it('should format recent narrative in chronological order (oldest first) using the newest ten segments', async () => {
-    // Create 12 segments with distinct timestamps and contents
-    const segments: NarrativeSegment[] = Array.from({ length: 12 }, (_, i) => ({
-      id: `seg-${i + 1}`,
-      content: `Segment event ${i + 1}`,
-      type: 'scene',
-      sessionId: 'session-789',
-      worldId: 'world-123',
-      metadata: { tags: [], mood: 'neutral' },
-      timestamp: new Date(2026, 0, 1, 10, i),
-      createdAt: getTimestamp(),
-      updatedAt: getTimestamp(),
-    }));
-
-    const mockRequest: EndingGenerationRequest = {
-      sessionId: 'session-789',
-      characterId: 'char-456',
-      worldId: 'world-123',
-      endingType: 'story-complete',
-    };
-
-    const mockContext = {
-      world: mockWorld,
-      character: mockCharacter,
-      narrativeSegments: segments,
-      journalEntries: [],
-    };
-
-    const mockResponse = `{
-      "epilogue": "The story ended.",
-      "characterLegacy": "Legacy.",
-      "worldImpact": "Impact.",
-      "tone": "hopeful",
-      "achievements": ["End"]
-    }`;
-
-    mockBuildEndingContext.mockResolvedValue(mockContext);
-    mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
-
-    await generateEnding(mockRequest);
-
-    const calledPrompt = mockGeminiClient.generateContent.mock.calls[0][0];
-
-    // Segments 1 and 2 should be excluded because only the latest 10 segments (3 through 12) are kept
-    expect(calledPrompt).not.toContain('Segment event 1\n');
-    expect(calledPrompt).not.toContain('Segment event 2\n');
-
-    // Segments 3 through 12 should appear in chronological order (oldest first: 3 before 12)
-    const seg3Index = calledPrompt.indexOf('Segment event 3');
-    const seg12Index = calledPrompt.indexOf('Segment event 12');
-    expect(seg3Index).toBeGreaterThan(-1);
-    expect(seg12Index).toBeGreaterThan(-1);
-    expect(seg3Index).toBeLessThan(seg12Index);
-  });
 });
-

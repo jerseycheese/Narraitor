@@ -212,14 +212,17 @@ export const createNarrativeEndingActions = (
 
   setCurrentEnding: (ending: StoryEnding | null) => set({ currentEnding: ending, endingError: null }),
 
-  updateCurrentEnding: (updater: (ending: StoryEnding | null) => StoryEnding | null) =>
-    set((state) => ({ currentEnding: updater(state.currentEnding), endingError: null })),
+  updateCurrentEnding: (updater: (ending: StoryEnding | null) => StoryEnding | null) => set((state) => ({
+    currentEnding: updater(state.currentEnding),
+    endingError: null
+  })),
 
   saveEndingToHistory: () => {
     const state = get();
     const ending = state.currentEnding;
     if (!ending) return;
 
+    // Create a special segment for the ending
     const endingSegmentId = generateUniqueId('segment');
     const now = new Date();
     const isoNow = now.toISOString();
@@ -244,19 +247,34 @@ export const createNarrativeEndingActions = (
 
     set((state) => {
       const sessionSegments = state.sessionSegments[ending.sessionId] || [];
+
       return {
-        segments: { ...state.segments, [endingSegmentId]: endingSegment },
-        sessionSegments: { ...state.sessionSegments, [ending.sessionId]: [...sessionSegments, endingSegmentId] }
+        segments: {
+          ...state.segments,
+          [endingSegmentId]: endingSegment
+        },
+        sessionSegments: {
+          ...state.sessionSegments,
+          [ending.sessionId]: [...sessionSegments, endingSegmentId]
+        }
       };
     });
   },
 
-  hasActiveEnding: (): boolean => get().currentEnding !== null,
+  hasActiveEnding: (): boolean => {
+    return get().currentEnding !== null;
+  },
 
   getEndingForSession: (sessionId: EntityID): StoryEnding | null => {
     const state = get();
-    if (state.currentEnding?.sessionId === sessionId) return state.currentEnding;
 
+    // Check if the current ending is for this session
+    if (state.currentEnding?.sessionId === sessionId) {
+      return state.currentEnding;
+    }
+
+    // Look for ending in all segments (not just session segments)
+    // This handles cases where segments are added directly without sessionSegments mapping
     const allSegments = Object.values(state.segments);
     const endingSegment = allSegments.find(seg =>
       seg.sessionId === sessionId &&
@@ -265,13 +283,21 @@ export const createNarrativeEndingActions = (
       seg.metadata?.endingData
     );
 
-    return (endingSegment?.metadata.endingData as StoryEnding) || null;
+    return endingSegment?.metadata.endingData as StoryEnding || null;
   },
 
-  isSessionEnded: (sessionId: EntityID): boolean => get().endedSessions[sessionId] === true,
+  // Session ending tracking
+  isSessionEnded: (sessionId: EntityID): boolean => {
+    return get().endedSessions[sessionId] === true;
+  },
 
   markSessionEnded: (sessionId: EntityID) => {
-    set((state) => ({ endedSessions: { ...state.endedSessions, [sessionId]: true } }));
+    set((state) => ({
+      endedSessions: {
+        ...state.endedSessions,
+        [sessionId]: true,
+      }
+    }));
 
     try {
       useSessionStore.getState().setSessionLifecycleStatus(sessionId, 'ended');

@@ -1,3 +1,5 @@
+// src/lib/promptTemplates/templates/endingTemplates.ts
+
 import type { PromptTemplate } from '../types';
 import type { EndingType } from '../../../types/narrative.types';
 import type { WorldClockPromptContext } from '@/types/worldThread.types';

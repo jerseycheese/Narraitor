@@ -1,10 +1,5 @@
 import type { WorldClockPromptContext } from '@/types/worldThread.types';
-
-const KIND_LABEL: Record<WorldClockPromptContext['threads'][number]['kind'], string> = {
-  consequence: 'consequence owed',
-  actor: 'off-screen actor',
-  deadline: 'deadline',
-};
+import { KIND_LABEL } from './narrative/worldClockBlock';
 
 /**
  * Open story threads and resolution rules for ending generation.
@@ -13,7 +8,7 @@ const KIND_LABEL: Record<WorldClockPromptContext['threads'][number]['kind'], str
  * existing prompt paths without threads remain byte-identical.
  */
 export const endingOpenThreadsBlock = (worldClock?: WorldClockPromptContext): string => {
-  if (!worldClock || !worldClock.threads || worldClock.threads.length === 0) return '';
+  if (!worldClock || worldClock.threads.length === 0) return '';
 
   const threadLines = worldClock.threads
     .map((thread) => {

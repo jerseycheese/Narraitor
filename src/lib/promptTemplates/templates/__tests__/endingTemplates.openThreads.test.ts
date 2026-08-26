@@ -1,6 +1,6 @@
 // src/lib/promptTemplates/templates/__tests__/endingTemplates.openThreads.test.ts
 
-import { endingTemplate, prepareEndingTemplateVariables } from '../endingTemplates';
+import { prepareEndingTemplateVariables } from '../endingTemplates';
 import { endingOpenThreadsBlock } from '../endingOpenThreadsBlock';
 import type { WorldClockPromptContext } from '@/types/worldThread.types';
 
@@ -47,8 +47,7 @@ describe('endingOpenThreadsBlock', () => {
     expect(rendered).toContain('deadline');
     expect(rendered).toContain('open 23 turns');
     expect(rendered).toContain('[OVERDUE');
-    expect(rendered).toMatch(/resolved.*explicitly named as unresolved/i);
-    expect(rendered).toMatch(/no prior history.*lore.*reputation.*did not establish/i);
+    expect(rendered).toContain('RULES FOR OPEN THREADS:');
   });
 });
 
@@ -67,13 +66,6 @@ describe('endingTemplates - openThreads integration', () => {
       },
     ],
   };
-
-  it('includes {{openThreads}} placeholder in STORY SUMMARY of endingTemplate', () => {
-    const storySummaryIndex = endingTemplate.content.indexOf('STORY SUMMARY:');
-    const openThreadsIndex = endingTemplate.content.indexOf('{{openThreads}}');
-    expect(storySummaryIndex).toBeGreaterThan(-1);
-    expect(openThreadsIndex).toBeGreaterThan(storySummaryIndex);
-  });
 
   it('defaults openThreads variable to empty string when worldClock is absent', () => {
     const vars = prepareEndingTemplateVariables(

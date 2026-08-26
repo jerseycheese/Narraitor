@@ -1,3 +1,5 @@
+// src/state/__tests__/narrativeStore.ending.test.ts
+
 import { useNarrativeStore } from '../narrativeStore';
 import { useWorldThreadStore } from '../worldThreadStore';
 import { isFeatureEnabled } from '@/lib/featureFlags';
@@ -340,4 +342,3 @@ describe('narrativeStore - Ending functionality', () => {
     });
   });
 });
-
