@@ -332,4 +332,50 @@ describe('ChoiceOutcomeCallout skill name in outcome label', () => {
     expect(screen.getByText('Success')).toBeInTheDocument();
     expect(screen.queryByText(/·/)).not.toBeInTheDocument();
   });
+
+  it('lists all contributing skills for multi-skill actions', () => {
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
+      worlds: {
+        'world-1': {
+          id: 'world-1',
+          skills: [
+            { id: 'skill-stealth', name: 'Stealth' },
+            { id: 'skill-hacking', name: 'Hacking' },
+          ],
+        },
+      },
+    });
+
+    useNarrativeStore.setState({
+      decisions: {
+        'decision-multi-skill': {
+          id: 'decision-multi-skill',
+          prompt: 'What do you do?',
+          selectedOptionId: 'opt-multi',
+          options: [
+            {
+              id: 'opt-multi',
+              text: 'Hack security while sneaking past',
+              requirements: [
+                { type: 'skill', targetId: 'skill-stealth', operator: 'gte', value: 3 },
+                { type: 'skill', targetId: 'skill-hacking', operator: 'gte', value: 4 },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    render(
+      <ChoiceOutcomeCallout
+        decisionId="decision-multi-skill"
+        decisionText="You hack security while sneaking past"
+        decisionOutcome="mixed"
+      />
+    );
+
+    expect(screen.getByText('Mixed · Stealth, Hacking')).toBeInTheDocument();
+  });
 });
+
+

@@ -82,16 +82,21 @@ export const SkillRequirementBadges: React.FC<SkillRequirementBadgesProps> = ({
   const badgeLabel = hasNamedSkill
     ? primaryRequirement.skillName!
     : 'Skill';
-  const { met } = primaryRequirement;
-  const displayLabel = met === false ? `${badgeLabel} · RISKY` : badgeLabel;
+  const isAnyRisky = requirements.some((req) => req.met === false);
+  const displayLabel = isAnyRisky ? `${badgeLabel} · RISKY` : badgeLabel;
+  const dataMet = isAnyRisky
+    ? 'false'
+    : requirements.every((req) => req.met === true)
+      ? 'true'
+      : undefined;
 
   return (
     <span
       className="manuscript-skill-check-badge"
       data-option-id={optionId}
-      data-met={met === undefined ? undefined : String(met)}
+      data-met={dataMet}
       aria-label={
-        met === false
+        isAnyRisky
           ? `${badgeLabel} check, risky for this character`
           : hasNamedSkill
             ? `${badgeLabel} check`

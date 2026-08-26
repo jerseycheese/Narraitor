@@ -137,12 +137,16 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
     useWorldStore.getState()?.worlds ?? {}
   ).flatMap((w) => w.skills ?? []);
 
-  const skillReq = selectedOption?.requirements?.find(
+  const skillReqs = selectedOption?.requirements?.filter(
     (r) => r.type === 'skill'
+  ) ?? [];
+  const skillNames = Array.from(
+    new Set(
+      skillReqs
+        .map((r) => resolveSkillData(r.targetId, worldSkills)?.name)
+        .filter((name): name is string => Boolean(name))
+    )
   );
-  const resolvedSkill = skillReq
-    ? resolveSkillData(skillReq.targetId, worldSkills)
-    : undefined;
 
   // A typed action is a first-person sentence, so it takes neither prefix -
   // "You attempt to I walk over..." is the same person shift. Rendering it from
@@ -155,11 +159,11 @@ export const ChoiceOutcomeCallout: React.FC<ChoiceOutcomeCalloutProps> = ({
   const baseOutcomeLabel = decisionOutcome
     ? outcomeLabels[decisionOutcome]
     : 'Decision Logged';
-  // Fold the skill name into the gutter label so the player knows which check
-  // produced this outcome without needing the toast that was deleted.
+  // Fold contributing skills into the gutter label so the player knows which
+  // check(s) produced this outcome without needing the toast that was deleted.
   const outcomeLabel =
-    decisionOutcome && resolvedSkill
-      ? `${baseOutcomeLabel} · ${resolvedSkill.name}`
+    decisionOutcome && skillNames.length > 0
+      ? `${baseOutcomeLabel} · ${skillNames.join(', ')}`
       : baseOutcomeLabel;
 
   const chips = buildConsequenceChips(

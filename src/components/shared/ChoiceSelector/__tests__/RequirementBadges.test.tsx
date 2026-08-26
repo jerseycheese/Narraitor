@@ -44,10 +44,13 @@ describe('SkillRequirementBadges', () => {
     );
   });
 
-  it('appends RISKY and sets data-met=false when the character is under the bar', () => {
+  it('appends RISKY and sets data-met=false when any requirement in a multi-skill choice is unmet', () => {
     render(
       <SkillRequirementBadges
-        requirements={[{ skillName: 'Stealth', met: false }]}
+        requirements={[
+          { skillName: 'Stealth', met: true },
+          { skillName: 'Hacking', met: false },
+        ]}
         optionId="option-1"
       />
     );
@@ -59,3 +62,4 @@ describe('SkillRequirementBadges', () => {
     );
   });
 });
+
