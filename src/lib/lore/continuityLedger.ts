@@ -133,7 +133,7 @@ function termPattern(term: string): RegExp {
 
 /**
  * Derives isReconfirmationRequested on delivered commitments when the player's
- * action directly asks to re-promise one specific delivered commitment (#1963).
+ * action directly asks to re-promise one specific delivered commitment.
  * Ambiguous (multiple matching) or non-matching requests leave all false.
  */
 export function annotateReconfirmationRequests(
@@ -192,7 +192,6 @@ export function buildCommitments(
   const commitments = Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
   return annotateReconfirmationRequests(commitments, playerActionText);
 }
-
 
 /**
  * One line per changed object, latest statement wins: later turns retell the

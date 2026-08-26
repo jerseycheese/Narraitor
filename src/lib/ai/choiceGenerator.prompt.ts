@@ -55,7 +55,6 @@ const getSettledCommitments = (
   }
 };
 
-
 export const buildChoicePrompt = ({
   world,
   worldId,
@@ -167,7 +166,6 @@ const buildContext = (
     settledCommitments,
   };
 };
-
 
 /**
  * Decisions already made this session - uncapped, unlike

@@ -42,7 +42,7 @@ const FEATURE_FLAG_DEFAULTS = {
   // byte-identical prompt and no extra calls.
   UNRECORDED_EXCHANGE_GUARD: true,
   // Feeds delivered commitments into the live aligned-choice prompt as a short
-  // already-settled block (#1963). Off by default until live evaluation passes.
+  // already-settled block. Off by default until live evaluation passes.
   SETTLED_COMMITMENT_CHOICES: false,
 } as const;
 
@@ -86,7 +86,6 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
     FEATURE_FLAG_DEFAULTS.SETTLED_COMMITMENT_CHOICES
   ),
 });
-
 
 export const isFeatureEnabled = (flag: FeatureFlag): boolean => {
   return getFeatureFlags()[flag];

@@ -29,7 +29,6 @@ interface PlayerChoiceTemplateContext {
   settledCommitments?: SettledCommitmentDTO[];
 }
 
-
 /** Definition text for each alignment tag, kept separate from the glossary's listing order (see ALIGNMENT_GLOSSARY_ORDERS) so the order can rotate without touching the wording. */
 const ALIGNMENT_DEFINITIONS: Record<'NEUTRAL' | 'CHAOTIC' | 'LAWFUL', string> = {
   NEUTRAL: 'Balanced approach, practical solutions, adapts to situation, moderate response',
@@ -158,7 +157,6 @@ SITUATION: ${narrativeContext?.currentSituation || 'General scenario'}
 
 FULL CONTEXT:
 ${shortContext}${skillsInfo}${protagonistInfo}${npcInfo}${settledInfo}
-
 
 === CRITICAL INSTRUCTIONS ===
 You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.

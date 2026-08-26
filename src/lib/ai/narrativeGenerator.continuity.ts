@@ -226,7 +226,6 @@ export const buildContinuityContractFromStores = (
       playerActionText: readPlayerActionText(request),
     });
 
-
     if (carriesNothingForTheModel(contract)) {
       return null;
     }

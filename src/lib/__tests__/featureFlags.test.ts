@@ -110,4 +110,3 @@ describe('featureFlags', () => {
     expect(mode).toBe('legacy');
   });
 });
-

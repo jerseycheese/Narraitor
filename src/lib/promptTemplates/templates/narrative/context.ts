@@ -37,7 +37,7 @@ interface NarrativeTemplateGenerationParameters {
   decisionWeight?: string;
 }
 
-/** Minimal settled commitment shape for prompt context (#1963). */
+/** Minimal settled commitment shape for prompt context. */
 export interface SettledCommitmentDTO {
   topic: string;
   by: string;
@@ -69,4 +69,3 @@ export interface NarrativeTemplateContext {
   newLocation?: string;
   settledCommitments?: SettledCommitmentDTO[];
 }
-

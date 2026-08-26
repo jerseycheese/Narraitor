@@ -73,7 +73,6 @@ const BAIT_ASSENT_LEXICON =
   /\b(?:(?:you\s+have\s+)?my\s+word|my\s+promise|of\s+course|as\s+you\s+wish|rest\s+assured|certainly|absolutely|it\s+will\s+be\s+done|(?:I|we)\s+will\s+see\s+to\s+it)\b|\b(?:I\s+promise|I\s+swear|I\s+vow)\b(?!\s+(?:to\s+[a-z]+|that\s+[a-z]+|\w+\s+(?:will|shall|can|must)))/i;
 
 export interface BuildContinuityContractArgs {
-
   facts: LoreFact[];
   npcRelationships: Record<EntityID, NPCRelationshipState>;
   /** npcId -> display name, from the NPC store roster. */
@@ -100,7 +99,7 @@ export interface BuildContinuityContractArgs {
    */
   unrecordedExchanges?: ContinuityUnrecordedExchange[];
   /**
-   * The player's typed action text for this turn, if any (#1963).
+   * The player's typed action text for this turn, if any.
    * Used to derive isReconfirmationRequested on delivered commitments.
    */
   playerActionText?: string;
@@ -213,7 +212,6 @@ export function buildContinuityContract(
     unrecordedExchanges: unrecordedExchanges ?? [],
   };
 }
-
 
 /** True when the contract has nothing to enforce; callers treat that as "guardrail off". */
 export function isContinuityContractEmpty(contract: ContinuityContract): boolean {
@@ -332,7 +330,7 @@ export function detectContinuityIssues(
         return true;
       }
       // When this specific delivered commitment was directly baited by the player
-      // action on this turn (#1963), flag bare assent or oblique future delivery.
+      // action on this turn, flag bare assent or oblique future delivery.
       if (commitment.isReconfirmationRequested) {
         if (BAIT_REFUSAL_GUARD.test(candidate)) return false;
         if (FUTURE_DELIVERY_LEXICON.test(candidate)) return true;
@@ -340,7 +338,6 @@ export function detectContinuityIssues(
       }
       return false;
     });
-
     if (sentence) {
       issues.push({
         type: 'stale-promise',

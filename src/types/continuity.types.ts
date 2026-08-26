@@ -76,7 +76,7 @@ export interface ContinuityCommitment {
   terms: string[];
   /**
    * True on a turn where the player's typed action directly asks to re-promise
-   * or reconfirm this specific delivered commitment (#1963).
+   * or reconfirm this specific delivered commitment.
    */
   isReconfirmationRequested?: boolean;
 }
