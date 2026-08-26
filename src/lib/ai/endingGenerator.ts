@@ -16,8 +16,8 @@ import type { ProviderCredential } from './providers/types';
 
 function extractRecentNarrative(segments: NarrativeSegment[]): string[] {
   const recentSegments = segments
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-    .slice(0, 10);
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+    .slice(-10);
 
   return recentSegments.map(segment => {
     const prefix = segment.type === 'dialogue' ? 'Dialogue: ' : '';
@@ -165,7 +165,8 @@ export async function generateEnding(
       recentNarrative,
       journalSummary,
       request.customPrompt,
-      request.desiredTone
+      request.desiredTone,
+      request.worldClock
     );
 
     const renderedPrompt = renderTemplate(endingTemplate.content, templateVariables);

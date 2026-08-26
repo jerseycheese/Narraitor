@@ -6,8 +6,11 @@ import type { Character } from './characterStore.types';
 import { generateUniqueId } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { aiFetch } from '@/lib/ai/aiFetch';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { buildWorldClockPromptContext, countWorldClockTurns } from '@/lib/narrative/worldClock';
 import { useSessionStore } from './sessionStore';
 import { useJournalStore } from './journalStore';
+import { useWorldThreadStore } from './worldThreadStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
@@ -106,6 +109,14 @@ export const createNarrativeEndingActions = (
         : [];
       journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
 
+      const currentTurn = countWorldClockTurns(allSegments);
+      const worldClock = isFeatureEnabled('WORLD_CLOCK')
+        ? buildWorldClockPromptContext(
+            useWorldThreadStore.getState().getOpenThreadsBySession(params.sessionId),
+            currentTurn
+          )
+        : undefined;
+
       // Route through server API to keep AI usage server-side and enable test mocking
       const response = await aiFetch('/api/narrative/ending', {
         method: 'POST',
@@ -121,6 +132,7 @@ export const createNarrativeEndingActions = (
           character: params.character, // Pass the character data from client
           narrativeSegments, // Pass narrative segments from client
           journalEntries, // Pass journal entries from client
+          worldClock,
         })
       });
 
@@ -200,17 +212,14 @@ export const createNarrativeEndingActions = (
 
   setCurrentEnding: (ending: StoryEnding | null) => set({ currentEnding: ending, endingError: null }),
 
-  updateCurrentEnding: (updater: (ending: StoryEnding | null) => StoryEnding | null) => set((state) => ({
-    currentEnding: updater(state.currentEnding),
-    endingError: null
-  })),
+  updateCurrentEnding: (updater: (ending: StoryEnding | null) => StoryEnding | null) =>
+    set((state) => ({ currentEnding: updater(state.currentEnding), endingError: null })),
 
   saveEndingToHistory: () => {
     const state = get();
     const ending = state.currentEnding;
     if (!ending) return;
 
-    // Create a special segment for the ending
     const endingSegmentId = generateUniqueId('segment');
     const now = new Date();
     const isoNow = now.toISOString();
@@ -235,34 +244,19 @@ export const createNarrativeEndingActions = (
 
     set((state) => {
       const sessionSegments = state.sessionSegments[ending.sessionId] || [];
-
       return {
-        segments: {
-          ...state.segments,
-          [endingSegmentId]: endingSegment
-        },
-        sessionSegments: {
-          ...state.sessionSegments,
-          [ending.sessionId]: [...sessionSegments, endingSegmentId]
-        }
+        segments: { ...state.segments, [endingSegmentId]: endingSegment },
+        sessionSegments: { ...state.sessionSegments, [ending.sessionId]: [...sessionSegments, endingSegmentId] }
       };
     });
   },
 
-  hasActiveEnding: (): boolean => {
-    return get().currentEnding !== null;
-  },
+  hasActiveEnding: (): boolean => get().currentEnding !== null,
 
   getEndingForSession: (sessionId: EntityID): StoryEnding | null => {
     const state = get();
+    if (state.currentEnding?.sessionId === sessionId) return state.currentEnding;
 
-    // Check if the current ending is for this session
-    if (state.currentEnding?.sessionId === sessionId) {
-      return state.currentEnding;
-    }
-
-    // Look for ending in all segments (not just session segments)
-    // This handles cases where segments are added directly without sessionSegments mapping
     const allSegments = Object.values(state.segments);
     const endingSegment = allSegments.find(seg =>
       seg.sessionId === sessionId &&
@@ -271,21 +265,13 @@ export const createNarrativeEndingActions = (
       seg.metadata?.endingData
     );
 
-    return endingSegment?.metadata.endingData as StoryEnding || null;
+    return (endingSegment?.metadata.endingData as StoryEnding) || null;
   },
 
-  // Session ending tracking
-  isSessionEnded: (sessionId: EntityID): boolean => {
-    return get().endedSessions[sessionId] === true;
-  },
+  isSessionEnded: (sessionId: EntityID): boolean => get().endedSessions[sessionId] === true,
 
   markSessionEnded: (sessionId: EntityID) => {
-    set((state) => ({
-      endedSessions: {
-        ...state.endedSessions,
-        [sessionId]: true,
-      }
-    }));
+    set((state) => ({ endedSessions: { ...state.endedSessions, [sessionId]: true } }));
 
     try {
       useSessionStore.getState().setSessionLifecycleStatus(sessionId, 'ended');

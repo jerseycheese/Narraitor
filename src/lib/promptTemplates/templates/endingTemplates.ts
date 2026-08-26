@@ -1,7 +1,7 @@
-// src/lib/promptTemplates/templates/endingTemplates.ts
-
 import type { PromptTemplate } from '../types';
 import type { EndingType } from '../../../types/narrative.types';
+import type { WorldClockPromptContext } from '@/types/worldThread.types';
+import { endingOpenThreadsBlock } from './endingOpenThreadsBlock';
 
 const endingTypeDescriptions: Record<EndingType, string> = {
   'player-choice': 'The player has chosen to end their story here',
@@ -30,7 +30,7 @@ Recent narrative events:
 
 Key moments from the journey:
 {{journalEntries}}
-
+{{openThreads}}
 Additional instructions:
 {{customPrompt}}
 
@@ -128,7 +128,8 @@ export function prepareEndingTemplateVariables(
   recentNarrative: string[],
   journalEntries?: string[],
   customPrompt?: string,
-  desiredTone?: 'triumphant' | 'mysterious' | 'tragic' | 'hopeful'
+  desiredTone?: 'triumphant' | 'mysterious' | 'tragic' | 'hopeful',
+  worldClock?: WorldClockPromptContext
 ): Record<string, string | number> {
   let finalCustomPrompt = customPrompt || 'No additional instructions.';
 
@@ -165,6 +166,7 @@ The story is OVER. Honor the character's death with dignity and finality.`;
     endingTypeDescription: endingTypeDescriptions[endingType],
     recentNarrative: recentNarrative.join('\n'),
     journalEntries: journalEntries?.length ? journalEntries.join('\n') : 'No significant events recorded in journal.',
+    openThreads: endingOpenThreadsBlock(worldClock),
     customPrompt: finalCustomPrompt
   };
 }
