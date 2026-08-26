@@ -45,13 +45,11 @@ describe('evaluateDecisionSkillChecks', () => {
 
   it('returns empty results and notifies with no rolls when the option has no requirements', () => {
     const onSkillCheckPerformed = jest.fn();
-    const addToast = jest.fn();
 
     const result = evaluateDecisionSkillChecks({
       selectedOption: { id: 'opt-0', text: 'Wait' },
       character: buildCharacter(),
       world: buildWorld([worldSkill('skill-1', 'Stealth')]),
-      toast: { addToast },
       onSkillCheckPerformed,
     });
 
@@ -59,55 +57,43 @@ describe('evaluateDecisionSkillChecks', () => {
     expect(result.skillCheckTags).toEqual([]);
     expect(result.decisionOutcome).toBeUndefined();
     expect(onSkillCheckPerformed).toHaveBeenCalledWith([]);
-    expect(addToast).not.toHaveBeenCalled();
   });
 
   it('skips evaluation when character or world is missing', () => {
-    const addToast = jest.fn();
-
     const result = evaluateDecisionSkillChecks({
       selectedOption: optionWithSkill(),
       character: undefined,
       world: buildWorld([]),
-      toast: { addToast },
     });
 
     expect(result.rollResults).toHaveLength(0);
     expect(result.skillCheckTags).toEqual([]);
-    expect(addToast).not.toHaveBeenCalled();
   });
 
-  it('builds success tags + outcome and fires a success toast on a passing roll', () => {
+  it('builds success tags + outcome on a passing roll', () => {
     jest.spyOn(Math, 'random').mockReturnValue(0.5); // d20 -> 11
-    const addToast = jest.fn();
 
     const result = evaluateDecisionSkillChecks({
       selectedOption: optionWithSkill(),
       character: buildCharacter(),
       world: buildWorld([worldSkill('skill-1', 'Stealth')]),
-      toast: { addToast },
     });
 
     expect(result.skillCheckTags).toEqual(['skill-success:skill-1', 'skill-roll:11']);
     expect(result.decisionOutcome).toBe('success');
     expect(result.rollResults).toHaveLength(1);
-    expect(addToast).toHaveBeenCalledTimes(1);
-    expect(addToast.mock.calls[0][0]).toMatchObject({ variant: 'success' });
   });
 
-  it('builds critical-failure tags + outcome and fires an error toast on a natural 1', () => {
+  it('builds critical-failure tags + outcome on a natural 1', () => {
     jest.spyOn(Math, 'random').mockReturnValue(0); // d20 -> 1
-    const addToast = jest.fn();
 
     const result = evaluateDecisionSkillChecks({
       selectedOption: optionWithSkill(),
       character: buildCharacter(),
       world: buildWorld([worldSkill('skill-1', 'Stealth')]),
-      toast: { addToast },
     });
 
     expect(result.skillCheckTags).toEqual(['skill-critical-failure:skill-1', 'skill-roll:1']);
     expect(result.decisionOutcome).toBe('critical-failure');
-    expect(addToast.mock.calls[0][0]).toMatchObject({ variant: 'error' });
   });
 });

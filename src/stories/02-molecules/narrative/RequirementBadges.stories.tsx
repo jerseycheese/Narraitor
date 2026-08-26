@@ -27,8 +27,8 @@ export const SkillRequirements: Story = {
     <SkillRequirementBadges
       optionId="opt-1"
       requirements={[
-        { skillName: 'Persuasion', met: true, dc: 12 },
-        { skillName: 'Stealth', met: false, dc: 16 },
+        { skillName: 'Persuasion', met: true },
+        { skillName: 'Stealth', met: false },
       ]}
     />
   ),

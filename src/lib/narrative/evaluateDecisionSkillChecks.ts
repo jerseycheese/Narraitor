@@ -1,8 +1,8 @@
 // Evaluates a chosen decision option's skill requirements: rolls each skill
 // check, builds the narrative tags that get merged into the next segment,
-// derives an overall decision outcome, and surfaces per-roll toasts. Extracted
-// from NarrativeController.generateNextSegment as a pure (no React state) unit;
-// side effects are limited to the two injected callbacks (toast, onSkillCheckPerformed).
+// derives an overall decision outcome. Extracted from
+// NarrativeController.generateNextSegment as a pure (no React state) unit;
+// the only side effect is the injected onSkillCheckPerformed callback.
 
 import { evaluateSkillCheck } from '@/utils/skillCheckEvaluator';
 import { logger } from '@/lib/utils/logger';
@@ -15,17 +15,11 @@ import type {
   DecisionWeight,
   SkillCheckRoll,
 } from '@/types/narrative.types';
-import type { ToastData } from '@/components/ui/toast/toaster';
-
-interface ToastNotifier {
-  addToast: (toast: Omit<ToastData, 'id'>) => string;
-}
 
 export interface DecisionSkillCheckParams {
   selectedOption: DecisionOption | null;
   character: StoreCharacter | undefined;
   world: World | undefined;
-  toast: ToastNotifier;
   onSkillCheckPerformed?: (results: SkillCheckRoll[]) => void;
 }
 
@@ -77,7 +71,6 @@ export function evaluateDecisionSkillChecks({
   selectedOption,
   character,
   world,
-  toast,
   onSkillCheckPerformed,
 }: DecisionSkillCheckParams): DecisionSkillCheckResult {
   const skillCheckTags: string[] = [];
@@ -134,55 +127,7 @@ export function evaluateDecisionSkillChecks({
   // Pass results to parent component
   onSkillCheckPerformed?.(rollResults);
 
-  // Show toast notifications for skill check results
-  // Use longer duration (8 seconds) so players have time to read the roll details
-  rollResults.forEach((result) => {
-    // Build detailed breakdown for description
-    const buildBreakdown = () => {
-      const parts = [`d20: ${result.diceRoll}`];
-      if (result.skillLevel > 0) parts.push(`skill: +${result.skillLevel}`);
-      if (result.attributeBonus > 0)
-        parts.push(`attribute: +${result.attributeBonus}`);
 
-      // If no bonuses, explicitly show that
-      const hasAnyBonus = result.skillLevel > 0 || result.attributeBonus > 0;
-      const breakdown = hasAnyBonus
-        ? parts.join(', ')
-        : `${parts[0]} (no bonuses)`;
-
-      return `${breakdown} = ${result.total} (need ${result.dc})`;
-    };
-
-    if (result.isCriticalSuccess) {
-      toast.addToast({
-        title: `Critical Success! ${result.skillName}`,
-        description: `Natural 20! Automatic success regardless of modifiers.`,
-        variant: 'success',
-        duration: 8000,
-      });
-    } else if (result.isCriticalFailure) {
-      toast.addToast({
-        title: `Critical Failure! ${result.skillName}`,
-        description: `Natural 1! Automatic failure regardless of modifiers.`,
-        variant: 'error',
-        duration: 8000,
-      });
-    } else if (result.success) {
-      toast.addToast({
-        title: `${result.skillName} Check: Success`,
-        description: buildBreakdown(),
-        variant: 'success',
-        duration: 8000,
-      });
-    } else {
-      toast.addToast({
-        title: `${result.skillName} Check: Failed`,
-        description: buildBreakdown(),
-        variant: 'warning',
-        duration: 8000,
-      });
-    }
-  });
 
   let decisionOutcome: DecisionOutcome | undefined;
   if (rollResults.length > 0) {

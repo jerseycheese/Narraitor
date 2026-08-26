@@ -22,7 +22,6 @@ export interface NormalizedOption {
     requirement: DecisionRequirement;
     skillName?: string;
     met: boolean;
-    dc?: number;
   }>;
   itemRequirementGroups?: Array<{
     logic: RequirementLogic;
@@ -68,18 +67,17 @@ export function normalizeDecisionOptions(
       const skillData = resolveSkillData(req.targetId, worldSkills);
       const evaluation = evaluateRequirement(req, evaluationContext);
 
-      // DC mirrors the d20 skill-check model: required level × 2 (see
-      // SkillCheckRoll.dc). Only numeric requirement values yield a DC;
-      // qualitative ones show the skill name alone.
       const requiredLevel =
         typeof req.value === 'number' ? req.value : Number(req.value);
-      const dc = Number.isFinite(requiredLevel) ? requiredLevel * 2 : undefined;
 
       return {
         requirement: req,
         skillName: skillData?.name || 'Unknown Skill',
-        met: evaluation.success,
-        dc,
+        // evaluation.success is hardcoded true (F47: choices stay selectable).
+        // Read the actual values the evaluator already computed correctly.
+        met: Number.isFinite(requiredLevel)
+          ? evaluation.current >= requiredLevel
+          : true,
       };
     })) || [];
 

@@ -27,4 +27,35 @@ describe('SkillRequirementBadges', () => {
 
     expect(screen.getByText('Skill')).toBeInTheDocument();
   });
+
+  it('shows skill name alone when met is true', () => {
+    render(
+      <SkillRequirementBadges
+        requirements={[{ skillName: 'Stealth', met: true }]}
+        optionId="option-1"
+      />
+    );
+
+    expect(screen.getByText('Stealth')).toBeInTheDocument();
+    expect(screen.queryByText(/RISKY/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Stealth').closest('[data-met]')).toHaveAttribute(
+      'data-met',
+      'true'
+    );
+  });
+
+  it('appends RISKY and sets data-met=false when the character is under the bar', () => {
+    render(
+      <SkillRequirementBadges
+        requirements={[{ skillName: 'Stealth', met: false }]}
+        optionId="option-1"
+      />
+    );
+
+    expect(screen.getByText('Stealth · RISKY')).toBeInTheDocument();
+    expect(screen.getByText('Stealth · RISKY').closest('[data-met]')).toHaveAttribute(
+      'data-met',
+      'false'
+    );
+  });
 });

@@ -260,23 +260,26 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Skill Requirements', () => {
-    it('surfaces a skill-and-DC badge for skill-gated options without leaking numbers into the option label', () => {
+    it('surfaces a skill badge for skill-gated options without leaking DC numbers', () => {
       const characterSkills = createCharacterSkills({ 'stealth-skill': 5, 'intimidation-skill': 7 });
       renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills, characterSkills});
       assertChoicesVisible(['Sneak past', 'Intimidate the guard', 'Walk directly']);
 
-      // F47: the skill and its DC are shown up front so the player can see the gate.
-      expect(screen.getByText(/Stealth.*DC 10/i)).toBeInTheDocument();
-      expect(screen.getByText(/Intimidation.*DC 14/i)).toBeInTheDocument();
+      // F47: the skill name is shown up front so the player can see the gate.
+      // DC numbers are tabletop jargon — they're not shown.
+      expect(screen.getByText('Stealth')).toBeInTheDocument();
+      expect(screen.getByText('Intimidation')).toBeInTheDocument();
+      expect(screen.queryByText(/DC/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/^Skill$/i)).not.toBeInTheDocument();
     });
 
-    it('still surfaces the skill-and-DC badge when the character lacks the skill (F47)', () => {
+    it('still surfaces the skill badge when the character lacks the skill (F47)', () => {
       // No character skills at all — the gate should still be visible before choosing.
       renderChoiceSelector({decision: decisionWithSkillRequirements, onSelect: mockOnSelect, worldSkills: mockWorldSkills, characterSkills: []});
 
-      expect(screen.getByText(/Stealth.*DC 10/i)).toBeInTheDocument();
-      expect(screen.getByText(/Intimidation.*DC 14/i)).toBeInTheDocument();
+      expect(screen.getByText(/Stealth/i)).toBeInTheDocument();
+      expect(screen.getByText(/Intimidation/i)).toBeInTheDocument();
+      expect(screen.queryByText(/DC/i)).not.toBeInTheDocument();
     });
 
     it('renders every option the decision carries, without evicting one for alignment spread', () => {

@@ -34,7 +34,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
-import { useToast } from '@/components/ui/toast/toaster';
+
 
 const EMPTY_NPC_IDS: string[] = [];
 
@@ -91,7 +91,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const toast = useToast();
+
 
   // Live-updating preview of the segment currently generating as the real API
   // streams. streamingPreviewRef is the source of truth so
@@ -726,7 +726,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           selectedOption,
           character,
           world,
-          toast,
           onSkillCheckPerformed,
         });
 
