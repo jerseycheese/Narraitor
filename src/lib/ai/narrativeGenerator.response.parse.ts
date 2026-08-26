@@ -79,7 +79,6 @@ export const parseNarrativeResponse = (
   const flattened = extractFlattenedFields(actualContent);
   if (flattened) {
     actualContent = flattened.content;
-    contentFromClosedField = true;
     if (flattened.type) segmentType = flattened.type;
   } else if (
     actualContent.includes('```json') ||
