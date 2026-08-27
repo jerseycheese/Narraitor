@@ -1,6 +1,6 @@
 import type { WorldClockPromptContext } from '@/types/worldThread.types';
 
-const KIND_LABEL: Record<WorldClockPromptContext['threads'][number]['kind'], string> = {
+export const KIND_LABEL: Record<WorldClockPromptContext['threads'][number]['kind'], string> = {
   consequence: 'consequence owed',
   actor: 'off-screen actor',
   deadline: 'deadline',

@@ -52,7 +52,8 @@ export async function POST(request: NextRequest) {
       world: body.world, // Pass world data from client
       character: body.character, // Pass character data from client
       narrativeSegments: body.narrativeSegments, // Pass narrative segments from client
-      journalEntries: body.journalEntries // Pass journal entries from client
+      journalEntries: body.journalEntries, // Pass journal entries from client
+      worldClock: body.worldClock,
     };
 
     logger.info('Generating story ending', { 

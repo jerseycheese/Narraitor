@@ -1,11 +1,17 @@
 // src/state/__tests__/narrativeStore.ending.test.ts
 
 import { useNarrativeStore } from '../narrativeStore';
+import { useWorldThreadStore } from '../worldThreadStore';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import type {
   StoryEnding,
   EndingGenerationResult
 } from '../../types/narrative.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
+
+jest.mock('@/lib/featureFlags', () => ({
+  isFeatureEnabled: jest.fn(() => true),
+}));
 
 // Mock fetch for API-based ending generation and restore after suite
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -277,6 +283,62 @@ describe('narrativeStore - Ending functionality', () => {
       expect(store.isSessionEnded('session-1')).toBe(true);
       expect(store.isSessionEnded('session-2')).toBe(true);
       expect(store.isSessionEnded('session-3')).toBe(false);
+    });
+  });
+
+  describe('worldClock integration in generateEnding', () => {
+    beforeEach(() => {
+      useWorldThreadStore.setState({
+        threads: {},
+        entities: {},
+        sessionThreads: {},
+        seedAttempts: {},
+      });
+    });
+
+    it('should include worldClock in POST body when WORLD_CLOCK feature flag is enabled', async () => {
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'WORLD_CLOCK');
+      useWorldThreadStore.setState({
+        threads: {
+          'thread-1': {
+            id: 'thread-1',
+            sessionId: 'session-123',
+            worldId: 'world-789',
+            kind: 'actor',
+            summary: 'Companion dragged off into woods',
+            openedAtTurn: 7,
+            lastAdvancedAtTurn: 7,
+            status: 'open',
+            notes: [],
+            createdAt: getTimestamp(),
+            updatedAt: getTimestamp(),
+          },
+        },
+        sessionThreads: {
+          'session-123': ['thread-1'],
+        },
+      });
+
+      mockSuccessfulEndingGeneration(createMockGenerationResult());
+
+      await useNarrativeStore.getState().generateEnding('player-choice', defaultEndingContext);
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      const postBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+      expect(postBody.worldClock).toBeDefined();
+      expect(postBody.worldClock.threads).toHaveLength(1);
+      expect(postBody.worldClock.threads[0].summary).toBe('Companion dragged off into woods');
+    });
+
+    it('should omit worldClock in POST body when WORLD_CLOCK feature flag is disabled', async () => {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      mockSuccessfulEndingGeneration(createMockGenerationResult());
+
+      await useNarrativeStore.getState().generateEnding('player-choice', defaultEndingContext);
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      const postBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+      expect(postBody.worldClock).toBeUndefined();
     });
   });
 });

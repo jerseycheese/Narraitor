@@ -165,7 +165,8 @@ export async function generateEnding(
       recentNarrative,
       journalSummary,
       request.customPrompt,
-      request.desiredTone
+      request.desiredTone,
+      request.worldClock
     );
 
     const renderedPrompt = renderTemplate(endingTemplate.content, templateVariables);

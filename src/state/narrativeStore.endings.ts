@@ -6,8 +6,11 @@ import type { Character } from './characterStore.types';
 import { generateUniqueId } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { aiFetch } from '@/lib/ai/aiFetch';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { buildWorldClockPromptContext, countWorldClockTurns } from '@/lib/narrative/worldClock';
 import { useSessionStore } from './sessionStore';
 import { useJournalStore } from './journalStore';
+import { useWorldThreadStore } from './worldThreadStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
@@ -106,6 +109,14 @@ export const createNarrativeEndingActions = (
         : [];
       journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
 
+      const currentTurn = countWorldClockTurns(allSegments);
+      const worldClock = isFeatureEnabled('WORLD_CLOCK')
+        ? buildWorldClockPromptContext(
+            useWorldThreadStore.getState().getOpenThreadsBySession(params.sessionId),
+            currentTurn
+          )
+        : undefined;
+
       // Route through server API to keep AI usage server-side and enable test mocking
       const response = await aiFetch('/api/narrative/ending', {
         method: 'POST',
@@ -121,6 +132,7 @@ export const createNarrativeEndingActions = (
           character: params.character, // Pass the character data from client
           narrativeSegments, // Pass narrative segments from client
           journalEntries, // Pass journal entries from client
+          worldClock,
         })
       });
 

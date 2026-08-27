@@ -171,4 +171,56 @@ describe('EndingGenerator - Basic Generation', () => {
     expect(result.tone).toBe('triumphant');
     expect(result.epilogue).toContain('cost');
   });
+
+  it('should include worldClock open threads in rendered prompt when provided', async () => {
+    const mockRequest: EndingGenerationRequest = {
+      sessionId: 'session-789',
+      characterId: 'char-456',
+      worldId: 'world-123',
+      endingType: 'story-complete',
+      worldClock: {
+        currentTurn: 30,
+        turnsSinceWorldMoved: 3,
+        threads: [
+          {
+            kind: 'actor',
+            summary: 'Companion dragged off at turn 7',
+            ageTurns: 23,
+            overdue: true,
+          },
+          {
+            kind: 'deadline',
+            summary: 'Camp kid on dawn deadline',
+            ageTurns: 22,
+            overdue: false,
+          },
+        ],
+      },
+    };
+
+    const mockContext = {
+      world: mockWorld,
+      character: mockCharacter,
+      narrativeSegments: mockNarrativeSegments,
+      journalEntries: mockJournalEntries,
+    };
+
+    const mockResponse = `{
+      "epilogue": "The sun rose on a quiet camp...",
+      "characterLegacy": "Remembered forever...",
+      "worldImpact": "The camp was never the same...",
+      "tone": "hopeful",
+      "achievements": ["Survivor"]
+    }`;
+
+    mockBuildEndingContext.mockResolvedValue(mockContext);
+    mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
+
+    await generateEnding(mockRequest);
+
+    const calledPrompt = mockGeminiClient.generateContent.mock.calls[0][0];
+    expect(calledPrompt).toContain('Companion dragged off at turn 7');
+    expect(calledPrompt).toContain('Camp kid on dawn deadline');
+    expect(calledPrompt).toContain('RULES FOR OPEN THREADS:');
+  });
 });
