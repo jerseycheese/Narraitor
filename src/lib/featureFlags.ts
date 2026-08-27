@@ -28,12 +28,11 @@ const FEATURE_FLAG_DEFAULTS = {
   // the character's conditions. Off until the playtest declared in
   // narraitor-prompt-template-governance/eval-logs/1882-world-cost.md measures it.
   WORLD_COST: false,
-  // Renders the world's own founding description in the per-turn scene
-  // prompt, not just the opening scene. Experiment, not a fix: it
-  // might carry the world's pressures further into the session, or it might
-  // do nothing but cost tokens every turn. Off until a playtest measures it —
-  // see narraitor-prompt-template-governance/eval-logs/1865-world-description-in-scene.md.
-  WORLD_DESCRIPTION_IN_SCENE: false,
+  // Renders the world's founding description in the per-turn scene prompt.
+  // Measured and shipped in issue #1865: keeps world-specific contextual pressure
+  // (e.g. deadlines, stakes) alive across 20+ turns without prompt amnesia or looping.
+  // See narraitor-prompt-template-governance/eval-logs/1865-world-description-in-scene.md.
+  WORLD_DESCRIPTION_IN_SCENE: true,
   // Guards against the engine backfilling a conversation that never happened.
   // The player naming a prior private exchange with a rostered NPC
   // turns co-presence already on the segments into an assertable fact, which
