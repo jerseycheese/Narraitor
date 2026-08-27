@@ -61,24 +61,24 @@ describe('featureFlags', () => {
     expect(load({ NEXT_PUBLIC_FEATURE_WORLD_CLOCK: 'FALSE' }).isFeatureEnabled('WORLD_CLOCK')).toBe(true);
   });
 
-  it('defaults WORLD_DESCRIPTION_IN_SCENE to false and enables it only for the exact string "true"', () => {
+  it('defaults WORLD_DESCRIPTION_IN_SCENE to true and turns it off only for the exact string "false"', () => {
     expect(
       load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: undefined }).isFeatureEnabled(
-        'WORLD_DESCRIPTION_IN_SCENE'
-      )
-    ).toBe(false);
-    jest.resetModules();
-    expect(
-      load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: 'true' }).isFeatureEnabled(
         'WORLD_DESCRIPTION_IN_SCENE'
       )
     ).toBe(true);
     jest.resetModules();
     expect(
-      load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: 'TRUE' }).isFeatureEnabled(
+      load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: 'false' }).isFeatureEnabled(
         'WORLD_DESCRIPTION_IN_SCENE'
       )
     ).toBe(false);
+    jest.resetModules();
+    expect(
+      load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: 'FALSE' }).isFeatureEnabled(
+        'WORLD_DESCRIPTION_IN_SCENE'
+      )
+    ).toBe(true);
   });
 
   it('defaults SETTLED_COMMITMENT_CHOICES to false and enables it only for the exact string "true"', () => {

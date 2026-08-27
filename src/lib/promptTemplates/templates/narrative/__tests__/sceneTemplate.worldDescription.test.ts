@@ -20,7 +20,7 @@ function makeContext(worldDescription?: string): NarrativeTemplateContext {
   };
 }
 
-describe('sceneTemplate world description block (#1865, EXPERIMENT — unmeasured)', () => {
+describe('sceneTemplate world description block (#1865, SHIPPED)', () => {
   const originalEnv = process.env[FLAG_ENV_VAR];
 
   afterEach(() => {
@@ -31,17 +31,8 @@ describe('sceneTemplate world description block (#1865, EXPERIMENT — unmeasure
     }
   });
 
-  it('omits worldDescription from the prompt by default (flag unset)', () => {
+  it('renders worldDescription in the prompt by default (flag unset)', () => {
     delete process.env[FLAG_ENV_VAR];
-    const prompt = sceneTemplate(
-      makeContext('The council votes on the developer\'s offer in six weeks.')
-    );
-    expect(prompt).not.toContain(WORLD_DESCRIPTION_HEADER);
-    expect(prompt).not.toContain("The council votes on the developer's offer in six weeks.");
-  });
-
-  it('renders worldDescription in the prompt when the flag is on', () => {
-    process.env[FLAG_ENV_VAR] = 'true';
     const prompt = sceneTemplate(
       makeContext('The council votes on the developer\'s offer in six weeks.')
     );
@@ -49,24 +40,27 @@ describe('sceneTemplate world description block (#1865, EXPERIMENT — unmeasure
     expect(prompt).toContain("The council votes on the developer's offer in six weeks.");
   });
 
-  it('does not render worldDescription when the flag is on but the field is absent', () => {
-    process.env[FLAG_ENV_VAR] = 'true';
+  it('omits worldDescription from the prompt when explicitly disabled with "false"', () => {
+    process.env[FLAG_ENV_VAR] = 'false';
+    const prompt = sceneTemplate(
+      makeContext('The council votes on the developer\'s offer in six weeks.')
+    );
+    expect(prompt).not.toContain(WORLD_DESCRIPTION_HEADER);
+    expect(prompt).not.toContain("The council votes on the developer's offer in six weeks.");
+  });
+
+  it('does not render worldDescription when the field is absent', () => {
+    delete process.env[FLAG_ENV_VAR];
     const prompt = sceneTemplate(makeContext(undefined));
     expect(prompt).not.toContain(WORLD_DESCRIPTION_HEADER);
   });
 
   it('trims a long description at a word boundary rather than rendering it in full', () => {
-    process.env[FLAG_ENV_VAR] = 'true';
+    delete process.env[FLAG_ENV_VAR];
     const longDescription = 'A pressing deadline looms over the town. '.repeat(20);
     const prompt = sceneTemplate(makeContext(longDescription));
     expect(prompt).toContain(WORLD_DESCRIPTION_HEADER);
     expect(prompt).not.toContain(longDescription.trim());
     expect(prompt).toContain('...');
-  });
-
-  it('explicitly disables with "false" even though the default is off', () => {
-    process.env[FLAG_ENV_VAR] = 'false';
-    const prompt = sceneTemplate(makeContext('The deadline is six weeks away.'));
-    expect(prompt).not.toContain(WORLD_DESCRIPTION_HEADER);
   });
 });
