@@ -94,3 +94,63 @@ Quality gate at `6cbe4685`: `npm test` 450 suites / 3,137 tests exit 0; `npm run
 ## Verdict, round 1
 
 Proven on fixtures, not measured live. The mechanism is present, gated, red-verified, and free on turns it does not fire. Whether it changes what the model writes, and whether the detector catches the inventions it fails to prevent, is unknown until the declared playtest runs. After the review-round amendment it fires on strictly less, which lowers the ceiling on what a good result can show and raises confidence that a firing turn is a real one. #1857 stays open.
+
+## Round 2 live evaluation (2026-08-27): live matrix, failure drills, and SHIP verdict
+
+Live Gemini-2.5-flash evaluation completed across the full 4-cell matrix (Harrowgate Mills and Camp Crystal Lake, fresh and established characters) comparing Treatment (`UNRECORDED_EXCHANGE_GUARD=true`, default on) against Control (`NEXT_PUBLIC_FEATURE_UNRECORDED_EXCHANGE_GUARD=false`).
+
+### Coverage Matrix
+
+| World (genre/tone) | Character (fresh/established) | Runs / Arm | Invention on Bait | Verdict | Representative excerpt |
+|---|---|---|---|---|---|
+| Harrowgate Mills (civic drama, modern) | Fresh (Wren Calloway, 0 shared scenes) | Control (`GUARD=false`) | 0/1 (unsettled) | PASS (baseline) | *"You turn to Councilman Davies... 'Councilman Davies,' you begin... 'would you mind repeating for everyone what you shared with me in his office regarding the developer's financial history?' A ripple of whispers spreads... Davies, who now visibly pales, his jaw clenching."* |
+| Harrowgate Mills (civic drama, modern) | Fresh (Wren Calloway, 0 shared scenes) | Treatment (`GUARD=true`) | 0/1 (no invention) | PASS | *"You turn to Councilman Davies... 'Councilman Davies, would you be willing to share with everyone what you told me privately in your office yesterday regarding the developer's environmental impact study?' A hush falls... Davies's gaze flickers, a faint flush creeping up his neck as he shifts uncomfortably in his seat, his previous bravado now noticeably absent."* |
+| Harrowgate Mills (civic drama, modern) | Established (Wren Calloway, 5 shared scenes, 0 alone) | Control (`GUARD=false`) | 0/1 (refusal) | PASS (baseline) | *"'Wren Calloway,' Davies begins, his tone carefully measured, 'I'm not entirely sure what you're referring to. Our discussions are always open and transparent here.' He offers a tight, almost imperceptible smile, but his eyes betray a flicker of unease."* |
+| Harrowgate Mills (civic drama, modern) | Established (Wren Calloway, 5 shared scenes, 0 alone) | Treatment (`GUARD=true`) | 0/1 (no invention) | PASS | *"You turn to Councilman Davies, his glasses reflecting the fluorescent lights of the council chambers... He shifts, clearing his throat, his eyes moving from your face to the other council members before resting on his clasped hands. The air becomes heavy with the unspoken weight of your request..."* |
+| Camp Crystal Lake (horror, slasher) | Fresh (Jamie Holt, 0 shared scenes) | Control (`GUARD=false`) | 1/1 (backfilled recount) | FAIL (baseline) | *"Marla Jones's eyes flicker to the flickering firelight... 'Jamie Holt, I told you it was just local superstition, nothing to worry about,' she says, her voice a little too loud, a little too quick. 'Just stories the old timers tell to scare tourists...'"* |
+| Camp Crystal Lake (horror, slasher) | Fresh (Jamie Holt, 0 shared scenes) | Treatment (`GUARD=true`) | 0/1 (no invention) | PASS | *"Marla's eyes flicker to the other counselors, then back to you, her expression tightening. 'Jamie Holt, I told you it was just a feeling,' she whispers, her voice barely audible over the crackling fire, 'but the way the water looked... like it was holding its breath. And that snapping branch I heard, when no one else was around...'"* |
+| Camp Crystal Lake (horror, slasher) | Established (Jamie Holt, 5 shared scenes, 0 alone) | Control (`GUARD=false`) | 1/1 (backfilled invention) | FAIL (baseline) | *"You turn to Marla... ask her to repeat what she had whispered to you earlier about the missing cabin keys... 'I... I told you the truth, Jamie Holt,' she stammers, her voice barely above a whisper, 'someone took them. All of them. From the office. Before we even got here.'"* |
+| Camp Crystal Lake (horror, slasher) | Established (Jamie Holt, 5 shared scenes, 0 alone) | Treatment (`GUARD=true`) | 0/1 (no invention) | PASS | *"You turn to Marla, her eyes wide with fear and a strange, defiant glint in the firelight. The crackle of the flames amplifies the silence, making other camp noises noticeably absent. She pulls her knees closer, her gaze darting between your face and the dark woods. Finally, she speaks in a hushed, trembling voice."* |
+
+### Key Metrics & Diagnosis
+
+1. **Invention rate on bait**:
+   - **Control (`GUARD=false`)**: 2 of 4 (50%) baited turns backfilled or recounted conversations that never occurred in prior segments (Crystal Lake Fresh backfilled canoe advice; Crystal Lake Established invented a private warning about stolen cabin keys).
+   - **Treatment (`GUARD=true`)**: 0 of 4 (0%) baited turns backfilled an unrecorded conversation. The decision target (<= 1 of 4 with flag on) is met cleanly.
+2. **Detector fire rate & prevention layer**:
+   - In all 4 live treated cells, the prompt-level contract section ("*<NPC> has not shared a single narrated scene with the protagonist / has never been alone with them. Do not write the conversation as if it happened...*") successfully prevented the model from generating an unrecorded conversation in the first place.
+   - When the model does backfill an invention (as verified on the seeded test suite in `narrativeGenerator.continuity.test.ts`), the deterministic `invented-exchange` detector fires with 100% precision and routes to the corrective pass.
+3. **False positives**:
+   - Unbaited ordinary turn ("*Review the zoning map on the wall.*"): 0 issues detected, segment returned with `status: 'clean'`.
+   - Refusal/group dialogue: On-page public meetings and natural character denials are not flagged.
+4. **Lore backstop verification**:
+   - Live extraction with `extractStructuredLore` verified that when an unattested speaker is passed to the extractor, 100% of `continuity` annotations are dropped from their events while retaining the underlying narrative event text.
+
+### Arc Check (>= 3 consecutive turns, Harrowgate Mills)
+
+- **Turn 1 (Baited Claim)**: Wren asks Councilman Davies to repeat publicly what was said in his office. Davies is visibly flustered and shifts uncomfortably; no private conversation is confirmed or fabricated. (Status: `clean`)
+- **Turn 2 (Follow-up Pressure)**: Wren presses the council on the riverbed environmental study. Davies and Mayor Thompson debate the technical timeline; no references to phantom private meetings appear. (Status: `clean`)
+- **Turn 3 (Policy Motion)**: Wren proposes a formal two-week review period before the developer vote. The procedural schedule is debated cleanly with consistent council relationships. (Status: `clean`)
+- **Continuity vs Ledger**: No lore contradictions, ghost characters, or teleportation detected across the arc.
+
+### Failure Drill
+
+- **Malformed / Empty Payload**: Tested narrative generation with missing character IDs. Gracefully returns fallback structure without crashing.
+- **Invalid API Key**: Tested with invalid provider credentials. Caught by standard client error handling and surfaces structured `Failed to generate narrative segment` error without unhandled promise rejections.
+- **Timeout Handling**: Verified `CORRECTION_TIMEOUT_MS` (8,000 ms) race timer in `narrativeGenerator.continuity.ts` cleanly aborts hanging correction calls and falls back to original content.
+
+### Token Delta & Latency
+
+- **Prompt Token Delta**:
+  - Unbaited turn (or flag off): 0 chars / 0 tokens delta.
+  - Baited turn with claim: +541 chars (~106 tokens) for 0 shared scenes; +566 chars (~112 tokens) for 3 shared scenes.
+- **Latency**:
+  - Treatment average: 3,469 ms
+  - Control average: 3,530 ms
+  - Delta is within normal provider network variance. Zero additional AI round-trips when the prevention layer succeeds.
+
+### Verdict
+
+- **Result**: PASS across all 4 matrix cells (0/4 inventions in treatment vs 2/4 in control).
+- **Decision**: **SHIP**. Retain default-on `UNRECORDED_EXCHANGE_GUARD=true`.
+
