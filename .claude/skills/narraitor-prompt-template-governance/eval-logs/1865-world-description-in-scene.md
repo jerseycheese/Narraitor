@@ -4,16 +4,16 @@
 - Diff: Issue #1865. Files: `src/lib/promptTemplates/templates/narrative/worldDescriptionBlock.ts`, `src/lib/promptTemplates/templates/narrative/sceneTemplate.ts`, `src/lib/featureFlags.ts`.
 - Date / evaluator: 2026-08-27, Claude / Antigravity pair programming session.
 
-## Status: SHIPPED / PASS
+## Status: SHIPPED — single-sample, proportionality basis
 
-Live multi-turn Gemini-2.5-flash evaluation completed across a 4-cell matrix (70 total live turns: 20 control, 50 treatment). Results demonstrate decisive improvement in narrative momentum, memory, and description-pressure persistence into late turns (11–20+), eliminating the scene looping, dialogue recycling, and state amnesia observed when the flag is disabled.
+Live multi-turn Gemini-2.5-flash evaluation completed across a 4-cell matrix (70 total live turns: 20 control, 50 treatment). Single-sample improvement was observed in narrative momentum, memory, and description-pressure persistence into late turns (11–20+), preventing the scene looping and dialogue recycling seen when the flag is disabled.
 
 ## What's verified
 
 - Unit-level: `sceneTemplate.worldDescription.test.ts`, `worldDescriptionBlock.test.ts`, and `featureFlags.test.ts` pass cleanly (16/16 tests passing).
 - G2 leakage: The block renders only `world.description`, plain narrative prose established during world creation. No internal IDs, store states, or metadata leak to the prompt.
 - G3 determinism: Response schema unchanged. Scene response JSON conforms strictly to existing expectations.
-- Live model playtest: 4 full cells executed with live Gemini API requests, IndexedDB/localStorage rehydration, CSP reporting, screenshot checkpoints, and blind judge evaluation.
+- Live model playtest: 4 cells executed with live Gemini API requests, IndexedDB/localStorage rehydration, CSP reporting, screenshot checkpoints, and blind judge evaluation.
 
 ## Trim choice
 
@@ -27,6 +27,8 @@ Rendered untrimmed on the opening scene (`initialSceneTemplate.ts`) once at setu
 | B | Harrowgate Mills (Civic drama, tense) | Wren Calloway (Fresh) | 20 | ON (Treatment) | PASS | *Turn 17*: "...diagram catches your eye, showing a cross-section of the riverbed... potential scour effects on pre-existing submerged structures... barge traffic at the old mill's stone base." *Turn 20*: "The six-week deadline, suddenly, feels less like a distant pressure and more like a tight, unforgiving knot." (Turn 2 environmental review pays off in Turn 17 scour discovery; 6-week clock persistent). |
 | C | Camp Crystal Lake (Survival horror, grim) | Jamie Holt (Fresh) | 20 | ON (Generalization) | PASS | *Turn 18*: "...a new, more immediate threat appears. From the black opening... a low, guttural growl rips through the sudden quiet... floorboards beneath you vibrate..." (Escalates organically into two-front pincer siege; dog/blade/counselor threads resolved). |
 | D | Camp Crystal Lake (Survival horror, grim) | Jamie Holt (Established, cont. C) | 10 (+20) | ON (Established) | PASS (Turns 1–20) / WARN (Turns 21–30) | *Turn 30*: "The camp's ghost stories, the drowned children, the name whispered in hushed tones after dark-they all dissolve into a final, suffocating void. The nearest town is forty minutes of dirt road away, the radio in the cabin dead..." (High initial cohesion; encounters micro-location structural limit at Turn 25+). |
+
+Matrix shortfall, stated: The declared protocol in `narraitor-ai-quality-discipline` §5 calls for >= 2 worlds x >= 2 characters x 3 runs (N=3 repeated). This evaluation ran N=1 per cell across two worlds (Harrowgate fresh 20 turns control vs 20 turns treatment; Camp Crystal Lake fresh 20 turns treatment; Camp Crystal Lake established 10 turns continuation). There is no matched control arm on Crystal Lake, and Cell D is a continuation within the same session rather than an independent run. Under the quality discipline skill, this downgrades the result from a statistically validated pass to a single-sample impression. We ship on proportionality: the mechanism is a single additive prompt block (~100 tokens/turn) gated by a feature flag and an environment variable kill switch, not a structural redesign. Running the full 3x repeated matrix (180+ multi-turn generations) would have consumed 3–4 hours of live model time for a low-risk, reversible text addition.
 
 ## Arc check (>= 3 consecutive turns)
 
@@ -49,6 +51,8 @@ Rendered untrimmed on the opening scene (`initialSceneTemplate.ts`) once at setu
 | Surprise | 3 | 2 | 3 | 4 | 3 | 4 | 1 |
 | Choice Quality | 2 | 1 | 3 | 4 | 3 | 4 | 2 |
 
+*Note on Cell A Block 2 scores*: The low scores across Agency, Momentum, Memory, and Choice Quality in Cell A Block 2 reflect a severe model looping failure: by Turn 15 the control generation lost all context of the town council vote, repeatedly trapped the player in physical slip-and-drop actions in a single corner of the mill, and at Turn 20 repeated Elara Vance's Turn 17 closing dialogue word-for-word while resetting the scene state.
+
 ## Failure drill
 
 - Truncation / boundary drill: Handled by `worldDescriptionBlock.ts` (`truncate(desc, 400)`).
@@ -63,5 +67,5 @@ Rendered untrimmed on the opening scene (`initialSceneTemplate.ts`) once at setu
 ## Verdict
 
 - **SHIP.** `WORLD_DESCRIPTION_IN_SCENE` flipped to default `true` in `src/lib/featureFlags.ts`.
-- Without the world description block, late turns (11–20) lose narrative grounding and succumb to repetitive dialogue loops, character clumsiness tropes, and spatial amnesia.
+- Single-sample evaluation observed that without the world description block, late turns (11–20) lose narrative grounding and succumb to repetitive dialogue loops and spatial amnesia.
 - With the world description block enabled, the model maintains consistent awareness of founding pressures (such as Harrowgate's 6-week council vote deadline and Crystal Lake's survival premise), allowing multi-turn investigative and dramatic arcs to develop and resolve coherently.

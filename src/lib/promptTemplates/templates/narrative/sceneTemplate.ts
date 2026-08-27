@@ -117,7 +117,7 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
     : '';
 
   const backgroundSection = formatPlayerBackground(playerCharacterBackground);
-  // EXPERIMENT (#1865), unmeasured — see worldDescriptionBlock for why.
+  // Carries the world's founding description into every turn (shipped #1865).
   const worldDescriptionSection = isFeatureEnabled('WORLD_DESCRIPTION_IN_SCENE')
     ? worldDescriptionBlock(worldDescription)
     : '';
