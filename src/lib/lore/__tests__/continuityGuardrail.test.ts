@@ -500,3 +500,131 @@ describe('unrecorded exchange (#1857)', () => {
     expect(denying).toEqual([]);
   });
 });
+
+describe('delivered-commitment bait guards (#1963)', () => {
+  const buildDeliveredContract = (
+    playerActionText?: string,
+    extraDelivered = false
+  ) => {
+    const facts = [
+      makeEvent(
+        'e1',
+        'Councilman Davies hands over the parcel appraisal documents.',
+        {
+          kind: 'commitment',
+          topic: 'parcel appraisal documents',
+          speaker: 'Councilman Davies',
+          status: 'delivered',
+        }
+      ),
+    ];
+    if (extraDelivered) {
+      facts.push(
+        makeEvent(
+          'e2',
+          'Mayor Thorn delivers the deed to the general store.',
+          {
+            kind: 'commitment',
+            topic: 'general store deed',
+            speaker: 'Mayor Thorn',
+            status: 'delivered',
+          }
+        )
+      );
+    }
+    return buildContinuityContract({
+      facts,
+      npcRelationships: {},
+      npcNames: {},
+      recentDecisions: [],
+      inventoryItemNames: ['Copy of the parcel appraisal'],
+      playerActionText,
+    });
+  };
+
+  it('flags bare assent on a direct re-promise bait for a delivered commitment', () => {
+    const contract = buildDeliveredContract(
+      'Ask Davies to promise the parcel appraisal documents again.'
+    );
+
+    expect(contract.commitments[0].isReconfirmationRequested).toBe(true);
+
+    const issues = detectContinuityIssues(
+      'Davies nods solemnly. "You have my word."',
+      contract
+    );
+    expect(issues).toMatchObject([
+      { type: 'stale-promise', entity: 'parcel appraisal documents' },
+    ]);
+
+    const simpleAssent = detectContinuityIssues(
+      'Davies smiles. "Of course, I promise."',
+      contract
+    );
+    expect(simpleAssent).toMatchObject([
+      { type: 'stale-promise', entity: 'parcel appraisal documents' },
+    ]);
+  });
+
+  it('flags the historical oblique "You\'ll have a copy" shape on re-promise bait', () => {
+    const contract = buildDeliveredContract(
+      'Demand that Davies re-promise the appraisal before the council meeting.'
+    );
+
+    expect(contract.commitments[0].isReconfirmationRequested).toBe(true);
+
+    const issues = detectContinuityIssues(
+      'Davies spreads his hands. "You\'ll have a copy. Before the vote, just as I said."',
+      contract
+    );
+    expect(issues).toMatchObject([
+      { type: 'stale-promise', entity: 'parcel appraisal documents' },
+    ]);
+  });
+
+  it('leaves refusals, recaps, and unrelated new commitments clean on re-promise bait', () => {
+    const contract = buildDeliveredContract(
+      'Ask Davies to promise the parcel appraisal again.'
+    );
+
+    // Explicit refusal
+    const refusal = detectContinuityIssues(
+      'Davies frowns. "I cannot make that promise again when the papers are already settled."',
+      contract
+    );
+    expect(refusal).toEqual([]);
+
+    // Already-delivered recap
+    const recap = detectContinuityIssues(
+      'Davies gestures to the envelope. "As I promised earlier, the documents are already in your hands."',
+      contract
+    );
+    expect(recap).toEqual([]);
+
+    // Unrelated new promise
+    const unrelatedPromise = detectContinuityIssues(
+      'Davies straightens. "I promise we will audit the general fund before next month."',
+      contract
+    );
+    expect(unrelatedPromise).toEqual([]);
+  });
+
+  it('leaves ambiguous multi-commitment requests clean with isReconfirmationRequested false', () => {
+    const contract = buildDeliveredContract(
+      'Ask them to promise the parcel appraisal and the general store deed again.',
+      true
+    );
+
+    expect(contract.commitments.every((c) => !c.isReconfirmationRequested)).toBe(
+      true
+    );
+
+    const issues = detectContinuityIssues(
+      'Davies nods. "You have my word."',
+      contract
+    );
+    // Bare assent does not fire when isReconfirmationRequested is false/unset
+    expect(issues).toEqual([]);
+  });
+});
+

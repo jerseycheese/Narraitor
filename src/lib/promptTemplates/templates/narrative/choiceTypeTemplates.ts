@@ -1,4 +1,5 @@
 import { NarrativeContext } from '@/types/narrative.types';
+import { SettledCommitmentDTO } from './context';
 import { protagonistGuidance } from './protagonistGuidance';
 
 interface PlayerChoiceTemplateContext {
@@ -25,6 +26,7 @@ interface PlayerChoiceTemplateContext {
    * slice, so that count freezes once a session passes turn 5.
    */
   turnIndex?: number;
+  settledCommitments?: SettledCommitmentDTO[];
 }
 
 /** Definition text for each alignment tag, kept separate from the glossary's listing order (see ALIGNMENT_GLOSSARY_ORDERS) so the order can rotate without touching the wording. */
@@ -63,7 +65,7 @@ const ALIGNMENT_GLOSSARY_ORDERS: Array<Array<'NEUTRAL' | 'CHAOTIC' | 'LAWFUL'>> 
  * staying there for the rest of the session.
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount, playerCharacterName, turnIndex } = context;
+  const { worldName, genre, narrativeContext, worldSkills, worldNpcs, optionCount, playerCharacterName, turnIndex, settledCommitments } = context;
   const choiceCount =
     typeof optionCount === 'number' && Number.isFinite(optionCount)
       ? Math.max(1, Math.floor(optionCount))
@@ -135,6 +137,17 @@ CONSEQUENCES (REQUIRED WHEN A KNOWN CHARACTER IS AFFECTED):
    Consequences: [Optional - CharacterName trust +/-N]`
     : '';
 
+  const settledInfo =
+    settledCommitments && settledCommitments.length > 0
+      ? `
+
+ALREADY SETTLED (do not offer, request, negotiate, or obtain again):
+${settledCommitments
+  .slice(0, 6)
+  .map((c) => `- ${c.topic} (delivered by ${c.by})`)
+  .join('\n')}`
+      : '';
+
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
@@ -143,7 +156,7 @@ LOCATION: ${location || 'Unknown location'}
 SITUATION: ${narrativeContext?.currentSituation || 'General scenario'}
 
 FULL CONTEXT:
-${shortContext}${skillsInfo}${protagonistInfo}${npcInfo}
+${shortContext}${skillsInfo}${protagonistInfo}${npcInfo}${settledInfo}
 
 === CRITICAL INSTRUCTIONS ===
 You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.

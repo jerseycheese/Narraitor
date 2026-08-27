@@ -37,6 +37,12 @@ interface NarrativeTemplateGenerationParameters {
   decisionWeight?: string;
 }
 
+/** Minimal settled commitment shape for prompt context. */
+export interface SettledCommitmentDTO {
+  topic: string;
+  by: string;
+}
+
 /**
  * The context "bag" passed to narrative prompt templates. Different templates read
  * different subsets, so every field is optional; the generator assembles whichever
@@ -61,4 +67,5 @@ export interface NarrativeTemplateContext {
   previousContent?: string;
   previousType?: string;
   newLocation?: string;
+  settledCommitments?: SettledCommitmentDTO[];
 }

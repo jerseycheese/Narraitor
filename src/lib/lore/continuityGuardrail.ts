@@ -67,6 +67,10 @@ const FUTURE_DELIVERY_LEXICON =
   /\byou(?:['’]ll| will| shall| ['’]re going to| are going to)\s+(?:have|get|receive|be given|be handed)\b/i;
 const RECAP_GUARD =
   /\b(as (?:I |he |she |they |we )?promised|promised (?:earlier|before|you)|already|kept (?:his|her|their|my|our) (?:word|promise)|delivered|gave|handed|as agreed|in your (?:hands?|lap|possession))\b/i;
+const BAIT_REFUSAL_GUARD =
+  /\b(?:cannot|can['’]t|won['’]t|will not|refus\w*|make no (?:such )?promise|no (?:need|more|other) promise|nothing to promise|not going to promise|already (?:have|given|received|delivered|handed|settled))\b|n['’]t\s+(?:make|give|promise)\b/i;
+const BAIT_ASSENT_LEXICON =
+  /\b(?:(?:you\s+have\s+)?my\s+word|my\s+promise|of\s+course|as\s+you\s+wish|rest\s+assured|certainly|absolutely|it\s+will\s+be\s+done|(?:I|we)\s+will\s+see\s+to\s+it)\b|\b(?:I\s+promise|I\s+swear|I\s+vow)\b(?!\s+(?:to\s+[a-z]+|that\s+[a-z]+|\w+\s+(?:will|shall|can|must)))/i;
 
 export interface BuildContinuityContractArgs {
   facts: LoreFact[];
@@ -94,6 +98,11 @@ export interface BuildContinuityContractArgs {
    * fixtures keep compiling.
    */
   unrecordedExchanges?: ContinuityUnrecordedExchange[];
+  /**
+   * The player's typed action text for this turn, if any.
+   * Used to derive isReconfirmationRequested on delivered commitments.
+   */
+  playerActionText?: string;
 }
 
 /**
@@ -137,6 +146,7 @@ export function buildContinuityContract(
     playerName,
     inventoryItemNames,
     unrecordedExchanges,
+    playerActionText,
   } = args;
   const characterFacts = facts.filter((fact) => fact?.category === 'characters');
 
@@ -197,7 +207,7 @@ export function buildContinuityContract(
     canonFacts,
     recentDecisions: recentDecisions.slice(-MAX_RECENT_DECISIONS),
     assertions: buildAssertions(ledger, playerName),
-    commitments: buildCommitments(ledger, inventoryItemNames),
+    commitments: buildCommitments(ledger, inventoryItemNames, playerActionText),
     sceneChanges: buildSceneChanges(ledger),
     unrecordedExchanges: unrecordedExchanges ?? [],
   };
@@ -312,11 +322,21 @@ export function detectContinuityIssues(
       // Named obliquely: a future delivery to the player, plus either a name only
       // the delivered item goes by or the whole topic spelled out. Anything looser
       // fires on prose that merely reuses a topic word for something else.
-      return (
+      if (
         FUTURE_DELIVERY_LEXICON.test(candidate) &&
         (aliasPatterns.some((pattern) => pattern.test(candidate)) ||
           termPatterns.every((pattern) => pattern.test(candidate)))
-      );
+      ) {
+        return true;
+      }
+      // When this specific delivered commitment was directly baited by the player
+      // action on this turn, flag bare assent or oblique future delivery.
+      if (commitment.isReconfirmationRequested) {
+        if (BAIT_REFUSAL_GUARD.test(candidate)) return false;
+        if (FUTURE_DELIVERY_LEXICON.test(candidate)) return true;
+        if (BAIT_ASSENT_LEXICON.test(candidate)) return true;
+      }
+      return false;
     });
     if (sentence) {
       issues.push({

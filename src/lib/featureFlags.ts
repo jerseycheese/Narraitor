@@ -41,6 +41,9 @@ const FEATURE_FLAG_DEFAULTS = {
   // On by default: the whole path is gated on a rare turn, and off means a
   // byte-identical prompt and no extra calls.
   UNRECORDED_EXCHANGE_GUARD: true,
+  // Feeds delivered commitments into the live aligned-choice prompt as a short
+  // already-settled block. Off by default until live evaluation passes.
+  SETTLED_COMMITMENT_CHOICES: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
@@ -77,6 +80,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   UNRECORDED_EXCHANGE_GUARD: resolve(
     process.env.NEXT_PUBLIC_FEATURE_UNRECORDED_EXCHANGE_GUARD,
     FEATURE_FLAG_DEFAULTS.UNRECORDED_EXCHANGE_GUARD
+  ),
+  SETTLED_COMMITMENT_CHOICES: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES,
+    FEATURE_FLAG_DEFAULTS.SETTLED_COMMITMENT_CHOICES
   ),
 });
 

@@ -223,6 +223,7 @@ export const buildContinuityContractFromStores = (
       playerName: options?.playerName,
       inventoryItemNames: readInventoryItemNames(request),
       unrecordedExchanges: collectUnrecordedExchanges(request, npcNames),
+      playerActionText: readPlayerActionText(request),
     });
 
     if (carriesNothingForTheModel(contract)) {
