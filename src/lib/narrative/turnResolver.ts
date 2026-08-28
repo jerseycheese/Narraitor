@@ -11,7 +11,7 @@ import type {
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import type { ReconciledSegmentNotes } from '@/lib/narrative/applyWorldClockUpdates';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { applyWorldClockUpdates } from '@/lib/narrative/applyWorldClockUpdates';
 import { applyWorldStateThreadUpdates } from '@/lib/narrative/applyWorldStateThreadUpdates';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
@@ -240,7 +240,11 @@ async function resolveTurnInner(
   // Fire lore extraction as fire-and-forget. It doesn't block the turn
   // but still runs so facts introduced in this turn's prose are
   // available to later prompts.
-  fireLoreExtraction(result, { worldId, sessionId, characterIds: characterId ? [characterId] : [] });
+  fireLoreExtraction(
+    result,
+    { worldId, sessionId, characterIds: characterId ? [characterId] : [] },
+    preTurnSnapshot.character?.name
+  );
 
   // Read the settled segment after reconciliation may have stamped tags
   const settledSegment =
@@ -338,7 +342,13 @@ async function resolveInitialTurnInner(
 
   syncNpcMetadata(worldId, result.metadata.characters);
 
-  fireLoreExtraction(result, { worldId, sessionId, characterIds: characterId ? [characterId] : [] });
+  const playerCharacterName =
+    useCharacterStore.getState().characters[characterId]?.name;
+  fireLoreExtraction(
+    result,
+    { worldId, sessionId, characterIds: characterId ? [characterId] : [] },
+    playerCharacterName
+  );
 
   const settledSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? storedSegment;
@@ -387,7 +397,6 @@ async function reconcileCoreSideEffects({
   // 1. World clock: goals, thread extraction, world cost, fatal tag
   const allSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
   const currentTurn = countWorldClockTurns(allSegments);
-  const session = useSessionStore.getState();
   let notes: ReconciledSegmentNotes | null = null;
 
   try {
@@ -395,8 +404,7 @@ async function reconcileCoreSideEffects({
       segment,
       sessionId,
       characterId: metadata.characterIds?.[0],
-      playerCharacterId:
-        session.id === sessionId ? session.characterId ?? undefined : undefined,
+      playerCharacterId: characterId,
       currentTurn,
     });
 
@@ -435,6 +443,7 @@ async function reconcileCoreSideEffects({
       finalMetadata: segment.metadata,
       sessionId,
       isFirstSegment,
+      characterId,
     });
   } catch (error) {
     logger.warn('[TurnResolver] World state thread update failed:', error);
@@ -470,7 +479,8 @@ async function reconcileCoreSideEffects({
  */
 function fireLoreExtraction(
   result: { content: string; metadata: { continuity?: { remainingIssues?: Array<{ type: string; entity: string }> } } },
-  request: { worldId: EntityID; sessionId: EntityID; characterIds: string[] }
+  request: { worldId: EntityID; sessionId: EntityID; characterIds: string[] },
+  playerCharacterName?: string
 ): void {
   if (!result.content) return;
 
@@ -486,6 +496,7 @@ function fireLoreExtraction(
 
   void extractStructuredLore(result.content, existingLoreContext, {
     continuityTopics: collectContinuityTopicsFromStores(request),
+    playerCharacterName,
     ...(unattestedSpeakers.length > 0 ? { unattestedSpeakers } : {}),
   })
     .then(async (structuredLore) => {

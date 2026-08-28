@@ -361,6 +361,39 @@ describe('TurnResolver', () => {
 
       expect(extractStructuredLore).toHaveBeenCalledTimes(1);
     });
+
+    it('passes playerCharacterName to lore extraction', async () => {
+      const generator = makeMockGenerator();
+      await resolveTurn(makeCommand(), generator);
+
+      expect(extractStructuredLore).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.objectContaining({ playerCharacterName: 'Test Character' })
+      );
+    });
+
+    it('passes authoritative characterId to reconciliation, not the session singleton', async () => {
+      // Point the session singleton at a different character
+      useSessionStore.setState({
+        id: 'session-1',
+        worldId: 'world-1',
+        characterId: 'other-char',
+        status: 'active',
+      } as never);
+
+      const generator = makeMockGenerator();
+      await resolveTurn(makeCommand({ characterId: 'char-1' }), generator);
+
+      // applyWorldClockUpdates should receive the command's characterId,
+      // not the session singleton's 'other-char'
+      expect(applyWorldClockUpdates).toHaveBeenCalledWith(
+        expect.objectContaining({ playerCharacterId: 'char-1' })
+      );
+      expect(applyWorldStateThreadUpdates).toHaveBeenCalledWith(
+        expect.objectContaining({ characterId: 'char-1' })
+      );
+    });
   });
 
   describe('turn serialization', () => {

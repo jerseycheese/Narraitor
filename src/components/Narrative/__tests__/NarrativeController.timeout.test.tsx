@@ -155,8 +155,15 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
   });
 
   it('surfaces error state after timeout when resolveTurn hangs', async () => {
-    // Never-resolving promise simulates a hung resolver
-    mockResolveTurn.mockReturnValue(new Promise(() => {}));
+    // The mock rejects on abort — matching the real resolver's behavior
+    // where an aborted generator throws through the resolver chain.
+    mockResolveTurn.mockImplementation((command: { signal?: AbortSignal }) =>
+      new Promise((_, reject) => {
+        command.signal?.addEventListener('abort', () => {
+          reject(new Error('The operation was aborted'));
+        });
+      })
+    );
 
     renderWithToast(
       <NarrativeController
@@ -168,7 +175,7 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
       />
     );
 
-    // Advance past AI_GENERATION_TIMEOUT_MS so the race rejects
+    // Advance past AI_GENERATION_TIMEOUT_MS so the abort signal fires
     await act(async () => {
       jest.advanceTimersByTime(AI_GENERATION_TIMEOUT_MS + 100);
     });
@@ -182,10 +189,10 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
     expect(screen.queryByTestId('loading-indicator')).toBeNull();
   });
 
-  it('aborts the losing generation when the race times out', async () => {
-    // Losing the race must cancel the request itself, not just abandon the
-    // promise — otherwise the fetch lives on until aiFetch's outer ceiling
-    // (a zombie that wastes spend and mutates stores when it settles).
+  it('aborts the generation via signal when the timeout fires', async () => {
+    // The timeout fires abort() on the signal, which the real resolver
+    // propagates to the fetch layer. The mock ignores it (never resolves)
+    // to verify the signal itself was aborted.
     mockResolveTurn.mockReturnValue(new Promise(() => {}));
 
     renderWithToast(

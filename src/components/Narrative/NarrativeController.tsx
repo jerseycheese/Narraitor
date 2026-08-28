@@ -512,18 +512,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setError(null);
       resetStreamingPreview();
 
-      // Race AI generation against a timeout so a slow response falls back
-      // instead of hanging. The abort signal propagates through the resolver
-      // to the underlying generator call.
+      // The abort signal propagates through the resolver to the underlying
+      // generator call. Only the provider round-trip is timed; reconciliation
+      // (store writes + world-cost extraction) runs unraced so a slow
+      // reconciliation doesn't trigger a duplicate fallback segment.
       const generationAbort = new AbortController();
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        generationTimeoutId = setTimeout(() => {
-          generationAbort.abort();
-          reject(
-            new Error(`Initial generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
-          );
-        }, AI_GENERATION_TIMEOUT_MS);
-      });
+      generationTimeoutId = setTimeout(() => {
+        generationAbort.abort();
+      }, AI_GENERATION_TIMEOUT_MS);
 
       const initialCommand: InitialTurnCommand = {
         sessionId,
@@ -534,10 +530,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onChunk: handleStreamChunk,
       };
 
-      const turnResult = await Promise.race([
-        resolveInitialTurn(initialCommand, narrativeGenerator),
-        timeoutPromise,
-      ]);
+      const turnResult = await resolveInitialTurn(initialCommand, narrativeGenerator);
 
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
@@ -553,6 +546,13 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         setSegments(currentSegments);
         setIsLoading(false);
         return;
+      }
+
+      if (turnResult.reconciliationErrors.length > 0) {
+        logger.warn(
+          '[NarrativeController] Initial turn reconciliation partial:',
+          turnResult.reconciliationErrors.map((e) => e.step)
+        );
       }
 
       const gatedSegment = turnResult.segment;
@@ -576,10 +576,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         generatePlayerChoices();
       }
     } catch {
-      // Error generating initial narrative (timeout, network, etc.)
-      // The resolver may have already committed a segment before the
-      // timeout race rejected. Check the store before inserting a
-      // fallback to avoid duplicates.
+      // Error generating initial narrative (timeout, abort, network, etc.).
       try {
         const alreadyCommitted = getSessionSegments(sessionId);
         if (alreadyCommitted.length > 0) {
@@ -716,17 +713,13 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       const pacingEscalationRequested =
         !hasWorldClock && isPacingStale(computeTurnsSinceComplication(segments));
 
-      // Race AI generation against a timeout so a slow response falls back
-      // instead of hanging.
+      // The abort signal times out the provider round-trip; reconciliation
+      // runs unraced so a slow side-effect pass doesn't trigger a spurious
+      // error + Retry while the segment was already committed.
       const segmentAbort = new AbortController();
-      const segmentTimeoutPromise = new Promise<never>((_, reject) => {
-        segmentTimeoutId = setTimeout(() => {
-          segmentAbort.abort();
-          reject(
-            new Error(`Segment generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
-          );
-        }, AI_GENERATION_TIMEOUT_MS);
-      });
+      segmentTimeoutId = setTimeout(() => {
+        segmentAbort.abort();
+      }, AI_GENERATION_TIMEOUT_MS);
 
       const command: TurnCommand = {
         sessionId,
@@ -754,14 +747,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onChunk: handleStreamChunk,
       };
 
-      const turnResult = await Promise.race([
-        resolveTurn(command, narrativeGenerator),
-        segmentTimeoutPromise,
-      ]);
+      const turnResult = await resolveTurn(command, narrativeGenerator);
 
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
         return;
+      }
+
+      if (turnResult.reconciliationErrors.length > 0) {
+        logger.warn(
+          '[NarrativeController] Turn reconciliation partial:',
+          turnResult.reconciliationErrors.map((e) => e.step)
+        );
       }
 
       const gatedSegment = turnResult.segment;

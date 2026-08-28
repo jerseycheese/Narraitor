@@ -21,6 +21,9 @@ export interface ApplyWorldStateThreadUpdatesParams {
   finalMetadata: NarrativeMetadata;
   sessionId: EntityID;
   isFirstSegment: boolean;
+  /** When set, used as the authoritative character instead of reading the
+   *  session singleton. Prevents stale reads after a session switch. */
+  characterId?: EntityID;
 }
 
 export async function applyWorldStateThreadUpdates({
@@ -29,6 +32,7 @@ export async function applyWorldStateThreadUpdates({
   finalMetadata,
   sessionId,
   isFirstSegment,
+  characterId: authoritativeCharacterId,
 }: ApplyWorldStateThreadUpdatesParams): Promise<void> {
   try {
     if (!characterStoreModule) {
@@ -52,6 +56,7 @@ export async function applyWorldStateThreadUpdates({
     }
 
     const activeCharacterId =
+      authoritativeCharacterId ??
       sessionStore.characterId ??
       originalSegmentData.characterIds?.[0] ??
       finalMetadata.characterIds?.[0] ??
