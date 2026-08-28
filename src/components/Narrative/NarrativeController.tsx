@@ -576,42 +576,53 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         generatePlayerChoices();
       }
     } catch {
-      // Error generating initial narrative — create a graceful fallback segment
+      // Error generating initial narrative (timeout, network, etc.)
+      // The resolver may have already committed a segment before the
+      // timeout race rejected. Check the store before inserting a
+      // fallback to avoid duplicates.
       try {
-        const now = new Date();
-        const segmentId = `seg-${worldId}-fallback-${Date.now()}`;
-        const fallbackSegment: NarrativeSegment = {
-          id: segmentId,
-          content:
-            'The adventure begins. You find yourself at the edge of a new journey. What will you do next?',
-          type: 'scene',
-          characterIds: [],
-          metadata: {
-            characterIds: [],
-            location: 'Starting Location',
-            tags: ['intro', 'fallback'],
-          },
-          sessionId,
-          worldId,
-          timestamp: now,
-          createdAt: now.toISOString(),
-          updatedAt: now.toISOString(),
-        };
-
-        // Add locally and to the store to unblock the UI
-        const gatedFallback = storeSegmentAndTakeGated(fallbackSegment);
-        setSegments((prev) => [...prev, gatedFallback]);
-
-        // Notify parent so it can progress to choices skeleton + generation
-        if (onNarrativeGenerated) {
-          onNarrativeGenerated(gatedFallback);
-        }
-
-        // Kick off choice generation (will provide AI or fallback choices)
-        if (generateChoices && !isSessionEndingSegment(gatedFallback)) {
-          setTimeout(() => {
+        const alreadyCommitted = getSessionSegments(sessionId);
+        if (alreadyCommitted.length > 0) {
+          // The resolver finished generation but reconciliation pushed
+          // past the timeout. Adopt the committed segment instead.
+          setSegments(alreadyCommitted);
+          if (onNarrativeGenerated) {
+            onNarrativeGenerated(alreadyCommitted[0]);
+          }
+          if (generateChoices && !isSessionEndingSegment(alreadyCommitted[0])) {
             generatePlayerChoices();
-          }, 500);
+          }
+        } else {
+          const now = new Date();
+          const segmentId = `seg-${worldId}-fallback-${Date.now()}`;
+          const fallbackSegment: NarrativeSegment = {
+            id: segmentId,
+            content:
+              'The adventure begins. You find yourself at the edge of a new journey. What will you do next?',
+            type: 'scene',
+            characterIds: [],
+            metadata: {
+              characterIds: [],
+              location: 'Starting Location',
+              tags: ['intro', 'fallback'],
+            },
+            sessionId,
+            worldId,
+            timestamp: now,
+            createdAt: now.toISOString(),
+            updatedAt: now.toISOString(),
+          };
+
+          const gatedFallback = storeSegmentAndTakeGated(fallbackSegment);
+          setSegments((prev) => [...prev, gatedFallback]);
+
+          if (onNarrativeGenerated) {
+            onNarrativeGenerated(gatedFallback);
+          }
+
+          if (generateChoices && !isSessionEndingSegment(gatedFallback)) {
+            generatePlayerChoices();
+          }
         }
       } catch (error) {
         // Surface the original error if fallback insert also fails

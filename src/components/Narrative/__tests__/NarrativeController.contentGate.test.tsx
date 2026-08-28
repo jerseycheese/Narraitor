@@ -115,6 +115,7 @@ describe('NarrativeController - the rendered passage is gated', () => {
       snapshot: { sessionId: 'test-session' },
       isFatal: false,
       isEnding: false,
+      reconciliationErrors: [],
     });
 
     mockZustandStore(

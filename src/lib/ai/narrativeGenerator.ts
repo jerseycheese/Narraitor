@@ -56,7 +56,7 @@ import {
   collectContinuityTopicsFromStores,
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
-import { isResolverActive } from '@/lib/narrative/resolverGuard';
+import { isResolverManaged } from '@/lib/narrative/resolverGuard';
 import {
   buildKnownNameTokens,
   enhancePromptWithPhraseVariety,
@@ -94,7 +94,7 @@ export class NarrativeGenerator {
    */
   async generateSegment(
     request: NarrativeGenerationRequest,
-    options?: { signal?: AbortSignal; onChunk?: (delta: string) => void }
+    options?: { signal?: AbortSignal; onChunk?: (delta: string) => void; resolverManaged?: boolean }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -201,10 +201,11 @@ export class NarrativeGenerator {
       // acquisition/loss, NPC sync) in case the caller aborted mid-pipeline.
       throwIfAborted(options?.signal);
 
-      // When the TurnResolver drives this session, it handles all post-
-      // generation side effects (lore, inventory, NPC sync) itself, so skip
-      // the fire-and-forget tails here to avoid duplicate writers.
-      if (request.sessionId && isResolverActive(request.sessionId)) {
+      // When the TurnResolver drives this call, it handles inventory, NPC
+      // sync, and lore extraction itself, so skip the fire-and-forget tails
+      // here to avoid duplicate writers. Only this specific call is
+      // suppressed; concurrent calls from other paths run normally.
+      if (isResolverManaged(options)) {
         return result;
       }
 
@@ -368,6 +369,7 @@ export class NarrativeGenerator {
       generationParameters?: GenerationParameters;
       signal?: AbortSignal;
       onChunk?: (delta: string) => void;
+      resolverManaged?: boolean;
     }
   ): Promise<NarrativeGenerationResult> {
     try {
@@ -540,8 +542,8 @@ export class NarrativeGenerator {
       }
 
       // Resolver guard: skip item processing and NPC sync when the resolver
-      // drives this session (it awaits those itself).
-      if (sessionId && isResolverActive(sessionId)) {
+      // drives this call (it awaits those itself).
+      if (isResolverManaged(options)) {
         return result;
       }
 

@@ -199,6 +199,7 @@ describe('NarrativeController - fatal cadence on pivotal decisions', () => {
       snapshot: { sessionId: 'test-session' },
       isFatal: false,
       isEnding: false,
+      reconciliationErrors: [],
     });
   });
 

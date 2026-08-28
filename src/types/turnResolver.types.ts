@@ -90,8 +90,20 @@ export interface TurnResult {
   snapshot: SessionSnapshot;
   /** Whether a fatal outcome was detected (from world cost or critical failure). */
   isFatal: boolean;
-  /** Whether the segment type is 'ending' or carries ending tags. */
+  /**
+   * Whether the segment carries ending/fatal tags. The controller decides
+   * what to do with this (call onEndingSuggested, skip choices, etc.)
+   * based on its own handler availability.
+   */
   isEnding: boolean;
   /** The reconciled notes stamped onto the segment's metadata. */
   reconciledNotes?: ReconciledSegmentNotes;
+  /** Errors from core reconciliation steps that were swallowed. Empty when all succeeded. */
+  reconciliationErrors: ReconciliationError[];
+}
+
+/** A core reconciliation step that failed but was swallowed to avoid blocking the turn. */
+export interface ReconciliationError {
+  step: 'worldClock' | 'worldStateThreads' | 'itemAcquisition' | 'itemLoss';
+  error: unknown;
 }

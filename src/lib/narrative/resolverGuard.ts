@@ -1,29 +1,21 @@
 // src/lib/narrative/resolverGuard.ts
 
-import type { EntityID } from '@/types/common.types';
+/**
+ * Call-scoped flag that prevents duplicate writers during the TurnResolver
+ * migration. When the resolver drives a generation + commit cycle, it
+ * passes `resolverManaged: true` in the options so the generator and
+ * addSegment skip their own fire-and-forget side-effect tails. Only the
+ * specific call from the resolver is suppressed; concurrent calls from
+ * other paths (item-use, bootstrap) run their own tails normally.
+ *
+ * This replaces the previous session-wide guard, which blocked ALL writes
+ * to a session while any resolver was active.
+ */
 
 /**
- * Session-scoped guard that prevents duplicate writers during the
- * TurnResolver migration. When a session is resolver-active, the old
- * fire-and-forget tails in narrativeGenerator.generateSegment() and
- * narrativeStore.addSegment() skip their side effects because the
- * resolver handles those itself.
- *
- * Three-phase deployment:
- * 1. Guard lands, nothing calls markResolverActive - zero behavior change.
- * 2. Resolver wired, marks sessions active on entry - old path is dead.
- * 3. Stable, guard checks removed, fire-and-forget tails deleted.
+ * Check whether a generation or commit call should skip its side-effect
+ * tails because the TurnResolver is handling them.
  */
-const activeSessions = new Set<EntityID>();
-
-export function markResolverActive(sessionId: EntityID): void {
-  activeSessions.add(sessionId);
-}
-
-export function markResolverInactive(sessionId: EntityID): void {
-  activeSessions.delete(sessionId);
-}
-
-export function isResolverActive(sessionId: EntityID): boolean {
-  return activeSessions.has(sessionId);
+export function isResolverManaged(options?: { resolverManaged?: boolean }): boolean {
+  return options?.resolverManaged === true;
 }

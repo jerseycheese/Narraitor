@@ -21,8 +21,15 @@ import { countWorldClockTurns } from '@/lib/narrative/worldClock';
  * Prompt projections and post-turn assertions consume this instead of
  * scattered getState() calls, which eliminates the race window where one
  * store has been updated but another hasn't.
+ *
+ * Pass authoritative worldId/characterId from the command so the snapshot
+ * is always bound to the requested session, not whichever session happens
+ * to be active in the singleton store.
  */
-export function assembleSessionSnapshot(sessionId: EntityID): SessionSnapshot {
+export function assembleSessionSnapshot(
+  sessionId: EntityID,
+  ids?: { worldId: EntityID; characterId: EntityID }
+): SessionSnapshot {
   const narrativeState = useNarrativeStore.getState();
   const characterState = useCharacterStore.getState();
   const inventoryState = useInventoryStore.getState();
@@ -31,8 +38,8 @@ export function assembleSessionSnapshot(sessionId: EntityID): SessionSnapshot {
   const npcState = useNPCStore.getState();
   const sessionState = useSessionStore.getState();
 
-  const worldId = sessionState.worldId ?? '';
-  const characterId = sessionState.characterId ?? '';
+  const worldId = ids?.worldId ?? sessionState.worldId ?? '';
+  const characterId = ids?.characterId ?? sessionState.characterId ?? '';
 
   const allSegments = narrativeState.getSessionSegments(sessionId);
   const turnIndex = countWorldClockTurns(allSegments);

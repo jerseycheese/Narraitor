@@ -1,5 +1,5 @@
 import { resolveTurn, resolveInitialTurn } from '../turnResolver';
-import { isResolverActive, markResolverActive, markResolverInactive } from '../resolverGuard';
+import { isResolverManaged } from '../resolverGuard';
 import { assembleSessionSnapshot } from '../sessionSnapshotAssembler';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -49,6 +49,7 @@ jest.mock('../itemLossInference', () => ({
 
 jest.mock('@/lib/ai/loreContextHelper', () => ({
   getLoreContextForPrompt: jest.fn(() => ''),
+  checkAndRecordLoreMentions: jest.fn(),
 }));
 
 jest.mock('@/lib/analytics/trackFunnelStep', () => ({
@@ -67,11 +68,22 @@ jest.mock('../isSessionEndingSegment', () => ({
   isSessionEndingSegment: jest.fn(() => false),
 }));
 
+jest.mock('@/lib/ai/structuredLoreExtractor', () => ({
+  extractStructuredLore: jest.fn().mockResolvedValue({
+    characters: [], locations: [], events: [], rules: [],
+  }),
+}));
+
+jest.mock('@/lib/ai/narrativeGenerator.continuity', () => ({
+  collectContinuityTopicsFromStores: jest.fn(() => []),
+}));
+
 const { applyWorldClockUpdates } = jest.requireMock('../applyWorldClockUpdates');
 const { applyWorldStateThreadUpdates } = jest.requireMock('../applyWorldStateThreadUpdates');
 const { processAcquiredItems } = jest.requireMock('../itemAcquisitionProcessor');
 const { processLostItems } = jest.requireMock('../itemLossProcessor');
 const { syncNpcMetadata } = jest.requireMock('@/lib/ai/narrativeGenerator.npc');
+const { extractStructuredLore } = jest.requireMock('@/lib/ai/structuredLoreExtractor');
 
 function makeGenerationResult(overrides: Partial<NarrativeGenerationResult> = {}): NarrativeGenerationResult {
   return {
@@ -158,6 +170,17 @@ function seedStores() {
   } as never);
 }
 
+/** Returns a { promise, resolve, reject } triple for test control. */
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
 describe('TurnResolver', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -178,27 +201,48 @@ describe('TurnResolver', () => {
       expect(result.snapshot.sessionId).toBe('session-1');
     });
 
-    it('awaits world clock updates instead of fire-and-forget', async () => {
+    it('blocks until world clock updates resolve', async () => {
+      const clockDeferred = deferred<null>();
+      (applyWorldClockUpdates as jest.Mock).mockReturnValue(clockDeferred.promise);
+
       const generator = makeMockGenerator();
       const command = makeCommand();
+      const turnPromise = resolveTurn(command, generator);
 
-      await resolveTurn(command, generator);
-
+      // Flush microtasks so generation and segment commit complete,
+      // but reconciliation is still pending.
+      await new Promise((r) => setTimeout(r, 0));
       expect(applyWorldClockUpdates).toHaveBeenCalledTimes(1);
-      expect(applyWorldClockUpdates).toHaveBeenCalledWith(
-        expect.objectContaining({
-          sessionId: 'session-1',
-        })
-      );
+
+      // The resolver should still be pending because the clock update
+      // hasn't resolved. If it were void-fired, turnPromise would
+      // already have settled.
+      let settled = false;
+      turnPromise.then(() => { settled = true; });
+      await new Promise((r) => setTimeout(r, 0));
+      expect(settled).toBe(false);
+
+      // Now resolve the deferred and verify the resolver completes.
+      clockDeferred.resolve(null);
+      const result = await turnPromise;
+      expect(result.segment).toBeDefined();
     });
 
-    it('awaits world state thread updates instead of fire-and-forget', async () => {
+    it('blocks until world state thread updates resolve', async () => {
+      const threadDeferred = deferred<void>();
+      (applyWorldStateThreadUpdates as jest.Mock).mockReturnValue(threadDeferred.promise);
+
       const generator = makeMockGenerator();
-      const command = makeCommand();
+      const turnPromise = resolveTurn(makeCommand(), generator);
 
-      await resolveTurn(command, generator);
+      await new Promise((r) => setTimeout(r, 0));
+      let settled = false;
+      turnPromise.then(() => { settled = true; });
+      await new Promise((r) => setTimeout(r, 0));
+      expect(settled).toBe(false);
 
-      expect(applyWorldStateThreadUpdates).toHaveBeenCalledTimes(1);
+      threadDeferred.resolve();
+      await turnPromise;
     });
 
     it('processes acquired items synchronously in the turn pipeline', async () => {
@@ -271,16 +315,20 @@ describe('TurnResolver', () => {
       const result = await resolveTurn(command, generator);
 
       expect(result.isFatal).toBe(true);
-      expect(result.isEnding).toBe(true);
     });
 
-    it('marks isFatal from a critical failure command', async () => {
+    it('marks isFatal from a critical failure command without setting isEnding', async () => {
       const generator = makeMockGenerator();
       const command = makeCommand({ isFatalCriticalFailure: true });
 
       const result = await resolveTurn(command, generator);
 
+      // isFatal is true because the command says so, but isEnding stays
+      // false because the segment itself doesn't carry ending tags.
+      // The controller decides what to do with isFatal based on its own
+      // handler availability.
       expect(result.isFatal).toBe(true);
+      expect(result.isEnding).toBe(false);
     });
 
     it('post-turn snapshot reflects the committed segment', async () => {
@@ -292,6 +340,26 @@ describe('TurnResolver', () => {
       expect(result.snapshot.turnIndex).toBeGreaterThan(0);
       const storedSegments = useNarrativeStore.getState().getSessionSegments('session-1');
       expect(storedSegments.length).toBe(1);
+    });
+
+    it('captures reconciliation errors without aborting the turn', async () => {
+      (applyWorldClockUpdates as jest.Mock).mockRejectedValueOnce(
+        new Error('clock extraction failed')
+      );
+
+      const generator = makeMockGenerator();
+      const result = await resolveTurn(makeCommand(), generator);
+
+      expect(result.segment).toBeDefined();
+      expect(result.reconciliationErrors).toHaveLength(1);
+      expect(result.reconciliationErrors[0].step).toBe('worldClock');
+    });
+
+    it('fires lore extraction as fire-and-forget', async () => {
+      const generator = makeMockGenerator();
+      await resolveTurn(makeCommand(), generator);
+
+      expect(extractStructuredLore).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -329,32 +397,24 @@ describe('TurnResolver', () => {
     });
   });
 
-  describe('resolver guard', () => {
-    it('marks session active during turn resolution', async () => {
-      let wasActive = false;
-      const generator = {
-        generateSegment: jest.fn().mockImplementation(async () => {
-          wasActive = isResolverActive('session-1');
-          return makeGenerationResult();
-        }),
-        generateInitialScene: jest.fn(),
-      } as unknown as NarrativeGenerator;
-
+  describe('resolverManaged guard', () => {
+    it('passes resolverManaged to the generator call', async () => {
+      const generator = makeMockGenerator();
       await resolveTurn(makeCommand(), generator);
 
-      expect(wasActive).toBe(true);
-      // After resolution, guard should be cleared
-      expect(isResolverActive('session-1')).toBe(false);
+      const genCall = (generator.generateSegment as jest.Mock).mock.calls[0];
+      expect(genCall[1]).toEqual(
+        expect.objectContaining({ resolverManaged: true })
+      );
     });
 
-    it('clears the guard even on error', async () => {
-      const generator = {
-        generateSegment: jest.fn().mockRejectedValue(new Error('AI failed')),
-        generateInitialScene: jest.fn(),
-      } as unknown as NarrativeGenerator;
-
-      await expect(resolveTurn(makeCommand(), generator)).rejects.toThrow('AI failed');
-      expect(isResolverActive('session-1')).toBe(false);
+    it('is call-scoped, not session-scoped', () => {
+      // The guard is now a pure function check on the options object.
+      // No session-wide state to leak.
+      expect(isResolverManaged({ resolverManaged: true })).toBe(true);
+      expect(isResolverManaged({ resolverManaged: false })).toBe(false);
+      expect(isResolverManaged(undefined)).toBe(false);
+      expect(isResolverManaged({})).toBe(false);
     });
   });
 
@@ -397,31 +457,66 @@ describe('TurnResolver', () => {
       expect(generator.generateInitialScene).toHaveBeenCalledTimes(1);
       expect(applyWorldClockUpdates).toHaveBeenCalledTimes(1);
     });
+
+    it('skips generation when a segment already exists in the store', async () => {
+      // Simulate another instance having committed a segment
+      useNarrativeStore.getState().addSegment('session-1', {
+        content: 'Previously committed.',
+        type: 'scene',
+        characterIds: [],
+        metadata: { characterIds: [], tags: [] },
+        worldId: 'world-1',
+        timestamp: new Date(),
+        updatedAt: new Date().toISOString(),
+      });
+
+      const generator = makeMockGenerator();
+      const result = await resolveInitialTurn(
+        {
+          sessionId: 'session-1',
+          worldId: 'world-1',
+          characterId: 'char-1',
+          generateChoices: true,
+        },
+        generator
+      );
+
+      // Should adopt the existing segment, not generate a new one
+      expect(generator.generateInitialScene).not.toHaveBeenCalled();
+      expect(result.segment.content).toBe('Previously committed.');
+    });
+
+    it('returns reconciliation errors when present', async () => {
+      (applyWorldStateThreadUpdates as jest.Mock).mockRejectedValueOnce(
+        new Error('thread extraction failed')
+      );
+
+      const generator = makeMockGenerator();
+      const result = await resolveInitialTurn(
+        {
+          sessionId: 'session-1',
+          worldId: 'world-1',
+          characterId: 'char-1',
+          generateChoices: true,
+        },
+        generator
+      );
+
+      expect(result.reconciliationErrors).toHaveLength(1);
+      expect(result.reconciliationErrors[0].step).toBe('worldStateThreads');
+    });
   });
 });
 
-describe('resolverGuard', () => {
-  afterEach(() => {
-    markResolverInactive('test-session');
+describe('resolverManaged guard', () => {
+  it('returns true only when explicitly set', () => {
+    expect(isResolverManaged({ resolverManaged: true })).toBe(true);
   });
 
-  it('starts inactive', () => {
-    expect(isResolverActive('test-session')).toBe(false);
-  });
-
-  it('marks active and inactive', () => {
-    markResolverActive('test-session');
-    expect(isResolverActive('test-session')).toBe(true);
-
-    markResolverInactive('test-session');
-    expect(isResolverActive('test-session')).toBe(false);
-  });
-
-  it('scopes to session IDs', () => {
-    markResolverActive('session-a');
-    expect(isResolverActive('session-a')).toBe(true);
-    expect(isResolverActive('session-b')).toBe(false);
-    markResolverInactive('session-a');
+  it('returns false for all other inputs', () => {
+    expect(isResolverManaged(undefined)).toBe(false);
+    expect(isResolverManaged({})).toBe(false);
+    expect(isResolverManaged({ resolverManaged: false })).toBe(false);
   });
 });
 
@@ -439,6 +534,31 @@ describe('sessionSnapshotAssembler', () => {
     expect(Object.isFrozen(snapshot.segments)).toBe(true);
     expect(Object.isFrozen(snapshot.decisions)).toBe(true);
     expect(Object.isFrozen(snapshot.inventory)).toBe(true);
+  });
+
+  it('uses authoritative IDs from the command, not the session singleton', () => {
+    // Point the session singleton at a different world/character
+    useSessionStore.setState({
+      id: 'session-1',
+      worldId: 'other-world',
+      characterId: 'other-char',
+      status: 'active',
+    } as never);
+
+    const snapshot = assembleSessionSnapshot('session-1', {
+      worldId: 'world-1',
+      characterId: 'char-1',
+    });
+
+    expect(snapshot.worldId).toBe('world-1');
+    expect(snapshot.characterId).toBe('char-1');
+  });
+
+  it('falls back to session singleton when IDs are not passed', () => {
+    const snapshot = assembleSessionSnapshot('session-1');
+
+    expect(snapshot.worldId).toBe('world-1');
+    expect(snapshot.characterId).toBe('char-1');
   });
 
   it('reads character conditions', () => {

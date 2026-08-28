@@ -171,6 +171,7 @@ describe('NarrativeController — generation error capture (#1478)', () => {
       snapshot: { sessionId: 'test-session' },
       isFatal: false,
       isEnding: false,
+      reconciliationErrors: [],
     });
 
     renderWithToast(
