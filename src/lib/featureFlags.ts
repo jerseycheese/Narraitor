@@ -41,8 +41,8 @@ const FEATURE_FLAG_DEFAULTS = {
   // byte-identical prompt and no extra calls.
   UNRECORDED_EXCHANGE_GUARD: true,
   // Feeds delivered commitments into the live aligned-choice prompt as a short
-  // already-settled block. On by default after passing live evaluation.
-  SETTLED_COMMITMENT_CHOICES: true,
+  // already-settled block. Off by default until live evaluation passes.
+  SETTLED_COMMITMENT_CHOICES: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;

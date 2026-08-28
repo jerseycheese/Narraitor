@@ -228,7 +228,7 @@ describe('settled commitments in aligned choices (#1963)', () => {
     });
   };
 
-  it('omits the settled block when flag is disabled via kill switch', () => {
+  it('omits the settled block when flag is disabled (default)', () => {
     process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = 'false';
     seedFacts([
       {
@@ -250,30 +250,6 @@ describe('settled commitments in aligned choices (#1963)', () => {
     const prompt = buildAlignedPrompt();
     expect(prompt).not.toContain('ALREADY SETTLED');
     expect(prompt).not.toContain('parcel appraisal documents');
-  });
-
-  it('renders delivered commitments by default when env var is unset', () => {
-    delete process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES;
-    seedFacts([
-      {
-        id: 'e1',
-        category: 'events',
-        value: 'Davies handed over the parcel appraisal.',
-        createdAt: '2025-01-01T00:00:00.000Z',
-        metadata: {
-          continuity: {
-            kind: 'commitment',
-            topic: 'parcel appraisal documents',
-            speaker: 'Councilman Davies',
-            status: 'delivered',
-          },
-        },
-      },
-    ]);
-
-    const prompt = buildAlignedPrompt();
-    expect(prompt).toContain('ALREADY SETTLED (do not offer, request, negotiate, or obtain again):');
-    expect(prompt).toContain('- parcel appraisal documents (delivered by Councilman Davies)');
   });
 
   it('renders delivered commitments and excludes outstanding commitments and continuity sections when flag is on', () => {

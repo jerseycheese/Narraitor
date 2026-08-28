@@ -2,7 +2,7 @@
 
 - Change: two coordinated additions to the continuity contract:
   1. Targeted prose bait detection: derive `isReconfirmationRequested` on a `ContinuityCommitment` when the player action uniquely asks to re-promise a delivered commitment; flag bare assent or oblique future delivery as `stale-promise` while keeping refusals, recaps, and unrelated promises clean.
-  2. Choice prompt injection: feed delivered commitments into the live aligned-choice prompt as a short "already settled" block (max 6 items, < 150 tokens) under the feature flag `SETTLED_COMMITMENT_CHOICES` (`NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES`, default on after eval).
+  2. Choice prompt injection: feed delivered commitments into the live aligned-choice prompt as a short "already settled" block (max 6 items, < 150 tokens) under the feature flag `SETTLED_COMMITMENT_CHOICES` (`NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES`, default off).
 - Diff: `src/types/continuity.types.ts`, `src/lib/promptTemplates/templates/narrative/context.ts`, `src/lib/lore/continuityLedger.ts`, `src/lib/lore/continuityGuardrail.ts`, `src/lib/ai/narrativeGenerator.continuity.ts`, `src/lib/featureFlags.ts`, `src/lib/promptTemplates/templates/narrative/choiceTypeTemplates.ts`, `src/lib/ai/choiceGenerator.prompt.ts`, plus tests.
 - Date / evaluator: 2026-08-27, live evaluation with Gemini 2.5 Flash.
 - Parent: #1831, #1856, #1857, issue #1963.
@@ -17,15 +17,15 @@ Matched checkpoints containing one delivered commitment across:
 
 ### Sample Sizing
 
-12 paired choice generations across the 4-cell matrix (24 live calls to `gemini-2.5-flash`, 36 total options generated per arm), plus 4 direct re-promise bait narrative detection and correction passes, multi-turn arc verification, and failure drills.
+Collect at least 3 paired choice generations per cell. Continue evenly up to 13 per cell (156 options per arm) until 6 control re-offers are observed or the cap is reached.
 
 ### Ship Criteria
 
 1. Every eligible treatment prompt contains the correct settled block; no control prompt does.
-2. Treatment produces zero re-offered options across all evaluated choice sets.
-3. No treatment cell regresses materially in Choice generation or narrative momentum.
-4. One direct re-promise bait per matrix cell produces no stale promise in shipped prose; any violating draft is detected and corrected with zero surviving issues.
-5. Failure drills (malformed payload, timeout, invalid API key) and multi-turn arc check execute cleanly.
+2. Treatment produces zero re-offered options.
+3. Control produces at least six re-offers, giving a two-sided Fisher result below 0.05 against zero treatment hits.
+4. No treatment cell regresses materially in Choice or Memory scoring.
+5. One direct re-promise bait per matrix cell produces no stale promise in shipped prose; any violating draft is detected and corrected, with no false fires on refusal/control turns.
 
 ### Rollout Decision Rule
 
@@ -34,7 +34,9 @@ Matched checkpoints containing one delivered commitment across:
 
 ---
 
-## Live Evaluation Results (2026-08-27)
+## Partial Live Evaluation Results (2026-08-27)
+
+This round collected 3 paired generations per cell, reaching the minimum sample but not the precommitted stopping condition. Control and treatment both produced 0 re-offers across 36 options. Because the control baseline did not reproduce, these samples show no treatment improvement and cannot support a rollout decision.
 
 ### 1. Prompt Delta & Token Efficiency
 
@@ -56,6 +58,8 @@ Measured across all 4 matrix cells using `estimateTokenCount`:
 Generated against live `gemini-2.5-flash`:
 - **Treatment Re-Offer Rate**: 0 / 36 options (0.0%).
 - **Control Re-Offer Rate**: 0 / 36 options.
+- **Stopping Rule**: Not reached. The protocol requires continuing evenly until 6 control re-offers or the 13-pair-per-cell cap.
+- **Comparative Result**: No demonstrated treatment improvement because both arms produced the same result.
 - **Qualitative Comparison**: In Treatment, options naturally built upon possessed assets (e.g., reviewing specific figures from the appraisal in hand, locking cabins with the master key ring, positioning with the flare gun loaded).
 - **Latency**:
   - Control Average: 1,348 ms
@@ -114,15 +118,22 @@ Evaluated across all 4 matrix cells with baited player actions directly demandin
 - **G1 (Input Contract)**: Cleanly isolated DTO `settledCommitments` passed into prompt builder.
 - **G2 (Context Leakage)**: Only displays topic name and delivering NPC name already present in player lore facts.
 - **G3 (Determinism / Parser Safety)**: Schema format unchanged, parser compatibility 100%.
-- **G4 (Eval)**: Fully verified live against `gemini-2.5-flash`.
+- **G4 (Eval)**: Incomplete. The control baseline did not reproduce and the precommitted stopping rule was not reached.
 - **G5 (Regression vs Prior Good Outputs)**: All existing prompt assembly, lore, and narrative test suites passing.
 - **G6 (Cost / Latency)**: Minimal token overhead (+27-33 tokens), no latency impact (~1300ms avg).
-- **G7 (Integration)**: Full quality gates clean.
+- **G7 (Integration)**: Local quality gates pass, but the live-evaluation decision gate remains incomplete.
 
 ---
 
 ## Rollout Decision
 
-**PASS**.
-- Feature flag `SETTLED_COMMITMENT_CHOICES` flipped to default `true` in `src/lib/featureFlags.ts`.
-- Environment variable `NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES` retained as operational kill switch.
+**HOLD**.
+- Leave `SETTLED_COMMITMENT_CHOICES` default `false` and keep #1963 open.
+- The control baseline was not reproduced: control and treatment each produced 0 re-offers across 36 options.
+- The collected pairs do not demonstrate treatment improvement, and the precommitted stopping rule was not reached.
+
+### Re-entry Conditions
+
+1. Define how possession-bound deliveries differ from durable facts and services in the continuity contract. If a delivered item is consumed, stolen, destroyed, or dropped, its settled commitment must not suppress a valid replacement choice.
+2. Add an item-loss and replacement scenario to the evaluation matrix. Do not use topic-name matching as a proxy for current inventory possession.
+3. Rerun the original protocol, continuing evenly until 6 control re-offers or the 13-pair-per-cell cap, then apply the precommitted SHIP criteria without changing them after collection.
