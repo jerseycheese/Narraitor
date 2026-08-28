@@ -30,6 +30,7 @@ import {
 } from '@/lib/narrative/resolverGuard';
 import { logger } from '@/lib/utils/logger';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
+import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { useInventoryStore } from '@/state/inventoryStore';
 
 /**
@@ -154,7 +155,10 @@ async function resolveTurnInner(
           currentSceneId: `scene-${Date.now()}`,
           characterIds: characterId ? [characterId] : [],
           previousSegments: [...recentSegments],
-          currentTags: command.skillCheckTags,
+          currentTags: mergeTurnTags(
+            recentSegments[recentSegments.length - 1]?.metadata?.tags ?? [],
+            command.skillCheckTags
+          ),
           sessionId,
           recentSegments: [...recentSegments],
           turnsSinceComplication,

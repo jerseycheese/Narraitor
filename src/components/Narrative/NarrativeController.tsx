@@ -24,16 +24,15 @@ import {
 } from '@/lib/narrative/evaluateDecisionSkillChecks';
 import { computeTurnsSinceComplication, isPacingStale } from '@/lib/narrative/turnsSinceComplication';
 import { isFatalCadenceOffCooldown } from '@/lib/narrative/fatalDecisionCadence';
-import { buildWorldClockPromptContext, countWorldClockTurns } from '@/lib/narrative/worldClock';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
-import { useWorldThreadStore } from '@/state/worldThreadStore';
+import { resolveTurn, resolveInitialTurn } from '@/lib/narrative/turnResolver';
+import type { TurnCommand, InitialTurnCommand } from '@/types/turnResolver.types';
 
 
 const EMPTY_NPC_IDS: string[] = [];
@@ -513,10 +512,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       setError(null);
       resetStreamingPreview();
 
-      // Race AI generation against a timeout so a slow response falls back instead of hanging.
-      // Losing the race must also ABORT the generation: without the signal,
-      // the abandoned request keeps running (and spending) until aiFetch's
-      // ceiling, then mutates lore/inventory/NPC state when it settles.
+      // Race AI generation against a timeout so a slow response falls back
+      // instead of hanging. The abort signal propagates through the resolver
+      // to the underlying generator call.
       const generationAbort = new AbortController();
       const timeoutPromise = new Promise<never>((_, reject) => {
         generationTimeoutId = setTimeout(() => {
@@ -526,13 +524,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           );
         }, AI_GENERATION_TIMEOUT_MS);
       });
-      const result = await Promise.race([
-        narrativeGenerator.generateInitialScene(
-          worldId,
-          characterId ? [characterId] : [],
-          sessionId,
-          { signal: generationAbort.signal, onChunk: handleStreamChunk }
-        ),
+
+      const initialCommand: InitialTurnCommand = {
+        sessionId,
+        worldId,
+        characterId: characterId ?? '',
+        generateChoices: generateChoices ?? true,
+        signal: generationAbort.signal,
+        onChunk: handleStreamChunk,
+      };
+
+      const turnResult = await Promise.race([
+        resolveInitialTurn(initialCommand, narrativeGenerator),
         timeoutPromise,
       ]);
 
@@ -545,27 +548,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       const currentSegments = getSessionSegments(sessionId);
       const nowHasSegments = currentSegments.length > 0;
 
-      if (nowHasSegments) {
+      // If segments appeared from another source, just adopt them
+      if (nowHasSegments && !currentSegments.some(s => s.id === turnResult.segment.id)) {
+        setSegments(currentSegments);
         setIsLoading(false);
         return;
       }
 
-      const segmentId = `seg-${worldId}-${Date.now()}`;
-      const now = new Date();
-      const newSegment: NarrativeSegment = {
-        id: segmentId,
-        content: result.content,
-        type: result.segmentType,
-        characterIds: result.metadata.characterIds || [],
-        metadata: result.metadata,
-        sessionId, // Explicitly set sessionId
-        worldId, // Explicitly set worldId
-        timestamp: now,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-      };
-
-      const gatedSegment = storeSegmentAndTakeGated(newSegment);
+      const gatedSegment = turnResult.segment;
 
       // Add to local state
       setSegments((prev) => [...prev, gatedSegment]);
@@ -579,12 +569,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // choice generation below doesn't wait on.
       void checkForEndingIndicators(gatedSegment);
 
-      // Generate choices if enabled - skip when this segment already ends the session
-      if (generateChoices && !isSessionEndingSegment(gatedSegment)) {
-        // Start generating AI choices immediately without showing fallback choices first
-        setTimeout(() => {
-          generatePlayerChoices();
-        }, 500); // Reduced timeout since we're not showing immediate choices
+      // Generate choices if enabled - skip when this segment already ends
+      // the session. The resolver has already settled all core state, so
+      // choice generation reads the post-turn revision.
+      if (generateChoices && !turnResult.isEnding) {
+        generatePlayerChoices();
       }
     } catch {
       // Error generating initial narrative — create a graceful fallback segment
@@ -655,34 +644,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
     let segmentTimeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
-      // Use recent segments for context (last 3 segments for efficiency)
-      const recentSegments = segments.slice(-3);
-      // Streak tracked over the whole session, not just the trimmed context
-      // window above — a quiet stretch spans more than 3 segments.
-      const turnsSinceComplication = computeTurnsSinceComplication(segments);
-      // The turn the prompt names must match the one the store stamps after
-      // this segment lands (sessionSegments length after add), and the local
-      // segments state can lag the store, so read the store count directly.
-      const currentTurn =
-        countWorldClockTurns(useNarrativeStore.getState().getSessionSegments(sessionId)) + 1;
-      const worldClock = isFeatureEnabled('WORLD_CLOCK')
-        ? buildWorldClockPromptContext(
-            useWorldThreadStore
-              .getState()
-              .getAll()
-              .filter((thread) => thread.sessionId === sessionId),
-            currentTurn
-          )
-        : undefined;
-      // The scene prompt only carries the rising-tension block above this
-      // threshold, and the complication it asks for arrives with no dice roll
-      // behind it. Stamping the ask onto the segment is what lets the streak
-      // reset; without it the guidance would repeat on every following turn.
-      // With the world clock on, the template does not render that block, so
-      // the stamp stays off too and flag-off behavior is exactly the guard's.
-      const pacingEscalationRequested =
-        !worldClock && isPacingStale(turnsSinceComplication);
-
       // Get the actual choice text from the narrative store
       const decisions = useNarrativeStore
         .getState()
@@ -699,9 +660,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         );
         if (option) {
           selectedOption = option;
-          // Extract decision weight from the decision
           decisionWeight = decision.decisionWeight;
-          // For custom input, use the customText, otherwise use the regular text
           choiceText =
             option.isCustomInput && option.customText
               ? option.customText
@@ -713,10 +672,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
       // Evaluate skill requirements (rolls, tags, outcome, per-roll toasts, and
       // the parent onSkillCheckPerformed notification are handled in the helper)
-      // Read characters/worlds at call time via getState() rather than
-      // subscribing — they're only needed here inside this async handler, so a
-      // store subscription would re-render the controller on every character/
-      // world write for no benefit.
       const character = characterId
         ? useCharacterStore.getState().characters[characterId]
         : undefined;
@@ -730,16 +685,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         });
 
       // Fatal outcome check: a critical decision only ends the run on a true
-      // critical-failure roll (natural 1). An ordinary missed roll is a
-      // survivable setback the AI narrates (and can still escalate via the
-      // fatal-outcome tag the extraction stamps), so one unlucky-but-ordinary
-      // roll does not end the story.
-      //
-      // Critical weight is model-assigned and unbudgeted, so a tense genre can
-      // mark every turn pivotal and turn that natural 1 into a per-turn death
-      // roll. The cadence guard is what budgets it: only a decision off
-      // cooldown may be fatal, and taking that permission is what spends it,
-      // whichever way the dice then fall.
+      // critical-failure roll (natural 1). The cadence guard budgets it: only
+      // a decision off cooldown may be fatal.
       const fatalRiskAllowed =
         decisionWeight === 'critical' && isFatalCadenceOffCooldown(segments);
       const isFatalCriticalFailure =
@@ -752,31 +699,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         );
       }
 
-      // Combine existing tags with skill check tags
-      const existingTags =
-        recentSegments[recentSegments.length - 1]?.metadata?.tags || [];
-      const currentTags = mergeTurnTags(existingTags, skillCheckTags);
+      // Pacing stamp: the resolver builds worldClock from the store but needs
+      // the escalation flag from the controller's pacing evaluation.
+      const hasWorldClock = isFeatureEnabled('WORLD_CLOCK');
+      const pacingEscalationRequested =
+        !hasWorldClock && isPacingStale(computeTurnsSinceComplication(segments));
 
-      // Build skill check context for the AI
-      let skillCheckContext = '';
-      if (rollResults.length > 0) {
-        const skillResultDescriptions = rollResults.map((r) => {
-          if (r.isCriticalSuccess) {
-            return `${r.skillName}: CRITICAL SUCCESS (natural 20)`;
-          } else if (r.isCriticalFailure) {
-            return `${r.skillName}: CRITICAL FAILURE (natural 1)`;
-          } else if (r.success) {
-            return `${r.skillName}: SUCCESS (rolled ${r.total} vs DC ${r.dc})`;
-          } else {
-            return `${r.skillName}: FAILURE (rolled ${r.total} vs DC ${r.dc})`;
-          }
-        });
-        skillCheckContext = ` [Skill checks: ${skillResultDescriptions.join(', ')}]`;
-      }
-
-      // Same contract as the initial-scene race: losing the race aborts the
-      // generation at the fetch layer instead of orphaning it until aiFetch's
-      // ceiling fires.
+      // Race AI generation against a timeout so a slow response falls back
+      // instead of hanging.
       const segmentAbort = new AbortController();
       const segmentTimeoutPromise = new Promise<never>((_, reject) => {
         segmentTimeoutId = setTimeout(() => {
@@ -786,39 +716,35 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           );
         }, AI_GENERATION_TIMEOUT_MS);
       });
-      const result = await Promise.race([
-        narrativeGenerator.generateSegment(
-          {
-            worldId,
-            sessionId,
-            characterIds: characterId ? [characterId] : [],
-            narrativeContext: {
-              worldId,
-              currentSceneId: `scene-${Date.now()}`,
-              characterIds: characterId ? [characterId] : [],
-              previousSegments: recentSegments,
-              currentTags,
-              sessionId,
-              recentSegments,
-              turnsSinceComplication,
-              worldClock,
-              currentSituation: `Player chose: "${choiceText}"${skillCheckContext}`,
-            },
-            generationParameters: {
-              includedTopics: [choiceText],
-              // No desiredLength: the template scales the beat off decisionWeight
-              // so weighty moments get more room than routine ones.
-              decisionWeight,
-              // Critical decisions with critical failures should have tragic tone
-              desiredTone:
-                decisionWeight === 'critical' &&
-                rollResults.some((r) => r.isCriticalFailure)
-                  ? 'tragic'
-                  : undefined,
-            },
-          },
-          { signal: segmentAbort.signal, onChunk: handleStreamChunk }
-        ),
+
+      const command: TurnCommand = {
+        sessionId,
+        worldId,
+        characterId: characterId ?? '',
+        choiceId: triggeringChoiceId,
+        choiceText,
+        isCustomInput,
+        skillCheckResults: rollResults,
+        skillCheckTags,
+        decisionOutcome,
+        decisionWeight,
+        pacingEscalationRequested,
+        fatalRiskAllowed,
+        isFatalCriticalFailure,
+        generationParams: {
+          includedTopics: [choiceText],
+          desiredTone:
+            decisionWeight === 'critical' &&
+            rollResults.some((r) => r.isCriticalFailure)
+              ? 'tragic'
+              : undefined,
+        },
+        signal: segmentAbort.signal,
+        onChunk: handleStreamChunk,
+      };
+
+      const turnResult = await Promise.race([
+        resolveTurn(command, narrativeGenerator),
         segmentTimeoutPromise,
       ]);
 
@@ -827,29 +753,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         return;
       }
 
-      const segmentId = `seg-${worldId}-${triggeringChoiceId}-${Date.now()}`;
-      const now = new Date();
-      const newSegment: NarrativeSegment = {
-        id: segmentId,
-        content: result.content,
-        type: result.segmentType,
-        characterIds: result.metadata.characterIds || [],
-        metadata: {
-          ...result.metadata,
-          // Merge skill check tags into metadata
-          tags: [...(result.metadata.tags || []), ...skillCheckTags],
-          decisionOutcome,
-          pacingEscalationRequested,
-          fatalRiskAllowed,
-        },
-        sessionId, // Explicitly set sessionId
-        worldId, // Explicitly set worldId
-        timestamp: now,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-      };
-
-      const gatedSegment = storeSegmentAndTakeGated(newSegment);
+      const gatedSegment = turnResult.segment;
 
       // Add to local state
       setSegments((prev) => [...prev, gatedSegment]);
@@ -866,28 +770,16 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Generate choices if enabled - skip when the session is ending
       // (fatal/ending segment or a fatal critical-decision failure).
       // A fatal critical failure only ends the session when an ending handler
-      // is wired: suggestEnding() is a no-op without onEndingSuggested. Without
-      // a handler, keep generating choices so a standalone controller (harness,
-      // story, embedder) can still move forward instead of stalling with no
-      // ending and no choices.
+      // is wired. The resolver has already settled all core state, so choice
+      // generation reads the post-turn revision — no setTimeout needed.
       const criticalFailureEndsSession =
         isFatalCriticalFailure && Boolean(onEndingSuggested);
       if (
         generateChoices &&
-        !isSessionEndingSegment(gatedSegment) &&
+        !turnResult.isEnding &&
         !criticalFailureEndsSession
       ) {
-        if (isCustomInput) {
-          // Generate choices after a longer delay to ensure custom input is fully processed
-          setTimeout(() => {
-            generatePlayerChoices();
-          }, 2000); // Longer delay after custom input
-        } else {
-          // Start generating AI choices immediately without showing fallback choices first
-          setTimeout(() => {
-            generatePlayerChoices();
-          }, 500); // Normal timeout for predefined choices
-        }
+        generatePlayerChoices();
       }
     } catch (err) {
       // Error generating narrative. Classify the failure (transient network/

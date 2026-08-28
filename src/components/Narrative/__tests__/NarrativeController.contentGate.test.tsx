@@ -61,6 +61,12 @@ jest.mock('../useEndingDetection', () => ({
   useEndingDetection: () => ({ checkForEndingIndicators: jest.fn() }),
 }));
 
+jest.mock('@/lib/narrative/turnResolver', () => ({
+  resolveTurn: jest.fn(),
+  resolveInitialTurn: jest.fn(),
+  readSnapshot: jest.fn(),
+}));
+
 jest.mock('@/state/characterStore', () => ({ useCharacterStore: jest.fn() }));
 jest.mock('@/state/worldStore', () => ({ useWorldStore: jest.fn() }));
 jest.mock('@/state/npcStore', () => ({ useNPCStore: jest.fn() }));
@@ -88,6 +94,27 @@ describe('NarrativeController - the rendered passage is gated', () => {
       content: RAW_GENERATED_CONTENT,
       segmentType: 'scene',
       metadata: { characterIds: [], tags: [], location: 'Harrowgate' },
+    });
+
+    // The resolver gates the content via addSegment internally. The controller
+    // receives the gated result from TurnResult.segment.
+    const { resolveInitialTurn } = jest.requireMock('@/lib/narrative/turnResolver');
+    (resolveInitialTurn as jest.Mock).mockResolvedValue({
+      segment: {
+        id: 'seg-resolved',
+        content: PROSE,
+        type: 'scene',
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        characterIds: [],
+        metadata: { characterIds: [], tags: [], location: 'Harrowgate' },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      snapshot: { sessionId: 'test-session' },
+      isFatal: false,
+      isEnding: false,
     });
 
     mockZustandStore(

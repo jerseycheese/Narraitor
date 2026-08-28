@@ -59,6 +59,10 @@ jest.mock('@/lib/narrative/narrativeContentGate', () => ({
   applyNarrativeContentGate: jest.fn((content: string) => content),
 }));
 
+jest.mock('../turnTags', () => ({
+  mergeTurnTags: jest.fn((_prev: string[], current: string[]) => current),
+}));
+
 jest.mock('../isSessionEndingSegment', () => ({
   isSessionEndingSegment: jest.fn(() => false),
 }));

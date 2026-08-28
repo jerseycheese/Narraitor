@@ -62,6 +62,13 @@ jest.mock('@/state/npcStore', () => ({
   useNPCStore: jest.fn(),
 }));
 
+const mockResolveTurn = jest.fn();
+jest.mock('@/lib/narrative/turnResolver', () => ({
+  resolveTurn: (...args: unknown[]) => mockResolveTurn(...args),
+  resolveInitialTurn: jest.fn(),
+  readSnapshot: jest.fn(),
+}));
+
 jest.mock('../NarrativeHistory', () => ({
   NarrativeHistory: ({
     isLoading,
@@ -147,9 +154,9 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
     jest.useRealTimers();
   });
 
-  it('surfaces error state after timeout when generateSegment hangs', async () => {
-    // Never-resolving promise simulates a hung AI call
-    mockGenerateSegment.mockReturnValue(new Promise(() => {}));
+  it('surfaces error state after timeout when resolveTurn hangs', async () => {
+    // Never-resolving promise simulates a hung resolver
+    mockResolveTurn.mockReturnValue(new Promise(() => {}));
 
     renderWithToast(
       <NarrativeController
@@ -179,7 +186,7 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
     // Losing the race must cancel the request itself, not just abandon the
     // promise — otherwise the fetch lives on until aiFetch's outer ceiling
     // (a zombie that wastes spend and mutates stores when it settles).
-    mockGenerateSegment.mockReturnValue(new Promise(() => {}));
+    mockResolveTurn.mockReturnValue(new Promise(() => {}));
 
     renderWithToast(
       <NarrativeController
@@ -195,17 +202,15 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
       await Promise.resolve();
     });
 
-    expect(mockGenerateSegment).toHaveBeenCalledTimes(1);
-    const options = mockGenerateSegment.mock.calls[0][1] as
-      | { signal?: AbortSignal }
-      | undefined;
-    expect(options?.signal).toBeInstanceOf(AbortSignal);
-    expect(options?.signal?.aborted).toBe(false);
+    expect(mockResolveTurn).toHaveBeenCalledTimes(1);
+    const command = mockResolveTurn.mock.calls[0][0] as { signal?: AbortSignal };
+    expect(command?.signal).toBeInstanceOf(AbortSignal);
+    expect(command?.signal?.aborted).toBe(false);
 
     await act(async () => {
       jest.advanceTimersByTime(AI_GENERATION_TIMEOUT_MS + 100);
     });
 
-    expect(options?.signal?.aborted).toBe(true);
+    expect(command?.signal?.aborted).toBe(true);
   });
 });

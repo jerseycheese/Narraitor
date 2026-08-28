@@ -52,6 +52,13 @@ jest.mock('@/state/characterStore', () => ({ useCharacterStore: jest.fn() }));
 jest.mock('@/state/worldStore', () => ({ useWorldStore: jest.fn() }));
 jest.mock('@/state/npcStore', () => ({ useNPCStore: jest.fn() }));
 
+const mockResolveTurn = jest.fn();
+jest.mock('@/lib/narrative/turnResolver', () => ({
+  resolveTurn: (...args: unknown[]) => mockResolveTurn(...args),
+  resolveInitialTurn: jest.fn(),
+  readSnapshot: jest.fn(),
+}));
+
 jest.mock('../NarrativeHistory', () => ({
   NarrativeHistory: () => <div data-testid="narrative-history" />,
 }));
@@ -128,7 +135,7 @@ describe('NarrativeController — generation error capture (#1478)', () => {
   });
 
   it('captures a classified, retryable error when the segment call rejects', async () => {
-    mockGenerateSegment.mockRejectedValue(new Error('network request failed'));
+    mockResolveTurn.mockRejectedValue(new Error('network request failed'));
 
     renderWithToast(
       <NarrativeController
@@ -148,10 +155,22 @@ describe('NarrativeController — generation error capture (#1478)', () => {
   });
 
   it('does not leave an error behind when the segment call resolves', async () => {
-    mockGenerateSegment.mockResolvedValue({
-      content: 'The path bends north.',
-      segmentType: 'scene',
-      metadata: { characterIds: [], tags: [], location: 'North Path' },
+    mockResolveTurn.mockResolvedValue({
+      segment: {
+        id: 'seg-resolved',
+        content: 'The path bends north.',
+        type: 'scene',
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        characterIds: [],
+        metadata: { characterIds: [], tags: [], location: 'North Path' },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      snapshot: { sessionId: 'test-session' },
+      isFatal: false,
+      isEnding: false,
     });
 
     renderWithToast(
@@ -169,6 +188,5 @@ describe('NarrativeController — generation error capture (#1478)', () => {
     // The error is cleared at the start of every attempt and never set on success.
     expect(narrativeStoreMock.clearGenerationError).toHaveBeenCalled();
     expect(narrativeStoreMock.setGenerationError).not.toHaveBeenCalled();
-    expect(narrativeStoreMock.addSegment).toHaveBeenCalled();
   });
 });
