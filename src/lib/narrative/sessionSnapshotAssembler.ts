@@ -1,0 +1,73 @@
+// src/lib/narrative/sessionSnapshotAssembler.ts
+
+import type { EntityID } from '@/types/common.types';
+import type { SessionSnapshot } from '@/types/turnResolver.types';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useInventoryStore } from '@/state/inventoryStore';
+import { useWorldThreadStore } from '@/state/worldThreadStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useNPCStore } from '@/state/npcStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { getLoreContextForPrompt } from '@/lib/ai/loreContextHelper';
+import { countWorldClockTurns } from '@/lib/narrative/worldClock';
+
+/**
+ * Reads every session-relevant store once at call time and returns a frozen,
+ * read-only snapshot. No subscriptions, no side effects. Modeled after the
+ * existing decisionSnapshot.ts and buildContinuityContractFromStores()
+ * patterns.
+ *
+ * Prompt projections and post-turn assertions consume this instead of
+ * scattered getState() calls, which eliminates the race window where one
+ * store has been updated but another hasn't.
+ */
+export function assembleSessionSnapshot(sessionId: EntityID): SessionSnapshot {
+  const narrativeState = useNarrativeStore.getState();
+  const characterState = useCharacterStore.getState();
+  const inventoryState = useInventoryStore.getState();
+  const worldThreadState = useWorldThreadStore.getState();
+  const worldState = useWorldStore.getState();
+  const npcState = useNPCStore.getState();
+  const sessionState = useSessionStore.getState();
+
+  const worldId = sessionState.worldId ?? '';
+  const characterId = sessionState.characterId ?? '';
+
+  const allSegments = narrativeState.getSessionSegments(sessionId);
+  const turnIndex = countWorldClockTurns(allSegments);
+
+  const character = characterState.characters[characterId];
+  const conditions = character?.status?.conditions ?? [];
+
+  const inventory = inventoryState.getCharacterItems(characterId);
+
+  const worldThreads = worldThreadState
+    .getAll()
+    .filter((thread) => thread.sessionId === sessionId);
+
+  const ws = worldState.getWorldState(worldId);
+
+  const loreContext = getLoreContextForPrompt(worldId, sessionId);
+
+  const npcs = npcState.getNPCsByWorld(worldId);
+
+  const snapshot: SessionSnapshot = {
+    sessionId,
+    worldId,
+    characterId,
+    turnIndex,
+    segments: Object.freeze([...allSegments]) as readonly typeof allSegments[number][],
+    decisions: Object.freeze([...narrativeState.getSessionDecisions(sessionId)]),
+    character: Object.freeze({ ...character }) as Readonly<typeof character>,
+    inventory: Object.freeze([...inventory]),
+    worldThreads: Object.freeze([...worldThreads]),
+    worldState: ws ? Object.freeze({ ...ws }) : undefined,
+    loreContext,
+    npcs: Object.freeze([...npcs]),
+    conditions: Object.freeze([...conditions]),
+    endedSessions: Object.freeze({ ...narrativeState.endedSessions }),
+  };
+
+  return snapshot;
+}

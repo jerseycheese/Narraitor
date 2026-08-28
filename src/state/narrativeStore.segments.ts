@@ -10,6 +10,7 @@ import { countWorldClockTurns } from '../lib/narrative/worldClock';
 import { formatDecisionText } from '../lib/narrative/formatDecisionText';
 import { useSessionStore } from './sessionStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
+import { isResolverActive } from '@/lib/narrative/resolverGuard';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
 const normalizeLocationKey = (value: string): string =>
@@ -168,6 +169,12 @@ export const createNarrativeSegmentActions = (
       useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId, sessionSegments.length);
     } catch (error) {
       logger.error('[NarrativeStore]', 'Failed to update session narrative count:', error);
+    }
+
+    // When the TurnResolver drives this session, it awaits these operations
+    // itself, so skip the fire-and-forget tails to avoid duplicate writers.
+    if (isResolverActive(sessionId)) {
+      return segmentId;
     }
 
     // One post-segment extraction call covers goals and the world clock's

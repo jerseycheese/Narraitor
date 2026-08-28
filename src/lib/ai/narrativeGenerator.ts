@@ -56,6 +56,7 @@ import {
   collectContinuityTopicsFromStores,
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
+import { isResolverActive } from '@/lib/narrative/resolverGuard';
 import {
   buildKnownNameTokens,
   enhancePromptWithPhraseVariety,
@@ -199,6 +200,13 @@ export class NarrativeGenerator {
       // Re-check before the store-mutating tail (lore extraction, item
       // acquisition/loss, NPC sync) in case the caller aborted mid-pipeline.
       throwIfAborted(options?.signal);
+
+      // When the TurnResolver drives this session, it handles all post-
+      // generation side effects (lore, inventory, NPC sync) itself, so skip
+      // the fire-and-forget tails here to avoid duplicate writers.
+      if (request.sessionId && isResolverActive(request.sessionId)) {
+        return result;
+      }
 
       // Lore extraction runs on the final (possibly corrected) prose so a
       // contradicted draft never pollutes the lore store. Deferred off the
@@ -529,6 +537,12 @@ export class NarrativeGenerator {
         checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
       } catch (error) {
         logger.warn('Failed to record lore mentions:', error);
+      }
+
+      // Resolver guard: skip item processing and NPC sync when the resolver
+      // drives this session (it awaits those itself).
+      if (sessionId && isResolverActive(sessionId)) {
+        return result;
       }
 
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
