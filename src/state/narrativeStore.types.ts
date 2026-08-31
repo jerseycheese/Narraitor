@@ -34,7 +34,7 @@ export interface NarrativeStore {
   _hasHydrated: boolean; // Track if persistence has loaded
 
   // Actions
-  addSegment: (sessionId: EntityID, segment: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>) => EntityID;
+  addSegment: (sessionId: EntityID, segment: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>, options?: { resolverManaged?: boolean }) => EntityID;
   updateSegment: (segmentId: EntityID, updates: Partial<NarrativeSegment>) => void;
   deleteSegment: (segmentId: EntityID) => void;
 

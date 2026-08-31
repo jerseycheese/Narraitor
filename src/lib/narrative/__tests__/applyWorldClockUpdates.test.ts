@@ -61,6 +61,23 @@ describe('applyWorldClockUpdates', () => {
     expect(useWorldThreadStore.getState().hasSessionLedger('session-1')).toBe(false);
   });
 
+  it('reports a fail-open extraction error to an awaited caller', async () => {
+    mockIsFeatureEnabled.mockReturnValue(true);
+    const extractionError = new Error('clock extraction failed');
+    const onError = jest.fn();
+    processSpy.mockRejectedValueOnce(extractionError);
+
+    const note = await applyWorldClockUpdates({
+      segment: segment(worldId),
+      sessionId: 'session-1',
+      currentTurn: 1,
+      onError,
+    });
+
+    expect(note).toBeUndefined();
+    expect(onError).toHaveBeenCalledWith(extractionError);
+  });
+
   it('with the flag on, seeds an unseeded session from the world prose and applies the result', async () => {
     mockIsFeatureEnabled.mockReturnValue(true);
     processSpy.mockResolvedValue({

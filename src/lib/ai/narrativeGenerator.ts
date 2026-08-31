@@ -56,6 +56,7 @@ import {
   collectContinuityTopicsFromStores,
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
+import { isResolverManaged } from '@/lib/narrative/resolverGuard';
 import {
   buildKnownNameTokens,
   enhancePromptWithPhraseVariety,
@@ -93,7 +94,7 @@ export class NarrativeGenerator {
    */
   async generateSegment(
     request: NarrativeGenerationRequest,
-    options?: { signal?: AbortSignal; onChunk?: (delta: string) => void }
+    options?: { signal?: AbortSignal; onChunk?: (delta: string) => void; resolverManaged?: boolean }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -199,6 +200,14 @@ export class NarrativeGenerator {
       // Re-check before the store-mutating tail (lore extraction, item
       // acquisition/loss, NPC sync) in case the caller aborted mid-pipeline.
       throwIfAborted(options?.signal);
+
+      // When the TurnResolver drives this call, it handles inventory, NPC
+      // sync, and lore extraction itself, so skip the fire-and-forget tails
+      // here to avoid duplicate writers. Only this specific call is
+      // suppressed; concurrent calls from other paths run normally.
+      if (isResolverManaged(options)) {
+        return result;
+      }
 
       // Lore extraction runs on the final (possibly corrected) prose so a
       // contradicted draft never pollutes the lore store. Deferred off the
@@ -360,6 +369,7 @@ export class NarrativeGenerator {
       generationParameters?: GenerationParameters;
       signal?: AbortSignal;
       onChunk?: (delta: string) => void;
+      resolverManaged?: boolean;
     }
   ): Promise<NarrativeGenerationResult> {
     try {
@@ -442,54 +452,6 @@ export class NarrativeGenerator {
       throwIfAborted(options?.signal);
       recordRequestCalibration(fullyEnhancedPrompt, response);
 
-      // Deferred off the per-turn path, same as generateSegment above.
-      if (response.content) {
-        if (process.env.NODE_ENV !== 'production') {
-          logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
-            worldId,
-            sessionId,
-            contentLength: response.content.length,
-          });
-        }
-
-        const existingLoreContext = getLoreContextForPrompt(worldId, sessionId, {
-          recordUsage: false,
-        });
-        void extractStructuredLore(response.content, existingLoreContext, {
-          playerCharacterName: playerCharacter?.name,
-        })
-          .then(async (structuredLore) => {
-            const { useLoreStore } = await import('@/state/loreStore');
-            const { addStructuredLore } = useLoreStore.getState();
-            addStructuredLore(structuredLore, worldId, sessionId);
-
-            if (process.env.NODE_ENV !== 'production') {
-              logger.info(
-                '[NarrativeGenerator] Extracted and stored lore from initial scene:',
-                {
-                  worldId,
-                  sessionId,
-                  factCount:
-                    structuredLore.characters.length +
-                    structuredLore.locations.length +
-                    structuredLore.events.length +
-                    structuredLore.rules.length,
-                  characters: structuredLore.characters.map((c) => c.name),
-                  locations: structuredLore.locations.map((l) => l.name),
-                  events: structuredLore.events.length,
-                  rules: structuredLore.rules.length,
-                }
-              );
-            }
-          })
-          .catch((error) => {
-            logger.error(
-              '[NarrativeGenerator] Failed to extract lore from initial scene:',
-              error
-            );
-          });
-      }
-
       // The opening segment is the one turn with no earlier place to carry forward.
       let result = await formatNarrativeResponse(
         response,
@@ -529,6 +491,61 @@ export class NarrativeGenerator {
         checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
       } catch (error) {
         logger.warn('Failed to record lore mentions:', error);
+      }
+
+      // Resolver guard: skip lore extraction, item processing, and NPC
+      // sync when the resolver drives this call (it handles those itself).
+      if (isResolverManaged(options)) {
+        return result;
+      }
+
+      // Lore extraction runs on the final (possibly corrected) prose, after
+      // the resolver guard, so resolver-driven calls don't double-extract.
+      if (result.content) {
+        if (process.env.NODE_ENV !== 'production') {
+          logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
+            worldId,
+            sessionId,
+            contentLength: result.content.length,
+          });
+        }
+
+        const existingLoreContext = getLoreContextForPrompt(worldId, sessionId, {
+          recordUsage: false,
+        });
+        void extractStructuredLore(result.content, existingLoreContext, {
+          playerCharacterName: playerCharacter?.name,
+        })
+          .then(async (structuredLore) => {
+            const { useLoreStore } = await import('@/state/loreStore');
+            const { addStructuredLore } = useLoreStore.getState();
+            addStructuredLore(structuredLore, worldId, sessionId);
+
+            if (process.env.NODE_ENV !== 'production') {
+              logger.info(
+                '[NarrativeGenerator] Extracted and stored lore from initial scene:',
+                {
+                  worldId,
+                  sessionId,
+                  factCount:
+                    structuredLore.characters.length +
+                    structuredLore.locations.length +
+                    structuredLore.events.length +
+                    structuredLore.rules.length,
+                  characters: structuredLore.characters.map((c) => c.name),
+                  locations: structuredLore.locations.map((l) => l.name),
+                  events: structuredLore.events.length,
+                  rules: structuredLore.rules.length,
+                }
+              );
+            }
+          })
+          .catch((error) => {
+            logger.error(
+              '[NarrativeGenerator] Failed to extract lore from initial scene:',
+              error
+            );
+          });
       }
 
       if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {

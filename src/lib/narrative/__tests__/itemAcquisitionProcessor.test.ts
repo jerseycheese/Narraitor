@@ -425,13 +425,20 @@ describe('itemAcquisitionProcessor', () => {
         .mockImplementationOnce(() => {
           throw new Error('Failed to add item');
         });
+      const onError = jest.fn();
 
-      await processAcquiredItems(items, 'character-123', 'session-456');
+      await processAcquiredItems(
+        items,
+        'character-123',
+        'session-456',
+        onError
+      );
 
       // Both categorizations should have been attempted
       expect(mockCategorize).toHaveBeenCalledTimes(2);
       // Both additions should have been attempted
       expect(mockAddItem).toHaveBeenCalledTimes(2);
+      expect(onError).toHaveBeenCalledWith(expect.any(Error));
     });
 
     it('splits multi-quantity equipment into individual items', async () => {

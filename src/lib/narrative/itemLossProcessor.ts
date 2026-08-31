@@ -37,11 +37,13 @@ const processingQueue = new Map<EntityID, Promise<void>>();
  * @param items - Array of item loss metadata from AI narrative generation
  * @param characterId - ID of the character losing the items
  * @param sessionId - ID of the current game session
+ * @param onError - Reports fail-open item errors to an awaited caller
  */
 export async function processLostItems(
   items: LostItemMetadata[],
   characterId: EntityID,
-  sessionId: EntityID
+  sessionId: EntityID,
+  onError?: (error: unknown) => void
 ): Promise<void> {
   if (!items || items.length === 0) {
     return;
@@ -101,11 +103,18 @@ export async function processLostItems(
           await delayBetweenItems(i, preparedItems.length);
         } catch (err) {
           logger.error(`Failed to remove item "${item.name}" from inventory:`, err);
+          onError?.(err);
         }
       }
     },
-    (err) => logger.error('Previous item loss run failed', err),
-    (err) => logger.error('processLostItems encountered an unexpected error', err)
+    (err) => {
+      logger.error('Previous item loss run failed', err);
+      onError?.(err);
+    },
+    (err) => {
+      logger.error('processLostItems encountered an unexpected error', err);
+      onError?.(err);
+    }
   );
 }
 
@@ -192,4 +201,3 @@ async function createJournalEntryForLoss(
     });
   }
 }
-

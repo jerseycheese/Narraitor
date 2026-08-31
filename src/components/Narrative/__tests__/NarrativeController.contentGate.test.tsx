@@ -37,6 +37,7 @@ const RAW_GENERATED_CONTENT = [
 ].join('\n');
 
 const mockGenerateInitialScene = jest.fn();
+const mockGeneratePlayerChoices = jest.fn();
 
 jest.mock('@/lib/ai/defaultGeminiClient', () => ({
   createDefaultGeminiClient: jest.fn(() => ({ generateContent: jest.fn() })),
@@ -46,7 +47,7 @@ jest.mock('@/lib/ai/narrativeGenerator', () => ({
   NarrativeGenerator: jest.fn().mockImplementation(() => ({
     generateInitialScene: mockGenerateInitialScene,
     generateSegment: jest.fn(),
-    generatePlayerChoices: jest.fn(),
+    generatePlayerChoices: mockGeneratePlayerChoices,
   })),
 }));
 
@@ -59,6 +60,12 @@ jest.mock('@/lib/narrative/applyWorldStateThreadUpdates', () => ({
 }));
 jest.mock('../useEndingDetection', () => ({
   useEndingDetection: () => ({ checkForEndingIndicators: jest.fn() }),
+}));
+
+jest.mock('@/lib/narrative/turnResolver', () => ({
+  resolveTurn: jest.fn(),
+  resolveInitialTurn: jest.fn(),
+  readSnapshot: jest.fn(),
 }));
 
 jest.mock('@/state/characterStore', () => ({ useCharacterStore: jest.fn() }));
@@ -88,6 +95,29 @@ describe('NarrativeController - the rendered passage is gated', () => {
       content: RAW_GENERATED_CONTENT,
       segmentType: 'scene',
       metadata: { characterIds: [], tags: [], location: 'Harrowgate' },
+    });
+
+    // The resolver gates the content via addSegment internally. The controller
+    // receives the gated result from TurnResult.segment.
+    const { resolveInitialTurn } = jest.requireMock('@/lib/narrative/turnResolver');
+    (resolveInitialTurn as jest.Mock).mockResolvedValue({
+      segment: {
+        id: 'seg-resolved',
+        content: PROSE,
+        type: 'scene',
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        characterIds: [],
+        metadata: { characterIds: [], tags: [], location: 'Harrowgate' },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      snapshot: { sessionId: 'test-session' },
+      status: 'settled',
+      isFatal: false,
+      isEnding: false,
+      reconciliationErrors: [],
     });
 
     mockZustandStore(
@@ -139,5 +169,37 @@ describe('NarrativeController - the rendered passage is gated', () => {
 
     expect(onNarrativeGenerated).toHaveBeenCalledTimes(1);
     expect(onNarrativeGenerated.mock.calls[0][0].content).toBe(PROSE);
+  });
+
+  it('blocks the first Decision when initial reconciliation is partial', async () => {
+    const { resolveInitialTurn } = jest.requireMock('@/lib/narrative/turnResolver');
+    (resolveInitialTurn as jest.Mock).mockResolvedValueOnce({
+      segment: {
+        id: 'seg-partial',
+        content: PROSE,
+        type: 'scene',
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        characterIds: [],
+        metadata: { characterIds: [], tags: [], location: 'Harrowgate' },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      snapshot: { sessionId: 'test-session' },
+      status: 'partial',
+      isFatal: false,
+      isEnding: false,
+      reconciliationErrors: [
+        { step: 'worldStateThreads', error: new Error('thread update failed') },
+      ],
+    });
+
+    await renderController(jest.fn());
+
+    expect(mockGeneratePlayerChoices).not.toHaveBeenCalled();
+    expect(useNarrativeStore.getState().generationError).toEqual(
+      expect.objectContaining({ retryable: false })
+    );
   });
 });

@@ -10,6 +10,7 @@ import { countWorldClockTurns } from '../lib/narrative/worldClock';
 import { formatDecisionText } from '../lib/narrative/formatDecisionText';
 import { useSessionStore } from './sessionStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
+import { isResolverManaged } from '@/lib/narrative/resolverGuard';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
 const normalizeLocationKey = (value: string): string =>
@@ -22,7 +23,7 @@ export const createNarrativeSegmentActions = (
   set: NarrativeStoreSet,
   get: NarrativeStoreGet
 ) => ({
-  addSegment: (sessionId: EntityID, segmentData: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>): EntityID => {
+  addSegment: (sessionId: EntityID, segmentData: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>, options?: { resolverManaged?: boolean }): EntityID => {
     const normalizedContent = normalizeText(segmentData.content || '', NORM_DESC);
     if (!normalizedContent) {
       throw new Error('Segment content is required');
@@ -168,6 +169,14 @@ export const createNarrativeSegmentActions = (
       useSessionStore.getState().updateSavedSessionNarrativeCount(sessionId, sessionSegments.length);
     } catch (error) {
       logger.error('[NarrativeStore]', 'Failed to update session narrative count:', error);
+    }
+
+    // When the TurnResolver drives this specific commit, it awaits these
+    // operations itself, so skip the fire-and-forget tails to avoid
+    // duplicate writers. Only this call is suppressed; concurrent commits
+    // from other paths (item-use, bootstrap) run their own tails.
+    if (isResolverManaged(options)) {
+      return segmentId;
     }
 
     // One post-segment extraction call covers goals and the world clock's

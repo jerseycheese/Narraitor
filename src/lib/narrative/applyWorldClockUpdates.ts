@@ -26,6 +26,8 @@ export interface ApplyWorldClockUpdatesParams {
   playerCharacterId?: EntityID;
   /** 1-based index of this segment in the session, read after it was added. */
   currentTurn: number;
+  /** Reports a fail-open extraction so an awaited caller can mark the Turn partial. */
+  onError?: (error: unknown) => void;
 }
 
 /** What the one extraction call reconciled this turn; each member stamps its own metadata field. */
@@ -77,6 +79,7 @@ async function reconcileSegment({
   characterId,
   playerCharacterId,
   currentTurn,
+  onError,
 }: ApplyWorldClockUpdatesParams): Promise<ReconciledSegmentNotes | undefined> {
   const goalStore = useGoalStore.getState();
   const clockOn = isFeatureEnabled('WORLD_CLOCK') && isWorldClockTurnSegment(segment);
@@ -119,6 +122,7 @@ async function reconcileSegment({
     return notes.worldClock || notes.worldCost ? notes : undefined;
   } catch (error) {
     logger.warn('[WorldClock] Ledger reconciliation failed', { sessionId, error });
+    onError?.(error);
     return undefined;
   }
 }

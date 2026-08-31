@@ -47,6 +47,14 @@ jest.mock('@/state/narrativeStore', () => ({ useNarrativeStore: jest.fn() }));
 jest.mock('@/state/characterStore', () => ({ useCharacterStore: jest.fn() }));
 jest.mock('@/state/worldStore', () => ({ useWorldStore: jest.fn() }));
 jest.mock('@/state/npcStore', () => ({ useNPCStore: jest.fn() }));
+
+const mockResolveTurn = jest.fn();
+jest.mock('@/lib/narrative/turnResolver', () => ({
+  resolveTurn: (...args: unknown[]) => mockResolveTurn(...args),
+  resolveInitialTurn: jest.fn(),
+  readSnapshot: jest.fn(),
+}));
+
 jest.mock('../NarrativeHistory', () => ({
   NarrativeHistory: () => <div data-testid="narrative-history" />,
 }));
@@ -175,6 +183,25 @@ describe('NarrativeController - fatal cadence on pivotal decisions', () => {
       segmentType: 'scene',
       metadata: { characterIds: [], tags: [] },
     });
+    mockResolveTurn.mockResolvedValue({
+      segment: {
+        id: 'seg-resolved',
+        content: 'The door gives way.',
+        type: 'scene',
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        characterIds: [],
+        metadata: { characterIds: [], tags: [] },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      snapshot: { sessionId: 'test-session' },
+      status: 'settled',
+      isFatal: false,
+      isEnding: false,
+      reconciliationErrors: [],
+    });
   });
 
   it('does not end the run on a natural 1 while the fatal cadence is on cooldown', async () => {
@@ -192,19 +219,19 @@ describe('NarrativeController - fatal cadence on pivotal decisions', () => {
     expect(onEndingSuggested.mock.calls[0][0]).toMatch(/^fatal:/);
   });
 
-  it('records the spent fatal risk on the segment so the next pivotal turn is spaced out', async () => {
+  it('records the spent fatal risk on the command so the resolver stamps it', async () => {
     await playCriticalTurn(quietTurns(FATAL_DECISION_COOLDOWN_TURNS), jest.fn());
 
-    expect(mockAddSegment).toHaveBeenCalled();
-    const stored = mockAddSegment.mock.calls[0][1];
-    expect(stored.metadata.fatalRiskAllowed).toBe(true);
+    expect(mockResolveTurn).toHaveBeenCalled();
+    const command = mockResolveTurn.mock.calls[0][0];
+    expect(command.fatalRiskAllowed).toBe(true);
   });
 
   it('leaves the marker off a turn whose pivotal decision could not be fatal', async () => {
     await playCriticalTurn(quietTurns(3), jest.fn());
 
-    expect(mockAddSegment).toHaveBeenCalled();
-    const stored = mockAddSegment.mock.calls[0][1];
-    expect(stored.metadata.fatalRiskAllowed).toBe(false);
+    expect(mockResolveTurn).toHaveBeenCalled();
+    const command = mockResolveTurn.mock.calls[0][0];
+    expect(command.fatalRiskAllowed).toBe(false);
   });
 });

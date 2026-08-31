@@ -21,6 +21,11 @@ export interface ApplyWorldStateThreadUpdatesParams {
   finalMetadata: NarrativeMetadata;
   sessionId: EntityID;
   isFirstSegment: boolean;
+  /** When set, used as the authoritative character instead of reading the
+   *  session singleton. Prevents stale reads after a session switch. */
+  characterId?: EntityID;
+  /** Reports a fail-open update so an awaited caller can mark the Turn partial. */
+  onError?: (error: unknown) => void;
 }
 
 export async function applyWorldStateThreadUpdates({
@@ -29,6 +34,8 @@ export async function applyWorldStateThreadUpdates({
   finalMetadata,
   sessionId,
   isFirstSegment,
+  characterId: authoritativeCharacterId,
+  onError,
 }: ApplyWorldStateThreadUpdatesParams): Promise<void> {
   try {
     if (!characterStoreModule) {
@@ -52,6 +59,7 @@ export async function applyWorldStateThreadUpdates({
     }
 
     const activeCharacterId =
+      authoritativeCharacterId ??
       sessionStore.characterId ??
       originalSegmentData.characterIds?.[0] ??
       finalMetadata.characterIds?.[0] ??
@@ -229,5 +237,6 @@ export async function applyWorldStateThreadUpdates({
       error: error instanceof Error ? error.message : 'Unknown error',
       sessionId,
     });
+    onError?.(error);
   }
 }

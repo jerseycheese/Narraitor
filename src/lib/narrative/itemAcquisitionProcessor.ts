@@ -45,11 +45,13 @@ const processingQueue = new Map<EntityID, Promise<void>>();
  * @param items - Array of item metadata from AI narrative generation
  * @param characterId - ID of the character acquiring the items
  * @param sessionId - ID of the current game session
+ * @param onError - Reports fail-open item errors to an awaited caller
  */
 export async function processAcquiredItems(
   items: AcquiredItemMetadata[],
   characterId: EntityID,
-  sessionId: EntityID
+  sessionId: EntityID,
+  onError?: (error: unknown) => void
 ): Promise<void> {
   if (!items || items.length === 0) {
     return;
@@ -119,11 +121,18 @@ export async function processAcquiredItems(
         } catch (err) {
           // Log error but continue processing remaining items
           logger.error(`Failed to add item "${item.name}" to inventory:`, err);
+          onError?.(err);
         }
       }
     },
-    (err) => logger.error('Previous item acquisition run failed', err),
-    (err) => logger.error('processAcquiredItems encountered an unexpected error', err)
+    (err) => {
+      logger.error('Previous item acquisition run failed', err);
+      onError?.(err);
+    },
+    (err) => {
+      logger.error('processAcquiredItems encountered an unexpected error', err);
+      onError?.(err);
+    }
   );
 }
 
