@@ -14,6 +14,33 @@ jest.mock('@/lib/ai/defaultGeminiClient', () => ({
   createDefaultGeminiClient: jest.fn(() => ({ generateContent: jest.fn() })),
 }));
 
+jest.mock('@/lib/narrative/applyWorldClockUpdates', () => ({
+  applyWorldClockUpdates: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock('@/lib/narrative/applyWorldStateThreadUpdates', () => ({
+  applyWorldStateThreadUpdates: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/ai/narrativeGenerator.npc', () => ({
+  ...jest.requireActual('@/lib/ai/narrativeGenerator.npc'),
+  syncNpcMetadata: jest.fn(),
+}));
+
+jest.mock('@/lib/ai/structuredLoreExtractor', () => ({
+  extractStructuredLore: jest.fn().mockResolvedValue({
+    characters: [],
+    locations: [],
+    events: [],
+    rules: [],
+  }),
+}));
+
+jest.mock('@/lib/ai/loreContextHelper', () => ({
+  ...jest.requireActual('@/lib/ai/loreContextHelper'),
+  getLoreContextForPrompt: jest.fn(() => ''),
+}));
+
 const mockGenerateSegment = jest.fn();
 const mockGeneratePlayerChoices = jest.fn();
 
@@ -115,7 +142,12 @@ describe('processItemUsage - skip choice regeneration on session end (#925)', ()
   it('regenerates choices after a normal item-usage segment', async () => {
     mockGenerateSegment.mockResolvedValue(buildGeneration(['item-usage']));
 
-    const result = await processItemUsage(characterId, itemId, sessionId);
+    const result = await processItemUsage({
+      characterId,
+      itemId,
+      sessionId,
+      worldId,
+    });
 
     expect(result.success).toBe(true);
     expect(mockGeneratePlayerChoices).toHaveBeenCalledTimes(1);
@@ -132,7 +164,12 @@ describe('processItemUsage - skip choice regeneration on session end (#925)', ()
       options: [{ id: 'existing-1', text: 'Stay' }],
     });
 
-    const result = await processItemUsage(characterId, itemId, sessionId);
+    const result = await processItemUsage({
+      characterId,
+      itemId,
+      sessionId,
+      worldId,
+    });
 
     expect(result.success).toBe(true);
     expect(mockGeneratePlayerChoices).not.toHaveBeenCalled();

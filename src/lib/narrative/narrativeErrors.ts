@@ -26,6 +26,15 @@ export interface NarrativeError {
   severity: ErrorSeverity;
 }
 
+export const PARTIAL_RECONCILIATION_ERROR: NarrativeError = {
+  title: 'The story paused',
+  message: 'The story advanced, but some session changes did not finish.',
+  suggestion: 'Stop here rather than making another choice.',
+  retryable: false,
+  retryLabel: 'Continue the story',
+  severity: 'error',
+};
+
 const RETRY_LABEL = 'Continue the story';
 
 const NARRATIVE_COPY: Record<

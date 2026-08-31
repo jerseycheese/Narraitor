@@ -1,4 +1,8 @@
-import { resolveTurn, resolveInitialTurn } from '../turnResolver';
+import {
+  resolveTurn,
+  resolveInitialTurn,
+  resolveItemUseTurn,
+} from '../turnResolver';
 import { isResolverManaged } from '../resolverGuard';
 import { assembleSessionSnapshot } from '../sessionSnapshotAssembler';
 import { useNarrativeStore } from '@/state/narrativeStore';
@@ -6,6 +10,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
+import { useWorldStore } from '@/state/worldStore';
 import type { NarrativeGenerationResult } from '@/types/narrative.types';
 import type { TurnCommand } from '@/types/turnResolver.types';
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
@@ -168,6 +173,95 @@ function seedStores() {
     sessionThreads: {},
     seedAttempts: {},
   } as never);
+}
+
+function seedItemUseStores(quantity = 2) {
+  useWorldStore.getState().reset();
+  useCharacterStore.getState().reset();
+  useInventoryStore.getState().reset();
+  useNarrativeStore.getState().reset();
+
+  const worldId = useWorldStore.getState().create({
+    name: 'Test World',
+    description: 'A world for resolver tests',
+    genre: 'fantasy',
+    attributes: [],
+    skills: [],
+    settings: {
+      maxAttributes: 10,
+      maxSkills: 10,
+      attributePointPool: 10,
+      skillPointPool: 10,
+    },
+  });
+  const characterId = useCharacterStore.getState().create({
+    name: 'Test Character',
+    worldId,
+    description: 'A test character',
+    level: 1,
+    isPlayer: true,
+    status: { conditions: [] },
+    inventory: {
+      characterId: '',
+      items: [],
+      capacity: 0,
+      categories: [],
+      itemOrder: [],
+    },
+    background: {
+      history: 'A test history',
+      personality: 'Careful',
+      goals: [],
+      fears: [],
+      relationships: [],
+    },
+    attributes: [],
+    skills: [],
+    derivedStats: [],
+  });
+  const sessionId = `session-${worldId}-${characterId}`;
+  useSessionStore.setState({
+    id: sessionId,
+    worldId,
+    characterId,
+    status: 'active',
+  } as never);
+  const itemId = useInventoryStore.getState().addItem(characterId, {
+    name: 'Healing Potion',
+    description: 'Restores vitality',
+    stackable: true,
+    quantity,
+    categorization: {
+      categoryId: 'consumables',
+      source: 'manual',
+      classifiedAt: new Date().toISOString(),
+    },
+    acquisition: {
+      method: 'loot',
+      acquiredAt: new Date().toISOString(),
+      quantity,
+    },
+  });
+
+  return { sessionId, worldId, characterId, itemId };
+}
+
+function makeItemUseGenerator(
+  result: NarrativeGenerationResult = makeGenerationResult({
+    content: 'You drink the potion and warmth returns to your limbs.',
+    segmentType: 'action',
+    metadata: { characterIds: [], tags: ['item-usage'] },
+  })
+): NarrativeGenerator {
+  return {
+    generateSegment: jest.fn().mockResolvedValue(result),
+    generatePlayerChoices: jest.fn().mockResolvedValue({
+      prompt: 'What do you do next?',
+      options: [{ id: 'option-1', text: 'Continue onward' }],
+      decisionWeight: 'minor',
+      contextSummary: 'After using the potion',
+    }),
+  } as unknown as NarrativeGenerator;
 }
 
 /** Returns a { promise, resolve, reject } triple for test control. */
@@ -479,6 +573,185 @@ describe('TurnResolver', () => {
 
       // Verify sequential execution: gen-start, gen-end, gen-start, gen-end
       expect(callOrder).toEqual(['gen-start', 'gen-end', 'gen-start', 'gen-end']);
+    });
+  });
+
+  describe('resolveItemUseTurn', () => {
+    it('keeps replacement choices blocked until reconciliation settles', async () => {
+      const ids = seedItemUseStores();
+      const clockDeferred = deferred<null>();
+      (applyWorldClockUpdates as jest.Mock).mockReturnValue(clockDeferred.promise);
+      const generator = makeItemUseGenerator();
+
+      useNarrativeStore.getState().addDecision(ids.sessionId, {
+        prompt: 'Existing decision',
+        options: [{ id: 'existing-1', text: 'Wait' }],
+      });
+
+      const itemTurnPromise = resolveItemUseTurn(ids, generator);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(generator.generatePlayerChoices).not.toHaveBeenCalled();
+      expect(
+        useNarrativeStore.getState().getSessionDecisions(ids.sessionId)
+      ).toEqual([
+        expect.objectContaining({ prompt: 'Existing decision' }),
+      ]);
+
+      clockDeferred.resolve(null);
+      const outcome = await itemTurnPromise;
+
+      expect(outcome.success).toBe(true);
+      expect(generator.generateSegment).toHaveBeenCalledWith(
+        expect.any(Object),
+        { resolverManaged: true }
+      );
+      expect(generator.generatePlayerChoices).toHaveBeenCalledTimes(1);
+      expect(
+        useNarrativeStore.getState().getSessionDecisions(ids.sessionId)
+      ).toEqual([
+        expect.objectContaining({ prompt: 'What do you do next?' }),
+      ]);
+    });
+
+    it('serializes item generation, replacement choices, and a concurrent controller turn', async () => {
+      const ids = seedItemUseStores();
+      const callOrder: string[] = [];
+      const itemGenerator = makeItemUseGenerator();
+      (itemGenerator.generateSegment as jest.Mock).mockImplementation(async () => {
+        callOrder.push('item-generation');
+        return makeGenerationResult({
+          content: 'You drink the potion.',
+          segmentType: 'action',
+          metadata: { characterIds: [], tags: ['item-usage'] },
+        });
+      });
+      (itemGenerator.generatePlayerChoices as jest.Mock).mockImplementation(
+        async () => {
+          callOrder.push('item-choices');
+          return {
+            prompt: 'What follows?',
+            options: [{ id: 'option-1', text: 'Keep moving' }],
+          };
+        }
+      );
+      const controllerGenerator = makeMockGenerator();
+      (controllerGenerator.generateSegment as jest.Mock).mockImplementation(
+        async () => {
+          callOrder.push('controller-generation');
+          return makeGenerationResult();
+        }
+      );
+
+      const [itemOutcome, controllerResult] = await Promise.all([
+        resolveItemUseTurn(ids, itemGenerator),
+        resolveTurn(
+          makeCommand({
+            sessionId: ids.sessionId,
+            worldId: ids.worldId,
+            characterId: ids.characterId,
+          }),
+          controllerGenerator
+        ),
+      ]);
+
+      expect(itemOutcome.success).toBe(true);
+      expect(controllerResult.status).toBe('settled');
+      expect(callOrder).toEqual([
+        'item-generation',
+        'item-choices',
+        'controller-generation',
+      ]);
+      expect(
+        useNarrativeStore.getState().getSessionSegments(ids.sessionId)
+      ).toHaveLength(2);
+      expect(applyWorldClockUpdates).toHaveBeenCalledTimes(2);
+      expect(useInventoryStore.getState().items[ids.itemId]?.quantity).toBe(1);
+    });
+
+    it('consumes the explicit item once while reconciling other reported losses', async () => {
+      const ids = seedItemUseStores(3);
+      const generator = makeItemUseGenerator(
+        makeGenerationResult({
+          content: 'You drink the potion and drop an old key.',
+          segmentType: 'action',
+          metadata: {
+            characterIds: [],
+            tags: ['item-usage'],
+            itemsLost: [
+              {
+                itemId: ids.itemId,
+                name: 'Healing Potion',
+                quantity: 1,
+                lossReason: 'consumed',
+              },
+              { name: 'Old Key', quantity: 1, lossReason: 'dropped' },
+            ],
+          },
+        })
+      );
+
+      const outcome = await resolveItemUseTurn(ids, generator);
+
+      expect(outcome.success).toBe(true);
+      expect(useInventoryStore.getState().items[ids.itemId]?.quantity).toBe(2);
+      expect(processLostItems).toHaveBeenCalledWith(
+        [{ name: 'Old Key', quantity: 1, lossReason: 'dropped' }],
+        ids.characterId,
+        ids.sessionId,
+        expect.any(Function)
+      );
+    });
+
+    it('commits fallback prose and blocks choices when reconciliation is partial', async () => {
+      const ids = seedItemUseStores();
+      const generator = makeItemUseGenerator();
+      (generator.generateSegment as jest.Mock).mockRejectedValue(
+        new Error('provider unavailable')
+      );
+      (applyWorldClockUpdates as jest.Mock).mockRejectedValueOnce(
+        new Error('clock unavailable')
+      );
+      useNarrativeStore.getState().addDecision(ids.sessionId, {
+        prompt: 'Existing decision',
+        options: [{ id: 'existing-1', text: 'Wait' }],
+      });
+
+      const outcome = await resolveItemUseTurn(ids, generator);
+
+      expect(outcome.success).toBe(true);
+      if (!outcome.success) {
+        throw new Error('Expected item use to commit');
+      }
+      expect(outcome.turn.status).toBe('partial');
+      expect(outcome.turn.segment.content).toContain('Healing Potion');
+      expect(generator.generatePlayerChoices).not.toHaveBeenCalled();
+      expect(
+        useNarrativeStore.getState().getSessionDecisions(ids.sessionId)
+      ).toEqual([
+        expect.objectContaining({ prompt: 'Existing decision' }),
+      ]);
+    });
+
+    it('keeps existing decisions when replacement choice generation fails', async () => {
+      const ids = seedItemUseStores();
+      const generator = makeItemUseGenerator();
+      (generator.generatePlayerChoices as jest.Mock).mockRejectedValue(
+        new Error('choice provider unavailable')
+      );
+      useNarrativeStore.getState().addDecision(ids.sessionId, {
+        prompt: 'Existing decision',
+        options: [{ id: 'existing-1', text: 'Wait' }],
+      });
+
+      const outcome = await resolveItemUseTurn(ids, generator);
+
+      expect(outcome.success).toBe(true);
+      expect(
+        useNarrativeStore.getState().getSessionDecisions(ids.sessionId)
+      ).toEqual([
+        expect.objectContaining({ prompt: 'Existing decision' }),
+      ]);
     });
   });
 

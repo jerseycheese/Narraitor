@@ -3,7 +3,7 @@
 import type { EntityID } from './common.types';
 import type { NarrativeSegment, Decision, DecisionWeight, DecisionOutcome, SkillCheckRoll, EndingTone } from './narrative.types';
 import type { Character } from '@/state/characterStore.types';
-import type { InventoryItem } from './inventory.types';
+import type { InventoryItem, ItemUsageResult } from './inventory.types';
 import type { WorldThread } from './worldThread.types';
 import type { WorldState } from './world-state.types';
 import type { NPC } from './npc.types';
@@ -78,6 +78,14 @@ export interface InitialTurnCommand {
   onChunk?: (chunk: string) => void;
 }
 
+/** Authoritative identity for one item-use turn. */
+export interface ItemUseTurnCommand {
+  sessionId: EntityID;
+  worldId: EntityID;
+  characterId: EntityID;
+  itemId: EntityID;
+}
+
 /** The settlement state of a committed Turn. */
 export type TurnSettlementStatus = 'settled' | 'partial';
 
@@ -105,6 +113,18 @@ export interface TurnResult {
   /** Errors from core reconciliation steps. Empty when `status` is settled. */
   reconciliationErrors: ReconciliationError[];
 }
+
+export type ItemUseTurnOutcome =
+  | {
+      success: false;
+      error: NonNullable<ItemUsageResult['error']>;
+    }
+  | {
+      success: true;
+      item: InventoryItem;
+      usage: ItemUsageResult & { success: true };
+      turn: TurnResult;
+    };
 
 /** A core reconciliation step that failed while settling the Turn. */
 export interface ReconciliationError {

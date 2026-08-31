@@ -121,6 +121,13 @@ const createItem = (overrides: Partial<InventoryItem>): InventoryItem => {
 
 describe('InventoryList', () => {
   const characterId = 'char-1';
+  const inventoryList = () => (
+    <InventoryList
+      characterId={characterId}
+      worldId="world-1"
+      sessionId="session-1"
+    />
+  );
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -158,7 +165,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Consumables' })).toBeInTheDocument();
@@ -193,7 +200,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     expect(screen.getByText(/×12/)).toBeInTheDocument();
   });
@@ -210,7 +217,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     expect(screen.getByText(/no items in inventory/i)).toBeInTheDocument();
   });
@@ -237,7 +244,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    const { rerender } = render(<InventoryList characterId={characterId} />);
+    const { rerender } = render(inventoryList());
     expect(screen.getByText(/no items in inventory/i)).toBeInTheDocument();
 
     // Second render: item added to inventory
@@ -249,7 +256,7 @@ describe('InventoryList', () => {
       removeItem: jest.fn(),
     });
 
-    rerender(<InventoryList characterId={characterId} />);
+    rerender(inventoryList());
 
     expect(screen.getByText('Arcane Tome')).toBeInTheDocument();
   });
@@ -277,7 +284,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     const image = screen.getByAltText('Enchanted Ring') as HTMLImageElement;
     expect(image).toBeInTheDocument();
@@ -300,7 +307,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     expect(
       screen.getByLabelText('Image unavailable for Broken Compass')
@@ -327,7 +334,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     expect(
       screen.getByLabelText('Image unavailable for Faded Locket')
@@ -350,7 +357,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     expect(
       screen.getByLabelText('Generating image for Summoned Blade')
@@ -380,7 +387,7 @@ describe('InventoryList', () => {
     // Mock getState needed for the hook
     (mockUseInventoryStore as unknown as { getState: () => InventoryStore }).getState = () => mockStore;
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     // Find drop button
     const dropButton = screen.getByLabelText('Drop Test Item');
@@ -413,7 +420,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    const { container } = render(<InventoryList characterId={characterId} />);
+    const { container } = render(inventoryList());
 
     expect(screen.getByText('Equipped')).toBeInTheDocument();
     expect(container.querySelector('.manuscript-inventory-item.is-equipped')).toBeInTheDocument();
@@ -439,7 +446,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     await user.click(screen.getByRole('button', { name: 'Equip Steel Sword' }));
 
@@ -462,7 +469,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     expect(screen.queryByRole('button', { name: /Equip Health Potion/i })).not.toBeInTheDocument();
   });
@@ -491,7 +498,7 @@ describe('InventoryList', () => {
       selector ? selector(mockStore) : mockStore
     );
 
-    render(<InventoryList characterId={characterId} />);
+    render(inventoryList());
 
     await user.click(screen.getByRole('button', { name: 'Equip Lucky Charm' }));
 

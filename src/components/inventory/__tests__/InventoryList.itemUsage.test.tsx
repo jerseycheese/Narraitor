@@ -16,6 +16,16 @@ jest.mock('@/lib/inventory/itemUsageService');
 describe('InventoryList - Item Usage', () => {
   let worldId: string;
   let characterId: string;
+  const sessionId = 'session-1';
+
+  const renderInventoryList = () =>
+    render(
+      <InventoryList
+        characterId={characterId}
+        worldId={worldId}
+        sessionId={sessionId}
+      />
+    );
 
   beforeEach(() => {
     // Reset stores
@@ -86,7 +96,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       // Verify Use button appears
       const useButtons = screen.getAllByRole('button', { name: /use/i });
@@ -114,7 +124,7 @@ describe('InventoryList - Item Usage', () => {
       // Set quantity to 0
       useInventoryStore.getState().updateItem(itemId, { quantity: 0 });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       const useButton = screen.getByRole('button', { name: /use/i });
       expect(useButton).toBeDisabled();
@@ -134,9 +144,11 @@ describe('InventoryList - Item Usage', () => {
       const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
         typeof processItemUsage
       >;
-      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
+      mockProcessItemUsage.mockImplementation(async (command) => {
         // Call the real store method to update inventory
-        const result = useInventoryStore.getState().useItem(charId, itemId);
+        const result = useInventoryStore
+          .getState()
+          .useItem(command.characterId, command.itemId);
         return result;
       });
 
@@ -157,11 +169,18 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       // Click Use button
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);
+
+      expect(processItemUsage).toHaveBeenCalledWith({
+        sessionId,
+        worldId,
+        characterId,
+        itemId: expect.any(String),
+      });
 
       // Verify item quantity decreased
       await waitFor(() => {
@@ -180,9 +199,11 @@ describe('InventoryList - Item Usage', () => {
       const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
         typeof processItemUsage
       >;
-      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
+      mockProcessItemUsage.mockImplementation(async (command) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        return useInventoryStore.getState().useItem(charId, itemId);
+        return useInventoryStore
+          .getState()
+          .useItem(command.characterId, command.itemId);
       });
 
       useInventoryStore.getState().addItem(characterId, {
@@ -200,7 +221,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       const useButton = screen.getByRole('button', { name: /USE/i });
 
@@ -220,8 +241,10 @@ describe('InventoryList - Item Usage', () => {
       const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
         typeof processItemUsage
       >;
-      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
-        return useInventoryStore.getState().useItem(charId, itemId);
+      mockProcessItemUsage.mockImplementation(async (command) => {
+        return useInventoryStore
+          .getState()
+          .useItem(command.characterId, command.itemId);
       });
 
       useInventoryStore.getState().addItem(characterId, {
@@ -240,7 +263,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       // Verify item appears initially
       expect(screen.getByText('Magic Berry')).toBeInTheDocument();
@@ -294,7 +317,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);
@@ -339,7 +362,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);

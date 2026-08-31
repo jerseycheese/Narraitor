@@ -14,6 +14,8 @@ import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
 import type { InventoryItem } from '@/types/inventory.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import * as worldClockUpdates from '@/lib/narrative/applyWorldClockUpdates';
+import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 
 // Mock AI client
 jest.mock('@/lib/ai/defaultGeminiClient', () => ({
@@ -24,6 +26,33 @@ jest.mock('@/lib/ai/defaultGeminiClient', () => ({
       tokenUsage: 50,
     }),
   })),
+}));
+
+jest.mock('@/lib/narrative/applyWorldClockUpdates', () => ({
+  applyWorldClockUpdates: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock('@/lib/narrative/applyWorldStateThreadUpdates', () => ({
+  applyWorldStateThreadUpdates: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/ai/narrativeGenerator.npc', () => ({
+  ...jest.requireActual('@/lib/ai/narrativeGenerator.npc'),
+  syncNpcMetadata: jest.fn(),
+}));
+
+jest.mock('@/lib/ai/structuredLoreExtractor', () => ({
+  extractStructuredLore: jest.fn().mockResolvedValue({
+    characters: [],
+    locations: [],
+    events: [],
+    rules: [],
+  }),
+}));
+
+jest.mock('@/lib/ai/loreContextHelper', () => ({
+  ...jest.requireActual('@/lib/ai/loreContextHelper'),
+  getLoreContextForPrompt: jest.fn(() => ''),
 }));
 
 describe('Item Usage Service', () => {
@@ -88,6 +117,10 @@ describe('Item Usage Service', () => {
     useSessionStore.getState().setSessionId(sessionId);
     useSessionStore.getState().setCharacterId(characterId);
     useSessionStore.setState({ worldId });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('isNarrativelySignificant', () => {
@@ -313,7 +346,12 @@ describe('Item Usage Service', () => {
         },
       });
 
-      const result = await processItemUsage(characterId, itemId, sessionId);
+      const result = await processItemUsage({
+        characterId,
+        itemId,
+        sessionId,
+        worldId,
+      });
 
       expect(result.success).toBe(true);
       expect(result.narrative).toBeTruthy();
@@ -348,7 +386,12 @@ describe('Item Usage Service', () => {
         },
       });
 
-      const result = await processItemUsage(characterId, itemId, sessionId);
+      const result = await processItemUsage({
+        characterId,
+        itemId,
+        sessionId,
+        worldId,
+      });
       expect(result.segmentId).toBeTruthy();
       expect(result.previousQuantity).toBe(1);
 
@@ -388,7 +431,12 @@ describe('Item Usage Service', () => {
         .getState()
         .getSessionEntries(sessionId).length;
 
-      const result = await processItemUsage(characterId, itemId, sessionId);
+      const result = await processItemUsage({
+        characterId,
+        itemId,
+        sessionId,
+        worldId,
+      });
 
       const journalCountAfter = useJournalStore
         .getState()
@@ -399,6 +447,47 @@ describe('Item Usage Service', () => {
       expect(result.segmentId).toBeTruthy();
       expect(result.narrative).toBeTruthy();
       expect(result.previousQuantity).toBe(5);
+    });
+
+    it('surfaces the non-retryable pause state after partial settlement', async () => {
+      const itemId = useInventoryStore.getState().addItem(characterId, {
+        name: 'Cracked Compass',
+        stackable: false,
+        categorization: {
+          categoryId: 'equipment',
+          source: 'manual',
+          classifiedAt: new Date().toISOString(),
+        },
+        acquisition: {
+          method: 'loot',
+          acquiredAt: new Date().toISOString(),
+          quantity: 1,
+        },
+      });
+      useNarrativeStore.getState().addDecision(sessionId, {
+        prompt: 'Existing decision',
+        options: [{ id: 'existing-1', text: 'Wait' }],
+      });
+      jest
+        .spyOn(worldClockUpdates, 'applyWorldClockUpdates')
+        .mockRejectedValueOnce(new Error('clock unavailable'));
+
+      const result = await processItemUsage({
+        characterId,
+        itemId,
+        sessionId,
+        worldId,
+      });
+
+      expect(result.success).toBe(true);
+      expect(useNarrativeStore.getState().generationError).toEqual(
+        PARTIAL_RECONCILIATION_ERROR
+      );
+      expect(
+        useNarrativeStore.getState().getSessionDecisions(sessionId)
+      ).toEqual([
+        expect.objectContaining({ prompt: 'Existing decision' }),
+      ]);
     });
   });
 

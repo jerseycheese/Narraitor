@@ -264,16 +264,17 @@ When testing, try out different decision weights (minor, major, critical), all t
 
 Item usage ties inventory items into the narrative flow. When a player uses an item, the system handles inventory updates, generates appropriate narrative describing what happens, and creates journal entries for significant moments.
 
-The significance categorization matters because not every item usage deserves AI-generated narrative and a journal entry. Quest items, equipment, documents, and valuables get the full treatment - narrative generation, journal entries, the whole package. Consumables and miscellaneous items just get basic inventory updates. This prevents journal spam from using health potions while keeping important story moments tracked.
+Every item use gets a narrative turn. Significance controls journal creation: quest items, equipment, documents, and valuables create entries, while consumables and miscellaneous items don't. This prevents journal spam from using health potions while keeping important story moments tracked.
 
 ### How It Works
 
 When a player uses an item, the system:
 
-1. Updates inventory counts (decrements stackable items or marks equipment as used)
-2. Generates narrative describing the usage through the AI
-3. Creates a journal entry for significant items only
-4. Tracks remaining quantities in the narrative so players know what they have left
+1. Revalidates the world, character, item ownership, and quantity inside the session's turn lock
+2. Consumes the item once, then generates and commits an item-specific narrative segment
+3. Reconciles world-clock, world-state, and other reported item losses before continuing
+4. Replaces the current choices only after the turn fully settles and doesn't end the session
+5. Creates a journal entry for significant items after the turn lock is released
 
 The AI understands context around stackable items. If you use one health potion from a stack of five, the narrative will mention you still have four left. Use your last potion and it'll emphasize that you're out. This keeps players informed about their resources through the story itself instead of requiring constant inventory checking.
 
@@ -283,11 +284,12 @@ The AI understands context around stackable items. If you use one health potion 
 import { processItemUsage } from '@/lib/inventory/itemUsageService';
 
 // Use an item during gameplay
-const result = await processItemUsage(
+const result = await processItemUsage({
+  worldId,
   characterId,
   itemId,
-  sessionId // optional - uses current session if not provided
-);
+  sessionId,
+});
 
 // Check the result
 if (result.success) {

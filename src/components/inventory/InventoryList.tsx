@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { clsx } from 'clsx';
 import { Shield } from 'lucide-react';
 import { useInventoryStore } from '@/state/inventoryStore';
-import { useSessionStore } from '@/state/sessionStore';
 import { EntityID } from '@/types/common.types';
 import { InventoryItem } from '@/types/inventory.types';
 import { Button } from '@/components/ui/button';
@@ -22,6 +21,8 @@ import { DropConfirmationDialog } from './DropConfirmationDialog';
 
 interface InventoryListProps {
   characterId: EntityID;
+  worldId: EntityID;
+  sessionId: EntityID;
   className?: string;
 }
 
@@ -113,6 +114,8 @@ const InventoryItemImage: React.FC<InventoryItemImageProps> = ({
  */
 export const InventoryList: React.FC<InventoryListProps> = ({
   characterId,
+  worldId,
+  sessionId,
   className = '',
 }) => {
   // Select items and character inventory to re-render on changes
@@ -147,7 +150,6 @@ export const InventoryList: React.FC<InventoryListProps> = ({
       .map((id) => itemsObject[id])
       .filter((item): item is InventoryItem => Boolean(item));
   }, [itemsObject, characterInventories, characterId]);
-  const sessionId = useSessionStore((state) => state.id);
   const toggleEquipItem = useInventoryStore((state) => state.toggleEquipItem);
   const [usingItemId, setUsingItemId] = useState<EntityID | null>(null);
   const [errorFeedback, setErrorFeedback] = useState<string | null>(null);
@@ -167,11 +169,12 @@ export const InventoryList: React.FC<InventoryListProps> = ({
     setErrorFeedback(null);
 
     try {
-      const result = await processItemUsage(
+      const result = await processItemUsage({
+        sessionId,
+        worldId,
         characterId,
         itemId,
-        sessionId || undefined
-      );
+      });
 
       if (result.success) {
         // Success path handled via narrative segment entry; no inline feedback needed.
