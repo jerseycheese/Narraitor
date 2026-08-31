@@ -239,10 +239,17 @@ describe('itemLossProcessor', () => {
         .mockImplementationOnce((_characterId, _itemId, _qty) => {
           // Success for the second item
         });
+      const onError = jest.fn();
 
-      await processLostItems(items, 'character-123', 'session-456');
+      await processLostItems(
+        items,
+        'character-123',
+        'session-456',
+        onError
+      );
 
       expect(mockRemoveItem).toHaveBeenCalledTimes(2);
+      expect(onError).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 });

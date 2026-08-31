@@ -194,11 +194,44 @@ describe('TurnResolver', () => {
 
       const result = await resolveTurn(command, generator);
 
+      expect(result.status).toBe('settled');
       expect(result.segment).toBeDefined();
       expect(result.segment.content).toBe('The road stretches ahead under a gray sky.');
       expect(result.segment.sessionId).toBe('session-1');
       expect(result.snapshot).toBeDefined();
       expect(result.snapshot.sessionId).toBe('session-1');
+    });
+
+    it('rejects before commit when an abort-ignoring generator is cancelled', async () => {
+      const abortController = new AbortController();
+      const generator = makeMockGenerator();
+      (generator.generateSegment as jest.Mock).mockReturnValue(
+        new Promise(() => {})
+      );
+
+      const turnPromise = resolveTurn(
+        makeCommand({
+          sessionId: 'session-abort',
+          signal: abortController.signal,
+        }),
+        generator
+      );
+      await Promise.resolve();
+      expect(generator.generateSegment).toHaveBeenCalledTimes(1);
+
+      abortController.abort();
+      const result = await Promise.race([
+        turnPromise.then(
+          () => 'resolved',
+          (error) => error
+        ),
+        new Promise((resolve) => setTimeout(() => resolve('still-pending'), 0)),
+      ]);
+
+      expect(result).toMatchObject({ name: 'AbortError' });
+      expect(
+        useNarrativeStore.getState().getSessionSegments('session-abort')
+      ).toHaveLength(0);
     });
 
     it('blocks until world clock updates resolve', async () => {
@@ -261,7 +294,8 @@ describe('TurnResolver', () => {
       expect(processAcquiredItems).toHaveBeenCalledWith(
         [{ name: 'Iron sword' }],
         'char-1',
-        'session-1'
+        'session-1',
+        expect.any(Function)
       );
     });
 
@@ -281,7 +315,8 @@ describe('TurnResolver', () => {
       expect(processLostItems).toHaveBeenCalledWith(
         [{ name: 'Old key' }],
         'char-1',
-        'session-1'
+        'session-1',
+        expect.any(Function)
       );
     });
 
@@ -342,7 +377,7 @@ describe('TurnResolver', () => {
       expect(storedSegments.length).toBe(1);
     });
 
-    it('captures reconciliation errors without aborting the turn', async () => {
+    it('returns an explicit partial result when reconciliation fails', async () => {
       (applyWorldClockUpdates as jest.Mock).mockRejectedValueOnce(
         new Error('clock extraction failed')
       );
@@ -350,9 +385,26 @@ describe('TurnResolver', () => {
       const generator = makeMockGenerator();
       const result = await resolveTurn(makeCommand(), generator);
 
+      expect(result.status).toBe('partial');
       expect(result.segment).toBeDefined();
       expect(result.reconciliationErrors).toHaveLength(1);
       expect(result.reconciliationErrors[0].step).toBe('worldClock');
+    });
+
+    it('captures reconciliation failures reported by fail-open helpers', async () => {
+      (applyWorldClockUpdates as jest.Mock).mockImplementationOnce(
+        ({ onError }: { onError: (error: unknown) => void }) => {
+          onError(new Error('clock helper failed internally'));
+          return Promise.resolve(undefined);
+        }
+      );
+
+      const result = await resolveTurn(makeCommand(), makeMockGenerator());
+
+      expect(result.status).toBe('partial');
+      expect(result.reconciliationErrors).toEqual([
+        expect.objectContaining({ step: 'worldClock' }),
+      ]);
     });
 
     it('fires lore extraction as fire-and-forget', async () => {
@@ -535,6 +587,7 @@ describe('TurnResolver', () => {
         generator
       );
 
+      expect(result.status).toBe('partial');
       expect(result.reconciliationErrors).toHaveLength(1);
       expect(result.reconciliationErrors[0].step).toBe('worldStateThreads');
     });

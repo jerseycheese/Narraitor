@@ -32,10 +32,23 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { resolveTurn, resolveInitialTurn } from '@/lib/narrative/turnResolver';
-import type { TurnCommand, InitialTurnCommand } from '@/types/turnResolver.types';
+import type {
+  TurnCommand,
+  InitialTurnCommand,
+  TurnResult,
+} from '@/types/turnResolver.types';
+import type { NarrativeError } from '@/lib/narrative/narrativeErrors';
 
 
 const EMPTY_NPC_IDS: string[] = [];
+const PARTIAL_RECONCILIATION_ERROR: NarrativeError = {
+  title: 'The story paused',
+  message: 'The story advanced, but some session changes did not finish.',
+  suggestion: 'Stop here rather than making another choice.',
+  retryable: false,
+  retryLabel: 'Continue the story',
+  severity: 'error',
+};
 
 interface NarrativeControllerProps {
   worldId: string;
@@ -231,6 +244,22 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     onChoicesGenerated,
     onError: setError,
   });
+
+  const confirmTurnSettled = useCallback(
+    (turnResult: TurnResult, context: string): boolean => {
+      if (turnResult.status === 'settled') {
+        return true;
+      }
+
+      logger.warn(
+        `[NarrativeController] ${context} reconciliation partial:`,
+        turnResult.reconciliationErrors.map((error) => error.step)
+      );
+      setGenerationError(PARTIAL_RECONCILIATION_ERROR);
+      return false;
+    },
+    [setGenerationError]
+  );
 
   // Initialize component state on mount
   useEffect(() => {
@@ -548,12 +577,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         return;
       }
 
-      if (turnResult.reconciliationErrors.length > 0) {
-        logger.warn(
-          '[NarrativeController] Initial turn reconciliation partial:',
-          turnResult.reconciliationErrors.map((e) => e.step)
-        );
-      }
+      const isTurnSettled = confirmTurnSettled(turnResult, 'Initial turn');
 
       const gatedSegment = turnResult.segment;
 
@@ -572,7 +596,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Generate choices if enabled - skip when this segment already ends
       // the session. The resolver has already settled all core state, so
       // choice generation reads the post-turn revision.
-      if (generateChoices && !turnResult.isEnding) {
+      if (generateChoices && isTurnSettled && !turnResult.isEnding) {
         generatePlayerChoices();
       }
     } catch {
@@ -580,15 +604,13 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       try {
         const alreadyCommitted = getSessionSegments(sessionId);
         if (alreadyCommitted.length > 0) {
-          // The resolver finished generation but reconciliation pushed
-          // past the timeout. Adopt the committed segment instead.
+          // A post-commit failure cannot safely retry generation or advance
+          // to another Decision because the stored Turn may be partial.
           setSegments(alreadyCommitted);
           if (onNarrativeGenerated) {
             onNarrativeGenerated(alreadyCommitted[0]);
           }
-          if (generateChoices && !isSessionEndingSegment(alreadyCommitted[0])) {
-            generatePlayerChoices();
-          }
+          setGenerationError(PARTIAL_RECONCILIATION_ERROR);
         } else {
           const now = new Date();
           const segmentId = `seg-${worldId}-fallback-${Date.now()}`;
@@ -754,12 +776,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         return;
       }
 
-      if (turnResult.reconciliationErrors.length > 0) {
-        logger.warn(
-          '[NarrativeController] Turn reconciliation partial:',
-          turnResult.reconciliationErrors.map((e) => e.step)
-        );
-      }
+      const isTurnSettled = confirmTurnSettled(turnResult, 'Turn');
 
       const gatedSegment = turnResult.segment;
 
@@ -784,6 +801,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         isFatalCriticalFailure && Boolean(onEndingSuggested);
       if (
         generateChoices &&
+        isTurnSettled &&
         !turnResult.isEnding &&
         !criticalFailureEndsSession
       ) {

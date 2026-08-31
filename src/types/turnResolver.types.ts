@@ -78,15 +78,19 @@ export interface InitialTurnCommand {
   onChunk?: (chunk: string) => void;
 }
 
+/** The settlement state of a committed Turn. */
+export type TurnSettlementStatus = 'settled' | 'partial';
+
 /**
- * The settled result of one turn. Everything in here has been committed to
- * the stores and is safe to read. The next Decision can consume `snapshot`
- * knowing it reflects this turn's mutations.
+ * The result of one committed Turn. A settled result is safe for the next
+ * Decision to consume; a partial result must keep that Decision blocked.
  */
 export interface TurnResult {
   /** The committed, content-gated segment. */
   segment: NarrativeSegment;
-  /** Post-turn snapshot with all core mutations applied. */
+  /** Whether every core mutation completed successfully. */
+  status: TurnSettlementStatus;
+  /** Post-turn snapshot of the state that was successfully applied. */
   snapshot: SessionSnapshot;
   /** Whether a fatal outcome was detected (from world cost or critical failure). */
   isFatal: boolean;
@@ -98,11 +102,11 @@ export interface TurnResult {
   isEnding: boolean;
   /** The reconciled notes stamped onto the segment's metadata. */
   reconciledNotes?: ReconciledSegmentNotes;
-  /** Errors from core reconciliation steps that were swallowed. Empty when all succeeded. */
+  /** Errors from core reconciliation steps. Empty when `status` is settled. */
   reconciliationErrors: ReconciliationError[];
 }
 
-/** A core reconciliation step that failed but was swallowed to avoid blocking the turn. */
+/** A core reconciliation step that failed while settling the Turn. */
 export interface ReconciliationError {
   step: 'worldClock' | 'worldStateThreads' | 'itemAcquisition' | 'itemLoss';
   error: unknown;

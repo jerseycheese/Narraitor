@@ -25,6 +25,7 @@ import { ToastProvider } from '@/components/ui/toast/toaster';
 import type { NarrativeStore } from '@/state/narrativeStore.types';
 
 const mockGenerateSegment = jest.fn();
+const mockGeneratePlayerChoices = jest.fn();
 
 jest.mock('@/lib/ai/defaultGeminiClient', () => ({
   createDefaultGeminiClient: jest.fn(() => ({
@@ -36,7 +37,7 @@ jest.mock('@/lib/ai/narrativeGenerator', () => ({
   NarrativeGenerator: jest.fn().mockImplementation(() => ({
     generateInitialScene: jest.fn(),
     generateSegment: mockGenerateSegment,
-    generatePlayerChoices: jest.fn().mockResolvedValue({
+    generatePlayerChoices: mockGeneratePlayerChoices.mockResolvedValue({
       id: 'decision-1',
       prompt: 'What do you do?',
       options: [],
@@ -169,6 +170,7 @@ describe('NarrativeController — generation error capture (#1478)', () => {
         updatedAt: new Date().toISOString(),
       },
       snapshot: { sessionId: 'test-session' },
+      status: 'settled',
       isFatal: false,
       isEnding: false,
       reconciliationErrors: [],
@@ -189,5 +191,46 @@ describe('NarrativeController — generation error capture (#1478)', () => {
     // The error is cleared at the start of every attempt and never set on success.
     expect(narrativeStoreMock.clearGenerationError).toHaveBeenCalled();
     expect(narrativeStoreMock.setGenerationError).not.toHaveBeenCalled();
+  });
+
+  it('blocks choice generation when the committed turn is only partial', async () => {
+    mockResolveTurn.mockResolvedValue({
+      segment: {
+        id: 'seg-partial',
+        content: 'The path bends north.',
+        type: 'scene',
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        characterIds: [],
+        metadata: { characterIds: [], tags: [], location: 'North Path' },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      snapshot: { sessionId: 'test-session' },
+      status: 'partial',
+      isFatal: false,
+      isEnding: false,
+      reconciliationErrors: [
+        { step: 'worldClock', error: new Error('clock failed') },
+      ],
+    });
+
+    renderWithToast(
+      <NarrativeController
+        worldId="test-world"
+        sessionId="test-session"
+        triggerGeneration={true}
+        generateChoices={true}
+        choiceId="choice-1"
+      />
+    );
+
+    await flush();
+
+    expect(mockGeneratePlayerChoices).not.toHaveBeenCalled();
+    expect(narrativeStoreMock.setGenerationError).toHaveBeenCalledWith(
+      expect.objectContaining({ retryable: false })
+    );
   });
 });

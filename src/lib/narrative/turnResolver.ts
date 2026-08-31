@@ -58,6 +58,53 @@ function withTurnLock<T>(
   return next;
 }
 
+function getAbortError(signal: AbortSignal): Error {
+  if (signal.reason instanceof Error) {
+    return signal.reason;
+  }
+
+  const error = new Error('The operation was aborted');
+  error.name = 'AbortError';
+  return error;
+}
+
+/**
+ * Makes cancellation authoritative at the pre-commit generation seam even
+ * when a downstream provider or formatter ignores the signal itself.
+ */
+function awaitGeneration<T>(
+  startGeneration: () => Promise<T>,
+  signal?: AbortSignal
+): Promise<T> {
+  if (signal?.aborted) {
+    return Promise.reject(getAbortError(signal));
+  }
+
+  const generation = startGeneration();
+  if (!signal) {
+    return generation;
+  }
+
+  return new Promise<T>((resolve, reject) => {
+    const handleAbort = () => {
+      signal.removeEventListener('abort', handleAbort);
+      reject(getAbortError(signal));
+    };
+
+    signal.addEventListener('abort', handleAbort, { once: true });
+    generation.then(
+      (result) => {
+        signal.removeEventListener('abort', handleAbort);
+        resolve(result);
+      },
+      (error) => {
+        signal.removeEventListener('abort', handleAbort);
+        reject(error);
+      }
+    );
+  });
+}
+
 /**
  * Advance the story by one Turn. Handles everything between "the player
  * picked a choice" and "the next Decision can safely read state":
@@ -134,33 +181,36 @@ async function resolveTurnInner(
 
   // Call the generator with resolverManaged so it skips its own
   // fire-and-forget side effects (lore, inventory, NPC sync).
-  const result = await generator.generateSegment(
-    {
-      worldId,
-      sessionId,
-      characterIds: characterId ? [characterId] : [],
-      narrativeContext: {
+  const result = await awaitGeneration(
+    () => generator.generateSegment(
+      {
         worldId,
-        currentSceneId: `scene-${Date.now()}`,
-        characterIds: characterId ? [characterId] : [],
-        previousSegments: [...recentSegments],
-        currentTags: mergeTurnTags(
-          recentSegments[recentSegments.length - 1]?.metadata?.tags ?? [],
-          command.skillCheckTags
-        ),
         sessionId,
-        recentSegments: [...recentSegments],
-        turnsSinceComplication,
-        worldClock,
-        currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
+        characterIds: characterId ? [characterId] : [],
+        narrativeContext: {
+          worldId,
+          currentSceneId: `scene-${Date.now()}`,
+          characterIds: characterId ? [characterId] : [],
+          previousSegments: [...recentSegments],
+          currentTags: mergeTurnTags(
+            recentSegments[recentSegments.length - 1]?.metadata?.tags ?? [],
+            command.skillCheckTags
+          ),
+          sessionId,
+          recentSegments: [...recentSegments],
+          turnsSinceComplication,
+          worldClock,
+          currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
+        },
+        generationParameters: {
+          includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
+          decisionWeight: command.decisionWeight,
+          desiredTone: command.generationParams?.desiredTone,
+        },
       },
-      generationParameters: {
-        includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
-        decisionWeight: command.decisionWeight,
-        desiredTone: command.generationParams?.desiredTone,
-      },
-    },
-    { signal: command.signal, onChunk: command.onChunk, resolverManaged: true }
+      { signal: command.signal, onChunk: command.onChunk, resolverManaged: true }
+    ),
+    command.signal
   );
 
   // Infer item losses from the narrative text when the AI didn't tag them
@@ -263,6 +313,7 @@ async function resolveTurnInner(
 
   return {
     segment: settledSegment,
+    status: errors.length === 0 ? 'settled' : 'partial',
     snapshot: postTurnSnapshot,
     isFatal,
     isEnding,
@@ -285,6 +336,7 @@ async function resolveInitialTurnInner(
     const existing = existingSegments[0];
     return {
       segment: existing,
+      status: 'settled',
       snapshot: assembleSessionSnapshot(sessionId, ids),
       isFatal: false,
       isEnding: isSessionEndingSegment(existing),
@@ -292,11 +344,14 @@ async function resolveInitialTurnInner(
     };
   }
 
-  const result = await generator.generateInitialScene(
-    worldId,
-    characterId ? [characterId] : [],
-    sessionId,
-    { signal: command.signal, onChunk: command.onChunk, resolverManaged: true }
+  const result = await awaitGeneration(
+    () => generator.generateInitialScene(
+      worldId,
+      characterId ? [characterId] : [],
+      sessionId,
+      { signal: command.signal, onChunk: command.onChunk, resolverManaged: true }
+    ),
+    command.signal
   );
 
   const segmentId = `seg-${worldId}-${Date.now()}`;
@@ -357,6 +412,7 @@ async function resolveInitialTurnInner(
 
   return {
     segment: settledSegment,
+    status: errors.length === 0 ? 'settled' : 'partial',
     snapshot: postTurnSnapshot,
     isFatal: false,
     isEnding: isSessionEndingSegment(settledSegment),
@@ -393,6 +449,14 @@ async function reconcileCoreSideEffects({
   isFirstSegment,
 }: ReconcileParams): Promise<ReconcileResult> {
   const errors: ReconciliationError[] = [];
+  const recordError = (
+    step: ReconciliationError['step'],
+    message: string,
+    error: unknown
+  ) => {
+    logger.warn(message, error);
+    errors.push({ step, error });
+  };
 
   // 1. World clock: goals, thread extraction, world cost, fatal tag
   const allSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
@@ -406,6 +470,12 @@ async function reconcileCoreSideEffects({
       characterId: metadata.characterIds?.[0],
       playerCharacterId: characterId,
       currentTurn,
+      onError: (error) =>
+        recordError(
+          'worldClock',
+          '[TurnResolver] World clock reconciliation failed:',
+          error
+        ),
     });
 
     if (result) {
@@ -423,8 +493,11 @@ async function reconcileCoreSideEffects({
       }
     }
   } catch (error) {
-    logger.warn('[TurnResolver] World clock reconciliation failed:', error);
-    errors.push({ step: 'worldClock', error });
+    recordError(
+      'worldClock',
+      '[TurnResolver] World clock reconciliation failed:',
+      error
+    );
   }
 
   // 2. World state threads: player threads, relationships, major events
@@ -444,29 +517,64 @@ async function reconcileCoreSideEffects({
       sessionId,
       isFirstSegment,
       characterId,
+      onError: (error) =>
+        recordError(
+          'worldStateThreads',
+          '[TurnResolver] World state thread update failed:',
+          error
+        ),
     });
   } catch (error) {
-    logger.warn('[TurnResolver] World state thread update failed:', error);
-    errors.push({ step: 'worldStateThreads', error });
+    recordError(
+      'worldStateThreads',
+      '[TurnResolver] World state thread update failed:',
+      error
+    );
   }
 
   // 3. Inventory mutations
   try {
     if (metadata.itemsAcquired && metadata.itemsAcquired.length > 0) {
-      await processAcquiredItems(metadata.itemsAcquired, characterId, sessionId);
+      await processAcquiredItems(
+        metadata.itemsAcquired,
+        characterId,
+        sessionId,
+        (error) =>
+          recordError(
+            'itemAcquisition',
+            '[TurnResolver] Item acquisition failed:',
+            error
+          )
+      );
     }
   } catch (error) {
-    logger.warn('[TurnResolver] Item acquisition failed:', error);
-    errors.push({ step: 'itemAcquisition', error });
+    recordError(
+      'itemAcquisition',
+      '[TurnResolver] Item acquisition failed:',
+      error
+    );
   }
 
   try {
     if (metadata.itemsLost && metadata.itemsLost.length > 0) {
-      await processLostItems(metadata.itemsLost, characterId, sessionId);
+      await processLostItems(
+        metadata.itemsLost,
+        characterId,
+        sessionId,
+        (error) =>
+          recordError(
+            'itemLoss',
+            '[TurnResolver] Item loss processing failed:',
+            error
+          )
+      );
     }
   } catch (error) {
-    logger.warn('[TurnResolver] Item loss processing failed:', error);
-    errors.push({ step: 'itemLoss', error });
+    recordError(
+      'itemLoss',
+      '[TurnResolver] Item loss processing failed:',
+      error
+    );
   }
 
   return { notes, errors };
