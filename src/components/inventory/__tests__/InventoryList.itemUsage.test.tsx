@@ -2,7 +2,7 @@
 // Verifies that users can interact with the "Use" button and see appropriate feedback
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { InventoryList } from '../InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
@@ -231,6 +231,78 @@ describe('InventoryList - Item Usage', () => {
       // Button should show loading state during usage
       await waitFor(() => {
         expect(useButton).toHaveTextContent('USING...');
+      });
+    });
+
+    it('should block another item use while one is pending', async () => {
+      const user = userEvent.setup();
+      let resolveUsage!: (
+        result: Awaited<ReturnType<typeof processItemUsage>>
+      ) => void;
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
+        typeof processItemUsage
+      >;
+      mockProcessItemUsage.mockImplementationOnce(
+        () =>
+          new Promise<Awaited<ReturnType<typeof processItemUsage>>>((resolve) => {
+            resolveUsage = resolve;
+          })
+      );
+
+      for (const name of ['Health Potion', 'Antidote']) {
+        useInventoryStore.getState().addItem(characterId, {
+          name,
+          stackable: true,
+          quantity: 1,
+          categorization: {
+            categoryId: 'consumables',
+            source: 'manual',
+            classifiedAt: new Date().toISOString(),
+          },
+          acquisition: {
+            method: 'loot',
+            acquiredAt: new Date().toISOString(),
+            quantity: 1,
+          },
+        });
+      }
+
+      renderInventoryList();
+
+      const healthPotionCard = screen.getByText('Health Potion').closest('article');
+      const antidoteCard = screen.getByText('Antidote').closest('article');
+      expect(healthPotionCard).not.toBeNull();
+      expect(antidoteCard).not.toBeNull();
+
+      const healthPotionButton = within(healthPotionCard!).getByRole('button', {
+        name: 'USE',
+      });
+      const antidoteButton = within(antidoteCard!).getByRole('button', {
+        name: 'USE',
+      });
+
+      await user.click(healthPotionButton);
+
+      expect(healthPotionButton).toHaveTextContent('USING...');
+      expect(healthPotionButton).toBeDisabled();
+      expect(antidoteButton).toBeDisabled();
+
+      await user.click(antidoteButton);
+      expect(mockProcessItemUsage).toHaveBeenCalledTimes(1);
+
+      resolveUsage({
+        success: true,
+        narrative: 'The potion takes effect.',
+        itemName: 'Health Potion',
+        categoryId: 'consumables',
+        wasConsumed: true,
+        remainingQuantity: 0,
+      });
+
+      await waitFor(() => {
+        expect(healthPotionButton).toHaveTextContent('USE');
+        expect(healthPotionButton).toBeEnabled();
+        expect(antidoteButton).toBeEnabled();
       });
     });
 

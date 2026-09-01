@@ -17,13 +17,16 @@ import type {
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import type { ReconciledSegmentNotes } from '@/lib/narrative/applyWorldClockUpdates';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { applyWorldClockUpdates } from '@/lib/narrative/applyWorldClockUpdates';
 import { applyWorldStateThreadUpdates } from '@/lib/narrative/applyWorldStateThreadUpdates';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import { processLostItems } from '@/lib/narrative/itemLossProcessor';
+import { itemNamesMatch } from '@/lib/narrative/itemProcessorShared';
 import { syncNpcMetadata } from '@/lib/ai/narrativeGenerator.npc';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
+import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 import { countWorldClockTurns } from '@/lib/narrative/worldClock';
 import { buildWorldClockPromptContext } from '@/lib/narrative/worldClock';
 import { isFeatureEnabled } from '@/lib/featureFlags';
@@ -42,7 +45,6 @@ import {
   buildUsageNarrative,
   generateItemUsageNarrative,
 } from '@/lib/inventory/itemUsageNarrative';
-import { normalizeText, NORM_NAME } from '@/lib/utils';
 
 /**
  * Per-session lock so concurrent resolveTurn calls execute sequentially.
@@ -238,30 +240,17 @@ async function resolveTurnInner(
     command.signal
   );
 
-  // Infer item losses from the narrative text when the AI didn't tag them
-  let metadata = { ...result.metadata };
-  if (
-    (!metadata.itemsLost || metadata.itemsLost.length === 0) &&
-    result.content
-  ) {
-    const characterInventory = useInventoryStore
-      .getState()
-      .getCharacterItems(characterId);
-    const inferredLosses = inferItemsLostFromNarrative(
-      result.content,
-      characterInventory
-    );
-    if (inferredLosses.length > 0) {
-      metadata = { ...metadata, itemsLost: inferredLosses };
-    }
-  }
+  const resultWithInferredLosses = inferMissingItemLosses(result, characterId);
 
   return commitAndSettleGeneratedTurn({
     result: {
-      ...result,
+      ...resultWithInferredLosses,
       metadata: {
-        ...metadata,
-        tags: [...(metadata.tags || []), ...command.skillCheckTags],
+        ...resultWithInferredLosses.metadata,
+        tags: [
+          ...(resultWithInferredLosses.metadata.tags || []),
+          ...command.skillCheckTags,
+        ],
         decisionOutcome: command.decisionOutcome,
         pacingEscalationRequested: command.pacingEscalationRequested,
         fatalRiskAllowed: command.fatalRiskAllowed,
@@ -328,6 +317,16 @@ async function resolveItemUseTurnInner(
   generator: NarrativeGenerator
 ): Promise<ItemUseTurnOutcome> {
   const { sessionId, worldId, characterId, itemId } = command;
+  const generationError = useNarrativeStore.getState().generationError;
+  const activeSessionId = useSessionStore.getState().id;
+
+  if (
+    sessionId === activeSessionId &&
+    generationError === PARTIAL_RECONCILIATION_ERROR
+  ) {
+    return validationFailure(generationError.title, generationError.message);
+  }
+
   const world = useWorldStore.getState().worlds[worldId];
   const character = useCharacterStore.getState().characters[characterId];
 
@@ -384,9 +383,8 @@ async function resolveItemUseTurnInner(
   const characterIds = generated.metadata.characterIds.length
     ? generated.metadata.characterIds
     : [characterId];
-
-  const turn = await commitAndSettleGeneratedTurn({
-    result: {
+  const result = inferMissingItemLosses(
+    {
       ...generated,
       content,
       metadata: {
@@ -395,6 +393,11 @@ async function resolveItemUseTurnInner(
         characterIds,
       },
     },
+    characterId
+  );
+
+  const turn = await commitAndSettleGeneratedTurn({
+    result,
     segmentId: `seg-${worldId}-item-${itemId}-${Date.now()}`,
     sessionId,
     worldId,
@@ -404,9 +407,17 @@ async function resolveItemUseTurnInner(
     playerCharacterName: character.name,
     reconciliationPolicy: {
       skipItemAcquisition: true,
-      excludedItemLoss: { id: item.id, name: item.name },
+      excludedItemLoss: usage.wasConsumed
+        ? { id: item.id, name: item.name }
+        : undefined,
     },
   });
+
+  if (turn.status === 'partial') {
+    useNarrativeStore
+      .getState()
+      .setGenerationError(PARTIAL_RECONCILIATION_ERROR);
+  }
 
   if (turn.status === 'settled' && !turn.isEnding) {
     await replaceChoicesAfterItemUse(command, item.id, turn, generator);
@@ -417,6 +428,32 @@ async function resolveItemUseTurnInner(
     item,
     usage: { ...usage, success: true },
     turn,
+  };
+}
+
+function inferMissingItemLosses(
+  result: NarrativeGenerationResult,
+  characterId: EntityID
+): NarrativeGenerationResult {
+  if (result.metadata.itemsLost?.length || !result.content) {
+    return result;
+  }
+
+  const characterInventory = useInventoryStore
+    .getState()
+    .getCharacterItems(characterId);
+  const inferredLosses = inferItemsLostFromNarrative(
+    result.content,
+    characterInventory
+  );
+
+  if (inferredLosses.length === 0) {
+    return result;
+  }
+
+  return {
+    ...result,
+    metadata: { ...result.metadata, itemsLost: inferredLosses },
   };
 }
 
@@ -705,7 +742,7 @@ async function reconcileCoreSideEffects({
   }
 
   try {
-    const itemsLost = filterExplicitItemLoss(
+    const itemsLost = await filterExplicitItemLoss(
       metadata.itemsLost ?? [],
       policy?.excludedItemLoss
     );
@@ -733,30 +770,27 @@ async function reconcileCoreSideEffects({
   return { notes, errors };
 }
 
-function filterExplicitItemLoss(
+async function filterExplicitItemLoss(
   itemsLost: LostItemMetadata[],
   excludedItem?: { id: EntityID; name: string }
-): LostItemMetadata[] {
+): Promise<LostItemMetadata[]> {
   if (!excludedItem) {
     return itemsLost;
   }
 
-  const excludedName = normalizeText(excludedItem.name, NORM_NAME).toLowerCase();
-  let hasExcludedExplicitUse = false;
+  const filteredItems: LostItemMetadata[] = [];
 
-  return itemsLost.filter((item) => {
+  for (const item of itemsLost) {
     const matchesExplicitUse =
       item.itemId === excludedItem.id ||
-      (!item.itemId &&
-        normalizeText(item.name, NORM_NAME).toLowerCase() === excludedName);
+      (!item.itemId && await itemNamesMatch(item.name, excludedItem.name));
 
-    if (!hasExcludedExplicitUse && matchesExplicitUse) {
-      hasExcludedExplicitUse = true;
-      return false;
+    if (!matchesExplicitUse) {
+      filteredItems.push(item);
     }
+  }
 
-    return true;
-  });
+  return filteredItems;
 }
 
 /**

@@ -309,9 +309,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                           className="manuscript-inventory-action-button"
                           variant="outline"
                           onClick={() => handleUseItem(item.id)}
-                          disabled={
-                            usingItemId === item.id || item.quantity <= 0
-                          }
+                          disabled={usingItemId !== null || item.quantity <= 0}
                         >
                           {usingItemId === item.id ? 'USING...' : 'USE'}
                         </Button>

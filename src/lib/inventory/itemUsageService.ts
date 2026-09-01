@@ -1,9 +1,7 @@
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
-import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 import { resolveItemUseTurn } from '@/lib/narrative/turnResolver';
 import { useJournalStore } from '@/state/journalStore';
-import { useNarrativeStore } from '@/state/narrativeStore';
 import type {
   InventoryItem,
   ItemUsageResult,
@@ -61,12 +59,6 @@ export async function processItemUsage(
 
   if (!outcome.success) {
     return outcome;
-  }
-
-  if (outcome.turn.status === 'partial') {
-    useNarrativeStore
-      .getState()
-      .setGenerationError(PARTIAL_RECONCILIATION_ERROR);
   }
 
   if (isNarrativelySignificant(outcome.item)) {

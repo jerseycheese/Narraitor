@@ -464,6 +464,21 @@ describe('Item Usage Service', () => {
           quantity: 1,
         },
       });
+      const laterItemId = useInventoryStore.getState().addItem(characterId, {
+        name: 'Spare Tonic',
+        stackable: true,
+        quantity: 2,
+        categorization: {
+          categoryId: 'consumables',
+          source: 'manual',
+          classifiedAt: new Date().toISOString(),
+        },
+        acquisition: {
+          method: 'loot',
+          acquiredAt: new Date().toISOString(),
+          quantity: 2,
+        },
+      });
       useNarrativeStore.getState().addDecision(sessionId, {
         prompt: 'Existing decision',
         options: [{ id: 'existing-1', text: 'Wait' }],
@@ -488,6 +503,24 @@ describe('Item Usage Service', () => {
       ).toEqual([
         expect.objectContaining({ prompt: 'Existing decision' }),
       ]);
+
+      const pauseError = useNarrativeStore.getState().generationError;
+      const reconciliationCallsAfterPartial = (
+        worldClockUpdates.applyWorldClockUpdates as jest.Mock
+      ).mock.calls.length;
+      const laterResult = await processItemUsage({
+        characterId,
+        itemId: laterItemId,
+        sessionId,
+        worldId,
+      });
+
+      expect(laterResult.success).toBe(false);
+      expect(useInventoryStore.getState().items[laterItemId]?.quantity).toBe(2);
+      expect(useNarrativeStore.getState().generationError).toBe(pauseError);
+      expect(worldClockUpdates.applyWorldClockUpdates).toHaveBeenCalledTimes(
+        reconciliationCallsAfterPartial
+      );
     });
   });
 
