@@ -101,7 +101,13 @@ describe('usePlayerChoices', () => {
       await result.current.generatePlayerChoices();
     });
 
-    expect(aiGenerate).toHaveBeenCalledWith('w1', expect.any(Object), ['c1']);
+    expect(aiGenerate).toHaveBeenCalledWith(
+      'w1',
+      expect.any(Object),
+      ['c1'],
+      's1',
+      expect.any(Object)
+    );
 
     // Read the decision back through the same getter the store exposes,
     // rather than inspecting addDecision's call args, so this proves the
@@ -113,6 +119,45 @@ describe('usePlayerChoices', () => {
       decisionWeight: 'major',
       contextSummary: 'A fork in the road.',
     });
+    expect(onChoicesGenerated).toHaveBeenCalledTimes(1);
+  });
+
+  it('accepts an explicit SessionSnapshot and passes it directly to the generator', async () => {
+    setupStore();
+    const { result, aiGenerate, onChoicesGenerated } = renderPlayerChoices();
+
+    const explicitSnapshot = {
+      sessionId: 's1',
+      worldId: 'w1',
+      characterId: 'c1',
+      turnIndex: 1,
+      segments: [baseSegment],
+      decisions: [],
+      character: { id: 'c1', name: 'Custom Character', worldId: 'w1', level: 1 },
+      inventory: [{ id: 'item-custom', name: 'Custom Wand', characterId: 'c1', quantity: 1, equipped: true }],
+      worldThreads: [],
+      worldState: undefined,
+      loreContext: 'Custom lore fact',
+      npcs: [{ id: 'npc-custom', name: 'Elder Sage', worldId: 'w1' }],
+      conditions: [],
+      endedSessions: {},
+    };
+
+    await act(async () => {
+      await result.current.generatePlayerChoices(explicitSnapshot as unknown as import('@/types/turnResolver.types').SessionSnapshot);
+    });
+
+    expect(aiGenerate).toHaveBeenCalledWith(
+      'w1',
+      expect.objectContaining({
+        sessionId: 's1',
+        worldId: 'w1',
+        recentSegments: [baseSegment],
+      }),
+      ['c1'],
+      's1',
+      explicitSnapshot
+    );
     expect(onChoicesGenerated).toHaveBeenCalledTimes(1);
   });
 

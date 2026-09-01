@@ -56,6 +56,19 @@ jest.mock('@/state/characterStore', () => ({
   },
 }));
 
+jest.mock('@/state/loreStore', () => ({
+  useLoreStore: {
+    getState: jest.fn().mockReturnValue({
+      getLoreContext: jest.fn(() => ({
+        factCount: 1,
+        factIds: ['fact-1'],
+        facts: ['A world fact'],
+      })),
+      recordLoreUsage: jest.fn(),
+    }),
+  },
+}));
+
 const narrativeContext: NarrativeContext = {
   worldId: 'world-1',
   currentSceneId: 'scene-1',
@@ -123,4 +136,166 @@ describe('buildChoicePrompt', () => {
     );
   });
 
+  it('uses fields from the supplied SessionSnapshot rather than live stores', () => {
+    const world = createMockWorld({
+      id: 'world-1',
+      name: 'Test World',
+    });
+
+    const snapshot = {
+      sessionId: 'session-1',
+      worldId: 'world-1',
+      characterId: 'char-snapshot',
+      turnIndex: 3,
+      segments: [],
+      decisions: [],
+      character: {
+        id: 'char-snapshot',
+        name: 'SnapshotHero',
+        worldId: 'world-1',
+        level: 5,
+        skills: [{ id: 's1', characterId: 'char-snapshot', name: 'Stealth', level: 2 }],
+      },
+      inventory: [
+        {
+          id: 'item-snapshot',
+          name: 'Snapshot Blade',
+          characterId: 'char-snapshot',
+          quantity: 1,
+          equipped: true,
+        },
+      ],
+      worldThreads: [],
+      worldState: undefined,
+      loreContext: '\n\nSNAPSHOT_LORE_CONTEXT',
+      npcs: [{ id: 'npc-snapshot', name: 'Snapshot Guide', worldId: 'world-1' }],
+      conditions: [],
+      endedSessions: {},
+    };
+
+    const prompt = buildChoicePrompt({
+      world,
+      worldId: 'world-1',
+      narrativeContext,
+      characterIds: ['char-snapshot'],
+      sessionId: 'session-1',
+      includeDecisionHistory: false,
+      snapshot: snapshot as unknown as import('@/types/turnResolver.types').SessionSnapshot,
+    });
+
+    expect(prompt).toContain('SnapshotHero');
+    expect(prompt).toContain('CHARACTER SKILLS CONTEXT:');
+    expect(prompt).toContain('SNAPSHOT_LORE_CONTEXT');
+  });
+
+  it('proves generated choice prompt still reflects the snapshot even after stores are mutated', () => {
+    const { useInventoryStore } = jest.requireMock('@/state/inventoryStore');
+    const { useCharacterStore } = jest.requireMock('@/state/characterStore');
+
+    const world = createMockWorld({
+      id: 'world-1',
+      name: 'Test World',
+    });
+
+    const snapshot = {
+      sessionId: 'session-1',
+      worldId: 'world-1',
+      characterId: 'char-frozen',
+      turnIndex: 2,
+      segments: [],
+      decisions: [],
+      character: {
+        id: 'char-frozen',
+        name: 'FrozenCharacter',
+        worldId: 'world-1',
+        level: 3,
+        skills: [{ id: 's-frozen', characterId: 'char-frozen', name: 'Stealth', level: 1 }],
+      },
+      inventory: [
+        {
+          id: 'item-frozen',
+          name: 'Frozen Shield',
+          characterId: 'char-frozen',
+          quantity: 1,
+          equipped: true,
+        },
+      ],
+      worldThreads: [],
+      worldState: undefined,
+      loreContext: '\n\nFROZEN_LORE',
+      npcs: [{ id: 'npc-frozen', name: 'Frozen NPC', worldId: 'world-1' }],
+      conditions: [],
+      endedSessions: {},
+    };
+
+    // Mutate live stores AFTER snapshot is assembled
+    useInventoryStore.getState.mockReturnValue({
+      getCharacterItems: jest.fn(() => [
+        { id: 'item-mutated', name: 'Mutated Broadsword', equipped: false },
+      ]),
+    });
+    useCharacterStore.getState.mockReturnValue({
+      characters: {
+        'char-frozen': {
+          id: 'char-frozen',
+          name: 'MutatedName',
+          skills: [{ name: 'MutatedSkill', level: 99 }],
+        },
+      },
+    });
+
+    const prompt = buildChoicePrompt({
+      world,
+      worldId: 'world-1',
+      narrativeContext,
+      characterIds: ['char-frozen'],
+      sessionId: 'session-1',
+      includeDecisionHistory: false,
+      snapshot: snapshot as unknown as import('@/types/turnResolver.types').SessionSnapshot,
+    });
+
+    // Prompt MUST reflect the snapshot values, NOT the mutated live stores
+    expect(prompt).toContain('FrozenCharacter');
+    expect(prompt).not.toContain('MutatedName');
+    expect(prompt).toContain('FROZEN_LORE');
+  });
+
+  it('records lore usage in dev/test when snapshot contains loreContext', () => {
+    const { useLoreStore } = jest.requireMock('@/state/loreStore');
+    const world = createMockWorld({ id: 'world-1' });
+
+    const snapshot = {
+      sessionId: 'session-1',
+      worldId: 'world-1',
+      characterId: 'char-1',
+      turnIndex: 1,
+      segments: [],
+      decisions: [],
+      character: { id: 'char-1', name: 'Ava', worldId: 'world-1' },
+      inventory: [],
+      worldThreads: [],
+      worldState: undefined,
+      loreContext: '\n\nESTABLISHED_FACTS',
+      npcs: [],
+      conditions: [],
+      endedSessions: {},
+    };
+
+    buildChoicePrompt({
+      world,
+      worldId: 'world-1',
+      narrativeContext,
+      characterIds: ['char-1'],
+      sessionId: 'session-1',
+      includeDecisionHistory: false,
+      snapshot: snapshot as unknown as import('@/types/turnResolver.types').SessionSnapshot,
+    });
+
+    expect(useLoreStore.getState().recordLoreUsage).toHaveBeenCalledWith({
+      worldId: 'world-1',
+      sessionId: 'session-1',
+      factIds: ['fact-1'],
+      source: 'choices',
+    });
+  });
 });

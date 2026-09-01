@@ -32,6 +32,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { resolveTurn, resolveInitialTurn } from '@/lib/narrative/turnResolver';
+import { assembleSessionSnapshot } from '@/lib/narrative/sessionSnapshotAssembler';
 import type {
   TurnCommand,
   InitialTurnCommand,
@@ -482,7 +483,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       ) {
         setTimeout(() => {
           if (mountedRef.current) {
-            generatePlayerChoices();
+            const hydrationSnapshot = assembleSessionSnapshot(sessionId, {
+              worldId,
+              characterId: characterId ?? '',
+            });
+            generatePlayerChoices(hydrationSnapshot);
           }
         }, 300);
       }
@@ -587,7 +592,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // the session. The resolver has already settled all core state, so
       // choice generation reads the post-turn revision.
       if (generateChoices && isTurnSettled && !turnResult.isEnding) {
-        generatePlayerChoices();
+        generatePlayerChoices(turnResult.snapshot);
       }
     } catch {
       // Error generating initial narrative (timeout, abort, network, etc.).
@@ -630,7 +635,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           }
 
           if (generateChoices && !isSessionEndingSegment(gatedFallback)) {
-            generatePlayerChoices();
+            const fallbackSnapshot = assembleSessionSnapshot(sessionId, {
+              worldId,
+              characterId: characterId ?? '',
+            });
+            generatePlayerChoices(fallbackSnapshot);
           }
         }
       } catch (error) {
@@ -795,7 +804,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         !turnResult.isEnding &&
         !criticalFailureEndsSession
       ) {
-        generatePlayerChoices();
+        generatePlayerChoices(turnResult.snapshot);
       }
     } catch (err) {
       // Error generating narrative. Classify the failure (transient network/

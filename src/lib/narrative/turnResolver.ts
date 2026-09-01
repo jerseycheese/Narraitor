@@ -493,7 +493,8 @@ async function replaceChoicesAfterItemUse(
         currentLocation: lastSegment?.metadata?.location,
       },
       [characterId],
-      sessionId
+      sessionId,
+      turn.snapshot
     );
 
     const narrativeStore = useNarrativeStore.getState();

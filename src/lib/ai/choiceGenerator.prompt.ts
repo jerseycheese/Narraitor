@@ -8,6 +8,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
+import { useLoreStore } from '@/state/loreStore';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
@@ -22,6 +23,8 @@ import { canonicalizeName } from '@/lib/utils/textNormalization';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { buildContinuityContractFromStores } from './narrativeGenerator.continuity';
 import type { SettledCommitmentDTO } from '../promptTemplates/templates/narrative/context';
+import type { SessionSnapshot } from '@/types/turnResolver.types';
+
 interface ChoicePromptInput {
   world: World;
   worldId: string;
@@ -31,21 +34,28 @@ interface ChoicePromptInput {
   useAlignedChoices?: boolean;
   includeDecisionHistory?: boolean;
   maxOptions?: number;
+  snapshot?: SessionSnapshot;
 }
 const getSettledCommitments = (
   worldId: string,
   sessionId?: EntityID,
   characterIds?: string[],
-  narrativeContext?: NarrativeContext
+  narrativeContext?: NarrativeContext,
+  snapshot?: SessionSnapshot
 ): SettledCommitmentDTO[] | undefined => {
-  if (!isFeatureEnabled('SETTLED_COMMITMENT_CHOICES') || !sessionId) return undefined;
+  const targetSessionId = snapshot?.sessionId ?? sessionId;
+  if (!isFeatureEnabled('SETTLED_COMMITMENT_CHOICES') || !targetSessionId) return undefined;
   try {
-    const contract = buildContinuityContractFromStores({
-      worldId,
-      sessionId,
-      characterIds: characterIds ?? [],
-      narrativeContext,
-    });
+    const contract = buildContinuityContractFromStores(
+      {
+        worldId: snapshot?.worldId ?? worldId,
+        sessionId: targetSessionId,
+        characterIds: characterIds ?? (snapshot?.characterId ? [snapshot.characterId] : []),
+        narrativeContext,
+      },
+      undefined,
+      snapshot
+    );
     if (!contract) return undefined;
     const delivered = contract.commitments.filter((c) => c.status === 'delivered');
     if (delivered.length === 0) return undefined;
@@ -64,54 +74,76 @@ export const buildChoicePrompt = ({
   useAlignedChoices = false,
   includeDecisionHistory = true,
   maxOptions,
+  snapshot,
 }: ChoicePromptInput): string => {
-  const resolvedCharacterIds = resolveCharacterIds(characterIds, worldId);
+  const resolvedCharacterIds = resolveCharacterIds(characterIds, worldId, snapshot);
   const template = getTemplate(
     useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice'
   );
+  const targetSessionId = snapshot?.sessionId ?? sessionId;
+  const targetWorldId = snapshot?.worldId ?? worldId;
   const settledCommitments = useAlignedChoices
-    ? getSettledCommitments(worldId, sessionId, resolvedCharacterIds, narrativeContext)
+    ? getSettledCommitments(
+        targetWorldId,
+        targetSessionId,
+        resolvedCharacterIds,
+        narrativeContext,
+        snapshot
+      )
     : undefined;
   const context = buildContext(
     world,
     narrativeContext,
     resolvedCharacterIds,
     maxOptions,
-    getTurnIndex(sessionId),
-    settledCommitments
+    getTurnIndex(targetSessionId, snapshot),
+    settledCommitments,
+    snapshot
   );
   const basePrompt = template(context);
   const inventoryAwarePrompt = enhancePromptWithInventory(
     basePrompt,
-    resolvedCharacterIds
+    resolvedCharacterIds,
+    snapshot
   );
   const skillAwarePrompt = enhancePromptWithCharacterSkills(
     inventoryAwarePrompt,
-    resolvedCharacterIds
+    resolvedCharacterIds,
+    snapshot
   );
   const personalityAwarePrompt = enhancePromptWithPersonality(
     skillAwarePrompt,
     resolvedCharacterIds,
-    useAlignedChoices
+    useAlignedChoices,
+    snapshot
   );
   const loreEnhancedPrompt = enhancePromptWithLore(
     personalityAwarePrompt,
-    worldId,
-    sessionId
+    targetWorldId,
+    targetSessionId,
+    snapshot
   );
   const toneEnhancedPrompt = enhancePromptWithToneSettings(
     loreEnhancedPrompt,
     world
   );
-  return includeDecisionHistory && sessionId
-    ? enhancePromptWithDecisionHistory(toneEnhancedPrompt, worldId, sessionId)
+  return includeDecisionHistory && targetSessionId
+    ? enhancePromptWithDecisionHistory(
+        toneEnhancedPrompt,
+        targetWorldId,
+        targetSessionId,
+        snapshot
+      )
     : toneEnhancedPrompt;
 };
 const resolveCharacterIds = (
   characterIds: string[],
-  worldId: string
+  worldId: string,
+  snapshot?: SessionSnapshot
 ): string[] => {
   if (characterIds && characterIds.length > 0) return characterIds;
+  if (snapshot?.characterId) return [snapshot.characterId];
+  if (snapshot?.character?.id) return [snapshot.character.id];
   try {
     const sessionCharacterId = useSessionStore.getState().characterId;
     if (sessionCharacterId) return [sessionCharacterId];
@@ -143,9 +175,10 @@ const buildContext = (
   characterIds: string[],
   maxOptions?: number,
   turnIndex?: number,
-  settledCommitments?: SettledCommitmentDTO[]
+  settledCommitments?: SettledCommitmentDTO[],
+  snapshot?: SessionSnapshot
 ) => {
-  const playerCharacter = getPlayerCharacter(characterIds);
+  const playerCharacter = getPlayerCharacter(characterIds, snapshot);
 
   return {
     worldName: world.name,
@@ -162,7 +195,7 @@ const buildContext = (
         name: skill.name,
         description: skill.description,
       })) || [],
-    worldNpcs: getWorldNpcs(world.id, playerCharacter),
+    worldNpcs: getWorldNpcs(world.id, playerCharacter, snapshot),
     settledCommitments,
   };
 };
@@ -174,7 +207,10 @@ const buildContext = (
  * caught that the glossary rotation had keyed off previousSegments.length and
  * would freeze on one order past turn 5.
  */
-const getTurnIndex = (sessionId?: EntityID): number => {
+const getTurnIndex = (sessionId?: EntityID, snapshot?: SessionSnapshot): number => {
+  if (snapshot?.decisions) {
+    return snapshot.decisions.length;
+  }
   if (!sessionId) return 0;
   try {
     return useNarrativeStore.getState().getSessionDecisions(sessionId).length;
@@ -183,7 +219,20 @@ const getTurnIndex = (sessionId?: EntityID): number => {
   }
 };
 
-const getPlayerCharacter = (characterIds: string[]) => {
+const getPlayerCharacter = (
+  characterIds: string[],
+  snapshot?: SessionSnapshot
+): StoreCharacter | undefined => {
+  if (
+    snapshot?.character &&
+    snapshot.character.id &&
+    (!characterIds.length ||
+      characterIds.includes(snapshot.character.id) ||
+      snapshot.character.isPlayer ||
+      characterIds[0] === snapshot.characterId)
+  ) {
+    return snapshot.character as StoreCharacter;
+  }
   try {
     if (!characterIds || characterIds.length === 0) return undefined;
     const { characters } = useCharacterStore.getState();
@@ -208,7 +257,8 @@ const getPlayerCharacter = (characterIds: string[]) => {
  */
 const getWorldNpcs = (
   worldId: string,
-  playerCharacter?: StoreCharacter
+  playerCharacter?: StoreCharacter,
+  snapshot?: SessionSnapshot
 ): Array<{ id: string; name: string }> => {
   try {
     const playerId = playerCharacter?.id;
@@ -216,9 +266,9 @@ const getWorldNpcs = (
       ? canonicalizeName(playerCharacter.name)
       : '';
 
-    return useNPCStore
-      .getState()
-      .getNPCsByWorld(worldId)
+    const npcs = snapshot?.npcs ?? useNPCStore.getState().getNPCsByWorld(worldId);
+
+    return npcs
       .filter((npc) => {
         const isPlayer =
           (!!playerId && npc.id === playerId) ||
@@ -239,8 +289,28 @@ const getWorldNpcs = (
 const enhancePromptWithLore = (
   prompt: string,
   worldId: string,
-  sessionId?: EntityID
+  sessionId?: EntityID,
+  snapshot?: SessionSnapshot
 ): string => {
+  if (snapshot?.loreContext !== undefined) {
+    if (snapshot.loreContext && process.env.NODE_ENV !== 'production') {
+      try {
+        const { getLoreContext, recordLoreUsage } = useLoreStore.getState();
+        const context = getLoreContext(worldId, sessionId);
+        if (context.factIds && context.factIds.length > 0) {
+          recordLoreUsage({
+            worldId,
+            sessionId,
+            factIds: context.factIds,
+            source: 'choices',
+          });
+        }
+      } catch {
+        // Dev/test telemetry only, safe to ignore errors
+      }
+    }
+    return prompt + snapshot.loreContext;
+  }
   const loreContext = getLoreContextForPrompt(worldId, sessionId, {
     recordUsage: true,
     source: 'choices',
@@ -271,18 +341,32 @@ CHOICE GENERATION FOCUS:
 };
 const enhancePromptWithInventory = (
   prompt: string,
-  characterIds: string[]
+  characterIds: string[],
+  snapshot?: SessionSnapshot
 ): string => {
   try {
-    if (!characterIds || characterIds.length === 0) return prompt;
-    const characterId = characterIds[0];
-    const { getCharacterItems } = useInventoryStore.getState();
-    const items = getCharacterItems(characterId);
+    let items: readonly import('@/types/inventory.types').InventoryItem[] | undefined;
+    let equippedItemIds: string[] = [];
+
+    if (snapshot?.inventory) {
+      items = snapshot.inventory;
+      equippedItemIds = items.filter((item) => item.equipped).map((item) => item.id);
+    } else {
+      if (!characterIds || characterIds.length === 0) return prompt;
+      const characterId = characterIds[0];
+      const { getCharacterItems } = useInventoryStore.getState();
+      items = getCharacterItems(characterId);
+      equippedItemIds = getEquippedItemIds(characterIds);
+    }
+
     if (!items || items.length === 0) return prompt;
-    const equippedItemIds = getEquippedItemIds(characterIds);
-    const { context: inventorySection } = buildInventoryContext(items, {
-      equippedItemIds,
-    });
+
+    const { context: inventorySection } = buildInventoryContext(
+      items as import('@/types/inventory.types').InventoryItem[],
+      {
+        equippedItemIds,
+      }
+    );
     if (!inventorySection) return prompt;
     const guidance = `
 
@@ -301,18 +385,29 @@ CHOICE DESIGN RULES:
 };
 const enhancePromptWithCharacterSkills = (
   prompt: string,
-  characterIds: string[]
+  characterIds: string[],
+  snapshot?: SessionSnapshot
 ): string => {
   try {
-    if (!characterIds || characterIds.length === 0) return prompt;
-    const { characters } = useCharacterStore.getState();
     const skillSections: string[] = [];
-    for (const characterId of characterIds) {
-      const character = characters[characterId];
-      if (!character || !character.skills || character.skills.length === 0) continue;
-      const skillString = formatSkillsForNarrative(character.skills);
-      if (skillString) skillSections.push(`${character.name}: ${skillString}`);
+
+    if (snapshot?.character) {
+      const character = snapshot.character;
+      if (character.skills && character.skills.length > 0) {
+        const skillString = formatSkillsForNarrative(character.skills);
+        if (skillString) skillSections.push(`${character.name}: ${skillString}`);
+      }
+    } else {
+      if (!characterIds || characterIds.length === 0) return prompt;
+      const { characters } = useCharacterStore.getState();
+      for (const characterId of characterIds) {
+        const character = characters[characterId];
+        if (!character || !character.skills || character.skills.length === 0) continue;
+        const skillString = formatSkillsForNarrative(character.skills);
+        if (skillString) skillSections.push(`${character.name}: ${skillString}`);
+      }
     }
+
     if (skillSections.length === 0) return prompt;
     const guidance = `
 
@@ -334,10 +429,11 @@ SKILL-BASED CHOICE GUIDANCE:
 const enhancePromptWithPersonality = (
   prompt: string,
   characterIds: string[],
-  useAlignedChoices: boolean
+  useAlignedChoices: boolean,
+  snapshot?: SessionSnapshot
 ): string => {
   try {
-    const playerCharacter = getPlayerCharacter(characterIds);
+    const playerCharacter = getPlayerCharacter(characterIds, snapshot);
     if (!playerCharacter) return prompt;
     const personalitySection = formatPersonalityForChoices(
       playerCharacter,
@@ -353,22 +449,26 @@ const enhancePromptWithPersonality = (
 const enhancePromptWithDecisionHistory = (
   prompt: string,
   worldId: EntityID,
-  sessionId: EntityID
+  sessionId: EntityID,
+  snapshot?: SessionSnapshot
 ): string => {
   try {
-    const currentContext: SimpleNarrativeContext = { worldId, sessionId };
+    const currentContext: SimpleNarrativeContext = {
+      worldId: snapshot?.worldId ?? worldId,
+      sessionId: snapshot?.sessionId ?? sessionId,
+    };
 
     let decisions = playerDecisionTracker.getRelevantDecisions(
       currentContext,
       10,
-      { worldId, sessionId }
+      { worldId: currentContext.worldId, sessionId: currentContext.sessionId }
     );
 
     if (decisions.length === 0) {
       decisions = playerDecisionTracker.getRelevantDecisions(
         currentContext,
         10,
-        { worldId }
+        { worldId: currentContext.worldId }
       );
     }
 
