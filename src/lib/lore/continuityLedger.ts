@@ -176,7 +176,10 @@ interface CommitmentAggregation {
   factValue: string;
 }
 
-/** Delivered beats promised on the same topic; the delivering fact is the statement kept. */
+/**
+ * Delivered beats promised for settled commitments; a subsequent promise after
+ * an unsettled or lost possession delivery starts an outstanding replacement cycle.
+ */
 export function buildCommitments(
   ledger: LoreFact[],
   itemNames: string[] = [],
@@ -209,6 +212,12 @@ export function buildCommitments(
       byTopic.set(topicKey, agg);
     }
 
+    const isSettledDelivery =
+      agg.status === 'delivered' &&
+      (agg.isDurable ||
+        (agg.itemIds.size > 0 &&
+          Array.from(agg.itemIds).some((id) => currentItemIdsSet.has(id))));
+
     if (status === 'delivered') {
       agg.status = 'delivered';
       agg.statement = fact.value.trim();
@@ -225,8 +234,10 @@ export function buildCommitments(
       } else {
         agg.hasUnclassifiedDelivery = true;
       }
-    } else if (agg.status !== 'delivered') {
-      // Outstanding promise
+    } else if (!isSettledDelivery) {
+      // Outstanding promise: either a fresh promise before delivery, or a replacement
+      // promise made after an unsettled or lost possession delivery.
+      agg.status = 'promised';
       agg.statement = fact.value.trim();
       agg.factValue = fact.value;
       agg.topic = topic;

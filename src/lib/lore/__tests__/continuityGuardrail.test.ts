@@ -720,5 +720,89 @@ describe('delivered-commitment bait guards (#1963)', () => {
     const expectations = formatContinuityExpectations(contract);
     expect(expectations).toContain('- PREVIOUSLY DELIVERED: parcel appraisal documents');
   });
+
+  it('tracks a post-loss replacement promise as an outstanding commitment', () => {
+    const contract = buildContinuityContract({
+      facts: [
+        makeEvent(
+          'e1',
+          'Thorn promises the master key.',
+          { kind: 'commitment', topic: 'master key', speaker: 'Thorn', status: 'promised' },
+          '2025-01-01T00:00:00.000Z'
+        ),
+        makeEvent(
+          'e2',
+          'Thorn hands over the master key.',
+          {
+            kind: 'commitment',
+            topic: 'master key',
+            speaker: 'Thorn',
+            status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'key-1' },
+          },
+          '2025-01-01T00:10:00.000Z'
+        ),
+        makeEvent(
+          'e3',
+          'Thorn promises to forge a replacement key before the council meeting.',
+          { kind: 'commitment', topic: 'master key', speaker: 'Thorn', status: 'promised' },
+          '2025-01-01T00:20:00.000Z'
+        ),
+      ],
+      npcRelationships: {},
+      npcNames: {},
+      recentDecisions: [],
+      inventoryItemIds: [], // key-1 was lost!
+    });
+
+    expect(contract.commitments[0]).toMatchObject({
+      topic: 'master key',
+      by: 'Thorn',
+      statement: 'Thorn promises to forge a replacement key before the council meeting.',
+      status: 'promised',
+      isCurrentlySettled: false,
+    });
+
+    const expectations = formatContinuityExpectations(contract);
+    expect(expectations).toContain(
+      '- OUTSTANDING: master key (Thorn): Thorn promises to forge a replacement key before the council meeting.'
+    );
+  });
+
+  it('preserves delivered status when a re-promise occurs while the item is still settled in inventory', () => {
+    const contract = buildContinuityContract({
+      facts: [
+        makeEvent(
+          'e1',
+          'Thorn hands over the master key.',
+          {
+            kind: 'commitment',
+            topic: 'master key',
+            speaker: 'Thorn',
+            status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'key-1' },
+          },
+          '2025-01-01T00:10:00.000Z'
+        ),
+        makeEvent(
+          'e2',
+          'Thorn promises the master key.',
+          { kind: 'commitment', topic: 'master key', speaker: 'Thorn', status: 'promised' },
+          '2025-01-01T00:20:00.000Z'
+        ),
+      ],
+      npcRelationships: {},
+      npcNames: {},
+      recentDecisions: [],
+      inventoryItemIds: ['key-1'], // key is still in inventory!
+    });
+
+    expect(contract.commitments[0]).toMatchObject({
+      topic: 'master key',
+      by: 'Thorn',
+      status: 'delivered',
+      isCurrentlySettled: true,
+    });
+  });
 });
 
