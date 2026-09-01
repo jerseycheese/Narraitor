@@ -39,6 +39,8 @@ const createAcquisition = (quantity: number, timestamp: string) => ({
 export const Default: Story = {
   args: {
     characterId: 'char-story-default',
+    worldId: 'world-story-default',
+    sessionId: 'session-story-default',
   },
   decorators: [
     (StoryComponent) => {
@@ -122,6 +124,8 @@ export const Default: Story = {
 export const WithImages: Story = {
   args: {
     characterId: 'char-story-images',
+    worldId: 'world-story-images',
+    sessionId: 'session-story-images',
   },
   decorators: [
     (StoryComponent) => {
@@ -188,6 +192,8 @@ export const WithImages: Story = {
 export const SingleCategory: Story = {
   args: {
     characterId: 'char-story-single',
+    worldId: 'world-story-single',
+    sessionId: 'session-story-single',
   },
   decorators: [
     (StoryComponent) => {

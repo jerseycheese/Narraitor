@@ -586,7 +586,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             <CharacterDrawerContent character={character} />
           )}
           {activeDrawer === 'inventory' && characterId && (
-            <InventoryDrawerContent characterId={characterId} />
+            <InventoryDrawerContent
+              characterId={characterId}
+              worldId={worldId}
+              sessionId={sessionId}
+            />
           )}
           {activeDrawer === 'story-summary' && (
             <StorySummaryDrawerContent

@@ -2,7 +2,7 @@
 // Verifies that users can interact with the "Use" button and see appropriate feedback
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { InventoryList } from '../InventoryList';
 import { useInventoryStore } from '@/state/inventoryStore';
@@ -16,6 +16,16 @@ jest.mock('@/lib/inventory/itemUsageService');
 describe('InventoryList - Item Usage', () => {
   let worldId: string;
   let characterId: string;
+  const sessionId = 'session-1';
+
+  const renderInventoryList = () =>
+    render(
+      <InventoryList
+        characterId={characterId}
+        worldId={worldId}
+        sessionId={sessionId}
+      />
+    );
 
   beforeEach(() => {
     // Reset stores
@@ -86,7 +96,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       // Verify Use button appears
       const useButtons = screen.getAllByRole('button', { name: /use/i });
@@ -114,7 +124,7 @@ describe('InventoryList - Item Usage', () => {
       // Set quantity to 0
       useInventoryStore.getState().updateItem(itemId, { quantity: 0 });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       const useButton = screen.getByRole('button', { name: /use/i });
       expect(useButton).toBeDisabled();
@@ -134,9 +144,11 @@ describe('InventoryList - Item Usage', () => {
       const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
         typeof processItemUsage
       >;
-      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
+      mockProcessItemUsage.mockImplementation(async (command) => {
         // Call the real store method to update inventory
-        const result = useInventoryStore.getState().useItem(charId, itemId);
+        const result = useInventoryStore
+          .getState()
+          .useItem(command.characterId, command.itemId);
         return result;
       });
 
@@ -157,11 +169,18 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       // Click Use button
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);
+
+      expect(processItemUsage).toHaveBeenCalledWith({
+        sessionId,
+        worldId,
+        characterId,
+        itemId: expect.any(String),
+      });
 
       // Verify item quantity decreased
       await waitFor(() => {
@@ -180,9 +199,11 @@ describe('InventoryList - Item Usage', () => {
       const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
         typeof processItemUsage
       >;
-      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
+      mockProcessItemUsage.mockImplementation(async (command) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        return useInventoryStore.getState().useItem(charId, itemId);
+        return useInventoryStore
+          .getState()
+          .useItem(command.characterId, command.itemId);
       });
 
       useInventoryStore.getState().addItem(characterId, {
@@ -200,7 +221,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       const useButton = screen.getByRole('button', { name: /USE/i });
 
@@ -213,6 +234,78 @@ describe('InventoryList - Item Usage', () => {
       });
     });
 
+    it('should block another item use while one is pending', async () => {
+      const user = userEvent.setup();
+      let resolveUsage!: (
+        result: Awaited<ReturnType<typeof processItemUsage>>
+      ) => void;
+      const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
+        typeof processItemUsage
+      >;
+      mockProcessItemUsage.mockImplementationOnce(
+        () =>
+          new Promise<Awaited<ReturnType<typeof processItemUsage>>>((resolve) => {
+            resolveUsage = resolve;
+          })
+      );
+
+      for (const name of ['Health Potion', 'Antidote']) {
+        useInventoryStore.getState().addItem(characterId, {
+          name,
+          stackable: true,
+          quantity: 1,
+          categorization: {
+            categoryId: 'consumables',
+            source: 'manual',
+            classifiedAt: new Date().toISOString(),
+          },
+          acquisition: {
+            method: 'loot',
+            acquiredAt: new Date().toISOString(),
+            quantity: 1,
+          },
+        });
+      }
+
+      renderInventoryList();
+
+      const healthPotionCard = screen.getByText('Health Potion').closest('article');
+      const antidoteCard = screen.getByText('Antidote').closest('article');
+      expect(healthPotionCard).not.toBeNull();
+      expect(antidoteCard).not.toBeNull();
+
+      const healthPotionButton = within(healthPotionCard!).getByRole('button', {
+        name: 'USE',
+      });
+      const antidoteButton = within(antidoteCard!).getByRole('button', {
+        name: 'USE',
+      });
+
+      await user.click(healthPotionButton);
+
+      expect(healthPotionButton).toHaveTextContent('USING...');
+      expect(healthPotionButton).toBeDisabled();
+      expect(antidoteButton).toBeDisabled();
+
+      await user.click(antidoteButton);
+      expect(mockProcessItemUsage).toHaveBeenCalledTimes(1);
+
+      resolveUsage({
+        success: true,
+        narrative: 'The potion takes effect.',
+        itemName: 'Health Potion',
+        categoryId: 'consumables',
+        wasConsumed: true,
+        remainingQuantity: 0,
+      });
+
+      await waitFor(() => {
+        expect(healthPotionButton).toHaveTextContent('USE');
+        expect(healthPotionButton).toBeEnabled();
+        expect(antidoteButton).toBeEnabled();
+      });
+    });
+
     it('should remove item from list when last consumable is used', async () => {
       const user = userEvent.setup();
 
@@ -220,8 +313,10 @@ describe('InventoryList - Item Usage', () => {
       const mockProcessItemUsage = processItemUsage as jest.MockedFunction<
         typeof processItemUsage
       >;
-      mockProcessItemUsage.mockImplementation(async (charId, itemId) => {
-        return useInventoryStore.getState().useItem(charId, itemId);
+      mockProcessItemUsage.mockImplementation(async (command) => {
+        return useInventoryStore
+          .getState()
+          .useItem(command.characterId, command.itemId);
       });
 
       useInventoryStore.getState().addItem(characterId, {
@@ -240,7 +335,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       // Verify item appears initially
       expect(screen.getByText('Magic Berry')).toBeInTheDocument();
@@ -294,7 +389,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);
@@ -339,7 +434,7 @@ describe('InventoryList - Item Usage', () => {
         },
       });
 
-      render(<InventoryList characterId={characterId} />);
+      renderInventoryList();
 
       const useButton = screen.getByRole('button', { name: /use/i });
       await user.click(useButton);

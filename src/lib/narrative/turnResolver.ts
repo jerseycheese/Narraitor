@@ -1,23 +1,32 @@
 // src/lib/narrative/turnResolver.ts
 
 import type { EntityID } from '@/types/common.types';
-import type { NarrativeSegment } from '@/types/narrative.types';
+import type {
+  LostItemMetadata,
+  NarrativeGenerationResult,
+  NarrativeSegment,
+} from '@/types/narrative.types';
 import type {
   TurnCommand,
   InitialTurnCommand,
+  ItemUseTurnCommand,
+  ItemUseTurnOutcome,
   TurnResult,
   ReconciliationError,
 } from '@/types/turnResolver.types';
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import type { ReconciledSegmentNotes } from '@/lib/narrative/applyWorldClockUpdates';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { applyWorldClockUpdates } from '@/lib/narrative/applyWorldClockUpdates';
 import { applyWorldStateThreadUpdates } from '@/lib/narrative/applyWorldStateThreadUpdates';
 import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
 import { processLostItems } from '@/lib/narrative/itemLossProcessor';
+import { itemNamesMatch } from '@/lib/narrative/itemProcessorShared';
 import { syncNpcMetadata } from '@/lib/ai/narrativeGenerator.npc';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
+import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 import { countWorldClockTurns } from '@/lib/narrative/worldClock';
 import { buildWorldClockPromptContext } from '@/lib/narrative/worldClock';
 import { isFeatureEnabled } from '@/lib/featureFlags';
@@ -31,6 +40,11 @@ import { logger } from '@/lib/utils/logger';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
 import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useWorldStore } from '@/state/worldStore';
+import {
+  buildUsageNarrative,
+  generateItemUsageNarrative,
+} from '@/lib/inventory/itemUsageNarrative';
 
 /**
  * Per-session lock so concurrent resolveTurn calls execute sequentially.
@@ -140,6 +154,19 @@ export function resolveInitialTurn(
   );
 }
 
+/**
+ * Uses an inventory item as a first-class Turn. Validation, consumption,
+ * generation, settlement, and replacement choices share the session lock.
+ */
+export function resolveItemUseTurn(
+  command: ItemUseTurnCommand,
+  generator: NarrativeGenerator
+): Promise<ItemUseTurnOutcome> {
+  return withTurnLock(command.sessionId, () =>
+    resolveItemUseTurnInner(command, generator)
+  );
+}
+
 // -- Internal implementation --------------------------------------------------
 
 async function resolveTurnInner(
@@ -213,113 +240,30 @@ async function resolveTurnInner(
     command.signal
   );
 
-  // Infer item losses from the narrative text when the AI didn't tag them
-  let metadata = { ...result.metadata };
-  if (
-    (!metadata.itemsLost || metadata.itemsLost.length === 0) &&
-    result.content
-  ) {
-    const characterInventory = useInventoryStore
-      .getState()
-      .getCharacterItems(characterId);
-    const inferredLosses = inferItemsLostFromNarrative(
-      result.content,
-      characterInventory
-    );
-    if (inferredLosses.length > 0) {
-      metadata = { ...metadata, itemsLost: inferredLosses };
-    }
-  }
+  const resultWithInferredLosses = inferMissingItemLosses(result, characterId);
 
-  // Build the segment
-  const segmentId = `seg-${worldId}-${command.choiceId}-${Date.now()}`;
-  const now = new Date();
-  const newSegment: NarrativeSegment = {
-    id: segmentId,
-    content: result.content,
-    type: result.segmentType,
-    characterIds: metadata.characterIds || [],
-    metadata: {
-      ...metadata,
-      tags: [...(metadata.tags || []), ...command.skillCheckTags],
-      decisionOutcome: command.decisionOutcome,
-      pacingEscalationRequested: command.pacingEscalationRequested,
-      fatalRiskAllowed: command.fatalRiskAllowed,
+  return commitAndSettleGeneratedTurn({
+    result: {
+      ...resultWithInferredLosses,
+      metadata: {
+        ...resultWithInferredLosses.metadata,
+        tags: [
+          ...(resultWithInferredLosses.metadata.tags || []),
+          ...command.skillCheckTags,
+        ],
+        decisionOutcome: command.decisionOutcome,
+        pacingEscalationRequested: command.pacingEscalationRequested,
+        fatalRiskAllowed: command.fatalRiskAllowed,
+      },
     },
+    segmentId: `seg-${worldId}-${command.choiceId}-${Date.now()}`,
     sessionId,
     worldId,
-    timestamp: now,
-    createdAt: now.toISOString(),
-    updatedAt: now.toISOString(),
-  };
-
-  // Commit the segment. The resolverManaged flag tells addSegment to skip
-  // its own fire-and-forget tails; the resolver handles those below.
-  const storedSegmentId = useNarrativeStore.getState().addSegment(
-    sessionId,
-    {
-      content: newSegment.content,
-      type: newSegment.type,
-      characterIds: newSegment.characterIds || [],
-      metadata: newSegment.metadata,
-      worldId: newSegment.worldId,
-      updatedAt: newSegment.updatedAt,
-      timestamp: newSegment.timestamp,
-    },
-    { resolverManaged: true }
-  );
-
-  // Read back the gated version (addSegment runs content dedup/sanitization)
-  const storedSegment =
-    useNarrativeStore.getState().segments[storedSegmentId] ?? newSegment;
-
-  // -- Core reconciliation: awaited, not fire-and-forget --
-
-  const { notes, errors } = await reconcileCoreSideEffects({
-    segment: storedSegment,
-    segmentId: storedSegmentId,
-    sessionId,
     characterId,
-    metadata,
     isFirstSegment: false,
+    isFatalCriticalFailure: command.isFatalCriticalFailure,
+    playerCharacterName: preTurnSnapshot.character?.name,
   });
-
-  // Synchronous NPC sync (already not fire-and-forget)
-  syncNpcMetadata(worldId, result.metadata.characters);
-
-  // Fire lore extraction as fire-and-forget. It doesn't block the turn
-  // but still runs so facts introduced in this turn's prose are
-  // available to later prompts.
-  fireLoreExtraction(
-    result,
-    { worldId, sessionId, characterIds: characterId ? [characterId] : [] },
-    preTurnSnapshot.character?.name
-  );
-
-  // Read the settled segment after reconciliation may have stamped tags
-  const settledSegment =
-    useNarrativeStore.getState().segments[storedSegmentId] ?? storedSegment;
-
-  // Post-turn snapshot: the settled revision
-  const postTurnSnapshot = assembleSessionSnapshot(sessionId, ids);
-
-  // isFatal reports whether a fatal outcome was detected, but does NOT
-  // fold into isEnding unconditionally. The controller decides what to
-  // do with a fatal flag based on its own handler availability.
-  const isFatal =
-    command.isFatalCriticalFailure ||
-    settledSegment.metadata?.tags?.includes('fatal-outcome') === true;
-  const isEnding = isSessionEndingSegment(settledSegment);
-
-  return {
-    segment: settledSegment,
-    status: errors.length === 0 ? 'settled' : 'partial',
-    snapshot: postTurnSnapshot,
-    isFatal,
-    isEnding,
-    reconciledNotes: notes ?? undefined,
-    reconciliationErrors: errors,
-  };
 }
 
 async function resolveInitialTurnInner(
@@ -354,7 +298,248 @@ async function resolveInitialTurnInner(
     command.signal
   );
 
-  const segmentId = `seg-${worldId}-${Date.now()}`;
+  const playerCharacterName =
+    useCharacterStore.getState().characters[characterId]?.name;
+  return commitAndSettleGeneratedTurn({
+    result,
+    segmentId: `seg-${worldId}-${Date.now()}`,
+    sessionId,
+    worldId,
+    characterId,
+    isFirstSegment: true,
+    isFatalCriticalFailure: false,
+    playerCharacterName,
+  });
+}
+
+async function resolveItemUseTurnInner(
+  command: ItemUseTurnCommand,
+  generator: NarrativeGenerator
+): Promise<ItemUseTurnOutcome> {
+  const { sessionId, worldId, characterId, itemId } = command;
+  const generationError = useNarrativeStore.getState().generationError;
+  const activeSessionId = useSessionStore.getState().id;
+
+  if (
+    sessionId === activeSessionId &&
+    generationError === PARTIAL_RECONCILIATION_ERROR
+  ) {
+    return validationFailure(generationError.title, generationError.message);
+  }
+
+  const world = useWorldStore.getState().worlds[worldId];
+  const character = useCharacterStore.getState().characters[characterId];
+
+  if (!world) {
+    return validationFailure(
+      'World Not Found',
+      'The world for this item-use turn could not be found.'
+    );
+  }
+
+  if (!character || character.worldId !== worldId) {
+    return validationFailure(
+      'Character Not Found',
+      'The character for this item-use turn could not be found in this world.'
+    );
+  }
+
+  const inventoryStore = useInventoryStore.getState();
+  const currentItem = inventoryStore.items[itemId];
+  const item = currentItem
+    ? {
+        ...currentItem,
+        acquisitionHistory: [...currentItem.acquisitionHistory],
+        categorization: { ...currentItem.categorization },
+      }
+    : undefined;
+  const usage = inventoryStore.useItem(characterId, itemId);
+
+  if (!usage.success || !item) {
+    return {
+      success: false,
+      error: usage.error ?? {
+        type: 'VALIDATION',
+        title: 'Item Not Found',
+        message: 'The specified item could not be found.',
+      },
+    };
+  }
+
+  const usageDetails = {
+    wasConsumed: usage.wasConsumed,
+    remainingQuantity: usage.remainingQuantity,
+    previousQuantity: usage.previousQuantity,
+  };
+  const generated = await generateItemUsageNarrative(
+    { item, characterId, worldId, sessionId, usageDetails },
+    generator
+  );
+  const content = generated.content?.trim()
+    ? generated.content
+    : buildUsageNarrative(item, usageDetails, 'detailed');
+  const tags = new Set(['item-usage', item.categoryId]);
+  generated.metadata.tags.forEach((tag) => tags.add(tag));
+  const characterIds = generated.metadata.characterIds.length
+    ? generated.metadata.characterIds
+    : [characterId];
+  const result = inferMissingItemLosses(
+    {
+      ...generated,
+      content,
+      metadata: {
+        ...generated.metadata,
+        tags: [...tags],
+        characterIds,
+      },
+    },
+    characterId
+  );
+
+  const turn = await commitAndSettleGeneratedTurn({
+    result,
+    segmentId: `seg-${worldId}-item-${itemId}-${Date.now()}`,
+    sessionId,
+    worldId,
+    characterId,
+    isFirstSegment: false,
+    isFatalCriticalFailure: false,
+    playerCharacterName: character.name,
+    reconciliationPolicy: {
+      skipItemAcquisition: true,
+      excludedItemLoss: usage.wasConsumed
+        ? { id: item.id, name: item.name }
+        : undefined,
+    },
+  });
+
+  if (turn.status === 'partial') {
+    useNarrativeStore
+      .getState()
+      .setGenerationError(PARTIAL_RECONCILIATION_ERROR);
+  }
+
+  if (turn.status === 'settled' && !turn.isEnding) {
+    await replaceChoicesAfterItemUse(command, item.id, turn, generator);
+  }
+
+  return {
+    success: true,
+    item,
+    usage: { ...usage, success: true },
+    turn,
+  };
+}
+
+function inferMissingItemLosses(
+  result: NarrativeGenerationResult,
+  characterId: EntityID
+): NarrativeGenerationResult {
+  if (result.metadata.itemsLost?.length || !result.content) {
+    return result;
+  }
+
+  const characterInventory = useInventoryStore
+    .getState()
+    .getCharacterItems(characterId);
+  const inferredLosses = inferItemsLostFromNarrative(
+    result.content,
+    characterInventory
+  );
+
+  if (inferredLosses.length === 0) {
+    return result;
+  }
+
+  return {
+    ...result,
+    metadata: { ...result.metadata, itemsLost: inferredLosses },
+  };
+}
+
+function validationFailure(
+  title: string,
+  message: string
+): ItemUseTurnOutcome {
+  return {
+    success: false,
+    error: { type: 'VALIDATION', title, message },
+  };
+}
+
+async function replaceChoicesAfterItemUse(
+  command: ItemUseTurnCommand,
+  itemId: EntityID,
+  turn: TurnResult,
+  generator: NarrativeGenerator
+): Promise<void> {
+  const { sessionId, worldId, characterId } = command;
+  const recentSegments = [...turn.snapshot.segments.slice(-5)];
+  const lastSegment = recentSegments[recentSegments.length - 1];
+
+  try {
+    const decision = await generator.generatePlayerChoices(
+      worldId,
+      {
+        worldId,
+        sessionId,
+        currentSceneId: `item-usage-${itemId}-${Date.now()}`,
+        characterIds: [characterId],
+        previousSegments: recentSegments,
+        recentSegments,
+        currentTags: lastSegment?.metadata?.tags || [],
+        currentLocation: lastSegment?.metadata?.location,
+      },
+      [characterId],
+      sessionId
+    );
+
+    const narrativeStore = useNarrativeStore.getState();
+    narrativeStore.clearSessionDecisions(sessionId);
+    narrativeStore.addDecision(sessionId, {
+      prompt: decision.prompt,
+      options: decision.options,
+      decisionWeight: decision.decisionWeight,
+      contextSummary: decision.contextSummary,
+    });
+  } catch (error) {
+    logger.warn(
+      '[TurnResolver] Failed to replace choices after item use:',
+      error
+    );
+  }
+}
+
+interface ReconciliationPolicy {
+  skipItemAcquisition?: boolean;
+  excludedItemLoss?: { id: EntityID; name: string };
+}
+
+interface CommitAndSettleParams {
+  result: Omit<NarrativeGenerationResult, 'metadata'> & {
+    metadata: NarrativeSegment['metadata'];
+  };
+  segmentId: EntityID;
+  sessionId: EntityID;
+  worldId: EntityID;
+  characterId: EntityID;
+  isFirstSegment: boolean;
+  isFatalCriticalFailure: boolean;
+  playerCharacterName?: string;
+  reconciliationPolicy?: ReconciliationPolicy;
+}
+
+async function commitAndSettleGeneratedTurn({
+  result,
+  segmentId,
+  sessionId,
+  worldId,
+  characterId,
+  isFirstSegment,
+  isFatalCriticalFailure,
+  playerCharacterName,
+  reconciliationPolicy,
+}: CommitAndSettleParams): Promise<TurnResult> {
   const now = new Date();
   const newSegment: NarrativeSegment = {
     id: segmentId,
@@ -368,7 +553,6 @@ async function resolveInitialTurnInner(
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   };
-
   const storedSegmentId = useNarrativeStore.getState().addSegment(
     sessionId,
     {
@@ -382,23 +566,19 @@ async function resolveInitialTurnInner(
     },
     { resolverManaged: true }
   );
-
   const storedSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? newSegment;
-
   const { notes, errors } = await reconcileCoreSideEffects({
     segment: storedSegment,
     segmentId: storedSegmentId,
     sessionId,
     characterId,
     metadata: result.metadata,
-    isFirstSegment: true,
+    isFirstSegment,
+    policy: reconciliationPolicy,
   });
 
   syncNpcMetadata(worldId, result.metadata.characters);
-
-  const playerCharacterName =
-    useCharacterStore.getState().characters[characterId]?.name;
   fireLoreExtraction(
     result,
     { worldId, sessionId, characterIds: characterId ? [characterId] : [] },
@@ -408,13 +588,13 @@ async function resolveInitialTurnInner(
   const settledSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? storedSegment;
 
-  const postTurnSnapshot = assembleSessionSnapshot(sessionId, ids);
-
   return {
     segment: settledSegment,
     status: errors.length === 0 ? 'settled' : 'partial',
-    snapshot: postTurnSnapshot,
-    isFatal: false,
+    snapshot: assembleSessionSnapshot(sessionId, { worldId, characterId }),
+    isFatal:
+      isFatalCriticalFailure ||
+      settledSegment.metadata?.tags?.includes('fatal-outcome') === true,
     isEnding: isSessionEndingSegment(settledSegment),
     reconciledNotes: notes ?? undefined,
     reconciliationErrors: errors,
@@ -433,6 +613,7 @@ interface ReconcileParams {
   characterId: EntityID;
   metadata: NarrativeSegment['metadata'];
   isFirstSegment: boolean;
+  policy?: ReconciliationPolicy;
 }
 
 interface ReconcileResult {
@@ -447,6 +628,7 @@ async function reconcileCoreSideEffects({
   characterId,
   metadata,
   isFirstSegment,
+  policy,
 }: ReconcileParams): Promise<ReconcileResult> {
   const errors: ReconciliationError[] = [];
   const recordError = (
@@ -534,7 +716,11 @@ async function reconcileCoreSideEffects({
 
   // 3. Inventory mutations
   try {
-    if (metadata.itemsAcquired && metadata.itemsAcquired.length > 0) {
+    if (
+      !policy?.skipItemAcquisition &&
+      metadata.itemsAcquired &&
+      metadata.itemsAcquired.length > 0
+    ) {
       await processAcquiredItems(
         metadata.itemsAcquired,
         characterId,
@@ -556,9 +742,13 @@ async function reconcileCoreSideEffects({
   }
 
   try {
-    if (metadata.itemsLost && metadata.itemsLost.length > 0) {
+    const itemsLost = await filterExplicitItemLoss(
+      metadata.itemsLost ?? [],
+      policy?.excludedItemLoss
+    );
+    if (itemsLost.length > 0) {
       await processLostItems(
-        metadata.itemsLost,
+        itemsLost,
         characterId,
         sessionId,
         (error) =>
@@ -578,6 +768,29 @@ async function reconcileCoreSideEffects({
   }
 
   return { notes, errors };
+}
+
+async function filterExplicitItemLoss(
+  itemsLost: LostItemMetadata[],
+  excludedItem?: { id: EntityID; name: string }
+): Promise<LostItemMetadata[]> {
+  if (!excludedItem) {
+    return itemsLost;
+  }
+
+  const filteredItems: LostItemMetadata[] = [];
+
+  for (const item of itemsLost) {
+    const matchesExplicitUse =
+      item.itemId === excludedItem.id ||
+      (!item.itemId && await itemNamesMatch(item.name, excludedItem.name));
+
+    if (!matchesExplicitUse) {
+      filteredItems.push(item);
+    }
+  }
+
+  return filteredItems;
 }
 
 /**

@@ -25,12 +25,22 @@ export const CharacterDrawerContent: React.FC<CharacterDrawerContentProps> = ({ 
 
 interface InventoryDrawerContentProps {
   characterId: EntityID;
+  worldId: EntityID;
+  sessionId: EntityID;
 }
 
-export const InventoryDrawerContent: React.FC<InventoryDrawerContentProps> = ({ characterId }) => {
+export const InventoryDrawerContent: React.FC<InventoryDrawerContentProps> = ({
+  characterId,
+  worldId,
+  sessionId,
+}) => {
   return (
     <div className="manuscript-drawer-panel-section">
-      <InventoryList characterId={characterId} />
+      <InventoryList
+        characterId={characterId}
+        worldId={worldId}
+        sessionId={sessionId}
+      />
     </div>
   );
 };

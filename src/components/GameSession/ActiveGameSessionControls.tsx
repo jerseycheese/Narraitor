@@ -61,7 +61,11 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
           data-testid="inventory-collapsible"
         >
           <CollapsibleSection title="Inventory" initialCollapsed>
-            <InventoryList characterId={characterId} />
+            <InventoryList
+              characterId={characterId}
+              worldId={worldId}
+              sessionId={sessionId}
+            />
           </CollapsibleSection>
         </div>
       )}
