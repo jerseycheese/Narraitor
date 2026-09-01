@@ -27,6 +27,19 @@ export interface WorldThread extends TimestampedEntity {
   lastAdvancedAtTurn: number;
   /** Rough turn by which the thread should come due, when the prose gives one. */
   dueByTurn?: number;
+  /**
+   * Set when an advance lands this thread into the scene. From then on its
+   * summary replaces the vague opening wording, and once its fuse comes
+   * due the block demands its strike, its cost or its outcome.
+   */
+  firedAtTurn?: number;
+  /**
+   * Times this thread has acted since it fired (each advance on it while it
+   * is the DUE NOW pick re-fuses it and counts one strike). Past the strike
+   * cap the block stops demanding another act and demands the matter
+   * conclude, so a fired thread has an exit besides resolution or a kill.
+   */
+  strikeCount?: number;
   status: WorldThreadStatus;
   /** How it came due or closed, set when status leaves 'open'. */
   resolution?: string;
@@ -64,12 +77,27 @@ export interface WorldThreadExtractionInput {
   currentTurn: number;
   segmentSignals?: WorldThreadSegmentSignals;
   seed?: WorldThreadSeedContext;
+  /** The thread the scene block asked this segment to land, so the extractor matches arrivals to it first. */
+  dueNowThreadId?: EntityID;
+  /**
+   * Set when the ledger has gone quiet: nothing opened for a window of turns
+   * and no unfired open thread is due inside it. The extraction section then
+   * asks for one new off-stage pressure.
+   */
+  openAsk?: boolean;
 }
 
 /** What the extraction returns for the ledger; every array may be empty. */
 export interface WorldThreadExtractionResult {
-  opened: Array<{ kind: WorldThreadKind; summary: string; dueByTurn?: number }>;
-  advanced: Array<{ id: EntityID; note?: string }>;
+  opened: Array<{
+    kind: WorldThreadKind;
+    summary: string;
+    dueByTurn?: number;
+    /** The open thread this arrival is landing; refines it instead of opening new. */
+    covers?: EntityID;
+  }>;
+  /** An advance must name what is different now; restatements are dropped. */
+  advanced: Array<{ id: EntityID; changed: string }>;
   resolved: Array<{ id: EntityID; resolution: string; outcome: 'resolved' | 'dropped' }>;
 }
 
@@ -78,11 +106,21 @@ export interface WorldClockPromptContext {
   currentTurn: number;
   /** Turns since any thread advanced, resolved, or was opened; 0 on the seed turn. */
   turnsSinceWorldMoved: number;
+  /** Tone or register line from world settings; quotes the world's own voice into the strike prompt. */
+  register?: string;
   threads: Array<{
     kind: WorldThreadKind;
     summary: string;
     ageTurns: number;
     overdue: boolean;
+    overdueByTurns: number;
+    /** Single forced thread for this segment; at most one per turn. */
+    dueNow: boolean;
+    /** Already in the scene; rendered by its own summary with no arrival ask, and picked at its fuse for the strike. */
+    fired: boolean;
+    firedAtTurn?: number;
+    /** Strikes since firing; at the cap the fired DUE NOW ask becomes "conclude", not another strike. */
+    strikes: number;
   }>;
 }
 
