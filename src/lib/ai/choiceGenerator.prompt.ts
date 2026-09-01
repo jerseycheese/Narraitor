@@ -8,6 +8,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { getLoreContextForPrompt } from './loreContextHelper';
+import { useLoreStore } from '@/state/loreStore';
 import { buildInventoryContext } from '@/lib/promptContext/inventoryContextBuilder';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { formatDecisions } from './simpleDecisionFormatter';
@@ -292,6 +293,22 @@ const enhancePromptWithLore = (
   snapshot?: SessionSnapshot
 ): string => {
   if (snapshot?.loreContext !== undefined) {
+    if (snapshot.loreContext && process.env.NODE_ENV !== 'production') {
+      try {
+        const { getLoreContext, recordLoreUsage } = useLoreStore.getState();
+        const context = getLoreContext(worldId, sessionId);
+        if (context.factIds && context.factIds.length > 0) {
+          recordLoreUsage({
+            worldId,
+            sessionId,
+            factIds: context.factIds,
+            source: 'choices',
+          });
+        }
+      } catch {
+        // Dev/test telemetry only, safe to ignore errors
+      }
+    }
     return prompt + snapshot.loreContext;
   }
   const loreContext = getLoreContextForPrompt(worldId, sessionId, {
