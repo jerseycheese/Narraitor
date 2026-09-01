@@ -15,6 +15,7 @@ import { recordRequestCalibration } from './narrativeGenerator.calibration';
 import { buildPromptDebugInfo, isDebugInfoEnabled, type DebugInfoContext } from './debugInfoBuilder';
 import { getActiveProviderModel } from '@/state/providerStore';
 import { DEFAULT_TEXT_MODEL } from './config';
+import type { SessionSnapshot } from '@/types/turnResolver.types';
 
 /**
  * Parameters for choice generation
@@ -28,6 +29,7 @@ export interface ChoiceGenerationParams {
   minOptions?: number;
   useAlignedChoices?: boolean;
   includeDecisionHistory?: boolean;
+  snapshot?: SessionSnapshot;
 }
 
 /**
@@ -40,7 +42,17 @@ export async function generateChoices(
   params: ChoiceGenerationParams
 ): Promise<Decision> {
   try {
-    const { worldId, narrativeContext, characterIds, sessionId, maxOptions = 3, minOptions = 3, useAlignedChoices = false, includeDecisionHistory = true } = params;
+    const {
+      worldId,
+      narrativeContext,
+      characterIds,
+      sessionId,
+      maxOptions = 3,
+      minOptions = 3,
+      useAlignedChoices = false,
+      includeDecisionHistory = true,
+      snapshot,
+    } = params;
 
     const world = getWorld(worldId);
     const prompt = buildChoicePrompt({
@@ -52,6 +64,7 @@ export async function generateChoices(
       useAlignedChoices,
       includeDecisionHistory,
       maxOptions,
+      snapshot,
     });
 
     // Prefer the explicit choices entry point when the client has one (the

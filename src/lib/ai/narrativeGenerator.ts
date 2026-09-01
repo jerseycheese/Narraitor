@@ -13,6 +13,7 @@ import {
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
+import type { SessionSnapshot } from '@/types/turnResolver.types';
 import { generateChoices } from './choiceGenerator';
 import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
@@ -792,17 +793,19 @@ export class NarrativeGenerator {
     worldId: string,
     narrativeContext: NarrativeContext,
     characterIds: string[],
-    sessionId?: EntityID
+    sessionId?: EntityID,
+    snapshot?: SessionSnapshot
   ): Promise<Decision> {
     try {
       const result = await generateChoices(this.geminiClient, {
         worldId,
         narrativeContext,
         characterIds,
-        sessionId: sessionId || narrativeContext.sessionId,
+        sessionId: sessionId || narrativeContext.sessionId || snapshot?.sessionId,
         minOptions: 3,
         maxOptions: 3,
         useAlignedChoices: true,
+        snapshot,
       });
 
       return result;

@@ -12,6 +12,8 @@ import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import type { Decision, NarrativeContext } from '@/types/narrative.types';
+import type { SessionSnapshot } from '@/types/turnResolver.types';
+import { assembleSessionSnapshot } from '@/lib/narrative/sessionSnapshotAssembler';
 
 interface UsePlayerChoicesParams {
   sessionId: string;
@@ -28,7 +30,7 @@ interface UsePlayerChoicesParams {
 
 interface UsePlayerChoicesResult {
   isGeneratingChoices: boolean;
-  generatePlayerChoices: () => Promise<void>;
+  generatePlayerChoices: (snapshot?: SessionSnapshot) => Promise<void>;
 }
 
 /**
@@ -59,14 +61,16 @@ export function usePlayerChoices({
     };
   }, [sessionId, worldId, characterId]);
 
-  const generatePlayerChoices = useCallback(async () => {
-    if (!mountedRef.current) {
-      return;
-    }
-    if (!sessionId) {
-      warnMissingSessionId('choice');
-      return;
-    }
+  const generatePlayerChoices = useCallback(
+    async (providedSnapshot?: SessionSnapshot) => {
+      if (!mountedRef.current) {
+        return;
+      }
+      const targetSessionId = providedSnapshot?.sessionId || sessionId;
+      if (!targetSessionId) {
+        warnMissingSessionId('choice');
+        return;
+      }
 
     // Prevent overlapping choice generation using ref (more reliable than state)
     if (choiceGenerationInProgress.current) {
@@ -75,19 +79,21 @@ export function usePlayerChoices({
 
     choiceGenerationInProgress.current = true;
 
-    // Get fresh segments from the store instead of relying on component state
-    const currentSegments = useNarrativeStore
-      .getState()
-      .getSessionSegments(sessionId);
+    const snapshot =
+      providedSnapshot ??
+      assembleSessionSnapshot(targetSessionId, {
+        worldId,
+        characterId: characterId || '',
+      });
 
-    if (currentSegments.length === 0) {
+    if (snapshot.segments.length === 0) {
       choiceGenerationInProgress.current = false;
       return;
     }
     setIsGeneratingChoices(true);
 
-    // Use recent segments for context - get from fresh data
-    const recentSegments = currentSegments.slice(-5);
+    const recentSegments = [...snapshot.segments.slice(-5)];
+    const lastSegment = recentSegments[recentSegments.length - 1];
 
     // Create fallback choices upfront - we'll use these immediately if something fails
     let usedFallbackDecision = false;
@@ -115,25 +121,27 @@ export function usePlayerChoices({
       decisionWeight: 'minor',
       contextSummary:
         recentSegments.length > 0
-          ? `${recentSegments[recentSegments.length - 1]?.metadata?.location || 'Unknown location'}: ${truncate(recentSegments[recentSegments.length - 1]?.content || 'Making a decision', 100)}`
+          ? `${lastSegment?.metadata?.location || 'Unknown location'}: ${truncate(lastSegment?.content || 'Making a decision', 100)}`
           : 'Making a decision in an unknown location.',
     };
 
     try {
-      const choiceCharacterIds = characterId ? [characterId] : [];
+      const choiceCharacterIds = snapshot.characterId
+        ? [snapshot.characterId]
+        : characterId
+          ? [characterId]
+          : [];
+
       // Create narrative context for choice generation
       const narrativeContext: NarrativeContext = {
-        worldId,
+        worldId: snapshot.worldId || worldId,
         currentSceneId: `scene-${Date.now()}`,
         characterIds: choiceCharacterIds,
         previousSegments: recentSegments,
-        currentTags:
-          recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
-        sessionId,
+        currentTags: lastSegment?.metadata?.tags || [],
+        sessionId: snapshot.sessionId,
         recentSegments,
-        currentLocation:
-          recentSegments[recentSegments.length - 1]?.metadata?.location ||
-          undefined,
+        currentLocation: lastSegment?.metadata?.location || undefined,
       };
 
       // Generate choices with a 15-second timeout for real API calls
@@ -144,7 +152,9 @@ export function usePlayerChoices({
           setTimeout(
             () =>
               reject(
-                new Error(`AI choice generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`)
+                new Error(
+                  `AI choice generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`
+                )
               ),
             AI_GENERATION_TIMEOUT_MS
           );
@@ -152,9 +162,11 @@ export function usePlayerChoices({
 
         decision = await Promise.race([
           narrativeGenerator.generatePlayerChoices(
-            worldId,
+            snapshot.worldId || worldId,
             narrativeContext,
-            choiceCharacterIds
+            choiceCharacterIds,
+            snapshot.sessionId,
+            snapshot
           ),
           timeoutPromise,
         ]);
@@ -182,7 +194,7 @@ export function usePlayerChoices({
       // Add decision to store and get the actual stored ID
       const storedDecisionId = useNarrativeStore
         .getState()
-        .addDecision(sessionId, {
+        .addDecision(snapshot.sessionId, {
           prompt: decision.prompt,
           options: decision.options,
           decisionWeight: decision.decisionWeight,
@@ -218,7 +230,7 @@ export function usePlayerChoices({
         // Only try to create fallback choices if we haven't already added any for this session
         const existingDecisions = useNarrativeStore
           .getState()
-          .getSessionDecisions(sessionId);
+          .getSessionDecisions(targetSessionId);
 
         if (existingDecisions.length === 0 && mountedRef.current) {
           // Create and add fallback choices to the store
@@ -250,7 +262,7 @@ export function usePlayerChoices({
           // Add to store and get the actual stored ID
           const storedFallbackId = useNarrativeStore
             .getState()
-            .addDecision(sessionId, {
+            .addDecision(targetSessionId, {
               prompt: fallbackDecision.prompt,
               options: fallbackDecision.options,
               decisionWeight: fallbackDecision.decisionWeight,

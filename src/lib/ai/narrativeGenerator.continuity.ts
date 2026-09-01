@@ -23,6 +23,7 @@ import type {
   NarrativeGenerationResult,
 } from '@/types/narrative.types';
 import type { LoreFact } from '@/types/lore.types';
+import type { SessionSnapshot } from '@/types/turnResolver.types';
 import type {
   ContinuityContract,
   ContinuityRecentDecision,
@@ -195,33 +196,49 @@ const carriesNothingForTheModel = (contract: ContinuityContract): boolean =>
  */
 export const buildContinuityContractFromStores = (
   request: NarrativeGenerationRequest,
-  options?: { playerName?: string }
+  options?: { playerName?: string },
+  snapshot?: SessionSnapshot
 ): ContinuityContract | null => {
   try {
     const worldStoreState = useWorldStore.getState();
     const worldState =
-      typeof worldStoreState.getWorldState === 'function'
+      snapshot?.worldState ??
+      (typeof worldStoreState?.getWorldState === 'function'
         ? worldStoreState.getWorldState(request.worldId)
-        : undefined;
+        : undefined);
     const npcRelationships = worldState?.npcRelationships ?? {};
 
     const npcNames: Record<EntityID, string> = {};
-    const npcStoreState = useNPCStore.getState();
-    if (typeof npcStoreState.getNPCsByWorld === 'function') {
-      for (const npc of npcStoreState.getNPCsByWorld(request.worldId) ?? []) {
+    if (snapshot?.npcs) {
+      for (const npc of snapshot.npcs) {
         if (npc?.id && npc?.name) {
           npcNames[npc.id] = npc.name;
         }
       }
+    } else {
+      const npcStoreState = useNPCStore.getState();
+      if (typeof npcStoreState.getNPCsByWorld === 'function') {
+        for (const npc of npcStoreState.getNPCsByWorld(request.worldId) ?? []) {
+          if (npc?.id && npc?.name) {
+            npcNames[npc.id] = npc.name;
+          }
+        }
+      }
     }
+
+    const inventoryItemNames = snapshot?.inventory
+      ? snapshot.inventory.map((item) => item.name).filter(Boolean)
+      : readInventoryItemNames(request);
+
+    const playerName = options?.playerName ?? snapshot?.character?.name;
 
     const contract = buildContinuityContract({
       facts: readSessionFacts(request),
       npcRelationships,
       npcNames,
       recentDecisions: collectRecentDecisions(request),
-      playerName: options?.playerName,
-      inventoryItemNames: readInventoryItemNames(request),
+      playerName,
+      inventoryItemNames,
       unrecordedExchanges: collectUnrecordedExchanges(request, npcNames),
       playerActionText: readPlayerActionText(request),
     });

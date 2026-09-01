@@ -38,42 +38,69 @@ export function assembleSessionSnapshot(
   const npcState = useNPCStore.getState();
   const sessionState = useSessionStore.getState();
 
-  const worldId = ids?.worldId ?? sessionState.worldId ?? '';
-  const characterId = ids?.characterId ?? sessionState.characterId ?? '';
+  const worldId = ids?.worldId ?? sessionState?.worldId ?? '';
+  const characterId = ids?.characterId ?? sessionState?.characterId ?? '';
 
-  const allSegments = narrativeState.getSessionSegments(sessionId);
+  const allSegments =
+    typeof narrativeState?.getSessionSegments === 'function'
+      ? narrativeState.getSessionSegments(sessionId)
+      : [];
   const turnIndex = countWorldClockTurns(allSegments);
 
-  const character = characterState.characters[characterId];
+  const character = characterState?.characters?.[characterId];
   const conditions = character?.status?.conditions ?? [];
 
-  const inventory = inventoryState.getCharacterItems(characterId);
+  const inventory =
+    typeof inventoryState?.getCharacterItems === 'function'
+      ? inventoryState.getCharacterItems(characterId)
+      : [];
 
-  const worldThreads = worldThreadState
-    .getAll()
-    .filter((thread) => thread.sessionId === sessionId);
+  const worldThreads =
+    typeof worldThreadState?.getAll === 'function'
+      ? worldThreadState
+          .getAll()
+          .filter((thread) => thread.sessionId === sessionId)
+      : [];
 
-  const ws = worldState.getWorldState(worldId);
+  const ws =
+    typeof worldState?.getWorldState === 'function'
+      ? worldState.getWorldState(worldId)
+      : undefined;
 
-  const loreContext = getLoreContextForPrompt(worldId, sessionId);
+  let loreContext = '';
+  try {
+    loreContext = getLoreContextForPrompt(worldId, sessionId);
+  } catch {
+    loreContext = '';
+  }
 
-  const npcs = npcState.getNPCsByWorld(worldId);
+  const npcs =
+    typeof npcState?.getNPCsByWorld === 'function'
+      ? npcState.getNPCsByWorld(worldId)
+      : [];
+
+  const decisions =
+    typeof narrativeState?.getSessionDecisions === 'function'
+      ? narrativeState.getSessionDecisions(sessionId)
+      : [];
 
   const snapshot: SessionSnapshot = {
     sessionId,
     worldId,
     characterId,
     turnIndex,
-    segments: Object.freeze([...allSegments]) as readonly typeof allSegments[number][],
-    decisions: Object.freeze([...narrativeState.getSessionDecisions(sessionId)]),
-    character: Object.freeze({ ...character }) as Readonly<typeof character>,
+    segments: Object.freeze([...allSegments]) as readonly (typeof allSegments)[number][],
+    decisions: Object.freeze([...decisions]),
+    character: character
+      ? (Object.freeze({ ...character }) as Readonly<typeof character>)
+      : (Object.freeze({}) as Readonly<typeof character>),
     inventory: Object.freeze([...inventory]),
     worldThreads: Object.freeze([...worldThreads]),
     worldState: ws ? Object.freeze({ ...ws }) : undefined,
     loreContext,
     npcs: Object.freeze([...npcs]),
     conditions: Object.freeze([...conditions]),
-    endedSessions: Object.freeze({ ...narrativeState.endedSessions }),
+    endedSessions: Object.freeze({ ...(narrativeState?.endedSessions ?? {}) }),
   };
 
   return snapshot;
