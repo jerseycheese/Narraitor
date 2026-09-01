@@ -571,7 +571,7 @@ async function commitAndSettleGeneratedTurn({
   );
   const storedSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? newSegment;
-  const { notes, errors } = await reconcileCoreSideEffects({
+  const { notes, errors, acquiredItems } = await reconcileCoreSideEffects({
     segment: storedSegment,
     segmentId: storedSegmentId,
     sessionId,
@@ -582,11 +582,22 @@ async function commitAndSettleGeneratedTurn({
   });
 
   syncNpcMetadata(worldId, result.metadata.characters);
-  fireLoreExtraction(
-    result,
-    { worldId, sessionId, characterIds: characterId ? [characterId] : [] },
-    playerCharacterName
-  );
+
+  if (isFeatureEnabled('SETTLED_COMMITMENT_CHOICES')) {
+    await extractAndStoreLore(
+      result,
+      { worldId, sessionId, characterIds: characterId ? [characterId] : [] },
+      playerCharacterName,
+      acquiredItems
+    );
+  } else {
+    void extractAndStoreLore(
+      result,
+      { worldId, sessionId, characterIds: characterId ? [characterId] : [] },
+      playerCharacterName,
+      acquiredItems
+    );
+  }
 
   const settledSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? storedSegment;
@@ -622,6 +633,7 @@ interface ReconcileParams {
 interface ReconcileResult {
   notes: ReconciledSegmentNotes | null;
   errors: ReconciliationError[];
+  acquiredItems: Array<{ id: EntityID; name: string }>;
 }
 
 async function reconcileCoreSideEffects({
@@ -718,13 +730,14 @@ async function reconcileCoreSideEffects({
   }
 
   // 3. Inventory mutations
+  let acquiredItems: Array<{ id: EntityID; name: string }> = [];
   try {
     if (
       !policy?.skipItemAcquisition &&
       metadata.itemsAcquired &&
       metadata.itemsAcquired.length > 0
     ) {
-      await processAcquiredItems(
+      acquiredItems = await processAcquiredItems(
         metadata.itemsAcquired,
         characterId,
         sessionId,
@@ -733,7 +746,8 @@ async function reconcileCoreSideEffects({
             'itemAcquisition',
             '[TurnResolver] Item acquisition failed:',
             error
-          )
+          ),
+        segmentId
       );
     }
   } catch (error) {
@@ -770,7 +784,7 @@ async function reconcileCoreSideEffects({
     );
   }
 
-  return { notes, errors };
+  return { notes, errors, acquiredItems };
 }
 
 async function filterExplicitItemLoss(
@@ -797,38 +811,40 @@ async function filterExplicitItemLoss(
 }
 
 /**
- * Fire lore extraction as fire-and-forget. The turn doesn't block on it,
- * but it still runs so facts introduced in this segment's prose are
- * available to later prompts and continuity checks.
+ * Lore extraction helper. When SETTLED_COMMITMENT_CHOICES is on, the turn
+ * awaits this before returning the snapshot; when off, it runs in the background.
+ * In either mode, extraction failure is logged and fails open.
  */
-function fireLoreExtraction(
+async function extractAndStoreLore(
   result: { content: string; metadata: { continuity?: { remainingIssues?: Array<{ type: string; entity: string }> } } },
   request: { worldId: EntityID; sessionId: EntityID; characterIds: string[] },
-  playerCharacterName?: string
-): void {
+  playerCharacterName?: string,
+  acquiredItems?: Array<{ id: EntityID; name: string }>
+): Promise<void> {
   if (!result.content) return;
 
-  const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
-    recordUsage: false,
-  });
-
-  const unattestedSpeakers = (
-    result.metadata.continuity?.remainingIssues ?? []
-  )
-    .filter((issue) => issue.type === 'invented-exchange')
-    .map((issue) => issue.entity);
-
-  void extractStructuredLore(result.content, existingLoreContext, {
-    continuityTopics: collectContinuityTopicsFromStores(request),
-    playerCharacterName,
-    ...(unattestedSpeakers.length > 0 ? { unattestedSpeakers } : {}),
-  })
-    .then(async (structuredLore) => {
-      const { useLoreStore } = await import('@/state/loreStore');
-      const { addStructuredLore } = useLoreStore.getState();
-      addStructuredLore(structuredLore, request.worldId, request.sessionId);
-    })
-    .catch((error) => {
-      logger.warn('[TurnResolver] Lore extraction failed:', error);
+  try {
+    const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
+      recordUsage: false,
     });
+
+    const unattestedSpeakers = (
+      result.metadata.continuity?.remainingIssues ?? []
+    )
+      .filter((issue) => issue.type === 'invented-exchange')
+      .map((issue) => issue.entity);
+
+    const structuredLore = await extractStructuredLore(result.content, existingLoreContext, {
+      continuityTopics: collectContinuityTopicsFromStores(request),
+      playerCharacterName,
+      ...(unattestedSpeakers.length > 0 ? { unattestedSpeakers } : {}),
+      acquiredItems,
+    });
+
+    const { useLoreStore } = await import('@/state/loreStore');
+    const { addStructuredLore } = useLoreStore.getState();
+    addStructuredLore(structuredLore, request.worldId, request.sessionId);
+  } catch (error) {
+    logger.warn('[TurnResolver] Lore extraction failed:', error);
+  }
 }

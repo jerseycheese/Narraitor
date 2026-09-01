@@ -756,5 +756,76 @@ describe('itemAcquisitionProcessor', () => {
         quantity: 3, // All three merged correctly
       }));
     });
+
+    it('populates sourceId on acquisition record and returns added item references', async () => {
+      mockAddItem.mockReturnValue('new-item-789');
+      mockCategorize.mockResolvedValue({
+        categoryId: 'quest-items',
+        source: 'ai',
+        confidence: 0.95,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      const item: AcquiredItemMetadata = {
+        name: 'Ancient Key',
+        description: 'An old iron key',
+        quantity: 1,
+        acquisitionMethod: 'reward',
+      };
+
+      const result = await processAcquiredItems(
+        [item],
+        'character-123',
+        'session-456',
+        undefined,
+        'segment-abc'
+      );
+
+      expect(result).toEqual([{ id: 'new-item-789', name: 'Ancient Key' }]);
+      expect(mockAddItem).toHaveBeenCalledWith('character-123', expect.objectContaining({
+        acquisition: expect.objectContaining({
+          sourceId: 'segment-abc',
+          sessionId: 'session-456',
+          method: 'reward',
+        }),
+      }));
+    });
+
+    it('returns merged item reference when stackable item merges into existing inventory', async () => {
+      mockGetCharacterItems.mockReturnValue([
+        {
+          id: 'existing-coin-1',
+          name: 'Gold Coin',
+          description: 'A shiny gold coin',
+          quantity: 5,
+          stackable: true,
+          categoryId: 'valuables',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ]);
+      mockCategorize.mockResolvedValue({
+        categoryId: 'valuables',
+        source: 'ai',
+        confidence: 0.95,
+        classifiedAt: new Date().toISOString(),
+      });
+
+      const item: AcquiredItemMetadata = {
+        name: 'Gold Coin',
+        quantity: 3,
+      };
+
+      const result = await processAcquiredItems(
+        [item],
+        'character-123',
+        'session-456',
+        undefined,
+        'segment-xyz'
+      );
+
+      expect(result).toEqual([{ id: 'existing-coin-1', name: 'Gold Coin' }]);
+      expect(mockUpdateItemQuantity).toHaveBeenCalledWith('existing-coin-1', 8);
+    });
   });
 });

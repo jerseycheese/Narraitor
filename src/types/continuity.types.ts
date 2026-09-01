@@ -59,6 +59,10 @@ export interface ContinuityAssertion {
   mentions: number;
 }
 
+export type ContinuityFulfillment =
+  | { kind: 'durable' }
+  | { kind: 'possession'; itemIds: EntityID[] };
+
 /**
  * A promise made in the story, and whether it has since been kept. Delivered
  * commitments are the ones the engine must not promise again.
@@ -68,6 +72,13 @@ export interface ContinuityCommitment {
   by: string;
   statement: string;
   status: 'promised' | 'delivered';
+  /** Aggregated fulfillment evidence from delivered facts on this topic. */
+  fulfillment?: ContinuityFulfillment;
+  /**
+   * True if durable, or if at least one linked possession item ID is present in inventory.
+   * False for lost possessions, unclassified/legacy deliveries, and outstanding promises.
+   */
+  isCurrentlySettled?: boolean;
   /**
    * Words a sentence can use to refer to this commitment — the topic's own
    * significant terms plus those of a matching inventory item. Detection only;

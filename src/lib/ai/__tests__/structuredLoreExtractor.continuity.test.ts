@@ -47,8 +47,79 @@ describe('extractStructuredLore continuity annotations', () => {
       topic: 'mill debt',
       speaker: 'Aunt Carol',
       status: undefined,
+      fulfillment: undefined,
     });
-    expect(result.events[1].continuity).toMatchObject({ kind: 'commitment', status: 'delivered' });
+    expect(result.events[1].continuity).toMatchObject({
+      kind: 'commitment',
+      status: 'delivered',
+      fulfillment: undefined,
+    });
+  });
+
+  it('parses durable and valid possession fulfillment metadata', async () => {
+    respondWith({
+      characters: [],
+      locations: [],
+      rules: [],
+      events: [
+        {
+          description: 'The mayor confirms the city zoning permission is granted.',
+          continuity: {
+            kind: 'commitment',
+            topic: 'zoning permission',
+            speaker: 'Mayor Thorn',
+            status: 'delivered',
+            fulfillment: { kind: 'durable' },
+          },
+        },
+        {
+          description: 'Marcus hands over the cabin master key.',
+          continuity: {
+            kind: 'commitment',
+            topic: 'cabin master key',
+            speaker: 'Marcus',
+            status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'key-101' },
+          },
+        },
+      ],
+    });
+
+    const result = await extractStructuredLore('prose', undefined, {
+      acquiredItems: [{ id: 'key-101', name: 'Cabin Master Key' }],
+    });
+
+    expect(result.events[0].continuity?.fulfillment).toEqual({ kind: 'durable' });
+    expect(result.events[1].continuity?.fulfillment).toEqual({
+      kind: 'possession',
+      itemId: 'key-101',
+    });
+  });
+
+  it('rejects unknown possession item IDs and degrades to unclassified fulfillment', async () => {
+    respondWith({
+      characters: [],
+      locations: [],
+      rules: [],
+      events: [
+        {
+          description: 'Marcus hands over a mysterious key.',
+          continuity: {
+            kind: 'commitment',
+            topic: 'cabin master key',
+            speaker: 'Marcus',
+            status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'unknown-id-999' },
+          },
+        },
+      ],
+    });
+
+    const result = await extractStructuredLore('prose', undefined, {
+      acquiredItems: [{ id: 'key-101', name: 'Cabin Master Key' }],
+    });
+
+    expect(result.events[0].continuity?.fulfillment).toBeUndefined();
   });
 
   it('drops annotations with an unknown kind or bad status', async () => {
@@ -71,6 +142,7 @@ describe('extractStructuredLore continuity annotations', () => {
       topic: undefined,
       speaker: undefined,
       status: undefined,
+      fulfillment: undefined,
     });
     expect(result.events[2].continuity).toBeUndefined();
   });
@@ -80,11 +152,14 @@ describe('extractStructuredLore continuity annotations', () => {
 
     await extractStructuredLore('prose', undefined, {
       continuityTopics: ['mill debt', 'appraisal documents'],
+      acquiredItems: [{ id: 'key-101', name: 'Master Key' }],
     });
 
     const prompt = generateContent.mock.calls[0][0] as string;
     expect(prompt).toContain('mill debt');
     expect(prompt).toContain('appraisal documents');
+    expect(prompt).toContain('key-101');
+    expect(prompt).toContain('Master Key');
     expect(prompt).toContain('"continuity"');
   });
 });

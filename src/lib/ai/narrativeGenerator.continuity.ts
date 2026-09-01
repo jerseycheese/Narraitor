@@ -148,21 +148,23 @@ const readSessionFacts = (request: NarrativeGenerationRequest): LoreFact[] => {
 };
 
 /**
- * Names of what the player is carrying. A delivered commitment matches these
+ * Items what the player is carrying. A delivered commitment matches these
  * against its own topic so prose can name the thing the way the inventory does
  * ("a copy", "the envelope") and still be recognised as that commitment.
  */
-const readInventoryItemNames = (request: NarrativeGenerationRequest): string[] => {
+const readInventoryItems = (
+  request: NarrativeGenerationRequest
+): Array<{ id: EntityID; name: string }> => {
   const inventoryStoreState = useInventoryStore.getState();
   if (typeof inventoryStoreState?.getCharacterItems !== 'function') return [];
 
-  const names: string[] = [];
+  const items: Array<{ id: EntityID; name: string }> = [];
   for (const characterId of request.characterIds ?? []) {
     for (const item of inventoryStoreState.getCharacterItems(characterId) ?? []) {
-      if (item?.name) names.push(item.name);
+      if (item?.name && item?.id) items.push({ id: item.id, name: item.name });
     }
   }
-  return names;
+  return items;
 };
 
 /**
@@ -226,9 +228,16 @@ export const buildContinuityContractFromStores = (
       }
     }
 
-    const inventoryItemNames = snapshot?.inventory
-      ? snapshot.inventory.map((item) => item.name).filter(Boolean)
-      : readInventoryItemNames(request);
+    const inventoryItems = snapshot?.inventory
+      ? snapshot.inventory
+      : readInventoryItems(request);
+
+    const inventoryItemNames = inventoryItems
+      .map((item) => item.name)
+      .filter(Boolean);
+    const inventoryItemIds = inventoryItems
+      .map((item) => item.id)
+      .filter(Boolean);
 
     const playerName = options?.playerName ?? snapshot?.character?.name;
 
@@ -239,6 +248,7 @@ export const buildContinuityContractFromStores = (
       recentDecisions: collectRecentDecisions(request),
       playerName,
       inventoryItemNames,
+      inventoryItemIds,
       unrecordedExchanges: collectUnrecordedExchanges(request, npcNames),
       playerActionText: readPlayerActionText(request),
     });

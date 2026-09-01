@@ -92,6 +92,11 @@ export interface BuildContinuityContractArgs {
    */
   inventoryItemNames?: string[];
   /**
+   * IDs of items currently held in the character's inventory.
+   * Used to check if possession-bound commitments are currently settled.
+   */
+  inventoryItemIds?: EntityID[];
+  /**
    * Prior exchanges the player's action claims but the session never narrated
    * (#1857). Passed through rather than derived here: co-presence lives on the
    * narrative store, and this module stays store-free. Optional so the existing
@@ -207,7 +212,12 @@ export function buildContinuityContract(
     canonFacts,
     recentDecisions: recentDecisions.slice(-MAX_RECENT_DECISIONS),
     assertions: buildAssertions(ledger, playerName),
-    commitments: buildCommitments(ledger, inventoryItemNames, playerActionText),
+    commitments: buildCommitments(
+      ledger,
+      inventoryItemNames,
+      playerActionText,
+      args.inventoryItemIds
+    ),
     sceneChanges: buildSceneChanges(ledger),
     unrecordedExchanges: unrecordedExchanges ?? [],
   };
@@ -300,7 +310,7 @@ export function detectContinuityIssues(
   // contradicts "the town holds the mortgage" isn't a regex question. A fresh
   // promise of a delivered commitment is, so that one gets the fast path.
   for (const commitment of contract.commitments) {
-    if (commitment.status !== 'delivered') continue;
+    if (commitment.status !== 'delivered' || !commitment.isCurrentlySettled) continue;
     const terms = topicTerms(commitment.topic);
     if (terms.length === 0) continue;
     const termPatterns = terms.map(termPattern);
@@ -440,8 +450,21 @@ export function formatContinuityExpectations(contract: ContinuityContract): stri
       'Promises on record (never re-promise what is DELIVERED; never treat what is OUTSTANDING as done):'
     );
     for (const commitment of contract.commitments) {
-      const label = commitment.status === 'delivered' ? 'DELIVERED' : 'OUTSTANDING';
-      lines.push(`- ${label}: ${commitment.topic} (${commitment.by}): ${commitment.statement}`);
+      if (commitment.status === 'delivered') {
+        if (commitment.isCurrentlySettled) {
+          lines.push(`- DELIVERED: ${commitment.topic} (${commitment.by}): ${commitment.statement}`);
+        } else if (commitment.fulfillment?.kind === 'possession') {
+          lines.push(
+            `- PREVIOUSLY DELIVERED (replacement-eligible): ${commitment.topic} (${commitment.by}): ${commitment.statement}`
+          );
+        } else {
+          lines.push(
+            `- PREVIOUSLY DELIVERED: ${commitment.topic} (${commitment.by}): ${commitment.statement}`
+          );
+        }
+      } else {
+        lines.push(`- OUTSTANDING: ${commitment.topic} (${commitment.by}): ${commitment.statement}`);
+      }
     }
   }
   if (contract.sceneChanges.length > 0) {
