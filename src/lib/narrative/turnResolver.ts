@@ -183,6 +183,7 @@ async function resolveTurnInner(
     [...preTurnSnapshot.segments]
   );
   const currentTurn = preTurnSnapshot.turnIndex + 1;
+  const world = worldId ? useWorldStore.getState().worlds[worldId] : undefined;
 
   const worldClock = isFeatureEnabled('WORLD_CLOCK')
     ? buildWorldClockPromptContext(
@@ -190,7 +191,8 @@ async function resolveTurnInner(
           .getState()
           .getAll()
           .filter((thread) => thread.sessionId === sessionId),
-        currentTurn
+        currentTurn,
+        world?.toneSettings?.customInstructions
       )
     : undefined;
 

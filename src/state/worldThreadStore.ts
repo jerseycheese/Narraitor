@@ -8,6 +8,7 @@ import {
   WorldThreadExtractionResult,
   WorldClockSegmentNote,
 } from '../types/worldThread.types';
+import { MIN_DUE_HORIZON_TURNS, FIRED_THREAD_FUSE_TURNS, selectDueNowThread } from '@/lib/narrative/worldClock';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
@@ -224,14 +225,72 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
         const applied: AppliedExtraction = { opened: [], advanced: [], resolved: [] };
         const wasSeeded = sessionId in get().sessionThreads;
 
+        // Only this session's open threads may move; the model can echo a
+        // stale or foreign id and it must not touch another session's ledger.
+        const openThreadOf = (id: EntityID): WorldThread | undefined => {
+          const thread = get().threads[id];
+          return thread && thread.sessionId === sessionId && thread.status === 'open'
+            ? thread
+            : undefined;
+        };
+
+        // A due nearer than the horizon is this scene, not a deadline; floor
+        // it rather than lose the thread or its due.
+        const floorDue = (dueByTurn: number | undefined): number | undefined =>
+          dueByTurn !== undefined ? Math.max(dueByTurn, currentTurn + MIN_DUE_HORIZON_TURNS) : undefined;
+
+        // The pick the scene block rendered for this segment, read before any
+        // of this turn's changes land: an advance on it is the landing the
+        // block asked for, so the thread fires and is never asked to arrive
+        // again.
+        const dueNow = selectDueNowThread(get().getOpenThreadsBySession(sessionId), currentTurn);
+        const dueNowId = dueNow?.id;
+
+        // Firing lights the fuse: the landed thread now owes its strike, cost
+        // or outcome a few turns out, whatever due the arrival carried. An
+        // already-fired thread that strikes while it is the pick is re-fused,
+        // so the pressure returns instead of sitting on it every turn.
+        const fuse = { dueByTurn: currentTurn + FIRED_THREAD_FUSE_TURNS };
+
+        // If the pick was already in the scene, THIS turn rendered its fired
+        // section. Count the strike and re-fuse it immediately, even when the
+        // extractor mis-attributes the strike or files it as a new threat.
+        if (dueNow && dueNow.firedAtTurn !== undefined) {
+          get().update(dueNow.id, {
+            ...fuse,
+            strikeCount: (dueNow.strikeCount ?? 0) + 1,
+          });
+        }
+
         for (const entry of result.opened) {
+          // An arrival that is an open thread landing refines that thread
+          // instead of opening it again under a new name: the specific event
+          // replaces the vague one, and the fuse replaces its due.
+          const covered = entry.covers ? openThreadOf(entry.covers) : undefined;
+          if (covered) {
+            const firing = covered.firedAtTurn === undefined;
+            get().update(covered.id, {
+              kind: entry.kind,
+              summary: entry.summary,
+              lastAdvancedAtTurn: currentTurn,
+              firedAtTurn: covered.firedAtTurn ?? currentTurn,
+              notes: [...covered.notes, `${entry.summary} (was: ${covered.summary})`],
+              ...(firing
+                ? fuse
+                : entry.dueByTurn !== undefined
+                  ? { dueByTurn: floorDue(entry.dueByTurn) }
+                  : {}),
+            });
+            applied.advanced.push(covered.summary);
+            continue;
+          }
           try {
             get().create({
               sessionId,
               worldId,
               kind: entry.kind,
               summary: entry.summary,
-              dueByTurn: entry.dueByTurn,
+              dueByTurn: floorDue(entry.dueByTurn),
               openedAtTurn: currentTurn,
               lastAdvancedAtTurn: currentTurn,
               status: 'open',
@@ -256,23 +315,24 @@ export const useWorldThreadStore = create<WorldThreadStore>()(
                 ? { ...state.sessionThreads, [sessionId]: state.sessionThreads[sessionId] || [] }
                 : state.sessionThreads,
           }));
+        } else if (!wasSeeded) {
+          set((state) => ({
+            sessionThreads: {
+              ...state.sessionThreads,
+              [sessionId]: state.sessionThreads[sessionId] || [],
+            },
+          }));
         }
-
-        // Only this session's open threads may move; the model can echo a
-        // stale or foreign id and it must not touch another session's ledger.
-        const openThreadOf = (id: EntityID): WorldThread | undefined => {
-          const thread = get().threads[id];
-          return thread && thread.sessionId === sessionId && thread.status === 'open'
-            ? thread
-            : undefined;
-        };
 
         for (const entry of result.advanced) {
           const thread = openThreadOf(entry.id);
           if (!thread) continue;
+          const isPick = thread.id === dueNowId;
+          const changeNote = entry.changed || (entry as { note?: string }).note;
           get().update(thread.id, {
             lastAdvancedAtTurn: currentTurn,
-            notes: entry.note ? [...thread.notes, entry.note] : thread.notes,
+            notes: changeNote ? [...thread.notes, changeNote] : thread.notes,
+            ...(isPick && thread.firedAtTurn === undefined ? { firedAtTurn: currentTurn, ...fuse } : {}),
           });
           applied.advanced.push(thread.summary);
         }

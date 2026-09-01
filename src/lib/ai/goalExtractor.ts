@@ -115,8 +115,8 @@ function buildGoalExtractionPrompt(request: GoalExtractionRequest): string {
   const worldThreadSkeleton = request.worldThreads
     ? `,
   "worldThreads": {
-    "opened": [{ "kind": "consequence|actor|deadline", "summary": "...", "dueByTurn": 12 }],
-    "advanced": [{ "id": "thread-id", "note": "..." }],
+    "opened": [{ "kind": "consequence|actor|deadline", "summary": "...", "dueByTurn": 12, "covers": "id of the open thread this is landing or moving, else null" }],
+    "advanced": [{ "id": "thread-id", "changed": "what is different now that was not before" }],
     "resolved": [{ "id": "thread-id", "resolution": "...", "outcome": "resolved|dropped" }]
   }`
     : '';

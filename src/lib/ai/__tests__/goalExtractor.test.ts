@@ -225,7 +225,7 @@ describe('goalExtractor', () => {
       expect(mockSentPrompts[0]).toContain('[thread-abc]');
       expect(result.worldThreads).toEqual({
         opened: [],
-        advanced: [{ id: 'thread-abc', note: expect.any(String) }],
+        advanced: [{ id: 'thread-abc', changed: expect.any(String) }],
         resolved: [],
       });
     });

@@ -9,7 +9,12 @@ import type {
 import type { WorldCostExtractionInput, WorldCostSegmentNote } from '@/types/worldCost.types';
 import { logger } from '@/lib/utils/logger';
 import { isFeatureEnabled } from '@/lib/featureFlags';
-import { isWorldClockTurnSegment, summarizeLedgerForSegment } from '@/lib/narrative/worldClock';
+import {
+  isWorldClockTurnSegment,
+  needsOpenAsk,
+  selectDueNowThread,
+  summarizeLedgerForSegment,
+} from '@/lib/narrative/worldClock';
 import { applyWorldCost } from '@/lib/narrative/applyWorldCost';
 import { useCharacterStore } from '@/state/characterStore';
 import { useGoalStore } from '@/state/goalStore';
@@ -134,11 +139,16 @@ function buildThreadInput(
   segment: NarrativeSegment
 ): WorldThreadExtractionInput {
   const threadStore = useWorldThreadStore.getState();
+  const openThreads = threadStore.getOpenThreadsBySession(sessionId);
+  const seeded = threadStore.hasSessionLedger(sessionId);
+  const sessionThreads = threadStore.getAll().filter((thread) => thread.sessionId === sessionId);
   return {
-    openThreads: threadStore.getOpenThreadsBySession(sessionId),
+    openThreads,
     currentTurn,
     segmentSignals: collectSegmentSignals(segment),
-    seed: threadStore.hasSessionLedger(sessionId) ? undefined : buildSeedContext(worldId, sessionId),
+    seed: seeded ? undefined : buildSeedContext(worldId, sessionId),
+    dueNowThreadId: selectDueNowThread(openThreads, currentTurn)?.id,
+    ...(seeded && needsOpenAsk(sessionThreads, currentTurn) ? { openAsk: true } : {}),
   };
 }
 
