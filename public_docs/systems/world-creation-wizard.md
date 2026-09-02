@@ -43,7 +43,7 @@ The wizard uses local React state for managing:
 
 ## Features
 
-### AI-Powered Suggestions
+### Description-Based Suggestions
 
 This is where the wizard gets smart. Describe a post-apocalyptic wasteland and it suggests skills like "Radiation Resistance" and "Scavenging". Here's how it works:
 

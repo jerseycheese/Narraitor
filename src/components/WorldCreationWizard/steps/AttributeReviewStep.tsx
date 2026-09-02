@@ -298,7 +298,7 @@ export default function AttributeReviewStep({
     <div data-testid="attribute-review-step">
       <WizardFormSection
         title="Review Attributes"
-        description="We've suggested attributes for your world. At least one attribute is required to proceed. Click 'Customize' to modify any attribute, or 'Selected/Excluded' to include/exclude it. You can have up to 6 attributes total."
+        description="Keep the attributes that fit your world. At least one, up to 6."
         dataTutorial="attribute-editor"
       >
         {showClearButton && (

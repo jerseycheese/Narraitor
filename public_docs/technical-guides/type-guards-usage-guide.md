@@ -4,7 +4,7 @@ TypeScript gives you compile-time safety, but at runtime you're still handling u
 
 ## Why This Exists
 
-The challenge was that we kept getting runtime errors from invalid data - APIs returning unexpected shapes, localStorage containing old data formats, user forms with missing fields. TypeScript can't help you there because it only works at compile time.
+Invalid data kept causing runtime errors: APIs returning unexpected shapes, localStorage holding old data formats, user forms with missing fields. TypeScript can't help you there because it only works at compile time.
 
 The type guards system provides two approaches:
 

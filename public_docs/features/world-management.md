@@ -7,9 +7,7 @@ updated: 2026-07-21
 
 # World Management
 
-World creation is where the magic starts - it's where players define the rules and tone that make their narrative experience unique. The challenge was building something flexible enough for any fictional universe (Star Wars, Lovecraft, your own weird sci-fi thing) while keeping it simple enough that someone can just jump in and start playing.
-
-Whether you want "Force Sensitivity" for Star Wars or "Sanity" for horror games, the system adapts to what you need while keeping character creation from becoming a spreadsheet nightmare.
+A world is where you set the rules and tone your story runs on. It has to stretch far enough to cover any fictional universe (Star Wars, Lovecraft, your own weird sci-fi thing) without turning setup into homework before you can start playing.
 
 ## The Building Blocks of Your World
 

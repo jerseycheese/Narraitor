@@ -21,7 +21,7 @@ The AI integration is pretty central to the whole experience. Generic AI story g
 
 **Ending Detection** - Recognizes when a story arc has reached a natural conclusion point.
 
-**Story Checkpoint Generation** - Creates AI-powered "story so far" summaries at major narrative beats to keep long sessions coherent. See `story-checkpoints.md` for details.
+**Story Checkpoint Generation** - Creates "story so far" summaries at major narrative beats to keep long sessions coherent. See `story-checkpoints.md` for details.
 
 ## Security & Performance
 

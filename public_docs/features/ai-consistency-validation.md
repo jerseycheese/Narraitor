@@ -4,7 +4,7 @@
 
 Sometimes the AI forgets that your medieval world doesn't have spaceships, or starts talking about magic in a hard sci-fi campaign. This debugging tool is for figuring out what's going wrong when the AI goes off the rails.
 
-The challenge with AI storytelling is that the AI needs constant reminders about your world's rules, and sometimes those reminders don't work as expected. This system lets you peek under the hood and see exactly how the AI is processing your lore facts and what consistency instructions it's generating for itself.
+Keeping a story straight means feeding the AI constant reminders about your world's rules, and sometimes those reminders don't land. This system lets you peek under the hood and see exactly how the AI is processing your lore facts and what consistency instructions it's generating for itself.
 
 ## What You See
 

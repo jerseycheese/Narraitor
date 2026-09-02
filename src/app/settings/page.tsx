@@ -29,7 +29,7 @@ export default function SettingsPage() {
   return (
     <PageLayout
       title="Settings"
-      description="Manage your application settings and backup your game data. Export creates a downloadable backup file, and import restores your data from a previously exported file."
+      description="Manage your settings and back up your game data."
     >
       {/* Settings Sections */}
       <div className="settings-page">
