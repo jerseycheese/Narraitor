@@ -108,7 +108,7 @@ const sanitizeArray = (value?: unknown, fallback: string[] = []): string[] => {
     .slice(0, 6);
 };
 
-const sanitizeString = (value?: unknown, fallback = ''): string => {
+const trimmedOr = (value?: unknown, fallback = ''): string => {
   if (typeof value !== 'string') {
     return fallback;
   }
@@ -123,7 +123,7 @@ const parseResponse = (content: string, model: string): StoryCheckpointResponseB
   }
 
   const parsed = JSON.parse(payload);
-  const segment = sanitizeString(parsed.segment);
+  const segment = trimmedOr(parsed.segment);
   if (!segment) {
     throw new Error('Segment missing from AI response');
   }
@@ -134,7 +134,7 @@ const parseResponse = (content: string, model: string): StoryCheckpointResponseB
     majorEvents: sanitizeArray(parsed.majorEvents, []),
     includedEvents: typeof parsed.includedEvents === 'number' ? parsed.includedEvents : 0,
     includedDecisions: typeof parsed.includedDecisions === 'number' ? parsed.includedDecisions : 0,
-    lastEventTimestamp: sanitizeString(parsed.lastEventTimestamp),
+    lastEventTimestamp: trimmedOr(parsed.lastEventTimestamp),
     // Record the model the default client actually runs on, not whatever the AI
     // echoed back. The prompt used to carry a stale "gemini-1.5-pro" example and
     // the model dutifully repeated it, mislabelling every checkpoint (#1430 F37).

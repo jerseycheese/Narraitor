@@ -17,8 +17,9 @@
  * no stores; store reads live in `lib/ai/narrativeGenerator.continuity.ts`.
  */
 
+import { escapeRegExp } from '@/lib/utils/formatters';
 import type { EntityID } from '../../types/common.types';
-import { MIN_TERM_LENGTH, escapeRegExp } from './continuityLedger';
+import { MIN_TERM_LENGTH } from './continuityLedger';
 
 /**
  * Two tiers, because the single sharpest failure mode here is firing on a

@@ -12,6 +12,7 @@
  * stores; store reads live in `lib/ai/narrativeGenerator.continuity.ts`.
  */
 
+import { escapeRegExp } from '@/lib/utils/formatters';
 import type { LoreFact } from '../../types/lore.types';
 import type { NPCRelationshipState } from '../../types/world-state.types';
 import type { EntityID } from '../../types/common.types';
@@ -30,8 +31,8 @@ import {
   buildAssertions,
   buildCommitments,
   buildSceneChanges,
-  escapeRegExp,
   ledgerFacts,
+  termPattern,
   topicTerms,
 } from './continuityLedger';
 import { recountsUnrecordedExchange } from './unrecordedExchange';
@@ -233,11 +234,6 @@ export function isContinuityContractEmpty(contract: ContinuityContract): boolean
     contract.sceneChanges.length === 0 &&
     contract.unrecordedExchanges.length === 0
   );
-}
-
-/** Word-start match, so "document" also catches "documents". */
-function termPattern(term: string): RegExp {
-  return new RegExp(`\\b${escapeRegExp(term)}`, 'i');
 }
 
 function findOffendingSentence(

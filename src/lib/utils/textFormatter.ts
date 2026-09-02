@@ -1,4 +1,15 @@
-import { safeTrim } from './formatters';
+import { normalizeText } from './textNormalization';
+
+// Line endings and whitespace only. Quote and special-character rewriting is
+// deliberately off: this path formats narrative prose, and formatDialogue below
+// inserts quotes of its own.
+const WHITESPACE_ONLY = {
+  normalizeWhitespace: true,
+  normalizeLineEndings: true,
+  normalizeQuotes: false,
+  normalizeSpecialChars: false,
+  preserveStructure: true,
+};
 
 /**
  * Options for formatting AI-generated text
@@ -30,7 +41,7 @@ export function formatAIResponse(
 
   // Apply formatting in the correct order for predictable results
   // 1. First normalize whitespace (but preserve paragraph breaks)
-  formatted = normalizeWhitespace(formatted);
+  formatted = normalizeText(formatted, WHITESPACE_ONLY);
 
   // 2. Format dialogue if enabled (before paragraph wrapping to avoid HTML interference)
   if (options.formatDialogue) {
@@ -41,28 +52,6 @@ export function formatAIResponse(
   formatted = formatParagraphs(formatted, options.preserveLineBreaks, options.paragraphSpacing, outputFormat);
 
   return formatted;
-}
-
-/**
- * Normalizes whitespace in the text while preserving paragraph structure
- * @param text - Text to normalize
- * @returns Text with normalized whitespace
- */
-function normalizeWhitespace(text: string): string {
-  // First, normalize line endings to \n
-  let normalized = text.replace(/\r\n/g, '\n');
-  
-  // Replace tabs with spaces
-  normalized = normalized.replace(/\t/g, ' ');
-  
-  // Replace multiple spaces with single space (but preserve newlines)
-  normalized = normalized.replace(/[ ]+/g, ' ');
-  
-  // Trim each line
-  normalized = normalized.split('\n').map(line => safeTrim(line)).join('\n');
-  
-  // Trim the entire string
-  return normalized.trim();
 }
 
 /**

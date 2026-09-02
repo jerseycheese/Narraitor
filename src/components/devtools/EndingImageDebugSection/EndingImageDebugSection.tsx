@@ -95,7 +95,7 @@ export function EndingImageDebugSection() {
       const params = {
         ending: mockEnding,
         world,
-        character,
+        characterName: character?.name,
         recentNarrative
       };
 
@@ -143,7 +143,7 @@ export function EndingImageDebugSection() {
       const params = {
         ending: mockEnding,
         world,
-        character,
+        characterName: character?.name,
         recentNarrative
       };
 

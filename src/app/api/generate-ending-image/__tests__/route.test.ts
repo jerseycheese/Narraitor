@@ -149,6 +149,33 @@ describe('/api/generate-ending-image', () => {
     expect(mockGenerate).not.toHaveBeenCalled();
   });
 
+  // CONTEXT.md rules "hero" out of the vocabulary: a world can be a slasher or a
+  // civic drama, and this prompt steers the image model. "hero banner" further
+  // down is the layout term and is meant to stay.
+  it('puts the character in the scene rather than casting them as a hero', async () => {
+    await POST(
+      makeRequest({
+        ending: { ...mockEnding, tone: 'triumphant' },
+        world: { ...mockWorld, name: 'Camp Crystal Lake', genre: 'slasher' },
+        characterName: 'Sarah',
+      })
+    );
+
+    const prompt = mockClient.generateContent.mock.calls[0][0] as string;
+    expect(prompt).toContain('Sarah standing tall');
+    expect(prompt).not.toMatch(/\bthe hero\b/i);
+  });
+
+  it('falls back to the character when no name is given', async () => {
+    await POST(
+      makeRequest({ ending: { ...mockEnding, tone: 'triumphant' }, world: mockWorld })
+    );
+
+    const prompt = mockClient.generateContent.mock.calls[0][0] as string;
+    expect(prompt).toContain("the character's story");
+    expect(prompt).not.toMatch(/\bthe hero\b/i);
+  });
+
   it('returns 500 when request parsing fails', async () => {
     const response = await POST(makeRequest('invalid json'));
     const data = await response.json();

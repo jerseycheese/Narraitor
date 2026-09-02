@@ -1,12 +1,12 @@
 import type { World } from '@/types/world.types';
-import type { Character } from '@/state/characterStore';
 import type { StoryEnding } from '@/types/narrative.types';
 import { aiFetch } from '@/lib/ai/aiFetch';
 
 export interface EndingImageParams {
   ending: StoryEnding;
   world?: World;
-  character?: Character;
+  /** The name alone. The route's prompt never reads anything else off the character. */
+  characterName?: string;
   recentNarrative: string[];
 }
 
