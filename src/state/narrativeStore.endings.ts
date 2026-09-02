@@ -40,7 +40,7 @@ const buildLocalEnding = ({
   const now = new Date();
   const isoNow = now.toISOString();
   const worldName = params.world?.name || 'their world';
-  const characterName = params.character?.name || 'The hero';
+  const characterName = params.character?.name || 'The character';
 
   const recentNarrative = narrativeSegments
     .slice(-3)

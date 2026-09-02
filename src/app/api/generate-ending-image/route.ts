@@ -29,25 +29,25 @@ interface GenerateEndingImageRequest {
 function generateImagePrompt(ending: StoryEnding, world?: World, characterName?: string, recentNarrative?: string[]): string {
   const genre = world?.genre?.toLowerCase() || 'fantasy';
   const worldName = world?.name || 'Unknown Realm';
-  const heroName = characterName || 'The Hero';
+  const subjectName = characterName || 'the character';
   const tone = ending.tone;
 
-  const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of ${heroName}'s story in ${worldName}. This is a ${tone} ending to their journey.`;
+  const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of ${subjectName}'s story in ${worldName}. This is a ${tone} ending to their journey.`;
   
   // Add tone-specific visual guidance
   let toneGuidance = '';
   switch(tone) {
     case 'triumphant':
-      toneGuidance = 'Victorious, celebratory atmosphere with golden lighting, raised banners, cheering crowds, or the hero standing tall against a bright sky. Convey achievement and success.';
+      toneGuidance = `Victorious, celebratory atmosphere with golden lighting, raised banners, cheering crowds, or ${subjectName} standing tall against a bright sky. Convey achievement and success.`;
       break;
     case 'mysterious':
-      toneGuidance = 'Enigmatic and open-ended with misty atmosphere, mysterious doorways, paths leading into the unknown, or the hero silhouetted against an uncertain horizon. Ethereal, questioning mood.';
+      toneGuidance = `Enigmatic and open-ended with misty atmosphere, mysterious doorways, paths leading into the unknown, or ${subjectName} silhouetted against an uncertain horizon. Ethereal, questioning mood.`;
       break;
     case 'tragic':
       toneGuidance = 'Somber, melancholic atmosphere with muted colors, perhaps rain or storm clouds, memorials or ruins, conveying loss and sacrifice. Respectful, sorrowful mood.';
       break;
     case 'hopeful':
-      toneGuidance = 'Optimistic and forward-looking with bright, warm lighting, new beginnings imagery like sunrise, open roads, or the hero walking toward a bright future. Uplifting, inspiring mood.';
+      toneGuidance = `Optimistic and forward-looking with bright, warm lighting, new beginnings imagery like sunrise, open roads, or ${subjectName} walking toward a bright future. Uplifting, inspiring mood.`;
       break;
     default:
       toneGuidance = 'Reflective ending atmosphere with dramatic lighting and emotional depth.';
@@ -85,7 +85,7 @@ Requirements:
 - Wide landscape orientation (3:1 aspect ratio preferred, suitable for hero banner)
 - Horizontal panoramic composition
 - Show the end of a journey, conclusion, or resolution
-- Focus on ${heroName} or the aftermath of their actions
+- Focus on ${subjectName} or the aftermath of their actions
 - No text, logos, or watermarks
 - Colors and mood appropriate to the ${tone} ending tone`;
 }
@@ -196,7 +196,7 @@ Requirements:
       
       return NextResponse.json({ 
         imageUrl: fallbackUrl,
-        description: `A ${body.ending.tone} ending scene for ${body.characterName || 'the hero'} in ${body.world?.name || 'the realm'}`,
+        description: `A ${body.ending.tone} ending scene for ${body.characterName || 'the character'} in ${body.world?.name || 'the realm'}`,
         placeholder: true,
         aiGenerated: false
       });

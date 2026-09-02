@@ -297,7 +297,7 @@ export function EndingScreen() {
             <Image
               className="component-ending-screen-hero-image"
               src={endingImage}
-              alt={`${capitalize(currentEnding.tone)} ending for ${character?.name || 'the hero'}'s story`}
+              alt={`${capitalize(currentEnding.tone)} ending for ${character?.name || 'the character'}'s story`}
               width={1280}
               height={720}
               priority
