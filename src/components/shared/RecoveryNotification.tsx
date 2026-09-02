@@ -2,18 +2,32 @@
  * RecoveryNotification Component
  *
  * A modal dialog that presents recovery options when saved character creation data is detected.
- * Provides clear user choice between recovering previous progress or starting fresh with
- * data preview and conflict detection.
- *
- * Key Features:
- * - Data preview with character name, progress step, and completion status
- * - Conflict warnings when current form data would be overwritten
- * - Accessible modal dialog with proper ARIA attributes and focus management
- * - Formatted timestamp display with graceful error handling
- * - Auto-focus on primary action for optimal keyboard navigation
+ * Lets the player recover previous progress or start fresh, and warns when recovering would
+ * overwrite data already entered in the current form.
  *
  * @example
- * ```tsx * function CharacterCreationWizard() { * const { hasRecoveryData, recoveryPreview, hasCurrentData, clearAutoSave } = * useCharacterCreationAutoSave(worldId); * const [showDialog, setShowDialog] = useState(false); * * useEffect(() => { * if (hasRecoveryData) setShowDialog(true); * }, [hasRecoveryData]); * * return ( * <RecoveryNotification * isVisible={showDialog} * lastSaved={recoveryPreview?.lastSaved} * recoveryData={recoveryPreview} * hasCurrentData={hasCurrentData} * onRecover={() => setShowDialog(false)} * onDismiss={() => { clearAutoSave(); setShowDialog(false); }} * /> * ); * } *```
+ * ```tsx
+ * function CharacterCreationWizard() {
+ *   const { hasRecoveryData, recoveryPreview, hasCurrentData, clearAutoSave } =
+ *     useCharacterCreationAutoSave(worldId);
+ *   const [showDialog, setShowDialog] = useState(false);
+ *
+ *   useEffect(() => {
+ *     if (hasRecoveryData) setShowDialog(true);
+ *   }, [hasRecoveryData]);
+ *
+ *   return (
+ *     <RecoveryNotification
+ *       isVisible={showDialog}
+ *       lastSaved={recoveryPreview?.lastSaved}
+ *       recoveryData={recoveryPreview}
+ *       hasCurrentData={hasCurrentData}
+ *       onRecover={() => setShowDialog(false)}
+ *       onDismiss={() => { clearAutoSave(); setShowDialog(false); }}
+ *     />
+ *   );
+ * }
+ * ```
  */
 
 import React, { useEffect, useRef } from 'react';

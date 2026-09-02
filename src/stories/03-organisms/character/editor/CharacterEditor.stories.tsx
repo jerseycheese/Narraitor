@@ -18,7 +18,7 @@ const meta = {
     },
     docs: {
       description: {
-        component: `CharacterEditor provides a comprehensive interface for editing existing characters. ## Key Features - **Pre-populated forms** with current character data - **Custom prompt functionality** for portrait generation with undo capability - **Consistent UI components** using shadcn/ui throughout - **Save/Cancel functionality** with proper state management - **Validation reuse** from character creation system ## Recent Improvements - ✅ Custom prompt field no longer gets polluted by API responses - ✅ "Customize physical description" is unchecked by default - ✅ Added "Undo customizations" button for easy reset - ✅ Replaced all raw HTML elements with proper shadcn/ui components - ✅ Consistent button variants (default, outline, destructive, link) - ✅ Proper checkbox, select, textarea, and input components - ✅ **NEW**: Comprehensive UI standardization across entire codebase - ✅ **NEW**: All world editing forms now use shadcn/ui components - ✅ **NEW**: World creation wizard steps updated with consistent UI - ✅ **NEW**: Improved accessibility and keyboard navigation ## Usage The editor automatically loads character data and provides forms for all editable fields including basic info, background, attributes, skills, and portrait generation.`,
+        component: `Edits an existing character. Loads the character's saved data into forms for basic info, background, attributes, skills, and portrait generation, and reuses the validation from character creation. Portrait generation takes an optional custom prompt, with an undo that drops back to the generated description.`,
       },
     },
   },

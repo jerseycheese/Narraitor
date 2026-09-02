@@ -48,7 +48,7 @@ The wizard walks you through 5 steps:
 
 The wizard maintains its own internal state using React hooks and integrates with a few key systems:
 - `worldStore` for persisting created worlds
-- `worldAnalyzer` for AI-powered description analysis
+- `worldAnalyzer` for description analysis
 - Next.js router for navigation
 
 ### State Management

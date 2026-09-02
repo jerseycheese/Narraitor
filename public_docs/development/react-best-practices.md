@@ -260,13 +260,3 @@ test('calls onEdit when clicked', async () => {
   expect(onEdit).toHaveBeenCalledWith('1');
 });
 ```
-
-## Key Takeaways
-
-- **Start simple** - Add complexity only when needed
-- **Single responsibility** - One clear purpose per component
-- **Predictable state** - Flat state is easier to debug
-- **Clear interfaces** - Minimal props with obvious purposes
-- **Early optimization is evil** - Measure before optimizing
-
-The best code is code that doesn't need to exist. The second best is code that's easy to understand and change.

@@ -17,7 +17,7 @@ const meta: Meta<typeof ActiveGameSession> = {
     layout: 'padded',
     docs: {
       description: {
-        component: `# ActiveGameSession The ActiveGameSession component is the core narrative gameplay component that integrates narrative generation, choice selection, and character display. It replaces the older GameSessionActive component and provides full narrative engine integration. ## Key Features - Real-time narrative generation via NarrativeController - Player choice selection with AI-generated options - Character integration and summary display - Loading states for both narrative and choice generation - Error handling with fallback options - Session status management (active, paused, ended) ## Core Stories - **WithExistingSegments**: Main story showing active gameplay with narrative and choices - **LoadingNarrative**: Loading state during narrative generation - **ErrorState**: Error handling when narrative generation fails - **WithCharacter**: Complete integration with character system`,
+        component: `The main gameplay surface. Renders the narrative, the player's choices, and the character summary, driving generation through NarrativeController. Handles loading and error states for both narrative and choice generation, and reflects session status (active, paused, ended).`,
       },
     },
   },

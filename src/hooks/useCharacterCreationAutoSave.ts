@@ -121,15 +121,9 @@ function hasCurrentFormData(data: CharacterCreationState | undefined): boolean {
 /**
  * Character Creation Auto-Save Hook
  *
- * Provides automatic saving and recovery functionality for character creation workflows.
- * Uses localStorage for persistence with debounced saves to prevent excessive writes.
- * Includes recovery detection and user choice dialog integration.
- *
- * Key Features:
- * - Automatic debounced saving (300ms delay)
- * - Recovery data detection on mount
- * - Visual save status feedback
- * - Manual save clearing on completion
+ * Saves character creation progress to localStorage, debounced at 300ms so typing doesn't
+ * thrash the write. Detects recoverable data on mount and exposes a save status for UI
+ * feedback, plus a manual clear for when creation completes.
  *
  * @param worldId - The ID of the world for which the character is being created
  * @returns Object containing save state, data handlers, and recovery status
