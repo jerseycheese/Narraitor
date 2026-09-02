@@ -23,3 +23,11 @@
 .input-error:focus-visible {
   outline-color: var(--color-danger);
 }
+
+.storage-fallback-banner {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4);
+}

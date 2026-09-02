@@ -1,6 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AppSurfaceShell } from '../AppSurfaceShell';
+import {
+  _resetStorageStatusForTesting,
+  _setStorageStatusForTesting,
+} from '@/state/persistence';
+import { StorageStatus } from '@/lib/storage/resilientStorage';
 
 let mockPathname = '/dashboard';
 
@@ -13,6 +18,14 @@ jest.mock('@/components/Navigation', () => ({
 }));
 
 describe('AppSurfaceShell', () => {
+  beforeEach(() => {
+    _resetStorageStatusForTesting();
+  });
+
+  afterEach(() => {
+    _resetStorageStatusForTesting();
+  });
+
   it('renders the app chrome on non-play routes', () => {
     mockPathname = '/worlds';
 
@@ -77,4 +90,21 @@ describe('AppSurfaceShell', () => {
     expect(surface).not.toBeNull();
     expect(surface?.hasAttribute('data-register')).toBe(false);
   });
+
+  it('renders the storage fallback banner when storage is unavailable', () => {
+    mockPathname = '/worlds';
+    _setStorageStatusForTesting(StorageStatus.UNAVAILABLE, {
+      message: 'IndexedDB disabled',
+    });
+
+    render(
+      <AppSurfaceShell>
+        <p>content</p>
+      </AppSurfaceShell>
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText(/Storage is unavailable/i)).toBeInTheDocument();
+  });
 });
+

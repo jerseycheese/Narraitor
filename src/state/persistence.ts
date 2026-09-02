@@ -4,30 +4,99 @@
  */
 
 import { PersistStorage } from 'zustand/middleware';
-import { ResilientStorageMiddleware } from '../lib/storage/resilientStorage';
+import {
+  ResilientStorageMiddleware,
+  StorageStatus,
+  type StorageFallbackNotice,
+} from '../lib/storage/resilientStorage';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('Persistence');
 
-/**
- * Single resilient storage promise with lazy initialization pattern.
- * Avoids race conditions during initialization.
- */
+export type StorageStatusListener = (
+  status: StorageStatus | null,
+  notice: StorageFallbackNotice | null
+) => void;
+
 let resilientStoragePromise: Promise<ResilientStorageMiddleware> | null = null;
+let currentStorageStatus: StorageStatus | null = null;
+let currentFallbackNotice: StorageFallbackNotice | null = null;
+const statusListeners = new Set<StorageStatusListener>();
+
+/**
+ * Active storage status, or null if storage has not reported a degraded state.
+ */
+export const getStorageStatus = (): StorageStatus | null => currentStorageStatus;
+
+/**
+ * Notice detailing why storage fell back to memory, or null if healthy.
+ */
+export const getStorageFallbackNotice = (): StorageFallbackNotice | null =>
+  currentFallbackNotice;
+
+/**
+ * Subscribes to storage status transitions (e.g. IndexedDB failure fallback).
+ * Triggers lazy initialization so checks run even before the first store read.
+ */
+export const subscribeStorageStatus = (
+  listener: StorageStatusListener
+): (() => void) => {
+  statusListeners.add(listener);
+  return () => {
+    statusListeners.delete(listener);
+  };
+};
+
+/**
+ * Test-only helper to reset storage status state between tests.
+ */
+export const _resetStorageStatusForTesting = (): void => {
+  currentStorageStatus = null;
+  currentFallbackNotice = null;
+  statusListeners.clear();
+  resilientStoragePromise = null;
+};
+
+/**
+ * Test-only helper to dispatch storage status transitions in tests.
+ */
+export const _setStorageStatusForTesting = (
+  status: StorageStatus | null,
+  notice: StorageFallbackNotice | null = null
+): void => {
+  currentStorageStatus = status;
+  currentFallbackNotice = notice;
+  statusListeners.forEach((listener) => {
+    try {
+      listener(currentStorageStatus, currentFallbackNotice);
+    } catch (err) {
+      logger.error('[Persistence] Error in test storage status listener:', err);
+    }
+  });
+};
 
 /**
  * Get ResilientStorageMiddleware instance with lazy initialization.
  * This ensures the middleware is only initialized once and properly shared.
  * Falls back to memory-only storage if initialization fails.
  */
-const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
+export const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
   if (!resilientStoragePromise) {
     resilientStoragePromise = (async () => {
       const storage = new ResilientStorageMiddleware({
         onStatusChange: (status, notice) => {
+          currentStorageStatus = status;
+          currentFallbackNotice = notice ?? null;
           if (notice) {
-            logger.warn('[Persistence] Storage status changed:', status, notice.message);
+            logger.error('[Persistence] Storage status changed:', status, notice.message);
           }
+          statusListeners.forEach((listener) => {
+            try {
+              listener(currentStorageStatus, currentFallbackNotice);
+            } catch (err) {
+              logger.error('[Persistence] Error in storage status listener:', err);
+            }
+          });
         },
       });
 
