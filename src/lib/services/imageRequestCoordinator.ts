@@ -1,4 +1,4 @@
-const DEFAULT_RATE_LIMIT_DELAY_MS = 1500;
+const RATE_LIMIT_DELAY_MS = 1500;
 
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -11,11 +11,6 @@ const delay = (ms: number): Promise<void> =>
  */
 export class ImageRequestCoordinator<TResult> {
   private readonly cache = new Map<string, Promise<TResult>>();
-  private readonly rateLimitDelayMs: number;
-
-  constructor(options?: { rateLimitDelayMs?: number }) {
-    this.rateLimitDelayMs = options?.rateLimitDelayMs ?? DEFAULT_RATE_LIMIT_DELAY_MS;
-  }
 
   /**
    * Run (or return the in-flight Promise for) a single request keyed by id.
@@ -49,7 +44,7 @@ export class ImageRequestCoordinator<TResult> {
         // Swallow — caller logs inside runOne if desired.
       }
       if (i < items.length - 1) {
-        await delay(this.rateLimitDelayMs);
+        await delay(RATE_LIMIT_DELAY_MS);
       }
     }
   }

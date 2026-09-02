@@ -11,6 +11,7 @@
  * stores; store reads live in `lib/ai/narrativeGenerator.continuity.ts`.
  */
 
+import { escapeRegExp } from '@/lib/utils/formatters';
 import type { EntityID } from '../../types/common.types';
 import type { LoreFact } from '../../types/lore.types';
 import type {
@@ -39,10 +40,6 @@ const TOPIC_STOPWORDS = new Set([
 // The extractor tags the player's own questions as assertions spoken by "the
 // protagonist"; a question is not an answer, so player-spoken lines are dropped.
 const PLAYER_SPEAKER = /^(?:the )?(?:protagonist|player|you)$/i;
-
-export function escapeRegExp(term: string): string {
-  return term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 
 /** Topic labels compare case- and punctuation-insensitively so "Mill debt" and "mill debt" line up. */
 function normalizeTopic(topic: string): string {
@@ -128,7 +125,7 @@ const REPROMISE_LEXICON =
   /\b(?:re-?promis\w*|reassur\w*|reiterate(?:\s+your|\s+the|\s+his|\s+her|\s+their)?\s+promise|repeat(?:\s+your|\s+the|\s+his|\s+her|\s+their)?\s+promise)\b|\b(?:promis\w*|swear\w*|vow\w*|assur\w*|give\s+(?:me\s+)?your\s+word)\b[\s\S]*?\bagain\b/i;
 
 /** Word-start match, so "document" also catches "documents". */
-function termPattern(term: string): RegExp {
+export function termPattern(term: string): RegExp {
   return new RegExp(`\\b${escapeRegExp(term)}`, 'i');
 }
 

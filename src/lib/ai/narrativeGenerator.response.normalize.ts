@@ -1,5 +1,5 @@
 import { normalizeText, NORM_DESC } from '@/lib/utils/textNormalization';
-import { safeTrim } from '@/lib/utils';
+import { escapeRegExp, safeTrim } from '@/lib/utils';
 import type { NarrativeExtractedMetadata } from './narrativeGenerator.response.types';
 
 /**
@@ -63,8 +63,6 @@ export const normalizeNarrativeContent = (
     extractedMetadata.characters.length > 0 &&
     normalizedContent
   ) {
-    const escapeRegExp = (value: string) =>
-      value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     extractedMetadata.characters.forEach((character) => {
       if (!character?.id) return;
       const tokenRegex = new RegExp(`\\[${escapeRegExp(character.id)}\\]`, 'g');

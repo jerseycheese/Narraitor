@@ -3,7 +3,6 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import type { StoryEnding } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
-import type { Character } from '@/types/character.types';
 import Logger from '@/lib/utils/logger';
 import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
@@ -20,19 +19,20 @@ const MAX_IMPACT_CHARS = 200;
 interface GenerateEndingImageRequest {
   ending: StoryEnding;
   world?: World;
-  character?: Character;
+  /** The name alone. The prompt never reads anything else off the character. */
+  characterName?: string;
   recentNarrative?: string[];
   promptOnly?: boolean;
 }
 
 // Generate a detailed image prompt based on ending characteristics
-function generateImagePrompt(ending: StoryEnding, world?: World, character?: Character, recentNarrative?: string[]): string {
+function generateImagePrompt(ending: StoryEnding, world?: World, characterName?: string, recentNarrative?: string[]): string {
   const genre = world?.genre?.toLowerCase() || 'fantasy';
   const worldName = world?.name || 'Unknown Realm';
-  const characterName = character?.name || 'The Hero';
+  const heroName = characterName || 'The Hero';
   const tone = ending.tone;
-  
-  const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of ${characterName}'s story in ${worldName}. This is a ${tone} ending to their journey.`;
+
+  const basePrompt = `Create a highly detailed, cinematic image representing the conclusion of ${heroName}'s story in ${worldName}. This is a ${tone} ending to their journey.`;
   
   // Add tone-specific visual guidance
   let toneGuidance = '';
@@ -85,7 +85,7 @@ Requirements:
 - Wide landscape orientation (3:1 aspect ratio preferred, suitable for hero banner)
 - Horizontal panoramic composition
 - Show the end of a journey, conclusion, or resolution
-- Focus on ${characterName} or the aftermath of their actions
+- Focus on ${heroName} or the aftermath of their actions
 - No text, logos, or watermarks
 - Colors and mood appropriate to the ${tone} ending tone`;
 }
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     try {
       // Generate image prompt using AI (player's BYO key -> env fallback)
       const apiKey = resolveApiKey(request);
-      const imagePrompt = generateImagePrompt(body.ending, body.world, body.character, body.recentNarrative);
+      const imagePrompt = generateImagePrompt(body.ending, body.world, body.characterName, body.recentNarrative);
 
       // Length rather than text - this prompt carries the player's story.
       logger.debug('generate-ending-image', 'Image prompt built', { length: imagePrompt.length });
@@ -196,7 +196,7 @@ Requirements:
       
       return NextResponse.json({ 
         imageUrl: fallbackUrl,
-        description: `A ${body.ending.tone} ending scene for ${body.character?.name || 'the hero'} in ${body.world?.name || 'the realm'}`,
+        description: `A ${body.ending.tone} ending scene for ${body.characterName || 'the hero'} in ${body.world?.name || 'the realm'}`,
         placeholder: true,
         aiGenerated: false
       });

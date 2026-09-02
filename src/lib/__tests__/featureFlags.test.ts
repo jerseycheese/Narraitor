@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import path from 'path';
 
 describe('featureFlags', () => {
   const originalEnv = process.env;
@@ -99,6 +101,22 @@ describe('featureFlags', () => {
         'SETTLED_COMMITMENT_CHOICES'
       )
     ).toBe(false);
+  });
+
+  // The kill switches are only reachable in an incident if .env.example names
+  // them, so this asserts the two files agree rather than trusting a docblock.
+  it('gives every flag a commented override line in .env.example', () => {
+    const repoRoot = path.resolve(__dirname, '../../..');
+    const source = readFileSync(path.join(repoRoot, 'src/lib/featureFlags.ts'), 'utf8');
+    const example = readFileSync(path.join(repoRoot, '.env.example'), 'utf8');
+
+    const envVars = [...new Set(source.match(/NEXT_PUBLIC_FEATURE_[A-Z_]+/g) ?? [])];
+    expect(envVars.length).toBeGreaterThan(0);
+
+    const undocumented = envVars.filter(
+      (name) => !new RegExp(`^#\\s*${name}=`, 'm').test(example)
+    );
+    expect(undocumented).toEqual([]);
   });
 
   it('supports downstream gating decisions for BUFFERED_STREAMING', () => {

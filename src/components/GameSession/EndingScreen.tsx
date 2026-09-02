@@ -126,7 +126,7 @@ export function EndingScreen() {
       const data = await requestEndingImage({
         ending: currentEnding,
         world,
-        character,
+        characterName: character?.name,
         recentNarrative,
       });
       setEndingImage(data.imageUrl);

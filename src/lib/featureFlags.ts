@@ -1,8 +1,9 @@
 /**
  * Feature flags, read from NEXT_PUBLIC_* env vars.
  *
- * This file is the one place a flag's default lives. `.env.example` points
- * here rather than restating them, so the two can't drift apart.
+ * This file is the one place a flag's default lives. `.env.example` carries a
+ * commented override line for every flag so an operator can find one without
+ * reading `src/lib/`. Add a flag in both places, or the example file lies.
  *
  * Env access stays literal on purpose: Next.js inlines `process.env.NEXT_PUBLIC_*`
  * at build time, so a dynamic lookup keyed off a variable would read undefined

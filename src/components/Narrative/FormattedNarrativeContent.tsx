@@ -1,5 +1,5 @@
 import React from 'react';
-import { safeTrim } from '@/lib/utils';
+import { escapeRegExp, safeTrim } from '@/lib/utils';
 
 interface FormattedNarrativeContentProps {
   content: string;
@@ -9,9 +9,6 @@ interface FormattedNarrativeContentProps {
   definitionTerms?: string[];
   onTermClick?: (termText: string, anchorElement: HTMLElement) => void;
 }
-
-const escapeRegExp = (value: string) =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const isWordCharacter = (value: string) => /[0-9A-Za-z]/.test(value);
 

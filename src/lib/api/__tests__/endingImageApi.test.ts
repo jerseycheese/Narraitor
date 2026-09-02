@@ -10,12 +10,27 @@ const mockAiFetch = aiFetch as jest.MockedFunction<typeof aiFetch>;
 
 const params = {
   ending: { id: 'ending-1', tone: 'hopeful' } as StoryEnding,
+  characterName: 'Wren',
   recentNarrative: ['The hero rested.'],
 };
 
 describe('endingImageApi', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('sends the character name rather than the whole character', async () => {
+    mockAiFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ imageUrl: 'image-url' }),
+    } as unknown as Response);
+
+    await generateEndingImage(params);
+
+    const [, init] = mockAiFetch.mock.calls[0];
+    const body = JSON.parse(init?.body as string);
+    expect(body.characterName).toBe('Wren');
+    expect(body.character).toBeUndefined();
   });
 
   it('asks for the prompt alone without generating an image', async () => {

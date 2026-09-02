@@ -407,6 +407,27 @@ export function safeTrim(text: string | null | undefined): string {
 }
 
 /**
+ * Escapes regex metacharacters so a runtime string can be dropped into a
+ * `new RegExp(...)` and matched literally.
+ *
+ * Callers here build patterns out of player- and AI-supplied text (character
+ * names, lore terms), which can contain a `.` or a `(` without warning.
+ *
+ * @param value - Text to be matched literally
+ * @returns The same text with every regex metacharacter backslash-escaped
+ *
+ * @example
+ * ```typescript
+ * import { escapeRegExp } from '@/lib/utils';
+ *
+ * new RegExp(`\\b${escapeRegExp('St. Cloud')}`, 'i');
+ * ```
+ */
+export function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Safely serializes objects for JSON storage, handling functions, dates, and circular references.
  * Uses a WeakSet to detect circular references during traversal.
  *

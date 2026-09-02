@@ -24,6 +24,7 @@ export {
   capitalize,
   titleCase,
   safeTrim,
+  escapeRegExp,
 } from './formatters';
 
 /** Text normalization utilities for consistent text formatting */
