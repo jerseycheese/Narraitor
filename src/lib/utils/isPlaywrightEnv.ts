@@ -1,15 +1,15 @@
 /**
  * Detects whether the app is running under a Playwright E2E/visual test.
- * Playwright sets `window.__PLAYWRIGHT__` before the app loads (see
- * tests/visual/global.setup.ts); the user-agent check is a fallback.
  *
- * Centralized so every call site agrees on the flag name and shape — a prior
- * copy-paste used the wrong casing (`__playwright`) and silently never matched.
+ * We key strictly off the explicit `window.__PLAYWRIGHT__` flag injected by our
+ * test harness before scripts execute (see tests/visual/global.setup.ts).
+ * We don't inspect the client user-agent string: user-agents are client-controlled,
+ * so matching on substrings like 'Playwright' risks tripping test mode for real
+ * production visitors (suppressing provider modals, AI narrative generation, and
+ * telemetry).
  *
- * Note: this gates render-path behaviour (AI generation, checkpoints) on top of
- * dev-UI suppression, so keep it tied to the explicit Playwright flag. Panel
- * suppression that needs to catch *any* automation lives in ClientOnlyDevTools.
+ * Centralized so call sites agree on the flag name and shape.
  */
 export const isPlaywrightEnv = (): boolean =>
-  typeof window !== 'undefined' &&
-  (window.navigator.userAgent.includes('Playwright') || !!window.__PLAYWRIGHT__);
+  typeof window !== 'undefined' && !!window.__PLAYWRIGHT__;
+
