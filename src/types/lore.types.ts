@@ -59,6 +59,10 @@ export interface LoreUsageStats {
  */
 export type LoreContinuityKind = 'assertion' | 'commitment' | 'scene-change';
 
+export type LoreContinuityFulfillment =
+  | { kind: 'durable' }
+  | { kind: 'possession'; itemId: EntityID };
+
 export interface LoreContinuityAnnotation {
   kind: LoreContinuityKind;
   /** Short stable label for the question/promise/object so repeats line up across turns. */
@@ -67,6 +71,8 @@ export interface LoreContinuityAnnotation {
   speaker?: string;
   /** Commitments only. */
   status?: 'promised' | 'delivered';
+  /** Fulfillment classification for delivered commitments. Missing means legacy or unclassified. */
+  fulfillment?: LoreContinuityFulfillment;
 }
 
 /**

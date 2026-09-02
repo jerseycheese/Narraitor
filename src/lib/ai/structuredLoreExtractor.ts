@@ -7,8 +7,10 @@ import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { extractFencedJson } from './parseJSON';
 import { canonicalizeName } from '@/lib/utils/textNormalization';
 import { asTrimmedString } from '@/lib/utils/typeGuards';
+import type { EntityID } from '@/types/common.types';
 import type {
   LoreContinuityAnnotation,
+  LoreContinuityFulfillment,
   LoreContinuityKind,
   StructuredLoreExtraction,
 } from '@/types/lore.types';
@@ -38,6 +40,11 @@ export interface ExtractStructuredLoreOptions {
    * permanent canon assertion. Scoped to one turn and one speaker.
    */
   unattestedSpeakers?: string[];
+  /**
+   * Controlled item IDs and names acquired on this turn. Passed so the model
+   * can link possession-bound deliveries to exact item IDs.
+   */
+  acquiredItems?: Array<{ id: EntityID; name: string }>;
 }
 
 /**
@@ -55,7 +62,8 @@ export async function extractStructuredLore(
       existingLoreContext,
       options?.continuityTopics,
       options?.playerCharacterName,
-      options?.unattestedSpeakers
+      options?.unattestedSpeakers,
+      options?.acquiredItems
     );
     const response = await geminiClient.generateContent(prompt);
     
@@ -76,7 +84,7 @@ export async function extractStructuredLore(
     const extractedLore = JSON.parse(jsonStr) as StructuredLoreExtraction;
     return dropUnattestedAssertions(
       reservePlayerCharacterName(
-        validateAndCleanExtraction(extractedLore),
+        validateAndCleanExtraction(extractedLore, options?.acquiredItems),
         options?.playerCharacterName
       ),
       options?.unattestedSpeakers
@@ -96,7 +104,8 @@ function buildLoreExtractionPrompt(
   existingLoreContext?: string,
   continuityTopics?: string[],
   playerCharacterName?: string,
-  unattestedSpeakers?: string[]
+  unattestedSpeakers?: string[],
+  acquiredItems?: Array<{ id: EntityID; name: string }>
 ): string {
   const existingContext = existingLoreContext ? `\n\nExisting Lore Context:\n${existingLoreContext}` : '';
   const playerNameRule = playerCharacterName
@@ -109,6 +118,10 @@ function buildLoreExtractionPrompt(
   const topicHint =
     continuityTopics && continuityTopics.length > 0
       ? `\n- Continuity topics already in use (reuse the exact label when an event is about the same question, promise, or object): ${continuityTopics.join('; ')}`
+      : '';
+  const acquiredItemsHint =
+    acquiredItems && acquiredItems.length > 0
+      ? `\n- Controlled items acquired in this scene (use the exact itemId when linking possession fulfillment): ${acquiredItems.map((item) => `${item.id} ("${item.name}")`).join(', ')}`
       : '';
 
   return `You are a lore extraction system. Analyze the following narrative text and extract important facts as structured JSON.
@@ -144,8 +157,11 @@ CONTINUITY TAGGING (within the 3-event limit, prefer events that carry one of th
 - Add "continuity" to an event when it is one of:
   - "assertion": a character or the narration ANSWERS a factual question about the world (who owns what, what happened when, how much, whether something exists). A question being asked is not an assertion; only tag the answer. "topic" is a short label for the question (e.g. "mill debt"), "speaker" is who gave the answer ("narration" if unattributed).
   - "commitment": someone promises to do or provide something ("status": "promised"), or actually delivers on such a promise ("status": "delivered"). "topic" names the thing promised (e.g. "appraisal documents"), "speaker" is who promised.
+    - When "status" is "delivered", add "fulfillment":
+      - { "kind": "durable" } for services, permissions, revealed truths, agreements, or status changes that do not depend on holding a physical item.
+      - { "kind": "possession", "itemId": "<exact itemId from Acquired Items list>" } when the delivery gave the player a physical item listed in the Acquired Items list above.
   - "scene-change": the protagonist physically and lastingly changes the scene (tears, breaks, moves, takes, opens something). "topic" names the object.
-- Leave "continuity" out for everything else.${topicHint}
+- Leave "continuity" out for everything else.${topicHint}${acquiredItemsHint}
 
 Narrative Text:
 ${narrativeText}${existingContext}
@@ -183,7 +199,7 @@ Respond with ONLY a JSON block in this exact format:
       "importance": "low|medium|high",
       "visibility": "session-private|world-shared",
       "relatedEntities": ["entity1", "entity2"],
-      "continuity": { "kind": "assertion|commitment|scene-change", "topic": "short label", "speaker": "who said/promised it", "status": "promised|delivered" }
+      "continuity": { "kind": "assertion|commitment|scene-change", "topic": "short label", "speaker": "who said/promised it", "status": "promised|delivered", "fulfillment": { "kind": "durable" } }
     }
   ],
   "rules": [
@@ -212,7 +228,10 @@ Respond with ONLY a JSON block in this exact format:
 /**
  * Validate and clean the extracted lore
  */
-function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtraction {
+function validateAndCleanExtraction(
+  extraction: unknown,
+  allowedAcquiredItems?: Array<{ id: EntityID; name: string }>
+): StructuredLoreExtraction {
   const cleaned: StructuredLoreExtraction = {
     characters: [],
     locations: [],
@@ -265,7 +284,7 @@ function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtracti
         visibility: ['session-private', 'world-shared'].includes(event.visibility as string) ? event.visibility as 'session-private' | 'world-shared' : undefined,
         relatedEntities: Array.isArray(event.relatedEntities) ?
           (event.relatedEntities as unknown[]).filter((e) => typeof e === 'string') as string[] : undefined,
-        continuity: cleanContinuityAnnotation(event.continuity),
+        continuity: cleanContinuityAnnotation(event.continuity, allowedAcquiredItems),
       }));
   }
 
@@ -366,17 +385,41 @@ function dropUnattestedAssertions(
 }
 
 /** An annotation with an unknown kind is dropped; bad optional fields are just omitted. */
-function cleanContinuityAnnotation(raw: unknown): LoreContinuityAnnotation | undefined {
+function cleanContinuityAnnotation(
+  raw: unknown,
+  allowedAcquiredItems?: Array<{ id: EntityID; name: string }>
+): LoreContinuityAnnotation | undefined {
   if (!raw || typeof raw !== 'object') return undefined;
   const annotation = raw as Record<string, unknown>;
   const kind = annotation.kind as LoreContinuityKind;
   if (!CONTINUITY_KINDS.includes(kind)) return undefined;
   const status = annotation.status as (typeof COMMITMENT_STATUSES)[number];
+  const validStatus = COMMITMENT_STATUSES.includes(status) ? status : undefined;
+
+  let fulfillment: LoreContinuityFulfillment | undefined = undefined;
+  if (
+    kind === 'commitment' &&
+    validStatus === 'delivered' &&
+    annotation.fulfillment &&
+    typeof annotation.fulfillment === 'object'
+  ) {
+    const rawFulfillment = annotation.fulfillment as Record<string, unknown>;
+    if (rawFulfillment.kind === 'durable') {
+      fulfillment = { kind: 'durable' };
+    } else if (rawFulfillment.kind === 'possession') {
+      const itemId = asTrimmedString(rawFulfillment.itemId);
+      if (itemId && allowedAcquiredItems?.some((item) => item.id === itemId)) {
+        fulfillment = { kind: 'possession', itemId };
+      }
+    }
+  }
+
   return {
     kind,
     topic: asTrimmedString(annotation.topic),
     speaker: asTrimmedString(annotation.speaker),
-    status: COMMITMENT_STATUSES.includes(status) ? status : undefined,
+    status: validStatus,
+    fulfillment,
   };
 }
 

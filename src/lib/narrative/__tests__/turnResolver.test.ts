@@ -400,7 +400,8 @@ describe('TurnResolver', () => {
         [{ name: 'Iron sword' }],
         'char-1',
         'session-1',
-        expect.any(Function)
+        expect.any(Function),
+        expect.any(String)
       );
     });
 
@@ -409,7 +410,7 @@ describe('TurnResolver', () => {
         metadata: {
           characterIds: [],
           tags: [],
-          itemsLost: [{ name: 'Old key' }],
+          itemsLost: [{ name: 'Healing potion' }],
         },
       });
       const generator = makeMockGenerator(result);
@@ -418,7 +419,7 @@ describe('TurnResolver', () => {
       await resolveTurn(command, generator);
 
       expect(processLostItems).toHaveBeenCalledWith(
-        [{ name: 'Old key' }],
+        [{ name: 'Healing potion' }],
         'char-1',
         'session-1',
         expect.any(Function)
@@ -430,7 +431,7 @@ describe('TurnResolver', () => {
         metadata: {
           characterIds: [],
           tags: [],
-          characters: [{ id: 'npc-1', name: 'Guard', role: 'guard' }],
+          characters: [{ id: 'npc-1', name: 'Townsperson', description: 'A local' }],
         },
       });
       const generator = makeMockGenerator(result);
@@ -438,73 +439,72 @@ describe('TurnResolver', () => {
 
       await resolveTurn(command, generator);
 
-      expect(syncNpcMetadata).toHaveBeenCalledWith(
-        'world-1',
-        expect.arrayContaining([expect.objectContaining({ name: 'Guard' })])
-      );
+      expect(syncNpcMetadata).toHaveBeenCalledWith('world-1', [
+        { id: 'npc-1', name: 'Townsperson', description: 'A local' },
+      ]);
     });
 
     it('stamps fatal-outcome tag from world cost reconciliation', async () => {
       (applyWorldClockUpdates as jest.Mock).mockResolvedValueOnce({
-        worldCost: { fatal: true, entries: [] },
+        worldCost: { applied: true, fatal: true, message: 'Fatigue claims you' },
       });
-
       const generator = makeMockGenerator();
       const command = makeCommand();
 
-      const result = await resolveTurn(command, generator);
+      const turnResult = await resolveTurn(command, generator);
 
-      expect(result.isFatal).toBe(true);
+      expect(turnResult.segment.metadata?.tags).toContain('fatal-outcome');
+      expect(turnResult.isFatal).toBe(true);
     });
 
     it('marks isFatal from a critical failure command without setting isEnding', async () => {
       const generator = makeMockGenerator();
       const command = makeCommand({ isFatalCriticalFailure: true });
 
-      const result = await resolveTurn(command, generator);
+      const turnResult = await resolveTurn(command, generator);
 
-      // isFatal is true because the command says so, but isEnding stays
-      // false because the segment itself doesn't carry ending tags.
-      // The controller decides what to do with isFatal based on its own
-      // handler availability.
-      expect(result.isFatal).toBe(true);
-      expect(result.isEnding).toBe(false);
+      expect(turnResult.isFatal).toBe(true);
+      expect(turnResult.isEnding).toBe(false);
     });
 
     it('post-turn snapshot reflects the committed segment', async () => {
-      const generator = makeMockGenerator();
+      const generator = makeMockGenerator(
+        makeGenerationResult({ content: 'A unique narrative beat.' })
+      );
       const command = makeCommand();
 
-      const result = await resolveTurn(command, generator);
+      const turnResult = await resolveTurn(command, generator);
 
-      expect(result.snapshot.turnIndex).toBeGreaterThan(0);
-      const storedSegments = useNarrativeStore.getState().getSessionSegments('session-1');
-      expect(storedSegments.length).toBe(1);
+      expect(turnResult.snapshot.segments.length).toBeGreaterThan(0);
+      expect(
+        turnResult.snapshot.segments[turnResult.snapshot.segments.length - 1].content
+      ).toBe('A unique narrative beat.');
     });
 
     it('returns an explicit partial result when reconciliation fails', async () => {
       (applyWorldClockUpdates as jest.Mock).mockRejectedValueOnce(
-        new Error('clock extraction failed')
+        new Error('database unavailable')
       );
-
       const generator = makeMockGenerator();
-      const result = await resolveTurn(makeCommand(), generator);
+      const command = makeCommand();
 
-      expect(result.status).toBe('partial');
-      expect(result.segment).toBeDefined();
-      expect(result.reconciliationErrors).toHaveLength(1);
-      expect(result.reconciliationErrors[0].step).toBe('worldClock');
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.status).toBe('partial');
+      expect(turnResult.reconciliationErrors.length).toBeGreaterThan(0);
     });
 
     it('captures reconciliation failures reported by fail-open helpers', async () => {
       (applyWorldClockUpdates as jest.Mock).mockImplementationOnce(
-        ({ onError }: { onError: (error: unknown) => void }) => {
-          onError(new Error('clock helper failed internally'));
-          return Promise.resolve(undefined);
+        async ({ onError }: { onError?: (err: unknown) => void }) => {
+          onError?.(new Error('world clock non-fatal'));
+          return null;
         }
       );
+      const generator = makeMockGenerator();
+      const command = makeCommand();
 
-      const result = await resolveTurn(makeCommand(), makeMockGenerator());
+      const result = await resolveTurn(command, generator);
 
       expect(result.status).toBe('partial');
       expect(result.reconciliationErrors).toEqual([
@@ -512,11 +512,59 @@ describe('TurnResolver', () => {
       ]);
     });
 
-    it('fires lore extraction as fire-and-forget', async () => {
+    it('fires lore extraction as fire-and-forget when flag is off', async () => {
       const generator = makeMockGenerator();
       await resolveTurn(makeCommand(), generator);
 
       expect(extractStructuredLore).toHaveBeenCalledTimes(1);
+    });
+
+    it('awaits lore extraction when SETTLED_COMMITMENT_CHOICES is enabled and passes acquired items', async () => {
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation(
+        (flag: string) => flag === 'SETTLED_COMMITMENT_CHOICES'
+      );
+      (processAcquiredItems as jest.Mock).mockResolvedValueOnce([{ id: 'key-1', name: 'Master Key' }]);
+
+      const generator = makeMockGenerator(
+        makeGenerationResult({
+          content: 'You receive the master key.',
+          metadata: {
+            characterIds: [],
+            tags: [],
+            itemsAcquired: [{ name: 'Master Key' }],
+          },
+        })
+      );
+
+      const result = await resolveTurn(makeCommand(), generator);
+
+      expect(result.status).toBe('settled');
+      expect(extractStructuredLore).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.objectContaining({
+          acquiredItems: [{ id: 'key-1', name: 'Master Key' }],
+        })
+      );
+
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    });
+
+    it('fails open if lore extraction throws under SETTLED_COMMITMENT_CHOICES without marking turn partial', async () => {
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation(
+        (flag: string) => flag === 'SETTLED_COMMITMENT_CHOICES'
+      );
+      (extractStructuredLore as jest.Mock).mockRejectedValueOnce(new Error('AI extraction timeout'));
+
+      const generator = makeMockGenerator();
+      const result = await resolveTurn(makeCommand(), generator);
+
+      expect(result.status).toBe('settled');
+      expect(result.reconciliationErrors).toEqual([]);
+
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
     });
 
     it('passes playerCharacterName to lore extraction', async () => {

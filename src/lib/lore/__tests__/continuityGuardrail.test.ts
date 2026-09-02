@@ -11,6 +11,7 @@ import {
   CONTINUITY_CORRECTION_HEADER,
 } from '../continuityGuardrail';
 import { collectContinuityTopics } from '../continuityLedger';
+import type { EntityID } from '@/types/common.types';
 import type { LoreFact } from '@/types/lore.types';
 import type {
   ContinuityContract,
@@ -209,7 +210,10 @@ const makeEvent = (
 const buildLedgerContract = (
   facts: LoreFact[],
   playerName?: string,
-  inventoryItemNames?: string[]
+  inventoryItemNames?: string[],
+  unrecordedExchanges?: ContinuityUnrecordedExchange[],
+  playerActionText?: string,
+  inventoryItemIds?: EntityID[]
 ) =>
   buildContinuityContract({
     facts,
@@ -218,6 +222,9 @@ const buildLedgerContract = (
     recentDecisions: [],
     playerName,
     inventoryItemNames,
+    inventoryItemIds,
+    unrecordedExchanges,
+    playerActionText,
   });
 
 describe('ledger-fed contract', () => {
@@ -275,14 +282,14 @@ describe('ledger-fed contract', () => {
       makeEvent('e1', 'Thorn promises the appraisal documents before any vote.',
         { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'promised' }, '2025-01-01T00:00:00.000Z'),
       makeEvent('e2', 'Thorn hands the appraisal documents to the player.',
-        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered' }, '2025-01-01T00:10:00.000Z'),
+        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered', fulfillment: { kind: 'durable' } }, '2025-01-01T00:10:00.000Z'),
       makeEvent('e3', 'Caleb promises to speak at the meeting.',
         { kind: 'commitment', topic: 'Caleb speaks publicly', speaker: 'Caleb', status: 'promised' }, '2025-01-01T00:20:00.000Z'),
     ]);
 
     expect(contract.commitments).toEqual([
-      expect.objectContaining({ topic: 'appraisal documents', by: 'Thorn', status: 'delivered' }),
-      expect.objectContaining({ topic: 'Caleb speaks publicly', by: 'Caleb', status: 'promised' }),
+      expect.objectContaining({ topic: 'appraisal documents', by: 'Thorn', status: 'delivered', isCurrentlySettled: true }),
+      expect.objectContaining({ topic: 'Caleb speaks publicly', by: 'Caleb', status: 'promised', isCurrentlySettled: false }),
     ]);
   });
 
@@ -299,16 +306,19 @@ describe('ledger-fed contract', () => {
     const contract = buildLedgerContract(facts);
 
     expect(contract.sceneChanges.map((s) => s.statement)).toEqual([
-      'Scene change 2', 'Scene change 3', 'Scene change 4', 'Object 5 put back the way it was',
+      'Scene change 2',
+      'Scene change 3',
+      'Scene change 4',
+      'Object 5 put back the way it was',
     ]);
   });
 
   it('renders the ledger sections in the prompt block', () => {
     const contract = buildLedgerContract([
-      makeEvent('e1', 'Aunt Carol says Old Man Rowan paid off the mortgage.',
+      makeEvent('e1', 'Aunt Carol says Rowan paid off the mortgage.',
         { kind: 'assertion', topic: 'mill debt', speaker: 'Aunt Carol' }),
       makeEvent('e2', 'Thorn hands over the appraisal documents.',
-        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered' }),
+        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered', fulfillment: { kind: 'durable' } }),
       makeEvent('e3', 'The vote schedule is torn off the notice board.',
         { kind: 'scene-change', topic: 'notice board' }),
     ]);
@@ -318,15 +328,14 @@ describe('ledger-fed contract', () => {
     expect(block).toContain('CONTINUITY REQUIREMENTS');
     expect(block).toContain('mill debt');
     expect(block).toContain('Aunt Carol');
-    expect(block).toContain('DELIVERED');
-    expect(block).toContain('appraisal documents');
+    expect(block).toContain('DELIVERED: appraisal documents');
     expect(block).toContain('torn off the notice board');
   });
 
   it('flags a fresh promise of something already delivered, but not a recap of it', () => {
     const contract = buildLedgerContract([
       makeEvent('e1', 'Thorn hands over the appraisal documents.',
-        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered' }),
+        { kind: 'commitment', topic: 'appraisal documents', speaker: 'Thorn', status: 'delivered', fulfillment: { kind: 'durable' } }),
     ]);
 
     const issues = detectContinuityIssues(
@@ -351,10 +360,14 @@ describe('ledger-fed contract', () => {
           topic: 'parcel appraisal documents',
           speaker: 'Councilman Davies',
           status: 'delivered',
+          fulfillment: { kind: 'possession', itemId: 'doc-1' },
         }),
       ],
       undefined,
-      ['Copy of the parcel appraisal']
+      ['Copy of the parcel appraisal'],
+      undefined,
+      undefined,
+      ['doc-1']
     );
 
     expect(
@@ -380,10 +393,14 @@ describe('ledger-fed contract', () => {
           topic: "mayor's letter",
           speaker: 'The mayor',
           status: 'delivered',
+          fulfillment: { kind: 'possession', itemId: 'env-1' },
         }),
       ],
       undefined,
-      ['Sealed Envelope', 'Rusted Lantern']
+      ['Sealed Envelope', 'Rusted Lantern'],
+      undefined,
+      undefined,
+      ['env-1']
     );
 
     expect(
@@ -515,6 +532,7 @@ describe('delivered-commitment bait guards (#1963)', () => {
           topic: 'parcel appraisal documents',
           speaker: 'Councilman Davies',
           status: 'delivered',
+          fulfillment: { kind: 'possession', itemId: 'doc-1' },
         }
       ),
     ];
@@ -528,6 +546,7 @@ describe('delivered-commitment bait guards (#1963)', () => {
             topic: 'general store deed',
             speaker: 'Mayor Thorn',
             status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'deed-1' },
           }
         )
       );
@@ -538,6 +557,7 @@ describe('delivered-commitment bait guards (#1963)', () => {
       npcNames: {},
       recentDecisions: [],
       inventoryItemNames: ['Copy of the parcel appraisal'],
+      inventoryItemIds: ['doc-1', 'deed-1'],
       playerActionText,
     });
   };
@@ -625,6 +645,164 @@ describe('delivered-commitment bait guards (#1963)', () => {
     );
     // Bare assent does not fire when isReconfirmationRequested is false/unset
     expect(issues).toEqual([]);
+  });
+
+  it('leaves lost possession deliveries un-flagged on re-promise and formats as replacement-eligible', () => {
+    const contract = buildContinuityContract({
+      facts: [
+        makeEvent(
+          'e1',
+          'Davies handed over the parcel appraisal documents.',
+          {
+            kind: 'commitment',
+            topic: 'parcel appraisal documents',
+            speaker: 'Councilman Davies',
+            status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'doc-1' },
+          }
+        ),
+      ],
+      npcRelationships: {},
+      npcNames: {},
+      recentDecisions: [],
+      inventoryItemNames: [],
+      inventoryItemIds: [], // item is lost!
+      playerActionText: 'Ask Davies to promise the parcel appraisal documents again.',
+    });
+
+    expect(contract.commitments[0].isCurrentlySettled).toBe(false);
+    expect(contract.commitments[0].isReconfirmationRequested).toBeFalsy();
+
+    // Re-promising a lost item is permitted (replacement path)
+    const issues = detectContinuityIssues(
+      'Davies nods solemnly. "I promise you another copy will be delivered."',
+      contract
+    );
+    expect(issues).toEqual([]);
+
+    // Guidance formats as replacement-eligible
+    const expectations = formatContinuityExpectations(contract);
+    expect(expectations).toContain(
+      '- PREVIOUSLY DELIVERED (replacement-eligible): parcel appraisal documents'
+    );
+  });
+
+  it('leaves legacy/unclassified deliveries un-flagged and fails open', () => {
+    const contract = buildContinuityContract({
+      facts: [
+        makeEvent(
+          'e1',
+          'Davies handed over the documents.',
+          {
+            kind: 'commitment',
+            topic: 'parcel appraisal documents',
+            speaker: 'Councilman Davies',
+            status: 'delivered',
+            // Missing fulfillment
+          }
+        ),
+      ],
+      npcRelationships: {},
+      npcNames: {},
+      recentDecisions: [],
+      playerActionText: 'Ask Davies to promise the parcel appraisal documents again.',
+    });
+
+    expect(contract.commitments[0].isCurrentlySettled).toBe(false);
+    expect(contract.commitments[0].fulfillment).toBeUndefined();
+
+    const issues = detectContinuityIssues(
+      'Davies nods solemnly. "I promise you the parcel appraisal documents."',
+      contract
+    );
+    expect(issues).toEqual([]);
+
+    const expectations = formatContinuityExpectations(contract);
+    expect(expectations).toContain('- PREVIOUSLY DELIVERED: parcel appraisal documents');
+  });
+
+  it('tracks a post-loss replacement promise as an outstanding commitment', () => {
+    const contract = buildContinuityContract({
+      facts: [
+        makeEvent(
+          'e1',
+          'Thorn promises the master key.',
+          { kind: 'commitment', topic: 'master key', speaker: 'Thorn', status: 'promised' },
+          '2025-01-01T00:00:00.000Z'
+        ),
+        makeEvent(
+          'e2',
+          'Thorn hands over the master key.',
+          {
+            kind: 'commitment',
+            topic: 'master key',
+            speaker: 'Thorn',
+            status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'key-1' },
+          },
+          '2025-01-01T00:10:00.000Z'
+        ),
+        makeEvent(
+          'e3',
+          'Thorn promises to forge a replacement key before the council meeting.',
+          { kind: 'commitment', topic: 'master key', speaker: 'Thorn', status: 'promised' },
+          '2025-01-01T00:20:00.000Z'
+        ),
+      ],
+      npcRelationships: {},
+      npcNames: {},
+      recentDecisions: [],
+      inventoryItemIds: [], // key-1 was lost!
+    });
+
+    expect(contract.commitments[0]).toMatchObject({
+      topic: 'master key',
+      by: 'Thorn',
+      statement: 'Thorn promises to forge a replacement key before the council meeting.',
+      status: 'promised',
+      isCurrentlySettled: false,
+    });
+
+    const expectations = formatContinuityExpectations(contract);
+    expect(expectations).toContain(
+      '- OUTSTANDING: master key (Thorn): Thorn promises to forge a replacement key before the council meeting.'
+    );
+  });
+
+  it('preserves delivered status when a re-promise occurs while the item is still settled in inventory', () => {
+    const contract = buildContinuityContract({
+      facts: [
+        makeEvent(
+          'e1',
+          'Thorn hands over the master key.',
+          {
+            kind: 'commitment',
+            topic: 'master key',
+            speaker: 'Thorn',
+            status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'key-1' },
+          },
+          '2025-01-01T00:10:00.000Z'
+        ),
+        makeEvent(
+          'e2',
+          'Thorn promises the master key.',
+          { kind: 'commitment', topic: 'master key', speaker: 'Thorn', status: 'promised' },
+          '2025-01-01T00:20:00.000Z'
+        ),
+      ],
+      npcRelationships: {},
+      npcNames: {},
+      recentDecisions: [],
+      inventoryItemIds: ['key-1'], // key is still in inventory!
+    });
+
+    expect(contract.commitments[0]).toMatchObject({
+      topic: 'master key',
+      by: 'Thorn',
+      status: 'delivered',
+      isCurrentlySettled: true,
+    });
   });
 });
 

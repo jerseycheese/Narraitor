@@ -57,7 +57,9 @@ const getSettledCommitments = (
       snapshot
     );
     if (!contract) return undefined;
-    const delivered = contract.commitments.filter((c) => c.status === 'delivered');
+    const delivered = contract.commitments.filter(
+      (c) => c.status === 'delivered' && c.isCurrentlySettled
+    );
     if (delivered.length === 0) return undefined;
     return delivered.slice(0, 6).map((c) => ({ topic: c.topic, by: c.by }));
   } catch {

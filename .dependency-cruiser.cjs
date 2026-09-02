@@ -230,7 +230,9 @@ module.exports = {
         path: '^(src)',
         pathNot: [
           '[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$',
-          '[.]stories[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$'
+          '[.]stories[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$',
+          '(^|/)__tests__/',
+          '[.]d[.]ts$'
         ]
       },
       to: {

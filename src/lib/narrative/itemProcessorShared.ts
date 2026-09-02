@@ -93,18 +93,22 @@ export function delayBetweenItems(index: number, total: number): Promise<void> {
  * Used by acquisition and loss processors to prevent concurrent inventory mutations
  * for one character.
  */
-export function runQueued(
-  queue: Map<EntityID, Promise<void>>,
+export function runQueued<T = void>(
+  queue: Map<EntityID, Promise<unknown>>,
   characterId: EntityID,
-  work: () => Promise<void>,
+  work: () => Promise<T>,
   onPriorError: (err: unknown) => void,
   onUnexpectedError: (err: unknown) => void
-): Promise<void> {
+): Promise<T | undefined> {
   const previous = queue.get(characterId) ?? Promise.resolve();
 
+  let result: T | undefined;
   const tracked = previous
     .catch(onPriorError)
-    .then(work)
+    .then(async () => {
+      result = await work();
+      return result;
+    })
     .catch(onUnexpectedError)
     .finally(() => {
       if (queue.get(characterId) === tracked) {
@@ -113,5 +117,5 @@ export function runQueued(
     });
 
   queue.set(characterId, tracked);
-  return tracked;
+  return tracked.then(() => result);
 }

@@ -31,7 +31,12 @@ type PreparedItem = AcquiredItemMetadata & {
   quantity: number;
 };
 
-const processingQueue = new Map<EntityID, Promise<void>>();
+export interface AcquiredItemReference {
+  id: EntityID;
+  name: string;
+}
+
+const processingQueue = new Map<EntityID, Promise<unknown>>();
 
 /**
  * Processes items acquired during narrative generation and adds them to character inventory.
@@ -46,18 +51,20 @@ const processingQueue = new Map<EntityID, Promise<void>>();
  * @param characterId - ID of the character acquiring the items
  * @param sessionId - ID of the current game session
  * @param onError - Reports fail-open item errors to an awaited caller
+ * @param sourceId - Optional segment ID that sourced this acquisition
  */
 export async function processAcquiredItems(
   items: AcquiredItemMetadata[],
   characterId: EntityID,
   sessionId: EntityID,
-  onError?: (error: unknown) => void
-): Promise<void> {
+  onError?: (error: unknown) => void,
+  sourceId?: EntityID
+): Promise<AcquiredItemReference[]> {
   if (!items || items.length === 0) {
-    return;
+    return [];
   }
 
-  return runQueued(
+  const result = await runQueued(
     processingQueue,
     characterId,
     async () => {
@@ -70,6 +77,7 @@ export async function processAcquiredItems(
       );
 
       const deduplicatedItems = await deduplicateBatch(preparedItems);
+      const acceptedItems: AcquiredItemReference[] = [];
 
       for (let i = 0; i < deduplicatedItems.length; i++) {
         const item = deduplicatedItems[i];
@@ -83,6 +91,7 @@ export async function processAcquiredItems(
             if (existingMatch.stackable) {
               const newQuantity = (existingMatch.quantity || 0) + item.quantity;
               inventoryStore.updateItemQuantity(existingMatch.id, newQuantity);
+              acceptedItems.push({ id: existingMatch.id, name: existingMatch.name });
 
               if (matchResult.matchedBySoft) {
                 logger.warn(
@@ -110,13 +119,33 @@ export async function processAcquiredItems(
             for (let copyIndex = 0; copyIndex < item.quantity; copyIndex++) {
               const singleItem: PreparedItem = { ...item, quantity: 1 };
 
-              await addItemToInventory(inventoryStore, singleItem, characterId, sessionId, now);
+              const addedId = await addItemToInventory(
+                inventoryStore,
+                singleItem,
+                characterId,
+                sessionId,
+                now,
+                sourceId
+              );
+              if (addedId) {
+                acceptedItems.push({ id: addedId, name: singleItem.normalizedName });
+              }
               await delayBetweenItems(copyIndex, item.quantity);
             }
             continue;
           }
 
-          await addItemToInventory(inventoryStore, item, characterId, sessionId, now);
+          const addedId = await addItemToInventory(
+            inventoryStore,
+            item,
+            characterId,
+            sessionId,
+            now,
+            sourceId
+          );
+          if (addedId) {
+            acceptedItems.push({ id: addedId, name: item.normalizedName });
+          }
           await delayBetweenItems(i, deduplicatedItems.length);
         } catch (err) {
           // Log error but continue processing remaining items
@@ -124,6 +153,8 @@ export async function processAcquiredItems(
           onError?.(err);
         }
       }
+
+      return acceptedItems;
     },
     (err) => {
       logger.error('Previous item acquisition run failed', err);
@@ -134,6 +165,8 @@ export async function processAcquiredItems(
       onError?.(err);
     }
   );
+
+  return result ?? [];
 }
 
 /**
@@ -405,8 +438,9 @@ async function addItemToInventory(
   item: PreparedItem,
   characterId: EntityID,
   sessionId: EntityID,
-  now: string
-): Promise<void> {
+  now: string,
+  sourceId?: EntityID
+): Promise<EntityID | null> {
   const itemId = inventoryStore.addItem(characterId, {
     name: item.normalizedName,
     description: item.description,
@@ -417,6 +451,7 @@ async function addItemToInventory(
       method: item.acquisitionMethod || 'unknown',
       quantity: item.quantity,
       sessionId,
+      sourceId,
       acquiredAt: now,
     },
   });
@@ -426,6 +461,8 @@ async function addItemToInventory(
       logger.warn(`Background image generation failed for item: ${item.normalizedName}`, error);
     });
   }
+
+  return itemId;
 }
 
 function chooseBetterDescription(existing?: string, incoming?: string): string | undefined {

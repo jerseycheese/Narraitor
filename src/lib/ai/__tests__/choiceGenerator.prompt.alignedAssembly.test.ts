@@ -242,6 +242,7 @@ describe('settled commitments in aligned choices (#1963)', () => {
             topic: 'parcel appraisal documents',
             speaker: 'Councilman Davies',
             status: 'delivered',
+            fulfillment: { kind: 'durable' },
           },
         },
       },
@@ -266,6 +267,7 @@ describe('settled commitments in aligned choices (#1963)', () => {
             topic: 'parcel appraisal documents',
             speaker: 'Councilman Davies',
             status: 'delivered',
+            fulfillment: { kind: 'durable' },
           },
         },
       },
@@ -307,6 +309,47 @@ describe('settled commitments in aligned choices (#1963)', () => {
     expect(prompt).not.toContain('CONTINUITY REQUIREMENTS');
   });
 
+  it('excludes lost possession and legacy unclassified commitments from choices prompt', () => {
+    process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = 'true';
+    seedFacts([
+      {
+        id: 'e1',
+        category: 'events',
+        value: 'Davies handed over the parcel appraisal.',
+        createdAt: '2025-01-01T00:00:00.000Z',
+        metadata: {
+          continuity: {
+            kind: 'commitment',
+            topic: 'parcel appraisal documents',
+            speaker: 'Councilman Davies',
+            status: 'delivered',
+            fulfillment: { kind: 'possession', itemId: 'doc-lost' },
+          },
+        },
+      },
+      {
+        id: 'e2',
+        category: 'events',
+        value: 'Thorn handed over an unclassified letter.',
+        createdAt: '2025-01-01T00:05:00.000Z',
+        metadata: {
+          continuity: {
+            kind: 'commitment',
+            topic: 'unclassified letter',
+            speaker: 'Mayor Thorn',
+            status: 'delivered',
+            // Missing fulfillment
+          },
+        },
+      },
+    ]);
+
+    const prompt = buildAlignedPrompt();
+    expect(prompt).not.toContain('ALREADY SETTLED');
+    expect(prompt).not.toContain('parcel appraisal documents');
+    expect(prompt).not.toContain('unclassified letter');
+  });
+
   it('fails open when store throws', () => {
     process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES = 'true';
     (useLoreStore.getState as jest.Mock).mockReturnValue({
@@ -332,6 +375,7 @@ describe('settled commitments in aligned choices (#1963)', () => {
           topic: `settled topic number ${i} with long description`,
           speaker: `Important Official Name ${i}`,
           status: 'delivered',
+          fulfillment: { kind: 'durable' },
         },
       },
     }));

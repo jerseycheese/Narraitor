@@ -11,6 +11,7 @@
  * stores; store reads live in `lib/ai/narrativeGenerator.continuity.ts`.
  */
 
+import type { EntityID } from '../../types/common.types';
 import type { LoreFact } from '../../types/lore.types';
 import type {
   ContinuityAssertion,
@@ -147,7 +148,7 @@ export function annotateReconfirmationRequests(
 
   const matchingIndices: number[] = [];
   commitments.forEach((commitment, idx) => {
-    if (commitment.status !== 'delivered') return;
+    if (commitment.status !== 'delivered' || !commitment.isCurrentlySettled) return;
     const matches = commitment.terms.some((term) => termPattern(term).test(text));
     if (matches) {
       matchingIndices.push(idx);
@@ -164,32 +165,118 @@ export function annotateReconfirmationRequests(
   return commitments;
 }
 
-/** Delivered beats promised on the same topic; the delivering fact is the statement kept. */
+interface CommitmentAggregation {
+  topic: string;
+  by: string;
+  statement: string;
+  status: 'promised' | 'delivered';
+  isDurable: boolean;
+  itemIds: Set<EntityID>;
+  hasUnclassifiedDelivery: boolean;
+  factValue: string;
+}
+
+/**
+ * Delivered beats promised for settled commitments; a subsequent promise after
+ * an unsettled or lost possession delivery starts an outstanding replacement cycle.
+ */
 export function buildCommitments(
   ledger: LoreFact[],
   itemNames: string[] = [],
-  playerActionText?: string
+  playerActionText?: string,
+  inventoryItemIds?: EntityID[]
 ): ContinuityCommitment[] {
-  const byTopic = new Map<string, ContinuityCommitment>();
+  const currentItemIdsSet = new Set(inventoryItemIds ?? []);
+  const byTopic = new Map<string, CommitmentAggregation>();
+
   for (const fact of ledger) {
-    const annotation = fact.metadata!.continuity!;
-    if (annotation.kind !== 'commitment') continue;
+    const annotation = fact.metadata?.continuity;
+    if (!annotation || annotation.kind !== 'commitment') continue;
     const topic = annotation.topic?.trim() || fact.value.trim();
     const topicKey = normalizeTopic(topic);
     if (!topicKey) continue;
     const status = annotation.status ?? 'promised';
-    const existing = byTopic.get(topicKey);
-    if (existing && existing.status === 'delivered') continue;
-    if (existing && status === 'promised') continue;
-    byTopic.set(topicKey, {
-      topic,
-      by: annotation.speaker?.trim() || existing?.by || NARRATION_SPEAKER,
-      statement: fact.value.trim(),
-      status,
-      terms: referenceTerms(topic, itemNames, fact.value),
-    });
+
+    let agg = byTopic.get(topicKey);
+    if (!agg) {
+      agg = {
+        topic,
+        by: annotation.speaker?.trim() || NARRATION_SPEAKER,
+        statement: fact.value.trim(),
+        status,
+        isDurable: false,
+        itemIds: new Set(),
+        hasUnclassifiedDelivery: false,
+        factValue: fact.value,
+      };
+      byTopic.set(topicKey, agg);
+    }
+
+    const isSettledDelivery =
+      agg.status === 'delivered' &&
+      (agg.isDurable ||
+        (agg.itemIds.size > 0 &&
+          Array.from(agg.itemIds).some((id) => currentItemIdsSet.has(id))));
+
+    if (status === 'delivered') {
+      agg.status = 'delivered';
+      agg.statement = fact.value.trim();
+      agg.factValue = fact.value;
+      agg.topic = topic;
+      if (annotation.speaker?.trim()) {
+        agg.by = annotation.speaker.trim();
+      }
+
+      if (annotation.fulfillment?.kind === 'durable') {
+        agg.isDurable = true;
+      } else if (annotation.fulfillment?.kind === 'possession' && annotation.fulfillment.itemId) {
+        agg.itemIds.add(annotation.fulfillment.itemId);
+      } else {
+        agg.hasUnclassifiedDelivery = true;
+      }
+    } else if (!isSettledDelivery) {
+      // Outstanding promise: either a fresh promise before delivery, or a replacement
+      // promise made after an unsettled or lost possession delivery.
+      agg.status = 'promised';
+      agg.statement = fact.value.trim();
+      agg.factValue = fact.value;
+      agg.topic = topic;
+      if (annotation.speaker?.trim()) {
+        agg.by = annotation.speaker.trim();
+      }
+    }
   }
-  const commitments = Array.from(byTopic.values()).slice(-MAX_COMMITMENTS);
+
+  const rawCommitments: ContinuityCommitment[] = Array.from(byTopic.values()).map((agg) => {
+    let fulfillment: ContinuityCommitment['fulfillment'] = undefined;
+    let isCurrentlySettled = false;
+
+    if (agg.status === 'delivered') {
+      if (agg.isDurable) {
+        fulfillment = { kind: 'durable' };
+        isCurrentlySettled = true;
+      } else if (agg.itemIds.size > 0) {
+        const itemIds = Array.from(agg.itemIds);
+        fulfillment = { kind: 'possession', itemIds };
+        isCurrentlySettled = itemIds.some((id) => currentItemIdsSet.has(id));
+      } else {
+        fulfillment = undefined;
+        isCurrentlySettled = false;
+      }
+    }
+
+    return {
+      topic: agg.topic,
+      by: agg.by,
+      statement: agg.statement,
+      status: agg.status,
+      fulfillment,
+      isCurrentlySettled,
+      terms: referenceTerms(agg.topic, itemNames, agg.factValue),
+    };
+  });
+
+  const commitments = rawCommitments.slice(-MAX_COMMITMENTS);
   return annotateReconfirmationRequests(commitments, playerActionText);
 }
 

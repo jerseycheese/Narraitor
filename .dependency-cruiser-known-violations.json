@@ -63,24 +63,6 @@
     }
   },
   {
-    "type": "dependency",
-    "from": "src/state/__tests__/loreStore.testHelpers.ts",
-    "to": "node_modules/@testing-library/react/dist/@testing-library/react.esm.js",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/types/jest.d.ts",
-    "to": "node_modules/@testing-library/jest-dom/types/index.d.ts",
-    "rule": {
-      "severity": "error",
-      "name": "not-to-dev-dep"
-    }
-  },
-  {
     "type": "cycle",
     "from": "src/components/TutorialProvider/TutorialProvider.tsx",
     "to": "src/lib/tutorial/worldCreationTour.ts",
