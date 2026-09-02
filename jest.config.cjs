@@ -4,6 +4,26 @@ const config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   maxWorkers: '50%',
   workerIdleMemoryLimit: '512MB',
+  // Instruments every production source file so untested files are counted
+  // in the denominator rather than silently omitted (#1994).
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.stories.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/__mocks__/**',
+  ],
+  // Baseline ratchet with untested files included (#1994).
+  // Measured: statements 71.64%, branches 60.87%, functions 68.12%, lines 72.04%.
+  // Thresholds set with a ~1-2% cushion so regressions fail the build without
+  // tripping on current code.
+  coverageThreshold: {
+    global: {
+      branches: 59,
+      functions: 67,
+      lines: 70,
+      statements: 70,
+    },
+  },
   moduleNameMapper: {
     // CSS stub must come first: mappers match in order, and the @/ alias would
     // otherwise resolve @/-form stylesheet imports to real files.
