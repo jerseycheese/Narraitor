@@ -61,9 +61,8 @@ describe('Persistence Storage Status Tracking', () => {
       })
     );
     expect(errorSpy).toHaveBeenCalledWith(
-      '[Persistence] Storage status changed:',
-      StorageStatus.UNAVAILABLE,
-      expect.stringContaining('IndexedDB initialization failed')
+      '[Storage] IndexedDB unavailable, using memory storage:',
+      expect.any(Error)
     );
 
     unsubscribe();

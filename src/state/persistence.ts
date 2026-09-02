@@ -87,9 +87,9 @@ export const getResilientStorage = async (): Promise<ResilientStorageMiddleware>
         onStatusChange: (status, notice) => {
           currentStorageStatus = status;
           currentFallbackNotice = notice ?? null;
-          if (notice) {
-            logger.error('[Persistence] Storage status changed:', status, notice.message);
-          }
+          // ResilientStorageMiddleware already logs the failure with the full
+          // error object and stack trace. We don't duplicate logger.error here
+          // to prevent double-reporting to /api/telemetry/error.
           statusListeners.forEach((listener) => {
             try {
               listener(currentStorageStatus, currentFallbackNotice);
