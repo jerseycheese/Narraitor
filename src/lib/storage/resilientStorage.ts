@@ -51,6 +51,10 @@ export class ResilientStorageMiddleware {
    * Try to initialize IndexedDB, fall back to memory if it fails
    */
   private async initializeAdapter(): Promise<void> {
+    // SSR environments lack browser storage; avoid false UNAVAILABLE fallback during pre-render
+    if (typeof window === 'undefined') {
+      return;
+    }
     try {
       this.adapter = new IndexedDBAdapter();
       await this.adapter.initialize();

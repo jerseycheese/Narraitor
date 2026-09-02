@@ -30,6 +30,10 @@ export function StorageFallbackBanner({ className }: StorageFallbackBannerProps)
     () => null
   );
 
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
   if (status !== StorageStatus.UNAVAILABLE && !notice) {
     return null;
   }

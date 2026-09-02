@@ -26,13 +26,18 @@ const statusListeners = new Set<StorageStatusListener>();
 /**
  * Active storage status, or null if storage has not reported a degraded state.
  */
-export const getStorageStatus = (): StorageStatus | null => currentStorageStatus;
+export const getStorageStatus = (): StorageStatus | null => {
+  if (typeof window === 'undefined') return null;
+  return currentStorageStatus;
+};
 
 /**
  * Notice detailing why storage fell back to memory, or null if healthy.
  */
-export const getStorageFallbackNotice = (): StorageFallbackNotice | null =>
-  currentFallbackNotice;
+export const getStorageFallbackNotice = (): StorageFallbackNotice | null => {
+  if (typeof window === 'undefined') return null;
+  return currentFallbackNotice;
+};
 
 /**
  * Subscribes to storage status transitions (e.g. IndexedDB failure fallback).
