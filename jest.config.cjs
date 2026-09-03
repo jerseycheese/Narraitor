@@ -8,18 +8,20 @@ const config = {
   // in the denominator rather than silently omitted (#1994).
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
+    '!src/**/__tests__/**',
+    '!src/stories/**',
     '!src/**/*.stories.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/**/__mocks__/**',
   ],
-  // Baseline ratchet with untested files included (#1994).
-  // Measured: statements 71.64%, branches 60.87%, functions 68.12%, lines 72.04%.
+  // Baseline ratchet with untested production files included (#1994).
+  // Measured: statements 71.52%, branches 60.83%, functions 67.89%, lines 71.95%.
   // Thresholds set with a ~1-2% cushion so regressions fail the build without
   // tripping on current code.
   coverageThreshold: {
     global: {
       branches: 59,
-      functions: 67,
+      functions: 66,
       lines: 70,
       statements: 70,
     },
