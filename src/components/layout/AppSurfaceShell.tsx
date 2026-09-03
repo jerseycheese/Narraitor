@@ -3,6 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { HeaderNavigation } from '@/components/Navigation';
+import { StorageFallbackBanner } from '@/components/shared/StorageFallbackBanner';
 import { getSurfaceMode, getSurfaceRegister } from '@/lib/routing/surfaceMode';
 
 interface AppSurfaceShellProps {
@@ -24,6 +25,7 @@ export function AppSurfaceShell({ children }: AppSurfaceShellProps) {
   if (getSurfaceMode(pathname) === 'manuscript') {
     return (
       <div className="app-surface app-surface-manuscript" data-surface-mode="manuscript">
+        <StorageFallbackBanner />
         <main id="main-content" tabIndex={-1}>
           {children}
         </main>
@@ -38,6 +40,7 @@ export function AppSurfaceShell({ children }: AppSurfaceShellProps) {
       data-register={getSurfaceRegister(pathname)}
     >
       <HeaderNavigation />
+      <StorageFallbackBanner />
       <main id="main-content" tabIndex={-1} className="app-surface-main">
         <div className="app-surface-inner">{children}</div>
       </main>

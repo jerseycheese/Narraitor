@@ -5,6 +5,7 @@
 
 import { ResilientStorageMiddleware, StorageStatus } from '../resilientStorage';
 import { IndexedDBAdapter } from '../indexedDBAdapter';
+import Logger from '@/lib/utils/logger';
 
 // Mock IndexedDBAdapter
 jest.mock('../indexedDBAdapter');
@@ -14,9 +15,11 @@ const mockIndexedDBAdapter = IndexedDBAdapter as jest.MockedClass<typeof Indexed
 describe('ResilientStorageMiddleware', () => {
   let mockAdapter: jest.Mocked<IndexedDBAdapter>;
   let mockNotificationCallback: jest.Mock;
+  let errorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
     mockAdapter = {
       initialize: jest.fn(),
       getItem: jest.fn(),
@@ -31,6 +34,10 @@ describe('ResilientStorageMiddleware', () => {
 
     mockIndexedDBAdapter.mockImplementation(() => mockAdapter);
     mockNotificationCallback = jest.fn();
+  });
+
+  afterEach(() => {
+    errorSpy.mockRestore();
   });
 
   describe('Initialization', () => {
@@ -63,6 +70,10 @@ describe('ResilientStorageMiddleware', () => {
           message: expect.stringContaining('IndexedDB initialization failed'),
         })
       );
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[Storage] IndexedDB unavailable, using memory storage:'),
+        expect.any(Error)
+      );
     });
 
     it('should switch to UNAVAILABLE when IndexedDB is not initialized', async () => {
@@ -86,6 +97,9 @@ describe('ResilientStorageMiddleware', () => {
           message: 'IndexedDB not available in this environment',
         })
       );
+      expect(errorSpy).toHaveBeenCalledWith(
+        '[Storage] IndexedDB not available, using memory storage'
+      );
     });
   });
 
@@ -104,6 +118,7 @@ describe('ResilientStorageMiddleware', () => {
       expect(mockAdapter.setItem).toHaveBeenCalledWith('test-key', 'test-value');
       expect(mockAdapter.getItem).toHaveBeenCalledWith('test-key');
       expect(result).toBe('test-value');
+      expect(errorSpy).not.toHaveBeenCalled();
     });
 
     it('should fall back to memory when IndexedDB write fails', async () => {
@@ -122,6 +137,10 @@ describe('ResilientStorageMiddleware', () => {
         expect.objectContaining({
           message: expect.stringContaining('IndexedDB write failed'),
         })
+      );
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[Storage] IndexedDB write failed, switching to memory:'),
+        expect.any(Error)
       );
 
       // Should still be able to retrieve from memory
@@ -146,6 +165,10 @@ describe('ResilientStorageMiddleware', () => {
         expect.objectContaining({
           message: expect.stringContaining('IndexedDB read failed'),
         })
+      );
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[Storage] IndexedDB read failed, switching to memory:'),
+        expect.any(Error)
       );
 
       // Now store in memory

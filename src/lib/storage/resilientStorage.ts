@@ -51,13 +51,17 @@ export class ResilientStorageMiddleware {
    * Try to initialize IndexedDB, fall back to memory if it fails
    */
   private async initializeAdapter(): Promise<void> {
+    // SSR environments lack browser storage; avoid false UNAVAILABLE fallback during pre-render
+    if (typeof window === 'undefined') {
+      return;
+    }
     try {
       this.adapter = new IndexedDBAdapter();
       await this.adapter.initialize();
 
       // Check if IndexedDB is actually available (not just that initialize didn't throw)
       if (!this.adapter.isInitialized) {
-        logger.warn('[Storage] IndexedDB not available, using memory storage');
+        logger.error('[Storage] IndexedDB not available, using memory storage');
         this.adapter = null;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
           message: 'IndexedDB not available in this environment',
@@ -65,7 +69,7 @@ export class ResilientStorageMiddleware {
         return;
       }
     } catch (error) {
-      logger.warn('[Storage] IndexedDB unavailable, using memory storage:', error);
+      logger.error('[Storage] IndexedDB unavailable, using memory storage:', error);
       this.adapter = null;
       this.onStatusChange(StorageStatus.UNAVAILABLE, {
         message: `IndexedDB initialization failed: ${error}`,
@@ -82,7 +86,7 @@ export class ResilientStorageMiddleware {
       try {
         return await this.adapter.getItem(key);
       } catch (error) {
-        logger.warn('[Storage] IndexedDB read failed, switching to memory:', error);
+        logger.error('[Storage] IndexedDB read failed, switching to memory:', error);
         this.adapter = null;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
           message: `IndexedDB read failed: ${error}`,
@@ -106,7 +110,7 @@ export class ResilientStorageMiddleware {
         this.memoryStorage.set(key, value);
         return;
       } catch (error) {
-        logger.warn('[Storage] IndexedDB write failed, switching to memory:', error);
+        logger.error('[Storage] IndexedDB write failed, switching to memory:', error);
         this.adapter = null;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
           message: `IndexedDB write failed: ${error}`,

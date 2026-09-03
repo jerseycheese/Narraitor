@@ -53,6 +53,7 @@ export class IndexedDBAdapter {
 
       request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
         const db = (event.target as IDBOpenDBRequest).result;
+        this.db = db;
         
         if (!db.objectStoreNames.contains(this.storeName)) {
           db.createObjectStore(this.storeName);
