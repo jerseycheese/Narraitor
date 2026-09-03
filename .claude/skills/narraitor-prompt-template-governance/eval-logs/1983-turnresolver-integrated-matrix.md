@@ -24,10 +24,13 @@ commit that carries it is the declaration of record.
 
 ### Matrix
 
-Two contrasting worlds crossed with two character states, per the binding minimum in
-`narraitor-ai-quality-discipline` section 5. Character state is a window inside one
-continuous session rather than a separate seed, matching how rounds 9 and 13 read
-fresh-versus-established.
+Two contrasting worlds crossed with two character lifecycle windows within continuous
+sessions (t1-15 fresh, t16-45 established), following the longitudinal design of rounds 9
+and 13. Note on protocol: `narraitor-ai-quality-discipline` section 5 declares a 2 worlds x 2
+characters minimum; here character variation is longitudinal within a continuous 45-turn
+narrative rather than two distinct character seeds per world. This prioritizes stress-testing
+real state accumulation and TurnResolver causal guarantees over multi-turn arcs, but means
+character persona effects are not independently varied across seeds.
 
 | Cell | World | Genre / tone | Character window | Arm | Turns |
 |---|---|---|---|---|---|
@@ -209,7 +212,7 @@ still described as possessed. That count is zero everywhere - 0 of 95 prompts.
 | Gate | Result | Measured |
 |---|---|---|
 | G-1872a resolved-not-dropped > 0 per session | **PASS** | 2, 6, 5, 6 resolved across the four sessions. Zero dropped in any session. |
-| G-1872b last-block Momentum >= first block | **FAIL** | S2 4 -> 3 -> 2. S1 3 -> 3 -> 2, and S1's block 3 is contaminated. |
+| G-1872b last-block Momentum >= first block | **FAIL** | S2 4 -> 3 -> 2 (clean failure). S1 unscorable (block 3 contaminated by t40 stream drop). |
 | G-1872c no long overdue runs | **FAIL** | S1 carried two threads overdue ~15 turns; C-B carried three overdue 20-21 turns. |
 
 The mechanical half of #1872 is fixed and the judged half is not.
@@ -225,8 +228,9 @@ Mark through the kitchen at t10 and Mark is taken at that exact exit at t16, "a 
 decision coming due with a body attached." S1's judge traced the preservation grant from
 introduction at t13 to revocation at t36, "a genuine setup-to-payoff arc across 23 turns."
 
-But momentum still falls off a cliff in the last block of every judged session, and both
-judges independently named the same cause, without being asked about it. S1's judge:
+But momentum still fell off a cliff in the clean judged session (S2), and S1 showed the
+same directional drop despite its contaminated block 3. Both judges independently named the
+same cause, without being asked about it. S1's judge:
 
 > Every victory the player wins is deferred to a moment the game never reaches, because the
 > scene never ends. Forty-five turns, one room, one evening, no clock movement.
@@ -364,8 +368,9 @@ The mechanical half is fixed. Resolutions went from zero-resolved-two-dropped in
 19 resolved and zero dropped across four sessions, and the advance-to-resolution ratio now
 improves across a session instead of degrading. G-1872a passes in all four cells.
 
-The judged half does not. G-1872b fails in both judged sessions and G-1872c fails in two, with
-threads sitting overdue for 15 to 21 turns. Re-entry condition: this is the scene-boundary
+The judged half does not. G-1872b fails in the clean judged session (S2) with S1 unscorable,
+and G-1872c fails in two, with threads sitting overdue for 15 to 21 turns. Re-entry condition:
+this is the scene-boundary
 problem, not a ledger problem. A thread cannot come due inside a single continuous scene that
 never ends, which is what both judges said without being asked. The next move on #1872 is a
 time-cut or scene-boundary mechanism, and it should not be attempted as prompt wording.
@@ -401,3 +406,6 @@ of the model. Until that is answered, no further wording work on this issue is w
 - Whether the world-cost gain holds past 30 turns. The treatment arm was not run to 45.
 - Whether the #1857 guard fires correctly on any bait shape. The probe shows one shape it
   misses; no bait shape was found that makes it fire.
+- Independent character persona variation across separate seeds. Character state was
+  varied longitudinally across turns within single continuous sessions rather than across
+  distinct character seeds.
