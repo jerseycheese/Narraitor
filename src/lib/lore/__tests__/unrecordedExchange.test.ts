@@ -27,9 +27,12 @@ describe('detectUnrecordedExchangeClaim', () => {
     // Proposing a private word is not recalling one. This arm is what keeps
     // the lexicon from firing on ordinary custom actions.
     expect(
-      detectUnrecordedExchangeClaim("Tell Davies privately that I'll vote no.", {
-        'npc-davies': 'Davies',
-      })
+      detectUnrecordedExchangeClaim(
+        "Tell Davies privately that I'll vote no.",
+        {
+          'npc-davies': 'Davies',
+        }
+      )
     ).toBeNull();
   });
 
@@ -115,10 +118,26 @@ describe('countSharedScenes', () => {
 
     const counts = countSharedScenes(segments);
 
-    expect(counts['npc-davies']).toEqual({ scenes: 3, aloneTogether: false });
-    // Carol was alone with the protagonist once, so nothing can be asserted
-    // about a private conversation with her.
-    expect(counts['npc-carol']).toEqual({ scenes: 4, aloneTogether: true });
+    expect(counts['npc-davies']).toEqual({
+      scenes: 3,
+      aloneTogether: false,
+      privateExchangeNarrated: false,
+    });
+    expect(counts['npc-carol']).toEqual({
+      scenes: 4,
+      aloneTogether: true,
+      privateExchangeNarrated: false,
+    });
     expect(counts['npc-thornbury']).toBeUndefined();
+  });
+
+  it('records a private exchange only when the sole NPC is the primary speaker', () => {
+    expect(countSharedScenes([scene(['npc-carol'], 'npc-carol')])).toEqual({
+      'npc-carol': {
+        scenes: 1,
+        aloneTogether: true,
+        privateExchangeNarrated: true,
+      },
+    });
   });
 });

@@ -7,11 +7,10 @@
  * (#1856) cannot reach this, because a conversation that never happened leaves
  * nothing in the ledger to assert.
  *
- * Co-presence is already recorded, though. `NarrativeMetadata.characterIds`
- * and `metadata.speakerId` carry the NPCs an AI pass judged PHYSICALLY present
- * with the protagonist, per segment. So the contract can assert something true
- * instead of an absence: "Davies has shared three narrated scenes with you and
- * has never been alone with you." No new store, no new AI call.
+ * Co-presence and the primary speaker are already recorded, though.
+ * `NarrativeMetadata.characterIds` and `metadata.speakerId` let the contract
+ * distinguish merely sharing a scene from a narrated private exchange. No new
+ * store or AI call is needed.
  *
  * Like `continuityLedger.ts`, this module takes data as parameters and imports
  * no stores; store reads live in `lib/ai/narrativeGenerator.continuity.ts`.
@@ -66,8 +65,7 @@ const RECOUNT_LEXICON =
  * told you was not a threat" both read as recounting to the lexicon above, and
  * correcting a denial would be worse than missing an invention.
  */
-const DENIAL_LEXICON =
-  /\b(?:never|no\s+such|nothing|not|nor)\b|n['’]t\b/i;
+const DENIAL_LEXICON = /\b(?:never|no\s+such|nothing|not|nor)\b|n['’]t\b/i;
 
 /** Co-presence per NPC, read off the segments the session already persisted. */
 export interface SharedSceneRecord {
@@ -75,6 +73,8 @@ export interface SharedSceneRecord {
   scenes: number;
   /** At least one of those scenes had this NPC and nobody else present. */
   aloneTogether: boolean;
+  /** At least one solo scene records this NPC speaking to the protagonist. */
+  privateExchangeNarrated: boolean;
 }
 
 /** The only segment fields this module reads. */
@@ -98,9 +98,10 @@ const NPC_NAME_PART_STOPWORDS = new Set(['a', 'an', 'and', 'of', 'the']);
 
 /**
  * Counts, per NPC, the narrated scenes shared with the protagonist and whether
- * any of them left the two alone. A scene counts the segment's present NPCs
- * (`characterIds`) plus whoever spoke (`speakerId`); "alone together" means
- * exactly one NPC in that set.
+ * any of them record a private exchange. A scene counts the segment's present
+ * NPCs (`characterIds`) plus whoever spoke (`speakerId`). A private exchange
+ * requires exactly one NPC in that set and that NPC as the primary speaker;
+ * solo co-presence by itself is not a conversation.
  *
  * Feed this the whole session, never `previousSegments` — that is the last
  * three segments, and an NPC first met at turn 4 would read as never met at
@@ -122,10 +123,16 @@ export function countSharedScenes(
 
     const alone = present.size === 1;
     for (const npcId of present) {
-      const record = counts[npcId] ?? { scenes: 0, aloneTogether: false };
+      const record = counts[npcId] ?? {
+        scenes: 0,
+        aloneTogether: false,
+        privateExchangeNarrated: false,
+      };
       counts[npcId] = {
         scenes: record.scenes + 1,
         aloneTogether: record.aloneTogether || alone,
+        privateExchangeNarrated:
+          record.privateExchangeNarrated || (alone && speakerId === npcId),
       };
     }
   }
@@ -148,10 +155,12 @@ export function detectUnrecordedExchangeClaim(
   const named = Object.entries(npcNames ?? {}).filter(([, name]) => {
     const trimmed = name?.trim();
     if (!trimmed) return false;
-    const nameParts = trimmed.split(/\s+/).filter(
-      (part) =>
-        part.length >= MIN_TERM_LENGTH &&
-        !NPC_NAME_PART_STOPWORDS.has(part.toLowerCase())
+    const nameParts = trimmed
+      .split(/\s+/)
+      .filter(
+        (part) =>
+          part.length >= MIN_TERM_LENGTH &&
+          !NPC_NAME_PART_STOPWORDS.has(part.toLowerCase())
     );
     const terms = [trimmed, ...nameParts];
     return terms.some((term) =>

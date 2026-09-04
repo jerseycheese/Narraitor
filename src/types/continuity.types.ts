@@ -100,17 +100,16 @@ export interface ContinuitySceneChange {
 /**
  * The player's action referred to a private exchange with an NPC that the story
  * never told (#1857). Co-presence is already recorded per segment, so the void
- * becomes an assertable fact: how many narrated scenes the two have shared, and
- * whether any of them left them alone together. Only built when
- * `aloneTogether` is false, because that is the case the engine can state as
- * checkable truth rather than as an absence of evidence.
+ * becomes an assertable fact: how many narrated scenes the two have shared,
+ * whether they were alone, and whether the NPC was recorded speaking in that
+ * solo scene. The contract is omitted when a private exchange was narrated.
  */
 export interface ContinuityUnrecordedExchange {
   npcId: EntityID;
   name: string;
   /** Narrated scenes this NPC has shared with the protagonist so far. */
   scenes: number;
-  /** Always false on a contract entry; kept so the shape reads as what it means. */
+  /** Whether any narrated scene had this NPC as the only NPC present. */
   aloneTogether: boolean;
   /** The player's own phrasing that asserts the exchange. */
   claim: string;

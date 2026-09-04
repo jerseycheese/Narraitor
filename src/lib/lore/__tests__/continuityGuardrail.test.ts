@@ -516,6 +516,17 @@ describe('unrecorded exchange (#1857)', () => {
     );
     expect(denying).toEqual([]);
   });
+
+  it('does not flag an NPC who repeats the question before denying it', () => {
+    const contract = buildExchangeContract(3);
+
+    expect(
+      detectContinuityIssues(
+        'Davies turns to you. "Repeat publicly what I told you privately?" he asks. "I do not recall any private consultation with you. Perhaps you are mistaken."',
+        contract
+      )
+    ).toEqual([]);
+  });
 });
 
 describe('delivered-commitment bait guards (#1963)', () => {
@@ -805,4 +816,3 @@ describe('delivered-commitment bait guards (#1963)', () => {
     });
   });
 });
-

@@ -49,7 +49,8 @@ const MAX_EXCERPT_LENGTH = 240;
 // correction call, so prefer missing a soft contradiction over flagging
 // ordinary prose.
 const DEAD_STATUS = /\b(is dead|died|was killed|slain|deceased)\b/i;
-const DESTROYED_STATUS = /\b(was destroyed|burned down|razed|no longer exists)\b/i;
+const DESTROYED_STATUS =
+  /\b(was destroyed|burned down|razed|no longer exists)\b/i;
 const WARMTH_LEXICON =
   /\b(warmly|embrac(?:e|es|ed|ing)|beam(?:s|ed|ing)|fondly|affectionate(?:ly)?|hug(?:s|ged|ging)?|old friend|dear friend|trusts? you)\b/i;
 const NEGATION_GUARD =
@@ -154,7 +155,9 @@ export function buildContinuityContract(
     unrecordedExchanges,
     playerActionText,
   } = args;
-  const characterFacts = facts.filter((fact) => fact?.category === 'characters');
+  const characterFacts = facts.filter(
+    (fact) => fact?.category === 'characters'
+  );
 
   const npcs: ContinuityNpcExpectation[] = [];
   for (const [npcId, relationship] of Object.entries(npcRelationships)) {
@@ -166,11 +169,16 @@ export function buildContinuityContract(
       const factName = parseEntityName(fact.value).toLowerCase();
       return (
         factName === name.toLowerCase() ||
-        (fact.aliases || []).some((alias) => alias.toLowerCase() === name.toLowerCase())
+        (fact.aliases || []).some(
+          (alias) => alias.toLowerCase() === name.toLowerCase()
+        )
       );
     });
     const aliases = dedupeTerms(
-      matchingFacts.flatMap((fact) => [parseEntityName(fact.value), ...(fact.aliases || [])])
+      matchingFacts.flatMap((fact) => [
+        parseEntityName(fact.value),
+        ...(fact.aliases || []),
+      ])
     ).filter((alias) => alias.toLowerCase() !== name.toLowerCase());
 
     npcs.push({
@@ -179,14 +187,20 @@ export function buildContinuityContract(
       aliases,
       trust: relationship.trust,
       sentiment: relationship.sentiment,
-      expectedTone: toneForRelationship(relationship.trust, relationship.sentiment),
+      expectedTone: toneForRelationship(
+        relationship.trust,
+        relationship.sentiment
+      ),
     });
   }
   npcs.sort((a, b) => Math.abs(b.sentiment) - Math.abs(a.sentiment));
 
   const canonFacts: ContinuityCanonFact[] = [];
   for (const fact of facts) {
-    if (!fact?.value || !['characters', 'locations', 'events'].includes(fact.category)) {
+    if (
+      !fact?.value ||
+      !['characters', 'locations', 'events'].includes(fact.category)
+    ) {
       continue;
     }
     const text = `${fact.value} ${fact.metadata?.description ?? ''}`;
@@ -225,7 +239,9 @@ export function buildContinuityContract(
 }
 
 /** True when the contract has nothing to enforce; callers treat that as "guardrail off". */
-export function isContinuityContractEmpty(contract: ContinuityContract): boolean {
+export function isContinuityContractEmpty(
+  contract: ContinuityContract
+): boolean {
   return (
     contract.npcs.length === 0 &&
     contract.canonFacts.length === 0 &&
@@ -246,7 +262,8 @@ function findOffendingSentence(
     (term) => new RegExp(`\\b${escapeRegExp(term)}\\b`, 'i')
   );
   for (const sentence of sentences) {
-    if (!positiveLexicon.test(sentence) || guardLexicon.test(sentence)) continue;
+    if (!positiveLexicon.test(sentence) || guardLexicon.test(sentence))
+      continue;
     if (termPatterns.some((pattern) => pattern.test(sentence))) {
       return sentence.trim().slice(0, MAX_EXCERPT_LENGTH);
     }
@@ -268,7 +285,8 @@ export function detectContinuityIssues(
   const issues: ContinuityIssue[] = [];
 
   for (const npc of contract.npcs) {
-    if (npc.expectedTone !== 'hostile' && npc.expectedTone !== 'guarded') continue;
+    if (npc.expectedTone !== 'hostile' && npc.expectedTone !== 'guarded')
+      continue;
     const excerpt = findOffendingSentence(
       sentences,
       [npc.name, ...npc.aliases],
@@ -306,7 +324,8 @@ export function detectContinuityIssues(
   // contradicts "the town holds the mortgage" isn't a regex question. A fresh
   // promise of a delivered commitment is, so that one gets the fast path.
   for (const commitment of contract.commitments) {
-    if (commitment.status !== 'delivered' || !commitment.isCurrentlySettled) continue;
+    if (commitment.status !== 'delivered' || !commitment.isCurrentlySettled)
+      continue;
     const terms = topicTerms(commitment.topic);
     if (terms.length === 0) continue;
     const termPatterns = terms.map(termPattern);
@@ -359,9 +378,14 @@ export function detectContinuityIssues(
   // so the segment is that claim's answer and recounting anywhere in it is the
   // invention. Denial is what the change wants, and it is guarded.
   for (const exchange of contract.unrecordedExchanges) {
-    const sentence = sentences.find((candidate) =>
-      recountsUnrecordedExchange(candidate)
-    );
+    // Read the refusal guard across the whole answer before locating an
+    // excerpt. An NPC may echo the player's question in one sentence and deny
+    // it in the next; sentence-local detection mistakes that refusal for a
+    // recount.
+    if (!recountsUnrecordedExchange(content)) continue;
+    const sentence =
+      sentences.find((candidate) => recountsUnrecordedExchange(candidate)) ??
+      content;
     if (sentence) {
       issues.push({
         type: 'invented-exchange',
@@ -386,11 +410,15 @@ export function describeUnrecordedExchange(
   const record =
     exchange.scenes === 0
       ? `${exchange.name} has not shared a single narrated scene with the protagonist.`
-      : `${exchange.name} has shared ${exchange.scenes} narrated ${exchange.scenes === 1 ? 'scene' : 'scenes'} with the protagonist and has never been alone with them.`;
+      : exchange.aloneTogether
+        ? `No narrated scene records ${exchange.name} speaking privately with the protagonist.`
+        : `${exchange.name} has shared ${exchange.scenes} narrated ${exchange.scenes === 1 ? 'scene' : 'scenes'} with the protagonist and has never been alone with them.`;
   return `${premise} ${record} Do not write the conversation as if it happened, and do not have ${exchange.name} recount, confirm, or repeat it. Play the false premise: ${exchange.name} says no such conversation took place, or is confused by the question.`;
 }
 
-function describeCommitmentExpectation(commitment: ContinuityCommitment): string {
+function describeCommitmentExpectation(
+  commitment: ContinuityCommitment
+): string {
   if (commitment.status === 'delivered') {
     return `${commitment.by} already delivered on "${commitment.topic}" (${commitment.statement}). The player has it; nobody promises it again — refer to it as done.`;
   }
@@ -398,13 +426,15 @@ function describeCommitmentExpectation(commitment: ContinuityCommitment): string
 }
 
 function describeNpcExpectation(npc: ContinuityNpcExpectation): string {
-  const stance = npc.expectedTone === 'hostile' ? 'is hostile toward' : 'distrusts';
+  const stance =
+    npc.expectedTone === 'hostile' ? 'is hostile toward' : 'distrusts';
   return `${npc.name} currently ${stance} the player (trust ${npc.trust}/100, sentiment ${npc.sentiment}). Portray them as ${npc.expectedTone === 'hostile' ? 'hostile or cold' : 'guarded or wary'} — never warm or affectionate.`;
 }
 
 function describeCanonExpectation(canon: ContinuityCanonFact): string {
   const state = canon.status === 'dead' ? 'is dead' : 'was destroyed';
-  const forbidden = canon.status === 'dead' ? 'alive or present' : 'intact or in use';
+  const forbidden =
+    canon.status === 'dead' ? 'alive or present' : 'intact or in use';
   return `${canon.entity} ${state} (${canon.statement}). Do not write ${canon.status === 'dead' ? 'them' : 'it'} as ${forbidden}.`;
 }
 
@@ -413,7 +443,9 @@ function describeCanonExpectation(canon: ContinuityCanonFact): string {
  * generation prompt) and the correction prompt. Empty string for an empty
  * contract so callers can append unconditionally.
  */
-export function formatContinuityExpectations(contract: ContinuityContract): string {
+export function formatContinuityExpectations(
+  contract: ContinuityContract
+): string {
   const lines: string[] = [];
 
   for (const npc of contract.npcs) {
@@ -430,7 +462,9 @@ export function formatContinuityExpectations(contract: ContinuityContract): stri
   }
   for (const decision of contract.recentDecisions) {
     const outcome = decision.outcome ? ` (outcome: ${decision.outcome})` : '';
-    lines.push(`- Recent decision: "${decision.text}"${outcome}. Honor its consequences.`);
+    lines.push(
+      `- Recent decision: "${decision.text}"${outcome}. Honor its consequences.`
+    );
   }
 
   if (contract.assertions.length > 0) {
@@ -438,7 +472,9 @@ export function formatContinuityExpectations(contract: ContinuityContract): stri
       'Answers this story already gave (if the question comes up again, the same answer stands; another character may contradict it only knowingly, never by accident):'
     );
     for (const assertion of contract.assertions) {
-      lines.push(`- ${assertion.topic} (${assertion.speaker}): ${assertion.claim}`);
+      lines.push(
+        `- ${assertion.topic} (${assertion.speaker}): ${assertion.claim}`
+      );
     }
   }
   if (contract.commitments.length > 0) {
@@ -448,7 +484,9 @@ export function formatContinuityExpectations(contract: ContinuityContract): stri
     for (const commitment of contract.commitments) {
       if (commitment.status === 'delivered') {
         if (commitment.isCurrentlySettled) {
-          lines.push(`- DELIVERED: ${commitment.topic} (${commitment.by}): ${commitment.statement}`);
+          lines.push(
+            `- DELIVERED: ${commitment.topic} (${commitment.by}): ${commitment.statement}`
+          );
         } else if (commitment.fulfillment?.kind === 'possession') {
           lines.push(
             `- PREVIOUSLY DELIVERED (replacement-eligible): ${commitment.topic} (${commitment.by}): ${commitment.statement}`
@@ -459,18 +497,24 @@ export function formatContinuityExpectations(contract: ContinuityContract): stri
           );
         }
       } else {
-        lines.push(`- OUTSTANDING: ${commitment.topic} (${commitment.by}): ${commitment.statement}`);
+        lines.push(
+          `- OUTSTANDING: ${commitment.topic} (${commitment.by}): ${commitment.statement}`
+        );
       }
     }
   }
   if (contract.sceneChanges.length > 0) {
-    lines.push('Changes the player made to the scene (still true until undone on the page):');
+    lines.push(
+      'Changes the player made to the scene (still true until undone on the page):'
+    );
     for (const change of contract.sceneChanges) {
       lines.push(`- ${change.statement}`);
     }
   }
   if (contract.unrecordedExchanges.length > 0) {
-    lines.push('Conversations the player refers to that never happened on the page:');
+    lines.push(
+      'Conversations the player refers to that never happened on the page:'
+    );
     for (const exchange of contract.unrecordedExchanges) {
       lines.push(`- ${describeUnrecordedExchange(exchange)}`);
     }
@@ -490,7 +534,10 @@ export function buildContinuityCorrectionPrompt(
   contract: ContinuityContract
 ): string {
   const issueLines = issues
-    .map((issue) => `- [${issue.type}] ${issue.expectation}\n  Offending text: "${issue.excerpt}"`)
+    .map(
+      (issue) =>
+        `- [${issue.type}] ${issue.expectation}\n  Offending text: "${issue.excerpt}"`
+    )
     .join('\n');
 
   return `${CONTINUITY_CORRECTION_HEADER}
