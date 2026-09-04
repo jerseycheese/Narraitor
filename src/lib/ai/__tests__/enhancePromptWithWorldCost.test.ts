@@ -2,13 +2,13 @@ import { enhancePromptWithWorldCost } from '../narrativeGenerator.prompt';
 import { worldCostBlock } from '@/lib/promptTemplates/templates/narrative/worldCostBlock';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { useCharacterStore } from '@/state/characterStore';
-import type { Character } from '@/state/characterStore.types';
+import type { StoreCharacter } from '@/state/characterStore.types';
 
 jest.mock('@/lib/featureFlags');
 
 const mockIsFeatureEnabled = isFeatureEnabled as jest.MockedFunction<typeof isFeatureEnabled>;
 
-const makeCharacter = (id: string, conditions: string[]): Character =>
+const makeCharacter = (id: string, conditions: string[]): StoreCharacter =>
   ({
     id,
     name: 'Jamie Holt',
@@ -24,7 +24,7 @@ const makeCharacter = (id: string, conditions: string[]): Character =>
     inventory: { characterId: id, items: [], capacity: 10, categories: [], itemOrder: [] },
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
-  }) as Character;
+  }) as StoreCharacter;
 
 describe('worldCostBlock', () => {
   it('names what the character carries and says a landing costs something recordable', () => {

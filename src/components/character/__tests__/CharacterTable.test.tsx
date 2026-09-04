@@ -5,7 +5,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CharacterTable } from '@/components/character/CharacterTable';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import type { EntityID } from '@/types/common.types';
 
 // Mock next/navigation
@@ -15,7 +15,7 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
-const mockCharacters: Character[] = [
+const mockCharacters: StoreCharacter[] = [
   {
     id: 'char-1' as EntityID,
     name: 'Aragorn',

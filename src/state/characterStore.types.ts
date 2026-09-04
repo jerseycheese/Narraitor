@@ -47,7 +47,7 @@ interface CharacterStatus {
   location?: string;
 }
 
-export interface Character {
+export interface StoreCharacter {
   id: EntityID;
   name: string;
   description: string;

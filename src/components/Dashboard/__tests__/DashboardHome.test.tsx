@@ -2,10 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DashboardHome } from '../DashboardHome';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import type { World } from '@/types/world.types';
-import type { Character } from '@/state/characterStore';
 import type { SavedSessionInfo } from '@/types/game.types';
 
 jest.mock('@/components/GuidedFirstTimeExperience', () => ({
@@ -37,7 +36,7 @@ describe('DashboardHome', () => {
     updatedAt: '2024-01-01T00:00:00.000Z'
   };
 
-  const mockCharacter: Character = {
+  const mockCharacter: StoreCharacter = {
     id: 'char-1',
     worldId: 'world-1',
     name: 'Aragorn',

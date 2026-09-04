@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import type { WorldStore } from '@/state/worldStore';
 import type { CharacterStore } from '@/state/characterStore';
@@ -37,7 +37,7 @@ export function useNavigationData(): NavigationData {
       return 0;
     }
 
-    return (Object.values(characters) as Character[]).filter(
+    return (Object.values(characters) as StoreCharacter[]).filter(
       (char) => char.worldId === currentWorldId
     ).length;
   }, [characters, currentWorldId]);

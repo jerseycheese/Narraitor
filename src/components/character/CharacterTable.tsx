@@ -18,12 +18,12 @@ import {
   Plus,
 } from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import type { EntityID } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
 
 interface CharacterTableProps {
-  characters: Character[];
+  characters: StoreCharacter[];
   currentCharacterId: EntityID | null;
   onMakeActive: (characterId: EntityID) => void;
   onView: (characterId: EntityID) => void;
@@ -95,7 +95,7 @@ export function CharacterTable({
     [onMakeActive]
   );
 
-  const columns: ColumnDef<Character>[] = React.useMemo(
+  const columns: ColumnDef<StoreCharacter>[] = React.useMemo(
     () => [
       {
         accessorKey: 'name',

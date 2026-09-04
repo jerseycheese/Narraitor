@@ -1,8 +1,7 @@
 import { buildChoicePrompt } from '../choiceGenerator.prompt';
 import type { NarrativeContext } from '@/types/narrative.types';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
-import { useCharacterStore } from '@/state/characterStore';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
   getNarrativeTemplate: jest.fn().mockReturnValue((context: { worldName: string }) =>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { Button } from '@/components/ui/button';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedImage } from '@/types/common.types';
@@ -202,9 +202,9 @@ export const TestDataGeneratorSection: React.FC = () => {
 
     const createdCharacters = [];
     const { characters } = useCharacterStore.getState();
-    const existingCharacterNames = (Object.values(characters) as Character[])
-      .filter((char) => char.worldId === currentWorld.id)
-      .map((char) => char.name);
+    const existingCharacterNames = (Object.values(characters) as StoreCharacter[])
+      .filter((c) => c.worldId === effectiveWorldId)
+      .map((c) => c.name);
 
     try {
       for (let i = 0; i < 5; i++) {
@@ -385,8 +385,8 @@ export const TestDataGeneratorSection: React.FC = () => {
     }
 
     const { characters } = useCharacterStore.getState();
-    const worldCharacters = (Object.values(characters) as Character[]).filter(
-      (char) => char.worldId === currentWorld.id
+    const worldCharacters = (Object.values(characters) as StoreCharacter[]).filter(
+      (c) => c.worldId === effectiveWorldId
     );
 
     if (worldCharacters.length === 0) {

@@ -2,7 +2,7 @@ import { NarrativeSegment, StoryEnding, EndingType, EndingTone } from '../types/
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
 import { JournalEntry } from '../types/journal.types';
-import type { Character } from './characterStore.types';
+import type { StoreCharacter } from './characterStore.types';
 import { generateUniqueId } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
 import { aiFetch } from '@/lib/ai/aiFetch';
@@ -23,7 +23,7 @@ type EndingParams = {
   desiredTone?: EndingTone;
   customPrompt?: string;
   world?: World;
-  character?: Character;
+  character?: StoreCharacter;
 };
 
 const buildLocalEnding = ({

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import {
   useCharacterStore,
-  type Character as StoreCharacter,
+  type StoreCharacter,
   type CharacterAttribute,
   type CharacterSkill,
   type CharacterStore,

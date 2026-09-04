@@ -5,7 +5,7 @@
 import { inferCustomActionSkillChecks } from '../customActionSkillInference';
 import type { AIClient } from '../types';
 import type { World } from '@/types/world.types';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 
 const makeWorld = (): World =>
   ({
@@ -46,7 +46,7 @@ const makeWorld = (): World =>
     updatedAt: '2023-01-01',
   }) as unknown as World;
 
-const makeCharacter = (): Character =>
+const makeCharacter = (): StoreCharacter =>
   ({
     id: 'char-1',
     name: 'Tess',
@@ -64,7 +64,7 @@ const makeCharacter = (): Character =>
     inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
     createdAt: '2023-01-01',
     updatedAt: '2023-01-01',
-  }) as unknown as Character;
+  }) as unknown as StoreCharacter;
 
 const mockClient = (content: string): AIClient =>
   ({ generateContent: jest.fn().mockResolvedValue({ content }) }) as unknown as AIClient;

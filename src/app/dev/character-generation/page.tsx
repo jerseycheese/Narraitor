@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import {
   generateAICharacter,
   type GeneratedCharacterData,
@@ -37,7 +37,7 @@ export default function CharacterGenerationTestPage() {
 
     try {
       const world = worlds[selectedWorldId];
-      const existingNames = (Object.values(characters) as Character[])
+      const existingNames = (Object.values(characters) as StoreCharacter[])
         .filter((c) => c.worldId === selectedWorldId)
         .map((c) => c.name);
 
@@ -301,19 +301,17 @@ export default function CharacterGenerationTestPage() {
           </h2>
           {selectedWorldId ? (
             <div>
-              {(Object.values(characters) as Character[])
+              {(Object.values(characters) as StoreCharacter[])
                 .filter((c) => c.worldId === selectedWorldId)
-                .map((character) => (
-                  <div
-                    key={character.id}
-                  >
-                    <span>{character.name}</span>
-                    <span>
-                      Level {character.level}
-                    </span>
+                .map((char) => (
+                  <div key={char.id}>
+                    <p>{char.name}</p>
+                    <p>
+                      Level {char.level || 1} &bull; {char.description}
+                    </p>
                   </div>
                 ))}
-              {(Object.values(characters) as Character[]).filter(
+              {(Object.values(characters) as StoreCharacter[]).filter(
                 (c) => c.worldId === selectedWorldId
               ).length === 0 && (
                 <p>No characters in this world yet</p>

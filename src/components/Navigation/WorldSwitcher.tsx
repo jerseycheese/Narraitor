@@ -12,7 +12,7 @@ import {
 } from './navigationDropdownStyles';
 import { useNavigationData } from './useNavigationData';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 
 /**
  * WorldSwitcher - reads and changes the active world.
@@ -99,8 +99,8 @@ export function WorldSwitcher() {
         <div className={headerDropdownMenuClass}>
           {Object.values(worlds).map((world) => {
             const worldCharacters = (
-              Object.values(characters) as Character[]
-            ).filter((char) => char.worldId === world.id).length;
+              Object.values(characters) as StoreCharacter[]
+            ).filter((c) => c.worldId === world.id).length;
 
             return (
               <Button

@@ -5,7 +5,7 @@
 
 import { getTimestamp } from '@/lib/utils/timestamp';
 import type { World } from '@/types/world.types';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import type { JournalEntry } from '@/types/journal.types';
 import type { NarrativeSegment } from '@/types/narrative.types';
 

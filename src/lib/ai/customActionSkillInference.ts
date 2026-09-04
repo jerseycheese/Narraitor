@@ -6,7 +6,7 @@
 import { AIClient } from './types';
 import { createDefaultGeminiClient } from './defaultGeminiClient';
 import type { World, WorldSkill } from '@/types/world.types';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import type { DecisionRequirement, NarrativeSegment } from '@/types/narrative.types';
 import { safeTrim } from '@/lib/utils';
 import { extractFencedJson } from './parseJSON';
@@ -17,7 +17,7 @@ const logger = new Logger('CustomActionSkillInference');
 export interface CustomActionSkillInferenceParams {
   /** The free-text action the player typed. */
   actionText: string;
-  character: Character;
+  character: StoreCharacter;
   world: World;
   /** Recent narrative for situational fit; only the last couple are used. */
   recentSegments?: NarrativeSegment[];

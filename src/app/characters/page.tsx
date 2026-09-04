@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Plus, Sparkles, Globe } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
@@ -187,7 +187,7 @@ export default function CharactersPage() {
   const worldIdFromUrl = searchParams.get('worldId');
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
   const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
-  const worldCharacters = (Object.values(characters) as Character[]).filter(
+  const worldCharacters = (Object.values(characters) as StoreCharacter[]).filter(
     (char) => char.worldId === effectiveWorldId
   );
   const worldState = effectiveWorldId
@@ -540,7 +540,7 @@ export default function CharactersPage() {
           </div>
         ) : viewMode === 'table' ? (
           <CharacterTable
-            characters={worldCharacters as Character[]}
+            characters={worldCharacters as StoreCharacter[]}
             currentCharacterId={currentCharacterId}
             onMakeActive={handleSelectCharacter}
             onView={handleViewCharacter}
@@ -550,7 +550,7 @@ export default function CharactersPage() {
           />
         ) : (
           <div className="characters-grid">
-            {(worldCharacters as Character[]).map((character) => (
+            {(worldCharacters as StoreCharacter[]).map((character) => (
               <CharacterCard
                 key={character.id}
                 character={character}

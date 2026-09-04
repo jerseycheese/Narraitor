@@ -1,6 +1,6 @@
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 
 export interface NextStep {
@@ -52,7 +52,7 @@ export function useNavigationFlow() {
     }
 
     // World selected, check for characters
-    const worldCharacters = (Object.values(characters) as Character[]).filter(
+    const worldCharacters = (Object.values(characters) as StoreCharacter[]).filter(
       char => char.worldId === currentWorldId
     );
 

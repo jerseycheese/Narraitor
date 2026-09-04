@@ -9,7 +9,7 @@ import {
   type SkillCheckSubject,
 } from '@/utils/skillCheckEvaluator';
 import { logger } from '@/lib/utils/logger';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 import type {
   DecisionOption,

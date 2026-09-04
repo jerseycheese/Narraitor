@@ -1,6 +1,5 @@
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import type { EntityID } from '@/types/common.types';
 import type { World } from '@/types/world.types';

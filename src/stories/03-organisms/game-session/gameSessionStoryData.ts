@@ -12,7 +12,7 @@ import type {
 import type { World } from '@/types/world.types';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ const mockWorld: World = {
 
 // ── Mock Character ───────────────────────────────────────────────────
 
-export const mockCharacter: Character = {
+export const mockCharacter: StoreCharacter = {
   id: STORY_CHARACTER_ID,
   name: 'Kael Stormwright',
   description: 'A wandering swordmage seeking the truth behind the Shattering.',

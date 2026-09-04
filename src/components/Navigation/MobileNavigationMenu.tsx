@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
@@ -191,8 +191,8 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
             <div className="mobile-nav-world-list">
               {Object.values(worlds).map((world) => {
                 const worldCharacters = (
-                  Object.values(characters) as Character[]
-                ).filter((char) => char.worldId === world.id).length;
+                  Object.values(characters) as StoreCharacter[]
+                ).filter((c) => c.worldId === world.id).length;
 
                 return (
                   <Button

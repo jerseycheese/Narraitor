@@ -5,7 +5,7 @@
 
 import { AIClient } from '../types';
 import { World } from '@/types/world.types';
-import { Character } from '@/state/characterStore';
+import { StoreCharacter } from '@/state/characterStore';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
 /**
@@ -76,7 +76,7 @@ export function createMockWorldWithSkills(): World {
 /**
  * Creates a mock character with skills
  */
-export function createMockCharacterWithSkills(): Character {
+export function createMockCharacterWithSkills(): StoreCharacter {
   return {
     id: 'char-1',
     worldId: 'skill-world',

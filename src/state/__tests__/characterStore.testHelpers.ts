@@ -3,7 +3,7 @@
  * Provides reusable mock character data factories
  */
 
-import type { Character } from '../characterStore';
+import type { StoreCharacter } from '../characterStore';
 import type { EntityID } from '@/types/common.types';
 
 // Re-export centralized timer utilities
@@ -13,7 +13,7 @@ export {
 } from '@/lib/test-utils/testTimers';
 
 // Type for creating test characters (omits fields added by store)
-type CharacterInput = Omit<Character, 'id' | 'createdAt' | 'updatedAt'>;
+type CharacterInput = Omit<StoreCharacter, 'id' | 'createdAt' | 'updatedAt'>;
 
 /**
  * Creates basic character test data

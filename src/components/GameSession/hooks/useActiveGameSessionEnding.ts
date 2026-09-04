@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { EndingTone, EndingType } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('UseActiveGameSessionEnding');
@@ -12,7 +12,7 @@ interface UseActiveGameSessionEndingOptions {
   sessionId: string;
   characterId?: string;
   world?: World;
-  character?: Character;
+  character?: StoreCharacter;
   generateEnding: (
     endingType: EndingType,
     options: {
@@ -22,7 +22,7 @@ interface UseActiveGameSessionEndingOptions {
       desiredTone?: EndingTone;
       customPrompt?: string;
       world?: World;
-      character?: Character;
+      character?: StoreCharacter;
     }
   ) => Promise<void>;
 }

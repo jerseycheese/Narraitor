@@ -1,5 +1,5 @@
 import { safeTrim } from '@/lib/utils';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 
 type PersonalityContext = {
   personality: string;

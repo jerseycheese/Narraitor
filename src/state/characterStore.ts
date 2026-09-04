@@ -22,12 +22,12 @@ import { storeEvents, StoreEventTypes, type CharacterDeletedEvent, type WorldDel
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('CharacterStore');
 
-// Character shapes live in characterStore.types.ts so lib code can import
+// StoreCharacter shapes live in characterStore.types.ts so lib code can import
 // them without pulling in the store module. Re-exported here to keep the
 // existing import surface working.
-import type { Character, CharacterAttribute, CharacterSkill } from './characterStore.types';
+import type { StoreCharacter, CharacterAttribute, CharacterSkill } from './characterStore.types';
 import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
-export type { Character, CharacterAttribute, CharacterSkill } from './characterStore.types';
+export type { StoreCharacter, CharacterAttribute, CharacterSkill } from './characterStore.types';
 
 const addCharacterToRoster = (
   rosters: Record<EntityID, EntityID[]>,
@@ -72,7 +72,7 @@ const removeCharacterFromRoster = (
 };
 
 const buildWorldCharacterIds = (
-  characters: Record<EntityID, Character>
+  characters: Record<EntityID, StoreCharacter>
 ): Record<EntityID, EntityID[]> => {
   const rosters: Record<EntityID, EntityID[]> = {};
 
@@ -94,9 +94,9 @@ const buildWorldCharacterIds = (
 /**
  * Character store interface with state and actions
  */
-export interface CharacterStore extends CrudStore<Character> {
+export interface CharacterStore extends CrudStore<StoreCharacter> {
   // State
-  characters: Record<EntityID, Character>;
+  characters: Record<EntityID, StoreCharacter>;
   currentCharacterId: EntityID | null;
   error: UserFriendlyError | null;
   loading: boolean;
@@ -105,9 +105,9 @@ export interface CharacterStore extends CrudStore<Character> {
 
   // Actions
   createCharacter: (
-    character: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>
+    character: Omit<StoreCharacter, 'id' | 'createdAt' | 'updatedAt'>
   ) => EntityID;
-  updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
+  updateCharacter: (id: EntityID, updates: Partial<StoreCharacter>) => void;
   /** Shift the lawful/chaotic alignment axis by delta, clamped to -100..100. */
   applyAlignmentShift: (characterId: EntityID, delta: number) => void;
   /** A condition the world imposed; no-op if the character already carries it. */
@@ -118,7 +118,7 @@ export interface CharacterStore extends CrudStore<Character> {
   setCurrentCharacter: (id: EntityID) => void;
 
   // Queries
-  getCharactersByWorld: (worldId: EntityID) => Character[];
+  getCharactersByWorld: (worldId: EntityID) => StoreCharacter[];
   getWorldRoster: (worldId: EntityID) => EntityID[];
 
   // Attribute management
@@ -230,7 +230,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
               characterId,
             };
 
-            const newCharacter: Character = {
+            const newCharacter: StoreCharacter = {
               ...characterData,
               id: characterId,
               name: normalizedName,
@@ -258,6 +258,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
                 newCharacter.worldId,
                 characterId
               ),
+              currentCharacterId: characterId,
+              currentEntityId: characterId,
               error: null,
             }));
 
@@ -278,7 +280,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
 
             const previousWorldId = character.worldId;
 
-            const normalizedUpdates: Partial<Character> = { ...updates };
+            const normalizedUpdates: Partial<StoreCharacter> = { ...updates };
 
             if (updates?.name) {
               normalizedUpdates.name = normalizeText(updates.name, NORM_NAME);
@@ -317,7 +319,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
               };
             }
 
-            const updatedCharacter: Character = {
+            const updatedCharacter: StoreCharacter = {
               ...character,
               ...normalizedUpdates,
               inventory: normalizedUpdates.inventory ?? character.inventory,
@@ -418,7 +420,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             const roster = worldCharacterIds[worldId] ?? [];
             return roster
               .map((characterId) => characters[characterId])
-              .filter((char): char is Character => Boolean(char));
+              .filter((char): char is StoreCharacter => Boolean(char));
           },
           getWorldRoster: (worldId) => {
             const { worldCharacterIds } = get();
@@ -467,7 +469,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
                 entities: { ...characters },
                 worldCharacterIds: hasCharacters
                   ? buildWorldCharacterIds(
-                      characters as Record<EntityID, Character>
+                      characters as Record<EntityID, StoreCharacter>
                     )
                   : {},
                 currentCharacterId: hasCharacters
@@ -734,7 +736,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
                 characters: charactersToKeep,
                 entities: charactersToKeep,
                 worldCharacterIds: buildWorldCharacterIds(
-                  charactersToKeep as Record<EntityID, Character>
+                  charactersToKeep as Record<EntityID, StoreCharacter>
                 ),
                 currentCharacterId: shouldResetCurrent
                   ? null
