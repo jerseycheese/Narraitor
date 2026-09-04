@@ -6,6 +6,7 @@ import type { InventoryItem } from '@/types/inventory.types';
 import { buildItemPrompt } from '@/lib/ai/itemImageGenerator';
 import { generateImageWithFallback } from '@/lib/api/imageGenerationHelpers';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 const logger = new Logger('API');
 
@@ -17,7 +18,7 @@ const logger = new Logger('API');
  *
  * Returns: GeneratedImage object
  */
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const body = await request.json();
     logger.debug('generate-item-image API', 'Request body keys:', Object.keys(body));
@@ -57,9 +58,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to generate item image',
-        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
   }
-}
+});

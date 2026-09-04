@@ -5,6 +5,7 @@ import { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
 import { ToneSettings } from '@/types/tone-settings.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
 import { safeTrim } from '@/lib/utils';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
@@ -127,7 +128,7 @@ const sanitizeDecisions = (
   return sanitized;
 };
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const rawBody = await request.json();
     const worldId = safeTrim(String(rawBody?.worldId ?? ''));
@@ -175,8 +176,8 @@ export async function POST(request: NextRequest) {
     logger.error('[story-checkpoint] Failed to generate summary', error);
     reportServerError(error, { source: 'route', route: '/api/narrative/story-checkpoint' });
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to generate checkpoint summary.' },
+      { error: 'Failed to generate checkpoint summary.' },
       { status: 500 }
     );
   }
-}
+});

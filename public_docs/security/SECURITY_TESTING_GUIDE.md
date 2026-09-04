@@ -21,9 +21,9 @@ Run the automated test script:
 
 This script will:
 - Verify API routes exist and respond correctly
-- Check that rate limiting is working (50 requests/hour per IP in production mode)
+- Check that rate limiting is working (50 requests/hour per IP in production mode across all AI routes)
 - Ensure no `NEXT_PUBLIC_` provider keys are visible in the build
-- Validate request handling and error responses
+- Validate request handling, payload size limits (HTTP 413), and sanitized error responses
 - Confirm security headers are present
 
 ## Manual Browser Testing

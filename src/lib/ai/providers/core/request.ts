@@ -30,8 +30,7 @@ const logger = new Logger('ProviderRequest');
 export class ProviderUpstreamError extends Error {
   constructor(
     message: string,
-    readonly status: number,
-    readonly detail?: string
+    readonly status: number
   ) {
     super(message);
     this.name = 'ProviderUpstreamError';
@@ -241,26 +240,15 @@ export async function generateProviderText(
   const parsed = adapter.parseTextResponse(await response.json());
   if (parsed.ok) return parsed.result;
 
-  const { message, detail } = PARSE_FAILURES[parsed.failure];
+  const { message } = PARSE_FAILURES[parsed.failure];
   logger.error('Provider response could not be parsed', {
     provider: adapter.type,
     failure: parsed.failure,
   });
-  throw new ProviderUpstreamError(message, 500, detail);
+  throw new ProviderUpstreamError(message, 500);
 }
 
-/**
- * How much of an upstream error body to keep.
- *
- * SECURITY: for a custom endpoint this body is written by that service, and a
- * provider that echoes the request back would put the bearer credential and the
- * prompt in it. It is never logged, and only a bounded slice reaches the player
- * — enough to carry "model not found" or "insufficient quota", not enough to be
- * a channel.
- */
-const MAX_UPSTREAM_DETAIL = 300;
-
-/** Read the upstream error body once and turn it into a typed error. */
+/** Read the upstream error status and turn it into a typed error without retaining the raw body. */
 async function toUpstreamError(
   adapter: ProviderAdapter,
   response: Response
@@ -276,9 +264,5 @@ async function toUpstreamError(
   });
 
   const classified = classifyUpstreamStatus(response.status, response.statusText);
-  return new ProviderUpstreamError(
-    classified.message,
-    response.status,
-    errorText.slice(0, MAX_UPSTREAM_DETAIL)
-  );
+  return new ProviderUpstreamError(classified.message, response.status);
 }

@@ -2,11 +2,25 @@
  * @jest-environment node
  */
 
-jest.mock('@/utils/apiHelpers', () => ({
-  makeGeminiRequest: jest.fn(),
-  // Allowed by default; the limit itself is covered by the rate limiter's own
-  // tests, and these are about how upstream answers are classified.
-  handleRateLimiting: jest.fn(() => ({ response: null, result: {} })),
+jest.mock('@/utils/apiHelpers', () => {
+  const actual = jest.requireActual('@/utils/apiHelpers');
+  return {
+    ...actual,
+    makeGeminiRequest: jest.fn(),
+  };
+});
+
+jest.mock('@/utils/rateLimiter', () => ({
+  globalRateLimiter: {
+    checkLimit: jest.fn(() => ({
+      allowed: true,
+      remaining: 50,
+      resetTime: Date.now() + 3600000,
+    })),
+  },
+  RateLimiter: {
+    getErrorMessage: jest.fn(() => 'Rate limit exceeded'),
+  },
 }));
 
 // The endpoint guard resolves the hostname before any player-supplied URL is
@@ -18,11 +32,11 @@ jest.mock('node:dns/promises', () => ({
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
-import { handleRateLimiting, makeGeminiRequest } from '@/utils/apiHelpers';
+import { makeGeminiRequest } from '@/utils/apiHelpers';
+import { globalRateLimiter } from '@/utils/rateLimiter';
 import { lookup } from 'node:dns/promises';
 
 const mockMakeGeminiRequest = makeGeminiRequest as jest.MockedFunction<typeof makeGeminiRequest>;
-const mockHandleRateLimiting = handleRateLimiting as jest.MockedFunction<typeof handleRateLimiting>;
 
 const URL = 'http://localhost:3000/api/ai/validate-provider';
 const KEY = 'AIza-candidate-key';
@@ -56,11 +70,11 @@ describe('POST /api/ai/validate-provider', () => {
    * oracle, so the limit has to come before anything else the route does.
    */
   test('stops at the rate limit before dereferencing anything', async () => {
-    const limited = new Response(null, { status: 429 });
-    mockHandleRateLimiting.mockReturnValueOnce({
-      response: limited,
-      result: {},
-    } as ReturnType<typeof handleRateLimiting>);
+    (globalRateLimiter.checkLimit as jest.Mock).mockReturnValueOnce({
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + 60000,
+    });
 
     const response = await POST(buildRequest({ key: KEY }));
 
@@ -148,9 +162,11 @@ describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () =>
     global.fetch = jest.fn();
     // resetAllMocks in afterEach strips the module mock's implementation too.
     (lookup as jest.Mock).mockResolvedValue([{ address: '104.18.0.1', family: 4 }]);
-    mockHandleRateLimiting.mockReturnValue({ response: null, result: {} } as ReturnType<
-      typeof handleRateLimiting
-    >);
+    (globalRateLimiter.checkLimit as jest.Mock).mockReturnValue({
+      allowed: true,
+      remaining: 50,
+      resetTime: Date.now() + 3600000,
+    });
   });
 
   afterEach(() => {

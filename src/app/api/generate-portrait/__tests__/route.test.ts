@@ -96,7 +96,7 @@ describe('/api/generate-portrait', () => {
 
     expect(response.status).toBe(200);
     expect(data.portrait.url).toContain('api.dicebear.com/7.x/avataaars/svg');
-    expect(data.portrait.prompt).toContain('rate limited');
+    expect(data.portrait.prompt).toBe('Character portrait fallback');
   });
 
   it('uses recognizable source material fallback when prompt generation fails for a known figure', async () => {

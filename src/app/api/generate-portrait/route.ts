@@ -7,6 +7,7 @@ import { World } from '@/types/world.types';
 import { truncate, getTimestamp } from '@/lib/utils';
 import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 const logger = new Logger('API');
 
@@ -76,7 +77,7 @@ async function buildPortraitPrompt(
   }
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const body = await request.json();
     logger.debug(
@@ -200,11 +201,11 @@ export async function POST(request: NextRequest) {
       type: 'ai-generated' as const,
       url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
       generatedAt: getTimestamp(),
-      prompt: `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      prompt: 'Character portrait fallback',
     };
 
     return NextResponse.json({
       portrait: fallbackPortrait,
     });
   }
-}
+});

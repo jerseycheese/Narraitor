@@ -81,7 +81,6 @@ export async function handleSimilarityCheck(
     return NextResponse.json(
       {
         error: failureMessage,
-        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

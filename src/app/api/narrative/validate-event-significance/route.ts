@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
 import { validateEventSignificance, ValidationContext } from '@/lib/ai/eventSignificanceValidator';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
@@ -10,7 +11,7 @@ const logger = new Logger('ValidateEventSignificance');
  * API endpoint for validating event significance
  * POST /api/narrative/validate-event-significance
  */
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const body = await request.json();
     const { majorEvent, context } = body as {
@@ -38,9 +39,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to validate event significance',
-        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
   }
-}
+});

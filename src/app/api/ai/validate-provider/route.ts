@@ -1,7 +1,7 @@
 // src/app/api/ai/validate-provider/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { handleRateLimiting, makeGeminiRequest } from '@/utils/apiHelpers';
+import { withAIRoute, makeGeminiRequest } from '@/utils/apiHelpers';
 import { DEFAULT_TEXT_MODEL, getSafetySettings } from '@/lib/ai/config';
 import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 import { getProviderAdapter } from '@/lib/ai/providers/adapterRegistry';
@@ -18,12 +18,12 @@ import type { ProviderType } from '@/types/provider.types';
  * Validates a provider configuration WITHOUT storing the key server-side.
  *
  * The candidate key arrives in the PROVIDER_API_KEY_HEADER (read directly, not
- * via the env fallback — we want to test exactly what the player typed). We make
+ * via resolveProvider, because candidate settings are what we're testing). Makes
  * one cheap text ping to the provider and map the upstream status to a stable
- * result. The key is never logged, never persisted, and never echoed back.
+ * classification. Does not test generation quality or multimodal support —
+ * this is a reachability and credential probe.
  *
- * This covers every provider type the adapter registry can reach, not just
- * Gemini. Types with no adapter still report UNSUPPORTED_PROVIDER.
+ * Returns: { valid: boolean, capabilities: ProviderCapabilities, error?: string }
  */
 
 // Vercel function budget: one single-attempt provider ping (30s) + overhead.
@@ -47,6 +47,7 @@ type ValidationError =
   | 'UNSUPPORTED_PROVIDER'
   | 'INVALID_ENDPOINT'
   | 'INVALID_KEY'
+  | 'QUOTA_EXCEEDED'
   | 'INVALID_MODEL'
   | 'RATE_LIMITED'
   | 'VALIDATION_FAILED'
@@ -58,14 +59,7 @@ function fail(error: ValidationError) {
   return NextResponse.json({ valid: false, capabilities: NO_CAPABILITIES, error });
 }
 
-export async function POST(request: NextRequest) {
-  // SECURITY: this route dereferences a URL the caller names, and answers
-  // whether that host responded. Unmetered, it is a request forwarder with a
-  // reachability oracle attached, so it takes the same limit the generation
-  // routes take.
-  const { response: rateLimited } = handleRateLimiting(request);
-  if (rateLimited) return rateLimited;
-
+export const POST = withAIRoute(async (request: NextRequest) => {
   const key = request.headers.get(PROVIDER_API_KEY_HEADER)?.trim();
   if (!key) {
     return fail('NO_KEY');
@@ -86,7 +80,7 @@ export async function POST(request: NextRequest) {
   return type === 'gemini'
     ? validateGemini(key, body.model)
     : validateOpenAICompatible(key, type, body.endpoint, body.model);
-}
+});
 
 /**
  * Gemini's ping, unchanged: its own REST shape on a pinned base URL, with the

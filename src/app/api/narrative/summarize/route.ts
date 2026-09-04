@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
 const logger = new Logger('Summarize');
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     let body;
     try {
@@ -213,4 +214,4 @@ Do not include any explanatory text, code fences, markdown, or additional prose.
       { status: 500 }
     );
   }
-}
+});

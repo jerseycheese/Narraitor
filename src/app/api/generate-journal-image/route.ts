@@ -5,6 +5,7 @@ import Logger from '@/lib/utils/logger';
 import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
 import { getGenreStyleGuidance, getGenreFallbackImage } from '@/lib/utils/genrePromptGuide';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 const logger = new Logger('JournalImageAPI');
 
@@ -46,7 +47,7 @@ function generateFallbackImage(entry: JournalEntry, world?: World): string {
   return getGenreFallbackImage(genre, `journal-${entry.id}`);
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const body = (await request.json()) as GenerateJournalImageRequest;
 
@@ -83,4 +84,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

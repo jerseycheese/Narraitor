@@ -124,6 +124,7 @@ export function ProviderAdvancedSettings({
             id={fieldId('max-tokens')}
             type="number"
             min={1}
+            max={4096}
             step={1}
             placeholder="Provider default"
             value={value?.maxTokens ?? ''}
@@ -132,7 +133,7 @@ export function ProviderAdvancedSettings({
             }
           />
           <p className="form-help-text">
-            Caps how long one generated response can be. Higher allows longer scenes, but costs
+            Caps how long one generated response can be (up to 4,096 tokens). Higher allows longer scenes, but costs
             more and takes longer per turn.
           </p>
         </div>

@@ -5,6 +5,7 @@ import type { InventoryCategorizationResult } from '@/lib/ai/inventoryCategorize
 import Logger from '@/lib/utils/logger';
 import { getTimestamp } from '@/lib/utils';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 const logger = new Logger('InventoryCategorizeAPI');
 
@@ -18,7 +19,7 @@ interface CategorizeInventoryRequest {
   items: CategorizeInventoryItemPayload[];
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const body = (await request.json()) as CategorizeInventoryRequest;
 
@@ -89,4 +90,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
