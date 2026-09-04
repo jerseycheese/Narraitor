@@ -258,8 +258,6 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
                 newCharacter.worldId,
                 characterId
               ),
-              currentCharacterId: characterId,
-              currentEntityId: characterId,
               error: null,
             }));
 
