@@ -527,6 +527,17 @@ describe('unrecorded exchange (#1857)', () => {
       )
     ).toEqual([]);
   });
+
+  it('does not let unrelated negation hide a recounted exchange', () => {
+    const contract = buildExchangeContract(3);
+
+    expect(
+      detectContinuityIssues(
+        'Davies does not hesitate. "What I told you privately was that the mayor buried the report," he says.',
+        contract
+      )
+    ).toMatchObject([{ type: 'invented-exchange', entity: 'Davies' }]);
+  });
 });
 
 describe('delivered-commitment bait guards (#1963)', () => {
