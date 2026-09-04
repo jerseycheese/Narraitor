@@ -8,7 +8,7 @@ import {
   PROVIDER_MODEL_HEADER,
   PROVIDER_TYPE_HEADER,
 } from '../providerKeyHeader';
-import { resolveApiKey } from '../resolveApiKey';
+import { resolveApiKey, resolveProvider, SERVER_MAX_OUTPUT_TOKENS } from '../resolveApiKey';
 
 const ORIGINAL = process.env.GEMINI_API_KEY;
 
@@ -72,5 +72,35 @@ describe('resolveApiKey', () => {
     });
 
     expect(resolveApiKey(request)).toBeNull();
+  });
+
+  test('clamps maxTokens overrides above 4096 to SERVER_MAX_OUTPUT_TOKENS', () => {
+    const request = new NextRequest('http://localhost/api/x', {
+      headers: {
+        [PROVIDER_API_KEY_HEADER]: 'gemini-key',
+        'x-provider-max-tokens': '8192',
+      },
+    });
+
+    const result = resolveProvider(request);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.descriptor.maxTokensOverride).toBe(SERVER_MAX_OUTPUT_TOKENS);
+    }
+  });
+
+  test('preserves valid maxTokens override within [1, 4096]', () => {
+    const request = new NextRequest('http://localhost/api/x', {
+      headers: {
+        [PROVIDER_API_KEY_HEADER]: 'gemini-key',
+        'x-provider-max-tokens': '2048',
+      },
+    });
+
+    const result = resolveProvider(request);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.descriptor.maxTokensOverride).toBe(2048);
+    }
   });
 });

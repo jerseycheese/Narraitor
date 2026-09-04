@@ -237,10 +237,15 @@ function readTopPOverride(request?: NextRequest): number | undefined {
 export const SERVER_MAX_OUTPUT_TOKENS = 4096;
 
 /**
- * Response-length cap. Upper-bounded to the server-owned ceiling (SERVER_MAX_OUTPUT_TOKENS).
+ * Response-length cap. Clamps finite positive values to the server ceiling (SERVER_MAX_OUTPUT_TOKENS).
  */
 function readMaxTokensOverride(request?: NextRequest): number | undefined {
-  return readBoundedNumberHeader(request, PROVIDER_MAX_TOKENS_HEADER, 1, SERVER_MAX_OUTPUT_TOKENS);
+  const raw = request?.headers.get(PROVIDER_MAX_TOKENS_HEADER);
+  if (!raw) return undefined;
+
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 1) return undefined;
+  return Math.min(Math.floor(value), SERVER_MAX_OUTPUT_TOKENS);
 }
 
 function readPromptOverride(request: NextRequest | undefined, header: string): string | undefined {

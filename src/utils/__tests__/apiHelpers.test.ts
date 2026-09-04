@@ -219,12 +219,24 @@ describe('withAIRoute', () => {
       headersMap.set('content-length', options.contentLength);
     }
     const buffer = options.bodyBuffer ?? new ArrayBuffer(10);
-
     const req = {
       headers: {
         get: (key: string) => headersMap.get(key.toLowerCase()) ?? null,
       },
       clone: () => ({
+        body: {
+          getReader: () => {
+            let done = false;
+            return {
+              read: async () => {
+                if (done) return { done: true, value: undefined };
+                done = true;
+                return { done: false, value: new Uint8Array(buffer) };
+              },
+              cancel: async () => {},
+            };
+          },
+        },
         arrayBuffer: async () => buffer,
       }),
     } as unknown as NextRequest;

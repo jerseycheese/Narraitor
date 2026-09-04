@@ -108,23 +108,40 @@ export function withAIRoute(
       );
     }
 
-    // 2. Measure cloned request body's actual bytes
+    // 2. Single owner of rate limiting (reject early before buffering any unauthenticated payload)
+    const { response: rateLimitResponse, result: rateLimitResult } = handleRateLimiting(request);
+    if (rateLimitResponse) return rateLimitResponse;
+
+    // 3. Measure cloned request body incrementally to reject without buffering whole payload
     try {
       const cloned = request.clone();
-      const arrayBuffer = await cloned.arrayBuffer();
-      if (arrayBuffer.byteLength > maxBytes) {
-        return NextResponse.json(
-          { error: 'Payload too large', code: 'PAYLOAD_TOO_LARGE' },
-          { status: 413 }
-        );
+      if (cloned.body && typeof cloned.body.getReader === 'function') {
+        const reader = cloned.body.getReader();
+        let totalBytes = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          totalBytes += value?.byteLength ?? 0;
+          if (totalBytes > maxBytes) {
+            await reader.cancel().catch(() => {});
+            return NextResponse.json(
+              { error: 'Payload too large', code: 'PAYLOAD_TOO_LARGE' },
+              { status: 413 }
+            );
+          }
+        }
+      } else if (typeof cloned.arrayBuffer === 'function') {
+        const arrayBuffer = await cloned.arrayBuffer();
+        if (arrayBuffer.byteLength > maxBytes) {
+          return NextResponse.json(
+            { error: 'Payload too large', code: 'PAYLOAD_TOO_LARGE' },
+            { status: 413 }
+          );
+        }
       }
     } catch {
       // If cloning/reading fails, let the inner handler manage the request
     }
-
-    // 3. Single owner of rate limiting
-    const { response: rateLimitResponse, result: rateLimitResult } = handleRateLimiting(request);
-    if (rateLimitResponse) return rateLimitResponse;
 
     // 4. Call handler and attach rate limit headers
     const response = await handler(request);
