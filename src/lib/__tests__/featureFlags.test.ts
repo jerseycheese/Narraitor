@@ -63,6 +63,14 @@ describe('featureFlags', () => {
     expect(load({ NEXT_PUBLIC_FEATURE_WORLD_CLOCK: 'FALSE' }).isFeatureEnabled('WORLD_CLOCK')).toBe(true);
   });
 
+  it('defaults WORLD_COST to true and turns it off only for the exact string "false"', () => {
+    expect(load({ NEXT_PUBLIC_FEATURE_WORLD_COST: undefined }).isFeatureEnabled('WORLD_COST')).toBe(true);
+    jest.resetModules();
+    expect(load({ NEXT_PUBLIC_FEATURE_WORLD_COST: 'false' }).isFeatureEnabled('WORLD_COST')).toBe(false);
+    jest.resetModules();
+    expect(load({ NEXT_PUBLIC_FEATURE_WORLD_COST: 'FALSE' }).isFeatureEnabled('WORLD_COST')).toBe(true);
+  });
+
   it('defaults WORLD_DESCRIPTION_IN_SCENE to true and turns it off only for the exact string "false"', () => {
     expect(
       load({ NEXT_PUBLIC_FEATURE_WORLD_DESCRIPTION_IN_SCENE: undefined }).isFeatureEnabled(

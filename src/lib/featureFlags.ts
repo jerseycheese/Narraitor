@@ -26,9 +26,9 @@ const FEATURE_FLAG_DEFAULTS = {
   // The world can take something from the character: the post-segment
   // extraction records a cost (a condition written to the character, an item
   // loss attributed to the thread that took it) and the scene prompt carries
-  // the character's conditions. Off until the playtest declared in
-  // narraitor-prompt-template-governance/eval-logs/1882-world-cost.md measures it.
-  WORLD_COST: false,
+  // the character's conditions. On since the #1983 live matrix evaluation;
+  // the env var is the kill switch.
+  WORLD_COST: true,
   // Renders the world's founding description in the per-turn scene prompt.
   // Measured and shipped in issue #1865: keeps world-specific contextual pressure
   // (e.g. deadlines, stakes) alive across 20+ turns without prompt amnesia or looping.
