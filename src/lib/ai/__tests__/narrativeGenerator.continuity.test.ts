@@ -21,52 +21,52 @@ import type { NarrativeGenerationRequest } from '@/types/narrative.types';
 // Mock the store modules (same set as the sibling decision-consequences tests)
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: {
-    getState: jest.fn()
-  }
+    getState: jest.fn(),
+  },
 }));
 jest.mock('@/state/characterStore', () => ({
   useCharacterStore: {
-    getState: jest.fn()
-  }
+    getState: jest.fn(),
+  },
 }));
 jest.mock('@/state/aiContextStore', () => ({
   useAiContextStore: {
-    getState: jest.fn()
-  }
+    getState: jest.fn(),
+  },
 }));
 jest.mock('@/state/inventoryStore', () => ({
   useInventoryStore: {
-    getState: jest.fn()
-  }
+    getState: jest.fn(),
+  },
 }));
 jest.mock('@/state/npcStore', () => ({
   useNPCStore: {
-    getState: jest.fn()
-  }
+    getState: jest.fn(),
+  },
 }));
 jest.mock('../playerDecisionTracker');
 jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
-  getNarrativeTemplate: jest.fn()
+  getNarrativeTemplate: jest.fn(),
 }));
 jest.mock('../loreContextHelper', () => ({
   getLoreContextForPrompt: jest.fn(),
-  checkAndRecordLoreMentions: jest.fn()
+  checkAndRecordLoreMentions: jest.fn(),
 }));
 jest.mock('../structuredLoreExtractor', () => ({
-  extractStructuredLore: jest.fn()
+  extractStructuredLore: jest.fn(),
 }));
 jest.mock('../toneSettingsGuidance', () => ({
-  getDetailedToneInstructions: jest.fn()
+  getDetailedToneInstructions: jest.fn(),
 }));
 jest.mock('@/state/loreStore', () => ({
   useLoreStore: {
-    getState: jest.fn()
-  }
+    getState: jest.fn(),
+  },
 }));
 jest.mock('@/state/narrativeStore', () => ({
   useNarrativeStore: {
-    getState: jest.fn()
-  }
+    getState: jest.fn(),
+  },
 }));
 
 const mockWorld = {
@@ -186,7 +186,9 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     (useNPCStore.getState as jest.Mock).mockImplementation(() => ({
       getNPCsByWorld: jest
         .fn()
-        .mockReturnValue([{ id: 'npc-mira', name: 'Mira', worldId: 'world-1' }]),
+        .mockReturnValue([
+          { id: 'npc-mira', name: 'Mira', worldId: 'world-1' },
+        ]),
       getById: jest.fn(),
       createNPC: jest.fn(),
       updateNPC: jest.fn(),
@@ -301,11 +303,16 @@ describe('NarrativeGenerator - continuity guardrail', () => {
           id: 'fact-debt',
           category: 'events' as const,
           key: 'world-1:event_debt',
-          value: 'Aunt Carol says Old Man Rowan paid off the mortgage years ago.',
+          value:
+            'Aunt Carol says Old Man Rowan paid off the mortgage years ago.',
           aliases: [],
           metadata: {
             importance: 'high' as const,
-            continuity: { kind: 'assertion' as const, topic: 'mill debt', speaker: 'Aunt Carol' },
+            continuity: {
+              kind: 'assertion' as const,
+              topic: 'mill debt',
+              speaker: 'Aunt Carol',
+            },
           },
         },
       ]),
@@ -401,10 +408,12 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     // Three shared scenes, a third party in every one of them, and the first
     // sits outside any last-3 window.
     (useNarrativeStore.getState as jest.Mock).mockReturnValue({
-      getSessionSegments: jest.fn().mockReturnValue([
-        { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
-        { metadata: { characterIds: ['npc-mira'] } },
-        { metadata: { characterIds: ['npc-mira'] } },
+      getSessionSegments: jest
+        .fn()
+        .mockReturnValue([
+          { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
+          { metadata: { characterIds: ['npc-mira'] } },
+          { metadata: { characterIds: ['npc-mira'] } },
         { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
         { metadata: { characterIds: ['npc-mira'], speakerId: 'npc-davies' } },
       ]),
@@ -430,7 +439,9 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       'Davies blinks at you. "No such conversation ever took place," he says, loud enough for the room to hear.';
 
     const client = createRoutedClient(INVENTED_PROSE, REFUSED_PROSE);
-    const result = await new NarrativeGenerator(client).generateSegment(baitRequest);
+    const result = await new NarrativeGenerator(client).generateSegment(
+      baitRequest
+    );
 
     // The prompt states the checkable fact rather than an absence of evidence.
     const generationPrompt = client.generateContent.mock.calls[0][0] as string;
@@ -458,9 +469,9 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     // Same bait, but the correction keeps the invention: the lore backstop
     // takes over and the speaker's canon annotations get reserved.
     const stubbornClient = createRoutedClient(INVENTED_PROSE, INVENTED_PROSE);
-    const flagged = await new NarrativeGenerator(stubbornClient).generateSegment(
-      baitRequest
-    );
+    const flagged = await new NarrativeGenerator(
+      stubbornClient
+    ).generateSegment(baitRequest);
 
     expect(flagged.metadata.continuity?.status).toBe('flagged');
     expect(extractStructuredLore).toHaveBeenLastCalledWith(
@@ -468,6 +479,116 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       expect.anything(),
       expect.objectContaining({ unattestedSpeakers: ['Davies'] })
     );
+  });
+
+  it('does not treat solo co-presence as proof that the claimed exchange happened', async () => {
+    (useNPCStore.getState as jest.Mock).mockImplementation(() => ({
+      getNPCsByWorld: jest.fn().mockReturnValue([
+        { id: 'npc-mira', name: 'Mira', worldId: 'world-1' },
+        {
+          id: 'npc-miller',
+          name: 'Councilwoman Miller',
+          worldId: 'world-1',
+        },
+      ]),
+      getById: jest.fn(),
+      createNPC: jest.fn(),
+      updateNPC: jest.fn(),
+    }));
+    (useNarrativeStore.getState as jest.Mock).mockReturnValue({
+      getSessionSegments: jest.fn().mockReturnValue([
+        {
+          content:
+            'Councilwoman Miller waits at the far end of the hearing room.',
+          metadata: { characterIds: ['npc-miller'] },
+        },
+      ]),
+    });
+
+    const inventedProse =
+      'Councilwoman Miller nods. "What I told you privately was that the mayor buried the report."';
+    const refusedProse =
+      'Councilwoman Miller frowns. "We never spoke privately. I have nothing to repeat."';
+    const client = createRoutedClient(inventedProse, refusedProse);
+
+    const result = await new NarrativeGenerator(client).generateSegment({
+      ...request,
+      narrativeContext: {
+        worldId: 'world-1',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        sessionId: 'session-1',
+        currentTags: [],
+        previousSegments: [],
+        currentSituation:
+          'Player chose: "Ask Councilwoman Miller to repeat publicly what Councilwoman Miller told me privately"',
+      },
+    });
+
+    const generationPrompt = client.generateContent.mock.calls[0][0] as string;
+    expect(generationPrompt).toContain('never happened on the page');
+    expect(generationPrompt).toContain(
+      'No narrated scene records Councilwoman Miller speaking privately with the protagonist.'
+    );
+    expect(correctionPromptsOf(client)).toHaveLength(1);
+    expect(result.content).toBe(refusedProse);
+    expect(extractStructuredLore).toHaveBeenLastCalledWith(
+      refusedProse,
+      expect.anything(),
+      expect.not.objectContaining({ unattestedSpeakers: expect.anything() })
+    );
+  });
+
+  it('leaves the guard off when a private exchange was narrated', async () => {
+    (useNPCStore.getState as jest.Mock).mockImplementation(() => ({
+      getNPCsByWorld: jest.fn().mockReturnValue([
+        { id: 'npc-mira', name: 'Mira', worldId: 'world-1' },
+        {
+          id: 'npc-miller',
+          name: 'Councilwoman Miller',
+          worldId: 'world-1',
+        },
+      ]),
+      getById: jest.fn(),
+      createNPC: jest.fn(),
+      updateNPC: jest.fn(),
+    }));
+    (useNarrativeStore.getState as jest.Mock).mockReturnValue({
+      getSessionSegments: jest.fn().mockReturnValue([
+        {
+          content:
+            'Councilwoman Miller closes the office door. "The mayor buried the report," she tells you.',
+          metadata: {
+            characterIds: ['npc-miller'],
+            speakerId: 'npc-miller',
+          },
+        },
+      ]),
+    });
+
+    const recountedProse =
+      'Councilwoman Miller nods. "What I told you privately was that the mayor buried the report."';
+    const client = createRoutedClient(recountedProse, CORRECTED_PROSE);
+
+    const result = await new NarrativeGenerator(client).generateSegment({
+      ...request,
+      narrativeContext: {
+        worldId: 'world-1',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        sessionId: 'session-1',
+        currentTags: [],
+        previousSegments: [],
+        currentSituation:
+          'Player chose: "Ask Councilwoman Miller to repeat publicly what Councilwoman Miller told me privately"',
+      },
+    });
+
+    const generationPrompt = client.generateContent.mock.calls[0][0] as string;
+    expect(generationPrompt).not.toContain('never happened on the page');
+    expect(correctionPromptsOf(client)).toHaveLength(0);
+    expect(result.content).toBe(recountedProse);
+    expect(result.metadata.continuity).toEqual({ status: 'clean' });
   });
 
   // A partial correction still reports 'corrected'. If the quarantine keys on
@@ -484,10 +605,12 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       updateNPC: jest.fn(),
     }));
     (useNarrativeStore.getState as jest.Mock).mockReturnValue({
-      getSessionSegments: jest.fn().mockReturnValue([
-        { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
-        { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
-      ]),
+      getSessionSegments: jest
+        .fn()
+        .mockReturnValue([
+          { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
+          { metadata: { characterIds: ['npc-davies', 'npc-mira'] } },
+        ]),
     });
 
     // Two issues: Mira's tanked trust written as warm, and Davies recounting

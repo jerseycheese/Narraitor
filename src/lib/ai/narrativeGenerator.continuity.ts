@@ -104,7 +104,10 @@ export const collectUnrecordedExchanges = (
   const sessionId = request.sessionId;
   if (!sessionId) return [];
 
-  const claim = detectUnrecordedExchangeClaim(readPlayerActionText(request), npcNames);
+  const claim = detectUnrecordedExchangeClaim(
+    readPlayerActionText(request),
+    npcNames
+  );
   if (!claim) return [];
 
   // Fails open on its own rather than through the caller's catch: a narrative
@@ -113,25 +116,29 @@ export const collectUnrecordedExchanges = (
   let record;
   try {
     const narrativeStoreState = useNarrativeStore.getState();
-    if (typeof narrativeStoreState?.getSessionSegments !== 'function') return [];
+    if (typeof narrativeStoreState?.getSessionSegments !== 'function')
+      return [];
     record = countSharedScenes(
       narrativeStoreState.getSessionSegments(sessionId) ?? []
     )[claim.npcId];
   } catch (error) {
-    logger.warn('[UnrecordedExchange] Failed to read session co-presence', { error });
+    logger.warn('[UnrecordedExchange] Failed to read session co-presence', {
+      error,
+    });
     return [];
   }
 
-  // Having been alone together makes an off-page conversation plausible, and
-  // the contract only ever states what it can check.
-  if (record?.aloneTogether) return [];
+  // A solo scene is only evidence of an exchange when its structured metadata
+  // also records this NPC as the primary speaker. Mere co-presence is not proof
+  // that the claimed conversation happened.
+  if (record?.privateExchangeNarrated) return [];
 
   return [
     {
       npcId: claim.npcId,
       name: claim.name,
       scenes: record?.scenes ?? 0,
-      aloneTogether: false,
+      aloneTogether: record?.aloneTogether ?? false,
       claim: claim.excerpt,
     },
   ];
@@ -160,7 +167,8 @@ const readInventoryItems = (
 
   const items: Array<{ id: EntityID; name: string }> = [];
   for (const characterId of request.characterIds ?? []) {
-    for (const item of inventoryStoreState.getCharacterItems(characterId) ?? []) {
+    for (const item of inventoryStoreState.getCharacterItems(characterId) ??
+      []) {
       if (item?.name && item?.id) items.push({ id: item.id, name: item.name });
     }
   }
@@ -277,7 +285,10 @@ export const enhancePromptWithContinuityExpectations = (
   return `${prompt}\n\n${expectations}`;
 };
 
-const raceWithTimeout = async <T>(promise: Promise<T>, ms: number): Promise<T> => {
+const raceWithTimeout = async <T>(
+  promise: Promise<T>,
+  ms: number
+): Promise<T> => {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
