@@ -85,6 +85,60 @@ export function handleRateLimiting(request: NextRequest): {
   return { response: null, result: rateLimitResult };
 }
 
+/** Roughly 64KB. Gives ample room for multi-turn prompts and lore blocks while capping unbounded payloads. */
+export const MAX_AI_BODY_BYTES = 65_536;
+
+/**
+ * Shared wrapper for AI route handlers.
+ * Single owner of rate limiting, request body size ceilings (HTTP 413), and rate-limit response headers.
+ */
+export function withAIRoute(
+  handler: (request: NextRequest) => Promise<Response>,
+  options?: { maxBodyBytes?: number }
+): (request: NextRequest) => Promise<Response> {
+  const maxBytes = options?.maxBodyBytes ?? MAX_AI_BODY_BYTES;
+
+  return async (request: NextRequest): Promise<Response> => {
+    // 1. Cheap early rejection of declared oversized Content-Length
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && parseInt(contentLength, 10) > maxBytes) {
+      return NextResponse.json(
+        { error: 'Payload too large', code: 'PAYLOAD_TOO_LARGE' },
+        { status: 413 }
+      );
+    }
+
+    // 2. Measure cloned request body's actual bytes
+    try {
+      const cloned = request.clone();
+      const arrayBuffer = await cloned.arrayBuffer();
+      if (arrayBuffer.byteLength > maxBytes) {
+        return NextResponse.json(
+          { error: 'Payload too large', code: 'PAYLOAD_TOO_LARGE' },
+          { status: 413 }
+        );
+      }
+    } catch {
+      // If cloning/reading fails, let the inner handler manage the request
+    }
+
+    // 3. Single owner of rate limiting
+    const { response: rateLimitResponse, result: rateLimitResult } = handleRateLimiting(request);
+    if (rateLimitResponse) return rateLimitResponse;
+
+    // 4. Call handler and attach rate limit headers
+    const response = await handler(request);
+    const rateLimitHeaders = createRateLimitHeaders(rateLimitResult);
+    for (const [key, value] of Object.entries(rateLimitHeaders)) {
+      if (!response.headers.has(key)) {
+        response.headers.set(key, value);
+      }
+    }
+
+    return response;
+  };
+}
+
 /**
  * Validate basic request structure for AI endpoints
  */
@@ -98,7 +152,7 @@ async function validateAIRequest(request: NextRequest): Promise<{
   try {
     const body = await request.json();
 
-    if (!body.prompt) {
+    if (!body || typeof body !== 'object' || !body.prompt || typeof body.prompt !== 'string') {
       throw new Error('Prompt is required');
     }
 
@@ -169,9 +223,9 @@ const RESOLUTION_ERRORS: Record<ProviderResolutionFailure, { message: string; st
 };
 
 /**
- * Everything the two entry points below share: rate limit, validate, resolve
- * the provider, and build the generation spec. Returns either a ready-to-send
- * error response or the pieces needed to generate.
+ * Everything the two entry points below share: validate, resolve the provider,
+ * and build the generation spec. Returns either a ready-to-send error response
+ * or the pieces needed to generate.
  */
 async function prepareTextRequest(
   request: NextRequest,
@@ -184,13 +238,9 @@ async function prepareTextRequest(
       adapter: ProviderAdapter;
       descriptor: ProviderDescriptor;
       spec: TextGenerationSpec;
-      rateLimitResult: RateLimitResult;
     }
 > {
   const { maxTokens = 1024, temperature = 0.7 } = options;
-
-  const { response: rateLimitResponse, result: rateLimitResult } = handleRateLimiting(request);
-  if (rateLimitResponse) return { ok: false, response: rateLimitResponse };
 
   const requestData = await validateAIRequest(request);
   if (!requestData) {
@@ -206,32 +256,47 @@ async function prepareTextRequest(
     return { ok: false, response: createAPIErrorResponse(new Error(message), status) };
   }
 
+  const rawTemp = requestData.config?.temperature;
+  const clampedTemperature =
+    typeof rawTemp === 'number' && Number.isFinite(rawTemp)
+      ? Math.max(0, Math.min(rawTemp, 2))
+      : temperature;
+
+  const rawTokens = requestData.config?.maxTokens;
+  const effectiveCeiling = Math.min(maxTokens, 4096);
+  const clampedMaxTokens =
+    typeof rawTokens === 'number' && Number.isFinite(rawTokens)
+      ? Math.max(1, Math.min(Math.floor(rawTokens), effectiveCeiling))
+      : effectiveCeiling;
+
   return {
     ok: true,
     adapter: requireProviderAdapter(resolution.descriptor.type),
     descriptor: resolution.descriptor,
     spec: {
       prompt: requestData.prompt,
-      temperature: requestData.config?.temperature || temperature,
-      maxTokens: requestData.config?.maxTokens || maxTokens,
+      temperature: clampedTemperature,
+      maxTokens: clampedMaxTokens,
       contentRating: parseContentRating(requestData.prompt),
       stream,
     },
-    rateLimitResult,
   };
 }
 
 /** Turn a thrown provider error into the route's response. */
 function toErrorResponse(error: unknown, errorContext: string): Response {
   if (error instanceof ProviderUpstreamError) {
-    return createAPIErrorResponse(new Error(error.message), error.status, error.detail);
+    logger.error(`${errorContext} upstream error:`, {
+      message: error.message,
+      status: error.status,
+    });
+    return createAPIErrorResponse(new Error(error.message), error.status);
   }
 
   logger.error(`${errorContext} error:`, error);
   return createAPIErrorResponse(
     error instanceof Error ? error : new Error('Unknown error occurred'),
-    500,
-    error instanceof Error ? error.message : 'Unknown error'
+    500
   );
 }
 
@@ -252,21 +317,18 @@ export async function processAITextRequest(
   try {
     const result = await generateProviderText(prepared.adapter, prepared.descriptor, prepared.spec);
 
-    return NextResponse.json(result, {
-      headers: createRateLimitHeaders(prepared.rateLimitResult),
-    });
+    return NextResponse.json(result);
   } catch (error) {
     return toErrorResponse(error, errorContext);
   }
 }
 
 /**
- * Streaming counterpart to processAITextRequest: same rate limiting,
- * validation, and provider resolution, but calls the provider's streaming
- * endpoint and forwards narrative content to the client as it's generated
- * instead of waiting for the full response. See NarrativeStreamEvent for the
- * wire protocol. Used only by /api/narrative/generate — the other text routes
- * have no progressive-reveal UI and stay on the simpler path.
+ * Streaming counterpart to processAITextRequest: same validation and provider
+ * resolution, but calls the provider's streaming endpoint and forwards narrative
+ * content to the client as it's generated instead of waiting for the full
+ * response. See NarrativeStreamEvent for the wire protocol. Used only by
+ * /api/narrative/generate.
  */
 export async function processAIStreamingTextRequest(
   request: NextRequest,
@@ -306,7 +368,6 @@ export async function processAIStreamingTextRequest(
 
   return new Response(ndjsonStream, {
     headers: {
-      ...createRateLimitHeaders(prepared.rateLimitResult),
       'Content-Type': 'application/x-ndjson; charset=utf-8',
       'Cache-Control': 'no-cache, no-transform',
     },

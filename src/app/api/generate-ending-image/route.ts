@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { withAIRoute } from '@/utils/apiHelpers';
 import type { StoryEnding } from '@/types/narrative.types';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
@@ -100,7 +101,7 @@ function generateFallbackImage(ending: StoryEnding, world?: World): string {
   return getGenreFallbackImage(genre, seed, tone);
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const body = await request.json() as GenerateEndingImageRequest;
     
@@ -209,4 +210,4 @@ Requirements:
       { status: 500 }
     );
   }
-}
+});

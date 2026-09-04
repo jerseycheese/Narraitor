@@ -231,12 +231,16 @@ function readTopPOverride(request?: NextRequest): number | undefined {
 }
 
 /**
- * Response-length cap. Upper-bounded generously rather than to any one
- * provider's ceiling — a request that names more than a provider allows is the
- * provider's own 400 to give, same as an unrecognized model id is.
+ * Server-owned ceiling on generated output tokens across all routes and overrides.
+ * Bounded to 4096 tokens (roughly 3,000 words), preventing runaway costs and quota exhaustion.
+ */
+export const SERVER_MAX_OUTPUT_TOKENS = 4096;
+
+/**
+ * Response-length cap. Upper-bounded to the server-owned ceiling (SERVER_MAX_OUTPUT_TOKENS).
  */
 function readMaxTokensOverride(request?: NextRequest): number | undefined {
-  return readBoundedNumberHeader(request, PROVIDER_MAX_TOKENS_HEADER, 1, 1_000_000);
+  return readBoundedNumberHeader(request, PROVIDER_MAX_TOKENS_HEADER, 1, SERVER_MAX_OUTPUT_TOKENS);
 }
 
 function readPromptOverride(request: NextRequest | undefined, header: string): string | undefined {

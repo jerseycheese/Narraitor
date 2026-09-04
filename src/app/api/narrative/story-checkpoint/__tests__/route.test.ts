@@ -100,6 +100,6 @@ describe('/api/narrative/story-checkpoint', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toContain('Gemini unavailable');
+    expect(data.error).toBe('Failed to generate checkpoint summary.');
   });
 });

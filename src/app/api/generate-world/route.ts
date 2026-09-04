@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 import { generateWorld } from '@/lib/generators/worldGenerator';
+import { withAIRoute } from '@/utils/apiHelpers';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('API');
@@ -13,7 +14,7 @@ interface GenerateWorldRequest {
   existingNames?: string[];
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     logger.debug('generate-world API', 'Request received');
     const body = await request.json() as GenerateWorldRequest;
@@ -56,8 +57,7 @@ export async function POST(request: NextRequest) {
 
     return createAPIErrorResponse(
       error instanceof Error ? error : new Error('Failed to generate world'),
-      500,
-      error instanceof Error ? error.message : 'Unknown error'
+      500
     );
   }
-}
+});

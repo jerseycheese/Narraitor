@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveApiKey } from '@/lib/ai/resolveApiKey';
+import { withAIRoute } from '@/utils/apiHelpers';
 import type { World } from '@/types/world.types';
 import Logger from '@/lib/utils/logger';
 import { resolveGeneratedImageUrl } from '@/lib/api/imageGenerationHelpers';
@@ -67,7 +68,7 @@ function generateFallbackImage(world: World): string {
   return getGenreFallbackImage(genre, world.name);
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const body = await request.json() as GenerateWorldImageRequest;
     
@@ -166,4 +167,4 @@ Requirements:
       { status: 500 }
     );
   }
-}
+});

@@ -3,6 +3,7 @@ import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
 import { analyzeWorldDescription } from '@/lib/ai/worldAnalyzer';
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 const logger = new Logger('API');
 
@@ -10,7 +11,7 @@ interface AnalyzeWorldRequest {
   description: string;
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     logger.debug('analyze-world API', 'Request received');
     const body = await request.json() as AnalyzeWorldRequest;
@@ -43,9 +44,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to analyze world description',
-        details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     );
   }
-}
+});

@@ -6,8 +6,9 @@ import { generateEnding } from '@/lib/ai/endingGenerator';
 import { logger } from '@/lib/utils/logger';
 import type { EndingGenerationRequest, EndingType, EndingTone } from '@/types/narrative.types';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
+import { withAIRoute } from '@/utils/apiHelpers';
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     // Parse the request body
     const body = await request.json();
@@ -89,25 +90,25 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error) {
       if (error.message.includes('not found')) {
         return NextResponse.json(
-          { error: 'Resource not found', details: error.message },
+          { error: 'Resource not found' },
           { status: 404 }
         );
       }
       
       if (error.message.includes('API') || error.message.includes('generation')) {
         return NextResponse.json(
-          { error: 'Model provider unavailable', details: 'Try again in a moment.' },
+          { error: 'Model provider unavailable' },
           { status: 503 }
         );
       }
     }
 
     return NextResponse.json(
-      { error: 'Internal server error', details: 'Unable to load ending' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
-}
+});
 
 export async function GET() {
   return NextResponse.json(

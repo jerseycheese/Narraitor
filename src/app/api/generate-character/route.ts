@@ -4,11 +4,12 @@ import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 import { generateAICharacter } from '@/lib/generators/characterGenerator';
 import { World } from '@/types/world.types';
 import { validateWorld } from '@/lib/utils/typeGuards';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('GenerateCharacter');
 
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   try {
     const body = await request.json();
     const characterType = body?.characterType;
@@ -52,8 +53,7 @@ export async function POST(request: NextRequest) {
 
     return createAPIErrorResponse(
       error instanceof Error ? error : new Error('Character generation failed'),
-      500,
-      error instanceof Error ? error.message : 'Character generation failed'
+      500
     );
   }
-}
+});

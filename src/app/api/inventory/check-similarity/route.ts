@@ -3,6 +3,7 @@
 import { NextRequest } from 'next/server';
 import Logger from '@/lib/utils/logger';
 import { handleSimilarityCheck } from '@/app/api/_shared/similarityCheck';
+import { withAIRoute } from '@/utils/apiHelpers';
 
 const logger = new Logger('CheckSimilarityAPI');
 
@@ -10,7 +11,7 @@ const logger = new Logger('CheckSimilarityAPI');
  * API endpoint to check if two item names refer to the same item.
  * Uses AI to handle complex semantic similarity.
  */
-export async function POST(request: NextRequest) {
+export const POST = withAIRoute(async (request: NextRequest) => {
   return handleSimilarityCheck(request, {
     logger,
     route: '/api/inventory/check-similarity',
@@ -38,4 +39,4 @@ If they're definitely different items, return similar: false.
 
 Response (JSON only):`,
   });
-}
+});

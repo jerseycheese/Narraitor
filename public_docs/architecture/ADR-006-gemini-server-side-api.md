@@ -43,8 +43,9 @@ so on — which attach the key and call Gemini server-side. The client never see
 `googleapis.com` URL.
 
 The default text model is `gemini-2.5-flash` (`src/lib/ai/config.ts`); image generation uses a
-Gemini image model. A small in-memory per-IP rate limiter (`src/utils/rateLimiter.ts`, 50/hr in
-production) guards the generation routes.
+Gemini image model. A shared route wrapper (`withAIRoute` in `src/utils/apiHelpers.ts`) guards all
+AI routes with in-memory per-IP rate limiting (`src/utils/rateLimiter.ts`, 50/hr in production),
+a 64KB request body size cap (HTTP 413), and a server-enforced max output token ceiling (4096).
 
 ## Why This Made Sense
 
