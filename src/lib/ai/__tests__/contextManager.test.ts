@@ -5,7 +5,7 @@ import {
   createMockJournalEntry,
 } from '@/lib/test-utils/testDataFactory';
 import type { EndingGenerationRequest } from '@/types/narrative.types';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import type { SavedSessionInfo } from '@/types/game.types';
 
 jest.mock('@/state/worldStore', () => ({

@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ActiveGameSessionControls from '../ActiveGameSessionControls';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 
 jest.mock('../CharacterSummary', () => ({
   __esModule: true,
-  default: ({ character }: { character: Character }) => (
+  default: ({ character }: { character: StoreCharacter }) => (
     <div data-testid="character-summary">{character.name}</div>
   ),
 }));
@@ -46,7 +46,7 @@ describe('ActiveGameSessionControls', () => {
     const character = {
       id: 'char-1',
       name: 'Avery',
-    } as Character;
+    } as StoreCharacter;
 
     render(
       <ActiveGameSessionControls

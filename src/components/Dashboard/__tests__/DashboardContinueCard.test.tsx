@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { DashboardContinueCard } from '../DashboardContinueCard';
 import type { SavedSessionInfo } from '@/types/game.types';
 import type { World } from '@/types/world.types';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 
 describe('DashboardContinueCard', () => {
   const mockWorld: World = {
@@ -19,7 +19,7 @@ describe('DashboardContinueCard', () => {
     updatedAt: '2024-01-01T00:00:00.000Z'
   };
 
-  const mockCharacter: Character = {
+  const mockCharacter: StoreCharacter = {
     id: 'char-1',
     worldId: 'world-1',
     name: 'Aragorn',

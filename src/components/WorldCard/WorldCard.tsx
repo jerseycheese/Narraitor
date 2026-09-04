@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { World } from '@/types/world.types';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +26,7 @@ interface WorldCardProps {
   /** Callback when user wants to delete this world */
   onDelete: (worldId: string) => void;
   /** Characters in this world */
-  characters?: Character[];
+  characters?: StoreCharacter[];
 }
 
 /**
@@ -81,7 +81,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       // Check for characters in this world
       const characterState = useCharacterStore.getState();
       const worldCharacters = (
-        Object.values(characterState.characters) as Character[]
+        Object.values(characterState.characters) as StoreCharacter[]
       ).filter((char) => char.worldId === world.id);
 
       if (worldCharacters.length === 0) {

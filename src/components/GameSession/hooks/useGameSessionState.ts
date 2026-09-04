@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { GameSessionState, PlayerChoice } from '@/types/game.types';
 import Logger from '@/lib/utils/logger';
@@ -122,7 +122,7 @@ export const useGameSessionState = ({
   const currentCharacterId = actualCharacterState.currentCharacterId;
   
   // Get all characters for this world
-  const worldCharacters = (Object.values(actualCharacterState.characters || {}) as Character[]).filter(
+  const worldCharacters = (Object.values(actualCharacterState.characters || {}) as StoreCharacter[]).filter(
     char => char.worldId === worldId
   );
   
@@ -136,7 +136,7 @@ export const useGameSessionState = ({
     }
     
     // Otherwise, use the first available character for this world
-    const firstWorldChar = (Object.values(actualCharacterState.characters || {}) as Character[]).find(
+    const firstWorldChar = (Object.values(actualCharacterState.characters || {}) as StoreCharacter[]).find(
       char => char.worldId === worldId
     );
     

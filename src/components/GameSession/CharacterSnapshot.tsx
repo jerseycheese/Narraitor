@@ -1,11 +1,11 @@
 import React from 'react';
-import { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useShallow } from 'zustand/react/shallow';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 interface CharacterSnapshotProps {
-  character: Character;
+  character: StoreCharacter;
 }
 
 /** -100..-34 Chaotic, -33..33 Neutral, 34..100 Lawful. */

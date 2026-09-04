@@ -8,11 +8,11 @@ import { ChoiceHistorySection } from './ChoiceHistorySection';
 import { useJournalStore } from '@/state/journalStore';
 import { useShallow } from 'zustand/react/shallow';
 import { EntityID } from '@/types/common.types';
-import { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import { titleCase, capitalize } from '@/lib/utils';
 
 interface CharacterDrawerContentProps {
-  character: Character;
+  character: StoreCharacter;
 }
 
 export const CharacterDrawerContent: React.FC<CharacterDrawerContentProps> = ({ character }) => {

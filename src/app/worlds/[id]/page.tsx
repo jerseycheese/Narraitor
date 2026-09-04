@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Play, Users, Settings } from 'lucide-react';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
 import { NotFoundState } from '@/components/shared/NotFoundState';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
@@ -22,7 +22,7 @@ export default function WorldViewPage() {
   const setCurrentWorld = useWorldStore((state) => state.setCurrentWorld);
   const characters = useCharacterStore((state) => state.characters);
 
-  const worldCharacters = Object.values(characters).filter((char): char is Character => char.worldId === worldId);
+  const worldCharacters = Object.values(characters).filter((char): char is StoreCharacter => char.worldId === worldId);
   const isActive = currentWorldId === worldId;
 
   useEffect(() => setMounted(true), []);

@@ -1,4 +1,4 @@
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
 import {
   validateText,
@@ -10,7 +10,7 @@ export const isCharacterNameUnique = (name: string, worldId: EntityID): boolean 
   // Check uniqueness within world
   const state = useCharacterStore.getState();
   const characters = state.characters || {};
-  const existingCharacters = (Object.values(characters) as Character[]).filter(c => c.worldId === worldId);
+  const existingCharacters = (Object.values(characters) as StoreCharacter[]).filter(c => c.worldId === worldId);
   return !existingCharacters.some(c => c.name === name);
 };
 

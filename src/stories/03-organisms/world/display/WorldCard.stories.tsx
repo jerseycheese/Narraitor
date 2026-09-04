@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { World } from '@/types/world.types';
-import { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import React from 'react';
 // Mock character data
-const mockCharacters: Character[] = [
+const mockCharacters: StoreCharacter[] = [
   {
     id: 'char1',
     name: 'Eldara the Wise',

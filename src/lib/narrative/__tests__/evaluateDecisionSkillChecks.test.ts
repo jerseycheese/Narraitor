@@ -1,5 +1,5 @@
 import { evaluateDecisionSkillChecks } from '../evaluateDecisionSkillChecks';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import type { World, WorldSkill } from '@/types/world.types';
 import type { DecisionOption } from '@/types/narrative.types';
 

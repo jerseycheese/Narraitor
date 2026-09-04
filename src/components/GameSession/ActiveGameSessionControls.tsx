@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import { StorySummarySection } from './StorySummarySection';
 import { ChoiceHistorySection } from './ChoiceHistorySection';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
@@ -9,7 +9,7 @@ import { InventoryList } from '@/components/inventory/InventoryList';
 import { Button } from '@/components/ui/button';
 
 interface ActiveGameSessionControlsProps {
-  character?: Character;
+  character?: StoreCharacter;
   characterId?: string;
   worldId: string;
   sessionId: string;

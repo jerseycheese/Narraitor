@@ -1,7 +1,7 @@
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { World } from '../types/world.types';
-import type { Character } from './characterStore.types';
+import type { StoreCharacter } from './characterStore.types';
 import type { NarrativeError } from '../lib/narrative/narrativeErrors';
 
 /**
@@ -68,7 +68,7 @@ export interface NarrativeStore {
     desiredTone?: EndingTone;
     customPrompt?: string;
     world?: World;
-    character?: Character;
+    character?: StoreCharacter;
   }) => Promise<void>;
   clearEnding: () => void;
   setCurrentEnding: (ending: StoryEnding | null) => void;

@@ -2,7 +2,7 @@
 
 import type { EntityID } from './common.types';
 import type { NarrativeSegment, Decision, DecisionWeight, DecisionOutcome, SkillCheckRoll, EndingTone } from './narrative.types';
-import type { Character } from '@/state/characterStore.types';
+import type { StoreCharacter } from '@/state/characterStore.types';
 import type { InventoryItem, ItemUsageResult } from './inventory.types';
 import type { WorldThread } from './worldThread.types';
 import type { WorldState } from './world-state.types';
@@ -24,7 +24,7 @@ export interface SessionSnapshot {
   readonly segments: readonly NarrativeSegment[];
   /** All session decisions (needed for decision linking and history). */
   readonly decisions: readonly Decision[];
-  readonly character: Readonly<Character>;
+  readonly character: Readonly<StoreCharacter>;
   readonly inventory: readonly InventoryItem[];
   readonly worldThreads: readonly WorldThread[];
   readonly worldState: Readonly<WorldState> | undefined;

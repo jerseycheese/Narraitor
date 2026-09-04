@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DashboardRecentCharacters } from '../DashboardRecentCharacters';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 
 describe('DashboardRecentCharacters', () => {
@@ -20,7 +20,7 @@ describe('DashboardRecentCharacters', () => {
     }
   };
 
-  const mockCharacters: Record<string, Character> = {
+  const mockCharacters: Record<string, StoreCharacter> = {
     'char-1': {
       id: 'char-1',
       worldId: 'world-1',

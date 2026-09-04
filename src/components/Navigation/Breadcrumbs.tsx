@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, Globe, User, Users } from 'lucide-react';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import {
   buildBreadcrumbSegments,
@@ -138,7 +138,7 @@ export function Breadcrumbs({
 
     if (
       nextStep.action === 'select-character' &&
-      (Object.values(characters) as Character[]).filter(
+      (Object.values(characters) as StoreCharacter[]).filter(
         (c) => c.worldId === currentWorldId
       ).length > 0
     ) {
@@ -149,7 +149,7 @@ export function Breadcrumbs({
           <Button
             onClick={() => {
               const firstCharacter = (
-                Object.values(characters) as Character[]
+                Object.values(characters) as StoreCharacter[]
               ).find((c) => c.worldId === currentWorldId);
               if (currentWorldId && firstCharacter) {
                 initializeSession(currentWorldId, firstCharacter.id, () => {

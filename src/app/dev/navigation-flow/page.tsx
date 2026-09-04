@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { GameStartWizard } from '@/components/GameStartWizard';
 import { Breadcrumbs } from '@/components/Navigation/Breadcrumbs';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
 import { formatDateTime } from '@/lib/utils';
@@ -23,7 +23,7 @@ export default function NavigationFlowTestPage() {
   const { getNextStep, canQuickStart, getQuickStartInfo, getCurrentFlowStep } = useNavigationFlow();
 
   const worldList = Object.values(worlds);
-  const characterList = (Object.values(characters) as Character[]) as Character[];
+  const characterList = Object.values(characters) as StoreCharacter[];
   const sessionList = Object.values(savedSessions);
 
   return (

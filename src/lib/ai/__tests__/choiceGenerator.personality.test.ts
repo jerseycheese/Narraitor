@@ -2,7 +2,7 @@ import {
   extractPersonalityContext,
   formatPersonalityForChoices,
 } from '../choiceGenerator.personality';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 
 const createCharacter = (
   overrides: Partial<StoreCharacter> = {}

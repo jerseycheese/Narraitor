@@ -1,11 +1,11 @@
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 
 /**
  * Test fixture data for Character entities
  * Uses the store shape (not domain type) for visual regression tests
  */
 
-export const SAMPLE_CHARACTERS: Character[] = [
+export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'char-cyberpunk-hacker',
     name: 'Nova "Ghost" Chen',

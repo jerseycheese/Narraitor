@@ -4,7 +4,7 @@ import { useGoalStore } from '@/state/goalStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
-import type { Character } from '@/state/characterStore.types';
+import type { StoreCharacter } from '@/state/characterStore.types';
 import type { NarrativeSegment } from '@/types/narrative.types';
 
 jest.mock('@/lib/featureFlags');
@@ -301,7 +301,7 @@ describe('applyWorldClockUpdates', () => {
             inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
             createdAt: '2026-01-01T00:00:00.000Z',
             updatedAt: '2026-01-01T00:00:00.000Z',
-          } as Character,
+          } as StoreCharacter,
         },
       }));
     });

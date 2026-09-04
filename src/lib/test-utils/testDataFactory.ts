@@ -10,7 +10,7 @@ import type { WorldAttribute, WorldSkill } from '@/types/world.types';
 import type { NarrativeSegment } from '@/types/narrative.types';
 import type { JournalEntry, JournalEntryType } from '@/types/journal.types';
 import type { InventoryItem } from '@/types/inventory.types';
-import type { Character } from '@/state/characterStore';
+import type { StoreCharacter } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils';
 
 // Default timestamp for consistent test data
@@ -76,8 +76,8 @@ export function createMockWorldSkill(
  * Creates a mock Character object with sensible defaults
  */
 export function createMockCharacter(
-  overrides: Partial<Character> = {}
-): Character {
+  overrides: Partial<StoreCharacter> = {}
+): StoreCharacter {
   return {
     id: overrides.id || generateUniqueId('char'),
     worldId: 'world-test-1',

@@ -7,7 +7,7 @@ import { NarrativeController } from '@/components/Narrative/NarrativeController'
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { useCharacterStore, Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { EndingScreen } from './EndingScreen';
 import { EndingSuggestionBanner } from './EndingSuggestionBanner';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -107,7 +107,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Check for test data to support visual regression tests (guarded for SSR)
   const testCharacters =
     typeof window !== 'undefined'
-      ? (window as typeof window & { __TEST_CHARACTERS__?: Record<string, Character> }).__TEST_CHARACTERS__
+      ? (window as typeof window & { __TEST_CHARACTERS__?: Record<string, StoreCharacter> }).__TEST_CHARACTERS__
       : undefined;
   const isTestMode = !!testCharacters;
   
@@ -119,7 +119,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Get character details - use test data in test mode or store data in normal mode
   const character = isTestMode 
-    ? Object.values(testCharacters || {}).find((char: Character) => char.worldId === worldId)
+    ? Object.values(testCharacters || {}).find((char: StoreCharacter) => char.worldId === worldId)
     : storeCharacter;
   
   const getInventoryItems = useInventoryStore((state) => state.getCharacterItems);

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { Button } from '@/components/ui/button';
 
@@ -17,7 +17,7 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
   const { worlds } = useWorldStore();
   const world = worlds[worldId];
   
-  const worldCharacters = (Object.values(characters) as Character[]).filter(
+  const worldCharacters = (Object.values(characters) as StoreCharacter[]).filter(
     char => char.worldId === worldId
   );
 

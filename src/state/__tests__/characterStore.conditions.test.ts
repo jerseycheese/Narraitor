@@ -1,7 +1,7 @@
 import { useCharacterStore } from '../characterStore';
-import type { Character } from '../characterStore.types';
+import type { StoreCharacter } from '../characterStore.types';
 
-const makeCharacter = (id: string, conditions: string[] = []): Character =>
+const makeCharacter = (id: string, conditions: string[] = []): StoreCharacter =>
   ({
     id,
     name: 'Jamie Holt',
@@ -17,7 +17,7 @@ const makeCharacter = (id: string, conditions: string[] = []): Character =>
     inventory: { characterId: id, items: [], capacity: 10, categories: [], itemOrder: [] },
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
-  }) as Character;
+  }) as StoreCharacter;
 
 const conditionsOf = (id: string) => useCharacterStore.getState().characters[id].status.conditions;
 

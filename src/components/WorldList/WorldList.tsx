@@ -1,7 +1,7 @@
 import React from 'react';
 import { World } from '@/types/world.types';
 import WorldCard from '@/components/WorldCard/WorldCard';
-import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { Globe } from 'lucide-react';
 
 interface WorldListProps {
@@ -19,13 +19,13 @@ const WorldList: React.FC<WorldListProps> = ({
 }) => {
   // Get character counts and character data for each world using proper hook
   const characters = useCharacterStore((state) => state.characters);
-  const allCharacters = Object.values(characters) as Character[];
+  const allCharacters = Object.values(characters) as StoreCharacter[];
   const charactersByWorld = worlds.reduce(
     (acc, world) => {
       acc[world.id] = allCharacters.filter((char) => char.worldId === world.id);
       return acc;
     },
-    {} as Record<string, Character[]>
+    {} as Record<string, StoreCharacter[]>
   );
   if (worlds.length === 0) {
     return (

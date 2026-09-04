@@ -1,6 +1,5 @@
 import { getNarrativeTemplate } from '../promptTemplates/narrativeTemplateManager';
-import { useCharacterStore } from '@/state/characterStore';
-import type { Character as StoreCharacter } from '@/state/characterStore';
+import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useSessionStore } from '@/state/sessionStore';
