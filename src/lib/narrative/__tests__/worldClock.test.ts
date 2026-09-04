@@ -6,6 +6,7 @@ import {
   isOverdue,
   isWorldClockTurnSegment,
   needsOpenAsk,
+  needsSceneTransition,
   overdueByTurns,
   selectDueNowThread,
   selectThreadsForPrompt,
@@ -201,6 +202,16 @@ describe('worldClock', () => {
   test('buildWorldClockPromptContext carries a thread\'s strike count into the prompt shape', () => {
     const threads = [makeThread({ summary: 'The thing in the boathouse', dueByTurn: 11, firedAtTurn: 8, strikeCount: 3 })];
     expect(buildWorldClockPromptContext(threads, 11).threads[0].strikes).toBe(3);
+  });
+
+  test.each([
+    ['an unfired deadline that is due now', makeThread({ kind: 'deadline', dueByTurn: 3 }), 6, true],
+    ['an unfired actor that can enter the current scene', makeThread({ kind: 'actor', dueByTurn: 3 }), 6, false],
+    ['a fired thread below the strike cap', makeThread({ dueByTurn: 6, firedAtTurn: 3, strikeCount: 2 }), 6, false],
+    ['a fired thread at the strike cap', makeThread({ dueByTurn: 6, firedAtTurn: 3, strikeCount: 3 }), 6, true],
+  ])('needsSceneTransition: %s', (_label, thread, currentTurn, expected) => {
+    const context = buildWorldClockPromptContext([thread], currentTurn);
+    expect(needsSceneTransition(context)).toBe(expected);
   });
 
   test('needsOpenAsk fires only when the quiet window has passed and nothing unfired is due inside it', () => {

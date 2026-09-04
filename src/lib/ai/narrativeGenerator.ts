@@ -198,6 +198,20 @@ export class NarrativeGenerator {
         worldId: request.worldId,
         sessionId: request.sessionId,
       });
+
+      // A world-clock boundary is resolver-selected state, not a model
+      // classification. Keep it recorded even if the response labels its own
+      // prose as a scene, so the next turn starts on the far side of the cut.
+      if (request.generationParameters?.segmentType === 'transition') {
+        result = {
+          ...result,
+          segmentType: 'transition',
+          metadata: {
+            ...result.metadata,
+            tags: Array.from(new Set([...(result.metadata.tags ?? []), 'transition'])),
+          },
+        };
+      }
       // Re-check before the store-mutating tail (lore extraction, item
       // acquisition/loss, NPC sync) in case the caller aborted mid-pipeline.
       throwIfAborted(options?.signal);

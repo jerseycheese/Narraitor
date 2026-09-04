@@ -110,6 +110,20 @@ export const selectDueNowThread = (
     )[0];
 
 /**
+ * A deadline needs a forward cut when it comes due, and a fired thread needs
+ * a clean scene exit once it has exhausted its strikes. Other arrivals can
+ * still land inside the current scene without forcing a boundary.
+ */
+export const needsSceneTransition = (
+  worldClock?: WorldClockPromptContext
+): boolean => {
+  const dueNow = worldClock?.threads.find((thread) => thread.dueNow);
+  if (!dueNow) return false;
+  if (!dueNow.fired) return dueNow.kind === 'deadline';
+  return dueNow.strikes >= FIRED_THREAD_MAX_STRIKES;
+};
+
+/**
  * Turns since the ledger last moved in any direction. Resolved threads count:
  * a payoff last turn means the world just moved even if nothing is open now.
  */

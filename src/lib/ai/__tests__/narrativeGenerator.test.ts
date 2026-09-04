@@ -166,6 +166,27 @@ describe('NarrativeGenerator', () => {
       expect(result.segmentType).toBe('transition');
     });
 
+    it('keeps a requested transition as a scene boundary when the model labels it scene', async () => {
+      mockGeminiClient.generateContent.mockResolvedValue({
+        content: JSON.stringify({
+          content: 'Three days later, the council gathers for the vote.',
+          type: 'scene',
+          metadata: { mood: 'tense', tags: ['council'] },
+        }),
+        finishReason: 'stop',
+      });
+
+      const result = await narrativeGenerator.generateSegment({
+        worldId: 'world-123',
+        sessionId: 'session-123',
+        characterIds: ['char-1'],
+        generationParameters: { segmentType: 'transition' },
+      });
+
+      expect(result.segmentType).toBe('transition');
+      expect(result.metadata.tags).toContain('transition');
+    });
+
     it('handles errors gracefully', async () => {
       mockGeminiClient.generateContent.mockRejectedValue(
         new Error('API Error')

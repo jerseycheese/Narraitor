@@ -12,7 +12,10 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useWorldStore } from '@/state/worldStore';
 import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
-import type { NarrativeGenerationResult } from '@/types/narrative.types';
+import type {
+  NarrativeGenerationResult,
+  NarrativeSegment,
+} from '@/types/narrative.types';
 import type { TurnCommand } from '@/types/turnResolver.types';
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 
@@ -43,6 +46,7 @@ jest.mock('@/lib/ai/narrativeGenerator.npc', () => ({
 jest.mock('../worldClock', () => ({
   countWorldClockTurns: jest.fn((segments: unknown[]) => segments.length),
   buildWorldClockPromptContext: jest.fn(),
+  needsSceneTransition: jest.fn(() => false),
 }));
 
 jest.mock('../turnsSinceComplication', () => ({
@@ -100,6 +104,7 @@ const { inferItemsLostFromNarrative: inferItemsLostFromNarrativeActual } =
   jest.requireActual('../itemLossInference');
 const { syncNpcMetadata } = jest.requireMock('@/lib/ai/narrativeGenerator.npc');
 const { extractStructuredLore } = jest.requireMock('@/lib/ai/structuredLoreExtractor');
+const { buildWorldClockPromptContext, needsSceneTransition } = jest.requireMock('../worldClock');
 
 function makeGenerationResult(overrides: Partial<NarrativeGenerationResult> = {}): NarrativeGenerationResult {
   return {
@@ -305,6 +310,70 @@ describe('TurnResolver', () => {
       expect(result.segment.sessionId).toBe('session-1');
       expect(result.snapshot).toBeDefined();
       expect(result.snapshot.sessionId).toBe('session-1');
+    });
+
+    it('requests a transition when the world clock requires a scene boundary', async () => {
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation(
+        (flag: string) => flag === 'WORLD_CLOCK'
+      );
+      (buildWorldClockPromptContext as jest.Mock).mockReturnValue({
+        currentTurn: 6,
+        turnsSinceWorldMoved: 3,
+        threads: [],
+      });
+      (needsSceneTransition as jest.Mock).mockReturnValue(true);
+      const generator = makeMockGenerator();
+
+      await resolveTurn(makeCommand(), generator);
+
+      expect(generator.generateSegment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          generationParameters: expect.objectContaining({
+            segmentType: 'transition',
+          }),
+        }),
+        expect.anything()
+      );
+    });
+
+    it('starts prompt context at the latest transition boundary', async () => {
+      const makeSegment = (
+        id: string,
+        type: NarrativeSegment['type']
+      ): NarrativeSegment => ({
+        id,
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        content: id,
+        type,
+        metadata: { tags: [] },
+        timestamp: new Date('2026-01-01T00:00:00.000Z'),
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      });
+      const beforeBoundary = makeSegment('before-boundary', 'scene');
+      const boundary = makeSegment('boundary', 'transition');
+      useNarrativeStore.setState({
+        segments: {
+          [beforeBoundary.id]: beforeBoundary,
+          [boundary.id]: boundary,
+        },
+        sessionSegments: {
+          'session-1': [beforeBoundary.id, boundary.id],
+        },
+      });
+      const generator = makeMockGenerator();
+
+      await resolveTurn(makeCommand(), generator);
+
+      const generationRequest = (generator.generateSegment as jest.Mock).mock
+        .calls[0][0];
+      expect(
+        generationRequest.narrativeContext.recentSegments.map(
+          (segment: NarrativeSegment) => segment.id
+        )
+      ).toEqual(['boundary']);
     });
 
     it('rejects before commit when an abort-ignoring generator is cancelled', async () => {

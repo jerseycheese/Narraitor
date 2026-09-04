@@ -27,8 +27,11 @@ import { itemNamesMatch } from '@/lib/narrative/itemProcessorShared';
 import { syncNpcMetadata } from '@/lib/ai/narrativeGenerator.npc';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
 import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
-import { countWorldClockTurns } from '@/lib/narrative/worldClock';
-import { buildWorldClockPromptContext } from '@/lib/narrative/worldClock';
+import {
+  buildWorldClockPromptContext,
+  countWorldClockTurns,
+  needsSceneTransition,
+} from '@/lib/narrative/worldClock';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplication';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
@@ -51,6 +54,18 @@ import {
  * Modeled after chainBySession in applyWorldClockUpdates.ts.
  */
 const turnLockBySession = new Map<EntityID, Promise<unknown>>();
+
+const recentSceneSegments = (
+  segments: readonly NarrativeSegment[],
+  limit = 3
+): NarrativeSegment[] => {
+  const recent = segments.slice(-limit);
+  let latestBoundary = -1;
+  recent.forEach((segment, index) => {
+    if (segment.type === 'transition') latestBoundary = index;
+  });
+  return latestBoundary >= 0 ? recent.slice(latestBoundary) : recent;
+};
 
 function withTurnLock<T>(
   sessionId: EntityID,
@@ -178,7 +193,7 @@ async function resolveTurnInner(
 
   // Pre-turn snapshot for prompt context
   const preTurnSnapshot = assembleSessionSnapshot(sessionId, ids);
-  const recentSegments = preTurnSnapshot.segments.slice(-3);
+  const recentSegments = recentSceneSegments(preTurnSnapshot.segments);
   const turnsSinceComplication = computeTurnsSinceComplication(
     [...preTurnSnapshot.segments]
   );
@@ -235,6 +250,9 @@ async function resolveTurnInner(
           includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
           decisionWeight: command.decisionWeight,
           desiredTone: command.generationParams?.desiredTone,
+          ...(needsSceneTransition(worldClock)
+            ? { segmentType: 'transition' as const }
+            : {}),
         },
       },
       { signal: command.signal, onChunk: command.onChunk, resolverManaged: true }

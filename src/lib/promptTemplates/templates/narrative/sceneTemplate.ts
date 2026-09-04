@@ -177,10 +177,15 @@ PIVOTAL DECISION (LIFE OR DEATH):
 ` : ''}
 
 CRITICAL CONTINUITY RULES:
-- The player is EXACTLY where the last scene ended
+${segmentType === 'transition'
+    ? `- Preserve cause and effect from the last scene, then cross the requested scene boundary
+- Time may move FORWARD as far as the transition requires, never backward
+- Carry the player's action through the cut instead of abandoning or undoing it
+- Open on the far side of the transition, where the due event lands or the current matter has concluded`
+    : `- The player is EXACTLY where the last scene ended
 - Time has NOT reset or jumped backward
 - Pick up IMMEDIATELY from where the story left off
-- The player's action happens RIGHT NOW in the current moment
+- The player's action happens RIGHT NOW in the current moment`}
 
 ${formattedRoster}
 
