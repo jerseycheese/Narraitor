@@ -67,6 +67,14 @@ const RECOUNT_LEXICON =
  */
 const DENIAL_LEXICON = /\b(?:never|no\s+such|nothing|not|nor)\b|n['’]t\b/i;
 
+/**
+ * A direct refusal of the claimed exchange. Unlike DENIAL_LEXICON, this is
+ * safe to apply to nearby sentences because it requires the negation to name
+ * memory, the conversation, or the act of speaking.
+ */
+const EXCHANGE_REFUSAL_LEXICON =
+  /\b(?:do\s+not|don['’]t|cannot|can['’]t|never)\s+(?:recall|remember|recollect)\b|\bno\s+such\s+(?:conversation|talk|chat|exchange|meeting|consultation)\b|\b(?:I|we)\s+(?:never|did\s+not|didn['’]t)\s+(?:speak|spoke|talk|talked|meet|met|tell|told)\b|\bnothing\s+to\s+(?:repeat|recount|confirm)\b|\byou\s+(?:are|must\s+be)\s+mistaken\b/i;
+
 /** Co-presence per NPC, read off the segments the session already persisted. */
 export interface SharedSceneRecord {
   /** Narrated scenes in which this NPC was present with the protagonist. */
@@ -182,4 +190,9 @@ export function recountsUnrecordedExchange(sentence: string): boolean {
   if (!sentence) return false;
   if (DENIAL_LEXICON.test(sentence)) return false;
   return RECOUNT_LEXICON.test(sentence);
+}
+
+/** True when nearby prose directly refuses the claimed exchange. */
+export function refusesUnrecordedExchange(text: string): boolean {
+  return Boolean(text && EXCHANGE_REFUSAL_LEXICON.test(text));
 }

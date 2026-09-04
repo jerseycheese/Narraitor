@@ -35,7 +35,10 @@ import {
   termPattern,
   topicTerms,
 } from './continuityLedger';
-import { recountsUnrecordedExchange } from './unrecordedExchange';
+import {
+  recountsUnrecordedExchange,
+  refusesUnrecordedExchange,
+} from './unrecordedExchange';
 
 /** Routes correction responses in tests and marks the call in debug output. */
 export const CONTINUITY_CORRECTION_HEADER = 'CONTINUITY CORRECTION';
@@ -378,14 +381,15 @@ export function detectContinuityIssues(
   // so the segment is that claim's answer and recounting anywhere in it is the
   // invention. Denial is what the change wants, and it is guarded.
   for (const exchange of contract.unrecordedExchanges) {
-    // Read the refusal guard across the whole answer before locating an
-    // excerpt. An NPC may echo the player's question in one sentence and deny
-    // it in the next; sentence-local detection mistakes that refusal for a
-    // recount.
-    if (!recountsUnrecordedExchange(content)) continue;
-    const sentence =
-      sentences.find((candidate) => recountsUnrecordedExchange(candidate)) ??
-      content;
+    const sentence = sentences.find((candidate, index) => {
+      if (!recountsUnrecordedExchange(candidate)) return false;
+
+      // An NPC may echo the player's question and deny it immediately after.
+      // Only a direct exchange refusal in the following two sentences guards
+      // that echo; unrelated negation elsewhere must not hide a recount.
+      const response = sentences.slice(index + 1, index + 3).join(' ');
+      return !refusesUnrecordedExchange(response);
+    });
     if (sentence) {
       issues.push({
         type: 'invented-exchange',
