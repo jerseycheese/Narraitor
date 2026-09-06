@@ -204,6 +204,26 @@ describe('worldClock', () => {
     expect(buildWorldClockPromptContext(threads, 11).threads[0].strikes).toBe(3);
   });
 
+  test('buildWorldClockPromptContext retains the due-now thread when the prompt cap is full', () => {
+    const firedAtFuse = makeThread({
+      id: 'fired-at-fuse',
+      kind: 'deadline',
+      openedAtTurn: 10,
+      dueByTurn: 20,
+      firedAtTurn: 17,
+      strikeCount: 3,
+    });
+    const olderOverdueThreads = Array.from({ length: 8 }, (_, index) =>
+      makeThread({ id: `overdue-${index}`, openedAtTurn: index + 1, dueByTurn: 10 })
+    );
+
+    const context = buildWorldClockPromptContext([...olderOverdueThreads, firedAtFuse], 20);
+
+    expect(context.threads).toHaveLength(8);
+    expect(context.threads.find((thread) => thread.dueNow)?.summary).toBe(firedAtFuse.summary);
+    expect(needsSceneTransition(context)).toBe(true);
+  });
+
   test.each([
     ['an unfired deadline that is due now', makeThread({ kind: 'deadline', dueByTurn: 3 }), 6, true],
     ['an unfired actor that can enter the current scene', makeThread({ kind: 'actor', dueByTurn: 3 }), 6, false],

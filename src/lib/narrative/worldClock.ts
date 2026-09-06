@@ -158,12 +158,16 @@ export const buildWorldClockPromptContext = (
 ): WorldClockPromptContext => {
   const openThreads = sessionThreads.filter((thread) => thread.status === 'open');
   const dueNow = selectDueNowThread(openThreads, currentTurn);
+  const promptThreads = selectThreadsForPrompt(openThreads, currentTurn);
+  if (dueNow && !promptThreads.some((thread) => thread.id === dueNow.id)) {
+    promptThreads[promptThreads.length - 1] = dueNow;
+  }
   const trimmedRegister = register?.trim();
   return {
     currentTurn,
     turnsSinceWorldMoved: turnsSinceWorldMoved(sessionThreads, currentTurn),
     ...(trimmedRegister ? { register: trimmedRegister } : {}),
-    threads: selectThreadsForPrompt(openThreads, currentTurn).map((thread) => ({
+    threads: promptThreads.map((thread) => ({
       kind: thread.kind,
       summary: thread.summary,
       ageTurns: currentTurn - thread.openedAtTurn,
