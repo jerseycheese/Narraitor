@@ -56,6 +56,11 @@ describe('errorUtils', () => {
       expect(isRetryableError(error)).toBe(false);
     });
 
+    it('should return false for missing API key errors', () => {
+      expect(isRetryableError(new Error('API key not configured'))).toBe(false);
+      expect(isRetryableError(new Error('412 Precondition Failed'))).toBe(false);
+    });
+
     it('should return false for validation errors', () => {
       const error = new Error('invalid input data');
       expect(isRetryableError(error)).toBe(false);
@@ -146,6 +151,24 @@ describe('errorUtils', () => {
       expect(result.message).toBe('Authentication failed. Please check your credentials.');
       expect(result.retryable).toBe(false);
       expect(result.type).toBe(ErrorType.AUTH);
+    });
+
+    it('should map missing API key errors to provider setup guidance', () => {
+      const cases = [
+        new Error('API key not configured'),
+        new Error('412 Precondition Failed: API key not configured'),
+        new Error('no api key configured for this provider'),
+      ];
+
+      for (const error of cases) {
+        const result = getUserFriendlyError(error);
+        expect(result.title).toBe('API Key Required');
+        expect(result.message).toBe('No API key configured for this provider.');
+        expect(result.suggestion).toBe('Add your API key in Settings > Provider Setup to play.');
+        expect(result.retryable).toBe(false);
+        expect(result.type).toBe(ErrorType.AUTH);
+        expect(result.severity).toBe('critical');
+      }
     });
 
     it('should map validation errors with generic message', () => {
@@ -245,6 +268,7 @@ describe('errorUtils', () => {
         'request timeout',
         '429 rate limit',
         '401 unauthorized',
+        'api key not configured',
         'invalid input',
         'totally unexpected',
       ];
