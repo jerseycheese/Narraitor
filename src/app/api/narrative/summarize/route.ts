@@ -140,11 +140,15 @@ Do not include any explanatory text, code fences, markdown, or additional prose.
         jsonContent = jsonContent.replace(/```\s*/, '').replace(/\s*```/, '');
       }
 
+      // Both offsets are read against the string as it stands at that moment.
+      // Taking lastBrace before the leading slice would leave it pointing past
+      // where the closing brace ended up, so trailing prose survived the trim
+      // and the parse below failed on a response that was recoverable.
       const firstBrace = jsonContent.indexOf('{');
-      const lastBrace = jsonContent.lastIndexOf('}');
       if (firstBrace > 0) {
         jsonContent = jsonContent.slice(firstBrace);
       }
+      const lastBrace = jsonContent.lastIndexOf('}');
       if (lastBrace >= 0 && lastBrace < jsonContent.length - 1) {
         jsonContent = jsonContent.slice(0, lastBrace + 1);
       }
