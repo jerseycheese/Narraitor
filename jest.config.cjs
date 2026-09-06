@@ -14,16 +14,16 @@ const config = {
     '!src/**/*.d.ts',
     '!src/**/__mocks__/**',
   ],
-  // Baseline ratchet with untested production files included (#1994).
-  // Measured: statements 71.52%, branches 60.83%, functions 67.89%, lines 71.95%.
+  // Baseline ratchet with untested production files included.
+  // Measured: statements 72.42%, branches 61.56%, functions 68.20%, lines 72.87%.
   // Thresholds set with a ~1-2% cushion so regressions fail the build without
   // tripping on current code.
   coverageThreshold: {
     global: {
-      branches: 59,
+      branches: 60,
       functions: 66,
-      lines: 70,
-      statements: 70,
+      lines: 71,
+      statements: 71,
     },
   },
   moduleNameMapper: {
