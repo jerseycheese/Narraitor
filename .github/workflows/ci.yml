@@ -10,7 +10,7 @@ on:
     # re-run when the author edits baseline notes without pushing a commit.
     types: [ opened, synchronize, reopened, edited ]
   # Off-cycle manual runs of the visual suite go through this pipeline, so a
-  # hand-triggered run gets the same sharded --workers=1 e2e job a PR does.
+  # hand-triggered run gets the same sharded --workers=1 visual regression job a PR does.
   workflow_dispatch:
 
 jobs:
@@ -350,7 +350,7 @@ jobs:
         run: npm run build-storybook
 
   e2e:
-    name: E2E Tests
+    name: Visual Regression
     runs-on: macos-latest
     needs: [build]
     # Shard across runners and force --workers=1 per shard. That started as a
@@ -411,15 +411,15 @@ jobs:
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
         run: npm run build:app
 
-      - name: Run E2E tests (fail on visual diffs)
+      - name: Run visual regression tests (fail on visual diffs)
         env:
           PLAYWRIGHT_PROD_SERVER: 'true'
-        run: npm run test:e2e:critical -- --shard=${{ matrix.shard }}/2 --workers=1
+        run: npm run test:visual -- --shard=${{ matrix.shard }}/2 --workers=1
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: e2e-test-failures-shard${{ matrix.shard }}
+          name: visual-test-failures-shard${{ matrix.shard }}
           path: test-results/
           retention-days: 7
       - name: Upload HTML report

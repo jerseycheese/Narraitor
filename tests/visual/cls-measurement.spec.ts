@@ -29,9 +29,7 @@ import { waitForStableScrollHeight } from './utils/wait-helpers';
  * #1750 (the docked rail this measurement outlived)
  *
  * DS coverage (#1264): single-theme by design — this is a performance/CLS metric
- * test, not a visual baseline, so per-theme captures add no signal. The play
- * surface's per-theme visuals are covered by tests/visual/session-themes.spec.ts
- * and tests/visual/design-system-session.spec.ts.
+ * test, not a visual baseline, so per-theme captures add no signal.
  */
 
 const ROUTE = '/worlds/world-cyberpunk-2077/play';
