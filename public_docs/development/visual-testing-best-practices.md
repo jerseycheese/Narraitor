@@ -354,7 +354,7 @@ a CI one on this axis regardless of `NODE_ENV`.
 **CI baseline adoption**:
 Visual regression runs on `macos-latest`. If a visual change passes locally but fails in CI,
 download the failed shard artifacts with `./scripts/download-playwright-report.sh <pr>` or
-`gh run download <run-id> --pattern 'e2e-test-failures-shard*'`. Verify each `*-actual.png`
+`gh run download <run-id> --pattern '*test-failures-shard*'`. Verify each `*-actual.png`
 is a correct render, not a seeding or empty-state failure, before copying it over the matching
 `*-chromium-darwin.png` baseline. The old `dashboard-themes` and `theme-switcher` specs no
 longer exist; do not preserve exception lists for deleted visual suites.

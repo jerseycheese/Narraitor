@@ -84,7 +84,7 @@ Append new entries at the bottom; never rewrite existing ones (corrections per c
 - **Symptom:** Seeded store state vanishes or half-applies in e2e; flaky specs blamed on Playwright.
 - **Wrong path:** `addInitScript` seeding (races persist rehydration) and blind timeout bumps.
 - **Root cause:** Zustand persist rehydrates from IndexedDB asynchronously; seeding before `hasHydrated` gets overwritten.
-- **Evidence:** observed — `tests/visual/global.setup.ts` + seedTestData dual-seed IndexedDB/localStorage; specs wait on hydration.
+- **Evidence:** observed — `tests/visual/utils/seedTestData.ts` dual-seeds IndexedDB/localStorage; specs wait on hydration.
 - **Doctrine:** Seed AFTER hydration (`waitForFunction(persist.hasHydrated)` then `evaluate`), or via the established seed helpers; never re-invent seeding inline in a spec.
 - **Encoded in:** validation-and-qa, debugging-playbook, domain-reference.
 
