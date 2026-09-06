@@ -22,7 +22,14 @@ export function applyWorldCost({ sessionId, characterId, result }: ApplyWorldCos
   const threadStore = useWorldThreadStore.getState();
   const note: WorldCostSegmentNote = { imposed: [], cleared: [] };
 
-  // Conditions currently carried by the character.
+  // 1. Cleared conditions: process first so a cleared condition being replaced
+  // by a newer development isn't removed after being added.
+  for (const condition of result.cleared) {
+    characterStore.removeCondition(characterId, condition);
+    note.cleared.push(condition);
+  }
+
+  // Conditions currently carried by the character after clears.
   const currentConditions = [
     ...(characterStore.characters[characterId]?.status.conditions ?? []),
   ];
@@ -55,11 +62,6 @@ export function applyWorldCost({ sessionId, characterId, result }: ApplyWorldCos
       detail: cost.detail,
       ...(thread ? { thread: thread.summary } : {}),
     });
-  }
-
-  for (const condition of result.cleared) {
-    characterStore.removeCondition(characterId, condition);
-    note.cleared.push(condition);
   }
 
   if (result.fatal) note.fatal = true;

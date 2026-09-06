@@ -189,6 +189,28 @@ describe('applyWorldCost', () => {
     ]);
   });
 
+  it('correctly handles clear-and-replace when clearing old label and imposing replacement in same turn', () => {
+    useCharacterStore.setState((state) => ({
+      characters: { ...state.characters, 'char-1': makeCharacter('char-1', ['twisted left ankle']) },
+    }));
+
+    const note = applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: {
+        imposed: [{ kind: 'condition', detail: 'swollen, aching left ankle' }],
+        cleared: ['twisted left ankle'],
+        fatal: false,
+      },
+    });
+
+    expect(note.cleared).toEqual(['twisted left ankle']);
+    expect(note.imposed).toEqual([{ kind: 'condition', detail: 'swollen, aching left ankle' }]);
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual([
+      'swollen, aching left ankle',
+    ]);
+  });
+
   it('carries a fatal read onto the note and writes no condition for it', () => {
     const note = applyWorldCost({
       sessionId: 'session-1',

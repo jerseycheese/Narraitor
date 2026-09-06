@@ -530,9 +530,12 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             if (!character) {
               return;
             }
-            const remaining = character.status.conditions.filter(
-              (existing) => !sameCondition(existing, condition)
-            );
+            const target = condition.trim().toLowerCase();
+            const normalizedTarget = normalizeConditionLabel(target);
+            const remaining = character.status.conditions.filter((existing) => {
+              const ext = existing.trim().toLowerCase();
+              return ext !== target && normalizeConditionLabel(ext) !== normalizedTarget;
+            });
             if (remaining.length === character.status.conditions.length) {
               return;
             }

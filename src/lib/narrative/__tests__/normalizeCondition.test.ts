@@ -47,5 +47,16 @@ describe('isSameCondition', () => {
     expect(isSameCondition('twisted left ankle', 'gashed left forearm')).toBe(false);
     expect(isSameCondition('twisted left ankle', 'twisted right ankle')).toBe(false);
     expect(isSameCondition('bleeding left shoulder', 'gashed left forearm')).toBe(false);
+    expect(isSameCondition('blinded left eye', 'blinded right eye')).toBe(false);
+    expect(isSameCondition('deafened left ear', 'deafened right ear')).toBe(false);
+  });
+
+  it('distinguishes separate injury types on the same body part', () => {
+    expect(isSameCondition('burned left hand', 'broken left hand')).toBe(false);
+    expect(isSameCondition('gashed left forearm', 'broken left forearm')).toBe(false);
+  });
+
+  it('does not merge distinct conditions that merely share context words', () => {
+    expect(isSameCondition('no longer welcome at Hendersons', 'indebted to Hendersons')).toBe(false);
   });
 });

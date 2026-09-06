@@ -75,12 +75,21 @@ const STOP_WORDS = new Set([
   'fresh', 'wave', 'waves', 'pain', 'pains', 'ache', 'aching', 'sharp', 'dull',
 ]);
 
+const INJURY_TYPES: Array<{ type: string; pattern: RegExp }> = [
+  { type: 'burn', pattern: /\b(?:burned?|burns?|scal(?:d|ded|ding)|scorched?|charred?)\b/i },
+  { type: 'fracture', pattern: /\b(?:fractur(?:ed?|es?)|broken|breaks?|shattered?|crushed?)\b/i },
+  { type: 'laceration', pattern: /\b(?:gash(?:ed?|es?)?|cut[s]?|slash(?:ed?|es?)?|lacerat(?:ed?|ions?)?|bleeding|wound(?:ed|s)?)\b/i },
+  { type: 'sprain', pattern: /\b(?:sprain(?:ed?|s?)?|twist(?:ed?|s?)?|strain(?:ed?|s?)?|wrenched?)\b/i },
+  { type: 'frostbite', pattern: /\b(?:frostbit(?:e|ten)|froz(?:e|en))\b/i },
+];
+
 interface ParsedCondition {
   normalized: string;
   laterality?: 'left' | 'right' | 'bilateral';
   region?: 'lower_limb' | 'upper_limb' | 'head_neck' | 'torso';
   bodyPart?: string;
   isGeneralRegion?: boolean;
+  injuryType?: string;
   statusCategory?: string;
   tokens: Set<string>;
 }
@@ -124,6 +133,14 @@ function parseCondition(raw: string, normalized: string): ParsedCondition {
     }
   }
 
+  let injuryType: string | undefined;
+  for (const it of INJURY_TYPES) {
+    if (it.pattern.test(raw)) {
+      injuryType = it.type;
+      break;
+    }
+  }
+
   let statusCategory: string | undefined;
   for (const sc of STATUS_CATEGORIES) {
     if (sc.pattern.test(raw)) {
@@ -141,6 +158,7 @@ function parseCondition(raw: string, normalized: string): ParsedCondition {
     region,
     bodyPart,
     isGeneralRegion,
+    injuryType,
     statusCategory,
     tokens,
   };
@@ -161,18 +179,21 @@ export function isSameCondition(a: string, b: string): boolean {
   const parsedA = parseCondition(a, normA);
   const parsedB = parseCondition(b, normB);
 
-  // Status/emotional states (e.g. "shaken" vs "badly shaken")
-  if (parsedA.statusCategory && parsedB.statusCategory) {
-    return parsedA.statusCategory === parsedB.statusCategory;
+  // If explicit lateralities differ (e.g. blinded left eye vs blinded right eye),
+  // they cannot be the same condition regardless of status or body part.
+  if (parsedA.laterality && parsedB.laterality && parsedA.laterality !== parsedB.laterality) {
+    return false;
   }
 
   // Physical injury comparison
   if (parsedA.region && parsedB.region) {
-    if (parsedA.laterality && parsedB.laterality && parsedA.laterality !== parsedB.laterality) {
+    if (parsedA.region !== parsedB.region) {
       return false;
     }
 
-    if (parsedA.region !== parsedB.region) {
+    // If both have different explicit injury types on the same body part
+    // (e.g. "burned left hand" vs "broken left hand"), they are separate injuries.
+    if (parsedA.injuryType && parsedB.injuryType && parsedA.injuryType !== parsedB.injuryType) {
       return false;
     }
 
@@ -187,23 +208,19 @@ export function isSameCondition(a: string, b: string): boolean {
     return false;
   }
 
-  // Direct substring containment for free-form descriptions
-  if (normA.includes(normB) || normB.includes(normA)) {
-    return true;
+  // Status/emotional states (e.g. "shaken" vs "badly shaken")
+  if (parsedA.statusCategory && parsedB.statusCategory) {
+    return parsedA.statusCategory === parsedB.statusCategory;
   }
 
-  // Token overlap fallback
-  if (parsedA.tokens.size > 0 && parsedB.tokens.size > 0) {
-    let overlap = 0;
-    for (const token of parsedA.tokens) {
-      if (parsedB.tokens.has(token)) {
-        overlap++;
-      }
-    }
-    const minTokens = Math.min(parsedA.tokens.size, parsedB.tokens.size);
-    if (overlap >= Math.ceil(minTokens / 2)) {
-      return true;
-    }
+  // Direct elaboration containment for non-physical states (e.g. "shaken by explosions" vs "shaken by explosions again")
+  if (
+    normA.startsWith(normB + ' ') ||
+    normB.startsWith(normA + ' ') ||
+    normA.endsWith(' ' + normB) ||
+    normB.endsWith(' ' + normA)
+  ) {
+    return true;
   }
 
   return false;
