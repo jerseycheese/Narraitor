@@ -50,7 +50,7 @@ Environment: node v24.16.0, npm 11.13.0 (known). Port 3000 free at session time 
 - Toolbar: light/dark `colorScheme` global + viewports — no design-system picker (ADR-013 collapsed to ds3) (observed).
 - Storybook is the canon design surface (ADR-012, `public_docs/architecture/ADR-012-storybook-single-canon-surface.md`); `verify-ds-canon.cjs` (via `npm run lint:ds-canon`, CI-blocking) fails on NEW in-scope components without stories, grandfathered via `.ds-canon-baseline.json` (observed).
 - Production build copies `storybook-static` into `public/` (known — package.json build script).
-- Integration tier: real app hydrates from IndexedDB; e2e seeds stores post-hydration (`tests/visual/global.setup.ts`, seedTestData dual-seeding IndexedDB + localStorage; AI calls gated by `isPlaywrightEnv()` from `src/lib/utils/isPlaywrightEnv.ts`) (observed).
+- Integration tier: real app hydrates from IndexedDB; e2e seeds stores post-hydration (`tests/visual/utils/seedTestData.ts` dual-seeding IndexedDB + localStorage; AI calls gated by `isPlaywrightEnv()` from `src/lib/utils/isPlaywrightEnv.ts`) (observed).
 
 ## 6. Critical docs of record
 
