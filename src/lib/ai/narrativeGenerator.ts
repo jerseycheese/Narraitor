@@ -58,6 +58,7 @@ import {
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
 import { isResolverManaged } from '@/lib/narrative/resolverGuard';
+import { WORLD_CLOCK_TRANSITION_TAG } from '@/lib/narrative/turnTags';
 import {
   buildKnownNameTokens,
   enhancePromptWithPhraseVariety,
@@ -208,7 +209,11 @@ export class NarrativeGenerator {
           segmentType: 'transition',
           metadata: {
             ...result.metadata,
-            tags: Array.from(new Set([...(result.metadata.tags ?? []), 'transition'])),
+            tags: Array.from(new Set([
+              ...(result.metadata.tags ?? []),
+              'transition',
+              WORLD_CLOCK_TRANSITION_TAG,
+            ])),
           },
         };
       }

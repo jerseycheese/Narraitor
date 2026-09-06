@@ -45,6 +45,10 @@ jest.mock('@/lib/ai/narrativeGenerator.npc', () => ({
 
 jest.mock('../worldClock', () => ({
   countWorldClockTurns: jest.fn((segments: unknown[]) => segments.length),
+  isWorldClockTurnSegment: jest.fn(
+    (segment: { metadata?: { tags?: string[] } }) =>
+      !segment.metadata?.tags?.includes('item-usage')
+  ),
   buildWorldClockPromptContext: jest.fn(),
   needsSceneTransition: jest.fn(() => false),
 }));
@@ -78,6 +82,7 @@ jest.mock('@/lib/narrative/narrativeContentGate', () => ({
 }));
 
 jest.mock('../turnTags', () => ({
+  WORLD_CLOCK_TRANSITION_TAG: 'world-clock-transition',
   mergeTurnTags: jest.fn((_prev: string[], current: string[]) => current),
 }));
 
@@ -337,17 +342,18 @@ describe('TurnResolver', () => {
       );
     });
 
-    it('starts prompt context at the latest transition boundary', async () => {
+    it('does not treat a generic transition classification as a world-clock boundary', async () => {
       const makeSegment = (
         id: string,
-        type: NarrativeSegment['type']
+        type: NarrativeSegment['type'],
+        tags: string[] = []
       ): NarrativeSegment => ({
         id,
         sessionId: 'session-1',
         worldId: 'world-1',
         content: id,
         type,
-        metadata: { tags: [] },
+        metadata: { tags },
         timestamp: new Date('2026-01-01T00:00:00.000Z'),
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-01T00:00:00.000Z',
@@ -373,7 +379,87 @@ describe('TurnResolver', () => {
         generationRequest.narrativeContext.recentSegments.map(
           (segment: NarrativeSegment) => segment.id
         )
+      ).toEqual(['before-boundary', 'boundary']);
+    });
+
+    it('starts prompt context at the latest resolver-owned world-clock boundary', async () => {
+      const makeSegment = (id: string, tags: string[] = []): NarrativeSegment => ({
+        id,
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        content: id,
+        type: 'scene',
+        metadata: { tags },
+        timestamp: new Date('2026-01-01T00:00:00.000Z'),
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      });
+      const beforeBoundary = makeSegment('before-boundary');
+      const boundary = makeSegment('boundary', ['world-clock-transition']);
+      useNarrativeStore.setState({
+        segments: {
+          [beforeBoundary.id]: beforeBoundary,
+          [boundary.id]: boundary,
+        },
+        sessionSegments: {
+          'session-1': [beforeBoundary.id, boundary.id],
+        },
+      });
+      const generator = makeMockGenerator();
+
+      await resolveTurn(makeCommand(), generator);
+
+      const generationRequest = (generator.generateSegment as jest.Mock).mock
+        .calls[0][0];
+      expect(
+        generationRequest.narrativeContext.recentSegments.map(
+          (segment: NarrativeSegment) => segment.id
+        )
       ).toEqual(['boundary']);
+    });
+
+    it('does not request consecutive world-clock boundaries', async () => {
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation(
+        (flag: string) => flag === 'WORLD_CLOCK'
+      );
+      (buildWorldClockPromptContext as jest.Mock).mockReturnValue({
+        currentTurn: 7,
+        turnsSinceWorldMoved: 4,
+        threads: [],
+      });
+      (needsSceneTransition as jest.Mock).mockReturnValue(true);
+      const boundary: NarrativeSegment = {
+        id: 'boundary',
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        content: 'Three days pass.',
+        type: 'transition',
+        metadata: { tags: ['world-clock-transition'] },
+        timestamp: new Date('2026-01-01T00:00:00.000Z'),
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      };
+      const itemUse: NarrativeSegment = {
+        ...boundary,
+        id: 'item-use',
+        content: 'You drink the potion.',
+        type: 'action',
+        metadata: { tags: ['item-usage'] },
+      };
+      useNarrativeStore.setState({
+        segments: { [boundary.id]: boundary, [itemUse.id]: itemUse },
+        sessionSegments: { 'session-1': [boundary.id, itemUse.id] },
+      });
+      const generator = makeMockGenerator();
+
+      await resolveTurn(makeCommand(), generator);
+
+      const generationRequest = (generator.generateSegment as jest.Mock).mock
+        .calls[0][0];
+      expect(generationRequest.generationParameters).not.toHaveProperty(
+        'segmentType'
+      );
     });
 
     it('rejects before commit when an abort-ignoring generator is cancelled', async () => {
@@ -705,6 +791,52 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveItemUseTurn', () => {
+    it('keeps replacement-choice context behind the latest world-clock boundary', async () => {
+      const ids = seedItemUseStores();
+      const beforeBoundary: NarrativeSegment = {
+        id: 'before-boundary',
+        sessionId: ids.sessionId,
+        worldId: ids.worldId,
+        content: 'The old room lingers.',
+        type: 'scene',
+        metadata: { tags: [] },
+        timestamp: new Date('2026-01-01T00:00:00.000Z'),
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      };
+      const boundary: NarrativeSegment = {
+        ...beforeBoundary,
+        id: 'boundary',
+        content: 'Three days later, you reach the council hall.',
+        type: 'transition',
+        metadata: { tags: ['world-clock-transition'] },
+      };
+      useNarrativeStore.setState({
+        segments: {
+          [beforeBoundary.id]: beforeBoundary,
+          [boundary.id]: boundary,
+        },
+        sessionSegments: {
+          [ids.sessionId]: [beforeBoundary.id, boundary.id],
+        },
+      });
+      const generator = makeItemUseGenerator();
+
+      const outcome = await resolveItemUseTurn(ids, generator);
+
+      expect(outcome.success).toBe(true);
+      const choiceContext = (generator.generatePlayerChoices as jest.Mock).mock
+        .calls[0][1];
+      expect(
+        choiceContext.recentSegments.map(
+          (segment: NarrativeSegment) => segment.content
+        )
+      ).toEqual([
+        'Three days later, you reach the council hall.',
+        'You drink the potion and warmth returns to your limbs.',
+      ]);
+    });
+
     it('keeps replacement choices blocked until reconciliation settles', async () => {
       const ids = seedItemUseStores();
       const clockDeferred = deferred<null>();

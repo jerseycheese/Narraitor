@@ -1,4 +1,4 @@
-import { mergeTurnTags } from '../turnTags';
+import { WORLD_CLOCK_TRANSITION_TAG, mergeTurnTags } from '../turnTags';
 import { sceneTemplate } from '@/lib/promptTemplates/templates/narrative/sceneTemplate';
 
 describe('mergeTurnTags', () => {
@@ -21,6 +21,13 @@ describe('mergeTurnTags', () => {
 
   it('drops previous item-usage tags before building the next turn', () => {
     expect(mergeTurnTags(['forest', 'item-usage'], ['combat'])).toEqual(['forest', 'combat']);
+  });
+
+  it('drops a recorded world-clock boundary before building the next turn', () => {
+    expect(mergeTurnTags(['forest', WORLD_CLOCK_TRANSITION_TAG], ['combat'])).toEqual([
+      'forest',
+      'combat',
+    ]);
   });
 });
 

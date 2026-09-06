@@ -1,4 +1,5 @@
 import { NarrativeGenerator } from '../narrativeGenerator';
+import { WORLD_CLOCK_TRANSITION_TAG } from '@/lib/narrative/turnTags';
 import { GeminiClient } from '../geminiClient';
 import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
@@ -184,7 +185,9 @@ describe('NarrativeGenerator', () => {
       });
 
       expect(result.segmentType).toBe('transition');
-      expect(result.metadata.tags).toContain('transition');
+      expect(result.metadata.tags).toEqual(
+        expect.arrayContaining(['transition', WORLD_CLOCK_TRANSITION_TAG])
+      );
     });
 
     it('handles errors gracefully', async () => {
