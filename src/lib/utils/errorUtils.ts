@@ -133,7 +133,6 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   // Missing API key / precondition errors (#2028)
   if (
     message.includes('api key not configured') ||
-    message.includes('412') ||
     message.includes('no api key')
   ) {
     return {
