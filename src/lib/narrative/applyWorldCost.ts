@@ -3,6 +3,8 @@ import type { WorldCostExtractionResult, WorldCostSegmentNote } from '@/types/wo
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 
+import { isSameCondition, normalizeConditionLabel } from './normalizeCondition';
+
 export interface ApplyWorldCostParams {
   sessionId: EntityID;
   characterId: EntityID;
@@ -20,18 +22,31 @@ export function applyWorldCost({ sessionId, characterId, result }: ApplyWorldCos
   const threadStore = useWorldThreadStore.getState();
   const note: WorldCostSegmentNote = { imposed: [], cleared: [] };
 
-  // A condition the character already carries, re-imposed verbatim, is not a
-  // new cost: skipping it here keeps it off the note and out of every count,
-  // not just out of the store (which already ignored the duplicate write).
-  const carried = new Set(
-    (characterStore.characters[characterId]?.status.conditions ?? []).map((condition) =>
-      condition.trim().toLowerCase()
-    )
-  );
+  // Conditions currently carried by the character.
+  const currentConditions = [
+    ...(characterStore.characters[characterId]?.status.conditions ?? []),
+  ];
 
   for (const cost of result.imposed) {
     if (cost.kind === 'condition') {
-      if (carried.has(cost.detail.trim().toLowerCase())) continue;
+      const trimmed = cost.detail.trim();
+      const normalized = normalizeConditionLabel(trimmed);
+
+      // A condition the character already carries, re-imposed verbatim, is not a
+      // new cost: skipping it here keeps it off the note and out of every count,
+      // not just out of the store (which already ignored the duplicate write).
+      const verbatimDuplicate = currentConditions.some(
+        (condition) => condition.trim().toLowerCase() === trimmed.toLowerCase()
+      );
+      if (verbatimDuplicate) continue;
+
+      const existingIndex = currentConditions.findIndex((c) => isSameCondition(c, trimmed));
+      if (existingIndex !== -1) {
+        currentConditions[existingIndex] = normalized;
+      } else {
+        currentConditions.push(normalized);
+      }
+
       characterStore.addCondition(characterId, cost.detail);
     }
     const thread = cost.threadId ? threadStore.recordThreadCost(sessionId, cost.threadId, cost.detail) : undefined;

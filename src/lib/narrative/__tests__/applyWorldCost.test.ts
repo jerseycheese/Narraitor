@@ -100,7 +100,7 @@ describe('applyWorldCost', () => {
     expect(useWorldThreadStore.getState().threads[threadId].costs).toBeUndefined();
   });
 
-  it('still imposes a condition worded differently from what the character carries', () => {
+  it('updates and replaces an existing condition when a later development of the same harm is imposed', () => {
     const note = applyWorldCost({
       sessionId: 'session-1',
       characterId: 'char-1',
@@ -112,7 +112,81 @@ describe('applyWorldCost', () => {
     });
 
     expect(note.imposed).toEqual([{ kind: 'condition', detail: 'badly shaken' }]);
-    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken', 'badly shaken']);
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['badly shaken']);
+  });
+
+  it('normalizes an initial condition into a stable state entry while keeping narrative phrasing on the note', () => {
+    useCharacterStore.setState((state) => ({
+      characters: { ...state.characters, 'char-1': makeCharacter('char-1', []) },
+    }));
+
+    const note = applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: {
+        imposed: [
+          { kind: 'condition', detail: 'fresh wave of blinding pain through twisted lower limb' },
+        ],
+        cleared: [],
+        fatal: false,
+      },
+    });
+
+    expect(note.imposed).toEqual([
+      { kind: 'condition', detail: 'fresh wave of blinding pain through twisted lower limb' },
+    ]);
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual([
+      'twisted lower limb',
+    ]);
+  });
+
+  it('replaces an evolving condition and appends a genuinely distinct condition', () => {
+    useCharacterStore.setState((state) => ({
+      characters: { ...state.characters, 'char-1': makeCharacter('char-1', []) },
+    }));
+
+    // Step 1: Initial condition creates stable entry
+    applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: {
+        imposed: [{ kind: 'condition', detail: 'twisted left ankle' }],
+        cleared: [],
+        fatal: false,
+      },
+    });
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual([
+      'twisted left ankle',
+    ]);
+
+    // Step 2: Later development of same condition updates/replaces
+    applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: {
+        imposed: [{ kind: 'condition', detail: 'swollen, aching left ankle' }],
+        cleared: [],
+        fatal: false,
+      },
+    });
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual([
+      'swollen, aching left ankle',
+    ]);
+
+    // Step 3: Genuinely distinct condition adds another entry
+    applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: {
+        imposed: [{ kind: 'condition', detail: 'gashed left forearm' }],
+        cleared: [],
+        fatal: false,
+      },
+    });
+    expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual([
+      'swollen, aching left ankle',
+      'gashed left forearm',
+    ]);
   });
 
   it('carries a fatal read onto the note and writes no condition for it', () => {

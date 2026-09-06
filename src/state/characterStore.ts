@@ -19,6 +19,7 @@ import { CrudStore } from './crudStore.types';
 import { calculateDerivedStat } from '@/lib/utils/derivedStatCalculator';
 import { storeEvents, StoreEventTypes, type CharacterDeletedEvent, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 
+import { normalizeConditionLabel, isSameCondition } from '@/lib/narrative/normalizeCondition';
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('CharacterStore');
 
@@ -165,7 +166,7 @@ const getInitialState = () => ({
 
 // Character Store implementation with persistence
 const sameCondition = (a: string, b: string): boolean =>
-  a.trim().toLowerCase() === b.trim().toLowerCase();
+  isSameCondition(a, b);
 
 export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
   create<CharacterStore>()(
@@ -505,12 +506,22 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
             if (!character || !trimmed) {
               return;
             }
+            const normalized = normalizeConditionLabel(trimmed);
             const conditions = character.status.conditions;
-            if (conditions.some((existing) => sameCondition(existing, trimmed))) {
+            const existingIndex = conditions.findIndex((existing) => sameCondition(existing, trimmed));
+            if (existingIndex !== -1) {
+              if (conditions[existingIndex].toLowerCase() === normalized.toLowerCase()) {
+                return;
+              }
+              const updated = [...conditions];
+              updated[existingIndex] = normalized;
+              get().update(characterId, {
+                status: { ...character.status, conditions: updated },
+              });
               return;
             }
             get().update(characterId, {
-              status: { ...character.status, conditions: [...conditions, trimmed] },
+              status: { ...character.status, conditions: [...conditions, normalized] },
             });
           },
 
