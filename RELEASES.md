@@ -4,6 +4,39 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.4.0 - 2026-09-05
+
+The theme is the world cashing its checks. v1.3 taught the story to remember what it said; v1.4 makes those facts settle before the next choice and forces off-stage pressure to actually arrive. The v1.4 milestone closes 13 issues across 29 commits since [v1.3.0](https://github.com/jerseycheese/narraitor/releases/tag/v1.3.0), including the bounded TurnResolver work that was briefly split into v1.5 and folded back because it is the mechanism that completes this release.
+
+**What's in this release**
+
+- Turns settle before the next choice reads them. `TurnResolver` serializes generation per session, commits the segment, awaits inventory, condition, world-thread and fatal-outcome reconciliation, and returns one frozen snapshot. A partial reconciliation leaves the prose visible but blocks the next choice instead of presenting stale state as settled. Item use now goes through the same lock and consumes the selected item exactly once, while choice generation consumes the returned snapshot rather than rereading whichever store revision happens to be live ([#1983](https://github.com/jerseycheese/narraitor/issues/1983), [#1985](https://github.com/jerseycheese/narraitor/issues/1985), [#1986](https://github.com/jerseycheese/narraitor/issues/1986)).
+- The world clock can finish what it starts. Fired threads count their own strikes and arm a conclusion after three instead of re-announcing themselves forever ([#1889](https://github.com/jerseycheese/narraitor/issues/1889)). An overdue deadline or exhausted fired thread now forces a real scene transition, and the next turn's context begins on the far side of that cut ([#1872](https://github.com/jerseycheese/narraitor/issues/1872)). The focused live matrix passed all declared gates in two worlds: 12 of 12 boundary turns moved forward or concluded the matter, 10 resolved it, and neither follow-up fell back into the old scene.
+- Arrived threats can take something the game actually records. `WORLD_COST` is on by default after the matched TurnResolver matrix cleared the held threshold in both worlds: Harrowgate moved from 0 to 4 recorded cost turns per 30, and Crystal Lake from 1 to 10. The treatment sessions also wrote nine durable character conditions where the controls wrote none ([#1882](https://github.com/jerseycheese/narraitor/issues/1882)).
+- Delivered commitments reach the choices that follow them. The next decision reads the settled commitment revision, and stale business is not re-offered as if delivery never happened ([#1963](https://github.com/jerseycheese/narraitor/issues/1963)).
+- Endings read the session in the right order and account for the other threads it opened, not only the fatal one in front of them. That behavior was measured live before shipping ([#1974](https://github.com/jerseycheese/narraitor/issues/1974), [#1966](https://github.com/jerseycheese/narraitor/issues/1966), [#1975](https://github.com/jerseycheese/narraitor/issues/1975)).
+- The engine is less willing to invent a private conversation. Natural first-name references now resolve to the right NPC, and a denial only suppresses an alleged exchange when it sits beside that claim, so one refusal elsewhere in the response cannot hide a different invented conversation ([#1857](https://github.com/jerseycheese/narraitor/issues/1857), [#1967](https://github.com/jerseycheese/narraitor/issues/1967)).
+- A malformed dotted-key metadata dump no longer replaces the narrative passage on a consequential turn; the parser recovers the prose before the content gate sees it ([#1965](https://github.com/jerseycheese/narraitor/issues/1965)).
+- Alongside the milestone, the shared AI route boundary now measures real request bytes, applies rate limiting once, clamps provider token overrides, keeps raw provider bodies out of logs, and enforces a bounded response. Storage fallback errors also reach the player instead of living only in a log, and coverage now includes untested files behind a threshold ratchet ([#1998](https://github.com/jerseycheese/narraitor/issues/1998), [#1999](https://github.com/jerseycheese/narraitor/issues/1999), [#1994](https://github.com/jerseycheese/narraitor/issues/1994)).
+
+**Known incomplete**
+
+World costs are durable now, but their state model is still rough. Conditions can arrive as accumulating prose fragments rather than one stable condition developing ([#2019](https://github.com/jerseycheese/Narraitor/issues/2019)), and the measured losses come from the world's side of the table rather than being causally linked to the decision that exposed the player to them ([#2020](https://github.com/jerseycheese/Narraitor/issues/2020)). The strongest treatment arm ran 30 turns, so whether the gain holds through a 45-turn session is still untested.
+
+The green automated suite still does not execute the provider-backed narrative generation path. Route validation and error mapping for the core game loop remain a high-priority test gap ([#1995](https://github.com/jerseycheese/Narraitor/issues/1995), under [#2005](https://github.com/jerseycheese/Narraitor/issues/2005)). This release's AI claims come from the recorded live matrices, not from pretending the unit or Playwright layers cover Gemini.
+
+The broader playtest campaign stays open ([#1818](https://github.com/jerseycheese/Narraitor/issues/1818)). v1.4 closes the specific settlement and world-movement failures it measured; it is not a blanket claim that every long story now holds engagement past turn ten. The milestone charter also named a UX slate, but no evidence-backed UX slate was filed or shipped, so this is an engine and reliability release.
+
+One persistence question from the release audit remains unresolved: four store version bumps say they clear incompatible saved data while their migration functions preserve it ([#2000](https://github.com/jerseycheese/Narraitor/issues/2000)). No v1.4 store-shape migration depends on that behavior, but the next real persisted-shape change should settle it first.
+
+**What's next**
+
+- Close the test-confidence gap at the real game-loop routes, starting with narrative generation and choices ([#1995](https://github.com/jerseycheese/Narraitor/issues/1995), [#2005](https://github.com/jerseycheese/Narraitor/issues/2005)).
+- Give world costs stable condition identities and a durable link back to the decisions that incurred them ([#2019](https://github.com/jerseycheese/Narraitor/issues/2019), [#2020](https://github.com/jerseycheese/Narraitor/issues/2020)).
+- Run a fresh prioritization pass before naming another product milestone, including the UX discovery that v1.4's original charter named but never defined.
+
+---
+
 ## v1.3.0 - 2026-08-26
 
 The theme is the story staying true to itself. Every prior release added a capability; this one went looking for the specific ways a 20-30 turn session quietly stops matching what it already told the player, and closed what it found one measured fix at a time. The v1.3 milestone closed 9 issues across 77 commits since [v1.2.0](https://github.com/jerseycheese/narraitor/releases/tag/v1.2.0), all of it fed by the live-playtest campaign tracked in [#1818](https://github.com/jerseycheese/narraitor/issues/1818).
