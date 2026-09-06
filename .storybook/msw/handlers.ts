@@ -129,5 +129,4 @@ export const handlers = [
   http.post('/api/generate-ending-image', () =>
     HttpResponse.json({ imageUrl: placeholderImage('ending'), aiGenerated: false, placeholder: true }),
   ),
-  http.post('/api/delete-image', () => HttpResponse.json({ success: true })),
 ];
