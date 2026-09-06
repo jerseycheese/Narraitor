@@ -1,5 +1,6 @@
 const SKILL_CHECK_TAG_PREFIX = 'skill-';
-const TRANSIENT_TURN_TAGS = new Set(['item-usage']);
+export const WORLD_CLOCK_TRANSITION_TAG = 'world-clock-transition';
+const TRANSIENT_TURN_TAGS = new Set(['item-usage', WORLD_CLOCK_TRANSITION_TAG]);
 
 /**
  * Builds the tag list a turn's prompt sees.

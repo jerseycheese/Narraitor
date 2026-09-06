@@ -1,4 +1,5 @@
 import { NarrativeGenerator } from '../narrativeGenerator';
+import { WORLD_CLOCK_TRANSITION_TAG } from '@/lib/narrative/turnTags';
 import { GeminiClient } from '../geminiClient';
 import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
@@ -164,6 +165,29 @@ describe('NarrativeGenerator', () => {
       expect(result.content).toContain('Hours pass');
       // Segment type comes from AI's JSON response
       expect(result.segmentType).toBe('transition');
+    });
+
+    it('keeps a requested transition as a scene boundary when the model labels it scene', async () => {
+      mockGeminiClient.generateContent.mockResolvedValue({
+        content: JSON.stringify({
+          content: 'Three days later, the council gathers for the vote.',
+          type: 'scene',
+          metadata: { mood: 'tense', tags: ['council'] },
+        }),
+        finishReason: 'stop',
+      });
+
+      const result = await narrativeGenerator.generateSegment({
+        worldId: 'world-123',
+        sessionId: 'session-123',
+        characterIds: ['char-1'],
+        generationParameters: { segmentType: 'transition' },
+      });
+
+      expect(result.segmentType).toBe('transition');
+      expect(result.metadata.tags).toEqual(
+        expect.arrayContaining(['transition', WORLD_CLOCK_TRANSITION_TAG])
+      );
     });
 
     it('handles errors gracefully', async () => {

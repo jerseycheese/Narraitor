@@ -6,6 +6,7 @@ import {
   isOverdue,
   isWorldClockTurnSegment,
   needsOpenAsk,
+  needsSceneTransition,
   overdueByTurns,
   selectDueNowThread,
   selectThreadsForPrompt,
@@ -201,6 +202,36 @@ describe('worldClock', () => {
   test('buildWorldClockPromptContext carries a thread\'s strike count into the prompt shape', () => {
     const threads = [makeThread({ summary: 'The thing in the boathouse', dueByTurn: 11, firedAtTurn: 8, strikeCount: 3 })];
     expect(buildWorldClockPromptContext(threads, 11).threads[0].strikes).toBe(3);
+  });
+
+  test('buildWorldClockPromptContext retains the due-now thread when the prompt cap is full', () => {
+    const firedAtFuse = makeThread({
+      id: 'fired-at-fuse',
+      kind: 'deadline',
+      openedAtTurn: 10,
+      dueByTurn: 20,
+      firedAtTurn: 17,
+      strikeCount: 3,
+    });
+    const olderOverdueThreads = Array.from({ length: 8 }, (_, index) =>
+      makeThread({ id: `overdue-${index}`, openedAtTurn: index + 1, dueByTurn: 10 })
+    );
+
+    const context = buildWorldClockPromptContext([...olderOverdueThreads, firedAtFuse], 20);
+
+    expect(context.threads).toHaveLength(8);
+    expect(context.threads.find((thread) => thread.dueNow)?.summary).toBe(firedAtFuse.summary);
+    expect(needsSceneTransition(context)).toBe(true);
+  });
+
+  test.each([
+    ['an unfired deadline that is due now', makeThread({ kind: 'deadline', dueByTurn: 3 }), 6, true],
+    ['an unfired actor that can enter the current scene', makeThread({ kind: 'actor', dueByTurn: 3 }), 6, false],
+    ['a fired thread below the strike cap', makeThread({ dueByTurn: 6, firedAtTurn: 3, strikeCount: 2 }), 6, false],
+    ['a fired thread at the strike cap', makeThread({ dueByTurn: 6, firedAtTurn: 3, strikeCount: 3 }), 6, true],
+  ])('needsSceneTransition: %s', (_label, thread, currentTurn, expected) => {
+    const context = buildWorldClockPromptContext([thread], currentTurn);
+    expect(needsSceneTransition(context)).toBe(expected);
   });
 
   test('needsOpenAsk fires only when the quiet window has passed and nothing unfired is due inside it', () => {

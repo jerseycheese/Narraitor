@@ -44,3 +44,26 @@ Matrix shortfall, stated: the protocol asks for 2 worlds x 2 characters; this ro
 - Improved on the evaluated matrix. The headline symptom (#1822: nothing happens the player did not cause) moves in both cells: Harrowgate world-moved 1/0/0 -> 4/4/4, Crystal Lake 3 -> 10 in the first treated block. Momentum, Stakes and Surprise rise in the first treated block of both cells; Memory, Voice and Choice hold at control.
 - Known failure mode, filed not fixed: threads are advanced by restatement and never come due, so the last block re-announces instead of paying off (Harrowgate block 3 Momentum 3 -> 2, Crystal Lake block 3 Momentum 1). #1872 carries the fix shape; #1873 the empty seed on the established path. Both are prompt-side experiments behind the same flag.
 - Ship/hold decision recorded at: `.claude/skills/narraitor-feature-experiment-lifecycle/memos/1822-world-clock.md` (SHIP; linked from PR #1869).
+
+## Round 12 re-entry precommit (#1872)
+
+- Date / evaluator: 2026-09-04, Codex. Live Gemini through `/worlds/[id]/play`; no mocked provider calls.
+- Intervention: when the resolver selects an unfired DUE NOW deadline, or a fired DUE NOW thread has reached the three-strike cap, it requests and records a `transition` segment. The next turn's recent context starts at that boundary. Actor and consequence arrivals, plus fired threads below the cap, keep the current-scene path.
+- Matrix: Harrowgate Mills and Camp Crystal Lake x unfired deadline / fired three-strike conclusion x 3 independent probes = 12 turns. One follow-up turn per world checks that prompt context stays beyond the cut.
+- Primary gates: 12/12 segments recorded as `transition` with the `transition` tag; 0 backward time cuts; at least 10/12 visible forward cuts or clean conclusions; each world's fired-conclusion cell resolves at least once; both follow-ups stay beyond the prior scene.
+- Decision rule: SHIP if every deterministic gate passes and the qualitative misses stay within the declared 2/12 allowance. HOLD if boundary metadata is missing, time moves backward, either world never resolves its fired thread, or a follow-up re-enters the pre-boundary scene.
+- Scope boundary: this is a focused architecture re-entry on the measured failure cause, not a repeat of the earlier 150-turn mechanical matrix. That matrix already established 19 resolutions, 0 dropped threads, and 150/150 clock stamps while exposing the single-scene stall this round targets.
+
+### Round 12 results
+
+| World | Trigger | Runs | Boundary result | Ledger result | Representative result |
+|---|---|---:|---|---|---|
+| Harrowgate Mills | unfired overdue deadline | 3 | 3/3 `transition` type and tag; 3/3 forward cuts; 0 backward cuts | 2 resolved, 1 landed and re-fused | Afternoon became evening, the hall opened, and the long-awaited vote began. |
+| Harrowgate Mills | fired thread at three strikes | 3 | 3/3 `transition` type and tag; 3/3 clean conclusions | 3 resolved | A final gavel strike ended the argument and fixed the council's decision. |
+| Camp Crystal Lake | unfired overdue deadline | 3 | 3/3 `transition` type and tag; 3/3 forward cuts; 0 backward cuts | 2 resolved, 1 landed and re-fused | Midnight passed without the evacuation boat, leaving the character stranded. |
+| Camp Crystal Lake | fired thread at three strikes | 3 | 3/3 `transition` type and tag; 3/3 clean conclusions | 3 resolved | The attacker fell into the water, was defeated in the boathouse, or was escaped. |
+
+- Aggregate: 12/12 deterministic boundaries; 12/12 visible forward cuts or clean conclusions; 0 backward time cuts; 10 resolved threads and 2 deadline arrivals that advanced and re-fused instead of being restated.
+- Boundary carry-forward: the Harrowgate follow-up began after the vote with the crowd leaving the hall. The Crystal Lake follow-up began outside the boathouse and moved deeper into the camp. Neither prompt re-entered its pre-transition scene.
+- Failure drill: no provider, parsing, or reconciliation failures occurred in the 14 live turns. The two deadline arrivals left their threads open intentionally because the event began without its outcome; both produced an observable change and the store re-fused them.
+- Verdict: SHIP. Every precommitted gate passed. This closes the measured one-room stall through a resolver-owned boundary rather than another wording-only prompt round.

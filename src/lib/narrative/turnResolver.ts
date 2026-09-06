@@ -27,8 +27,12 @@ import { itemNamesMatch } from '@/lib/narrative/itemProcessorShared';
 import { syncNpcMetadata } from '@/lib/ai/narrativeGenerator.npc';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
 import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
-import { countWorldClockTurns } from '@/lib/narrative/worldClock';
-import { buildWorldClockPromptContext } from '@/lib/narrative/worldClock';
+import {
+  buildWorldClockPromptContext,
+  countWorldClockTurns,
+  isWorldClockTurnSegment,
+  needsSceneTransition,
+} from '@/lib/narrative/worldClock';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplication';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
@@ -38,7 +42,10 @@ import { getLoreContextForPrompt } from '@/lib/ai/loreContextHelper';
 import { collectContinuityTopicsFromStores } from '@/lib/ai/narrativeGenerator.continuity';
 import { logger } from '@/lib/utils/logger';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
-import { mergeTurnTags } from '@/lib/narrative/turnTags';
+import {
+  mergeTurnTags,
+  WORLD_CLOCK_TRANSITION_TAG,
+} from '@/lib/narrative/turnTags';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldStore } from '@/state/worldStore';
 import {
@@ -51,6 +58,31 @@ import {
  * Modeled after chainBySession in applyWorldClockUpdates.ts.
  */
 const turnLockBySession = new Map<EntityID, Promise<unknown>>();
+
+const recentSceneSegments = (
+  segments: readonly NarrativeSegment[],
+  limit = 3
+): NarrativeSegment[] => {
+  const recent = segments.slice(-limit);
+  let latestBoundary = -1;
+  recent.forEach((segment, index) => {
+    if (segment.metadata?.tags?.includes(WORLD_CLOCK_TRANSITION_TAG)) {
+      latestBoundary = index;
+    }
+  });
+  return latestBoundary >= 0 ? recent.slice(latestBoundary) : recent;
+};
+
+const didWorldClockTransitionLastClockTurn = (
+  segments: readonly NarrativeSegment[]
+): boolean => {
+  for (let index = segments.length - 1; index >= 0; index -= 1) {
+    const segment = segments[index];
+    if (!isWorldClockTurnSegment(segment)) continue;
+    return segment.metadata?.tags?.includes(WORLD_CLOCK_TRANSITION_TAG) ?? false;
+  }
+  return false;
+};
 
 function withTurnLock<T>(
   sessionId: EntityID,
@@ -178,7 +210,7 @@ async function resolveTurnInner(
 
   // Pre-turn snapshot for prompt context
   const preTurnSnapshot = assembleSessionSnapshot(sessionId, ids);
-  const recentSegments = preTurnSnapshot.segments.slice(-3);
+  const recentSegments = recentSceneSegments(preTurnSnapshot.segments);
   const turnsSinceComplication = computeTurnsSinceComplication(
     [...preTurnSnapshot.segments]
   );
@@ -195,6 +227,9 @@ async function resolveTurnInner(
         world?.toneSettings?.customInstructions
       )
     : undefined;
+  const shouldRequestSceneTransition =
+    needsSceneTransition(worldClock) &&
+    !didWorldClockTransitionLastClockTurn(preTurnSnapshot.segments);
 
   // Build skill check context string for the AI prompt
   let skillCheckContext = '';
@@ -235,6 +270,9 @@ async function resolveTurnInner(
           includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
           decisionWeight: command.decisionWeight,
           desiredTone: command.generationParams?.desiredTone,
+          ...(shouldRequestSceneTransition
+            ? { segmentType: 'transition' as const }
+            : {}),
         },
       },
       { signal: command.signal, onChunk: command.onChunk, resolverManaged: true }
@@ -476,7 +514,7 @@ async function replaceChoicesAfterItemUse(
   generator: NarrativeGenerator
 ): Promise<void> {
   const { sessionId, worldId, characterId } = command;
-  const recentSegments = [...turn.snapshot.segments.slice(-5)];
+  const recentSegments = recentSceneSegments(turn.snapshot.segments, 5);
   const lastSegment = recentSegments[recentSegments.length - 1];
 
   try {

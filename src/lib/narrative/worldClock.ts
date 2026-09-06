@@ -110,6 +110,20 @@ export const selectDueNowThread = (
     )[0];
 
 /**
+ * A deadline needs a forward cut when it comes due, and a fired thread needs
+ * a clean scene exit once it has exhausted its strikes. Other arrivals can
+ * still land inside the current scene without forcing a boundary.
+ */
+export const needsSceneTransition = (
+  worldClock?: WorldClockPromptContext
+): boolean => {
+  const dueNow = worldClock?.threads.find((thread) => thread.dueNow);
+  if (!dueNow) return false;
+  if (!dueNow.fired) return dueNow.kind === 'deadline';
+  return dueNow.strikes >= FIRED_THREAD_MAX_STRIKES;
+};
+
+/**
  * Turns since the ledger last moved in any direction. Resolved threads count:
  * a payoff last turn means the world just moved even if nothing is open now.
  */
@@ -144,12 +158,16 @@ export const buildWorldClockPromptContext = (
 ): WorldClockPromptContext => {
   const openThreads = sessionThreads.filter((thread) => thread.status === 'open');
   const dueNow = selectDueNowThread(openThreads, currentTurn);
+  const promptThreads = selectThreadsForPrompt(openThreads, currentTurn);
+  if (dueNow && !promptThreads.some((thread) => thread.id === dueNow.id)) {
+    promptThreads[promptThreads.length - 1] = dueNow;
+  }
   const trimmedRegister = register?.trim();
   return {
     currentTurn,
     turnsSinceWorldMoved: turnsSinceWorldMoved(sessionThreads, currentTurn),
     ...(trimmedRegister ? { register: trimmedRegister } : {}),
-    threads: selectThreadsForPrompt(openThreads, currentTurn).map((thread) => ({
+    threads: promptThreads.map((thread) => ({
       kind: thread.kind,
       summary: thread.summary,
       ageTurns: currentTurn - thread.openedAtTurn,

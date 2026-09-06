@@ -107,6 +107,21 @@ describe('sceneTemplate world clock block', () => {
     expect(prompt).not.toContain('Prefer an OVERDUE thread');
   });
 
+  it('replaces immediate-continuity rules when the resolver requests a transition', () => {
+    const context = makeContext({
+      currentTurn: 12,
+      turnsSinceWorldMoved: 3,
+      threads: [],
+    });
+    context.generationParameters = { segmentType: 'transition' };
+
+    const prompt = sceneTemplate(context);
+
+    expect(prompt).toContain('cross the requested scene boundary');
+    expect(prompt).toContain('Open on the far side of the transition');
+    expect(prompt).not.toContain('Pick up IMMEDIATELY');
+  });
+
   it('renders a fired thread as already in the scene by its own summary, and asks for something new when everything has fired', () => {
     const fired = {
       kind: 'actor' as const,
