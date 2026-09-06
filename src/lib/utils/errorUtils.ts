@@ -130,6 +130,22 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     };
   }
 
+  // Missing API key / precondition errors (#2028)
+  if (
+    message.includes('api key not configured') ||
+    message.includes('412') ||
+    message.includes('no api key')
+  ) {
+    return {
+      title: 'API Key Required',
+      message: 'No API key configured for this provider.',
+      suggestion: 'Add your API key in Settings > Provider Setup to play.',
+      retryable: false,
+      type: ErrorType.AUTH,
+      severity: 'critical'
+    };
+  }
+
   // Moderation blocks. Checked before the validation branch below, which would
   // otherwise swallow these on the word "invalid" and tell the player to review
   // their input — when the input was fine and the provider simply refused it.

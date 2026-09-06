@@ -36,4 +36,10 @@ describe('createAPIErrorResponse error reporting (#1641)', () => {
 
     expect(mockReportServerError).not.toHaveBeenCalled();
   });
+
+  it('does not report a 412 precondition failure for missing API key (#2028)', () => {
+    createAPIErrorResponse(new Error('API key not configured'), 412);
+
+    expect(mockReportServerError).not.toHaveBeenCalled();
+  });
 });

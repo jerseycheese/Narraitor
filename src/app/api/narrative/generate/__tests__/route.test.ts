@@ -53,8 +53,11 @@ describe('/api/narrative/generate', () => {
       buildAIRequest('/api/narrative/generate', { prompt: 'Continue.' }, { withoutKey: true })
     );
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(412);
     expect(upstream).not.toHaveBeenCalled();
+    const data = await response.json();
+    expect(data.title).toBe('API Key Required');
+    expect(data.error).toBe('No API key configured for this provider.');
   });
 
   it('sends a Gemini-shaped body built by the real adapter', async () => {

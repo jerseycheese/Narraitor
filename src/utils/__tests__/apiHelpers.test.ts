@@ -129,8 +129,24 @@ describe('processAIStreamingTextRequest', () => {
   it('errors without calling Gemini when no API key resolves', async () => {
     // No header key, and jest.setup.ts pins GEMINI_API_KEY to the MOCK_API_KEY
     // sentinel, which resolveApiKey treats as unset.
-    await processAIStreamingTextRequest(fakeRequest({ prompt: 'hello' }), { errorContext: 'Test' });
+    const response = await processAIStreamingTextRequest(fakeRequest({ prompt: 'hello' }), { errorContext: 'Test' });
     expect(global.fetch).not.toHaveBeenCalled();
+    expect(response.status).toBe(412);
+    const data = await response.json();
+    expect(data.title).toBe('API Key Required');
+    expect(data.error).toBe('No API key configured for this provider.');
+    expect(data.suggestion).toBe('Add your API key in Settings > Provider Setup to play.');
+    expect(data.retryable).toBe(false);
+  });
+
+  it('returns 412 with key configuration guidance when non-streaming request has no key', async () => {
+    const response = await processAITextRequest(fakeRequest({ prompt: 'hello' }), { errorContext: 'Test' });
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(response.status).toBe(412);
+    const data = await response.json();
+    expect(data.title).toBe('API Key Required');
+    expect(data.error).toBe('No API key configured for this provider.');
+    expect(data.suggestion).toBe('Add your API key in Settings > Provider Setup to play.');
   });
 
   it('surfaces an upstream non-ok response as an error instead of streaming', async () => {
