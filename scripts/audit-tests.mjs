@@ -99,7 +99,13 @@ const IN_DOCUMENT = /\.(toBeInTheDocument|toBeVisible)\b/;
 const DEFINED_ONLY = /expect\s*\([^)]*\)\s*\.\s*(toBeDefined|toBeTruthy)\s*\(\s*\)/;
 const RENDER = /\brender\s*\(/;
 
-// Names that promise more than a mock assertion can deliver.
+// Names that promise more than a mock assertion can deliver. Matched against the
+// case NAME only, never the file path: this bucket exists to catch a name that
+// claims behavior the body never observes, and a path match flags whole files
+// whose names claim nothing -- storePubSub.test.ts on "store", LoadingOverlay on
+// "load", WorldListScreen.integration on "integrat". Seven of the twenty this
+// once reported were path artifacts, which is enough noise to make the bucket
+// unreadable.
 const PROMISE_WORDS =
   /\b(persist|persists|persisted|persistence|save|saves|saved|store[sd]?|restore[sd]?|load[sd]?|integrat|sync|write[sn]?|read[sn]?|hydrat)/i;
 
@@ -257,7 +263,7 @@ function scanFile(file) {
     if (expects.every((l) => MOCK_MATCHER.test(l))) {
       const entry = { at, name, assertions: expects.length };
       findings.mockOnly.push(entry);
-      if (PROMISE_WORDS.test(name) || PROMISE_WORDS.test(rel)) {
+      if (PROMISE_WORDS.test(name)) {
         findings.mockOnlyNameMismatch.push(entry);
       }
       return;

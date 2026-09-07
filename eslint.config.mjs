@@ -68,8 +68,10 @@ const eslintConfig = [
   },
   {
     // Dead/low-value test detection. Scoped to real test files (not stories or
-    // dev tooling). warn keeps these out of the blocking CI gate as a first-pass
-    // introduction, matching the markup-hygiene rules above.
+    // dev tooling). These were introduced at warn to phase them in; the backlog
+    // they landed against is now empty, so they are errors and the count stays
+    // at zero. `npm run audit:tests` covers the judgment-call cases these rules
+    // cannot see.
     files: [
       "**/*.test.{js,mjs,jsx,ts,tsx}",
       "**/__tests__/**/*.{js,mjs,jsx,ts,tsx}",
@@ -78,18 +80,18 @@ const eslintConfig = [
     rules: {
       // A test with no expect() asserts nothing. Recognize custom assertion
       // helpers (assertChoicesVisible, etc.) so delegating tests aren't flagged.
-      "jest/expect-expect": ["warn", { assertFunctionNames: ["expect", "assert*"] }],
+      "jest/expect-expect": ["error", { assertFunctionNames: ["expect", "assert*"] }],
       // Indefinitely skipped / commented-out tests are dead weight.
-      "jest/no-disabled-tests": "warn",
-      "jest/no-commented-out-tests": "warn",
+      "jest/no-disabled-tests": "error",
+      "jest/no-commented-out-tests": "error",
       // Handing an element its own layout geometry means the test is reading
       // back numbers it wrote, not observing layout. jsdom has no layout engine,
       // so there's no repair for this in a unit test — the check belongs in
       // Playwright. See public_docs/development/visual-testing-best-practices.md,
       // "Two tiers of layout assertion".
       //
-      // error rather than the warn the rules above use: those landed against an
-      // existing backlog and needed phasing in. This one starts at zero.
+      // This one started at zero rather than being phased in like the rules
+      // above, which had a backlog to clear first.
       "no-restricted-syntax": ["error",
         {
           selector: "CallExpression[callee.object.name='Object'][callee.property.name='defineProperty'] > Literal.arguments:matches([value='scrollHeight'], [value='clientHeight'], [value='scrollTop'], [value='getBoundingClientRect'], [value='offsetHeight'], [value='offsetTop'])",
