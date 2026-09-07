@@ -132,4 +132,49 @@ describe('useWizardState', () => {
     });
     expect(result.current.canGoNext).toBe(false);
   });
+
+  it('resets state to provided restored data, step, and validation', () => {
+    const onDataChange = jest.fn();
+    const { result } = renderHook(() =>
+      useWizardState({
+        initialData,
+        steps: testSteps,
+        onDataChange,
+      })
+    );
+
+    act(() => {
+      result.current.reset(
+        { name: 'Alice', age: 30, email: 'alice@example.com' },
+        2,
+        { 0: { valid: true, errors: [], touched: true } }
+      );
+    });
+
+    expect(result.current.state.currentStep).toBe(2);
+    expect(result.current.state.data).toEqual({
+      name: 'Alice',
+      age: 30,
+      email: 'alice@example.com',
+    });
+    expect(result.current.state.validation[0]).toEqual({
+      valid: true,
+      errors: [],
+      touched: true,
+    });
+    expect(onDataChange).toHaveBeenCalledWith({
+      name: 'Alice',
+      age: 30,
+      email: 'alice@example.com',
+    });
+
+    // Calling reset() with no args resets back to initial data and step 0
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.state.currentStep).toBe(0);
+    expect(result.current.state.data).toEqual(initialData);
+    expect(result.current.state.validation).toEqual({});
+  });
 });
