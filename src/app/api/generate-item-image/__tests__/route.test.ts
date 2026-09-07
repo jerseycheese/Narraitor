@@ -4,8 +4,8 @@
 
 /**
  * Image generation never goes through the text provider adapter, so `fetch` is
- * not the seam here. The image client is faked — the same seam the other image
- * routes already use — which leaves the route's own work running for real: the
+ * not the seam here. The image client is faked - the same seam the other image
+ * routes already use - which leaves the route's own work running for real: the
  * input check, the prompt it builds from the item, and the choice between a
  * real generation, the placeholder, and a 500.
  */
@@ -85,19 +85,13 @@ describe('POST /api/generate-item-image', () => {
     expect(data.image.url).toContain('api.dicebear.com');
   });
 
-  /**
-   * Pinning what the route DOES, which is not what it reads like it does.
-   *
-   * The handler ends in `return generateImageWithFallback(...)` with no await,
-   * so a hard failure rejects after the try block has already been left and
-   * the route's own catch — the one that answers 'Failed to generate item
-   * image' — never runs. Every other image route awaits the helper inside its
-   * try and gets a shaped 500. Filed as a follow-up rather than fixed here:
-   * this PR is coverage only, and the fix is a production change.
-   */
-  it('rejects instead of answering 500 when generation fails hard', async () => {
+  it('returns 500 when generation fails hard', async () => {
     mockGenerate.mockRejectedValue(new Error('quota exhausted'));
 
-    await expect(POST(itemRequest({ item: ITEM }))).rejects.toThrow('quota exhausted');
+    const response = await POST(itemRequest({ item: ITEM }));
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Failed to generate item image');
   });
 });
