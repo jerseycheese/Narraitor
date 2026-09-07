@@ -35,6 +35,18 @@ const buildWorldConfig = (skillPointPool: number): World => ({
       baseValue: 1,
       minValue: 1,
       maxValue: 5
+    },
+    {
+      id: 'skill-2',
+      worldId: 'world-1',
+      name: 'Athletics',
+      description: 'Run and jump.',
+      difficulty: 'medium',
+      category: 'physical',
+      attributeIds: ['attr-1'],
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 5
     }
   ],
   settings: {
@@ -132,5 +144,51 @@ describe('SkillsStep - skill point allocation', () => {
     const updatedSkills = onUpdate.mock.calls[0][0].skills as Array<{ isSelected: boolean; level: number }>;
     expect(updatedSkills[0].isSelected).toBe(false);
     expect(updatedSkills[0].level).toBe(1);
+  });
+
+  it('includes skill name and selection state in toggle button accessible names', () => {
+    renderSkillsStep({
+      data: {
+        characterData: {
+          skills: [
+            {
+              skillId: 'skill-1',
+              name: 'Stealth',
+              description: 'Move unseen and unheard.',
+              attributeIds: ['attr-1'],
+              isSelected: true,
+              level: 2,
+              minLevel: 1,
+              maxLevel: 5,
+            },
+            {
+              skillId: 'skill-2',
+              name: 'Athletics',
+              description: 'Run and jump.',
+              attributeIds: ['attr-1'],
+              isSelected: false,
+              level: 1,
+              minLevel: 1,
+              maxLevel: 5,
+            },
+          ],
+        },
+        pointPools: {
+          skills: {
+            total: 3,
+            spent: 1,
+            remaining: 2,
+          },
+        },
+        validation: {},
+      },
+    });
+
+    expect(screen.getByRole('button', { name: 'Stealth, selected' })).toHaveAccessibleName(
+      'Stealth, selected'
+    );
+    expect(
+      screen.getByRole('button', { name: 'Athletics, not selected' })
+    ).toHaveAccessibleName('Athletics, not selected');
   });
 });

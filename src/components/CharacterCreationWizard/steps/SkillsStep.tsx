@@ -340,6 +340,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                   isActive={skill.isSelected}
                   activeLabel="Selected"
                   inactiveLabel={isLocked ? 'Locked' : 'Not Selected'}
+                  ariaLabel={`${skill.name}, ${isLocked ? 'locked' : skill.isSelected ? 'selected' : 'not selected'}`}
                   onClick={() => handleSkillToggle(skill.skillId)}
                   testId={`skill-toggle-${safeKey}`}
                   disabled={isLocked}
