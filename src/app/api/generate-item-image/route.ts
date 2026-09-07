@@ -41,7 +41,7 @@ export const POST = withAIRoute(async (request: NextRequest) => {
     logger.debug('generate-item-image API', 'Prompt built', { length: prompt.length });
 
     // Use centralized helper for image generation with fallback
-    return generateImageWithFallback({
+    return await generateImageWithFallback({
       prompt,
       apiKey: resolveApiKey(request),
       fallback: {
