@@ -1,47 +1,32 @@
 /**
- * Tests for skill-based choice generation
- * Verifies that choices can have skill requirements
+ * Skill-gated choices have to survive the trip back through
+ * generatePlayerChoices. The method is a pass-through to the choice generator,
+ * and its catch path deliberately substitutes generic options carrying no skill
+ * requirements (asserted in narrativeGenerator.choices.test.ts). This file
+ * guards the other half: on the success path the requirements the choice
+ * generator produced reach the caller untouched, because ChoiceSelector and
+ * RequirementBadges render them and gate selection on them.
+ *
+ * Whether character skills reach the prompt at all is the choice generator's
+ * own contract, covered in choiceGenerator.skillBased.test.ts.
  */
 
-// Mock stores at module level (before imports)
-jest.mock('@/state/worldStore');
-jest.mock('@/state/characterStore');
 jest.mock('../choiceGenerator');
 
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { NarrativeContext } from '@/types/narrative.types';
-import { createMockAIClient, createMockWorldWithSkills, createMockCharacterWithSkills } from './narrativeGenerator.skill.testHelpers';
-import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { createMockAIClient } from './narrativeGenerator.skill.testHelpers';
 import { generateChoices } from '../choiceGenerator';
-import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils/mockStoreFactories';
 
 describe('NarrativeGenerator - Skill-Based Choices', () => {
   let narrativeGenerator: NarrativeGenerator;
-  let mockAIClient: ReturnType<typeof createMockAIClient>;
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Setup store mocks
-    const mockWorld = createMockWorldWithSkills();
-    const mockCharacter = createMockCharacterWithSkills();
-
-    (useWorldStore.getState as jest.Mock).mockReturnValue(createMockWorldStore({
-      worlds: { 'skill-world': mockWorld },
-      currentWorldId: 'skill-world'
-    }));
-
-    (useCharacterStore.getState as jest.Mock).mockReturnValue(createMockCharacterStore({
-      characters: { 'char-1': mockCharacter }
-    }));
-
-    mockAIClient = createMockAIClient();
-    narrativeGenerator = new NarrativeGenerator(mockAIClient);
+    narrativeGenerator = new NarrativeGenerator(createMockAIClient());
   });
 
-  test('should pass character skills to choice generator', async () => {
-    // Spy on the context passed to the choice generator
+  test('returns each option with the skill requirements the choice generator set on it', async () => {
     (generateChoices as jest.Mock).mockResolvedValue({
       id: 'decision-with-skills',
       prompt: 'What approach will you take?',
@@ -49,21 +34,19 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
         {
           id: 'opt-1',
           text: 'Climb the wall',
-          requirements: [{ type: 'skill' as const, targetId: 'athletics', operator: 'gte' as const, value: 5 }],
-          hint: 'Requires athletic ability'
+          requirements: [
+            { type: 'skill', targetId: 'athletics', operator: 'gte', value: 5 },
+          ],
         },
         {
           id: 'opt-2',
           text: 'Cast a levitation spell',
-          requirements: [{ type: 'skill' as const, targetId: 'magic', operator: 'gte' as const, value: 4 }],
-          hint: 'Requires magical knowledge'
+          requirements: [
+            { type: 'skill', targetId: 'magic', operator: 'gte', value: 4 },
+          ],
         },
-        {
-          id: 'opt-3',
-          text: 'Look for another way',
-          alignment: 'neutral' as const
-        }
-      ]
+        { id: 'opt-3', text: 'Look for another way', alignment: 'neutral' },
+      ],
     });
 
     const narrativeContext: NarrativeContext = {
@@ -74,26 +57,32 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       previousSegments: [],
       currentTags: ['obstacle'],
       currentLocation: 'High Wall',
-      currentSituation: 'Facing a tall obstacle'
+      currentSituation: 'Facing a tall obstacle',
     };
 
-    await narrativeGenerator.generatePlayerChoices(
+    const decision = await narrativeGenerator.generatePlayerChoices(
       'skill-world',
       narrativeContext,
       ['char-1']
     );
 
-    // Verify the choice generator was called with the client and correct parameters
-    expect(generateChoices).toHaveBeenCalledWith(mockAIClient, {
-      worldId: 'skill-world',
-      narrativeContext,
-      characterIds: ['char-1'],
-      sessionId: 'session-1', // Now includes sessionId from narrativeContext
-      minOptions: 3,
-      maxOptions: 3,
-      useAlignedChoices: true
-    });
-
-    // Verify the choice generator was called - the choices themselves are tested in choiceGenerator tests
+    expect(decision.options).toEqual([
+      expect.objectContaining({
+        id: 'opt-1',
+        requirements: [
+          { type: 'skill', targetId: 'athletics', operator: 'gte', value: 5 },
+        ],
+      }),
+      expect.objectContaining({
+        id: 'opt-2',
+        requirements: [
+          { type: 'skill', targetId: 'magic', operator: 'gte', value: 4 },
+        ],
+      }),
+      expect.objectContaining({ id: 'opt-3' }),
+    ]);
+    // The ungated option stays ungated: a requirement invented on the way out
+    // would lock a choice the generator meant to leave open.
+    expect(decision.options[2].requirements).toBeUndefined();
   });
 });
