@@ -21,6 +21,7 @@ import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { normalizeSkillBounds } from './utils/skillAllocation';
 import { useTutorial } from '@/components/TutorialProvider';
+import type { WizardValidation } from '@/hooks/useWizardState';
 
 /**
  * Props for the CharacterCreationWizard component
@@ -73,66 +74,50 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     }
   }, [currentTour, isTourActive, pauseTour, resumeTour, showRecoveryDialog]);
 
-  // Initialize character data from auto-save or defaults
-  const initialCharacterData: CharacterCreationData = useMemo(() => {
-    if (data?.characterData) {
-      const existingSkills = (
-        (data.characterData as Partial<CharacterCreationData>)?.skills ?? []
-      ) as CharacterCreationData['skills'];
-
-      const skillsWithBounds = normalizeSkillBounds(existingSkills, world);
-
-      return {
-        ...(data.characterData as CharacterCreationData),
-        skills: skillsWithBounds,
-        worldId,
-      };
-    }
-
-    return {
-      worldId,
-      name: '',
-      description: '',
-      portraitPlaceholder: '',
-      portrait: {
-        type: 'placeholder',
-        url: null
-      },
-      attributes: world?.attributes.map(attr => ({
-        attributeId: attr.id,
-        name: attr.name,
-        description: attr.description,
-        value: attr.minValue,
-        minValue: attr.minValue,
-        maxValue: attr.maxValue,
+  // Default blank character data
+  const defaultCharacterData: CharacterCreationData = useMemo(() => ({
+    worldId,
+    name: '',
+    description: '',
+    portraitPlaceholder: '',
+    portrait: {
+      type: 'placeholder',
+      url: null
+    },
+    attributes: world?.attributes.map(attr => ({
+      attributeId: attr.id,
+      name: attr.name,
+      description: attr.description,
+      value: attr.minValue,
+      minValue: attr.minValue,
+      maxValue: attr.maxValue,
+    })) || [],
+    skills: normalizeSkillBounds(
+      world?.skills.map(skill => ({
+        skillId: skill.id,
+        name: skill.name,
+        description: skill.description,
+        level: skill.minValue,
+        minLevel: skill.minValue,
+        maxLevel: skill.maxValue,
+        attributeIds: skill.attributeIds || [],
+        linkedAttributeId: skill.attributeIds?.[0],
+        isSelected: false,
       })) || [],
-      skills: normalizeSkillBounds(
-        world?.skills.map(skill => ({
-          skillId: skill.id,
-          name: skill.name,
-          description: skill.description,
-          level: skill.minValue,
-          minLevel: skill.minValue,
-          maxLevel: skill.maxValue,
-          attributeIds: skill.attributeIds || [],
-          linkedAttributeId: skill.attributeIds?.[0],
-          isSelected: false,
-        })) || [],
-        world
-      ),
-      background: {
-        history: '',
-        personality: '',
-        goals: [],
-        motivation: '',
-      },
-    };
-  }, [data, worldId, world]);
+      world
+    ),
+    background: {
+      history: '',
+      personality: '',
+      goals: [],
+      motivation: '',
+    },
+  }), [worldId, world]);
 
   // Wizard state management
   const { wizard, steps, stepValidators } = useCharacterCreationWizard({
-    initialData: initialCharacterData,
-    initialStep: data?.currentStep || initialStep,
+    initialData: defaultCharacterData,
+    initialStep,
     worldId,
     world
   });
@@ -179,8 +164,63 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   };
 
   const handleRecoveryChoice = (choice: 'recover' | 'dismiss') => {
-    if (choice === 'dismiss') {
+    if (choice === 'recover' && data?.characterData) {
+      const existingSkills = (
+        (data.characterData as Partial<CharacterCreationData>)?.skills ?? []
+      ) as CharacterCreationData['skills'];
+
+      const skillsWithBounds = normalizeSkillBounds(existingSkills, world);
+
+      const savedAttributes = Array.isArray(
+        (data.characterData as Partial<CharacterCreationData>)?.attributes
+      )
+        ? (data.characterData as CharacterCreationData).attributes
+        : [];
+      const mergedAttributes = world?.attributes?.length
+        ? world.attributes.map(attr => {
+            const savedAttr = savedAttributes.find(a => a.attributeId === attr.id);
+            return savedAttr
+              ? {
+                  ...savedAttr,
+                  name: attr.name,
+                  description: attr.description,
+                  minValue: attr.minValue,
+                  maxValue: attr.maxValue,
+                }
+              : {
+                  attributeId: attr.id,
+                  name: attr.name,
+                  description: attr.description,
+                  value: attr.minValue,
+                  minValue: attr.minValue,
+                  maxValue: attr.maxValue,
+                };
+          })
+        : savedAttributes;
+
+      const restoredBackground = {
+        ...defaultCharacterData.background,
+        ...((data.characterData as Partial<CharacterCreationData>)?.background || {}),
+      };
+
+      const restoredData: CharacterCreationData = {
+        ...defaultCharacterData,
+        ...(data.characterData as CharacterCreationData),
+        attributes: mergedAttributes,
+        skills: skillsWithBounds,
+        background: restoredBackground,
+        worldId,
+      };
+
+      const restoredStep =
+        typeof data.currentStep === 'number' ? data.currentStep : initialStep;
+      const restoredValidation =
+        (data.validation as Record<number, WizardValidation>) || {};
+
+      wizard.reset(restoredData, restoredStep, restoredValidation);
+    } else if (choice === 'dismiss') {
       clearAutoSave();
+      wizard.reset(defaultCharacterData, initialStep, {});
     }
     setShowRecoveryDialog(false);
   };

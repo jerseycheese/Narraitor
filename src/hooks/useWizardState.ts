@@ -51,7 +51,11 @@ export interface UseWizardStateReturn<TData> {
   setProcessing: (isProcessing: boolean) => void;
   setError: (key: string, error: string) => void;
   clearError: (key: string) => void;
-  reset: () => void;
+  reset: (
+    newData?: TData,
+    newStep?: number,
+    newValidation?: Record<number, WizardValidation>
+  ) => void;
 }
 
 export function useWizardState<TData = unknown>({
@@ -209,15 +213,30 @@ export function useWizardState<TData = unknown>({
     });
   }, []);
 
-  const reset = useCallback(() => {
-    setState({
-      currentStep: initialStep,
-      data: initialData,
-      validation: {},
-      isProcessing: false,
-      errors: {},
-    });
-  }, [initialData, initialStep]);
+  const reset = useCallback(
+    (
+      newData?: TData,
+      newStep?: number,
+      newValidation?: Record<number, WizardValidation>
+    ) => {
+      const nextData = newData ?? initialData;
+      let nextStep = newStep ?? initialStep;
+      if (nextStep < 0 || nextStep >= steps.length) {
+        nextStep = initialStep;
+      }
+      setState({
+        currentStep: nextStep,
+        data: nextData,
+        validation: newValidation ?? {},
+        isProcessing: false,
+        errors: {},
+      });
+      if (onDataChange) {
+        onDataChange(nextData);
+      }
+    },
+    [initialData, initialStep, steps.length, onDataChange]
+  );
 
   return {
     state,
