@@ -4,6 +4,37 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.5.0 - 2026-09-07
+
+Where earlier releases built out capabilities and continuity guards on faith and live matrices, v1.5 makes the core game loop observable to automated tests and opens the UX backlog with an empirical discovery sweep over the new-player path. The v1.5 milestone closes 6 issues across 12 commits since [v1.4.0](https://github.com/jerseycheese/narraitor/releases/tag/v1.4.0), with no known-incomplete tail — unfinished work drops directly to v1.6.
+
+**What's in this release**
+
+- Route-tier automated tests for the core game loop. No automated test had ever executed `POST()` on the game-loop API routes (`narrative/generate`, `narrative/choices`, `narrative/ending`, `narrative/summarize`, `generate-world`, `generate-character`). They now have route-tier tests covering body validation, client dispatch, NDJSON streaming, and error mapping at the real boundary rather than assuming client mocks cover them ([#1995](https://github.com/jerseycheese/Narraitor/issues/1995)). The summarize tests immediately caught and fixed a live defect where shifted indices dumped the model's raw output into the journal.
+- All non-loop API routes tested. The remaining untested API routes (`ai/analyze-world`, `inventory/check-similarity`, `narrative/validate-event-significance`, `generate-item-image`, `debug`, and `telemetry/error`) now have route tests, including strict payload validation and sanitization on `telemetry/error` ([#2027](https://github.com/jerseycheese/Narraitor/issues/2027)).
+- Unreachable code pruned and rate limiter tested. The dead image-deletion path (`/api/delete-image` and `fileStorage.ts`) left over from pre-1.0 disk uploads was removed entirely, while the active rate limiter gained tests proving it fires at `maxRequests`, resets on expiry, and clears identifiers ([#1996](https://github.com/jerseycheese/Narraitor/issues/1996)).
+- Test audit wired into CI. `scripts/audit-tests.mjs` now runs in CI on every PR to surface hollow or mock-only tests, and Jest rules for unasserted, disabled, or commented-out tests were elevated from warnings to errors ([#1997](https://github.com/jerseycheese/Narraitor/issues/1997)). Name-mismatched cases in `turnResolver` and `narrativeGenerator` now prove the asynchronous pipeline and skill gating they claim to observe.
+- Visual regression CI accurately named. Renamed the CI check from "E2E Tests" to "Visual Regression", pruned dead references to nonexistent theme specs, and deleted dead global setup files ([#2004](https://github.com/jerseycheese/Narraitor/issues/2004)).
+- Normalized world-cost conditions into stable state labels. Character conditions inflicted by world costs now normalize into stable state labels and keys (`normalizeCondition`), deduplicating escalating injury descriptions into coherent state records rather than accumulating repetitive prose strings ([#2019](https://github.com/jerseycheese/Narraitor/issues/2019)).
+- Clean 412 status for keyless AI requests. Missing provider keys now return HTTP 412 Precondition Failed instead of 500, preventing false-positive client error telemetry reports when a player has not configured a key yet ([#2028](https://github.com/jerseycheese/Narraitor/issues/2028)).
+- Explicit key descriptors reach Gemini client. `createDefaultGeminiClient` now allows explicit keyed descriptors to bypass the test runner's mock branch, making live-key integration test paths possible ([#2024](https://github.com/jerseycheese/Narraitor/issues/2024)).
+- Opened the UX backlog. Ran a bounded discovery pass over the complete new-player path (landing, provider setup, world creation, character creation, and first session turns) with live Gemini, filing 12 concrete player-friction issues and seeding the v1.6 milestone ([#2022](https://github.com/jerseycheese/Narraitor/issues/2022)).
+- First UX discovery fixes landed early:
+  - Fixed accessible names for all 12 skill toggle buttons in character creation so screen readers announce the skill name instead of just "Not Selected" ([#2041](https://github.com/jerseycheese/Narraitor/issues/2041)).
+  - Omitted large world images from portrait generation payloads to prevent HTTP 413 Payload Too Large errors ([#2036](https://github.com/jerseycheese/Narraitor/issues/2036)).
+  - Fixed character creation "Recover Progress" dialog so saved drafts actually repopulate the wizard state when restored ([#2035](https://github.com/jerseycheese/Narraitor/issues/2035)).
+
+**Known incomplete**
+
+None. Per the milestone charter ("No known-incomplete tail - unfinished work drops to v1.6"), v1.5 has no lingering incomplete commitments in its scope. The open issues discovered during [#2022](https://github.com/jerseycheese/Narraitor/issues/2022) belong to the v1.6 player-experience milestone (milestone #7). A live-key contract tier for the game-loop routes ([#2023](https://github.com/jerseycheese/Narraitor/issues/2023)) and worktree mock warning cleanup ([#2025](https://github.com/jerseycheese/Narraitor/issues/2025)) remain tracked on the general backlog.
+
+**What's next**
+
+- Milestone v1.6: The player-experience milestone addressing the new-player journey friction cataloged in [#2022](https://github.com/jerseycheese/Narraitor/issues/2022) (landing page BYO-key clarity [#2044](https://github.com/jerseycheese/Narraitor/issues/2044), dark-mode detection [#2045](https://github.com/jerseycheese/Narraitor/issues/2045), character creation tutorial flow [#2037](https://github.com/jerseycheese/Narraitor/issues/2037), world creation drafts [#2034](https://github.com/jerseycheese/Narraitor/issues/2034), UI styling/dialog polish [#2038](https://github.com/jerseycheese/Narraitor/issues/2038), [#2039](https://github.com/jerseycheese/Narraitor/issues/2039), [#2040](https://github.com/jerseycheese/Narraitor/issues/2040), [#2042](https://github.com/jerseycheese/Narraitor/issues/2042)).
+- Live-key contract test tier for on-demand validation of real provider streams ([#2023](https://github.com/jerseycheese/Narraitor/issues/2023)).
+
+---
+
 ## v1.4.0 - 2026-09-05
 
 The theme is the world cashing its checks. v1.3 taught the story to remember what it said; v1.4 makes those facts settle before the next choice and forces off-stage pressure to actually arrive. The v1.4 milestone closes 13 issues across 29 commits since [v1.3.0](https://github.com/jerseycheese/narraitor/releases/tag/v1.3.0), including the bounded TurnResolver work that was briefly split into v1.5 and folded back because it is the mechanism that completes this release.
