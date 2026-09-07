@@ -117,6 +117,14 @@ jobs:
       - name: Enforce a shrinking dependency baseline
         run: npm run deps:check
 
+      # Advisory, not a gate: every case it lists is a candidate for human
+      # review, and plenty are legitimately mock-shaped -- a callback prop or a
+      # redirect has no other observable output. Exits 0 and prints a worklist
+      # (same failure ergonomics as `docs:check-symbols` below). Wire it to a
+      # threshold only once the counts have settled.
+      - name: Audit test quality (advisory)
+        run: npm run audit:tests
+
   knip:
     name: Knip (unused code)
     runs-on: ubuntu-latest

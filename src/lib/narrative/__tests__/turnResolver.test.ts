@@ -539,6 +539,13 @@ describe('TurnResolver', () => {
     });
 
     it('processes acquired items synchronously in the turn pipeline', async () => {
+      // The payload check alone would pass just as happily against a
+      // void-fired call, which is the shape narrativeGenerator deliberately
+      // uses elsewhere. Hold the processor open and prove the turn waits.
+      const acquisitionDeferred = deferred<[]>();
+      (processAcquiredItems as jest.Mock).mockReturnValue(
+        acquisitionDeferred.promise
+      );
       const result = makeGenerationResult({
         metadata: {
           characterIds: [],
@@ -549,8 +556,9 @@ describe('TurnResolver', () => {
       const generator = makeMockGenerator(result);
       const command = makeCommand();
 
-      await resolveTurn(command, generator);
+      const turnPromise = resolveTurn(command, generator);
 
+      await new Promise((r) => setTimeout(r, 0));
       expect(processAcquiredItems).toHaveBeenCalledWith(
         [{ name: 'Iron sword' }],
         'char-1',
@@ -558,9 +566,22 @@ describe('TurnResolver', () => {
         expect.any(Function),
         expect.any(String)
       );
+
+      let settled = false;
+      turnPromise.then(() => {
+        settled = true;
+      });
+      await new Promise((r) => setTimeout(r, 0));
+      expect(settled).toBe(false);
+
+      acquisitionDeferred.resolve([]);
+      const resolved = await turnPromise;
+      expect(resolved.segment).toBeDefined();
     });
 
     it('processes lost items synchronously in the turn pipeline', async () => {
+      const lossDeferred = deferred<void>();
+      (processLostItems as jest.Mock).mockReturnValue(lossDeferred.promise);
       const result = makeGenerationResult({
         metadata: {
           characterIds: [],
@@ -571,17 +592,31 @@ describe('TurnResolver', () => {
       const generator = makeMockGenerator(result);
       const command = makeCommand();
 
-      await resolveTurn(command, generator);
+      const turnPromise = resolveTurn(command, generator);
 
+      await new Promise((r) => setTimeout(r, 0));
       expect(processLostItems).toHaveBeenCalledWith(
         [{ name: 'Healing potion' }],
         'char-1',
         'session-1',
         expect.any(Function)
       );
+
+      let settled = false;
+      turnPromise.then(() => {
+        settled = true;
+      });
+      await new Promise((r) => setTimeout(r, 0));
+      expect(settled).toBe(false);
+
+      lossDeferred.resolve();
+      const resolved = await turnPromise;
+      expect(resolved.segment).toBeDefined();
     });
 
-    it('calls syncNpcMetadata', async () => {
+    // Fire-and-forget by design in the resolver, so the call itself is the whole
+    // guarantee. Nothing later in the turn waits on it.
+    it('hands the segment NPC roster to the world during the turn', async () => {
       const result = makeGenerationResult({
         metadata: {
           characterIds: [],
