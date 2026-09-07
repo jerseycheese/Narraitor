@@ -9,6 +9,9 @@ import { useWorldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import type { World } from '@/types/world.types';
+
+// Matches MAX_AI_BODY_BYTES in src/utils/apiHelpers.ts (64KB route limit)
+const MAX_AI_BODY_BYTES = 65_536;
 // Removed AI client imports - using API routes instead
 
 // Mock the dependencies
@@ -382,6 +385,60 @@ describe('PortraitStep Component', () => {
 
     expect(screen.queryByText(/just a preview/i)).not.toBeInTheDocument();
     expect(mockOnUpdate).not.toHaveBeenCalled();
+  });
+
+  it('omits world image from generation payload so request stays under MAX_AI_BODY_BYTES', async () => {
+    const user = userEvent.setup();
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          portrait: {
+            type: 'ai-generated',
+            url: 'data:image/png;base64,mockimage',
+            generatedAt: getTimestamp(),
+          },
+        }),
+    });
+
+    const worldWithLargeImage: Partial<World> = {
+      genre: 'fantasy',
+      image: {
+        type: 'ai-generated',
+        url: 'data:image/png;base64,' + 'x'.repeat(1024 * 1024),
+        prompt: 'A grand landscape',
+        generatedAt: getTimestamp(),
+      },
+    };
+
+    render(
+      <PortraitStep
+        data={mockData}
+        onUpdate={mockOnUpdate}
+        worldConfig={worldWithLargeImage}
+      />
+    );
+
+    const generateButton = screen.getByRole('button', {
+      name: /generate portrait/i,
+    });
+    await user.click(generateButton);
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalled();
+    });
+
+    const [endpoint, requestInit] = mockFetch.mock.calls[0];
+    expect(endpoint).toBe('/api/generate-portrait');
+
+    const requestBodyString = requestInit.body as string;
+    const bodyBytes = new TextEncoder().encode(requestBodyString).length;
+    expect(bodyBytes).toBeLessThan(MAX_AI_BODY_BYTES);
+
+    const parsedBody = JSON.parse(requestBodyString);
+    expect(parsedBody.world.image).toBeUndefined();
+    expect(parsedBody.world.genre).toBe('fantasy');
   });
 });
 
