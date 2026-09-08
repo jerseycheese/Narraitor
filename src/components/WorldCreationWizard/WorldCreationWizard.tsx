@@ -104,7 +104,7 @@ export default function WorldCreationWizard({
 }: WorldCreationWizardProps) {
   const router = useRouter();
   const createWorld = useWorldStore((state) => state.createWorld);
-  const { startTour, setCurrentWizardStep, isTourActive, pauseTour, resumeTour } = useTutorial();
+  const { startTour, setCurrentWizardStep, isTourActive, pauseTour, resumeTour, stepIndex, currentTour } = useTutorial();
   const worldCreationProgress = useSessionStore(state => state.tutorialProgress.phases.worldCreation);
   
   // Initialize world creation data
@@ -231,6 +231,15 @@ export default function WorldCreationWizard({
   React.useEffect(() => {
     setCurrentWizardStep(wizard.state.currentStep);
   }, [wizard.state.currentStep, setCurrentWizardStep]);
+
+  // Sync tour step index to wizard step when tour is active
+  React.useEffect(() => {
+    if (!isTourActive || currentTour !== 'worldCreation') return;
+    const targetWizardStep = tourStepToWizardStep[stepIndex];
+    if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
+      wizard.goToStep(targetWizardStep);
+    }
+  }, [stepIndex, isTourActive, currentTour, wizard]);
 
   const shouldAutoStartTour = useMemo(() => {
     if (worldCreationProgress.skipped) return false;
