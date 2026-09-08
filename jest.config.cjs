@@ -36,6 +36,7 @@ const config = {
     '<rootDir>/src/**/*.test.{ts,tsx}',
     '<rootDir>/__tests__/**/*.test.{js,jsx,ts,tsx}',
     '<rootDir>/scripts/**/*.test.{js,mjs}',
+    '<rootDir>/.github/scripts/**/__tests__/**/*.test.{js,mjs}',
   ],
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',

@@ -444,8 +444,6 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-latest
     needs: [setup]
-    env:
-      NODE_ENV: production
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -474,6 +472,14 @@ jobs:
 
       - name: Generate npm audit JSON report
         run: npm audit --omit=dev --json > ci-security/npm-audit.json
+        continue-on-error: true
+
+      - name: Run full npm audit (non-blocking advisory)
+        run: npm audit | tee ci-security/npm-audit-full.txt || true
+        continue-on-error: true
+
+      - name: Generate full npm audit JSON report
+        run: npm audit --json > ci-security/npm-audit-full.json || true
         continue-on-error: true
 
       - name: Capture dependency update suggestions
