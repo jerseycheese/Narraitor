@@ -255,7 +255,7 @@
   font-weight: normal;
   color: var(--color-text-secondary);
   line-height: 1.4;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 
