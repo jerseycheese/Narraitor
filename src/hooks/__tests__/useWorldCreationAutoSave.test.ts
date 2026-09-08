@@ -137,7 +137,7 @@ describe('useWorldCreationAutoSave', () => {
       jest.advanceTimersByTime(100);
     });
 
-    expect(result.current.hasRecoveryData).toBe(true);
+    expect(result.current.hasRecoveryData).toBe(false);
     expect(result.current.recoveryPreview).toBeUndefined();
   });
 });

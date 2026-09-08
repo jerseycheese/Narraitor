@@ -162,8 +162,10 @@ export const useWorldCreationAutoSave = () => {
           hasLoadedRef.current = true;
         } catch (e) {
           logger.error('[AutoSave] Failed to restore world creation data', e);
-          setHasRecoveryData(true);
+          localStorage.removeItem(saveKey);
+          setHasRecoveryData(false);
           setRecoveryPreview(undefined);
+          setDataInternal(undefined);
           hasLoadedRef.current = true;
         }
       } else {
@@ -202,7 +204,7 @@ export const useWorldCreationAutoSave = () => {
     setHasRecoveryData(false);
     setRecoveryPreview(undefined);
     setDataInternal(undefined);
-    hasLoadedRef.current = false;
+    hasLoadedRef.current = true;
     setSaveStatus('idle');
   }, [saveKey]);
 

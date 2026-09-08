@@ -161,13 +161,19 @@ export default function WorldCreationWizard({
     }
   }, [hasRecoveryData]);
 
+  const wasTourPausedByRecoveryRef = React.useRef(false);
+
   React.useEffect(() => {
     if (showRecoveryModal) {
-      pauseTour?.();
-    } else {
+      if (isTourActive) {
+        wasTourPausedByRecoveryRef.current = true;
+        pauseTour?.();
+      }
+    } else if (wasTourPausedByRecoveryRef.current) {
+      wasTourPausedByRecoveryRef.current = false;
       resumeTour?.();
     }
-  }, [showRecoveryModal, pauseTour, resumeTour]);
+  }, [showRecoveryModal, isTourActive, pauseTour, resumeTour]);
 
   const handleDataChange = useCallback(
     (newData: WorldCreationData) => {

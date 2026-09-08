@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WorldCreationWizard from '../WorldCreationWizard';
 import { DRAFT_STORAGE_KEY } from '@/hooks/useWorldCreationAutoSave';
@@ -145,6 +145,31 @@ describe('WorldCreationWizard draft auto-save and recovery', () => {
     });
 
     expect(localStorage.getItem(DRAFT_STORAGE_KEY)).toBeNull();
+  });
+
+  it('continues auto-saving new edits after Start Fresh is clicked', async () => {
+    const user = userEvent.setup();
+    const draft = {
+      currentStep: 0,
+      worldData: { name: 'Old World' },
+      lastSaved: '2026-09-07T20:00:00.000Z',
+    };
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+
+    render(<WorldCreationWizard />);
+
+    const startFreshButton = await screen.findByRole('button', { name: /Start Fresh/i });
+    await user.click(startFreshButton);
+
+    const nameInput = screen.getByTestId('world-name-input');
+    await user.type(nameInput, 'New World');
+
+    await waitFor(() => {
+      const savedRaw = localStorage.getItem(DRAFT_STORAGE_KEY);
+      expect(savedRaw).not.toBeNull();
+      const saved = JSON.parse(savedRaw!);
+      expect(saved.worldData.name).toBe('New World');
+    });
   });
 
   it('clears draft from localStorage on cancel confirmation', async () => {
