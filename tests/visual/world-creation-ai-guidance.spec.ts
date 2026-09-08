@@ -59,6 +59,14 @@ test.describe('World Creation Wizard AI Guidance', () => {
 
     await page.goto('/worlds');
     await waitForContentStable(page);
+    await page.evaluate(() => {
+      try {
+        window.localStorage.removeItem('world-creation-draft');
+        window.sessionStorage.clear();
+      } catch {
+        /* ignore */
+      }
+    });
     await page.goto('/worlds/create');
     await waitForContentStable(page);
     await hideDynamicContent(page);
