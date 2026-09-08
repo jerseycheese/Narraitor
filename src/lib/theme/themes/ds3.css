@@ -13,6 +13,7 @@
   /* Color tokens */
   --color-canvas: rgb(247 243 237);
   --color-surface: rgb(255 252 246 / 80%);
+  --color-surface-opaque: rgb(255 252 246);
   --color-surface-hover: rgb(239 233 224);
   --color-border: rgb(226 217 206);
   --color-border-strong: rgb(212 201 186);
@@ -147,6 +148,7 @@
 :root.dark {
   --color-canvas: rgb(23 19 16);
   --color-surface: rgb(30 26 22 / 80%);
+  --color-surface-opaque: rgb(30 26 22);
   --color-surface-hover: rgb(18 15 12);
   --color-border: rgb(48 41 35);
   --color-border-strong: rgb(61 53 45);
