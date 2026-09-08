@@ -15,7 +15,7 @@ export const WizardStep: React.FC<WizardStepProps> = ({
   return (
     <div className={`${wizardStyles.step.content} ${className}`}>
       {error && (
-        <div className={wizardStyles.errorContainer}>
+        <div key="wizard-step-error" className={wizardStyles.errorContainer}>
           <p>{error}</p>
         </div>
       )}

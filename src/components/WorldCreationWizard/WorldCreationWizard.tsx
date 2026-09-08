@@ -560,7 +560,7 @@ export default function WorldCreationWizard({
         />
         
         <WizardStep error={currentError}>
-          <div data-testid="wizard-content">
+          <div key="wizard-content" data-testid="wizard-content">
             {renderCurrentStep()}
           </div>
         </WizardStep>
