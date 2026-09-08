@@ -116,8 +116,13 @@ test.describe('World Creation Wizard AI Guidance', () => {
     // Generate suggestions
     const longDescription = 'This is a very long description that should be more than fifty characters. It describes a world where ancient dragons sleep beneath futuristic cities, and their awakening threatens to shatter the delicate balance between magic and advanced technology. Factions vie for control over scarce resources and forgotten spells.';
     await page.getByTestId('world-full-description').fill(longDescription);
+    // Wait for autosave re-renders to settle before clicking generate -- the autosave hook
+    // triggers a state update on fill which detaches and remounts the textarea.
+    await waitForContentStable(page);
     await page.getByTestId('generate-ai-suggestions').click();
-    await expect(page.getByTestId('ai-suggestion-preview')).toBeVisible(); // Wait for suggestions to load
+    await expect(page.getByTestId('ai-suggestion-preview')).toBeVisible();
+    // Wait for suggestion-load re-renders to settle before the second fill.
+    await waitForContentStable(page);
 
     // Modify description
     await page.getByTestId('world-full-description').fill(longDescription + ' A new sentence.');
