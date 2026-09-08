@@ -41,6 +41,8 @@ jest.mock('@/components/TutorialProvider', () => ({
     resumeTour,
     currentTour: 'characterCreationWizard',
     isTourActive: true,
+    isPaused: true,
+    stepIndex: 0,
   }),
 }));
 

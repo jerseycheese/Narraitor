@@ -45,6 +45,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     resumeTour,
     currentTour,
     isTourActive,
+    isPaused,
     stepIndex,
   } = useTutorial();
   const pausedForRecoveryRef = useRef(false);
@@ -129,14 +130,22 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     setCurrentWizardStep(wizard.state.currentStep);
   }, [wizard.state.currentStep, setCurrentWizardStep]);
 
-  // Sync tour step index to wizard step when tour is active
+  // Sync tour step index to wizard step when tour is active and not paused for recovery
   React.useEffect(() => {
-    if (!isTourActive || currentTour !== 'characterCreationWizard') return;
+    if (
+      !isTourActive ||
+      isPaused ||
+      pausedForRecoveryRef.current ||
+      showRecoveryDialog ||
+      currentTour !== 'characterCreationWizard'
+    ) {
+      return;
+    }
     const targetWizardStep = tourStepToWizardStep[stepIndex];
     if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
       wizard.goToStep(targetWizardStep);
     }
-  }, [stepIndex, isTourActive, currentTour, wizard]);
+  }, [stepIndex, isTourActive, isPaused, showRecoveryDialog, currentTour, wizard]);
 
   // Point pool managers
   const { attributePool, skillPool } = useCharacterPointPools({

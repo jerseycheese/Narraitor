@@ -30,6 +30,7 @@ interface TutorialContextValue {
   skipTour: () => void;
   resetTutorial: () => void;
   isTourActive: boolean;
+  isPaused?: boolean;
   currentTour: TutorialPhase | string | null;
   stepIndex: number;
   setCurrentWizardStep: (step: number) => void;
@@ -42,6 +43,15 @@ const normalizeSteps = (steps: Step[]) =>
     ...step,
     disableBeacon: true,
   }));
+
+const getPhaseKey = (
+  tourId: TutorialPhase | string | null,
+  phases: Record<string, unknown>
+): TutorialPhase | null => {
+  if (!tourId) return null;
+  if (tourId === 'characterCreationWizard') return 'characterCreation';
+  return tourId in phases ? (tourId as TutorialPhase) : null;
+};
 
 const loadTour = async (tourId: TutorialPhase | string): Promise<{ steps: Step[], mapping?: Record<number, number> }> => {
   try {
@@ -175,9 +185,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     
     if (loadedSteps.length > 0) {
       // If resuming, check last step from store if not provided explicitly
-      // Safe check for phase existence
-      const isPhase = tourId in tutorialProgress.phases;
-      const phaseData = isPhase ? tutorialProgress.phases[tourId as TutorialPhase] : undefined;
+      // Safe check for phase existence with alias resolution
+      const phaseKey = getPhaseKey(tourId, tutorialProgress.phases);
+      const phaseData = phaseKey ? tutorialProgress.phases[phaseKey] : undefined;
       const lastStep = (phaseData && 'lastStep' in phaseData) ? (phaseData as { lastStep: number }).lastStep : 0;
 
       if (mapping && initialStepIndex === 0) {
@@ -267,12 +277,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setPauseReason(null);
     missingTargetRef.current = null;
     if (activeTour) {
-      const phaseKey: TutorialPhase | null =
-        activeTour === 'characterCreationWizard'
-          ? 'characterCreation'
-          : (activeTour && activeTour in tutorialProgress.phases)
-            ? (activeTour as TutorialPhase)
-            : null;
+      const phaseKey = getPhaseKey(activeTour, tutorialProgress.phases);
 
       if (phaseKey) {
         if (outcome === 'finished') {
@@ -333,12 +338,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
       
       if (activeTour) {
-        const phaseKey: TutorialPhase | null =
-          activeTour === 'characterCreationWizard'
-            ? 'characterCreation'
-            : (activeTour && activeTour in tutorialProgress.phases)
-              ? (activeTour as TutorialPhase)
-              : null;
+        const phaseKey = getPhaseKey(activeTour, tutorialProgress.phases);
 
         if (phaseKey) {
           updateTutorialProgress(phaseKey, { lastStep: index });
@@ -468,10 +468,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setPauseReason(null);
     missingTargetRef.current = null;
     if (activeTour) {
-      if (activeTour === 'characterCreationWizard') {
-        updateTutorialProgress('characterCreation', { skipped: true });
-      } else if (activeTour in tutorialProgress.phases) {
-        updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });
+      const phaseKey = getPhaseKey(activeTour, tutorialProgress.phases);
+      if (phaseKey) {
+        updateTutorialProgress(phaseKey, { skipped: true });
       }
     }
     setActiveTour(null);
@@ -496,6 +495,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       skipTour,
       resetTutorial,
       isTourActive: run || isPaused,
+      isPaused,
       currentTour: activeTour,
       stepIndex,
       setCurrentWizardStep,

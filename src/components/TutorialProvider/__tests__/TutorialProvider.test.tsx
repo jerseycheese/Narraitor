@@ -266,4 +266,26 @@ describe('TutorialProvider', () => {
       useSessionStore.getState().tutorialProgress.phases.firstPlay.completed
     ).toBe(false);
   });
+
+  it('resumes character creation tour from stored progress using aliased phase key', async () => {
+    useSessionStore.getState().updateTutorialProgress('characterCreation', { lastStep: 1 });
+
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Wizard Step 1').click();
+    });
+
+    await act(async () => {
+      screen.getByText('Start Character Wizard Tour').click();
+    });
+
+    await screen.findByTestId('joyride-mock');
+    expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
+    expect(screen.getByTestId('step-index')).toHaveTextContent('1');
+  });
 });
