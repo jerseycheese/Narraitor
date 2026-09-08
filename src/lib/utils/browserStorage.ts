@@ -41,7 +41,6 @@ export function writeString(kind: StorageKind, key: string, value: string): void
   }
 }
 
-
 export function readJSON<T>(kind: StorageKind, key: string, fallback: T): T {
   const raw = readString(kind, key);
   if (raw === null) return fallback;
