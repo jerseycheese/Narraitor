@@ -41,15 +41,6 @@ export function writeString(kind: StorageKind, key: string, value: string): void
   }
 }
 
-export function removeKey(kind: StorageKind, key: string): void {
-  const store = getStore(kind);
-  if (!store) return;
-  try {
-    store.removeItem(key);
-  } catch {
-    /* ignore */
-  }
-}
 
 export function readJSON<T>(kind: StorageKind, key: string, fallback: T): T {
   const raw = readString(kind, key);
