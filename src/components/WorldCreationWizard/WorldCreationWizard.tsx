@@ -20,6 +20,8 @@ import {
   WizardStep 
 } from '@/components/shared/wizard';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
+import { useWorldCreationAutoSave } from '@/hooks/useWorldCreationAutoSave';
+import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
 import BasicInfoStep from './steps/BasicInfoStep';
 import DescriptionStep from './steps/DescriptionStep';
 import AttributeReviewStep from './steps/AttributeReviewStep';
@@ -102,7 +104,7 @@ export default function WorldCreationWizard({
 }: WorldCreationWizardProps) {
   const router = useRouter();
   const createWorld = useWorldStore((state) => state.createWorld);
-  const { startTour, setCurrentWizardStep, isTourActive } = useTutorial();
+  const { startTour, setCurrentWizardStep, isTourActive, pauseTour, resumeTour } = useTutorial();
   const worldCreationProgress = useSessionStore(state => state.tutorialProgress.phases.worldCreation);
   
   // Initialize world creation data
@@ -140,6 +142,45 @@ export default function WorldCreationWizard({
     };
   }, []);
 
+  const {
+    data: autoSaveData,
+    setData: setAutoSaveData,
+    clearAutoSave,
+    dismissRecovery,
+    hasRecoveryData,
+    recoveryPreview,
+    hasCurrentData: autoSaveHasCurrentData,
+    isLoaded: isAutoSaveLoaded,
+  } = useWorldCreationAutoSave();
+
+  const [showRecoveryModal, setShowRecoveryModal] = useState(false);
+
+  React.useEffect(() => {
+    if (hasRecoveryData) {
+      setShowRecoveryModal(true);
+    }
+  }, [hasRecoveryData]);
+
+  React.useEffect(() => {
+    if (showRecoveryModal) {
+      pauseTour?.();
+    } else {
+      resumeTour?.();
+    }
+  }, [showRecoveryModal, pauseTour, resumeTour]);
+
+  const handleDataChange = useCallback(
+    (newData: WorldCreationData) => {
+      if (isAutoSaveLoaded && !hasRecoveryData && !showRecoveryModal) {
+        setAutoSaveData({
+          currentStep: wizardRef.current?.state.currentStep ?? 0,
+          worldData: newData,
+        });
+      }
+    },
+    [setAutoSaveData, isAutoSaveLoaded, hasRecoveryData, showRecoveryModal]
+  );
+
   // Wizard state management
   const wizard = useWizardState<WorldCreationData>({
     initialData: initialWorldData,
@@ -149,7 +190,36 @@ export default function WorldCreationWizard({
       const validator = stepValidators[stepIndex];
       return validator ? validator(data) : { valid: true, errors: [], touched: true };
     },
+    onDataChange: handleDataChange,
   });
+
+  const wizardRef = React.useRef(wizard);
+  wizardRef.current = wizard;
+
+  React.useEffect(() => {
+    if (isAutoSaveLoaded && wizard.state.data && !hasRecoveryData && !showRecoveryModal) {
+      setAutoSaveData({
+        currentStep: wizard.state.currentStep,
+        worldData: wizard.state.data,
+      });
+    }
+  }, [isAutoSaveLoaded, wizard.state.currentStep, hasRecoveryData, showRecoveryModal, setAutoSaveData]);
+
+  const handleRecoverProgress = useCallback(() => {
+    if (autoSaveData) {
+      wizard.reset(
+        autoSaveData.worldData,
+        autoSaveData.currentStep
+      );
+      dismissRecovery();
+    }
+    setShowRecoveryModal(false);
+  }, [autoSaveData, wizard, dismissRecovery]);
+
+  const handleDismissRecovery = useCallback(() => {
+    clearAutoSave();
+    setShowRecoveryModal(false);
+  }, [clearAutoSave]);
 
   // Sync wizard step with tutorial provider
   React.useEffect(() => {
@@ -287,6 +357,7 @@ export default function WorldCreationWizard({
       // Show confirmation dialog
       setShowCancelConfirmation(true);
     } else {
+      clearAutoSave();
       // Direct cancel for clean state
       if (onCancel) {
         onCancel();
@@ -294,16 +365,17 @@ export default function WorldCreationWizard({
         router.push('/worlds');
       }
     }
-  }, [isDirty, onCancel, router]);
+  }, [isDirty, clearAutoSave, onCancel, router]);
 
   const handleConfirmCancel = useCallback(() => {
+    clearAutoSave();
     setShowCancelConfirmation(false);
     if (onCancel) {
       onCancel();
     } else {
       router.push('/worlds');
     }
-  }, [onCancel, router]);
+  }, [clearAutoSave, onCancel, router]);
 
   const handleRejectCancel = useCallback(() => {
     setShowCancelConfirmation(false);
@@ -318,6 +390,7 @@ export default function WorldCreationWizard({
   }, [onComplete, router]);
 
   const handleComplete = useCallback(async () => {
+    clearAutoSave();
     const data = wizard.state.data;
 
     // If the world was already created (e.g. returning to finalize), just finish.
@@ -495,6 +568,25 @@ export default function WorldCreationWizard({
         variant="warning"
         confirmText="Yes, Cancel"
         cancelText="Continue Editing"
+      />
+
+      {/* Recovery Notification Dialog */}
+      <RecoveryNotification
+        isVisible={showRecoveryModal}
+        lastSaved={recoveryPreview?.lastSaved}
+        recoveryData={recoveryPreview}
+        hasCurrentData={autoSaveHasCurrentData}
+        title="World Creation Progress Found"
+        description="Found saved world creation progress from a previous session."
+        stepNames={[
+          'Basic Information',
+          'World Description',
+          'Review Attributes',
+          'Review Skills',
+          'Finalize',
+        ]}
+        onRecover={handleRecoverProgress}
+        onDismiss={handleDismissRecovery}
       />
     </WizardContainer>
   );

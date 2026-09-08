@@ -40,15 +40,19 @@ import { formatDateTime } from '@/lib/utils';
  * Recovery data structure containing analyzed save information for preview display
  */
 interface RecoveryData {
-  /** Character name from saved data */
+  /** Character or World name from saved data */
   name?: string;
+  /** Genre from saved data */
+  genre?: string;
+  /** Description from saved data */
+  description?: string;
   /** Current wizard step index (0-based) */
   currentStep?: number;
   /** ISO timestamp of when data was last saved */
   lastSaved?: string;
-  /** Whether character has allocated attribute points */
+  /** Whether character/world has allocated attributes */
   hasAttributes?: boolean;
-  /** Whether character has selected skills */
+  /** Whether character/world has selected skills */
   hasSkills?: boolean;
   /** Whether character has completed background information */
   hasBackground?: boolean;
@@ -56,6 +60,10 @@ interface RecoveryData {
   selectedSkillCount?: number;
   /** Total attribute points allocated across all attributes */
   totalAttributePoints?: number;
+  /** Number of attributes created or present */
+  attributeCount?: number;
+  /** Number of skills created or present */
+  skillCount?: number;
 }
 
 /**
@@ -74,6 +82,12 @@ interface RecoveryNotificationProps {
   onRecover: () => void;
   /** Callback fired when user chooses to dismiss recovery and start fresh */
   onDismiss: () => void;
+  /** Optional custom title for modal */
+  title?: string;
+  /** Optional custom description for modal */
+  description?: string;
+  /** Optional custom step names array */
+  stepNames?: string[];
 }
 
 /**
@@ -92,6 +106,9 @@ export function RecoveryNotification({
   hasCurrentData = false,
   onRecover,
   onDismiss,
+  title,
+  description,
+  stepNames,
 }: RecoveryNotificationProps) {
   /** Reference to the recover button for focus management */
   const recoverButtonRef = useRef<HTMLButtonElement>(null);
@@ -121,15 +138,15 @@ export function RecoveryNotification({
    * @returns Human-readable step description
    */
   const getStepDescription = (step?: number): string => {
-    const stepNames = [
+    const names = stepNames || [
       'Basic Info',
       'Attributes',
       'Skills',
       'Background',
       'Portrait',
     ];
-    if (step !== undefined && step >= 0 && step < stepNames.length) {
-      return `${stepNames[step]} step`;
+    if (step !== undefined && step >= 0 && step < names.length) {
+      return `${names[step]} step`;
     }
     return 'Unknown step';
   };
@@ -138,8 +155,8 @@ export function RecoveryNotification({
     <SimpleModal
       isOpen={isVisible}
       onClose={onDismiss}
-      title="Character Creation Progress Found"
-      description="Found saved character creation progress from a previous session."
+      title={title || "Character Creation Progress Found"}
+      description={description || "Found saved character creation progress from a previous session."}
       showCloseButton={true}
       ariaDescribedBy="recovery-notification-content"
     >
@@ -182,7 +199,12 @@ export function RecoveryNotification({
             <div>
               {recoveryData.name && (
                 <div>
-                  Character name: <span>{recoveryData.name}</span>
+                  Name: <span>{recoveryData.name}</span>
+                </div>
+              )}
+              {recoveryData.genre && (
+                <div>
+                  Genre: <span>{recoveryData.genre}</span>
                 </div>
               )}
               {recoveryData.currentStep !== undefined && (
@@ -192,17 +214,19 @@ export function RecoveryNotification({
                 </div>
               )}
               {recoveryData.hasAttributes &&
-                recoveryData.totalAttributePoints !== undefined && (
+                (recoveryData.totalAttributePoints !== undefined || recoveryData.attributeCount !== undefined) && (
                   <div>
-                    Attribute points allocated:{' '}
-                    <span>{recoveryData.totalAttributePoints}</span>
+                    {recoveryData.totalAttributePoints !== undefined
+                      ? `Attribute points allocated: ${recoveryData.totalAttributePoints}`
+                      : `Attributes: ${recoveryData.attributeCount}`}
                   </div>
                 )}
               {recoveryData.hasSkills &&
-                recoveryData.selectedSkillCount !== undefined && (
+                (recoveryData.selectedSkillCount !== undefined || recoveryData.skillCount !== undefined) && (
                   <div>
-                    Skills selected:{' '}
-                    <span>{recoveryData.selectedSkillCount}</span>
+                    {recoveryData.selectedSkillCount !== undefined
+                      ? `Skills selected: ${recoveryData.selectedSkillCount}`
+                      : `Skills: ${recoveryData.skillCount}`}
                   </div>
                 )}
               {recoveryData.hasBackground && (
