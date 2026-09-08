@@ -21,6 +21,7 @@ import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { normalizeSkillBounds } from './utils/skillAllocation';
 import { useTutorial } from '@/components/TutorialProvider';
+import { tourStepToWizardStep } from '@/lib/tutorial/characterCreationWizardTour';
 import type { WizardValidation } from '@/hooks/useWizardState';
 
 /**
@@ -44,6 +45,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     resumeTour,
     currentTour,
     isTourActive,
+    isPaused,
+    stepIndex,
   } = useTutorial();
   const pausedForRecoveryRef = useRef(false);
 
@@ -126,6 +129,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   React.useEffect(() => {
     setCurrentWizardStep(wizard.state.currentStep);
   }, [wizard.state.currentStep, setCurrentWizardStep]);
+
+  // Sync tour step index to wizard step when tour is active and not paused for recovery
+  React.useEffect(() => {
+    if (
+      !isTourActive ||
+      isPaused ||
+      pausedForRecoveryRef.current ||
+      showRecoveryDialog ||
+      currentTour !== 'characterCreationWizard'
+    ) {
+      return;
+    }
+    const targetWizardStep = tourStepToWizardStep[stepIndex];
+    if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
+      wizard.goToStep(targetWizardStep);
+    }
+  }, [stepIndex, isTourActive, isPaused, showRecoveryDialog, currentTour, wizard]);
 
   // Point pool managers
   const { attributePool, skillPool } = useCharacterPointPools({

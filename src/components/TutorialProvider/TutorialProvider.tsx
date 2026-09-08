@@ -30,6 +30,7 @@ interface TutorialContextValue {
   skipTour: () => void;
   resetTutorial: () => void;
   isTourActive: boolean;
+  isPaused?: boolean;
   currentTour: TutorialPhase | string | null;
   stepIndex: number;
   setCurrentWizardStep: (step: number) => void;
@@ -42,6 +43,15 @@ const normalizeSteps = (steps: Step[]) =>
     ...step,
     disableBeacon: true,
   }));
+
+const getPhaseKey = (
+  tourId: TutorialPhase | string | null,
+  phases: Record<string, unknown>
+): TutorialPhase | null => {
+  if (!tourId) return null;
+  if (tourId === 'characterCreationWizard') return 'characterCreation';
+  return tourId in phases ? (tourId as TutorialPhase) : null;
+};
 
 const loadTour = async (tourId: TutorialPhase | string): Promise<{ steps: Step[], mapping?: Record<number, number> }> => {
   try {
@@ -175,9 +185,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     
     if (loadedSteps.length > 0) {
       // If resuming, check last step from store if not provided explicitly
-      // Safe check for phase existence
-      const isPhase = tourId in tutorialProgress.phases;
-      const phaseData = isPhase ? tutorialProgress.phases[tourId as TutorialPhase] : undefined;
+      // Safe check for phase existence with alias resolution
+      const phaseKey = getPhaseKey(tourId, tutorialProgress.phases);
+      const phaseData = phaseKey ? tutorialProgress.phases[phaseKey] : undefined;
       const lastStep = (phaseData && 'lastStep' in phaseData) ? (phaseData as { lastStep: number }).lastStep : 0;
 
       if (mapping && initialStepIndex === 0) {
@@ -267,31 +277,25 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setPauseReason(null);
     missingTargetRef.current = null;
     if (activeTour) {
-      if (outcome === 'finished') {
-        if (activeTour === 'characterCreationWizard') {
-          completeTutorialPhase('characterCreation');
-        } else if (stepMapping) {
-          const wizardStepValues = Object.values(stepMapping);
-          const maxWizardStep = wizardStepValues.length > 0 ? Math.max(...wizardStepValues) : null;
-          const isFinalWizardStep = maxWizardStep !== null && currentWizardStep >= maxWizardStep;
-          const isFinalTourStep = steps.length > 0 && index >= steps.length - 1;
+      const phaseKey = getPhaseKey(activeTour, tutorialProgress.phases);
 
-          if (isFinalWizardStep && isFinalTourStep) {
-            completeTutorialPhase(activeTour as TutorialPhase);
+      if (phaseKey) {
+        if (outcome === 'finished') {
+          const isFinalTourStep = steps.length > 0 && index >= steps.length - 1;
+          let isFinalWizardStep = true;
+          if (stepMapping) {
+            const wizardStepValues = Object.values(stepMapping);
+            const maxWizardStep = wizardStepValues.length > 0 ? Math.max(...wizardStepValues) : null;
+            isFinalWizardStep = maxWizardStep === null || currentWizardStep >= maxWizardStep;
+          }
+
+          if (isFinalTourStep && isFinalWizardStep) {
+            completeTutorialPhase(phaseKey);
           } else {
-            updateTutorialProgress(activeTour as TutorialPhase, { lastStep: index });
+            updateTutorialProgress(phaseKey, { lastStep: index });
           }
         } else {
-          // Check if it's a valid phase before completing
-          if (activeTour in tutorialProgress.phases) {
-            completeTutorialPhase(activeTour as TutorialPhase);
-          }
-        }
-      } else {
-        if (activeTour === 'characterCreationWizard') {
-          updateTutorialProgress('characterCreation', { skipped: true });
-        } else if (activeTour in tutorialProgress.phases) {
-          updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });
+          updateTutorialProgress(phaseKey, { skipped: true });
         }
       }
     }
@@ -334,8 +338,10 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
       
       if (activeTour) {
-        if (activeTour in tutorialProgress.phases) {
-          updateTutorialProgress(activeTour as TutorialPhase, { lastStep: index });
+        const phaseKey = getPhaseKey(activeTour, tutorialProgress.phases);
+
+        if (phaseKey) {
+          updateTutorialProgress(phaseKey, { lastStep: index });
         }
         setStepIndex(nextIndex);
       }
@@ -344,18 +350,12 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       // the target later, so a missing anchor won't reappear. Skip past the
       // unrenderable step instead of freezing on it — the old early-return left
       // Joyride mounted on a step it couldn't draw (a dark overlay with no tooltip
-      // and no way out). Reaching the end completes the phase so onboarding doesn't
-      // re-arm every session and isTourActive resolves. With progressive disclosure
-      // on (the default), every anchor is present and this never fires; it's the
-      // safety net for when the flag is off, where the Tools anchor isn't rendered.
+      // and no way out).
       if (!stepMapping) {
         const nextIndex = index + 1;
         if (Number.isInteger(nextIndex) && nextIndex < steps.length) {
           setStepIndex(nextIndex);
         } else {
-          if (activeTour && activeTour in tutorialProgress.phases) {
-            completeTutorialPhase(activeTour as TutorialPhase);
-          }
           stopTour();
         }
         return;
@@ -468,10 +468,9 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     setPauseReason(null);
     missingTargetRef.current = null;
     if (activeTour) {
-      if (activeTour === 'characterCreationWizard') {
-        updateTutorialProgress('characterCreation', { skipped: true });
-      } else if (activeTour in tutorialProgress.phases) {
-        updateTutorialProgress(activeTour as TutorialPhase, { skipped: true });
+      const phaseKey = getPhaseKey(activeTour, tutorialProgress.phases);
+      if (phaseKey) {
+        updateTutorialProgress(phaseKey, { skipped: true });
       }
     }
     setActiveTour(null);
@@ -496,6 +495,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
       skipTour,
       resetTutorial,
       isTourActive: run || isPaused,
+      isPaused,
       currentTour: activeTour,
       stepIndex,
       setCurrentWizardStep,

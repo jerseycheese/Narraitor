@@ -242,7 +242,7 @@ describe('TutorialProvider', () => {
     expect(screen.getByTestId('step-index')).toHaveTextContent('2');
   });
 
-  it('completes a mapping-less tour when its final target is missing instead of hanging', async () => {
+  it('stops a mapping-less tour when its final target is missing without marking phase completed', async () => {
     render(
       <TutorialProvider>
         <TestComponent />
@@ -255,9 +255,8 @@ describe('TutorialProvider', () => {
     await screen.findByTestId('joyride-mock');
     expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
 
-    // firstPlay has no stepMapping; a missing final anchor (e.g. the Tools button in
-    // DS3 / progressive-disclosure-off) must end the tour and mark the phase complete,
-    // not leave it paused with isTourActive stuck true.
+    // firstPlay has no stepMapping; a missing final anchor must end the tour
+    // without marking the phase as completed.
     await act(async () => {
       screen.getByText('Target Missing Last').click();
     });
@@ -265,6 +264,28 @@ describe('TutorialProvider', () => {
     expect(screen.getByTestId('tour-status')).toHaveTextContent('Inactive');
     expect(
       useSessionStore.getState().tutorialProgress.phases.firstPlay.completed
-    ).toBe(true);
+    ).toBe(false);
+  });
+
+  it('resumes character creation tour from stored progress using aliased phase key', async () => {
+    useSessionStore.getState().updateTutorialProgress('characterCreation', { lastStep: 1 });
+
+    render(
+      <TutorialProvider>
+        <TestComponent />
+      </TutorialProvider>
+    );
+
+    await act(async () => {
+      screen.getByText('Wizard Step 1').click();
+    });
+
+    await act(async () => {
+      screen.getByText('Start Character Wizard Tour').click();
+    });
+
+    await screen.findByTestId('joyride-mock');
+    expect(screen.getByTestId('tour-status')).toHaveTextContent('Active');
+    expect(screen.getByTestId('step-index')).toHaveTextContent('1');
   });
 });
