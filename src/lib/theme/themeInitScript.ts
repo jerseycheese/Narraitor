@@ -5,7 +5,7 @@ export const THEME_INIT_SCRIPT = `(function () {
   try {
     var scheme = localStorage.getItem('narraitor-color-scheme');
     var systemPrefersDark =
-      scheme === 'system' &&
+      (!scheme || scheme === 'system') &&
       matchMedia('(prefers-color-scheme: dark)').matches;
     if (scheme === 'dark' || systemPrefersDark) {
       document.documentElement.classList.add('dark');
