@@ -57,8 +57,6 @@ export function useAIGeneration<TRequest = Record<string, unknown>, TResponse = 
     } catch (error) {
       // Retain raw error details in console logs for debugging (#2042)
       logger.error(`Generation error at ${options.endpoint}:`, error);
-      // eslint-disable-next-line no-console
-      console.error(`[useAIGeneration] Generation error at ${options.endpoint}:`, error);
 
       const plainLanguageError = formatPlainLanguageError(error);
       setState(prev => ({ ...prev, error: plainLanguageError, isGenerating: false }));

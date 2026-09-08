@@ -182,7 +182,9 @@ describe('PortraitStep Component', () => {
 
     // Retains raw error details in console logs for debugging
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      '[useAIGeneration] Generation error at /api/generate-portrait:',
+      expect.stringContaining('[useAIGeneration]'),
+      expect.anything(),
+      expect.stringContaining('Generation error at /api/generate-portrait:'),
       expect.objectContaining({ message: 'Payload too large' })
     );
 
