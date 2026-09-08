@@ -41,7 +41,7 @@ describe('RecoveryNotification', () => {
       expect(icon).toBeInTheDocument();
       expect(icon).toHaveAttribute('width', '48');
       expect(icon).toHaveAttribute('height', '48');
-      expect(icon).toHaveClass('w-12', 'h-12');
+      expect(icon).toHaveClass('recovery-notification-icon');
     });
   });
 

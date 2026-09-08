@@ -144,10 +144,14 @@ export function RecoveryNotification({
       ariaDescribedBy="recovery-notification-content"
     >
       <div id="recovery-notification-content">
-        <div className="recovery-notification-icon-wrapper flex justify-center">
+        <div
+          className="recovery-notification-icon-wrapper"
+          style={{ display: 'flex', justifyContent: 'center' }}
+        >
           <AlertTriangle
             size={48}
-            className="recovery-notification-icon w-12 h-12 text-amber-500"
+            className="recovery-notification-icon"
+            style={{ color: 'var(--color-warning, #f59e0b)' }}
             aria-hidden="true"
           />
         </div>
