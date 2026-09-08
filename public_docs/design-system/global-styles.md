@@ -161,7 +161,7 @@ Throws `Error('useTheme must be used within a ThemeProvider')` if called outside
 
 | Key | localStorage Key | Default | Purpose |
 |-----|-----------------|---------|---------|
-| Color scheme | `narraitor-color-scheme` | `'light'` | Light, dark, or system preference |
+| Color scheme | `narraitor-color-scheme` | `'system'` | Light, dark, or system preference |
 
 There's no theme key: the design-system axis was collapsed to one (ADR-013), and the vestigial `theme`/`setTheme` surface was removed from `useTheme()` along with the selector flatten (#1546).
 

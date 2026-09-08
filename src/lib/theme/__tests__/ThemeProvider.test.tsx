@@ -40,7 +40,46 @@ describe('ThemeProvider', () => {
     });
   });
 
-  it('defaults to light mode', () => {
+  it('defaults an unchosen color scheme to system', () => {
+    let ctx: ReturnType<typeof useTheme> | null = null;
+    renderWithProvider((c) => { ctx = c; });
+
+    expect(ctx!.colorScheme).toBe('system');
+    expect(ctx!.resolvedColorScheme).toBe('light');
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+  });
+
+  it('tracks system dark mode preference when no explicit choice is set', () => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: jest.fn().mockImplementation((query: string) => ({
+        matches: query.includes('prefers-color-scheme: dark'),
+        media: query,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      })),
+    });
+
+    let ctx: ReturnType<typeof useTheme> | null = null;
+    renderWithProvider((c) => { ctx = c; });
+
+    expect(ctx!.colorScheme).toBe('system');
+    expect(ctx!.resolvedColorScheme).toBe('dark');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+  });
+
+  it('preserves explicit light choice when system preference is dark', () => {
+    localStorage.setItem(STORAGE_KEY_COLOR_SCHEME, 'light');
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: jest.fn().mockImplementation((query: string) => ({
+        matches: query.includes('prefers-color-scheme: dark'),
+        media: query,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      })),
+    });
+
     let ctx: ReturnType<typeof useTheme> | null = null;
     renderWithProvider((c) => { ctx = c; });
 

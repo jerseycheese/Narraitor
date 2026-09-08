@@ -4,9 +4,9 @@
 export const THEME_INIT_SCRIPT = `(function () {
   try {
     var scheme = localStorage.getItem('narraitor-color-scheme');
+    var isExplicit = scheme === 'light' || scheme === 'dark';
     var systemPrefersDark =
-      scheme === 'system' &&
-      matchMedia('(prefers-color-scheme: dark)').matches;
+      !isExplicit && matchMedia('(prefers-color-scheme: dark)').matches;
     if (scheme === 'dark' || systemPrefersDark) {
       document.documentElement.classList.add('dark');
     }
