@@ -86,20 +86,7 @@ test.describe('World Creation Wizard AI Guidance', () => {
     // Select required genre and proceed to description step
     await page.getByTestId('world-genre-select').selectOption('fantasy');
     await page.getByRole('button', { name: 'Next' }).click();
-
-    // Wait for the description textarea to appear and stabilize. The wizard step
-    // transition triggers autosave state updates that re-mount the textarea -- fill()
-    // exhausts its retries if we don't wait for React to finish the render cycle.
-    const descriptionField = page.getByTestId('world-full-description');
-    await expect(descriptionField).toBeVisible();
-    await page.waitForFunction(
-      (testId) => {
-        const el = document.querySelector(`[data-testid="${testId}"]`);
-        return el !== null && el.isConnected;
-      },
-      'world-full-description',
-      { timeout: 5000 }
-    );
+    await expect(page.getByTestId('description-step')).toBeVisible();
 
     // Initially the description is empty, so generate button should be disabled
     await expect(page.getByTestId('generate-ai-suggestions')).toBeDisabled();
@@ -107,9 +94,9 @@ test.describe('World Creation Wizard AI Guidance', () => {
 
     // Fill a long enough description to enable AI generation
     const longDescription = 'A world where magic and technology coexist in constant conflict. Ancient magical forces clash with futuristic tech.';
+    const descriptionField = page.getByTestId('world-full-description');
     await descriptionField.fill(longDescription);
     await expect(page.getByTestId('generate-ai-suggestions')).toBeEnabled();
-
 
     // Click generate and wait for suggestions to appear (mock responds instantly)
     await page.getByTestId('generate-ai-suggestions').click();
@@ -126,35 +113,17 @@ test.describe('World Creation Wizard AI Guidance', () => {
     // Select required genre and proceed to description step
     await page.getByTestId('world-genre-select').selectOption('fantasy');
     await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByTestId('description-step')).toBeVisible();
 
     // Generate suggestions
     const longDescription = 'This is a very long description that should be more than fifty characters. It describes a world where ancient dragons sleep beneath futuristic cities, and their awakening threatens to shatter the delicate balance between magic and advanced technology. Factions vie for control over scarce resources and forgotten spells.';
-    // Wait for the textarea to stabilize after step transition before filling.
     const descriptionField = page.getByTestId('world-full-description');
-    await expect(descriptionField).toBeVisible();
-    await page.waitForFunction(
-      (testId) => {
-        const el = document.querySelector(`[data-testid="${testId}"]`);
-        return el !== null && el.isConnected;
-      },
-      'world-full-description',
-      { timeout: 5000 }
-    );
     await descriptionField.fill(longDescription);
     await page.getByTestId('generate-ai-suggestions').click();
     await expect(page.getByTestId('ai-suggestion-preview')).toBeVisible();
-    // Wait for suggestion-load re-renders to settle before the second fill.
-    await page.waitForFunction(
-      (testId) => {
-        const el = document.querySelector(`[data-testid="${testId}"]`);
-        return el !== null && el.isConnected;
-      },
-      'world-full-description',
-      { timeout: 5000 }
-    );
 
     // Modify description
-    await page.getByTestId('world-full-description').fill(longDescription + ' A new sentence.');
+    await descriptionField.fill(longDescription + ' A new sentence.');
 
     // Verify outdated warning appears
     await expect(page.getByTestId('ai-description-outdated')).toBeVisible();
