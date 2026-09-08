@@ -19,7 +19,7 @@ const tutorialScrollTargets = [
   '[data-tutorial="attribute-allocation"]',
   '[data-tutorial="skill-selection"]',
   '[data-tutorial="background-editor"]',
-  '[data-tutorial="portrait-generator"]',
+  '[data-tutorial="portrait-generator-action"]',
 ];
 
 async function scrollTutorialTargetIntoView(

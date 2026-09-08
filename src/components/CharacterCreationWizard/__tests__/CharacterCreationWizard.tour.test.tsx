@@ -67,7 +67,7 @@ jest.mock('@/state/worldStore', () => ({
 }));
 
 // Mock react-joyride to simulate clicking Joyride's own Next/Finish buttons
-let lastJoyrideProps: Record<string, unknown> | null = null;
+let _lastJoyrideProps: Record<string, unknown> | null = null;
 
 jest.mock('react-joyride', () => {
   const STATUS = {
@@ -87,7 +87,7 @@ jest.mock('react-joyride', () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const DummyJoyride = ({ run, stepIndex, steps, callback, ...rest }: any) => {
-    lastJoyrideProps = { run, stepIndex, steps, callback, ...rest };
+    _lastJoyrideProps = { run, stepIndex, steps, callback, ...rest };
     if (!run) return null;
 
     const isLast = stepIndex >= steps.length - 1;
@@ -156,7 +156,7 @@ const TourTrigger = () => {
 describe('CharacterCreationWizard Joyride Next integration', () => {
   beforeEach(() => {
     useSessionStore.getState().resetTutorialProgress();
-    lastJoyrideProps = null;
+    _lastJoyrideProps = null;
   });
 
   it('reaches all five tutorial steps by clicking Joyrides own Next button', async () => {
@@ -175,36 +175,52 @@ describe('CharacterCreationWizard Joyride Next integration', () => {
     expect(screen.getByTestId('tour-active')).toHaveTextContent('yes');
     expect(screen.getByTestId('joyride-step-index')).toHaveTextContent('0');
 
-    // Step 0: Basic Info step target should be present in DOM
-    expect(document.querySelector('[data-tutorial="basic-info"]')).not.toBeNull();
+    // Step 0: Basic Info step target should be on fields container, not section header
+    const basicInfoTarget = document.querySelector('[data-tutorial="basic-info"]');
+    expect(basicInfoTarget).not.toBeNull();
+    expect(basicInfoTarget?.classList.contains('component-basic-info-fields')).toBe(true);
+    expect(document.querySelector('.wizard-form-section-header[data-tutorial="basic-info"]')).toBeNull();
 
     // Click Joyride Next on Step 0 -> advances to Step 1 (Attributes)
     await act(async () => {
       screen.getByTestId('joyride-next-btn').click();
     });
     expect(screen.getByTestId('joyride-step-index')).toHaveTextContent('1');
-    expect(document.querySelector('[data-tutorial="attribute-allocation"]')).not.toBeNull();
+    const attributeTarget = document.querySelector('[data-tutorial="attribute-allocation"]');
+    expect(attributeTarget).not.toBeNull();
+    expect(attributeTarget?.classList.contains('component-point-pool-manager')).toBe(true);
+    expect(document.querySelector('.wizard-form-section-header[data-tutorial="attribute-allocation"]')).toBeNull();
 
     // Click Joyride Next on Step 1 -> advances to Step 2 (Skills)
     await act(async () => {
       screen.getByTestId('joyride-next-btn').click();
     });
     expect(screen.getByTestId('joyride-step-index')).toHaveTextContent('2');
-    expect(document.querySelector('[data-tutorial="skill-selection"]')).not.toBeNull();
+    const skillTarget = document.querySelector('[data-tutorial="skill-selection"]');
+    expect(skillTarget).not.toBeNull();
+    expect(skillTarget?.classList.contains('wizard-skill-allocation-list')).toBe(true);
+    expect(document.querySelector('.wizard-form-section-header[data-tutorial="skill-selection"]')).toBeNull();
 
     // Click Joyride Next on Step 2 -> advances to Step 3 (Background)
     await act(async () => {
       screen.getByTestId('joyride-next-btn').click();
     });
     expect(screen.getByTestId('joyride-step-index')).toHaveTextContent('3');
-    expect(document.querySelector('[data-tutorial="background-editor"]')).not.toBeNull();
+    const backgroundTarget = document.querySelector('[data-tutorial="background-editor"]');
+    expect(backgroundTarget).not.toBeNull();
+    expect(backgroundTarget?.tagName.toLowerCase()).toBe('textarea');
+    expect(backgroundTarget?.id).toBe('character-history');
+    expect(document.querySelector('.wizard-form-section-header[data-tutorial="background-editor"]')).toBeNull();
 
     // Click Joyride Next on Step 3 -> advances to Step 4 (Portrait)
     await act(async () => {
       screen.getByTestId('joyride-next-btn').click();
     });
     expect(screen.getByTestId('joyride-step-index')).toHaveTextContent('4');
-    expect(document.querySelector('[data-tutorial="portrait-generator-action"]')).not.toBeNull();
+    const portraitTarget = document.querySelector('[data-tutorial="portrait-generator-action"]');
+    expect(portraitTarget).not.toBeNull();
+    expect(portraitTarget?.tagName.toLowerCase()).toBe('button');
+    expect(document.querySelector('.wizard-form-section-header[data-tutorial="portrait-generator-action"]')).toBeNull();
 
     // Click Finish on Step 4 -> completes tutorial phase
     await act(async () => {

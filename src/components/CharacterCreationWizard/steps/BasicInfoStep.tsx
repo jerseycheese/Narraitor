@@ -67,7 +67,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       <WizardFormSection
         title="Basic Information"
         description="Create your character by providing their name and basic details."
-        dataTutorial="basic-info"
       >
       {/* Helpful tip */}
       <div>
@@ -84,7 +83,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         </div>
 
         {/* Form fields */}
-        <div className="component-basic-info-fields">
+        <div className="component-basic-info-fields" data-tutorial="basic-info">
           <div>
             <Label htmlFor="character-name">
               Character Name <span>*</span>

@@ -201,18 +201,14 @@ export const WizardFormSection: React.FC<WizardFormSectionProps> = ({
   children,
   dataTutorial,
 }) => {
-  const headerProps = dataTutorial
+  const sectionProps = dataTutorial
     ? { 'data-tutorial': dataTutorial }
     : undefined;
-  const sectionProps =
-    !title && !description && dataTutorial
-      ? { 'data-tutorial': dataTutorial }
-      : undefined;
 
   return (
     <div className="wizard-form-section component-wizard-form-section" {...sectionProps}>
       {(title || description) && (
-        <div className="wizard-form-section-header" {...headerProps}>
+        <div className="wizard-form-section-header">
           {title && <h3 className={wizardStyles.subheading}>{title}</h3>}
           {description && (
             <p className={wizardStyles.step.description}>{description}</p>

@@ -24,6 +24,8 @@ export interface PointPoolManagerProps {
   poolConfig: PointPoolConfig;
   onChange: (id: string, newValue: number) => void;
   className?: string;
+  dataTutorial?: string;
+  'data-tutorial'?: string;
 }
 
 export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
@@ -31,6 +33,8 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
   poolConfig,
   onChange,
   className = '',
+  dataTutorial,
+  'data-tutorial': dataTutorialAttr,
 }) => {
   const { remaining } = useMemo(() => {
     const totalSpent = allocations.reduce(
@@ -68,6 +72,7 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
       className={['component-point-pool-manager', className]
         .filter(Boolean)
         .join(' ')}
+      data-tutorial={dataTutorial || dataTutorialAttr}
     >
       {/* Point Pool Summary */}
       <div className={`${wizardStyles.card.base} point-pool-summary`}>
