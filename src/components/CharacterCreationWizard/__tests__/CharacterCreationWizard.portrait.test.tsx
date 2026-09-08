@@ -152,11 +152,16 @@ describe('PortraitStep Component', () => {
     expect(generateButton).not.toBeDisabled();
   });
 
-  it('should show error message on generation failure', async () => {
+  it('should show plain language error message on generation failure and log raw error to console', async () => {
     const user = userEvent.setup();
-    
-    // Mock failed API response
-    mockFetch.mockRejectedValue(new Error('API error'));
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    // Mock failed API response with raw server error string
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 413,
+      json: async () => ({ error: 'Payload too large', code: 'PAYLOAD_TOO_LARGE' }),
+    });
 
     render(
       <PortraitStep 
@@ -170,8 +175,20 @@ describe('PortraitStep Component', () => {
     await user.click(generateButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/API error/i)).toBeInTheDocument();
+      // Plain language message with actionable step instead of raw server string "Payload too large"
+      expect(screen.getByText(/input is too large/i)).toBeInTheDocument();
+      expect(screen.getByText(/shortening your physical description/i)).toBeInTheDocument();
     });
+
+    // Retains raw error details in console logs for debugging
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[useAIGeneration]'),
+      expect.anything(),
+      expect.stringContaining('Generation error at /api/generate-portrait:'),
+      expect.objectContaining({ message: 'Payload too large' })
+    );
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('should be skippable', () => {
@@ -364,7 +381,7 @@ describe('PortraitStep Component', () => {
 
     await user.click(screen.getAllByRole('button', { name: /avatar$/i })[0]);
 
-    expect(screen.queryByText(/API error/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/didn't work/i)).not.toBeInTheDocument();
     expect(screen.getByText(/just a preview/i)).toBeInTheDocument();
   });
 

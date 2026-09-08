@@ -1,6 +1,10 @@
 // src/lib/hooks/useAIGeneration.ts
 
 import { useState, useCallback } from 'react';
+import Logger from '@/lib/utils/logger';
+import { formatPlainLanguageError } from '@/lib/utils/errorUtils';
+
+const logger = new Logger('useAIGeneration');
 
 interface AIGenerationState<T> {
   isGenerating: boolean;
@@ -39,8 +43,8 @@ export function useAIGeneration<TRequest = Record<string, unknown>, TResponse = 
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Generation failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Generation failed with status ${response.status}`);
       }
 
       const data = await response.json();
@@ -51,9 +55,12 @@ export function useAIGeneration<TRequest = Record<string, unknown>, TResponse = 
       
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Generation failed';
-      setState(prev => ({ ...prev, error: errorMessage, isGenerating: false }));
-      options.onError?.(errorMessage);
+      // Retain raw error details in console logs for debugging (#2042)
+      logger.error(`Generation error at ${options.endpoint}:`, error);
+
+      const plainLanguageError = formatPlainLanguageError(error);
+      setState(prev => ({ ...prev, error: plainLanguageError, isGenerating: false }));
+      options.onError?.(plainLanguageError);
       throw error;
     }
   }, [options]);

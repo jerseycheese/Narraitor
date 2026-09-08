@@ -15,6 +15,8 @@ import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
 import { generatePortrait } from '@/lib/api/generatePortrait';
 
+import { formatPlainLanguageError } from '@/lib/utils/errorUtils';
+
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('CharacterEditor');
 
@@ -138,7 +140,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
       logger.error('Failed to generate portrait:', error);
-      setPortraitError("Couldn't generate a portrait. Try again in a moment.");
+      setPortraitError(formatPlainLanguageError(error));
     } finally {
       setGeneratingPortrait(false);
     }
