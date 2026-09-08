@@ -160,6 +160,23 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     };
   }
 
+  // Payload size errors
+  if (
+    message.includes('payload too large') ||
+    message.includes('payload_too_large') ||
+    message.includes('413')
+  ) {
+    return {
+      title: 'Payload Too Large',
+      message: "Couldn't generate this content because the input is too large.",
+      suggestion: 'Try shortening your physical description or prompt and try again.',
+      actionLabel: 'Try Again',
+      retryable: false,
+      type: ErrorType.VALIDATION,
+      severity: 'warning'
+    };
+  }
+
   // Validation errors
   if (message.includes('validation') || message.includes('invalid') ||
       message.includes('malformed') || message.includes('bad request') ||
@@ -185,6 +202,24 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     severity: 'error'
   };
 }
+
+/**
+ * Formats an error into a user-facing plain language message with an actionable next step,
+ * avoiding raw technical server strings (e.g. "Payload too large", "400 Bad Request").
+ */
+export function formatPlainLanguageError(error: unknown): string {
+  const err =
+    error instanceof Error
+      ? error
+      : new Error(typeof error === 'string' ? error : 'Generation failed');
+
+  const friendly = getUserFriendlyError(err);
+  if (friendly.suggestion) {
+    return `${friendly.message} ${friendly.suggestion}`;
+  }
+  return friendly.message;
+}
+
 
 /**
  * Creates a standardized UserFriendlyError for store operations

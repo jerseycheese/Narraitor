@@ -69,7 +69,7 @@ export function CharacterPortrait({
   if (error) {
     return (
       <div className={containerClasses} data-testid="character-portrait">
-        <div>
+        <div className="component-character-portrait-error">
           <span>{error}</span>
         </div>
       </div>

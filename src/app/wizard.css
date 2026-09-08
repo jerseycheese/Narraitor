@@ -248,6 +248,17 @@
   font-weight: 600;
 }
 
+.component-character-portrait-error {
+  padding: var(--space-3);
+  text-align: center;
+  font-size: var(--font-size-xs);
+  font-weight: normal;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+
 /* Character portrait placeholder — avatar thumbnail in Basic Info (#1434 / F55).
    Empty state shows a person icon instead of a stray floating "?". Matches the
    portrait preview's square + radius-md treatment for consistency. */

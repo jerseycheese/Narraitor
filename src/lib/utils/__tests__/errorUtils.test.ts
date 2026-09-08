@@ -6,6 +6,7 @@ import {
   ErrorType,
   isRetryableError,
   getUserFriendlyError,
+  formatPlainLanguageError,
   createStoreError
 } from '../errorUtils';
 
@@ -329,6 +330,33 @@ describe('errorUtils', () => {
 
       expect(error.type).toBe(ErrorType.NETWORK);
       expect(error.retryable).toBe(true);
+    });
+  });
+
+  describe('formatPlainLanguageError', () => {
+    it('formats Payload too large into plain language with actionable next step', () => {
+      const formatted = formatPlainLanguageError(new Error('Payload too large'));
+      expect(formatted).toBe(
+        "Couldn't generate this content because the input is too large. Try shortening your physical description or prompt and try again."
+      );
+    });
+
+    it('formats rate limit into plain language with actionable next step', () => {
+      const formatted = formatPlainLanguageError(new Error('429 rate limit exceeded'));
+      expect(formatted).toContain('Too many requests');
+      expect(formatted).toContain('Wait a minute or so before trying again');
+    });
+
+    it('formats missing API key error into plain language with setup guidance', () => {
+      const formatted = formatPlainLanguageError(new Error('API key not configured'));
+      expect(formatted).toContain('No API key configured for this provider');
+      expect(formatted).toContain('Add your API key in Settings > Provider Setup to play');
+    });
+
+    it('formats generic error into plain language message and suggestion', () => {
+      const formatted = formatPlainLanguageError(new Error('Unknown server crash'));
+      expect(formatted).toContain("That didn't work");
+      expect(formatted).toContain('try reloading the page');
     });
   });
 
