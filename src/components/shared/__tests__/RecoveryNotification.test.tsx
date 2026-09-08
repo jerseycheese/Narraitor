@@ -30,6 +30,19 @@ describe('RecoveryNotification', () => {
       expect(screen.getByText(/Jan 1, 2023/i)).toBeInTheDocument();
       expect(screen.getByText(/Last saved:/i)).toBeInTheDocument();
     });
+
+    test('renders warning icon with bounded dimensions', () => {
+      render(<RecoveryNotification {...defaultProps} />);
+
+      const contentDiv = document.getElementById('recovery-notification-content');
+      expect(contentDiv).toBeInTheDocument();
+
+      const icon = contentDiv?.querySelector('svg');
+      expect(icon).toBeInTheDocument();
+      expect(icon).toHaveAttribute('width', '48');
+      expect(icon).toHaveAttribute('height', '48');
+      expect(icon).toHaveClass('recovery-notification-icon');
+    });
   });
 
   describe('user interactions', () => {
