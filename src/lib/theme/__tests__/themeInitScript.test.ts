@@ -48,4 +48,10 @@ describe('THEME_INIT_SCRIPT', () => {
     executeInitScript(true);
     expect(document.documentElement.classList.contains('dark')).toBe(false);
   });
+
+  it('treats invalid or unrecognized stored scheme as system default on dark-mode OS', () => {
+    localStorage.setItem('narraitor-color-scheme', 'invalid-scheme');
+    executeInitScript(true);
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+  });
 });
