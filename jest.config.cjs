@@ -43,10 +43,12 @@ const config = {
     '<rootDir>/.next/',
     '<rootDir>/pages/',  // Ignore old pages directory
     '<rootDir>/app/',    // Ignore old app directory
-    '<rootDir>/.claude/worktrees/',  // Ignore git worktrees
+    '<rootDir>/.claude/worktrees/',   // Ignore git worktrees (current convention)
+    '<rootDir>/narraitor-worktrees/', // Ignore git worktrees (legacy path, still in .gitignore/tsconfig/stryker.config)
   ],
   modulePathIgnorePatterns: [
-    '<rootDir>/.claude/worktrees/',  // Ignore git worktrees for module resolution
+    '<rootDir>/.claude/worktrees/',   // Ignore git worktrees for module resolution (current convention)
+    '<rootDir>/narraitor-worktrees/', // Ignore git worktrees for module resolution (legacy path)
   ],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
