@@ -11,6 +11,7 @@ import {
   WizardFormSection,
   wizardStyles
 } from '@/components/shared/wizard';
+import Link from 'next/link';
 import { useProviderStore } from '@/state/providerStore';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
@@ -53,7 +54,8 @@ export default function BasicInfoStep({
           data-testid="provider-key-disclosure"
         >
           <AlertDescription>
-            Narraitor runs on your own provider key (Google Gemini, OpenAI, OpenRouter, or a local model). It&apos;s stored only in your browser, and there&apos;s no account needed.
+            Narraitor runs on your own provider key (Google Gemini, OpenAI, OpenRouter, or a local model). It&apos;s stored only in your browser, and there&apos;s no account needed.{' '}
+            <Link href="/settings/providers">Set up a provider</Link>.
           </AlertDescription>
         </Alert>
       )}

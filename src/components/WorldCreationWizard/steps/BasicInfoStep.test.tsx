@@ -160,6 +160,10 @@ describe('BasicInfoStep', () => {
     expect(disclosure).toHaveTextContent(
       /stored only in your browser, and there's no account needed/i
     );
+    expect(screen.getByRole('link', { name: 'Set up a provider' })).toHaveAttribute(
+      'href',
+      '/settings/providers'
+    );
   });
 
   test('does not render provider key requirement disclosure when a provider is configured', () => {
