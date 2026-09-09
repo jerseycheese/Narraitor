@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import BasicInfoStep from './BasicInfoStep';
 import { World } from '@/types/world.types';
+import { useProviderStore } from '@/state/providerStore';
 
 describe('BasicInfoStep', () => {
   const mockWorldData: Partial<World> = {
@@ -14,6 +15,7 @@ describe('BasicInfoStep', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    useProviderStore.setState({ providers: {} });
   });
 
   test('renders all required form fields', () => {
@@ -159,4 +161,32 @@ describe('BasicInfoStep', () => {
       /stored only in your browser, and there's no account needed/i
     );
   });
+
+  test('does not render provider key requirement disclosure when a provider is configured', () => {
+    useProviderStore.setState({
+      providers: {
+        p1: {
+          id: 'p1',
+          name: 'Gemini',
+          type: 'gemini',
+          endpoint: 'https://example.test',
+          model: 'gemini-2.5-flash',
+          capabilities: { text: true, images: false, streaming: true },
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+        },
+      },
+    });
+
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    expect(screen.queryByTestId('provider-key-disclosure')).not.toBeInTheDocument();
+  });
 });
+
