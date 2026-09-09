@@ -3,18 +3,10 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
-import { readJSON, removeKey } from '@/lib/utils/browserStorage';
-
-// Session key used to hand off generated world data into the wizard.
-// Read once on mount and then cleared so refreshes don't replay.
-const HANDOFF_KEYS = [
-  'generated-world-data',
-] as const;
 
 export default function CreateWorldPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [generatedData, setGeneratedData] = useState(null);
   const [initialStep, setInitialStep] = useState(0);
 
   useEffect(() => {
@@ -23,14 +15,6 @@ export default function CreateWorldPage() {
       const step = parseInt(stepParam, 10);
       if (!isNaN(step)) {
         setInitialStep(step);
-      }
-    }
-
-    for (const key of HANDOFF_KEYS) {
-      const data = readJSON<typeof generatedData>('session', key, null);
-      if (data) {
-        setGeneratedData(data);
-        removeKey('session', key);
       }
     }
   }, [searchParams]);
@@ -43,7 +27,6 @@ export default function CreateWorldPage() {
     router.push('/worlds');
   };
 
-  
   return (
     <section
       className="component-create-world-page wizard-page"
@@ -54,8 +37,7 @@ export default function CreateWorldPage() {
       <WorldCreationWizard
         onComplete={handleComplete}
         onCancel={handleCancel}
-        initialData={generatedData || undefined}
-        initialStep={initialStep} // Use step from URL parameter or default to 0
+        initialStep={initialStep}
       />
     </section>
   );

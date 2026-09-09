@@ -105,8 +105,9 @@ for generic), `state/` (Zustand stores — the source of truth for app data, plu
 - `create<StoreInterface>()(...)` in `src/state/`. CRUD-style store methods. `persist`
   middleware for state that survives reloads.
 - Cross-store events via `storeEvents` / `StoreEventTypes`. Static imports only.
-- Wizard step state goes through sessionStorage (`generated-world-data`); theme prefs
-  through localStorage.
+- World creation auto-saves drafts to `localStorage` under key `world-creation-draft` via
+  `useWorldCreationAutoSave`, with user-prompted recovery on return; step navigation via
+  query param `?step=N`. Theme prefs through `localStorage`.
 
 ### Styling
 
