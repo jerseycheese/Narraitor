@@ -80,7 +80,6 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
       <WizardFormSection
         title="Allocate Attribute Points"
         description={`Distribute ${data.pointPools.attributes.total} points across your character's attributes. Each attribute affects different aspects of gameplay.`}
-        dataTutorial="attribute-allocation"
       >
       <PointPoolManager
         allocations={allocations}
@@ -89,6 +88,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
           label: 'Attribute Points'
         }}
         onChange={handleAttributeChange}
+        dataTutorial="attribute-allocation"
       />
 
       {/* Validation errors */}

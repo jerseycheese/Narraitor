@@ -73,7 +73,6 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
       <WizardFormSection
         title="Character Background"
         description="Provide details about your character's history, personality, and motivations."
-        dataTutorial="background-editor"
       >
       {/* Helpful tip */}
       <div>
@@ -89,6 +88,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
         </Label>
         <Textarea
           id="character-history"
+          data-tutorial="background-editor"
           value={data.characterData.background.history}
           onChange={handleHistoryChange}
           onBlur={handleBlur}

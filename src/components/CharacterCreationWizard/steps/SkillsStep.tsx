@@ -259,7 +259,6 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       <WizardFormSection
         title="Allocate Skill Points"
         description={`Choose up to ${maxSelectable} starting skills and distribute ${totalSkillPoints} skill points across them.`}
-        dataTutorial="skill-selection"
       >
       <div className="wizard-skill-intro">
         <p>
@@ -294,7 +293,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
         </div>
       </div>
 
-      <div className="wizard-skill-allocation-list">
+      <div className="wizard-skill-allocation-list" data-tutorial="skill-selection">
         {data.characterData.skills.map((skill, index) => {
           const bounds = boundsBySkillId.get(skill.skillId) ?? resolveSkillBounds(skill, worldConfig);
           const cost = costBySkillId.get(skill.skillId) ?? 0;

@@ -26,6 +26,22 @@ describe('characterCreationWizardTour', () => {
     expect(step?.placement).toBe('bottom');
   });
 
+  it('keeps the background editor tooltip constrained to vertical placements', () => {
+    const step = characterCreationWizardTour.find(
+      (tourStep) => tourStep.target === '[data-tutorial="background-editor"]',
+    );
+
+    expect(step?.placement).toBe('top');
+  });
+
+  it('keeps the portrait action tooltip constrained to vertical placements', () => {
+    const step = characterCreationWizardTour.find(
+      (tourStep) => tourStep.target === '[data-tutorial="portrait-generator-action"]',
+    );
+
+    expect(step?.placement).toBe('top');
+  });
+
   it('disables joyride scrolling for wizard steps', () => {
     const stepsWithoutDisableScrolling = characterCreationWizardTour.filter(
       (step) => step.disableScrolling !== true,
