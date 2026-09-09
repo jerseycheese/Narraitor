@@ -617,7 +617,10 @@ export async function seedTestData(page: Page): Promise<void> {
           tutorialProgress: {
             phases: {
               intro: { completed: true, skipped: false },
-              worldCreation: { completed: true, skipped: false, lastStep: 6 },
+              // lastStep must clear the highest tour index that maps to a wizard
+              // step, or WorldCreationWizard's shouldAutoStartTour re-launches the
+              // tour and its step-sync effect fights manual wizard navigation.
+              worldCreation: { completed: true, skipped: false, lastStep: 999 },
               worldGeneration: { completed: true, skipped: false, lastStep: 0 },
               characterCreation: { completed: true, skipped: false, lastStep: 5 },
               firstPlay: { completed: true, skipped: false },
