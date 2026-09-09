@@ -4,6 +4,7 @@ import React, { useMemo, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { useProviderStore } from '@/state/providerStore';
 import { World } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
@@ -106,6 +107,7 @@ export default function WorldCreationWizard({
   const createWorld = useWorldStore((state) => state.createWorld);
   const { startTour, setCurrentWizardStep, isTourActive, isPaused, pauseTour, resumeTour, stepIndex, currentTour } = useTutorial();
   const worldCreationProgress = useSessionStore(state => state.tutorialProgress.phases.worldCreation);
+  const hasConfiguredKey = useProviderStore((s) => Object.keys(s.providers).length > 0);
   
   // Initialize world creation data
   // Note: initialData spread at the end takes precedence over defaults,
@@ -329,14 +331,19 @@ export default function WorldCreationWizard({
         aiSuggestionsGenerated: true,
         aiSuggestionMeta: buildSuggestionMeta(description, 'fallback'),
       });
+      // The generic "service trouble" message is wrong when the real cause is
+      // no provider key at all — that's not a service outage, and telling the
+      // player to wait for it to "recover" is a dead end with no actual fix.
       wizard.setError(
         'ai',
-        'We had trouble reaching the generation service, so we loaded starter suggestions. You can generate again once the service recovers.'
+        hasConfiguredKey
+          ? 'We had trouble reaching the generation service, so we loaded starter suggestions. You can generate again once the service recovers.'
+          : 'Generating suggestions needs a provider key. Add one in Settings, then regenerate — starter suggestions are loaded for now.'
       );
     } finally {
       wizard.setProcessing(false);
     }
-  }, [wizard]);
+  }, [wizard, hasConfiguredKey]);
 
   const clearAISuggestions = useCallback(() => {
     wizard.updateData({
