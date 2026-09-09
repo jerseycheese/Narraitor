@@ -43,10 +43,10 @@ const config = {
     '<rootDir>/.next/',
     '<rootDir>/pages/',  // Ignore old pages directory
     '<rootDir>/app/',    // Ignore old app directory
-    '<rootDir>/narraitor-worktrees/',  // Ignore git worktrees
+    '<rootDir>/.claude/worktrees/',  // Ignore git worktrees
   ],
   modulePathIgnorePatterns: [
-    '<rootDir>/narraitor-worktrees/',  // Ignore git worktrees for module resolution
+    '<rootDir>/.claude/worktrees/',  // Ignore git worktrees for module resolution
   ],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
