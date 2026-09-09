@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import BasicInfoStep from './BasicInfoStep';
 import { World } from '@/types/world.types';
+import { useProviderStore } from '@/state/providerStore';
 
 describe('BasicInfoStep', () => {
   const mockWorldData: Partial<World> = {
@@ -14,6 +15,7 @@ describe('BasicInfoStep', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    useProviderStore.setState({ providers: {} });
   });
 
   test('renders all required form fields', () => {
@@ -140,4 +142,55 @@ describe('BasicInfoStep', () => {
     expect(screen.getByText('Name is too short')).toBeInTheDocument();
   });
 
+  test('renders provider key requirement disclosure with accessible alert role', () => {
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    const disclosure = screen.getByTestId('provider-key-disclosure');
+    expect(disclosure).toBeInTheDocument();
+    expect(disclosure).toHaveAttribute('role', 'alert');
+    expect(disclosure).toHaveTextContent(
+      /Narraitor runs on your own provider key \(Google Gemini, OpenAI, OpenRouter, or a model you host yourself\)/i
+    );
+    expect(disclosure).toHaveTextContent(
+      /stored only in your browser, and there's no account needed/i
+    );
+    expect(screen.getByRole('link', { name: 'Set up a provider' })).toHaveAttribute(
+      'href',
+      '/settings/providers'
+    );
+  });
+
+  test('does not render provider key requirement disclosure when a provider is configured', () => {
+    useProviderStore.setState({
+      providers: {
+        p1: {
+          id: 'p1',
+          name: 'Gemini',
+          type: 'gemini',
+          endpoint: 'https://example.test',
+          model: 'gemini-2.5-flash',
+          capabilities: { text: true, images: false, streaming: true },
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+        },
+      },
+    });
+
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    expect(screen.queryByTestId('provider-key-disclosure')).not.toBeInTheDocument();
+  });
 });
+
