@@ -11,6 +11,7 @@ import {
   WizardFormSection,
   wizardStyles
 } from '@/components/shared/wizard';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { GENRES, type GenreValue } from '@/lib/constants/genres';
@@ -34,12 +35,22 @@ export default function BasicInfoStep({
   const guidance = getWorldGuidance(worldData.genre as GenreValue | undefined);
 
   return (
-    <div data-testid="basic-info-step">
+    <div className="component-basic-info-step" data-testid="basic-info-step">
       {/* Main step header */}
       <div>
         <h2 className={wizardStyles.step.title}>Basic Information</h2>
         <p className={wizardStyles.step.description}>Let&apos;s start with some basic information about your world and configure how stories will be told.</p>
       </div>
+
+      <Alert
+        variant="info"
+        className="component-provider-key-disclosure wizard-byok-disclosure"
+        data-testid="provider-key-disclosure"
+      >
+        <AlertDescription>
+          Narraitor runs on your own provider key (Google Gemini, OpenAI, OpenRouter, or a local model). It&apos;s stored only in your browser, and there&apos;s no account needed.
+        </AlertDescription>
+      </Alert>
 
       <WizardFormSection
         title="World Details"

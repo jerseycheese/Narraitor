@@ -2293,3 +2293,10 @@
 .component-world-creation-wizard .wizard-review-card-head {
   gap: var(--space-2);
 }
+
+/* ─── F18 — provider key disclosure (#2044) ─── */
+
+.component-world-creation-wizard .wizard-byok-disclosure {
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-3);
+}

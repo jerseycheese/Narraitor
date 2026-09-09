@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { World } from '@/types/world.types';
 import { GeneratedImage } from '@/types/common.types';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DataField } from '@/components/shared/DataField';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
@@ -101,7 +102,7 @@ export default function FinalizeStep({
   };
   
   return (
-    <div data-testid="finalize-step">
+    <div className="component-finalize-step" data-testid="finalize-step">
       <WizardFormSection
         title="Review Your World"
         description="Review your world configuration before creating it."
@@ -238,6 +239,16 @@ export default function FinalizeStep({
           {errors.submit}
         </div>
       )}
+
+      <Alert
+        variant="info"
+        className="component-provider-key-disclosure wizard-byok-disclosure"
+        data-testid="finalize-provider-key-disclosure"
+      >
+        <AlertDescription>
+          Stories and images are generated using your own provider key. It&apos;s kept in your browser, and there&apos;s no account needed.
+        </AlertDescription>
+      </Alert>
 
       <div className="wizard-button-row">
         <div className="wizard-nav-group">

@@ -140,4 +140,23 @@ describe('BasicInfoStep', () => {
     expect(screen.getByText('Name is too short')).toBeInTheDocument();
   });
 
+  test('renders provider key requirement disclosure with accessible alert role', () => {
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    const disclosure = screen.getByTestId('provider-key-disclosure');
+    expect(disclosure).toBeInTheDocument();
+    expect(disclosure).toHaveAttribute('role', 'alert');
+    expect(disclosure).toHaveTextContent(
+      /Narraitor runs on your own provider key \(Google Gemini, OpenAI, OpenRouter, or a local model\)/i
+    );
+    expect(disclosure).toHaveTextContent(
+      /stored only in your browser, and there's no account needed/i
+    );
+  });
 });
