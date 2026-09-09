@@ -155,7 +155,7 @@ describe('BasicInfoStep', () => {
     expect(disclosure).toBeInTheDocument();
     expect(disclosure).toHaveAttribute('role', 'alert');
     expect(disclosure).toHaveTextContent(
-      /Narraitor runs on your own provider key \(Google Gemini, OpenAI, OpenRouter, or a local model\)/i
+      /Narraitor runs on your own provider key \(Google Gemini, OpenAI, OpenRouter, or a model you host yourself\)/i
     );
     expect(disclosure).toHaveTextContent(
       /stored only in your browser, and there's no account needed/i
