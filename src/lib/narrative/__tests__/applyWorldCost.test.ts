@@ -221,4 +221,45 @@ describe('applyWorldCost', () => {
     expect(note).toEqual({ imposed: [], cleared: [], fatal: true });
     expect(useCharacterStore.getState().characters['char-1'].status.conditions).toEqual(['shaken']);
   });
+
+  it('records decisionId only on costs where causedByDecision is true', () => {
+    const note = applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      decisionId: 'decision-99',
+      result: {
+        imposed: [
+          { kind: 'condition', detail: 'gashed left forearm', causedByDecision: true },
+          { kind: 'item', detail: 'rusty shovel', threadId, causedByDecision: false },
+          { kind: 'item', detail: 'flashlight' },
+        ],
+        cleared: [],
+        fatal: false,
+      },
+    });
+
+    expect(note.imposed).toEqual([
+      { kind: 'condition', detail: 'gashed left forearm', decisionId: 'decision-99' },
+      { kind: 'item', detail: 'rusty shovel', thread: 'The creature comes through the shed wall' },
+      { kind: 'item', detail: 'flashlight' },
+    ]);
+  });
+
+  it('omits decisionId when no decisionId was provided even if causedByDecision is true', () => {
+    const note = applyWorldCost({
+      sessionId: 'session-1',
+      characterId: 'char-1',
+      result: {
+        imposed: [
+          { kind: 'condition', detail: 'gashed left forearm', causedByDecision: true },
+        ],
+        cleared: [],
+        fatal: false,
+      },
+    });
+
+    expect(note.imposed).toEqual([
+      { kind: 'condition', detail: 'gashed left forearm' },
+    ]);
+  });
 });

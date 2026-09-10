@@ -110,7 +110,12 @@ async function reconcileSegment({
     // something. The extractor can only cite ids it was handed, so nothing it
     // attributes can belong to a thread opened by this same result.
     if (result.worldCost && playerCharacterId) {
-      notes.worldCost = applyWorldCost({ sessionId, characterId: playerCharacterId, result: result.worldCost });
+      notes.worldCost = applyWorldCost({
+        sessionId,
+        characterId: playerCharacterId,
+        result: result.worldCost,
+        decisionId: segment.metadata?.causedByDecisionId,
+      });
     }
 
     if (clockOn && result.worldThreads && worldId) {
@@ -153,12 +158,19 @@ function buildThreadInput(
 }
 
 /** What the character carries and what the scene took this turn, so the extractor records against real state. */
-function buildCostInput(characterId: EntityID, segment: NarrativeSegment): WorldCostExtractionInput | undefined {
+export function buildCostInput(characterId: EntityID, segment: NarrativeSegment): WorldCostExtractionInput | undefined {
   const character = useCharacterStore.getState().characters[characterId];
   if (!character) return undefined;
   return {
     conditions: character.status.conditions,
     itemsLost: segment.metadata?.itemsLost?.map((item) => item.name) ?? [],
+    decision: segment.metadata?.causedByDecisionId
+      ? {
+          id: segment.metadata.causedByDecisionId,
+          text: segment.metadata.causedByDecisionText ?? '',
+          outcome: segment.metadata.decisionOutcome,
+        }
+      : undefined,
   };
 }
 

@@ -9,6 +9,7 @@ export interface ApplyWorldCostParams {
   sessionId: EntityID;
   characterId: EntityID;
   result: WorldCostExtractionResult;
+  decisionId?: EntityID;
 }
 
 /**
@@ -17,7 +18,7 @@ export interface ApplyWorldCostParams {
  * out of the inventory. Either kind is recorded on the thread that imposed
  * it when the extractor named one of this session's open threads.
  */
-export function applyWorldCost({ sessionId, characterId, result }: ApplyWorldCostParams): WorldCostSegmentNote {
+export function applyWorldCost({ sessionId, characterId, result, decisionId }: ApplyWorldCostParams): WorldCostSegmentNote {
   const characterStore = useCharacterStore.getState();
   const threadStore = useWorldThreadStore.getState();
   const note: WorldCostSegmentNote = { imposed: [], cleared: [] };
@@ -57,10 +58,12 @@ export function applyWorldCost({ sessionId, characterId, result }: ApplyWorldCos
       characterStore.addCondition(characterId, cost.detail);
     }
     const thread = cost.threadId ? threadStore.recordThreadCost(sessionId, cost.threadId, cost.detail) : undefined;
+    const causedByThisDecision = cost.causedByDecision && decisionId;
     note.imposed.push({
       kind: cost.kind,
       detail: cost.detail,
       ...(thread ? { thread: thread.summary } : {}),
+      ...(causedByThisDecision ? { decisionId } : {}),
     });
   }
 
