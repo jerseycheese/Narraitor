@@ -234,8 +234,13 @@ export default function WorldCreationWizard({
     setCurrentWizardStep(wizard.state.currentStep);
   }, [wizard.state.currentStep, setCurrentWizardStep]);
 
-  // Sync tour step index to wizard step when tour is active and not paused for recovery
+  const prevStepIndexRef = React.useRef(stepIndex);
+
+  // Sync tour step index to wizard step when tour step index advances while tour is active and not paused for recovery
   React.useEffect(() => {
+    const prevStepIndex = prevStepIndexRef.current;
+    prevStepIndexRef.current = stepIndex;
+
     if (
       !isTourActive ||
       isPaused ||
@@ -245,6 +250,11 @@ export default function WorldCreationWizard({
     ) {
       return;
     }
+
+    if (prevStepIndex === stepIndex) {
+      return;
+    }
+
     const targetWizardStep = tourStepToWizardStep[stepIndex];
     if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
       wizard.goToStep(targetWizardStep);
