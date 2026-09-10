@@ -4,6 +4,47 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.6.0 - 2026-09-10
+
+v1.5 catalogued what the new-player path gets wrong. v1.6 fixes it. The milestone closes 12 issues from the [#2022](https://github.com/jerseycheese/Narraitor/issues/2022) discovery sweep across 14 commits since [v1.5.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.5.0), and picks up a production bug that turned out to break every dynamic route in the app.
+
+**What's in this release**
+
+The production fix comes first, because it is the one players actually hit:
+
+- Every dynamic `[id]` route rendered the client error boundary in production. World detail, world edit, world play, character detail and character edit all showed "Something Went Wrong" instead of the page. The cause was a module-scope `fs.readFileSync` of `public/` in `opengraph-image.tsx`: static routes prerender on the build worker where `public/` is on disk, but on-demand routes evaluate that module inside the serverless function, where it is not. The logo is now inlined as a data URI, so module evaluation never touches the filesystem ([#2062](https://github.com/jerseycheese/Narraitor/issues/2062)).
+
+The new-player path, from the [#2022](https://github.com/jerseycheese/Narraitor/issues/2022) sweep:
+
+- World creation no longer loses everything typed when the page reloads. Drafts auto-save and offer recovery on return ([#2034](https://github.com/jerseycheese/Narraitor/issues/2034)).
+- The character creation tutorial shows all five of its steps rather than one. Wizard steps advance on Joyride's Next, and the tour now requires full completion before onboarding retires ([#2037](https://github.com/jerseycheese/Narraitor/issues/2037)).
+- The tutorial spotlight highlights the field it describes instead of the section header above it ([#2040](https://github.com/jerseycheese/Narraitor/issues/2040)).
+- Portrait failures show plain language with an actionable next step, not the raw server error string ([#2042](https://github.com/jerseycheese/Narraitor/issues/2042)).
+- First load respects a dark-mode machine. An unchosen color scheme defaults to the system preference rather than pinning light ([#2045](https://github.com/jerseycheese/Narraitor/issues/2045)).
+- The bring-your-own-key requirement is disclosed inside the world creation wizard, not only at the bottom of the landing page ([#2044](https://github.com/jerseycheese/Narraitor/issues/2044)).
+- Dialog panels use an opaque surface token. They had been rendering 20% transparent with no backdrop blur ([#2039](https://github.com/jerseycheese/Narraitor/issues/2039)).
+- The character recovery dialog's warning icon renders at its intended size instead of 438px ([#2038](https://github.com/jerseycheese/Narraitor/issues/2038)).
+- `generated-world-data` was read but never written. The dead handoff is gone and CLAUDE.md no longer documents it ([#2043](https://github.com/jerseycheese/Narraitor/issues/2043)).
+
+Security and CI:
+
+- Cleared a critical unauthenticated Next.js RCE and a high-severity libheif issue in `sharp`. Both advisories had gone red on `develop` and on every open PR. Next.js moves within the 15.5 line and the existing `sharp` override rises to 0.35.4, so no major-version bump was needed ([#2066](https://github.com/jerseycheese/Narraitor/issues/2066)).
+- The CI security scan gained an advisory full-dependency audit alongside the gating production one ([#2061](https://github.com/jerseycheese/Narraitor/pull/2061)).
+- `seedTestData` no longer re-triggers the world-creation tour. Its runtime setState path seeded `worldCreation.lastStep: 6` while two other paths in the same file used `999`, so the tour relaunched after seeding and dragged the wizard back to step 0 mid-test ([#2067](https://github.com/jerseycheese/Narraitor/issues/2067)).
+- The test config ignores `.claude/worktrees/` rather than a path where worktrees have never lived, which removes roughly forty duplicate-mock warnings from the head of every local run ([#2025](https://github.com/jerseycheese/Narraitor/issues/2025)).
+
+**Known incomplete**
+
+Three of the twelve milestone issues ([#2035](https://github.com/jerseycheese/Narraitor/issues/2035), [#2036](https://github.com/jerseycheese/Narraitor/issues/2036), [#2041](https://github.com/jerseycheese/Narraitor/issues/2041)) landed early and already shipped in v1.5. They count toward the milestone but are not new here.
+
+One live regression came out of this release's own tutorial work. The world-creation tour reverts a manual "Next" click: the step-sync effect added in [#2037](https://github.com/jerseycheese/Narraitor/issues/2037) fires whenever the wizard diverges from the tour's step index, including when the player caused that divergence by moving ahead, and it can only pull the wizard back toward the tour. Filed as [#2069](https://github.com/jerseycheese/Narraitor/issues/2069) and carried into v1.7.
+
+**What's next**
+
+- Milestone v1.7, "the world answers back". The [#1818](https://github.com/jerseycheese/Narraitor/issues/1818) playtest campaign found the engine to be purely reactive, and most of that campaign has since shipped. What remains is the link between a decision and its consequence: charging world costs to the decisions that incur them ([#2020](https://github.com/jerseycheese/Narraitor/issues/2020)), giving choices without explicit alignment metadata a real category ([#666](https://github.com/jerseycheese/Narraitor/issues/666)), and adding session-level pacing for long sessions ([#805](https://github.com/jerseycheese/Narraitor/issues/805)), plus the [#2069](https://github.com/jerseycheese/Narraitor/issues/2069) carry-in.
+
+---
+
 ## v1.5.0 - 2026-09-07
 
 Where earlier releases built out capabilities and continuity guards on faith and live matrices, v1.5 makes the core game loop observable to automated tests and opens the UX backlog with an empirical discovery sweep over the new-player path. The v1.5 milestone closes 6 issues across 12 commits since [v1.4.0](https://github.com/jerseycheese/narraitor/releases/tag/v1.4.0), with no known-incomplete tail — unfinished work drops directly to v1.6.
